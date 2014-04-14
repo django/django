@@ -33,5 +33,14 @@ class ReverseSingleRelatedTests(TestCase):
         # of the "bare" queryset. Usually you'd define this as a property on the class,
         # but this approximates that in a way that's easier in tests.
         Source.objects.use_for_related_fields = True
-        private_item = Item.objects.get(pk=private_item.pk)
-        self.assertRaises(Source.DoesNotExist, lambda: private_item.source)
+        try:
+            private_item = Item.objects.get(pk=private_item.pk)
+            self.assertRaises(Source.DoesNotExist, lambda: private_item.source)
+        finally:
+            Source.objects.use_for_related_fields = False
+
+    def test_hasattr_single_related(self):
+        # The exception raised on attribute access when a related object
+        # doesn't exist should be an instance of a subclass of `AttributeError`
+        # refs #21563
+        self.assertFalse(hasattr(Item(), 'source'))

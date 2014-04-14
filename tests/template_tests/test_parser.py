@@ -7,7 +7,7 @@ from unittest import TestCase
 
 from django.template import (TokenParser, FilterExpression, Parser, Variable,
     Template, TemplateSyntaxError, Library)
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils import six
 
 
@@ -58,9 +58,7 @@ class ParserTests(TestCase):
 
         # Filtered variables should reject access of attributes beginning with
         # underscores.
-        self.assertRaises(TemplateSyntaxError,
-            FilterExpression, "article._hidden|upper", p
-        )
+        self.assertRaises(TemplateSyntaxError, FilterExpression, "article._hidden|upper", p)
 
     def test_variable_parsing(self):
         c = {"article": {"section": "News"}}
@@ -83,9 +81,7 @@ class ParserTests(TestCase):
 
         # Variables should reject access of attributes beginning with
         # underscores.
-        self.assertRaises(TemplateSyntaxError,
-            Variable, "article._hidden"
-        )
+        self.assertRaises(TemplateSyntaxError, Variable, "article._hidden")
 
         # Variables should raise on non string type
         with six.assertRaisesRegex(self, TypeError, "Variable must be a string or number, got <(class|type) 'dict'>"):

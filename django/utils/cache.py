@@ -191,25 +191,25 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
         value = request.META.get(header, None)
         if value is not None:
             ctx.update(force_bytes(value))
-    path = hashlib.md5(force_bytes(iri_to_uri(request.get_full_path())))
+    url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
-        key_prefix, method, path.hexdigest(), ctx.hexdigest())
+        key_prefix, method, url.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 
 
 def _generate_cache_header_key(key_prefix, request):
     """Returns a cache key for the header cache."""
-    path = hashlib.md5(force_bytes(iri_to_uri(request.get_full_path())))
+    url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
-        key_prefix, path.hexdigest())
+        key_prefix, url.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 
 
 def get_cache_key(request, key_prefix=None, method='GET', cache=None):
     """
-    Returns a cache key based on the request path and query. It can be used
+    Returns a cache key based on the request URL and query. It can be used
     in the request phase because it pulls the list of headers to take into
-    account from the global path registry and uses those to build a cache key
+    account from the global URL registry and uses those to build a cache key
     to check against.
 
     If there is no headerlist stored, the page needs to be rebuilt, so this
@@ -229,9 +229,9 @@ def get_cache_key(request, key_prefix=None, method='GET', cache=None):
 
 def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cache=None):
     """
-    Learns what headers to take into account for some request path from the
-    response object. It stores those headers in a global path registry so that
-    later access to that path will know what headers to take into account
+    Learns what headers to take into account for some request URL from the
+    response object. It stores those headers in a global URL registry so that
+    later access to that URL will know what headers to take into account
     without building the response object itself. The headers are named in the
     Vary header of the response, but we want to prevent response generation.
 
@@ -264,7 +264,7 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         return _generate_cache_key(request, request.method, headerlist, key_prefix)
     else:
         # if there is no Vary header, we still need a cache key
-        # for the request.get_full_path()
+        # for the request.build_absolute_uri()
         cache.set(cache_key, [], cache_timeout)
         return _generate_cache_key(request, request.method, [], key_prefix)
 

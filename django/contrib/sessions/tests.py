@@ -20,8 +20,8 @@ from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core import management
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings, patch_logger
+from django.test import TestCase, RequestFactory, override_settings
+from django.test.utils import patch_logger
 from django.utils import six
 from django.utils import timezone
 
@@ -141,7 +141,7 @@ class SessionTestsMixin(object):
 
     def test_save(self):
         if (hasattr(self.session, '_cache') and 'DummyCache' in
-            settings.CACHES[settings.SESSION_CACHE_ALIAS]['BACKEND']):
+                settings.CACHES[settings.SESSION_CACHE_ALIAS]['BACKEND']):
             raise unittest.SkipTest("Session saving tests require a real cache backend")
         self.session.save()
         self.assertTrue(self.session.exists(self.session.session_key))
@@ -446,7 +446,7 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
 
         def count_sessions():
             return len([session_file for session_file in os.listdir(storage_path)
-                                     if session_file.startswith(file_prefix)])
+                if session_file.startswith(file_prefix)])
 
         self.assertEqual(0, count_sessions())
 

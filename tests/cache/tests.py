@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import os
 import re
+import copy
 import shutil
 import tempfile
 import threading
@@ -15,17 +16,17 @@ import warnings
 
 from django.conf import settings
 from django.core import management
-from django.core.cache import cache, caches, CacheKeyWarning, InvalidCacheBackendError
-from django.db import connection, router, transaction
+from django.core.cache import (cache, caches, CacheKeyWarning,
+    InvalidCacheBackendError, DEFAULT_CACHE_ALIAS)
+from django.db import connection, connections, router, transaction
 from django.core.cache.utils import make_template_fragment_key
 from django.http import HttpResponse, StreamingHttpResponse
 from django.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
 from django.template import Template
 from django.template.response import TemplateResponse
-from django.test import TestCase, TransactionTestCase, RequestFactory
-from django.test.utils import (override_settings, IgnoreDeprecationWarningsMixin,
-    IgnorePendingDeprecationWarningsMixin)
+from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils import six
 from django.utils import timezone
 from django.utils import translation
@@ -494,7 +495,7 @@ class BaseCacheTests(object):
 
     def test_zero_timeout(self):
         '''
-        Passing in None into timeout results in a value that is cached forever
+        Passing in zero into timeout results in a value that is not cached
         '''
         cache.set('key1', 'eggs', 0)
         self.assertEqual(cache.get('key1'), None)
@@ -896,10 +897,9 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         management.call_command('createcachetable', verbosity=0, interactive=False)
 
     def drop_table(self):
-        cursor = connection.cursor()
-        table_name = connection.ops.quote_name('test cache table')
-        cursor.execute('DROP TABLE %s' % table_name)
-        cursor.close()
+        with connection.cursor() as cursor:
+            table_name = connection.ops.quote_name('test cache table')
+            cursor.execute('DROP TABLE %s' % table_name)
 
     def test_zero_cull(self):
         self._perform_cull_test(caches['zero_cull'], 50, 18)
@@ -981,14 +981,29 @@ class CreateCacheTableForDBCacheTests(TestCase):
             # cache table should be created on 'other'
             # Queries:
             #   1: check table doesn't already exist
-            #   2: create the table
-            #   3: create the index
-            with self.assertNumQueries(3, using='other'):
+            #   2: create savepoint (if transactional DDL is supported)
+            #   3: create the table
+            #   4: create the index
+            #   5: release savepoint (if transactional DDL is supported)
+            num = 5 if connections['other'].features.can_rollback_ddl else 3
+            with self.assertNumQueries(num, using='other'):
                 management.call_command('createcachetable',
                                         database='other',
                                         verbosity=0, interactive=False)
         finally:
             router.routers = old_routers
+
+
+class PicklingSideEffect(object):
+
+    def __init__(self, cache):
+        self.cache = cache
+        self.locked = False
+
+    def __getstate__(self):
+        if self.cache._lock.active_writers:
+            self.locked = True
+        return {}
 
 
 @override_settings(CACHES=caches_setting_for_tests(
@@ -1025,6 +1040,15 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         cache.set('value', 42)
         self.assertEqual(caches['default'].get('value'), 42)
         self.assertEqual(caches['other'].get('value'), None)
+
+    def test_locking_on_pickle(self):
+        """#20613/#18541 -- Ensures pickling is done outside of the lock."""
+        bad_obj = PicklingSideEffect(cache)
+        cache.set('set', bad_obj)
+        self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
+
+        cache.add('add', bad_obj)
+        self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
 
     def test_incr_decr_timeout(self):
         """incr/decr does not modify expiry time (matches memcached behavior)"""
@@ -1152,10 +1176,10 @@ class CustomCacheKeyValidationTests(TestCase):
         }
     }
 )
-class GetCacheTests(IgnorePendingDeprecationWarningsMixin, TestCase):
+class GetCacheTests(IgnoreDeprecationWarningsMixin, TestCase):
 
     def test_simple(self):
-        from django.core.cache import caches, DEFAULT_CACHE_ALIAS, get_cache
+        from django.core.cache import caches, get_cache
         self.assertIsInstance(
             caches[DEFAULT_CACHE_ALIAS],
             get_cache('default').__class__
@@ -1184,6 +1208,82 @@ class GetCacheTests(IgnorePendingDeprecationWarningsMixin, TestCase):
         self.assertTrue(cache.closed)
 
 
+DEFAULT_MEMORY_CACHES_SETTINGS = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+NEVER_EXPIRING_CACHES_SETTINGS = copy.deepcopy(DEFAULT_MEMORY_CACHES_SETTINGS)
+NEVER_EXPIRING_CACHES_SETTINGS['default']['TIMEOUT'] = None
+
+
+class DefaultNonExpiringCacheKeyTests(TestCase):
+    """Tests that verify that settings having Cache arguments with a TIMEOUT
+    set to `None` will create Caches that will set non-expiring keys.
+
+    This fixes ticket #22085.
+    """
+    def setUp(self):
+        # The 5 minute (300 seconds) default expiration time for keys is
+        # defined in the implementation of the initializer method of the
+        # BaseCache type.
+        self.DEFAULT_TIMEOUT = caches[DEFAULT_CACHE_ALIAS].default_timeout
+
+    def tearDown(self):
+        del(self.DEFAULT_TIMEOUT)
+
+    def test_default_expiration_time_for_keys_is_5_minutes(self):
+        """The default expiration time of a cache key is 5 minutes.
+
+        This value is defined inside the __init__() method of the
+        :class:`django.core.cache.backends.base.BaseCache` type.
+        """
+        self.assertEqual(300, self.DEFAULT_TIMEOUT)
+
+    def test_caches_with_unset_timeout_has_correct_default_timeout(self):
+        """Caches that have the TIMEOUT parameter undefined in the default
+        settings will use the default 5 minute timeout.
+        """
+        cache = caches[DEFAULT_CACHE_ALIAS]
+        self.assertEqual(self.DEFAULT_TIMEOUT, cache.default_timeout)
+
+    @override_settings(CACHES=NEVER_EXPIRING_CACHES_SETTINGS)
+    def test_caches_set_with_timeout_as_none_has_correct_default_timeout(self):
+        """Memory caches that have the TIMEOUT parameter set to `None` in the
+        default settings with have `None` as the default timeout.
+
+        This means "no timeout".
+        """
+        cache = caches[DEFAULT_CACHE_ALIAS]
+        self.assertIs(None, cache.default_timeout)
+        self.assertEqual(None, cache.get_backend_timeout())
+
+    @override_settings(CACHES=DEFAULT_MEMORY_CACHES_SETTINGS)
+    def test_caches_with_unset_timeout_set_expiring_key(self):
+        """Memory caches that have the TIMEOUT parameter unset will set cache
+        keys having the default 5 minute timeout.
+        """
+        key = "my-key"
+        value = "my-value"
+        cache = caches[DEFAULT_CACHE_ALIAS]
+        cache.set(key, value)
+        cache_key = cache.make_key(key)
+        self.assertNotEqual(None, cache._expire_info[cache_key])
+
+    @override_settings(CACHES=NEVER_EXPIRING_CACHES_SETTINGS)
+    def text_caches_set_with_timeout_as_none_set_non_expiring_key(self):
+        """Memory caches that have the TIMEOUT parameter set to `None` will set
+        a non expiring key by default.
+        """
+        key = "another-key"
+        value = "another-value"
+        cache = caches[DEFAULT_CACHE_ALIAS]
+        cache.set(key, value)
+        cache_key = cache.make_key(key)
+        self.assertEqual(None, cache._expire_info[cache_key])
+
+
 @override_settings(
     CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
     CACHE_MIDDLEWARE_SECONDS=1,
@@ -1198,8 +1298,20 @@ class CacheUtils(TestCase):
     """TestCase for django.utils.cache functions."""
 
     def setUp(self):
+        self.host = 'www.example.com'
         self.path = '/cache/test/'
-        self.factory = RequestFactory()
+        self.factory = RequestFactory(HTTP_HOST=self.host)
+
+    def _get_request_cache(self, method='GET', query_string=None, update_cache=None):
+        request = self._get_request(self.host, self.path,
+                                    method, query_string=query_string)
+        request._cache_update_cache = True if not update_cache else update_cache
+        return request
+
+    def _set_cache(self, request, msg):
+        response = HttpResponse()
+        response.content = msg
+        return UpdateCacheMiddleware().process_response(request, response)
 
     def test_patch_vary_headers(self):
         headers = (
@@ -1229,10 +1341,19 @@ class CacheUtils(TestCase):
         self.assertEqual(get_cache_key(request), None)
         # Set headers to an empty list.
         learn_cache_key(request, response)
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
+
+        self.assertEqual(
+            get_cache_key(request),
+            'views.decorators.cache.cache_page.settingsprefix.GET.'
+            '18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e'
+        )
         # Verify that a specified key_prefix is taken into account.
         learn_cache_key(request, response, key_prefix=key_prefix)
-        self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(
+            get_cache_key(request, key_prefix=key_prefix),
+            'views.decorators.cache.cache_page.localprefix.GET.'
+            '18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e'
+        )
 
     def test_get_cache_key_with_query(self):
         request = self.factory.get(self.path, {'test': 1})
@@ -1242,7 +1363,22 @@ class CacheUtils(TestCase):
         # Set headers to an empty list.
         learn_cache_key(request, response)
         # Verify that the querystring is taken into account.
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.d11198ba31883732b0de5786a80cc12b.d41d8cd98f00b204e9800998ecf8427e')
+
+        self.assertEqual(
+            get_cache_key(request),
+            'views.decorators.cache.cache_page.settingsprefix.GET.'
+            'beaf87a9a99ee81c673ea2d67ccbec2a.d41d8cd98f00b204e9800998ecf8427e'
+        )
+
+    def test_cache_key_varies_by_url(self):
+        """
+        get_cache_key keys differ by fully-qualified URL instead of path
+        """
+        request1 = self.factory.get(self.path, HTTP_HOST='sub-1.example.com')
+        learn_cache_key(request1, HttpResponse())
+        request2 = self.factory.get(self.path, HTTP_HOST='sub-2.example.com')
+        learn_cache_key(request2, HttpResponse())
+        self.assertTrue(get_cache_key(request1) != get_cache_key(request2))
 
     def test_learn_cache_key(self):
         request = self.factory.head(self.path)
@@ -1250,7 +1386,12 @@ class CacheUtils(TestCase):
         response['Vary'] = 'Pony'
         # Make sure that the Vary header is added to the key hash
         learn_cache_key(request, response)
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
+
+        self.assertEqual(
+            get_cache_key(request),
+            'views.decorators.cache.cache_page.settingsprefix.GET.'
+            '18a03f9c9649f7d684af5db3524f5c99.d41d8cd98f00b204e9800998ecf8427e'
+        )
 
     def test_patch_cache_control(self):
         tests = (
@@ -1604,7 +1745,6 @@ def hello_world_view(request, value):
     CACHE_MIDDLEWARE_ALIAS='other',
     CACHE_MIDDLEWARE_KEY_PREFIX='middlewareprefix',
     CACHE_MIDDLEWARE_SECONDS=30,
-    CACHE_MIDDLEWARE_ANONYMOUS_ONLY=False,
     CACHES={
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -1616,7 +1756,7 @@ def hello_world_view(request, value):
         },
     },
 )
-class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
+class CacheMiddlewareTest(TestCase):
 
     def setUp(self):
         super(CacheMiddlewareTest, self).setUp()
@@ -1642,7 +1782,6 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         self.assertEqual(middleware.cache_timeout, 30)
         self.assertEqual(middleware.key_prefix, 'middlewareprefix')
         self.assertEqual(middleware.cache_alias, 'other')
-        self.assertEqual(middleware.cache_anonymous_only, False)
 
         # If arguments are being passed in construction, it's being used as a decorator.
         # First, test with "defaults":
@@ -1651,15 +1790,13 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         self.assertEqual(as_view_decorator.cache_timeout, 30)  # Timeout value for 'default' cache, i.e. 30
         self.assertEqual(as_view_decorator.key_prefix, '')
         self.assertEqual(as_view_decorator.cache_alias, 'default')  # Value of DEFAULT_CACHE_ALIAS from django.core.cache
-        self.assertEqual(as_view_decorator.cache_anonymous_only, False)
 
         # Next, test with custom values:
-        as_view_decorator_with_custom = CacheMiddleware(cache_anonymous_only=True, cache_timeout=60, cache_alias='other', key_prefix='foo')
+        as_view_decorator_with_custom = CacheMiddleware(cache_timeout=60, cache_alias='other', key_prefix='foo')
 
         self.assertEqual(as_view_decorator_with_custom.cache_timeout, 60)
         self.assertEqual(as_view_decorator_with_custom.key_prefix, 'foo')
         self.assertEqual(as_view_decorator_with_custom.cache_alias, 'other')
-        self.assertEqual(as_view_decorator_with_custom.cache_anonymous_only, True)
 
     def test_middleware(self):
         middleware = CacheMiddleware()
@@ -1690,57 +1827,6 @@ class CacheMiddlewareTest(IgnoreDeprecationWarningsMixin, TestCase):
         result = timeout_middleware.process_request(request)
         self.assertNotEqual(result, None)
         self.assertEqual(result.content, b'Hello World 1')
-
-    @override_settings(CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True)
-    def test_cache_middleware_anonymous_only_wont_cause_session_access(self):
-        """ The cache middleware shouldn't cause a session access due to
-        CACHE_MIDDLEWARE_ANONYMOUS_ONLY if nothing else has accessed the
-        session. Refs 13283 """
-
-        from django.contrib.sessions.middleware import SessionMiddleware
-        from django.contrib.auth.middleware import AuthenticationMiddleware
-
-        middleware = CacheMiddleware()
-        session_middleware = SessionMiddleware()
-        auth_middleware = AuthenticationMiddleware()
-
-        request = self.factory.get('/view_anon/')
-
-        # Put the request through the request middleware
-        session_middleware.process_request(request)
-        auth_middleware.process_request(request)
-        result = middleware.process_request(request)
-        self.assertEqual(result, None)
-
-        response = hello_world_view(request, '1')
-
-        # Now put the response through the response middleware
-        session_middleware.process_response(request, response)
-        response = middleware.process_response(request, response)
-
-        self.assertEqual(request.session.accessed, False)
-
-    @override_settings(CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True)
-    def test_cache_middleware_anonymous_only_with_cache_page(self):
-        """CACHE_MIDDLEWARE_ANONYMOUS_ONLY should still be effective when used
-        with the cache_page decorator: the response to a request from an
-        authenticated user should not be cached."""
-
-        request = self.factory.get('/view_anon/')
-
-        class MockAuthenticatedUser(object):
-            def is_authenticated(self):
-                return True
-
-        class MockAccessedSession(object):
-            accessed = True
-
-        request.user = MockAuthenticatedUser()
-        request.session = MockAccessedSession()
-
-        response = cache_page(60)(hello_world_view)(request, '1')
-
-        self.assertFalse("Cache-Control" in response)
 
     def test_view_decorator(self):
         # decorate the same view with different cache decorators
@@ -1874,10 +1960,19 @@ class TestWithTemplateResponse(TestCase):
         self.assertEqual(get_cache_key(request), None)
         # Set headers to an empty list.
         learn_cache_key(request, response)
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
+
+        self.assertEqual(
+            get_cache_key(request),
+            'views.decorators.cache.cache_page.settingsprefix.GET.'
+            '58a0a05c8a5620f813686ff969c26853.d41d8cd98f00b204e9800998ecf8427e'
+        )
         # Verify that a specified key_prefix is taken into account.
         learn_cache_key(request, response, key_prefix=key_prefix)
-        self.assertEqual(get_cache_key(request, key_prefix=key_prefix), 'views.decorators.cache.cache_page.localprefix.GET.9fa0fd092afb73bdce204bb4f94d5804.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(
+            get_cache_key(request, key_prefix=key_prefix),
+            'views.decorators.cache.cache_page.localprefix.GET.'
+            '58a0a05c8a5620f813686ff969c26853.d41d8cd98f00b204e9800998ecf8427e'
+        )
 
     def test_get_cache_key_with_query(self):
         request = self.factory.get(self.path, {'test': 1})
@@ -1887,7 +1982,11 @@ class TestWithTemplateResponse(TestCase):
         # Set headers to an empty list.
         learn_cache_key(request, response)
         # Verify that the querystring is taken into account.
-        self.assertEqual(get_cache_key(request), 'views.decorators.cache.cache_page.settingsprefix.GET.d11198ba31883732b0de5786a80cc12b.d41d8cd98f00b204e9800998ecf8427e')
+        self.assertEqual(
+            get_cache_key(request),
+            'views.decorators.cache.cache_page.settingsprefix.GET.'
+            '0f1c2d56633c943073c4569d9a9502fe.d41d8cd98f00b204e9800998ecf8427e'
+        )
 
     @override_settings(USE_ETAGS=False)
     def test_without_etag(self):
@@ -1908,19 +2007,19 @@ class TestWithTemplateResponse(TestCase):
         self.assertTrue(response.has_header('ETag'))
 
 
+@override_settings(ROOT_URLCONF="admin_views.urls")
 class TestEtagWithAdmin(TestCase):
     # See https://code.djangoproject.com/ticket/16003
-    urls = "admin_views.urls"
 
     def test_admin(self):
         with self.settings(USE_ETAGS=False):
             response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             self.assertFalse(response.has_header('ETag'))
 
         with self.settings(USE_ETAGS=True):
             response = self.client.get('/test_admin/admin/')
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             self.assertTrue(response.has_header('ETag'))
 
 

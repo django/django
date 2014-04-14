@@ -1,11 +1,13 @@
 from __future__ import unicode_literals
 
+import datetime
+import decimal
 import os
 import sys
 
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.urlresolvers import get_resolver
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render_to_response, render
 from django.template import Context, RequestContext, TemplateDoesNotExist
 from django.views.debug import technical_500_response, SafeExceptionReporterFilter
@@ -55,7 +57,7 @@ def raises403(request):
 
 def raises404(request):
     resolver = get_resolver(None)
-    resolver.resolve('')
+    resolver.resolve('/not-in-urls')
 
 
 def redirect(request):
@@ -334,3 +336,13 @@ def multivalue_dict_key_error(request):
         exc_info = sys.exc_info()
         send_log(request, exc_info)
         return technical_500_response(request, *exc_info)
+
+
+def json_response_view(request):
+    return JsonResponse({
+        'a': [1, 2, 3],
+        'foo': {'bar': 'baz'},
+        # Make sure datetime and Decimal objects would be serialized properly
+        'timestamp': datetime.datetime(2013, 5, 19, 20),
+        'value': decimal.Decimal('3.14'),
+    })

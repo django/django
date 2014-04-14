@@ -52,7 +52,7 @@ class TemplateCommand(BaseCommand):
                          'Separate multiple extensions with commas, or use '
                          '-n multiple times.')
     )
-    requires_model_validation = False
+    requires_system_checks = False
     # Can't import settings during this command, because they haven't
     # necessarily been created.
     can_import_settings = False
@@ -266,7 +266,7 @@ class TemplateCommand(BaseCommand):
                 guessed_filename += ext
 
         # Move the temporary file to a filename that has better
-        # chances of being recognnized by the archive utils
+        # chances of being recognized by the archive utils
         if used_name != guessed_filename:
             guessed_path = path.join(tempdir, guessed_filename)
             shutil.move(the_path, guessed_path)

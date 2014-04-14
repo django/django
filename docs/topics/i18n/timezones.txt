@@ -649,6 +649,12 @@ Troubleshooting
        >>> local.date()
        datetime.date(2012, 3, 3)
 
+4. **I get an error** "``Are time zone definitions for your database and pytz
+   installed?``" **pytz is installed, so I guess the problem is my database?**
+
+   If you are using MySQL, see the :ref:`mysql-time-zone-definitions` section
+   of the MySQL notes for instructions on loading time zone definitions.
+
 Usage
 -----
 

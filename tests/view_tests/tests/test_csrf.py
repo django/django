@@ -2,8 +2,8 @@ from django.test import TestCase, override_settings, Client
 from django.utils.translation import override
 
 
+@override_settings(ROOT_URLCONF="view_tests.urls")
 class CsrfViewTests(TestCase):
-    urls = "view_tests.urls"
 
     def setUp(self):
         super(CsrfViewTests, self).setUp()

@@ -2,6 +2,7 @@
 # Unit and doctests for specific database backends.
 from __future__ import unicode_literals
 
+import copy
 import datetime
 from decimal import Decimal
 import re
@@ -13,16 +14,16 @@ from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
     DatabaseError, IntegrityError, transaction)
 from django.db.backends.signals import connection_created
-from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.backends.utils import format_number, CursorWrapper
 from django.db.models import Sum, Avg, Variance, StdDev
 from django.db.models.fields import (AutoField, DateField, DateTimeField,
     DecimalField, IntegerField, TimeField)
+from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
-from django.test import (TestCase, skipUnlessDBFeature, skipIfDBFeature,
-    TransactionTestCase)
-from django.test.utils import override_settings, str_prefix
+from django.test import (TestCase, TransactionTestCase, override_settings,
+    skipUnlessDBFeature, skipIfDBFeature)
+from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.six.moves import xrange
 
@@ -57,9 +58,9 @@ class OracleChecks(unittest.TestCase):
         # stored procedure through our cursor wrapper.
         from django.db.backends.oracle.base import convert_unicode
 
-        cursor = connection.cursor()
-        cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
-                        [convert_unicode('_django_testing!')])
+        with connection.cursor() as cursor:
+            cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
+                            [convert_unicode('_django_testing!')])
 
     @unittest.skipUnless(connection.vendor == 'oracle',
                          "No need to check Oracle cursor semantics")
@@ -68,31 +69,31 @@ class OracleChecks(unittest.TestCase):
         # as query parameters.
         from django.db.backends.oracle.base import Database
 
-        cursor = connection.cursor()
-        var = cursor.var(Database.STRING)
-        cursor.execute("BEGIN %s := 'X'; END; ", [var])
-        self.assertEqual(var.getvalue(), 'X')
+        with connection.cursor() as cursor:
+            var = cursor.var(Database.STRING)
+            cursor.execute("BEGIN %s := 'X'; END; ", [var])
+            self.assertEqual(var.getvalue(), 'X')
 
     @unittest.skipUnless(connection.vendor == 'oracle',
                          "No need to check Oracle cursor semantics")
     def test_long_string(self):
         # If the backend is Oracle, test that we can save a text longer
         # than 4000 chars and read it properly
-        c = connection.cursor()
-        c.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
-        long_str = ''.join(six.text_type(x) for x in xrange(4000))
-        c.execute('INSERT INTO ltext VALUES (%s)', [long_str])
-        c.execute('SELECT text FROM ltext')
-        row = c.fetchone()
-        self.assertEqual(long_str, row[0].read())
-        c.execute('DROP TABLE ltext')
+        with connection.cursor() as cursor:
+            cursor.execute('CREATE TABLE ltext ("TEXT" NCLOB)')
+            long_str = ''.join(six.text_type(x) for x in xrange(4000))
+            cursor.execute('INSERT INTO ltext VALUES (%s)', [long_str])
+            cursor.execute('SELECT text FROM ltext')
+            row = cursor.fetchone()
+            self.assertEqual(long_str, row[0].read())
+            cursor.execute('DROP TABLE ltext')
 
     @unittest.skipUnless(connection.vendor == 'oracle',
                          "No need to check Oracle connection semantics")
     def test_client_encoding(self):
         # If the backend is Oracle, test that the client encoding is set
         # correctly.  This was broken under Cygwin prior to r14781.
-        connection.cursor()  # Ensure the connection is initialized.
+        connection.ensure_connection()
         self.assertEqual(connection.connection.encoding, "UTF-8")
         self.assertEqual(connection.connection.nencoding, "UTF-8")
 
@@ -101,12 +102,12 @@ class OracleChecks(unittest.TestCase):
     def test_order_of_nls_parameters(self):
         # an 'almost right' datetime should work with configured
         # NLS parameters as per #18465.
-        c = connection.cursor()
-        query = "select 1 from dual where '1936-12-29 00:00' < sysdate"
-        # Test that the query succeeds without errors - pre #18465 this
-        # wasn't the case.
-        c.execute(query)
-        self.assertEqual(c.fetchone()[0], 1)
+        with connection.cursor() as cursor:
+            query = "select 1 from dual where '1936-12-29 00:00' < sysdate"
+            # Test that the query succeeds without errors - pre #18465 this
+            # wasn't the case.
+            cursor.execute(query)
+            self.assertEqual(cursor.fetchone()[0], 1)
 
 
 class SQLiteTests(TestCase):
@@ -208,7 +209,7 @@ class LastExecutedQueryTest(TestCase):
         """
         persons = models.Reporter.objects.filter(raw_data=b'\x00\x46  \xFE').extra(select={'föö': 1})
         sql, params = persons.query.sql_with_params()
-        cursor = persons.query.get_compiler('default').execute_sql(None)
+        cursor = persons.query.get_compiler('default').execute_sql(CURSOR)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
         self.assertIsInstance(last_sql, six.text_type)
 
@@ -326,6 +327,12 @@ class PostgresVersionTest(TestCase):
             def fetchone(self):
                 return ["PostgreSQL 8.3"]
 
+            def __enter__(self):
+                return self
+
+            def __exit__(self, type, value, traceback):
+                pass
+
         class OlderConnectionMock(object):
             "Mock of psycopg2 (< 2.0.12) connection"
             def cursor(self):
@@ -336,16 +343,18 @@ class PostgresVersionTest(TestCase):
         self.assertEqual(pg_version.get_version(conn), 80300)
 
 
-class PostgresNewConnectionTest(TestCase):
-    """
-    #17062: PostgreSQL shouldn't roll back SET TIME ZONE, even if the first
-    transaction is rolled back.
-    """
+class PostgresNewConnectionTests(TestCase):
+
     @unittest.skipUnless(
         connection.vendor == 'postgresql',
         "This test applies only to PostgreSQL")
     def test_connect_and_rollback(self):
-        new_connections = ConnectionHandler(settings.DATABASES)
+        """
+        PostgreSQL shouldn't roll back SET TIME ZONE, even if the first
+        transaction is rolled back (#17062).
+        """
+        databases = copy.deepcopy(settings.DATABASES)
+        new_connections = ConnectionHandler(databases)
         new_connection = new_connections[DEFAULT_DB_ALIAS]
         try:
             # Ensure the database default time zone is different than
@@ -361,7 +370,7 @@ class PostgresNewConnectionTest(TestCase):
             # Fetch a new connection with the new_tz as default
             # time zone, run a query and rollback.
             new_connection.settings_dict['TIME_ZONE'] = new_tz
-            new_connection.enter_transaction_management()
+            new_connection.set_autocommit(False)
             cursor = new_connection.cursor()
             new_connection.rollback()
 
@@ -370,10 +379,26 @@ class PostgresNewConnectionTest(TestCase):
             tz = cursor.fetchone()[0]
             self.assertEqual(new_tz, tz)
         finally:
-            try:
-                new_connection.close()
-            except DatabaseError:
-                pass
+            new_connection.close()
+
+    @unittest.skipUnless(
+        connection.vendor == 'postgresql',
+        "This test applies only to PostgreSQL")
+    def test_connect_non_autocommit(self):
+        """
+        The connection wrapper shouldn't believe that autocommit is enabled
+        after setting the time zone when AUTOCOMMIT is False (#21452).
+        """
+        databases = copy.deepcopy(settings.DATABASES)
+        databases[DEFAULT_DB_ALIAS]['AUTOCOMMIT'] = False
+        new_connections = ConnectionHandler(databases)
+        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        try:
+            # Open a database connection.
+            new_connection.cursor()
+            self.assertFalse(new_connection.get_autocommit())
+        finally:
+            new_connection.close()
 
 
 # This test needs to run outside of a transaction, otherwise closing the
@@ -459,6 +484,8 @@ class SqliteChecks(TestCase):
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "No need to do SQLite checks")
     def test_convert_values_to_handle_null_value(self):
+        from django.db.backends.sqlite3.base import DatabaseOperations
+
         database_operations = DatabaseOperations(connection)
         self.assertEqual(
             None,
@@ -537,14 +564,14 @@ class BackendTestCase(TestCase):
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_execute_with_pyformat(self):
-        #10070: Support pyformat style passing of paramters
+        #10070: Support pyformat style passing of parameters
         args = {'root': 3, 'square': 9}
         self.create_squares(args, 'pyformat', multiple=False)
         self.assertEqual(models.Square.objects.count(), 1)
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_executemany_with_pyformat(self):
-        #10070: Support pyformat style passing of paramters
+        #10070: Support pyformat style passing of parameters
         args = [{'root': i, 'square': i ** 2} for i in range(-5, 6)]
         self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(models.Square.objects.count(), 11)
@@ -619,7 +646,7 @@ class BackendTestCase(TestCase):
         Test that cursors can be used as a context manager
         """
         with connection.cursor() as cursor:
-            self.assertTrue(isinstance(cursor, CursorWrapper))
+            self.assertIsInstance(cursor, CursorWrapper)
         # Both InterfaceError and ProgrammingError seem to be used when
         # accessing closed cursor (psycopg2 has InterfaceError, rest seem
         # to use ProgrammingError).
@@ -634,8 +661,32 @@ class BackendTestCase(TestCase):
         # psycopg2 offers us a way to check that by closed attribute.
         # So, run only on psycopg2 for that reason.
         with connection.cursor() as cursor:
-            self.assertTrue(isinstance(cursor, CursorWrapper))
+            self.assertIsInstance(cursor, CursorWrapper)
         self.assertTrue(cursor.closed)
+
+    # Unfortunately with sqlite3 the in-memory test database cannot be closed.
+    @skipUnlessDBFeature('test_db_allows_multiple_connections')
+    def test_is_usable_after_database_disconnects(self):
+        """
+        Test that is_usable() doesn't crash when the database disconnects.
+
+        Regression for #21553.
+        """
+        # Open a connection to the database.
+        with connection.cursor():
+            pass
+        # Emulate a connection close by the database.
+        connection._close()
+        # Even then is_usable() should not raise an exception.
+        try:
+            self.assertFalse(connection.is_usable())
+        finally:
+            # Clean up the mess created by connection._close(). Since the
+            # connection is already closed, this crashes on some backends.
+            try:
+                connection.close()
+            except Exception:
+                pass
 
 
 # We don't make these tests conditional because that means we would need to
@@ -707,7 +758,7 @@ class FkConstraintsTests(TransactionTestCase):
         with transaction.atomic():
             # Create an Article.
             models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
-            # Retrive it from the DB
+            # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
             try:
@@ -725,7 +776,7 @@ class FkConstraintsTests(TransactionTestCase):
         with transaction.atomic():
             # Create an Article.
             models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
-            # Retrive it from the DB
+            # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
             try:
@@ -742,7 +793,7 @@ class FkConstraintsTests(TransactionTestCase):
         with transaction.atomic():
             # Create an Article.
             models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
-            # Retrive it from the DB
+            # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
             with connection.constraint_checks_disabled():
@@ -908,10 +959,9 @@ class ThreadTests(TestCase):
 class MySQLPKZeroTests(TestCase):
     """
     Zero as id for AutoField should raise exception in MySQL, because MySQL
-    does not allow zero for automatic primary key.
+    does not allow zero for autoincrement primary key.
     """
-
-    @skipIfDBFeature('allows_primary_key_0')
+    @skipIfDBFeature('allows_auto_pk_0')
     def test_zero_as_autoval(self):
         with self.assertRaises(ValueError):
             models.Square.objects.create(id=0, root=0, square=1)
@@ -1008,3 +1058,16 @@ class UnicodeArrayTestCase(TestCase):
         a = ["ᄲawef"]
         b = self.select(a)
         self.assertEqual(a[0], b[0])
+
+
+@unittest.skipUnless(
+    connection.vendor == 'postgresql',
+    "This test applies only to PostgreSQL")
+class PostgresLookupCastTests(TestCase):
+    def test_lookup_cast(self):
+        from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations
+
+        do = DatabaseOperations(connection=None)
+        for lookup in ('iexact', 'contains', 'icontains', 'startswith',
+                       'istartswith', 'endswith', 'iendswith', 'regex', 'iregex'):
+            self.assertIn('::text', do.lookup_cast(lookup))

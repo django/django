@@ -1,4 +1,6 @@
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -13,7 +15,7 @@ __all__ = ('Link', 'Place', 'Restaurant', 'Person', 'Address',
 class Link(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
 
     def __str__(self):
         return "Link to %s id=%s" % (self.content_type, self.object_id)
@@ -22,7 +24,7 @@ class Link(models.Model):
 @python_2_unicode_compatible
 class Place(models.Model):
     name = models.CharField(max_length=100)
-    links = generic.GenericRelation(Link)
+    links = GenericRelation(Link)
 
     def __str__(self):
         return "Place: %s" % self.name
@@ -42,7 +44,7 @@ class Address(models.Model):
     zipcode = models.CharField(max_length=5)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
 
     def __str__(self):
         return '%s %s, %s %s' % (self.street, self.city, self.state, self.zipcode)
@@ -52,7 +54,7 @@ class Address(models.Model):
 class Person(models.Model):
     account = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=128)
-    addresses = generic.GenericRelation(Address)
+    addresses = GenericRelation(Address)
 
     def __str__(self):
         return self.name
@@ -61,35 +63,35 @@ class Person(models.Model):
 class CharLink(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.CharField(max_length=100)
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
 
 
 class TextLink(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.TextField()
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
 
 
 class OddRelation1(models.Model):
     name = models.CharField(max_length=100)
-    clinks = generic.GenericRelation(CharLink)
+    clinks = GenericRelation(CharLink)
 
 
 class OddRelation2(models.Model):
     name = models.CharField(max_length=100)
-    tlinks = generic.GenericRelation(TextLink)
+    tlinks = GenericRelation(TextLink)
 
 
 # models for test_q_object_or:
 class Note(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
     note = models.TextField()
 
 
 class Contact(models.Model):
-    notes = generic.GenericRelation(Note)
+    notes = GenericRelation(Note)
 
 
 class Organization(models.Model):
@@ -100,7 +102,7 @@ class Organization(models.Model):
 @python_2_unicode_compatible
 class Company(models.Model):
     name = models.CharField(max_length=100)
-    links = generic.GenericRelation(Link)
+    links = GenericRelation(Link)
 
     def __str__(self):
         return "Company: %s" % self.name
@@ -135,7 +137,7 @@ class Guild(models.Model):
 class Tag(models.Model):
     content_type = models.ForeignKey(ContentType, related_name='g_r_r_tags')
     object_id = models.CharField(max_length=15)
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
     label = models.CharField(max_length=15)
 
 
@@ -143,7 +145,7 @@ class Board(models.Model):
     name = models.CharField(primary_key=True, max_length=15)
 
 
-class SpecialGenericRelation(generic.GenericRelation):
+class SpecialGenericRelation(GenericRelation):
     def __init__(self, *args, **kwargs):
         super(SpecialGenericRelation, self).__init__(*args, **kwargs)
         self.editable = True
@@ -168,11 +170,11 @@ class A(models.Model):
     flag = models.NullBooleanField()
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
 
 class B(models.Model):
-    a = generic.GenericRelation(A)
+    a = GenericRelation(A)
 
     class Meta:
         ordering = ('id',)

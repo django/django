@@ -239,7 +239,7 @@ class LayerMapping(object):
                     raise TypeError('ForeignKey mapping must be of dictionary type.')
             else:
                 # Is the model field type supported by LayerMapping?
-                if not model_field.__class__ in self.FIELD_TYPES:
+                if model_field.__class__ not in self.FIELD_TYPES:
                     raise LayerMapError('Django field type "%s" has no OGR mapping (yet).' % fld_name)
 
                 # Is the OGR field in the Layer?
@@ -277,7 +277,7 @@ class LayerMapping(object):
         if isinstance(unique, (list, tuple)):
             # List of fields to determine uniqueness with
             for attr in unique:
-                if not attr in self.mapping:
+                if attr not in self.mapping:
                     raise ValueError
         elif isinstance(unique, six.string_types):
             # Only a single field passed in.
@@ -339,7 +339,7 @@ class LayerMapping(object):
         otherwise the proper exception is raised.
         """
         if (isinstance(ogr_field, OFTString) and
-            isinstance(model_field, (models.CharField, models.TextField))):
+                isinstance(model_field, (models.CharField, models.TextField))):
             if self.encoding:
                 # The encoding for OGR data sources may be specified here
                 # (e.g., 'cp437' for Census Bureau boundary files).
@@ -489,7 +489,7 @@ class LayerMapping(object):
 
          progress:
            When this keyword is set, status information will be printed giving
-           the number of features processed and sucessfully saved.  By default,
+           the number of features processed and successfully saved.  By default,
            progress information will pe printed every 1000 features processed,
            however, this default may be overridden by setting this keyword with an
            integer for the desired interval.

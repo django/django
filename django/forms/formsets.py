@@ -13,7 +13,7 @@ from django.utils.six.moves import xrange
 from django.utils.translation import ungettext, ugettext as _
 
 
-__all__ = ('BaseFormSet', 'all_valid')
+__all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
 
 # special field names
 TOTAL_FORM_COUNT = 'TOTAL_FORMS'
@@ -153,7 +153,7 @@ class BaseFormSet(object):
         if self.is_bound:
             defaults['data'] = self.data
             defaults['files'] = self.files
-        if self.initial and not 'initial' in kwargs:
+        if self.initial and 'initial' not in kwargs:
             try:
                 defaults['initial'] = self.initial[i]
             except IndexError:
@@ -308,7 +308,7 @@ class BaseFormSet(object):
                     # should not cause the entire formset to be invalid.
                     continue
             forms_valid &= form.is_valid()
-        return forms_valid and not bool(self.non_form_errors())
+        return forms_valid and not self.non_form_errors()
 
     def full_clean(self):
         """
@@ -325,15 +325,15 @@ class BaseFormSet(object):
             self._errors.append(form.errors)
         try:
             if (self.validate_max and
-                self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
-                self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
+                    self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
+                    self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
                 raise ValidationError(ungettext(
                     "Please submit %d or fewer forms.",
                     "Please submit %d or fewer forms.", self.max_num) % self.max_num,
                     code='too_many_forms',
                 )
             if (self.validate_min and
-                self.total_form_count() - len(self.deleted_forms) < self.min_num):
+                    self.total_form_count() - len(self.deleted_forms) < self.min_num):
                 raise ValidationError(ungettext(
                     "Please submit %d or more forms.",
                     "Please submit %d or more forms.", self.min_num) % self.min_num,
@@ -341,13 +341,13 @@ class BaseFormSet(object):
             # Give self.clean() a chance to do cross-form validation.
             self.clean()
         except ValidationError as e:
-            self._non_form_errors = self.error_class(e.messages)
+            self._non_form_errors = self.error_class(e.error_list)
 
     def clean(self):
         """
         Hook for doing any extra formset-wide cleaning after Form.clean() has
         been called on every form. Any ValidationError raised by this method
-        will not be associated with a particular form; it will be accesible
+        will not be associated with a particular form; it will be accessible
         via formset.non_form_errors()
         """
         pass

@@ -11,7 +11,9 @@ returns.
 
 from __future__ import unicode_literals
 
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -88,7 +90,7 @@ class Person(models.Model):
     favorite_book = models.ForeignKey('Book', null=True, related_name='favorite_books')
     favorite_thing_type = models.ForeignKey('contenttypes.ContentType', null=True)
     favorite_thing_id = models.IntegerField(null=True)
-    favorite_thing = generic.GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
+    favorite_thing = GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
 
     objects = PersonManager()
     fun_people = FunPeopleManager()
@@ -102,14 +104,35 @@ class Person(models.Model):
 
 
 @python_2_unicode_compatible
+class FunPerson(models.Model):
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    fun = models.BooleanField(default=True)
+
+    favorite_book = models.ForeignKey('Book', null=True, related_name='fun_people_favorite_books')
+    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', null=True)
+    favorite_thing_id = models.IntegerField(null=True)
+    favorite_thing = GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
+
+    objects = FunPeopleManager()
+
+    def __str__(self):
+        return "%s %s" % (self.first_name, self.last_name)
+
+
+@python_2_unicode_compatible
 class Book(models.Model):
     title = models.CharField(max_length=50)
     author = models.CharField(max_length=30)
     is_published = models.BooleanField(default=False)
     published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
+    fun_authors = models.ManyToManyField(FunPerson, related_name='books')
 
-    favorite_things = generic.GenericRelation(Person,
+    favorite_things = GenericRelation(Person,
+        content_type_field='favorite_thing_type', object_id_field='favorite_thing_id')
+
+    fun_people_favorite_things = GenericRelation(FunPerson,
         content_type_field='favorite_thing_type', object_id_field='favorite_thing_id')
 
     def __str__(self):

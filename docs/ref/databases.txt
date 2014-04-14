@@ -19,8 +19,6 @@ General notes
 Persistent connections
 ----------------------
 
-.. versionadded:: 1.6
-
 Persistent connections avoid the overhead of re-establishing a connection to
 the database in each request. They're controlled by the
 :setting:`CONN_MAX_AGE` parameter which defines the maximum lifetime of a
@@ -114,33 +112,10 @@ will do some additional queries to set these parameters.
 
 .. _ALTER ROLE: http://www.postgresql.org/docs/current/interactive/sql-alterrole.html
 
-.. _postgresql-autocommit-mode:
-
-Autocommit mode
----------------
-
-.. versionchanged:: 1.6
-
-In previous versions of Django, database-level autocommit could be enabled by
-setting the ``autocommit`` key in the :setting:`OPTIONS` part of your database
-configuration in :setting:`DATABASES`::
-
-    DATABASES = {
-        # ...
-        'OPTIONS': {
-            'autocommit': True,
-        },
-    }
-
-Since Django 1.6, autocommit is turned on by default. This configuration is
-ignored and can be safely removed.
-
 .. _database-isolation-level:
 
 Isolation level
 ---------------
-
-.. versionadded:: 1.6
 
 Like PostgreSQL itself, Django defaults to the ``READ COMMITTED`` `isolation
 level`_. If you need a higher isolation level such as ``REPEATABLE READ`` or
@@ -259,8 +234,8 @@ drivers that implement this API:
 Both drivers are thread-safe and both provide connection pooling. The major
 difference is that MySQL Connector/Python supports Python 3.
 
-In addition to a DB API driver, Django needs an adaptor to access the database
-drivers from its ORM. Django provides an adaptor for MySQLdb while MySQL
+In addition to a DB API driver, Django needs an adapter to access the database
+drivers from its ORM. Django provides an adapter for MySQLdb while MySQL
 Connector/Python includes `its own`_.
 
 .. _its own: http://dev.mysql.com/doc/refman/5.6/en/connector-python-django-backend.html
@@ -304,6 +279,17 @@ Available (GA, currently 1.0.x) and Development (Dev, currently 1.1.x beta).
 The Django adapter is currently only available in the Dev branch.
 
 .. _release branches: http://dev.mysql.com/downloads/connector/python/
+
+.. _mysql-time-zone-definitions:
+
+Time zone definitions
+---------------------
+
+If you plan on using Django's :doc:`timezone support </topics/i18n/timezones>`,
+use `mysql_tzinfo_to_sql`_ to load time zone tables into the MySQL database.
+This needs to be done just once for your MySQL server, not per database.
+
+.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.5/en/mysql-tzinfo-to-sql.html
 
 Creating your database
 ----------------------
@@ -543,7 +529,7 @@ are passed into the query. So the :lookup:`iexact` filter will behave exactly
 the same as the :lookup:`exact` filter in these cases.
 
 Some possible workarounds for this are `documented at sqlite.org`_, but they
-aren't utilised by the default SQLite backend in Django, as incorporating them
+aren't utilized by the default SQLite backend in Django, as incorporating them
 would be fairly difficult to do robustly. Thus, Django exposes the default
 SQLite behavior and you should be aware of this when doing case-insensitive or
 substring filtering.
@@ -592,7 +578,7 @@ Version 3.6.2
 --------------
 
 SQLite version 3.6.2 (released August 30, 2008) introduced a bug into ``SELECT
-DISTINCT`` handling that is triggered by, amongst other things, Django's
+DISTINCT`` handling that is triggered by, among other things, Django's
 ``DateQuerySet`` (returned by the ``dates()`` method on a queryset).
 
 You should avoid using this version of SQLite with Django. Either upgrade to
@@ -604,9 +590,8 @@ version of SQLite.
 Using newer versions of the SQLite DB-API 2.0 driver
 ----------------------------------------------------
 
-For versions of Python 2.5 or newer that include ``sqlite3`` in the standard
-library Django will now use a ``pysqlite2`` interface in preference to
-``sqlite3`` if it finds one is available.
+Django will use a ``pysqlite2`` module in preference to ``sqlite3`` as shipped
+with the Python standard library if it finds one is available.
 
 This provides the ability to upgrade both the DB-API 2.0 interface or SQLite 3
 itself to versions newer than the ones included with your particular Python
@@ -851,9 +836,9 @@ Using a 3rd-party database backend
 In addition to the officially supported databases, there are backends provided
 by 3rd parties that allow you to use other databases with Django:
 
-* `Sybase SQL Anywhere`_
+* `SAP SQL Anywhere`_
 * `IBM DB2`_
-* `Microsoft SQL Server 2005`_
+* `Microsoft SQL Server`_
 * Firebird_
 * ODBC_
 * ADSDB_
@@ -863,9 +848,9 @@ vary considerably. Queries regarding the specific capabilities of these
 unofficial backends, along with any support queries, should be directed to
 the support channels provided by each 3rd party project.
 
-.. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/
+.. _SAP SQL Anywhere: https://github.com/sqlanywhere/sqlany-django
 .. _IBM DB2: http://code.google.com/p/ibm-db/
-.. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
-.. _Firebird: http://code.google.com/p/django-firebird/
-.. _ODBC: https://github.com/aurorasoftware/django-pyodbc/
+.. _Microsoft SQL Server: http://django-mssql.readthedocs.org/en/latest/
+.. _Firebird: https://github.com/maxirobaina/django-firebird
+.. _ODBC: https://github.com/lionheart/django-pyodbc/
 .. _ADSDB: http://code.google.com/p/adsdb-django/

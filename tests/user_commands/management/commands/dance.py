@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 class Command(BaseCommand):
     help = "Dance around like a madman."
     args = ''
-    requires_model_validation = True
+    requires_system_checks = True
 
     option_list = BaseCommand.option_list + (
         make_option("-s", "--style", default="Rock'n'Roll"),

@@ -3,9 +3,10 @@ from __future__ import unicode_literals
 import inspect
 
 from django.core import serializers
+from django.db import connection
 from django.test import TestCase
 
-from .fields import Small
+from .fields import Small, CustomTypedField
 from .models import DataModel, MyModel, OtherModel
 
 
@@ -39,7 +40,7 @@ class CustomField(TestCase):
         # Custom fields still have normal field's attributes.
         self.assertEqual(m._meta.get_field("data").verbose_name, "small field")
 
-        # The m.data attribute has been initialised correctly. It's a Small
+        # The m.data attribute has been initialized correctly. It's a Small
         # object.
         self.assertEqual((m.data.first, m.data.second), (1, 2))
 
@@ -100,7 +101,14 @@ class CustomField(TestCase):
         http://users.rcn.com/python/download/Descriptor.htm#properties
         """
         # Even when looking for totally different properties, SubfieldBase's
-        # non property like behaviour made inspect crash. Refs #12568.
+        # non property like behavior made inspect crash. Refs #12568.
         data = dict(inspect.getmembers(MyModel))
         self.assertIn('__module__', data)
         self.assertEqual(data['__module__'], 'field_subclassing.models')
+
+
+class TestDbType(TestCase):
+
+    def test_db_parameters_respects_db_type(self):
+        f = CustomTypedField()
+        self.assertEqual(f.db_parameters(connection)['type'], 'custom_field')

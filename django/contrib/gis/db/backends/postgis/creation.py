@@ -11,10 +11,10 @@ class PostGISCreation(DatabaseCreation):
     @cached_property
     def template_postgis(self):
         template_postgis = getattr(settings, 'POSTGIS_TEMPLATE', 'template_postgis')
-        cursor = self.connection.cursor()
-        cursor.execute('SELECT 1 FROM pg_database WHERE datname = %s LIMIT 1;', (template_postgis,))
-        if cursor.fetchone():
-            return template_postgis
+        with self.connection.cursor() as cursor:
+            cursor.execute('SELECT 1 FROM pg_database WHERE datname = %s LIMIT 1;', (template_postgis,))
+            if cursor.fetchone():
+                return template_postgis
         return None
 
     def sql_indexes_for_field(self, model, f, style):
@@ -88,8 +88,8 @@ class PostGISCreation(DatabaseCreation):
             # Connect to the test database in order to create the postgis extension
             self.connection.close()
             self.connection.settings_dict["NAME"] = test_database_name
-            cursor = self.connection.cursor()
-            cursor.execute("CREATE EXTENSION postgis")
-            cursor.connection.commit()
+            with self.connection.cursor() as cursor:
+                cursor.execute("CREATE EXTENSION IF NOT EXISTS postgis")
+                cursor.connection.commit()
 
         return test_database_name

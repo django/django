@@ -201,7 +201,7 @@ class GeoModelTest(TestCase):
         as_text = 'ST_AsText' if postgis else 'asText'
         cities2 = City.objects.raw('select id, name, %s(point) from geoapp_city' % as_text)
         self.assertEqual(len(cities1), len(list(cities2)))
-        self.assertTrue(isinstance(cities2[0].point, Point))
+        self.assertIsInstance(cities2[0].point, Point)
 
 
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
@@ -345,7 +345,7 @@ class GeoLookupTest(TestCase):
         nmi = State.objects.create(name='Northern Mariana Islands', poly=None)
         self.assertEqual(nmi.poly, None)
 
-        # Assigning a geomery and saving -- then UPDATE back to NULL.
+        # Assigning a geometry and saving -- then UPDATE back to NULL.
         nmi.poly = 'POLYGON((0 0,1 0,1 1,1 0,0 0))'
         nmi.save()
         State.objects.filter(name='Northern Mariana Islands').update(poly=None)
@@ -359,7 +359,7 @@ class GeoLookupTest(TestCase):
         pnt1 = fromstr('POINT (649287.0363174 4177429.4494686)', srid=2847)
         pnt2 = fromstr('POINT(-98.4919715741052 29.4333344025053)', srid=4326)
 
-        # Not passing in a geometry as first param shoud
+        # Not passing in a geometry as first param should
         # raise a type error when initializing the GeoQuerySet
         self.assertRaises(ValueError, Country.objects.filter, mpoly__relate=(23, 'foo'))
 
@@ -435,8 +435,11 @@ class GeoQuerySetTest(TestCase):
                 self.assertEqual(c.mpoly.difference(geom), c.difference)
                 if not spatialite:
                     self.assertEqual(c.mpoly.intersection(geom), c.intersection)
-                self.assertEqual(c.mpoly.sym_difference(geom), c.sym_difference)
-                self.assertEqual(c.mpoly.union(geom), c.union)
+                # Ordering might differ in collections
+                self.assertSetEqual(set(g.wkt for g in c.mpoly.sym_difference(geom)),
+                                    set(g.wkt for g in c.sym_difference))
+                self.assertSetEqual(set(g.wkt for g in c.mpoly.union(geom)),
+                                    set(g.wkt for g in c.union))
 
     @skipUnless(getattr(connection.ops, 'envelope', False), 'Database does not support envelope operation')
     def test_envelope(self):
@@ -775,9 +778,9 @@ class GeoQuerySetTest(TestCase):
     def test_unionagg(self):
         "Testing the `unionagg` (aggregate union) GeoQuerySet method."
         tx = Country.objects.get(name='Texas').mpoly
-        # Houston, Dallas -- Oracle has different order.
+        # Houston, Dallas -- Ordering may differ depending on backend or GEOS version.
         union1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
-        union2 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
+        union2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)')
         qs = City.objects.filter(point__within=tx)
         self.assertRaises(TypeError, qs.unionagg, 'name')
         # Using `field_name` keyword argument in one query and specifying an
@@ -786,11 +789,16 @@ class GeoQuerySetTest(TestCase):
         u1 = qs.unionagg(field_name='point')
         u2 = qs.order_by('name').unionagg()
         tol = 0.00001
-        if oracle:
-            union = union2
-        else:
-            union = union1
-        self.assertEqual(True, union.equals_exact(u1, tol))
-        self.assertEqual(True, union.equals_exact(u2, tol))
+        self.assertEqual(True, union1.equals_exact(u1, tol) or union2.equals_exact(u1, tol))
+        self.assertEqual(True, union1.equals_exact(u2, tol) or union2.equals_exact(u2, tol))
         qs = City.objects.filter(name='NotACity')
         self.assertEqual(None, qs.unionagg(field_name='point'))
+
+    def test_non_concrete_field(self):
+        pkfield = City._meta.get_field_by_name('id')[0]
+        orig_pkfield_col = pkfield.column
+        pkfield.column = None
+        try:
+            list(City.objects.all())
+        finally:
+            pkfield.column = orig_pkfield_col

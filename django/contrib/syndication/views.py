@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from calendar import timegm
 
 from django.conf import settings
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import HttpResponse, Http404
 from django.template import loader, TemplateDoesNotExist, RequestContext

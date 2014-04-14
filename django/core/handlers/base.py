@@ -11,7 +11,7 @@ from django.core import signals
 from django.core.exceptions import MiddlewareNotUsed, PermissionDenied, SuspiciousOperation
 from django.db import connections, transaction
 from django.utils.encoding import force_text
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.utils import six
 from django.views import debug
 
@@ -43,7 +43,7 @@ class BaseHandler(object):
 
         request_middleware = []
         for middleware_path in settings.MIDDLEWARE_CLASSES:
-            mw_class = import_by_path(middleware_path)
+            mw_class = import_string(middleware_path)
             try:
                 mw_instance = mw_class()
             except MiddlewareNotUsed:
@@ -128,7 +128,8 @@ class BaseHandler(object):
                     view_name = callback.__name__
                 else:                                           # CBV
                     view_name = callback.__class__.__name__ + '.__call__'
-                raise ValueError("The view %s.%s didn't return an HttpResponse object." % (callback.__module__, view_name))
+                raise ValueError("The view %s.%s didn't return an HttpResponse object. It returned None instead."
+                                 % (callback.__module__, view_name))
 
             # If the response supports deferred rendering, apply template
             # response middleware and then render the response

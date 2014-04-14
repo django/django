@@ -24,7 +24,7 @@ class DistanceTest(TestCase):
 
     if HAS_GEOS and HAS_SPATIAL_DB:
         # A point we are testing distances with -- using a WGS84
-        # coordinate that'll be implicitly transormed to that to
+        # coordinate that'll be implicitly transformed to that to
         # the coordinate system of the field, EPSG:32140 (Texas South Central
         # w/units in meters)
         stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
@@ -110,7 +110,7 @@ class DistanceTest(TestCase):
                        138809.684197, 158309.246259, 212183.594374,
                        70870.188967, 165337.758878, 139196.085105]
         #  SELECT ST_Distance(point, ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 2278)) FROM distapp_southtexascityft;
-        # Oracle 11 thinks this is not a projected coordinate system, so it's s
+        # Oracle 11 thinks this is not a projected coordinate system, so it's
         # not tested.
         ft_distances = [482528.79154625, 458103.408123001, 462231.860397575,
                         455411.438904354, 519386.252102563, 696139.009211594,
@@ -336,8 +336,7 @@ class DistanceTest(TestCase):
         # Reference queries:
         # SELECT ST_Area(poly) FROM distapp_southtexaszipcode;
         area_sq_m = [5437908.90234375, 10183031.4389648, 11254471.0073242, 9881708.91772461]
-        # Tolerance has to be lower for Oracle and differences
-        # with GEOS 3.0.0RC4
+        # Tolerance has to be lower for Oracle
         tol = 2
         for i, z in enumerate(SouthTexasZipcode.objects.area()):
             self.assertAlmostEqual(area_sq_m[i], z.area.sq_m, tol)

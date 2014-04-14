@@ -42,7 +42,8 @@ class CustomColumnsTests(TestCase):
         )
 
     def test_field_error(self):
-        self.assertRaises(FieldError,
+        self.assertRaises(
+            FieldError,
             lambda: Author.objects.filter(firstname__exact="John")
         )
 

@@ -1,14 +1,93 @@
 from __future__ import unicode_literals
+
 import datetime
-import types
-import os
+import inspect
+import decimal
+import collections
 from importlib import import_module
-from django.utils import six
+import os
+import types
+
+from django.apps import apps
 from django.db import models
-from django.db.models.loading import cache
 from django.db.migrations.loader import MigrationLoader
+from django.utils import datetime_safe, six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
+
+
+class SettingsReference(str):
+    """
+    Special subclass of string which actually references a current settings
+    value. It's treated as the value in memory, but serializes out to a
+    settings.NAME attribute reference.
+    """
+
+    def __new__(self, value, setting_name):
+        return str.__new__(self, value)
+
+    def __init__(self, value, setting_name):
+        self.setting_name = setting_name
+
+
+class OperationWriter(object):
+    indentation = 2
+
+    def __init__(self, operation):
+        self.operation = operation
+        self.buff = []
+
+    def serialize(self):
+        imports = set()
+        name, args, kwargs = self.operation.deconstruct()
+        argspec = inspect.getargspec(self.operation.__init__)
+        normalized_kwargs = inspect.getcallargs(self.operation.__init__, *args, **kwargs)
+
+        self.feed('migrations.%s(' % name)
+        self.indent()
+        for arg_name in argspec.args[1:]:
+            arg_value = normalized_kwargs[arg_name]
+            if (arg_name in self.operation.serialization_expand_args and
+                    isinstance(arg_value, (list, tuple, dict))):
+                if isinstance(arg_value, dict):
+                    self.feed('%s={' % arg_name)
+                    self.indent()
+                    for key, value in arg_value.items():
+                        key_string, key_imports = MigrationWriter.serialize(key)
+                        arg_string, arg_imports = MigrationWriter.serialize(value)
+                        self.feed('%s: %s,' % (key_string, arg_string))
+                        imports.update(key_imports)
+                        imports.update(arg_imports)
+                    self.unindent()
+                    self.feed('},')
+                else:
+                    self.feed('%s=[' % arg_name)
+                    self.indent()
+                    for item in arg_value:
+                        arg_string, arg_imports = MigrationWriter.serialize(item)
+                        self.feed('%s,' % arg_string)
+                        imports.update(arg_imports)
+                    self.unindent()
+                    self.feed('],')
+            else:
+                arg_string, arg_imports = MigrationWriter.serialize(arg_value)
+                self.feed('%s=%s,' % (arg_name, arg_string))
+                imports.update(arg_imports)
+        self.unindent()
+        self.feed('),')
+        return self.render(), imports
+
+    def indent(self):
+        self.indentation += 1
+
+    def unindent(self):
+        self.indentation -= 1
+
+    def feed(self, line):
+        self.buff.append(' ' * (self.indentation * 4) + line)
+
+    def render(self):
+        return '\n'.join(self.buff)
 
 
 class MigrationWriter(object):
@@ -25,34 +104,37 @@ class MigrationWriter(object):
         Returns a string of the file contents.
         """
         items = {
-            "dependencies": repr(self.migration.dependencies),
             "replaces_str": "",
         }
+
         imports = set()
+
         # Deconstruct operations
-        operation_strings = []
+        operations = []
         for operation in self.migration.operations:
-            name, args, kwargs = operation.deconstruct()
-            arg_strings = []
-            for arg in args:
-                arg_string, arg_imports = self.serialize(arg)
-                arg_strings.append(arg_string)
-                imports.update(arg_imports)
-            for kw, arg in kwargs.items():
-                arg_string, arg_imports = self.serialize(arg)
-                imports.update(arg_imports)
-                arg_strings.append("%s = %s" % (kw, arg_string))
-            operation_strings.append("migrations.%s(%s\n        )" % (name, "".join("\n            %s," % arg for arg in arg_strings)))
-        items["operations"] = "[%s\n    ]" % "".join("\n        %s," % s for s in operation_strings)
+            operation_string, operation_imports = OperationWriter(operation).serialize()
+            imports.update(operation_imports)
+            operations.append(operation_string)
+        items["operations"] = "\n".join(operations) + "\n" if operations else ""
+
+        # Format dependencies and write out swappable dependencies right
+        dependencies = []
+        for dependency in self.migration.dependencies:
+            if dependency[0] == "__setting__":
+                dependencies.append("        migrations.swappable_dependency(settings.%s)," % dependency[1])
+                imports.add("from django.conf import settings")
+            else:
+                dependencies.append("        %s," % self.serialize(dependency)[0])
+        items["dependencies"] = "\n".join(dependencies) + "\n" if dependencies else ""
+
         # Format imports nicely
         imports.discard("from django.db import models")
-        if not imports:
-            items["imports"] = ""
-        else:
-            items["imports"] = "\n".join(imports) + "\n"
+        items["imports"] = "\n".join(imports) + "\n" if imports else ""
+
         # If there's a replaces, make a string for it
         if self.migration.replaces:
-            items['replaces_str'] = "\n    replaces = %s\n" % repr(self.migration.replaces)
+            items['replaces_str'] = "\n    replaces = %s\n" % self.serialize(self.migration.replaces)[0]
+
         return (MIGRATION_TEMPLATE % items).encode("utf8")
 
     @property
@@ -67,14 +149,12 @@ class MigrationWriter(object):
             migrations_module = import_module(migrations_package_name)
             basedir = os.path.dirname(migrations_module.__file__)
         except ImportError:
-            app = cache.get_app(self.migration.app_label)
-            app_path = cache._get_app_path(app)
-            app_package_name = cache._get_app_package(app)
+            app_config = apps.get_app_config(self.migration.app_label)
             migrations_package_basename = migrations_package_name.split(".")[-1]
 
             # Alright, see if it's a direct submodule of the app
-            if '%s.%s' % (app_package_name, migrations_package_basename) == migrations_package_name:
-                basedir = os.path.join(app_path, migrations_package_basename)
+            if '%s.%s' % (app_config.name, migrations_package_basename) == migrations_package_name:
+                basedir = os.path.join(app_config.path, migrations_package_basename)
             else:
                 raise ImportError("Cannot open migrations module %s for app %s" % (migrations_package_name, self.migration.app_label))
         return os.path.join(basedir, self.filename)
@@ -88,16 +168,16 @@ class MigrationWriter(object):
         else:
             imports = set(["import %s" % module])
             name = path
-        arg_strings = []
+        strings = []
         for arg in args:
             arg_string, arg_imports = cls.serialize(arg)
-            arg_strings.append(arg_string)
+            strings.append(arg_string)
             imports.update(arg_imports)
         for kw, arg in kwargs.items():
             arg_string, arg_imports = cls.serialize(arg)
             imports.update(arg_imports)
-            arg_strings.append("%s=%s" % (kw, arg_string))
-        return "%s(%s)" % (name, ", ".join(arg_strings)), imports
+            strings.append("%s=%s" % (kw, arg_string))
+        return "%s(%s)" % (name, ", ".join(strings)), imports
 
     @classmethod
     def serialize(cls, value):
@@ -107,6 +187,12 @@ class MigrationWriter(object):
         More advanced than repr() as it can encode things
         like datetime.datetime.now.
         """
+        # FIXME: Ideally Promise would be reconstructible, but for now we
+        # use force_text on them and defer to the normal string serialization
+        # process.
+        if isinstance(value, Promise):
+            value = force_text(value)
+
         # Sequences
         if isinstance(value, (list, set, tuple)):
             imports = set()
@@ -118,7 +204,7 @@ class MigrationWriter(object):
             if isinstance(value, set):
                 format = "set([%s])"
             elif isinstance(value, tuple):
-                format = "(%s,)"
+                format = "(%s)" if len(value) > 1 else "(%s,)"
             else:
                 format = "[%s]"
             return format % (", ".join(strings)), imports
@@ -134,14 +220,40 @@ class MigrationWriter(object):
                 strings.append((k_string, v_string))
             return "{%s}" % (", ".join("%s: %s" % (k, v) for k, v in strings)), imports
         # Datetimes
-        elif isinstance(value, (datetime.datetime, datetime.date)):
-            return repr(value), set(["import datetime"])
+        elif isinstance(value, datetime.datetime):
+            if value.tzinfo is not None:
+                raise ValueError("Cannot serialize datetime values with timezones. Either use a callable value for default or remove the timezone.")
+            value_repr = repr(value)
+            if isinstance(value, datetime_safe.datetime):
+                value_repr = "datetime.%s" % value_repr
+            return value_repr, set(["import datetime"])
+        # Dates
+        elif isinstance(value, datetime.date):
+            value_repr = repr(value)
+            if isinstance(value, datetime_safe.date):
+                value_repr = "datetime.%s" % value_repr
+            return value_repr, set(["import datetime"])
+        # Settings references
+        elif isinstance(value, SettingsReference):
+            return "settings.%s" % value.setting_name, set(["from django.conf import settings"])
         # Simple types
-        elif isinstance(value, six.integer_types + (float, six.binary_type, six.text_type, bool, type(None))):
+        elif isinstance(value, six.integer_types + (float, bool, type(None))):
             return repr(value), set()
-        # Promise
-        elif isinstance(value, Promise):
-            return repr(force_text(value)), set()
+        elif isinstance(value, six.binary_type):
+            value_repr = repr(value)
+            if six.PY2:
+                # Prepend the `b` prefix since we're importing unicode_literals
+                value_repr = 'b' + value_repr
+            return value_repr, set()
+        elif isinstance(value, six.text_type):
+            value_repr = repr(value)
+            if six.PY2:
+                # Strip the `u` prefix since we're importing unicode_literals
+                value_repr = value_repr[1:]
+            return value_repr, set()
+        # Decimal
+        elif isinstance(value, decimal.Decimal):
+            return repr(value), set(["from decimal import Decimal"])
         # Django fields
         elif isinstance(value, models.Field):
             attr_name, path, args, kwargs = value.deconstruct()
@@ -174,18 +286,35 @@ class MigrationWriter(object):
             if hasattr(value, "__module__"):
                 module = value.__module__
                 return "%s.%s" % (module, value.__name__), set(["import %s" % module])
+        # Other iterables
+        elif isinstance(value, collections.Iterable):
+            imports = set()
+            strings = []
+            for item in value:
+                item_string, item_imports = cls.serialize(item)
+                imports.update(item_imports)
+                strings.append(item_string)
+            format = "(%s)" if len(strings) > 1 else "(%s,)"
+            return format % (", ".join(strings)), imports
         # Uh oh.
         else:
-            raise ValueError("Cannot serialize: %r" % value)
+            raise ValueError("Cannot serialize: %r\nThere are some values Django cannot serialize into migration files.\nFor more, see https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing" % value)
 
 
-MIGRATION_TEMPLATE = """# encoding: utf8
+MIGRATION_TEMPLATE = """\
+# encoding: utf8
+from __future__ import unicode_literals
+
 from django.db import models, migrations
 %(imports)s
 
 class Migration(migrations.Migration):
-    %(replaces_str)s
-    dependencies = %(dependencies)s
+%(replaces_str)s
+    dependencies = [
+%(dependencies)s\
+    ]
 
-    operations = %(operations)s
+    operations = [
+%(operations)s\
+    ]
 """

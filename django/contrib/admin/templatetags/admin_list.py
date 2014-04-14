@@ -95,7 +95,8 @@ def result_headers(cl):
     """
     ordering_field_columns = cl.get_ordering_field_columns()
     for i, field_name in enumerate(cl.list_display):
-        text, attr = label_for_field(field_name, cl.model,
+        text, attr = label_for_field(
+            field_name, cl.model,
             model_admin=cl.model_admin,
             return_attr=True
         )
@@ -332,7 +333,7 @@ def date_hierarchy(cl):
         month_lookup = cl.params.get(month_field)
         day_lookup = cl.params.get(day_field)
 
-        link = lambda d: cl.get_query_string(d, [field_generic])
+        link = lambda filters: cl.get_query_string(filters, [field_generic])
 
         if not (year_lookup or month_lookup or day_lookup):
             # select appropriate start level

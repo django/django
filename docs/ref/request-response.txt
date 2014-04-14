@@ -36,7 +36,7 @@ All attributes should be considered read-only, unless stated otherwise below.
 
    .. versionadded:: 1.7
 
-   A string representing the scheme of the request (``http`` or ``https`` 
+   A string representing the scheme of the request (``http`` or ``https``
    usually).
 
 .. attribute:: HttpRequest.body
@@ -132,7 +132,7 @@ All attributes should be considered read-only, unless stated otherwise below.
 
     A dictionary-like object containing all uploaded files. Each key in
     ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
-    value in ``FILES`` is an :class:`UploadedFile` as described below.
+    value in ``FILES`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
 
     See :doc:`/topics/files` for more information.
 
@@ -334,36 +334,6 @@ Methods
             process(element)
 
 
-UploadedFile objects
-====================
-
-.. class:: UploadedFile
-
-
-Attributes
-----------
-
-.. attribute::  UploadedFile.name
-
-    The name of the uploaded file.
-
-.. attribute:: UploadedFile.size
-
-    The size, in bytes, of the uploaded file.
-
-Methods
-----------
-
-.. method:: UploadedFile.chunks(chunk_size=None)
-
-    Returns a generator that yields sequential chunks of data.
-
-.. method:: UploadedFile.read(num_bytes=None)
-
-    Read a number of bytes from the file.
-
-
-
 QueryDict objects
 =================
 
@@ -425,9 +395,9 @@ a subclass of dictionary. Exceptions are outlined here:
           >>> q = q.copy() # to make it mutable
           >>> q.update({'a': '2'})
           >>> q.getlist('a')
-          [u'1', u'2']
+          ['1', '2']
           >>> q['a'] # returns the last
-          [u'2']
+          ['2']
 
 .. method:: QueryDict.items()
 
@@ -436,7 +406,7 @@ a subclass of dictionary. Exceptions are outlined here:
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.items()
-           [(u'a', u'3')]
+           [('a', '3')]
 
 .. method:: QueryDict.iteritems()
 
@@ -456,7 +426,7 @@ a subclass of dictionary. Exceptions are outlined here:
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.values()
-           [u'3']
+           ['3']
 
 .. method:: QueryDict.itervalues()
 
@@ -497,7 +467,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> q.lists()
-        [(u'a', [u'1', u'2', u'3'])]
+        [('a', ['1', '2', '3'])]
 
 .. method:: QueryDict.pop(key)
 
@@ -506,7 +476,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
         >>> q.pop('a')
-        [u'1', u'2', u'3']
+        ['1', '2', '3']
 
 .. method:: QueryDict.popitem()
 
@@ -517,7 +487,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
         >>> q.popitem()
-        (u'a', [u'1', u'2', u'3'])
+        ('a', ['1', '2', '3'])
 
 .. method:: QueryDict.dict()
 
@@ -527,7 +497,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=3&a=5')
         >>> q.dict()
-        {u'a': u'5'}
+        {'a': '5'}
 
 .. method:: QueryDict.urlencode([safe])
 
@@ -627,7 +597,7 @@ Attributes
 
 .. attribute:: HttpResponse.content
 
-    A string representing the content, encoded from a Unicode
+    A bytestring representing the content, encoded from a Unicode
     object if necessary.
 
 .. attribute:: HttpResponse.status_code
@@ -635,8 +605,6 @@ Attributes
     The `HTTP status code`_ for the response.
 
 .. attribute:: HttpResponse.reason_phrase
-
-    .. versionadded:: 1.6
 
     The HTTP reason phrase for the response.
 
@@ -669,8 +637,6 @@ Methods
     Historically, this parameter was called ``mimetype`` (now deprecated).
 
     ``status`` is the `HTTP status code`_ for the response.
-
-    .. versionadded:: 1.6
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
@@ -723,6 +689,14 @@ Methods
 
     .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
+    .. warning::
+
+        Both :rfc:`2109` and :rfc:`6265` state that user agents should support
+        cookies of at least 4096 bytes. For many browsers this is also the
+        maximum size. Django will not raise an exception if there's an attempt
+        to store a cookie of more than 4096 bytes, but many browsers will not
+        set the cookie correctly.
+
 .. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=True)
 
     Like :meth:`~HttpResponse.set_cookie()`, but
@@ -774,8 +748,6 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
     .. attribute:: HttpResponseRedirect.url
 
-        .. versionadded:: 1.6
-
         This read-only attribute represents the URL the response will redirect
         to (equivalent to the ``Location`` response header).
 
@@ -823,6 +795,74 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
 
+JsonResponse objects
+====================
+
+.. versionadded:: 1.7
+
+.. class:: JsonResponse
+
+.. method:: JsonResponse.__init__(data, encoder=DjangoJSONEncoder, safe=True, **kwargs)
+
+   An :class:`HttpResponse` subclass that helps to create a JSON-encoded
+   response. It inherits most behavior from its superclass with a couple
+   differences:
+
+   Its default ``Content-Type`` header is set to ``application/json``.
+
+   The first parameter, ``data``, should be a ``dict`` instance. If the ``safe``
+   parameter is set to ``False`` (see below) it can be any JSON-serializable
+   object.
+
+   The ``encoder``, which defaults to
+   ``django.core.serializers.json.DjangoJSONEncoder``, will be used to
+   serialize the data. See :ref:`JSON serialization
+   <serialization-formats-json>` for more details about this serializer.
+
+   The ``safe`` boolean parameter defaults to ``True``. If it's set to ``False``,
+   any object can be passed for serialization (otherwise only ``dict`` instances
+   are allowed). If ``safe`` is ``True`` and a non-``dict`` object is passed as
+   the first argument, a :exc:`~exceptions.TypeError` will be raised.
+
+Usage
+-----
+
+Typical usage could look like::
+
+    >>> from django.http import JsonResponse
+    >>> response = JsonResponse({'foo': 'bar'})
+    >>> response.content
+    '{"foo": "bar"}'
+
+
+Serializing non-dictionary objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to serialize objects other than ``dict`` you must set the ``safe``
+parameter to ``False``::
+
+    >>> response = JsonResponse([1, 2, 3], safe=False)
+
+Without passing ``safe=False``, a :exc:`~exceptions.TypeError` will be raised.
+
+.. warning::
+
+    Before the `5th edition of EcmaScript
+    <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_
+    it was possible to poison the JavaScript ``Array`` constructor. For this
+    reason, Django does not allow passing non-dict objects to the
+    :class:`~django.http.JsonResponse` constructor by default.  However, most
+    modern browsers implement EcmaScript 5 which removes this attack vector.
+    Therefore it is possible to disable this security precaution.
+
+Changing the default JSON encoder
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you need to use a differ JSON encoder class you can pass the ``encoder``
+parameter to the constructor method::
+
+    >>> response = JsonResponse(data, encoder=MyJSONEncoder)
+
 .. _httpresponse-streaming:
 
 StreamingHttpResponse objects
@@ -833,7 +873,7 @@ StreamingHttpResponse objects
 The :class:`StreamingHttpResponse` class is used to stream a response from
 Django to the browser. You might want to do this if generating the response
 takes too long or uses too much memory. For instance, it's useful for
-generating large CSV files.
+:ref:`generating large CSV files <streaming-csv-files>`.
 
 .. admonition:: Performance considerations
 
@@ -877,8 +917,6 @@ Attributes
     The `HTTP status code`_ for the response.
 
 .. attribute:: HttpResponse.reason_phrase
-
-    .. versionadded:: 1.6
 
     The HTTP reason phrase for the response.
 

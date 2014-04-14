@@ -179,9 +179,9 @@ class RelatedFieldListFilter(FieldListFilter):
         self.title = self.lookup_title
 
     def has_output(self):
-        if (isinstance(self.field, models.related.RelatedObject)
-                and self.field.field.null or hasattr(self.field, 'rel')
-                    and self.field.null):
+        if (isinstance(self.field, models.related.RelatedObject) and
+                self.field.field.null or hasattr(self.field, 'rel') and
+                self.field.null):
             extra = 1
         else:
             extra = 0
@@ -206,9 +206,9 @@ class RelatedFieldListFilter(FieldListFilter):
                 }, [self.lookup_kwarg_isnull]),
                 'display': val,
             }
-        if (isinstance(self.field, models.related.RelatedObject)
-                and self.field.field.null or hasattr(self.field, 'rel')
-                    and self.field.null):
+        if (isinstance(self.field, models.related.RelatedObject) and
+                self.field.field.null or hasattr(self.field, 'rel') and
+                self.field.null):
             yield {
                 'selected': bool(self.lookup_val_isnull),
                 'query_string': cl.get_query_string({

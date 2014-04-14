@@ -8,8 +8,7 @@ import warnings
 
 from django import http
 from django.contrib.formtools import preview, utils
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils._os import upath
 
 from django.contrib.formtools.tests.forms import (
@@ -37,9 +36,9 @@ class TestFormPreview(preview.FormPreview):
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     ),
+    ROOT_URLCONF='django.contrib.formtools.tests.urls',
 )
 class PreviewTests(TestCase):
-    urls = 'django.contrib.formtools.tests.urls'
 
     def setUp(self):
         super(PreviewTests, self).setUp()
@@ -59,7 +58,7 @@ class PreviewTests(TestCase):
         """
         Test contrib.formtools.preview form retrieval.
 
-        Use the client library to see if we can sucessfully retrieve
+        Use the client library to see if we can successfully retrieve
         the form (mostly testing the setup ROOT_URLCONF
         process). Verify that an additional  hidden input field
         is created to manage the stage.

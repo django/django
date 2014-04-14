@@ -22,7 +22,7 @@ class MigrationExecutor(object):
         plan = []
         applied = set(self.loader.applied_migrations)
         for target in targets:
-            # If the target is (appname, None), that means unmigrate everything
+            # If the target is (app_label, None), that means unmigrate everything
             if target[1] is None:
                 for root in self.loader.graph.root_nodes():
                     if root[0] == target[0]:
@@ -74,7 +74,7 @@ class MigrationExecutor(object):
                     migration.apply(project_state, schema_editor, collect_sql=True)
                 else:
                     migration.unapply(project_state, schema_editor, collect_sql=True)
-                statements.extend(schema_editor.collected_sql)
+            statements.extend(schema_editor.collected_sql)
         return statements
 
     def apply_migration(self, migration, fake=False):
@@ -85,7 +85,7 @@ class MigrationExecutor(object):
             self.progress_callback("apply_start", migration, fake)
         if not fake:
             # Test to see if this is an already-applied initial migration
-            if not migration.dependencies and self.detect_soft_applied(migration):
+            if self.detect_soft_applied(migration):
                 fake = True
             else:
                 # Alright, do it normally
@@ -124,15 +124,17 @@ class MigrationExecutor(object):
 
     def detect_soft_applied(self, migration):
         """
-        Tests whether a migration has been implicity applied - that the
+        Tests whether a migration has been implicitly applied - that the
         tables it would create exist. This is intended only for use
         on initial migrations (as it only looks for CreateModel).
         """
         project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=True)
-        app_cache = project_state.render()
+        apps = project_state.render()
         for operation in migration.operations:
             if isinstance(operation, migrations.CreateModel):
-                model = app_cache.get_model(migration.app_label, operation.name)
+                model = apps.get_model(migration.app_label, operation.name)
                 if model._meta.db_table not in self.connection.introspection.get_table_list(self.connection.cursor()):
                     return False
+            else:
+                return False
         return True

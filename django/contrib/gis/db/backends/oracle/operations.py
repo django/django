@@ -196,7 +196,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         else:
             dist_param = value
 
-        # dwithin lookups on oracle require a special string parameter
+        # dwithin lookups on Oracle require a special string parameter
         # that starts with "distance=".
         if lookup_type == 'dwithin':
             dist_param = 'distance=%s' % dist_param
@@ -220,7 +220,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
                 placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
             else:
                 placeholder = '%s'
-            # No geometry value used for F expression, substitue in
+            # No geometry value used for F expression, substitute in
             # the column name instead.
             return placeholder % self.get_expression_column(value)
         else:
@@ -231,10 +231,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
 
     def spatial_lookup_sql(self, lvalue, lookup_type, value, field, qn):
         "Returns the SQL WHERE clause for use in Oracle spatial SQL construction."
-        alias, col, db_type = lvalue
-
-        # Getting the quoted table name as `geo_col`.
-        geo_col = '%s.%s' % (qn(alias), qn(col))
+        geo_col, db_type = lvalue
 
         # See if a Oracle Geometry function matches the lookup type next
         lookup_info = self.geometry_functions.get(lookup_type, False)

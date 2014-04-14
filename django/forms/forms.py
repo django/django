@@ -8,20 +8,19 @@ from collections import OrderedDict
 import copy
 import warnings
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.forms.fields import Field, FileField
 from django.forms.utils import flatatt, ErrorDict, ErrorList
 from django.forms.widgets import Media, MediaDefiningClass, TextInput, Textarea
-from django.utils.html import conditional_escape, format_html
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import smart_text, force_text, python_2_unicode_compatible
+from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils import six
 
 
 __all__ = ('BaseForm', 'Form')
-
-NON_FIELD_ERRORS = '__all__'
 
 
 def pretty_name(name):
@@ -45,7 +44,7 @@ def get_declared_fields(bases, attrs, with_base_fields=True):
 
     warnings.warn(
         "get_declared_fields is deprecated and will be removed in Django 1.9.",
-        PendingDeprecationWarning,
+        RemovedInDjango19Warning,
         stacklevel=2,
     )
 
@@ -158,7 +157,7 @@ class BaseForm(object):
         Returns True if the form has no errors. Otherwise, False. If errors are
         being ignored, returns False.
         """
-        return self.is_bound and not bool(self.errors)
+        return self.is_bound and not self.errors
 
     def add_prefix(self, field_name):
         """
@@ -192,7 +191,7 @@ class BaseForm(object):
                          for e in bf_errors])
                 hidden_fields.append(six.text_type(bf))
             else:
-                # Create a 'class="..."' atribute if the row should have any
+                # Create a 'class="..."' attribute if the row should have any
                 # CSS classes applied.
                 css_classes = bf.css_classes()
                 if css_classes:
@@ -290,6 +289,60 @@ class BaseForm(object):
         prefix = self.add_prefix(fieldname)
         return field.widget.value_from_datadict(self.data, self.files, prefix)
 
+    def add_error(self, field, error):
+        """
+        Update the content of `self._errors`.
+
+        The `field` argument is the name of the field to which the errors
+        should be added. If its value is None the errors will be treated as
+        NON_FIELD_ERRORS.
+
+        The `error` argument can be a single error, a list of errors, or a
+        dictionary that maps field names to lists of errors. What we define as
+        an "error" can be either a simple string or an instance of
+        ValidationError with its message attribute set and what we define as
+        list or dictionary can be an actual `list` or `dict` or an instance
+        of ValidationError with its `error_list` or `error_dict` attribute set.
+
+        If `error` is a dictionary, the `field` argument *must* be None and
+        errors will be added to the fields that correspond to the keys of the
+        dictionary.
+        """
+        if not isinstance(error, ValidationError):
+            # Normalize to ValidationError and let its constructor
+            # do the hard work of making sense of the input.
+            error = ValidationError(error)
+
+        if hasattr(error, 'error_dict'):
+            if field is not None:
+                raise TypeError(
+                    "The argument `field` must be `None` when the `error` "
+                    "argument contains errors for multiple fields."
+                )
+            else:
+                error = error.error_dict
+        else:
+            error = {field or NON_FIELD_ERRORS: error.error_list}
+
+        for field, error_list in error.items():
+            if field not in self.errors:
+                if field != NON_FIELD_ERRORS and field not in self.fields:
+                    raise ValueError(
+                        "'%s' has no field named '%s'." % (self.__class__.__name__, field))
+                self._errors[field] = self.error_class()
+            self._errors[field].extend(error_list)
+            if field in self.cleaned_data:
+                del self.cleaned_data[field]
+
+    def has_error(self, field, code=None):
+        if code is None:
+            return field in self.errors
+        if field in self.errors:
+            for error in self.errors.as_data()[field]:
+                if error.code == code:
+                    return True
+        return False
+
     def full_clean(self):
         """
         Cleans all of self.data and populates self._errors and
@@ -303,6 +356,7 @@ class BaseForm(object):
         # changed from the initial data, short circuit any validation.
         if self.empty_permitted and not self.has_changed():
             return
+
         self._clean_fields()
         self._clean_form()
         self._post_clean()
@@ -324,15 +378,13 @@ class BaseForm(object):
                     value = getattr(self, 'clean_%s' % name)()
                     self.cleaned_data[name] = value
             except ValidationError as e:
-                self._errors[name] = self.error_class(e.messages)
-                if name in self.cleaned_data:
-                    del self.cleaned_data[name]
+                self.add_error(name, e)
 
     def _clean_form(self):
         try:
             cleaned_data = self.clean()
         except ValidationError as e:
-            self._errors[NON_FIELD_ERRORS] = self.error_class(e.messages)
+            self.add_error(None, e)
         else:
             if cleaned_data is not None:
                 self.cleaned_data = cleaned_data
@@ -386,13 +438,7 @@ class BaseForm(object):
                         # Always assume data has changed if validation fails.
                         self._changed_data.append(name)
                         continue
-                if hasattr(field.widget, '_has_changed'):
-                    warnings.warn("The _has_changed method on widgets is deprecated,"
-                        " define it at field level instead.",
-                        DeprecationWarning, stacklevel=2)
-                    if field.widget._has_changed(initial_value, data_value):
-                        self._changed_data.append(name)
-                elif field._has_changed(initial_value, data_value):
+                if field._has_changed(initial_value, data_value):
                     self._changed_data.append(name)
         return self._changed_data
 
@@ -575,6 +621,12 @@ class BoundField(object):
             id_for_label = widget.id_for_label(id_)
             if id_for_label:
                 attrs = dict(attrs or {}, **{'for': id_for_label})
+            if self.field.required and hasattr(self.form, 'required_css_class'):
+                attrs = attrs or {}
+                if 'class' in attrs:
+                    attrs['class'] += ' ' + self.form.required_css_class
+                else:
+                    attrs['class'] = self.form.required_css_class
             attrs = flatatt(attrs) if attrs else ''
             contents = format_html('<label{0}>{1}</label>', attrs, contents)
         else:
@@ -617,7 +669,7 @@ class BoundField(object):
         """
         Wrapper around the field widget's `id_for_label` method.
         Useful, for example, for focusing on this field regardless of whether
-        it has a single widget or a MutiWidget.
+        it has a single widget or a MultiWidget.
         """
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id

@@ -22,6 +22,11 @@ def noop(value, param=None):
     return value
 
 
+@register.simple_tag(takes_context=True)
+def context_stack_length(context):
+    return len(context.dicts)
+
+
 @register.simple_tag
 def no_params():
     """Expected no_params __doc__"""

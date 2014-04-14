@@ -6,8 +6,8 @@ from __future__ import unicode_literals
 import random
 
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -34,7 +34,7 @@ class Child(models.Model):
 
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    parent = generic.GenericForeignKey()
+    parent = GenericForeignKey()
 
     def __str__(self):
         return 'I am %s, a child of %s' % (self.name, self.parent)

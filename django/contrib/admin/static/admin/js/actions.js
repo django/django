@@ -1,5 +1,5 @@
 (function($) {
-	var _actions_icnt, lastChecked;
+	var lastChecked;
 
 	$.fn.actions = function(opts) {
 		var options = $.extend({}, $.fn.actions.defaults, opts);
@@ -16,6 +16,8 @@
 		},
 		updateCounter = function() {
 			var sel = $(actionCheckboxes).filter(":checked").length;
+			// _actions_icnt is defined in the generated HTML
+			// and contains the total amount of objects in the queryset
 			$(options.counterContainer).html(interpolate(
 			ngettext('%(sel)s of %(cnt)s selected', '%(sel)s of %(cnt)s selected', sel), {
 				sel: sel,

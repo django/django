@@ -38,11 +38,11 @@ and Django's handling of database schema:
 It's worth noting that migrations are created and run on a per-app basis.
 In particular, it's possible to have apps that *do not use migrations* (these
 are referred to as "unmigrated" apps) - these apps will instead mimic the
-legacy behaviour of just adding new models.
+legacy behavior of just adding new models.
 
 You should think of migrations as a version control system for your database
 schema. ``makemigrations`` is responsible for packaging up your model changes
-into individual migration files - analagous to commits - and ``migrate`` is
+into individual migration files - analogous to commits - and ``migrate`` is
 responsible for applying those to your database.
 
 The migration files for each app live in a "migrations" directory inside
@@ -51,16 +51,20 @@ of, its codebase. You should be making them once on your development machine
 and then running the same migrations on your colleagues' machines, your
 staging machines, and eventually your production machines.
 
-Migrations will run the same way every time and produce consistent results,
-meaning that what you see in development and staging is exactly what will
-happen in production - no unexpected surprises.
+.. note::
+    It is possible to override the name of the package which contains the
+    migrations on a per-app basis by modifying the :setting:`MIGRATION_MODULES` setting.
+
+Migrations will run the same way on the same dataset and produce consistent
+results, meaning that what you see in development and staging is, under the
+same circumstances, exactly what will happen in production.
 
 Backend Support
 ---------------
 
 Migrations are supported on all backends that Django ships with, as well
 as any third-party backends if they have programmed in support for schema
-alteration (done via the ``SchemaEditor`` class).
+alteration (done via the :doc:`SchemaEditor </ref/schema-editor>` class).
 
 However, some databases are more capable than others when it comes to
 schema migrations; some of the caveats are covered below.
@@ -70,7 +74,7 @@ PostgreSQL
 
 PostgreSQL is the most capable of all the databases here in terms of schema
 support; the only caveat is that adding columns with default values will
-lock a table for a time proportional to the number of rows in it.
+cause a full rewrite of the table, for a time proportional to its size.
 
 For this reason, it's recommended you always create new columns with
 ``null=True``, as this way they will be added immediately.
@@ -83,11 +87,11 @@ meaning that if a migration fails to apply you will have to manually unpick
 the changes in order to try again (it's impossible to roll back to an
 earlier point).
 
-In addition, MySQL will lock tables for almost every schema operation and
-generally takes a time proportional to the number of rows in the table to
-add or remove columns. On slower hardware this can be worse than a minute
-per million rows - adding a few columns to a table with just a few million
-rows could lock your site up for over ten minutes.
+In addition, MySQL will fully rewrite tables for almost every schema operation
+and generally takes a time proportional to the number of rows in the table to
+add or remove columns. On slower hardware this can be worse than a minute per
+million rows - adding a few columns to a table with just a few million rows
+could lock your site up for over ten minutes.
 
 Finally, MySQL has reasonably small limits on name lengths for columns, tables
 and indexes, as well as a limit on the combined size of all columns an index
@@ -190,7 +194,7 @@ If this didn't happen, the migration would try to create the ForeignKey column
 without the table it's referencing existing and your database would
 throw an error.
 
-This dependency behaviour affects most migration operations where you
+This dependency behavior affects most migration operations where you
 restrict to a single app. Restricting to a single app (either in
 ``makemigrations`` or ``migrate``) is a best-efforts promise, and not
 a guarantee; any other apps that need to be used to get dependencies correct
@@ -244,6 +248,15 @@ it's entirely possible to write them manually if you need to. Some of the
 more complex operations are not autodetectable and are only available via
 a hand-written migration, so don't be scared about editing them if you have to.
 
+Custom fields
+~~~~~~~~~~~~~
+
+You can't modify the number of positional arguments in an already migrated
+custom field without raising a TypeError. The old migration will call the
+modified ``__init__`` method with the old signature. So if you need a new
+argument, please create a keyword argument and use e.g.
+``assert kwargs.get('argument_name') is not None`` in the constructor.
+
 Adding migrations to apps
 -------------------------
 
@@ -255,7 +268,7 @@ If your app already has models and database tables, and doesn't have migrations
 yet (for example, you created it against a previous Django version), you'll
 need to convert it to use migrations; this is a simple process::
 
-    $ python manage.py makemigrations yourappname
+    $ python manage.py makemigrations your_app_label
 
 This will make a new initial migration for your app. Now, when you run
 :djadmin:`migrate`, Django will detect that you have an initial migration
@@ -271,6 +284,7 @@ Note that this only works given two things:
 * You have not manually edited your database - Django won't be able to detect
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
+
 
 .. _historical-models:
 
@@ -288,8 +302,164 @@ models will not have any custom methods or managers that you have defined.
 They will, however, have the same fields, relationships and ``Meta`` options
 (also versioned, so they may be different from your current ones).
 
+.. warning::
+
+  This means that you will NOT have custom save() methods called on objects
+  when you access them in migrations, and you will NOT have any custom constructors
+  or instance methods. Plan appropriately!
+
 In addition, the base classes of the model are just stored as pointers,
 so you must always keep base classes around for as long as there is a migration
 that contains a reference to them. On the plus side, methods and managers
 from these base classes inherit normally, so if you absolutely need access
 to these you can opt to move them into a superclass.
+
+
+.. _data-migrations:
+
+Data Migrations
+---------------
+
+As well as changing the database schema, you can also use migrations to change
+the data in the database itself, in conjunction with the schema if you want.
+
+Migrations that alter data are usually called "data migrations"; they're best
+written as separate migrations, sitting alongside your schema migrations.
+
+Django can't automatically generate data migrations for you, as it does with
+schema migrations, but it's not very hard to write them. Migration files in
+Django are made up of :doc:`Operations </ref/migration-operations>`, and
+the main operation you use for data migrations is
+:ref:`RunPython <operation-run-python>`.
+
+To start, make an empty migration file you can work from (Django will put
+the file in the right place, suggest a name, and add dependencies for you)::
+
+    python manage.py makemigrations --empty yourappname
+
+Then, open up the file; it should look something like this::
+
+    # encoding: utf8
+    from django.db import models, migrations
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('yourappname', '0001_initial'),
+        ]
+
+        operations = [
+        ]
+
+Now, all you need to do is create a new function and have RunPython use it.
+RunPython expects a callable as its argument which takes two arguments - the
+first is an :doc:`app registry </ref/applications/>` that has the historical
+versions of all your models loaded into it to match where in your history the
+migration sits, and the second is a :doc:`SchemaEditor </ref/schema-editor>`,
+which you can use to manually effect database schema changes (but beware,
+doing this can confuse the migration autodetector!)
+
+Let's write a simple migration that populates our new ``name`` field with the
+combined values of ``first_name`` and ``last_name`` (we've come to our senses
+and realized that not everyone has first and last names). All we
+need to do is use the historical model and iterate over the rows::
+
+    # encoding: utf8
+    from django.db import models, migrations
+
+    def combine_names(apps, schema_editor):
+        # We can't import the Person model directly as it may be a newer
+        # version than this migration expects. We use the historical version.
+        Person = apps.get_model("yourappname", "Person")
+        for person in Person.objects.all():
+            person.name = "%s %s" % (person.first_name, person.last_name)
+            person.save()
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('yourappname', '0001_initial'),
+        ]
+
+        operations = [
+            migrations.RunPython(combine_names),
+        ]
+
+Once that's done, we can just run ``python manage.py migrate`` as normal and
+the data migration will run in place alongside other migrations.
+
+If you're interested in the more advanced migration operations, or want
+to be able to write your own, see our
+:doc:`migration operations reference </ref/migration-operations>`.
+
+
+.. _migration-serializing:
+
+Serializing values
+------------------
+
+Migrations are just Python files containing the old definitions of your models
+- thus, to write them, Django must take the current state of your models and
+serialize them out into a file.
+
+While Django can serialize most things, there are some things that we just
+can't serialize out into a valid Python representation - there's no Python
+standard for how a value can be turned back into code (``repr()`` only works
+for basic values, and doesn't specify import paths).
+
+Django can serialize the following:
+
+- ``int``, ``long``, ``float``, ``bool``, ``str``, ``unicode``, ``bytes``, ``None``
+- ``list``, ``set``, ``tuple``, ``dict``
+- ``datetime.date`` and ``datetime.datetime`` instances
+- ``decimal.Decimal`` instances
+- Any Django field
+- Any function or method reference (e.g. ``datetime.datetime.today``)
+- Any class reference
+- Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
+
+Django cannot serialize:
+
+- Arbitrary class instances (e.g. ``MyClass(4.3, 5.7)``)
+- Lambdas
+
+.. _custom-deconstruct-method:
+
+Adding a deconstruct() method
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can let Django serialize your own custom class instances by giving the class
+a ``deconstruct`` method. It takes no arguments, and should return a tuple
+of 3 things: ``(path, args, kwargs)``.
+
+``path`` should be the Python path to the class, with the class name included as the
+last part (for example, ``myapp.custom_things.MyClass``). If your class is not
+available at the top level of a module it is not serializable.
+
+``args`` should be a list of positional arguments to pass to your class'
+``__init__`` method. Everything in this list should itself be serializable.
+
+``kwargs`` should be a dict of keyword arguments to pass to your class'
+``__init__`` method. Every value should itself be serializable.
+
+Django will write out the value as an instantiation of your class with the
+given arguments, similar to the way it writes out references to Django fields.
+
+
+Upgrading from South
+--------------------
+
+If you already have pre-existing migrations created with
+`South 0.x <http://south.aeracode.org>`_, then the upgrade process to use
+``django.db.migrations`` is quite simple:
+
+* Ensure all installs are fully up-to-date with their migrations
+* Delete all your (numbered) migration files, but not the directory or __init__.py - make sure you remove the ``.pyc`` files too.
+* Run ``python manage.py makemigrations``. Django should see the empty migration directories and make new initial migrations in the new format.
+* Run ``python manage.py migrate``. Django will see that the tables for the initial migrations already exist and mark them as applied without running them.
+
+That's it! The only complication is if you have a circular dependency loop
+of foreign keys; in this case, ``makemigrations`` might make more than one
+initial migration, and you'll need to mark them all as applied using::
+
+    python manage.py migrate --fake yourappnamehere

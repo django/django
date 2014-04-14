@@ -19,7 +19,7 @@ ogrinspect <data_source> <model_name>
 
 .. django-admin:: ogrinspect
 
-The ``ogrinpsect`` management command will inspect the given OGR-compatible
+The ``ogrinspect`` management command will inspect the given OGR-compatible
 :class:`~django.contrib.gis.gdal.DataSource` (e.g., a shapefile) and will
 output a GeoDjango model with the given model name.  There's a detailed example
 of using ``ogrinspect`` :ref:`in the tutorial <ogrinspect-intro>`.
@@ -65,7 +65,7 @@ of using ``ogrinspect`` :ref:`in the tutorial <ogrinspect-intro>`.
 
 .. django-admin-option:: --name-field <name_field>
 
-   Generates a ``__unicode__`` routine (``__str__`` on Python 3) on the model
+   Generates a ``__str__`` routine (``__unicode__`` on Python 2) on the model
    that will return the given field name.
 
 .. django-admin-option:: --no-imports

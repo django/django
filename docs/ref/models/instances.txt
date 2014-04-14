@@ -86,14 +86,8 @@ validation errors yourself, or if you have excluded fields from the
 
 .. method:: Model.full_clean(exclude=None, validate_unique=True)
 
-.. versionchanged:: 1.6
-
-  The ``validate_unique`` parameter was added to allow skipping
-  :meth:`Model.validate_unique()`. Previously, :meth:`Model.validate_unique()`
-  was always called by ``full_clean``.
-
 This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`, and
-:meth:`Model.validate_unique()` (if ``validate_unique`` is ``True``, in that
+:meth:`Model.validate_unique()` (if ``validate_unique`` is ``True``), in that
 order and raises a :exc:`~django.core.exceptions.ValidationError` that has a
 ``message_dict`` attribute containing errors from all three stages.
 
@@ -151,8 +145,8 @@ access to more than a single field::
 
 Any :exc:`~django.core.exceptions.ValidationError` exceptions raised by
 ``Model.clean()`` will be stored in a special key error dictionary key,
-``NON_FIELD_ERRORS``, that is used for errors that are tied to the entire model
-instead of to a specific field::
+:data:`~django.core.exceptions.NON_FIELD_ERRORS`, that is used for errors
+that are tied to the entire model instead of to a specific field::
 
     from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
     try:
@@ -310,17 +304,15 @@ value explicitly when saving new objects, if you cannot guarantee the
 primary-key value is unused. For more on this nuance, see `Explicitly specifying
 auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
 
-.. versionchanged:: 1.6
-
-    Previously Django did a ``SELECT`` when the primary key attribute was set.
-    If the ``SELECT`` found a row, then Django did an ``UPDATE``, otherwise it
-    did an ``INSERT``. The old algorithm results in one more query in the
-    ``UPDATE`` case. There are some rare cases where the database doesn't
-    report that a row was updated even if the database contains a row for the
-    object's primary key value. An example is the PostgreSQL ``ON UPDATE``
-    trigger which returns ``NULL``. In such cases it is possible to revert to the
-    old algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
-    option to ``True``.
+In Django 1.5 and earlier, Django did a ``SELECT`` when the primary key
+attribute was set. If the ``SELECT`` found a row, then Django did an ``UPDATE``,
+otherwise it did an ``INSERT``. The old algorithm results in one more query in
+the ``UPDATE`` case. There are some rare cases where the database doesn't
+report that a row was updated even if the database contains a row for the
+object's primary key value. An example is the PostgreSQL ``ON UPDATE`` trigger
+which returns ``NULL``. In such cases it is possible to revert to the old
+algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
+option to ``True``.
 
 .. _ref-models-force-insert:
 
@@ -449,7 +441,7 @@ For example::
         last_name = models.CharField(max_length=50)
 
         def __unicode__(self):
-            return u'%s %s' % (self.first_name, self.last_name)
+            return '%s %s' % (self.first_name, self.last_name)
 
 If you define a ``__unicode__()`` method on your model and not a
 :meth:`~Model.__str__()` method, Django will automatically provide you with a
@@ -463,9 +455,29 @@ the conversion to string objects when required.
 
 .. method:: Model.__str__()
 
-The ``__str__()`` method is called whenever you call ``str()`` on an object. The main use for this method directly inside Django is when the ``repr()`` output of a model is displayed anywhere (for example, in debugging output).
-Thus, you should return a nice, human-readable string for the object's
-``__str__()``.  It isn't required to put ``__str__()`` methods everywhere if you have sensible :meth:`~Model.__unicode__()` methods.
+The ``__str__()`` method is called whenever you call ``str()`` on an
+object. In Python 3, Django uses ``str(obj)`` in a number of
+places. Most notably, to display an object in the Django admin site
+and as the value inserted into a template when it displays an
+object. Thus, you should always return a nice, human-readable
+representation of the model from the ``__str__()`` method.
+
+For example::
+
+    from django.db import models
+
+    class Person(models.Model):
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
+
+        def __str__(self):
+            return '%s %s' % (self.first_name, self.last_name)
+
+In Python 2, the main use of ``__str__`` directly inside Django is
+when the ``repr()`` output of a model is displayed anywhere (for
+example, in debugging output). It isn't required to put ``__str__()``
+methods everywhere if you have sensible :meth:`~Model.__unicode__()`
+methods.
 
 The previous :meth:`~Model.__unicode__()` example could be similarly written
 using ``__str__()`` like this::
@@ -590,7 +602,7 @@ in ``get_absolute_url()`` and have all your other code call that one place.
 
 .. note::
     The string you return from ``get_absolute_url()`` **must** contain only
-    ASCII characters (required by the URI specfication, :rfc:`2396`) and be
+    ASCII characters (required by the URI specification, :rfc:`2396`) and be
     URL-encoded, if necessary.
 
     Code and templates calling ``get_absolute_url()`` should be able to use the
@@ -704,9 +716,9 @@ For example::
 
     class Person(models.Model):
         SHIRT_SIZES = (
-            (u'S', u'Small'),
-            (u'M', u'Medium'),
-            (u'L', u'Large'),
+            ('S', 'Small'),
+            ('M', 'Medium'),
+            ('L', 'Large'),
         )
         name = models.CharField(max_length=60)
         shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
@@ -716,9 +728,9 @@ For example::
     >>> p = Person(name="Fred Flintstone", shirt_size="L")
     >>> p.save()
     >>> p.shirt_size
-    u'L'
+    'L'
     >>> p.get_shirt_size_display()
-    u'Large'
+    'Large'
 
 .. method:: Model.get_next_by_FOO(\**kwargs)
 .. method:: Model.get_previous_by_FOO(\**kwargs)

@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.contrib.formtools.tests.wizard.namedwizardtests.forms import (
     SessionContactWizard, CookieContactWizard, Page1, Page2, Page3, Page4)
 
@@ -18,9 +18,9 @@ def get_named_cookie_wizard():
         done_step_name='nwiz_cookie_done'
     )
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^nwiz_session/(?P<step>.+)/$', get_named_session_wizard(), name='nwiz_session'),
     url(r'^nwiz_session/$', get_named_session_wizard(), name='nwiz_session_start'),
     url(r'^nwiz_cookie/(?P<step>.+)/$', get_named_cookie_wizard(), name='nwiz_cookie'),
     url(r'^nwiz_cookie/$', get_named_cookie_wizard(), name='nwiz_cookie_start'),
-)
+]

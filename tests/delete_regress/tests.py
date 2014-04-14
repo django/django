@@ -15,6 +15,7 @@ from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
 
 # Can't run this test under SQLite, because you can't
 # get two connections to an in-memory database.
+@skipUnlessDBFeature('test_db_allows_multiple_connections')
 class DeleteLockingTest(TransactionTestCase):
 
     available_apps = ['delete_regress']
@@ -23,45 +24,36 @@ class DeleteLockingTest(TransactionTestCase):
         # Create a second connection to the default database
         new_connections = ConnectionHandler(settings.DATABASES)
         self.conn2 = new_connections[DEFAULT_DB_ALIAS]
-        # Put both DB connections into managed transaction mode
-        transaction.enter_transaction_management()
-        self.conn2.enter_transaction_management()
+        self.conn2.set_autocommit(False)
 
     def tearDown(self):
         # Close down the second connection.
-        transaction.leave_transaction_management()
-        self.conn2.abort()
+        self.conn2.rollback()
         self.conn2.close()
 
-    @skipUnlessDBFeature('test_db_allows_multiple_connections')
     def test_concurrent_delete(self):
-        "Deletes on concurrent transactions don't collide and lock the database. Regression for #9479"
+        """Concurrent deletes don't collide and lock the database (#9479)."""
+        with transaction.atomic():
+            Book.objects.create(id=1, pagecount=100)
+            Book.objects.create(id=2, pagecount=200)
+            Book.objects.create(id=3, pagecount=300)
 
-        # Create some dummy data
-        b1 = Book(id=1, pagecount=100)
-        b2 = Book(id=2, pagecount=200)
-        b3 = Book(id=3, pagecount=300)
-        b1.save()
-        b2.save()
-        b3.save()
+        with transaction.atomic():
+            # Start a transaction on the main connection.
+            self.assertEqual(3, Book.objects.count())
 
-        transaction.commit()
+            # Delete something using another database connection.
+            with self.conn2.cursor() as cursor2:
+                cursor2.execute("DELETE from delete_regress_book WHERE id = 1")
+            self.conn2.commit()
 
-        self.assertEqual(3, Book.objects.count())
+            # In the same transaction on the main connection, perform a
+            # queryset delete that covers the object deleted with the other
+            # connection. This causes an infinite loop under MySQL InnoDB
+            # unless we keep track of already deleted objects.
+            Book.objects.filter(pagecount__lt=250).delete()
 
-        # Delete something using connection 2.
-        cursor2 = self.conn2.cursor()
-        cursor2.execute('DELETE from delete_regress_book WHERE id=1')
-        self.conn2._commit()
-
-        # Now perform a queryset delete that covers the object
-        # deleted in connection 2. This causes an infinite loop
-        # under MySQL InnoDB unless we keep track of already
-        # deleted objects.
-        Book.objects.filter(pagecount__lt=250).delete()
-        transaction.commit()
         self.assertEqual(1, Book.objects.count())
-        transaction.commit()
 
 
 class DeleteCascadeTests(TestCase):

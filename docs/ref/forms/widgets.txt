@@ -148,11 +148,9 @@ the 'type' attribute to take advantage of the new HTML5 input types.  To do
 this, you use the :attr:`Widget.attrs` argument when creating the widget::
 
     class CommentForm(forms.Form):
-        name = forms.CharField(
-                    widget=forms.TextInput(attrs={'class':'special'}))
+        name = forms.CharField(widget=forms.TextInput(attrs={'class': 'special'}))
         url = forms.URLField()
-        comment = forms.CharField(
-                   widget=forms.TextInput(attrs={'size':'40'}))
+        comment = forms.CharField(widget=forms.TextInput(attrs={'size': '40'}))
 
 Django will then include the extra attributes in the rendered output:
 
@@ -205,7 +203,20 @@ foundation for custom widgets.
             >>> from django import forms
             >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name',})
             >>> name.render('name', 'A name')
-            u'<input title="Your name" type="text" name="name" value="A name" size="10" />'
+            '<input title="Your name" type="text" name="name" value="A name" size="10" />'
+
+        .. versionchanged:: 1.8
+
+            If you assign a value of ``True`` or ``False`` to an attribute,
+            it will be rendered as an HTML5 boolean attribute::
+
+                >>> name = forms.TextInput(attrs={'required': True})
+                >>> name.render('name', 'A name')
+                '<input name="name" type="text" value="A name" required />'
+                >>>
+                >>> name = forms.TextInput(attrs={'required': False})
+                >>> name.render('name', 'A name')
+                '<input name="name" type="text" value="A name" />'
 
     .. method:: render(name, value, attrs=None)
 
@@ -216,7 +227,7 @@ foundation for custom widgets.
         The 'value' given is not guaranteed to be valid input, therefore
         subclass implementations should program defensively.
 
-    .. method:: value_from_datadict(self, data, files, name)
+    .. method:: value_from_datadict(data, files, name)
 
         Given a dictionary of data and this widget's name, returns the value
         of this widget. Returns ``None`` if a value wasn't provided.
@@ -331,7 +342,7 @@ foundation for custom widgets.
                 return [None, None, None]
 
             def format_output(self, rendered_widgets):
-                return u''.join(rendered_widgets)
+                return ''.join(rendered_widgets)
 
             def value_from_datadict(self, data, files, name):
                 datelist = [
@@ -398,8 +409,6 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: NumberInput
 
-    .. versionadded:: 1.6
-
     Text input: ``<input type="number" ...>``
 
     Beware that not all browsers support entering localized numbers in
@@ -411,16 +420,12 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: EmailInput
 
-    .. versionadded:: 1.6
-
     Text input: ``<input type="email" ...>``
 
 ``URLInput``
 ~~~~~~~~~~~~
 
 .. class:: URLInput
-
-    .. versionadded:: 1.6
 
     Text input: ``<input type="url" ...>``
 
@@ -522,7 +527,7 @@ Selector and checkbox widgets
 
     .. attribute:: CheckboxInput.check_test
 
-        A callable that takes the value of the CheckBoxInput and returns
+        A callable that takes the value of the ``CheckboxInput`` and returns
         ``True`` if the checkbox should be checked for that value.
 
 ``Select``
@@ -638,10 +643,8 @@ Selector and checkbox widgets
     simply includes ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>``
     with ``<li>`` tags, as above.
 
-.. versionchanged:: 1.6
-
-The outer ``<ul>`` container will now receive the ``id`` attribute defined on
-the widget.
+    The outer ``<ul>`` container will receive the ``id`` attribute defined on
+    the widget.
 
 .. versionchanged:: 1.7
 
@@ -664,10 +667,8 @@ the widget.
           ...
         </ul>
 
-.. versionchanged:: 1.6
-
-The outer ``<ul>`` container will now receive the ``id`` attribute defined on
-the widget.
+    The outer ``<ul>`` container will receive the ``id`` attribute defined on
+    the widget.
 
 Like :class:`RadioSelect`, you can now loop over the individual checkboxes making
 up the lists. See the documentation of :class:`RadioSelect` for more details.

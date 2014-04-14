@@ -3,6 +3,7 @@ from django.db.backends.postgresql_psycopg2.base import DatabaseWrapper as Psyco
 from django.contrib.gis.db.backends.postgis.creation import PostGISCreation
 from django.contrib.gis.db.backends.postgis.introspection import PostGISIntrospection
 from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
+from django.contrib.gis.db.backends.postgis.schema import PostGISSchemaEditor
 
 
 class DatabaseWrapper(Psycopg2DatabaseWrapper):
@@ -12,3 +13,7 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
             self.creation = PostGISCreation(self)
             self.ops = PostGISOperations(self)
             self.introspection = PostGISIntrospection(self)
+
+    def schema_editor(self, *args, **kwargs):
+        "Returns a new instance of this backend's SchemaEditor"
+        return PostGISSchemaEditor(self, *args, **kwargs)

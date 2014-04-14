@@ -39,6 +39,6 @@ def get_version(connection):
     if hasattr(connection, 'server_version'):
         return connection.server_version
     else:
-        cursor = connection.cursor()
-        cursor.execute("SELECT version()")
-        return _parse_version(cursor.fetchone()[0])
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT version()")
+            return _parse_version(cursor.fetchone()[0])

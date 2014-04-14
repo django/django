@@ -1,7 +1,7 @@
 import re
 
 from django.conf import settings
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.core.exceptions import ImproperlyConfigured
 
 
@@ -12,9 +12,9 @@ def static(prefix, view='django.views.static.serve', **kwargs):
     from django.conf import settings
     from django.conf.urls.static import static
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         # ... the rest of your URLconf goes here ...
-    ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     """
     # No-op if not in debug mode or an non-local prefix
@@ -22,6 +22,6 @@ def static(prefix, view='django.views.static.serve', **kwargs):
         return []
     elif not prefix:
         raise ImproperlyConfigured("Empty static prefix not permitted")
-    return patterns('',
+    return [
         url(r'^%s(?P<path>.*)$' % re.escape(prefix.lstrip('/')), view, kwargs=kwargs),
-    )
+    ]

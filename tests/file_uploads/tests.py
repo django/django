@@ -14,7 +14,7 @@ from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http.multipartparser import MultiPartParser
 from django.test import TestCase, client
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils.encoding import force_bytes
 from django.utils.six import StringIO
 
@@ -27,8 +27,9 @@ MEDIA_ROOT = sys_tempfile.mkdtemp()
 UPLOAD_TO = os.path.join(MEDIA_ROOT, 'test_upload')
 
 
-@override_settings(MEDIA_ROOT=MEDIA_ROOT)
+@override_settings(MEDIA_ROOT=MEDIA_ROOT, ROOT_URLCONF='file_uploads.urls')
 class FileUploadTests(TestCase):
+
     @classmethod
     def setUpClass(cls):
         if not os.path.isdir(MEDIA_ROOT):
@@ -44,7 +45,7 @@ class FileUploadTests(TestCase):
                 'name': 'Ringo',
                 'file_field': fp,
             }
-            response = self.client.post('/file_uploads/upload/', post_data)
+            response = self.client.post('/upload/', post_data)
         self.assertEqual(response.status_code, 200)
 
     def test_large_upload(self):
@@ -71,7 +72,7 @@ class FileUploadTests(TestCase):
             except AttributeError:
                 post_data[key + '_hash'] = hashlib.sha1(force_bytes(post_data[key])).hexdigest()
 
-        response = self.client.post('/file_uploads/verify/', post_data)
+        response = self.client.post('/verify/', post_data)
 
         self.assertEqual(response.status_code, 200)
 
@@ -87,7 +88,7 @@ class FileUploadTests(TestCase):
         r = {
             'CONTENT_LENGTH': len(payload),
             'CONTENT_TYPE': client.MULTIPART_CONTENT,
-            'PATH_INFO': "/file_uploads/echo_content/",
+            'PATH_INFO': "/echo_content/",
             'REQUEST_METHOD': 'POST',
             'wsgi.input': payload,
         }
@@ -115,7 +116,7 @@ class FileUploadTests(TestCase):
                 'file_unicode': file1,
             }
 
-            response = self.client.post('/file_uploads/unicode_name/', post_data)
+            response = self.client.post('/unicode_name/', post_data)
 
         self.assertEqual(response.status_code, 200)
 
@@ -154,7 +155,7 @@ class FileUploadTests(TestCase):
         r = {
             'CONTENT_LENGTH': len(payload),
             'CONTENT_TYPE': client.MULTIPART_CONTENT,
-            'PATH_INFO': "/file_uploads/echo/",
+            'PATH_INFO': "/echo/",
             'REQUEST_METHOD': 'POST',
             'wsgi.input': payload,
         }
@@ -191,7 +192,7 @@ class FileUploadTests(TestCase):
         r = {
             'CONTENT_LENGTH': len(payload),
             'CONTENT_TYPE': client.MULTIPART_CONTENT,
-            'PATH_INFO': "/file_uploads/echo/",
+            'PATH_INFO': "/echo/",
             'REQUEST_METHOD': 'POST',
             'wsgi.input': payload,
         }
@@ -215,7 +216,7 @@ class FileUploadTests(TestCase):
         simple_file.seek(0)
         simple_file.content_type = 'text/plain; test-key=test_value'
 
-        response = self.client.post('/file_uploads/echo_content_type_extra/', {
+        response = self.client.post('/echo_content_type_extra/', {
             'no_content_type': no_content_type,
             'simple_file': simple_file,
         })
@@ -242,7 +243,7 @@ class FileUploadTests(TestCase):
         r = {
             'CONTENT_LENGTH': len(payload),
             'CONTENT_TYPE': client.MULTIPART_CONTENT,
-            'PATH_INFO': '/file_uploads/echo/',
+            'PATH_INFO': '/echo/',
             'REQUEST_METHOD': 'POST',
             'wsgi.input': payload,
         }
@@ -257,7 +258,7 @@ class FileUploadTests(TestCase):
         r = {
             'CONTENT_LENGTH': 0,
             'CONTENT_TYPE': client.MULTIPART_CONTENT,
-            'PATH_INFO': '/file_uploads/echo/',
+            'PATH_INFO': '/echo/',
             'REQUEST_METHOD': 'POST',
             'wsgi.input': client.FakePayload(b''),
         }
@@ -276,12 +277,12 @@ class FileUploadTests(TestCase):
         bigfile.seek(0)
 
         # Small file posting should work.
-        response = self.client.post('/file_uploads/quota/', {'f': smallfile})
+        response = self.client.post('/quota/', {'f': smallfile})
         got = json.loads(response.content.decode('utf-8'))
         self.assertTrue('f' in got)
 
         # Large files don't go through.
-        response = self.client.post("/file_uploads/quota/", {'f': bigfile})
+        response = self.client.post("/quota/", {'f': bigfile})
         got = json.loads(response.content.decode('utf-8'))
         self.assertTrue('f' not in got)
 
@@ -294,7 +295,7 @@ class FileUploadTests(TestCase):
         self.assertRaises(
             AttributeError,
             self.client.post,
-            '/file_uploads/quota/broken/',
+            '/quota/broken/',
             {'f': f}
         )
 
@@ -311,7 +312,7 @@ class FileUploadTests(TestCase):
         file2a.write(b'a' * (5 * 2 ** 20))
         file2a.seek(0)
 
-        response = self.client.post('/file_uploads/getlist_count/', {
+        response = self.client.post('/getlist_count/', {
             'file1': file1,
             'field1': 'test',
             'field2': 'test3',
@@ -357,7 +358,7 @@ class FileUploadTests(TestCase):
                 'file_field': fp,
             }
             try:
-                self.client.post('/file_uploads/upload_errors/', post_data)
+                self.client.post('/upload_errors/', post_data)
             except reference_error.__class__ as err:
                 self.assertFalse(
                     str(err) == str(reference_error),
@@ -386,7 +387,7 @@ class FileUploadTests(TestCase):
             '--%(boundary)s--\r\n',
         ]
         response = self.client.post(
-            '/file_uploads/filename_case/',
+            '/filename_case/',
             '\r\n'.join(post_data) % vars,
             'multipart/form-data; boundary=%(boundary)s' % vars
         )

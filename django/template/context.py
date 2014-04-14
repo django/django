@@ -1,5 +1,5 @@
 from copy import copy
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 
 # Cache of actual callables.
 _standard_context_processors = None
@@ -97,6 +97,27 @@ class BaseContext(object):
         new_context._reset_dicts(values)
         return new_context
 
+    def flatten(self):
+        """
+        Returns self.dicts as one dictionary
+        """
+        flat = {}
+        for d in self.dicts:
+            flat.update(d)
+        return flat
+
+    def __eq__(self, other):
+        """
+        Compares two contexts by comparing theirs 'dicts' attributes.
+        """
+        if isinstance(other, BaseContext):
+            # because dictionaries can be put in different order
+            # we have to flatten them like in templates
+            return self.flatten() == other.flatten()
+
+        # if it's not comparable return false
+        return False
+
 
 class Context(BaseContext):
     "A stack container for variable context"
@@ -145,10 +166,10 @@ class RenderContext(BaseContext):
         return key in self.dicts[-1]
 
     def get(self, key, otherwise=None):
-        d = self.dicts[-1]
-        if key in d:
-            return d[key]
-        return otherwise
+        return self.dicts[-1].get(key, otherwise)
+
+    def __getitem__(self, key):
+        return self.dicts[-1][key]
 
 
 # This is a function rather than module-level procedural code because we only
@@ -162,7 +183,7 @@ def get_standard_processors():
         collect.extend(_builtin_context_processors)
         collect.extend(settings.TEMPLATE_CONTEXT_PROCESSORS)
         for path in collect:
-            func = import_by_path(path)
+            func = import_string(path)
             processors.append(func)
         _standard_context_processors = tuple(processors)
     return _standard_context_processors

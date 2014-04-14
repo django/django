@@ -33,7 +33,7 @@ Available ``Meta`` options
     .. versionadded:: 1.7
 
         ``app_label`` is no longer required for models that are defined
-        in a ``models`` package within an app.
+        outside the ``models`` module of an application.
 
 ``db_table``
 ------------
@@ -74,14 +74,14 @@ Django quotes column and table names behind the scenes.
 
 .. admonition:: Table name quoting for Oracle
 
-   In order to to meet the 30-char limitation Oracle has on table names,
+   In order to meet the 30-char limitation Oracle has on table names,
    and match the usual conventions for Oracle databases, Django may shorten
    table names and turn them all-uppercase. To prevent such transformations,
    use a quoted name as the value for ``db_table``::
 
        db_table = '"name_left_in_lowercase"'
 
-   Such quoted names can also be used with Django's other supported database 
+   Such quoted names can also be used with Django's other supported database
    backends; except for Oracle, however, the quotes have no effect. See the
    :ref:`Oracle notes <oracle-notes>` for more details.
 
@@ -279,8 +279,6 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.select_on_save
 
-    .. versionadded:: 1.6
-
     Determines if Django will use the pre-1.6
     :meth:`django.db.models.Model.save()` algorithm. The old algorithm
     uses ``SELECT`` to determine if there is an existing row to be updated.
@@ -321,6 +319,11 @@ Django quotes column and table names behind the scenes.
     :class:`~django.db.models.ManyToManyField`, try using a signal or
     an explicit :attr:`through <ManyToManyField.through>` model.
 
+    .. versionchanged:: 1.7
+
+    The ``ValidationError`` raised during model validation when the
+    constraint is violated has the ``unique_together`` error code.
+
 ``index_together``
 ------------------
 
@@ -334,6 +337,13 @@ Django quotes column and table names behind the scenes.
 
     This list of fields will be indexed together (i.e. the appropriate
     ``CREATE INDEX`` statement will be issued.)
+
+    .. versionchanged:: 1.7
+
+    For convenience, ``index_together`` can be a single list when dealing with a single
+    set of fields::
+
+        index_together = ["pub_date", "deadline"]
 
 ``verbose_name``
 ----------------

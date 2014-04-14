@@ -6,11 +6,6 @@ import re
 import sys
 from io import BytesIO
 from pprint import pformat
-try:
-    from urllib.parse import parse_qsl, urlencode, quote, urljoin
-except ImportError:
-    from urllib import urlencode, quote
-    from urlparse import parse_qsl, urljoin
 
 from django.conf import settings
 from django.core import signing
@@ -20,6 +15,7 @@ from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils import six
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
+from django.utils.six.moves.urllib.parse import parse_qsl, urlencode, quote, urljoin
 
 
 RAISE_ERROR = object()
@@ -66,7 +62,7 @@ class HttpRequest(object):
         """Returns the HTTP host using the environment or request headers."""
         # We try three options, in order of decreasing preference.
         if settings.USE_X_FORWARDED_HOST and (
-            'HTTP_X_FORWARDED_HOST' in self.META):
+                'HTTP_X_FORWARDED_HOST' in self.META):
             host = self.META['HTTP_X_FORWARDED_HOST']
         elif 'HTTP_HOST' in self.META:
             host = self.META['HTTP_HOST']

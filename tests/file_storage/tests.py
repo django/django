@@ -16,12 +16,12 @@ except ImportError:
     import dummy_threading as threading
 
 from django.core.cache import cache
-from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
+from django.core.exceptions import SuspiciousOperation
 from django.core.files.base import File, ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import LiveServerTestCase, SimpleTestCase
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils import six
 from django.utils.six.moves.urllib.request import urlopen
 from django.utils._os import upath
@@ -43,29 +43,23 @@ class GetStorageClassTests(SimpleTestCase):
         """
         get_storage_class raises an error if the requested import don't exist.
         """
-        with six.assertRaisesRegex(self, ImproperlyConfigured,
-                "Error importing module storage: \"No module named '?storage'?\""):
+        with six.assertRaisesRegex(self, ImportError, "No module named '?storage'?"):
             get_storage_class('storage.NonExistingStorage')
 
     def test_get_nonexisting_storage_class(self):
         """
         get_storage_class raises an error if the requested class don't exist.
         """
-        self.assertRaisesMessage(
-            ImproperlyConfigured,
-            'Module "django.core.files.storage" does not define a '
-            '"NonExistingStorage" attribute/class',
-            get_storage_class,
-            'django.core.files.storage.NonExistingStorage')
+        self.assertRaises(ImportError, get_storage_class,
+                          'django.core.files.storage.NonExistingStorage')
 
     def test_get_nonexisting_storage_module(self):
         """
         get_storage_class raises an error if the requested module don't exist.
         """
         # Error message may or may not be the fully qualified path.
-        with six.assertRaisesRegex(self, ImproperlyConfigured,
-                "Error importing module django.core.files.non_existing_storage: "
-                "\"No module named '?(django.core.files.)?non_existing_storage'?\""):
+        with six.assertRaisesRegex(self, ImportError,
+                "No module named '?(django.core.files.)?non_existing_storage'?"):
             get_storage_class(
                 'django.core.files.non_existing_storage.NonExistingStorage')
 
@@ -347,7 +341,7 @@ class FileStorageTests(unittest.TestCase):
 
     def test_file_chunks_error(self):
         """
-        Test behaviour when file.chunks() is raising an error
+        Test behavior when file.chunks() is raising an error
         """
         f1 = ContentFile('chunks fails')
 
@@ -647,13 +641,13 @@ class ContentFileStorageTestCase(unittest.TestCase):
         self.storage.save('unicode.txt', ContentFile("español"))
 
 
+@override_settings(ROOT_URLCONF='file_storage.urls')
 class FileLikeObjectTestCase(LiveServerTestCase):
     """
     Test file-like objects (#15644).
     """
 
     available_apps = []
-    urls = 'file_storage.urls'
 
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()

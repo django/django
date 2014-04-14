@@ -84,7 +84,7 @@ GZip middleware
     Security researchers recently revealed that when compression techniques
     (including ``GZipMiddleware``) are used on a website, the site becomes
     exposed to a number of possible attacks. These approaches can be used to
-    compromise, amongst other things, Django's CSRF protection. Before using
+    compromise, among other things, Django's CSRF protection. Before using
     ``GZipMiddleware`` on your site, you should consider very carefully whether
     you are subject to these attacks. If you're in *any* doubt about whether
     you're affected, you should avoid using ``GZipMiddleware``. For more
@@ -179,6 +179,19 @@ Session middleware
 Enables session support. See the :doc:`session documentation
 </topics/http/sessions>`.
 
+Site middleware
+---------------
+
+.. module:: django.contrib.sites.middleware
+  :synopsis: Site middleware.
+
+.. class:: CurrentSiteMiddleware
+
+.. versionadded:: 1.7
+
+Adds the ``site`` attribute representing the current site to every incoming
+``HttpRequest`` object. See the :ref:`sites documentation <site-middleware>`.
+
 Authentication middleware
 -------------------------
 
@@ -190,6 +203,15 @@ Authentication middleware
 Adds the ``user`` attribute, representing the currently-logged-in user, to
 every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
 <auth-web-requests>`.
+
+.. class:: SessionAuthenticationMiddleware
+
+.. versionadded:: 1.7
+
+Allows a user's sessions to be invalidated when their password changes. See
+:ref:`session-invalidation-on-password-change` for details. This middleware must
+appear after :class:`django.contrib.auth.middleware.AuthenticationMiddleware`
+in :setting:`MIDDLEWARE_CLASSES`.
 
 CSRF protection middleware
 --------------------------
@@ -203,30 +225,6 @@ CSRF protection middleware
 Adds protection against Cross Site Request Forgeries by adding hidden form
 fields to POST forms and checking requests for the correct value. See the
 :doc:`Cross Site Request Forgery protection documentation </ref/contrib/csrf>`.
-
-Transaction middleware
-----------------------
-
-.. module:: django.middleware.transaction
-   :synopsis: Middleware binding a database transaction to each Web request.
-
-.. class:: TransactionMiddleware
-
-.. versionchanged:: 1.6
-
-    ``TransactionMiddleware`` is deprecated. The documentation of transactions
-    contains :ref:`upgrade instructions <transactions-upgrading-from-1.5>`.
-
-Binds commit and rollback of the default database to the request/response
-phase. If a view function runs successfully, a commit is done. If it fails with
-an exception, a rollback is done.
-
-The order of this middleware in the stack is important: middleware modules
-running outside of it run with commit-on-save - the default Django behavior.
-Middleware modules running inside it (coming later in the stack) will be under
-the same transaction control as the view functions.
-
-See the :doc:`transaction management documentation </topics/db/transactions>`.
 
 X-Frame-Options middleware
 --------------------------

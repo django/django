@@ -153,7 +153,7 @@ class Number(models.Model):
     def __str__(self):
         return six.text_type(self.num)
 
-# Symmetrical m2m field with a normal field using the reverse accesor name
+# Symmetrical m2m field with a normal field using the reverse accessor name
 # ("valid").
 
 
@@ -257,6 +257,12 @@ class CustomPk(models.Model):
 
 class Related(models.Model):
     custom = models.ForeignKey(CustomPk)
+
+
+class CustomPkTag(models.Model):
+    id = models.CharField(max_length=20, primary_key=True)
+    custom_pk = models.ManyToManyField(CustomPk)
+    tag = models.CharField(max_length=20)
 
 # An inter-related setup with a model subclass that has a nullable
 # path to another model, and a return path from that model.

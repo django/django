@@ -4,8 +4,7 @@ from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 # local test models
 from .admin import InnerInline
@@ -16,9 +15,9 @@ from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     SomeChildModel)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF="admin_inlines.urls")
 class TestInline(TestCase):
-    urls = "admin_inlines.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -64,7 +63,7 @@ class TestInline(TestCase):
     def test_inline_primary(self):
         person = Person.objects.create(firstname='Imelda')
         item = OutfitItem.objects.create(name='Shoes')
-        # Imelda likes shoes, but can't cary her own bags.
+        # Imelda likes shoes, but can't carry her own bags.
         data = {
             'shoppingweakness_set-TOTAL_FORMS': 1,
             'shoppingweakness_set-INITIAL_FORMS': 0,
@@ -92,7 +91,7 @@ class TestInline(TestCase):
             'title_set-0-title2': 'a different title',
         }
         response = self.client.post('/admin/admin_inlines/titlecollection/add/', data)
-        # Here colspan is "4": two fields (title1 and title2), one hidden field and the delete checkbock.
+        # Here colspan is "4": two fields (title1 and title2), one hidden field and the delete checkbox.
         self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>The two titles must be the same</li></ul></td></tr>')
 
     def test_no_parent_callable_lookup(self):
@@ -110,7 +109,7 @@ class TestInline(TestCase):
         self.assertEqual(response.status_code, 200)
         # Add parent object view should have the child inlines section
         self.assertContains(response, '<div class="inline-group" id="question_set-group">')
-        # The right callabe should be used for the inline readonly_fields
+        # The right callable should be used for the inline readonly_fields
         # column cells
         self.assertContains(response, '<p>Callable in QuestionInline</p>')
 
@@ -240,10 +239,25 @@ class TestInline(TestCase):
             '<input class="vIntegerField" id="id_editablepkbook_set-2-0-manual_pk" name="editablepkbook_set-2-0-manual_pk" type="text" />',
              html=True, count=1)
 
+    def test_stacked_inline_edit_form_contains_has_original_class(self):
+        holder = Holder.objects.create(dummy=1)
+        holder.inner_set.create(dummy=1)
+        response = self.client.get('/admin/admin_inlines/holder/%s/' % holder.pk)
+        self.assertContains(
+            response,
+            '<div class="inline-related has_original" id="inner_set-0">',
+            count=1
+        )
+        self.assertContains(
+            response,
+            '<div class="inline-related" id="inner_set-1">',
+            count=1
+        )
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF="admin_inlines.urls")
 class TestInlineMedia(TestCase):
-    urls = "admin_inlines.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -280,8 +294,8 @@ class TestInlineMedia(TestCase):
         self.assertContains(response, 'my_awesome_inline_scripts.js')
 
 
+@override_settings(ROOT_URLCONF="admin_inlines.urls")
 class TestInlineAdminForm(TestCase):
-    urls = "admin_inlines.urls"
 
     def test_immutable_content_type(self):
         """Regression for #9362
@@ -299,9 +313,9 @@ class TestInlineAdminForm(TestCase):
         self.assertEqual(iaf.original.content_type, parent_ct)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF="admin_inlines.urls")
 class TestInlineProtectedOnDelete(TestCase):
-    urls = "admin_inlines.urls"
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -336,13 +350,13 @@ class TestInlineProtectedOnDelete(TestCase):
                             % (chapter, foot_note))
 
 
+@override_settings(ROOT_URLCONF="admin_inlines.urls")
 class TestInlinePermissions(TestCase):
     """
     Make sure the admin respects permissions for objects that are edited
     inline. Refs #8060.
 
     """
-    urls = "admin_inlines.urls"
 
     def setUp(self):
         self.user = User(username='admin')
@@ -532,12 +546,12 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF="admin_inlines.urls")
 class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     available_apps = ['admin_inlines'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-views-users.xml']
-    urls = "admin_inlines.urls"
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def test_add_stackeds(self):

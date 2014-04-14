@@ -1,0 +1,112 @@
+============
+SchemaEditor
+============
+
+Django's migration system is split into two parts; the logic for calculating
+and storing what operations should be run (``django.db.migrations``), and the
+database abstraction layer that turns things like "create a model" or
+"delete a field" into SQL - which is the job of the ``SchemaEditor``.
+
+It's unlikely that you will want to interact directly with ``SchemaEditor`` as
+a normal developer using Django, but if you want to write your own migration
+system, or have more advanced needs, it's a lot nicer than writing SQL.
+
+Each database backend in Django supplies its own version of ``SchemaEditor``,
+and it's always accessible via the ``connection.schema_editor()`` context
+manager::
+
+    with connection.schema_editor() as schema_editor:
+        schema_editor.delete_model(MyModel)
+
+It must be used via the context manager as this allows it to manage things
+like transactions and deferred SQL (like creating ``ForeignKey`` constraints).
+
+It exposes all possible operations as methods, that should be called in
+the order you wish changes to be applied. Some possible operations or types
+of change are not possible on all databases - for example, MyISAM does not
+support foreign key constraints.
+
+Methods
+=======
+
+execute
+-------
+
+::
+
+    execute(sql, params=[])
+
+Executes the SQL statement passed in, with parameters if supplied. This
+is a simple wrapper around the normal database cursors that allows
+capture of the SQL to a ``.sql`` file if the user wishes.
+
+create_model
+------------
+
+::
+
+    create_model(model)
+
+
+delete_model
+------------
+
+::
+
+    delete_model(model)
+
+
+alter_unique_together
+---------------------
+
+::
+
+    alter_unique_together(model, old_unique_together, new_unique_together)
+
+
+alter_index_together
+--------------------
+
+::
+
+    alter_index_together(model, old_index_together, new_index_together)
+
+
+alter_db_table
+--------------
+
+::
+
+    alter_db_table(model, old_db_table, new_db_table)
+
+
+alter_db_tablespace
+-------------------
+
+::
+
+    alter_db_tablespace(model, old_db_tablespace, new_db_tablespace)
+
+
+add_field
+---------
+
+::
+
+    add_field(model, field)
+
+
+remove_field
+------------
+
+::
+
+    remove_field(model, field)
+
+
+alter_field
+------------
+
+::
+
+    alter_field(model, old_field, new_field, strict=False)

@@ -8,15 +8,17 @@ words, most of these tests should be rewritten.
 """
 from __future__ import unicode_literals
 
+import datetime
 import os
 import tempfile
 
 from django.core import validators
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils._os import upath
 
 
 temp_storage_dir = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
@@ -33,6 +35,10 @@ ARTICLE_STATUS_CHAR = (
     ('p', 'Pending'),
     ('l', 'Live'),
 )
+
+
+class Person(models.Model):
+    name = models.CharField(max_length=100)
 
 
 @python_2_unicode_compatible
@@ -70,11 +76,10 @@ class Article(models.Model):
     categories = models.ManyToManyField(Category, blank=True)
     status = models.PositiveIntegerField(choices=ARTICLE_STATUS, blank=True, null=True)
 
-    def save(self):
-        import datetime
+    def save(self, *args, **kwargs):
         if not self.id:
             self.created = datetime.date.today()
-        return super(Article, self).save()
+        return super(Article, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.headline
@@ -93,12 +98,35 @@ class BetterWriter(Writer):
 
 
 @python_2_unicode_compatible
+class Publication(models.Model):
+    title = models.CharField(max_length=30)
+    date_published = models.DateField()
+
+    def __str__(self):
+        return self.title
+
+
+class Author(models.Model):
+    publication = models.OneToOneField(Publication, null=True, blank=True)
+    full_name = models.CharField(max_length=255)
+
+
+class Author1(models.Model):
+    publication = models.OneToOneField(Publication, null=False)
+    full_name = models.CharField(max_length=255)
+
+
+@python_2_unicode_compatible
 class WriterProfile(models.Model):
     writer = models.OneToOneField(Writer, primary_key=True)
     age = models.PositiveIntegerField()
 
     def __str__(self):
         return "%s is %s" % (self.writer, self.age)
+
+
+class Document(models.Model):
+    myfile = models.FileField(upload_to='unused', blank=True)
 
 
 @python_2_unicode_compatible
@@ -109,8 +137,24 @@ class TextFile(models.Model):
     def __str__(self):
         return self.description
 
+
+class CustomFileField(models.FileField):
+    def save_form_data(self, instance, data):
+        been_here = getattr(self, 'been_saved', False)
+        assert not been_here, "save_form_data called more than once"
+        setattr(self, 'been_saved', True)
+
+
+class CustomFF(models.Model):
+    f = CustomFileField(upload_to='unused', blank=True)
+
+
+class FilePathModel(models.Model):
+    path = models.FilePathField(path=os.path.dirname(upath(__file__)), match=".*\.py$", blank=True)
+
+
 try:
-    from django.utils.image import Image  # NOQA: detect if Pillow is installed
+    from PIL import Image  # NOQA: detect if Pillow is installed
 
     test_images = True
 
@@ -149,7 +193,7 @@ try:
 
         def __str__(self):
             return self.description
-except ImproperlyConfigured:
+except ImportError:
     test_images = False
 
 
@@ -159,6 +203,10 @@ class CommaSeparatedInteger(models.Model):
 
     def __str__(self):
         return self.field
+
+
+class Homepage(models.Model):
+    url = models.URLField()
 
 
 @python_2_unicode_compatible
@@ -179,6 +227,15 @@ class Price(models.Model):
 
     class Meta:
         unique_together = (('price', 'quantity'),)
+
+
+class Triple(models.Model):
+    left = models.IntegerField()
+    middle = models.IntegerField()
+    right = models.IntegerField()
+
+    class Meta:
+        unique_together = (('left', 'middle'), ('middle', 'right'))
 
 
 class ArticleStatus(models.Model):
@@ -312,11 +369,6 @@ class ColourfulItem(models.Model):
     colours = models.ManyToManyField(Colour)
 
 
-class ArticleStatusNote(models.Model):
-    name = models.CharField(max_length=20)
-    status = models.ManyToManyField(ArticleStatus)
-
-
 class CustomErrorMessage(models.Model):
     name1 = models.CharField(max_length=50,
         validators=[validators.validate_slug],
@@ -329,3 +381,23 @@ class CustomErrorMessage(models.Model):
     def clean(self):
         if self.name1 == 'FORBIDDEN_VALUE':
             raise ValidationError({'name1': [ValidationError('Model.clean() error messages.')]})
+        elif self.name1 == 'GLOBAL_ERROR':
+            raise ValidationError("Global error message.")
+
+
+def today_callable_dict():
+    return {"last_action__gte": datetime.datetime.today()}
+
+
+def today_callable_q():
+    return models.Q(last_action__gte=datetime.datetime.today())
+
+
+class Character(models.Model):
+    username = models.CharField(max_length=100)
+    last_action = models.DateTimeField()
+
+
+class StumpJoke(models.Model):
+    most_recently_fooled = models.ForeignKey(Character, limit_choices_to=today_callable_dict, related_name="+")
+    has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")

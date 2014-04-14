@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.http import Http404
 from django.utils.translation import ugettext as _
@@ -50,7 +50,7 @@ class SingleObjectMixin(ContextMixin):
         try:
             # Get the single item from the filtered queryset
             obj = queryset.get()
-        except ObjectDoesNotExist:
+        except queryset.model.DoesNotExist:
             raise Http404(_("No %(verbose_name)s found matching the query") %
                           {'verbose_name': queryset.model._meta.verbose_name})
         return obj
@@ -128,7 +128,7 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
         * the value of ``template_name`` on the view (if provided)
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
-        * ``<app_label>/<object_name><template_name_suffix>.html``
+        * ``<app_label>/<model_name><template_name_suffix>.html``
         """
         try:
             names = super(SingleObjectTemplateResponseMixin, self).get_template_names()

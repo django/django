@@ -28,6 +28,26 @@ def clear_cache_handlers(**kwargs):
 
 
 @receiver(setting_changed)
+def update_installed_apps(**kwargs):
+    if kwargs['setting'] == 'INSTALLED_APPS':
+        # Rebuild any AppDirectoriesFinder instance.
+        from django.contrib.staticfiles.finders import get_finder
+        get_finder.cache_clear()
+        # Rebuild management commands cache
+        from django.core.management import get_commands
+        get_commands.cache_clear()
+        # Rebuild templatetags module cache.
+        from django.template import base as mod
+        mod.templatetags_modules = []
+        # Rebuild app_template_dirs cache.
+        from django.template.loaders import app_directories as mod
+        mod.app_template_dirs = mod.calculate_app_template_dirs()
+        # Rebuild translations cache.
+        from django.utils.translation import trans_real
+        trans_real._translations = {}
+
+
+@receiver(setting_changed)
 def update_connections_time_zone(**kwargs):
     if kwargs['setting'] == 'TIME_ZONE':
         # Reset process time zone
@@ -80,11 +100,14 @@ def clear_serializers_cache(**kwargs):
 
 @receiver(setting_changed)
 def language_changed(**kwargs):
-    if kwargs['setting'] in ('LOCALE_PATHS', 'LANGUAGE_CODE'):
+    if kwargs['setting'] in {'LANGUAGES', 'LANGUAGE_CODE', 'LOCALE_PATHS'}:
         from django.utils.translation import trans_real
         trans_real._default = None
-        if kwargs['setting'] == 'LOCALE_PATHS':
-            trans_real._translations = {}
+        trans_real._active = threading.local()
+    if kwargs['setting'] in {'LANGUAGES', 'LOCALE_PATHS'}:
+        from django.utils.translation import trans_real
+        trans_real._translations = {}
+        trans_real.check_for_language.cache_clear()
 
 
 @receiver(setting_changed)
@@ -97,4 +120,14 @@ def file_storage_changed(**kwargs):
 @receiver(setting_changed)
 def complex_setting_changed(**kwargs):
     if kwargs['enter'] and kwargs['setting'] in COMPLEX_OVERRIDE_SETTINGS:
-        warnings.warn("Overriding setting %s can lead to unexpected behaviour." % kwargs['setting'])
+        # Considering the current implementation of the signals framework,
+        # stacklevel=5 shows the line containing the override_settings call.
+        warnings.warn("Overriding setting %s can lead to unexpected behavior."
+                      % kwargs['setting'], stacklevel=5)
+
+
+@receiver(setting_changed)
+def root_urlconf_changed(**kwargs):
+    if kwargs['setting'] == 'ROOT_URLCONF':
+        from django.core.urlresolvers import clear_url_caches
+        clear_url_caches()

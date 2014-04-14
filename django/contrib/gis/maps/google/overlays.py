@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.gis.geos import fromstr, Point, LineString, LinearRing, Polygon
 from django.utils.functional import total_ordering
 from django.utils.safestring import mark_safe
@@ -156,7 +158,7 @@ class GPolyline(GOverlayBase):
           opacity:
             The opacity of the polyline, between 0 and 1.  Defaults to 1.
         """
-        # If a GEOS geometry isn't passed in, try to contsruct one.
+        # If a GEOS geometry isn't passed in, try to construct one.
         if isinstance(geom, six.string_types):
             geom = fromstr(geom)
         if isinstance(geom, (tuple, list)):

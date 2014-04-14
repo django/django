@@ -83,6 +83,7 @@ class CsrfViewMiddleware(object):
     #   deprecated. The default values from settings should be set here after
     #   that occurs and the __new__ function should be removed.
     #   Until then, these attributes cannot be used before __new__ is called.
+    COOKIE_AGE = 60 * 60 * 24 * 7 * 52
     COOKIE_NAME = None
     COOKIE_DOMAIN = None
     COOKIE_PATH = None
@@ -94,6 +95,7 @@ class CsrfViewMiddleware(object):
     # TODO(wesalvaro): This is a work-around until the settings have been
     #   deprecated. This lazily grabs the settings, preferring class values.
     def __new__(cls, *args, **kwargs):
+        cls.COOKIE_AGE = cls.COOKIE_AGE or settings.CSRF_COOKIE_AGE
         cls.COOKIE_NAME = cls.COOKIE_NAME or settings.CSRF_COOKIE_NAME
         cls.COOKIE_DOMAIN = cls.COOKIE_DOMAIN or settings.CSRF_COOKIE_DOMAIN
         cls.COOKIE_PATH = cls.COOKIE_PATH or settings.CSRF_COOKIE_PATH
@@ -217,7 +219,7 @@ class CsrfViewMiddleware(object):
         # the expiry timer.
         response.set_cookie(self.COOKIE_NAME,
                             request.META["CSRF_COOKIE"],
-                            max_age=60 * 60 * 24 * 7 * 52,
+                            max_age=self.COOKIE_AGE,
                             domain=self.COOKIE_DOMAIN,
                             path=self.COOKIE_PATH,
                             secure=self.COOKIE_SECURE,

@@ -4,9 +4,10 @@ import os
 import gettext as gettext_module
 
 from django import http
+from django.apps import apps
 from django.conf import settings
 from django.template import Context, Template
-from django.utils.translation import check_for_language, to_locale, get_language
+from django.utils.translation import check_for_language, to_locale, get_language, LANGUAGE_SESSION_KEY
 from django.utils.encoding import smart_text
 from django.utils.formats import get_format_modules, get_format
 from django.utils._os import upath
@@ -35,9 +36,12 @@ def set_language(request):
         lang_code = request.POST.get('language', None)
         if lang_code and check_for_language(lang_code):
             if hasattr(request, 'session'):
-                request.session['_language'] = lang_code
+                request.session[LANGUAGE_SESSION_KEY] = lang_code
             else:
-                response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code)
+                response.set_cookie(settings.LANGUAGE_COOKIE_NAME, lang_code,
+                                    max_age=settings.LANGUAGE_COOKIE_AGE,
+                                    path=settings.LANGUAGE_COOKIE_PATH,
+                                    domain=settings.LANGUAGE_COOKIE_DOMAIN)
     return response
 
 
@@ -187,7 +191,10 @@ def render_javascript_catalog(catalog=None, plural=None):
 
 def get_javascript_catalog(locale, domain, packages):
     default_locale = to_locale(settings.LANGUAGE_CODE)
-    packages = [p for p in packages if p == 'django.conf' or p in settings.INSTALLED_APPS]
+    app_configs = apps.get_app_configs()
+    allowable_packages = set(app_config.name for app_config in app_configs)
+    allowable_packages.add('django.conf')
+    packages = [p for p in packages if p in allowable_packages]
     t = {}
     paths = []
     en_selected = locale.startswith('en')

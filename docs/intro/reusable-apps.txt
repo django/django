@@ -19,7 +19,7 @@ could save some of this repeated work?
 Reusability is the way of life in Python. `The Python Package Index (PyPI)
 <http://guide.python-distribute.org/contributing.html#pypi-info>`_ has a vast
 range of packages you can use in your own Python programs. Check out `Django
-Packages <http://www.djangopackages.com>`_ for existing reusable apps you could
+Packages <https://www.djangopackages.com>`_ for existing reusable apps you could
 incorporate in your project. Django itself is also just a Python package. This
 means that you can take existing Python packages or Django apps and compose
 them into your own web project. You only need to write the parts that make
@@ -42,9 +42,10 @@ projects and ready to publish for others to install and use.
     bar``. For a directory (like ``polls``) to form a package, it must contain
     a special file ``__init__.py``, even if this file is empty.
 
-    A Django *app* is just a Python package that is specifically intended for
-    use in a Django project. An app may also use common Django conventions,
-    such as having a ``models.py`` file.
+    A Django *application* is just a Python package that is specifically
+    intended for use in a Django project. An application may use common Django
+    conventions, such as having ``models``, ``tests``, ``urls``, and ``views``
+    submodules.
 
     Later on we use the term *packaging* to describe the process of making a
     Python package easy for others to install. It can be a little confusing, we
@@ -108,7 +109,7 @@ Django with pip<installing-official-release>`. You can install ``setuptools``
 the same way.
 
 .. _setuptools: https://pypi.python.org/pypi/setuptools
-.. _pip: http://pypi.python.org/pypi/pip
+.. _pip: https://pypi.python.org/pypi/pip
 
 Packaging your app
 ==================
@@ -127,6 +128,12 @@ this. For a small app like polls, this process isn't too difficult.
        ``django-`` to your module name when creating a package to distribute.
        This helps others looking for Django apps identify your app as Django
        specific.
+
+       Application labels (that is, the final part of the dotted path to
+       application packages) *must* be unique in :setting:`INSTALLED_APPS`.
+       Avoid using the same label as any of the Django :doc:`contrib packages
+       </ref/contrib/index>`, for example ``auth``, ``admin``, or
+       ``messages``.
 
 2. Move the ``polls`` directory into the ``django-polls`` directory.
 
@@ -175,7 +182,7 @@ this. For a small app like polls, this process isn't too difficult.
 5. Next we'll create a ``setup.py`` file which provides details about how to
    build and install the app.  A full explanation of this file is beyond the
    scope of this tutorial, but the `setuptools docs
-   <http://packages.python.org/setuptools/setuptools.html>`_ have a good
+   <http://pythonhosted.org/setuptools/setuptools.html>`_ have a good
    explanation. Create a file ``django-polls/setup.py`` with the following
    contents:
 
@@ -208,9 +215,10 @@ this. For a small app like polls, this process isn't too difficult.
                'License :: OSI Approved :: BSD License', # example license
                'Operating System :: OS Independent',
                'Programming Language :: Python',
-               # replace these appropriately if you are using Python 3
-               'Programming Language :: Python :: 2',
-               'Programming Language :: Python :: 2.7',
+               # Replace these appropriately if you are stuck on Python 2.
+               'Programming Language :: Python :: 3',
+               'Programming Language :: Python :: 3.2',
+               'Programming Language :: Python :: 3.3',
                'Topic :: Internet :: WWW/HTTP',
                'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
            ],
@@ -239,7 +247,7 @@ this. For a small app like polls, this process isn't too difficult.
 
    Note that the ``docs`` directory won't be included in your package unless
    you add some files to it. Many Django apps also provide their documentation
-   online through sites like `readthedocs.org <http://readthedocs.org>`_.
+   online through sites like `readthedocs.org <https://readthedocs.org>`_.
 
 8. Try building your package with ``python setup.py sdist`` (run from inside
    ``django-polls``). This creates a directory called ``dist`` and builds your
@@ -278,7 +286,7 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 
     pip uninstall django-polls
 
-.. _pip: http://pypi.python.org/pypi/pip
+.. _pip: https://pypi.python.org/pypi/pip
 
 Publishing your app
 ===================

@@ -18,7 +18,7 @@ from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.models import CharField, DateField
 from django.test import TestCase as DjangoTestCase
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils import six
 from django.utils import translation
 
@@ -178,10 +178,11 @@ class AdminFormfieldForDBFieldTests(TestCase):
                              filter_vertical=['companies'])
         ma = AdvisorAdmin(models.Advisor, admin.site)
         f = ma.formfield_for_dbfield(models.Advisor._meta.get_field('companies'), request=None)
-        self.assertEqual(six.text_type(f.help_text), ' Hold down "Control", or "Command" on a Mac, to select more than one.')
+        self.assertEqual(six.text_type(f.help_text), 'Hold down "Control", or "Command" on a Mac, to select more than one.')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='admin_widgets.urls')
 class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
 
@@ -190,15 +191,15 @@ class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
         Ensure the user can only see their own cars in the foreign key dropdown.
         """
         self.client.login(username="super", password="secret")
-        response = self.client.get("/widget_admin/admin_widgets/cartire/add/")
+        response = self.client.get("/admin_widgets/cartire/add/")
         self.assertNotContains(response, "BMW M3")
         self.assertContains(response, "Volkswagon Passat")
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='admin_widgets.urls')
 class AdminForeignKeyWidgetChangeList(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
-    admin_root = '/widget_admin'
 
     def setUp(self):
         self.client.login(username="super", password="secret")
@@ -207,14 +208,14 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
         self.client.logout()
 
     def test_changelist_foreignkey(self):
-        response = self.client.get('%s/admin_widgets/car/' % self.admin_root)
-        self.assertContains(response, '%s/auth/user/add/' % self.admin_root)
+        response = self.client.get('/admin_widgets/car/')
+        self.assertContains(response, '/auth/user/add/')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='admin_widgets.urls')
 class AdminForeignKeyRawIdWidget(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
-    admin_root = '/widget_admin'
 
     def setUp(self):
         self.client.login(username="super", password="secret")
@@ -231,8 +232,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
         }
         # Try posting with a non-existent pk in a raw id field: this
         # should result in an error message, not a server exception.
-        response = self.client.post('%s/admin_widgets/event/add/' % self.admin_root,
-            post_data)
+        response = self.client.post('/admin_widgets/event/add/', post_data)
         self.assertContains(response,
             'Select a valid choice. That choice is not one of the available choices.')
 
@@ -240,7 +240,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
 
         for test_str in ('Iñtërnâtiônàlizætiøn', "1234'", -1234):
             # This should result in an error message, not a server exception.
-            response = self.client.post('%s/admin_widgets/event/add/' % self.admin_root,
+            response = self.client.post('/admin_widgets/event/add/',
                 {"main_band": test_str})
 
             self.assertContains(response,
@@ -391,7 +391,9 @@ class AdminFileWidgetTest(DjangoTestCase):
         )
 
 
+@override_settings(ROOT_URLCONF='admin_widgets.urls')
 class ForeignKeyRawIdWidgetTest(DjangoTestCase):
+
     def test_render(self):
         band = models.Band.objects.create(name='Linkin Park')
         band.album_set.create(
@@ -402,7 +404,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('test', band.pk, attrs={}),
-            '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/band/?_to_field=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_static_prefix(), bandpk=band.pk)
+            '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/admin_widgets/band/?_to_field=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_static_prefix(), bandpk=band.pk)
         )
 
     def test_relations_to_non_primary_key(self):
@@ -417,7 +419,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('test', core.parent_id, attrs={}),
-            '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>' % admin_static_prefix()
+            '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>' % admin_static_prefix()
         )
 
     def test_fk_related_model_not_in_admin(self):
@@ -459,11 +461,13 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         )
         self.assertHTMLEqual(
             w.render('test', child_of_hidden.parent_id, attrs={}),
-            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="/widget_admin/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>' % admin_static_prefix()
+            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>' % admin_static_prefix()
         )
 
 
+@override_settings(ROOT_URLCONF='admin_widgets.urls')
 class ManyToManyRawIdWidgetTest(DjangoTestCase):
+
     def test_render(self):
         band = models.Band.objects.create(name='Linkin Park')
 
@@ -475,12 +479,12 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('test', [m1.pk, m2.pk], attrs={}),
-            '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/static/admin/img/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk, m2pk=m2.pk)
+            '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" /><a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/static/admin/img/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk, m2pk=m2.pk)
         )
 
         self.assertHTMLEqual(
             w.render('test', [m1.pk]),
-            '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField" /><a href="/widget_admin/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk)
+            '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField" /><a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk)
         )
 
     def test_m2m_related_model_not_in_admin(self):
@@ -514,12 +518,12 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
         self.assertFalse(w.can_add_related)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='admin_widgets.urls')
 class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-widgets-users.xml']
-    urls = "admin_widgets.urls"
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def test_show_hide_date_time_picker_widgets(self):
@@ -648,11 +652,11 @@ class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
 
 @skipIf(pytz is None, "this test requires pytz")
 @override_settings(TIME_ZONE='Asia/Singapore')
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='admin_widgets.urls')
 class DateTimePickerShortcutsSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-widgets-users.xml']
-    urls = "admin_widgets.urls"
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def test_date_time_picker_shortcuts(self):
@@ -716,12 +720,12 @@ class DateTimePickerShortcutsSeleniumIETests(DateTimePickerShortcutsSeleniumFire
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='admin_widgets.urls')
 class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-widgets-users.xml']
-    urls = "admin_widgets.urls"
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def setUp(self):
@@ -960,11 +964,11 @@ class HorizontalVerticalFilterSeleniumIETests(HorizontalVerticalFilterSeleniumFi
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='admin_widgets.urls')
 class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-widgets-users.xml']
-    urls = "admin_widgets.urls"
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def setUp(self):
@@ -993,9 +997,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # The field now contains the selected band's id
         self.selenium.switch_to_window(main_window)
-        self.assertEqual(
-            self.selenium.find_element_by_id('id_main_band').get_attribute('value'),
-            '42')
+        self.wait_for_value('#id_main_band', '42')
 
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_main_band').click()
@@ -1007,9 +1009,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # The field now contains the other selected band's id
         self.selenium.switch_to_window(main_window)
-        self.assertEqual(
-            self.selenium.find_element_by_id('id_main_band').get_attribute('value'),
-            '98')
+        self.wait_for_value('#id_main_band', '98')
 
     def test_many_to_many(self):
         self.admin_login(username='super', password='secret', login_url='/')
@@ -1032,9 +1032,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # The field now contains the selected band's id
         self.selenium.switch_to_window(main_window)
-        self.assertEqual(
-            self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
-            '42')
+        self.wait_for_value('#id_supporting_bands', '42')
 
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
@@ -1046,9 +1044,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # The field now contains the two selected bands' ids
         self.selenium.switch_to_window(main_window)
-        self.assertEqual(
-            self.selenium.find_element_by_id('id_supporting_bands').get_attribute('value'),
-            '42,98')
+        self.wait_for_value('#id_supporting_bands', '42,98')
 
 
 class AdminRawIdWidgetSeleniumChromeTests(AdminRawIdWidgetSeleniumFirefoxTests):
@@ -1059,11 +1055,11 @@ class AdminRawIdWidgetSeleniumIETests(AdminRawIdWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF='admin_widgets.urls')
 class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['admin-widgets-users.xml']
-    urls = "admin_widgets.urls"
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def test_foreign_key_using_to_field(self):
@@ -1087,14 +1083,12 @@ class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         save_button_css_selector = '.submit-row > input[type=submit]'
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
         self.selenium.switch_to_window(main_window)
-        # Wait up to 2 seconds for the new option to show up after clicking save in the popup.
-        self.selenium.implicitly_wait(2)
-        self.selenium.find_element_by_css_selector('#id_user option[value=newuser]')
-        self.selenium.implicitly_wait(0)
+        # The field now contains the new user
+        self.wait_for('#id_user option[value="newuser"]')
 
         # Go ahead and submit the form to make sure it works
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
-        self.wait_page_loaded()
+        self.wait_for_text('li.success', 'The profile "newuser" was added successfully.')
         profiles = models.Profile.objects.all()
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)

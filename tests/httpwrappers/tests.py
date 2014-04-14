@@ -2,18 +2,19 @@
 from __future__ import unicode_literals
 
 import copy
+import json
 import os
 import pickle
 import unittest
-import warnings
 
 from django.core.exceptions import SuspiciousOperation
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import request_finished
 from django.db import close_old_connections
 from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
                          HttpResponsePermanentRedirect, HttpResponseNotAllowed,
                          HttpResponseNotModified, StreamingHttpResponse,
-                         SimpleCookie, BadHeaderError,
+                         SimpleCookie, BadHeaderError, JsonResponse,
                          parse_cookie)
 from django.test import TestCase
 from django.utils.encoding import smart_str, force_text
@@ -451,6 +452,35 @@ class HttpResponseSubclassesTests(TestCase):
         self.assertContains(response, 'Only the GET method is allowed', status_code=405)
 
 
+class JsonResponseTests(TestCase):
+    def test_json_response_non_ascii(self):
+        data = {'key': 'łóżko'}
+        response = JsonResponse(data)
+        self.assertEqual(json.loads(response.content.decode()), data)
+
+    def test_json_response_raises_type_error_with_default_setting(self):
+        with self.assertRaisesMessage(TypeError,
+                'In order to allow non-dict objects to be serialized set the '
+                'safe parameter to False'):
+            JsonResponse([1, 2, 3])
+
+    def test_json_response_text(self):
+        response = JsonResponse('foobar', safe=False)
+        self.assertEqual(json.loads(response.content.decode()), 'foobar')
+
+    def test_json_response_list(self):
+        response = JsonResponse(['foo', 'bar'], safe=False)
+        self.assertEqual(json.loads(response.content.decode()), ['foo', 'bar'])
+
+    def test_json_response_custom_encoder(self):
+        class CustomDjangoJSONEncoder(DjangoJSONEncoder):
+            def encode(self, o):
+                return json.dumps({'foo': 'bar'})
+
+        response = JsonResponse({}, encoder=CustomDjangoJSONEncoder)
+        self.assertEqual(json.loads(response.content.decode()), {'foo': 'bar'})
+
+
 class StreamingHttpResponseTests(TestCase):
     def test_streaming_response(self):
         r = StreamingHttpResponse(iter(['hello', 'world']))
@@ -529,9 +559,7 @@ class FileCloseTests(TestCase):
         file1 = open(filename)
         r = HttpResponse(file1)
         self.assertFalse(file1.closed)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            list(r)
+        list(r)
         self.assertFalse(file1.closed)
         r.close()
         self.assertTrue(file1.closed)

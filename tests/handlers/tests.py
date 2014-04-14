@@ -6,7 +6,7 @@ from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
 from django.core.signals import request_started, request_finished
 from django.db import close_old_connections, connection
 from django.test import RequestFactory, TestCase, TransactionTestCase
-from django.test.utils import override_settings
+from django.test import override_settings
 from django.utils.encoding import force_str
 from django.utils import six
 
@@ -65,10 +65,10 @@ class HandlerTests(TestCase):
         self.assertEqual(request.COOKIES['want'], force_str("café"))
 
 
+@override_settings(ROOT_URLCONF='handlers.urls')
 class TransactionsPerRequestTests(TransactionTestCase):
 
     available_apps = []
-    urls = 'handlers.urls'
 
     def test_no_transaction(self):
         response = self.client.get('/in_transaction/')
@@ -93,8 +93,8 @@ class TransactionsPerRequestTests(TransactionTestCase):
         self.assertContains(response, 'False')
 
 
+@override_settings(ROOT_URLCONF='handlers.urls')
 class SignalsTests(TestCase):
-    urls = 'handlers.urls'
 
     def setUp(self):
         self.signals = []
@@ -123,8 +123,8 @@ class SignalsTests(TestCase):
         self.assertEqual(self.signals, ['started', 'finished'])
 
 
+@override_settings(ROOT_URLCONF='handlers.urls')
 class HandlerSuspiciousOpsTest(TestCase):
-    urls = 'handlers.urls'
 
     def test_suspiciousop_in_view_returns_400(self):
         response = self.client.get('/suspicious/')

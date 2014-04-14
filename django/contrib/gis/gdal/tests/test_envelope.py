@@ -20,7 +20,7 @@ class EnvelopeTest(unittest.TestCase):
         self.e = Envelope(0, 0, 5, 5)
 
     def test01_init(self):
-        "Testing Envelope initilization."
+        "Testing Envelope initialization."
         e1 = Envelope((0, 0, 5, 5))
         Envelope(0, 0, 5, 5)
         Envelope(0, '0', '5', 5)  # Thanks to ww for this

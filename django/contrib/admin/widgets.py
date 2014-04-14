@@ -153,10 +153,13 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         extra = []
         if rel_to in self.admin_site._registry:
             # The related object is registered with the same AdminSite
-            related_url = reverse('admin:%s_%s_changelist' %
-                                    (rel_to._meta.app_label,
-                                    rel_to._meta.model_name),
-                                    current_app=self.admin_site.name)
+            related_url = reverse(
+                'admin:%s_%s_changelist' % (
+                    rel_to._meta.app_label,
+                    rel_to._meta.model_name,
+                ),
+                current_app=self.admin_site.name,
+            )
 
             params = self.url_parameters()
             if params:
@@ -167,17 +170,20 @@ class ForeignKeyRawIdWidget(forms.TextInput):
                 attrs['class'] = 'vForeignKeyRawIdAdminField'  # The JavaScript code looks for this hook.
             # TODO: "lookup_id_" is hard-coded here. This should instead use
             # the correct API to determine the ID dynamically.
-            extra.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> '
-                            % (related_url, url, name))
-            extra.append('<img src="%s" width="16" height="16" alt="%s" /></a>'
-                            % (static('admin/img/selector-search.gif'), _('Lookup')))
+            extra.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' %
+                (related_url, url, name))
+            extra.append('<img src="%s" width="16" height="16" alt="%s" /></a>' %
+                (static('admin/img/selector-search.gif'), _('Lookup')))
         output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)] + extra
         if value:
             output.append(self.label_for_value(value))
         return mark_safe(''.join(output))
 
     def base_url_parameters(self):
-        return url_params_from_lookup_dict(self.rel.limit_choices_to)
+        limit_choices_to = self.rel.limit_choices_to
+        if callable(limit_choices_to):
+            limit_choices_to = limit_choices_to()
+        return url_params_from_lookup_dict(limit_choices_to)
 
     def url_parameters(self):
         from django.contrib.admin.views.main import TO_FIELD_VAR
@@ -229,7 +235,6 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     admin interface.
     """
     def __init__(self, widget, rel, admin_site, can_add_related=None):
-        self.is_hidden = widget.is_hidden
         self.needs_multipart_form = widget.needs_multipart_form
         self.attrs = widget.attrs
         self.choices = widget.choices
@@ -249,6 +254,10 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         obj.attrs = self.widget.attrs
         memo[id(self)] = obj
         return obj
+
+    @property
+    def is_hidden(self):
+        return self.widget.is_hidden
 
     @property
     def media(self):

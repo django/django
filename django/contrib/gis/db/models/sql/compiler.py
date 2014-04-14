@@ -21,12 +21,12 @@ class GeoSQLCompiler(compiler.SQLCompiler):
 
         If 'with_aliases' is true, any column names that are duplicated
         (without the table names) are given unique aliases. This is needed in
-        some cases to avoid ambiguitity with nested queries.
+        some cases to avoid ambiguity with nested queries.
 
         This routine is overridden from Query to handle customized selection of
         geometry columns.
         """
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (self.get_extra_select_format(alias) % col[0], qn2(alias))
                   for alias, col in six.iteritems(self.query.extra_select)]
@@ -124,7 +124,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         seen = self.query.included_inherited_models.copy()
         if start_alias:
             seen[None] = start_alias
-        for field, model in opts.get_fields_with_model():
+        for field, model in opts.get_concrete_fields_with_model():
             if from_parent and model is not None and issubclass(from_parent, model):
                 # Avoid loading data for already loaded parents.
                 continue
@@ -133,7 +133,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
             if table in only_load and field.column not in only_load[table]:
                 continue
             if as_pairs:
-                result.append((alias, field.column))
+                result.append((alias, field))
                 aliases.add(alias)
                 continue
             # This part of the function is customized for GeoQuery. We

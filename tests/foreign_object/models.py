@@ -113,7 +113,7 @@ class ArticleTranslationDescriptor(ReverseSingleRelatedObjectDescriptor):
 
 
 class ColConstraint(object):
-    # Antyhing with as_sql() method works in get_extra_restriction().
+    # Anything with as_sql() method works in get_extra_restriction().
     def __init__(self, alias, col, value):
         self.alias, self.col, self.value = alias, col, value
 
@@ -162,7 +162,7 @@ class NewsArticle(Article):
 
 class ArticleTranslation(models.Model):
     article = models.ForeignKey(Article)
-    lang = models.CharField(max_length='2')
+    lang = models.CharField(max_length=2)
     title = models.CharField(max_length=100)
     body = models.TextField()
     abstract = models.CharField(max_length=400, null=True)

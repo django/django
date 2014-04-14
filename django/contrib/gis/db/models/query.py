@@ -73,7 +73,7 @@ class GeoQuerySet(QuerySet):
     def collect(self, **kwargs):
         """
         Performs an aggregate collect operation on the given geometry field.
-        This is analagous to a union operation, but much faster because
+        This is analogous to a union operation, but much faster because
         boundaries are not dissolved.
         """
         return self._spatial_aggregate(aggregates.Collect, **kwargs)
@@ -137,7 +137,7 @@ class GeoQuerySet(QuerySet):
 
     def geojson(self, precision=8, crs=False, bbox=False, **kwargs):
         """
-        Returns a GeoJSON representation of the geomtry field in a `geojson`
+        Returns a GeoJSON representation of the geometry field in a `geojson`
         attribute on each element of the GeoQuerySet.
 
         The `crs` and `bbox` keywords may be set to True if the user wants
@@ -362,12 +362,14 @@ class GeoQuerySet(QuerySet):
         relative = int(bool(relative))
         if not isinstance(precision, six.integer_types):
             raise TypeError('SVG precision keyword argument must be an integer.')
-        s = {'desc': 'SVG',
-             'procedure_fmt': '%(geo_col)s,%(rel)s,%(precision)s',
-             'procedure_args': {'rel': relative,
-                                 'precision': precision,
-                                 }
-             }
+        s = {
+            'desc': 'SVG',
+            'procedure_fmt': '%(geo_col)s,%(rel)s,%(precision)s',
+            'procedure_args': {
+                'rel': relative,
+                'precision': precision,
+            }
+        }
         return self._spatial_attribute('svg', s, **kwargs)
 
     def sym_difference(self, geom, **kwargs):
@@ -465,7 +467,7 @@ class GeoQuerySet(QuerySet):
 
         # If the `geo_field_type` keyword was used, then enforce that
         # type limitation.
-        if not geo_field_type is None and not isinstance(geo_field, geo_field_type):
+        if geo_field_type is not None and not isinstance(geo_field, geo_field_type):
             raise TypeError('"%s" stored procedures may only be called on %ss.' % (func, geo_field_type.__name__))
 
         # Setting the procedure args.
@@ -486,7 +488,7 @@ class GeoQuerySet(QuerySet):
 
         # Checking if there are any geo field type limitations on this
         # aggregate (e.g. ST_Makeline only operates on PointFields).
-        if not geo_field_type is None and not isinstance(geo_field, geo_field_type):
+        if geo_field_type is not None and not isinstance(geo_field, geo_field_type):
             raise TypeError('%s aggregate may only be called on %ss.' % (aggregate.name, geo_field_type.__name__))
 
         # Getting the string expression of the field name, as this is the
@@ -644,7 +646,7 @@ class GeoQuerySet(QuerySet):
             # been transformed via the `transform` GeoQuerySet method.
             if self.query.transformed_srid:
                 u, unit_name, s = get_srid_info(self.query.transformed_srid, connection)
-                geodetic = unit_name in geo_field.geodetic_units
+                geodetic = unit_name.lower() in geo_field.geodetic_units
 
             if backend.spatialite and geodetic:
                 raise ValueError('SQLite does not support linear distance calculations on geodetic coordinate systems.')
@@ -746,11 +748,12 @@ class GeoQuerySet(QuerySet):
         for geometry set-like operations (e.g., intersection, difference,
         union, sym_difference).
         """
-        s = {'geom_args': ('geom',),
-             'select_field': GeomField(),
-             'procedure_fmt': '%(geo_col)s,%(geom)s',
-             'procedure_args': {'geom': geom},
-            }
+        s = {
+            'geom_args': ('geom',),
+            'select_field': GeomField(),
+            'procedure_fmt': '%(geo_col)s,%(geom)s',
+            'procedure_args': {'geom': geom},
+        }
         if connections[self.db].ops.oracle:
             s['procedure_fmt'] += ',%(tolerance)s'
             s['procedure_args']['tolerance'] = tolerance
@@ -763,7 +766,7 @@ class GeoQuerySet(QuerySet):
         ForeignKey relation to the current model.
         """
         opts = self.model._meta
-        if not geo_field in opts.fields:
+        if geo_field not in opts.fields:
             # Is this operation going to be on a related geographic field?
             # If so, it'll have to be added to the select related information
             # (e.g., if 'location__point' was given as the field name).
@@ -774,7 +777,7 @@ class GeoQuerySet(QuerySet):
                 if field == geo_field:
                     return compiler._field_column(geo_field, rel_table)
             raise ValueError("%r not in self.query.related_select_cols" % geo_field)
-        elif not geo_field in opts.local_fields:
+        elif geo_field not in opts.local_fields:
             # This geographic field is inherited from another model, so we have to
             # use the db table for the _parent_ model instead.
             tmp_fld, parent_model, direct, m2m = opts.get_field_by_name(geo_field.name)

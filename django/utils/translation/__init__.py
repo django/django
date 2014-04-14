@@ -21,6 +21,8 @@ __all__ = [
     'npgettext', 'npgettext_lazy',
 ]
 
+LANGUAGE_SESSION_KEY = '_language'
+
 
 class TranslatorCommentWarning(SyntaxWarning):
     pass
@@ -185,8 +187,8 @@ def get_language_from_request(request, check_path=False):
     return _trans.get_language_from_request(request, check_path)
 
 
-def get_language_from_path(path, supported=None):
-    return _trans.get_language_from_path(path, supported=supported)
+def get_language_from_path(path):
+    return _trans.get_language_from_path(path)
 
 
 def templatize(src, origin=None):

@@ -22,7 +22,7 @@ def method_decorator(decorator):
         def _wrapper(self, *args, **kwargs):
             @decorator
             def bound_func(*args2, **kwargs2):
-                return func(self, *args2, **kwargs2)
+                return func.__get__(self, type(self))(*args2, **kwargs2)
             # bound_func has the signature that 'decorator' expects i.e.  no
             # 'self' argument, but it is a closure over self so it can call
             # 'func' correctly.
@@ -39,9 +39,13 @@ def method_decorator(decorator):
         update_wrapper(_wrapper, func)
 
         return _wrapper
-    update_wrapper(_dec, decorator)
+
+    update_wrapper(_dec, decorator, assigned=available_attrs(decorator))
     # Change the name to aid debugging.
-    _dec.__name__ = 'method_decorator(%s)' % decorator.__name__
+    if hasattr(decorator, '__name__'):
+        _dec.__name__ = 'method_decorator(%s)' % decorator.__name__
+    else:
+        _dec.__name__ = 'method_decorator(%s)' % decorator.__class__.__name__
     return _dec
 
 

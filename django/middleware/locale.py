@@ -1,7 +1,5 @@
 "This is the locale selecting middleware that will look at accept headers"
 
-from collections import OrderedDict
-
 from django.conf import settings
 from django.core.urlresolvers import (is_valid_path, get_resolver,
                                       LocaleRegexURLResolver)
@@ -21,7 +19,6 @@ class LocaleMiddleware(object):
     response_redirect_class = HttpResponseRedirect
 
     def __init__(self):
-        self._supported_languages = OrderedDict(settings.LANGUAGES)
         self._is_language_prefix_patterns_used = False
         for url_pattern in get_resolver(None).url_patterns:
             if isinstance(url_pattern, LocaleRegexURLResolver):
@@ -37,9 +34,7 @@ class LocaleMiddleware(object):
 
     def process_response(self, request, response):
         language = translation.get_language()
-        language_from_path = translation.get_language_from_path(
-            request.path_info, supported=self._supported_languages
-        )
+        language_from_path = translation.get_language_from_path(request.path_info)
         if (response.status_code == 404 and not language_from_path
                 and self.is_language_prefix_patterns_used()):
             urlconf = getattr(request, 'urlconf', None)
@@ -54,16 +49,6 @@ class LocaleMiddleware(object):
                     request.scheme, request.get_host(), language,
                     request.get_full_path())
                 return self.response_redirect_class(language_url)
-
-        # Store language back into session if it is not present
-        if hasattr(request, 'session') and '_language' not in request.session:
-            # Backwards compatibility check on django_language (remove in 1.8);
-            # revert to: `request.session.setdefault('_language', language)`.
-            if 'django_language' in request.session:
-                request.session['_language'] = request.session['django_language']
-                del request.session['django_language']
-            else:
-                request.session['_language'] = language
 
         if not (self.is_language_prefix_patterns_used()
                 and language_from_path):

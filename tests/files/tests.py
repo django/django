@@ -8,7 +8,6 @@ import tempfile
 import unittest
 import zlib
 
-from django.core.exceptions import ImproperlyConfigured
 from django.core.files import File
 from django.core.files.move import file_move_safe
 from django.core.files.base import ContentFile
@@ -18,10 +17,11 @@ from django.utils._os import upath
 from django.utils import six
 
 try:
-    from django.utils.image import Image
-    from django.core.files import images
-except ImproperlyConfigured:
+    from PIL import Image
+except ImportError:
     Image = None
+else:
+    from django.core.files import images
 
 
 class FileTests(unittest.TestCase):
@@ -64,6 +64,14 @@ class FileTests(unittest.TestCase):
         self.assertFalse(hasattr(file, 'mode'))
         gzip.GzipFile(fileobj=file)
 
+    def test_file_iteration(self):
+        """
+        File objects should yield lines when iterated over.
+        Refs #22107.
+        """
+        file = File(BytesIO(b'one\ntwo\nthree'))
+        self.assertEqual(list(file), [b'one\n', b'two\n', b'three'])
+
 
 class NoNameFileTestCase(unittest.TestCase):
     """
@@ -104,7 +112,7 @@ class DimensionClosingBug(unittest.TestCase):
     """
     Test that get_image_dimensions() properly closes files (#8817)
     """
-    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_not_closing_of_files(self):
         """
         Open files passed into get_image_dimensions() should stay opened.
@@ -115,7 +123,7 @@ class DimensionClosingBug(unittest.TestCase):
         finally:
             self.assertTrue(not empty_io.closed)
 
-    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_closing_of_filenames(self):
         """
         get_image_dimensions() called with a filename should closed the file.
@@ -155,21 +163,21 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
     Test that get_image_dimensions() works properly after various calls
     using a file handler (#11158)
     """
-    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_multiple_calls(self):
         """
         Multiple calls of get_image_dimensions() should return the same size.
         """
         img_path = os.path.join(os.path.dirname(upath(__file__)), "test.png")
-        with open(img_path, 'rb') as file:
-            image = images.ImageFile(file)
-            image_pil = Image.open(img_path)
+        with open(img_path, 'rb') as fh:
+            image = images.ImageFile(fh)
+            image_pil = Image.open(fh)
             size_1 = images.get_image_dimensions(image)
             size_2 = images.get_image_dimensions(image)
         self.assertEqual(image_pil.size, size_1)
         self.assertEqual(size_1, size_2)
 
-    @unittest.skipUnless(Image, "Pillow/PIL not installed")
+    @unittest.skipUnless(Image, "Pillow not installed")
     def test_bug_19457(self):
         """
         Regression test for #19457
@@ -180,7 +188,8 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
             size = images.get_image_dimensions(img_path)
         except zlib.error:
             self.fail("Exception raised from get_image_dimensions().")
-        self.assertEqual(size, Image.open(img_path).size)
+        with open(img_path, 'rb') as fh:
+            self.assertEqual(size, Image.open(fh).size)
 
 
 class FileMoveSafeTests(unittest.TestCase):
@@ -196,3 +205,17 @@ class FileMoveSafeTests(unittest.TestCase):
 
         os.close(handle_a)
         os.close(handle_b)
+
+
+class SpooledTempTests(unittest.TestCase):
+    def test_in_memory_spooled_temp(self):
+        with tempfile.SpooledTemporaryFile() as temp:
+            temp.write(b"foo bar baz quux\n")
+            django_file = File(temp, name="something.txt")
+            self.assertEqual(django_file.size, 17)
+
+    def test_written_spooled_temp(self):
+        with tempfile.SpooledTemporaryFile(max_size=4) as temp:
+            temp.write(b"foo bar baz quux\n")
+            django_file = File(temp, name="something.txt")
+            self.assertEqual(django_file.size, 17)

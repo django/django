@@ -1,11 +1,32 @@
+from django.utils import six
+from django.apps.registry import Apps
 from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.db.models.fields.related import ManyToManyField
-from django.db.models.loading import BaseAppCache
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_delete_table = "DROP TABLE %(table)s"
+    sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_column)s)"
+
+    def quote_value(self, value):
+        # Inner import to allow nice failure for backend if not present
+        import _sqlite3
+        try:
+            value = _sqlite3.adapt(value)
+        except _sqlite3.ProgrammingError:
+            pass
+        # Manual emulation of SQLite parameter quoting
+        if isinstance(value, type(True)):
+            return str(int(value))
+        elif isinstance(value, six.integer_types):
+            return str(value)
+        elif isinstance(value, six.string_types):
+            return '"%s"' % six.text_type(value)
+        elif value is None:
+            return "NULL"
+        else:
+            raise ValueError("Cannot quote parameter value %r" % value)
 
     def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], rename_fields=[], override_uniques=None):
         """
@@ -28,6 +49,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Add in any created fields
         for field in create_fields:
             body[field.name] = field
+            # If there's a default, insert it into the copy map
+            if field.has_default():
+                mapping[field.column] = self.quote_value(
+                    field.get_default()
+                )
         # Add in any altered fields
         for (old_field, new_field) in alter_fields:
             del body[old_field.name]
@@ -38,14 +64,17 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         for field in delete_fields:
             del body[field.name]
             del mapping[field.column]
-        # Work inside a new AppCache
-        app_cache = BaseAppCache()
+            # Remove any implicit M2M tables
+            if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
+                return self.delete_model(field.rel.through)
+        # Work inside a new app registry
+        apps = Apps()
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
             'db_table': model._meta.db_table + "__new",
             'unique_together': model._meta.unique_together if override_uniques is None else override_uniques,
-            'app_cache': app_cache,
+            'apps': apps,
         }
         meta = type("Meta", tuple(), meta_contents)
         body['Meta'] = meta
@@ -57,12 +86,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         field_maps = list(mapping.items())
         self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
             self.quote_name(temp_model._meta.db_table),
-            ', '.join(x for x, y in field_maps),
-            ', '.join(y for x, y in field_maps),
+            ', '.join(self.quote_name(x) for x, y in field_maps),
+            ', '.join(self.quote_name(y) for x, y in field_maps),
             self.quote_name(model._meta.db_table),
         ))
-        # Delete the old table
-        self.delete_model(model)
+        # Delete the old table (not using self.delete_model to avoid deleting
+        # all implicit M2M tables)
+        self.execute(self.sql_delete_table % {
+            "table": self.quote_name(model._meta.db_table),
+        })
         # Rename the new to the old
         self.alter_db_table(model, temp_model._meta.db_table, model._meta.db_table)
         # Run deferred SQL on correct table
@@ -82,11 +114,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Special-case implicit M2M tables
         if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
             return self.create_model(field.rel.through)
-        # Detect bad field combinations
-        if (not field.null and
-           (not field.has_default() or field.get_default() is None) and
-           not field.empty_strings_allowed):
-            raise ValueError("You cannot add a null=False column without a default value on SQLite.")
         self._remake_table(model, create_fields=[field])
 
     def remove_field(self, model, field):
@@ -134,6 +161,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         Alters M2Ms to repoint their to= endpoints.
         """
+        if old_field.rel.through._meta.db_table == new_field.rel.through._meta.db_table:
+            return
+
         # Make a new through table
         self.create_model(new_field.rel.through)
         # Copy the data across

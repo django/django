@@ -1,14 +1,14 @@
 from __future__ import unicode_literals
 
-from unittest import TestCase
-
 from django.core.urlresolvers import NoReverseMatch
 from django.contrib.auth.views import logout
 from django.shortcuts import resolve_url
+from django.test import TestCase, override_settings
 
 from .models import UnimportantThing
 
 
+@override_settings(ROOT_URLCONF='resolve_url.urls')
 class ResolveUrlTests(TestCase):
     """
     Tests for the ``resolve_url`` function.
@@ -20,6 +20,16 @@ class ResolveUrlTests(TestCase):
         same url.
         """
         self.assertEqual('/something/', resolve_url('/something/'))
+
+    def test_relative_path(self):
+        """
+        Tests that passing a relative URL path to ``resolve_url`` will result
+        in the same url.
+        """
+        self.assertEqual('../', resolve_url('../'))
+        self.assertEqual('../relative/', resolve_url('../relative/'))
+        self.assertEqual('./', resolve_url('./'))
+        self.assertEqual('./relative/', resolve_url('./relative/'))
 
     def test_full_url(self):
         """

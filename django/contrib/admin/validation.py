@@ -14,10 +14,6 @@ __all__ = ['BaseValidator', 'InlineValidator']
 
 
 class BaseValidator(object):
-    def __init__(self):
-        # Before we can introspect models, they need to be fully loaded so that
-        # inter-relations are set up correctly. We force that here.
-        models.get_apps()
 
     def validate(self, cls, model):
         for m in dir(self):
@@ -142,7 +138,7 @@ class BaseValidator(object):
                     raise ImproperlyConfigured("'%s.radio_fields['%s']' "
                             "is neither an instance of ForeignKey nor does "
                             "have choices set." % (cls.__name__, field))
-                if not val in (HORIZONTAL, VERTICAL):
+                if val not in (HORIZONTAL, VERTICAL):
                     raise ImproperlyConfigured("'%s.radio_fields['%s']' "
                             "is neither admin.HORIZONTAL nor admin.VERTICAL."
                             % (cls.__name__, field))
@@ -155,7 +151,7 @@ class BaseValidator(object):
             for field, val in cls.prepopulated_fields.items():
                 f = get_field(cls, model, 'prepopulated_fields', field)
                 if isinstance(f, (models.DateTimeField, models.ForeignKey,
-                    models.ManyToManyField)):
+                        models.ManyToManyField)):
                     raise ImproperlyConfigured("'%s.prepopulated_fields['%s']' "
                             "is either a DateTimeField, ForeignKey or "
                             "ManyToManyField. This isn't allowed."

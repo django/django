@@ -60,6 +60,9 @@ for several versions of Django:
   Django 1.3. Upon the release of Django 1.5, Django 1.3's security
   support will end.
 
+* :ref:`Long-term support (LTS) releases <lts-releases>` will receive
+  security updates for a specified period.
+
 When new releases are issued for security reasons, the accompanying
 notice will include a list of affected versions. This list is
 comprised solely of *supported* versions of Django: older versions may
@@ -89,7 +92,7 @@ email message, signed with the Django release key, containing:
 * The patch(es), if any, that will be applied to Django.
 
 * The date on which the Django team will apply these patches, issue
-  new releases and publicy disclose the issue.
+  new releases and publicly disclose the issue.
 
 Simultaneously, the reporter of the issue will receive notification of
 the date on which we plan to take the issue public.
@@ -113,7 +116,7 @@ On the day of disclosure, we will take the following steps:
 4. Post a notice to the |django-announce| mailing list that links to the blog
    post.
 
-.. _the Python Package Index: http://pypi.python.org/pypi
+.. _the Python Package Index: https://pypi.python.org/pypi
 .. _the official Django development blog: https://www.djangoproject.com/weblog/
 
 If a reported issue is believed to be particularly time-sensitive --

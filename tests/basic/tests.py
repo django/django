@@ -755,7 +755,6 @@ class ConcurrentSaveTests(TransactionTestCase):
             try:
                 # Do not delete a directly - doing so alters its state.
                 Article.objects.filter(pk=a.pk).delete()
-                connections[DEFAULT_DB_ALIAS].commit_unless_managed()
             except Exception as e:
                 exceptions.append(e)
             finally:
@@ -871,7 +870,7 @@ class SelectOnSaveTests(TestCase):
             with self.assertNumQueries(2):
                 asos.save()
                 self.assertTrue(FakeQuerySet.called)
-            # This is not wanted behaviour, but this is how Django has always
+            # This is not wanted behavior, but this is how Django has always
             # behaved for databases that do not return correct information
             # about matched rows for UPDATE.
             with self.assertRaises(DatabaseError):

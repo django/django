@@ -1,6 +1,5 @@
 from collections import OrderedDict
 import sys
-import warnings
 
 from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 from django.core.paginator import InvalidPage
@@ -8,8 +7,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.http import urlencode
 
@@ -34,36 +32,7 @@ IGNORED_PARAMS = (
 EMPTY_CHANGELIST_VALUE = ugettext_lazy('(None)')
 
 
-def _is_changelist_popup(request):
-    """
-    Returns True if the popup GET parameter is set.
-
-    This function is introduced to facilitate deprecating the legacy
-    value for IS_POPUP_VAR and should be removed at the end of the
-    deprecation cycle.
-    """
-
-    if IS_POPUP_VAR in request.GET:
-        return True
-
-    IS_LEGACY_POPUP_VAR = 'pop'
-    if IS_LEGACY_POPUP_VAR in request.GET:
-        warnings.warn(
-            "The `%s` GET parameter has been renamed to `%s`." %
-            (IS_LEGACY_POPUP_VAR, IS_POPUP_VAR),
-            DeprecationWarning, 2)
-        return True
-
-    return False
-
-
-class RenameChangeListMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('get_query_set', 'get_queryset', DeprecationWarning),
-    )
-
-
-class ChangeList(six.with_metaclass(RenameChangeListMethods)):
+class ChangeList(object):
     def __init__(self, request, model, list_display, list_display_links,
             list_filter, date_hierarchy, search_fields, list_select_related,
             list_per_page, list_max_show_all, list_editable, model_admin):
@@ -88,7 +57,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         except ValueError:
             self.page_num = 0
         self.show_all = ALL_VAR in request.GET
-        self.is_popup = _is_changelist_popup(request)
+        self.is_popup = IS_POPUP_VAR in request.GET
         self.to_field = request.GET.get(TO_FIELD_VAR)
         self.params = dict(request.GET.items())
         if PAGE_VAR in self.params:
@@ -110,20 +79,6 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         self.title = title % force_text(self.opts.verbose_name)
         self.pk_attname = self.lookup_opts.pk.attname
 
-    @property
-    def root_query_set(self):
-        warnings.warn("`ChangeList.root_query_set` is deprecated, "
-                      "use `root_queryset` instead.",
-                      DeprecationWarning, 2)
-        return self.root_queryset
-
-    @property
-    def query_set(self):
-        warnings.warn("`ChangeList.query_set` is deprecated, "
-                      "use `queryset` instead.",
-                      DeprecationWarning, 2)
-        return self.queryset
-
     def get_filters_params(self, params=None):
         """
         Returns all params except IGNORED_PARAMS
@@ -142,14 +97,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         lookup_params = self.get_filters_params()
         use_distinct = False
 
-        # Normalize the types of keys
         for key, value in lookup_params.items():
-            if not isinstance(key, str):
-                # 'key' will be used as a keyword argument later, so Python
-                # requires it to be a string.
-                del lookup_params[key]
-                lookup_params[force_str(key)] = value
-
             if not self.model_admin.lookup_allowed(key, value):
                 raise DisallowedModelAdminLookup("Filtering by %s not allowed" % key)
 
@@ -224,7 +172,7 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
         # Perform a slight optimization:
         # full_result_count is equal to paginator.count if no filters
         # were applied
-        if self.get_filters_params():
+        if self.get_filters_params() or self.params.get(SEARCH_VAR):
             full_result_count = self.root_queryset.count()
         else:
             full_result_count = result_count
@@ -300,7 +248,11 @@ class ChangeList(six.with_metaclass(RenameChangeListMethods)):
                     order_field = self.get_ordering_field(field_name)
                     if not order_field:
                         continue  # No 'admin_order_field', skip it
-                    ordering.append(pfx + order_field)
+                    # reverse order if order_field has already "-" as prefix
+                    if order_field.startswith('-') and pfx == "-":
+                        ordering.append(order_field[1:])
+                    else:
+                        ordering.append(pfx + order_field)
                 except (IndexError, ValueError):
                     continue  # Invalid ordering specified, skip it.
 

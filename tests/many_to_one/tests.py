@@ -178,8 +178,9 @@ class ManyToOneTests(TestCase):
             ])
         # ... and should work fine with the unicode that comes out of forms.Form.cleaned_data
         self.assertQuerysetEqual(
-            Article.objects.filter(reporter__first_name__exact='John'
-                                  ).extra(where=["many_to_one_reporter.last_name='%s'" % 'Smith']),
+            (Article.objects
+                .filter(reporter__first_name__exact='John')
+                .extra(where=["many_to_one_reporter.last_name='%s'" % 'Smith'])),
             [
                 "<Article: John's second story>",
                 "<Article: This is a test>",
@@ -337,7 +338,7 @@ class ManyToOneTests(TestCase):
 
     def test_delete(self):
         self.r.article_set.create(headline="John's second story",
-                                                pub_date=datetime.date(2005, 7, 29))
+                                  pub_date=datetime.date(2005, 7, 29))
         self.r2.article_set.create(headline="Paul's story",
                                    pub_date=datetime.date(2006, 1, 17))
         Article.objects.create(id=None, headline="Third article",

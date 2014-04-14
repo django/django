@@ -24,6 +24,11 @@ introduce controlled coupling for convenience's sake.
    :func:`render_to_response()` with a ``context_instance`` argument that
    forces the use of a :class:`~django.template.RequestContext`.
 
+   Django does not provide a shortcut function which returns a
+   :class:`~django.template.response.TemplateResponse` because the constructor
+   of :class:`~django.template.response.TemplateResponse` offers the same level
+   of convenience as :func:`render()`.
+
 Required arguments
 ------------------
 
@@ -198,10 +203,15 @@ If you want to override the :setting:`TEMPLATE_DIRS` setting, use the
      <django.core.urlresolvers.reverse>` will be used to reverse-resolve the
      name.
 
-   * A URL, which will be used as-is for the redirect location.
+   * An absolute or relative URL, which will be used as-is for the redirect
+     location.
 
    By default issues a temporary redirect; pass ``permanent=True`` to issue a
-   permanent redirect
+   permanent redirect.
+
+   .. versionchanged:: 1.7
+
+       The ability to use relative URLs was added.
 
 Examples
 --------

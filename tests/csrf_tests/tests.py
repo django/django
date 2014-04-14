@@ -7,8 +7,7 @@ from django.core.context_processors import csrf
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH
 from django.template import RequestContext, Template
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
 
 
@@ -405,3 +404,47 @@ class CsrfViewMiddlewareTest(TestCase):
         finally:
             logger.removeHandler(test_handler)
             logger.setLevel(old_log_level)
+
+    def test_csrf_cookie_age(self):
+        """
+        Test to verify CSRF cookie age can be set using
+        settings.CSRF_COOKIE_AGE.
+        """
+        req = self._get_GET_no_csrf_cookie_request()
+
+        MAX_AGE = 123
+        with self.settings(CSRF_COOKIE_NAME='csrfcookie',
+                           CSRF_COOKIE_DOMAIN='.example.com',
+                           CSRF_COOKIE_AGE=MAX_AGE,
+                           CSRF_COOKIE_PATH='/test/',
+                           CSRF_COOKIE_SECURE=True,
+                           CSRF_COOKIE_HTTPONLY=True):
+            # token_view calls get_token() indirectly
+            CsrfViewMiddleware().process_view(req, token_view, (), {})
+            resp = token_view(req)
+
+            resp2 = CsrfViewMiddleware().process_response(req, resp)
+            max_age = resp2.cookies.get('csrfcookie').get('max-age')
+            self.assertEqual(max_age, MAX_AGE)
+
+    def test_csrf_cookie_age_none(self):
+        """
+        Test to verify CSRF cookie age does not have max age set and therefore
+        uses session-based cookies.
+        """
+        req = self._get_GET_no_csrf_cookie_request()
+
+        MAX_AGE = None
+        with self.settings(CSRF_COOKIE_NAME='csrfcookie',
+                           CSRF_COOKIE_DOMAIN='.example.com',
+                           CSRF_COOKIE_AGE=MAX_AGE,
+                           CSRF_COOKIE_PATH='/test/',
+                           CSRF_COOKIE_SECURE=True,
+                           CSRF_COOKIE_HTTPONLY=True):
+            # token_view calls get_token() indirectly
+            CsrfViewMiddleware().process_view(req, token_view, (), {})
+            resp = token_view(req)
+
+            resp2 = CsrfViewMiddleware().process_response(req, resp)
+            max_age = resp2.cookies.get('csrfcookie').get('max-age')
+            self.assertEqual(max_age, '')

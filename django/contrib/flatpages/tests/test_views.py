@@ -3,8 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.flatpages.models import FlatPage
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 
 @override_settings(
@@ -17,6 +16,7 @@ from django.test.utils import override_settings
         'django.contrib.messages.middleware.MessageMiddleware',
         # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
     ),
+    ROOT_URLCONF='django.contrib.flatpages.tests.urls',
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
@@ -24,7 +24,6 @@ from django.test.utils import override_settings
 )
 class FlatpageViewTests(TestCase):
     fixtures = ['sample_flatpages', 'example_site']
-    urls = 'django.contrib.flatpages.tests.urls'
 
     def test_view_flatpage(self):
         "A flatpage can be served through a view"
@@ -54,7 +53,7 @@ class FlatpageViewTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage won't be served if the fallback middlware is disabled"
+        "A non-existent flatpage won't be served if the fallback middleware is disabled"
         response = self.client.get('/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -85,6 +84,7 @@ class FlatpageViewTests(TestCase):
         'django.contrib.messages.middleware.MessageMiddleware',
         # no 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
     ),
+    ROOT_URLCONF='django.contrib.flatpages.tests.urls',
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
@@ -92,7 +92,6 @@ class FlatpageViewTests(TestCase):
 )
 class FlatpageViewAppendSlashTests(TestCase):
     fixtures = ['sample_flatpages', 'example_site']
-    urls = 'django.contrib.flatpages.tests.urls'
 
     def test_redirect_view_flatpage(self):
         "A flatpage can be served through a view and should add a slash"
@@ -110,7 +109,7 @@ class FlatpageViewAppendSlashTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_redirect_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage won't be served if the fallback middlware is disabled and should not add a slash"
+        "A non-existent flatpage won't be served if the fallback middleware is disabled and should not add a slash"
         response = self.client.get('/no_such_flatpage')
         self.assertEqual(response.status_code, 404)
 

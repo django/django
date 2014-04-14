@@ -26,9 +26,9 @@
 # installed, because pkg_resources is necessary to read eggs.
 
 from django.core.exceptions import ImproperlyConfigured
-from django.template.base import Origin, Template, Context, TemplateDoesNotExist, add_to_builtins
+from django.template.base import Origin, Template, Context, TemplateDoesNotExist
 from django.conf import settings
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.utils import six
 
 template_source_loaders = None
@@ -95,7 +95,7 @@ def find_template_loader(loader):
     else:
         args = []
     if isinstance(loader, six.string_types):
-        TemplateLoader = import_by_path(loader)
+        TemplateLoader = import_string(loader)
 
         if hasattr(TemplateLoader, 'load_template_source'):
             func = TemplateLoader(*args)
@@ -164,13 +164,14 @@ def render_to_string(template_name, dictionary=None, context_instance=None,
     get_template, or it may be a tuple to use select_template to find one of
     the templates in the list. Returns a string.
     """
-    dictionary = dictionary or {}
     if isinstance(template_name, (list, tuple)):
         t = select_template(template_name, dirs)
     else:
         t = get_template(template_name, dirs)
     if not context_instance:
         return t.render(Context(dictionary))
+    if not dictionary:
+        return t.render(context_instance)
     # Add the dictionary to the context stack, ensuring it gets removed again
     # to keep the context_instance in the same state it started in.
     with context_instance.push(dictionary):
@@ -191,5 +192,3 @@ def select_template(template_name_list, dirs=None):
             continue
     # If we get here, none of the templates could be loaded
     raise TemplateDoesNotExist(', '.join(not_found))
-
-add_to_builtins('django.template.loader_tags')

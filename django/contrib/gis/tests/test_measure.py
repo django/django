@@ -1,5 +1,5 @@
 """
-Distance and Area objects to allow for sensible and convienient calculation
+Distance and Area objects to allow for sensible and convenient calculation
 and conversions. Here are some tests.
 """
 
@@ -12,7 +12,7 @@ class DistanceTest(unittest.TestCase):
     "Testing the Distance object"
 
     def testInit(self):
-        "Testing initialisation from valid units"
+        "Testing initialization from valid units"
         d = Distance(m=100)
         self.assertEqual(d.m, 100)
 
@@ -33,7 +33,7 @@ class DistanceTest(unittest.TestCase):
             self.assertEqual(d.mm, 1000.0)
 
     def testInitInvalid(self):
-        "Testing initialisation from invalid units"
+        "Testing initialization from invalid units"
         self.assertRaises(AttributeError, D, banana=100)
 
     def testAccess(self):
@@ -93,7 +93,7 @@ class DistanceTest(unittest.TestCase):
         self.assertEqual(d5, 50)
 
         a5 = d1 * D(m=10)
-        self.assertTrue(isinstance(a5, Area))
+        self.assertIsInstance(a5, Area)
         self.assertEqual(a5.sq_m, 100 * 10)
 
         with self.assertRaises(TypeError):
@@ -149,7 +149,7 @@ class AreaTest(unittest.TestCase):
     "Testing the Area object"
 
     def testInit(self):
-        "Testing initialisation from valid units"
+        "Testing initialization from valid units"
         a = Area(sq_m=100)
         self.assertEqual(a.sq_m, 100)
 
@@ -160,7 +160,7 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(a.sq_m, 258998811.0336)
 
     def testInitInvaliA(self):
-        "Testing initialisation from invalid units"
+        "Testing initialization from invalid units"
         self.assertRaises(AttributeError, A, banana=100)
 
     def testAccess(self):

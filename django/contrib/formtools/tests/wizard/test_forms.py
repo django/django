@@ -48,7 +48,7 @@ class CustomKwargsStep1(Step1):
 
     def __init__(self, test=None, *args, **kwargs):
         self.test = test
-        return super(CustomKwargsStep1, self).__init__(*args, **kwargs)
+        super(CustomKwargsStep1, self).__init__(*args, **kwargs)
 
 
 class TestModel(models.Model):
@@ -246,11 +246,11 @@ class SessionFormTests(TestCase):
     def test_init(self):
         request = get_request()
         testform = SessionWizardView.as_view([('start', Step1)])
-        self.assertTrue(isinstance(testform(request), TemplateResponse))
+        self.assertIsInstance(testform(request), TemplateResponse)
 
 
 class CookieFormTests(TestCase):
     def test_init(self):
         request = get_request()
         testform = CookieWizardView.as_view([('start', Step1)])
-        self.assertTrue(isinstance(testform(request), TemplateResponse))
+        self.assertIsInstance(testform(request), TemplateResponse)

@@ -9,9 +9,9 @@ from django.conf import settings
 if __name__ == '__main__':
     settings.configure()
 
-import imp
 import os.path
 import sys
+import types
 import unittest
 
 try:
@@ -23,8 +23,7 @@ except ImportError:
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils._os import upath
 from django.utils.six import StringIO
@@ -42,14 +41,15 @@ def create_egg(name, resources):
     name: The name of the module.
     resources: A dictionary of resources. Keys are the names and values the data.
     """
-    egg = imp.new_module(name)
+    egg = types.ModuleType(name)
     egg.__loader__ = MockLoader()
+    egg.__path__ = ['/some/bogus/path/']
+    egg.__file__ = '/some/bogus/path/__init__.pyc'
     egg._resources = resources
     sys.modules[name] = egg
 
 
 @unittest.skipUnless(pkg_resources, 'setuptools is not installed')
-@override_settings(INSTALLED_APPS=[])
 class EggLoaderTest(TestCase):
     def setUp(self):
         # Defined here b/c at module scope we may not have pkg_resources
@@ -69,6 +69,9 @@ class EggLoaderTest(TestCase):
 
             def _get(self, path):
                 return self.module._resources[path].read()
+
+            def _fn(self, base, resource_name):
+                return os.path.normcase(resource_name)
 
         pkg_resources._provider_factories[MockLoader] = MockProvider
 
@@ -98,9 +101,8 @@ class EggLoaderTest(TestCase):
         self.assertEqual(contents, "y")
         self.assertEqual(template_name, "egg:egg_1:templates/y.html")
 
-    @override_settings(INSTALLED_APPS=[])
     def test_not_installed(self):
-        "Loading an existent template from an egg not included in INSTALLED_APPS should fail"
+        "Loading an existent template from an egg not included in any app should fail"
         egg_loader = EggLoader()
         self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "y.html")
 
@@ -115,7 +117,7 @@ class EggLoaderTest(TestCase):
 class CachedLoader(TestCase):
     def test_templatedir_caching(self):
         "Check that the template directories form part of the template cache key. Refs #13573"
-        # Retrive a template specifying a template directory to check
+        # Retrieve a template specifying a template directory to check
         t1, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'first'),))
         # Now retrieve the same template name, but from a different directory
         t2, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'second'),))
@@ -168,6 +170,18 @@ class RenderToStringTest(TestCase):
         six.assertRaisesRegex(self, TemplateDoesNotExist,
             'No template names provided$',
             loader.select_template, [])
+
+    def test_no_empty_dict_pushed_to_stack(self):
+        """
+        No empty dict should be pushed to the context stack when render_to_string
+        is called without any argument (#21741).
+        """
+
+        # The stack should have a length of 1, corresponding to the builtins
+        self.assertEqual('1',
+            loader.render_to_string('test_context_stack.html').strip())
+        self.assertEqual('1',
+            loader.render_to_string('test_context_stack.html', context_instance=Context()).strip())
 
 
 class TemplateDirsOverrideTest(unittest.TestCase):

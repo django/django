@@ -1,22 +1,74 @@
 from __future__ import unicode_literals
-from datetime import date
 
+from datetime import date
+import locale
+import sys
+
+from django.apps import apps
 from django.contrib.auth import models, management
+from django.contrib.auth.checks import check_user_model
 from django.contrib.auth.management import create_permissions
-from django.contrib.auth.management.commands import changepassword
+from django.contrib.auth.management.commands import changepassword, createsuperuser
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.custom_user import CustomUser
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
+from django.core import checks
 from django.core import exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.core.management.validation import get_validation_errors
-from django.db.models.loading import get_app
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings, override_system_checks
 from django.utils import six
-from django.utils.six import StringIO
+from django.utils.encoding import force_str
+
+
+def mock_inputs(inputs):
+    """
+    Decorator to temporarily replace input/getpass to allow interactive
+    createsuperuser.
+    """
+    def inner(test_func):
+        def wrapped(*args):
+            class mock_getpass:
+                @staticmethod
+                def getpass(prompt=b'Password: ', stream=None):
+                    if six.PY2:
+                        # getpass on Windows only supports prompt as bytestring (#19807)
+                        assert isinstance(prompt, six.binary_type)
+                    return inputs['password']
+
+            def mock_input(prompt):
+                # prompt should be encoded in Python 2. This line will raise an
+                # Exception if prompt contains unencoded non-ASCII on Python 2.
+                prompt = str(prompt)
+                assert str('__proxy__') not in prompt
+                response = ''
+                for key, val in inputs.items():
+                    if force_str(key) in prompt.lower():
+                        response = val
+                        break
+                return response
+
+            old_getpass = createsuperuser.getpass
+            old_input = createsuperuser.input
+            createsuperuser.getpass = mock_getpass
+            createsuperuser.input = mock_input
+            try:
+                test_func(*args)
+            finally:
+                createsuperuser.getpass = old_getpass
+                createsuperuser.input = old_input
+        return wrapped
+    return inner
+
+
+class MockTTY(object):
+    """
+    A fake stdin object that pretends to be a TTY to be used in conjunction
+    with mock_inputs.
+    """
+    def isatty(self):
+        return True
 
 
 @skipIfCustomUser
@@ -53,8 +105,8 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
         self.user = models.User.objects.create_user(username='joe', password='qwerty')
-        self.stdout = StringIO()
-        self.stderr = StringIO()
+        self.stdout = six.StringIO()
+        self.stderr = six.StringIO()
 
     def tearDown(self):
         self.stdout.close()
@@ -83,15 +135,29 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         with self.assertRaises(CommandError):
             command.execute("joe", stdout=self.stdout, stderr=self.stderr)
 
+    def test_that_changepassword_command_works_with_nonascii_output(self):
+        """
+        #21627 -- Executing the changepassword management command should allow
+        non-ASCII characters from the User object representation.
+        """
+        # 'Julia' with accented 'u':
+        models.User.objects.create_user(username='J\xfalia', password='qwerty')
+
+        command = changepassword.Command()
+        command._get_pass = lambda *args: 'not qwerty'
+
+        command.execute("J\xfalia", stdout=self.stdout)
+
 
 @skipIfCustomUser
 class CreatesuperuserManagementCommandTestCase(TestCase):
 
-    def test_createsuperuser(self):
+    def test_basic_usage(self):
         "Check the operation of the createsuperuser management command"
         # We can use the management command to create a superuser
-        new_io = StringIO()
-        call_command("createsuperuser",
+        new_io = six.StringIO()
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe",
             email="joe@somewhere.org",
@@ -105,10 +171,68 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # created password should be unusable
         self.assertFalse(u.has_usable_password())
 
+    @mock_inputs({'password': "nopasswd"})
+    def test_nolocale(self):
+        """
+        Check that createsuperuser does not break when no locale is set. See
+        ticket #16017.
+        """
+
+        old_getdefaultlocale = locale.getdefaultlocale
+        try:
+            # Temporarily remove locale information
+            locale.getdefaultlocale = lambda: (None, None)
+
+            # Call the command in this new environment
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                username="nolocale@somewhere.org",
+                email="nolocale@somewhere.org",
+                verbosity=0,
+                stdin=MockTTY(),
+            )
+
+        except TypeError:
+            self.fail("createsuperuser fails if the OS provides no information about the current locale")
+
+        finally:
+            # Re-apply locale information
+            locale.getdefaultlocale = old_getdefaultlocale
+
+        # If we were successful, a user should have been created
+        u = User.objects.get(username="nolocale@somewhere.org")
+        self.assertEqual(u.email, 'nolocale@somewhere.org')
+
+    @mock_inputs({
+        'password': "nopasswd",
+        'u\u017eivatel': 'foo',  # username (cz)
+        'email': 'nolocale@somewhere.org'})
+    def test_non_ascii_verbose_name(self):
+        # Aliased so the string doesn't get extracted
+        from django.utils.translation import ugettext_lazy as ulazy
+        username_field = User._meta.get_field('username')
+        old_verbose_name = username_field.verbose_name
+        username_field.verbose_name = ulazy('u\u017eivatel')
+        new_io = six.StringIO()
+        try:
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                stdout=new_io,
+                stdin=MockTTY(),
+            )
+        finally:
+            username_field.verbose_name = old_verbose_name
+
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, 'Superuser created successfully.')
+
     def test_verbosity_zero(self):
         # We can supress output on the management command
-        new_io = StringIO()
-        call_command("createsuperuser",
+        new_io = six.StringIO()
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe2",
             email="joe2@somewhere.org",
@@ -122,8 +246,9 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertFalse(u.has_usable_password())
 
     def test_email_in_username(self):
-        new_io = StringIO()
-        call_command("createsuperuser",
+        new_io = six.StringIO()
+        call_command(
+            "createsuperuser",
             interactive=False,
             username="joe+admin@somewhere.org",
             email="joe@somewhere.org",
@@ -139,13 +264,14 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # We can use the management command to create a superuser
         # We skip validation because the temporary substitution of the
         # swappable User model messes with validation.
-        new_io = StringIO()
-        call_command("createsuperuser",
+        new_io = six.StringIO()
+        call_command(
+            "createsuperuser",
             interactive=False,
             email="joe@somewhere.org",
             date_of_birth="1976-04-01",
             stdout=new_io,
-            skip_validation=True
+            skip_checks=True
         )
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, 'Superuser created successfully.')
@@ -161,40 +287,144 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # We can use the management command to create a superuser
         # We skip validation because the temporary substitution of the
         # swappable User model messes with validation.
-        new_io = StringIO()
+        new_io = six.StringIO()
         with self.assertRaises(CommandError):
-            call_command("createsuperuser",
+            call_command(
+                "createsuperuser",
                 interactive=False,
                 username="joe@somewhere.org",
                 stdout=new_io,
                 stderr=new_io,
-                skip_validation=True
+                skip_checks=True
             )
 
         self.assertEqual(CustomUser._default_manager.count(), 0)
 
+    def test_skip_if_not_in_TTY(self):
+        """
+        If the command is not called from a TTY, it should be skipped and a
+        message should be displayed (#7423).
+        """
+        class FakeStdin(object):
+            """A fake stdin object that has isatty() return False."""
+            def isatty(self):
+                return False
+
+        out = six.StringIO()
+        call_command(
+            "createsuperuser",
+            stdin=FakeStdin(),
+            stdout=out,
+            interactive=True,
+        )
+
+        self.assertEqual(User._default_manager.count(), 0)
+        self.assertIn("Superuser creation skipped", out.getvalue())
+
+    def test_passing_stdin(self):
+        """
+        You can pass a stdin object as an option and it should be
+        available on self.stdin.
+        If no such option is passed, it defaults to sys.stdin.
+        """
+        sentinel = object()
+        command = createsuperuser.Command()
+        command.execute(
+            stdin=sentinel,
+            stdout=six.StringIO(),
+            interactive=False,
+            username='janet',
+            email='janet@example.com',
+        )
+        self.assertIs(command.stdin, sentinel)
+
+        command = createsuperuser.Command()
+        command.execute(
+            stdout=six.StringIO(),
+            interactive=False,
+            username='joe',
+            email='joe@example.com',
+        )
+        self.assertIs(command.stdin, sys.stdin)
+
 
 class CustomUserModelValidationTestCase(TestCase):
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
+    @override_system_checks([check_user_model])
     def test_required_fields_is_list(self):
         "REQUIRED_FIELDS should be a list."
-        new_io = StringIO()
-        get_validation_errors(new_io, get_app('auth'))
-        self.assertIn("The REQUIRED_FIELDS must be a list or tuple.", new_io.getvalue())
+
+        from .custom_user import CustomUserNonListRequiredFields
+        errors = checks.run_checks()
+        expected = [
+            checks.Error(
+                "'REQUIRED_FIELDS' must be a list or tuple.",
+                hint=None,
+                obj=CustomUserNonListRequiredFields,
+                id='auth.E001',
+            ),
+        ]
+        self.assertEqual(errors, expected)
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
+    @override_system_checks([check_user_model])
     def test_username_not_in_required_fields(self):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
-        new_io = StringIO()
-        get_validation_errors(new_io, get_app('auth'))
-        self.assertIn("The field named as the USERNAME_FIELD should not be included in REQUIRED_FIELDS on a swappable User model.", new_io.getvalue())
+
+        from .custom_user import CustomUserBadRequiredFields
+        errors = checks.run_checks()
+        expected = [
+            checks.Error(
+                ("The field named as the 'USERNAME_FIELD' for a custom user model "
+                 "must not be included in 'REQUIRED_FIELDS'."),
+                hint=None,
+                obj=CustomUserBadRequiredFields,
+                id='auth.E002',
+            ),
+        ]
+        self.assertEqual(errors, expected)
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername')
+    @override_system_checks([check_user_model])
     def test_username_non_unique(self):
         "A non-unique USERNAME_FIELD should raise a model validation error."
-        new_io = StringIO()
-        get_validation_errors(new_io, get_app('auth'))
-        self.assertIn("The USERNAME_FIELD must be unique. Add unique=True to the field parameters.", new_io.getvalue())
+
+        from .custom_user import CustomUserNonUniqueUsername
+        errors = checks.run_checks()
+        expected = [
+            checks.Error(
+                ("'CustomUserNonUniqueUsername.username' must be "
+                 "unique because it is named as the 'USERNAME_FIELD'."),
+                hint=None,
+                obj=CustomUserNonUniqueUsername,
+                id='auth.E003',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername',
+                       AUTHENTICATION_BACKENDS=[
+                           'my.custom.backend',
+                       ])
+    @override_system_checks([check_user_model])
+    def test_username_non_unique_with_custom_backend(self):
+        """ A non-unique USERNAME_FIELD should raise an error only if we use the
+        default authentication backend. Otherwise, an warning should be raised.
+        """
+
+        from .custom_user import CustomUserNonUniqueUsername
+        errors = checks.run_checks()
+        expected = [
+            checks.Warning(
+                ("'CustomUserNonUniqueUsername.username' is named as "
+                 "the 'USERNAME_FIELD', but it is not unique."),
+                hint=('Ensure that your authentication backend(s) can handle '
+                      'non-unique usernames.'),
+                obj=CustomUserNonUniqueUsername,
+                id='auth.W004',
+            )
+        ]
+        self.assertEqual(errors, expected)
 
 
 class PermissionTestCase(TestCase):
@@ -215,13 +445,15 @@ class PermissionTestCase(TestCase):
         Test that we show proper error message if we are trying to create
         duplicate permissions.
         """
+        auth_app_config = apps.get_app_config('auth')
+
         # check duplicated default permission
         models.Permission._meta.permissions = [
             ('change_permission', 'Can edit permission (duplicate)')]
         six.assertRaisesRegex(self, CommandError,
             "The permission codename 'change_permission' clashes with a "
             "builtin permission for model 'auth.Permission'.",
-            create_permissions, models, [], verbosity=0)
+            create_permissions, auth_app_config, verbosity=0)
 
         # check duplicated custom permissions
         models.Permission._meta.permissions = [
@@ -232,21 +464,23 @@ class PermissionTestCase(TestCase):
         six.assertRaisesRegex(self, CommandError,
             "The permission codename 'my_custom_permission' is duplicated for model "
             "'auth.Permission'.",
-            create_permissions, models, [], verbosity=0)
+            create_permissions, auth_app_config, verbosity=0)
 
         # should not raise anything
         models.Permission._meta.permissions = [
             ('my_custom_permission', 'Some permission'),
             ('other_one', 'Some other permission'),
         ]
-        create_permissions(models, [], verbosity=0)
+        create_permissions(auth_app_config, verbosity=0)
 
     def test_default_permissions(self):
+        auth_app_config = apps.get_app_config('auth')
+
         permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
         models.Permission._meta.permissions = [
             ('my_custom_permission', 'Some permission'),
         ]
-        create_permissions(models, [], verbosity=0)
+        create_permissions(auth_app_config, verbosity=0)
 
         # add/change/delete permission by default + custom permission
         self.assertEqual(models.Permission.objects.filter(
@@ -255,7 +489,7 @@ class PermissionTestCase(TestCase):
 
         models.Permission.objects.filter(content_type=permission_content_type).delete()
         models.Permission._meta.default_permissions = []
-        create_permissions(models, [], verbosity=0)
+        create_permissions(auth_app_config, verbosity=0)
 
         # custom permission only since default permissions is empty
         self.assertEqual(models.Permission.objects.filter(
@@ -263,10 +497,12 @@ class PermissionTestCase(TestCase):
         ).count(), 1)
 
     def test_verbose_name_length(self):
+        auth_app_config = apps.get_app_config('auth')
+
         permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
         models.Permission.objects.filter(content_type=permission_content_type).delete()
         models.Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control"
 
         six.assertRaisesRegex(self, exceptions.ValidationError,
             "The verbose_name of permission is longer than 39 characters",
-            create_permissions, models, [], verbosity=0)
+            create_permissions, auth_app_config, verbosity=0)

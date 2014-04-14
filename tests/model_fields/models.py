@@ -2,11 +2,9 @@ import os
 import tempfile
 import warnings
 
-from django.core.exceptions import ImproperlyConfigured
-
 try:
-    from django.utils.image import Image
-except ImproperlyConfigured:
+    from PIL import Image
+except ImportError:
     Image = None
 
 from django.core.files.storage import FileSystemStorage
@@ -49,13 +47,33 @@ class BigD(models.Model):
     d = models.DecimalField(max_digits=38, decimal_places=30)
 
 
+class FloatModel(models.Model):
+    size = models.FloatField()
+
+
 class BigS(models.Model):
     s = models.SlugField(max_length=255)
 
 
-class BigInt(models.Model):
+class SmallIntegerModel(models.Model):
+    value = models.SmallIntegerField()
+
+
+class IntegerModel(models.Model):
+    value = models.IntegerField()
+
+
+class BigIntegerModel(models.Model):
     value = models.BigIntegerField()
     null_value = models.BigIntegerField(null=True, blank=True)
+
+
+class PositiveSmallIntegerModel(models.Model):
+    value = models.PositiveSmallIntegerField()
+
+
+class PositiveIntegerModel(models.Model):
+    value = models.PositiveIntegerField()
 
 
 class Post(models.Model):
@@ -72,10 +90,25 @@ class BooleanModel(models.Model):
     string = models.CharField(max_length=10, default='abc')
 
 
+class DateTimeModel(models.Model):
+    d = models.DateField()
+    dt = models.DateTimeField()
+    t = models.TimeField()
+
+
+class PrimaryKeyCharModel(models.Model):
+    string = models.CharField(max_length=10, primary_key=True)
+
+
 class FksToBooleans(models.Model):
     """Model wih FKs to models with {Null,}BooleanField's, #15040"""
     bf = models.ForeignKey(BooleanModel)
     nbf = models.ForeignKey(NullBooleanModel)
+
+
+class FkToChar(models.Model):
+    """Model with FK to a model with a CharField primary key, #19299"""
+    out = models.ForeignKey(PrimaryKeyCharModel)
 
 
 class RenamedField(models.Model):
@@ -95,7 +128,7 @@ class VerboseNameField(models.Model):
     field9 = models.FileField("verbose field9", upload_to="unused")
     field10 = models.FilePathField("verbose field10")
     field11 = models.FloatField("verbose field11")
-    # Don't want to depend on Pillow/PIL in this test
+    # Don't want to depend on Pillow in this test
     #field_image = models.ImageField("verbose field")
     field12 = models.IntegerField("verbose field12")
     with warnings.catch_warnings(record=True) as w:
@@ -132,7 +165,7 @@ class Document(models.Model):
 ###############################################################################
 # ImageField
 
-# If Pillow/PIL available, do these tests.
+# If Pillow available, do these tests.
 if Image:
     class TestImageFieldFile(ImageFieldFile):
         """

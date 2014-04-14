@@ -10,7 +10,7 @@ from django.utils import six
 
 from .models import (
     Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place, Post,
-    Restaurant, Student, StudentWorker, Supplier, Worker, MixinModel,
+    Restaurant, Student, Supplier, Worker, MixinModel,
     Title, Base, SubBase)
 
 
@@ -47,38 +47,6 @@ class ModelInheritanceTests(TestCase):
         # However, the CommonInfo class cannot be used as a normal model (it
         # doesn't exist as a model).
         self.assertRaises(AttributeError, lambda: CommonInfo.objects.all())
-
-        # A StudentWorker which does not exist is both a Student and Worker
-        # which does not exist.
-        self.assertRaises(
-            Student.DoesNotExist,
-            StudentWorker.objects.get, pk=12321321
-        )
-        self.assertRaises(
-            Worker.DoesNotExist,
-            StudentWorker.objects.get, pk=12321321
-        )
-
-        # MultipleObjectsReturned is also inherited.
-        # This is written out "long form", rather than using __init__/create()
-        # because of a bug with diamond inheritance (#10808)
-        sw1 = StudentWorker()
-        sw1.name = "Wilma"
-        sw1.age = 35
-        sw1.save()
-        sw2 = StudentWorker()
-        sw2.name = "Betty"
-        sw2.age = 24
-        sw2.save()
-
-        self.assertRaises(
-            Student.MultipleObjectsReturned,
-            StudentWorker.objects.get, pk__lt=sw2.pk + 100
-        )
-        self.assertRaises(
-            Worker.MultipleObjectsReturned,
-            StudentWorker.objects.get, pk__lt=sw2.pk + 100
-        )
 
     def test_multiple_table(self):
         post = Post.objects.create(title="Lorem Ipsum")

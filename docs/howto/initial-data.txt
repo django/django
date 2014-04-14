@@ -103,6 +103,14 @@ directories.
 Providing initial SQL data
 ==========================
 
+.. deprecated:: 1.8
+
+    Historically this functionality has used regular expression parsing of the
+    initial SQL which is a bit buggy. This parsing is now deprecated in favor
+    of installing `sqlparse <https://pypi.python.org/pypi/sqlparse>`_; doing so
+    will be required for this functionality in Django 2.0. You can install it
+    using ``pip install sqlparse``.
+
 Django provides a hook for passing the database arbitrary SQL that's executed
 just after the CREATE TABLE statements when you run :djadmin:`migrate`. You can
 use this hook to populate default records, or you could also create SQL
@@ -150,13 +158,13 @@ Database-backend-specific SQL data
 There's also a hook for backend-specific SQL data. For example, you
 can have separate initial-data files for PostgreSQL and SQLite. For
 each app, Django looks for a file called
-``<appname>/sql/<modelname>.<backend>.sql``, where ``<appname>`` is
+``<app_label>/sql/<modelname>.<backend>.sql``, where ``<app_label>`` is
 your app directory, ``<modelname>`` is the model's name in lowercase
 and ``<backend>`` is the last part of the module name provided for the
 :setting:`ENGINE <DATABASE-ENGINE>` in your settings file (e.g., if you have
 defined a database with an :setting:`ENGINE <DATABASE-ENGINE>` value of
 ``django.db.backends.sqlite3``, Django will look for
-``<appname>/sql/<modelname>.sqlite3.sql``).
+``<app_label>/sql/<modelname>.sqlite3.sql``).
 
 Backend-specific SQL data is executed before non-backend-specific SQL
 data. For example, if your app contains the files ``sql/person.sql``

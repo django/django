@@ -16,26 +16,23 @@ In this example, a ``Place`` optionally can be a ``Restaurant``:
         name = models.CharField(max_length=50)
         address = models.CharField(max_length=80)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
-            return u"%s the place" % self.name
+        def __str__(self):              # __unicode__ on Python 2
+            return "%s the place" % self.name
 
     class Restaurant(models.Model):
         place = models.OneToOneField(Place, primary_key=True)
         serves_hot_dogs = models.BooleanField()
         serves_pizza = models.BooleanField()
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
-            return u"%s the restaurant" % self.place.name
+        def __str__(self):              # __unicode__ on Python 2
+            return "%s the restaurant" % self.place.name
 
     class Waiter(models.Model):
         restaurant = models.ForeignKey(Restaurant)
         name = models.CharField(max_length=50)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
-            return u"%s the waiter at %s" % (self.name, self.restaurant)
+        def __str__(self):              # __unicode__ on Python 2
+            return "%s the waiter at %s" % (self.name, self.restaurant)
 
 What follows are examples of operations that can be performed using the Python
 API facilities.
@@ -64,10 +61,17 @@ A Place can access its restaurant, if available::
 
 p2 doesn't have an associated restaurant::
 
-    >>> p2.restaurant
-    Traceback (most recent call last):
-        ...
-    DoesNotExist: Restaurant matching query does not exist.
+    >>> from django.core.exceptions import ObjectDoesNotExist
+    >>> try:
+    >>>     p2.restaurant
+    >>> except ObjectDoesNotExist:
+    >>>     print("There is no restaurant here.")
+    There is no restaurant here.
+
+You can also use ``hasattr`` to avoid the need for exception catching::
+
+    >>> hasattr(p2, 'restaurant')
+    False
 
 Set the place using assignment notation. Because place is the primary key on
 Restaurant, the save will create a new restaurant::
@@ -113,7 +117,7 @@ This of course works in reverse::
 
     >>> Place.objects.get(pk=1)
     <Place: Demon Dogs the place>
-    >>> Place.objects.get(restaurant__place__exact=p1)
+    >>> Place.objects.get(restaurant__place=p1)
     <Place: Demon Dogs the place>
     >>> Place.objects.get(restaurant=r)
     <Place: Demon Dogs the place>

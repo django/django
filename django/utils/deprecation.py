@@ -2,6 +2,17 @@ import inspect
 import warnings
 
 
+class RemovedInDjango20Warning(PendingDeprecationWarning):
+    pass
+
+
+class RemovedInDjango19Warning(DeprecationWarning):
+    pass
+
+
+RemovedInNextVersionWarning = RemovedInDjango19Warning
+
+
 class warn_about_renamed_method(object):
     def __init__(self, class_name, old_method_name, new_method_name, deprecation_warning):
         self.class_name = class_name

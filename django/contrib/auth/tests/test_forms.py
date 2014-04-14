@@ -12,8 +12,7 @@ from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
 from django.forms.fields import Field, CharField
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import translation
@@ -133,7 +132,7 @@ class AuthenticationFormTest(TestCase):
                              [force_text(form.error_messages['inactive'])])
 
     def test_custom_login_allowed_policy(self):
-        # The user is inactive, but our custom form policy allows him to log in.
+        # The user is inactive, but our custom form policy allows them to log in.
         data = {
             'username': 'inactive',
             'password': 'password',

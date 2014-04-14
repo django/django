@@ -189,7 +189,7 @@ class WKTWriter(IOBase):
 
     @outdim.setter
     def outdim(self, new_dim):
-        if not new_dim in (2, 3):
+        if new_dim not in (2, 3):
             raise ValueError('WKT output dimension must be 2 or 3')
         wkt_writer_set_outdim(self.ptr, new_dim)
 
@@ -214,7 +214,7 @@ class WKBWriter(IOBase):
         return wkb_writer_get_byteorder(self.ptr)
 
     def _set_byteorder(self, order):
-        if not order in (0, 1):
+        if order not in (0, 1):
             raise ValueError('Byte order parameter must be 0 (Big Endian) or 1 (Little Endian).')
         wkb_writer_set_byteorder(self.ptr, order)
 
@@ -225,7 +225,7 @@ class WKBWriter(IOBase):
         return wkb_writer_get_outdim(self.ptr)
 
     def _set_outdim(self, new_dim):
-        if not new_dim in (2, 3):
+        if new_dim not in (2, 3):
             raise ValueError('WKB output dimension must be 2 or 3')
         wkb_writer_set_outdim(self.ptr, new_dim)
 

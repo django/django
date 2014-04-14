@@ -1,8 +1,9 @@
+import os
 import sys
 
 from django.core import management
 from django.core.management import CommandError
-from django.core.management.utils import popen_wrapper
+from django.core.management.utils import find_command, popen_wrapper
 from django.test import SimpleTestCase
 from django.utils import translation
 from django.utils.six import StringIO
@@ -59,6 +60,19 @@ class CommandTests(SimpleTestCase):
         with translation.override('pl'):
             management.call_command('leave_locale_alone_true', stdout=out)
             self.assertEqual(out.getvalue(), "pl\n")
+
+    def test_find_command_without_PATH(self):
+        """
+        find_command should still work when the PATH environment variable
+        doesn't exist (#22256).
+        """
+        current_path = os.environ.pop('PATH', None)
+
+        try:
+            self.assertIsNone(find_command('_missing_'))
+        finally:
+            if current_path is not None:
+                os.environ['PATH'] = current_path
 
 
 class UtilsTests(SimpleTestCase):

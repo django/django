@@ -59,7 +59,7 @@ class BlockNode(Node):
                 if block is None:
                     block = self
                 # Create new block so we can store context without thread-safety issues.
-                block = BlockNode(block.name, block.nodelist)
+                block = type(self)(block.name, block.nodelist)
                 block.context = context
                 context['block'] = block
                 result = block.nodelist.render(context)
@@ -70,7 +70,7 @@ class BlockNode(Node):
     def super(self):
         render_context = self.context.render_context
         if (BLOCK_CONTEXT_KEY in render_context and
-            render_context[BLOCK_CONTEXT_KEY].get_block(self.name) is not None):
+                render_context[BLOCK_CONTEXT_KEY].get_block(self.name) is not None):
             return mark_safe(self.render(self.context))
         return ''
 
@@ -117,7 +117,7 @@ class ExtendsNode(Node):
             if not isinstance(node, TextNode):
                 if not isinstance(node, ExtendsNode):
                     blocks = dict((n.name, n) for n in
-                                   compiled_parent.nodelist.get_nodes_by_type(BlockNode))
+                                  compiled_parent.nodelist.get_nodes_by_type(BlockNode))
                     block_context.add_blocks(blocks)
                 break
 

@@ -9,9 +9,9 @@ Welcome to Django 1.5!
 These release notes cover the `new features`_, as well
 as some `backwards incompatible changes`_ you'll want to be aware of
 when upgrading from Django 1.4 or older versions. We've also dropped some
-features, which are detailed in :doc:`our deprecation plan
-</internals/deprecation>`, and we've `begun the deprecation process for some
-features`_.
+features, which are detailed in :ref:`our deprecation plan
+<deprecation-removed-in-1.5>`, and we've `begun the deprecation process for
+some features`_.
 
 .. _`new features`: `What's new in Django 1.5`_
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.5`_
@@ -714,6 +714,8 @@ Miscellaneous
 * Accessing reverse one-to-one relations fetched via
   :meth:`~django.db.models.query.QuerySet.select_related` now raises
   :exc:`~django.core.exceptions.DoesNotExist` instead of returning ``None``.
+
+.. _deprecated-features-1.5:
 
 Features deprecated in 1.5
 ==========================

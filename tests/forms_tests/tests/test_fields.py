@@ -38,7 +38,7 @@ from django.forms import (
     DecimalField, EmailField, Field, FileField, FilePathField, FloatField,
     Form, forms, HiddenInput, IntegerField, MultipleChoiceField,
     NullBooleanField, NumberInput, PasswordInput, RadioSelect, RegexField,
-    SplitDateTimeField, TextInput, TimeField, TypedChoiceField,
+    SplitDateTimeField, TextInput, Textarea, TimeField, TypedChoiceField,
     TypedMultipleChoiceField, URLField, ValidationError, Widget,
 )
 from django.test import SimpleTestCase
@@ -148,14 +148,13 @@ class FieldsTests(SimpleTestCase):
         # Return an empty dictionary if max_length is None
         f = CharField()
         self.assertEqual(f.widget_attrs(TextInput()), {})
-
-        # Or if the widget is not TextInput or PasswordInput
-        f = CharField(max_length=10)
-        self.assertEqual(f.widget_attrs(HiddenInput()), {})
+        self.assertEqual(f.widget_attrs(Textarea()), {})
 
         # Otherwise, return a maxlength attribute equal to max_length
+        f = CharField(max_length=10)
         self.assertEqual(f.widget_attrs(TextInput()), {'maxlength': '10'})
         self.assertEqual(f.widget_attrs(PasswordInput()), {'maxlength': '10'})
+        self.assertEqual(f.widget_attrs(Textarea()), {'maxlength': '10'})
 
     # IntegerField ################################################################
 
@@ -240,6 +239,18 @@ class FieldsTests(SimpleTestCase):
         f1 = IntegerField(localize=True)
         self.assertWidgetRendersTo(f1, '<input id="id_f" name="f" type="text" />')
 
+    def test_integerfield_subclass(self):
+        """
+        Test that class-defined widget is not overwritten by __init__ (#22245).
+        """
+        class MyIntegerField(IntegerField):
+            widget = Textarea
+
+        f = MyIntegerField()
+        self.assertEqual(f.widget.__class__, Textarea)
+        f = MyIntegerField(localize=True)
+        self.assertEqual(f.widget.__class__, Textarea)
+
     # FloatField ##################################################################
 
     def test_floatfield_1(self):
@@ -281,6 +292,10 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(0.5, f.clean('0.5'))
         self.assertEqual(f.max_value, 1.5)
         self.assertEqual(f.min_value, 0.5)
+
+    def test_floatfield_widget_attrs(self):
+        f = FloatField(widget=NumberInput(attrs={'step': 0.01, 'max': 1.0, 'min': 0.0}))
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.0" max="1.0" type="number" id="id_f" />')
 
     def test_floatfield_localized(self):
         """
@@ -392,6 +407,8 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.widget_attrs(NumberInput()), {'step': '1e-19'})
         f = DecimalField(max_digits=20)
         self.assertEqual(f.widget_attrs(NumberInput()), {'step': 'any'})
+        f = DecimalField(max_digits=6, widget=NumberInput(attrs={'step': '0.01'}))
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" type="number" id="id_f" />')
 
     def test_decimalfield_localized(self):
         """
@@ -731,14 +748,14 @@ class FieldsTests(SimpleTestCase):
         self.assertWidgetRendersTo(f, '<input type="url" name="f" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
-        self.assertEqual('http://localhost/', f.clean('http://localhost'))
-        self.assertEqual('http://example.com/', f.clean('http://example.com'))
-        self.assertEqual('http://example.com./', f.clean('http://example.com.'))
-        self.assertEqual('http://www.example.com/', f.clean('http://www.example.com'))
+        self.assertEqual('http://localhost', f.clean('http://localhost'))
+        self.assertEqual('http://example.com', f.clean('http://example.com'))
+        self.assertEqual('http://example.com.', f.clean('http://example.com.'))
+        self.assertEqual('http://www.example.com', f.clean('http://www.example.com'))
         self.assertEqual('http://www.example.com:8000/test', f.clean('http://www.example.com:8000/test'))
-        self.assertEqual('http://valid-with-hyphens.com/', f.clean('valid-with-hyphens.com'))
-        self.assertEqual('http://subdomain.domain.com/', f.clean('subdomain.domain.com'))
-        self.assertEqual('http://200.8.9.10/', f.clean('http://200.8.9.10'))
+        self.assertEqual('http://valid-with-hyphens.com', f.clean('valid-with-hyphens.com'))
+        self.assertEqual('http://subdomain.domain.com', f.clean('subdomain.domain.com'))
+        self.assertEqual('http://200.8.9.10', f.clean('http://200.8.9.10'))
         self.assertEqual('http://200.8.9.10:8000/test', f.clean('http://200.8.9.10:8000/test'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'foo')
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://')
@@ -751,7 +768,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://-invalid.com')
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://inv-.alid-.com')
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://inv-.-alid.com')
-        self.assertEqual('http://valid-----hyphens.com/', f.clean('http://valid-----hyphens.com'))
+        self.assertEqual('http://valid-----hyphens.com', f.clean('http://valid-----hyphens.com'))
         self.assertEqual('http://some.idn.xyz\xe4\xf6\xfc\xdfabc.domain.com:123/blah', f.clean('http://some.idn.xyzäöüßabc.domain.com:123/blah'))
         self.assertEqual('http://www.example.com/s/http://code.djangoproject.com/ticket/13804', f.clean('www.example.com/s/http://code.djangoproject.com/ticket/13804'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, '[a')
@@ -770,8 +787,8 @@ class FieldsTests(SimpleTestCase):
         f = URLField(required=False)
         self.assertEqual('', f.clean(''))
         self.assertEqual('', f.clean(None))
-        self.assertEqual('http://example.com/', f.clean('http://example.com'))
-        self.assertEqual('http://www.example.com/', f.clean('http://www.example.com'))
+        self.assertEqual('http://example.com', f.clean('http://example.com'))
+        self.assertEqual('http://www.example.com', f.clean('http://www.example.com'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'foo')
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://')
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://example')
@@ -781,25 +798,22 @@ class FieldsTests(SimpleTestCase):
     def test_urlfield_5(self):
         f = URLField(min_length=15, max_length=20)
         self.assertWidgetRendersTo(f, '<input id="id_f" type="url" name="f" maxlength="20" />')
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 15 characters (it has 13).'", f.clean, 'http://f.com')
-        self.assertEqual('http://example.com/', f.clean('http://example.com'))
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (it has 38).'", f.clean, 'http://abcdefghijklmnopqrstuvwxyz.com')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 15 characters (it has 12).'", f.clean, 'http://f.com')
+        self.assertEqual('http://example.com', f.clean('http://example.com'))
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (it has 37).'", f.clean, 'http://abcdefghijklmnopqrstuvwxyz.com')
 
     def test_urlfield_6(self):
         f = URLField(required=False)
-        self.assertEqual('http://example.com/', f.clean('example.com'))
+        self.assertEqual('http://example.com', f.clean('example.com'))
         self.assertEqual('', f.clean(''))
-        self.assertEqual('https://example.com/', f.clean('https://example.com'))
+        self.assertEqual('https://example.com', f.clean('https://example.com'))
 
     def test_urlfield_7(self):
         f = URLField()
-        self.assertEqual('http://example.com/', f.clean('http://example.com'))
+        self.assertEqual('http://example.com', f.clean('http://example.com'))
         self.assertEqual('http://example.com/test', f.clean('http://example.com/test'))
-
-    def test_urlfield_8(self):
-        # ticket #11826
-        f = URLField()
-        self.assertEqual('http://example.com/?some_param=some_value', f.clean('http://example.com?some_param=some_value'))
+        self.assertEqual('http://example.com?some_param=some_value',
+                         f.clean('http://example.com?some_param=some_value'))
 
     def test_urlfield_9(self):
         f = URLField()
@@ -955,6 +969,7 @@ class FieldsTests(SimpleTestCase):
         # has_changed should not trigger required validation
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
         self.assertFalse(f._has_changed(None, ''))
+        self.assertFalse(f._has_changed(1, '1'))
 
     def test_typedchoicefield_special_coerce(self):
         """
@@ -1143,7 +1158,7 @@ class FieldsTests(SimpleTestCase):
             "'Select a valid choice. 3 is not one of the available choices.'",
             f.clean, ['3'])
 
-   # ComboField ##################################################################
+    # ComboField ##################################################################
 
     def test_combofield_1(self):
         f = ComboField(fields=[CharField(max_length=20), EmailField()])

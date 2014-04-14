@@ -14,10 +14,10 @@ from django.template.defaultfilters import force_escape, pprint
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.encoding import force_bytes, smart_text
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.utils import six
 
-HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|PROFANITIES_LIST|SIGNATURE')
+HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE')
 
 CLEANSED_SUBSTITUTE = '********************'
 
@@ -85,7 +85,7 @@ def get_exception_reporter_filter(request):
     global default_exception_reporter_filter
     if default_exception_reporter_filter is None:
         # Load the default filter for the first time and cache it.
-        default_exception_reporter_filter = import_by_path(
+        default_exception_reporter_filter = import_string(
             settings.DEFAULT_EXCEPTION_REPORTER_FILTER)()
     if request:
         return getattr(request, 'exception_reporter_filter', default_exception_reporter_filter)
@@ -189,7 +189,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
         sensitive_variables = None
         while current_frame is not None:
             if (current_frame.f_code.co_name == 'sensitive_variables_wrapper'
-                and 'sensitive_variables_wrapper' in current_frame.f_locals):
+                    and 'sensitive_variables_wrapper' in current_frame.f_locals):
                 # The sensitive_variables decorator was used, so we take note
                 # of the sensitive variables' names.
                 wrapper = current_frame.f_locals['sensitive_variables_wrapper']
@@ -218,7 +218,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 cleansed[name] = self.cleanse_special_types(request, value)
 
         if (tb_frame.f_code.co_name == 'sensitive_variables_wrapper'
-            and 'sensitive_variables_wrapper' in tb_frame.f_locals):
+                and 'sensitive_variables_wrapper' in tb_frame.f_locals):
             # For good measure, obfuscate the decorated function's arguments in
             # the sensitive_variables decorator's frame, in case the variables
             # associated with those arguments were meant to be obfuscated from
@@ -287,7 +287,7 @@ class ExceptionReporter(object):
                     'templates': template_list,
                 })
         if (settings.TEMPLATE_DEBUG and
-            hasattr(self.exc_value, 'django_template_source')):
+                hasattr(self.exc_value, 'django_template_source')):
             self.get_template_exception_info()
 
         frames = self.get_traceback_frames()
@@ -475,6 +475,11 @@ class ExceptionReporter(object):
 def technical_404_response(request, exception):
     "Create a technical 404 error response. The exception should be the Http404."
     try:
+        error_url = exception.args[0]['path']
+    except (IndexError, TypeError, KeyError):
+        error_url = request.path_info[1:]  # Trim leading slash
+
+    try:
         tried = exception.args[0]['tried']
     except (IndexError, TypeError, KeyError):
         tried = []
@@ -483,7 +488,7 @@ def technical_404_response(request, exception):
             or (request.path == '/'
                 and len(tried) == 1             # default URLconf
                 and len(tried[0]) == 1
-                and tried[0][0].app_name == tried[0][0].namespace == 'admin')):
+                and getattr(tried[0][0], 'app_name', '') == getattr(tried[0][0], 'namespace', '') == 'admin')):
             return default_urlconf(request)
 
     urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
@@ -494,7 +499,7 @@ def technical_404_response(request, exception):
     c = Context({
         'urlconf': urlconf,
         'root_urlconf': settings.ROOT_URLCONF,
-        'request_path': request.path_info[1:],  # Trim leading slash
+        'request_path': error_url,
         'urlpatterns': tried,
         'reason': force_bytes(exception, errors='replace'),
         'request': request,
@@ -979,7 +984,7 @@ Exception Value: {{ exception_value|force_escape }}
 </html>
 """
 
-TECHNICAL_500_TEXT_TEMPLATE = """{% load firstof from future %}{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
+TECHNICAL_500_TEXT_TEMPLATE = """{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
 {% firstof exception_value 'No exception message supplied' %}
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
@@ -1149,7 +1154,7 @@ DEFAULT_URLCONF_TEMPLATE = """
 <div id="instructions">
   <p>
     Of course, you haven't actually done any work yet.
-    Next, start your first app by running <code>python manage.py startapp [appname]</code>.
+    Next, start your first app by running <code>python manage.py startapp [app_label]</code>.
   </p>
 </div>
 

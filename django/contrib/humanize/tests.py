@@ -8,11 +8,9 @@ try:
 except ImportError:
     pytz = None
 
-from django.conf import settings
 from django.contrib.humanize.templatetags import humanize
 from django.template import Template, Context, defaultfilters
-from django.test import TestCase
-from django.test.utils import override_settings, TransRealMixin
+from django.test import TestCase, override_settings
 from django.utils.html import escape
 from django.utils.timezone import utc, get_fixed_timezone
 from django.utils import translation
@@ -28,7 +26,7 @@ now = datetime.datetime(2012, 3, 9, 22, 30)
 
 class MockDateTime(datetime.datetime):
     @classmethod
-    def now(self, tz=None):
+    def now(cls, tz=None):
         if tz is None or tz.utcoffset(now) is None:
             return now
         else:
@@ -36,7 +34,7 @@ class MockDateTime(datetime.datetime):
             return now.replace(tzinfo=tz) + tz.utcoffset(now)
 
 
-class HumanizeTests(TransRealMixin, TestCase):
+class HumanizeTests(TestCase):
 
     def humanize_tester(self, test_list, result_list, method, normalize_result_func=escape):
         for test_content, result in zip(test_list, result_list):
@@ -163,8 +161,7 @@ class HumanizeTests(TransRealMixin, TestCase):
         # As 24h of difference they will never be the same
         self.assertNotEqual(naturalday_one, naturalday_two)
 
-    @skipIf(settings.TIME_ZONE != "America/Chicago" and pytz is None,
-            "this test requires pytz when a non-default time zone is set")
+    @skipIf(pytz is None, "this test requires pytz")
     def test_naturalday_uses_localtime(self):
         # Regression for #18504
         # This is 2012-03-08HT19:30:00-06:00 in America/Chicago

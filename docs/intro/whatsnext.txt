@@ -64,7 +64,7 @@ different needs:
   trying to learn. Instead, details about individual classes, functions,
   methods, and modules are kept in the :doc:`reference </ref/index>`. This is
   where you'll turn to find the details of a particular function or
-  whathaveyou.
+  whatever you need.
 
 * If you are interested in deploying a project for public use, our docs have
   :doc:`several guides</howto/deployment/index>` for various deployment

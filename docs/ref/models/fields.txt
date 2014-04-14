@@ -39,19 +39,17 @@ The following arguments are available to all field types. All are optional.
 If ``True``, Django will store empty values as ``NULL`` in the database. Default
 is ``False``.
 
-Note that empty string values will always get stored as empty strings, not as
-``NULL``. Only use ``null=True`` for non-string fields such as integers,
-booleans and dates. For both types of fields, you will also need to set
-``blank=True`` if you wish to permit empty values in forms, as the
-:attr:`~Field.null` parameter only affects database storage (see
-:attr:`~Field.blank`).
-
 Avoid using :attr:`~Field.null` on string-based fields such as
-:class:`CharField` and :class:`TextField` unless you have an excellent reason.
-If a string-based field has ``null=True``, that means it has two possible values
-for "no data": ``NULL``, and the empty string. In most cases, it's redundant to
-have two possible values for "no data;" Django convention is to use the empty
-string, not ``NULL``.
+:class:`CharField` and :class:`TextField` because empty string values will
+always be stored as empty strings, not as ``NULL``. If a string-based field has
+``null=True``, that means it has two possible values for "no data": ``NULL``,
+and the empty string. In most cases, it's redundant to have two possible values
+for "no data;" the Django convention is to use the empty string, not ``NULL``.
+
+For both string-based and non-string-based fields, you will also need to
+set ``blank=True`` if you wish to permit empty values in forms, as the
+:attr:`~Field.null` parameter only affects database storage
+(see :attr:`~Field.blank`).
 
 .. note::
 
@@ -233,8 +231,12 @@ field will raise. Pass in a dictionary with keys matching the error messages you
 want to override.
 
 Error message keys include ``null``, ``blank``, ``invalid``, ``invalid_choice``,
-and ``unique``. Additional error message keys are specified for each field in
-the `Field types`_ section below.
+``unique``, and ``unique_for_date``. Additional error message keys are
+specified for each field in the `Field types`_ section below.
+
+.. versionadded:: 1.7
+
+The ``unique_for_date`` error message key was added.
 
 ``help_text``
 -------------
@@ -343,6 +345,13 @@ underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 A list of validators to run for this field. See the :doc:`validators
 documentation </ref/validators>` for more information.
 
+Registering and fetching lookups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``Field`` implements the :ref:`lookup registration API <lookup-registration-api>`.
+The API can be used to customize which lookups are available for a field class, and
+how lookups are fetched from a field.
+
 .. _model-field-types:
 
 Field types
@@ -375,8 +384,6 @@ guaranteed to fit numbers from ``-9223372036854775808`` to
 
 .. class:: BinaryField([**options])
 
-.. versionadded:: 1.6
-
 A field to store raw binary data. It only supports ``bytes`` assignment. Be
 aware that this field has limited functionality. For example, it is not possible
 to filter a queryset on a ``BinaryField`` value.
@@ -400,10 +407,8 @@ The default form widget for this field is a
 If you need to accept :attr:`~Field.null` values then use
 :class:`NullBooleanField` instead.
 
-.. versionchanged:: 1.6
-
-    The default value of ``BooleanField`` was changed from ``False`` to
-    ``None`` when :attr:`Field.default` isn't defined.
+The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
+isn't defined.
 
 ``CharField``
 -------------
@@ -832,9 +837,9 @@ optional arguments:
     Name of a model field which will be auto-populated with the width of the
     image each time the model instance is saved.
 
-Requires the `Python Imaging Library`_.
+Requires the `Pillow`_ library.
 
-.. _Python Imaging Library: http://www.pythonware.com/products/pil/
+.. _Pillow: http://python-imaging.github.io/Pillow/
 
 By default, :class:`ImageField` instances are created as ``varchar(100)``
 columns in your database. As with other fields, you can change the maximum
@@ -858,7 +863,7 @@ databases supported by Django. The default form widget for this field is a
 .. class:: IPAddressField([**options])
 
 .. deprecated:: 1.7
-    This field has been deprecated in favour of
+    This field has been deprecated in favor of
     :class:`~django.db.models.GenericIPAddressField`.
 
 An IP address, in string format (e.g. "192.0.2.30"). The default form widget
@@ -948,7 +953,7 @@ of some other value.  You can do this automatically in the admin using
 .. class:: SmallIntegerField([**options])
 
 Like an :class:`IntegerField`, but only allows values under a certain
-(database-dependent) point. Values from ``-32768`` to ``32767``` are safe in all
+(database-dependent) point. Values from ``-32768`` to ``32767`` are safe in all
 databases supported by Django.
 
 ``TextField``
@@ -958,6 +963,13 @@ databases supported by Django.
 
 A large text field. The default form widget for this field is a
 :class:`~django.forms.Textarea`.
+
+.. versionchanged:: 1.7
+
+    If you specify a ``max_length`` attribute, it will be reflected in the
+    :class:`~django.forms.Textarea` widget of the auto-generated form field.
+    However it is not enforced at the model or database level. Use a
+    :class:`CharField` for that.
 
 .. admonition:: MySQL users
 
@@ -1067,22 +1079,45 @@ define the details of how the relation works.
 
 .. attribute:: ForeignKey.limit_choices_to
 
-    A dictionary of lookup arguments and values (see :doc:`/topics/db/queries`)
-    that limit the available admin or ModelForm choices for this object. Use
-    this with functions from the Python ``datetime`` module to limit choices of
-    objects by date. For example::
+    Sets a limit to the available choices for this field when this field is
+    rendered using a ``ModelForm`` or the admin (by default, all objects
+    in the queryset are available to choose). Either a dictionary, a
+    :class:`~django.db.models.Q` object, or a callable returning a
+    dictionary or :class:`~django.db.models.Q` object can be used.
 
-        limit_choices_to = {'pub_date__lte': datetime.date.today}
+    For example::
 
-    only allows the choice of related objects with a ``pub_date`` before the
-    current date to be chosen.
+        staff_member = models.ForeignKey(User, limit_choices_to={'is_staff': True})
 
-    Instead of a dictionary this can also be a :class:`Q object
-    <django.db.models.Q>` for more :ref:`complex queries
-    <complex-lookups-with-q>`. However, if ``limit_choices_to`` is a :class:`Q
-    object <django.db.models.Q>` then it will only have an effect on the
-    choices available in the admin when the field is not listed in
-    ``raw_id_fields`` in the ``ModelAdmin`` for the model.
+    causes the corresponding field on the ``ModelForm`` to list only ``Users``
+    that have ``is_staff=True``. This may be helpful in the Django admin.
+
+    The callable form can be helpful, for instance, when used in conjunction
+    with the Python ``datetime`` module to limit selections by date range. For
+    example::
+
+        limit_choices_to = lambda: {'pub_date__lte': datetime.date.utcnow()}
+
+    If ``limit_choices_to`` is or returns a :class:`Q object
+    <django.db.models.Q>`, which is useful for :ref:`complex queries
+    <complex-lookups-with-q>`, then it will only have an effect on the choices
+    available in the admin when the field is not listed in
+    :attr:`~django.contrib.admin.ModelAdmin.raw_id_fields` in the
+    ``ModelAdmin`` for the model.
+
+    .. versionchanged:: 1.7
+
+        Previous versions of Django do not allow passing a callable as a value
+        for ``limit_choices_to``.
+
+    .. note::
+
+        If a callable is used for ``limit_choices_to``, it will be invoked
+        every time a new form is instantiated. It may also be invoked when a
+        model is validated, for example by management commands or the admin.
+        The admin constructs querysets to validate its form inputs in various
+        edge cases multiple times, so there is a possibility your callable may
+        be invoked several times.
 
 .. attribute:: ForeignKey.related_name
 
@@ -1103,8 +1138,6 @@ define the details of how the relation works.
 
 .. attribute:: ForeignKey.related_query_name
 
-    .. versionadded:: 1.6
-
     The name to use for the reverse filter name from the target model.
     Defaults to the value of :attr:`related_name` if it is set, otherwise it
     defaults to the name of the model::
@@ -1123,8 +1156,6 @@ define the details of how the relation works.
     uses the primary key of the related object.
 
 .. attribute:: ForeignKey.db_constraint
-
-    .. versionadded:: 1.6
 
     Controls whether or not a constraint should be created in the database for
     this foreign key. The default is ``True``, and that's almost certainly what
@@ -1195,6 +1226,23 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     you manually add an SQL ``ON DELETE`` constraint to the database field
     (perhaps using :ref:`initial sql<initial-sql>`).
 
+.. attribute:: ForeignKey.swappable
+
+    .. versionadded:: 1.7
+
+    Controls the migration framework's reaction if this :class:`ForeignKey`
+    is pointing at a swappable model. If it is ``True`` - the default -
+    then if the :class:`ForeignKey` is pointing at a model which matches
+    the current value of ``settings.AUTH_USER_MODEL`` (or another swappable
+    model setting) the relationship will be stored in the migration using
+    a reference to the setting, not to the model directly.
+
+    You only want to override this to be ``False`` if you are sure your
+    model should always point towards the swapped-in model - for example,
+    if it is a profile model designed specifically for your custom user model.
+
+    If in doubt, leave it to its default of ``True``.
+
 .. _ref-manytomany:
 
 ``ManyToManyField``
@@ -1234,9 +1282,7 @@ that control how the relationship functions.
 
     Same as :attr:`ForeignKey.related_name`.
 
-.. attribute:: ForeignKey.related_query_name
-
-    .. versionadded:: 1.6
+.. attribute:: ManyToManyField.related_query_name
 
     Same as :attr:`ForeignKey.related_query_name`.
 
@@ -1281,6 +1327,56 @@ that control how the relationship functions.
     :ref:`extra data with a many-to-many relationship
     <intermediary-manytomany>`.
 
+.. attribute:: ManyToManyField.through_fields
+
+    .. versionadded:: 1.7
+
+    Only used when a custom intermediary model is specified. Django will
+    normally determine which fields of the intermediary model to use in order
+    to establish a many-to-many relationship automatically. However,
+    consider the following models::
+
+        from django.db import models
+
+        class Person(models.Model):
+            name = models.CharField(max_length=50)
+
+        class Group(models.Model):
+            name = models.CharField(max_length=128)
+            members = models.ManyToManyField(Person, through='Membership', through_fields=('group', 'person'))
+
+        class Membership(models.Model):
+            group = models.ForeignKey(Group)
+            person = models.ForeignKey(Person)
+            inviter = models.ForeignKey(Person, related_name="membership_invites")
+            invite_reason = models.CharField(max_length=64)
+
+    ``Membership`` has *two* foreign keys to ``Person`` (``person`` and
+    ``inviter``), which makes the relationship ambiguous and Django can't know
+    which one to use. In this case, you must explicitly specify which
+    foreign keys Django should use using ``through_fields``, as in the example
+    above.
+
+    ``through_fields`` accepts a 2-tuple ``('field1', 'field2')``, where
+    ``field1`` is the name of the foreign key to the model the
+    :class:`ManyToManyField` is defined on (``group`` in this case), and
+    ``field2`` the name of the foreign key to the target model (``person``
+    in this case).
+
+    When you have more than one foreign key on an intermediary model to any
+    (or even both) of the models participating in a many-to-many relationship,
+    you *must* specify ``through_fields``. This also applies to
+    :ref:`recursive relationships <recursive-relationships>`
+    when an intermediary model is used and there are more than two
+    foreign keys to the model, or you want to explicitly specify which two
+    Django should use.
+
+    Recursive relationships using an intermediary model are always defined as
+    non-symmetrical -- that is, with :attr:`symmetrical=False <ManyToManyField.symmetrical>`
+    -- therefore, there is the concept of a "source" and a "target". In that
+    case ``'field1'`` will be treated as the "source" of the relationship and
+    ``'field2'`` as the "target".
+
 .. attribute:: ManyToManyField.db_table
 
     The name of the table to create for storing the many-to-many data. If this
@@ -1289,8 +1385,6 @@ that control how the relationship functions.
     itself.
 
 .. attribute:: ManyToManyField.db_constraint
-
-    .. versionadded:: 1.6
 
     Controls whether or not constraints should be created in the database for
     the foreign keys in the intermediary table. The default is ``True``, and
@@ -1302,6 +1396,23 @@ that control how the relationship functions.
     * You're sharding your database.
 
     It is an error to pass both ``db_constraint`` and ``through``.
+
+.. attribute:: ManyToManyField.swappable
+
+    .. versionadded:: 1.7
+
+    Controls the migration framework's reaction if this :class:`ManyToManyField`
+    is pointing at a swappable model. If it is ``True`` - the default -
+    then if the :class:`ManyToManyField` is pointing at a model which matches
+    the current value of ``settings.AUTH_USER_MODEL`` (or another swappable
+    model setting) the relationship will be stored in the migration using
+    a reference to the setting, not to the model directly.
+
+    You only want to override this to be ``False`` if you are sure your
+    model should always point towards the swapped-in model - for example,
+    if it is a profile model designed specifically for your custom user model.
+
+    If in doubt, leave it to its default of ``True``.
 
 
 .. _ref-onetoone:
@@ -1345,6 +1456,15 @@ your resulting ``User`` model will have the following attributes::
     True
     >>> hasattr(user, 'supervisor_of')
     True
+
+A ``DoesNotExist`` exception is raised when accessing the reverse relationship
+if an entry in the related table doesn't exist. For example, if a user doesn't
+have a supervisor designated by ``MySpecialUser``::
+
+    >>> user.supervisor_of
+    Traceback (most recent call last):
+        ...
+    DoesNotExist: User matching query does not exist.
 
 .. _onetoone-arguments:
 

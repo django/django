@@ -30,6 +30,14 @@ Python style
 * Use ``InitialCaps`` for class names (or for factory functions that
   return classes).
 
+* Use convenience imports whenever available. For example, do this::
+
+      from django.views.generic import View
+
+  Don't do this::
+
+      from django.views.generic.base import View
+
 * In docstrings, use "action words" such as::
 
       def foo():
@@ -213,4 +221,4 @@ Miscellaneous
   change to the ``AUTHORS`` file in your patch if you make more than a
   single trivial change.
 
-.. _flake8: http://pypi.python.org/pypi/flake8
+.. _flake8: https://pypi.python.org/pypi/flake8

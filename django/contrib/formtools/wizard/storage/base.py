@@ -26,6 +26,11 @@ class BaseStorage(object):
         }
 
     def reset(self):
+        # Delete temporary files before breaking reference to them.
+        wizard_files = self.data[self.step_files_key]
+        for step_files in six.itervalues(wizard_files):
+            for step_file in six.itervalues(step_files):
+                self.file_storage.delete(step_file['tmp_name'])
         self.init_data()
 
     def _get_current_step(self):

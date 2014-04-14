@@ -46,9 +46,9 @@ Then either:
 
 3. Add an entry in your URLconf. For example::
 
-    urlpatterns = patterns('',
-        (r'^pages/', include('django.contrib.flatpages.urls')),
-    )
+    urlpatterns = [
+        url(r'^pages/', include('django.contrib.flatpages.urls')),
+    ]
 
 or:
 
@@ -73,17 +73,19 @@ Using the URLconf
 There are several ways to include the flat pages in your URLconf. You can
 dedicate a particular path to flat pages::
 
-    urlpatterns = patterns('',
-        (r'^pages/', include('django.contrib.flatpages.urls')),
-    )
+    urlpatterns = [
+        url(r'^pages/', include('django.contrib.flatpages.urls')),
+    ]
 
 You can also set it up as a "catchall" pattern. In this case, it is important
 to place the pattern at the end of the other urlpatterns::
 
+    from django.contrib.flatpages import views
+
     # Your other patterns here
-    urlpatterns += patterns('django.contrib.flatpages.views',
-        (r'^(?P<url>.*/)$', 'flatpage'),
-    )
+    urlpatterns += [
+        url(r'^(?P<url>.*/)$', views.flatpage),
+    ]
 
 .. warning::
 
@@ -95,10 +97,12 @@ Another common setup is to use flat pages for a limited set of known pages and
 to hard code the urls, so you can reference them with the :ttag:`url` template
 tag::
 
-    urlpatterns += patterns('django.contrib.flatpages.views',
-        url(r'^about-us/$', 'flatpage', {'url': '/about-us/'}, name='about'),
-        url(r'^license/$', 'flatpage', {'url': '/license/'}, name='license'),
-    )
+    from django.contrib.flatpages import views
+
+    urlpatterns += [
+        url(r'^about-us/$', views.flatpage, {'url': '/about-us/'}, name='about'),
+        url(r'^license/$', views.flatpage, {'url': '/license/'}, name='license'),
+    ]
 
 Using the middleware
 --------------------

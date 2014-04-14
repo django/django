@@ -3,13 +3,15 @@ from __future__ import unicode_literals
 
 import unittest
 
+from django.conf.urls import url
+from django.core.urlresolvers import reverse
 from django.db import connection
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
-from django.test.utils import CaptureQueriesContext, IgnoreAllDeprecationWarningsMixin
+from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
 
 from .models import Person
@@ -49,16 +51,14 @@ class SkippingClassTestCase(TestCase):
         self.assertEqual(len(result.skipped), 1)
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertNumQueriesTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_assert_num_queries(self):
         def test_func():
             raise ValueError
 
-        self.assertRaises(ValueError,
-            self.assertNumQueries, 2, test_func
-        )
+        self.assertRaises(ValueError, self.assertNumQueries, 2, test_func)
 
     def test_assert_num_queries_with_client(self):
         person = Person.objects.create(name='test')
@@ -121,8 +121,8 @@ class AssertQuerysetEqualTests(TestCase):
         )
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class CaptureQueriesContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def setUp(self):
         self.person_pk = six.text_type(Person.objects.create(name='test').pk)
@@ -175,8 +175,8 @@ class CaptureQueriesContextManagerTests(TestCase):
         self.assertIn(self.person_pk, captured_queries[1]['sql'])
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertNumQueriesContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_simple(self):
         with self.assertNumQueries(0):
@@ -194,6 +194,7 @@ class AssertNumQueriesContextManagerTests(TestCase):
             with self.assertNumQueries(2):
                 Person.objects.count()
         self.assertIn("1 queries executed, 2 expected", str(exc_info.exception))
+        self.assertIn("Captured queries were", str(exc_info.exception))
 
         with self.assertRaises(TypeError):
             with self.assertNumQueries(4000):
@@ -213,8 +214,8 @@ class AssertNumQueriesContextManagerTests(TestCase):
             self.client.get("/test_utils/get_person/%s/" % person.pk)
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertTemplateUsedContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_usage(self):
         with self.assertTemplateUsed('template_used/base.html'):
@@ -621,10 +622,30 @@ class AssertFieldOutputTests(SimpleTestCase):
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
 
-class DoctestNormalizerTest(IgnoreAllDeprecationWarningsMixin, SimpleTestCase):
+# for OverrideSettingsTests
+def fake_view(request):
+    pass
 
-    def test_normalizer(self):
-        from django.test.simple import make_doctest
-        suite = make_doctest("test_utils.doctest_output")
-        failures = unittest.TextTestRunner(stream=six.StringIO()).run(suite)
-        self.assertEqual(failures.failures, [])
+
+class FirstUrls:
+    urlpatterns = [url(r'first/$', fake_view, name='first')]
+
+
+class SecondUrls:
+    urlpatterns = [url(r'second/$', fake_view, name='second')]
+
+
+class OverrideSettingsTests(TestCase):
+    """
+    #21518 -- If neither override_settings nor a settings_changed receiver
+    clears the URL cache between tests, then one of these two test methods will
+    fail.
+    """
+
+    @override_settings(ROOT_URLCONF=FirstUrls)
+    def test_first(self):
+        reverse('first')
+
+    @override_settings(ROOT_URLCONF=SecondUrls)
+    def test_second(self):
+        reverse('second')

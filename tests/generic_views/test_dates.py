@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import override_settings, requires_tz_support
+from django.test import TestCase, override_settings, skipUnlessDBFeature
+from django.test.utils import requires_tz_support
 from django.utils import timezone
 
 from .models import Book, BookSigning
@@ -19,9 +19,9 @@ def _make_books(n, base_date):
             pubdate=base_date - datetime.timedelta(days=i))
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class ArchiveIndexViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_archive_view(self):
         res = self.client.get('/dates/books/')
@@ -121,9 +121,9 @@ class ArchiveIndexViewTests(TestCase):
         self.assertEqual(list(res.context['date_list']), list(reversed(sorted(res.context['date_list']))))
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class YearArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_year_view(self):
         res = self.client.get('/dates/books/2008/')
@@ -206,9 +206,9 @@ class YearArchiveViewTests(TestCase):
         self.assertEqual(list(res.context['date_list']), list(sorted(res.context['date_list'])))
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class MonthArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_month_view(self):
         res = self.client.get('/dates/books/2008/oct/')
@@ -333,9 +333,9 @@ class MonthArchiveViewTests(TestCase):
         self.assertEqual(list(res.context['date_list']), list(sorted(res.context['date_list'])))
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class WeekArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_week_view(self):
         res = self.client.get('/dates/books/2008/week/39/')
@@ -430,9 +430,9 @@ class WeekArchiveViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class DayArchiveViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_day_view(self):
         res = self.client.get('/dates/books/2008/oct/01/')
@@ -548,9 +548,9 @@ class DayArchiveViewTests(TestCase):
         self.assertEqual(res.status_code, 404)
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class DateDetailViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_date_detail_by_pk(self):
         res = self.client.get('/dates/books/2008/oct/01/1/')

@@ -9,7 +9,7 @@ from io import BytesIO
 from django.conf import settings
 from django.core.files.uploadedfile import TemporaryUploadedFile, InMemoryUploadedFile
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 
 __all__ = [
     'UploadFileException', 'StopUpload', 'SkipFile', 'FileUploadHandler',
@@ -111,7 +111,7 @@ class FileUploadHandler(object):
         Receive data from the streamed upload parser. ``start`` is the position
         in the file of the chunk.
         """
-        raise NotImplementedError('subclasses of FileUploadHandler must provide a recieve_data_chunk() method')
+        raise NotImplementedError('subclasses of FileUploadHandler must provide a receive_data_chunk() method')
 
     def file_complete(self, file_size):
         """
@@ -214,4 +214,4 @@ def load_handler(path, *args, **kwargs):
         <TemporaryFileUploadHandler object at 0x...>
 
     """
-    return import_by_path(path)(*args, **kwargs)
+    return import_string(path)(*args, **kwargs)

@@ -2,8 +2,7 @@ import os
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.template import Template, Context, TemplateSyntaxError
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 
 @override_settings(
@@ -15,6 +14,7 @@ from django.test.utils import override_settings
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
     ),
+    ROOT_URLCONF='django.contrib.flatpages.tests.urls',
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(__file__), 'templates'),
     ),
@@ -22,7 +22,6 @@ from django.test.utils import override_settings
 )
 class FlatpageTemplateTagTests(TestCase):
     fixtures = ['sample_flatpages']
-    urls = 'django.contrib.flatpages.tests.urls'
 
     def test_get_flatpages_tag(self):
         "The flatpage template tag retrives unregistered prefixed flatpages by default"
@@ -89,7 +88,7 @@ class FlatpageTemplateTagTests(TestCase):
 
     @skipIfCustomUser
     def test_get_flatpages_with_prefix_for_user(self):
-        "The flatpage template tag retrive prefixed flatpages for an authenticated user"
+        "The flatpage template tag retrieve prefixed flatpages for an authenticated user"
         me = User.objects.create_user('testuser', 'test@example.com', 's3krit')
         out = Template(
             "{% load flatpages %}"

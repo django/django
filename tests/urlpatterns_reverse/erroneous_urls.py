@@ -1,6 +1,6 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns('',
+urlpatterns = [
     # View has erroneous import
     url(r'erroneous_inner/$', 'urlpatterns_reverse.views.erroneous_view'),
     # Module has erroneous import
@@ -13,4 +13,4 @@ urlpatterns = patterns('',
     url(r'missing_outer/$', 'urlpatterns_reverse.missing_module.missing_view'),
     # Regex contains an error (refs #6170)
     url(r'(regex_error/$', 'regressiontestes.urlpatterns_reverse.views.empty_view'),
-)
+]

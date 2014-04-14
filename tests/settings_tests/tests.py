@@ -1,22 +1,63 @@
+import os
+import sys
+from types import ModuleType
 import unittest
 import warnings
 
-from django.conf import settings
+from django.conf import LazySettings, Settings, settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
-from django.test import SimpleTestCase, TransactionTestCase, TestCase, signals
-from django.test.utils import override_settings
+from django.test import (SimpleTestCase, TransactionTestCase, TestCase,
+    modify_settings, override_settings, signals)
 from django.utils import six
 
 
-@override_settings(TEST='override', TEST_OUTER='outer')
+@modify_settings(ITEMS={
+    'prepend': ['b'],
+    'append': ['d'],
+    'remove': ['a', 'e']
+})
+@override_settings(ITEMS=['a', 'c', 'e'], ITEMS_OUTER=[1, 2, 3],
+                   TEST='override', TEST_OUTER='outer')
 class FullyDecoratedTranTestCase(TransactionTestCase):
 
     available_apps = []
 
     def test_override(self):
+        self.assertListEqual(settings.ITEMS, ['b', 'c', 'd'])
+        self.assertListEqual(settings.ITEMS_OUTER, [1, 2, 3])
         self.assertEqual(settings.TEST, 'override')
         self.assertEqual(settings.TEST_OUTER, 'outer')
+
+    @modify_settings(ITEMS={
+        'append': ['e', 'f'],
+        'prepend': ['a'],
+        'remove': ['d', 'c'],
+    })
+    def test_method_list_override(self):
+        self.assertListEqual(settings.ITEMS, ['a', 'b', 'e', 'f'])
+        self.assertListEqual(settings.ITEMS_OUTER, [1, 2, 3])
+
+    @modify_settings(ITEMS={
+        'append': ['b'],
+        'prepend': ['d'],
+        'remove': ['a', 'c', 'e'],
+    })
+    def test_method_list_override_no_ops(self):
+        self.assertListEqual(settings.ITEMS, ['b', 'd'])
+
+    @modify_settings(ITEMS={
+        'append': 'e',
+        'prepend': 'a',
+        'remove': 'c',
+    })
+    def test_method_list_override_strings(self):
+        self.assertListEqual(settings.ITEMS, ['a', 'b', 'd', 'e'])
+
+    @modify_settings(ITEMS={'remove': ['b', 'd']})
+    @modify_settings(ITEMS={'append': ['b'], 'prepend': ['d']})
+    def test_method_list_override_nested_order(self):
+        self.assertListEqual(settings.ITEMS, ['d', 'c', 'b'])
 
     @override_settings(TEST='override2')
     def test_method_override(self):
@@ -30,14 +71,26 @@ class FullyDecoratedTranTestCase(TransactionTestCase):
         self.assertEqual(FullyDecoratedTranTestCase.__module__, __name__)
 
 
-@override_settings(TEST='override')
+@modify_settings(ITEMS={
+    'prepend': ['b'],
+    'append': ['d'],
+    'remove': ['a', 'e']
+})
+@override_settings(ITEMS=['a', 'c', 'e'], TEST='override')
 class FullyDecoratedTestCase(TestCase):
 
     def test_override(self):
+        self.assertListEqual(settings.ITEMS, ['b', 'c', 'd'])
         self.assertEqual(settings.TEST, 'override')
 
+    @modify_settings(ITEMS={
+        'append': 'e',
+        'prepend': 'a',
+        'remove': 'c',
+    })
     @override_settings(TEST='override2')
     def test_method_override(self):
+        self.assertListEqual(settings.ITEMS, ['a', 'b', 'd', 'e'])
         self.assertEqual(settings.TEST, 'override2')
 
 
@@ -72,14 +125,17 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
             self.fail()
 
 
-@override_settings(TEST='override-parent')
+@modify_settings(ITEMS={'append': 'mother'})
+@override_settings(ITEMS=['father'], TEST='override-parent')
 class ParentDecoratedTestCase(TestCase):
     pass
 
 
+@modify_settings(ITEMS={'append': ['child']})
 @override_settings(TEST='override-child')
 class ChildDecoratedTestCase(ParentDecoratedTestCase):
     def test_override_settings_inheritance(self):
+        self.assertEqual(settings.ITEMS, ['father', 'mother', 'child'])
         self.assertEqual(settings.TEST, 'override-child')
 
 
@@ -176,10 +232,15 @@ class SettingsTests(TestCase):
         Allow deletion of a setting in an overridden settings set (#18824)
         """
         previous_i18n = settings.USE_I18N
+        previous_l10n = settings.USE_L10N
         with self.settings(USE_I18N=False):
             del settings.USE_I18N
             self.assertRaises(AttributeError, getattr, settings, 'USE_I18N')
+            # Should also work for a non-overridden setting
+            del settings.USE_L10N
+            self.assertRaises(AttributeError, getattr, settings, 'USE_L10N')
         self.assertEqual(settings.USE_I18N, previous_i18n)
+        self.assertEqual(settings.USE_L10N, previous_l10n)
 
     def test_override_settings_nested(self):
         """
@@ -227,34 +288,15 @@ class TestComplexSettingOverride(TestCase):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
 
-            override = override_settings(TEST_WARN='override')
-            override.enable()
-            self.assertEqual('override', settings.TEST_WARN)
-            override.disable()
+            with override_settings(TEST_WARN='override'):
+                self.assertEqual(settings.TEST_WARN, 'override')
 
             self.assertEqual(len(w), 1)
-            self.assertEqual('Overriding setting TEST_WARN can lead to unexpected behaviour.', str(w[-1].message))
-
-
-class UniqueSettingsTests(TestCase):
-    """
-    Tests for the INSTALLED_APPS setting.
-    """
-    settings_module = settings
-
-    def setUp(self):
-        self._installed_apps = self.settings_module.INSTALLED_APPS
-
-    def tearDown(self):
-        self.settings_module.INSTALLED_APPS = self._installed_apps
-
-    def test_unique(self):
-        """
-        An ImproperlyConfigured exception is raised if the INSTALLED_APPS contains
-        any duplicate strings.
-        """
-        with self.assertRaises(ImproperlyConfigured):
-            self.settings_module.INSTALLED_APPS = ("myApp1", "myApp1", "myApp2", "myApp3")
+            # File extension may by .py, .pyc, etc. Compare only basename.
+            self.assertEqual(os.path.splitext(w[0].filename)[0],
+                             os.path.splitext(__file__)[0])
+            self.assertEqual(str(w[0].message),
+                'Overriding setting TEST_WARN can lead to unexpected behavior.')
 
 
 class TrailingSlashURLTests(TestCase):
@@ -369,3 +411,28 @@ class SecureProxySslHeaderTest(TestCase):
         req = HttpRequest()
         req.META['HTTP_X_FORWARDED_PROTOCOL'] = 'https'
         self.assertEqual(req.is_secure(), True)
+
+
+class IsOverriddenTest(TestCase):
+    def test_configure(self):
+        s = LazySettings()
+        s.configure(SECRET_KEY='foo')
+
+        self.assertTrue(s.is_overridden('SECRET_KEY'))
+
+    def test_module(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.SECRET_KEY = 'foo'
+        sys.modules['fake_settings_module'] = settings_module
+        try:
+            s = Settings('fake_settings_module')
+
+            self.assertTrue(s.is_overridden('SECRET_KEY'))
+            self.assertFalse(s.is_overridden('TEMPLATE_LOADERS'))
+        finally:
+            del sys.modules['fake_settings_module']
+
+    def test_override(self):
+        self.assertFalse(settings.is_overridden('TEMPLATE_LOADERS'))
+        with override_settings(TEMPLATE_LOADERS=[]):
+            self.assertTrue(settings.is_overridden('TEMPLATE_LOADERS'))

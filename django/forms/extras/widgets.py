@@ -23,22 +23,17 @@ RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
 def _parse_date_fmt():
     fmt = get_format('DATE_FORMAT')
     escaped = False
-    output = []
     for char in fmt:
         if escaped:
             escaped = False
         elif char == '\\':
             escaped = True
         elif char in 'Yy':
-            output.append('year')
-            #if not self.first_select: self.first_select = 'year'
+            yield 'year'
         elif char in 'bEFMmNn':
-            output.append('month')
-            #if not self.first_select: self.first_select = 'month'
+            yield 'month'
         elif char in 'dj':
-            output.append('day')
-            #if not self.first_select: self.first_select = 'day'
-    return output
+            yield 'day'
 
 
 class SelectDateWidget(Widget):
@@ -86,29 +81,21 @@ class SelectDateWidget(Widget):
                     match = RE_DATE.match(value)
                     if match:
                         year_val, month_val, day_val = [int(v) for v in match.groups()]
+        html = {}
         choices = [(i, i) for i in self.years]
-        year_html = self.create_select(name, self.year_field, value, year_val, choices)
+        html['year'] = self.create_select(name, self.year_field, value, year_val, choices)
         choices = list(six.iteritems(self.months))
-        month_html = self.create_select(name, self.month_field, value, month_val, choices)
+        html['month'] = self.create_select(name, self.month_field, value, month_val, choices)
         choices = [(i, i) for i in range(1, 32)]
-        day_html = self.create_select(name, self.day_field, value, day_val, choices)
+        html['day'] = self.create_select(name, self.day_field, value, day_val, choices)
 
         output = []
         for field in _parse_date_fmt():
-            if field == 'year':
-                output.append(year_html)
-            elif field == 'month':
-                output.append(month_html)
-            elif field == 'day':
-                output.append(day_html)
+            output.append(html[field])
         return mark_safe('\n'.join(output))
 
     def id_for_label(self, id_):
-        first_select = None
-        field_list = _parse_date_fmt()
-        if field_list:
-            first_select = field_list[0]
-        if first_select is not None:
+        for first_select in _parse_date_fmt():
             return '%s_%s' % (id_, first_select)
         else:
             return '%s_month' % id_

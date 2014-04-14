@@ -6,15 +6,17 @@ from __future__ import unicode_literals
 import unittest
 
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.core.urlresolvers import (reverse, reverse_lazy, resolve, get_callable,
     get_resolver, NoReverseMatch, Resolver404, ResolverMatch, RegexURLResolver,
     RegexURLPattern)
 from django.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import redirect
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils import six
+
+from admin_scripts.tests import AdminScriptTestCase
 
 from . import urlconf_outer, middleware, views
 from .views import empty_view
@@ -119,6 +121,7 @@ test_data = (
     ('inner-extra', '/outer/42/extra/inner/', [], {'extra': 'inner', 'outer': '42'}),
     ('inner-extra', '/outer/42/extra/inner/', ['42', 'inner'], {}),
     ('inner-extra', NoReverseMatch, ['fred', 'inner'], {}),
+    ('inner-no-kwargs', '/outer-no-kwargs/42/inner-no-kwargs/1/', ['42', '1'], {}),
     ('disjunction', NoReverseMatch, ['foo'], {}),
     ('inner-disjunction', NoReverseMatch, ['10', '11'], {}),
     ('extra-places', '/e-places/10/', ['10'], {}),
@@ -150,22 +153,24 @@ test_data = (
 )
 
 
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.no_urls')
 class NoURLPatternsTests(TestCase):
-    urls = 'urlpatterns_reverse.no_urls'
 
     def test_no_urls_exception(self):
         """
         RegexURLResolver should raise an exception when no urlpatterns exist.
         """
-        resolver = RegexURLResolver(r'^$', self.urls)
+        resolver = RegexURLResolver(r'^$', settings.ROOT_URLCONF)
 
         self.assertRaisesMessage(ImproperlyConfigured,
-            "The included urlconf urlpatterns_reverse.no_urls "
-            "doesn't have any patterns in it", getattr, resolver, 'url_patterns')
+            "The included urlconf 'urlpatterns_reverse.no_urls' does not "
+            "appear to have any patterns in it. If you see valid patterns in "
+            "the file then the issue is probably caused by a circular import.",
+            getattr, resolver, 'url_patterns')
 
 
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
 class URLPatternReverse(TestCase):
-    urls = 'urlpatterns_reverse.urls'
 
     def test_urlpattern_reverse(self):
         for name, expected, args, kwargs in test_data:
@@ -286,8 +291,8 @@ class ResolverTests(unittest.TestCase):
                             self.assertEqual(t.name, e['name'], 'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name))
 
 
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.reverse_lazy_urls')
 class ReverseLazyTest(TestCase):
-    urls = 'urlpatterns_reverse.reverse_lazy_urls'
 
     def test_redirect_with_lazy_reverse(self):
         response = self.client.get('/redirect/')
@@ -302,8 +307,26 @@ class ReverseLazyTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
+class ReverseLazySettingsTest(AdminScriptTestCase):
+    """
+    Test that reverse_lazy can be used in settings without causing a circular
+    import error.
+    """
+    def setUp(self):
+        self.write_settings('settings.py', extra="""
+from django.core.urlresolvers import reverse_lazy
+LOGIN_URL = reverse_lazy('login')""")
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    def test_lazy_in_settings(self):
+        out, err = self.run_manage(['sqlall', 'auth'])
+        self.assertNoOutput(err)
+
+
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
 class ReverseShortcutTests(TestCase):
-    urls = 'urlpatterns_reverse.urls'
 
     def test_redirect_to_object(self):
         # We don't really need a model; just something with a get_absolute_url
@@ -341,8 +364,8 @@ class ReverseShortcutTests(TestCase):
         self.assertRaises(NoReverseMatch, redirect, absolute_kwargs_view, wrong_argument=None)
 
 
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')
 class NamespaceTests(TestCase):
-    urls = 'urlpatterns_reverse.namespace_urls'
 
     def test_ambiguous_object(self):
         "Names deployed via dynamic URL objects that require namespaces can't be resolved"
@@ -578,8 +601,8 @@ class ErrorHandlerResolutionTests(TestCase):
         self.assertEqual(self.callable_resolver.resolve500(), handler)
 
 
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_full_import')
 class DefaultErrorHandlerTests(TestCase):
-    urls = 'urlpatterns_reverse.urls_without_full_import'
 
     def test_default_handler(self):
         "If the urls.py doesn't specify handlers, the defaults are used"
@@ -595,16 +618,16 @@ class DefaultErrorHandlerTests(TestCase):
             self.fail("Shouldn't get an AttributeError due to undefined 500 handler")
 
 
+@override_settings(ROOT_URLCONF=None)
 class NoRootUrlConfTests(TestCase):
     """Tests for handler404 and handler500 if urlconf is None"""
-    urls = None
 
     def test_no_handler_exception(self):
         self.assertRaises(ImproperlyConfigured, self.client.get, '/test/me/')
 
 
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')
 class ResolverMatchTests(TestCase):
-    urls = 'urlpatterns_reverse.namespace_urls'
 
     def test_urlpattern_resolve(self):
         for path, name, app_name, namespace, func, args, kwargs in resolve_test_data:
@@ -639,8 +662,8 @@ class ResolverMatchTests(TestCase):
         self.assertIsNone(request.resolver_match)
 
 
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.erroneous_urls')
 class ErroneousViewTests(TestCase):
-    urls = 'urlpatterns_reverse.erroneous_urls'
 
     def test_erroneous_resolve(self):
         self.assertRaises(ImportError, self.client.get, '/erroneous_inner/')

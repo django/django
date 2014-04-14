@@ -1,17 +1,16 @@
 from __future__ import unicode_literals
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.views.generic.base import View
 from django.utils.encoding import force_str
 
 from .models import Author, Artist
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class ListViewTests(TestCase):
     fixtures = ['generic-views-test-data.json']
-    urls = 'generic_views.urls'
 
     def test_items(self):
         res = self.client.get('/list/dict/')

@@ -244,8 +244,7 @@ model to represent this data::
         objects = models.GeoManager()
 
         # Returns the string representation of the model.
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
 Please note two important things:
@@ -289,12 +288,17 @@ This command should produce the following output:
         "subregion" integer NOT NULL,
         "lon" double precision NOT NULL,
         "lat" double precision NOT NULL
+        "mpoly" geometry(MULTIPOLYGON,4326) NOT NULL
     )
     ;
-    SELECT AddGeometryColumn('world_worldborder', 'mpoly', 4326, 'MULTIPOLYGON', 2);
-    ALTER TABLE "world_worldborder" ALTER "mpoly" SET NOT NULL;
-    CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" GIST_GEOMETRY_OPS );
+    CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" );
     COMMIT;
+
+.. note::
+
+    With PostGIS < 2.0, the output is slightly different. The ``mpoly`` geometry
+    column is added through a separate ``SELECT AddGeometryColumn(...)``
+    statement.
 
 If this looks correct, run :djadmin:`migrate` to create this table in the database::
 
@@ -726,14 +730,12 @@ Let's dive right in.  Create a file called ``admin.py`` inside the
 
 Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import url, include
     from django.contrib.gis import admin
 
-    admin.autodiscover()
-
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^admin/', include(admin.site.urls)),
-    )
+    ]
 
 Start up the Django development server:
 
@@ -747,7 +749,7 @@ entries -- the borders may be edited by clicking on a polygon and dragging
 the vertexes to the desired position.
 
 .. _OpenLayers: http://openlayers.org/
-.. _Open Street Map: http://openstreetmap.org/
+.. _Open Street Map: http://www.openstreetmap.org/
 .. _Vector Map Level 0: http://earth-info.nga.mil/publications/vmap0.html
 .. _OSGeo: http://www.osgeo.org
 

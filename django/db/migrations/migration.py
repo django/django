@@ -12,7 +12,7 @@ class Migration(object):
      - replaces: A list of migration_names
 
     Note that all migrations come out of migrations and into the Loader or
-    Graph as instances, having been initialised with their app label and name.
+    Graph as instances, having been initialized with their app label and name.
     """
 
     # Operations to apply during this migration, in order.
@@ -127,3 +127,10 @@ class Migration(object):
         to_run.reverse()
         for operation, to_state, from_state in to_run:
             operation.database_backwards(self.app_label, schema_editor, from_state, to_state)
+
+
+def swappable_dependency(value):
+    """
+    Turns a setting value into a dependency.
+    """
+    return (value.split(".", 1)[0], "__first__")

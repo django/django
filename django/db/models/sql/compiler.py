@@ -4,12 +4,14 @@ from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends.utils import truncate_name
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.expressions import ExpressionNode
 from django.db.models.query_utils import select_related_descend, QueryWrapper
-from django.db.models.sql.constants import (SINGLE, MULTI, ORDER_DIR,
-        GET_ITERATOR_CHUNK_SIZE, SelectInfo)
+from django.db.models.sql.constants import (CURSOR, SINGLE, MULTI, NO_RESULTS,
+        ORDER_DIR, GET_ITERATOR_CHUNK_SIZE, SelectInfo)
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.expressions import SQLEvaluator
 from django.db.models.sql.query import get_order_dir, Query
+from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
 from django.utils import six
 from django.utils.six.moves import zip
@@ -45,7 +47,7 @@ class SQLCompiler(object):
         if self.query.select_related and not self.query.related_select_cols:
             self.fill_related_selections()
 
-    def quote_name_unless_alias(self, name):
+    def __call__(self, name):
         """
         A wrapper around connection.ops.quote_name that doesn't quote aliases
         for table names. This avoids problems with some SQL dialects that treat
@@ -60,6 +62,22 @@ class SQLCompiler(object):
         r = self.connection.ops.quote_name(name)
         self.quote_cache[name] = r
         return r
+
+    def quote_name_unless_alias(self, name):
+        """
+        A wrapper around connection.ops.quote_name that doesn't quote aliases
+        for table names. This avoids problems with some SQL dialects that treat
+        quoted strings specially (e.g. PostgreSQL).
+        """
+        return self(name)
+
+    def compile(self, node):
+        vendor_impl = getattr(
+            node, 'as_' + self.connection.vendor, None)
+        if vendor_impl:
+            return vendor_impl(self, self.connection)
+        else:
+            return node.as_sql(self, self.connection)
 
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """
@@ -88,11 +106,9 @@ class SQLCompiler(object):
         # docstring of get_from_clause() for details.
         from_, f_params = self.get_from_clause()
 
-        qn = self.quote_name_unless_alias
-
-        where, w_params = self.query.where.as_sql(qn=qn, connection=self.connection)
-        having, h_params = self.query.having.as_sql(qn=qn, connection=self.connection)
-        having_group_by = self.query.having.get_cols()
+        where, w_params = self.compile(self.query.where)
+        having, h_params = self.compile(self.query.having)
+        having_group_by = self.query.having.get_group_by_cols()
         params = []
         for val in six.itervalues(self.query.extra_select):
             params.extend(val[1])
@@ -142,6 +158,9 @@ class SQLCompiler(object):
                 result.append('OFFSET %d' % self.query.low_mark)
 
         if self.query.select_for_update and self.connection.features.has_select_for_update:
+            if self.connection.get_autocommit():
+                raise TransactionManagementError("select_for_update cannot be used outside of a transaction.")
+
             # If we've been asked for a NOWAIT query but the backend does not support it,
             # raise a DatabaseError otherwise we could get an unexpected deadlock.
             nowait = self.query.select_for_update_nowait
@@ -180,7 +199,7 @@ class SQLCompiler(object):
         (without the table names) are given unique aliases. This is needed in
         some cases to avoid ambiguity with nested queries.
         """
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (col[0], qn2(alias)) for alias, col in six.iteritems(self.query.extra_select)]
         params = []
@@ -213,7 +232,7 @@ class SQLCompiler(object):
                         aliases.add(r)
                         col_aliases.add(col[1])
                 else:
-                    col_sql, col_params = col.as_sql(qn, self.connection)
+                    col_sql, col_params = self.compile(col)
                     result.append(col_sql)
                     params.extend(col_params)
 
@@ -229,7 +248,7 @@ class SQLCompiler(object):
 
         max_name_length = self.connection.ops.max_name_length()
         for alias, aggregate in self.query.aggregate_select.items():
-            agg_sql, agg_params = aggregate.as_sql(qn, self.connection)
+            agg_sql, agg_params = self.compile(aggregate)
             if alias is None:
                 result.append(agg_sql)
             else:
@@ -267,7 +286,7 @@ class SQLCompiler(object):
         result = []
         if opts is None:
             opts = self.query.get_meta()
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         aliases = set()
         only_load = self.deferred_to_columns()
@@ -284,25 +303,32 @@ class SQLCompiler(object):
                 continue
             alias = self.query.join_parent_model(opts, model, start_alias,
                                                  seen_models)
+            column = field.column
+            for seen_model, seen_alias in seen_models.items():
+                if seen_model and seen_alias == alias:
+                    ancestor_link = seen_model._meta.get_ancestor_link(model)
+                    if ancestor_link:
+                        column = ancestor_link.column
+                    break
             table = self.query.alias_map[alias].table_name
-            if table in only_load and field.column not in only_load[table]:
+            if table in only_load and column not in only_load[table]:
                 continue
             if as_pairs:
-                result.append((alias, field.column))
+                result.append((alias, field))
                 aliases.add(alias)
                 continue
-            if with_aliases and field.column in col_aliases:
+            if with_aliases and column in col_aliases:
                 c_alias = 'Col%d' % len(col_aliases)
                 result.append('%s.%s AS %s' % (qn(alias),
-                    qn2(field.column), c_alias))
+                    qn2(column), c_alias))
                 col_aliases.add(c_alias)
                 aliases.add(c_alias)
             else:
-                r = '%s.%s' % (qn(alias), qn2(field.column))
+                r = '%s.%s' % (qn(alias), qn2(column))
                 result.append(r)
                 aliases.add(r)
                 if with_aliases:
-                    col_aliases.add(field.column)
+                    col_aliases.add(column)
         return result, aliases
 
     def get_distinct(self):
@@ -312,7 +338,7 @@ class SQLCompiler(object):
         Note that this method can alter the tables in the query, and thus it
         must be called before get_from_clause().
         """
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         result = []
         opts = self.query.get_meta()
@@ -345,7 +371,7 @@ class SQLCompiler(object):
             ordering = (self.query.order_by
                         or self.query.get_meta().ordering
                         or [])
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         distinct = self.query.distinct
         select_aliases = self._select_aliases
@@ -483,7 +509,7 @@ class SQLCompiler(object):
         ordering and distinct must be done first.
         """
         result = []
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         first = True
         from_params = []
@@ -501,8 +527,7 @@ class SQLCompiler(object):
                 extra_cond = join_field.get_extra_restriction(
                     self.query.where_class, alias, lhs)
                 if extra_cond:
-                    extra_sql, extra_params = extra_cond.as_sql(
-                        qn, self.connection)
+                    extra_sql, extra_params = self.compile(extra_cond)
                     extra_sql = 'AND (%s)' % extra_sql
                     from_params.extend(extra_params)
                 else:
@@ -534,7 +559,7 @@ class SQLCompiler(object):
         """
         Returns a tuple representing the SQL elements in the "group by" clause.
         """
-        qn = self.quote_name_unless_alias
+        qn = self
         result, params = [], []
         if self.query.group_by is not None:
             select_cols = self.query.select + self.query.related_select_cols
@@ -553,7 +578,7 @@ class SQLCompiler(object):
                 if isinstance(col, (list, tuple)):
                     sql = '%s.%s' % (qn(col[0]), qn(col[1]))
                 elif hasattr(col, 'as_sql'):
-                    sql, col_params = col.as_sql(qn, self.connection)
+                    self.compile(col)
                 else:
                     sql = '(%s)' % str(col)
                 if sql not in seen:
@@ -618,10 +643,10 @@ class SQLCompiler(object):
             _, _, _, joins, _ = self.query.setup_joins(
                 [f.name], opts, root_alias)
             alias = joins[-1]
-            columns, aliases = self.get_default_columns(start_alias=alias,
+            columns, _ = self.get_default_columns(start_alias=alias,
                     opts=f.rel.to._meta, as_pairs=True)
             self.query.related_select_cols.extend(
-                SelectInfo(col, field) for col, field in zip(columns, f.rel.to._meta.concrete_fields))
+                SelectInfo((col[0], col[1].column), col[1]) for col in columns)
             if restricted:
                 next = requested.get(f.name, {})
             else:
@@ -645,11 +670,10 @@ class SQLCompiler(object):
                 alias = joins[-1]
                 from_parent = (opts.model if issubclass(model, opts.model)
                                else None)
-                columns, aliases = self.get_default_columns(start_alias=alias,
+                columns, _ = self.get_default_columns(start_alias=alias,
                     opts=model._meta, as_pairs=True, from_parent=from_parent)
                 self.query.related_select_cols.extend(
-                    SelectInfo(col, field) for col, field
-                    in zip(columns, model._meta.concrete_fields))
+                    SelectInfo((col[0], col[1].column), col[1]) for col in columns)
                 next = requested.get(f.related_query_name(), {})
                 self.fill_related_selections(model._meta, alias, cur_depth + 1,
                                              next, restricted)
@@ -692,8 +716,10 @@ class SQLCompiler(object):
                         # found in get_columns(). It would be nice to clean this up.
                         if self.query.select:
                             fields = [f.field for f in self.query.select]
-                        else:
+                        elif self.query.default_cols:
                             fields = self.query.get_meta().concrete_fields
+                        else:
+                            fields = []
                         fields = fields + [f.field for f in self.query.related_select_cols]
 
                         # If the field was deferred, exclude it from being passed
@@ -741,6 +767,8 @@ class SQLCompiler(object):
         is needed, as the filters describe an empty set. In that case, None is
         returned, to avoid any unnecessary database interaction.
         """
+        if not result_type:
+            result_type = NO_RESULTS
         try:
             sql, params = self.as_sql()
             if not sql:
@@ -752,31 +780,48 @@ class SQLCompiler(object):
                 return
 
         cursor = self.connection.cursor()
-        cursor.execute(sql, params)
+        try:
+            cursor.execute(sql, params)
+        except Exception:
+            cursor.close()
+            raise
 
-        if not result_type:
+        if result_type == CURSOR:
+            # Caller didn't specify a result_type, so just give them back the
+            # cursor to process (and close).
             return cursor
         if result_type == SINGLE:
-            if self.ordering_aliases:
-                return cursor.fetchone()[:-len(self.ordering_aliases)]
-            return cursor.fetchone()
+            try:
+                if self.ordering_aliases:
+                    return cursor.fetchone()[:-len(self.ordering_aliases)]
+                return cursor.fetchone()
+            finally:
+                # done with the cursor
+                cursor.close()
+        if result_type == NO_RESULTS:
+            cursor.close()
+            return
 
         # The MULTI case.
         if self.ordering_aliases:
             result = order_modified_iter(cursor, len(self.ordering_aliases),
                     self.connection.features.empty_fetchmany_value)
         else:
-            result = iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
-                    self.connection.features.empty_fetchmany_value)
+            result = cursor_iter(cursor,
+                self.connection.features.empty_fetchmany_value)
         if not self.connection.features.can_use_chunked_reads:
-            # If we are using non-chunked reads, we return the same data
-            # structure as normally, but ensure it is all read into memory
-            # before going any further.
-            return list(result)
+            try:
+                # If we are using non-chunked reads, we return the same data
+                # structure as normally, but ensure it is all read into memory
+                # before going any further.
+                return list(result)
+            finally:
+                # done with the cursor
+                cursor.close()
         return result
 
     def as_subquery_condition(self, alias, columns, qn):
-        inner_qn = self.quote_name_unless_alias
+        inner_qn = self
         qn2 = self.connection.ops.quote_name
         if len(columns) == 1:
             sql, params = self.as_sql()
@@ -850,7 +895,7 @@ class SQLInsertCompiler(SQLCompiler):
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
             result.append("VALUES (%s)" % ", ".join(placeholders[0]))
             r_fmt, r_params = self.connection.ops.return_insert_id()
-            # Skip empty r_fmt to allow subclasses to customize behaviour for
+            # Skip empty r_fmt to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
             if r_fmt:
                 result.append(r_fmt % col)
@@ -868,15 +913,15 @@ class SQLInsertCompiler(SQLCompiler):
     def execute_sql(self, return_id=False):
         assert not (return_id and len(self.query.objs) != 1)
         self.return_id = return_id
-        cursor = self.connection.cursor()
-        for sql, params in self.as_sql():
-            cursor.execute(sql, params)
-        if not (return_id and cursor):
-            return
-        if self.connection.features.can_return_id_from_insert:
-            return self.connection.ops.fetch_returned_insert_id(cursor)
-        return self.connection.ops.last_insert_id(cursor,
-                self.query.get_meta().db_table, self.query.get_meta().pk.column)
+        with self.connection.cursor() as cursor:
+            for sql, params in self.as_sql():
+                cursor.execute(sql, params)
+            if not (return_id and cursor):
+                return
+            if self.connection.features.can_return_id_from_insert:
+                return self.connection.ops.fetch_returned_insert_id(cursor)
+            return self.connection.ops.last_insert_id(cursor,
+                    self.query.get_meta().db_table, self.query.get_meta().pk.column)
 
 
 class SQLDeleteCompiler(SQLCompiler):
@@ -886,10 +931,10 @@ class SQLDeleteCompiler(SQLCompiler):
         parameters.
         """
         assert len(self.query.tables) == 1, \
-                "Can only delete from one table at a time."
-        qn = self.quote_name_unless_alias
+            "Can only delete from one table at a time."
+        qn = self
         result = ['DELETE FROM %s' % qn(self.query.tables[0])]
-        where, params = self.query.where.as_sql(qn=qn, connection=self.connection)
+        where, params = self.compile(self.query.where)
         if where:
             result.append('WHERE %s' % where)
         return ' '.join(result), tuple(params)
@@ -905,13 +950,19 @@ class SQLUpdateCompiler(SQLCompiler):
         if not self.query.values:
             return '', ()
         table = self.query.tables[0]
-        qn = self.quote_name_unless_alias
+        qn = self
         result = ['UPDATE %s' % qn(table)]
         result.append('SET')
         values, update_params = [], []
         for field, model, val in self.query.values:
             if hasattr(val, 'prepare_database_save'):
-                val = val.prepare_database_save(field)
+                if field.rel or isinstance(val, ExpressionNode):
+                    val = val.prepare_database_save(field)
+                else:
+                    raise TypeError("Database is trying to update a relational field "
+                                    "of type %s with a value of type %s. Make sure "
+                                    "you are setting the correct relations" %
+                                    (field.__class__.__name__, val.__class__.__name__))
             else:
                 val = field.get_db_prep_save(val, connection=self.connection)
 
@@ -925,7 +976,7 @@ class SQLUpdateCompiler(SQLCompiler):
                 val = SQLEvaluator(val, self.query, allow_joins=False)
             name = field.column
             if hasattr(val, 'as_sql'):
-                sql, params = val.as_sql(qn, self.connection)
+                sql, params = self.compile(val)
                 values.append('%s = %s' % (qn(name), sql))
                 update_params.extend(params)
             elif val is not None:
@@ -936,7 +987,7 @@ class SQLUpdateCompiler(SQLCompiler):
         if not values:
             return '', ()
         result.append(', '.join(values))
-        where, params = self.query.where.as_sql(qn=qn, connection=self.connection)
+        where, params = self.compile(self.query.where)
         if where:
             result.append('WHERE %s' % where)
         return ' '.join(result), tuple(update_params + params)
@@ -949,12 +1000,15 @@ class SQLUpdateCompiler(SQLCompiler):
         related queries are not available.
         """
         cursor = super(SQLUpdateCompiler, self).execute_sql(result_type)
-        rows = cursor.rowcount if cursor else 0
-        is_empty = cursor is None
-        del cursor
+        try:
+            rows = cursor.rowcount if cursor else 0
+            is_empty = cursor is None
+        finally:
+            if cursor:
+                cursor.close()
         for query in self.query.get_related_updates():
             aux_rows = query.get_compiler(self.using).execute_sql(result_type)
-            if is_empty:
+            if is_empty and aux_rows:
                 rows = aux_rows
                 is_empty = False
         return rows
@@ -1016,11 +1070,11 @@ class SQLAggregateCompiler(SQLCompiler):
         parameters.
         """
         if qn is None:
-            qn = self.quote_name_unless_alias
+            qn = self
 
         sql, params = [], []
         for aggregate in self.query.aggregate_select.values():
-            agg_sql, agg_params = aggregate.as_sql(qn, self.connection)
+            agg_sql, agg_params = self.compile(aggregate)
             sql.append(agg_sql)
             params.extend(agg_params)
         sql = ', '.join(sql)
@@ -1090,6 +1144,19 @@ class SQLDateTimeCompiler(SQLCompiler):
                 yield datetime
 
 
+def cursor_iter(cursor, sentinel):
+    """
+    Yields blocks of rows from a cursor and ensures the cursor is closed when
+    done.
+    """
+    try:
+        for rows in iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
+                sentinel):
+            yield rows
+    finally:
+        cursor.close()
+
+
 def order_modified_iter(cursor, trim, sentinel):
     """
     Yields blocks of rows from a cursor. We use this iterator in the special
@@ -1097,6 +1164,9 @@ def order_modified_iter(cursor, trim, sentinel):
     requirements. We must trim those extra columns before anything else can use
     the results, since they're only needed to make the SQL valid.
     """
-    for rows in iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
-            sentinel):
-        yield [r[:-trim] for r in rows]
+    try:
+        for rows in iter((lambda: cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)),
+                sentinel):
+            yield [r[:-trim] for r in rows]
+    finally:
+        cursor.close()

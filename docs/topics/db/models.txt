@@ -190,9 +190,9 @@ ones:
         >>> p = Person(name="Fred Flintstone", shirt_size="L")
         >>> p.save()
         >>> p.shirt_size
-        u'L'
+        'L'
         >>> p.get_shirt_size_display()
-        u'Large'
+        'Large'
 
 :attr:`~Field.default`
     The default value for the field. This can be a value or a callable
@@ -417,16 +417,14 @@ something like this::
     class Person(models.Model):
         name = models.CharField(max_length=128)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
     class Group(models.Model):
         name = models.CharField(max_length=128)
         members = models.ManyToManyField(Person, through='Membership')
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
     class Membership(models.Model):
@@ -436,29 +434,37 @@ something like this::
         invite_reason = models.CharField(max_length=64)
 
 When you set up the intermediary model, you explicitly specify foreign
-keys to the models that are involved in the ManyToMany relation. This
+keys to the models that are involved in the many-to-many relationship. This
 explicit declaration defines how the two models are related.
 
 There are a few restrictions on the intermediate model:
 
 * Your intermediate model must contain one - and *only* one - foreign key
-  to the target model (this would be ``Person`` in our example). If you
-  have more than one foreign key, a validation error will be raised.
+  to the source model (this would be ``Group`` in our example), or you must
+  explicitly specify the foreign keys Django should use for the relationship
+  using :attr:`ManyToManyField.through_fields <ManyToManyField.through_fields>`.
+  If you have more than one foreign key and ``through_fields`` is not
+  specified, a validation error will be raised. A similar restriction applies
+  to the foreign key to the target model (this would be ``Person`` in our
+  example).
 
-* Your intermediate model must contain one - and *only* one - foreign key
-  to the source model (this would be ``Group`` in our example). If you
-  have more than one foreign key, a validation error will be raised.
-
-* The only exception to this is a model which has a many-to-many
-  relationship to itself, through an intermediary model. In this
-  case, two foreign keys to the same model are permitted, but they
-  will be treated as the two (different) sides of the many-to-many
-  relation.
+* For a model which has a many-to-many relationship to itself through an
+  intermediary model, two foreign keys to the same model are permitted, but
+  they will be treated as the two (different) sides of the many-to-many
+  relationship. If there are *more* than two foreign keys though, you
+  must also specify ``through_fields`` as above, or a validation error
+  will be raised.
 
 * When defining a many-to-many relationship from a model to
   itself, using an intermediary model, you *must* use
   :attr:`symmetrical=False <ManyToManyField.symmetrical>` (see
   :ref:`the model field reference <manytomany-arguments>`).
+
+.. versionchanged:: 1.7
+
+    In Django 1.6 and earlier, intermediate models containing more than one
+    foreign key to any of the models involved in the many-to-many relationship
+    used to be prohibited.
 
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
 your intermediary model (``Membership``, in this case), you're ready to start
@@ -535,7 +541,7 @@ querying the ``Membership`` model::
     >>> ringos_membership.date_joined
     datetime.date(1962, 8, 16)
     >>> ringos_membership.invite_reason
-    u'Needed a new drummer.'
+    'Needed a new drummer.'
 
 Another way to access the same information is by querying the
 :ref:`many-to-many reverse relationship<m2m-reverse-relationships>` from a
@@ -545,7 +551,7 @@ Another way to access the same information is by querying the
     >>> ringos_membership.date_joined
     datetime.date(1962, 8, 16)
     >>> ringos_membership.invite_reason
-    u'Needed a new drummer.'
+    'Needed a new drummer.'
 
 
 One-to-one relationships
@@ -664,6 +670,19 @@ Meta`` to a model is completely optional.
 
 A complete list of all possible ``Meta`` options can be found in the :doc:`model
 option reference </ref/models/options>`.
+
+.. _model-attributes:
+
+Model attributes
+================
+
+``objects``
+    The most important attribute of a model is the
+    :class:`~django.db.models.Manager`. It's the interface through which
+    database query operations are provided to Django models and is used to
+    :ref:`retrieve the instances <retrieving-objects>` from the database. If no
+    custom ``Manager`` is defined, the default name is ``objects``. Managers
+    are only accessible via model classes, not the model instances.
 
 .. _model-methods:
 
@@ -960,7 +979,7 @@ The reverse name of the ``common.ChildA.m2m`` field will be
 reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
 It is up to you how you use the ``'%(class)s'`` and ``'%(app_label)s`` portion
 to construct your related name, but if you forget to use it, Django will raise
-errors when you validate your models (or run :djadmin:`migrate`).
+errors when you perform system checks (or run :djadmin:`migrate`).
 
 If you don't specify a :attr:`~django.db.models.ForeignKey.related_name`
 attribute for a field in an abstract base class, the default reverse name will
@@ -1011,7 +1030,8 @@ of the model name::
 
 However, if ``p`` in the above example was *not* a ``Restaurant`` (it had been
 created directly as a ``Place`` object or was the parent of some other class),
-referring to ``p.restaurant`` would raise a Restaurant.DoesNotExist exception.
+referring to ``p.restaurant`` would raise a ``Restaurant.DoesNotExist``
+exception.
 
 ``Meta`` and multi-table inheritance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1053,7 +1073,7 @@ are putting those types of relations on a subclass of another model,
 you **must** specify the
 :attr:`~django.db.models.ForeignKey.related_name` attribute on each
 such field. If you forget, Django will raise an error when you run
-:djadmin:`validate` or :djadmin:`migrate`.
+:djadmin:`check` or :djadmin:`migrate`.
 
 For example, using the above ``Place`` class again, let's create another
 subclass with a :class:`~django.db.models.ManyToManyField`::

@@ -5,6 +5,7 @@ import warnings
 
 from django.db import models
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango19Warning
 
 
 class SerializerDoesNotExist(KeyError):
@@ -42,7 +43,7 @@ class Serializer(object):
         self.use_natural_keys = options.pop("use_natural_keys", False)
         if self.use_natural_keys:
             warnings.warn("``use_natural_keys`` is deprecated; use ``use_natural_foreign_keys`` instead.",
-                PendingDeprecationWarning)
+                RemovedInDjango19Warning)
         self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False) or self.use_natural_keys
         self.use_natural_primary_keys = options.pop('use_natural_primary_keys', False)
 
@@ -136,10 +137,6 @@ class Deserializer(six.Iterator):
             self.stream = six.StringIO(stream_or_string)
         else:
             self.stream = stream_or_string
-        # hack to make sure that the models have all been loaded before
-        # deserialization starts (otherwise subclass calls to get_model()
-        # and friends might fail...)
-        models.get_apps()
 
     def __iter__(self):
         return self

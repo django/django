@@ -1,23 +1,22 @@
 from __future__ import unicode_literals
 
 import datetime
-import time
+import json
 import sys
+import time
 from email.header import Header
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
 
 from django.conf import settings
 from django.core import signals
 from django.core import signing
 from django.core.exceptions import DisallowedRedirect
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import six, timezone
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.http import cookie_date
 from django.utils.six.moves import map
+from django.utils.six.moves.urllib.parse import urlparse
 
 
 # See http://www.iana.org/assignments/http-status-codes
@@ -141,7 +140,7 @@ class HttpResponseBase(six.Iterator):
         """Converts headers key/value to ascii/latin-1 native strings.
 
         `charset` must be 'ascii' or 'latin-1'. If `mime_encode` is True and
-        `value` value can't be represented in the given charset, MIME-encoding
+        `value` can't be represented in the given charset, MIME-encoding
         is applied.
         """
         if not isinstance(value, (bytes, six.text_type)):
@@ -187,7 +186,7 @@ class HttpResponseBase(six.Iterator):
         return self._headers[header.lower()][1]
 
     def __getstate__(self):
-        # SimpleCookie is not pickeable with pickle.HIGHEST_PROTOCOL, so we
+        # SimpleCookie is not pickleable with pickle.HIGHEST_PROTOCOL, so we
         # serialize to a string instead
         state = self.__dict__.copy()
         state['cookies'] = str(state['cookies'])
@@ -272,7 +271,7 @@ class HttpResponseBase(six.Iterator):
             return bytes(value)
 
         # Handle string types -- we can't rely on force_bytes here because:
-        # - under Python 3 it attemps str conversion first
+        # - under Python 3 it attempts str conversion first
         # - when self._charset != 'utf-8' it re-encodes the content
         if isinstance(value, bytes):
             return bytes(value)
@@ -456,3 +455,25 @@ class HttpResponseServerError(HttpResponse):
 
 class Http404(Exception):
     pass
+
+
+class JsonResponse(HttpResponse):
+    """
+    An HTTP response class that consumes data to be serialized to JSON.
+
+    :param data: Data to be dumped into json. By default only ``dict`` objects
+      are allowed to be passed due to a security flaw before EcmaScript 5. See
+      the ``safe`` parameter for more information.
+    :param encoder: Should be an json encoder class. Defaults to
+      ``django.core.serializers.json.DjangoJSONEncoder``.
+    :param safe: Controls if only ``dict`` objects may be serialized. Defaults
+      to ``True``.
+    """
+
+    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True, **kwargs):
+        if safe and not isinstance(data, dict):
+            raise TypeError('In order to allow non-dict objects to be '
+                'serialized set the safe parameter to False')
+        kwargs.setdefault('content_type', 'application/json')
+        data = json.dumps(data, cls=encoder)
+        super(JsonResponse, self).__init__(content=data, **kwargs)

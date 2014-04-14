@@ -13,7 +13,7 @@ from django.utils.encoding import force_bytes, force_str, force_text
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import (
     pbkdf2, constant_time_compare, get_random_string)
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_noop as _
 
 
@@ -57,7 +57,7 @@ def check_password(password, encoded, setter=None, preferred='default'):
 
     must_update = hasher.algorithm != preferred.algorithm
     if not must_update:
-        must_update = hasher.must_update(encoded)
+        must_update = preferred.must_update(encoded)
     is_correct = hasher.verify(password, encoded)
     if setter and is_correct and must_update:
         setter(password)
@@ -92,7 +92,7 @@ def load_hashers(password_hashers=None):
     if not password_hashers:
         password_hashers = settings.PASSWORD_HASHERS
     for backend in password_hashers:
-        hasher = import_by_path(backend)()
+        hasher = import_string(backend)()
         if not getattr(hasher, 'algorithm'):
             raise ImproperlyConfigured("hasher doesn't specify an "
                                        "algorithm name: %s" % backend)
@@ -186,7 +186,7 @@ class BasePasswordHasher(object):
 
     def salt(self):
         """
-        Generates a cryptographically secure nonce salt in ascii
+        Generates a cryptographically secure nonce salt in ASCII
         """
         return get_random_string()
 

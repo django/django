@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+from contextlib import contextmanager
 import datetime
 import decimal
 from importlib import import_module
@@ -11,8 +12,7 @@ from threading import local
 from django.conf import settings
 from django.template import Template, Context
 from django.template.base import TemplateSyntaxError
-from django.test import TestCase, RequestFactory
-from django.test.utils import override_settings, TransRealMixin
+from django.test import TestCase, RequestFactory, override_settings
 from django.utils import translation
 from django.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules,
@@ -31,7 +31,8 @@ from django.utils.translation import (activate, deactivate,
     ungettext_lazy,
     pgettext,
     npgettext, npgettext_lazy,
-    check_for_language)
+    check_for_language,
+    string_concat, LANGUAGE_SESSION_KEY)
 
 from .forms import I18nForm, SelectDateForm, SelectDateWidget, CompanyForm
 from .models import Company, TestModel
@@ -43,17 +44,32 @@ extended_locale_paths = settings.LOCALE_PATHS + (
 )
 
 
-class TranslationTests(TransRealMixin, TestCase):
+@contextmanager
+def patch_formats(lang, **settings):
+    from django.utils.formats import _format_cache
+
+    # Populate _format_cache with temporary values
+    for key, value in settings.items():
+        _format_cache[(key, lang)] = value
+    try:
+        yield
+    finally:
+        reset_format_cache()
+
+
+class TranslationTests(TestCase):
 
     def test_override(self):
         activate('de')
-        with translation.override('pl'):
-            self.assertEqual(get_language(), 'pl')
-        self.assertEqual(get_language(), 'de')
-        with translation.override(None):
-            self.assertEqual(get_language(), settings.LANGUAGE_CODE)
-        self.assertEqual(get_language(), 'de')
-        deactivate()
+        try:
+            with translation.override('pl'):
+                self.assertEqual(get_language(), 'pl')
+            self.assertEqual(get_language(), 'de')
+            with translation.override(None):
+                self.assertEqual(get_language(), settings.LANGUAGE_CODE)
+            self.assertEqual(get_language(), 'de')
+        finally:
+            deactivate()
 
     def test_lazy_objects(self):
         """
@@ -265,8 +281,7 @@ class TranslationTests(TransRealMixin, TestCase):
         """
         six.text_type(string_concat(...)) should not raise a TypeError - #4796
         """
-        import django.utils.translation
-        self.assertEqual('django', six.text_type(django.utils.translation.string_concat("dja", "ngo")))
+        self.assertEqual('django', six.text_type(string_concat("dja", "ngo")))
 
     def test_safe_status(self):
         """
@@ -335,7 +350,6 @@ class TranslationTests(TransRealMixin, TestCase):
 
 
 class TranslationThreadSafetyTests(TestCase):
-    """Specifically not using TransRealMixin here to test threading."""
 
     def setUp(self):
         self._old_language = get_language()
@@ -367,7 +381,7 @@ class TranslationThreadSafetyTests(TestCase):
 
 
 @override_settings(USE_L10N=True)
-class FormattingTests(TransRealMixin, TestCase):
+class FormattingTests(TestCase):
 
     def setUp(self):
         super(FormattingTests, self).setUp()
@@ -482,31 +496,17 @@ class FormattingTests(TransRealMixin, TestCase):
         conditional test (e.g. 0 or empty string).
         Refs #16938.
         """
-        from django.conf.locale.fr import formats as fr_formats
+        with patch_formats('fr', THOUSAND_SEPARATOR='', FIRST_DAY_OF_WEEK=0):
+            with translation.override('fr'):
+                with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='!'):
+                    self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
+                    # Even a second time (after the format has been cached)...
+                    self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
 
-        # Back up original formats
-        backup_THOUSAND_SEPARATOR = fr_formats.THOUSAND_SEPARATOR
-        backup_FIRST_DAY_OF_WEEK = fr_formats.FIRST_DAY_OF_WEEK
-
-        # Set formats that would get interpreted as False in a conditional test
-        fr_formats.THOUSAND_SEPARATOR = ''
-        fr_formats.FIRST_DAY_OF_WEEK = 0
-
-        reset_format_cache()
-        with translation.override('fr'):
-            with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='!'):
-                self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
-                # Even a second time (after the format has been cached)...
-                self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
-
-            with self.settings(FIRST_DAY_OF_WEEK=1):
-                self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
-                # Even a second time (after the format has been cached)...
-                self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
-
-        # Restore original formats
-        fr_formats.THOUSAND_SEPARATOR = backup_THOUSAND_SEPARATOR
-        fr_formats.FIRST_DAY_OF_WEEK = backup_FIRST_DAY_OF_WEEK
+                with self.settings(FIRST_DAY_OF_WEEK=1):
+                    self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
+                    # Even a second time (after the format has been cached)...
+                    self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
 
     def test_l10n_enabled(self):
         self.maxDiff = 3000
@@ -806,7 +806,7 @@ class FormattingTests(TransRealMixin, TestCase):
             )
 
 
-class MiscTests(TransRealMixin, TestCase):
+class MiscTests(TestCase):
 
     def setUp(self):
         super(MiscTests, self).setUp()
@@ -821,10 +821,10 @@ class MiscTests(TransRealMixin, TestCase):
         p = trans_real.parse_accept_lang_header
         # Good headers.
         self.assertEqual([('de', 1.0)], p('de'))
-        self.assertEqual([('en-AU', 1.0)], p('en-AU'))
+        self.assertEqual([('en-au', 1.0)], p('en-AU'))
         self.assertEqual([('es-419', 1.0)], p('es-419'))
         self.assertEqual([('*', 1.0)], p('*;q=1.00'))
-        self.assertEqual([('en-AU', 0.123)], p('en-AU;q=0.123'))
+        self.assertEqual([('en-au', 0.123)], p('en-AU;q=0.123'))
         self.assertEqual([('en-au', 0.5)], p('en-au;q=0.5'))
         self.assertEqual([('en-au', 1.0)], p('en-au;q=1.0'))
         self.assertEqual([('da', 1.0), ('en', 0.5), ('en-gb', 0.25)], p('da, en-gb;q=0.25, en;q=0.5'))
@@ -883,6 +883,24 @@ class MiscTests(TransRealMixin, TestCase):
         # by Django without falling back nor ignoring it.
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,de'}
         self.assertEqual(g(r), 'zh-cn')
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'NL'}
+        self.assertEqual('nl', g(r))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'fy'}
+        self.assertEqual('fy', g(r))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'ia'}
+        self.assertEqual('ia', g(r))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'sr-latn'}
+        self.assertEqual('sr-latn', g(r))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-hans'}
+        self.assertEqual('zh-hans', g(r))
+
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-hant'}
+        self.assertEqual('zh-hant', g(r))
 
     @override_settings(
         LANGUAGES=(
@@ -1019,7 +1037,7 @@ class MiscTests(TransRealMixin, TestCase):
             self.assertNotEqual('pt-br', g(r))
 
 
-class ResolutionOrderI18NTests(TransRealMixin, TestCase):
+class ResolutionOrderI18NTests(TestCase):
 
     def setUp(self):
         super(ResolutionOrderI18NTests, self).setUp()
@@ -1035,11 +1053,27 @@ class ResolutionOrderI18NTests(TransRealMixin, TestCase):
             "translation of '%s'; the actual result is '%s'." % (msgstr, msgid, result)))
 
 
-@override_settings(INSTALLED_APPS=['i18n.resolution'] + list(settings.INSTALLED_APPS))
 class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
+    @override_settings(LANGUAGE_CODE='de')
     def test_app_translation(self):
-        self.assertUgettext('Date/time', 'APP')
+        # Original translation.
+        self.assertUgettext('Date/time', 'Datum/Zeit')
+
+        # Different translation.
+        with self.modify_settings(INSTALLED_APPS={'append': 'i18n.resolution'}):
+            # Force refreshing translations.
+            activate('de')
+
+            # Doesn't work because it's added later in the list.
+            self.assertUgettext('Date/time', 'Datum/Zeit')
+
+            with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.admin.apps.SimpleAdminConfig'}):
+                # Force refreshing translations.
+                activate('de')
+
+                # Unless the original is removed from the list.
+                self.assertUgettext('Date/time', 'Datum/Zeit (APP)')
 
 
 @override_settings(LOCALE_PATHS=extended_locale_paths)
@@ -1049,8 +1083,7 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
         self.assertUgettext('Time', 'LOCALE_PATHS')
 
     def test_locale_paths_override_app_translation(self):
-        extended_apps = list(settings.INSTALLED_APPS) + ['i18n.resolution']
-        with self.settings(INSTALLED_APPS=extended_apps):
+        with self.settings(INSTALLED_APPS=['i18n.resolution']):
             self.assertUgettext('Time', 'LOCALE_PATHS')
 
 
@@ -1095,7 +1128,7 @@ class TestLanguageInfo(TestCase):
         six.assertRaisesRegex(self, KeyError, r"Unknown language code xx-xx and xx\.", get_language_info, 'xx-xx')
 
 
-class MultipleLocaleActivationTests(TransRealMixin, TestCase):
+class MultipleLocaleActivationTests(TestCase):
     """
     Tests for template rendering behavior when multiple locales are activated
     during the lifetime of the same process.
@@ -1228,10 +1261,9 @@ class MultipleLocaleActivationTests(TransRealMixin, TestCase):
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ),
+    ROOT_URLCONF='i18n.urls',
 )
-class LocaleMiddlewareTests(TransRealMixin, TestCase):
-
-    urls = 'i18n.urls'
+class LocaleMiddlewareTests(TestCase):
 
     def test_streaming_response(self):
         # Regression test for #5241
@@ -1247,51 +1279,12 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
             'django.middleware.common.CommonMiddleware',
         ),
     )
-    def test_session_language(self):
-        """
-        Check that language is stored in session if missing.
-        """
-        # Create an empty session
-        engine = import_module(settings.SESSION_ENGINE)
-        session = engine.SessionStore()
-        session.save()
-        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
-
-        # Clear the session data before request
-        session.save()
-        self.client.get('/en/simple/')
-        self.assertEqual(self.client.session['_language'], 'en')
-
-        # Clear the session data before request
-        session.save()
+    def test_language_not_saved_to_session(self):
+        """Checks that current language is not automatically saved to
+        session on every request."""
+        # Regression test for #21473
         self.client.get('/fr/simple/')
-        self.assertEqual(self.client.session['_language'], 'fr')
-
-        # Check that language is not changed in session
-        self.client.get('/en/simple/')
-        self.assertEqual(self.client.session['_language'], 'fr')
-
-    @override_settings(
-        MIDDLEWARE_CLASSES=(
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.common.CommonMiddleware',
-        ),
-    )
-    def test_backwards_session_language(self):
-        """
-        Check that language is stored in session if missing.
-        """
-        # Create session with old language key name
-        engine = import_module(settings.SESSION_ENGINE)
-        session = engine.SessionStore()
-        session['django_language'] = 'en'
-        session.save()
-        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
-
-        # request other language; should default to old language key value
-        self.client.get('/fr/simple/')
-        self.assertEqual(self.client.session['_language'], 'en')
+        self.assertNotIn(LANGUAGE_SESSION_KEY, self.client.session)
 
 
 @override_settings(
@@ -1305,10 +1298,9 @@ class LocaleMiddlewareTests(TransRealMixin, TestCase):
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ),
+    ROOT_URLCONF='i18n.urls'
 )
-class CountrySpecificLanguageTests(TransRealMixin, TestCase):
-
-    urls = 'i18n.urls'
+class CountrySpecificLanguageTests(TestCase):
 
     def setUp(self):
         super(CountrySpecificLanguageTests, self).setUp()

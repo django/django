@@ -6,7 +6,9 @@ import tempfile
 import os
 
 from django.contrib.auth.models import User
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import FileSystemStorage
 from django.db import models
@@ -38,6 +40,11 @@ class Article(models.Model):
         return self.date.year
     model_year.admin_order_field = 'date'
     model_year.short_description = ''
+
+    def model_year_reversed(self):
+        return self.date.year
+    model_year_reversed.admin_order_field = '-date'
+    model_year_reversed.short_description = ''
 
 
 @python_2_unicode_compatible
@@ -169,6 +176,33 @@ class Sketch(models.Model):
 
     def __str__(self):
         return self.title
+
+
+def today_callable_dict():
+    return {"last_action__gte": datetime.datetime.today()}
+
+
+def today_callable_q():
+    return models.Q(last_action__gte=datetime.datetime.today())
+
+
+@python_2_unicode_compatible
+class Character(models.Model):
+    username = models.CharField(max_length=100)
+    last_action = models.DateTimeField()
+
+    def __str__(self):
+        return self.username
+
+
+@python_2_unicode_compatible
+class StumpJoke(models.Model):
+    variation = models.CharField(max_length=100)
+    most_recently_fooled = models.ForeignKey(Character, limit_choices_to=today_callable_dict, related_name="+")
+    has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")
+
+    def __str__(self):
+        return self.variation
 
 
 class Fabric(models.Model):
@@ -404,6 +438,13 @@ class Post(models.Model):
         return "Very awesome."
 
 
+# Proxy model to test overridden fields attrs on Post model so as not to
+# interfere with other tests.
+class FieldOverridePost(Post):
+    class Meta:
+        proxy = True
+
+
 @python_2_unicode_compatible
 class Gadget(models.Model):
     name = models.CharField(max_length=100)
@@ -430,7 +471,7 @@ class FunkyTag(models.Model):
     name = models.CharField(max_length=25)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
         return self.name
@@ -441,7 +482,7 @@ class Plot(models.Model):
     name = models.CharField(max_length=100)
     team_leader = models.ForeignKey(Villain, related_name='lead_plots')
     contact = models.ForeignKey(Villain, related_name='contact_plots')
-    tags = generic.GenericRelation(FunkyTag)
+    tags = GenericRelation(FunkyTag)
 
     def __str__(self):
         return self.name
@@ -710,6 +751,26 @@ class Simple(models.Model):
 class Choice(models.Model):
     choice = models.IntegerField(blank=True, null=True,
         choices=((1, 'Yes'), (0, 'No'), (None, 'No opinion')))
+
+
+class ParentWithDependentChildren(models.Model):
+    """
+    Issue #20522
+    Model where the validation of child foreign-key relationships depends
+    on validation of the parent
+    """
+    some_required_info = models.PositiveIntegerField()
+    family_name = models.CharField(max_length=255, blank=False)
+
+
+class DependentChild(models.Model):
+    """
+    Issue #20522
+    Model that depends on validation of the parent class for one of its
+    fields to validate during clean
+    """
+    parent = models.ForeignKey(ParentWithDependentChildren)
+    family_name = models.CharField(max_length=255)
 
 
 class _Manager(models.Manager):

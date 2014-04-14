@@ -45,10 +45,6 @@ class Student(CommonInfo):
         pass
 
 
-class StudentWorker(Student, Worker):
-    pass
-
-
 #
 # Abstract base classes with related models
 #

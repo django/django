@@ -124,6 +124,15 @@ ValidationError
     :ref:`Model Field Validation <validating-objects>` and the
     :doc:`Validator Reference </ref/validators>`.
 
+NON_FIELD_ERRORS
+~~~~~~~~~~~~~~~~
+.. data:: NON_FIELD_ERRORS
+
+``ValidationError``\s that don't belong to a particular field in a form
+or model are classified as ``NON_FIELD_ERRORS``. This constant is used
+as a key in dictionaries that otherwise map fields to their respective
+list of errors.
+
 .. currentmodule:: django.core.urlresolvers
 
 URL Resolver exceptions
@@ -177,11 +186,6 @@ As per :pep:`3134`, a ``__cause__`` attribute is set with the original
 information provided. (Note that this attribute is available under
 both Python 2 and Python 3, although :pep:`3134` normally only applies
 to Python 3.)
-
-.. versionchanged:: 1.6
-
-    Previous versions of Django only wrapped ``DatabaseError`` and
-    ``IntegrityError``, and did not provide ``__cause__``.
 
 .. exception:: models.ProtectedError
 

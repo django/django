@@ -1,16 +1,21 @@
 from contextlib import contextmanager
 import os
-from unittest import expectedFailure, TestSuite, TextTestRunner, defaultTestLoader
+from unittest import TestSuite, TextTestRunner, defaultTestLoader
 
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
 
 
-def expectedFailureIf(condition):
-    """Marks a test as an expected failure if ``condition`` is met."""
-    if condition:
-        return expectedFailure
-    return lambda func: func
+@contextmanager
+def change_cwd(directory):
+    current_dir = os.path.abspath(os.path.dirname(__file__))
+    new_dir = os.path.join(current_dir, directory)
+    old_cwd = os.getcwd()
+    os.chdir(new_dir)
+    try:
+        yield
+    finally:
+        os.chdir(old_cwd)
 
 
 class DiscoverRunnerTest(TestCase):
@@ -20,7 +25,7 @@ class DiscoverRunnerTest(TestCase):
             ["test_discovery_sample.tests_sample"],
         ).countTestCases()
 
-        self.assertEqual(count, 2)
+        self.assertEqual(count, 4)
 
     def test_dotted_test_class_vanilla_unittest(self):
         count = DiscoverRunner().build_suite(
@@ -51,22 +56,66 @@ class DiscoverRunnerTest(TestCase):
         self.assertEqual(count, 1)
 
     def test_file_path(self):
-        @contextmanager
-        def change_cwd_to_tests():
-            """Change CWD to tests directory (one level up from this file)"""
-            current_dir = os.path.abspath(os.path.dirname(__file__))
-            tests_dir = os.path.join(current_dir, '..')
-            old_cwd = os.getcwd()
-            os.chdir(tests_dir)
-            yield
-            os.chdir(old_cwd)
-
-        with change_cwd_to_tests():
+        with change_cwd(".."):
             count = DiscoverRunner().build_suite(
                 ["test_discovery_sample/"],
             ).countTestCases()
 
-        self.assertEqual(count, 3)
+        self.assertEqual(count, 5)
+
+    def test_empty_label(self):
+        """
+        If the test label is empty, discovery should happen on the current
+        working directory.
+        """
+        with change_cwd("."):
+            suite = DiscoverRunner().build_suite([])
+            self.assertEqual(
+                suite._tests[0].id().split(".")[0],
+                os.path.basename(os.getcwd()),
+            )
+
+    def test_empty_test_case(self):
+        count = DiscoverRunner().build_suite(
+            ["test_discovery_sample.tests_sample.EmptyTestCase"],
+        ).countTestCases()
+
+        self.assertEqual(count, 0)
+
+    def test_discovery_on_package(self):
+        count = DiscoverRunner().build_suite(
+            ["test_discovery_sample.tests"],
+        ).countTestCases()
+
+        self.assertEqual(count, 1)
+
+    def test_ignore_adjacent(self):
+        """
+        When given a dotted path to a module, unittest discovery searches
+        not just the module, but also the directory containing the module.
+
+        This results in tests from adjacent modules being run when they
+        should not. The discover runner avoids this behavior.
+        """
+        count = DiscoverRunner().build_suite(
+            ["test_discovery_sample.empty"],
+        ).countTestCases()
+
+        self.assertEqual(count, 0)
+
+    def test_testcase_ordering(self):
+        suite = DiscoverRunner().build_suite(["test_discovery_sample/"])
+        tc_names = [case.__class__.__name__ for case in suite._tests]
+        self.assertEqual(
+            suite._tests[0].__class__.__name__,
+            'TestDjangoTestCase',
+            msg="TestDjangoTestCase should be the first test case")
+        self.assertEqual(
+            suite._tests[1].__class__.__name__,
+            'TestZimpleTestCase',
+            msg="TestZimpleTestCase should be the second test case")
+        # All others can follow in unspecified order, including doctests
+        self.assertIn('DocTestCase', [t.__class__.__name__ for t in suite._tests[2:]])
 
     def test_overrideable_test_suite(self):
         self.assertEqual(DiscoverRunner().test_suite, TestSuite)

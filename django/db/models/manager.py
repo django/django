@@ -3,20 +3,18 @@ import inspect
 
 from django.db import router
 from django.db.models.query import QuerySet
-from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase
+from django.utils.encoding import python_2_unicode_compatible
 
 
-def ensure_default_manager(sender, **kwargs):
+def ensure_default_manager(cls):
     """
     Ensures that a Model subclass contains a default manager  and sets the
     _default_manager attribute on the class. Also sets up the _base_manager
     points to a plain Manager instance (which could be the same as
     _default_manager if it's not a subclass of Manager).
     """
-    cls = sender
     if cls._meta.abstract:
         setattr(cls, 'objects', AbstractManagerDescriptor(cls))
         return
@@ -48,17 +46,9 @@ def ensure_default_manager(sender, **kwargs):
                     return
             raise AssertionError("Should never get here. Please report a bug, including your model and model manager setup.")
 
-signals.class_prepared.connect(ensure_default_manager)
 
-
-class RenameManagerMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('get_query_set', 'get_queryset', DeprecationWarning),
-        ('get_prefetch_query_set', 'get_prefetch_queryset', DeprecationWarning),
-    )
-
-
-class BaseManager(six.with_metaclass(RenameManagerMethods)):
+@python_2_unicode_compatible
+class BaseManager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
@@ -69,6 +59,19 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
         self._inherited = False
         self._db = None
         self._hints = {}
+
+    def __str__(self):
+        """ Return "app_label.model_label.manager_name". """
+        model = self.model
+        opts = model._meta
+        app = model._meta.app_label
+        manager_name = next(name for (_, name, manager)
+            in opts.concrete_managers + opts.abstract_managers
+            if manager == self)
+        return '%s.%s.%s' % (app, model._meta.object_name, manager_name)
+
+    def check(self, **kwargs):
+        return []
 
     @classmethod
     def _get_queryset_methods(cls, queryset_class):
@@ -113,7 +116,7 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
         elif model._meta.swapped:
             setattr(model, name, SwappedManagerDescriptor(model))
         else:
-        # if not model._meta.abstract and not model._meta.swapped:
+            # if not model._meta.abstract and not model._meta.swapped:
             setattr(model, name, ManagerDescriptor(self))
         if not getattr(model, '_default_manager', None) or self.creation_counter < model._default_manager.creation_counter:
             model._default_manager = self
@@ -155,6 +158,10 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
     def db(self):
         return self._db or router.db_for_read(self.model, **self._hints)
 
+    #######################
+    # PROXIES TO QUERYSET #
+    #######################
+
     def get_queryset(self):
         """
         Returns a new QuerySet object.  Subclasses can override this method to
@@ -171,7 +178,9 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
         # understanding of how this comes into play.
         return self.get_queryset()
 
-Manager = BaseManager.from_queryset(QuerySet, class_name='Manager')
+
+class Manager(BaseManager.from_queryset(QuerySet)):
+    pass
 
 
 class ManagerDescriptor(object):

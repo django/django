@@ -1,20 +1,21 @@
-from unittest import skipIf
+from unittest import skipUnless
 
 from django import http
-from django.conf import settings, global_settings
+from django.apps import apps
+from django.conf import global_settings
 from django.contrib.messages import constants, utils, get_level, set_level
 from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
 from django.contrib.messages.storage import default_storage, base
 from django.contrib.messages.storage.base import Message
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
+from django.test import modify_settings, override_settings
 from django.utils.translation import ugettext_lazy
 
 
 def skipUnlessAuthIsInstalled(func):
-    return skipIf(
-        'django.contrib.auth' not in settings.INSTALLED_APPS,
+    return skipUnless(
+        apps.is_installed('django.contrib.auth'),
         "django.contrib.auth isn't installed")(func)
 
 
@@ -47,7 +48,6 @@ class override_settings_tags(override_settings):
 
 class BaseTests(object):
     storage_class = default_storage
-    urls = 'django.contrib.messages.tests.urls'
     levels = {
         'debug': constants.DEBUG,
         'info': constants.INFO,
@@ -60,9 +60,10 @@ class BaseTests(object):
         self.settings_override = override_settings_tags(
             TEMPLATE_DIRS=(),
             TEMPLATE_CONTEXT_PROCESSORS=global_settings.TEMPLATE_CONTEXT_PROCESSORS,
+            ROOT_URLCONF='django.contrib.messages.tests.urls',
             MESSAGE_TAGS='',
             MESSAGE_STORAGE='%s.%s' % (self.storage_class.__module__,
-                                         self.storage_class.__name__),
+                                       self.storage_class.__name__),
             SESSION_SERIALIZER='django.contrib.sessions.serializers.JSONSerializer',
         )
         self.settings_override.enable()
@@ -164,8 +165,7 @@ class BaseTests(object):
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
             self.assertTrue('messages' in response.context)
-            messages = [Message(self.levels[level], msg) for msg in
-                                                         data['messages']]
+            messages = [Message(self.levels[level], msg) for msg in data['messages']]
             self.assertEqual(list(response.context['messages']), messages)
             for msg in data['messages']:
                 self.assertContains(response, msg)
@@ -209,8 +209,7 @@ class BaseTests(object):
         show_url = reverse('django.contrib.messages.tests.urls.show')
         messages = []
         for level in ('debug', 'info', 'success', 'warning', 'error'):
-            messages.extend([Message(self.levels[level], msg) for msg in
-                                                             data['messages']])
+            messages.extend([Message(self.levels[level], msg) for msg in data['messages']])
             add_url = reverse('django.contrib.messages.tests.urls.add',
                               args=(level,))
             self.client.post(add_url, data)
@@ -220,16 +219,12 @@ class BaseTests(object):
         for msg in data['messages']:
             self.assertContains(response, msg)
 
-    @override_settings(
-        INSTALLED_APPS=filter(
-            lambda app: app != 'django.contrib.messages', settings.INSTALLED_APPS),
-        MIDDLEWARE_CLASSES=filter(
-            lambda m: 'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
-        TEMPLATE_CONTEXT_PROCESSORS=filter(
-            lambda p: 'context_processors.messages' not in p,
-            settings.TEMPLATE_CONTEXT_PROCESSORS),
-        MESSAGE_LEVEL=constants.DEBUG
+    @modify_settings(
+        INSTALLED_APPS={'remove': 'django.contrib.messages'},
+        MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
+        TEMPLATE_CONTEXT_PROCESSORS={'remove': 'django.contrib.messages.context_processors.messages'},
     )
+    @override_settings(MESSAGE_LEVEL=constants.DEBUG)
     def test_middleware_disabled(self):
         """
         Tests that, when the middleware is disabled, an exception is raised
@@ -245,15 +240,10 @@ class BaseTests(object):
             self.assertRaises(MessageFailure, self.client.post, add_url,
                               data, follow=True)
 
-    @override_settings(
-        INSTALLED_APPS=filter(
-            lambda app: app != 'django.contrib.messages', settings.INSTALLED_APPS),
-        MIDDLEWARE_CLASSES=filter(
-            lambda m: 'MessageMiddleware' not in m, settings.MIDDLEWARE_CLASSES),
-        TEMPLATE_CONTEXT_PROCESSORS=filter(
-            lambda p: 'context_processors.messages' not in p,
-            settings.TEMPLATE_CONTEXT_PROCESSORS),
-        MESSAGE_LEVEL=constants.DEBUG
+    @modify_settings(
+        INSTALLED_APPS={'remove': 'django.contrib.messages'},
+        MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
+        TEMPLATE_CONTEXT_PROCESSORS={'remove': 'django.contrib.messages.context_processors.messages'},
     )
     def test_middleware_disabled_fail_silently(self):
         """
@@ -285,7 +275,7 @@ class BaseTests(object):
     def get_existing_storage(self):
         return self.get_storage([Message(constants.INFO, 'Test message 1'),
                                  Message(constants.INFO, 'Test message 2',
-                                              extra_tags='tag')])
+                                 extra_tags='tag')])
 
     def test_existing_read(self):
         """

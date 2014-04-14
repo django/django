@@ -436,7 +436,7 @@ class LookupTests(TestCase):
             ])
 
     def test_none(self):
-       # none() returns a QuerySet that behaves like any other QuerySet object
+        # none() returns a QuerySet that behaves like any other QuerySet object
         self.assertQuerysetEqual(Article.objects.none(), [])
         self.assertQuerysetEqual(
             Article.objects.none().filter(headline__startswith='Article'), [])
@@ -476,8 +476,9 @@ class LookupTests(TestCase):
             Article.objects.filter(headline__starts='Article')
             self.fail('FieldError not raised')
         except FieldError as ex:
-            self.assertEqual(str(ex), "Join on field 'headline' not permitted. "
-                             "Did you misspell 'starts' for the lookup type?")
+            self.assertEqual(
+                str(ex), "Unsupported lookup 'starts' for CharField "
+                "or join on the field not permitted.")
 
     def test_regex(self):
         # Create some articles with a bit more interesting headlines for testing field lookups:
@@ -628,7 +629,7 @@ class LookupTests(TestCase):
 
     def test_regex_non_ascii(self):
         """
-        Ensure that a regex lookup does not trip on non-ascii characters.
+        Ensure that a regex lookup does not trip on non-ASCII characters.
         """
         Player.objects.create(name='\u2660')
         Player.objects.get(name__regex='\u2660')

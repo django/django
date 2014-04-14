@@ -58,7 +58,7 @@ class TestAdminOrdering(TestCase):
 
     def test_dynamic_ordering(self):
         """
-        Let's use a custom ModelAdmin that changes the ordering dinamically.
+        Let's use a custom ModelAdmin that changes the ordering dynamically.
         """
         super_user = User.objects.create(username='admin', is_superuser=True)
         other_user = User.objects.create(username='other')

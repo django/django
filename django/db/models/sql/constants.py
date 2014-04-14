@@ -33,6 +33,8 @@ SelectInfo = namedtuple('SelectInfo', 'col field')
 # How many results to expect from a cursor.execute call
 MULTI = 'multi'
 SINGLE = 'single'
+CURSOR = 'cursor'
+NO_RESULTS = 'no results'
 
 ORDER_PATTERN = re.compile(r'\?|[-+]?[.\w]+$')
 ORDER_DIR = {

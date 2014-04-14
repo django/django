@@ -6,6 +6,7 @@ from datetime import date
 from decimal import Decimal
 
 from django import forms
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.forms.models import (_get_foreign_key, inlineformset_factory,
     modelformset_factory, BaseModelFormSet)
@@ -55,8 +56,8 @@ class DeletionTests(TestCase):
             'form-0-name': 'test',
             'form-1-id': '',
             'form-1-name': 'x' * 1000,  # Too long
-            'form-1-id': six.text_type(poet.id),  # Violate unique constraint
-            'form-1-name': 'test2',
+            'form-2-id': six.text_type(poet.id),  # Violate unique constraint
+            'form-2-name': 'test2',
         }
         formset = PoetFormSet(data, queryset=Poet.objects.all())
         # Make sure this form doesn't pass validation.
@@ -131,6 +132,15 @@ class DeletionTests(TestCase):
 
 
 class ModelFormsetTest(TestCase):
+    def test_modelformset_factory_without_fields(self):
+        """ Regression for #19733 """
+        message = (
+            "Calling modelformset_factory without defining 'fields' or 'exclude' "
+            "explicitly is prohibited."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, message):
+            modelformset_factory(Author)
+
     def test_simple_save(self):
         qs = Author.objects.all()
         AuthorFormSet = modelformset_factory(Author, fields="__all__", extra=3)

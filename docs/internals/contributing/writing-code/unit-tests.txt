@@ -13,8 +13,8 @@ The tests cover:
 We appreciate any and all contributions to the test suite!
 
 The Django tests all use the testing infrastructure that ships with Django for
-testing applications. See :doc:`Testing Django applications
-</topics/testing/overview>` for an explanation of how to write new tests.
+testing applications. See :doc:`/topics/testing/overview` for an explanation of
+how to write new tests.
 
 .. _running-unit-tests:
 
@@ -30,15 +30,17 @@ sample settings module that uses the SQLite database. To run the tests:
 
 .. code-block:: bash
 
-    git clone git@github.com:django/django.git django-repo
-    cd django-repo/tests
-    PYTHONPATH=..:$PYTHONPATH ./runtests.py
+   $ git clone git@github.com:django/django.git django-repo
+   $ cd django-repo/tests
+   $ PYTHONPATH=..:$PYTHONPATH ./runtests.py
 
 .. versionchanged:: 1.7
 
-Older versions of Django required specifying a settings file::
+Older versions of Django required specifying a settings file:
 
-    PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
+.. code-block:: bash
+
+   $ PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
 
 ``runtests.py`` now uses ``test_sqlite`` by default if settings aren't provided
 through either ``--settings`` or :envvar:`DJANGO_SETTINGS_MODULE`.
@@ -46,6 +48,8 @@ through either ``--settings`` or :envvar:`DJANGO_SETTINGS_MODULE`.
 You can avoid typing the ``PYTHONPATH`` bit each time by adding your Django
 checkout to your ``PYTHONPATH`` or by installing the source checkout using pip.
 See :ref:`installing-development-version`.
+
+Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
 
 .. _running-unit-tests-settings:
 
@@ -111,7 +115,7 @@ internationalization, type:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=path.to.settings generic_relations i18n
+   $ ./runtests.py --settings=path.to.settings generic_relations i18n
 
 How do you find out the names of individual tests? Look in ``tests/`` — each
 directory name there is the name of a test. Contrib app names are also valid
@@ -123,13 +127,13 @@ of the ``i18n`` module, type:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests
+   $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests
 
 Going beyond that, you can specify an individual test method like this:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests.test_lazy_objects
+   $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests.test_lazy_objects
 
 Running the Selenium tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -141,7 +145,7 @@ the tests with the ``--selenium`` option:
 
 .. code-block:: bash
 
-    ./runtests.py --settings=test_sqlite --selenium admin_inlines
+   $ ./runtests.py --settings=test_sqlite --selenium admin_inlines
 
 
 .. _running-unit-tests-dependencies:
@@ -154,6 +158,7 @@ dependencies:
 
 *  bcrypt_
 *  docutils_
+*  numpy_
 *  Pillow_
 *  PyYAML_
 *  pytz_
@@ -161,12 +166,15 @@ dependencies:
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
+*  sqlparse_
 
 You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
-like so::
+like so:
 
-    pip install -r tests/requirements/py2.txt  # Python 3: py3.txt
+.. code-block:: bash
+
+   $ pip install -r tests/requirements/py2.txt  # Python 3: py3.txt
 
 You can also install the database adapter(s) of your choice using
 ``oracle.txt``, ``mysql.txt``, or ``postgres.txt``.
@@ -182,14 +190,16 @@ associated tests will be skipped.
 
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
+.. _numpy: https://pypi.python.org/pypi/numpy
 .. _Pillow: https://pypi.python.org/pypi/Pillow/
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
 .. _pytz: https://pypi.python.org/pypi/pytz/
-.. _setuptools: http://pypi.python.org/pypi/setuptools/
+.. _setuptools: https://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
-.. _selenium: http://pypi.python.org/pypi/selenium
-.. _pip requirements files: http://www.pip-installer.org/en/latest/requirements.html
+.. _selenium: https://pypi.python.org/pypi/selenium
+.. _sqlparse: https://pypi.python.org/pypi/sqlparse
+.. _pip requirements files: http://www.pip-installer.org/en/latest/cookbook.html#requirements-files
 
 Code coverage
 ~~~~~~~~~~~~~
@@ -198,13 +208,17 @@ Contributors are encouraged to run coverage on the test suite to identify areas
 that need additional tests. The coverage tool installation and use is described
 in :ref:`testing code coverage<topics-testing-code-coverage>`.
 
-To run coverage on the Django test suite using the standard test settings::
+To run coverage on the Django test suite using the standard test settings:
 
-    coverage run ./runtests.py --settings=test_sqlite
+.. code-block:: bash
 
-After running coverage, generate the html report by running::
+   $ coverage run ./runtests.py --settings=test_sqlite
 
-    coverage html
+After running coverage, generate the html report by running:
+
+.. code-block:: bash
+
+   $ coverage html
 
 When running coverage for the Django tests, the included ``.coveragerc``
 settings file  defines ``coverage_html`` as the output directory for the report
@@ -220,10 +234,29 @@ Tests for contrib apps go in their respective directories under
 ``django/contrib``, in a ``tests.py`` file. You can split the tests over
 multiple modules by using a ``tests`` directory in the normal Python way.
 
-For the tests to be found, a ``models.py`` file must exist, even if it's empty.
 If you have URLs that need to be mapped, put them in ``tests/urls.py``.
 
 To run tests for just one contrib app (e.g. ``auth``), use the same
-method as above::
+method as above:
 
-    ./runtests.py --settings=settings django.contrib.auth
+.. code-block:: bash
+
+   $ ./runtests.py --settings=settings django.contrib.auth
+
+.. _troubleshooting-unit-tests:
+
+Troubleshooting
+---------------
+
+Many test failures with ``UnicodeEncodeError``.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the ``locales`` package is not installed, some tests will fail with a
+``UnicodeEncodeError``.
+
+You can resolve this on Debian-based systems, for example, by running:
+
+.. code-block:: bash
+
+    $ apt-get install locales
+    $ dpkg-reconfigure locales

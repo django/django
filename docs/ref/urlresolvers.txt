@@ -23,6 +23,9 @@ keyword arguments to use in the URL matching. For example::
     def myview(request):
         return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
 
+If no match can be made, ``reverse()`` raises a
+:class:`~django.core.urlresolvers.NoReverseMatch` exception.
+
 The ``reverse()`` function can reverse a large variety of regular expression
 patterns for URLs, but not every possible one. The main restriction at the
 moment is that the pattern cannot contain alternative choices using the
@@ -61,7 +64,7 @@ You can use ``kwargs`` instead of ``args``. For example::
     The string returned by ``reverse()`` is already
     :ref:`urlquoted <uri-and-iri-handling>`. For example::
 
-        >>> reverse('cities', args=[u'Orléans'])
+        >>> reverse('cities', args=['Orléans'])
         '.../Orl%C3%A9ans/'
 
     Applying further encoding (such as :meth:`~django.utils.http.urlquote` or
@@ -143,6 +146,11 @@ If the URL does not resolve, the function raises a
         i.e., if the namespace is ``foo:bar``, then namespaces will be
         ``['foo', 'bar']``.
 
+    .. attribute:: ResolverMatch.view_name
+
+        The name of the view that matches the URL, including the namespace if
+        there is one.
+
 A :class:`ResolverMatch` object can then be interrogated to provide
 information about the URL pattern that matches a URL::
 
@@ -158,9 +166,9 @@ A :class:`ResolverMatch` object can also be assigned to a triple::
 One possible use of :func:`~django.core.urlresolvers.resolve` would be to test
 whether a view would raise a ``Http404`` error before redirecting to it::
 
-    from urlparse import urlparse
     from django.core.urlresolvers import resolve
     from django.http import HttpResponseRedirect, Http404
+    from django.utils.six.moves.urllib.parse import urlparse
 
     def myview(request):
         next = request.META.get('HTTP_REFERER', None) or '/'
