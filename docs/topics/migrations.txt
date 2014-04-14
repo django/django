@@ -392,6 +392,69 @@ If you're interested in the more advanced migration operations, or want
 to be able to write your own, see our
 :doc:`migration operations reference </ref/migration-operations>`.
 
+.. _migration-squashing:
+
+Squashing migrations
+--------------------
+
+You are encouraged to make migrations freely and not worry about how many you
+have; the migration code is optimised to deal with hundreds at a time without
+much slowdown. However, eventually you will want to move back from having
+several hundred migrations to just a few, and that's where squashing comes in.
+
+Squashing is the act of reducing an existing set of many migrations down to
+one (or sometimes a few) migrations which still represent the same changes.
+
+Django does this by taking all of your existing migrations, extracting their
+Operations and putting them all in sequence, and then running an optimizer
+over them to try and reduce the length of the list - for example, it knows
+that ``CreateModel`` and ``DeleteModel`` cancel each other out, and it knows
+that ``AddColumn`` can be rolled into ``CreateModel``.
+
+Once the operation sequence has been reduced as much as possible - the amount
+possible depends on how closely intertwined your models are and if you have
+any RunSQL or RunPython operations (which can't be optimized through) - Django
+will them write it back out into a new set of initial migration files.
+
+These files are marked to say they replace the previously-squashed migrations,
+so they can coexist with the old migration files, and Django will intelligently
+switch between them depending where you are in the history. If you're still
+part-way through the set of migrations that you squashed, it will keep using
+them until it hits the end and then switch to the squashed history, while new
+installs will just use the new squashed migration and skip all the old ones.
+
+This enables you to squash and not mess up systems currently in production
+that aren't fully up-to-date yet. The recommended process is to squash, keeping
+the old files, commit and release, wait until all systems are upgraded with
+the new release (or if you're a third-party project, just ensure your users
+upgrade releases in order without skipping any), and then remove the old files,
+commit and do a second release.
+
+The command that backs all this is :djadmin:`squashmigrations` - just pass
+it the app label and migration name you want to squash up to, and it'll get to
+work::
+
+  $ ./manage.py squashmigrations myapp 0004
+  Will squash the following migrations:
+   - 0001_initial
+   - 0002_some_change
+   - 0003_another_change
+   - 0004_undo_something
+  Do you wish to proceed? [yN] y
+  Optimizing...
+    Optimized from 12 operations to 7 operations.
+  Created new squashed migration /home/andrew/Programs/DjangoTest/test/migrations/0001_squashed_0004_undo_somthing.py
+    You should commit this migration but leave the old ones in place;
+    the new migration will be used for new installs. Once you are sure
+    all instances of the codebase have applied the migrations you squashed,
+    you can delete them.
+
+Note that model interdependencies in Django can get very complex, and squashing
+may occasionally result in an optimized migration that doesn't work or is
+impossible to run. When this occurs, you can re-try with ``--no-optimize``, but
+please file a bug report either way detailing the models and their
+relationships so we can improve the optimizer to handle your case.
+
 
 .. _migration-serializing:
 

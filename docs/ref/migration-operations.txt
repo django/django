@@ -211,7 +211,46 @@ match the operation's place in the project history, and the second is an
 instance of SchemaEditor.
 
 You are advised to write the code as a separate function above the ``Migration``
-class in the migration file, and just pass it to ``RunPython``.
+class in the migration file, and just pass it to ``RunPython``. Here's an
+example of using RunPython to create some initial objects on a Country model::
+
+    # encoding: utf8
+    from django.db import models, migrations
+
+    def forwards_func(apps, schema_editor):
+        # We get the model from the versioned app registry;
+        # if we directly import it, it'll be the wrong version
+        Country = apps.get_model("myapp", "Country")
+        Country.objects.create(name="USA", code="us")
+        Country.objects.create(name="France", code="fr")
+
+    class Migration(migrations.Migration):
+
+        dependencies = []
+
+        operations = [
+            migrations.RunPython(
+                forwards_func,
+            ),
+        ]
+
+This is generally the operation you would use to create
+:ref:`data migrations <data-migrations>`, run
+custom data updates and alterations, and anything else you need access to an
+ORM and/or python code for.
+
+If you're upgrading from South, this is basically the South pattern as an
+operation - one or two methods for forwards and backwards, with an ORM and
+schema operations available. You should be able to translate the ``orm.Model``
+or ``orm["appname", "Model"]`` references from South directly into
+``apps.get_model("appname", "Model")`` references here and leave most of the
+rest of the code unchanged for data migrations.
+
+Much like ``RunSQL``, ensure that if you change schema inside here you're
+either doing it outside the scope of the Django model system (e.g. triggers)
+or that you use ``SeparateDatabaseAndState`` to add in operations that will
+reflect your changes to the model state - otherwise, the versioned ORM and
+the autodetector will stop working correctly.
 
 
 SeparateDatabaseAndState

@@ -1086,6 +1086,25 @@ of sync with its automatically incremented field data.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
+squashmigrations <app_label> <migration_name>
+---------------------------------------------
+
+.. django-admin:: squashmigrations
+
+Squashes the migrations for ``app_label`` up to and including ``migration_name``
+down into fewer migrations, if possible. The resulting squashed migrations
+can live alongside the unsquashed ones safely. For more information,
+please read :ref:`migration-squashing`.
+
+.. django-admin-option:: --no-optimize
+
+By default, Django will try to optimize the operations in your migrations
+to reduce the size of the resulting file. Pass ``--no-optimize`` if this
+process is failing for you or creating incorrect migrations, though please
+also file a Django bug report about the behaviour, as optimization is meant
+to be safe.
+
+
 startapp <app_label> [destination]
 ----------------------------------
 
