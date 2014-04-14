@@ -1350,11 +1350,11 @@ class Model(six.with_metaclass(ModelBase)):
                     errors.append(
                         checks.Error(
                             ("'%s' refers to field '%s' which is not local "
-                             "to model '%s'. This issue may be caused by "
-                             "multi-table inheritance.") % (
+                             "to model '%s'.") % (
                                 option, field_name, cls._meta.object_name
                             ),
-                            hint=None,
+                            hint=("This issue may be caused by multi-table "
+                                  "inheritance."),
                             obj=cls,
                             id='models.E016',
                         )

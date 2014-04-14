@@ -92,9 +92,8 @@ class IndexTogetherTests(IsolatedModelsTestCase):
         expected = [
             Error(
                 ("'index_together' refers to field 'field1' which is not "
-                 "local to model 'Bar'. This issue may be caused by "
-                 "multi-table inheritance."),
-                hint=None,
+                 "local to model 'Bar'."),
+                hint=("This issue may be caused by multi-table inheritance."),
                 obj=Bar,
                 id='models.E016',
             ),
