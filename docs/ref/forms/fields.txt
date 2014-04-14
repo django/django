@@ -930,10 +930,10 @@ Slightly complex built-in ``Field`` classes
                     # Or define a different message for each field.
                     fields = (
                         CharField(error_messages={'incomplete': 'Enter a country code.'},
-                                  validators=[RegexValidator(r'^\d+$', 'Enter a valid country code.')]),
+                                  validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid country code.')]),
                         CharField(error_messages={'incomplete': 'Enter a phone number.'},
-                                  validators=[RegexValidator(r'^\d+$', 'Enter a valid phone number.')]),
-                        CharField(validators=[RegexValidator(r'^\d+$', 'Enter a valid extension.')],
+                                  validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid phone number.')]),
+                        CharField(validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid extension.')],
                                   required=False),
                     )
                     super(PhoneField, self).__init__(

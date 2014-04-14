@@ -600,7 +600,7 @@ class FieldsTests(SimpleTestCase):
     # RegexField ##################################################################
 
     def test_regexfield_1(self):
-        f = RegexField('^\d[A-F]\d$')
+        f = RegexField('^[0-9][A-F][0-9]$')
         self.assertEqual('2A2', f.clean('2A2'))
         self.assertEqual('3F3', f.clean('3F3'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '3G3')
@@ -609,14 +609,14 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
 
     def test_regexfield_2(self):
-        f = RegexField('^\d[A-F]\d$', required=False)
+        f = RegexField('^[0-9][A-F][0-9]$', required=False)
         self.assertEqual('2A2', f.clean('2A2'))
         self.assertEqual('3F3', f.clean('3F3'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '3G3')
         self.assertEqual('', f.clean(''))
 
     def test_regexfield_3(self):
-        f = RegexField(re.compile('^\d[A-F]\d$'))
+        f = RegexField(re.compile('^[0-9][A-F][0-9]$'))
         self.assertEqual('2A2', f.clean('2A2'))
         self.assertEqual('3F3', f.clean('3F3'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '3G3')
@@ -624,13 +624,13 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '2A2 ')
 
     def test_regexfield_4(self):
-        f = RegexField('^\d\d\d\d$', error_message='Enter a four-digit number.')
+        f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
         self.assertEqual('1234', f.clean('1234'))
         self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, '123')
         self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, 'abcd')
 
     def test_regexfield_5(self):
-        f = RegexField('^\d+$', min_length=5, max_length=10)
+        f = RegexField('^[0-9]+$', min_length=5, max_length=10)
         self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 5 characters (it has 3).'", f.clean, '123')
         six.assertRaisesRegex(self, ValidationError, "'Ensure this value has at least 5 characters \(it has 3\)\.', u?'Enter a valid value\.'", f.clean, 'abc')
         self.assertEqual('12345', f.clean('12345'))
@@ -648,7 +648,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_change_regex_after_init(self):
         f = RegexField('^[a-z]+$')
-        f.regex = '^\d+$'
+        f.regex = '^[0-9]+$'
         self.assertEqual('1234', f.clean('1234'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, 'abcd')
 

@@ -215,11 +215,11 @@ Wire these new views into the ``polls.urls`` module by adding the following
         # ex: /polls/
         url(r'^$', views.index, name='index'),
         # ex: /polls/5/
-        url(r'^(?P<question_id>\d+)/$', views.detail, name='detail'),
+        url(r'^(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
         # ex: /polls/5/results/
-        url(r'^(?P<question_id>\d+)/results/$', views.results, name='results'),
+        url(r'^(?P<question_id>[0-9]+)/results/$', views.results, name='results'),
         # ex: /polls/5/vote/
-        url(r'^(?P<question_id>\d+)/vote/$', views.vote, name='vote'),
+        url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
     ]
 
 Take a look in your browser, at "/polls/34/". It'll run the ``detail()``
@@ -251,15 +251,15 @@ Here's what happens if a user goes to "/polls/34/" in this system:
 
 * Then, Django will strip off the matching text (``"polls/"``) and send the
   remaining text -- ``"34/"`` -- to the 'polls.urls' URLconf for
-  further processing which matches ``r'^(?P<question_id>\d+)/$'`` resulting in a
+  further processing which matches ``r'^(?P<question_id>[0-9]+)/$'`` resulting in a
   call to the ``detail()`` view like so::
 
     detail(request=<HttpRequest object>, question_id='34')
 
-The ``question_id='34'`` part comes from ``(?P<question_id>\d+)``. Using parentheses
+The ``question_id='34'`` part comes from ``(?P<question_id>[0-9]+)``. Using parentheses
 around a pattern "captures" the text matched by that pattern and sends it as an
 argument to the view function; ``?P<question_id>`` defines the name that will
-be used to identify the matched pattern; and ``\d+`` is a regular expression to
+be used to identify the matched pattern; and ``[0-9]+`` is a regular expression to
 match a sequence of digits (i.e., a number).
 
 Because the URL patterns are regular expressions, there really is no limit on
@@ -554,7 +554,7 @@ defined below::
 
     ...
     # the 'name' value as called by the {% url %} template tag
-    url(r'^(?P<question_id>\d+)/$', views.detail, name='detail'),
+    url(r'^(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
     ...
 
 If you want to change the URL of the polls detail view to something else,
@@ -563,7 +563,7 @@ template (or templates) you would change it in ``polls/urls.py``::
 
     ...
     # added the word 'specifics'
-    url(r'^specifics/(?P<question_id>\d+)/$', views.detail, name='detail'),
+    url(r'^specifics/(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
     ...
 
 Namespacing URL names

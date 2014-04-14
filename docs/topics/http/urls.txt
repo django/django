@@ -76,9 +76,9 @@ Here's a sample URLconf::
 
     urlpatterns = [
         url(r'^articles/2003/$', 'news.views.special_case_2003'),
-        url(r'^articles/(\d{4})/$', 'news.views.year_archive'),
-        url(r'^articles/(\d{4})/(\d{2})/$', 'news.views.month_archive'),
-        url(r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
+        url(r'^articles/([0-9]{4})/$', 'news.views.year_archive'),
+        url(r'^articles/([0-9]{4})/([0-9]{2})/$', 'news.views.month_archive'),
+        url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', 'news.views.article_detail'),
     ]
 
 Notes:
@@ -133,9 +133,9 @@ Here's the above example URLconf, rewritten to use named groups::
 
     urlpatterns = [
         url(r'^articles/2003/$', 'news.views.special_case_2003'),
-        url(r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
-        url(r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
-        url(r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/$', 'news.views.article_detail'),
+        url(r'^articles/(?P<year>[0-9]{4})/$', 'news.views.year_archive'),
+        url(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$', 'news.views.month_archive'),
+        url(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<day>[0-9]{2})/$', 'news.views.article_detail'),
     ]
 
 This accomplishes exactly the same thing as the previous example, with one
@@ -191,10 +191,10 @@ Each captured argument is sent to the view as a plain Python string, regardless
 of what sort of match the regular expression makes. For example, in this
 URLconf line::
 
-    url(r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+    url(r'^articles/(?P<year>[0-9]{4})/$', 'news.views.year_archive'),
 
 ...the ``year`` argument to ``news.views.year_archive()`` will be a string, not
-an integer, even though the ``\d{4}`` will only match integer strings.
+an integer, even though the ``[0-9]{4}`` will only match integer strings.
 
 Specifying defaults for view arguments
 ======================================
@@ -207,7 +207,7 @@ Here's an example URLconf and view::
 
     urlpatterns = [
         url(r'^blog/$', 'blog.views.page'),
-        url(r'^blog/page(?P<num>\d+)/$', 'blog.views.page'),
+        url(r'^blog/page(?P<num>[0-9]+)/$', 'blog.views.page'),
     ]
 
     # View (in blog/views.py)
@@ -291,7 +291,7 @@ Another possibility is to include additional URL patterns by using a list of
     from django.conf.urls import include, url
 
     extra_patterns = [
-        url(r'^reports/(?P<id>\d+)/$', 'credit.views.report'),
+        url(r'^reports/(?P<id>[0-9]+)/$', 'credit.views.report'),
         url(r'^charge/$', 'credit.views.charge'),
     ]
 
@@ -377,7 +377,7 @@ For example::
     from . import views
 
     urlpatterns = [
-        url(r'^blog/(?P<year>\d{4})/$', views.year_archive, {'foo': 'bar'}),
+        url(r'^blog/(?P<year>[0-9]{4})/$', views.year_archive, {'foo': 'bar'}),
     ]
 
 In this example, for a request to ``/blog/2005/``, Django will call
@@ -558,7 +558,7 @@ Consider again this URLconf entry::
 
     urlpatterns = [
         #...
-        url(r'^articles/(\d{4})/$', 'news.views.year_archive'),
+        url(r'^articles/([0-9]{4})/$', 'news.views.year_archive'),
         #...
     ]
 
@@ -610,8 +610,8 @@ view::
     from mysite.views import archive
 
     urlpatterns = [
-        url(r'^archive/(\d{4})/$', archive),
-        url(r'^archive-summary/(\d{4})/$', archive, {'summary': True}),
+        url(r'^archive/([0-9]{4})/$', archive),
+        url(r'^archive-summary/([0-9]{4})/$', archive, {'summary': True}),
     ]
 
 This is completely valid, but it leads to problems when you try to do reverse
@@ -631,8 +631,8 @@ Here's the above example, rewritten to use named URL patterns::
     from mysite.views import archive
 
     urlpatterns = [
-        url(r'^archive/(\d{4})/$', archive, name="full-archive"),
-        url(r'^archive-summary/(\d{4})/$', archive, {'summary': True}, name="arch-summary"),
+        url(r'^archive/([0-9]{4})/$', archive, name="full-archive"),
+        url(r'^archive-summary/([0-9]{4})/$', archive, {'summary': True}, name="arch-summary"),
     ]
 
 With these names in place (``full-archive`` and ``arch-summary``), you can

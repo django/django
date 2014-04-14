@@ -1000,7 +1000,7 @@ takes a client ID (here, ``client()`` is a method inside the views file
 
 .. code-block:: python
 
-    ('^client/(\d+)/$', 'app_views.client')
+    ('^client/([0-9]+)/$', 'app_views.client')
 
 If this app's URLconf is included into the project's URLconf under a path
 such as this:

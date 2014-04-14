@@ -261,7 +261,7 @@ We can hook this into our URLs easily enough::
 
     urlpatterns = [
         #...
-        url(r'^author/(?P<pk>\d+)/interest/$', RecordInterest.as_view(), name='author-interest'),
+        url(r'^author/(?P<pk>[0-9]+)/interest/$', RecordInterest.as_view(), name='author-interest'),
     ]
 
 Note the ``pk`` named group, which

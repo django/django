@@ -642,7 +642,7 @@ template tag and a high-level wrapper for the
 An example should make it clear how to use ``permalink()``. Suppose your URLconf
 contains a line such as::
 
-    (r'^people/(\d+)/$', 'people.views.details'),
+    (r'^people/([0-9]+)/$', 'people.views.details'),
 
 ...your model could have a :meth:`~django.db.models.Model.get_absolute_url`
 method that looked like this::
@@ -655,7 +655,7 @@ method that looked like this::
 
 Similarly, if you had a URLconf entry that looked like::
 
-    (r'/archive/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/$', archive_view)
+    (r'/archive/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<day>[0-9]{2})/$', archive_view)
 
 ...you could reference this using ``permalink()`` as follows::
 
@@ -684,7 +684,7 @@ pattern tuple by a call to the ``url`` function)::
 
     from django.conf.urls import url
 
-    url(r'^people/(\d+)/$', 'blog_views.generic_detail', name='people_view'),
+    url(r'^people/([0-9]+)/$', 'blog_views.generic_detail', name='people_view'),
 
 ...and then using that name to perform the reverse URL resolution instead
 of the view name::
