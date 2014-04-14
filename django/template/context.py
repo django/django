@@ -141,6 +141,7 @@ class Context(BaseContext):
         self._current_app = current_app
         self.use_l10n = use_l10n
         self.use_tz = use_tz
+        self.template_name = "unknown"
         self.render_context = RenderContext()
         # Set to the original template -- as opposed to extended or included
         # templates -- during rendering, see bind_template.

@@ -188,6 +188,9 @@ Templates
 * Added a :meth:`Context.setdefault() <django.template.Context.setdefault>`
   method.
 
+* A warning will now be logged for missing context variables. These messages
+  will be logged to a new built-in logger ``django.template``.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
