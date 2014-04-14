@@ -478,6 +478,16 @@ Messages to this logger have the following extra context:
 * ``request``: The request object that generated the logging
   message.
 
+.. _django-template-logger:
+
+``django.template``
+~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.9
+
+Log messages related to the rendering of templates. Missing context variables
+are logged as ``DEBUG`` messages if :setting:`DEBUG` is `True`.
+
 .. _django-db-logger:
 
 ``django.db.backends``
