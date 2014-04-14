@@ -66,6 +66,8 @@ def _sanitize_token(token):
         return _get_new_csrf_key()
     return token
 
+_NOT_SET = object()
+
 
 class CsrfViewMiddleware(object):
     """
@@ -83,27 +85,32 @@ class CsrfViewMiddleware(object):
     #   deprecated. The default values from settings should be set here after
     #   that occurs and the __new__ function should be removed.
     #   Until then, these attributes cannot be used before __new__ is called.
-    COOKIE_AGE = 60 * 60 * 24 * 7 * 52
-    COOKIE_NAME = None
-    COOKIE_DOMAIN = None
-    COOKIE_PATH = None
-    COOKIE_SECURE = None
-    COOKIE_HTTPONLY = None
-    FAILURE_VIEW = None
+    COOKIE_AGE = _NOT_SET
+    COOKIE_NAME = _NOT_SET
+    COOKIE_DOMAIN = _NOT_SET
+    COOKIE_PATH = _NOT_SET
+    COOKIE_SECURE = _NOT_SET
+    COOKIE_HTTPONLY = _NOT_SET
+    FAILURE_VIEW = _NOT_SET
     HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 
     # TODO(wesalvaro): This is a work-around until the settings have been
     #   deprecated. This lazily grabs the settings, preferring class values.
     def __new__(cls, *args, **kwargs):
-        cls.COOKIE_AGE = cls.COOKIE_AGE or settings.CSRF_COOKIE_AGE
-        cls.COOKIE_NAME = cls.COOKIE_NAME or settings.CSRF_COOKIE_NAME
-        cls.COOKIE_DOMAIN = cls.COOKIE_DOMAIN or settings.CSRF_COOKIE_DOMAIN
-        cls.COOKIE_PATH = cls.COOKIE_PATH or settings.CSRF_COOKIE_PATH
+        cls.COOKIE_AGE = (settings.CSRF_COOKIE_AGE
+                          if cls.COOKIE_AGE is _NOT_SET else cls.COOKIE_AGE)
+        cls.COOKIE_NAME = (settings.CSRF_COOKIE_NAME
+                           if cls.COOKIE_NAME is _NOT_SET else cls.COOKIE_NAME)
+        cls.COOKIE_DOMAIN = (settings.CSRF_COOKIE_DOMAIN
+                             if cls.COOKIE_DOMAIN is _NOT_SET else cls.COOKIE_DOMAIN)
+        cls.COOKIE_PATH = (settings.CSRF_COOKIE_PATH
+                           if cls.COOKIE_PATH is _NOT_SET else cls.COOKIE_PATH)
         cls.COOKIE_SECURE = (settings.CSRF_COOKIE_SECURE
-                             if cls.COOKIE_SECURE is None else cls.COOKIE_SECURE)
+                             if cls.COOKIE_SECURE is _NOT_SET else cls.COOKIE_SECURE)
         cls.COOKIE_HTTPONLY = (settings.CSRF_COOKIE_HTTPONLY
-                               if cls.COOKIE_HTTPONLY is None else cls.COOKIE_HTTPONLY)
-        cls.FAILURE_VIEW = cls.FAILURE_VIEW or settings.CSRF_FAILURE_VIEW
+                               if cls.COOKIE_HTTPONLY is _NOT_SET else cls.COOKIE_HTTPONLY)
+        cls.FAILURE_VIEW = (settings.CSRF_FAILURE_VIEW
+                            if cls.FAILURE_VIEW is _NOT_SET else cls.FAILURE_VIEW)
         return super(CsrfViewMiddleware, cls).__new__(cls, *args, **kwargs)
 
     # The _accept and _reject methods currently only exist for the sake of the

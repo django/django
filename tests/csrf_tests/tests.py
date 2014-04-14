@@ -413,19 +413,19 @@ class CsrfViewMiddlewareTest(TestCase):
         req = self._get_GET_no_csrf_cookie_request()
 
         MAX_AGE = 123
-        with self.settings(CSRF_COOKIE_NAME='csrfcookie',
-                           CSRF_COOKIE_DOMAIN='.example.com',
-                           CSRF_COOKIE_AGE=MAX_AGE,
-                           CSRF_COOKIE_PATH='/test/',
-                           CSRF_COOKIE_SECURE=True,
-                           CSRF_COOKIE_HTTPONLY=True):
-            # token_view calls get_token() indirectly
-            CsrfViewMiddleware().process_view(req, token_view, (), {})
-            resp = token_view(req)
 
-            resp2 = CsrfViewMiddleware().process_response(req, resp)
-            max_age = resp2.cookies.get('csrfcookie').get('max-age')
-            self.assertEqual(max_age, MAX_AGE)
+        class OverrideCsrfViewMiddleware(CsrfViewMiddleware):
+            COOKIE_AGE = MAX_AGE
+
+        middleware = OverrideCsrfViewMiddleware()
+        # token_view calls get_token() indirectly
+        middleware.process_view(req, token_view, (), {})
+        resp = token_view(req)
+
+        resp2 = middleware.process_response(req, resp)
+        cookie = resp2.cookies.get(middleware.COOKIE_NAME)
+        max_age = cookie.get('max-age')
+        self.assertEqual(max_age, MAX_AGE)
 
     def test_csrf_cookie_age_none(self):
         """
@@ -434,17 +434,15 @@ class CsrfViewMiddlewareTest(TestCase):
         """
         req = self._get_GET_no_csrf_cookie_request()
 
-        MAX_AGE = None
-        with self.settings(CSRF_COOKIE_NAME='csrfcookie',
-                           CSRF_COOKIE_DOMAIN='.example.com',
-                           CSRF_COOKIE_AGE=MAX_AGE,
-                           CSRF_COOKIE_PATH='/test/',
-                           CSRF_COOKIE_SECURE=True,
-                           CSRF_COOKIE_HTTPONLY=True):
-            # token_view calls get_token() indirectly
-            CsrfViewMiddleware().process_view(req, token_view, (), {})
-            resp = token_view(req)
+        class OverrideCsrfViewMiddleware(CsrfViewMiddleware):
+            COOKIE_AGE = None
 
-            resp2 = CsrfViewMiddleware().process_response(req, resp)
-            max_age = resp2.cookies.get('csrfcookie').get('max-age')
-            self.assertEqual(max_age, '')
+        middleware = OverrideCsrfViewMiddleware()
+        # token_view calls get_token() indirectly
+        middleware.process_view(req, token_view, (), {})
+        resp = token_view(req)
+
+        resp2 = middleware.process_response(req, resp)
+        cookie = resp2.cookies.get(middleware.COOKIE_NAME)
+        max_age = cookie.get('max-age')
+        self.assertEqual(max_age, '')
