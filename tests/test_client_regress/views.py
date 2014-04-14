@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template import RequestContext
+from django.template.loader import render_to_string
 from django.test import Client
 from django.test.client import CONTENT_TYPE_RE
 from django.test.utils import setup_test_environment
@@ -151,3 +152,9 @@ def request_context_view(request):
     # Special attribute that won't be present on a plain HttpRequest
     request.special_path = request.path
     return render_to_response('request_context.html', context_instance=RequestContext(request, {}))
+
+
+def render_template_multiple_times(request):
+    """A view that renders a template multiple times."""
+    return HttpResponse(
+        render_to_string('base.html') + render_to_string('base.html'))

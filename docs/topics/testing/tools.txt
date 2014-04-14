@@ -1328,12 +1328,18 @@ your test suite.
     attribute ordering is not significant. See
     :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
 
-.. method:: SimpleTestCase.assertTemplateUsed(response, template_name, msg_prefix='')
+.. method:: SimpleTestCase.assertTemplateUsed(response, template_name, msg_prefix='', count=None)
 
     Asserts that the template with the given name was used in rendering the
     response.
 
     The name is a string such as ``'admin/index.html'``.
+
+    .. versionadded:: 1.8
+
+        The count argument is an integer indicating the number of times the
+        template should be rendered. Default is ``None``, meaning that the
+        template should be rendered one or more times.
 
     You can use this as a context manager, like this::
 
