@@ -3,6 +3,8 @@ from django.db import models
 from django.db.migrations.state import ProjectState, ModelState, InvalidBasesError
 from django.test import TestCase
 
+from .models import ModelWithCustomBase
+
 
 class StateTests(TestCase):
     """
@@ -335,3 +337,9 @@ class StateTests(TestCase):
         project_state.add_model_state(ModelState.from_model(Magazine))
         with self.assertRaises(ValueError):
             rendered_state = project_state.render()
+
+
+class ModelStateTests(TestCase):
+    def test_custom_model_base(self):
+        state = ModelState.from_model(ModelWithCustomBase)
+        self.assertEqual(state.bases, (models.Model,))
