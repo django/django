@@ -2,10 +2,12 @@ from __future__ import unicode_literals
 
 import time
 import unittest
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory, override_settings
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.views.generic import View, TemplateView, RedirectView
 
 from . import views
@@ -438,6 +440,41 @@ class RedirectViewTest(TestCase):
         view = RedirectView()
         response = view.dispatch(self.rf.head('/foo/'))
         self.assertEqual(response.status_code, 410)
+
+    def test_deprecation_warning_raised_when_permanent_not_passed(self):
+        """
+        Tests to make sure that a DeprecationWarning is raised if 'permanent'
+        is not included during instantiation.
+        """
+        with warnings.catch_warnings(record=True) as warns:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter('always')
+
+            view_function = RedirectView.as_view(url='/bar/')
+            # should trigger a warning
+            request = self.rf.request(PATH_INFO='/foo/')
+            view_function(request)
+
+        # check warning raised once and is instance of right class
+        self.assertEqual(len(warns), 1)
+        got_warning = warns[0].category
+        self.assertTrue(issubclass(got_warning, RemovedInDjango19Warning))
+
+    def test_no_deprecation_warning_when_permanent_passed(self):
+        """
+        Tests to make sure that a DeprecationWarning is not raised if
+        'permanent' is not included during instantiation.
+        """
+        with warnings.catch_warnings(record=True) as warns:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter('always')
+
+            # This shouldn't trigger a warning
+            view_function = RedirectView.as_view(url='/bar/', permanent=False)
+            request = self.rf.request(PATH_INFO='/foo/')
+            view_function(request)
+
+        self.assertEqual(len(warns), 0)
 
 
 class GetContextDataTest(unittest.TestCase):
