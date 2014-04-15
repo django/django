@@ -292,6 +292,17 @@ over them::
         </ol>
     {% endif %}
 
+.. versionchanged:: 1.8
+
+Non-field errors (and/or hidden field errors that are rendered at the top of
+the form when using helpers like ``form.as_p()``) will be rendered with an
+additional class of ``nonfield`` to help distinguish them from field-specific
+errors. For example, ``{{ form.non_field_errors }}`` would look like::
+
+    <ul class="errorlist nonfield">
+        <li>Generic validation error</li>
+    </ul>
+
 Looping over the form's fields
 ------------------------------
 

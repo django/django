@@ -129,6 +129,10 @@ Forms
   the ``<label>`` tags for required fields will have this class present in its
   attributes.
 
+* The rendering of non-field errors in unordered lists (``<ul>``) now includes
+  ``nonfield`` in its list of classes to distinguish them from field-specific
+  errors.
+
 * :class:`~django.forms.Field` now accepts a
   :attr:`~django.forms.Field.label_suffix` argument, which will override the
   form's :attr:`~django.forms.Form.label_suffix`. This enables customizing the

@@ -98,8 +98,8 @@ class FormsRegressionsTestCase(TestCase):
             data = IntegerField(widget=HiddenInput)
 
         f = HiddenForm({})
-        self.assertHTMLEqual(f.as_p(), '<ul class="errorlist"><li>(Hidden field data) This field is required.</li></ul>\n<p> <input type="hidden" name="data" id="id_data" /></p>')
-        self.assertHTMLEqual(f.as_table(), '<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field data) This field is required.</li></ul><input type="hidden" name="data" id="id_data" /></td></tr>')
+        self.assertHTMLEqual(f.as_p(), '<ul class="errorlist nonfield"><li>(Hidden field data) This field is required.</li></ul>\n<p> <input type="hidden" name="data" id="id_data" /></p>')
+        self.assertHTMLEqual(f.as_table(), '<tr><td colspan="2"><ul class="errorlist nonfield"><li>(Hidden field data) This field is required.</li></ul><input type="hidden" name="data" id="id_data" /></td></tr>')
 
     def test_xss_error_messages(self):
         ###################################################
