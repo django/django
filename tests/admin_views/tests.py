@@ -2035,7 +2035,7 @@ class AdminViewListEditable(TestCase):
             "_save": "Save",
         }
         response = self.client.post('/test_admin/admin/admin_views/fooddelivery/', data)
-        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>Food delivery with this Driver and Restaurant already exists.</li></ul></td></tr>', 1, html=True)
+        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist nonfield"><li>Food delivery with this Driver and Restaurant already exists.</li></ul></td></tr>', 1, html=True)
 
         data = {
             "form-TOTAL_FORMS": "3",
@@ -2062,7 +2062,7 @@ class AdminViewListEditable(TestCase):
             "_save": "Save",
         }
         response = self.client.post('/test_admin/admin/admin_views/fooddelivery/', data)
-        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>Food delivery with this Driver and Restaurant already exists.</li></ul></td></tr>', 2, html=True)
+        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist nonfield"><li>Food delivery with this Driver and Restaurant already exists.</li></ul></td></tr>', 2, html=True)
 
     def test_non_form_errors(self):
         # test if non-form errors are handled; ticket #12716
