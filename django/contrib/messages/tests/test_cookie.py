@@ -152,3 +152,31 @@ class CookieTest(BaseTests, TestCase):
             encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
         self.assertNotIsInstance(
             encode_decode("<b>Hello Django!</b>"), SafeData)
+
+    def test_pre_1_5_messages_still_work(self):
+        """
+        For ticket #22426. Tests whether messages that were set in the cookie
+        before the addition of is_safedata are decoded correctly.
+
+        is_safedata was added at 1.5 and the backwards compatibility patch is
+        in 1.5 and 1.6. This means that the test should not work on 1.7 and 
+        in fact, does not belong in 1.7.
+        """
+
+        # Encode the messages using the current encoder.
+        messages = [Message(constants.INFO, 'message %s') for x in range(5)]
+        encoder = MessageEncoder(separators=(',', ':'))
+        encoded_messages = encoder.encode(messages)
+
+        # Remove the is_safedata flag from the messages in order to imitate
+        # the behavior of before 1.5 (monkey patching).
+        encoded_messages = json.loads(encoded_messages)
+        for obj in encoded_messages:
+            obj.pop(1)
+        encoded_messages = json.dumps(encoded_messages, separators=(',', ':'))
+
+        # Decode the messages in the old format (without is_safedata)
+        decoded_messages = json.loads(encoded_messages, cls=MessageDecoder)
+        self.assertEqual(messages, decoded_messages)
+        
+        
