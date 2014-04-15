@@ -6,8 +6,11 @@ from unittest import TestSuite, defaultTestLoader
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.core.management.color import color_style, supports_color
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
+from django.utils import six
+from django.utils.termcolors import RESET
 
 
 class DiscoverRunner(object):
@@ -149,6 +152,142 @@ class DiscoverRunner(object):
         self.teardown_databases(old_config)
         self.teardown_test_environment()
         return self.suite_result(suite, result)
+
+
+class ColorTextTestResult(unittest.TextTestResult):
+
+    """
+    A TextTestResult that displays output using ANSI colors.
+
+    The following color palette options are used to determine the colors
+    of the output:
+
+        TEST_SUCCESS is used for passing tests
+        TEST_FAILURE is used for failing and erroring tests
+        TEST_SKIP is used for skipped tests
+        TEST_EXPECTED_FAULURE is used for expected failing tests
+        TEST_UNEXPECTED_SUCCESS is used for unexpectedly passing tests
+    """
+
+    def __init__(self, *args, **kwargs):
+        """
+        Set the style of this instance.
+        """
+        super(ColorTextTestResult, self).__init__(*args, **kwargs)
+        self.style = color_style()
+        self.traceback_highlighter = make_traceback_highlighter()
+        self.terminator = '\x1b[%sm' % RESET if supports_color() else ''
+
+    def addSuccess(self, test):
+        """
+        Print a colored success message.
+        """
+        self._colorize('TEST_SUCCESS')
+        super(ColorTextTestResult, self).addSuccess(test)
+        self._uncolorize()
+
+    def addError(self, test, err):
+        """
+        Print a colored error message.
+        """
+        self._colorize('TEST_FAILURE')
+        super(ColorTextTestResult, self).addError(test, err)
+        self._uncolorize()
+
+    def addFailure(self, test, err):
+        """
+        Print a colored failure message.
+        """
+        self._colorize('TEST_FAILURE')
+        super(ColorTextTestResult, self).addFailure(test, err)
+        self._uncolorize()
+
+    def addSkip(self, test, reason):
+        """
+        Print a colored skip message.
+        """
+        self._colorize('TEST_SKIP')
+        super(ColorTextTestResult, self).addSkip(test, reason)
+        self._uncolorize()
+
+    def addExpectedFailure(self, test, err):
+        """
+        Print a colored expected failure message.
+        """
+        self._colorize('TEST_EXPECTED_FAILURE')
+        super(ColorTextTestResult, self).addExpectedFailure(test, err)
+        self._uncolorize()
+
+    def addUnexpectedSuccess(self, test):
+        """
+        Print a colored unexpected success message.
+        """
+        self._colorize('TEST_UNEXPECTED_SUCCESS')
+        super(ColorTextTestResult, self).addUnexpectedSuccess(test)
+        self._uncolorize()
+
+    def printErrorList(self, flavour, errors):
+        """
+        Print a colored error list.
+        """
+        for test, err in errors:
+            self.stream.writeln(self.separator1)
+            self.stream.writeln(self.style.TEST_FAILURE(
+                "%s: %s" % (flavour, self.getDescription(test))))
+            self.stream.writeln(self.separator2)
+            self.stream.writeln(self.traceback_highlighter(err))
+
+    def _colorize(self, color):
+        """
+        Begin a colored section of terminal output. The given color should
+        be an attribute of self.style
+        """
+        # Write an empty string using the current style because we only care
+        # about setting the style
+        message = getattr(self.style, color)('')
+        # Remove the terminator so that subsequent writes will have the color
+        self.stream.write(self._unterminate(message))
+
+    def _uncolorize(self):
+        """
+        End a colored section of terminal output.
+        """
+        self.stream.write(self.terminator)
+
+    def _unterminate(self, message):
+        """
+        Remove the color termination portion of the message.
+        """
+        end = message.find(self.terminator)
+        return message[:end]
+
+
+def make_traceback_highlighter():
+    """
+    Return a function for highlighting traceback text.
+
+    If the Pygments library is available, it will be used to create
+    a function that takes traceback text and returns an ANSI-highlighted
+    version. If Pygments is not available, the returned highlighter will
+    simply return the traceback text unchanged.
+    """
+    # Terminal doesn't support color, do not highlight
+    if not supports_color():
+        return lambda text: text
+
+    try:
+        from pygments import highlight
+        from pygments.formatters import TerminalFormatter
+    except ImportError:
+        # User does not have Pygments installed, do not highlight
+        return lambda text: text
+
+    if six.PY2:
+        from pygments.lexers import PythonTracebackLexer as Lexer
+    else:
+        from pygments.lexers import Python3TracebackLexer as Lexer
+
+    return lambda text: highlight(text, Lexer(), TerminalFormatter())
 
 
 def is_discoverable(label):

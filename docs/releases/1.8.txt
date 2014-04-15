@@ -131,6 +131,12 @@ Management Commands
 * :ref:`initial-sql` now works better if the `sqlparse
   <https://pypi.python.org/pypi/sqlparse>`_ Python library is installed.
 
+* :djadmin:`test` now features colored output. If necessary, colored output
+  can be supressed using the :djadminopt:`--no-color` option. Windows users
+  will need to have the `ANSICON library`_ installed for this to work.
+
+.. _ANSICON library: https://github.com/adoxa/ansicon
+
 Models
 ^^^^^^
 

@@ -11,6 +11,7 @@ import warnings
 
 import django
 from django import contrib
+from django.test.runner import ColorTextTestResult
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils._os import upath
 from django.utils import six
@@ -188,7 +189,7 @@ def teardown(state):
         setattr(settings, key, value)
 
 
-def django_tests(verbosity, interactive, failfast, test_labels):
+def django_tests(verbosity, interactive, failfast, no_color, test_labels):
     from django.conf import settings
     state = setup(verbosity, test_labels)
     extra_tests = []
@@ -204,6 +205,11 @@ def django_tests(verbosity, interactive, failfast, test_labels):
         interactive=interactive,
         failfast=failfast,
     )
+
+    # Colorize output
+    if not no_color:
+        test_runner.test_runner.resultclass = ColorTextTestResult
+
     # Catch warnings thrown in test DB setup -- remove in Django 1.9
     with warnings.catch_warnings():
         warnings.filterwarnings(
@@ -351,6 +357,10 @@ if __name__ == "__main__":
         '--selenium', action='store_true', dest='selenium',
         default=False,
         help='Run the Selenium tests as well (if Selenium is installed)')
+    parser.add_option(
+        '--no-color', action='store_true', dest='no_color',
+        default=False,
+        help='Suppress colorization of test result output')
     options, args = parser.parse_args()
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
@@ -371,6 +381,6 @@ if __name__ == "__main__":
         paired_tests(options.pair, options, args)
     else:
         failures = django_tests(int(options.verbosity), options.interactive,
-                                options.failfast, args)
+                                options.failfast, options.no_color, args)
         if failures:
             sys.exit(bool(failures))

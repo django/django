@@ -5,6 +5,7 @@ from optparse import make_option, OptionParser
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.test.runner import ColorTextTestResult
 from django.test.utils import get_runner
 
 
@@ -85,6 +86,10 @@ class Command(BaseCommand):
             del options['liveserver']
 
         test_runner = TestRunner(**options)
+
+        if not options.get('no_color') and hasattr(test_runner, 'test_runner'):
+            test_runner.test_runner.resultclass = ColorTextTestResult
+
         failures = test_runner.run_tests(test_labels)
 
         if failures:
