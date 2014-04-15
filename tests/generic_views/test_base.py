@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import time
 import unittest
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
@@ -439,6 +440,21 @@ class RedirectViewTest(TestCase):
         response = view.dispatch(self.rf.head('/foo/'))
         self.assertEqual(response.status_code, 410)
 
+    def test_permanent_default_deprecation_warning(self):
+        """
+        Tests to make sure that a DeprecationWarning is raised if 'permanent' is not included during instantiation
+        """
+        with warnings.catch_warnings(record=True) as warns:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter('always')
+            view = RedirectView(url='/bar/')
+            view = RedirectView.as_view(url='/bar/')(self.rf.request(PATH_INFO='/foo/'))
+
+        self.assertEqual(
+            len(warns),
+            2,
+            msg="Failed to generate deprecation warning when calling RedirectView without permanent kwargs"
+        )
 
 class GetContextDataTest(unittest.TestCase):
 

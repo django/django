@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import logging
+import warnings
 from functools import update_wrapper
 
 from django import http
@@ -163,6 +164,20 @@ class RedirectView(View):
     url = None
     pattern_name = None
     query_string = False
+
+    def __init__(self, *args, **kwargs):
+        """
+        When initializing the RedirectView we check if permanent is given,
+        if not we raise a deprecation warning and continue on as normal.
+        """
+        if 'permanent' not in kwargs:
+            warnings.warn(
+                "Deprecation Warning: Default value of permanent for RedirectViews will change from True to False in" \
+                " the next release",
+                DeprecationWarning
+            )
+
+        super(RedirectView, self).__init__(*args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
         """
