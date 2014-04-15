@@ -341,3 +341,35 @@ form::
     <script type="text/javascript" src="http://static.example.com/animations.js"></script>
     <script type="text/javascript" src="http://static.example.com/actions.js"></script>
     <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
+
+Custom Media Types
+------------------
+
+By subclassing ``Media``, you can add support for media types beyond the
+default ``css`` and ``js`` types. One use case for this would be adding support
+for inline JavaScript.
+
+To add a custom media type, you need to add the type to the ``MEDIA_TYPES``
+tuple and add ``add_X`` and ``render_X`` methods for adding and rendering
+your custom type. For example::
+
+    from django.utils.html import format_html
+
+    class InlineJSMedia(Media):
+        # MEDIA_TYPES stores tuples of (media_name, constructor).
+        # __init__ will create an attribute self._media_name using the
+        # constructor.
+        MEDIA_TYPES = Media.MEDIA_TYPES + (('inline_js', list),)
+
+        # data must be the same type as the constructor in MEDIA_TYPES.
+        def add_inline_js(self, data):
+            if data:
+                for code in data:
+                    self._inline_js.append(code)
+
+        # Must return a list of strings containing the rendered media.
+        def render_inline_js(self):
+            return [
+                format_html('<script type="text/javascript">{0}</script>'.format(code))
+                for code in self._inline_js
+            ]
