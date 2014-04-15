@@ -9,6 +9,7 @@ from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql_psycopg2.base import DatabaseOperations
+from django.db.backends.postgresql_psycopg2.version import get_version
 from django.db.utils import ProgrammingError
 from django.utils import six
 from django.utils.functional import cached_property
