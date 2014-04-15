@@ -257,14 +257,18 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             version = settings.POSTGIS_VERSION
         else:
             try:
-                vtup = self.postgis_version_tuple()
-            except ProgrammingError:
-                raise ImproperlyConfigured(
-                    'Cannot determine PostGIS version for database "%s". '
-                    'GeoDjango requires at least PostGIS version 1.3. '
-                    'Was the database created from a spatial database '
-                    'template?' % self.connection.settings_dict['NAME']
-                )
+                get_version(self.connection)
+                try:
+                    vtup = self.postgis_version_tuple()
+                except DatabaseError:
+                    raise ImproperlyConfigured(
+                        'Cannot determine PostGIS version for database "%s". '
+                        'GeoDjango requires at least PostGIS version 1.3. '
+                        'Was the database created from a spatial database '
+                       'template?' % self.connection.settings_dict['NAME']
+                    )
+            except DatabaseError:
+                raise ImproperlyConfigured('Database connection error: "%s"' % get_version(self.connection))
             version = vtup[1:]
         return version
 
