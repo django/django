@@ -418,7 +418,8 @@ class RegexURLResolver(LocaleRegexProvider):
                 # arguments in order to return a properly encoded URL.
                 candidate_pat = prefix_norm.replace('%', '%%') + result
                 if re.search('^%s%s' % (prefix_norm, pattern), candidate_pat % candidate_subs, re.UNICODE):
-                    candidate_subs = dict((k, urlquote(v)) for (k, v) in candidate_subs.items())
+                    candidate_subs = dict((k, urlquote(v, safe='/:@&=+$,')) for
+                                          (k, v) in candidate_subs.items())
                     return candidate_pat % candidate_subs
         # lookup_view can be URL label, or dotted path, or callable, Any of
         # these can be passed in at the top, but callables are not friendly in

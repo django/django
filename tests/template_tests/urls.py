@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'^client/(?P<id>\d+)/(?P<action>[^/]+)/$', views.client_action),
     url(r'^client/(?P<client_id>\d+)/(?P<action>[^/]+)/$', views.client_action),
     url(r'^named-client/(\d+)/$', views.client2, name="named.client"),
+    url(r'^unreserved-client/(.+)$', views.client2, name="unreserved.client"),
 
     # Unicode strings are permitted everywhere.
     url(r'^Юникод/(\w+)/$', views.client2, name="метка_оператора"),
