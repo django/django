@@ -105,7 +105,6 @@ class DiscoverRunnerTest(TestCase):
 
     def test_testcase_ordering(self):
         suite = DiscoverRunner().build_suite(["test_discovery_sample/"])
-        tc_names = [case.__class__.__name__ for case in suite._tests]
         self.assertEqual(
             suite._tests[0].__class__.__name__,
             'TestDjangoTestCase',

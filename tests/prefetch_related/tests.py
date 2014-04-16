@@ -1066,7 +1066,7 @@ class Ticket21760Tests(TestCase):
         for _ in range(3):
             house = House.objects.create()
             for _ in range(3):
-                self.rooms.append(Room.objects.create(house = house))
+                self.rooms.append(Room.objects.create(house=house))
 
     def test_bug(self):
         prefetcher = get_prefetcher(self.rooms[0], 'house')[0]

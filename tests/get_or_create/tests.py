@@ -19,40 +19,38 @@ class GetOrCreateTests(TestCase):
         )
 
     def test_get_or_create_method_with_get(self):
-        p, created = Person.objects.get_or_create(
+        created = Person.objects.get_or_create(
             first_name="John", last_name="Lennon", defaults={
                 "birthday": date(1940, 10, 9)
             }
-        )
+        )[1]
         self.assertFalse(created)
         self.assertEqual(Person.objects.count(), 1)
 
-
     def test_get_or_create_method_with_create(self):
-        p, created = Person.objects.get_or_create(
+        created = Person.objects.get_or_create(
             first_name='George', last_name='Harrison', defaults={
                 'birthday': date(1943, 2, 25)
             }
-        )
+        )[1]
         self.assertTrue(created)
         self.assertEqual(Person.objects.count(), 2)
-
 
     def test_get_or_create_redundant_instance(self):
         """
         If we execute the exact same statement twice, the second time,
         it won't create a Person.
         """
-        george, created = Person.objects.get_or_create(
+        Person.objects.get_or_create(
             first_name='George', last_name='Harrison', defaults={
                 'birthday': date(1943, 2, 25)
             }
         )
-        evil_george, created = Person.objects.get_or_create(
+        created = Person.objects.get_or_create(
             first_name='George', last_name='Harrison', defaults={
                 'birthday': date(1943, 2, 25)
             }
-        )
+        )[1]
 
         self.assertFalse(created)
         self.assertEqual(Person.objects.count(), 2)
@@ -66,6 +64,7 @@ class GetOrCreateTests(TestCase):
             IntegrityError,
             Person.objects.get_or_create, first_name="Tom", last_name="Smith"
         )
+
 
 class GetOrCreateTestsWithManualPKs(TestCase):
 

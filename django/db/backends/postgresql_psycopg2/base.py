@@ -4,8 +4,6 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
-import sys
-
 from django.conf import settings
 from django.db.backends import (BaseDatabaseFeatures, BaseDatabaseWrapper,
     BaseDatabaseValidation)
