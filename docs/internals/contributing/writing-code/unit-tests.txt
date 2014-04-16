@@ -31,7 +31,7 @@ with this sample ``settings`` module:
 
 .. code-block:: bash
 
-    git clone git@github.com:django/django.git django-repo
+    git clone https://github.com:django/django.git django-repo
     cd django-repo/tests
     PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
 
