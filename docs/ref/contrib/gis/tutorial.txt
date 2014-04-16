@@ -730,12 +730,12 @@ Let's dive right in.  Create a file called ``admin.py`` inside the
 
 Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import url, include
     from django.contrib.gis import admin
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^admin/', include(admin.site.urls)),
-    )
+    ]
 
 Start up the Django development server:
 

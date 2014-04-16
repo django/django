@@ -44,6 +44,8 @@ supported Python series (2.6.X, 2.7.X, 3.2.X, and 3.3.X).
 Django 1.6 will be the final release series to support Python 2.6; beginning
 with Django 1.7, the minimum supported Python version will be 2.7.
 
+Python 3.4 is not supported, but support will be added in Django 1.7.
+
 What's new in Django 1.6
 ========================
 
@@ -411,8 +413,8 @@ Autocommit option for PostgreSQL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In previous versions, database-level autocommit was only an option for
-PostgreSQL, and it was disabled by default. This option is now :ref:`ignored
-<postgresql-autocommit-mode>` and can be removed.
+PostgreSQL, and it was disabled by default. This option is now ignored and can
+be removed.
 
 .. _new-test-runner:
 
@@ -441,6 +443,17 @@ to fully restore the old test behavior. ``DjangoTestSuiteRunner`` is deprecated
 but will not be removed from Django until version 1.8.
 
 .. _recommendations in the Python documentation: http://docs.python.org/2/library/doctest.html#unittest-api
+
+Removal of ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner`` GeoDjango custom test runner
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is for developers working on the GeoDjango application itself and related
+to the item above about changes in the test runners:
+
+The ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner`` test runner has been
+removed and the standalone GeoDjango tests execution setup it implemented isn't
+supported anymore. To run the GeoDjango tests simply use the new
+``DicoverRunner`` and specify the ``django.contrib.gis`` app.
 
 Custom User models in tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -584,12 +597,13 @@ to arguments before interpolating them in URL patterns. This bug is fixed in
 Django 1.6. If you worked around this bug by applying URL quoting before
 passing arguments to :func:`~django.core.urlresolvers.reverse`, this may
 result in double-quoting. If this happens, simply remove the URL quoting from
-your code.
+your code. You will also have to replace special characters in URLs used in
+:func:`~django.test.SimpleTestCase.assertRedirects` with their encoded versions.
 
 Storage of IP addresses in the comments app
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :doc:`comments </ref/contrib/comments/index>` app now uses a
+The comments app now uses a
 ``GenericIPAddressField`` for storing commenters' IP addresses, to support
 comments submitted from IPv6 addresses. Until now, it stored them in an
 ``IPAddressField``, which is only meant to support IPv4. When saving a comment
@@ -637,21 +651,24 @@ Help text of model form fields for ManyToManyField fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 HTML rendering of model form fields corresponding to
-:class:`~django.db.models.ManyToManyField` ORM model fields used to get the
-hard-coded sentence
+:class:`~django.db.models.ManyToManyField` model fields used to get the
+hard-coded sentence:
 
   *Hold down "Control", or "Command" on a Mac, to select more than one.*
 
 (or its translation to the active locale) imposed as the help legend shown along
 them if neither :attr:`model <django.db.models.Field.help_text>` nor :attr:`form
-<django.forms.Field.help_text>` ``help_text`` attribute was specified by the
-user (or appended to, if ``help_text`` was provided.)
+<django.forms.Field.help_text>` ``help_text`` attributes were specified by the
+user (or this string was appended to any ``help_text`` that was provided).
 
-This happened always, possibly even with form fields implementing user
-interactions that don't involve a keyboard and/or a mouse and was handled at the
-model field layer.
+Since this happened at the model layer, there was no way to prevent the text
+from appearing in cases where it wasn't applicable such as form fields that
+implement user interactions that don't involve a keyboard and/or a mouse.
 
-Starting with Django 1.6 this doesn't happen anymore.
+Starting with Django 1.6, as an ad-hoc temporary backward-compatibility
+provision, the logic to add the "Hold down..." sentence has been moved to the
+model form field layer and modified to add the text only when the associated
+widget is :class:`~django.forms.SelectMultiple` or selected subclasses.
 
 The change can affect you in a backward incompatible way if you employ custom
 model form fields and/or widgets for ``ManyToManyField`` model fields whose UIs
@@ -663,11 +680,6 @@ Applications that use Django :doc:`model form </topics/forms/modelforms>`
 facilities together with Django built-in form :doc:`fields </ref/forms/fields>`
 and :doc:`widgets </ref/forms/widgets>` aren't affected but need to be aware of
 what's described in :ref:`m2m-help_text-deprecation` below.
-
-This is because, as an ad-hoc temporary backward-compatibility provision, the
-described non-standard behavior has been preserved but moved to the model form
-field layer and occurs only when the associated widget is
-:class:`~django.forms.SelectMultiple` or selected subclasses.
 
 QuerySet iteration
 ~~~~~~~~~~~~~~~~~~

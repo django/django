@@ -179,10 +179,6 @@ your choice of default manager in order to avoid a situation where overriding
 ``get_queryset()`` results in an inability to retrieve objects you'd like to
 work with.
 
-.. versionchanged:: 1.6
-
-    The ``get_queryset`` method was previously named ``get_query_set``.
-
 .. _managers-for-related-objects:
 
 Using managers for related object access

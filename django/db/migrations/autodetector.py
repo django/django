@@ -51,16 +51,17 @@ class MigrationAutodetector(object):
         new_apps = self.to_state.render()
         # Prepare lists of old/new model keys that we care about
         # (i.e. ignoring proxy ones)
-        old_model_keys = [
-            (al, mn)
-            for al, mn in self.from_state.models.keys()
-            if not old_apps.get_model(al, mn)._meta.proxy
-        ]
-        new_model_keys = [
-            (al, mn)
-            for al, mn in self.to_state.models.keys()
-            if not new_apps.get_model(al, mn)._meta.proxy
-        ]
+        old_model_keys = []
+        for al, mn in self.from_state.models.keys():
+            model = old_apps.get_model(al, mn)
+            if not model._meta.proxy and model._meta.managed:
+                old_model_keys.append((al, mn))
+
+        new_model_keys = []
+        for al, mn in self.to_state.models.keys():
+            model = new_apps.get_model(al, mn)
+            if not model._meta.proxy and model._meta.managed:
+                new_model_keys.append((al, mn))
 
         def _rel_agnostic_fields_def(fields):
             """
@@ -133,9 +134,11 @@ class MigrationAutodetector(object):
                         bases=model_state.bases,
                     )
                 )
+
         # Phase 2 is progressively adding pending models, splitting up into two
         # migrations if required.
         pending_new_fks = []
+        pending_unique_together = []
         added_phase_2 = set()
         while pending_add:
             # Is there one we can add that has all dependencies satisfied?
@@ -159,19 +162,16 @@ class MigrationAutodetector(object):
                     # migration for safety.
                     new=any((al, mn) in added_phase_2 for f, al, mn in related_fields),
                 )
-                for field_name, other_app_label, other_model_name in related_fields:
-                    # If it depends on a swappable something, add a dynamic depend'cy
-                    swappable_setting = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0].swappable_setting
-                    if swappable_setting is not None:
-                        self.add_swappable_dependency(app_label, swappable_setting)
-                    elif app_label != other_app_label:
-                            self.add_dependency(app_label, other_app_label)
-                del pending_add[app_label, model_name]
                 added_phase_2.add((app_label, model_name))
             # Ah well, we'll need to split one. Pick deterministically.
             else:
                 (app_label, model_name), related_fields = sorted(pending_add.items())[0]
                 model_state = self.to_state.models[app_label, model_name]
+                # Defer unique together constraints creation, see ticket #22275
+                unique_together_constraints = model_state.options.pop('unique_together', None)
+                if unique_together_constraints:
+                    pending_unique_together.append((app_label, model_name,
+                                                   unique_together_constraints))
                 # Work out the fields that need splitting out
                 bad_fields = dict((f, (al, mn)) for f, al, mn in related_fields if (al, mn) in pending_add)
                 # Create the model, without those
@@ -187,8 +187,16 @@ class MigrationAutodetector(object):
                 # Add the bad fields to be made in a phase 3
                 for field_name, (other_app_label, other_model_name) in bad_fields.items():
                     pending_new_fks.append((app_label, model_name, field_name, other_app_label))
-                del pending_add[app_label, model_name]
-        # Phase 3 is adding the final set of FKs as separate new migrations
+            for field_name, other_app_label, other_model_name in related_fields:
+                # If it depends on a swappable something, add a dynamic depend'cy
+                swappable_setting = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0].swappable_setting
+                if swappable_setting is not None:
+                    self.add_swappable_dependency(app_label, swappable_setting)
+                elif app_label != other_app_label:
+                    self.add_dependency(app_label, other_app_label)
+            del pending_add[app_label, model_name]
+
+        # Phase 3 is adding the final set of FKs as separate new migrations.
         for app_label, model_name, field_name, other_app_label in pending_new_fks:
             model_state = self.to_state.models[app_label, model_name]
             self.add_to_migration(
@@ -206,6 +214,15 @@ class MigrationAutodetector(object):
                 self.add_swappable_dependency(app_label, swappable_setting)
             elif app_label != other_app_label:
                 self.add_dependency(app_label, other_app_label)
+        # Phase 3.1 - unique together constraints
+        for app_label, model_name, unique_together in pending_unique_together:
+            self.add_to_migration(
+                app_label,
+                operations.AlterUniqueTogether(
+                    name=model_name,
+                    unique_together=unique_together
+                )
+            )
         # Removing models
         removed_models = set(old_model_keys) - set(new_model_keys)
         for app_label, model_name in removed_models:
@@ -252,7 +269,7 @@ class MigrationAutodetector(object):
             for rem_app_label, rem_model_name, rem_field_name in (old_fields - new_fields):
                 if rem_app_label == app_label and rem_model_name == model_name:
                     old_field_dec = old_model_state.get_field_by_name(rem_field_name).deconstruct()[1:]
-                    if field.rel and field.rel.to:
+                    if field.rel and field.rel.to and 'to' in old_field_dec[2]:
                         old_rel_to = old_field_dec[2]['to']
                         if old_rel_to in renamed_models_rel:
                             old_field_dec[2]['to'] = renamed_models_rel[old_rel_to]
@@ -354,7 +371,7 @@ class MigrationAutodetector(object):
         Adds a dependency to app_label's newest migration on
         other_app_label's latest migration.
         """
-        if self.migrations.get(other_app_label, []):
+        if self.migrations.get(other_app_label):
             dependency = (other_app_label, self.migrations[other_app_label][-1].name)
         else:
             dependency = (other_app_label, "__first__")

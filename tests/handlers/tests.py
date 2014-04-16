@@ -65,10 +65,10 @@ class HandlerTests(TestCase):
         self.assertEqual(request.COOKIES['want'], force_str("café"))
 
 
+@override_settings(ROOT_URLCONF='handlers.urls')
 class TransactionsPerRequestTests(TransactionTestCase):
 
     available_apps = []
-    urls = 'handlers.urls'
 
     def test_no_transaction(self):
         response = self.client.get('/in_transaction/')
@@ -93,8 +93,8 @@ class TransactionsPerRequestTests(TransactionTestCase):
         self.assertContains(response, 'False')
 
 
+@override_settings(ROOT_URLCONF='handlers.urls')
 class SignalsTests(TestCase):
-    urls = 'handlers.urls'
 
     def setUp(self):
         self.signals = []
@@ -123,8 +123,8 @@ class SignalsTests(TestCase):
         self.assertEqual(self.signals, ['started', 'finished'])
 
 
+@override_settings(ROOT_URLCONF='handlers.urls')
 class HandlerSuspiciousOpsTest(TestCase):
-    urls = 'handlers.urls'
 
     def test_suspiciousop_in_view_returns_400(self):
         response = self.client.get('/suspicious/')

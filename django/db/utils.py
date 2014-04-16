@@ -6,7 +6,7 @@ import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils._os import upath
@@ -167,11 +167,6 @@ class ConnectionHandler(object):
             raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
 
         conn.setdefault('ATOMIC_REQUESTS', False)
-        if settings.TRANSACTIONS_MANAGED:
-            warnings.warn(
-                "TRANSACTIONS_MANAGED is deprecated. Use AUTOCOMMIT instead.",
-                RemovedInDjango18Warning, stacklevel=2)
-            conn.setdefault('AUTOCOMMIT', False)
         conn.setdefault('AUTOCOMMIT', True)
         conn.setdefault('ENGINE', 'django.db.backends.dummy')
         if conn['ENGINE'] == 'django.db.backends.' or not conn['ENGINE']:

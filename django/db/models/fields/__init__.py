@@ -20,7 +20,7 @@ from django.core import exceptions, validators, checks
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.functional import curry, total_ordering, Promise
+from django.utils.functional import cached_property, curry, total_ordering, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -157,7 +157,6 @@ class Field(RegisterLookupMixin):
             Field.creation_counter += 1
 
         self._validators = validators  # Store for deconstruction later
-        self.validators = self.default_validators + validators
 
         messages = {}
         for c in reversed(self.__class__.__mro__):
@@ -446,6 +445,12 @@ class Field(RegisterLookupMixin):
         Returns the converted value. Subclasses should override this.
         """
         return value
+
+    @cached_property
+    def validators(self):
+        # Some validators can't be created at field initialization time.
+        # This method provides a way to delay their creation until required.
+        return self.default_validators + self._validators
 
     def run_validators(self, value):
         if value in self.empty_values:
@@ -1560,6 +1565,19 @@ class IntegerField(Field):
         'invalid': _("'%(value)s' value must be an integer."),
     }
     description = _("Integer")
+
+    @cached_property
+    def validators(self):
+        # These validators can't be added at field initialization time since
+        # they're based on values retrieved from `connection`.
+        range_validators = []
+        internal_type = self.get_internal_type()
+        min_value, max_value = connection.ops.integer_field_range(internal_type)
+        if min_value is not None:
+            range_validators.append(validators.MinValueValidator(min_value))
+        if max_value is not None:
+            range_validators.append(validators.MaxValueValidator(max_value))
+        return super(IntegerField, self).validators + range_validators
 
     def get_prep_value(self, value):
         value = super(IntegerField, self).get_prep_value(value)

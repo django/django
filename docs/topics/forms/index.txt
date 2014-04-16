@@ -317,14 +317,11 @@ attributes, which can be useful in your templates:
     The label of the field, e.g. ``Email address``.
 
 ``{{ field.label_tag }}``
-    The field's label wrapped in the appropriate HTML ``<label>`` tag.
+    The field's label wrapped in the appropriate HTML ``<label>`` tag. This
+    includes the form's :attr:`~django.forms.Form.label_suffix`. For example,
+    the default ``label_suffix`` is a colon::
 
-    .. versionchanged:: 1.6
-
-        This includes the form's :attr:`~django.forms.Form.label_suffix`. For
-        example, the default ``label_suffix`` is a colon::
-
-            <label for="id_email">Email address:</label>
+        <label for="id_email">Email address:</label>
 
 ``{{ field.id_for_label }}``
     The ID that will be used for this field (``id_email`` in the example

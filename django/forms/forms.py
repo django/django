@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.forms.fields import Field, FileField
 from django.forms.utils import flatatt, ErrorDict, ErrorList
 from django.forms.widgets import Media, MediaDefiningClass, TextInput, Textarea
-from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import smart_text, force_text, python_2_unicode_compatible
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
@@ -157,7 +157,7 @@ class BaseForm(object):
         Returns True if the form has no errors. Otherwise, False. If errors are
         being ignored, returns False.
         """
-        return self.is_bound and not bool(self.errors)
+        return self.is_bound and not self.errors
 
     def add_prefix(self, field_name):
         """
@@ -334,6 +334,15 @@ class BaseForm(object):
             if field in self.cleaned_data:
                 del self.cleaned_data[field]
 
+    def has_error(self, field, code=None):
+        if code is None:
+            return field in self.errors
+        if field in self.errors:
+            for error in self.errors.as_data()[field]:
+                if error.code == code:
+                    return True
+        return False
+
     def full_clean(self):
         """
         Cleans all of self.data and populates self._errors and
@@ -429,13 +438,7 @@ class BaseForm(object):
                         # Always assume data has changed if validation fails.
                         self._changed_data.append(name)
                         continue
-                if hasattr(field.widget, '_has_changed'):
-                    warnings.warn("The _has_changed method on widgets is deprecated,"
-                        " define it at field level instead.",
-                        RemovedInDjango18Warning, stacklevel=2)
-                    if field.widget._has_changed(initial_value, data_value):
-                        self._changed_data.append(name)
-                elif field._has_changed(initial_value, data_value):
+                if field._has_changed(initial_value, data_value):
                     self._changed_data.append(name)
         return self._changed_data
 
@@ -618,6 +621,12 @@ class BoundField(object):
             id_for_label = widget.id_for_label(id_)
             if id_for_label:
                 attrs = dict(attrs or {}, **{'for': id_for_label})
+            if self.field.required and hasattr(self.form, 'required_css_class'):
+                attrs = attrs or {}
+                if 'class' in attrs:
+                    attrs['class'] += ' ' + self.form.required_css_class
+                else:
+                    attrs['class'] = self.form.required_css_class
             attrs = flatatt(attrs) if attrs else ''
             contents = format_html('<label{0}>{1}</label>', attrs, contents)
         else:

@@ -190,9 +190,9 @@ ones:
         >>> p = Person(name="Fred Flintstone", shirt_size="L")
         >>> p.save()
         >>> p.shirt_size
-        u'L'
+        'L'
         >>> p.get_shirt_size_display()
-        u'Large'
+        'Large'
 
 :attr:`~Field.default`
     The default value for the field. This can be a value or a callable
@@ -541,7 +541,7 @@ querying the ``Membership`` model::
     >>> ringos_membership.date_joined
     datetime.date(1962, 8, 16)
     >>> ringos_membership.invite_reason
-    u'Needed a new drummer.'
+    'Needed a new drummer.'
 
 Another way to access the same information is by querying the
 :ref:`many-to-many reverse relationship<m2m-reverse-relationships>` from a
@@ -551,7 +551,7 @@ Another way to access the same information is by querying the
     >>> ringos_membership.date_joined
     datetime.date(1962, 8, 16)
     >>> ringos_membership.invite_reason
-    u'Needed a new drummer.'
+    'Needed a new drummer.'
 
 
 One-to-one relationships

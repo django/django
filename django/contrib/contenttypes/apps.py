@@ -9,4 +9,4 @@ class ContentTypesConfig(AppConfig):
     verbose_name = _("Content Types")
 
     def ready(self):
-        checks.register('models')(check_generic_foreign_keys)
+        checks.register(checks.Tags.models)(check_generic_foreign_keys)

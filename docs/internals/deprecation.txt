@@ -12,6 +12,22 @@ about each item can often be found in the release notes of two versions prior.
 2.0
 ---
 
+* ``cycle`` and ``firstof`` template tags will be removed from the ``future``
+  template tag library (used during the 1.6/1.7 deprecation period).
+
+* ``django.conf.urls.patterns()`` will be removed.
+
+* Support for the ``prefix`` argument to
+  ``django.conf.urls.i18n.i18n_patterns()`` will be removed.
+
+* ``SimpleTestCase.urls`` will be removed.
+
+* Using an incorrect count of unpacked values in the ``for`` template tag
+  will raise an exception rather than fail silently.
+
+* The regular expression parsing of SQL initial data will be removed and
+  ``sqlparse`` will be required for the feature.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
@@ -35,6 +51,12 @@ details on these changes.
 
 * ``allow_syncdb`` on database routers will no longer automatically become
   ``allow_migrate``.
+
+* The ``DatabaseCreation`` class on each database backend will be removed,
+  and all table/schema editing will be moved to be via ``SchemaEditor`` instead.
+
+* The legacy method of syncing apps without migrations will be removed,
+  and migrations will become compulsory for all apps.
 
 * All models will need to be defined inside an installed application or
   declare an explicit :attr:`~django.db.models.Options.app_label`.
@@ -153,6 +175,9 @@ details on these changes.
 * The ``SEND_BROKEN_LINK_EMAILS`` setting will be removed. Add the
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware` middleware to
   your :setting:`MIDDLEWARE_CLASSES` setting instead.
+
+* ``django.middleware.doc.XViewMiddleware`` will be removed. Use
+  ``django.contrib.admindocs.middleware.XViewMiddleware`` instead.
 
 * ``Model._meta.module_name`` was renamed to ``model_name``.
 

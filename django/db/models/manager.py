@@ -3,21 +3,18 @@ import inspect
 
 from django.db import router
 from django.db.models.query import QuerySet
-from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase, RemovedInDjango18Warning
 from django.utils.encoding import python_2_unicode_compatible
 
 
-def ensure_default_manager(sender, **kwargs):
+def ensure_default_manager(cls):
     """
     Ensures that a Model subclass contains a default manager  and sets the
     _default_manager attribute on the class. Also sets up the _base_manager
     points to a plain Manager instance (which could be the same as
     _default_manager if it's not a subclass of Manager).
     """
-    cls = sender
     if cls._meta.abstract:
         setattr(cls, 'objects', AbstractManagerDescriptor(cls))
         return
@@ -49,18 +46,9 @@ def ensure_default_manager(sender, **kwargs):
                     return
             raise AssertionError("Should never get here. Please report a bug, including your model and model manager setup.")
 
-signals.class_prepared.connect(ensure_default_manager)
-
-
-class RenameManagerMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('get_query_set', 'get_queryset', RemovedInDjango18Warning),
-        ('get_prefetch_query_set', 'get_prefetch_queryset', RemovedInDjango18Warning),
-    )
-
 
 @python_2_unicode_compatible
-class BaseManager(six.with_metaclass(RenameManagerMethods)):
+class BaseManager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
@@ -128,7 +116,7 @@ class BaseManager(six.with_metaclass(RenameManagerMethods)):
         elif model._meta.swapped:
             setattr(model, name, SwappedManagerDescriptor(model))
         else:
-        # if not model._meta.abstract and not model._meta.swapped:
+            # if not model._meta.abstract and not model._meta.swapped:
             setattr(model, name, ManagerDescriptor(self))
         if not getattr(model, '_default_manager', None) or self.creation_counter < model._default_manager.creation_counter:
             model._default_manager = self

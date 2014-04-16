@@ -5,4 +5,4 @@ Django 1.4.11 release notes
 *Under development*
 
 Django's vendored version of six, :mod:`django.utils.six`, has been upgraded to
-the latest release (1.5.2).
+the latest release (1.6.1).

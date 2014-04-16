@@ -67,8 +67,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     _savepoint_commit = complain
     _savepoint_rollback = ignore
     _set_autocommit = complain
-    set_dirty = complain
-    set_clean = complain
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)

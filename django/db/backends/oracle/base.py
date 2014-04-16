@@ -121,6 +121,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.oracle.compiler"
 
+    # Oracle uses NUMBER(11) and NUMBER(19) for integer fields.
+    integer_field_ranges = {
+        'SmallIntegerField': (-99999999999, 99999999999),
+        'IntegerField': (-99999999999, 99999999999),
+        'BigIntegerField': (-9999999999999999999, 9999999999999999999),
+        'PositiveSmallIntegerField': (0, 99999999999),
+        'PositiveIntegerField': (0, 99999999999),
+    }
+
     def autoinc_sql(self, table, column):
         # To simulate auto-incrementing primary keys in Oracle, we have to
         # create a sequence and a trigger.
@@ -678,7 +687,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         pass
 
     def _set_autocommit(self, autocommit):
-        self.connection.autocommit = autocommit
+        with self.wrap_database_errors:
+            self.connection.autocommit = autocommit
 
     def check_constraints(self, table_names=None):
         """
@@ -695,7 +705,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             else:
                 # Use a cx_Oracle cursor directly, bypassing Django's utilities.
                 self.connection.cursor().execute("SELECT 1 FROM DUAL")
-        except DatabaseError:
+        except Database.Error:
             return False
         else:
             return True

@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import json
 import sys
-import warnings
 
 try:
     from collections import UserList
@@ -10,7 +9,6 @@ except ImportError:  # Python 2
     from UserList import UserList
 
 from django.conf import settings
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import format_html, format_html_join, escape
 from django.utils import timezone
@@ -31,19 +29,18 @@ def flatatt(attrs):
 
     The result is passed through 'mark_safe'.
     """
-    for attr_name, value in attrs.items():
-        if type(value) is bool:
-            warnings.warn(
-                "In Django 1.8, widget attribute %(attr_name)s=%(bool_value)s "
-                "will %(action)s. To preserve current behavior, use the "
-                "string '%(bool_value)s' instead of the boolean value." % {
-                    'attr_name': attr_name,
-                    'action': "be rendered as '%s'" % attr_name if value else "not be rendered",
-                    'bool_value': value,
-                },
-                RemovedInDjango18Warning
-            )
-    return format_html_join('', ' {0}="{1}"', sorted(attrs.items()))
+    boolean_attrs = []
+    for attr, value in list(attrs.items()):
+        if value is True:
+            boolean_attrs.append((attr,))
+            del attrs[attr]
+        elif value is False:
+            del attrs[attr]
+
+    return (
+        format_html_join('', ' {0}="{1}"', sorted(attrs.items())) +
+        format_html_join('', ' {0}', sorted(boolean_attrs))
+    )
 
 
 @python_2_unicode_compatible

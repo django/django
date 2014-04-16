@@ -168,9 +168,6 @@ FILE_CHARSET = 'utf-8'
 # Email address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
 
-# Whether to send broken-link emails. Deprecated, must be removed in 1.8.
-SEND_BROKEN_LINK_EMAILS = False
-
 # Database connection info. If left empty, will default to the dummy backend.
 DATABASES = {}
 
@@ -423,10 +420,6 @@ NUMBER_GROUPING = 0
 # Thousand separator symbol
 THOUSAND_SEPARATOR = ','
 
-# Do you want to manage transactions manually?
-# Hint: you really don't!
-TRANSACTIONS_MANAGED = False
-
 # The tablespaces to use for each model when not specified otherwise.
 DEFAULT_TABLESPACE = ''
 DEFAULT_INDEX_TABLESPACE = ''
@@ -499,16 +492,6 @@ CACHES = {
 CACHE_MIDDLEWARE_KEY_PREFIX = ''
 CACHE_MIDDLEWARE_SECONDS = 600
 CACHE_MIDDLEWARE_ALIAS = 'default'
-
-####################
-# COMMENTS         #
-####################
-
-COMMENTS_ALLOW_PROFANITIES = False
-
-# The profanities that will trigger a validation error in
-# CommentDetailsForm.clean_comment. All of these should be in lowercase.
-PROFANITIES_LIST = ()
 
 ##################
 # AUTHENTICATION #

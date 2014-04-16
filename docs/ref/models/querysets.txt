@@ -484,7 +484,7 @@ A few subtleties that are worth mentioning:
   For example::
 
     >>> Entry.objects.values()
-    [{'blog_id': 1, 'headline': u'First Entry', ...}, ...]
+    [{'blog_id': 1, 'headline': 'First Entry', ...}, ...]
 
     >>> Entry.objects.values('blog')
     [{'blog': 1}, ...]
@@ -554,7 +554,7 @@ respective field passed into the ``values_list()`` call — so the first item is
 the first field, etc. For example::
 
     >>> Entry.objects.values_list('id', 'headline')
-    [(1, u'First entry'), ...]
+    [(1, 'First entry'), ...]
 
 If you only pass in a single field, you can also pass in the ``flat``
 parameter. If ``True``, this will mean the returned results are single values,
@@ -585,16 +585,7 @@ Returns a ``DateQuerySet`` — a ``QuerySet`` that evaluates to a list of
 :class:`datetime.date` objects representing all available dates of a
 particular kind within the contents of the ``QuerySet``.
 
-.. versionchanged:: 1.6
-
-    ``dates`` used to return a list of :class:`datetime.datetime` objects.
-
 ``field`` should be the name of a ``DateField`` of your model.
-
-.. versionchanged:: 1.6
-
-    ``dates`` used to accept operating on a ``DateTimeField``.
-
 ``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
 ``datetime.date`` object in the result list is "truncated" to the given
 ``type``.
@@ -623,8 +614,6 @@ Examples::
 
 datetimes
 ~~~~~~~~~
-
-.. versionadded:: 1.6
 
 .. method:: datetimes(field, kind, order='ASC', tzinfo=None)
 
@@ -768,8 +757,6 @@ cases it is possible to call ``select_related()`` with no arguments. This will
 follow all non-null foreign keys it can find - nullable foreign keys must be
 specified. This is not recommended in most cases as it is likely to make the
 underlying query more complex, and return more data, than is actually needed.
-
-.. versionadded:: 1.6
 
 If you need to clear the list of related fields added by past calls of
 ``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter::
@@ -981,7 +968,7 @@ less ambiguous than storing a filtered result in the related manager's cache:
     >>>
     >>> # Recommended:
     >>> restaurants = Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', to_attr='vegetarian_pizzas' queryset=queryset))
+    ...     Prefetch('pizzas', queryset=queryset, to_attr='vegetarian_pizzas'))
     >>> vegetarian_pizzas = restaurants[0].vegetarian_pizzas
     >>>
     >>> # Not recommended:
@@ -1378,8 +1365,18 @@ do not support ``nowait``, such as MySQL, will cause a
 :exc:`~django.db.DatabaseError` to be raised. This is in order to prevent code
 unexpectedly blocking.
 
+Evaluating a queryset with ``select_for_update`` in autocommit mode is
+an error because the rows are then not locked. If allowed, this would
+facilitate data corruption, and could easily be caused by calling,
+outside of any transaction, code that expects to be run in one.
+
 Using ``select_for_update`` on backends which do not support
 ``SELECT ... FOR UPDATE`` (such as SQLite) will have no effect.
+
+.. versionchanged:: 1.6.3
+
+    It is now an error to execute a query with ``select_for_update()`` in
+    autocommit mode. With earlier releases in the 1.6 series it was a no-op.
 
 raw
 ~~~
@@ -1473,10 +1470,6 @@ get_or_create
 
 A convenience method for looking up an object with the given ``kwargs`` (may be
 empty if your model has defaults for all fields), creating one if necessary.
-
-.. versionchanged:: 1.6
-
-    Older versions of Django required ``kwargs``.
 
 Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
 created object and ``created`` is a boolean specifying whether a new object was
@@ -1762,16 +1755,13 @@ earliest
 
 .. method:: earliest(field_name=None)
 
-.. versionadded:: 1.6
-
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.
 
 first
 ~~~~~
-.. method:: first()
 
-.. versionadded:: 1.6
+.. method:: first()
 
 Returns the first object matched by the queryset, or ``None`` if there
 is no matching object. If the ``QuerySet`` has no ordering defined, then the
@@ -1792,8 +1782,6 @@ equivalent to the above example::
 last
 ~~~~
 .. method:: last()
-
-.. versionadded:: 1.6
 
 Works like  :meth:`first()`, but returns the last object in the queryset.
 
@@ -2435,8 +2423,6 @@ in the database <database-time-zone-definitions>`.
 hour
 ~~~~
 
-.. versionadded:: 1.6
-
 For datetime fields, an exact hour match. Takes an integer between 0 and 23.
 
 Example::
@@ -2457,8 +2443,6 @@ zone before filtering.
 minute
 ~~~~~~
 
-.. versionadded:: 1.6
-
 For datetime fields, an exact minute match. Takes an integer between 0 and 59.
 
 Example::
@@ -2478,8 +2462,6 @@ zone before filtering.
 
 second
 ~~~~~~
-
-.. versionadded:: 1.6
 
 For datetime fields, an exact second match. Takes an integer between 0 and 59.
 

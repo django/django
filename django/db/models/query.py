@@ -391,7 +391,7 @@ class QuerySet(object):
         self._for_write = True
         connection = connections[self.db]
         fields = self.model._meta.local_concrete_fields
-        with transaction.commit_on_success_unless_managed(using=self.db):
+        with transaction.atomic(using=self.db, savepoint=False):
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
                     and self.model._meta.has_auto_field):
                 self._batched_insert(objs, fields, batch_size)
@@ -437,7 +437,7 @@ class QuerySet(object):
         for k, v in six.iteritems(defaults):
             setattr(obj, k, v)
 
-        with transaction.atomic(using=self.db):
+        with transaction.atomic(using=self.db, savepoint=False):
             obj.save(using=self.db)
         return obj, False
 
@@ -574,7 +574,7 @@ class QuerySet(object):
         self._for_write = True
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
-        with transaction.commit_on_success_unless_managed(using=self.db):
+        with transaction.atomic(using=self.db, savepoint=False):
             rows = query.get_compiler(self.db).execute_sql(CURSOR)
         self._result_cache = None
         return rows
@@ -721,13 +721,11 @@ class QuerySet(object):
         else:
             return self._filter_or_exclude(None, **filter_obj)
 
-    def select_for_update(self, **kwargs):
+    def select_for_update(self, nowait=False):
         """
         Returns a new QuerySet instance that will select objects with a
         FOR UPDATE lock.
         """
-        # Default to false for nowait
-        nowait = kwargs.pop('nowait', False)
         obj = self._clone()
         obj._for_write = True
         obj.query.select_for_update = True

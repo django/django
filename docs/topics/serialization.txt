@@ -122,11 +122,6 @@ Calling ``DeserializedObject.save()`` saves the object to the database.
     If the ``pk`` attribute in the serialized data doesn't exist or is
     null, a new instance will be saved to the database.
 
-.. versionchanged:: 1.6
-
-    In previous versions of Django, the ``pk`` attribute had to be present
-    on the serialized data or a ``DeserializationError`` would be raised.
-
 This ensures that deserializing is a non-destructive operation even if the
 data in your serialized representation doesn't match what's currently in the
 database. Usually, working with these ``DeserializedObject`` instances looks

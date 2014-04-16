@@ -12,8 +12,8 @@ from django.test.client import RequestFactory
 from django.utils import six
 
 
+@override_settings(ROOT_URLCONF="wsgi.urls")
 class WSGITest(TestCase):
-    urls = "wsgi.urls"
 
     def setUp(self):
         request_started.disconnect(close_old_connections)

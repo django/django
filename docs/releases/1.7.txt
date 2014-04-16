@@ -18,7 +18,8 @@ Python compatibility
 ====================
 
 Django 1.7 requires Python 2.7 or above, though we **highly recommend**
-the latest minor release. Support for Python 2.6 has been dropped.
+the latest minor release. Support for Python 2.6 has been dropped and support
+for Python 3.4 has been added.
 
 This change should affect only a small number of Django users, as most
 operating-system vendors today are shipping Python 2.7 or newer as their default
@@ -330,6 +331,15 @@ Minor features
   ``html_email_template_name`` parameter used to send a multipart HTML email
   for password resets.
 
+* The :meth:`AbstractBaseUser.get_session_auth_hash()
+  <django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash>`
+  method was added and if your :setting:`AUTH_USER_MODEL` inherits from
+  :class:`~django.contrib.auth.models.AbstractBaseUser`, changing a user's
+  password now invalidates old sessions if the
+  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` is
+  enabled. See :ref:`session-invalidation-on-password-change` for more details
+  including upgrade considerations when enabling this new middleware.
+
 :mod:`django.contrib.formtools`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -391,7 +401,7 @@ Minor features
 :mod:`django.contrib.sites`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* The new :class:`django.contrib.site.middleware.CurrentSiteMiddleware` allows
+* The new :class:`django.contrib.sites.middleware.CurrentSiteMiddleware` allows
   setting the current site on each request.
 
 :mod:`django.contrib.staticfiles`
@@ -678,6 +688,11 @@ Models
   Previously this used to work if the field accepted integers as input as it
   took the primary key.
 
+* Integer fields are now validated against database backend specific min and
+  max values based on their :meth:`internal_type <django.db.models.Field.get_internal_type>`.
+  Previously model field validation didn't prevent values out of their associated
+  column data type range from being saved resulting in an integrity error.
+
 Signals
 ^^^^^^^
 
@@ -792,14 +807,24 @@ Tests
 * The database settings for testing have been collected into a dictionary
   named :setting:`TEST <DATABASE-TEST>`.
 
+Utilities
+^^^^^^^^^
+
+* Improved :func:`~django.utils.html.strip_tags` accuracy (but it still cannot
+  guarantee an HTML-safe result, as stated in the documentation).
+
 Validators
 ^^^^^^^^^^
 
-* :class:`~django.core.validators.RegexValidator` now accepts an optional
-  Boolean :attr:`~django.core.validators.RegexValidator.inverse_match` argument
-  which determines if the :exc:`~django.core.exceptions.ValidationError` should
+* :class:`~django.core.validators.RegexValidator` now accepts the optional
+  :attr:`~django.core.validators.RegexValidator.flags` and
+  Boolean :attr:`~django.core.validators.RegexValidator.inverse_match` arguments.
+  The :attr:`~django.core.validators.RegexValidator.inverse_match` attribute
+  determines if the :exc:`~django.core.exceptions.ValidationError` should
   be raised when the regular expression pattern matches (``True``) or does not
-  match (``False``, by default) the provided ``value``.
+  match (``False``, by default) the provided ``value``. The
+  :attr:`~django.core.validators.RegexValidator.flags` attribute sets the flags
+  used when compiling a regular expression string.
 
 * :class:`~django.core.validators.URLValidator` now accepts an optional
   ``schemes`` argument which allows customization of the accepted URI schemes
@@ -1061,6 +1086,30 @@ Note also that the admin login form has been updated to not contain the
 ``this_is_the_login_form`` field (now unused) and the ``ValidationError`` code
 has been set to the more regular ``invalid_login`` key.
 
+``select_for_update()`` requires a transaction
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Historically, queries that use
+:meth:`~django.db.models.query.QuerySet.select_for_update()` could be
+executed in autocommit mode, outside of a transaction. Before Django
+1.6, Django's automatic transactions mode allowed this to be used to
+lock records until the next write operation. Django 1.6 introduced
+database-level autocommit; since then, execution in such a context
+voids the effect of ``select_for_update()``. It is, therefore, assumed
+now to be an error and raises an exception.
+
+This change was made because such errors can be caused by including an
+app which expects global transactions (e.g. :setting:`ATOMIC_REQUESTS
+<DATABASE-ATOMIC_REQUESTS>` set to ``True``), or Django's old autocommit
+behavior, in a project which runs without them; and further, such
+errors may manifest as data-corruption bugs. It was also made in
+Django 1.6.3.
+
+This change may cause test failures if you use ``select_for_update()``
+in a test class which is a subclass of
+:class:`~django.test.TransactionTestCase` rather than
+:class:`~django.test.TestCase`.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -1190,6 +1239,13 @@ Miscellaneous
   optional ``related_query_name`` argument. Setting ``related_query_name`` adds
   a relation from the related object back to the content type for filtering,
   ordering and other query operations.
+
+* When a model field's :attr:`~django.db.models.Field.validators` contains
+  a :class:`~django.core.validators.RegexValidator`, the regular expression
+  must now be passed as a regular expression string. You can no longer use a
+  pre-compiled regular expression in this case, as it is not serializable.
+  The :attr:`~django.core.validators.RegexValidator.flags` attribute was added
+  to :class:`~django.core.validators.RegexValidator` to simplify this change.
 
 .. _deprecated-features-1.7:
 
@@ -1461,7 +1517,7 @@ If all you need is to generate valid javascript strings, you can simply use
 ``fix_ampersands`` utils method and template filter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``django.utils.html.fix_ampersands`` method and the :tfilter:`fix_ampersands`
+The ``django.utils.html.fix_ampersands`` method and the ``fix_ampersands``
 template filter are deprecated, as the escaping of ampersands is already taken care
 of by Django's standard HTML escaping features. Combining this with ``fix_ampersands``
 would either result in double escaping, or, if the output is assumed to be safe,

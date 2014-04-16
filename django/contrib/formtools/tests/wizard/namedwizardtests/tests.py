@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from django.contrib.auth.models import User
 from django.contrib.auth.tests.utils import skipIfCustomUser
@@ -13,7 +13,6 @@ from django.contrib.formtools.tests.wizard.test_forms import get_request, Step1,
 
 
 class NamedWizardTests(object):
-    urls = 'django.contrib.formtools.tests.wizard.namedwizardtests.urls'
 
     def setUp(self):
         self.testuser, created = User.objects.get_or_create(username='testuser1')
@@ -283,6 +282,7 @@ class NamedWizardTests(object):
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.formtools.tests.wizard.namedwizardtests.urls')
 class NamedSessionWizardTests(NamedWizardTests, TestCase):
     wizard_urlname = 'nwiz_session'
     wizard_step_1_data = {
@@ -315,6 +315,7 @@ class NamedSessionWizardTests(NamedWizardTests, TestCase):
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.formtools.tests.wizard.namedwizardtests.urls')
 class NamedCookieWizardTests(NamedWizardTests, TestCase):
     wizard_urlname = 'nwiz_cookie'
     wizard_step_1_data = {
@@ -347,7 +348,6 @@ class NamedCookieWizardTests(NamedWizardTests, TestCase):
 
 
 class NamedFormTests(object):
-    urls = 'django.contrib.formtools.tests.wizard.namedwizardtests.urls'
 
     def test_revalidation(self):
         request = get_request()
@@ -376,12 +376,14 @@ class TestNamedUrlCookieWizardView(NamedUrlCookieWizardView):
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.formtools.tests.wizard.namedwizardtests.urls')
 class NamedSessionFormTests(NamedFormTests, TestCase):
     formwizard_class = TestNamedUrlSessionWizardView
     wizard_urlname = 'nwiz_session'
 
 
 @skipIfCustomUser
+@override_settings(ROOT_URLCONF='django.contrib.formtools.tests.wizard.namedwizardtests.urls')
 class NamedCookieFormTests(NamedFormTests, TestCase):
     formwizard_class = TestNamedUrlCookieWizardView
     wizard_urlname = 'nwiz_cookie'

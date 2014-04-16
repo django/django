@@ -755,7 +755,6 @@ class ConcurrentSaveTests(TransactionTestCase):
             try:
                 # Do not delete a directly - doing so alters its state.
                 Article.objects.filter(pk=a.pk).delete()
-                connections[DEFAULT_DB_ALIAS].commit_unless_managed()
             except Exception as e:
                 exceptions.append(e)
             finally:

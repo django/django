@@ -923,7 +923,7 @@ Check their documentation for details.
 `COMMENTS_BANNED_USERS_GROUP` setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django's :doc:`comments app </ref/contrib/comments/index>` has historically
+Django's comments has historically
 supported excluding the comments of a special user group, but we've never
 documented the feature properly and didn't enforce the exclusion in other parts
 of the app such as the template tags. To fix this problem, we removed the code
@@ -945,8 +945,7 @@ comment model manager to exclude the user group, like this::
             return qs
 
 Save this model manager in your custom comment app (e.g., in
-``my_comments_app/managers.py``) and add it your
-:ref:`custom comment app model <custom-comment-app-api>`::
+``my_comments_app/managers.py``) and add it your custom comment app model::
 
     from django.db import models
     from django.contrib.comments.models import Comment
@@ -957,9 +956,6 @@ Save this model manager in your custom comment app (e.g., in
         title = models.CharField(max_length=300)
 
         objects = BanningCommentManager()
-
-For more details, see the documentation about
-:doc:`customizing the comments framework </ref/contrib/comments/custom>`.
 
 `IGNORABLE_404_STARTS` and `IGNORABLE_404_ENDS` settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

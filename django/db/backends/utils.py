@@ -44,7 +44,6 @@ class CursorWrapper(object):
 
     def callproc(self, procname, params=None):
         self.db.validate_no_broken_transaction()
-        self.db.set_dirty()
         with self.db.wrap_database_errors:
             if params is None:
                 return self.cursor.callproc(procname)
@@ -53,7 +52,6 @@ class CursorWrapper(object):
 
     def execute(self, sql, params=None):
         self.db.validate_no_broken_transaction()
-        self.db.set_dirty()
         with self.db.wrap_database_errors:
             if params is None:
                 return self.cursor.execute(sql)
@@ -62,7 +60,6 @@ class CursorWrapper(object):
 
     def executemany(self, sql, param_list):
         self.db.validate_no_broken_transaction()
-        self.db.set_dirty()
         with self.db.wrap_database_errors:
             return self.cursor.executemany(sql, param_list)
 
@@ -131,7 +128,7 @@ def typecast_timestamp(s):  # does NOT store time zone information
     # "2005-07-29 09:56:00-05"
     if not s:
         return None
-    if not ' ' in s:
+    if ' ' not in s:
         return typecast_date(s)
     d, t = s.split()
     # Extract timezone information, if it exists. Currently we just throw

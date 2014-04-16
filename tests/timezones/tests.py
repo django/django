@@ -113,7 +113,7 @@ class LegacyDatabaseTests(TestCase):
         Event.objects.create(dt=dt)
         event = Event.objects.get()
         self.assertIsNone(event.dt.tzinfo)
-        # django.db.backend.utils.typecast_dt will just drop the
+        # django.db.backends.utils.typecast_dt will just drop the
         # timezone, so a round-trip in the database alters the data (!)
         # interpret the naive datetime in local time and you get a wrong value
         self.assertNotEqual(event.dt.replace(tzinfo=EAT), dt)
@@ -139,7 +139,7 @@ class LegacyDatabaseTests(TestCase):
         Event.objects.create(dt=dt)
         event = Event.objects.get()
         self.assertIsNone(event.dt.tzinfo)
-        # django.db.backend.utils.typecast_dt will just drop the
+        # django.db.backends.utils.typecast_dt will just drop the
         # timezone, so a round-trip in the database alters the data (!)
         # interpret the naive datetime in local time and you get a wrong value
         self.assertNotEqual(event.dt.replace(tzinfo=EAT), dt)
@@ -1070,10 +1070,10 @@ class NewFormsTests(TestCase):
 
 
 @override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True,
-                  PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+                  PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                  ROOT_URLCONF='timezones.urls')
 class AdminTests(TestCase):
 
-    urls = 'timezones.urls'
     fixtures = ['tz_users.xml']
 
     def setUp(self):

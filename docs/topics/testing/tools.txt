@@ -187,7 +187,7 @@ Use the ``django.test.Client`` class to make requests.
 
             >>> response = c.get('/redirect_me/', follow=True)
             >>> response.redirect_chain
-            [(u'http://testserver/next/', 302), (u'http://testserver/final/', 302)]
+            [('http://testserver/next/', 302), ('http://testserver/final/', 302)]
 
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
@@ -572,11 +572,6 @@ functionality like:
 * The ability to run tests with :ref:`modified settings <overriding-settings>`.
 * Using the :attr:`~SimpleTestCase.client` :class:`~django.test.Client`.
 * Custom test-time :attr:`URL maps <SimpleTestCase.urls>`.
-
-.. versionchanged:: 1.6
-
-    The latter two features were moved from ``TransactionTestCase`` to
-    ``SimpleTestCase`` in Django 1.6.
 
 If you need any of the other more complex and heavyweight Django-specific
 features like:
@@ -966,6 +961,11 @@ URLconf configuration
 
 .. attribute:: SimpleTestCase.urls
 
+.. deprecated:: 1.8
+
+    Use ``@override_settings(ROOT_URLCONF=...)`` instead for URLconf
+    configuration.
+
 If your application provides views, you may want to include tests that use the
 test client to exercise those views. However, an end user is free to deploy the
 views in your application at any URL of their choosing. This means that your
@@ -1193,6 +1193,11 @@ have been overridden, like this::
         del settings.LOGIN_URL
         ...
 
+.. versionchanged:: 1.7
+
+    Previously, you could only simulate the deletion of a setting which was
+    explicitly overridden.
+
 When overriding settings, make sure to handle the cases in which your app's
 code uses a cache or similar feature that retains state even if the setting is
 changed. Django provides the :data:`django.test.signals.setting_changed`
@@ -1245,7 +1250,7 @@ your test suite.
     failure. Similar to unittest's :meth:`~unittest.TestCase.assertRaisesRegexp`
     with the difference that ``expected_message`` isn't a regular expression.
 
-.. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value=u'')
+.. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value='')
 
     Asserts that a form field behaves correctly with various inputs.
 
@@ -1262,7 +1267,7 @@ your test suite.
     ``a@a.com`` as a valid email address, but rejects ``aaa`` with a reasonable
     error message::
 
-        self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': [u'Enter a valid email address.']})
+        self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': ['Enter a valid email address.']})
 
 .. method:: SimpleTestCase.assertFormError(response, form, field, errors, msg_prefix='')
 
@@ -1274,14 +1279,13 @@ your test suite.
 
     ``field`` is the name of the field on the form to check. If ``field``
     has a value of ``None``, non-field errors (errors you can access via
-    ``form.non_field_errors()``) will be checked.
+    :meth:`form.non_field_errors() <django.forms.Form.non_field_errors>`) will
+    be checked.
 
     ``errors`` is an error string, or a list of error strings, that are
     expected as a result of form validation.
 
 .. method:: SimpleTestCase.assertFormsetError(response, formset, form_index, field, errors, msg_prefix='')
-
-    .. versionadded:: 1.6
 
     Asserts that the ``formset`` raises the provided list of errors when
     rendered.
@@ -1295,7 +1299,8 @@ your test suite.
 
     ``field`` is the name of the field on the form to check. If ``field``
     has a value of ``None``, non-field errors (errors you can access via
-    ``form.non_field_errors()``) will be checked.
+    :meth:`form.non_field_errors() <django.forms.Form.non_field_errors>`) will
+    be checked.
 
     ``errors`` is an error string, or a list of error strings, that are
     expected as a result of form validation.
@@ -1323,12 +1328,18 @@ your test suite.
     attribute ordering is not significant. See
     :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
 
-.. method:: SimpleTestCase.assertTemplateUsed(response, template_name, msg_prefix='')
+.. method:: SimpleTestCase.assertTemplateUsed(response, template_name, msg_prefix='', count=None)
 
     Asserts that the template with the given name was used in rendering the
     response.
 
     The name is a string such as ``'admin/index.html'``.
+
+    .. versionadded:: 1.8
+
+        The count argument is an integer indicating the number of times the
+        template should be rendered. Default is ``None``, meaning that the
+        template should be rendered one or more times.
 
     You can use this as a context manager, like this::
 
@@ -1459,15 +1470,11 @@ your test suite.
     By default, the comparison is also ordering dependent. If ``qs`` doesn't
     provide an implicit ordering, you can set the ``ordered`` parameter to
     ``False``, which turns the comparison into a Python set comparison.
+    If the order is undefined (if the given ``qs`` isn't ordered and the
+    comparison is against more than one ordered values), a ``ValueError`` is
+    raised.
 
     Output in case of error can be customized with the ``msg`` argument.
-
-    .. versionchanged:: 1.6
-
-        The method now checks for undefined order and raises ``ValueError``
-        if undefined order is spotted. The ordering is seen as undefined if
-        the given ``qs`` isn't ordered and the comparison is against more
-        than one ordered values.
 
     .. versionchanged:: 1.7
 

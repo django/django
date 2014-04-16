@@ -21,7 +21,7 @@ from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning, trim_whitespace, LANGUAGE_SESSION_KEY
 
 
-# Translations are cached in a dictionary for every language+app tuple.
+# Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.
 _translations = {}
 _active = local()
@@ -168,7 +168,7 @@ def translation(language):
         # doesn't affect en-gb), even though they will both use the core "en"
         # translation. So we have to subvert Python's internal gettext caching.
         base_lang = lambda x: x.split('-', 1)[0]
-        if base_lang(lang) in [base_lang(trans) for trans in list(_translations)]:
+        if any(base_lang(lang) == base_lang(trans) for trans in _translations):
             res._info = res._info.copy()
             res._catalog = res._catalog.copy()
 
@@ -206,9 +206,8 @@ def translation(language):
 
 def activate(language):
     """
-    Fetches the translation object for a given tuple of application name and
-    language and installs it as the current translation object for the current
-    thread.
+    Fetches the translation object for a given language and installs it as the
+    current translation object for the current thread.
     """
     if language in _DJANGO_DEPRECATED_LOCALES:
         msg = ("The use of the language code '%s' is deprecated. "
@@ -390,12 +389,16 @@ def all_locale_paths():
     return [globalpath] + list(settings.LOCALE_PATHS)
 
 
-@lru_cache.lru_cache()
+@lru_cache.lru_cache(maxsize=1000)
 def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language
     code. This is used to decide whether a user-provided language is
     available.
+
+    lru_cache should have a maxsize to prevent from memory exhaustion attacks,
+    as the provided language codes are taken from the HTTP request. See also
+    <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>.
     """
     # First, a quick check to make sure lang_code is well-formed (#21458)
     if not language_code_re.search(lang_code):
@@ -480,8 +483,7 @@ def get_language_from_request(request, check_path=False):
             return lang_code
 
     if hasattr(request, 'session'):
-        # for backwards compatibility django_language is also checked (remove in 1.8)
-        lang_code = request.session.get(LANGUAGE_SESSION_KEY, request.session.get('django_language'))
+        lang_code = request.session.get(LANGUAGE_SESSION_KEY)
         if lang_code in _supported and lang_code is not None and check_for_language(lang_code):
             return lang_code
 

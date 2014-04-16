@@ -324,8 +324,6 @@ You can edit it multiple times.
 Session serialization
 ---------------------
 
-.. versionchanged:: 1.6
-
 Before version 1.6, Django defaulted to using :mod:`pickle` to serialize
 session data before storing it in the backend. If you're using the :ref:`signed
 cookie session backend<cookie-session-backend>` and :setting:`SECRET_KEY` is

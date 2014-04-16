@@ -119,12 +119,12 @@ Now we need to define a view::
 Finally hook that view into your urls::
 
     # urls.py
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from books.views import PublisherList
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^publishers/$', PublisherList.as_view()),
-    )
+    ]
 
 That's all the Python code we need to write. We still need to write a template,
 however. We could explicitly tell the view which template to use by adding a
@@ -330,12 +330,12 @@ various useful things are stored on ``self``; as well as the request
 Here, we have a URLconf with a single captured group::
 
     # urls.py
-    from django.conf.urls import patterns
+    from django.conf.urls import url
     from books.views import PublisherBookList
 
-    urlpatterns = patterns('',
-        (r'^books/([\w-]+)/$', PublisherBookList.as_view()),
-    )
+    urlpatterns = [
+        url(r'^books/([\w-]+)/$', PublisherBookList.as_view()),
+    ]
 
 Next, we'll write the ``PublisherBookList`` view itself::
 
@@ -396,13 +396,13 @@ updated.
 First, we'd need to add an author detail bit in the URLconf to point to a
 custom view::
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from books.views import AuthorDetailView
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         #...
         url(r'^authors/(?P<pk>\d+)/$', AuthorDetailView.as_view(), name='author-detail'),
-    )
+    ]
 
 Then we'd write our new view -- ``get_object`` is the method that retrieves the
 object -- so we simply override it and wrap the call::

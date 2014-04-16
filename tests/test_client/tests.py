@@ -29,10 +29,10 @@ from django.test import override_settings
 from .views import get_view
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF='test_client.urls',)
 class ClientTest(TestCase):
     fixtures = ['testdata.json']
-    urls = 'test_client.urls'
 
     def test_get_view(self):
         "GET a view"
@@ -499,10 +499,10 @@ class ClientTest(TestCase):
 
 
 @override_settings(
-    MIDDLEWARE_CLASSES=('django.middleware.csrf.CsrfViewMiddleware',)
+    MIDDLEWARE_CLASSES=('django.middleware.csrf.CsrfViewMiddleware',),
+    ROOT_URLCONF='test_client.urls',
 )
 class CSRFEnabledClientTests(TestCase):
-    urls = 'test_client.urls'
 
     def test_csrf_enabled_client(self):
         "A client can be instantiated with CSRF checks enabled"
@@ -529,8 +529,8 @@ class CustomTestClientTest(TestCase):
         self.assertEqual(hasattr(self.client, "i_am_customized"), True)
 
 
+@override_settings(ROOT_URLCONF='test_client.urls')
 class RequestFactoryTest(TestCase):
-    urls = 'test_client.urls'
 
     def test_request_factory(self):
         factory = RequestFactory()

@@ -11,19 +11,15 @@ from django.test import (
     LiveServerTestCase, TestCase, modify_settings, override_settings)
 from django.utils import six
 from django.utils._os import upath
+from django.utils.module_loading import import_string
 from django.utils.translation import override, LANGUAGE_SESSION_KEY
-
-try:
-    from selenium.webdriver.firefox import webdriver as firefox
-except ImportError:
-    firefox = None
 
 from ..urls import locale_dir
 
 
+@override_settings(ROOT_URLCONF='view_tests.urls')
 class I18NTests(TestCase):
     """ Tests django views in django/views/i18n.py """
-    urls = 'view_tests.urls'
 
     def test_setlang(self):
         """
@@ -89,12 +85,12 @@ class I18NTests(TestCase):
                     self.assertContains(response, r'"month name\u0004May": "mai"', 1)
 
 
+@override_settings(ROOT_URLCONF='view_tests.urls')
 class JsI18NTests(TestCase):
     """
     Tests django views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE.
     """
-    urls = 'view_tests.urls'
 
     def test_jsi18n_with_missing_en_files(self):
         """
@@ -167,8 +163,8 @@ class JsI18NTests(TestCase):
             self.assertContains(response, '\\ud83d\\udca9')
 
 
+@override_settings(ROOT_URLCONF='view_tests.urls')
 class JsI18NTestsMultiPackage(TestCase):
-    urls = 'view_tests.urls'
     """
     Tests for django views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE and merge JS translation from several packages.
@@ -211,16 +207,20 @@ skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
 
 
 @unittest.skipIf(skip_selenium, 'Selenium tests not requested')
-@unittest.skipUnless(firefox, 'Selenium not installed')
+@override_settings(ROOT_URLCONF='view_tests.urls')
 class JavascriptI18nTests(LiveServerTestCase):
 
     # The test cases use translations from these apps.
     available_apps = ['django.contrib.admin', 'view_tests']
-    urls = 'view_tests.urls'
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     @classmethod
     def setUpClass(cls):
-        cls.selenium = firefox.WebDriver()
+        try:
+            cls.selenium = import_string(cls.webdriver_class)()
+        except Exception as e:
+            raise unittest.SkipTest('Selenium webdriver "%s" not installed or '
+                                    'not operational: %s' % (cls.webdriver_class, str(e)))
         super(JavascriptI18nTests, cls).setUpClass()
 
     @classmethod

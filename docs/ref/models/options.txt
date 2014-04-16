@@ -279,8 +279,6 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.select_on_save
 
-    .. versionadded:: 1.6
-
     Determines if Django will use the pre-1.6
     :meth:`django.db.models.Model.save()` algorithm. The old algorithm
     uses ``SELECT`` to determine if there is an existing row to be updated.
@@ -344,7 +342,7 @@ Django quotes column and table names behind the scenes.
 
     For convenience, ``index_together`` can be a single list when dealing with a single
     set of fields::
-    
+
         index_together = ["pub_date", "deadline"]
 
 ``verbose_name``

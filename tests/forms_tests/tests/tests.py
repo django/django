@@ -111,12 +111,12 @@ class ModelFormCallableModelDefault(TestCase):
 <option value="1" selected="selected">ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice" value="1" id="initial-id_multi_choice_0" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>
+</select><input type="hidden" name="initial-multi_choice" value="1" id="initial-id_multi_choice_0" /></p>
 <p><label for="id_multi_choice_int">Multi choice int:</label> <select multiple="multiple" name="multi_choice_int" id="id_multi_choice_int">
 <option value="1" selected="selected">ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice_int" value="1" id="initial-id_multi_choice_int_0" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
+</select><input type="hidden" name="initial-multi_choice_int" value="1" id="initial-id_multi_choice_int_0" /></p>""")
 
     def test_initial_instance_value(self):
         "Initial instances for model fields may also be instances (refs #7287)"
@@ -143,13 +143,13 @@ class ModelFormCallableModelDefault(TestCase):
 <option value="2" selected="selected">ChoiceOption 2</option>
 <option value="3" selected="selected">ChoiceOption 3</option>
 </select><input type="hidden" name="initial-multi_choice" value="2" id="initial-id_multi_choice_0" />
-<input type="hidden" name="initial-multi_choice" value="3" id="initial-id_multi_choice_1" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>
+<input type="hidden" name="initial-multi_choice" value="3" id="initial-id_multi_choice_1" /></p>
 <p><label for="id_multi_choice_int">Multi choice int:</label> <select multiple="multiple" name="multi_choice_int" id="id_multi_choice_int">
 <option value="1">ChoiceOption 1</option>
 <option value="2" selected="selected">ChoiceOption 2</option>
 <option value="3" selected="selected">ChoiceOption 3</option>
 </select><input type="hidden" name="initial-multi_choice_int" value="2" id="initial-id_multi_choice_int_0" />
-<input type="hidden" name="initial-multi_choice_int" value="3" id="initial-id_multi_choice_int_1" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
+<input type="hidden" name="initial-multi_choice_int" value="3" id="initial-id_multi_choice_int_1" /></p>""")
 
 
 class FormsModelTestCase(TestCase):

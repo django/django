@@ -292,6 +292,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'django_power(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
+    def integer_field_range(self, internal_type):
+        # SQLite doesn't enforce any integer constraints
+        return (None, None)
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'sqlite'
@@ -407,7 +411,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             level = ''
         # 'isolation_level' is a misleading API.
         # SQLite always runs at the SERIALIZABLE isolation level.
-        self.connection.isolation_level = level
+        with self.wrap_database_errors:
+            self.connection.isolation_level = level
 
     def check_constraints(self, table_names=None):
         """

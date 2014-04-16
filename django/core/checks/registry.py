@@ -6,6 +6,16 @@ from itertools import chain
 from django.utils.itercompat import is_iterable
 
 
+class Tags(object):
+    """
+    Built-in tags for internal checks.
+    """
+    admin = 'admin'
+    compatibility = 'compatibility'
+    models = 'models'
+    signals = 'signals'
+
+
 class CheckRegistry(object):
 
     def __init__(self):
@@ -54,8 +64,10 @@ class CheckRegistry(object):
         return errors
 
     def tag_exists(self, tag):
-        tags = chain(*[check.tags for check in self.registered_checks if hasattr(check, 'tags')])
-        return tag in tags
+        return tag in self.tags_available()
+
+    def tags_available(self):
+        return set(chain(*[check.tags for check in self.registered_checks if hasattr(check, 'tags')]))
 
 
 registry = CheckRegistry()

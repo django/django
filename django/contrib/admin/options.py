@@ -30,18 +30,19 @@ from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.formsets import all_valid, DELETION_FIELD_NAME
 from django.forms.models import (modelform_factory, modelformset_factory,
     inlineformset_factory, BaseInlineFormSet, modelform_defines_fields)
+from django.forms.widgets import SelectMultiple, CheckboxSelectMultiple
 from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils import six
 from django.utils.decorators import method_decorator
-from django.utils.deprecation import (RenameMethodsBase,
-    RemovedInDjango18Warning, RemovedInDjango19Warning)
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import escape, escapejs
 from django.utils.http import urlencode
 from django.utils.text import capfirst, get_text_list
+from django.utils.translation import string_concat
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.utils.safestring import mark_safe
@@ -59,7 +60,7 @@ def get_content_type_for_model(obj):
     # Since this module gets imported in the application's root package,
     # it cannot import models from other applications at the module level.
     from django.contrib.contenttypes.models import ContentType
-    return ContentType.objects.get_for_model(obj)
+    return ContentType.objects.get_for_model(obj, for_concrete_model=False)
 
 
 def get_ul_class(radio_style):
@@ -92,13 +93,7 @@ FORMFIELD_FOR_DBFIELD_DEFAULTS = {
 csrf_protect_m = method_decorator(csrf_protect)
 
 
-class RenameBaseModelAdminMethods(forms.MediaDefiningClass, RenameMethodsBase):
-    renamed_methods = (
-        ('queryset', 'get_queryset', RemovedInDjango18Warning),
-    )
-
-
-class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
+class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     """Functionality common to both ModelAdmin and InlineAdmin."""
 
     raw_id_fields = ()
@@ -258,7 +253,7 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
             })
             kwargs['empty_label'] = _('None') if db_field.blank else None
 
-        if not 'queryset' in kwargs:
+        if 'queryset' not in kwargs:
             queryset = self.get_field_queryset(db, db_field, request)
             if queryset is not None:
                 kwargs['queryset'] = queryset
@@ -282,12 +277,17 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
         elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
             kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
 
-        if not 'queryset' in kwargs:
+        if 'queryset' not in kwargs:
             queryset = self.get_field_queryset(db, db_field, request)
             if queryset is not None:
                 kwargs['queryset'] = queryset
 
-        return db_field.formfield(**kwargs)
+        form_field = db_field.formfield(**kwargs)
+        if isinstance(form_field.widget, SelectMultiple) and not isinstance(form_field.widget, CheckboxSelectMultiple):
+            msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
+            help_text = form_field.help_text
+            form_field.help_text = string_concat(help_text, ' ', msg) if help_text else msg
+        return form_field
 
     def get_view_on_site_url(self, obj=None):
         if obj is None or not self.view_on_site:
@@ -543,7 +543,7 @@ class ModelAdmin(BaseModelAdmin):
         return inline_instances
 
     def get_urls(self):
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         def wrap(view):
             def wrapper(*args, **kwargs):
@@ -552,13 +552,13 @@ class ModelAdmin(BaseModelAdmin):
 
         info = self.model._meta.app_label, self.model._meta.model_name
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^$', wrap(self.changelist_view), name='%s_%s_changelist' % info),
             url(r'^add/$', wrap(self.add_view), name='%s_%s_add' % info),
             url(r'^(.+)/history/$', wrap(self.history_view), name='%s_%s_history' % info),
             url(r'^(.+)/delete/$', wrap(self.delete_view), name='%s_%s_delete' % info),
             url(r'^(.+)/$', wrap(self.change_view), name='%s_%s_change' % info),
-        )
+        ]
         return urlpatterns
 
     def urls(self):
@@ -791,8 +791,7 @@ class ModelAdmin(BaseModelAdmin):
         """
         # If self.actions is explicitly set to None that means that we don't
         # want *any* actions enabled on this page.
-        from django.contrib.admin.views.main import _is_changelist_popup
-        if self.actions is None or _is_changelist_popup(request):
+        if self.actions is None or IS_POPUP_VAR in request.GET:
             return OrderedDict()
 
         actions = []

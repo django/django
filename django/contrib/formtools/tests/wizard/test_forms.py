@@ -246,11 +246,11 @@ class SessionFormTests(TestCase):
     def test_init(self):
         request = get_request()
         testform = SessionWizardView.as_view([('start', Step1)])
-        self.assertTrue(isinstance(testform(request), TemplateResponse))
+        self.assertIsInstance(testform(request), TemplateResponse)
 
 
 class CookieFormTests(TestCase):
     def test_init(self):
         request = get_request()
         testform = CookieWizardView.as_view([('start', Step1)])
-        self.assertTrue(isinstance(testform(request), TemplateResponse))
+        self.assertIsInstance(testform(request), TemplateResponse)

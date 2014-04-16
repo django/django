@@ -7,20 +7,20 @@ import warnings
 
 from django.apps import apps
 from django.apps.config import MODELS_MODULE_NAME
-import django.db.models.manager  # NOQA: Imported to register signal handler.
 from django.conf import settings
 from django.core import checks
 from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
+from django.db import (router, transaction, DatabaseError,
+    DEFAULT_DB_ALIAS)
+from django.db.models.deletion import Collector
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
     OneToOneField, add_lazy_relation)
-from django.db import (router, transaction, DatabaseError,
-    DEFAULT_DB_ALIAS)
+from django.db.models.manager import ensure_default_manager
+from django.db.models.options import Options
 from django.db.models.query import Q
 from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
-from django.db.models.deletion import Collector
-from django.db.models.options import Options
 from django.db.models import signals
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
@@ -353,6 +353,7 @@ class ModelBase(type):
             cls.get_absolute_url = update_wrapper(curry(get_absolute_url, opts, cls.get_absolute_url),
                                                   cls.get_absolute_url)
 
+        ensure_default_manager(cls)
         signals.class_prepared.send(sender=cls)
 
 
@@ -625,7 +626,7 @@ class Model(six.with_metaclass(ModelBase)):
         if not meta.auto_created:
             signals.pre_save.send(sender=origin, instance=self, raw=raw, using=using,
                                   update_fields=update_fields)
-        with transaction.commit_on_success_unless_managed(using=using, savepoint=False):
+        with transaction.atomic(using=using, savepoint=False):
             if not raw:
                 self._save_parents(cls, using, update_fields)
             updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
@@ -1345,6 +1346,19 @@ class Model(six.with_metaclass(ModelBase)):
                             id='models.E013',
                         )
                     )
+                elif field not in cls._meta.local_fields:
+                    errors.append(
+                        checks.Error(
+                            ("'%s' refers to field '%s' which is not local "
+                             "to model '%s'.") % (
+                                option, field_name, cls._meta.object_name
+                            ),
+                            hint=("This issue may be caused by multi-table "
+                                  "inheritance."),
+                            obj=cls,
+                            id='models.E016',
+                        )
+                    )
         return errors
 
     @classmethod
@@ -1417,7 +1431,7 @@ def method_set_order(ordered_obj, self, id_list, using=None):
     order_name = ordered_obj._meta.order_with_respect_to.name
     # FIXME: It would be nice if there was an "update many" version of update
     # for situations like this.
-    with transaction.commit_on_success_unless_managed(using=using):
+    with transaction.atomic(using=using, savepoint=False):
         for i, j in enumerate(id_list):
             ordered_obj.objects.filter(**{'pk': j, order_name: rel_val}).update(_order=i)
 

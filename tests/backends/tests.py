@@ -14,7 +14,6 @@ from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
     DatabaseError, IntegrityError, transaction)
 from django.db.backends.signals import connection_created
-from django.db.backends.sqlite3.base import DatabaseOperations
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.backends.utils import format_number, CursorWrapper
 from django.db.models import Sum, Avg, Variance, StdDev
@@ -371,7 +370,7 @@ class PostgresNewConnectionTests(TestCase):
             # Fetch a new connection with the new_tz as default
             # time zone, run a query and rollback.
             new_connection.settings_dict['TIME_ZONE'] = new_tz
-            new_connection.enter_transaction_management()
+            new_connection.set_autocommit(False)
             cursor = new_connection.cursor()
             new_connection.rollback()
 
@@ -485,6 +484,8 @@ class SqliteChecks(TestCase):
     @unittest.skipUnless(connection.vendor == 'sqlite',
                          "No need to do SQLite checks")
     def test_convert_values_to_handle_null_value(self):
+        from django.db.backends.sqlite3.base import DatabaseOperations
+
         database_operations = DatabaseOperations(connection)
         self.assertEqual(
             None,
@@ -645,7 +646,7 @@ class BackendTestCase(TestCase):
         Test that cursors can be used as a context manager
         """
         with connection.cursor() as cursor:
-            self.assertTrue(isinstance(cursor, CursorWrapper))
+            self.assertIsInstance(cursor, CursorWrapper)
         # Both InterfaceError and ProgrammingError seem to be used when
         # accessing closed cursor (psycopg2 has InterfaceError, rest seem
         # to use ProgrammingError).
@@ -660,8 +661,32 @@ class BackendTestCase(TestCase):
         # psycopg2 offers us a way to check that by closed attribute.
         # So, run only on psycopg2 for that reason.
         with connection.cursor() as cursor:
-            self.assertTrue(isinstance(cursor, CursorWrapper))
+            self.assertIsInstance(cursor, CursorWrapper)
         self.assertTrue(cursor.closed)
+
+    # Unfortunately with sqlite3 the in-memory test database cannot be closed.
+    @skipUnlessDBFeature('test_db_allows_multiple_connections')
+    def test_is_usable_after_database_disconnects(self):
+        """
+        Test that is_usable() doesn't crash when the database disconnects.
+
+        Regression for #21553.
+        """
+        # Open a connection to the database.
+        with connection.cursor():
+            pass
+        # Emulate a connection close by the database.
+        connection._close()
+        # Even then is_usable() should not raise an exception.
+        try:
+            self.assertFalse(connection.is_usable())
+        finally:
+            # Clean up the mess created by connection._close(). Since the
+            # connection is already closed, this crashes on some backends.
+            try:
+                connection.close()
+            except Exception:
+                pass
 
 
 # We don't make these tests conditional because that means we would need to
@@ -1033,3 +1058,16 @@ class UnicodeArrayTestCase(TestCase):
         a = ["ᄲawef"]
         b = self.select(a)
         self.assertEqual(a[0], b[0])
+
+
+@unittest.skipUnless(
+    connection.vendor == 'postgresql',
+    "This test applies only to PostgreSQL")
+class PostgresLookupCastTests(TestCase):
+    def test_lookup_cast(self):
+        from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations
+
+        do = DatabaseOperations(connection=None)
+        for lookup in ('iexact', 'contains', 'icontains', 'startswith',
+                       'istartswith', 'endswith', 'iendswith', 'regex', 'iregex'):
+            self.assertIn('::text', do.lookup_cast(lookup))

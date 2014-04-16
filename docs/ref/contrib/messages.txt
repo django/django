@@ -354,8 +354,6 @@ example::
 Adding messages in Class Based Views
 ------------------------------------
 
-.. versionadded:: 1.6
-
 .. class:: views.SuccessMessageMixin
 
     Adds a success message attribute to

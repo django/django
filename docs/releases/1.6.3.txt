@@ -5,7 +5,33 @@ Django 1.6.3 release notes
 *Under development*
 
 This is Django 1.6.3, a bugfix release for Django 1.6. Django 1.6.3 fixes
-several bugs in 1.6.2:
+several bugs in 1.6.2 and makes one backwards-incompatible change:
+
+``select_for_update()`` requires a transaction
+==============================================
+
+Historically, queries that use
+:meth:`~django.db.models.query.QuerySet.select_for_update()` could be
+executed in autocommit mode, outside of a transaction. Before Django
+1.6, Django's automatic transactions mode allowed this to be used to
+lock records until the next write operation. Django 1.6 introduced
+database-level autocommit; since then, execution in such a context
+voids the effect of ``select_for_update()``. It is, therefore, assumed
+now to be an error and raises an exception.
+
+This change was made because such errors can be caused by including an
+app which expects global transactions (e.g. :setting:`ATOMIC_REQUESTS
+<DATABASE-ATOMIC_REQUESTS>` set to ``True``), or Django's old autocommit
+behavior, in a project which runs without them; and further, such
+errors may manifest as data-corruption bugs.
+
+This change may cause test failures if you use ``select_for_update()``
+in a test class which is a subclass of
+:class:`~django.test.TransactionTestCase` rather than
+:class:`~django.test.TestCase`.
+
+Other bugfixes and changes
+==========================
 
 * Content retrieved from the GeoIP library is now properly decoded from its
   default ``iso-8859-1`` encoding
@@ -23,3 +49,27 @@ several bugs in 1.6.2:
   :class:`~django.forms.IntegerField` subclasses from being overwritten by the
   code in their ``__init__`` method
   (`#22245 <http://code.djangoproject.com/ticket/22245>`_).
+
+* Improved :func:`~django.utils.html.strip_tags` accuracy (but it still cannot
+  guarantee an HTML-safe result, as stated in the documentation).
+
+* Fixed a regression in the :mod:`django.contrib.gis` SQL compiler for
+  non-concrete fields (`#22250 <http://code.djangoproject.com/ticket/22250>`_).
+
+* Fixed :attr:`ModelAdmin.preserve_filters
+  <django.contrib.admin.ModelAdmin.preserve_filters>` when running a site with
+  a URL prefix (`#21795 <http://code.djangoproject.com/ticket/21795>`_).
+
+* Fixed a crash in the ``find_command`` management utility when the ``PATH``
+  environment variable wasn't set
+  (`#22256 <http://code.djangoproject.com/ticket/22256>`_).
+
+* Fixed :djadmin:`changepassword` on Windows
+  (`#22364 <https://code.djangoproject.com/ticket/22364>`_).
+
+* Fixed regression in ``prefetch_related`` that caused the related objects
+  query to include an unnecessary join
+  (`#21760 <https://code.djangoproject.com/ticket/21760>`_).
+
+Additionally, Django's vendored version of six, :mod:`django.utils.six` has been
+upgraded to the latest release (1.6.1).

@@ -641,7 +641,7 @@ class ImageField(FileField):
         if f is None:
             return None
 
-        from django.utils.image import Image
+        from PIL import Image
 
         # We need to get a file object for Pillow. We might have a path or we might
         # have to read the data into memory.
@@ -659,7 +659,7 @@ class ImageField(FileField):
             # verify() must be called immediately after the constructor.
             Image.open(file).verify()
         except Exception:
-            # Pillow (or PIL) doesn't recognize it as an image.
+            # Pillow doesn't recognize it as an image.
             six.reraise(ValidationError, ValidationError(
                 self.error_messages['invalid_image'],
                 code='invalid_image',
@@ -704,9 +704,6 @@ class URLField(CharField):
                 # Rebuild the url_fields list, since the domain segment may now
                 # contain the path too.
                 url_fields = split_url(urlunsplit(url_fields))
-            if not url_fields[2]:
-                # the path portion may need to be added before query params
-                url_fields[2] = '/'
             value = urlunsplit(url_fields)
         return value
 

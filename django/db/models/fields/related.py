@@ -14,7 +14,6 @@ from django.db.models.query import QuerySet
 from django.db.models.sql.datastructures import Col
 from django.utils.encoding import smart_text
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase, RemovedInDjango18Warning
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry, cached_property
 from django.core import exceptions
@@ -344,14 +343,7 @@ class RelatedField(Field):
         return self.rel.related_query_name or self.rel.related_name or self.opts.model_name
 
 
-class RenameRelatedObjectDescriptorMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('get_query_set', 'get_queryset', RemovedInDjango18Warning),
-        ('get_prefetch_query_set', 'get_prefetch_queryset', RemovedInDjango18Warning),
-    )
-
-
-class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescriptorMethods)):
+class SingleRelatedObjectDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
     # a single "remote" value, on the class pointed to by a related field.
@@ -479,7 +471,7 @@ class SingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescri
         setattr(value, self.related.field.get_cache_name(), instance)
 
 
-class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjectDescriptorMethods)):
+class ReverseSingleRelatedObjectDescriptor(object):
     # This class provides the functionality that makes the related-object
     # managers available as attributes on a model class, for fields that have
     # a single "remote" value, on the class that defines the related field.
@@ -529,7 +521,9 @@ class ReverseSingleRelatedObjectDescriptor(six.with_metaclass(RenameRelatedObjec
         # composite fields. In the meantime we take this practical approach to
         # solve a regression on 1.6 when the reverse manager in hidden
         # (related_name ends with a '+'). Refs #21410.
-        if self.field.rel.is_hidden():
+        # The check for len(...) == 1 is a special case that allows the query
+        # to be join-less and smaller. Refs #21760.
+        if self.field.rel.is_hidden() or len(self.field.foreign_related_fields) == 1:
             query = {'%s__in' % related_field.name: set(instance_attr(inst)[0] for inst in instances)}
         else:
             query = {'%s__in' % self.field.related_query_name(): instances}
@@ -694,8 +688,7 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
         def add(self, *objs):
             objs = list(objs)
             db = router.db_for_write(self.model, instance=self.instance)
-            with transaction.commit_on_success_unless_managed(
-                    using=db, savepoint=False):
+            with transaction.atomic(using=db, savepoint=False):
                 for obj in objs:
                     if not isinstance(obj, self.model):
                         raise TypeError("'%s' instance expected, got %r" %
@@ -744,9 +737,10 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
                 db = router.db_for_write(self.model, instance=self.instance)
                 queryset = queryset.using(db)
                 if bulk:
+                    # `QuerySet.update()` is intrinsically atomic.
                     queryset.update(**{rel_field.name: None})
                 else:
-                    with transaction.commit_on_success_unless_managed(using=db, savepoint=False):
+                    with transaction.atomic(using=db, savepoint=False):
                         for obj in queryset:
                             setattr(obj, rel_field.name, None)
                             obj.save(update_fields=[rel_field.name])
@@ -771,12 +765,18 @@ class ForeignRelatedObjectsDescriptor(object):
         return self.related_manager_cls(instance)
 
     def __set__(self, instance, value):
+        # Force evaluation of `value` in case it's a queryset whose
+        # value could be affected by `manager.clear()`. Refs #19816.
+        value = tuple(value)
+
         manager = self.__get__(instance)
-        # If the foreign key can support nulls, then completely clear the related set.
-        # Otherwise, just move the named objects into the set.
-        if self.related.field.null:
-            manager.clear()
-        manager.add(*value)
+        db = router.db_for_write(manager.model, instance=manager.instance)
+        with transaction.atomic(using=db, savepoint=False):
+            # If the foreign key can support nulls, then completely clear the related set.
+            # Otherwise, just move the named objects into the set.
+            if self.related.field.null:
+                manager.clear()
+            manager.add(*value)
 
     @cached_property
     def related_manager_cls(self):
@@ -910,11 +910,14 @@ def create_many_related_manager(superclass, rel):
                     "Cannot use add() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." %
                     (opts.app_label, opts.object_name)
                 )
-            self._add_items(self.source_field_name, self.target_field_name, *objs)
 
-            # If this is a symmetrical m2m relation to self, add the mirror entry in the m2m table
-            if self.symmetrical:
-                self._add_items(self.target_field_name, self.source_field_name, *objs)
+            db = router.db_for_write(self.through, instance=self.instance)
+            with transaction.atomic(using=db, savepoint=False):
+                self._add_items(self.source_field_name, self.target_field_name, *objs)
+
+                # If this is a symmetrical m2m relation to self, add the mirror entry in the m2m table
+                if self.symmetrical:
+                    self._add_items(self.target_field_name, self.source_field_name, *objs)
         add.alters_data = True
 
         def remove(self, *objs):
@@ -929,17 +932,17 @@ def create_many_related_manager(superclass, rel):
 
         def clear(self):
             db = router.db_for_write(self.through, instance=self.instance)
+            with transaction.atomic(using=db, savepoint=False):
+                signals.m2m_changed.send(sender=self.through, action="pre_clear",
+                    instance=self.instance, reverse=self.reverse,
+                    model=self.model, pk_set=None, using=db)
 
-            signals.m2m_changed.send(sender=self.through, action="pre_clear",
-                instance=self.instance, reverse=self.reverse,
-                model=self.model, pk_set=None, using=db)
+                filters = self._build_remove_filters(super(ManyRelatedManager, self).get_queryset().using(db))
+                self.through._default_manager.using(db).filter(filters).delete()
 
-            filters = self._build_remove_filters(super(ManyRelatedManager, self).get_queryset().using(db))
-            self.through._default_manager.using(db).filter(filters).delete()
-
-            signals.m2m_changed.send(sender=self.through, action="post_clear",
-                instance=self.instance, reverse=self.reverse,
-                model=self.model, pk_set=None, using=db)
+                signals.m2m_changed.send(sender=self.through, action="post_clear",
+                    instance=self.instance, reverse=self.reverse,
+                    model=self.model, pk_set=None, using=db)
         clear.alters_data = True
 
         def create(self, **kwargs):
@@ -999,35 +1002,39 @@ def create_many_related_manager(superclass, rel):
                         )
                     else:
                         new_ids.add(obj)
+
                 db = router.db_for_write(self.through, instance=self.instance)
-                vals = self.through._default_manager.using(db).values_list(target_field_name, flat=True)
-                vals = vals.filter(**{
-                    source_field_name: self.related_val[0],
-                    '%s__in' % target_field_name: new_ids,
-                })
+                vals = (self.through._default_manager.using(db)
+                        .values_list(target_field_name, flat=True)
+                        .filter(**{
+                            source_field_name: self.related_val[0],
+                            '%s__in' % target_field_name: new_ids,
+                        }))
                 new_ids = new_ids - set(vals)
 
-                if self.reverse or source_field_name == self.source_field_name:
-                    # Don't send the signal when we are inserting the
-                    # duplicate data row for symmetrical reverse entries.
-                    signals.m2m_changed.send(sender=self.through, action='pre_add',
-                        instance=self.instance, reverse=self.reverse,
-                        model=self.model, pk_set=new_ids, using=db)
-                # Add the ones that aren't there already
-                self.through._default_manager.using(db).bulk_create([
-                    self.through(**{
-                        '%s_id' % source_field_name: self.related_val[0],
-                        '%s_id' % target_field_name: obj_id,
-                    })
-                    for obj_id in new_ids
-                ])
+                with transaction.atomic(using=db, savepoint=False):
+                    if self.reverse or source_field_name == self.source_field_name:
+                        # Don't send the signal when we are inserting the
+                        # duplicate data row for symmetrical reverse entries.
+                        signals.m2m_changed.send(sender=self.through, action='pre_add',
+                            instance=self.instance, reverse=self.reverse,
+                            model=self.model, pk_set=new_ids, using=db)
 
-                if self.reverse or source_field_name == self.source_field_name:
-                    # Don't send the signal when we are inserting the
-                    # duplicate data row for symmetrical reverse entries.
-                    signals.m2m_changed.send(sender=self.through, action='post_add',
-                        instance=self.instance, reverse=self.reverse,
-                        model=self.model, pk_set=new_ids, using=db)
+                    # Add the ones that aren't there already
+                    self.through._default_manager.using(db).bulk_create([
+                        self.through(**{
+                            '%s_id' % source_field_name: self.related_val[0],
+                            '%s_id' % target_field_name: obj_id,
+                        })
+                        for obj_id in new_ids
+                    ])
+
+                    if self.reverse or source_field_name == self.source_field_name:
+                        # Don't send the signal when we are inserting the
+                        # duplicate data row for symmetrical reverse entries.
+                        signals.m2m_changed.send(sender=self.through, action='post_add',
+                            instance=self.instance, reverse=self.reverse,
+                            model=self.model, pk_set=new_ids, using=db)
 
         def _remove_items(self, source_field_name, target_field_name, *objs):
             # source_field_name: the PK colname in join table for the source object
@@ -1046,23 +1053,23 @@ def create_many_related_manager(superclass, rel):
                     old_ids.add(obj)
 
             db = router.db_for_write(self.through, instance=self.instance)
+            with transaction.atomic(using=db, savepoint=False):
+                # Send a signal to the other end if need be.
+                signals.m2m_changed.send(sender=self.through, action="pre_remove",
+                    instance=self.instance, reverse=self.reverse,
+                    model=self.model, pk_set=old_ids, using=db)
+                target_model_qs = super(ManyRelatedManager, self).get_queryset()
+                if target_model_qs._has_filters():
+                    old_vals = target_model_qs.using(db).filter(**{
+                        '%s__in' % self.target_field.related_field.attname: old_ids})
+                else:
+                    old_vals = old_ids
+                filters = self._build_remove_filters(old_vals)
+                self.through._default_manager.using(db).filter(filters).delete()
 
-            # Send a signal to the other end if need be.
-            signals.m2m_changed.send(sender=self.through, action="pre_remove",
-                instance=self.instance, reverse=self.reverse,
-                model=self.model, pk_set=old_ids, using=db)
-            target_model_qs = super(ManyRelatedManager, self).get_queryset()
-            if target_model_qs._has_filters():
-                old_vals = target_model_qs.using(db).filter(**{
-                    '%s__in' % self.target_field.related_field.attname: old_ids})
-            else:
-                old_vals = old_ids
-            filters = self._build_remove_filters(old_vals)
-            self.through._default_manager.using(db).filter(filters).delete()
-
-            signals.m2m_changed.send(sender=self.through, action="post_remove",
-                instance=self.instance, reverse=self.reverse,
-                model=self.model, pk_set=old_ids, using=db)
+                signals.m2m_changed.send(sender=self.through, action="post_remove",
+                    instance=self.instance, reverse=self.reverse,
+                    model=self.model, pk_set=old_ids, using=db)
 
     return ManyRelatedManager
 
@@ -1111,9 +1118,15 @@ class ManyRelatedObjectsDescriptor(object):
             opts = self.related.field.rel.through._meta
             raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
 
+        # Force evaluation of `value` in case it's a queryset whose
+        # value could be affected by `manager.clear()`. Refs #19816.
+        value = tuple(value)
+
         manager = self.__get__(instance)
-        manager.clear()
-        manager.add(*value)
+        db = router.db_for_write(manager.through, instance=manager.instance)
+        with transaction.atomic(using=db, savepoint=False):
+            manager.clear()
+            manager.add(*value)
 
 
 class ReverseManyRelatedObjectsDescriptor(object):
@@ -1165,12 +1178,15 @@ class ReverseManyRelatedObjectsDescriptor(object):
             opts = self.field.rel.through._meta
             raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model.  Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
 
-        manager = self.__get__(instance)
-        # clear() can change expected output of 'value' queryset, we force evaluation
-        # of queryset before clear; ticket #19816
+        # Force evaluation of `value` in case it's a queryset whose
+        # value could be affected by `manager.clear()`. Refs #19816.
         value = tuple(value)
-        manager.clear()
-        manager.add(*value)
+
+        manager = self.__get__(instance)
+        db = router.db_for_write(manager.through, instance=manager.instance)
+        with transaction.atomic(using=db, savepoint=False):
+            manager.clear()
+            manager.add(*value)
 
 
 class ForeignObjectRel(object):

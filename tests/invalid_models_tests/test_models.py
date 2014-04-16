@@ -76,6 +76,30 @@ class IndexTogetherTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_pointing_to_non_local_field(self):
+        class Foo(models.Model):
+            field1 = models.IntegerField()
+
+        class Bar(Foo):
+            field2 = models.IntegerField()
+
+            class Meta:
+                index_together = [
+                    ["field2", "field1"],
+                ]
+
+        errors = Bar.check()
+        expected = [
+            Error(
+                ("'index_together' refers to field 'field1' which is not "
+                 "local to model 'Bar'."),
+                hint=("This issue may be caused by multi-table inheritance."),
+                obj=Bar,
+                id='models.E016',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
     def test_pointing_to_m2m_field(self):
         class Model(models.Model):
             m2m = models.ManyToManyField('self')

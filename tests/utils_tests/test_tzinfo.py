@@ -6,7 +6,7 @@ import time
 import unittest
 import warnings
 
-from django.test.utils import IgnorePendingDeprecationWarningsMixin
+from django.test.utils import IgnoreDeprecationWarningsMixin
 from django.utils.deprecation import RemovedInDjango19Warning
 
 
@@ -16,7 +16,7 @@ with warnings.catch_warnings():
     from django.utils.tzinfo import FixedOffset, LocalTimezone
 
 
-class TzinfoTests(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
+class TzinfoTests(IgnoreDeprecationWarningsMixin, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

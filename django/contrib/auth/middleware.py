@@ -2,6 +2,7 @@ from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.crypto import constant_time_compare
 from django.utils.functional import SimpleLazyObject
 
 
@@ -13,9 +14,31 @@ def get_user(request):
 
 class AuthenticationMiddleware(object):
     def process_request(self, request):
-        assert hasattr(request, 'session'), "The Django authentication middleware requires session middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.sessions.middleware.SessionMiddleware'."
-
+        assert hasattr(request, 'session'), (
+            "The Django authentication middleware requires session middleware "
+            "to be installed. Edit your MIDDLEWARE_CLASSES setting to insert "
+            "'django.contrib.sessions.middleware.SessionMiddleware' before "
+            "'django.contrib.auth.middleware.AuthenticationMiddleware'."
+        )
         request.user = SimpleLazyObject(lambda: get_user(request))
+
+
+class SessionAuthenticationMiddleware(object):
+    """
+    Middleware for invalidating a user's sessions that don't correspond to the
+    user's current session authentication hash (generated based on the user's
+    password for AbstractUser).
+    """
+    def process_request(self, request):
+        user = request.user
+        if user and hasattr(user, 'get_session_auth_hash'):
+            session_hash = request.session.get(auth.HASH_SESSION_KEY)
+            session_hash_verified = session_hash and constant_time_compare(
+                session_hash,
+                user.get_session_auth_hash()
+            )
+            if not session_hash_verified:
+                auth.logout(request)
 
 
 class RemoteUserMiddleware(object):

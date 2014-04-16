@@ -71,7 +71,9 @@ class Command(BaseCommand):
         for i, line in enumerate(table_output):
             full_statement.append('    %s%s' % (line, ',' if i < len(table_output) - 1 else ''))
         full_statement.append(');')
-        with transaction.commit_on_success_unless_managed():
+
+        with transaction.atomic(using=database,
+                                savepoint=connection.features.can_rollback_ddl):
             with connection.cursor() as curs:
                 try:
                     curs.execute("\n".join(full_statement))
@@ -81,5 +83,6 @@ class Command(BaseCommand):
                         (tablename, force_text(e)))
                 for statement in index_output:
                     curs.execute(statement)
+
         if self.verbosity > 1:
             self.stdout.write("Cache table '%s' created." % tablename)

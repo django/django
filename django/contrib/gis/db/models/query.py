@@ -467,7 +467,7 @@ class GeoQuerySet(QuerySet):
 
         # If the `geo_field_type` keyword was used, then enforce that
         # type limitation.
-        if not geo_field_type is None and not isinstance(geo_field, geo_field_type):
+        if geo_field_type is not None and not isinstance(geo_field, geo_field_type):
             raise TypeError('"%s" stored procedures may only be called on %ss.' % (func, geo_field_type.__name__))
 
         # Setting the procedure args.
@@ -488,7 +488,7 @@ class GeoQuerySet(QuerySet):
 
         # Checking if there are any geo field type limitations on this
         # aggregate (e.g. ST_Makeline only operates on PointFields).
-        if not geo_field_type is None and not isinstance(geo_field, geo_field_type):
+        if geo_field_type is not None and not isinstance(geo_field, geo_field_type):
             raise TypeError('%s aggregate may only be called on %ss.' % (aggregate.name, geo_field_type.__name__))
 
         # Getting the string expression of the field name, as this is the
@@ -766,7 +766,7 @@ class GeoQuerySet(QuerySet):
         ForeignKey relation to the current model.
         """
         opts = self.model._meta
-        if not geo_field in opts.fields:
+        if geo_field not in opts.fields:
             # Is this operation going to be on a related geographic field?
             # If so, it'll have to be added to the select related information
             # (e.g., if 'location__point' was given as the field name).
@@ -777,7 +777,7 @@ class GeoQuerySet(QuerySet):
                 if field == geo_field:
                     return compiler._field_column(geo_field, rel_table)
             raise ValueError("%r not in self.query.related_select_cols" % geo_field)
-        elif not geo_field in opts.local_fields:
+        elif geo_field not in opts.local_fields:
             # This geographic field is inherited from another model, so we have to
             # use the db table for the _parent_ model instead.
             tmp_fld, parent_model, direct, m2m = opts.get_field_by_name(geo_field.name)

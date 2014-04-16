@@ -8,8 +8,8 @@ or output.
 
 Each middleware component is responsible for doing some specific function. For
 example, Django includes a middleware component,
-:class:`~django.middleware.transaction.TransactionMiddleware`, that wraps the
-processing of each HTTP request in a database transaction.
+:class:`~django.contrib.auth.middleware.AuthenticationMiddleware`, that
+associates users with requests using sessions.
 
 This document explains how middleware works, how you activate middleware, and
 how to write your own middleware. Django ships with some built-in middleware

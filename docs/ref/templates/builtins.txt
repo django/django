@@ -102,13 +102,11 @@ this::
         </tr>
     {% endfor %}
 
-Note that the variables included in the cycle will not be escaped. Any HTML or
-Javascript code contained in the printed variable will be rendered as-is, which
-could potentially lead to security issues. So either make sure that you trust
-their values or use explicit escaping like this::
+Variables included in the cycle will be escaped.  You can disable auto-escaping
+with::
 
     {% for o in some_list %}
-        <tr class="{% filter force_escape %}{% cycle rowvalue1 rowvalue2 %}{% endfilter %}">
+        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape
             ...
         </tr>
     {% endfor %}
@@ -196,21 +194,6 @@ In this syntax, each value gets interpreted as a literal string, and there's no
 way to specify variable values. Or literal commas. Or spaces. Did we mention
 you shouldn't use this syntax in any new projects?
 
-.. versionchanged:: 1.6
-
-To improve safety, future versions of ``cycle`` will automatically escape
-their output. You're encouraged to activate this behavior by loading
-``cycle`` from the ``future`` template library::
-
-    {% load cycle from future %}
-
-When using the ``future`` version, you can disable auto-escaping with::
-
-    {% for o in some_list %}
-        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
-            ...
-        </tr>
-    {% endfor %}
 
 .. templatetag:: debug
 
@@ -268,10 +251,8 @@ Sample usage::
 firstof
 ^^^^^^^
 
-Outputs the first argument variable that is not False. This tag does *not*
-auto-escape variable values.
-
-Outputs nothing if all the passed variables are False.
+Outputs the first argument variable that is not ``False``. Outputs nothing if
+all the passed variables are ``False``.
 
 Sample usage::
 
@@ -292,32 +273,15 @@ passed variables are False::
 
     {% firstof var1 var2 var3 "fallback value" %}
 
-Note that currently the variables included in the firstof tag will not be
-escaped. Any HTML or Javascript code contained in the printed variable will be
-rendered as-is, which could potentially lead to security issues. If you need
-to escape the variables in the firstof tag, you must do so explicitly::
+This tag auto-escapes variable values. You can disable auto-escaping with::
 
-    {% filter force_escape %}
-        {% firstof var1 var2 var3 "fallback value" %}
-    {% endfilter %}
+    {% autoescape off %}
+        {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
+    {% endautoescape %}
 
-.. versionchanged:: 1.6
+Or if only some variables should be escaped, you can use::
 
-    To improve safety, future versions of ``firstof`` will automatically escape
-    their output. You're encouraged to activate this behavior by loading
-    ``firstof`` from the ``future`` template library::
-
-        {% load firstof from future %}
-
-    When using the ``future`` version, you can disable auto-escaping with::
-
-        {% autoescape off %}
-            {% firstof var1 var2 var3 "<strong>fallback value</strong>" %}
-        {% endautoescape %}
-
-    Or if only some variables should be escaped, you can use::
-
-        {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
+    {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
 
 .. templatetag:: for
 
@@ -1010,12 +974,8 @@ url
 ^^^
 
 Returns an absolute path reference (a URL without the domain name) matching a
-given view function and optional parameters.
-
-.. versionchanged:: 1.6
-
-    Any special characters in the resulting path will be encoded using
-    :func:`~django.utils.encoding.iri_to_uri`.
+given view function and optional parameters. Any special characters in the
+resulting path will be encoded using :func:`~django.utils.encoding.iri_to_uri`.
 
 This is a way to output links without violating the DRY principle by having to
 hard-code URLs in your templates::
@@ -1572,35 +1532,6 @@ For example::
 
 If ``value`` is the list ``['a', 'b', 'c']``, the output will be ``'a'``.
 
-.. templatefilter:: fix_ampersands
-
-fix_ampersands
-^^^^^^^^^^^^^^
-
-.. note::
-
-    This is rarely useful as ampersands are automatically escaped. See
-    :tfilter:`escape` for more information.
-
-.. deprecated:: 1.7
-    This filter has been deprecated and will be removed in Django 1.8.
-
-Replaces ampersands with ``&amp;`` entities.
-
-For example::
-
-    {{ value|fix_ampersands }}
-
-If ``value`` is ``Tom & Jerry``, the output will be ``Tom &amp; Jerry``.
-
-However, ampersands used in named entities and numeric character references
-will not be replaced. For example, if ``value`` is ``Caf&eacute;``, the output
-will *not* be ``Caf&amp;eacute;`` but remain ``Caf&eacute;``. This means that
-in some edge cases, such as acronyms followed by semicolons, this filter will
-not replace ampersands that need replacing. For example, if ``value`` is
-``Contact the R&D;``, the output will remain unchanged because ``&D;``
-resembles a named entity.
-
 .. templatefilter:: floatformat
 
 floatformat
@@ -1745,7 +1676,8 @@ For example::
 
     {{ value|length }}
 
-If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``4``.
+If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
+``4``.
 
 .. templatefilter:: length_is
 
@@ -1758,7 +1690,8 @@ For example::
 
     {{ value|length_is:"4" }}
 
-If ``value`` is ``['a', 'b', 'c', 'd']``, the output will be ``True``.
+If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
+``True``.
 
 .. templatefilter:: linebreaks
 
@@ -1857,8 +1790,8 @@ For example::
     {{ value|make_list }}
 
 If ``value`` is the string ``"Joel"``, the output would be the list
-``[u'J', u'o', u'e', u'l']``. If ``value`` is ``123``, the output will be the
-list ``[u'1', u'2', u'3']``.
+``['J', 'o', 'e', 'l']``. If ``value`` is ``123``, the output will be the
+list ``['1', '2', '3']``.
 
 .. templatefilter:: phone2numeric
 
@@ -2050,7 +1983,7 @@ If ``value`` is ``10``, the output will be ``1.000000E+01``.
 striptags
 ^^^^^^^^^
 
-Strips all [X]HTML tags.
+Makes all possible efforts to strip all [X]HTML tags.
 
 For example::
 
@@ -2058,6 +1991,16 @@ For example::
 
 If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``, the
 output will be ``"Joel is a slug"``.
+
+.. admonition:: No safety guarantee
+
+    Note that ``striptags`` doesn't give any guarantee about its output being
+    entirely HTML safe, particularly with non valid HTML input. So **NEVER**
+    apply the ``safe`` filter to a ``striptags`` output.
+    If you are looking for something more robust, you can use the ``bleach``
+    Python library, notably its `clean`_ method.
+
+.. _clean: http://bleach.readthedocs.org/en/latest/clean.html
 
 .. templatefilter:: time
 

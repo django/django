@@ -17,7 +17,7 @@ from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (setup_test_template_loader,
     restore_template_loaders, override_settings, extend_sys_path)
-from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.formats import date_format
 from django.utils._os import upath
@@ -511,7 +511,7 @@ class TemplateRegressionTests(TestCase):
     def test_ifchanged_render_once(self):
         """ Test for ticket #19890. The content of ifchanged template tag was
         rendered twice."""
-        template = Template('{% load cycle from future %}{% ifchanged %}{% cycle "1st time" "2nd time" %}{% endifchanged %}')
+        template = Template('{% ifchanged %}{% cycle "1st time" "2nd time" %}{% endifchanged %}')
         output = template.render(Context({}))
         self.assertEqual(output, '1st time')
 
@@ -529,9 +529,9 @@ class TemplateRegressionTests(TestCase):
 @override_settings(MEDIA_URL="/media/", STATIC_URL="/static/",
                    TEMPLATE_DEBUG=False, ALLOWED_INCLUDE_ROOTS=(
                        os.path.dirname(os.path.abspath(upath(__file__))),),
+                   ROOT_URLCONF='template_tests.urls',
                    )
 class TemplateTests(TestCase):
-    urls = 'template_tests.urls'
 
     def test_templates(self):
         template_tests = self.get_template_tests()
@@ -593,18 +593,18 @@ class TemplateTests(TestCase):
                             try:
                                 try:
                                     with warnings.catch_warnings():
-                                        # Ignore deprecations of the old syntax of the 'cycle' and 'firstof' tags.
-                                        warnings.filterwarnings("ignore", category=RemovedInDjango18Warning, module='django.template.base')
                                         # Ignore pending deprecations of loading 'ssi' and 'url' tags from future.
                                         warnings.filterwarnings("ignore", category=RemovedInDjango19Warning, module='django.templatetags.future')
+                                        # Ignore deprecations of loading 'cycle' and 'firstof' tags from future.
+                                        warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.templatetags.future")
                                         test_template = loader.get_template(name)
                                 except ShouldNotExecuteException:
                                     failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
 
                                 try:
                                     with warnings.catch_warnings():
-                                        # Ignore deprecation of fix_ampersands
-                                        warnings.filterwarnings("ignore", category=DeprecationWarning, module='django.template.defaultfilters')
+                                        # Ignore deprecations of using the wrong number of variables with the 'for' tag.
+                                        warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaulttags")
                                         output = self.render(test_template, vals)
                                 except ShouldNotExecuteException:
                                     failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
@@ -642,7 +642,7 @@ class TemplateTests(TestCase):
         # SYNTAX --
         # 'template_name': ('template contents', 'context dict', 'expected string output' or Exception class)
         # This import is necessary when tests are run isolated:
-        from .templatetags import custom
+        from .templatetags import custom  # noqa
         basedir = os.path.dirname(os.path.abspath(upath(__file__)))
         tests = {
             ### BASIC SYNTAX ################################################
@@ -886,13 +886,13 @@ class TemplateTests(TestCase):
             'cycle17': ("{% cycle 'a' 'b' 'c' as abc silent %}{% cycle abc %}{% cycle abc %}{% cycle abc %}{% cycle abc %}", {}, ""),
             'cycle18': ("{% cycle 'a' 'b' 'c' as foo invalid_flag %}", {}, template.TemplateSyntaxError),
             'cycle19': ("{% cycle 'a' 'b' as silent %}{% cycle silent %}", {}, "ab"),
-            'cycle20': ("{% cycle one two as foo %} &amp; {% cycle foo %}", {'one': 'A & B', 'two': 'C & D'}, "A & B &amp; C & D"),
-            'cycle21': ("{% filter force_escape %}{% cycle one two as foo %} & {% cycle foo %}{% endfilter %}", {'one': 'A & B', 'two': 'C & D'}, "A &amp; B &amp; C &amp; D"),
+            'cycle20': ("{% cycle one two as foo %} &amp; {% cycle foo %}", {'one': 'A & B', 'two': 'C & D'}, "A &amp; B &amp; C &amp; D"),
+            'cycle21': ("{% filter force_escape %}{% cycle one two as foo %} & {% cycle foo %}{% endfilter %}", {'one': 'A & B', 'two': 'C & D'}, "A &amp;amp; B &amp; C &amp;amp; D"),
             'cycle22': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ x }}{% endfor %}", {'values': [1, 2, 3, 4]}, "1234"),
             'cycle23': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{{ abc }}{{ x }}{% endfor %}", {'values': [1, 2, 3, 4]}, "a1b2c3a4"),
             'included-cycle': ('{{ abc }}', {'abc': 'xxx'}, 'xxx'),
             'cycle24': ("{% for x in values %}{% cycle 'a' 'b' 'c' as abc silent %}{% include 'included-cycle' %}{% endfor %}", {'values': [1, 2, 3, 4]}, "abca"),
-            'cycle25': ('{% cycle a as abc %}', {'a': '<'}, '<'),
+            'cycle25': ('{% cycle a as abc %}', {'a': '<'}, '&lt;'),
 
             'cycle26': ('{% load cycle from future %}{% cycle a b as ab %}{% cycle ab %}', {'a': '<', 'b': '>'}, '&lt;&gt;'),
             'cycle27': ('{% load cycle from future %}{% autoescape off %}{% cycle a b as ab %}{% cycle ab %}{% endautoescape %}', {'a': '<', 'b': '>'}, '<>'),
@@ -932,7 +932,7 @@ class TemplateTests(TestCase):
             'firstof07': ('{% firstof a b "c" %}', {'a': 0}, 'c'),
             'firstof08': ('{% firstof a b "c and d" %}', {'a': 0, 'b': 0}, 'c and d'),
             'firstof09': ('{% firstof %}', {}, template.TemplateSyntaxError),
-            'firstof10': ('{% firstof a %}', {'a': '<'}, '<'),
+            'firstof10': ('{% firstof a %}', {'a': '<'}, '&lt;'),
 
             'firstof11': ('{% load firstof from future %}{% firstof a b %}', {'a': '<', 'b': '>'}, '&lt;'),
             'firstof12': ('{% load firstof from future %}{% firstof a b %}', {'a': '', 'b': '>'}, '&gt;'),
@@ -957,17 +957,20 @@ class TemplateTests(TestCase):
             'for-tag-unpack08': ("{% for key,value, in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, template.TemplateSyntaxError),
             # Ensure that a single loopvar doesn't truncate the list in val.
             'for-tag-unpack09': ("{% for val in items %}{{ val.0 }}:{{ val.1 }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, "one:1/two:2/"),
-            # Otherwise, silently truncate if the length of loopvars differs to the length of each set of items.
-            'for-tag-unpack10': ("{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": (('one', 1, 'carrot'), ('two', 2, 'orange'))}, "one:1/two:2/"),
-            'for-tag-unpack11': ("{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, ("one:1,/two:2,/", "one:1,INVALID/two:2,INVALID/")),
-            'for-tag-unpack12': ("{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": (('one', 1, 'carrot'), ('two', 2))}, ("one:1,carrot/two:2,/", "one:1,carrot/two:2,INVALID/")),
             'for-tag-unpack13': ("{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": (('one', 1, 'carrot'), ('two', 2, 'cheese'))}, ("one:1,carrot/two:2,cheese/", "one:1,carrot/two:2,cheese/")),
-            'for-tag-unpack14': ("{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": (1, 2)}, (":/:/", "INVALID:INVALID/INVALID:INVALID/")),
             'for-tag-empty01': ("{% for val in values %}{{ val }}{% empty %}empty text{% endfor %}", {"values": [1, 2, 3]}, "123"),
             'for-tag-empty02': ("{% for val in values %}{{ val }}{% empty %}values array empty{% endfor %}", {"values": []}, "values array empty"),
             'for-tag-empty03': ("{% for val in values %}{{ val }}{% empty %}values array not found{% endfor %}", {}, "values array not found"),
             # Ticket 19882
             'for-tag-filter-ws': ("{% load custom %}{% for x in s|noop:'x y' %}{{ x }}{% endfor %}", {'s': 'abc'}, 'abc'),
+
+            # These tests raise deprecation warnings and will raise an exception
+            # in Django 2.0. The existing behavior is silent truncation if the
+            # length of loopvars differs to the length of each set of items.
+            'for-tag-unpack10': ("{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": (('one', 1, 'carrot'), ('two', 2, 'orange'))}, "one:1/two:2/"),
+            'for-tag-unpack11': ("{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, ("one:1,/two:2,/", "one:1,INVALID/two:2,INVALID/")),
+            'for-tag-unpack12': ("{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": (('one', 1, 'carrot'), ('two', 2))}, ("one:1,carrot/two:2,/", "one:1,carrot/two:2,INVALID/")),
+            'for-tag-unpack14': ("{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": (1, 2)}, (":/:/", "INVALID:INVALID/INVALID:INVALID/")),
 
             ### IF TAG ################################################################
             'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),

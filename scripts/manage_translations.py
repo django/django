@@ -115,7 +115,7 @@ def lang_stats(resources=None, languages=None):
         print("\nShowing translations stats for '%s':" % name)
         langs = sorted([d for d in os.listdir(dir_) if not d.startswith('_')])
         for lang in langs:
-            if languages and not lang in languages:
+            if languages and lang not in languages:
                 continue
             # TODO: merge first with the latest en catalog
             p = Popen("msgfmt -vc -o /dev/null %(path)s/%(lang)s/LC_MESSAGES/django%(ext)s.po" % {

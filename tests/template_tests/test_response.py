@@ -259,7 +259,8 @@ class TemplateResponseTest(TestCase):
             'first/test.html', {
                 'value': 123,
                 'fn': datetime.now,
-            })
+            }
+        )
         self.assertRaises(ContentNotRenderedError,
                           pickle.dumps, response)
 
@@ -301,10 +302,10 @@ class TemplateResponseTest(TestCase):
 @override_settings(
     MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
         'template_tests.test_response.CustomURLConfMiddleware'
-    ]
+    ],
+    ROOT_URLCONF='template_tests.urls',
 )
 class CustomURLConfTest(TestCase):
-    urls = 'template_tests.urls'
 
     def test_custom_urlconf(self):
         response = self.client.get('/template_response_view/')
@@ -317,10 +318,10 @@ class CustomURLConfTest(TestCase):
     MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
         'django.middleware.cache.FetchFromCacheMiddleware',
         'django.middleware.cache.UpdateCacheMiddleware',
-    ]
+    ],
+    ROOT_URLCONF='template_tests.alternate_urls',
 )
 class CacheMiddlewareTest(TestCase):
-    urls = 'template_tests.alternate_urls'
 
     def test_middleware_caching(self):
         response = self.client.get('/template_response_view/')

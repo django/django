@@ -289,39 +289,29 @@ class QueryTestCase(TestCase):
 
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
         # Set a foreign key set with an object from a different database
-        try:
-            marty.book_set = [pro, dive]
-            self.fail("Shouldn't be able to assign across databases")
-        except ValueError:
-            pass
+        with self.assertRaises(ValueError):
+            with transaction.atomic(using='default'):
+                marty.edited = [pro, dive]
 
         # Add to an m2m with an object from a different database
-        try:
-            marty.book_set.add(dive)
-            self.fail("Shouldn't be able to assign across databases")
-        except ValueError:
-            pass
+        with self.assertRaises(ValueError):
+            with transaction.atomic(using='default'):
+                marty.book_set.add(dive)
 
         # Set a m2m with an object from a different database
-        try:
-            marty.book_set = [pro, dive]
-            self.fail("Shouldn't be able to assign across databases")
-        except ValueError:
-            pass
+        with self.assertRaises(ValueError):
+            with transaction.atomic(using='default'):
+                marty.book_set = [pro, dive]
 
         # Add to a reverse m2m with an object from a different database
-        try:
-            dive.authors.add(marty)
-            self.fail("Shouldn't be able to assign across databases")
-        except ValueError:
-            pass
+        with self.assertRaises(ValueError):
+            with transaction.atomic(using='other'):
+                dive.authors.add(marty)
 
         # Set a reverse m2m with an object from a different database
-        try:
-            dive.authors = [mark, marty]
-            self.fail("Shouldn't be able to assign across databases")
-        except ValueError:
-            pass
+        with self.assertRaises(ValueError):
+            with transaction.atomic(using='other'):
+                dive.authors = [mark, marty]
 
     def test_m2m_deletion(self):
         "Cascaded deletions of m2m relations issue queries on the right database"
@@ -489,28 +479,18 @@ class QueryTestCase(TestCase):
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
 
         # Set a foreign key with an object from a different database
-        try:
-            with transaction.atomic(using='default'):
-                dive.editor = marty
-            self.fail("Shouldn't be able to assign across databases")
-        except ValueError:
-            pass
+        with self.assertRaises(ValueError):
+            dive.editor = marty
 
         # Set a foreign key set with an object from a different database
-        try:
+        with self.assertRaises(ValueError):
             with transaction.atomic(using='default'):
                 marty.edited = [pro, dive]
-            self.fail("Shouldn't be able to assign across databases")
-        except ValueError:
-            pass
 
         # Add to a foreign key set with an object from a different database
-        try:
+        with self.assertRaises(ValueError):
             with transaction.atomic(using='default'):
                 marty.edited.add(dive)
-            self.fail("Shouldn't be able to assign across databases")
-        except ValueError:
-            pass
 
         # BUT! if you assign a FK object when the base object hasn't
         # been saved yet, you implicitly assign the database for the
@@ -634,11 +614,8 @@ class QueryTestCase(TestCase):
 
         # Set a one-to-one relation with an object from a different database
         alice_profile = UserProfile.objects.using('default').create(user=alice, flavor='chocolate')
-        try:
+        with self.assertRaises(ValueError):
             bob.userprofile = alice_profile
-            self.fail("Shouldn't be able to assign across databases")
-        except ValueError:
-            pass
 
         # BUT! if you assign a FK object when the base object hasn't
         # been saved yet, you implicitly assign the database for the
@@ -784,18 +761,13 @@ class QueryTestCase(TestCase):
         Review.objects.using('other').create(source="Python Weekly", content_object=dive)
 
         # Set a foreign key with an object from a different database
-        try:
+        with self.assertRaises(ValueError):
             review1.content_object = dive
-            self.fail("Shouldn't be able to assign across databases")
-        except ValueError:
-            pass
 
         # Add to a foreign key set with an object from a different database
-        try:
-            dive.reviews.add(review1)
-            self.fail("Shouldn't be able to assign across databases")
-        except ValueError:
-            pass
+        with self.assertRaises(ValueError):
+            with transaction.atomic(using='other'):
+                dive.reviews.add(review1)
 
         # BUT! if you assign a FK object when the base object hasn't
         # been saved yet, you implicitly assign the database for the
@@ -892,12 +864,9 @@ class QueryTestCase(TestCase):
         self.assertRaises(ValueError, str, qs.query)
 
         # Evaluating the query shouldn't work, either
-        try:
+        with self.assertRaises(ValueError):
             for obj in qs:
                 pass
-            self.fail('Iterating over query should raise ValueError')
-        except ValueError:
-            pass
 
     def test_related_manager(self):
         "Related managers return managers, not querysets"
@@ -1041,12 +1010,9 @@ class RouterTestCase(TestCase):
         # An update query will be routed to the default database
         Book.objects.filter(title='Pro Django').update(pages=200)
 
-        try:
+        with self.assertRaises(Book.DoesNotExist):
             # By default, the get query will be directed to 'other'
             Book.objects.get(title='Pro Django')
-            self.fail("Shouldn't be able to find the book")
-        except Book.DoesNotExist:
-            pass
 
         # But the same query issued explicitly at a database will work.
         pro = Book.objects.using('default').get(title='Pro Django')

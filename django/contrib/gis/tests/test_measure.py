@@ -93,7 +93,7 @@ class DistanceTest(unittest.TestCase):
         self.assertEqual(d5, 50)
 
         a5 = d1 * D(m=10)
-        self.assertTrue(isinstance(a5, Area))
+        self.assertIsInstance(a5, Area)
         self.assertEqual(a5.sq_m, 100 * 10)
 
         with self.assertRaises(TypeError):

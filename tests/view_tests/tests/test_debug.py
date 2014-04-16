@@ -30,9 +30,9 @@ from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
     multivalue_dict_key_error)
 
 
-@override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
+@override_settings(DEBUG=True, TEMPLATE_DEBUG=True,
+                   ROOT_URLCONF="view_tests.urls")
 class DebugViewTests(TestCase):
-    urls = "view_tests.urls"
 
     def test_files(self):
         response = self.client.get('/raises/')
@@ -521,12 +521,12 @@ class ExceptionReportTestMixin(object):
                 self.assertNotIn(v, body)
 
 
+@override_settings(ROOT_URLCONF='view_tests.urls')
 class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
     """
     Ensure that sensitive information can be filtered out of error reports.
     Refs #14614.
     """
-    urls = 'view_tests.urls'
     rf = RequestFactory()
 
     def test_non_sensitive_request(self):

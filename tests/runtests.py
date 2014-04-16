@@ -11,13 +11,13 @@ import warnings
 
 import django
 from django import contrib
-from django.utils.deprecation import RemovedInDjango18Warning, RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils._os import upath
 from django.utils import six
 
 
 warnings.simplefilter("default", RemovedInDjango19Warning)
-warnings.simplefilter("default", RemovedInDjango18Warning)
+warnings.simplefilter("default", RemovedInDjango20Warning)
 
 CONTRIB_MODULE_PATH = 'django.contrib'
 
@@ -45,7 +45,6 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.comments',
     'django.contrib.admin.apps.SimpleAdminConfig',
     'django.contrib.admindocs',
     'django.contrib.staticfiles',
@@ -126,16 +125,6 @@ def setup(verbosity, test_labels):
         handler = logging.StreamHandler()
         logger.addHandler(handler)
 
-    warnings.filterwarnings(
-        'ignore',
-        'django.contrib.comments is deprecated and will be removed before Django 1.8.',
-        RemovedInDjango18Warning
-    )
-    warnings.filterwarnings(
-        'ignore',
-        'Model class django.contrib.comments.models.* Django 1.9.',
-        RemovedInDjango19Warning
-    )
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()
 

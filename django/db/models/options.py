@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from bisect import bisect
 from collections import OrderedDict
-import warnings
 
 from django.apps import apps
 from django.conf import settings
@@ -10,7 +9,6 @@ from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango18Warning
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.text import camel_case_to_spaces
@@ -164,16 +162,6 @@ class Options(object):
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.model_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
-
-    @property
-    def module_name(self):
-        """
-        This property has been deprecated in favor of `model_name`. refs #19689
-        """
-        warnings.warn(
-            "Options.module_name has been deprecated in favor of model_name",
-            RemovedInDjango18Warning, stacklevel=2)
-        return self.model_name
 
     def _prepare(self, model):
         if self.order_with_respect_to:
@@ -454,39 +442,6 @@ class Options(object):
         if apps.ready:
             self._name_map = cache
         return cache
-
-    def get_add_permission(self):
-        """
-        This method has been deprecated in favor of
-        `django.contrib.auth.get_permission_codename`. refs #20642
-        """
-        warnings.warn(
-            "`Options.get_add_permission` has been deprecated in favor "
-            "of `django.contrib.auth.get_permission_codename`.",
-            RemovedInDjango18Warning, stacklevel=2)
-        return 'add_%s' % self.model_name
-
-    def get_change_permission(self):
-        """
-        This method has been deprecated in favor of
-        `django.contrib.auth.get_permission_codename`. refs #20642
-        """
-        warnings.warn(
-            "`Options.get_change_permission` has been deprecated in favor "
-            "of `django.contrib.auth.get_permission_codename`.",
-            RemovedInDjango18Warning, stacklevel=2)
-        return 'change_%s' % self.model_name
-
-    def get_delete_permission(self):
-        """
-        This method has been deprecated in favor of
-        `django.contrib.auth.get_permission_codename`. refs #20642
-        """
-        warnings.warn(
-            "`Options.get_delete_permission` has been deprecated in favor "
-            "of `django.contrib.auth.get_permission_codename`.",
-            RemovedInDjango18Warning, stacklevel=2)
-        return 'delete_%s' % self.model_name
 
     def get_all_related_objects(self, local_only=False, include_hidden=False,
                                 include_proxy_eq=False):

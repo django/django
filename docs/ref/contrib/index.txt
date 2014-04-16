@@ -24,7 +24,6 @@ those packages have.
 
    admin/index
    auth
-   comments/index
    contenttypes
    csrf
    flatpages
@@ -54,11 +53,6 @@ auth
 Django's authentication framework.
 
 See :doc:`/topics/auth/index`.
-
-comments
-========
-
-A simple yet flexible comments system. See :doc:`/ref/contrib/comments/index`.
 
 contenttypes
 ============

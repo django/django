@@ -222,16 +222,16 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 .. snippet::
     :filename: polls/urls.py
 
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
 
     from polls import views
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^$', views.IndexView.as_view(), name='index'),
         url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
         url(r'^(?P<pk>\d+)/results/$', views.ResultsView.as_view(), name='results'),
         url(r'^(?P<question_id>\d+)/vote/$', views.vote, name='vote'),
-    )
+    ]
 
 Amend views
 -----------

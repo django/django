@@ -14,6 +14,7 @@ from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import str_prefix, CaptureQueriesContext
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
 
 from .models import (
@@ -1149,7 +1150,7 @@ class Queries1Tests(BaseQuerysetTest):
                 ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>']
             )
             self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, PendingDeprecationWarning))
+            self.assertTrue(issubclass(w[0].category, RemovedInDjango19Warning))
 
 
 class Queries2Tests(TestCase):

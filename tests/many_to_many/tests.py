@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.db import transaction
 from django.test import TestCase
 from django.utils import six
 
@@ -54,7 +55,9 @@ class ManyToManyTests(TestCase):
 
         # Adding an object of the wrong type raises TypeError
         with six.assertRaisesRegex(self, TypeError, "'Publication' instance expected, got <Article.*"):
-            a6.publications.add(a5)
+            with transaction.atomic():
+                a6.publications.add(a5)
+
         # Add a Publication directly via publications.add by using keyword arguments.
         a6.publications.create(title='Highlights for Adults')
         self.assertQuerysetEqual(a6.publications.all(),
@@ -366,6 +369,30 @@ class ManyToManyTests(TestCase):
                                  ['<Article: NASA finds intelligent life on Earth>'])
         self.assertQuerysetEqual(self.a4.publications.all(),
                                  ['<Publication: Science Weekly>'])
+
+    def test_forward_assign_with_queryset(self):
+        # Ensure that querysets used in m2m assignments are pre-evaluated
+        # so their value isn't affected by the clearing operation in
+        # ManyRelatedObjectsDescriptor.__set__. Refs #19816.
+        self.a1.publications = [self.p1, self.p2]
+
+        qs = self.a1.publications.filter(title='The Python Journal')
+        self.a1.publications = qs
+
+        self.assertEqual(1, self.a1.publications.count())
+        self.assertEqual(1, qs.count())
+
+    def test_reverse_assign_with_queryset(self):
+        # Ensure that querysets used in M2M assignments are pre-evaluated
+        # so their value isn't affected by the clearing operation in
+        # ReverseManyRelatedObjectsDescriptor.__set__. Refs #19816.
+        self.p1.article_set = [self.a1, self.a2]
+
+        qs = self.p1.article_set.filter(headline='Django lets you build Web apps easily')
+        self.p1.article_set = qs
+
+        self.assertEqual(1, self.p1.article_set.count())
+        self.assertEqual(1, qs.count())
 
     def test_clear(self):
         # Relation sets can be cleared:

@@ -12,19 +12,11 @@ from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
 from django.db.models.sql.datastructures import Col
 from django.contrib.contenttypes.models import ContentType
-from django.utils import six
-from django.utils.deprecation import RenameMethodsBase, RemovedInDjango18Warning
 from django.utils.encoding import smart_text, python_2_unicode_compatible
 
 
-class RenameGenericForeignKeyMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('get_prefetch_query_set', 'get_prefetch_queryset', RemovedInDjango18Warning),
-    )
-
-
 @python_2_unicode_compatible
-class GenericForeignKey(six.with_metaclass(RenameGenericForeignKeyMethods)):
+class GenericForeignKey(object):
     """
     Provides a generic relation to any object through content-type/object-id
     fields.
@@ -401,10 +393,16 @@ class ReverseGenericRelatedObjectsDescriptor(object):
         return manager
 
     def __set__(self, instance, value):
+        # Force evaluation of `value` in case it's a queryset whose
+        # value could be affected by `manager.clear()`. Refs #19816.
+        value = tuple(value)
+
         manager = self.__get__(instance)
-        manager.clear()
-        for obj in value:
-            manager.add(obj)
+        db = router.db_for_write(manager.model, instance=manager.instance)
+        with transaction.atomic(using=db, savepoint=False):
+            manager.clear()
+            for obj in value:
+                manager.add(obj)
 
 
 def create_generic_related_manager(superclass):
@@ -482,12 +480,14 @@ def create_generic_related_manager(superclass):
                     self.prefetch_cache_name)
 
         def add(self, *objs):
-            for obj in objs:
-                if not isinstance(obj, self.model):
-                    raise TypeError("'%s' instance expected" % self.model._meta.object_name)
-                setattr(obj, self.content_type_field_name, self.content_type)
-                setattr(obj, self.object_id_field_name, self.pk_val)
-                obj.save()
+            db = router.db_for_write(self.model, instance=self.instance)
+            with transaction.atomic(using=db, savepoint=False):
+                for obj in objs:
+                    if not isinstance(obj, self.model):
+                        raise TypeError("'%s' instance expected" % self.model._meta.object_name)
+                    setattr(obj, self.content_type_field_name, self.content_type)
+                    setattr(obj, self.object_id_field_name, self.pk_val)
+                    obj.save()
         add.alters_data = True
 
         def remove(self, *objs, **kwargs):
@@ -506,9 +506,11 @@ def create_generic_related_manager(superclass):
             db = router.db_for_write(self.model, instance=self.instance)
             queryset = queryset.using(db)
             if bulk:
+                # `QuerySet.delete()` creates its own atomic block which
+                # contains the `pre_delete` and `post_delete` signal handlers.
                 queryset.delete()
             else:
-                with transaction.commit_on_success_unless_managed(using=db, savepoint=False):
+                with transaction.atomic(using=db, savepoint=False):
                     for obj in queryset:
                         obj.delete()
         _clear.alters_data = True

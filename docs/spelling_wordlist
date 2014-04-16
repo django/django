@@ -23,6 +23,7 @@ attr
 auth
 autoclobber
 autocommit
+autocompletion
 autoconf
 autodetect
 autodetectable
@@ -222,6 +223,7 @@ geo
 geoip
 geolibs
 geolocalized
+geolocated
 geolocation
 geoquerysets
 geospatial
@@ -555,6 +557,7 @@ sqlflush
 sqlindexes
 sqlmigrate
 sqlsequencereset
+squashmigrations
 ssi
 stacktrace
 startswith
@@ -661,6 +664,7 @@ unrendered
 Unreviewed
 unsanitized
 unsets
+unsquashed
 untar
 url
 urlencode

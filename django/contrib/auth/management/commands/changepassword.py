@@ -6,6 +6,7 @@ from optparse import make_option
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
+from django.utils.encoding import force_str
 
 
 class Command(BaseCommand):
@@ -18,7 +19,7 @@ class Command(BaseCommand):
     requires_system_checks = False
 
     def _get_pass(self, prompt="Password: "):
-        p = getpass.getpass(prompt=prompt)
+        p = getpass.getpass(prompt=force_str(prompt))
         if not p:
             raise CommandError("aborted")
         return p

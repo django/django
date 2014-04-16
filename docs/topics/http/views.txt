@@ -242,8 +242,6 @@ same way you can for the 404 and 500 views by specifying a
 The 400 (bad request) view
 --------------------------
 
-.. versionadded:: 1.6
-
 .. function:: django.views.defaults.bad_request(request, template_name='400.html')
 
 When a :exc:`~django.core.exceptions.SuspiciousOperation` is raised in Django,

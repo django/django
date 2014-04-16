@@ -2,7 +2,6 @@
 should be added within the test folders, and use TestCase.urls to set them.
 This helps the tests remain isolated.
 """
-from django.conf.urls import patterns
 
 
-urlpatterns = patterns('')
+urlpatterns = []

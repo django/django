@@ -189,7 +189,7 @@ backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 KEY_FUNCTION
 ~~~~~~~~~~~~
 
-A string containing a dotted path to a function that defines how to
+A string containing a dotted path to a function (or any callable) that defines how to
 compose a prefix, version and key into a final cache key. The default
 implementation is equivalent to the function::
 
@@ -279,26 +279,6 @@ Default: ``default``
 
 The cache connection to use for the cache middleware.
 
-.. setting:: CACHE_MIDDLEWARE_ANONYMOUS_ONLY
-
-CACHE_MIDDLEWARE_ANONYMOUS_ONLY
--------------------------------
-
-Default: ``False``
-
-.. deprecated:: 1.6
-
-    This setting was largely ineffective because of using cookies for sessions
-    and CSRF. See the :doc:`Django 1.6 release notes</releases/1.6>` for more
-    information.
-
-If the value of this setting is ``True``, only anonymous requests (i.e., not
-those made by a logged-in user) will be cached.  Otherwise, the middleware
-caches every page that doesn't have GET or POST parameters.
-
-If you set the value of this setting to ``True``, you should make sure you've
-activated ``AuthenticationMiddleware``.
-
 .. setting:: CACHE_MIDDLEWARE_KEY_PREFIX
 
 CACHE_MIDDLEWARE_KEY_PREFIX
@@ -367,8 +347,6 @@ protection is safe from cross-subdomain attacks by default - please see the
 
 CSRF_COOKIE_HTTPONLY
 --------------------
-
-.. versionadded:: 1.6
 
 Default: ``False``
 
@@ -475,8 +453,6 @@ configurations are available:
 ATOMIC_REQUESTS
 ~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.6
-
 Default: ``False``
 
 Set this to ``True`` to wrap each HTTP request in a transaction on this
@@ -486,8 +462,6 @@ database. See :ref:`tying-transactions-to-http-requests`.
 
 AUTOCOMMIT
 ~~~~~~~~~~
-
-.. versionadded:: 1.6
 
 Default: ``True``
 
@@ -554,8 +528,6 @@ file. When specifying the path, always use forward slashes, even on Windows
 
 CONN_MAX_AGE
 ~~~~~~~~~~~~
-
-.. versionadded:: 1.6
 
 Default: ``0``
 
@@ -1002,14 +974,12 @@ environment, such as all the currently defined Django settings (from
 ``settings.py``).
 
 As a security measure, Django will *not* include settings that might be
-sensitive (or offensive), such as :setting:`SECRET_KEY` or
-:setting:`PROFANITIES_LIST`. Specifically, it will exclude any setting whose
-name includes any of the following:
+sensitive (or offensive), such as :setting:`SECRET_KEY`. Specifically, it will
+exclude any setting whose name includes any of the following:
 
 * ``'API'``
 * ``'KEY'``
 * ``'PASS'``
-* ``'PROFANITIES_LIST'``
 * ``'SECRET'``
 * ``'SIGNATURE'``
 * ``'TOKEN'``
@@ -1490,7 +1460,7 @@ A tuple of IP addresses, as strings, that:
 
 * See debug comments, when :setting:`DEBUG` is ``True``
 * Receive X headers in admindocs if the ``XViewMiddleware`` is installed (see
-  :doc:`/topics/http/middleware`)
+  :doc:`/ref/contrib/admin/admindocs`)
 
 .. setting:: LANGUAGE_CODE
 
@@ -1919,24 +1889,6 @@ available in ``request.META``.)
     If any of those are not true, you should keep this setting set to ``None``
     and find another way of determining HTTPS, perhaps via custom middleware.
 
-.. setting:: SEND_BROKEN_LINK_EMAILS
-
-SEND_BROKEN_LINK_EMAILS
------------------------
-
-.. deprecated:: 1.6
-    Since :class:`~django.middleware.common.BrokenLinkEmailsMiddleware`
-    was split from :class:`~django.middleware.common.CommonMiddleware`,
-    this setting no longer serves a purpose.
-
-Default: ``False``
-
-Whether to send an email to the :setting:`MANAGERS` each time somebody visits
-a Django-powered page that is 404ed with a non-empty referer (i.e., a broken
-link). This is only used if ``CommonMiddleware`` is installed (see
-:doc:`/topics/http/middleware`). See also :setting:`IGNORABLE_404_URLS` and
-:doc:`/howto/error-reporting`.
-
 .. setting:: SERIALIZATION_MODULES
 
 SERIALIZATION_MODULES
@@ -2107,11 +2059,6 @@ Default: ``'django.test.runner.DiscoverRunner'``
 The name of the class to use for starting the test suite. See
 :ref:`other-testing-frameworks`.
 
-.. versionchanged:: 1.6
-
-    Previously the default ``TEST_RUNNER`` was
-    ``django.test.simple.DjangoTestSuiteRunner``.
-
 .. setting:: THOUSAND_SEPARATOR
 
 THOUSAND_SEPARATOR
@@ -2166,10 +2113,6 @@ precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
-.. versionchanged:: 1.6
-
-    Input format with microseconds has been added.
-
 .. _datetime: http://docs.python.org/library/datetime.html#strftime-strptime-behavior
 
 .. setting:: TIME_ZONE
@@ -2222,22 +2165,6 @@ to ensure your processes are running in the correct environment.
 .. _list of time zones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 .. _pytz: http://pytz.sourceforge.net/
-
-.. setting:: TRANSACTIONS_MANAGED
-
-TRANSACTIONS_MANAGED
---------------------
-
-.. deprecated:: 1.6
-
-    This setting was deprecated because its name is very misleading. Use the
-    :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` key in :setting:`DATABASES`
-    entries instead.
-
-Default: ``False``
-
-Set this to ``True`` if you want to :ref:`disable Django's transaction
-management <deactivate-transaction-management>` and implement your own.
 
 .. setting:: USE_ETAGS
 
@@ -2468,53 +2395,6 @@ Default::
      'django.contrib.auth.hashers.MD5PasswordHasher',
      'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
      'django.contrib.auth.hashers.CryptPasswordHasher',)
-
-
-.. _settings-comments:
-
-Comments
-========
-
-Settings for :mod:`django.contrib.comments`.
-
-.. setting:: COMMENTS_HIDE_REMOVED
-
-COMMENTS_HIDE_REMOVED
----------------------
-
-If ``True`` (default), removed comments will be excluded from comment
-lists/counts (as taken from template tags). Otherwise, the template author is
-responsible for some sort of a "this comment has been removed by the site staff"
-message.
-
-.. setting:: COMMENT_MAX_LENGTH
-
-COMMENT_MAX_LENGTH
-------------------
-
-The maximum length of the comment field, in characters. Comments longer than
-this will be rejected. Defaults to 3000.
-
-.. setting:: COMMENTS_APP
-
-COMMENTS_APP
-------------
-
-An app which provides :doc:`customization of the comments framework
-</ref/contrib/comments/custom>`.  Use the same dotted-string notation
-as in :setting:`INSTALLED_APPS`.  Your custom :setting:`COMMENTS_APP`
-must also be listed in :setting:`INSTALLED_APPS`.
-
-.. setting:: PROFANITIES_LIST
-
-PROFANITIES_LIST
-----------------
-
-Default: ``()`` (Empty tuple)
-
-A tuple of profanities, as strings, that will be forbidden in comments when
-``COMMENTS_ALLOW_PROFANITIES`` is ``False``.
-
 
 .. _settings-messages:
 
@@ -2762,12 +2642,6 @@ SESSION_SERIALIZER
 
 Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
 
-.. versionchanged:: 1.6
-
-    The default switched from
-    :class:`~django.contrib.sessions.serializers.PickleSerializer` to
-    :class:`~django.contrib.sessions.serializers.JSONSerializer` in Django 1.6.
-
 Full import path of a serializer class to use for serializing session data.
 Included serializers are:
 
@@ -2952,7 +2826,6 @@ Cache
 -----
 * :setting:`CACHES`
 * :setting:`CACHE_MIDDLEWARE_ALIAS`
-* :setting:`CACHE_MIDDLEWARE_ANONYMOUS_ONLY`
 * :setting:`CACHE_MIDDLEWARE_KEY_PREFIX`
 * :setting:`CACHE_MIDDLEWARE_SECONDS`
 
@@ -2962,7 +2835,6 @@ Database
 * :setting:`DATABASE_ROUTERS`
 * :setting:`DEFAULT_INDEX_TABLESPACE`
 * :setting:`DEFAULT_TABLESPACE`
-* :setting:`TRANSACTIONS_MANAGED`
 
 Debugging
 ---------
@@ -2983,7 +2855,6 @@ Email
 * :setting:`EMAIL_SUBJECT_PREFIX`
 * :setting:`EMAIL_USE_TLS`
 * :setting:`MANAGERS`
-* :setting:`SEND_BROKEN_LINK_EMAILS`
 * :setting:`SERVER_EMAIL`
 
 Error reporting
@@ -2991,7 +2862,6 @@ Error reporting
 * :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER`
 * :setting:`IGNORABLE_404_URLS`
 * :setting:`MANAGERS`
-* :setting:`SEND_BROKEN_LINK_EMAILS`
 * :setting:`SILENCED_SYSTEM_CHECKS`
 
 File uploads

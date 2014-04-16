@@ -187,11 +187,6 @@ information provided. (Note that this attribute is available under
 both Python 2 and Python 3, although :pep:`3134` normally only applies
 to Python 3.)
 
-.. versionchanged:: 1.6
-
-    Previous versions of Django only wrapped ``DatabaseError`` and
-    ``IntegrityError``, and did not provide ``__cause__``.
-
 .. exception:: models.ProtectedError
 
 Raised to prevent deletion of referenced objects when using

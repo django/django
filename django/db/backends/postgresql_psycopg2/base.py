@@ -3,7 +3,7 @@ PostgreSQL database backend for Django.
 
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
-import logging
+
 import sys
 
 from django.conf import settings
@@ -36,8 +36,6 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
 psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString)
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 
-logger = logging.getLogger('django.db.backends')
-
 
 def utc_tzinfo_factory(offset):
     if offset != 0:
@@ -48,7 +46,6 @@ def utc_tzinfo_factory(offset):
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     can_return_id_from_insert = True
-    requires_rollback_on_dirty_transaction = True
     has_real_datatype = True
     can_defer_constraint_checks = True
     has_select_for_update = True
@@ -162,28 +159,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
 
-    def close(self):
-        self.validate_thread_sharing()
-        if self.connection is None:
-            return
-
-        try:
-            self.connection.close()
-            self.connection = None
-        except Database.Error:
-            # In some cases (database restart, network connection lost etc...)
-            # the connection to the database is lost without giving Django a
-            # notification. If we don't set self.connection to None, the error
-            # will occur a every request.
-            self.connection = None
-            logger.warning(
-                'psycopg2 error while closing the connection.',
-                exc_info=sys.exc_info()
-            )
-            raise
-        finally:
-            self.set_clean()
-
     def _set_isolation_level(self, isolation_level):
         assert isolation_level in range(1, 5)     # Use set_autocommit for level = 0
         if self.psycopg2_version >= (2, 4, 2):
@@ -192,14 +167,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection.set_isolation_level(isolation_level)
 
     def _set_autocommit(self, autocommit):
-        if self.psycopg2_version >= (2, 4, 2):
-            self.connection.autocommit = autocommit
-        else:
-            if autocommit:
-                level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+        with self.wrap_database_errors:
+            if self.psycopg2_version >= (2, 4, 2):
+                self.connection.autocommit = autocommit
             else:
-                level = self.isolation_level
-            self.connection.set_isolation_level(level)
+                if autocommit:
+                    level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+                else:
+                    level = self.isolation_level
+                self.connection.set_isolation_level(level)
 
     def check_constraints(self, table_names=None):
         """
@@ -213,7 +189,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         try:
             # Use a psycopg cursor directly, bypassing Django's utilities.
             self.connection.cursor().execute("SELECT 1")
-        except DatabaseError:
+        except Database.Error:
             return False
         else:
             return True

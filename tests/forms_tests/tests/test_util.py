@@ -20,6 +20,9 @@ class FormsUtilTestCase(TestCase):
 
         self.assertEqual(flatatt({'id': "header"}), ' id="header"')
         self.assertEqual(flatatt({'class': "news", 'title': "Read this"}), ' class="news" title="Read this"')
+        self.assertEqual(flatatt({'class': "news", 'title': "Read this", 'required': "required"}), ' class="news" required="required" title="Read this"')
+        self.assertEqual(flatatt({'class': "news", 'title': "Read this", 'required': True}), ' class="news" title="Read this" required')
+        self.assertEqual(flatatt({'class': "news", 'title': "Read this", 'required': False}), ' class="news" title="Read this"')
         self.assertEqual(flatatt({}), '')
 
     def test_validation_error(self):

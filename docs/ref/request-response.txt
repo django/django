@@ -132,7 +132,7 @@ All attributes should be considered read-only, unless stated otherwise below.
 
     A dictionary-like object containing all uploaded files. Each key in
     ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
-    value in ``FILES`` is an :class:`UploadedFile` as described below.
+    value in ``FILES`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
 
     See :doc:`/topics/files` for more information.
 
@@ -334,36 +334,6 @@ Methods
             process(element)
 
 
-UploadedFile objects
-====================
-
-.. class:: UploadedFile
-
-
-Attributes
-----------
-
-.. attribute::  UploadedFile.name
-
-    The name of the uploaded file.
-
-.. attribute:: UploadedFile.size
-
-    The size, in bytes, of the uploaded file.
-
-Methods
-----------
-
-.. method:: UploadedFile.chunks(chunk_size=None)
-
-    Returns a generator that yields sequential chunks of data.
-
-.. method:: UploadedFile.read(num_bytes=None)
-
-    Read a number of bytes from the file.
-
-
-
 QueryDict objects
 =================
 
@@ -425,9 +395,9 @@ a subclass of dictionary. Exceptions are outlined here:
           >>> q = q.copy() # to make it mutable
           >>> q.update({'a': '2'})
           >>> q.getlist('a')
-          [u'1', u'2']
+          ['1', '2']
           >>> q['a'] # returns the last
-          [u'2']
+          ['2']
 
 .. method:: QueryDict.items()
 
@@ -436,7 +406,7 @@ a subclass of dictionary. Exceptions are outlined here:
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.items()
-           [(u'a', u'3')]
+           [('a', '3')]
 
 .. method:: QueryDict.iteritems()
 
@@ -456,7 +426,7 @@ a subclass of dictionary. Exceptions are outlined here:
 
            >>> q = QueryDict('a=1&a=2&a=3')
            >>> q.values()
-           [u'3']
+           ['3']
 
 .. method:: QueryDict.itervalues()
 
@@ -497,7 +467,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> q.lists()
-        [(u'a', [u'1', u'2', u'3'])]
+        [('a', ['1', '2', '3'])]
 
 .. method:: QueryDict.pop(key)
 
@@ -506,7 +476,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
         >>> q.pop('a')
-        [u'1', u'2', u'3']
+        ['1', '2', '3']
 
 .. method:: QueryDict.popitem()
 
@@ -517,7 +487,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
         >>> q.popitem()
-        (u'a', [u'1', u'2', u'3'])
+        ('a', ['1', '2', '3'])
 
 .. method:: QueryDict.dict()
 
@@ -527,7 +497,7 @@ In addition, ``QueryDict`` has the following methods:
 
         >>> q = QueryDict('a=1&a=3&a=5')
         >>> q.dict()
-        {u'a': u'5'}
+        {'a': '5'}
 
 .. method:: QueryDict.urlencode([safe])
 
@@ -636,8 +606,6 @@ Attributes
 
 .. attribute:: HttpResponse.reason_phrase
 
-    .. versionadded:: 1.6
-
     The HTTP reason phrase for the response.
 
 .. attribute:: HttpResponse.streaming
@@ -669,8 +637,6 @@ Methods
     Historically, this parameter was called ``mimetype`` (now deprecated).
 
     ``status`` is the `HTTP status code`_ for the response.
-
-    .. versionadded:: 1.6
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
@@ -781,8 +747,6 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     constructor arguments. Note that this returns an HTTP status code 302.
 
     .. attribute:: HttpResponseRedirect.url
-
-        .. versionadded:: 1.6
 
         This read-only attribute represents the URL the response will redirect
         to (equivalent to the ``Location`` response header).
@@ -953,8 +917,6 @@ Attributes
     The `HTTP status code`_ for the response.
 
 .. attribute:: HttpResponse.reason_phrase
-
-    .. versionadded:: 1.6
 
     The HTTP reason phrase for the response.
 

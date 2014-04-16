@@ -192,7 +192,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         SafeMIMEMultipart as well
         """
         headers = {"Date": "Fri, 09 Nov 2001 01:08:47 -0000", "Message-ID": "foo"}
-        subject, from_email, to = 'hello', 'from@example.com', '"Sürname, Firstname" <to@example.com>'
+        from_email, to = 'from@example.com', '"Sürname, Firstname" <to@example.com>'
         text_content = 'This is an important message.'
         html_content = '<p>This is an <strong>important</strong> message.</p>'
         msg = EmailMultiAlternatives('Message from Firstname Sürname', text_content, from_email, [to], headers=headers)
@@ -637,6 +637,27 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
             conn.close()
         except Exception as e:
             self.fail("close() unexpectedly raised an exception: %s" % e)
+
+    def test_use_as_contextmanager(self):
+        """
+        Test that the connection can be used as a contextmanager.
+        """
+        opened = [False]
+        closed = [False]
+        conn = mail.get_connection(username='', password='')
+
+        def open():
+            opened[0] = True
+        conn.open = open
+
+        def close():
+            closed[0] = True
+        conn.close = close
+        with conn as same_conn:
+            self.assertTrue(opened[0])
+            self.assertIs(same_conn, conn)
+            self.assertFalse(closed[0])
+        self.assertTrue(closed[0])
 
 
 class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):

@@ -9,6 +9,7 @@ from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
 from django.test import TestCase, override_settings
+from django.utils.deprecation import RemovedInDjango19Warning
 
 # local test models
 from .admin import MediaInline, MediaPermanentInline
@@ -17,9 +18,9 @@ from .models import (Episode, EpisodeExtra, EpisodeMaxNum, Media,
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
-                   TEMPLATE_DEBUG=True)
+                   TEMPLATE_DEBUG=True,
+                   ROOT_URLCONF="generic_inline_admin.urls")
 class GenericAdminViewTest(TestCase):
-    urls = "generic_inline_admin.urls"
     fixtures = ['users.xml']
 
     def setUp(self):
@@ -129,9 +130,9 @@ class GenericAdminViewTest(TestCase):
         self.assertTrue(formset.get_queryset().ordered)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF="generic_inline_admin.urls")
 class GenericInlineAdminParametersTest(TestCase):
-    urls = "generic_inline_admin.urls"
     fixtures = ['users.xml']
 
     def setUp(self):
@@ -182,9 +183,9 @@ class GenericInlineAdminParametersTest(TestCase):
         self.assertEqual(formset.initial_form_count(), 1)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF="generic_inline_admin.urls")
 class GenericInlineAdminWithUniqueTogetherTest(TestCase):
-    urls = "generic_inline_admin.urls"
     fixtures = ['users.xml']
 
     def setUp(self):
@@ -211,8 +212,8 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
         self.assertEqual(response.status_code, 302)  # redirect somewhere
 
 
+@override_settings(ROOT_URLCONF="generic_inline_admin.urls")
 class NoInlineDeletionTest(TestCase):
-    urls = "generic_inline_admin.urls"
 
     def test_no_deletion(self):
         fake_site = object()
@@ -234,8 +235,8 @@ request = MockRequest()
 request.user = MockSuperUser()
 
 
+@override_settings(ROOT_URLCONF="generic_inline_admin.urls")
 class GenericInlineModelAdminTest(TestCase):
-    urls = "generic_inline_admin.urls"
 
     def setUp(self):
         self.site = AdminSite()
@@ -376,7 +377,7 @@ class GenericInlineModelAdminTest(TestCase):
             # Verify that the deprecation warning was triggered when get_formsets was called
             # This verifies that we called that method.
             self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, PendingDeprecationWarning))
+            self.assertTrue(issubclass(w[0].category, RemovedInDjango19Warning))
 
         class EpisodeAdmin(admin.ModelAdmin):
             inlines = [

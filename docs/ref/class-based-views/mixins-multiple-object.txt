@@ -81,8 +81,6 @@ MultipleObjectMixin
 
     .. attribute:: paginate_orphans
 
-        .. versionadded:: 1.6
-
         An integer specifying the number of "overflow" objects the last page
         can contain. This extends the :attr:`paginate_by` limit on the last
         page by up to ``paginate_orphans``, in order to keep the last page from
@@ -134,8 +132,6 @@ MultipleObjectMixin
         instantiates an instance of :attr:`paginator_class`.
 
     .. method:: get_paginate_orphans()
-
-        .. versionadded:: 1.6
 
         An integer specifying the number of "overflow" objects the last page
         can contain. By default this simply returns the value of

@@ -295,14 +295,14 @@ Sample usage::
 
     >>> from django.utils import feedgenerator
     >>> feed = feedgenerator.Rss201rev2Feed(
-    ...     title=u"Poynter E-Media Tidbits",
-    ...     link=u"http://www.poynter.org/column.asp?id=31",
-    ...     description=u"A group Weblog by the sharpest minds in online media/journalism/publishing.",
-    ...     language=u"en",
+    ...     title="Poynter E-Media Tidbits",
+    ...     link="http://www.poynter.org/column.asp?id=31",
+    ...     description="A group Weblog by the sharpest minds in online media/journalism/publishing.",
+    ...     language="en",
     ... )
     >>> feed.add_item(
     ...     title="Hello",
-    ...     link=u"http://www.holovaty.com/test/",
+    ...     link="http://www.holovaty.com/test/",
     ...     description="Testing."
     ... )
     >>> with open('test.rss', 'w') as fp:
@@ -559,7 +559,7 @@ escaping HTML.
 
     .. code-block:: python
 
-        mark_safe(u"%s <b>%s</b> %s" % (some_html,
+        mark_safe("%s <b>%s</b> %s" % (some_html,
                                         escape(some_text),
                                         escape(some_other_text),
                                         ))
@@ -568,7 +568,7 @@ escaping HTML.
 
     .. code-block:: python
 
-        format_html(u"{0} <b>{1}</b> {2}",
+        format_html("{0} <b>{1}</b> {2}",
                     mark_safe(some_html), some_text, some_other_text)
 
     This has the advantage that you don't need to apply :func:`escape` to each
@@ -595,21 +595,23 @@ escaping HTML.
 
 .. function:: strip_tags(value)
 
-    Removes anything that looks like an html tag from the string, that is
-    anything contained within ``<>``.
+    Tries to remove anything that looks like an HTML tag from the string, that
+    is anything contained within ``<>``.
+    Absolutely NO guaranty is provided about the resulting string being entirely
+    HTML safe. So NEVER mark safe the result of a ``strip_tag`` call without
+    escaping it first, for example with :func:`~django.utils.html.escape`.
 
     For example::
 
         strip_tags(value)
 
     If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``
-    the return value will be ``"Joel is a slug"``. Note that ``strip_tags``
-    result may still contain unsafe HTML content, so you might use
-    :func:`~django.utils.html.escape` to make it a safe string.
+    the return value will be ``"Joel is a slug"``.
 
-    .. versionchanged:: 1.6
+    If you are looking for a more robust solution, take a look at the `bleach`_
+    Python library.
 
-        For improved safety, ``strip_tags`` is now parser-based.
+    .. _bleach: https://pypi.python.org/pypi/bleach
 
 .. function:: remove_tags(value, tags)
 
@@ -690,14 +692,10 @@ escaping HTML.
 
 .. function:: urlsafe_base64_encode(s)
 
-    .. versionadded:: 1.6
-
     Encodes a bytestring in base64 for use in URLs, stripping any trailing
     equal signs.
 
 .. function::  urlsafe_base64_decode(s)
-
-    .. versionadded:: 1.6
 
     Decodes a base64 encoded string, adding back any trailing equal signs that
     might have been stripped.
@@ -727,7 +725,6 @@ Functions for working with Python modules.
 
 .. function:: import_by_path(dotted_path, error_prefix='')
 
-    .. versionadded:: 1.6
     .. deprecated:: 1.7
        Use :meth:`~django.utils.module_loading.import_string` instead.
 

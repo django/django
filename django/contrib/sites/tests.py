@@ -26,7 +26,7 @@ class SitesFrameworkTests(TestCase):
     def test_site_manager(self):
         # Make sure that get_current() does not return a deleted Site object.
         s = Site.objects.get_current()
-        self.assertTrue(isinstance(s, Site))
+        self.assertIsInstance(s, Site)
         s.delete()
         self.assertRaises(ObjectDoesNotExist, Site.objects.get_current)
 
@@ -57,7 +57,7 @@ class SitesFrameworkTests(TestCase):
             "SERVER_PORT": "80",
         }
         site = get_current_site(request)
-        self.assertTrue(isinstance(site, Site))
+        self.assertIsInstance(site, Site)
         self.assertEqual(site.id, settings.SITE_ID)
 
         # Test that an exception is raised if the sites framework is installed
@@ -68,7 +68,7 @@ class SitesFrameworkTests(TestCase):
         # A RequestSite is returned if the sites framework is not installed
         with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
             site = get_current_site(request)
-            self.assertTrue(isinstance(site, RequestSite))
+            self.assertIsInstance(site, RequestSite)
             self.assertEqual(site.name, "example.com")
 
     def test_domain_name_with_whitespaces(self):

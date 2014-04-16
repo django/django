@@ -7,9 +7,9 @@ from django.test import override_settings
 from .base import SitemapTestsBase
 
 
+@override_settings(ROOT_URLCONF='django.contrib.sitemaps.tests.urls.https')
 class HTTPSSitemapTests(SitemapTestsBase):
     protocol = 'https'
-    urls = 'django.contrib.sitemaps.tests.urls.https'
 
     def test_secure_sitemap_index(self):
         "A secure sitemap index can be rendered"

@@ -26,8 +26,8 @@ from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
     UnorderedObject, OrderedObject, CustomIdUser)
 
 
+@override_settings(ROOT_URLCONF="admin_changelist.urls")
 class ChangeListTests(TestCase):
-    urls = "admin_changelist.urls"
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -664,12 +664,12 @@ class AdminLogNodeTestCase(TestCase):
         self.assertEqual(template.render(context), '')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF="admin_changelist.urls")
 class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     available_apps = ['admin_changelist'] + AdminSeleniumWebDriverTestCase.available_apps
     fixtures = ['users.json']
-    urls = "admin_changelist.urls"
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def test_add_row_selection(self):

@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 from django.core import validators
 from django.db import models
 from django.db.models.manager import EmptyManager
-from django.utils.crypto import get_random_string
+from django.utils.crypto import get_random_string, salted_hmac
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -248,6 +248,13 @@ class AbstractBaseUser(models.Model):
 
     def get_short_name(self):
         raise NotImplementedError('subclasses of AbstractBaseUser must provide a get_short_name() method.')
+
+    def get_session_auth_hash(self):
+        """
+        Returns an HMAC of the password field.
+        """
+        key_salt = "django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash"
+        return salted_hmac(key_salt, self.password).hexdigest()
 
 
 # A few helper functions for common logic between User and AnonymousUser.

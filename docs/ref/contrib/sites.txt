@@ -249,10 +249,6 @@ To do this, you can use the sites framework. A simple example::
 Enabling the sites framework
 ============================
 
-.. versionchanged:: 1.6
-
-    In previous versions, the sites framework was enabled by default.
-
 To enable the sites framework, follow these steps:
 
 1. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS`
@@ -389,7 +385,7 @@ If you often use this pattern::
         ...
 
 there is simple way to avoid repetitions. Add
-:class:`django.contrib.site.middleware.CurrentSiteMiddleware` to
+:class:`django.contrib.sites.middleware.CurrentSiteMiddleware` to
 :setting:`MIDDLEWARE_CLASSES`. The middleware sets the ``site`` attribute on
 every request object, so you can use ``request.site`` to get the current site.
 
@@ -486,7 +482,7 @@ the ``domain`` and ``name`` by looking at the request's domain. It has
 Finally, to avoid repetitive fallback code, the framework provides a
 :func:`django.contrib.sites.shortcuts.get_current_site` function.
 
-.. function:: shortcuts.get_current_site
+.. function:: shortcuts.get_current_site(request)
 
     A function that checks if ``django.contrib.sites`` is installed and
     returns either the current :class:`~django.contrib.sites.models.Site`

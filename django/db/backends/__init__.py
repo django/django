@@ -30,28 +30,25 @@ class BaseDatabaseWrapper(object):
 
     def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS,
                  allow_thread_sharing=False):
+        # Connection related attributes.
+        self.connection = None
+        self.queries = []
         # `settings_dict` should be a dictionary containing keys such as
         # NAME, USER, etc. It's called `settings_dict` instead of `settings`
         # to disambiguate it from Django settings modules.
-        self.connection = None
-        self.queries = []
         self.settings_dict = settings_dict
         self.alias = alias
         self.use_debug_cursor = None
 
-        # Savepoint management related attributes
-        self.savepoint_state = 0
-
-        # Transaction management related attributes
+        # Transaction related attributes.
+        # Tracks if the connection is in autocommit mode. Per PEP 249, by
+        # default, it isn't.
         self.autocommit = False
-        self.transaction_state = []
-        # Tracks if the connection is believed to be in transaction. This is
-        # set somewhat aggressively, as the DBAPI doesn't make it easy to
-        # deduce if the connection is in transaction or not.
-        self._dirty = False
         # Tracks if the connection is in a transaction managed by 'atomic'.
         self.in_atomic_block = False
-        # List of savepoints created by 'atomic'
+        # Increment to generate unique savepoint ids.
+        self.savepoint_state = 0
+        # List of savepoints created by 'atomic'.
         self.savepoint_ids = []
         # Tracks if the outermost 'atomic' block should commit on exit,
         # ie. if autocommit was active on entry.
@@ -60,11 +57,12 @@ class BaseDatabaseWrapper(object):
         # available savepoint because of an exception in an inner block.
         self.needs_rollback = False
 
-        # Connection termination related attributes
+        # Connection termination related attributes.
         self.close_at = None
+        self.closed_in_transaction = False
         self.errors_occurred = False
 
-        # Thread-safety related attributes
+        # Thread-safety related attributes.
         self.allow_thread_sharing = allow_thread_sharing
         self._thread_ident = thread.get_ident()
 
@@ -104,9 +102,11 @@ class BaseDatabaseWrapper(object):
         # In case the previous connection was closed while in an atomic block
         self.in_atomic_block = False
         self.savepoint_ids = []
+        self.needs_rollback = False
         # Reset parameters defining when to close the connection
         max_age = self.settings_dict['CONN_MAX_AGE']
         self.close_at = None if max_age is None else time.time() + max_age
+        self.closed_in_transaction = False
         self.errors_occurred = False
         # Establish the connection
         conn_params = self.get_connection_params()
@@ -166,7 +166,6 @@ class BaseDatabaseWrapper(object):
         self.validate_thread_sharing()
         self.validate_no_atomic_block()
         self._commit()
-        self.set_clean()
 
     def rollback(self):
         """
@@ -175,7 +174,6 @@ class BaseDatabaseWrapper(object):
         self.validate_thread_sharing()
         self.validate_no_atomic_block()
         self._rollback()
-        self.set_clean()
 
     def close(self):
         """
@@ -188,8 +186,11 @@ class BaseDatabaseWrapper(object):
         try:
             self._close()
         finally:
-            self.connection = None
-        self.set_clean()
+            if self.in_atomic_block:
+                self.closed_in_transaction = True
+                self.needs_rollback = True
+            else:
+                self.connection = None
 
     ##### Backend-specific savepoint management methods #####
 
@@ -267,59 +268,6 @@ class BaseDatabaseWrapper(object):
 
     ##### Generic transaction management methods #####
 
-    def enter_transaction_management(self, managed=True, forced=False):
-        """
-        Enters transaction management for a running thread. It must be balanced with
-        the appropriate leave_transaction_management call, since the actual state is
-        managed as a stack.
-
-        The state and dirty flag are carried over from the surrounding block or
-        from the settings, if there is no surrounding block (dirty is always false
-        when no current block is running).
-
-        If you switch off transaction management and there is a pending
-        commit/rollback, the data will be committed, unless "forced" is True.
-        """
-        self.validate_no_atomic_block()
-
-        self.transaction_state.append(managed)
-
-        if not managed and self.is_dirty() and not forced:
-            self.commit()
-            self.set_clean()
-
-        if managed == self.get_autocommit():
-            self.set_autocommit(not managed)
-
-    def leave_transaction_management(self):
-        """
-        Leaves transaction management for a running thread. A dirty flag is carried
-        over to the surrounding block, as a commit will commit all changes, even
-        those from outside. (Commits are on connection level.)
-        """
-        self.validate_no_atomic_block()
-
-        if self.transaction_state:
-            del self.transaction_state[-1]
-        else:
-            raise TransactionManagementError(
-                "This code isn't under transaction management")
-
-        if self.transaction_state:
-            managed = self.transaction_state[-1]
-        else:
-            managed = not self.settings_dict['AUTOCOMMIT']
-
-        if self._dirty:
-            self.rollback()
-            if managed == self.get_autocommit():
-                self.set_autocommit(not managed)
-            raise TransactionManagementError(
-                "Transaction managed block ended with pending COMMIT/ROLLBACK")
-
-        if managed == self.get_autocommit():
-            self.set_autocommit(not managed)
-
     def get_autocommit(self):
         """
         Check the autocommit state.
@@ -368,41 +316,6 @@ class BaseDatabaseWrapper(object):
                 "An error occurred in the current transaction. You can't "
                 "execute queries until the end of the 'atomic' block.")
 
-    def abort(self):
-        """
-        Roll back any ongoing transaction and clean the transaction state
-        stack.
-        """
-        if self._dirty:
-            self.rollback()
-        while self.transaction_state:
-            self.leave_transaction_management()
-
-    def is_dirty(self):
-        """
-        Returns True if the current transaction requires a commit for changes to
-        happen.
-        """
-        return self._dirty
-
-    def set_dirty(self):
-        """
-        Sets a dirty flag for the current thread and code streak. This can be used
-        to decide in a managed block of code to decide whether there are open
-        changes waiting for commit.
-        """
-        if not self.get_autocommit():
-            self._dirty = True
-
-    def set_clean(self):
-        """
-        Resets a dirty flag for the current thread and code streak. This can be used
-        to decide in a managed block of code to decide whether a commit or rollback
-        should happen.
-        """
-        self._dirty = False
-        self.clean_savepoints()
-
     ##### Foreign key constraints checks handling #####
 
     @contextmanager
@@ -445,9 +358,14 @@ class BaseDatabaseWrapper(object):
     def is_usable(self):
         """
         Tests if the database connection is usable.
+
         This function may assume that self.connection is not None.
+
+        Actual implementations should take care not to raise exceptions
+        as that may prevent Django from recycling unusable connections.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require an is_usable() method')
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseWrapper may require an is_usable() method")
 
     def close_if_unusable_or_obsolete(self):
         """
@@ -536,7 +454,7 @@ class BaseDatabaseWrapper(object):
 
 class BaseDatabaseFeatures(object):
     allows_group_by_pk = False
-    # True if django.db.backend.utils.typecast_timestamp is used on values
+    # True if django.db.backends.utils.typecast_timestamp is used on values
     # returned from dates() calls.
     needs_datetime_string_cast = True
     empty_fetchmany_value = []
@@ -575,10 +493,6 @@ class BaseDatabaseFeatures(object):
     # FK constraints checked at the end of transaction, or
     # at the end of each save operation?
     supports_forward_references = True
-
-    # Does a dirty transaction need to be rolled back
-    # before the cursor can be used again?
-    requires_rollback_on_dirty_transaction = False
 
     # Does the backend allow very long model names without error?
     supports_long_model_names = True
@@ -682,28 +596,21 @@ class BaseDatabaseFeatures(object):
 
     @cached_property
     def supports_transactions(self):
-        "Confirm support for transactions"
-        try:
-            # Make sure to run inside a managed transaction block,
-            # otherwise autocommit will cause the confimation to
-            # fail.
-            self.connection.enter_transaction_management()
-            with self.connection.cursor() as cursor:
-                cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
-                self.connection.commit()
-                cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
-                self.connection.rollback()
-                cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
-                count, = cursor.fetchone()
-                cursor.execute('DROP TABLE ROLLBACK_TEST')
-                self.connection.commit()
-        finally:
-            self.connection.leave_transaction_management()
+        """Confirm support for transactions."""
+        with self.connection.cursor() as cursor:
+            cursor.execute('CREATE TABLE ROLLBACK_TEST (X INT)')
+            self.connection.set_autocommit(False)
+            cursor.execute('INSERT INTO ROLLBACK_TEST (X) VALUES (8)')
+            self.connection.rollback()
+            self.connection.set_autocommit(True)
+            cursor.execute('SELECT COUNT(X) FROM ROLLBACK_TEST')
+            count, = cursor.fetchone()
+            cursor.execute('DROP TABLE ROLLBACK_TEST')
         return count == 0
 
     @cached_property
     def supports_stddev(self):
-        "Confirm support for STDDEV and related stats functions"
+        """Confirm support for STDDEV and related stats functions."""
         class StdDevPop(object):
             sql_function = 'STDDEV_POP'
 
@@ -721,6 +628,16 @@ class BaseDatabaseOperations(object):
     row.
     """
     compiler_module = "django.db.models.sql.compiler"
+
+    # Integer field safe ranges by `internal_type` as documented
+    # in docs/ref/models/fields.txt.
+    integer_field_ranges = {
+        'SmallIntegerField': (-32768, 32767),
+        'IntegerField': (-2147483648, 2147483647),
+        'BigIntegerField': (-9223372036854775808, 9223372036854775807),
+        'PositiveSmallIntegerField': (0, 32767),
+        'PositiveIntegerField': (0, 2147483647),
+    }
 
     def __init__(self, connection):
         self.connection = connection
@@ -1205,6 +1122,14 @@ class BaseDatabaseOperations(object):
         backend due to #10888.
         """
         return params
+
+    def integer_field_range(self, internal_type):
+        """
+        Given an integer field internal type (e.g. 'PositiveIntegerField'),
+        returns a tuple of the (min_value, max_value) form representing the
+        range of the column type bound to the field.
+        """
+        return self.integer_field_ranges[internal_type]
 
 
 # Structure returned by the DB-API cursor.description interface (PEP 249)

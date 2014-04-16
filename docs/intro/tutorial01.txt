@@ -777,7 +777,7 @@ Save these changes and start a new Python interactive shell by running
     >>> Question.objects.get(id=2)
     Traceback (most recent call last):
         ...
-    DoesNotExist: Question matching query does not exist. Lookup parameters were {'id': 2}
+    DoesNotExist: Question matching query does not exist.
 
     # Lookup by a primary key is the most common case, so Django provides a
     # shortcut for primary-key exact lookups.

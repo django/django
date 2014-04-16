@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 import unittest
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.core.urlresolvers import reverse
 from django.db import connection
 from django.forms import EmailField, IntegerField
@@ -11,8 +11,7 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
-from django.test.utils import (CaptureQueriesContext,
-    IgnoreAllDeprecationWarningsMixin, override_settings)
+from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
 
 from .models import Person
@@ -52,8 +51,8 @@ class SkippingClassTestCase(TestCase):
         self.assertEqual(len(result.skipped), 1)
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertNumQueriesTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_assert_num_queries(self):
         def test_func():
@@ -122,8 +121,8 @@ class AssertQuerysetEqualTests(TestCase):
         )
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class CaptureQueriesContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def setUp(self):
         self.person_pk = six.text_type(Person.objects.create(name='test').pk)
@@ -176,8 +175,8 @@ class CaptureQueriesContextManagerTests(TestCase):
         self.assertIn(self.person_pk, captured_queries[1]['sql'])
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertNumQueriesContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_simple(self):
         with self.assertNumQueries(0):
@@ -215,8 +214,8 @@ class AssertNumQueriesContextManagerTests(TestCase):
             self.client.get("/test_utils/get_person/%s/" % person.pk)
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertTemplateUsedContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_usage(self):
         with self.assertTemplateUsed('template_used/base.html'):
@@ -623,26 +622,17 @@ class AssertFieldOutputTests(SimpleTestCase):
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
 
-class DoctestNormalizerTest(IgnoreAllDeprecationWarningsMixin, SimpleTestCase):
-
-    def test_normalizer(self):
-        from django.test.simple import make_doctest
-        suite = make_doctest("test_utils.doctest_output")
-        failures = unittest.TextTestRunner(stream=six.StringIO()).run(suite)
-        self.assertEqual(failures.failures, [])
-
-
 # for OverrideSettingsTests
 def fake_view(request):
     pass
 
 
 class FirstUrls:
-    urlpatterns = patterns('', url(r'first/$', fake_view, name='first'))
+    urlpatterns = [url(r'first/$', fake_view, name='first')]
 
 
 class SecondUrls:
-    urlpatterns = patterns('', url(r'second/$', fake_view, name='second'))
+    urlpatterns = [url(r'second/$', fake_view, name='second')]
 
 
 class OverrideSettingsTests(TestCase):
