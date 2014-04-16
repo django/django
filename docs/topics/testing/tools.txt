@@ -1196,7 +1196,7 @@ have been overridden, like this::
 .. versionchanged:: 1.7
 
     Previously, you could only simulate the deletion of a setting which was
-    explicitely overridden.
+    explicitly overridden.
 
 When overriding settings, make sure to handle the cases in which your app's
 code uses a cache or similar feature that retains state even if the setting is

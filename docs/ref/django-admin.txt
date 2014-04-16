@@ -1101,7 +1101,7 @@ please read :ref:`migration-squashing`.
 By default, Django will try to optimize the operations in your migrations
 to reduce the size of the resulting file. Pass ``--no-optimize`` if this
 process is failing for you or creating incorrect migrations, though please
-also file a Django bug report about the behaviour, as optimization is meant
+also file a Django bug report about the behavior, as optimization is meant
 to be safe.
 
 
