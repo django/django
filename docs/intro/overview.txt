@@ -102,7 +102,7 @@ necessary:
     >>> Reporter.objects.get(id=2)
     Traceback (most recent call last):
         ...
-    DoesNotExist: Reporter matching query does not exist. Lookup parameters were {'id': 2}
+    DoesNotExist: Reporter matching query does not exist.
 
     # Create an article.
     >>> from datetime import date
