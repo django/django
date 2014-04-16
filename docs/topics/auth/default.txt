@@ -142,6 +142,16 @@ Authenticating Users
             # the authentication system was unable to verify the username and password
             print("The username and password were incorrect.")
 
+    .. note::
+
+        This is a low level way to authenticate a set of credentials; for
+        example, it's used by the
+        :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`. Unless
+        you are writing your own authentication system, you probably won't use
+        this. Rather if you are looking for a way to limit access to logged in
+        users, see the :func:`~django.contrib.auth.decorators.login_required`
+        decorator.
+
 .. _topic-authorization:
 
 Permissions and Authorization
