@@ -71,6 +71,9 @@ are required.
   :mimetype:`text/plain` content type and ``html_message`` as the
   :mimetype:`text/html` content type.
 
+The return value will be the number of successfully delivered messages (which
+can be ``0`` or ``1`` since it can only send one message).
+
 .. versionadded:: 1.7
 
     The ``html_message`` parameter was added.
@@ -101,6 +104,8 @@ mail server would be opened::
     message1 = ('Subject here', 'Here is the message', 'from@example.com', ['first@example.com', 'other@example.com'])
     message2 = ('Another Subject', 'Here is another message', 'from@example.com', ['second@test.com'])
     send_mass_mail((message1, message2), fail_silently=False)
+
+The return value will be the number of successfully delivered messages.
 
 send_mass_mail() vs. send_mail()
 --------------------------------
