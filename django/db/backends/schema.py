@@ -3,7 +3,7 @@ import operator
 
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.utils import truncate_name
-from django.db.models.fields.related import ManyToManyField
+from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.db.transaction import atomic
 from django.utils.encoding import force_bytes
 from django.utils.log import getLogger
@@ -442,6 +442,17 @@ class BaseDatabaseSchemaEditor(object):
         # It might not actually have a column behind it
         if field.db_parameters(connection=self.connection)['type'] is None:
             return
+        # MySQL requires explicit constraint delete when removing FK field
+        if isinstance(field, ForeignKey) and self.connection.features.supports_foreign_keys:
+            to_table = field.rel.to._meta.db_table
+            to_column = field.rel.to._meta.get_field(field.rel.field_name).column
+            sql1 = self.sql_delete_fk % {
+                "name": self._create_index_name(
+                    model, [field.column], suffix="_fk_%s_%s" % (to_table, to_column)),
+                "table": self.quote_name(model._meta.db_table)
+            }
+            self.execute(sql1)
+
         # Get the column's definition
         definition, params = self.column_sql(model, field)
         # Delete the column
