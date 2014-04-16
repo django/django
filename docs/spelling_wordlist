@@ -555,6 +555,7 @@ sqlflush
 sqlindexes
 sqlmigrate
 sqlsequencereset
+squashmigrations
 ssi
 stacktrace
 startswith
@@ -661,6 +662,7 @@ unrendered
 Unreviewed
 unsanitized
 unsets
+unsquashed
 untar
 url
 urlencode

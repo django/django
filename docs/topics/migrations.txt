@@ -398,7 +398,7 @@ Squashing migrations
 --------------------
 
 You are encouraged to make migrations freely and not worry about how many you
-have; the migration code is optimised to deal with hundreds at a time without
+have; the migration code is optimized to deal with hundreds at a time without
 much slowdown. However, eventually you will want to move back from having
 several hundred migrations to just a few, and that's where squashing comes in.
 
