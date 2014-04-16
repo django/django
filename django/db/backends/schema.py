@@ -442,8 +442,16 @@ class BaseDatabaseSchemaEditor(object):
         # It might not actually have a column behind it
         if field.db_parameters(connection=self.connection)['type'] is None:
             return
-        # Get the column's definition
-        definition, params = self.column_sql(model, field)
+        # Drop any FK constraints, MySQL requires explicit deletion
+        if field.rel:
+            fk_names = self._constraint_names(model, [field.column], foreign_key=True)
+            for fk_name in fk_names:
+                self.execute(
+                    self.sql_delete_fk % {
+                        "table": self.quote_name(model._meta.db_table),
+                        "name": fk_name,
+                    }
+                )
         # Delete the column
         sql = self.sql_delete_column % {
             "table": self.quote_name(model._meta.db_table),
