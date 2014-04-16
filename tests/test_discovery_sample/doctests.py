@@ -3,6 +3,7 @@ Doctest example from the official Python documentation.
 https://docs.python.org/3/library/doctest.html
 """
 
+
 def factorial(n):
     """Return the factorial of n, an exact integer >= 0.
 
@@ -35,7 +36,7 @@ def factorial(n):
         raise ValueError("n must be >= 0")
     if math.floor(n) != n:
         raise ValueError("n must be exact integer")
-    if n+1 == n:  # catch a value like 1e300
+    if n + 1 == n:  # catch a value like 1e300
         raise OverflowError("n too large")
     result = 1
     factor = 2
