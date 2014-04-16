@@ -290,7 +290,8 @@ var DateTimeShortcuts = {
         // Determine if the current value in the input has a valid date.
         // If so, draw the calendar with that date's year and month.
         if (inp.value) {
-            var selected = new Date(inp.value);
+            var format = get_format('DATE_INPUT_FORMATS')[0];
+            var selected = inp.value.strptime(format);
             var year = selected.getFullYear();
             var month = selected.getMonth() + 1;
             var re = /\d{4}/

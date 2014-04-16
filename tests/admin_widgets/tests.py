@@ -650,6 +650,48 @@ class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
+@override_settings(LANGUAGE_CODE='fr-ca', DATE_INPUT_FORMATS=('%d/%m/%Y',))
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='admin_widgets.urls')
+class DatePickerCalendarSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+
+    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
+    fixtures = ['admin-widgets-users.xml']
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    def test_calendar_show_date_from_input(self):
+        """
+        Ensure that the calendar show the date from the input field for a locale
+        with a date format different than English.
+        """
+        self.admin_login(username='super', password='secret', login_url='/')
+
+        # Open a page that has a date picker widget
+        self.selenium.get('%s%s' % (self.live_server_url,
+            '/admin_widgets/member/add/'))
+
+        # Enter a date with French format in the input field
+        self.selenium.find_element_by_id('id_birthdate_0').send_keys('15/05/1984')
+
+        # Click on the calendar icon
+        self.selenium.find_element_by_id('calendarlink0').click()
+
+        # Get the calendar caption
+        calendar0 = self.selenium.find_element_by_id('calendarin0')
+        caption = calendar0.find_element_by_tag_name('caption')
+
+        # Make sure that the right month and year are displayed
+        self.assertEqual(caption.text, 'Mai 1984')
+
+
+class DatePickerCalendarSeleniumChromeTests(DatePickerCalendarSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+
+class DatePickerCalendarSeleniumIETests(DatePickerCalendarSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
+
+
 @skipIf(pytz is None, "this test requires pytz")
 @override_settings(TIME_ZONE='Asia/Singapore')
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
