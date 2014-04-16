@@ -185,6 +185,11 @@ Adds the ``user`` attribute, representing the currently-logged-in user, to
 every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
 <auth-web-requests>`.
 
+.. class:: RemoteUserMiddleware
+
+Middleware for utilizing Web server provided authentication. See
+:doc:`/howto/auth-remote-user` for usage details.
+
 CSRF protection middleware
 --------------------------
 
