@@ -236,7 +236,7 @@ class LookupTests(TestCase):
                 {'name': self.au2.name, 'article__headline': self.a6.headline, 'article__tag__name': self.t3.name},
                 {'name': self.au2.name, 'article__headline': self.a7.headline, 'article__tag__name': self.t3.name},
             ], transform=identity)
-        # However, an exception FieldDoesNotExist will be thrown if you specify
+        # However, a FieldError exception will be thrown if you specify
         # a non-existent field name in values() (a field that is neither in the
         # model nor in extra(select)).
         self.assertRaises(FieldError,
@@ -281,6 +281,7 @@ class LookupTests(TestCase):
                 {'primary_key': self.a1.id, 'title': 'Article 1'},
             ],
             transform=identity)
+
         # You can use values() with iterator() to reduce memory usage,
         # because iterator() uses database-level iteration.
         self.assertQuerysetEqual(Article.objects.values(primary_key='id', title='headline').iterator(),
@@ -294,6 +295,7 @@ class LookupTests(TestCase):
                 {'primary_key': self.a1.id, 'title': 'Article 1'},
             ],
             transform=identity)
+
         # The values() method works with "extra" fields specified in extra(select).
         qs = Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id_plus_one', primary_key='id')
         self.assertQuerysetEqual(
@@ -330,6 +332,7 @@ class LookupTests(TestCase):
                 'id_plus_seven_': self.a1.id + 7,
                 'id_plus_eight_': self.a1.id + 8,
             }], transform=identity)
+
         # You can specify fields from forward and reverse relations, just like filter().
         self.assertQuerysetEqual(
             Article.objects.values('headline', a_name='author__name'),
@@ -366,6 +369,7 @@ class LookupTests(TestCase):
                 {'name': self.au2.name, 'headline': self.a6.headline, 'tag_name': self.t3.name},
                 {'name': self.au2.name, 'headline': self.a7.headline, 'tag_name': self.t3.name},
             ], transform=identity)
+
         # However, a FieldError exception will be thrown if you specify
         # a non-existent field name in values() (a field that is neither in the
         # model nor in extra(select)).

@@ -619,7 +619,7 @@ class QuerySet(object):
 
     def values(self, *fields, **aliased_fields):
         cls = self._clone(klass=ValuesQuerySet, setup=True, _fields=fields,
-                           _aliased_fields=aliased_fields)
+                          _aliased_fields=aliased_fields)
         return cls
 
     def values_list(self, *fields, **kwargs):
@@ -630,7 +630,7 @@ class QuerySet(object):
         if flat and len(fields) > 1:
             raise TypeError("'flat' is not valid when values_list is called with more than one field.")
         return self._clone(klass=ValuesListQuerySet, setup=True, flat=flat,
-                _fields=fields)
+                           _fields=fields)
 
     def dates(self, field_name, kind, order='ASC'):
         """
