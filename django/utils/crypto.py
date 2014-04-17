@@ -117,51 +117,68 @@ def _long_to_bin(x, hex_format_string):
     return binascii.unhexlify((hex_format_string % x).encode('ascii'))
 
 
-def pbkdf2(password, salt, iterations, dklen=0, digest=None):
-    """
-    Implements PBKDF2 as defined in RFC 2898, section 5.2
+if hasattr(hashlib, "pbkdf2_hmac"):
+    def pbkdf2(password, salt, iterations, dklen=0, digest=None):
+        """
+        Implements PBDF2 with the same API as Django's existing implementation,
+        using the stdlib.
 
-    HMAC+SHA256 is used as the default pseudo random function.
+        This is used in Python 3.4 and up.
+        """
+        if digest is None:
+            digest = hashlib.sha256
+        if not dklen:
+            dklen = None
+        password = force_bytes(password)
+        salt = force_bytes(salt)
+        return hashlib.pbkdf2_hmac(
+            digest().name, password, salt, iterations, dklen)
+else:
+    def pbkdf2(password, salt, iterations, dklen=0, digest=None):
+        """
+        Implements PBKDF2 as defined in RFC 2898, section 5.2
 
-    As of 2011, 10,000 iterations was the recommended default which
-    took 100ms on a 2.2Ghz Core 2 Duo. This is probably the bare
-    minimum for security given 1000 iterations was recommended in
-    2001. This code is very well optimized for CPython and is only
-    four times slower than openssl's implementation. Look in
-    django.contrib.auth.hashers for the present default.
-    """
-    assert iterations > 0
-    if not digest:
-        digest = hashlib.sha256
-    password = force_bytes(password)
-    salt = force_bytes(salt)
-    hlen = digest().digest_size
-    if not dklen:
-        dklen = hlen
-    if dklen > (2 ** 32 - 1) * hlen:
-        raise OverflowError('dklen too big')
-    l = -(-dklen // hlen)
-    r = dklen - (l - 1) * hlen
+        HMAC+SHA256 is used as the default pseudo random function.
 
-    hex_format_string = "%%0%ix" % (hlen * 2)
+        As of 2011, 10,000 iterations was the recommended default which
+        took 100ms on a 2.2Ghz Core 2 Duo. This is probably the bare
+        minimum for security given 1000 iterations was recommended in
+        2001. This code is very well optimized for CPython and is only
+        four times slower than openssl's implementation. Look in
+        django.contrib.auth.hashers for the present default.
+        """
+        assert iterations > 0
+        if not digest:
+            digest = hashlib.sha256
+        password = force_bytes(password)
+        salt = force_bytes(salt)
+        hlen = digest().digest_size
+        if not dklen:
+            dklen = hlen
+        if dklen > (2 ** 32 - 1) * hlen:
+            raise OverflowError('dklen too big')
+        l = -(-dklen // hlen)
+        r = dklen - (l - 1) * hlen
 
-    inner, outer = digest(), digest()
-    if len(password) > inner.block_size:
-        password = digest(password).digest()
-    password += b'\x00' * (inner.block_size - len(password))
-    inner.update(password.translate(hmac.trans_36))
-    outer.update(password.translate(hmac.trans_5C))
+        hex_format_string = "%%0%ix" % (hlen * 2)
 
-    def F(i):
-        u = salt + struct.pack(b'>I', i)
-        result = 0
-        for j in xrange(int(iterations)):
-            dig1, dig2 = inner.copy(), outer.copy()
-            dig1.update(u)
-            dig2.update(dig1.digest())
-            u = dig2.digest()
-            result ^= _bin_to_long(u)
-        return _long_to_bin(result, hex_format_string)
+        inner, outer = digest(), digest()
+        if len(password) > inner.block_size:
+            password = digest(password).digest()
+        password += b'\x00' * (inner.block_size - len(password))
+        inner.update(password.translate(hmac.trans_36))
+        outer.update(password.translate(hmac.trans_5C))
 
-    T = [F(x) for x in range(1, l)]
-    return b''.join(T) + F(l)[:r]
+        def F(i):
+            u = salt + struct.pack(b'>I', i)
+            result = 0
+            for j in xrange(int(iterations)):
+                dig1, dig2 = inner.copy(), outer.copy()
+                dig1.update(u)
+                dig2.update(dig1.digest())
+                u = dig2.digest()
+                result ^= _bin_to_long(u)
+            return _long_to_bin(result, hex_format_string)
+
+        T = [F(x) for x in range(1, l)]
+        return b''.join(T) + F(l)[:r]
