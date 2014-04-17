@@ -9,12 +9,10 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
     to the `spatial_ref_sys` table of the spatial backend.  Doing this enables
     database-level spatial transformations for the backend.  Thus, this utility
     is useful for adding spatial reference systems not included by default with
-    the backend -- for example, the so-called "Google Maps Mercator Projection"
-    is excluded in PostGIS 1.3 and below, and the following adds it to the
-    `spatial_ref_sys` table:
+    the backend:
 
     >>> from django.contrib.gis.utils import add_srs_entry
-    >>> add_srs_entry(900913)
+    >>> add_srs_entry(3857)
 
     Keyword Arguments:
      auth_name:

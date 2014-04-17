@@ -1005,7 +1005,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         tgeoms = get_geoms(self.geometries.points)
         tgeoms.extend(get_geoms(self.geometries.multilinestrings, 4326))
         tgeoms.extend(get_geoms(self.geometries.polygons, 3084))
-        tgeoms.extend(get_geoms(self.geometries.multipolygons, 900913))
+        tgeoms.extend(get_geoms(self.geometries.multipolygons, 3857))
 
         # The SRID won't be exported in GEOS 3.0 release candidates.
         no_srid = self.null_srid == -1
