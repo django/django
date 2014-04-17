@@ -194,6 +194,10 @@ class MigrationLoader(object):
             self.graph.add_node(key, migration)
         for key, migration in normal.items():
             for parent in migration.dependencies:
+                if parent is not None and parent[1] != "__first__":
+                    self.graph.add_dependency(key, parent)
+        for key, migration in normal.items():
+            for parent in migration.dependencies:
                 # Special-case __first__, which means "the first migration" for
                 # migrated apps, and is ignored for unmigrated apps. It allows
                 # makemigrations to declare dependencies on apps before they
@@ -229,8 +233,8 @@ class MigrationLoader(object):
                         parent = list(self.graph.root_nodes(parent[0]))[0]
                     else:
                         raise ValueError("Dependency on unknown app %s" % parent[0])
-                if parent is not None:
-                    self.graph.add_dependency(key, parent)
+                    if parent is not None:
+                        self.graph.add_dependency(key, parent)
 
     def detect_conflicts(self):
         """
