@@ -1458,6 +1458,13 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
+.. method:: SimpleTestCase.assertJSONNotEqual(raw, expected_data, msg=None)
+
+    Asserts that the JSON fragments ``raw`` and ``expected_data`` are *not* equal.
+    See :meth:`~SimpleTestCase.assertJSONEqual` for further details.
+
+    Output in case of error can be customized with the ``msg`` argument.
+
 .. method:: TransactionTestCase.assertQuerysetEqual(qs, values, transform=repr, ordered=True, msg=None)
 
     Asserts that a queryset ``qs`` returns a particular list of values ``values``.

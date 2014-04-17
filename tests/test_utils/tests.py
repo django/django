@@ -542,6 +542,51 @@ class HTMLEqualTests(TestCase):
         self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
 
 
+class JSONEqualTests(TestCase):
+    def test_simple_equal(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr1": "foo", "attr2":"baz"}'
+        self.assertJSONEqual(json1, json2)
+
+    def test_simple_equal_unordered(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr2":"baz", "attr1": "foo"}'
+        self.assertJSONEqual(json1, json2)
+
+    def test_simple_equal_raise(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONEqual(json1, json2)
+
+    def test_equal_parsing_errors(self):
+        invalid_json = '{"attr1": "foo, "attr2":"baz"}'
+        valid_json = '{"attr1": "foo", "attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONEqual(invalid_json, valid_json)
+        with self.assertRaises(AssertionError):
+            self.assertJSONEqual(valid_json, invalid_json)
+
+    def test_simple_not_equal(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr2":"baz"}'
+        self.assertJSONNotEqual(json1, json2)
+
+    def test_simple_not_equal_raise(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr1": "foo", "attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONNotEqual(json1, json2)
+
+    def test_not_equal_parsing_errors(self):
+        invalid_json = '{"attr1": "foo, "attr2":"baz"}'
+        valid_json = '{"attr1": "foo", "attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONNotEqual(invalid_json, valid_json)
+        with self.assertRaises(AssertionError):
+            self.assertJSONNotEqual(valid_json, invalid_json)
+
+
 class XMLEqualTests(TestCase):
     def test_simple_equal(self):
         xml1 = "<elem attr1='a' attr2='b' />"
