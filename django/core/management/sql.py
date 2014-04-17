@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.management.base import CommandError
 from django.db import models, router
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango19Warning
 
 
 def sql_create(app_config, style, connection):
@@ -155,27 +155,18 @@ def sql_all(app_config, style, connection):
 
 
 def _split_statements(content):
-    try:
-        import sqlparse
-    except ImportError:
-        warnings.warn(
-            "Providing intial SQL data works better with sqlparse installed "
-            "and it will be required in Django 2.0.", RemovedInDjango20Warning
-        )
-        comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
-        statements = []
-        statement = []
-        for line in content.split("\n"):
-            cleaned_line = comment_re.sub(r"\1", line).strip()
-            if not cleaned_line:
-                continue
-            statement.append(cleaned_line)
-            if cleaned_line.endswith(";"):
-                statements.append(" ".join(statement))
-                statement = []
-        return statements
-    else:
-        return sqlparse.split(content.strip())
+    comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
+    statements = []
+    statement = []
+    for line in content.split("\n"):
+        cleaned_line = comment_re.sub(r"\1", line).strip()
+        if not cleaned_line:
+            continue
+        statement.append(cleaned_line)
+        if cleaned_line.endswith(";"):
+            statements.append(" ".join(statement))
+            statement = []
+    return statements
 
 
 def custom_sql_for_model(model, style, connection):

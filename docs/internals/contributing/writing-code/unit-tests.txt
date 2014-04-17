@@ -166,7 +166,6 @@ dependencies:
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
-*  sqlparse_
 
 You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
@@ -198,7 +197,6 @@ associated tests will be skipped.
 .. _memcached: http://memcached.org/
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
 .. _selenium: https://pypi.python.org/pypi/selenium
-.. _sqlparse: https://pypi.python.org/pypi/sqlparse
 .. _pip requirements files: http://www.pip-installer.org/en/latest/cookbook.html#requirements-files
 
 Code coverage

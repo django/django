@@ -103,14 +103,6 @@ directories.
 Providing initial SQL data
 ==========================
 
-.. deprecated:: 1.8
-
-    Historically this functionality has used regular expression parsing of the
-    initial SQL which is a bit buggy. This parsing is now deprecated in favor
-    of installing `sqlparse <https://pypi.python.org/pypi/sqlparse>`_; doing so
-    will be required for this functionality in Django 2.0. You can install it
-    using ``pip install sqlparse``.
-
 Django provides a hook for passing the database arbitrary SQL that's executed
 just after the CREATE TABLE statements when you run :djadmin:`migrate`. You can
 use this hook to populate default records, or you could also create SQL

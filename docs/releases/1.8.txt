@@ -128,9 +128,6 @@ Management Commands
 * :djadmin:`dumpdata` now has the option :djadminopt:`--output` which allows
   specifying the file to which the serialized data is written.
 
-* :ref:`initial-sql` now works better if the `sqlparse
-  <https://pypi.python.org/pypi/sqlparse>`_ Python library is installed.
-
 Models
 ^^^^^^
 
@@ -281,12 +278,3 @@ Using an incorrect count of unpacked values in the :ttag:`for` template tag
 
 Using an incorrect count of unpacked values in :ttag:`for` tag will raise an
 exception rather than fail silently in Django 2.0.
-
-Regular expression parsing of initial SQL
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The somewhat buggy regular expression logic used for parsing :ref:`SQL initial
-data <initial-sql>` has been deprecated. Install `sqlparse
-<https://pypi.python.org/pypi/sqlparse>`_ if you wish to use this feature.
-Doing so will be required in Django 2.0 when the regular expression logic is
-removed.
