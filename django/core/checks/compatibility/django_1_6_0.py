@@ -78,7 +78,7 @@ def _check_test_runner(app_configs=None, **kwargs):
                 hint=("Django 1.6 introduced a new default test runner. It looks like "
                       "this project was generated using Django 1.5 or earlier. You should "
                       "ensure your tests are all running & behaving as expected. See "
-                      "https://docs.djangoproject.com/en/dev/releases/1.6/#discovery-of-tests-in-any-test-module "
+                      "https://docs.djangoproject.com/en/dev/releases/1.6/#new-test-runner "
                       "for more information."),
                 obj=None,
                 id='1_6.W001',
