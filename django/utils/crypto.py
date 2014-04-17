@@ -120,8 +120,8 @@ def _long_to_bin(x, hex_format_string):
 if hasattr(hashlib, "pbkdf2_hmac"):
     def pbkdf2(password, salt, iterations, dklen=0, digest=None):
         """
-        Implements PBDF2 with the same API as Django's existing implementation,
-        using the stdlib.
+        Implements PBKDF2 with the same API as Django's existing
+        implementation, using the stdlib.
 
         This is used in Python 3.4 and up.
         """
