@@ -167,3 +167,13 @@ class ExecutorTests(MigrationTestBase):
         executor.migrate([("migrations", None)])
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_custom_user"})
+    @override_settings(AUTH_USER_MODEL="migrations.Author")
+    def test_custom_user(self):
+        """
+        Regression test for #22325 - references to a custom user model defined in the
+        same app are not resolved correctly.
+        """
+        executor = MigrationExecutor(connection)
+        executor.migrate([("migrations", "0001_initial")])
