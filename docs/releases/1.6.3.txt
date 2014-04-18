@@ -67,6 +67,16 @@ Other bugfixes and changes
 * Fixed :djadmin:`changepassword` on Windows
   (`#22364 <https://code.djangoproject.com/ticket/22364>`_).
 
+* Avoided shadowing deadlock exceptions on MySQL
+  (`#22291 <https://code.djangoproject.com/ticket/22291>`_).
+
+* Wrapped database exceptions in ``_set_autocommit``
+  (`#22321 <https://code.djangoproject.com/ticket/22321>`_).
+
+* Fixed atomicity when closing a database connection or when the database server
+  disconnects (`#21239 <https://code.djangoproject.com/ticket/21239>`_ and
+  `#21202 <https://code.djangoproject.com/ticket/21202>`_)
+
 * Fixed regression in ``prefetch_related`` that caused the related objects
   query to include an unnecessary join
   (`#21760 <https://code.djangoproject.com/ticket/21760>`_).
