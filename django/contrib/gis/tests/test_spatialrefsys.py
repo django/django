@@ -110,11 +110,11 @@ class SpatialRefSysTest(unittest.TestCase):
         """
         from django.contrib.gis.utils import add_srs_entry
 
-        add_srs_entry(900913)
+        add_srs_entry(3857)
         self.assertTrue(
-            SpatialRefSys.objects.filter(srid=900913).exists()
+            SpatialRefSys.objects.filter(srid=3857).exists()
         )
-        srs = SpatialRefSys.objects.get(srid=900913)
+        srs = SpatialRefSys.objects.get(srid=3857)
         self.assertTrue(
             SpatialRefSys.get_spheroid(srs.wkt).startswith('SPHEROID[')
         )

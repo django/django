@@ -77,6 +77,13 @@ again, you'll wipe out any changes you've made.
 Automatically loading initial data fixtures
 -------------------------------------------
 
+.. deprecated:: 1.7
+
+    If an application uses migrations, there is no automatic loading of
+    fixtures. Since migrations will be required for applications in Django 1.9,
+    this behavior is considered deprecated. If you want to load initial data
+    for an app, consider doing it in a migration.
+
 If you create a fixture named ``initial_data.[xml/yaml/json]``, that fixture will
 be loaded every time you run :djadmin:`migrate`. This is extremely convenient,
 but be careful: remember that the data will be refreshed *every time* you run
@@ -102,6 +109,13 @@ directories.
 
 Providing initial SQL data
 ==========================
+
+.. deprecated:: 1.7
+
+    If an application uses migrations, there is no loading of initial SQL data
+    (including backend-specific SQL data). Since migrations will be required
+    for applications in Django 1.9, this behavior is considered deprecated.
+    If you want to use initial SQL for an app, consider doing it in a migration.
 
 Django provides a hook for passing the database arbitrary SQL that's executed
 just after the CREATE TABLE statements when you run :djadmin:`migrate`. You can

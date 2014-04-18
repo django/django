@@ -47,6 +47,9 @@ setup(
     entry_points={'console_scripts': [
         'django-admin = django.core.management:execute_from_command_line',
     ]},
+    extras_require={
+        "bcrypt": ["bcrypt"],
+    },
     zip_safe=False,
     classifiers=[
         'Development Status :: 3 - Alpha',
