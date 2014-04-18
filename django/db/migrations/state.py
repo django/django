@@ -51,16 +51,6 @@ class ProjectState(object):
                 if len(new_unrendered_models) == len(unrendered_models):
                     raise InvalidBasesError("Cannot resolve bases for %r" % new_unrendered_models)
                 unrendered_models = new_unrendered_models
-            # make sure apps has no dangling references
-            if self.apps._pending_lookups:
-                # Raise an error with a best-effort helpful message
-                # (only for the first issue). Error message should look like:
-                # "ValueError: Lookup failed for model referenced by
-                # field migrations.Book.author: migrations.Author"
-                dangling_lookup = list(self.apps._pending_lookups.items())[0]
-                raise ValueError("Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}".format(
-                    field=dangling_lookup[1][0][1],
-                    model=dangling_lookup[0]))
         return self.apps
 
     @classmethod

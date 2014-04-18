@@ -223,6 +223,16 @@ class MigrationAutodetector(object):
                     unique_together=unique_together
                 )
             )
+        # Removing models
+        removed_models = set(old_model_keys) - set(new_model_keys)
+        for app_label, model_name in removed_models:
+            model_state = self.from_state.models[app_label, model_name]
+            self.add_to_migration(
+                app_label,
+                operations.DeleteModel(
+                    model_state.name,
+                )
+            )
         # Changes within models
         kept_models = set(old_model_keys).intersection(new_model_keys)
         old_fields = set()
@@ -338,16 +348,6 @@ class MigrationAutodetector(object):
                 )
         for app_label, operation in unique_together_operations:
             self.add_to_migration(app_label, operation)
-        # Removing models
-        removed_models = set(old_model_keys) - set(new_model_keys)
-        for app_label, model_name in removed_models:
-            model_state = self.from_state.models[app_label, model_name]
-            self.add_to_migration(
-                app_label,
-                operations.DeleteModel(
-                    model_state.name,
-                )
-            )
         # Alright, now add internal dependencies
         for app_label, migrations in self.migrations.items():
             for m1, m2 in zip(migrations, migrations[1:]):

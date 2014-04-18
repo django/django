@@ -33,15 +33,11 @@ class AutodetectorTests(TestCase):
     other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
     third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
     book = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))])
-    book_with_no_author = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("title", models.CharField(max_length=200))])
     book_with_author_renamed = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Writer")), ("title", models.CharField(max_length=200))])
     book_with_field_and_author_renamed = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("writer", models.ForeignKey("testapp.Writer")), ("title", models.CharField(max_length=200))])
-    book_with_multiple_authors = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("authors", models.ManyToManyField("testapp.Author")), ("title", models.CharField(max_length=200))])
-    book_with_multiple_authors_through_attribution = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("authors", models.ManyToManyField("testapp.Author", through="otherapp.Attribution")), ("title", models.CharField(max_length=200))])
     book_unique = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("author", "title")]})
     book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "author")]})
     book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "newfield")]})
-    attribution = ModelState("otherapp", "Attribution", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("book", models.ForeignKey("otherapp.Book"))])
     edition = ModelState("thirdapp", "Edition", [("id", models.AutoField(primary_key=True)), ("book", models.ForeignKey("otherapp.Book"))])
     custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))])
     knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
@@ -556,65 +552,18 @@ class AutodetectorTests(TestCase):
         """
         # Make state
         before = self.make_project_state([self.author_with_publisher_string])
-        after = self.make_project_state([self.author_with_publisher, self.publisher])
+        after = self.make_project_state([self.author_with_publisher])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes['testapp']), 1)
         # Right number of actions?
         migration = changes['testapp'][0]
-        self.assertEqual(len(migration.operations), 3)
+        self.assertEqual(len(migration.operations), 2)
         # Right actions?
         action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        self.assertEqual(action.name, "Publisher")
-        action = migration.operations[1]
         self.assertEqual(action.__class__.__name__, "AddField")
         self.assertEqual(action.name, "publisher")
-        action = migration.operations[2]
+        action = migration.operations[1]
         self.assertEqual(action.__class__.__name__, "RemoveField")
         self.assertEqual(action.name, "publisher_name")
-
-    def test_foreign_key_removed_before_target_model(self):
-        """
-        Removing an FK and the model it targets in the same change must remove
-        the FK field before the model to maintain consistency.
-        """
-        before = self.make_project_state([self.author_with_publisher, self.publisher])
-        after = self.make_project_state([self.author_name])  # removes both the model and FK
-        autodetector = MigrationAutodetector(before, after)
-        changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['testapp']), 1)
-        # Right number of actions?
-        migration = changes['testapp'][0]
-        self.assertEqual(len(migration.operations), 2)
-        # Right actions in right order?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "RemoveField")
-        self.assertEqual(action.name, "publisher")
-        action = migration.operations[1]
-        self.assertEqual(action.__class__.__name__, "DeleteModel")
-        self.assertEqual(action.name, "Publisher")
-
-    def test_many_to_many_removed_before_through_model(self):
-        """
-        Removing a ManyToManyField and the "through" model in the same change must remove
-        the field before the model to maintain consistency.
-        """
-        before = self.make_project_state([self.book_with_multiple_authors_through_attribution, self.author_name, self.attribution])
-        after = self.make_project_state([self.book_with_no_author, self.author_name])  # removes both the through model and ManyToMany
-        autodetector = MigrationAutodetector(before, after)
-        changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['otherapp']), 1)
-        # Right number of actions?
-        migration = changes['otherapp'][0]
-        self.assertEqual(len(migration.operations), 2)
-        # Right actions in right order?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "RemoveField")
-        self.assertEqual(action.name, "authors")
-        action = migration.operations[1]
-        self.assertEqual(action.__class__.__name__, "DeleteModel")
-        self.assertEqual(action.name, "Attribution")

@@ -121,15 +121,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         Removes a field from a model. Usually involves deleting a column,
         but for M2Ms may involve deleting a table.
         """
-        # M2M fields are a special case
-        if isinstance(field, ManyToManyField):
-            # For implicit M2M tables, delete the auto-created table
-            if field.rel.through._meta.auto_created:
-                self.delete_model(field.rel.through)
-            # For explicit "through" M2M fields, do nothing
+        # Special-case implicit M2M tables
+        if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
+            return self.delete_model(field.rel.through)
         # For everything else, remake.
-        else:
-            self._remake_table(model, delete_fields=[field])
+        self._remake_table(model, delete_fields=[field])
 
     def alter_field(self, model, old_field, new_field, strict=False):
         """
