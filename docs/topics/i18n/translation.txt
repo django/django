@@ -1638,7 +1638,7 @@ is set :setting:`LANGUAGE_CODE` and make sure the corresponding :term:`message
 files <message file>` and their compiled versions (``.mo``) exist.
 
 If you want to let each individual user specify which language they
-prefer, then you also need to use use the ``LocaleMiddleware``.
+prefer, then you also need to use the ``LocaleMiddleware``.
 ``LocaleMiddleware`` enables language selection based on data from the request.
 It customizes content for each user.
 
