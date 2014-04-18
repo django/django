@@ -559,6 +559,14 @@ class JSONEqualTests(TestCase):
         with self.assertRaises(AssertionError):
             self.assertJSONEqual(json1, json2)
 
+    def test_equal_parsing_errors(self):
+        invalid_json = '{"attr1": "foo, "attr2":"baz"}'
+        valid_json = '{"attr1": "foo", "attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONEqual(invalid_json, valid_json)
+        with self.assertRaises(AssertionError):
+            self.assertJSONEqual(valid_json, invalid_json)
+
     def test_simple_not_equal(self):
         json1 = '{"attr1": "foo", "attr2":"baz"}'
         json2 = '{"attr2":"baz"}'
@@ -570,11 +578,13 @@ class JSONEqualTests(TestCase):
         with self.assertRaises(AssertionError):
             self.assertJSONNotEqual(json1, json2)
 
-    def test_parsing_errors(self):
+    def test_not_equal_parsing_errors(self):
         invalid_json = '{"attr1": "foo, "attr2":"baz"}'
         valid_json = '{"attr1": "foo", "attr2":"baz"}'
         with self.assertRaises(AssertionError):
             self.assertJSONNotEqual(invalid_json, valid_json)
+        with self.assertRaises(AssertionError):
+            self.assertJSONNotEqual(valid_json, invalid_json)
 
 
 class XMLEqualTests(TestCase):

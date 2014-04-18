@@ -706,7 +706,8 @@ class SimpleTestCase(unittest.TestCase):
     def assertJSONNotEqual(self, raw, expected_data, msg=None):
         """
         Asserts that the JSON fragments raw and expected_data are not equal.
-        Usual JSON non-significant whitespace rules apply as the heavyweight is delegated to the json library.
+        Usual JSON non-significant whitespace rules apply as the heavyweight
+        is delegated to the json library.
         Output in case of error can be customized with the msg argument.
         """
         try:
