@@ -155,6 +155,9 @@ Tests
   :meth:`~django.test.SimpleTestCase.assertTemplateUsed`. This allows you to
   assert that a template was rendered a specific number of times.
 
+* :meth:`~django.test.SimpleTestCase.assertJSONNotEqual` new assertion allow
+  you to test that two JSON fragments are not equal.
+
 Validators
 ^^^^^^^^^^
 
