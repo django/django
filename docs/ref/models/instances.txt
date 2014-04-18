@@ -149,6 +149,9 @@ access to more than a single field::
             if self.status == 'published' and self.pub_date is None:
                 self.pub_date = datetime.date.today()
 
+Note, however, that like :meth:`Model.full_clean()`, a model's ``clean()``
+method is not invoked when you call your model's :meth:`~Model.save()` method.
+
 Any :exc:`~django.core.exceptions.ValidationError` exceptions raised by
 ``Model.clean()`` will be stored in a special key error dictionary key,
 ``NON_FIELD_ERRORS``, that is used for errors that are tied to the entire model
