@@ -271,7 +271,7 @@ views and use Django's generic views instead. To do so, open the
 
 
     def vote(request, question_id):
-        ....
+        ... # same as above
 
 We're using two generic views here:
 :class:`~django.views.generic.list.ListView` and
