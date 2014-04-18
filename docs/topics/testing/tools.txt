@@ -1460,6 +1460,8 @@ your test suite.
 
 .. method:: SimpleTestCase.assertJSONNotEqual(raw, expected_data, msg=None)
 
+    .. versionadded:: 1.8
+
     Asserts that the JSON fragments ``raw`` and ``expected_data`` are *not* equal.
     See :meth:`~SimpleTestCase.assertJSONEqual` for further details.
 
