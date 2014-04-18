@@ -18,7 +18,7 @@ def check_test_runner():
         message = [
             "Django 1.6 introduced a new default test runner ('%s')" % new_default,
             "You should ensure your tests are all running & behaving as expected. See",
-            "https://docs.djangoproject.com/en/dev/releases/1.6/#discovery-of-tests-in-any-test-module",
+            "https://docs.djangoproject.com/en/dev/releases/1.6/#new-test-runner",
             "for more information.",
         ]
         return ' '.join(message)
