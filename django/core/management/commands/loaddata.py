@@ -125,7 +125,8 @@ class Command(BaseCommand):
         for fixture_file, fixture_dir, fixture_name in self.find_fixtures(fixture_label):
             _, ser_fmt, cmp_fmt = self.parse_name(os.path.basename(fixture_file))
             open_method = self.compression_formats[cmp_fmt]
-            fixture = open_method(fixture_file, 'r')
+            # Forcing binary mode may be revisited after dropping Python 2 support (see #22399)
+            fixture = open_method(fixture_file, 'rb')
             try:
                 self.fixture_count += 1
                 objects_in_fixture = 0
