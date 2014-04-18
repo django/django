@@ -433,3 +433,37 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
     :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`.  See
     the :doc:`Authenticating against REMOTE_USER </howto/auth-remote-user>`
     documentation.
+
+    If you need more control, you can create your own authentication backend
+    that inherits from this class and override these attributes or methods:
+
+.. attribute:: RemoteUserBackend.create_unknown_user
+
+    ``True`` or ``False``.  Determines whether or not a
+    :class:`~django.contrib.auth.models.User` object is created if not already
+    in the database.  Defaults to ``True``.
+
+.. method:: RemoteUserBackend.authenticate(remote_user)
+
+    The username passed as ``remote_user`` is considered trusted. This method
+    simply returns the ``User`` object with the given username, creating a new
+    ``User`` object if :attr:`~RemoteUserBackend.create_unknown_user` is
+    ``True``.
+
+    Returns ``None`` if :attr:`~RemoteUserBackend.create_unknown_user` is
+    ``False`` and a ``User`` object with the given username is not found in the
+    database.
+
+.. method:: RemoteUserBackend.clean_username(username)
+
+   Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
+   information) prior to using it to get or create a
+   :class:`~django.contrib.auth.models.User` object.  Returns the cleaned
+   username.
+
+.. method:: RemoteUserBackend.configure_user(user)
+
+   Configures a newly created user.  This method is called immediately after a
+   new user is created, and can be used to perform custom setup actions, such
+   as setting the user's groups based on attributes in an LDAP directory.
+   Returns the user object.
