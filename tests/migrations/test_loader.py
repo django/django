@@ -15,7 +15,7 @@ class RecorderTests(TestCase):
     def _filter_contrib(self, applied_set):
         """Filter out contrib app migrations from applied_set"""
         return set(item for item in applied_set if item[0] not in (
-            'admin', 'auth', 'sites'))
+            'admin', 'auth', 'flatpages', 'sites'))
 
     def test_apply(self):
         """
