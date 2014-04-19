@@ -587,10 +587,9 @@ class AggregationTests(TestCase):
         )
 
         publishers = publishers.annotate(n_books=Count("book"))
-        self.assertEqual(
-            publishers[0].n_books,
-            2
-        )
+        sorted_publishers = sorted(publishers, key=lambda x: x.name)
+        self.assertEqual(sorted_publishers[0].n_books, 2)
+        self.assertEqual(sorted_publishers[1].n_books, 1)
 
         self.assertEqual(
             sorted(p.name for p in publishers),
