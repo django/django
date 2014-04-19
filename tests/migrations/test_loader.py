@@ -14,7 +14,7 @@ class RecorderTests(TestCase):
 
     def _filter_contrib(self, applied_set):
         """Filter out contrib app migrations from applied_set"""
-        return set(item for item in applied_set if item[0] not in ('admin',))
+        return set(item for item in applied_set if item[0] not in ('admin', 'auth'))
 
     def test_apply(self):
         """
@@ -93,6 +93,7 @@ class LoaderTests(TestCase):
         self.assertEqual(
             migration_loader.graph.forwards_plan(("migrations", "0001_initial")),
             [
+                ("auth", "initial"),
                 ("migrations", "0001_initial"),
             ],
         )

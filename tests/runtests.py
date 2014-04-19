@@ -115,6 +115,7 @@ def setup(verbosity, test_labels):
     settings.TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
     settings.LANGUAGE_CODE = 'en'
     settings.SITE_ID = 1
+    settings.MIGRATION_MODULES = {'auth': "django.contrib.auth.tests.migrations"}
 
     if verbosity > 0:
         # Ensure any warnings captured to logging are piped through a verbose
