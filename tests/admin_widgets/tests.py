@@ -1,7 +1,11 @@
 # encoding: utf-8
 from __future__ import unicode_literals
 
+import os
+import gettext
+
 from datetime import datetime, timedelta
+from importlib import import_module
 from unittest import TestCase, skipIf
 
 try:
@@ -641,54 +645,58 @@ class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         self.assertEqual(len(selected), 0)
 
+    def test_calendar_show_date_from_input(self):
+        """
+        Ensure that the calendar show the date from the input field for every
+        locale supported by django.
+        """
+        self.admin_login(username='super', password='secret', login_url='/')
+
+        # Enter test data
+        birthdate = datetime(1984, 05, 15)
+        member = models.Member(name='Bob', birthdate=birthdate, gender='M')
+        member.save()
+
+        # Get month names translations for every locales
+        month_string = 'January February March April May June July August September October November December'
+        path = os.path.join(os.path.dirname(import_module('django.contrib.admin').__file__), 'locale')
+        for language_code, language_name in settings.LANGUAGES:
+            try:
+                catalog = gettext.translation('djangojs', path, [language_code])
+            except IOError:
+                continue
+            if month_string in catalog._catalog:
+                month_names = catalog._catalog[month_string]
+            else:
+                month_names = month_string
+
+            # Get the expected caption
+            may_translation = month_names.split(' ')[4]
+            expected_caption = '{0:s} {1:d}'.format(may_translation, 1984)
+
+            # Test with every locale
+            with override_settings(LANGUAGE_CODE=language_code, USE_L10N=True):
+
+                # Open a page that has a date picker widget
+                self.selenium.get('{}{}'.format(self.live_server_url,
+                    '/admin_widgets/member/{}/'.format(member.pk)))
+
+                # Click on the calendar icon
+                self.selenium.find_element_by_id('calendarlink0').click()
+
+                # Get the calendar caption
+                calendar0 = self.selenium.find_element_by_id('calendarin0')
+                caption = calendar0.find_element_by_tag_name('caption')
+
+                # Make sure that the right month and year are displayed
+                self.assertEqual(caption.text, expected_caption)
+
 
 class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
 
 
 class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
-
-
-@override_settings(LANGUAGE_CODE='fr-ca', DATE_INPUT_FORMATS=('%d/%m/%Y',))
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
-    ROOT_URLCONF='admin_widgets.urls')
-class DatePickerCalendarSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
-
-    available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
-    fixtures = ['admin-widgets-users.xml']
-    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
-
-    def test_calendar_show_date_from_input(self):
-        """
-        Ensure that the calendar show the date from the input field for a locale
-        with a date format different than English.
-        """
-        self.admin_login(username='super', password='secret', login_url='/')
-
-        # Open a page that has a date picker widget
-        self.selenium.get('%s%s' % (self.live_server_url,
-            '/admin_widgets/member/add/'))
-
-        # Enter a date with French format in the input field
-        self.selenium.find_element_by_id('id_birthdate_0').send_keys('15/05/1984')
-
-        # Click on the calendar icon
-        self.selenium.find_element_by_id('calendarlink0').click()
-
-        # Get the calendar caption
-        calendar0 = self.selenium.find_element_by_id('calendarin0')
-        caption = calendar0.find_element_by_tag_name('caption')
-
-        # Make sure that the right month and year are displayed
-        self.assertEqual(caption.text, 'Mai 1984')
-
-
-class DatePickerCalendarSeleniumChromeTests(DatePickerCalendarSeleniumFirefoxTests):
-    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
-
-
-class DatePickerCalendarSeleniumIETests(DatePickerCalendarSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 

@@ -219,6 +219,9 @@ String.prototype.strptime = function(format) {
             case "%Y":
                 var year = date[i];
                 break;
+            case "%y":
+                var year = date[i];
+                break;
         }
         ++i;
     };
