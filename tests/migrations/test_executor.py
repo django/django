@@ -96,7 +96,10 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_book")
 
-    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations", "sessions": "migrations.test_migrations_2"})
+    @override_settings(MIGRATION_MODULES={
+        "migrations": "migrations.test_migrations",
+        "sessions": "migrations.test_migrations_2"
+    })
     def test_empty_plan(self):
         """
         Tests that re-planning a full migration of a fully-migrated set doesn't
@@ -111,13 +114,14 @@ class ExecutorTests(MigrationTestBase):
         # We use 'sessions' here as the second app as it's always present
         # in INSTALLED_APPS, so we can happily assign it test migrations.
         executor = MigrationExecutor(connection)
-        plan = executor.migration_plan([("migrations", "0002_second"), ("sessions", "0001_initial")])
+        plan = executor.migration_plan([("migrations", "0002_second"), ("sessions", "0002_invented")])
         self.assertEqual(
             plan,
             [
                 (executor.loader.graph.nodes["migrations", "0001_initial"], False),
                 (executor.loader.graph.nodes["migrations", "0002_second"], False),
                 (executor.loader.graph.nodes["sessions", "0001_initial"], False),
+                (executor.loader.graph.nodes["sessions", "0002_invented"], False),
             ],
         )
         # Fake-apply all migrations
