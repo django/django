@@ -158,6 +158,11 @@ entirely!). If you want to use a different database name, specify
 :setting:`NAME <TEST_NAME>` in the :setting:`TEST <DATABASE-TEST>`
 dictionary for any given database in :setting:`DATABASES`.
 
+.. versionchanged:: 1.7
+
+    On PostgreSQL, :setting:`USER` will also need read access to the built-in
+    ``postgres`` database.
+
 Aside from using a separate database, the test runner will otherwise
 use all of the same database settings you have in your settings file:
 :setting:`ENGINE <DATABASE-ENGINE>`, :setting:`USER`, :setting:`HOST`, etc. The
