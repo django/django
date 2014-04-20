@@ -21,6 +21,10 @@ def defaults_view(request, arg1, arg2):
     pass
 
 
+def nested_view(request):
+    pass
+
+
 def erroneous_view(request):
     import non_existent  # NOQA
 

@@ -7,6 +7,7 @@ from .views import empty_view, absolute_kwargs_view
 
 other_patterns = [
     url(r'non_path_include/$', empty_view, name='non_path_include'),
+    url(r'nested_path/$', 'urlpatterns_reverse.views.nested_view'),
 ]
 
 # test deprecated patterns() function. convert to list of urls() in Django 2.0
