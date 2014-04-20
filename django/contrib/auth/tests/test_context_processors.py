@@ -77,8 +77,13 @@ class AuthContextProcessorTests(TestCase):
     fixtures = ['context-processors-users.xml']
 
     @override_settings(
-        MIDDLEWARE_CLASSES=global_settings.MIDDLEWARE_CLASSES,
-        TEMPLATE_CONTEXT_PROCESSORS=global_settings.TEMPLATE_CONTEXT_PROCESSORS,
+        MIDDLEWARE_CLASSES=(
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+        ),
+        TEMPLATE_CONTEXT_PROCESSORS=(
+            'django.contrib.auth.context_processors.auth',
+        ),
     )
     def test_session_not_accessed(self):
         """
@@ -89,8 +94,13 @@ class AuthContextProcessorTests(TestCase):
         self.assertContains(response, "Session not accessed")
 
     @override_settings(
-        MIDDLEWARE_CLASSES=global_settings.MIDDLEWARE_CLASSES,
-        TEMPLATE_CONTEXT_PROCESSORS=global_settings.TEMPLATE_CONTEXT_PROCESSORS,
+        MIDDLEWARE_CLASSES=(
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+        ),
+        TEMPLATE_CONTEXT_PROCESSORS=(
+            'django.contrib.auth.context_processors.auth',
+        ),
     )
     def test_session_is_accessed(self):
         """
