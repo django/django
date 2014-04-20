@@ -297,18 +297,21 @@ class StateTests(TestCase):
 
         class Author(models.Model):
             name = models.TextField()
+
             class Meta:
                 app_label = "migrations"
                 apps = new_apps
 
         class Book(models.Model):
             author = models.ForeignKey(Author)
+
             class Meta:
                 app_label = "migrations"
                 apps = new_apps
 
         class Magazine(models.Model):
             authors = models.ManyToManyField(Author)
+
             class Meta:
                 app_label = "migrations"
                 apps = new_apps
