@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for reverse URL lookups.
 """
 from __future__ import absolute_import
+
+import sys
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
@@ -267,6 +270,25 @@ class ReverseShortcutTests(TestCase):
         self.assertEqual(res['Location'], '/foo/')
         res = redirect('http://example.com/')
         self.assertEqual(res['Location'], 'http://example.com/')
+        # Assert that we can redirect using UTF-8 strings
+        res = redirect('/æøå/abc/')
+        self.assertEqual(res['Location'], '/%C3%A6%C3%B8%C3%A5/abc/')
+        # Assert that no imports are attempted when dealing with a relative path
+        # (previously, the below would resolve in a UnicodeEncodeError from __import__ )
+        res = redirect('/æøå.abc/')
+        self.assertEqual(res['Location'], '/%C3%A6%C3%B8%C3%A5.abc/')
+        res = redirect('os.path')
+        self.assertEqual(res['Location'], 'os.path')
+
+    def test_no_illegal_imports(self):
+        # modules that are not listed in urlpatterns should not be importable
+        redirect("urlpatterns_reverse.nonimported_module.view")
+        self.assertNotIn("urlpatterns_reverse.nonimported_module", sys.modules)
+
+    def test_reverse_by_path_nested(self):
+        # Views that are added to urlpatterns using include() should be
+        # reversable by doted path.
+        self.assertEqual(reverse('regressiontests.urlpatterns_reverse.views.nested_view'), '/includes/nested_path/')
 
     def test_redirect_view_object(self):
         from .views import absolute_kwargs_view
@@ -510,4 +532,3 @@ class ErroneousViewTests(TestCase):
         self.assertRaises(ViewDoesNotExist, self.client.get, '/missing_inner/')
         self.assertRaises(ViewDoesNotExist, self.client.get, '/missing_outer/')
         self.assertRaises(ViewDoesNotExist, self.client.get, '/uncallable/')
-

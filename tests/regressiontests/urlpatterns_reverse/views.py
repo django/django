@@ -16,6 +16,10 @@ def absolute_kwargs_view(request, arg1=1, arg2=2):
 def defaults_view(request, arg1, arg2):
     pass
 
+def nested_view(request):
+    pass
+
+
 def erroneous_view(request):
     import non_existent
 
