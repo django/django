@@ -19,12 +19,14 @@ from django.core import management
 from django.core.cache import get_cache
 from django.core.cache.backends.base import (CacheKeyWarning,
     InvalidCacheBackendError)
+from django.core.context_processors import csrf
 from django.db import router, transaction
 from django.core.cache.utils import make_template_fragment_key
 from django.http import (HttpResponse, HttpRequest, StreamingHttpResponse,
     QueryDict)
 from django.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
+from django.middleware.csrf import CsrfViewMiddleware
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory
@@ -1578,6 +1580,10 @@ def hello_world_view(request, value):
     return HttpResponse('Hello World %s' % value)
 
 
+def csrf_view(request):
+    return HttpResponse(csrf(request)['csrf_token'])
+
+
 @override_settings(
         CACHE_MIDDLEWARE_ALIAS='other',
         CACHE_MIDDLEWARE_KEY_PREFIX='middlewareprefix',
@@ -1796,6 +1802,28 @@ class CacheMiddlewareTest(IgnorePendingDeprecationWarningsMixin, TestCase):
         # .. even if it has a prefix
         response = other_with_prefix_view(request, '16')
         self.assertEqual(response.content, b'Hello World 16')
+
+    def test_sensitive_cookie_not_cached(self):
+        """
+        Django must prevent caching of responses that set a user-specific (and
+        maybe security sensitive) cookie in response to a cookie-less request.
+        """
+        csrf_middleware = CsrfViewMiddleware()
+        cache_middleware = CacheMiddleware()
+
+        request = self.factory.get('/view/')
+        self.assertIsNone(cache_middleware.process_request(request))
+
+        csrf_middleware.process_view(request, csrf_view, (), {})
+
+        response = csrf_view(request)
+
+        response = csrf_middleware.process_response(request, response)
+        response = cache_middleware.process_response(request, response)
+
+        # Inserting a CSRF cookie in a cookie-less request prevented caching.
+        self.assertIsNone(cache_middleware.process_request(request))
+
 
 @override_settings(
         CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
