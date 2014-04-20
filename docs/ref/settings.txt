@@ -1734,12 +1734,16 @@ MIDDLEWARE_CLASSES
 Default::
 
     ('django.middleware.common.CommonMiddleware',
-     'django.contrib.sessions.middleware.SessionMiddleware',
-     'django.middleware.csrf.CsrfViewMiddleware',
-     'django.contrib.auth.middleware.AuthenticationMiddleware',
-     'django.contrib.messages.middleware.MessageMiddleware',)
+     'django.middleware.csrf.CsrfViewMiddleware',)
 
 A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
+
+.. versionchanged:: 1.7
+
+    :class:`~django.contrib.sessions.middleware.SessionMiddleware`,
+    :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`, and
+    :class:`~django.contrib.messages.middleware.MessageMiddleware` were removed
+    from this setting.
 
 .. setting:: MIGRATION_MODULES
 

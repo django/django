@@ -58,6 +58,14 @@ ALWAYS_INSTALLED_APPS = [
     'servers.another_app',
 ]
 
+ALWAYS_MIDDLEWARE_CLASSES = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+)
+
 
 def get_test_modules():
     from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
@@ -106,6 +114,7 @@ def setup(verbosity, test_labels):
         'LANGUAGE_CODE': settings.LANGUAGE_CODE,
         'STATIC_URL': settings.STATIC_URL,
         'STATIC_ROOT': settings.STATIC_ROOT,
+        'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES,
     }
 
     # Redirect some settings for the duration of these tests.
@@ -116,6 +125,9 @@ def setup(verbosity, test_labels):
     settings.TEMPLATE_DIRS = (os.path.join(RUNTESTS_DIR, TEST_TEMPLATE_DIR),)
     settings.LANGUAGE_CODE = 'en'
     settings.SITE_ID = 1
+    settings.MIDDLEWARE_CLASSES = ALWAYS_MIDDLEWARE_CLASSES
+    # Ensure the middleware classes are seen as overridden otherwise we get a compatibility warning.
+    settings._explicit_settings.add('MIDDLEWARE_CLASSES')
 
     if verbosity > 0:
         # Ensure any warnings captured to logging are piped through a verbose
