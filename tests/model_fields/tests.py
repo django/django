@@ -673,9 +673,17 @@ class PromiseTest(test.TestCase):
         self.assertIsInstance(
             CharField().get_prep_value(lazy_func()),
             six.text_type)
+        lazy_func = lazy(lambda: 0, int)
+        self.assertIsInstance(
+            CharField().get_prep_value(lazy_func()),
+            six.text_type)
 
     def test_CommaSeparatedIntegerField(self):
         lazy_func = lazy(lambda: '1,2', six.text_type)
+        self.assertIsInstance(
+            CommaSeparatedIntegerField().get_prep_value(lazy_func()),
+            six.text_type)
+        lazy_func = lazy(lambda: 0, int)
         self.assertIsInstance(
             CommaSeparatedIntegerField().get_prep_value(lazy_func()),
             six.text_type)
@@ -709,9 +717,17 @@ class PromiseTest(test.TestCase):
         self.assertIsInstance(
             FileField().get_prep_value(lazy_func()),
             six.text_type)
+        lazy_func = lazy(lambda: 0, int)
+        self.assertIsInstance(
+            FileField().get_prep_value(lazy_func()),
+            six.text_type)
 
     def test_FilePathField(self):
         lazy_func = lazy(lambda: 'tests.py', six.text_type)
+        self.assertIsInstance(
+            FilePathField().get_prep_value(lazy_func()),
+            six.text_type)
+        lazy_func = lazy(lambda: 0, int)
         self.assertIsInstance(
             FilePathField().get_prep_value(lazy_func()),
             six.text_type)
@@ -735,15 +751,23 @@ class PromiseTest(test.TestCase):
             int)
 
     def test_IPAddressField(self):
-        lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
+            lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
+            self.assertIsInstance(
+                IPAddressField().get_prep_value(lazy_func()),
+                six.text_type)
+            lazy_func = lazy(lambda: 0, int)
             self.assertIsInstance(
                 IPAddressField().get_prep_value(lazy_func()),
                 six.text_type)
 
     def test_GenericIPAddressField(self):
         lazy_func = lazy(lambda: '127.0.0.1', six.text_type)
+        self.assertIsInstance(
+            GenericIPAddressField().get_prep_value(lazy_func()),
+            six.text_type)
+        lazy_func = lazy(lambda: 0, int)
         self.assertIsInstance(
             GenericIPAddressField().get_prep_value(lazy_func()),
             six.text_type)
@@ -771,6 +795,10 @@ class PromiseTest(test.TestCase):
         self.assertIsInstance(
             SlugField().get_prep_value(lazy_func()),
             six.text_type)
+        lazy_func = lazy(lambda: 0, int)
+        self.assertIsInstance(
+            SlugField().get_prep_value(lazy_func()),
+            six.text_type)
 
     def test_SmallIntegerField(self):
         lazy_func = lazy(lambda: 1, int)
@@ -780,6 +808,10 @@ class PromiseTest(test.TestCase):
 
     def test_TextField(self):
         lazy_func = lazy(lambda: 'Abc', six.text_type)
+        self.assertIsInstance(
+            TextField().get_prep_value(lazy_func()),
+            six.text_type)
+        lazy_func = lazy(lambda: 0, int)
         self.assertIsInstance(
             TextField().get_prep_value(lazy_func()),
             six.text_type)
