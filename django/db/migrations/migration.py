@@ -129,6 +129,7 @@ class Migration(object):
             operation.database_backwards(self.app_label, schema_editor, from_state, to_state)
         return project_state
 
+
 def swappable_dependency(value):
     """
     Turns a setting value into a dependency.

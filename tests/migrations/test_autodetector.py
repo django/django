@@ -581,7 +581,7 @@ class AutodetectorTests(TestCase):
         the FK field before the model to maintain consistency.
         """
         before = self.make_project_state([self.author_with_publisher, self.publisher])
-        after = self.make_project_state([self.author_name]) # removes both the model and FK
+        after = self.make_project_state([self.author_name])  # removes both the model and FK
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number of migrations?
@@ -603,7 +603,7 @@ class AutodetectorTests(TestCase):
         the field before the model to maintain consistency.
         """
         before = self.make_project_state([self.book_with_multiple_authors_through_attribution, self.author_name, self.attribution])
-        after = self.make_project_state([self.book_with_no_author, self.author_name]) # removes both the through model and ManyToMany
+        after = self.make_project_state([self.book_with_no_author, self.author_name])  # removes both the through model and ManyToMany
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number of migrations?
