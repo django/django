@@ -79,10 +79,10 @@ if using a UNIX-like system, or a semicolon (``;``) if using Windows. If any
 part of a directory path contains a space character, the complete argument
 string to ``WSGIPythonPath`` must be quoted::
 
-    WSGIPythonPath /path/to/mysite.com:/path/to/your/venv/lib/python2.X/site-packages
+    WSGIPythonPath /path/to/mysite.com:/path/to/your/venv/lib/python3.X/site-packages
 
 Make sure you give the correct path to your virtualenv, and replace
-``python2.X`` with the correct Python version (e.g. ``python2.7``).
+``python3.X`` with the correct Python version (e.g. ``python3.4``).
 
 .. _virtualenv: http://www.virtualenv.org
 
