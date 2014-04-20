@@ -911,6 +911,12 @@ class FilePathField(Field):
         kwargs['max_length'] = kwargs.get('max_length', 100)
         Field.__init__(self, verbose_name, name, **kwargs)
 
+    def get_prep_value(self, value):
+        value = super(FilePathField, self).get_prep_value(value)
+        if value is None:
+            return None
+        return smart_unicode(value)
+
     def formfield(self, **kwargs):
         defaults = {
             'path': self.path,
@@ -1010,6 +1016,12 @@ class IPAddressField(Field):
         kwargs['max_length'] = 15
         Field.__init__(self, *args, **kwargs)
 
+    def get_prep_value(self, value):
+        value = super(IPAddressField, self).get_prep_value(value)
+        if value is None:
+            return None
+        return smart_unicode(value)
+
     def get_internal_type(self):
         return "IPAddressField"
 
@@ -1047,12 +1059,14 @@ class GenericIPAddressField(Field):
         return value or None
 
     def get_prep_value(self, value):
+        if value is None:
+            return value
         if value and ':' in value:
             try:
                 return clean_ipv6_address(value, self.unpack_ipv4)
             except exceptions.ValidationError:
                 pass
-        return value
+        return smart_unicode(value)
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.GenericIPAddressField}

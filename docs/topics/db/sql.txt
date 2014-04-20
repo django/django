@@ -69,6 +69,16 @@ options that make it very powerful.
     database, but does nothing to enforce that. If the query does not
     return rows, a (possibly cryptic) error will result.
 
+.. warning::
+
+    If you are performing queries on MySQL, note that MySQL's silent type coercion
+    may cause unexpected results when mixing types. If you query on a string
+    type column, but with an integer value, MySQL will coerce the types of all values
+    in the table to an integer before performing the comparison. For example, if your
+    table contains the values ``'abc'``, ``'def'`` and you query for ``WHERE mycolumn=0``,
+    both rows will match. To prevent this, perform the correct typecasting
+    before using the value in a query.
+
 Mapping query fields to model fields
 ------------------------------------
 

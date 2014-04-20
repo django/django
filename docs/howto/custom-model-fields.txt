@@ -482,6 +482,16 @@ For example::
             return ''.join([''.join(l) for l in (value.north,
                     value.east, value.south, value.west)])
 
+.. warning::
+
+    If your custom field uses the ``CHAR``, ``VARCHAR`` or ``TEXT``
+    types for MySQL, you must make sure that :meth:`.get_prep_value`
+    always returns a string type. MySQL performs flexible and unexpected
+    matching when a query is performed on these types and the provided
+    value is an integer, which can cause queries to include unexpected
+    objects in their results. This problem cannot occur if you always
+    return a string type from :meth:`.get_prep_value`.
+
 Converting query values to database values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
