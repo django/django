@@ -1247,6 +1247,10 @@ Miscellaneous
   The :attr:`~django.core.validators.RegexValidator.flags` attribute was added
   to :class:`~django.core.validators.RegexValidator` to simplify this change.
 
+* When running tests on PostgreSQL, the :setting:`USER` will need read access
+  to the built-in ``postgres`` database. This is in lieu of the previous
+  behavior of connecting to the actual non-test database.
+
 .. _deprecated-features-1.7:
 
 Features deprecated in 1.7
