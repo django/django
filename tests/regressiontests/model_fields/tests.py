@@ -6,8 +6,15 @@ from decimal import Decimal
 from django import test
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db.models.fields import (
+    AutoField, BigIntegerField, BooleanField, CharField,
+    CommaSeparatedIntegerField, DateField, DateTimeField, DecimalField,
+    EmailField, FilePathField, FloatField, IntegerField, IPAddressField,
+    GenericIPAddressField, NullBooleanField, PositiveIntegerField,
+    PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
+    TimeField, URLField)
 from django.db import models
-from django.db.models.fields.files import FieldFile
+from django.db.models.fields.files import FileField, ImageField, FieldFile
 from django.utils import six
 from django.utils import unittest
 
@@ -414,3 +421,89 @@ class FileFieldTests(unittest.TestCase):
         field = d._meta.get_field('myfile')
         field.save_form_data(d, 'else.txt')
         self.assertEqual(d.myfile, 'else.txt')
+
+
+class PrepValueTest(test.TestCase):
+    def test_AutoField(self):
+        self.assertIsInstance(AutoField(primary_key=True).get_prep_value(1), int)
+
+    @unittest.skipIf(six.PY3, "Python 3 has no `long` type.")
+    def test_BigIntegerField(self):
+        self.assertIsInstance(BigIntegerField().get_prep_value(long(9999999999999999999)), long)
+
+    def test_BooleanField(self):
+        self.assertIsInstance(BooleanField().get_prep_value(True), bool)
+
+    def test_CharField(self):
+        self.assertIsInstance(CharField().get_prep_value(''), six.text_type)
+        self.assertIsInstance(CharField().get_prep_value(0), six.text_type)
+
+    def test_CommaSeparatedIntegerField(self):
+        self.assertIsInstance(CommaSeparatedIntegerField().get_prep_value('1,2'), six.text_type)
+        self.assertIsInstance(CommaSeparatedIntegerField().get_prep_value(0), six.text_type)
+
+    def test_DateField(self):
+        self.assertIsInstance(DateField().get_prep_value(datetime.date.today()), datetime.date)
+
+    def test_DateTimeField(self):
+        self.assertIsInstance(DateTimeField().get_prep_value(datetime.datetime.now()), datetime.datetime)
+
+    def test_DecimalField(self):
+        self.assertIsInstance(DecimalField().get_prep_value(Decimal('1.2')), Decimal)
+
+    def test_EmailField(self):
+        self.assertIsInstance(EmailField().get_prep_value('mailbox@domain.com'), six.text_type)
+
+    def test_FileField(self):
+        self.assertIsInstance(FileField().get_prep_value('filename.ext'), six.text_type)
+        self.assertIsInstance(FileField().get_prep_value(0), six.text_type)
+
+    def test_FilePathField(self):
+        self.assertIsInstance(FilePathField().get_prep_value('tests.py'), six.text_type)
+        self.assertIsInstance(FilePathField().get_prep_value(0), six.text_type)
+
+    def test_FloatField(self):
+        self.assertIsInstance(FloatField().get_prep_value(1.2), float)
+
+    def test_ImageField(self):
+        self.assertIsInstance(ImageField().get_prep_value('filename.ext'), six.text_type)
+
+    def test_IntegerField(self):
+        self.assertIsInstance(IntegerField().get_prep_value(1), int)
+
+    def test_IPAddressField(self):
+        self.assertIsInstance(IPAddressField().get_prep_value('127.0.0.1'), six.text_type)
+        self.assertIsInstance(IPAddressField().get_prep_value(0), six.text_type)
+
+    def test_GenericIPAddressField(self):
+        self.assertIsInstance(GenericIPAddressField().get_prep_value('127.0.0.1'), six.text_type)
+        self.assertIsInstance(GenericIPAddressField().get_prep_value(0), six.text_type)
+
+    def test_NullBooleanField(self):
+        self.assertIsInstance(NullBooleanField().get_prep_value(True), bool)
+
+    def test_PositiveIntegerField(self):
+        self.assertIsInstance(PositiveIntegerField().get_prep_value(1), int)
+
+    def test_PositiveSmallIntegerField(self):
+        self.assertIsInstance(PositiveSmallIntegerField().get_prep_value(1), int)
+
+    def test_SlugField(self):
+        self.assertIsInstance(SlugField().get_prep_value('slug'), six.text_type)
+        self.assertIsInstance(SlugField().get_prep_value(0), six.text_type)
+
+    def test_SmallIntegerField(self):
+        self.assertIsInstance(SmallIntegerField().get_prep_value(1), int)
+
+    def test_TextField(self):
+        self.assertIsInstance(TextField().get_prep_value('Abc'), six.text_type)
+        self.assertIsInstance(TextField().get_prep_value(0), six.text_type)
+
+    def test_TimeField(self):
+        self.assertIsInstance(
+            TimeField().get_prep_value(datetime.datetime.now().time()),
+            datetime.time)
+
+    def test_URLField(self):
+        self.assertIsInstance(URLField().get_prep_value('http://domain.com'), six.text_type)
+
