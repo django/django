@@ -507,6 +507,22 @@ MySQL does not support the ``NOWAIT`` option to the ``SELECT ... FOR UPDATE``
 statement. If ``select_for_update()`` is used with ``nowait=True`` then a
 ``DatabaseError`` will be raised.
 
+Automatic typecasting can cause unexpected results
+--------------------------------------------------
+
+When performing a query on a string type, but with an integer value, MySQL will
+coerce the types of all values in the table to an integer before performing the
+comparison. If your table contains the values ``'abc'``, ``'def'`` and you
+query for ``WHERE mycolumn=0``, both rows will match. Similarly, ``WHERE mycolumn=1``
+will match the value ``'abc1'``. Therefore, string type fields included in Django
+will always cast the value to a string before using it in a query.
+
+If you implement custom model fields that inherit from :class:`~django.db.models.Field`
+directly, are overriding :meth:`~django.db.models.Field.get_prep_value`, or use
+:meth:`extra() <django.db.models.query.QuerySet.extra>` or
+:meth:`raw() <django.db.models.Manager.raw>`, you should ensure that you
+perform the appropriate typecasting.
+
 .. _sqlite-notes:
 
 SQLite notes
