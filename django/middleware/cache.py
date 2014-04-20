@@ -50,7 +50,8 @@ More details about how the caching works:
 
 from django.conf import settings
 from django.core.cache import get_cache, DEFAULT_CACHE_ALIAS
-from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers, get_max_age
+from django.utils.cache import (get_cache_key, get_max_age, has_vary_header,
+    learn_cache_key, patch_response_headers)
 
 
 class UpdateCacheMiddleware(object):
@@ -93,8 +94,15 @@ class UpdateCacheMiddleware(object):
         if not self._should_update_cache(request, response):
             # We don't need to update the cache, just return.
             return response
+
         if response.streaming or response.status_code != 200:
             return response
+
+        # Don't cache responses that set a user-specific (and maybe security
+        # sensitive) cookie in response to a cookie-less request.
+        if not request.COOKIES and response.cookies and has_vary_header(response, 'Cookie'):
+            return response
+
         # Try to get the timeout from the "max-age" section of the "Cache-
         # Control" header before reverting to using the default cache_timeout
         # length.
