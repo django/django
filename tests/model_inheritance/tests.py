@@ -3,15 +3,16 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 from django.core.exceptions import FieldError
+from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
 
 from .models import (
     Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place, Post,
     Restaurant, Student, Supplier, Worker, MixinModel,
-    Title, Base, SubBase)
+    Title, Copy, Base, SubBase)
 
 
 class ModelInheritanceTests(TestCase):
@@ -339,3 +340,40 @@ class ModelInheritanceTests(TestCase):
         # accidentally found).
         self.assertQuerysetEqual(
             s.titles.all(), [])
+
+
+class InheritanceSameModelNameTests(TestCase):
+
+    def setUp(self):
+        # The Title model has distinct accessors for both
+        # model_inheritance.Copy and model_inheritance_same_model_name.Copy
+        # models.
+        self.title = Title.objects.create(title='Lorem Ipsum')
+
+    def test_inheritance_related_name(self):
+        self.assertEqual(
+            self.title.attached_model_inheritance_copy_set.create(
+                content='Save $ on V1agr@',
+                url='http://v1agra.com/',
+                title='V1agra is spam',
+            ), Copy.objects.get(
+                content='Save $ on V1agr@',
+            ))
+
+    def test_inheritance_with_same_model_name(self):
+        with self.modify_settings(
+                INSTALLED_APPS={'append': ['model_inheritance.same_model_name']}):
+            call_command('migrate', verbosity=0)
+            from .same_model_name.models import Copy
+            self.assertEqual(
+                self.title.attached_same_model_name_copy_set.create(
+                    content='The Web framework for perfectionists with deadlines.',
+                    url='http://www.djangoproject.com/',
+                    title='Django Rocks'
+                ), Copy.objects.get(
+                    content='The Web framework for perfectionists with deadlines.',
+                ))
+
+    def test_related_name_attribute_exists(self):
+        # The Post model doesn't have an attribute called 'attached_%(app_label)s_%(class)s_set'.
+        self.assertFalse(hasattr(self.title, 'attached_%(app_label)s_%(class)s_set'))
