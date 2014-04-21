@@ -12,7 +12,11 @@ from django.core.management import call_command
 from django import db
 from django.test import runner, TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.testcases import connections_support_transactions
-from django.test.utils import IgnoreAllDeprecationWarningsMixin, override_system_checks
+from django.test.utils import (
+    IgnoreAllDeprecationWarningsMixin,
+    override_settings,
+    override_system_checks
+)
 from django.utils import six
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -240,6 +244,20 @@ class ModulesTestsPackages(IgnoreAllDeprecationWarningsMixin, unittest.TestCase)
         app_config.import_models({})
         with self.assertRaises(ImportError):
             get_tests(app_config)
+
+
+class LabelDiscoveryTest(TestCase):
+
+    @override_settings(INSTALLED_APPS=['test_runner.valid_app'])
+    def test_discover_within_package(self):
+        """
+        Verify labels like applabel.TestCase find tests defined in
+        applabel/tests/__init__.py. Fixes #22478.
+        """
+
+        from django.test.simple import build_test
+        suite = build_test('valid_app.SampleTest')
+        self.assertEqual(suite.countTestCases(), 1)
 
 
 class Sqlite3InMemoryTestDbs(TestCase):

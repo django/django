@@ -181,7 +181,7 @@ def build_test(label):
 
     TestClass = None
     for module in test_modules:
-        TestClass = getattr(models_module, parts[1], None)
+        TestClass = getattr(module, parts[1], None)
         if TestClass is not None:
             break
 
