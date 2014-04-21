@@ -448,3 +448,54 @@ Versions affected
 * Django 1.4 `(patch <https://github.com/django/django/commit/3f3d887a6844ec2db743fee64c9e53e04d39a368>`__ and `Python compatibility fix) <https://github.com/django/django/commit/6903d1690a92aa040adfb0c8eb37cf62e4206714>`__
 
 * Django 1.5 `(patch) <https://github.com/django/django/commit/22b74fa09d7ccbc8c52270d648a0da7f3f0fa2bc>`__
+
+
+April 21, 2014 - CVE-2014-2014-0472
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2014-0472 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0472&cid=2>`_: Unexpected code execution using ``reverse()``. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`_
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch <https://github.com/django/django/commit/c1a8c420fe4b27fb2caf5e46d23b5712fc0ac535>`_)
+
+* Django 1.5 `(patch <https://github.com/django/django/commit/2a5bcb69f42b84464b24b5c835dca6467b6aa7f1>`_)
+
+* Django 1.6 `(patch <https://github.com/django/django/commit/4352a50871e239ebcdf64eee6f0b88e714015c1b>`_)
+
+* Django 1.7 `(patch <https://github.com/django/django/commit/546740544d7f69254a67b06a3fc7fa0c43512958>`_)
+
+
+April 21, 2014 - CVE-2014-2014-0473
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2014-0473 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0473&cid=2>`_: Caching of anonymous pages could reveal CSRF token. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`_
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch <https://github.com/django/django/commit/1170f285ddd6a94a65f911a27788ba49ca08c0b0>`_)
+
+* Django 1.5 `(patch <https://github.com/django/django/commit/6872f42757d7ef6a97e0b6ec5db4d2615d8a2bd8>`_)
+
+* Django 1.6 `(patch <https://github.com/django/django/commit/d63e20942f3024f24cb8cd85a49461ba8a9b6736>`_)
+
+* Django 1.7 `(patch <https://github.com/django/django/commit/380545bf85cbf17fc698d136815b7691f8d023ca>`_)
+
+
+April 21, 2014 - CVE-2014-2014-0472
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2014-0474 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0474&cid=2>`_: MySQL typecasting causes unexpected query results. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`_
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch <https://github.com/django/django/commit/aa80f498de6d687e613860933ac58433ab71ea4b>`_)
+
+* Django 1.5 `(patch <https://github.com/django/django/commit/985434fb1d6bf2335bf96c6ebf91c3674f1f399f>`_)
+
+* Django 1.6 `(patch <https://github.com/django/django/commit/5f0829a27e85d89ad8c433f5c6a7a7d17c9e9292>`_)
+
+* Django 1.7 `(patch <https://github.com/django/django/commit/34526c2f56b863c2103655a0893ac801667e86ea>`_)
