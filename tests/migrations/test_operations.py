@@ -5,7 +5,7 @@ from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
-from django.db.utils import IntegrityError
+from django.db.utils import IntegrityError, DatabaseError
 
 from .test_base import MigrationTestBase
 
@@ -37,11 +37,11 @@ class OperationTests(MigrationTestBase):
         with connection.cursor() as cursor:
             try:
                 cursor.execute("DROP TABLE %s_pony" % app_label)
-            except:
+            except DatabaseError:
                 pass
             try:
                 cursor.execute("DROP TABLE %s_stable" % app_label)
-            except:
+            except DatabaseError:
                 pass
         # Make the "current" state
         operations = [migrations.CreateModel(
