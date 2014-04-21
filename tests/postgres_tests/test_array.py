@@ -1,7 +1,7 @@
 import unittest
 
 from django.contrib.postgres.fields import ArrayField
-from django.contrib.postgres.forms import SimpleArrayField
+from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
 from django.core import exceptions, serializers
 from django.db import models, IntegrityError, connection
 from django.db.migrations.writer import MigrationWriter
@@ -283,3 +283,57 @@ class TestSimpleFormField(TestCase):
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, SimpleArrayField)
         self.assertEqual(form_field.max_length, 4)
+
+
+class TestSplitFormField(TestCase):
+
+    def test_valid(self):
+        class SplitForm(forms.Form):
+            array = SplitArrayField(forms.CharField(), size=3)
+
+        data = {'array_0': 'a', 'array_1': 'b', 'array_2': 'c'}
+        form = SplitForm(data)
+        form.full_clean()
+        self.assertEqual(form.cleaned_data, {'array': ['a', 'b', 'c']})
+
+    def test_require_all_fields(self):
+        class SplitForm(forms.Form):
+            array = SplitArrayField(forms.CharField(), size=3, require_all_fields=True)
+
+        data = {'array_0': 'a', 'array_1': 'b', 'array_2': ''}
+        form = SplitForm(data)
+        form.full_clean()
+        self.assertEqual(form.errors, {'array': ['This field is required.']})
+
+    def test_remove_trailing_nulls(self):
+        class SplitForm(forms.Form):
+            array = SplitArrayField(forms.CharField(), size=5, remove_trailing_nulls=True)
+
+        data = {'array_0': 'a', 'array_1': '', 'array_2': 'b', 'array_3': '', 'array_4': ''}
+        form = SplitForm(data)
+        form.full_clean()
+        self.assertEqual(form.cleaned_data, {'array': ['a', '', 'b']})
+
+    def test_max_allowable_size(self):
+        class SplitForm(forms.Form):
+            array = SplitArrayField(forms.CharField(), size=3, max_allowable_size=5)
+
+        data = {'array_0': 'a', 'array_1': 'b', 'array_2': 'c', 'array_3': 'd', 'array_4': 'e'}
+        form = SplitForm(data)
+        form.full_clean()
+        self.assertEqual(form.cleaned_data, {'array': ['a', 'b', 'c', 'd', 'e']})
+
+    def test_rendering(self):
+        class SplitForm(forms.Form):
+            array = SplitArrayField(forms.CharField(), size=3)
+
+        self.assertHTMLEqual(str(SplitForm()), '''
+            <tr>
+                <th><label for="id_array_0">Array:</label></th>
+                <td>
+                    <input id="id_array_0" name="array_0" type="text" />
+                    <input id="id_array_1" name="array_1" type="text" />
+                    <input id="id_array_2" name="array_2" type="text" />
+                </td>
+            </tr>
+        ''')

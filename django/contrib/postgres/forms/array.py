@@ -72,3 +72,58 @@ class SimpleArrayField(forms.CharField):
                     ))
         if errors:
             raise ValidationError(errors)
+
+
+class SplitArrayWidget(forms.MultiWidget):
+
+    def __init__(self, widget, size, max_allowable_size=None, **kwargs):
+        self.widget = widget
+        self.size = size
+        self.max_allowable_size = max_allowable_size or size
+        widgets = [widget] * size
+        super(SplitArrayWidget, self).__init__(widgets, **kwargs)
+
+    def value_from_datadict(self, data, files, name):
+        return [self.widget.value_from_datadict(data, files, name + '_%s' % i) for i in range(self.max_allowable_size)]
+
+    def decompress(self, value):
+        return value or []
+
+
+class SplitArrayField(forms.MultiValueField):
+
+    def __init__(self, base_field, size, remove_trailing_nulls=False, max_allowable_size=None, **kwargs):
+        self.base_field = base_field
+        self.size = size
+        fields = (base_field,) * size
+        if max_allowable_size is not None and max_allowable_size < size:
+            raise ValueError('Max allowable size of a SplitArrayField must be larger than the initial size.')
+        self.max_allowable_size = max_allowable_size
+        self.remove_trailing_nulls = remove_trailing_nulls
+        if remove_trailing_nulls:
+            # required=True doesn't make sense if we are allowing nulls
+            kwargs['required'] = False
+        widget = SplitArrayWidget(widget=base_field.widget, size=size, max_allowable_size=max_allowable_size)
+        kwargs.setdefault('widget', widget)
+        super(SplitArrayField, self).__init__(fields, **kwargs)
+
+    def compress(self, data_list):
+        return data_list
+
+    def clean(self, value):
+        if self.max_allowable_size != self.size and len(value) > len(self.fields):
+            # Extend the field list if we have max_allowable_size > self.size
+            self.fields = (self.base_field,) * len(value)
+        out = super(SplitArrayField, self).clean(value)
+        if self.max_allowable_size != self.size and len(self.fields) > self.size:
+            self.fields = (self.base_field,) * self.size
+        if self.remove_trailing_nulls:
+            null_index = None
+            for i, value in reversed(list(enumerate(out))):
+                if value in self.empty_values:
+                    null_index = i
+                else:
+                    break
+            if null_index:
+                return out[:null_index]
+        return out
