@@ -92,12 +92,12 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
 
     def remove_field(self, model, field):
         from django.contrib.gis.db.models.fields import GeometryField
-        if not isinstance(field, GeometryField) or self.connection.ops.spatial_version < (2, 0):
+        if not isinstance(field, GeometryField) or self.connection.ops.spatial_version > (2, 0):
             super(PostGISSchemaEditor, self).remove_field(model, field)
-
-        self.execute(
-            self.sql_drop_geometry_column % {
-                "table": self.geo_quote_name(model._meta.db_table),
-                "column": self.geo_quote_name(field.column),
-            }
-        )
+        else:
+            self.execute(
+                self.sql_drop_geometry_column % {
+                    "table": self.geo_quote_name(model._meta.db_table),
+                    "column": self.geo_quote_name(field.column),
+                }
+            )
