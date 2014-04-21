@@ -162,6 +162,73 @@ def parse_http_date_safe(date):
         pass
 
 
+class Range(object):
+    def __init__(self, start, finish, size):
+        self.start = start
+        self.finish = finish
+        self.size = size
+
+    @property
+    def valid(self):
+        return 0 <= self.start <= self.finish
+
+    def __len__(self):
+        return self.finish - self.start + 1
+
+    def __str__(self):
+        return 'bytes %s-%s/%s' % (self.start, self.finish, self.size)
+
+
+def parse_http_range(range_header, size):
+    """
+    Parse a byte range header as specified by HTTP RFC2616 section 14.35.1.
+
+    Takes the byte range header as well as the size of the file requested and
+    returns a list of tuples (start, finish) for the byte range specified.
+    """
+    if range_header is None or '=' not in range_header:
+        return None
+
+    _, byte_ranges = range_header.split('=', 1)
+
+    ranges = byte_ranges.split(',')
+
+    results = []
+    for byte_range in ranges:
+        byte_range = byte_range.strip()
+
+        if '-' not in byte_range:
+            return None
+
+        if byte_range.startswith('-'):
+            # Get the last x bytes of the file
+            start = size + int(byte_range)
+            finish = size
+        else:
+            start, finish = byte_range.split('-', 1)
+            start = int(start)
+            if finish:
+                finish = int(finish)
+                if finish > size:
+                    finish = size
+            else:
+                finish = size
+
+            if start > finish:
+                return None
+
+        results.append(Range(start, finish, size))
+
+    return results
+
+
+def http_range_valid(ranges):
+    if ranges is None:
+        return False
+
+    return all([r.valid for r in ranges])
+
+
 # Base 36 functions: useful for generating compact URLs
 
 def base36_to_int(s):
