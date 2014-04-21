@@ -1,0 +1,12 @@
+form .aligned .arrayfield {
+    margin-left: 7em;
+    padding-left: 30px;
+}
+form .aligned .arrayfield .arrayfield,
+form .aligned .arrayfield p.datetime {
+    margin-left: 0;
+    padding-left: 0;
+}
+form .aligned .arrayfield .addlink {
+    cursor: pointer;
+}
