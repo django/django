@@ -7,6 +7,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
     geom_index_ops_nd = 'GIST_GEOMETRY_OPS_ND'
 
     sql_add_geometry_column = "SELECT AddGeometryColumn(%(table)s, %(column)s, %(srid)s, %(geom_type)s, %(dim)s)"
+    sql_drop_geometry_column = "SELECT DropGeometryColumn(%(table)s, %(column)s)"
     sql_alter_geometry_column_not_null = "ALTER TABLE %(table)s ALTER COLUMN %(column)s SET NOT NULL"
     sql_add_spatial_index = "CREATE INDEX %(index)s ON %(table)s USING %(index_type)s (%(column)s %(ops)s)"
 
@@ -88,3 +89,15 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         for sql in self.geometry_sql:
             self.execute(sql)
         self.geometry_sql = []
+
+    def remove_field(self, model, field):
+        from django.contrib.gis.db.models.fields import GeometryField
+        if not isinstance(field, GeometryField) or self.connection.ops.spatial_version < (2, 0):
+            super(PostGISSchemaEditor, self).remove_field(model, field)
+
+        self.execute(
+            self.sql_drop_geometry_column % {
+                "table": self.geo_quote_name(model._meta.db_table),
+                "column": self.geo_quote_name(field.column),
+            }
+        )
