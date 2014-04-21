@@ -253,6 +253,11 @@ class TestSimpleFormField(TestCase):
         value = field.clean('a|b|c')
         self.assertEqual(value, ['a', 'b', 'c'])
 
+    def test_prepare_value(self):
+        field = SimpleArrayField(forms.CharField())
+        value = field.prepare_value(['a', 'b', 'c'])
+        self.assertEqual(value, 'a,b,c')
+
     def test_max_length(self):
         field = SimpleArrayField(forms.CharField(), max_length=2)
         with self.assertRaises(exceptions.ValidationError) as cm:
