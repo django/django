@@ -1,6 +1,7 @@
 import json
 import re
 
+from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, Lookup, Transform, IntegerField
@@ -139,6 +140,14 @@ class ArrayField(Field):
                     self.error_messages['nested_array_mismatch'],
                     code='nested_array_mismatch',
                 )
+
+    def formfield(self, **kwargs):
+        kwargs.update({
+            'form_class': SimpleArrayField,
+            'base_field': self.base_field.formfield(),
+            'max_length': self.size,
+        })
+        return super(ArrayField, self).formfield(**kwargs)
 
 
 class ArrayContainsLookup(Lookup):

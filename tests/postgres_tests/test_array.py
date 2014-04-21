@@ -1,9 +1,11 @@
 import unittest
 
 from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.forms import SimpleArrayField
 from django.core import exceptions, serializers
 from django.db import models, IntegrityError, connection
 from django.db.migrations.writer import MigrationWriter
+from django import forms
 from django.test import TestCase
 from django.utils import timezone
 
@@ -210,7 +212,7 @@ class TestValidation(TestCase):
         field.clean([1, 2, 3], None)
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean([1, 2, 3, 4], None)
-        self.assertEqual(cm.exception.messages[0], 'Array contains 4 items, it should contain no more than 3.')
+        self.assertEqual(cm.exception.messages[0], 'List contains 4 items, it should contain no more than 3.')
 
     def test_nested_array_mismatch(self):
         field = ArrayField(ArrayField(models.IntegerField()))
@@ -219,3 +221,65 @@ class TestValidation(TestCase):
             field.clean([[1, 2], [3, 4, 5]], None)
         self.assertEqual(cm.exception.code, 'nested_array_mismatch')
         self.assertEqual(cm.exception.messages[0], 'Nested arrays must have the same length.')
+
+
+class TestSimpleFormField(TestCase):
+
+    def test_valid(self):
+        field = SimpleArrayField(forms.CharField())
+        value = field.clean('a,b,c')
+        self.assertEqual(value, ['a', 'b', 'c'])
+
+    def test_to_python_fail(self):
+        field = SimpleArrayField(forms.IntegerField())
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean('a,b,9')
+        self.assertEqual(cm.exception.messages[0], 'Item 0 in the array did not validate: Enter a whole number.')
+
+    def test_validate_fail(self):
+        field = SimpleArrayField(forms.CharField(required=True))
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean('a,b,')
+        self.assertEqual(cm.exception.messages[0], 'Item 2 in the array did not validate: This field is required.')
+
+    def test_validators_fail(self):
+        field = SimpleArrayField(forms.RegexField('[a-e]{2}'))
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean('a,bc,de')
+        self.assertEqual(cm.exception.messages[0], 'Item 0 in the array did not validate: Enter a valid value.')
+
+    def test_delimiter(self):
+        field = SimpleArrayField(forms.CharField(), delimiter='|')
+        value = field.clean('a|b|c')
+        self.assertEqual(value, ['a', 'b', 'c'])
+
+    def test_max_length(self):
+        field = SimpleArrayField(forms.CharField(), max_length=2)
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean('a,b,c')
+        self.assertEqual(cm.exception.messages[0], 'List contains 3 items, it should contain no more than 2.')
+
+    def test_min_length(self):
+        field = SimpleArrayField(forms.CharField(), min_length=4)
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean('a,b,c')
+        self.assertEqual(cm.exception.messages[0], 'List contains 3 items, it should contain no fewer than 4.')
+
+    def test_required(self):
+        field = SimpleArrayField(forms.CharField(), required=True)
+        with self.assertRaises(exceptions.ValidationError) as cm:
+            field.clean('')
+        self.assertEqual(cm.exception.messages[0], 'This field is required.')
+
+    def test_model_field_formfield(self):
+        model_field = ArrayField(models.CharField(max_length=27))
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, SimpleArrayField)
+        self.assertIsInstance(form_field.base_field, forms.CharField)
+        self.assertEqual(form_field.base_field.max_length, 27)
+
+    def test_model_field_formfield_size(self):
+        model_field = ArrayField(models.CharField(max_length=27), size=4)
+        form_field = model_field.formfield()
+        self.assertIsInstance(form_field, SimpleArrayField)
+        self.assertEqual(form_field.max_length, 4)
