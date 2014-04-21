@@ -6,6 +6,7 @@ from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.db import connection, migrations, models
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
+from django.db.utils import DatabaseError
 from django.test import TransactionTestCase
 
 if HAS_SPATIAL_DB:
@@ -20,6 +21,19 @@ if HAS_SPATIAL_DB:
 @skipUnless(HAS_SPATIAL_DB, "Spatial db is required.")
 class OperationTests(TransactionTestCase):
     available_apps = ["django.contrib.gis.tests.gis_migrations"]
+
+    def tearDown(self):
+        # Delete table after testing
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute("DROP TABLE %s" % connection.ops.quote_name("gis_neighborhood"))
+            except DatabaseError:
+                pass
+            else:
+                if HAS_GEOMETRY_COLUMNS:
+                    cursor.execute("DELETE FROM geometry_columns WHERE %s = %%s" % (
+                        GeometryColumns.table_name_col(),), ["gis_neighborhood"])
+        super(OperationTests, self).tearDown()
 
     def get_table_description(self, table):
         with connection.cursor() as cursor:
@@ -38,17 +52,6 @@ class OperationTests(TransactionTestCase):
             return migration.apply(project_state, editor)
 
     def set_up_test_model(self):
-        # Delete the tables if they already exist
-        with connection.cursor() as cursor:
-            try:
-                cursor.execute("DROP TABLE %s" % connection.ops.quote_name("gis_neighborhood"))
-            except:
-                pass
-            else:
-                if HAS_GEOMETRY_COLUMNS:
-                    cursor.execute("DELETE FROM geometry_columns WHERE %s = %%s" % (
-                        GeometryColumns.table_name_col(),), ["gis_neighborhood"])
-
         operations = [migrations.CreateModel(
             "Neighborhood",
             [
