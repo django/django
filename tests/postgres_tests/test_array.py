@@ -298,34 +298,43 @@ class TestSplitFormField(TestCase):
 
         data = {'array_0': 'a', 'array_1': 'b', 'array_2': 'c'}
         form = SplitForm(data)
-        form.full_clean()
+        self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data, {'array': ['a', 'b', 'c']})
 
-    def test_require_all_fields(self):
+    def test_required(self):
         class SplitForm(forms.Form):
-            array = SplitArrayField(forms.CharField(), size=3, require_all_fields=True)
+            array = SplitArrayField(forms.CharField(), required=True, size=3)
 
-        data = {'array_0': 'a', 'array_1': 'b', 'array_2': ''}
+        data = {'array_0': '', 'array_1': '', 'array_2': ''}
         form = SplitForm(data)
-        form.full_clean()
+        self.assertFalse(form.is_valid())
         self.assertEqual(form.errors, {'array': ['This field is required.']})
 
     def test_remove_trailing_nulls(self):
         class SplitForm(forms.Form):
-            array = SplitArrayField(forms.CharField(), size=5, remove_trailing_nulls=True)
+            array = SplitArrayField(forms.CharField(required=False), size=5, remove_trailing_nulls=True)
 
         data = {'array_0': 'a', 'array_1': '', 'array_2': 'b', 'array_3': '', 'array_4': ''}
         form = SplitForm(data)
-        form.full_clean()
+        self.assertTrue(form.is_valid(), form.errors)
         self.assertEqual(form.cleaned_data, {'array': ['a', '', 'b']})
 
-    def test_max_allowable_size(self):
+    def test_required_field(self):
         class SplitForm(forms.Form):
-            array = SplitArrayField(forms.CharField(), size=3, max_allowable_size=5)
+            array = SplitArrayField(forms.CharField(), size=3)
+
+        data = {'array_0': 'a', 'array_1': 'b', 'array_2': ''}
+        form = SplitForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors, {'array': ['Item 2 in the array did not validate: This field is required.']})
+
+    def test_extending_data(self):
+        class SplitForm(forms.Form):
+            array = SplitArrayField(forms.CharField(), size=3)
 
         data = {'array_0': 'a', 'array_1': 'b', 'array_2': 'c', 'array_3': 'd', 'array_4': 'e'}
         form = SplitForm(data)
-        form.full_clean()
+        self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data, {'array': ['a', 'b', 'c', 'd', 'e']})
 
     def test_rendering(self):

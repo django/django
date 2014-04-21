@@ -142,12 +142,13 @@ class ArrayField(Field):
                 )
 
     def formfield(self, **kwargs):
-        kwargs.update({
+        defaults = {
             'form_class': SimpleArrayField,
             'base_field': self.base_field.formfield(),
             'max_length': self.size,
-        })
-        return super(ArrayField, self).formfield(**kwargs)
+        }
+        defaults.update(kwargs)
+        return super(ArrayField, self).formfield(**defaults)
 
 
 class ArrayContainsLookup(Lookup):

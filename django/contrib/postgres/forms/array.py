@@ -1,6 +1,10 @@
+import copy
+import re
+
 from django.contrib.postgres.validators import ArrayMinLengthValidator, ArrayMaxLengthValidator
 from django.core.exceptions import ValidationError
 from django import forms
+from django.utils.safestring import mark_safe
 from django.utils.translation import string_concat, ugettext_lazy as _
 
 
@@ -79,56 +83,105 @@ class SimpleArrayField(forms.CharField):
             raise ValidationError(errors)
 
 
-class SplitArrayWidget(forms.MultiWidget):
+class SplitArrayWidget(forms.Widget):
 
-    def __init__(self, widget, size, max_allowable_size=None, **kwargs):
-        self.widget = widget
+    def __init__(self, widget, size, **kwargs):
+        self.widget = widget() if isinstance(widget, type) else widget
         self.size = size
-        self.max_allowable_size = max_allowable_size or size
-        widgets = [widget] * size
-        super(SplitArrayWidget, self).__init__(widgets, **kwargs)
+        super(SplitArrayWidget, self).__init__(**kwargs)
+
+    @property
+    def is_hidden(self):
+        return self.widget.is_hidden
 
     def value_from_datadict(self, data, files, name):
-        return [self.widget.value_from_datadict(data, files, name + '_%s' % i) for i in range(self.max_allowable_size)]
+        regex = re.compile(name + '_([0-9]+).*')
+        indexes = [int(regex.match(key).groups()[0]) for key in data.keys() if regex.match(key)]
+        max_index = max(indexes)
+        return [self.widget.value_from_datadict(data, files, '%s_%s' % (name, index)) for index in range(max_index + 1)]
 
-    def decompress(self, value):
-        return value or []
+    def id_for_label(self, id_):
+        # See the comment for RadioSelect.id_for_label()
+        if id_:
+            id_ += '_0'
+        return id_
+
+    def render(self, name, value, attrs=None):
+        if self.is_localized:
+            self.widget.is_localized = self.is_localized
+        value = value or []
+        output = []
+        final_attrs = self.build_attrs(attrs)
+        id_ = final_attrs.get('id', None)
+        for i in range(max(len(value), self.size)):
+            try:
+                widget_value = value[i]
+            except IndexError:
+                widget_value = None
+            if id_:
+                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
+            output.append(self.widget.render(name + '_%s' % i, widget_value, final_attrs))
+        return mark_safe(self.format_output(output))
+
+    def format_output(self, rendered_widgets):
+        return ''.join(rendered_widgets)
+
+    def _get_media(self):
+        return self.widget.media
+    media = property(_get_media)
+
+    def __deepcopy__(self, memo):
+        obj = super(SplitArrayWidget, self).__deepcopy__(memo)
+        obj.widget = copy.deepcopy(self.widget)
+        return obj
+
+    @property
+    def needs_multipart_form(self):
+        return self.widget.needs_multipart_form
 
 
-class SplitArrayField(forms.MultiValueField):
+class SplitArrayField(forms.Field):
+    default_error_messages = {
+        'item_invalid': _('Item %(nth)s in the array did not validate: '),
+    }
 
-    def __init__(self, base_field, size, remove_trailing_nulls=False, max_allowable_size=None, **kwargs):
+    def __init__(self, base_field, size, remove_trailing_nulls=False, **kwargs):
         self.base_field = base_field
         self.size = size
-        fields = (base_field,) * size
-        if max_allowable_size is not None and max_allowable_size < size:
-            raise ValueError('Max allowable size of a SplitArrayField must be larger than the initial size.')
-        self.max_allowable_size = max_allowable_size
         self.remove_trailing_nulls = remove_trailing_nulls
-        if remove_trailing_nulls:
-            # required=True doesn't make sense if we are allowing nulls
-            kwargs['required'] = False
-        widget = SplitArrayWidget(widget=base_field.widget, size=size, max_allowable_size=max_allowable_size)
+        widget = SplitArrayWidget(widget=base_field.widget, size=size)
         kwargs.setdefault('widget', widget)
-        super(SplitArrayField, self).__init__(fields, **kwargs)
-
-    def compress(self, data_list):
-        return data_list
+        super(SplitArrayField, self).__init__(**kwargs)
 
     def clean(self, value):
-        if self.max_allowable_size != self.size and len(value) > len(self.fields):
-            # Extend the field list if we have max_allowable_size > self.size
-            self.fields = (self.base_field,) * len(value)
-        out = super(SplitArrayField, self).clean(value)
-        if self.max_allowable_size != self.size and len(self.fields) > self.size:
-            self.fields = (self.base_field,) * self.size
+        cleaned_data = []
+        errors = []
+        if not any(value) and self.required:
+            raise ValidationError(self.error_messages['required'])
+        max_size = max(self.size, len(value))
+        for i in range(max_size):
+            item = value[i]
+            try:
+                cleaned_data.append(self.base_field.clean(item))
+                errors.append(None)
+            except ValidationError as error:
+                errors.append(ValidationError(
+                    string_concat(self.error_messages['item_invalid'], error.message),
+                    code='item_invalid',
+                    params={'nth': i},
+                ))
+                cleaned_data.append(None)
         if self.remove_trailing_nulls:
             null_index = None
-            for i, value in reversed(list(enumerate(out))):
-                if value in self.empty_values:
+            for i, value in reversed(list(enumerate(cleaned_data))):
+                if value in self.base_field.empty_values:
                     null_index = i
                 else:
                     break
             if null_index:
-                return out[:null_index]
-        return out
+                cleaned_data = cleaned_data[:null_index]
+                errors = errors[:null_index]
+        errors = filter(None, errors)
+        if errors:
+            raise ValidationError(errors)
+        return cleaned_data
