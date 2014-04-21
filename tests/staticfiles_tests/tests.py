@@ -848,9 +848,10 @@ class TestDefaultStorageFinder(StaticFilesTestCase, FinderTestCase):
         self.find_all = ('media-file.txt', [test_file_path])
 
 
-@override_settings(STATICFILES_FINDERS=
-                   ('django.contrib.staticfiles.finders.FileSystemFinder',),
-                   STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'documents')])
+@override_settings(
+    STATICFILES_FINDERS=('django.contrib.staticfiles.finders.FileSystemFinder',),
+    STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'documents')],
+)
 class TestMiscFinder(TestCase):
     """
     A few misc finder tests.

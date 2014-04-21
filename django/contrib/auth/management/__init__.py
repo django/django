@@ -97,9 +97,9 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     ))
 
     perms = [
-        Permission(codename=codename, name=name, content_type=ctype)
-        for ctype, (codename, name) in searched_perms
-        if (ctype.pk, codename) not in all_perms
+        Permission(codename=codename, name=name, content_type=ct)
+        for ct, (codename, name) in searched_perms
+        if (ct.pk, codename) not in all_perms
     ]
     # Validate the permissions before bulk_creation to avoid cryptic
     # database error when the verbose_name is longer than 50 characters

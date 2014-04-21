@@ -1097,8 +1097,8 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
         "cache with python-memcached library not available")
     def test_memcached_uses_highest_pickle_version(self):
         # Regression test for #19810
-        for cache_key, cache in settings.CACHES.items():
-            if cache['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache':
+        for cache_key, cache_config in settings.CACHES.items():
+            if cache_config['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache':
                 self.assertEqual(caches[cache_key]._cache.pickleProtocol,
                                  pickle.HIGHEST_PROTOCOL)
 

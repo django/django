@@ -6,7 +6,7 @@ from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase
-from django.test.utils import CaptureQueriesContext, override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import six
 
 from .models import (
