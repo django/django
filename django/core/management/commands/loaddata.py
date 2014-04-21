@@ -239,9 +239,9 @@ class Command(BaseCommand):
         for app_config in apps.get_app_configs():
             if self.app_label and app_config.label != self.app_label:
                 continue
-            d = os.path.join(app_config.path, 'fixtures')
-            if os.path.isdir(d):
-                dirs.append(d)
+            app_dir = os.path.join(app_config.path, 'fixtures')
+            if os.path.isdir(app_dir):
+                dirs.append(app_dir)
         dirs.extend(list(settings.FIXTURE_DIRS))
         dirs.append('')
         dirs = [upath(os.path.abspath(os.path.realpath(d))) for d in dirs]

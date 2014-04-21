@@ -1105,7 +1105,7 @@ class Model(six.with_metaclass(ModelBase)):
 
         errors = []
         managers = cls._meta.concrete_managers + cls._meta.abstract_managers
-        for (_, _, manager) in managers:
+        for __, __, manager in managers:
             errors.extend(manager.check(**kwargs))
         return errors
 

@@ -160,7 +160,7 @@ class WriterTests(TestCase):
         # In order to preserve compatibility with Python 3.2 unicode literals
         # prefix shouldn't be added to strings.
         tokens = tokenize.generate_tokens(six.StringIO(str(output)).readline)
-        for token_type, token_source, (srow, scol), _, line in tokens:
+        for token_type, token_source, (srow, scol), __, line in tokens:
             if token_type == tokenize.STRING:
                 self.assertFalse(
                     token_source.startswith('u'),

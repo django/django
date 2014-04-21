@@ -728,7 +728,7 @@ class Field(RegisterLookupMixin):
         """Returns choices with a default blank choices included, for use
         as SelectField choices for this field."""
         blank_defined = False
-        for choice, _ in self.choices:
+        for choice, __ in self.choices:
             if choice in ('', None):
                 blank_defined = True
                 break
