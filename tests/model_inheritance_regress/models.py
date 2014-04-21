@@ -73,8 +73,13 @@ class ParkingLot4B(Place, ParkingLot4):
     pass
 
 
+@python_2_unicode_compatible
 class Supplier(models.Model):
+    name = models.CharField(max_length=50)
     restaurant = models.ForeignKey(Restaurant)
+
+    def __str__(self):
+        return self.name
 
 
 class Wholesaler(Supplier):
