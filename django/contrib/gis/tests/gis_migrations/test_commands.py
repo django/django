@@ -26,6 +26,10 @@ class MigrateTests(TransactionTestCase):
         with connection.cursor() as cursor:
             self.assertNotIn(table, connection.introspection.get_table_list(cursor))
 
+    def assertFieldExists(self, table, field):
+        field_names = [info.name for info in self.get_table_description(table)]
+        self.assertIn(field, field_names)
+
     @skipUnless(HAS_SPATIAL_DB, "Spatial db is required.")
     @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"gis": "django.contrib.gis.tests.gis_migrations.migrations"})
@@ -43,6 +47,10 @@ class MigrateTests(TransactionTestCase):
         # Make sure the right tables exist
         self.assertTableExists("gis_neighborhood")
         self.assertTableExists("gis_household")
+        # Run the migrations to 0002 (adding LineString field)
+        call_command("migrate", "gis", "0002", verbosity=0)
+        # Test the new field has been created
+        self.assertFieldExists("gis_neighborhood", "path")
         # Unmigrate everything
         call_command("migrate", "gis", "zero", verbosity=0)
         # Make sure it's all gone

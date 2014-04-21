@@ -13,33 +13,20 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
     def geo_quote_name(self, name):
         return self.connection.ops.geo_quote_name(name)
 
-    def create_model(self, model):
+    def column_sql(self, model, field, include_default=False):
         from django.contrib.gis.db.models.fields import GeometryField
-        # Do model creation first
-        super(PostGISSchemaEditor, self).create_model(model)
-        # Now add any spatial field SQL
-        sqls = []
-        for field in model._meta.local_fields:
-            if isinstance(field, GeometryField):
-                sqls.extend(self.spatial_field_sql(model, field))
-        for sql in sqls:
-            self.execute(sql)
-
-    def spatial_field_sql(self, model, field):
-        """
-        Takes a GeometryField and returns a list of SQL to execute to
-        create its spatial indexes.
-        """
-        output = []
+        if not isinstance(field, GeometryField):
+            return super(PostGISSchemaEditor, self).column_sql(model, field, include_default)
 
         if field.geography or self.connection.ops.geometry:
             # Geography and Geometry (PostGIS 2.0+) columns are
             # created normally.
-            pass
+            column_sql = super(PostGISSchemaEditor, self).column_sql(model, field, include_default)
         else:
+            column_sql = None, None
             # Geometry columns are created by the `AddGeometryColumn`
             # stored procedure.
-            output.append(
+            self.deferred_sql.append(
                 self.sql_add_geometry_column % {
                     "table": self.geo_quote_name(model._meta.db_table),
                     "column": self.geo_quote_name(field.column),
@@ -48,8 +35,9 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
                     "dim": field.dim,
                 }
             )
+
             if not field.null:
-                output.append(
+                self.deferred_sql.append(
                     self.sql_alter_geometry_column_not_null % {
                         "table": self.quote_name(model._meta.db_table),
                         "column": self.quote_name(field.column),
@@ -72,7 +60,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
                     index_ops = ''
             else:
                 index_ops = self.geom_index_ops
-            output.append(
+            self.deferred_sql.append(
                 self.sql_add_spatial_index % {
                     "index": self.quote_name('%s_%s_id' % (model._meta.db_table, field.column)),
                     "table": self.quote_name(model._meta.db_table),
@@ -81,5 +69,4 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
                     "ops": index_ops,
                 }
             )
-
-        return output
+        return column_sql
