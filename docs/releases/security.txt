@@ -448,3 +448,20 @@ Versions affected
 * Django 1.4 `(patch <https://github.com/django/django/commit/3f3d887a6844ec2db743fee64c9e53e04d39a368>`__ and `Python compatibility fix) <https://github.com/django/django/commit/6903d1690a92aa040adfb0c8eb37cf62e4206714>`__
 
 * Django 1.5 `(patch) <https://github.com/django/django/commit/22b74fa09d7ccbc8c52270d648a0da7f3f0fa2bc>`__
+
+
+April 21, 2014 - CVE-2014-2014-0472
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2014-0472 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0472&cid=2>`_: Unexpected code execution using ``reverse()``. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`_
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch <https://github.com/django/django/commit/c1a8c420fe4b27fb2caf5e46d23b5712fc0ac535>`_)
+
+* Django 1.5 `(patch <https://github.com/django/django/commit/2a5bcb69f42b84464b24b5c835dca6467b6aa7f1>`_)
+
+* Django 1.6 `(patch <https://github.com/django/django/commit/4352a50871e239ebcdf64eee6f0b88e714015c1b>`_)
+
+* Django 1.7 `(patch <https://github.com/django/django/commit/546740544d7f69254a67b06a3fc7fa0c43512958>`_)
