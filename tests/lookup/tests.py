@@ -2,8 +2,10 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 from operator import attrgetter
+from unittest import skipUnless
 
 from django.core.exceptions import FieldError
+from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import Author, Article, Tag, Game, Season, Player
@@ -710,3 +712,13 @@ class LookupTests(TestCase):
         self.assertEqual(Player.objects.filter(games__season__gt=333).distinct().count(), 2)
         self.assertEqual(Player.objects.filter(games__season__year__gt=2010).distinct().count(), 2)
         self.assertEqual(Player.objects.filter(games__season__gt__gt=222).distinct().count(), 2)
+
+    @skipUnless(connection.vendor == 'mysql', 'requires MySQL')
+    def test_mysql_lookup_search(self):
+        with connection.cursor() as cursor:
+            Article.objects.create(pub_date=datetime.now(), headline='Django Reinhardt')
+            # NOTE: Needs to be created after the article has been saved.
+            cursor.execute('CREATE FULLTEXT INDEX `ft` ON `{table}` (`headline`)'
+                           .format(table=Article._meta.db_table))
+            self.assertQuerysetEqual(Article.objects.filter(headline__search='Reinhardt'),
+                                     ['<Article: Django Reinhardt>'])

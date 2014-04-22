@@ -358,6 +358,13 @@ default_lookups['isnull'] = IsNull
 
 class Search(BuiltinLookup):
     lookup_name = 'search'
+
+    def as_sql(self, qn, connection):
+        lhs, lhs_params = self.process_lhs(qn, connection)
+        rhs, rhs_params = self.process_rhs(qn, connection)
+        sql_template = connection.ops.fulltext_search_sql(field_name=lhs)
+        return sql_template, lhs_params + rhs_params
+
 default_lookups['search'] = Search
 
 
