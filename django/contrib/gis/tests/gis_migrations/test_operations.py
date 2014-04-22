@@ -6,7 +6,6 @@ from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.db import connection, migrations, models
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
-from django.db.utils import DatabaseError
 from django.test import TransactionTestCase
 
 if HAS_SPATIAL_DB:
@@ -24,15 +23,7 @@ class OperationTests(TransactionTestCase):
 
     def tearDown(self):
         # Delete table after testing
-        with connection.cursor() as cursor:
-            try:
-                cursor.execute("DROP TABLE %s" % connection.ops.quote_name("gis_neighborhood"))
-            except DatabaseError:
-                pass
-            else:
-                if HAS_GEOMETRY_COLUMNS:
-                    cursor.execute("DELETE FROM geometry_columns WHERE %s = %%s" % (
-                        GeometryColumns.table_name_col(),), ["gis_neighborhood"])
+        self.apply_operations('gis', self.current_state, [migrations.DeleteModel("Neighborhood")])
         super(OperationTests, self).tearDown()
 
     def get_table_description(self, table):
@@ -84,6 +75,7 @@ class OperationTests(TransactionTestCase):
                 GeometryColumns.objects.filter(**{GeometryColumns.table_name_col(): "gis_neighborhood"}).count(),
                 2
             )
+        self.current_state = new_state
 
     def test_remove_gis_field(self):
         """
@@ -103,3 +95,4 @@ class OperationTests(TransactionTestCase):
                 GeometryColumns.objects.filter(**{GeometryColumns.table_name_col(): "gis_neighborhood"}).count(),
                 0
             )
+        self.current_state = new_state
