@@ -65,3 +65,15 @@ class Player(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# To test __search lookup a fulltext index is needed. This
+# is only available when using MySQL 5.6, or when using MyISAM
+# tables. As 5.6 isn't common yet, lets use MyISAM table for
+# testing. The table is manually created by the test method.
+class MyISAMArticle(models.Model):
+    headline = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'myisam_article'
+        managed = False
