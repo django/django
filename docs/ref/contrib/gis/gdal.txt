@@ -739,7 +739,7 @@ systems and coordinate transformation::
    .. attribute:: z
 
    Returns the Z coordinate of this point, or ``None`` if the
-   the point does not have a Z coordinate::
+   point does not have a Z coordinate::
 
        >>> OGRGeometry('POINT (1 2 3)').z
        3.0

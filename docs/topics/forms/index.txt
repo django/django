@@ -96,6 +96,7 @@ The standard pattern for processing a form in a view looks like this:
 
    def contact(request):
        if request.method == 'POST': # If the form has been submitted...
+           # ContactForm was defined in the previous section
            form = ContactForm(request.POST) # A form bound to the POST data
            if form.is_valid(): # All validation rules pass
                # Process the data in form.cleaned_data

@@ -146,7 +146,7 @@ Handling errors in actions
 
 If there are foreseeable error conditions that may occur while running your
 action, you should gracefully inform the user of the problem. This means
-handling exceptions and and using
+handling exceptions and using
 :meth:`django.contrib.admin.ModelAdmin.message_user` to display a user friendly
 description of the problem in the response.
 

@@ -192,7 +192,7 @@ Our policy for new features is:
     release, not the development version.
 
 Our preferred way for marking new features is by prefacing the features'
-documentation with: "``.. versionadded:: X.Y``", followed by a a mandatory
+documentation with: "``.. versionadded:: X.Y``", followed by a mandatory
 blank line and an optional content (indented).
 
 General improvements, or other changes to the APIs that should be emphasized

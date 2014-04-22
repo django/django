@@ -50,7 +50,7 @@ Following this change, all platforms, regardless of word size, will generate a
 
 As a result of this change, you will not be able to use the ``reset``
 management command on any table made by a 64-bit machine. This is because the
-the new generated name will not match the historically generated name; as a
+new generated name will not match the historically generated name; as a
 result, the SQL constructed by the reset command will be invalid.
 
 If you need to reset an application that was created with 64-bit constraints,

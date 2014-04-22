@@ -77,7 +77,7 @@ handlers have been refactored to allow finer-grained control over the
 uploading process as well as streaming uploads of large files.
 
 Along with these improvements and additions, we've made a number of
-of backwards-incompatible changes to the framework, as features have been
+backwards-incompatible changes to the framework, as features have been
 fleshed out and APIs have been finalized for the 1.0 release. A
 complete guide to these changes will be available as part of the final
 Django 1.0 release, and a comprehensive list of backwards-incompatible
