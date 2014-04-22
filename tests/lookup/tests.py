@@ -2,11 +2,13 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 from operator import attrgetter
+from unittest import skipUnless
 
 from django.core.exceptions import FieldError
-from django.test import TestCase, skipUnlessDBFeature
+from django.db import connection
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
-from .models import Author, Article, Tag, Game, Season, Player
+from .models import Author, Article, Tag, Game, Season, Player, MyISAMArticle
 
 
 class LookupTests(TestCase):
@@ -710,3 +712,27 @@ class LookupTests(TestCase):
         self.assertEqual(Player.objects.filter(games__season__gt=333).distinct().count(), 2)
         self.assertEqual(Player.objects.filter(games__season__year__gt=2010).distinct().count(), 2)
         self.assertEqual(Player.objects.filter(games__season__gt__gt=222).distinct().count(), 2)
+
+
+class LookupTransactionTests(TransactionTestCase):
+    available_apps = ['lookup']
+
+    @skipUnless(connection.vendor == 'mysql', 'requires MySQL')
+    def test_mysql_lookup_search(self):
+        # To use fulltext indexes on MySQL either version 5.6 is needed, or one must use
+        # MyISAM tables. Neither of these combinations is currently available on CI, so
+        # lets manually create a MyISAM table for Article model.
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "CREATE TEMPORARY TABLE myisam_article ("
+                "    id INTEGER PRIMARY KEY AUTO_INCREMENT, "
+                "    headline VARCHAR(100) NOT NULL "
+                ") ENGINE MYISAM")
+            dr = MyISAMArticle.objects.create(headline='Django Reinhardt')
+            MyISAMArticle.objects.create(headline='Ringo Star')
+            # NOTE: Needs to be created after the article has been saved.
+            cursor.execute(
+                'CREATE FULLTEXT INDEX myisam_article_ft ON myisam_article (headline)')
+            self.assertQuerysetEqual(
+                MyISAMArticle.objects.filter(headline__search='Reinhardt'),
+                [dr], lambda x: x)
