@@ -10,6 +10,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
     sql_drop_geometry_column = "SELECT DropGeometryColumn(%(table)s, %(column)s)"
     sql_alter_geometry_column_not_null = "ALTER TABLE %(table)s ALTER COLUMN %(column)s SET NOT NULL"
     sql_add_spatial_index = "CREATE INDEX %(index)s ON %(table)s USING %(index_type)s (%(column)s %(ops)s)"
+    sql_clear_geometry_columns = "DELETE FROM geometry_columns WHERE f_table_name = %(table)s"
 
     def __init__(self, *args, **kwargs):
         super(PostGISSchemaEditor, self).__init__(*args, **kwargs)
@@ -46,7 +47,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
                     self.sql_alter_geometry_column_not_null % {
                         "table": self.quote_name(model._meta.db_table),
                         "column": self.quote_name(field.column),
-                    },
+                    }
                 )
 
         if field.spatial_index:
@@ -82,6 +83,12 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
         for sql in self.geometry_sql:
             self.execute(sql)
         self.geometry_sql = []
+
+    def delete_model(self, model):
+        super(PostGISSchemaEditor, self).delete_model(model)
+        self.execute(self.sql_clear_geometry_columns % {
+            "table": self.geo_quote_name(model._meta.db_table),
+        })
 
     def add_field(self, model, field):
         super(PostGISSchemaEditor, self).add_field(model, field)
