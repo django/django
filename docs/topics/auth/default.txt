@@ -12,9 +12,9 @@ is.  For projects where authentication needs differ from the default, Django
 supports extensive :doc:`extension and customization
 </topics/auth/customizing>` of authentication.
 
-Django authentication provides both authentication and authorization, together
+Django authentication provides both authentication and authorization together
 and is generally referred to as the authentication system, as these features
-somewhat coupled.
+are somewhat coupled.
 
 .. _user-objects:
 
