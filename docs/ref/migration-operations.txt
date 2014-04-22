@@ -174,7 +174,7 @@ RunSQL
 
     RunSQL(sql, reverse_sql=None, state_operations=None, multiple=False)
 
-Allows runnning of arbitrary SQL on the database - useful for more advanced
+Allows running of arbitrary SQL on the database - useful for more advanced
 features of database backends that Django doesn't support directly, like
 partial indexes.
 

@@ -1016,7 +1016,7 @@ For a complete discussion on the usage of the following see the
     current point in time. Exactly what's returned depends on the value of
     :setting:`USE_TZ`:
 
-    * If :setting:`USE_TZ` is ``False``, this will be be a
+    * If :setting:`USE_TZ` is ``False``, this will be a
       :ref:`naive <naive_vs_aware_datetimes>` datetime (i.e. a datetime
       without an associated timezone) that represents the current time
       in the system's local timezone.
