@@ -880,7 +880,7 @@ Returns WKB of the geometry in hexadecimal.  Example::
 
 .. attribute:: WKBWriter.byteorder
 
-This property may be be set to change the byte-order of the geometry
+This property may be set to change the byte-order of the geometry
 representation.
 
 =============== =================================================

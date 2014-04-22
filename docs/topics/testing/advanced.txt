@@ -51,7 +51,7 @@ The following is a simple unit test using the request factory::
             # Create an instance of a GET request.
             request = self.factory.get('/customer/details')
 
-            # Recall that middleware are not suported. You can simulate a
+            # Recall that middleware are not supported. You can simulate a
             # logged-in user by setting request.user manually.
             request.user = self.user
 
