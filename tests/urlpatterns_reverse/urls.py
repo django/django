@@ -2,7 +2,7 @@ import warnings
 
 from django.conf.urls import patterns, url, include
 
-from .views import empty_view, absolute_kwargs_view
+from .views import empty_view, empty_view_partial, empty_view_wrapped, absolute_kwargs_view
 
 
 other_patterns = [
@@ -53,6 +53,10 @@ with warnings.catch_warnings(record=True):
         url(r'^outer/(?P<outer>[0-9]+)/', include('urlpatterns_reverse.included_urls')),
         url(r'^outer-no-kwargs/([0-9]+)/', include('urlpatterns_reverse.included_no_kwargs_urls')),
         url('', include('urlpatterns_reverse.extra_urls')),
+
+        # Partials should be fine.
+        url(r'^partial/', empty_view_partial, name="partial"),
+        url(r'^partial_wrapped/', empty_view_wrapped, name="partial_wrapped"),
 
         # This is non-reversible, but we shouldn't blow up when parsing it.
         url(r'^(?:foo|bar)(\w+)/$', empty_view, name="disjunction"),
