@@ -10,5 +10,5 @@ Bugfixes
 ========
 
 * Added backwards compatibility support for the :mod:`django.contrib.messages`
-  cookie format of Django 1.4 and earlier to faciliate upgrading to 1.6 from
+  cookie format of Django 1.4 and earlier to facilitate upgrading to 1.6 from
   1.4 (`#22426 <http://code.djangoproject.com/ticket/22426>`_).

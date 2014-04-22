@@ -106,7 +106,7 @@ respectively).
     in the :doc:`sessions documentation </topics/http/sessions>` on
     how to enable sessions.
 
-We will use the :class:`SessionWizardView` in all examples but is is completely
+We will use the :class:`SessionWizardView` in all examples but is completely
 fine to use the :class:`CookieWizardView` instead. As with your
 :class:`~django.forms.Form` classes, this :class:`WizardView` class can live
 anywhere in your codebase, but convention is to put it in :file:`views.py`.

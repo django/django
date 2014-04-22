@@ -768,7 +768,7 @@ Threaded option
 ----------------
 
 If you plan to run Django in a multithreaded environment (e.g. Apache using the
-the default MPM module on any modern operating system), then you **must** set
+default MPM module on any modern operating system), then you **must** set
 the ``threaded`` option of your Oracle database configuration to True::
 
             'OPTIONS': {
