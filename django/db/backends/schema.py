@@ -72,7 +72,8 @@ class BaseDatabaseSchemaEditor(object):
     def __enter__(self):
         self.deferred_sql = []
         if self.connection.features.can_rollback_ddl:
-            atomic(self.connection.alias).__enter__()
+            self.atomic = atomic(self.connection.alias)
+            self.atomic.__enter__()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -80,7 +81,7 @@ class BaseDatabaseSchemaEditor(object):
             for sql in self.deferred_sql:
                 self.execute(sql)
         if self.connection.features.can_rollback_ddl:
-            atomic(self.connection.alias).__exit__(exc_type, exc_value, traceback)
+            self.atomic.__exit__(exc_type, exc_value, traceback)
 
     # Core utility functions
 
