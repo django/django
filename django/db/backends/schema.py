@@ -71,14 +71,16 @@ class BaseDatabaseSchemaEditor(object):
 
     def __enter__(self):
         self.deferred_sql = []
-        atomic(self.connection.alias, self.connection.features.can_rollback_ddl).__enter__()
+        if self.connection.features.can_rollback_ddl:
+            atomic(self.connection.alias).__enter__()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             for sql in self.deferred_sql:
                 self.execute(sql)
-        atomic(self.connection.alias, self.connection.features.can_rollback_ddl).__exit__(exc_type, exc_value, traceback)
+        if self.connection.features.can_rollback_ddl:
+            atomic(self.connection.alias).__exit__(exc_type, exc_value, traceback)
 
     # Core utility functions
 
