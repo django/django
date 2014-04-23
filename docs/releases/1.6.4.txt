@@ -12,3 +12,7 @@ Bugfixes
 * Added backwards compatibility support for the :mod:`django.contrib.messages`
   cookie format of Django 1.4 and earlier to facilitate upgrading to 1.6 from
   1.4 (`#22426 <http://code.djangoproject.com/ticket/22426>`_).
+
+* Restored the ability to :meth:`~django.core.urlresolvers.reverse` views
+  created using :func:`functools.partial()`
+  (`#22486 <http://code.djangoproject.com/ticket/22486>`_)
