@@ -9,7 +9,6 @@ a string) and returns a tuple in this format:
 from __future__ import unicode_literals
 
 import functools
-from importlib import import_module
 import re
 from threading import local
 
