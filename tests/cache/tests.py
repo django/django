@@ -495,6 +495,12 @@ class BaseCacheTests(object):
         self.assertEqual(cache.get('key3'), 'sausage')
         self.assertEqual(cache.get('key4'), 'lobster bisque')
 
+    def test_add_with_forever_timeout_bug_22495(self):
+        cache.set('key1', 'forever', timeout=None)
+        added = cache.add('key1', 'new')
+        self.assertEqual(added, False)
+        self.assertEqual(cache.get('key1'), 'forever')
+
     def test_zero_timeout(self):
         '''
         Passing in zero into timeout results in a value that is not cached
