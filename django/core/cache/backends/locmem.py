@@ -29,8 +29,8 @@ class LocMemCache(BaseCache):
         self.validate_key(key)
         pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
         with self._lock.writer():
-            exp = self._expire_info.get(key)
-            if exp is None or exp <= time.time():
+            exp = self._expire_info.get(key, 0)
+            if exp is not None and exp <= time.time():
                 self._set(key, pickled, timeout)
                 return True
             return False
