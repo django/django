@@ -8,6 +8,7 @@ a string) and returns a tuple in this format:
 """
 from __future__ import unicode_literals
 
+import functools
 from importlib import import_module
 import re
 from threading import local
@@ -270,6 +271,9 @@ class RegexURLResolver(LocaleRegexProvider):
                 self._callback_strs.add(pattern._callback_str)
             elif hasattr(pattern, '_callback'):
                 callback = pattern._callback
+                if isinstance(callback, functools.partial):
+                    callback = callback.func
+
                 if not hasattr(callback, '__name__'):
                     lookup_str = callback.__module__ + "." + callback.__class__.__name__
                 else:
