@@ -41,6 +41,7 @@ class ResolverMatch(object):
         self.kwargs = kwargs
         self.url_name = url_name
         self.app_name = app_name
+
         if namespaces:
             self.namespaces = [x for x in namespaces if x]
         else:
@@ -48,18 +49,21 @@ class ResolverMatch(object):
         self.namespace = ':'.join(self.namespaces)
 
         if not hasattr(func, '__name__'):
-            # An instance of a callable class
+            # A class-based view
             self._func_path = '.'.join([func.__class__.__module__, func.__class__.__name__])
         else:
-            # A function
+            # A function-based view
             self._func_path = '.'.join([func.__module__, func.__name__])
+
+        view_path = url_name or self._func_path
+        self.view_name = ':'.join(self.namespaces + [view_path])
 
     def __getitem__(self, index):
         return (self.func, self.args, self.kwargs)[index]
 
     def __repr__(self):
-        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_name=%s, namespace='%s')" % (
-            self._func_path, self.args, self.kwargs, repr(self.url_name), repr(self.app_name), self.namespace)
+        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_name=%s, namespaces=%s)" % (
+            self._func_path, self.args, self.kwargs, self.url_name, self.app_name, self.namespaces)
 
 
 class Resolver404(Http404):
