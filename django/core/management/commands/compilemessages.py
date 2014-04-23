@@ -37,7 +37,9 @@ class Command(BaseCommand):
 
     requires_system_checks = False
     leave_locale_alone = True
+
     program = 'msgfmt'
+    program_options = ['--check-format']
 
     def handle(self, **options):
         locale = options.get('locale')
@@ -92,7 +94,7 @@ class Command(BaseCommand):
                                   "writable location. mo files will not be updated/created." % dirpath)
                 return
 
-            args = [self.program, '--check-format', '-o',
+            args = [self.program] + self.program_options + ['-o',
                     npath(base_path + '.mo'), npath(base_path + '.po')]
             output, errors, status = popen_wrapper(args)
             if status:
