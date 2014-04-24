@@ -183,6 +183,8 @@ class BaseDatabaseWrapper(object):
         # Don't call validate_no_atomic_block() to avoid making it difficult
         # to get rid of a connection in an invalid state. The next connect()
         # will reset the transaction state anyway.
+        if self.closed_in_transaction or self.connection is None:
+            return
         try:
             self._close()
         finally:
