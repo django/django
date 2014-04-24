@@ -560,12 +560,22 @@ Separate multiple extensions with commas or use -e or --extension multiple times
 Use the :djadminopt:`--locale` option (or its shorter version ``-l``) to
 specify the locale(s) to process.
 
+.. versionadded:: 1.8
+
+Use the :djadminopt:`--exclude` option (or its shorter version ``-e``) to
+specify the locale(s) to exclude from processing. If not provided, no locales are excluded.
+
 Example usage::
 
     django-admin.py makemessages --locale=pt_BR
     django-admin.py makemessages --locale=pt_BR --locale=fr
     django-admin.py makemessages -l pt_BR
     django-admin.py makemessages -l pt_BR -l fr
+    django-admin.py makemessages --exclude=pt_BR
+    django-admin.py makemessages --exclude=pt_BR --exclude=fr
+    django-admin.py makemessages -e pt_BR
+    django-admin.py makemessages -e pt_BR -e fr
+
 
 .. versionchanged:: 1.7
 
