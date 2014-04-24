@@ -13,6 +13,14 @@ return model instances`__, or you can avoid the model layer entirely and
 __ `performing raw queries`_
 __ `executing custom SQL directly`_
 
+.. warning::
+
+    You should be very careful whenever you write raw SQL. Every time you use
+    it, you should properly escape any parameters that the user can control
+    by using ``params`` in order to protect against SQL injection attacks.
+    Please read more about :ref:`SQL injection protection
+    <sql-injection-protection>`.
+
 .. _executing-raw-queries:
 
 Performing raw queries
