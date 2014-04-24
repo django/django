@@ -686,7 +686,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
         # change
         color_id = color2_addition_log.object_id
-        color2_change_url = reverse('admin:admin_views_color2_change', args=(color_id))
+        color2_change_url = reverse('admin:admin_views_color2_change', args=(color_id,))
 
         self.client.post(color2_change_url, {'value': 'blue'})
 
@@ -694,7 +694,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(color2_content_type, color2_change_log.content_type)
 
         # delete
-        color2_delete_url = reverse('admin:admin_views_color2_delete', args=(color_id))
+        color2_delete_url = reverse('admin:admin_views_color2_delete', args=(color_id,))
         self.client.post(color2_delete_url)
 
         color2_delete_log = LogEntry.objects.all()[0]
