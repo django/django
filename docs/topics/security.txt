@@ -79,6 +79,7 @@ HSTS for supported browsers.
 Be very careful with marking views with the ``csrf_exempt`` decorator unless
 it is absolutely necessary.
 
+.. _sql-injection-protection:
 
 SQL injection protection
 ========================
