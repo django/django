@@ -27,6 +27,7 @@ class Command(BaseCommand):
 
     help = "Creates new migration(s) for apps."
     usage_str = "Usage: ./manage.py makemigrations [--dry-run] [app [app ...]]"
+    args = "[app_label [app_label ...]]"
 
     def handle(self, *app_labels, **options):
 

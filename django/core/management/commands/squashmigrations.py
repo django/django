@@ -20,6 +20,7 @@ class Command(BaseCommand):
 
     help = "Squashes an existing set of migrations (from first until specified) into a single new one."
     usage_str = "Usage: ./manage.py squashmigrations app migration_name"
+    args = "app_label migration_name"
 
     def handle(self, app_label=None, migration_name=None, **options):
 
