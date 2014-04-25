@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import codecs
+import glob
 import os
 from optparse import make_option
 
@@ -30,8 +31,11 @@ def is_writable(path):
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
-        make_option('--locale', '-l', dest='locale', action='append',
-                    help='locale(s) to process (e.g. de_AT). Default is to process all. Can be used multiple times.'),
+        make_option('--locale', '-l', dest='locale', action='append', default=[],
+                    help='Locale(s) to process (e.g. de_AT). Default is to process all. Can be '
+                         'used multiple times.'),
+        make_option('--exclude', '-e', dest='exclude', action='append', default=[],
+                    help='Locales to exclude. Default is none. Can be used multiple times.'),
     )
     help = 'Compiles .po files to .mo files for use with builtin gettext support.'
 
@@ -43,6 +47,7 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         locale = options.get('locale')
+        exclude = options.get('exclude')
         self.verbosity = int(options.get('verbosity'))
 
         if find_command(self.program) is None:
@@ -62,9 +67,19 @@ class Command(BaseCommand):
                                "checkout or your project or app tree, or with "
                                "the settings module specified.")
 
+        # Build locale list
+        all_locales = []
         for basedir in basedirs:
-            if locale:
-                dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in locale]
+            locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % basedir))
+            all_locales.extend(map(os.path.basename, locale_dirs))
+
+        # Account for excluded locales
+        locales = locale or all_locales
+        locales = set(locales) - set(exclude)
+
+        for basedir in basedirs:
+            if locales:
+                dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in locales]
             else:
                 dirs = [basedir]
             locations = []
@@ -90,8 +105,8 @@ class Command(BaseCommand):
 
             # Check writability on first location
             if i == 0 and not is_writable(npath(base_path + '.mo')):
-                self.stderr.write("The po files under %s are in a seemingly not "
-                                  "writable location. mo files will not be updated/created." % dirpath)
+                self.stderr.write("The po files under %s are in a seemingly not writable location. "
+                                  "mo files will not be updated/created." % dirpath)
                 return
 
             args = [self.program] + self.program_options + ['-o',

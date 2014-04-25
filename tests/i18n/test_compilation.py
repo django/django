@@ -117,6 +117,63 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
         self.assertTrue(os.path.exists(self.MO_FILE_FR))
 
 
+@override_settings(LOCALE_PATHS=(os.path.join(test_dir, 'locale'),))
+class ExcludedLocaleCompilationTests(MessageCompilationTests):
+    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo'
+
+    localedir = os.path.join(test_dir, 'locale')
+    locales = os.listdir(localedir)
+
+    def setUp(self):
+        super(ExcludedLocaleCompilationTests, self).setUp()
+
+        locales_to_clean = list(set(self.locales) - {'en'})
+        for locale in locales_to_clean:
+            mo_file = os.path.join(self.localedir, '%s/LC_MESSAGES/django.mo' % locale)
+            self.addCleanup(self.rmfile, os.path.join(self.localedir, mo_file))
+
+    def test_one_locale_excluded(self):
+        with self.assertRaises(CommandError):
+            call_command('compilemessages', exclude=['it'], stdout=StringIO())
+
+        # ja and es_AR are excluded because of errors in their respective test .po files
+        locales = list(set(self.locales) - {'it', 'ja', 'es_AR'})
+        for locale in locales:
+            self.assertTrue(os.path.exists(self.MO_FILE % locale))
+
+        self.assertFalse(os.path.exists(self.MO_FILE % 'it'))
+        self.assertFalse(os.path.exists(self.MO_FILE % 'ja'))
+        self.assertFalse(os.path.exists(self.MO_FILE % 'es_AR'))
+
+    def test_multiple_locales_excluded(self):
+        with self.assertRaises(CommandError):
+            call_command('compilemessages', exclude=['it', 'fr'], stdout=StringIO())
+
+        # ja and es_AR are excluded because of errors in their respective test .po files
+        locales = list(set(self.locales) - {'it', 'fr', 'ja', 'es_AR'})
+        for locale in locales:
+            self.assertTrue(os.path.exists(self.MO_FILE % locale))
+
+        self.assertFalse(os.path.exists(self.MO_FILE % 'it'))
+        self.assertFalse(os.path.exists(self.MO_FILE % 'fr'))
+        self.assertFalse(os.path.exists(self.MO_FILE % 'ja'))
+        self.assertFalse(os.path.exists(self.MO_FILE % 'es_AR'))
+
+    def test_one_locale_excluded_with_locale(self):
+        call_command('compilemessages', locale=['en', 'fr'], exclude=['fr'], stdout=StringIO())
+
+        self.assertTrue(os.path.exists(self.MO_FILE % 'en'))
+        self.assertFalse(os.path.exists(self.MO_FILE % 'fr'))
+
+    def test_multiple_locales_excluded_with_locale(self):
+        call_command('compilemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'],
+                     stdout=StringIO())
+
+        self.assertTrue(os.path.exists(self.MO_FILE % 'en'))
+        self.assertFalse(os.path.exists(self.MO_FILE % 'fr'))
+        self.assertFalse(os.path.exists(self.MO_FILE % 'it'))
+
+
 class CompilationErrorHandling(MessageCompilationTests):
 
     LOCALE = 'ja'
