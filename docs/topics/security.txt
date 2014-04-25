@@ -237,11 +237,11 @@ User-uploaded content
   you can take to mitigate these attacks:
 
   1. One class of attacks can be prevented by always serving user uploaded
-     content from a distinct Top Level Domain (TLD). This prevents any
-     exploit blocked by `same-origin policy`_ protections such as cross site
-     scripting. For example, if your site runs on ``example.com``, you would
-     want to serve uploaded content (the :setting:`MEDIA_URL` setting) from
-     something like ``usercontent-example.com``. It's *not* sufficient to
+     content from a distinct top-level or second-level domain. This prevents
+     any exploit blocked by `same-origin policy`_ protections such as cross
+     site scripting. For example, if your site runs on ``example.com``, you
+     would want to serve uploaded content (the :setting:`MEDIA_URL` setting)
+     from something like ``usercontent-example.com``. It's *not* sufficient to
      serve content from a subdomain like ``usercontent.example.com``.
 
   2. Beyond this, applications may choose to define a whitelist of allowable
