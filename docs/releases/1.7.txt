@@ -877,7 +877,7 @@ Start-up sequence
 
 Django 1.7 loads application configurations and models as soon as it starts.
 While this behavior is more straightforward and is believed to be more robust,
-regressions cannot be ruled out. See :ref:`application-loading-process` for
+regressions cannot be ruled out. See :ref:`applications-troubleshooting` for
 solutions to some problems you may encounter.
 
 Standalone scripts
