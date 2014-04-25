@@ -35,6 +35,7 @@ class Command(BaseCommand):
     )
 
     help = "Updates database schema. Manages both apps with migrations and those without."
+    args = "[app_label] [migration_name]"
 
     def handle(self, *args, **options):
 
