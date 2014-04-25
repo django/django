@@ -15,4 +15,8 @@ Bugfixes
 
 * Restored the ability to :meth:`~django.core.urlresolvers.reverse` views
   created using :func:`functools.partial()`
-  (`#22486 <http://code.djangoproject.com/ticket/22486>`_)
+  (`#22486 <http://code.djangoproject.com/ticket/22486>`_).
+
+* Fixed the ``object_id`` of the ``LogEntry`` that's created after a user
+  password change in the admin
+  (`#22515 <http://code.djangoproject.com/ticket/22515>`_).
