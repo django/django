@@ -2809,6 +2809,10 @@ STATIC_ROOT
 
 Default: ``None``
 
+.. versionchanged:: 1.6.2
+
+    The default changed from ``''`` (empty string) to ``None``.
+
 The absolute path to the directory where :djadmin:`collectstatic` will collect
 static files for deployment.
 
