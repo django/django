@@ -105,7 +105,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_foreign_keys = False
     supports_check_constraints = False
     autocommits_when_autocommit_is_off = True
+    supports_transactions = True
     atomic_transactions = False
+    can_rollback_ddl = True
     supports_paramstyle_pyformat = False
     supports_sequence_reset = False
 
