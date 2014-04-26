@@ -192,7 +192,7 @@ class GeoIP(object):
 
     def country(self, query):
         """
-        Returns a dictionary with with the country code and name when given an
+        Returns a dictionary with the country code and name when given an
         IP address or a Fully Qualified Domain Name (FQDN).  For example, both
         '24.124.1.80' and 'djangoproject.com' are valid parameters.
         """

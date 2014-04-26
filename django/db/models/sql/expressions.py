@@ -40,7 +40,7 @@ class SQLEvaluator(object):
         return self.expression.evaluate(self, qn, connection)
 
     #####################################################
-    # Vistor methods for initial expression preparation #
+    # Visitor methods for initial expression preparation #
     #####################################################
 
     def prepare_node(self, node, query, allow_joins):
@@ -72,7 +72,7 @@ class SQLEvaluator(object):
                                                       [f.name for f in self.opts.fields]))
 
     ##################################################
-    # Vistor methods for final expression evaluation #
+    # Visitor methods for final expression evaluation #
     ##################################################
 
     def evaluate_node(self, node, qn, connection):

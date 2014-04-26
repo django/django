@@ -50,7 +50,7 @@
    - The `dom_id` property returns the DOM id for the map.  Defaults to "map".
 
   The following attributes may be set or customized in your local settings:
-   * GOOGLE_MAPS_API_KEY: String of your Google Maps API key.  These are tied to
+   * GOOGLE_MAPS_API_KEY: String of your Google Maps API key.  These are tied
       to a domain.  May be obtained from http://www.google.com/apis/maps/
    * GOOGLE_MAPS_API_VERSION (optional): Defaults to using "2.x"
    * GOOGLE_MAPS_URL (optional): Must have a substitution ('%s') for the API

@@ -385,7 +385,7 @@ class TestInlinePermissions(TestCase):
         author = Author.objects.create(pk=1, name='The Author')
         book = author.books.create(name='The inline Book')
         self.author_change_url = '/admin/admin_inlines/author/%i/' % author.id
-        # Get the ID of the automatically created intermediate model for thw Author-Book m2m
+        # Get the ID of the automatically created intermediate model for the Author-Book m2m
         author_book_auto_m2m_intermediate = Author.books.through.objects.get(author=author, book=book)
         self.author_book_auto_m2m_intermediate_id = author_book_auto_m2m_intermediate.pk
 

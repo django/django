@@ -199,7 +199,7 @@ class Query(object):
     def sql_with_params(self):
         """
         Returns the query as an SQL string and the parameters that will be
-        subsituted into the query.
+        substituted into the query.
         """
         return self.get_compiler(DEFAULT_DB_ALIAS).as_sql()
 
@@ -675,7 +675,7 @@ class Query(object):
             alias = '%s%d' % (self.alias_prefix, len(self.alias_map) + 1)
             current.append(alias)
         else:
-            # The first occurence of a table uses the table name directly.
+            # The first occurrence of a table uses the table name directly.
             alias = table_name
             self.table_map[alias] = [alias]
         self.alias_refcount[alias] = 1
@@ -1242,7 +1242,7 @@ class Query(object):
         """
         having_parts = []
         for c in q_object.children[:]:
-            # When constucting the having nodes we need to take care to
+            # When constructing the having nodes we need to take care to
             # preserve the negation status from the upper parts of the tree
             if isinstance(c, Node):
                 # For each negated child, flip the in_negated flag.
@@ -1802,7 +1802,7 @@ class Query(object):
         """
         If any fields are marked to be deferred, returns a dictionary mapping
         models to a set of names in those fields that will be loaded. If a
-        model is not in the returned dictionary, none of it's fields are
+        model is not in the returned dictionary, none of its fields are
         deferred.
 
         If no fields are marked for deferral, returns an empty dictionary.

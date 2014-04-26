@@ -27,16 +27,16 @@ class GeometryColumns(models.Model):
     @classmethod
     def table_name_col(cls):
         """
-        Returns the name of the metadata column used to store the
-        the feature table name.
+        Returns the name of the metadata column used to store the feature table
+        name.
         """
         return 'table_name'
 
     @classmethod
     def geom_col_name(cls):
         """
-        Returns the name of the metadata column used to store the
-        the feature geometry column.
+        Returns the name of the metadata column used to store the feature
+        geometry column.
         """
         return 'column_name'
 

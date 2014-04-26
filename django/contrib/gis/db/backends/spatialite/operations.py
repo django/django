@@ -247,7 +247,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         """
         Helper routine for calling SpatiaLite functions and returning
         their result.
-        Any error occuring in this method should be handled by the caller.
+        Any error occurring in this method should be handled by the caller.
         """
         cursor = self.connection._cursor()
         try:

@@ -757,8 +757,8 @@ class QuerySet(object):
         evaluated.
 
         When prefetch_related() is called more than once, the list of lookups to
-        prefetch is appended to. If prefetch_related(None) is called, the
-        the list is cleared.
+        prefetch is appended to. If prefetch_related(None) is called, the list
+        is cleared.
         """
         clone = self._clone()
         if lookups == (None,):
@@ -869,7 +869,7 @@ class QuerySet(object):
 
     def using(self, alias):
         """
-        Selects which database this QuerySet should excecute its query against.
+        Selects which database this QuerySet should execute its query against.
         """
         clone = self._clone()
         clone._db = alias
@@ -1599,7 +1599,7 @@ class RawQuerySet(object):
 
     def using(self, alias):
         """
-        Selects which database this Raw QuerySet should excecute it's query against.
+        Selects which database this Raw QuerySet should execute its query against.
         """
         return RawQuerySet(self.raw_query, model=self.model,
                 query=self.query.clone(using=alias),
@@ -1621,7 +1621,7 @@ class RawQuerySet(object):
                     index = self._columns.index(query_name)
                     self._columns[index] = model_name
                 except ValueError:
-                    # Ignore translations for non-existant column names
+                    # Ignore translations for non-existent column names
                     pass
 
         return self._columns

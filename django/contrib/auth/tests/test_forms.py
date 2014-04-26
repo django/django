@@ -388,7 +388,7 @@ class PasswordResetFormTest(TestCase):
 
     def test_nonexistant_email(self):
         """
-        Test nonexistant email address. This should not fail because it would
+        Test nonexistent email address. This should not fail because it would
         expose information about registered users.
         """
         data = {'email': 'foo@bar.com'}

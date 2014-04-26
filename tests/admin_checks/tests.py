@@ -409,7 +409,7 @@ class SystemChecksTestCase(TestCase):
 
     def test_nonexistant_field(self):
         class SongAdmin(admin.ModelAdmin):
-            readonly_fields = ("title", "nonexistant")
+            readonly_fields = ("title", "nonexistent")
 
         errors = SongAdmin.check(model=Song)
         expected = [
