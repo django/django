@@ -91,6 +91,6 @@ class DataTypesTestCase(TestCase):
         b = RumBaba.objects.create()
         # Verify we didn't break DateTimeField behavior
         self.assertIsInstance(b.baked_timestamp, datetime.datetime)
-        # We need to test this this way because datetime.datetime inherits
+        # We need to test this way because datetime.datetime inherits
         # from datetime.date:
         self.assertIsInstance(b.baked_date, datetime.date) and not isinstance(b.baked_date, datetime.datetime)

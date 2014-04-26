@@ -28,7 +28,7 @@
  GDAL links to a large number of external libraries that consume RAM when
  loaded.  Thus, it may desirable to disable GDAL on systems with limited
  RAM resources -- this may be accomplished by setting `GDAL_LIBRARY_PATH`
- to a non-existant file location (e.g., `GDAL_LIBRARY_PATH='/null/path'`;
+ to a non-existent file location (e.g., `GDAL_LIBRARY_PATH='/null/path'`;
  setting to None/False/'' will not work as a string must be given).
 """
 from django.contrib.gis.gdal.error import check_err, OGRException, OGRIndexError, SRSException  # NOQA

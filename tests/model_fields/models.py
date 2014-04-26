@@ -101,7 +101,7 @@ class PrimaryKeyCharModel(models.Model):
 
 
 class FksToBooleans(models.Model):
-    """Model wih FKs to models with {Null,}BooleanField's, #15040"""
+    """Model with FKs to models with {Null,}BooleanField's, #15040"""
     bf = models.ForeignKey(BooleanModel)
     nbf = models.ForeignKey(NullBooleanModel)
 

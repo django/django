@@ -60,7 +60,7 @@ class SingleObjectMixin(ContextMixin):
         Return the `QuerySet` that will be used to look up the object.
 
         Note that this method is called by the default implementation of
-        `get_object` and may not be called if `get_object` is overriden.
+        `get_object` and may not be called if `get_object` is overridden.
         """
         if self.queryset is None:
             if self.model:

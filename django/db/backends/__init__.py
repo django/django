@@ -890,7 +890,7 @@ class BaseDatabaseOperations(object):
             if _allow_fallback:
                 # Without sqlparse, fall back to the legacy (and buggy) logic.
                 warnings.warn(
-                    "Providing intial SQL data on a %s database will require "
+                    "Providing initial SQL data on a %s database will require "
                     "sqlparse in Django 1.9." % self.connection.vendor,
                     RemovedInDjango19Warning)
                 from django.core.management.sql import _split_statements

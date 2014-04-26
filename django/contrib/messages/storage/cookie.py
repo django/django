@@ -103,7 +103,7 @@ class CookieStorage(BaseStorage):
         encoded_data = self._encode(messages)
         if self.max_cookie_size:
             # data is going to be stored eventually by SimpleCookie, which
-            # adds it's own overhead, which we must account for.
+            # adds its own overhead, which we must account for.
             cookie = SimpleCookie()  # create outside the loop
 
             def stored_length(val):

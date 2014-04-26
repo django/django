@@ -258,7 +258,7 @@ class ModelInheritanceTest(TestCase):
         self.assertEqual(m2mchildren, [])
 
         # Ordering should not include any database column more than once (this
-        # is most likely to ocurr naturally with model inheritance, so we
+        # is most likely to occur naturally with model inheritance, so we
         # check it here). Regression test for #9390. This necessarily pokes at
         # the SQL string for the query, since the duplicate problems are only
         # apparent at that late stage.
@@ -363,10 +363,10 @@ class ModelInheritanceTest(TestCase):
         self.assertEqual(parties, [bachelor])
 
         # Check that a subclass of a subclass of an abstract model doesn't get
-        # it's own accessor.
+        # its own accessor.
         self.assertFalse(hasattr(p2, 'messybachelorparty_set'))
 
-        # ... but it does inherit the m2m from it's parent
+        # ... but it does inherit the m2m from its parent
         messy = MessyBachelorParty.objects.create(
             name='Bachelor party for Dave')
         messy.attendees = [p4]
