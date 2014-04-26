@@ -167,25 +167,23 @@ Changes a field's name (and, unless ``db_column`` is set, its column name).
 Special Operations
 ==================
 
+.. _operation-run-sql:
+
 RunSQL
 ------
 
 ::
 
-    RunSQL(sql, reverse_sql=None, state_operations=None, multiple=False)
+    RunSQL(sql, reverse_sql=None, state_operations=None)
 
 Allows running of arbitrary SQL on the database - useful for more advanced
 features of database backends that Django doesn't support directly, like
 partial indexes.
 
-``sql``, and ``reverse_sql`` if provided, should be strings of SQL to run on the
-database. They will be passed to the database as a single SQL statement unless
-``multiple`` is set to ``True``, in which case they will be split into separate
-statements manually by the operation before being passed through.
-
-In some extreme cases, the built-in statement splitter may not be able to split
-correctly, in which case you should manually split the SQL into multiple calls
-to ``RunSQL``.
+``sql``, and ``reverse_sql`` if provided, should be strings of SQL to run on
+the database. On most database backends (all but PostgreSQL), Django will
+split the SQL into individual statements prior to executing them. This
+requires installing the sqlparse_ Python library.
 
 The ``state_operations`` argument is so you can supply operations that are
 equivalent to the SQL in terms of project state; for example, if you are
@@ -194,6 +192,7 @@ operation here so that the autodetector still has an up-to-date state of the
 model (otherwise, when you next run ``makemigrations``, it won't see any
 operation that adds that field and so will try to run it again).
 
+.. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
 .. _operation-run-python:
 
