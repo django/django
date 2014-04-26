@@ -1,5 +1,10 @@
 import unittest
 
+try:
+    import sqlparse
+except ImportError:
+    sqlparse = None
+
 from django.db import connection, migrations, models, router
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
@@ -640,6 +645,7 @@ class OperationTests(MigrationTestBase):
             operation.database_backwards("test_alinto", editor, new_state, project_state)
         self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])
 
+    @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql(self):
         """
         Tests the RunSQL operation.
@@ -647,7 +653,10 @@ class OperationTests(MigrationTestBase):
         project_state = self.set_up_test_model("test_runsql")
         # Create the operation
         operation = migrations.RunSQL(
-            "CREATE TABLE i_love_ponies (id int, special_thing int)",
+            # Use a multi-line string with a commment to test splitting on SQLite and MySQL respectively
+            "CREATE TABLE i_love_ponies (id int, special_thing int);\n"
+            "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 42); -- this is magic!\n"
+            "INSERT INTO i_love_ponies (id, special_thing) VALUES (2, 51);\n",
             "DROP TABLE i_love_ponies",
             state_operations=[migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])],
         )
@@ -661,6 +670,10 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_forwards("test_runsql", editor, project_state, new_state)
         self.assertTableExists("i_love_ponies")
+        # Make sure all the SQL was processed
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM i_love_ponies")
+            self.assertEqual(cursor.fetchall()[0][0], 2)
         # And test reversal
         self.assertTrue(operation.reversible)
         with connection.schema_editor() as editor:
