@@ -27,7 +27,6 @@ class InitialSQLTests(TestCase):
         """
         connection = connections[DEFAULT_DB_ALIAS]
         custom_sql = custom_sql_for_model(Simple, no_style(), connection)
-        self.assertEqual(len(custom_sql), 9)
         with connection.cursor() as cursor:
             for sql in custom_sql:
                 cursor.execute(sql)

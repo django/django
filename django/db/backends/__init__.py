@@ -1,5 +1,6 @@
 import datetime
 import time
+import warnings
 
 try:
     from django.utils.six.moves import _thread as thread
@@ -16,6 +17,7 @@ from django.db.backends.signals import connection_created
 from django.db.backends import utils
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper, ProgrammingError
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.functional import cached_property
 from django.utils import six
 from django.utils import timezone
@@ -599,6 +601,10 @@ class BaseDatabaseFeatures(object):
     # Does 'a' LIKE 'A' match?
     has_case_insensitive_like = True
 
+    # Does the backend require the sqlparse library for splitting multi-line
+    # statements before executing them?
+    requires_sqlparse_for_splitting = True
+
     def __init__(self, connection):
         self.connection = connection
 
@@ -866,6 +872,34 @@ class BaseDatabaseOperations(object):
         the field should use its default value.
         """
         return 'DEFAULT'
+
+    def prepare_sql_script(self, sql, _allow_fallback=False):
+        """
+        Takes a SQL script that may contain multiple lines and returns a list
+        of statements to feed to successive cursor.execute() calls.
+
+        Since few databases are able to process raw SQL scripts in a single
+        cursor.execute() call and PEP 249 doesn't talk about this use case,
+        the default implementation is conservative.
+        """
+        # Remove _allow_fallback and keep only 'return ...' in Django 1.9.
+        try:
+            # This import must stay inside the method because it's optional.
+            import sqlparse
+        except ImportError:
+            if _allow_fallback:
+                # Without sqlparse, fall back to the legacy (and buggy) logic.
+                warnings.warn(
+                    "Providing intial SQL data on a %s database will require "
+                    "sqlparse in Django 1.9." % self.connection.vendor,
+                    RemovedInDjango19Warning)
+                from django.core.management.sql import _split_statements
+                return _split_statements(sql)
+            else:
+                raise
+        else:
+            return [sqlparse.format(statement, strip_comments=True)
+                    for statement in sqlparse.split(sql) if statement]
 
     def process_clob(self, value):
         """

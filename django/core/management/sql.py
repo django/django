@@ -155,6 +155,7 @@ def sql_all(app_config, style, connection):
 
 
 def _split_statements(content):
+    # Private API only called from code that emits a RemovedInDjango19Warning.
     comment_re = re.compile(r"^((?:'[^']*'|[^'])*?)--.*$")
     statements = []
     statement = []
@@ -202,9 +203,7 @@ def custom_sql_for_model(model, style, connection):
     for sql_file in sql_files:
         if os.path.exists(sql_file):
             with codecs.open(sql_file, 'r' if six.PY3 else 'U', encoding=settings.FILE_CHARSET) as fp:
-                # Some backends can't execute more than one SQL statement at a time,
-                # so split into separate statements.
-                output.extend(_split_statements(fp.read()))
+                output.extend(connection.ops.prepare_sql_script(fp.read(), _allow_fallback=True))
     return output
 
 

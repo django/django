@@ -1,4 +1,3 @@
-import re
 from .base import Operation
 
 
@@ -43,20 +42,16 @@ class SeparateDatabaseAndState(Operation):
 
 class RunSQL(Operation):
     """
-    Runs some raw SQL - a single statement by default, but it will attempt
-    to parse and split it into multiple statements if multiple=True.
-
-    A reverse SQL statement may be provided.
+    Runs some raw SQL. A reverse SQL statement may be provided.
 
     Also accepts a list of operations that represent the state change effected
     by this SQL change, in case it's custom column/table creation/deletion.
     """
 
-    def __init__(self, sql, reverse_sql=None, state_operations=None, multiple=False):
+    def __init__(self, sql, reverse_sql=None, state_operations=None):
         self.sql = sql
         self.reverse_sql = reverse_sql
         self.state_operations = state_operations or []
-        self.multiple = multiple
 
     @property
     def reversible(self):
@@ -66,30 +61,15 @@ class RunSQL(Operation):
         for state_operation in self.state_operations:
             state_operation.state_forwards(app_label, state)
 
-    def _split_sql(self, sql):
-        regex = r"(?mx) ([^';]* (?:'[^']*'[^';]*)*)"
-        comment_regex = r"(?mx) (?:^\s*$)|(?:--.*$)"
-        # First, strip comments
-        sql = "\n".join([x.strip().replace("%", "%%") for x in re.split(comment_regex, sql) if x.strip()])
-        # Now get each statement
-        for st in re.split(regex, sql)[1:][::2]:
-            yield st
-
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        if self.multiple:
-            statements = self._split_sql(self.sql)
-        else:
-            statements = [self.sql]
+        statements = schema_editor.connection.ops.prepare_sql_script(self.sql)
         for statement in statements:
             schema_editor.execute(statement)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_sql is None:
             raise NotImplementedError("You cannot reverse this operation")
-        if self.multiple:
-            statements = self._split_sql(self.reverse_sql)
-        else:
-            statements = [self.reverse_sql]
+        statements = schema_editor.connection.ops.prepare_sql_script(self.reverse_sql)
         for statement in statements:
             schema_editor.execute(statement)
 
