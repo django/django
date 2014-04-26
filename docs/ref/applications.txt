@@ -307,13 +307,71 @@ Application registry
     :exc:`ValueError` when called with a single argument that doesn't contain
     exactly one dot.
 
+Initialization process
+======================
+
+How applications are loaded
+---------------------------
+
+When Django starts, :func:`django.setup()` is responsible for populating the
+application registry.
+
+.. currentmodule:: django
+
+.. function:: setup()
+
+    Configures Django by:
+
+    * Loading the settings.
+    * Setting up logging.
+    * Initializing the application registry.
+
+    This function is called automatically:
+
+    * When running an HTTP server via Django's WSGI support.
+    * When invoking a management command.
+
+    It must be called explicitly in other cases, for instance in plain Python
+    scripts.
+
+.. currentmodule:: django.apps
+
+The application registry is initialized in three stages. At each stage, Django
+processes all applications in the order of :setting:`INSTALLED_APPS`.
+
+#. First Django imports each item in :setting:`INSTALLED_APPS`.
+
+   If it's an application configuration class, Django imports the root package
+   of the application, defined by its :attr:`~AppConfig.name` attribute. If
+   it's a Python package, Django creates a default application configuration.
+
+   *At this stage, your code shouldn't import any models!*
+
+   In other words, your applications' root packages and the modules that
+   define your application configuration classes shouldn't import any models,
+   even indirectly.
+
+   Strictly speaking, Django allows importing models once their application
+   configuration is loaded. However, in order to avoid needless constraints on
+   the order of :setting:`INSTALLED_APPS`, it's strongly recommended not
+   import any models at this stage.
+
+#. Then Django attempts to import the ``models`` submodule of each application,
+   if there is one.
+
+   You must define or import all models in your application's ``models.py`` or
+   ``models/__init__.py``. Otherwise, the application registry may not be fully
+   populated at this point, which could cause the ORM to malfunction.
+
+#. Finally Django runs the :meth:`~AppConfig.ready()` method of each application
+   configuration.
+
 .. _applications-troubleshooting:
 
 Troubleshooting
-===============
+---------------
 
-Django loads application configurations and models as soon as it starts. Here
-are some common problems you may encounter:
+Here are some common problems that you may encounter during initialization:
 
 * ``RuntimeError: App registry isn't ready yet.`` This happens when importing
   an application configuration or a models module triggers code that depends
@@ -333,6 +391,9 @@ are some common problems you may encounter:
   Another common culprit is :func:`django.contrib.auth.get_user_model()`. Use
   the :setting:`AUTH_USER_MODEL` setting to reference the User model at import
   time.
+
+  This exception also happens if you forget to call :func:`django.setup()` in
+  a standalone Python script.
 
 * ``ImportError: cannot import name ...`` This happens if the import sequence
   ends up in a loop.
