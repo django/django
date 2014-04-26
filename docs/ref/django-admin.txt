@@ -14,11 +14,11 @@ two things for you before delegating to ``django-admin.py``:
 * It sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable so that
   it points to your project's ``settings.py`` file.
 
-* It calls ``django.setup()`` to initialize various internals of Django.
+* It calls :func:`django.setup()` to initialize various internals of Django.
 
 .. versionadded:: 1.7
 
-    ``django.setup()`` didn't exist in previous versions of Django.
+    :func:`django.setup()` didn't exist in previous versions of Django.
 
 The ``django-admin.py`` script should be on your system path if you installed
 Django via its ``setup.py`` utility. If it's not on your path, you can find it
