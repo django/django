@@ -464,8 +464,9 @@ class SQLCompiler(object):
         field, targets, alias, joins, path, opts = self._setup_joins(pieces, opts, alias)
 
         # If we get to this point and the field is a relation to another model,
-        # append the default ordering for that model.
-        if field.rel and path and opts.ordering:
+        # append the default ordering for that model unless the attribute name
+        # of the field is specified.
+        if field.rel and path and opts.ordering and name != field.attname:
             # Firstly, avoid infinite loops.
             if not already_seen:
                 already_seen = set()

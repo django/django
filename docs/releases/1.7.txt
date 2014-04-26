@@ -702,6 +702,9 @@ Models
   Previously model field validation didn't prevent values out of their associated
   column data type range from being saved resulting in an integrity error.
 
+* It is now possible to explicitly :meth:`~django.db.models.query.QuerySet.order_by`
+  a relation ``_id`` field by using its attribute name.
+
 Signals
 ^^^^^^^
 

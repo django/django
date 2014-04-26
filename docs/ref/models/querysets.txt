@@ -294,6 +294,18 @@ primary key if there is no :attr:`Meta.ordering
 
 ...since the ``Blog`` model has no default ordering specified.
 
+.. versionadded:: 1.7
+
+    Note that it is also possible to order a queryset by a related field,
+    without incurring the cost of a JOIN, by referring to the ``_id`` of the
+    related field::
+
+        # No Join
+        Entry.objects.order_by('blog_id')
+
+        # Join
+        Entry.objects.order_by('blog__id')
+
 Be cautious when ordering by fields in related models if you are also using
 :meth:`distinct()`. See the note in :meth:`distinct` for an explanation of how
 related model ordering can change the expected results.
@@ -434,6 +446,21 @@ Examples (those after the first will only work on PostgreSQL)::
 
     >>> Entry.objects.order_by('author', 'pub_date').distinct('author')
     [...]
+
+.. note::
+    Keep in mind that :meth:`order_by` uses any default related model ordering
+    that has been defined. You might have to explicitly order by the relation
+    ``_id`` or referenced field to make sure the ``DISTINCT ON`` expressions
+    match those at the beginning of the ``ORDER BY`` clause. For example, if
+    the ``Blog`` model defined an :attr:`~django.db.models.Options.ordering` by
+    ``name``::
+
+        Entry.objects.order_by('blog').distinct('blog')
+
+    ...wouldn't work because the query would be ordered by ``blog__name`` thus
+    mismatching the ``DISTINCT ON`` expression. You'd have to explicitly order
+    by the relation `_id` field (``blog_id`` in this case) or the referenced
+    one (``blog__pk``) to make sure both expressions match.
 
 values
 ~~~~~~
