@@ -550,8 +550,7 @@ Miscellaneous
   ``QuerySet`` as the empty value instead of an empty list.
 
 * :func:`~django.utils.http.int_to_base36` properly raises a
-  :exc:`~exceptions.TypeError` instead of :exc:`~exceptions.ValueError` for
-  non-integer inputs.
+  :exc:`TypeError` instead of :exc:`ValueError` for non-integer inputs.
 
 * The ``slugify`` template filter is now available as a standard python
   function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is

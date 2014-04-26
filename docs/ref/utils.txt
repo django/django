@@ -133,8 +133,8 @@ results. Instead do::
 
 The functions defined in this module share the following properties:
 
-- They raise :exc:`~exceptions.ValueError` if their input is well formatted but
-  isn't a valid date or time.
+- They raise :exc:`ValueError` if their input is well formatted but isn't a
+  valid date or time.
 - They return ``None`` if it isn't well formatted at all.
 - They accept up to picosecond resolution in input, but they truncate it to
   microseconds, since that's what Python supports.
@@ -688,7 +688,9 @@ escaping HTML.
 .. function:: int_to_base36(i)
 
     Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
-    smaller than :data:`sys.maxint`.
+    smaller than `sys.maxint`_.
+
+    .. _sys.maxint: http://docs.python.org/2/library/sys.html#sys.maxint
 
 .. function:: urlsafe_base64_encode(s)
 

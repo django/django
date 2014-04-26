@@ -460,9 +460,8 @@ zone support.
 
 Fixtures generated with ``USE_TZ = False``, or before Django 1.4, use the
 "naive" format. If your project contains such fixtures, after you enable time
-zone support, you'll see :exc:`~exceptions.RuntimeWarning`\ s when you load
-them. To get rid of the warnings, you must convert your fixtures to the "aware"
-format.
+zone support, you'll see :exc:`RuntimeWarning`\ s when you load them. To get
+rid of the warnings, you must convert your fixtures to the "aware" format.
 
 You can regenerate fixtures with :djadmin:`loaddata` then :djadmin:`dumpdata`.
 Or, if they're small enough, you can simply edit them to add the UTC offset

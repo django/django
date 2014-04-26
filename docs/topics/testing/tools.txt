@@ -77,8 +77,7 @@ Note a few important things about how the test client works:
 
   The test client is not capable of retrieving Web pages that are not
   powered by your Django project. If you need to retrieve other Web pages,
-  use a Python standard library module such as :mod:`urllib` or
-  :mod:`urllib2`.
+  use a Python standard library module such as :mod:`urllib`.
 
 * To resolve URLs, the test client uses whatever URLconf is pointed-to by
   your :setting:`ROOT_URLCONF` setting.
@@ -479,9 +478,9 @@ can access these properties as part of a test condition.
 
 .. attribute:: Client.cookies
 
-    A Python :class:`~Cookie.SimpleCookie` object, containing the current values
-    of all the client cookies. See the documentation of the :mod:`Cookie` module
-    for more.
+    A Python :class:`~http.cookies.SimpleCookie` object, containing the current
+    values of all the client cookies. See the documentation of the
+    :mod:`http.cookies` module for more.
 
 .. attribute:: Client.session
 
@@ -1247,7 +1246,7 @@ your test suite.
     Asserts that execution of callable ``callable_obj`` raised the
     ``expected_exception`` exception and that such exception has an
     ``expected_message`` representation. Any other outcome is reported as a
-    failure. Similar to unittest's :meth:`~unittest.TestCase.assertRaisesRegexp`
+    failure. Similar to unittest's :meth:`~unittest.TestCase.assertRaisesRegex`
     with the difference that ``expected_message`` isn't a regular expression.
 
 .. method:: SimpleTestCase.assertFieldOutput(fieldclass, valid, invalid, field_args=None, field_kwargs=None, empty_value='')

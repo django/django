@@ -662,8 +662,8 @@ Methods
 
 .. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False)
 
-    Sets a cookie. The parameters are the same as in the :class:`Cookie.Morsel`
-    object in the Python standard library.
+    Sets a cookie. The parameters are the same as in the
+    :class:`~http.cookies.Morsel` cookie object in the Python standard library.
 
     * ``max_age`` should be a number of seconds, or ``None`` (default) if
       the cookie should last only as long as the client's browser session.
@@ -822,7 +822,7 @@ JsonResponse objects
    The ``safe`` boolean parameter defaults to ``True``. If it's set to ``False``,
    any object can be passed for serialization (otherwise only ``dict`` instances
    are allowed). If ``safe`` is ``True`` and a non-``dict`` object is passed as
-   the first argument, a :exc:`~exceptions.TypeError` will be raised.
+   the first argument, a :exc:`TypeError` will be raised.
 
 Usage
 -----
@@ -843,7 +843,7 @@ parameter to ``False``::
 
     >>> response = JsonResponse([1, 2, 3], safe=False)
 
-Without passing ``safe=False``, a :exc:`~exceptions.TypeError` will be raised.
+Without passing ``safe=False``, a :exc:`TypeError` will be raised.
 
 .. warning::
 
