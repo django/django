@@ -214,10 +214,10 @@ class ValidationTestCase(TestCase):
 
     def test_nonexistant_field(self):
         class SongAdmin(admin.ModelAdmin):
-            readonly_fields = ("title", "nonexistant")
+            readonly_fields = ("title", "nonexistent")
 
         self.assertRaisesMessage(ImproperlyConfigured,
-            str_prefix("SongAdmin.readonly_fields[1], %(_)s'nonexistant' is not a callable "
+            str_prefix("SongAdmin.readonly_fields[1], %(_)s'nonexistent' is not a callable "
                        "or an attribute of 'SongAdmin' or found in the model 'Song'."),
             SongAdmin.validate,
             Song)

@@ -187,7 +187,7 @@ class Field(object):
         Return True if data differs from initial.
         """
         # For purposes of seeing whether something has changed, None is
-        # the same as an empty string, if the data or inital value we get
+        # the same as an empty string, if the data or initial value we get
         # is None, replace it w/ ''.
         initial_value = initial if initial is not None else ''
         try:

@@ -637,7 +637,7 @@ the Python import path to your :file:`mysite/settings.py` file.
     >>> import django
     >>> django.setup()
 
-    If this raises an :exc:`~exceptions.AttributeError`, you're probably using
+    If this raises an :exc:`AttributeError`, you're probably using
     a version of Django that doesn't match this tutorial version. You'll want
     to either switch to the older tutorial or the newer Django version.
 

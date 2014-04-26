@@ -728,7 +728,7 @@ class Field(RegisterLookupMixin):
         """Returns choices with a default blank choices included, for use
         as SelectField choices for this field."""
         blank_defined = False
-        for choice, _ in self.choices:
+        for choice, __ in self.choices:
             if choice in ('', None):
                 blank_defined = True
                 break
@@ -1509,6 +1509,12 @@ class FilePathField(Field):
             del kwargs["max_length"]
         return name, path, args, kwargs
 
+    def get_prep_value(self, value):
+        value = super(FilePathField, self).get_prep_value(value)
+        if value is None:
+            return None
+        return six.text_type(value)
+
     def formfield(self, **kwargs):
         defaults = {
             'path': self.path,
@@ -1642,6 +1648,12 @@ class IPAddressField(Field):
         del kwargs['max_length']
         return name, path, args, kwargs
 
+    def get_prep_value(self, value):
+        value = super(IPAddressField, self).get_prep_value(value)
+        if value is None:
+            return None
+        return six.text_type(value)
+
     def get_internal_type(self):
         return "IPAddressField"
 
@@ -1711,12 +1723,14 @@ class GenericIPAddressField(Field):
 
     def get_prep_value(self, value):
         value = super(GenericIPAddressField, self).get_prep_value(value)
+        if value is None:
+            return None
         if value and ':' in value:
             try:
                 return clean_ipv6_address(value, self.unpack_ipv4)
             except exceptions.ValidationError:
                 pass
-        return value
+        return six.text_type(value)
 
     def formfield(self, **kwargs):
         defaults = {

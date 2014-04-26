@@ -2465,7 +2465,7 @@ slightly different call:
     The :mod:`staticfiles<django.contrib.staticfiles>` contrib app also ships
     with a :ttag:`static template tag<staticfiles-static>` which uses
     ``staticfiles'`` :setting:`STATICFILES_STORAGE` to build the URL of the
-    given path (rather than simply using :func:`urlparse.urljoin` with the
+    given path (rather than simply using :func:`urllib.parse.urljoin` with the
     :setting:`STATIC_URL` setting and the given path). Use that instead if you
     have an advanced use case such as :ref:`using a cloud service to serve
     static files<staticfiles-from-cdn>`::

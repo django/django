@@ -686,7 +686,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
         # change
         color_id = color2_addition_log.object_id
-        color2_change_url = reverse('admin:admin_views_color2_change', args=(color_id))
+        color2_change_url = reverse('admin:admin_views_color2_change', args=(color_id,))
 
         self.client.post(color2_change_url, {'value': 'blue'})
 
@@ -694,7 +694,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(color2_content_type, color2_change_log.content_type)
 
         # delete
-        color2_delete_url = reverse('admin:admin_views_color2_delete', args=(color_id))
+        color2_delete_url = reverse('admin:admin_views_color2_delete', args=(color_id,))
         self.client.post(color2_delete_url)
 
         color2_delete_log = LogEntry.objects.all()[0]
@@ -1045,8 +1045,8 @@ class AdminViewPermissionsTest(TestCase):
         """
         Make sure only staff members can log in.
 
-        Successful posts to the login page will redirect to the orignal url.
-        Unsuccessfull attempts will continue to render the login page with
+        Successful posts to the login page will redirect to the original url.
+        Unsuccessful attempts will continue to render the login page with
         a 200 status code.
         """
         login_url = reverse('admin:login') + '?next=/test_admin/admin/'
@@ -3649,7 +3649,7 @@ class ReadonlyTest(TestCase):
         self.assertContains(response,
             "<label>Awesomeness level:</label>")
         self.assertContains(response, "Very awesome.")
-        self.assertContains(response, "Unkown coolness.")
+        self.assertContains(response, "Unknown coolness.")
         self.assertContains(response, "foo")
 
         # Checks that multiline text in a readonly field gets <br /> tags

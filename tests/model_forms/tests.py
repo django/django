@@ -1844,7 +1844,7 @@ class FileAndImageFieldTests(TestCase):
 
     @skipUnless(test_images, "Pillow not installed")
     def test_image_field(self):
-        # ImageField and FileField are nearly identical, but they differ slighty when
+        # ImageField and FileField are nearly identical, but they differ slightly when
         # it comes to validation. This specifically tests that #6302 is fixed for
         # both file fields and image fields.
 

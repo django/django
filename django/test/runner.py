@@ -178,7 +178,7 @@ def dependency_ordered(test_databases, dependencies):
     # Maps db signature to dependencies of all it's aliases
     dependencies_map = {}
 
-    # sanity check - no DB can depend on it's own alias
+    # sanity check - no DB can depend on its own alias
     for sig, (_, aliases) in test_databases:
         all_deps = set()
         for alias in aliases:

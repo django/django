@@ -9,7 +9,8 @@ from django.core.management.base import CommandError, NoArgsCommand
 from django.utils.encoding import smart_text
 from django.utils.six.moves import input
 
-from django.contrib.staticfiles import finders, storage
+from django.contrib.staticfiles.finders import get_finders
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 class Command(NoArgsCommand):
@@ -52,7 +53,7 @@ class Command(NoArgsCommand):
         self.symlinked_files = []
         self.unmodified_files = []
         self.post_processed_files = []
-        self.storage = storage.staticfiles_storage
+        self.storage = staticfiles_storage
         try:
             self.storage.path('')
         except NotImplementedError:
@@ -93,7 +94,7 @@ class Command(NoArgsCommand):
             handler = self.copy_file
 
         found_files = OrderedDict()
-        for finder in finders.get_finders():
+        for finder in get_finders():
             for path, storage in finder.list(self.ignore_patterns):
                 # Prefix the relative path if the source storage contains it
                 if getattr(storage, 'prefix', None):

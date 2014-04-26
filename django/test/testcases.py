@@ -232,8 +232,7 @@ class SimpleTestCase(unittest.TestCase):
 
     def settings(self, **kwargs):
         """
-        A context manager that temporarily sets a setting and reverts
-        back to the original value when exiting the context.
+        A context manager that temporarily sets a setting and reverts to the original value when exiting the context.
         """
         return override_settings(**kwargs)
 
@@ -676,6 +675,11 @@ class SimpleTestCase(unittest.TestCase):
                 msg_prefix + "Couldn't find '%s' in response" % needle)
 
     def assertJSONEqual(self, raw, expected_data, msg=None):
+        """
+        Asserts that the JSON fragments raw and expected_data are equal.
+        Usual JSON non-significant whitespace rules apply as the heavyweight
+        is delegated to the json library.
+        """
         try:
             data = json.loads(raw)
         except ValueError:
@@ -686,6 +690,23 @@ class SimpleTestCase(unittest.TestCase):
             except ValueError:
                 self.fail("Second argument is not valid JSON: %r" % expected_data)
         self.assertEqual(data, expected_data, msg=msg)
+
+    def assertJSONNotEqual(self, raw, expected_data, msg=None):
+        """
+        Asserts that the JSON fragments raw and expected_data are not equal.
+        Usual JSON non-significant whitespace rules apply as the heavyweight
+        is delegated to the json library.
+        """
+        try:
+            data = json.loads(raw)
+        except ValueError:
+            self.fail("First argument is not valid JSON: %r" % raw)
+        if isinstance(expected_data, six.string_types):
+            try:
+                expected_data = json.loads(expected_data)
+            except ValueError:
+                self.fail("Second argument is not valid JSON: %r" % expected_data)
+        self.assertNotEqual(data, expected_data, msg=msg)
 
     def assertXMLEqual(self, xml1, xml2, msg=None):
         """
@@ -702,24 +723,6 @@ class SimpleTestCase(unittest.TestCase):
             if not result:
                 standardMsg = '%s != %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
                 self.fail(self._formatMessage(msg, standardMsg))
-
-    def assertJSONNotEqual(self, raw, expected_data, msg=None):
-        """
-        Asserts that the JSON fragments raw and expected_data are not equal.
-        Usual JSON non-significant whitespace rules apply as the heavyweight
-        is delegated to the json library.
-        Output in case of error can be customized with the msg argument.
-        """
-        try:
-            data = json.loads(raw)
-        except ValueError:
-            self.fail("First argument is not valid JSON: %r" % raw)
-        if isinstance(expected_data, six.string_types):
-            try:
-                expected_data = json.loads(expected_data)
-            except ValueError:
-                self.fail("Second argument is not valid JSON: %r" % expected_data)
-        self.assertNotEqual(data, expected_data, msg=msg)
 
     def assertXMLNotEqual(self, xml1, xml2, msg=None):
         """

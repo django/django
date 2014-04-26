@@ -21,7 +21,7 @@ script found at the top level of each Django project directory.
 .BI cleanup
 Cleans out old data from the database (only expired sessions at the moment).
 .TP
-.BI "compilemessages [" "\-\-locale=LOCALE" "]"
+.BI "compilemessages [" "\-\-locale=LOCALE" "] [" "\-\-exclude=LOCALE" "]"
 Compiles .po files to .mo files for use with builtin gettext support.
 .TP
 .BI "createcachetable [" "tablename" "]"
@@ -59,7 +59,7 @@ Executes
 .B sqlall
 for the given app(s) in the current database.
 .TP
-.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "] [" "\-\-symlinks" "] [" "\-\-ignore=PATTERN" "] [" "\-\-no\-default\-ignore" "] [" "\-\-no\-wrap" "] [" "\-\-no\-location" "]"
+.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-exclude=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "] [" "\-\-symlinks" "] [" "\-\-ignore=PATTERN" "] [" "\-\-no\-default\-ignore" "] [" "\-\-no\-wrap" "] [" "\-\-no\-location" "]"
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
 conf/locale (in the django tree) or locale (for project and application) directory.
@@ -175,6 +175,9 @@ output a full stack trace whenever an exception is raised.
 .TP
 .I \-l, \-\-locale=LOCALE
 The locale to process when using makemessages or compilemessages.
+.TP
+.I \-e, \-\-exclude=LOCALE
+The locale to exclude from processing when using makemessages or compilemessages.
 .TP
 .I \-d, \-\-domain=DOMAIN
 The domain of the message files (default: "django") when using makemessages.

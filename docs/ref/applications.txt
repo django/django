@@ -172,7 +172,7 @@ Configurable attributes
 .. attribute:: AppConfig.path
 
     Filesystem path to the application directory, e.g.
-    ``'/usr/lib/python2.7/dist-packages/django/contrib/admin'``.
+    ``'/usr/lib/python3.4/dist-packages/django/contrib/admin'``.
 
     In most cases, Django can automatically detect and set this, but you can
     also provide an explicit override as a class attribute on your
@@ -209,8 +209,8 @@ Methods
 .. method:: AppConfig.get_model(model_name)
 
     Returns the :class:`~django.db.models.Model` with the given
-    ``model_name``. Raises :exc:`~exceptions.LookupError` if no such model
-    exists. ``model_name`` is case-insensitive.
+    ``model_name``. Raises :exc:`LookupError` if no such model exists.
+    ``model_name`` is case-insensitive.
 
 .. method:: AppConfig.ready()
 
@@ -284,8 +284,8 @@ Application registry
 .. method:: apps.get_app_config(app_label)
 
     Returns an :class:`~django.apps.AppConfig` for the application with the
-    given ``app_label``. Raises :exc:`~exceptions.LookupError` if no such
-    application exists.
+    given ``app_label``. Raises :exc:`LookupError` if no such application
+    exists.
 
 .. method:: apps.is_installed(app_name)
 
@@ -303,6 +303,48 @@ Application registry
     argument in the form ``app_label.model_name``. ``model_name`` is case-
     insensitive.
 
-    Raises :exc:`~exceptions.LookupError` if no such application or model
-    exists. Raises :exc:`~exceptions.ValueError` when called with a single
-    argument that doesn't contain exactly one dot.
+    Raises :exc:`LookupError` if no such application or model exists. Raises
+    :exc:`ValueError` when called with a single argument that doesn't contain
+    exactly one dot.
+
+.. _applications-troubleshooting:
+
+Troubleshooting
+===============
+
+Django loads application configurations and models as soon as it starts. Here
+are some common problems you may encounter:
+
+* ``RuntimeError: App registry isn't ready yet.`` This happens when importing
+  an application configuration or a models module triggers code that depends
+  on the app registry.
+
+  For example, :func:`~django.utils.translation.ugettext()` uses the app
+  registry to look up translation catalogs in applications. To translate at
+  import time, you need :func:`~django.utils.translation.ugettext_lazy()`
+  instead. (Using :func:`~django.utils.translation.ugettext()` would be a bug,
+  because the translation would happen at import time, rather than at each
+  request depending on the active language.)
+
+  Executing database queries with the ORM at import time in models modules
+  will also trigger this exception. The ORM cannot function properly until all
+  models are available.
+
+  Another common culprit is :func:`django.contrib.auth.get_user_model()`. Use
+  the :setting:`AUTH_USER_MODEL` setting to reference the User model at import
+  time.
+
+* ``ImportError: cannot import name ...`` This happens if the import sequence
+  ends up in a loop.
+
+  To eliminate such problems, you should minimize dependencies between your
+  models modules and do as little work as possible at import time. To avoid
+  executing code at import time, you can move it into a function and cache its
+  results. The code will be executed when you first need its results. This
+  concept is known as "lazy evaluation".
+
+* ``django.contrib.admin`` automatically performs autodiscovery of ``admin``
+  modules in installed applications. To prevent it, change your
+  :setting:`INSTALLED_APPS` to contain
+  ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
+  ``'django.contrib.admin'``.

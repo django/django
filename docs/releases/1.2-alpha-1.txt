@@ -520,7 +520,7 @@ Added ``readonly_fields`` to ``ModelAdmin``
 
 :attr:`django.contrib.admin.ModelAdmin.readonly_fields` has been added to
 enable non-editable fields in add/change pages for models and inlines. Field
-and calculated values can be displayed along side editable fields.
+and calculated values can be displayed alongside editable fields.
 
 Customizable syntax highlighting
 --------------------------------

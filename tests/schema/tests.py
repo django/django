@@ -527,7 +527,7 @@ class SchemaTests(TransactionTestCase):
         UniqueTest.objects.create(year=2011, slug="bar")
         self.assertRaises(IntegrityError, UniqueTest.objects.create, year=2012, slug="foo")
         UniqueTest.objects.all().delete()
-        # Alter the model to it's non-unique-together companion
+        # Alter the model to its non-unique-together companion
         with connection.schema_editor() as editor:
             editor.alter_unique_together(
                 UniqueTest,

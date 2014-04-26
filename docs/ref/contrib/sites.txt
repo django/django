@@ -474,7 +474,7 @@ method takes an :class:`~django.http.HttpRequest` object. It's able to deduce
 the ``domain`` and ``name`` by looking at the request's domain. It has
 ``save()`` and ``delete()`` methods to match the interface of
 :class:`~django.contrib.sites.models.Site`, but the methods raise
-:exc:`~exceptions.NotImplementedError`..
+:exc:`NotImplementedError`.
 
 ``get_current_site`` shortcut
 =============================

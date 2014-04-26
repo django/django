@@ -204,7 +204,7 @@ class Command(BaseCommand):
             # Create the tables for each model
             if self.verbosity >= 1:
                 self.stdout.write("  Creating tables...\n")
-            with transaction.atomic(using=connection.alias, savepoint=False):
+            with transaction.atomic(using=connection.alias, savepoint=connection.features.can_rollback_ddl):
                 for app_name, model_list in manifest.items():
                     for model in model_list:
                         # Create the model's database table, if it doesn't already exist.
@@ -264,7 +264,7 @@ class Command(BaseCommand):
                             if self.verbosity >= 2:
                                 self.stdout.write("    Installing index for %s.%s model\n" % (app_name, model._meta.object_name))
                             try:
-                                with transaction.atomic(using=connection.alias):
+                                with transaction.atomic(using=connection.alias, savepoint=connection.features.can_rollback_ddl):
                                     for sql in index_sql:
                                         cursor.execute(sql)
                             except Exception as e:

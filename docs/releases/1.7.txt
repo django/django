@@ -636,6 +636,14 @@ Management Commands
 * :djadmin:`collectstatic` command with symlink option is now supported on
   Windows NT 6 (Windows Vista and newer).
 
+* :ref:`initial-sql` now works better if the sqlparse_ Python library is
+  installed.
+
+  Note that it's deprecated in favor of the :ref:`RunSQL <operation-run-sql>`
+  operation of migrations, which benefits from the improved behavior.
+
+.. _sqlparse: https://pypi.python.org/pypi/sqlparse
+
 Models
 ^^^^^^
 
@@ -877,41 +885,8 @@ Start-up sequence
 
 Django 1.7 loads application configurations and models as soon as it starts.
 While this behavior is more straightforward and is believed to be more robust,
-regressions cannot be ruled out. You may encounter the following exceptions:
-
-* ``RuntimeError: App registry isn't ready yet.`` This happens when importing
-  an application configuration or a models module triggers code that depends
-  on the app registry.
-
-  For example, :func:`~django.utils.translation.ugettext()` uses the app
-  registry to look up translation catalogs in applications. To translate at
-  import time, you need :func:`~django.utils.translation.ugettext_lazy()`
-  instead. (Using :func:`~django.utils.translation.ugettext()` would be a bug,
-  because the translation would happen at import time, rather than at each
-  request depending on the active language.)
-
-  Executing database queries with the ORM at import time in models modules
-  will also trigger this exception. The ORM cannot function properly until all
-  models are available.
-
-  Another common culprit is :func:`django.contrib.auth.get_user_model()`. Use
-  the :setting:`AUTH_USER_MODEL` setting to reference the User model at import
-  time.
-
-* ``ImportError: cannot import name ...`` This happens if the import sequence
-  ends up in a loop.
-
-  To eliminate such problems, you should minimize dependencies between your
-  models modules and do as little work as possible at import time. To avoid
-  executing code at import time, you can move it into a function and cache its
-  results. The code will be executed when you first need its results. This
-  concept is known as "lazy evaluation".
-
-* ``django.contrib.admin`` will now automatically perform autodiscovery of
-  ``admin`` modules in installed applications. To prevent it, change your
-  :setting:`INSTALLED_APPS` to contain
-  ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
-  ``'django.contrib.admin'``.
+regressions cannot be ruled out. See :ref:`applications-troubleshooting` for
+solutions to some problems you may encounter.
 
 Standalone scripts
 ^^^^^^^^^^^^^^^^^^
@@ -977,8 +952,8 @@ the app cache was a private API, obsolete methods and arguments will be
 removed through a standard deprecation path, with the exception of the
 following changes that take effect immediately:
 
-* ``get_model`` raises :exc:`~exceptions.LookupError` instead of returning
-  ``None`` when no model is found.
+* ``get_model`` raises :exc:`LookupError` instead of returning ``None`` when no
+  model is found.
 
 * The ``only_installed`` argument of ``get_model`` and ``get_models`` no
   longer exists, nor does the ``seed_cache`` argument of ``get_model``.
@@ -1038,9 +1013,9 @@ pytz may be required
 ~~~~~~~~~~~~~~~~~~~~
 
 If your project handles datetimes before 1970 or after 2037 and Django raises
-a :exc:`~exceptions.ValueError` when encountering them, you will have to
-install pytz_. You may be affected by this problem if you use Django's time
-zone-related date formats or :mod:`django.contrib.syndication`.
+a :exc:`ValueError` when encountering them, you will have to install pytz_. You
+may be affected by this problem if you use Django's time zone-related date
+formats or :mod:`django.contrib.syndication`.
 
 .. _pytz: https://pypi.python.org/pypi/pytz/
 
@@ -1246,6 +1221,10 @@ Miscellaneous
   pre-compiled regular expression in this case, as it is not serializable.
   The :attr:`~django.core.validators.RegexValidator.flags` attribute was added
   to :class:`~django.core.validators.RegexValidator` to simplify this change.
+
+* When running tests on PostgreSQL, the :setting:`USER` will need read access
+  to the built-in ``postgres`` database. This is in lieu of the previous
+  behavior of connecting to the actual non-test database.
 
 .. _deprecated-features-1.7:
 

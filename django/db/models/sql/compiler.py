@@ -1132,7 +1132,7 @@ class SQLDateTimeCompiler(SQLCompiler):
                     datetime = self.resolve_columns(row, fields)[offset]
                 elif needs_string_cast:
                     datetime = typecast_timestamp(str(datetime))
-                # Datetimes are artifically returned in UTC on databases that
+                # Datetimes are artificially returned in UTC on databases that
                 # don't support time zone. Restore the zone used in the query.
                 if settings.USE_TZ:
                     if datetime is None:

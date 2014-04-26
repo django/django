@@ -917,6 +917,13 @@ class FormatStylePlaceholderCursor(object):
     def fetchall(self):
         return tuple(_rowfactory(r, self.cursor) for r in self.cursor.fetchall())
 
+    def close(self):
+        try:
+            self.cursor.close()
+        except Database.InterfaceError:
+            # already closed
+            pass
+
     def var(self, *args):
         return VariableWrapper(self.cursor.var(*args))
 

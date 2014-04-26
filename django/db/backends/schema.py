@@ -71,14 +71,17 @@ class BaseDatabaseSchemaEditor(object):
 
     def __enter__(self):
         self.deferred_sql = []
-        atomic(self.connection.alias, self.connection.features.can_rollback_ddl).__enter__()
+        if self.connection.features.can_rollback_ddl:
+            self.atomic = atomic(self.connection.alias)
+            self.atomic.__enter__()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             for sql in self.deferred_sql:
                 self.execute(sql)
-        atomic(self.connection.alias, self.connection.features.can_rollback_ddl).__exit__(exc_type, exc_value, traceback)
+        if self.connection.features.can_rollback_ddl:
+            self.atomic.__exit__(exc_type, exc_value, traceback)
 
     # Core utility functions
 
@@ -416,11 +419,11 @@ class BaseDatabaseSchemaEditor(object):
             to_column = field.rel.to._meta.get_field(field.rel.field_name).column
             self.deferred_sql.append(
                 self.sql_create_fk % {
-                    "name": '%s_refs_%s_%x' % (
+                    "name": self.quote_name('%s_refs_%s_%x' % (
                         field.column,
                         to_column,
                         abs(hash((model._meta.db_table, to_table)))
-                    ),
+                    )),
                     "table": self.quote_name(model._meta.db_table),
                     "column": self.quote_name(field.column),
                     "to_table": self.quote_name(to_table),

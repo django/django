@@ -5,3 +5,4 @@ Pillow
 PyYAML
 pytz > dev
 selenium
+sqlparse

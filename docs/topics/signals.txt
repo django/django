@@ -235,7 +235,8 @@ For example:
 This declares a ``pizza_done`` signal that will provide receivers with
 ``toppings`` and ``size`` arguments.
 
-Remember that you're allowed to change this list of arguments at any time, so getting the API right on the first try isn't necessary.
+Remember that you're allowed to change this list of arguments at any time, so
+getting the API right on the first try isn't necessary.
 
 Sending signals
 ---------------
@@ -246,8 +247,8 @@ There are two ways to send signals in Django.
 .. method:: Signal.send_robust(sender, **kwargs)
 
 To send a signal, call either :meth:`Signal.send` or :meth:`Signal.send_robust`.
-You must provide the ``sender`` argument, and may provide as many other keyword
-arguments as you like.
+You must provide the ``sender`` argument (which is a class most of the time),
+and may provide as many other keyword arguments as you like.
 
 For example, here's how sending our ``pizza_done`` signal might look:
 
@@ -257,7 +258,7 @@ For example, here's how sending our ``pizza_done`` signal might look:
         ...
 
         def send_pizza(self, toppings, size):
-            pizza_done.send(sender=self, toppings=toppings, size=size)
+            pizza_done.send(sender=self.__class__, toppings=toppings, size=size)
             ...
 
 Both ``send()`` and ``send_robust()`` return a list of tuple pairs

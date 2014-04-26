@@ -328,7 +328,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         """
         # We access the property and check if it triggers a warning.
         # If it does, then it's ours and we can safely ignore it, but if
-        # it doesn't then it has been overriden so we must warn about the
+        # it doesn't then it has been overridden so we must warn about the
         # deprecation.
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")

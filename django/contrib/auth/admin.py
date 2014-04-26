@@ -129,7 +129,7 @@ class UserAdmin(admin.ModelAdmin):
             if form.is_valid():
                 form.save()
                 change_message = self.construct_change_message(request, form, None)
-                self.log_change(request, request.user, change_message)
+                self.log_change(request, user, change_message)
                 msg = ugettext('Password changed successfully.')
                 messages.success(request, msg)
                 update_session_auth_hash(request, form.user)

@@ -2009,7 +2009,7 @@ class CloneTests(TestCase):
         n_list = Note.objects.all()
         # Evaluate the Note queryset, populating the query cache
         list(n_list)
-        # Use the note queryset in a query, and evalute
+        # Use the note queryset in a query, and evaluate
         # that query in a way that involves cloning.
         self.assertEqual(ExtraInfo.objects.filter(note__in=n_list)[0].info, 'good')
 

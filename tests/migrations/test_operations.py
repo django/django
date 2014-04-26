@@ -1,9 +1,17 @@
 import unittest
-from django.db import connection, models, migrations, router
+
+try:
+    import sqlparse
+except ImportError:
+    sqlparse = None
+
+from django.db import connection, migrations, models, router
+from django.db.migrations.migration import Migration
+from django.db.migrations.state import ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
-from django.db.utils import IntegrityError
-from django.db.migrations.state import ProjectState
+from django.db.utils import IntegrityError, DatabaseError
+
 from .test_base import MigrationTestBase
 
 
@@ -15,15 +23,16 @@ class OperationTests(MigrationTestBase):
     """
 
     def apply_operations(self, app_label, project_state, operations):
-        new_state = project_state.clone()
-        for operation in operations:
-            operation.state_forwards(app_label, new_state)
-
-        # Set up the database
+        migration = Migration('name', app_label)
+        migration.operations = operations
         with connection.schema_editor() as editor:
-            for operation in operations:
-                operation.database_forwards(app_label, editor, project_state, new_state)
-        return new_state
+            return migration.apply(project_state, editor)
+
+    def unapply_operations(self, app_label, project_state, operations):
+        migration = Migration('name', app_label)
+        migration.operations = operations
+        with connection.schema_editor() as editor:
+            return migration.unapply(project_state, editor)
 
     def set_up_test_model(self, app_label, second_model=False, related_model=False, mti_model=False):
         """
@@ -33,11 +42,11 @@ class OperationTests(MigrationTestBase):
         with connection.cursor() as cursor:
             try:
                 cursor.execute("DROP TABLE %s_pony" % app_label)
-            except:
+            except DatabaseError:
                 pass
             try:
                 cursor.execute("DROP TABLE %s_stable" % app_label)
-            except:
+            except DatabaseError:
                 pass
         # Make the "current" state
         operations = [migrations.CreateModel(
@@ -396,6 +405,38 @@ class OperationTests(MigrationTestBase):
         Pony = new_apps.get_model("test_alflmm", "Pony")
         self.assertTrue(Pony._meta.get_field('stables').blank)
 
+    def test_remove_field_m2m(self):
+        project_state = self.set_up_test_model("test_rmflmm", second_model=True)
+
+        project_state = self.apply_operations("test_rmflmm", project_state, operations=[
+            migrations.AddField("Pony", "stables", models.ManyToManyField("Stable", related_name="ponies"))
+        ])
+        self.assertTableExists("test_rmflmm_pony_stables")
+
+        operations = [migrations.RemoveField("Pony", "stables")]
+        self.apply_operations("test_rmflmm", project_state, operations=operations)
+        self.assertTableNotExists("test_rmflmm_pony_stables")
+
+        # And test reversal
+        self.unapply_operations("test_rmflmm", project_state, operations=operations)
+        self.assertTableExists("test_rmflmm_pony_stables")
+
+    def test_remove_field_m2m_with_through(self):
+        project_state = self.set_up_test_model("test_rmflmmwt", second_model=True)
+
+        self.assertTableNotExists("test_rmflmmwt_ponystables")
+        project_state = self.apply_operations("test_rmflmmwt", project_state, operations=[
+            migrations.CreateModel("PonyStables", fields=[
+                ("pony", models.ForeignKey('test_rmflmmwt.Pony')),
+                ("stable", models.ForeignKey('test_rmflmmwt.Stable')),
+            ]),
+            migrations.AddField("Pony", "stables", models.ManyToManyField("Stable", related_name="ponies", through='test_rmflmmwt.PonyStables'))
+        ])
+        self.assertTableExists("test_rmflmmwt_ponystables")
+
+        operations = [migrations.RemoveField("Pony", "stables")]
+        self.apply_operations("test_rmflmmwt", project_state, operations=operations)
+
     def test_remove_field(self):
         """
         Tests the RemoveField operation.
@@ -604,6 +645,7 @@ class OperationTests(MigrationTestBase):
             operation.database_backwards("test_alinto", editor, new_state, project_state)
         self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])
 
+    @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql(self):
         """
         Tests the RunSQL operation.
@@ -611,7 +653,10 @@ class OperationTests(MigrationTestBase):
         project_state = self.set_up_test_model("test_runsql")
         # Create the operation
         operation = migrations.RunSQL(
-            "CREATE TABLE i_love_ponies (id int, special_thing int)",
+            # Use a multi-line string with a commment to test splitting on SQLite and MySQL respectively
+            "CREATE TABLE i_love_ponies (id int, special_thing int);\n"
+            "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 42); -- this is magic!\n"
+            "INSERT INTO i_love_ponies (id, special_thing) VALUES (2, 51);\n",
             "DROP TABLE i_love_ponies",
             state_operations=[migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])],
         )
@@ -625,6 +670,10 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_forwards("test_runsql", editor, project_state, new_state)
         self.assertTableExists("i_love_ponies")
+        # Make sure all the SQL was processed
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM i_love_ponies")
+            self.assertEqual(cursor.fetchall()[0][0], 2)
         # And test reversal
         self.assertTrue(operation.reversible)
         with connection.schema_editor() as editor:

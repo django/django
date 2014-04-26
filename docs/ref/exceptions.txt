@@ -220,5 +220,4 @@ Python Exceptions
 =================
 
 Django raises built-in Python exceptions when appropriate as well. See the
-Python documentation for further information on the
-built-in :mod:`exceptions`.
+Python documentation for further information on the :ref:`bltin-exceptions`.

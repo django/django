@@ -34,7 +34,6 @@ SUBDIRS_TO_SKIP = [
     'test_discovery_sample',
     'test_discovery_sample2',
     'test_runner_deprecation_app',
-    'test_runner_invalid_app',
 ]
 
 ALWAYS_INSTALLED_APPS = [

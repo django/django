@@ -38,7 +38,7 @@ class GeoQuerySet(QuerySet):
         Returns the area of the geographic field in an `area` attribute on
         each element of this GeoQuerySet.
         """
-        # Peforming setup here rather than in `_spatial_attribute` so that
+        # Performing setup here rather than in `_spatial_attribute` so that
         # we can get the units for `AreaField`.
         procedure_args, geo_field = self._spatial_setup('area', field_name=kwargs.get('field_name', None))
         s = {'procedure_args': procedure_args,

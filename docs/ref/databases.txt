@@ -363,6 +363,15 @@ table (usually called ``django_session``) and the
 
 .. _fixed in MySQLdb 1.2.2: http://sourceforge.net/tracker/index.php?func=detail&aid=1495765&group_id=22307&atid=374932
 
+Please note that according to `MySQL Unicode Character Sets`_, comparisons for
+the ``utf8_general_ci`` collation are faster, but slightly less correct, than
+comparisons for ``utf8_unicode_ci``. If this is acceptable for your application,
+you should use ``utf8_general_ci`` because it is faster. If this is not acceptable
+(for example, if you require German dictionary order), use ``utf8_unicode_ci``
+because it is more accurate.
+
+.. _MySQL Unicode Character Sets: http://dev.mysql.com/doc/refman/5.7/en/charset-unicode-sets.html
+
 Connecting to the database
 --------------------------
 
@@ -497,6 +506,22 @@ Row locking with ``QuerySet.select_for_update()``
 MySQL does not support the ``NOWAIT`` option to the ``SELECT ... FOR UPDATE``
 statement. If ``select_for_update()`` is used with ``nowait=True`` then a
 ``DatabaseError`` will be raised.
+
+Automatic typecasting can cause unexpected results
+--------------------------------------------------
+
+When performing a query on a string type, but with an integer value, MySQL will
+coerce the types of all values in the table to an integer before performing the
+comparison. If your table contains the values ``'abc'``, ``'def'`` and you
+query for ``WHERE mycolumn=0``, both rows will match. Similarly, ``WHERE mycolumn=1``
+will match the value ``'abc1'``. Therefore, string type fields included in Django
+will always cast the value to a string before using it in a query.
+
+If you implement custom model fields that inherit from :class:`~django.db.models.Field`
+directly, are overriding :meth:`~django.db.models.Field.get_prep_value`, or use
+:meth:`extra() <django.db.models.query.QuerySet.extra>` or
+:meth:`raw() <django.db.models.Manager.raw>`, you should ensure that you
+perform the appropriate typecasting.
 
 .. _sqlite-notes:
 
@@ -743,7 +768,7 @@ Threaded option
 ----------------
 
 If you plan to run Django in a multithreaded environment (e.g. Apache using the
-the default MPM module on any modern operating system), then you **must** set
+default MPM module on any modern operating system), then you **must** set
 the ``threaded`` option of your Oracle database configuration to True::
 
             'OPTIONS': {

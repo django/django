@@ -80,7 +80,7 @@ each feature in that layer.
        >>> from django.contrib.gis.gdal import DataSource
        >>> ds = DataSource(CITIES_PATH)
        >>> ds.name                         # The exact filename may be different on your computer
-       '/usr/local/lib/python2.7/site-packages/django/contrib/gis/tests/data/cities/cities.shp'
+       '/usr/local/lib/python3.4/site-packages/django/contrib/gis/tests/data/cities/cities.shp'
        >>> ds.layer_count                  # This file only contains one layer
        1
 
@@ -739,7 +739,7 @@ systems and coordinate transformation::
    .. attribute:: z
 
    Returns the Z coordinate of this point, or ``None`` if the
-   the point does not have a Z coordinate::
+   point does not have a Z coordinate::
 
        >>> OGRGeometry('POINT (1 2 3)').z
        3.0

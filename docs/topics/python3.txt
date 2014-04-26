@@ -78,8 +78,8 @@ wherever possible and avoid the ``b`` prefixes.
 String handling
 ---------------
 
-Python 2's :func:`unicode` type was renamed :func:`str` in Python 3,
-:func:`str` was renamed ``bytes()``, and :func:`basestring` disappeared.
+Python 2's `unicode`_ type was renamed :class:`str` in Python 3,
+``str()`` was renamed :func:`bytes`, and `basestring`_ disappeared.
 six_ provides :ref:`tools <string-handling-with-six>` to deal with these
 changes.
 
@@ -131,35 +131,34 @@ and ``SafeText`` respectively.
 
 For forwards compatibility, the new names work as of Django 1.4.2.
 
-:meth:`~object.__str__` and :meth:`~object.__unicode__` methods
----------------------------------------------------------------
+:meth:`~object.__str__` and ` __unicode__()`_ methods
+-----------------------------------------------------
 
 In Python 2, the object model specifies :meth:`~object.__str__` and
-:meth:`~object.__unicode__` methods. If these methods exist, they must return
+` __unicode__()`_ methods. If these methods exist, they must return
 ``str`` (bytes) and ``unicode`` (text) respectively.
 
-The ``print`` statement and the :func:`str` built-in call
+The ``print`` statement and the :class:`str` built-in call
 :meth:`~object.__str__` to determine the human-readable representation of an
-object. The :func:`unicode` built-in calls :meth:`~object.__unicode__` if it
+object. The ``unicode`` built-in calls ` __unicode__()`_ if it
 exists, and otherwise falls back to :meth:`~object.__str__` and decodes the
 result with the system encoding. Conversely, the
 :class:`~django.db.models.Model` base class automatically derives
-:meth:`~object.__str__` from :meth:`~object.__unicode__` by encoding to UTF-8.
+:meth:`~object.__str__` from ` __unicode__()`_ by encoding to UTF-8.
 
 In Python 3, there's simply :meth:`~object.__str__`, which must return ``str``
 (text).
 
-(It is also possible to define ``__bytes__()``, but Django application have
-little use for that method, because they hardly ever deal with
-``bytes``.)
+(It is also possible to define :meth:`~object.__bytes__`, but Django application
+have little use for that method, because they hardly ever deal with ``bytes``.)
 
 Django provides a simple way to define :meth:`~object.__str__` and
-:meth:`~object.__unicode__` methods that work on Python 2 and 3: you must
+` __unicode__()`_ methods that work on Python 2 and 3: you must
 define a :meth:`~object.__str__` method returning text and to apply the
 :func:`~django.utils.encoding.python_2_unicode_compatible` decorator.
 
 On Python 3, the decorator is a no-op. On Python 2, it defines appropriate
-:meth:`~object.__unicode__` and :meth:`~object.__str__` methods (replacing the
+` __unicode__()`_ and :meth:`~object.__str__` methods (replacing the
 original :meth:`~object.__str__` method in the process). Here's an example::
 
     from __future__ import unicode_literals
@@ -233,7 +232,7 @@ In order to enable the same behavior in Python 2, every module must import
     my_bytestring = b"This is a bytestring"
 
 If you need a byte string literal under Python 2 and a unicode string literal
-under Python 3, use the :func:`str` builtin::
+under Python 3, use the :class:`str` builtin::
 
     str('my string')
 
@@ -402,3 +401,7 @@ extras.
 
 In addition to six' defaults moves, Django's version provides ``thread`` as
 ``_thread`` and ``dummy_thread`` as ``_dummy_thread``.
+
+.. _unicode: http://docs.python.org/2/library/functions.html#unicode
+.. _ __unicode__(): https://docs.python.org/2/reference/datamodel.html#object.__unicode__
+.. _basestring: http://docs.python.org/2/library/functions.html#basestring

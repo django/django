@@ -1564,7 +1564,7 @@ class Discovery(TestCase):
 
     def test_precedence(self):
         """
-        Apps listed first in INSTALLED_APPS have precendence.
+        Apps listed first in INSTALLED_APPS have precedence.
         """
         with self.settings(INSTALLED_APPS=['admin_scripts.complex_app',
                                            'admin_scripts.simple_app',

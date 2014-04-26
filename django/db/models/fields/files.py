@@ -429,7 +429,7 @@ class ImageField(FileField):
         Dimensions can be forced to update with force=True, which is how
         ImageFileDescriptor.__set__ calls this method.
         """
-        # Nothing to update if the field doesn't have have dimension fields.
+        # Nothing to update if the field doesn't have dimension fields.
         has_dimension_fields = self.width_field or self.height_field
         if not has_dimension_fields:
             return

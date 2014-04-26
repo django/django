@@ -279,14 +279,16 @@ class TestConfiguration(StaticFilesTestCase):
                 command = collectstatic.Command()
                 self.assertFalse(command.is_local_storage())
 
-            storage.staticfiles_storage = storage.FileSystemStorage()
+            collectstatic.staticfiles_storage = storage.FileSystemStorage()
             command = collectstatic.Command()
             self.assertTrue(command.is_local_storage())
 
-            storage.staticfiles_storage = DummyStorage()
+            collectstatic.staticfiles_storage = DummyStorage()
             command = collectstatic.Command()
             self.assertFalse(command.is_local_storage())
         finally:
+            staticfiles_storage._wrapped = empty
+            collectstatic.staticfiles_storage = staticfiles_storage
             storage.staticfiles_storage = staticfiles_storage
 
 
@@ -848,9 +850,10 @@ class TestDefaultStorageFinder(StaticFilesTestCase, FinderTestCase):
         self.find_all = ('media-file.txt', [test_file_path])
 
 
-@override_settings(STATICFILES_FINDERS=
-                   ('django.contrib.staticfiles.finders.FileSystemFinder',),
-                   STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'documents')])
+@override_settings(
+    STATICFILES_FINDERS=('django.contrib.staticfiles.finders.FileSystemFinder',),
+    STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'documents')],
+)
 class TestMiscFinder(TestCase):
     """
     A few misc finder tests.

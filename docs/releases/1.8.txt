@@ -128,6 +128,10 @@ Management Commands
 * :djadmin:`dumpdata` now has the option :djadminopt:`--output` which allows
   specifying the file to which the serialized data is written.
 
+* :djadmin:`makemessages` and :djadmin:`compilemessages` now have the option
+  :djadminopt:`--exclude` which allows exclusion of specific locales from
+  processing.
+
 Models
 ^^^^^^
 
@@ -155,8 +159,8 @@ Tests
   :meth:`~django.test.SimpleTestCase.assertTemplateUsed`. This allows you to
   assert that a template was rendered a specific number of times.
 
-* :meth:`~django.test.SimpleTestCase.assertJSONNotEqual` new assertion allow
-  you to test that two JSON fragments are not equal.
+* The new :meth:`~django.test.SimpleTestCase.assertJSONNotEqual` assertion
+  allows you to test that two JSON fragments are not equal.
 
 Validators
 ^^^^^^^^^^

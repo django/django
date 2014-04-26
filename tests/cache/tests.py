@@ -18,11 +18,13 @@ from django.conf import settings
 from django.core import management
 from django.core.cache import (cache, caches, CacheKeyWarning,
     InvalidCacheBackendError, DEFAULT_CACHE_ALIAS)
+from django.core.context_processors import csrf
 from django.db import connection, connections, router, transaction
 from django.core.cache.utils import make_template_fragment_key
 from django.http import HttpResponse, StreamingHttpResponse
 from django.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
+from django.middleware.csrf import CsrfViewMiddleware
 from django.template import Template
 from django.template.response import TemplateResponse
 from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
@@ -488,6 +490,9 @@ class BaseCacheTests(object):
 
         cache.add('key2', 'ham', None)
         self.assertEqual(cache.get('key2'), 'ham')
+        added = cache.add('key1', 'new eggs', None)
+        self.assertEqual(added, False)
+        self.assertEqual(cache.get('key1'), 'eggs')
 
         cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, None)
         self.assertEqual(cache.get('key3'), 'sausage')
@@ -1097,8 +1102,8 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
         "cache with python-memcached library not available")
     def test_memcached_uses_highest_pickle_version(self):
         # Regression test for #19810
-        for cache_key, cache in settings.CACHES.items():
-            if cache['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache':
+        for cache_key, cache_config in settings.CACHES.items():
+            if cache_config['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache':
                 self.assertEqual(caches[cache_key]._cache.pickleProtocol,
                                  pickle.HIGHEST_PROTOCOL)
 
@@ -1741,6 +1746,10 @@ def hello_world_view(request, value):
     return HttpResponse('Hello World %s' % value)
 
 
+def csrf_view(request):
+    return HttpResponse(csrf(request)['csrf_token'])
+
+
 @override_settings(
     CACHE_MIDDLEWARE_ALIAS='other',
     CACHE_MIDDLEWARE_KEY_PREFIX='middlewareprefix',
@@ -1904,6 +1913,27 @@ class CacheMiddlewareTest(TestCase):
         # .. even if it has a prefix
         response = other_with_prefix_view(request, '16')
         self.assertEqual(response.content, b'Hello World 16')
+
+    def test_sensitive_cookie_not_cached(self):
+        """
+        Django must prevent caching of responses that set a user-specific (and
+        maybe security sensitive) cookie in response to a cookie-less request.
+        """
+        csrf_middleware = CsrfViewMiddleware()
+        cache_middleware = CacheMiddleware()
+
+        request = self.factory.get('/view/')
+        self.assertIsNone(cache_middleware.process_request(request))
+
+        csrf_middleware.process_view(request, csrf_view, (), {})
+
+        response = csrf_view(request)
+
+        response = csrf_middleware.process_response(request, response)
+        response = cache_middleware.process_response(request, response)
+
+        # Inserting a CSRF cookie in a cookie-less request prevented caching.
+        self.assertIsNone(cache_middleware.process_request(request))
 
 
 @override_settings(
