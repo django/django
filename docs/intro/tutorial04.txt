@@ -106,9 +106,9 @@ This code includes a few things we haven't covered yet in this tutorial:
   <django.http.HttpRequest.POST>` in our code, to ensure that data is only
   altered via a POST call.
 
-* ``request.POST['choice']`` will raise :exc:`~exceptions.KeyError` if
+* ``request.POST['choice']`` will raise :exc:`KeyError` if
   ``choice`` wasn't provided in POST data. The above code checks for
-  :exc:`~exceptions.KeyError` and redisplays the question form with an error
+  :exc:`KeyError` and redisplays the question form with an error
   message if ``choice`` isn't given.
 
 * After incrementing the choice count, the code returns an

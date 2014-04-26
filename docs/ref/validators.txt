@@ -68,7 +68,7 @@ to, or in lieu of custom ``field.clean()`` methods.
     :param inverse_match: If not ``None``, overrides :attr:`inverse_match`.
     :param flags: If not ``None``, overrides :attr:`flags`. In that case,
         :attr:`regex` must be a regular expression string, or
-        :exc:`~exceptions.TypeError` is raised.
+        :exc:`TypeError` is raised.
 
     .. attribute:: regex
 
@@ -102,7 +102,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         The flags used when compiling the regular expression string :attr:`regex`.
         If :attr:`regex` is a pre-compiled regular expression, and :attr:`flags` is overridden,
-        :exc:`~exceptions.TypeError` is raised.
+        :exc:`TypeError` is raised.
         Defaults to `0`.
 
 ``URLValidator``

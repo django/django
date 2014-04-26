@@ -168,7 +168,7 @@ Minor features
   :setting:`CSRF_COOKIE_HTTPONLY`.
 
 * The :meth:`~django.test.TransactionTestCase.assertQuerysetEqual` now checks
-  for undefined order and raises :exc:`~exceptions.ValueError` if undefined
+  for undefined order and raises :exc:`ValueError` if undefined
   order is spotted. The order is seen as undefined if the given ``QuerySet``
   isn't ordered and there are more than one ordered values to compare against.
 

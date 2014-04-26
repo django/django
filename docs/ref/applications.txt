@@ -209,8 +209,8 @@ Methods
 .. method:: AppConfig.get_model(model_name)
 
     Returns the :class:`~django.db.models.Model` with the given
-    ``model_name``. Raises :exc:`~exceptions.LookupError` if no such model
-    exists. ``model_name`` is case-insensitive.
+    ``model_name``. Raises :exc:`LookupError` if no such model exists.
+    ``model_name`` is case-insensitive.
 
 .. method:: AppConfig.ready()
 
@@ -284,8 +284,8 @@ Application registry
 .. method:: apps.get_app_config(app_label)
 
     Returns an :class:`~django.apps.AppConfig` for the application with the
-    given ``app_label``. Raises :exc:`~exceptions.LookupError` if no such
-    application exists.
+    given ``app_label``. Raises :exc:`LookupError` if no such application
+    exists.
 
 .. method:: apps.is_installed(app_name)
 
@@ -303,9 +303,9 @@ Application registry
     argument in the form ``app_label.model_name``. ``model_name`` is case-
     insensitive.
 
-    Raises :exc:`~exceptions.LookupError` if no such application or model
-    exists. Raises :exc:`~exceptions.ValueError` when called with a single
-    argument that doesn't contain exactly one dot.
+    Raises :exc:`LookupError` if no such application or model exists. Raises
+    :exc:`ValueError` when called with a single argument that doesn't contain
+    exactly one dot.
 
 .. _applications-troubleshooting:
 
