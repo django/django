@@ -128,6 +128,9 @@ Management Commands
 * :djadmin:`dumpdata` now has the option :djadminopt:`--output` which allows
   specifying the file to which the serialized data is written.
 
+* :ref:`initial-sql` now works better if the `sqlparse
+  <https://pypi.python.org/pypi/sqlparse>`_ Python library is installed.
+
 Models
 ^^^^^^
 
