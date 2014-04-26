@@ -636,6 +636,9 @@ Management Commands
 * :djadmin:`collectstatic` command with symlink option is now supported on
   Windows NT 6 (Windows Vista and newer).
 
+* The `ignorenonexistent`option of loaddata management command now ignore data
+  for models that no longer exist.
+
 Models
 ^^^^^^
 
