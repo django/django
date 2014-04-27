@@ -2,39 +2,39 @@
 Migration Operations
 ====================
 
-Migration files are composed of one or more Operations, objects that
+.. module:: django.db.migrations.operations
+
+Migration files are composed of one or more ``Operation``\s, objects that
 declaratively record what the migration should do to your database.
 
-Django also uses these Operation objects to work out what your models
+Django also uses these ``Operation`` objects to work out what your models
 looked like historically, and to calculate what changes you've made to
 your models since the last migration so it can automatically write
 your migrations; that's why they're declarative, as it means Django can
 easily load them all into memory and run through them without touching
 the database to work out what your project should look like.
 
-There are also more specialized Operation objects which are for things like
+There are also more specialized ``Operation`` objects which are for things like
 :ref:`data migrations <data-migrations>` and for advanced manual database
-manipulation. You can also write your own Operation classes if you want
+manipulation. You can also write your own ``Operation`` classes if you want
 to encapsulate a custom change you commonly make.
 
-If you need an empty migration file to write your own Operation objects
+If you need an empty migration file to write your own ``Operation`` objects
 into, just use ``python manage.py makemigrations --empty yourappname``,
 but be aware that manually adding schema-altering operations can confuse the
-migration autodetector and make resulting runs of ``makemigrations`` output
-incorrect code.
+migration autodetector and make resulting runs of :djadmin:`makemigrations`
+output incorrect code.
 
 All of the core Django operations are available from the
 ``django.db.migrations.operations`` module.
-
 
 Schema Operations
 =================
 
 CreateModel
 -----------
-::
 
-    CreateModel(name, fields, options=None, bases=None)
+.. class:: CreateModel(name, fields, options=None, bases=None)
 
 Creates a new model in the project history and a corresponding table in the
 database to match it.
@@ -53,21 +53,17 @@ it can contain both class objects as well as strings in the format
 from the historical version). If it's not supplied, it defaults to just
 inheriting from the standard ``models.Model``.
 
-
 DeleteModel
 -----------
-::
 
-    DeleteModel(name)
+.. class:: DeleteModel(name)
 
 Deletes the model from the project history and its table from the database.
 
-
 RenameModel
 -----------
-::
 
-    RenameModel(old_name, new_name)
+.. class:: RenameModel(old_name, new_name)
 
 Renames the model from an old name to a new one.
 
@@ -77,41 +73,36 @@ the autodetector, this will look like you deleted a model with the old name
 and added a new one with a different name, and the migration it creates will
 lose any data in the old table.
 
-
 AlterModelTable
 ---------------
-::
 
-    AlterModelTable(name, table)
+.. class:: AlterModelTable(name, table)
 
-Changes the model's table name (the ``db_table`` option on the ``Meta`` subclass)
-
+Changes the model's table name (the :attr:`~django.db.models.Options.db_table`
+option on the ``Meta`` subclass).
 
 AlterUniqueTogether
 -------------------
-::
 
-    AlterUniqueTogether(name, unique_together)
+.. class:: AlterUniqueTogether(name, unique_together)
 
-Changes the model's set of unique constraints
-(the ``unique_together`` option on the ``Meta`` subclass)
-
+Changes the model's set of unique constraints (the
+:attr:`~django.db.models.Options.unique_together` option on the ``Meta``
+subclass).
 
 AlterIndexTogether
 ------------------
-::
 
-    AlterIndexTogether(name, index_together)
+.. class:: AlterIndexTogether(name, index_together)
 
-Changes the model's set of custom indexes
-(the ``index_together`` option on the ``Meta`` subclass)
-
+Changes the model's set of custom indexes (the
+:attr:`~django.db.models.Options.index_together` option on the ``Meta``
+subclass).
 
 AddField
 --------
-::
 
-    AddField(model_name, name, field, preserve_default=True)
+.. class:: AddField(model_name, name, field, preserve_default=True)
 
 Adds a field to a model. ``model_name`` is the model's name, ``name`` is
 the field's name, and ``field`` is an unbound Field instance (the thing
@@ -126,12 +117,10 @@ a default value to put into existing rows. It does not effect the behavior
 of setting defaults in the database directly - Django never sets database
 defaults, and always applies them in the Django ORM code.
 
-
 RemoveField
 -----------
-::
 
-    RemoveField(model_name, name)
+.. class:: RemoveField(model_name, name)
 
 Removes a field from a model.
 
@@ -139,42 +128,34 @@ Bear in mind that when reversed this is actually adding a field to a model;
 if the field is not nullable this may make this operation irreversible (apart
 from any data loss, which of course is irreversible).
 
-
 AlterField
 ----------
-::
 
-    AlterField(model_name, name, field)
+.. class:: AlterField(model_name, name, field)
 
-Alters a field's definition, including changes to its type, ``null``, ``unique``,
-``db_column`` and other field attributes.
+Alters a field's definition, including changes to its type,
+:attr:`~django.db.models.Field.null`, :attr:`~django.db.models.Field.unique`,
+:attr:`~django.db.models.Field.db_column` and other field attributes.
 
 Note that not all changes are possible on all databases - for example, you
 cannot change a text-type field like ``models.TextField()`` into a number-type
 field like ``models.IntegerField()`` on most databases.
 
-
 RenameField
 -----------
-::
 
-    RenameField(model_name, old_name, new_name)
+.. class:: RenameField(model_name, old_name, new_name)
 
-Changes a field's name (and, unless ``db_column`` is set, its column name).
-
-
+Changes a field's name (and, unless :attr:`~django.db.models.Field.db_column`
+is set, its column name).
 
 Special Operations
 ==================
 
-.. _operation-run-sql:
-
 RunSQL
 ------
 
-::
-
-    RunSQL(sql, reverse_sql=None, state_operations=None)
+.. class:: RunSQL(sql, reverse_sql=None, state_operations=None)
 
 Allows running of arbitrary SQL on the database - useful for more advanced
 features of database backends that Django doesn't support directly, like
@@ -194,24 +175,22 @@ operation that adds that field and so will try to run it again).
 
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
-.. _operation-run-python:
-
 RunPython
 ---------
 
-::
-
-    RunPython(code, reverse_code=None)
+.. class:: RunPython(code, reverse_code=None)
 
 Runs custom Python code in a historical context. ``code`` (and ``reverse_code``
 if supplied) should be callable objects that accept two arguments; the first is
 an instance of ``django.apps.registry.Apps`` containing historical models that
 match the operation's place in the project history, and the second is an
-instance of SchemaEditor.
+instance of :class:`SchemaEditor
+<django.db.backends.schema.BaseDatabaseSchemaEditor>`.
 
 You are advised to write the code as a separate function above the ``Migration``
 class in the migration file, and just pass it to ``RunPython``. Here's an
-example of using RunPython to create some initial objects on a Country model::
+example of using ``RunPython`` to create some initial objects on a ``Country``
+model::
 
     # encoding: utf8
     from django.db import models, migrations
@@ -245,19 +224,16 @@ or ``orm["appname", "Model"]`` references from South directly into
 ``apps.get_model("appname", "Model")`` references here and leave most of the
 rest of the code unchanged for data migrations.
 
-Much like ``RunSQL``, ensure that if you change schema inside here you're
+Much like :class:`RunSQL`, ensure that if you change schema inside here you're
 either doing it outside the scope of the Django model system (e.g. triggers)
-or that you use ``SeparateDatabaseAndState`` to add in operations that will
+or that you use :class:`SeparateDatabaseAndState` to add in operations that will
 reflect your changes to the model state - otherwise, the versioned ORM and
 the autodetector will stop working correctly.
-
 
 SeparateDatabaseAndState
 ------------------------
 
-::
-
-    SeparateDatabaseAndState(database_operations=None, state_operations=None)
+.. class:: SeparateDatabaseAndState(database_operations=None, state_operations=None)
 
 A highly specialized operation that let you mix and match the database
 (schema-changing) and state (autodetector-powering) aspects of operations.
@@ -266,13 +242,12 @@ It accepts two list of operations, and when asked to apply state will use the
 state list, and when asked to apply changes to the database will use the database
 list. Do not use this operation unless you're very sure you know what you're doing.
 
-
 Writing your own
 ================
 
 Operations have a relatively simple API, and they're designed so that you can
 easily write your own to supplement the built-in Django ones. The basic structure
-of an Operation looks like this::
+of an ``Operation`` looks like this::
 
     from django.db.migrations.operations.base import Operation
 
@@ -317,7 +292,7 @@ historical models.
 
 Some things to note:
 
-* You don't need to learn too much about ProjectState to just write simple
+* You don't need to learn too much about ``ProjectState`` to just write simple
   migrations; just know that it has a ``.render()`` method that turns it into
   an app registry (which you can then call ``get_model`` on).
 
