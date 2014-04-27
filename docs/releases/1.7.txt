@@ -639,8 +639,9 @@ Management Commands
 * :ref:`initial-sql` now works better if the sqlparse_ Python library is
   installed.
 
-  Note that it's deprecated in favor of the :ref:`RunSQL <operation-run-sql>`
-  operation of migrations, which benefits from the improved behavior.
+  Note that it's deprecated in favor of the
+  :class:`~django.db.migrations.operations.RunSQL` operation of migrations,
+  which benefits from the improved behavior.
 
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
