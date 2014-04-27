@@ -389,6 +389,11 @@ need to do is use the historical model and iterate over the rows::
 Once that's done, we can just run ``python manage.py migrate`` as normal and
 the data migration will run in place alongside other migrations.
 
+You can pass a second callable to
+:class:`~django.db.migrations.operations.RunPython` to run whatever logic you
+want executed when migrating backwards. If this callable is omitted, migrating
+backwards will raise an exception.
+
 If you're interested in the more advanced migration operations, or want
 to be able to write your own, see the :doc:`migration operations reference
 </ref/migration-operations>`.
