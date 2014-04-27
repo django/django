@@ -1226,6 +1226,11 @@ Miscellaneous
   to the built-in ``postgres`` database. This is in lieu of the previous
   behavior of connecting to the actual non-test database.
 
+* As part of the :doc:`System check framework </ref/checks>`, :ref:`fields,
+  models, and model managers <field-checking>` all implement a ``check()``
+  method that is registered with the check framework. If you have an existing
+  method called ``check()`` on one of these objects, you will need to rename it.
+
 .. _deprecated-features-1.7:
 
 Features deprecated in 1.7
