@@ -15,7 +15,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (request_started, request_finished,
     got_request_exception)
 from django.db import close_old_connections
-from django.http import SimpleCookie, QueryDict
+from django.http import SimpleCookie, HttpRequest, QueryDict
 from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.utils.functional import curry
@@ -553,8 +553,8 @@ class Client(RequestFactory):
                 apps.is_installed('django.contrib.sessions')):
             engine = import_module(settings.SESSION_ENGINE)
 
-            # Create a fake request that goes through request middleware
-            request = self.request().wsgi_request
+            # Create a fake request to store login details.
+            request = HttpRequest()
 
             if self.session:
                 request.session = self.session
@@ -588,9 +588,8 @@ class Client(RequestFactory):
         Causes the authenticated user to be logged out.
         """
         from django.contrib.auth import get_user_model, logout
-        # Create a fake request that goes through request middleware
-        request = self.request().wsgi_request
 
+        request = HttpRequest()
         engine = import_module(settings.SESSION_ENGINE)
         UserModel = get_user_model()
         if self.session:
