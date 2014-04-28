@@ -2,7 +2,7 @@
 Django 1.6.4 release notes
 ==========================
 
-*Under development*
+*April 28, 2014*
 
 Django 1.6.4 fixes several bugs in 1.6.3.
 
