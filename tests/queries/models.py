@@ -536,3 +536,18 @@ class Ticket21203Parent(models.Model):
 class Ticket21203Child(models.Model):
     childid = models.AutoField(primary_key=True)
     parent = models.ForeignKey(Ticket21203Parent)
+
+
+# Bug #22429
+
+class School(models.Model):
+    pass
+
+
+class Student(models.Model):
+    school = models.ForeignKey(School)
+
+
+class Classroom(models.Model):
+    school = models.ForeignKey(School)
+    students = models.ManyToManyField(Student, related_name='classroom')

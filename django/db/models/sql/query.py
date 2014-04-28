@@ -780,6 +780,9 @@ class Query(object):
             if lhs in change_map:
                 data = data._replace(lhs_alias=change_map[lhs])
                 self.alias_map[alias] = data
+        # 4. Update the temporary _lookup_joins list
+        if hasattr(self, '_lookup_joins'):
+            self._lookup_joins = [change_map.get(lj, lj) for lj in self._lookup_joins]
 
     def bump_prefix(self, exceptions=()):
         """
@@ -1100,6 +1103,9 @@ class Query(object):
                     allow_explicit_fk=True)
             if can_reuse is not None:
                 can_reuse.update(join_list)
+            # split_exclude() needs to know which joins were generated for the
+            # lookup parts
+            self._lookup_joins = join_list
         except MultiJoin as e:
             return self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
                                       can_reuse, e.names_with_path)
@@ -1822,17 +1828,21 @@ class Query(object):
         for _, paths in names_with_path:
             all_paths.extend(paths)
         contains_louter = False
-        for pos, path in enumerate(all_paths):
+        # Trim and operate only on tables that were generated for
+        # the lookup part of the query. That is, avoid trimming
+        # joins generated for F() expressions.
+        lookup_tables = [t for t in self.tables if t in self._lookup_joins or t == self.tables[0]]
+        for trimmed_paths, path in enumerate(all_paths):
             if path.m2m:
                 break
-            if self.alias_map[self.tables[pos + 1]].join_type == self.LOUTER:
+            if self.alias_map[lookup_tables[trimmed_paths + 1]].join_type == self.LOUTER:
                 contains_louter = True
-            self.unref_alias(self.tables[pos])
+            self.unref_alias(lookup_tables[trimmed_paths])
         # The path.join_field is a Rel, lets get the other side's field
         join_field = path.join_field.field
         # Build the filter prefix.
+        paths_in_prefix = trimmed_paths
         trimmed_prefix = []
-        paths_in_prefix = pos
         for name, path in names_with_path:
             if paths_in_prefix - len(path) < 0:
                 break
@@ -1844,12 +1854,12 @@ class Query(object):
         # Lets still see if we can trim the first join from the inner query
         # (that is, self). We can't do this for LEFT JOINs because we would
         # miss those rows that have nothing on the outer side.
-        if self.alias_map[self.tables[pos + 1]].join_type != self.LOUTER:
+        if self.alias_map[lookup_tables[trimmed_paths + 1]].join_type != self.LOUTER:
             select_fields = [r[0] for r in join_field.related_fields]
-            select_alias = self.tables[pos + 1]
-            self.unref_alias(self.tables[pos])
+            select_alias = lookup_tables[trimmed_paths + 1]
+            self.unref_alias(lookup_tables[trimmed_paths])
             extra_restriction = join_field.get_extra_restriction(
-                self.where_class, None, self.tables[pos + 1])
+                self.where_class, None, lookup_tables[trimmed_paths + 1])
             if extra_restriction:
                 self.where.add(extra_restriction, AND)
         else:
@@ -1857,7 +1867,7 @@ class Query(object):
             # inner query if it happens to have a longer join chain containing the
             # values in select_fields. Lets punt this one for now.
             select_fields = [r[1] for r in join_field.related_fields]
-            select_alias = self.tables[pos]
+            select_alias = lookup_tables[trimmed_paths]
         self.select = [SelectInfo((select_alias, f.column), f) for f in select_fields]
         return trimmed_prefix, contains_louter
 
