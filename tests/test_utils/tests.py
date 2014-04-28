@@ -121,6 +121,46 @@ class AssertQuerysetEqualTests(TestCase):
         )
 
 
+class AssertQuerysetNotEqualTests(TestCase):
+    def setUp(self):
+        self.p1 = Person.objects.create(name='p1')
+        self.p2 = Person.objects.create(name='p2')
+
+    def test_ordered(self):
+        self.assertQuerysetNotEqual(
+            Person.objects.all().order_by('name'),
+            [repr(self.p2), repr(self.p1)]
+        )
+
+    def test_unordered(self):
+        self.assertQuerysetNotEqual(
+            Person.objects.all().order_by('name'),
+            [repr(self.p1)],
+            ordered=False
+        )
+
+    def test_transform(self):
+        self.assertQuerysetNotEqual(
+            Person.objects.all().order_by('name'),
+            [self.p2.pk, self.p1.pk],
+            transform=lambda x: x.pk
+        )
+
+    def test_undefined_order(self):
+        # Using an unordered queryset with more than one ordered value
+        # is an error.
+        with self.assertRaises(ValueError):
+            self.assertQuerysetNotEqual(
+                Person.objects.all(),
+                [repr(self.p1), repr(self.p2)]
+            )
+        # No error for one value.
+        self.assertQuerysetNotEqual(
+            Person.objects.filter(name='p1'),
+            [repr(self.p2)]
+        )
+
+
 @override_settings(ROOT_URLCONF='test_utils.urls')
 class CaptureQueriesContextManagerTests(TestCase):
 

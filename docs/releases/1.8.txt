@@ -162,6 +162,9 @@ Tests
 * The new :meth:`~django.test.SimpleTestCase.assertJSONNotEqual` assertion
   allows you to test that two JSON fragments are not equal.
 
+* The new :meth:`~django.test.TransactionTestCase.assertQuerysetNotEqual` assertion
+  allows you to test that two queryset are not equal.
+
 Validators
 ^^^^^^^^^^
 

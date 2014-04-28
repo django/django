@@ -1489,6 +1489,13 @@ your test suite.
         The method now accepts a ``msg`` parameter to allow customization of
         error message
 
+.. method:: TransactionTestCase.assertQuerysetNotEqual(qs, values, transform=repr, ordered=True, msg=None)
+
+    .. versionadded:: 1.8
+
+    Asserts that a queryset ``qs`` does *not* returns a particular list of values ``values``.
+    See :meth:`~TransactionTestCase.assertQuerysetEqual` for further details.
+
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
 
     Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
