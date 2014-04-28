@@ -502,8 +502,10 @@ Adding a deconstruct() method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can let Django serialize your own custom class instances by giving the class
-a ``deconstruct`` method. It takes no arguments, and should return a tuple
-of 3 things: ``(path, args, kwargs)``.
+a ``deconstruct()`` method. It takes no arguments, and should return a tuple
+of three things: ``(path, args, kwargs)``. Note this return value is different
+from the ``deconstruct()`` method :ref:`for custom fields
+<custom-field-deconstruct-method>` which returns a tuple of four items.
 
 ``path`` should be the Python path to the class, with the class name included as the
 last part (for example, ``myapp.custom_things.MyClass``). If your class is not
