@@ -135,10 +135,11 @@ def create_superuser(app_config, verbosity=2, interactive=True, using=DEFAULT_DB
             "now? (yes/no): ")
         confirm = input(msg)
         while 1:
-            if confirm not in ('yes', 'no'):
+            first_letter = confirm[:1]
+            if first_letter not in ('y', 'n'):
                 confirm = input('Please enter either "yes" or "no": ')
                 continue
-            if confirm == 'yes':
+            if first_letter == 'y':
                 call_command("createsuperuser", interactive=True, database=using)
             break
 
