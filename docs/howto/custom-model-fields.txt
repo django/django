@@ -230,6 +230,8 @@ All of the options without an explanation in the above list have the same
 meaning they do for normal Django fields. See the :doc:`field documentation
 </ref/models/fields>` for examples and details.
 
+.. _custom-field-deconstruct-method:
+
 Field deconstruction
 --------------------
 
@@ -239,19 +241,21 @@ Field deconstruction
     above. If you have custom fields from previous versions they will
     need this method added before you can use them with migrations.
 
-The counterpoint to writing your ``__init__`` method is writing the
-``deconstruct`` method. This method tells Django how to take an instance
+The counterpoint to writing your ``__init__()`` method is writing the
+``deconstruct()`` method. This method tells Django how to take an instance
 of your new field and reduce it to a serialized form - in particular, what
-arguments to pass to ``__init__`` to re-create it.
+arguments to pass to ``__init__()`` to re-create it.
 
 If you haven't added any extra options on top of the field you inherited from,
-then there's no need to write a new ``deconstruct`` method. If, however, you're
-changing the arguments passed in ``__init__`` (like we are in ``HandField``),
-you'll need to supplement the values being passed.
+then there's no need to write a new ``deconstruct()`` method. If, however,
+you're, changing the arguments passed in ``__init__()`` (like we are in
+``HandField``), you'll need to supplement the values being passed.
 
-The contract of ``deconstruct`` is simple; it returns a tuple of four items:
+The contract of ``deconstruct()`` is simple; it returns a tuple of four items:
 the field's attribute name, the full import path of the field class, the
-positional arguments (as a list), and the keyword arguments (as a dict).
+positional arguments (as a list), and the keyword arguments (as a dict). Note
+this is different from the ``deconstruct()`` method :ref:`for custom classes
+<custom-deconstruct-method>` which returns a tuple of three things.
 
 As a custom field author, you don't need to care about the first two values;
 the base ``Field`` class has all the code to work out the field's attribute
@@ -259,7 +263,7 @@ name and import path. You do, however, have to care about the positional
 and keyword arguments, as these are likely the things you are changing.
 
 For example, in our ``HandField`` class we're always forcibly setting
-max_length in ``__init__``. The ``deconstruct`` method on the base ``Field``
+max_length in ``__init__()``. The ``deconstruct()`` method on the base ``Field``
 class will see this and try to return it in the keyword arguments; thus,
 we can drop it from the keyword arguments for readability::
 
@@ -296,7 +300,7 @@ into ``kwargs`` yourself::
             return name, path, args, kwargs
 
 More complex examples are beyond the scope of this document, but remember -
-for any configuration of your Field instance, ``deconstruct`` must return
+for any configuration of your Field instance, ``deconstruct()`` must return
 arguments that you can pass to ``__init__`` to reconstruct that state.
 
 Pay extra attention if you set new default values for arguments in the
@@ -460,7 +464,7 @@ For example::
 
 The :meth:`.db_type` method is called by Django when the framework
 constructs the ``CREATE TABLE`` statements for your application -- that is,
-when you first create your tables. It is also called when constructing a 
+when you first create your tables. It is also called when constructing a
 ``WHERE`` clause that includes the model field -- that is, when you retrieve data
 using QuerySet methods like ``get()``, ``filter()``, and ``exclude()`` and have
 the model field as an argument. It's not called at any other time, so it can afford to
