@@ -28,7 +28,7 @@ from .models import (
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
     MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser,
     CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
-    Company, Employment, CustomPk, CustomPkTag)
+    Company, Employment, CustomPk, CustomPkTag, Classroom, School, Student)
 
 
 class BaseQuerysetTest(TestCase):
@@ -3345,3 +3345,18 @@ class ReverseM2MCustomPkTests(TestCase):
         self.assertQuerysetEqual(
             CustomPkTag.objects.filter(custom_pk=cp1), [cpt1],
             lambda x: x)
+
+
+class Ticket22429Tests(TestCase):
+    def test_ticket_22429(self):
+        sc1 = School.objects.create()
+        st1 = Student.objects.create(school=sc1)
+
+        sc2 = School.objects.create()
+        st2 = Student.objects.create(school=sc2)
+
+        cr = Classroom.objects.create(school=sc1)
+        cr.students.add(st1)
+
+        queryset = Student.objects.filter(~Q(classroom__school=F('school')))
+        self.assertQuerysetEqual(queryset, [st2], lambda x: x)

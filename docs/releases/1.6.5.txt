@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed ``pgettext_lazy`` crash when receiving bytestring content on Python 2
   (`#22565 <http://code.djangoproject.com/ticket/22565>`_).
+
+* Fixed the SQL generated when filtering by a negated ``Q`` object that contains
+  a ``F`` object. (`#22429 <http://code.djangoproject.com/ticket/22429>`_).

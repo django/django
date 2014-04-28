@@ -660,3 +660,18 @@ class Employment(models.Model):
     employer = models.ForeignKey(Company)
     employee = models.ForeignKey(Person)
     title = models.CharField(max_length=128)
+
+
+# Bug #22429
+
+class School(models.Model):
+    pass
+
+
+class Student(models.Model):
+    school = models.ForeignKey(School)
+
+
+class Classroom(models.Model):
+    school = models.ForeignKey(School)
+    students = models.ManyToManyField(Student, related_name='classroom')
