@@ -78,14 +78,14 @@ js_catalog_template = r"""
   {% if plural %}
   django.pluralidx = function (n) {
     var v={{ plural }};
-    if (typeof(v) == 'boolean') {
+    if (typeof(v) === 'boolean') {
       return v ? 1 : 0;
     } else {
       return v;
     }
   };
   {% else %}
-  django.pluralidx = function (count) { return (count == 1) ? 0 : 1; };
+  django.pluralidx = function (count) { return (count === 1) ? 0 : 1; };
   {% endif %}
 
   {% if catalog_str %}
@@ -98,14 +98,14 @@ js_catalog_template = r"""
     if (typeof(value) == 'undefined') {
       return msgid;
     } else {
-      return (typeof(value) == 'string') ? value : value[0];
+      return (typeof(value) === 'string') ? value : value[0];
     }
   };
 
   django.ngettext = function (singular, plural, count) {
     var value = django.catalog[singular];
     if (typeof(value) == 'undefined') {
-      return (count == 1) ? singular : plural;
+      return (count === 1) ? singular : plural;
     } else {
       return value[django.pluralidx(count)];
     }
@@ -115,7 +115,7 @@ js_catalog_template = r"""
 
   django.pgettext = function (context, msgid) {
     var value = django.gettext(context + '\x04' + msgid);
-    if (value.indexOf('\x04') != -1) {
+    if (value.indexOf('\x04') !== -1) {
       value = msgid;
     }
     return value;
@@ -123,7 +123,7 @@ js_catalog_template = r"""
 
   django.npgettext = function (context, singular, plural, count) {
     var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-    if (value.indexOf('\x04') != -1) {
+    if (value.indexOf('\x04') !== -1) {
       value = django.ngettext(singular, plural, count);
     }
     return value;
@@ -132,10 +132,10 @@ js_catalog_template = r"""
   /* gettext identity library */
 
   django.gettext = function (msgid) { return msgid; };
-  django.ngettext = function (singular, plural, count) { return (count == 1) ? singular : plural; };
+  django.ngettext = function (singular, plural, count) { return (count === 1) ? singular : plural; };
   django.gettext_noop = function (msgid) { return msgid; };
   django.pgettext = function (context, msgid) { return msgid; };
-  django.npgettext = function (context, singular, plural, count) { return (count == 1) ? singular : plural; };
+  django.npgettext = function (context, singular, plural, count) { return (count === 1) ? singular : plural; };
   {% endif %}
 
   django.interpolate = function (fmt, obj, named) {
@@ -159,6 +159,13 @@ js_catalog_template = r"""
       return value;
     }
   };
+
+  /* Register django as an AMD module if it is available */
+  if (typeof define === 'function' && define.amd) {
+    define('django', [], function() {
+      return django;
+    });
+  }
 
   /* add to global namespace */
   globals.pluralidx = django.pluralidx;
