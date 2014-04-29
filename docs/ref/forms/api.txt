@@ -931,6 +931,8 @@ Here's an example of how you might use this in a template::
     {{ form }}
     </form>
 
+.. _subclassing-forms:
+
 Subclassing forms
 -----------------
 
@@ -977,10 +979,18 @@ classes::
 
 .. versionadded:: 1.7
 
-* It's possible to opt-out from a ``Field`` inherited from a parent class by
-  shadowing it. While any non-``Field`` value works for this purpose, it's
-  recommended to use ``None`` to make it explicit that a field is being
-  nullified.
+It's possible to opt-out from a ``Field`` inherited from a parent class by
+declaring the ``ignore_fields`` attribute::
+
+    >>> class PersonForm(Form):
+    ...     first_name = CharField()
+    ...     last_name = CharField()
+    >>> class CustomForm(PersonForm):
+    ...     ignore_fields = ['last_name']
+    >>> b = CustomForm(auto_id=False)
+    >>> print(b.as_ul())
+    <li>First name: <input type="text" name="first_name" /></li>
+
 
 .. _form-prefix:
 

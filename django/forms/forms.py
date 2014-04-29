@@ -79,6 +79,7 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
                 attrs.pop(key)
         current_fields.sort(key=lambda x: x[1].creation_counter)
         attrs['declared_fields'] = OrderedDict(current_fields)
+        attrs['ignore_fields'] = set(attrs.pop('ignore_fields', []))
 
         new_class = (super(DeclarativeFieldsMetaclass, mcs)
             .__new__(mcs, name, bases, attrs))
@@ -91,9 +92,9 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
                 declared_fields.update(base.declared_fields)
 
             # Field shadowing.
-            for attr in base.__dict__.get('shadow_fields', []):
-                if attr in declared_fields:
-                    declared_fields.pop(attr)
+            if hasattr(base, 'ignore_fields'):
+                for field in base.ignore_fields:
+                    declared_fields.pop(field, None)
 
         new_class.base_fields = declared_fields
         new_class.declared_fields = declared_fields
