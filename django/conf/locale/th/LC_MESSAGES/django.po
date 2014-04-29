@@ -997,7 +997,7 @@ msgstr "มี.ค."
 #: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "เม.ษ."
+msgstr "เม.ย."
 
 #: utils/dates.py:35
 msgctxt "abbrev. month"
