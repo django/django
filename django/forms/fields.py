@@ -61,7 +61,7 @@ class Field(object):
 
     def __init__(self, required=True, widget=None, label=None, initial=None,
                  help_text='', error_messages=None, show_hidden_initial=False,
-                 validators=[], localize=False):
+                 label_suffix=None, validators=[], localize=False):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
         # widget -- A Widget class, or instance of a Widget class, that should
@@ -79,11 +79,14 @@ class Field(object):
         #                   messages that the field will raise.
         # show_hidden_initial -- Boolean that specifies if it is needed to render a
         #                        hidden widget with initial value after widget.
+        # label_suffix -- Suffix to be added to the label. Overrides
+        #                 form's ``label_suffix``.
         # validators -- List of addtional validators to use
         # localize -- Boolean that specifies if the field should be localized.
         self.required, self.label, self.initial = required, label, initial
         self.show_hidden_initial = show_hidden_initial
         self.help_text = help_text
+        self.label_suffix = label_suffix
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
