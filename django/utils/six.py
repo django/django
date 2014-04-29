@@ -628,7 +628,21 @@ _add_doc(reraise, """Reraise an exception.""")
 
 def with_metaclass(meta, *bases):
     """Create a base class with a metaclass."""
-    return meta("NewBase", bases, {})
+    # This requires a bit of explanation: the basic idea is to make a
+    # dummy metaclass for one level of class instantiation that replaces
+    # itself with the actual metaclass.  Because of internal type checks
+    # we also need to make sure that we downgrade the custom metaclass
+    # for one level to something closer to type (that's why __call__ and
+    # __init__ comes back from type etc.).
+    class metaclass(meta):
+        __call__ = type.__call__
+        __init__ = type.__init__
+        def __new__(cls, name, this_bases, d):
+            if this_bases is None:
+                return type.__new__(cls, name, (), d)
+            return meta(name, bases, d)
+    return metaclass('temporary_class', None, {})
+
 
 def add_metaclass(metaclass):
     """Class decorator for creating a class with a metaclass."""
