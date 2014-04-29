@@ -118,6 +118,13 @@ Forms
   the ``<label>`` tags for required fields will have this class present in its
   attributes.
 
+* :class:`~django.forms.Field` now accepts a
+  :attr:`~django.forms.Field.label_suffix` argument, which will override the
+  form's :attr:`~django.forms.Form.label_suffix`. This enables customizing the
+  suffix on a per-field basis — previously it wasn't possible to override
+  a form's :attr:`~django.forms.Form.label_suffix` while using  shortcuts such
+  as ``{{ form.as_p }}`` in templates.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
