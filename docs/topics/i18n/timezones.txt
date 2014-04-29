@@ -30,7 +30,9 @@ interacting with end users.
 
 Time zone support is disabled by default. To enable it, set :setting:`USE_TZ =
 True <USE_TZ>` in your settings file. Installing pytz_ is highly recommended,
-but not mandatory. It's as simple as:
+but may not be mandatory depending on your particular database backend,
+operating system and time zone. If you encounter an exception querying dates
+or times, please try installing it before filing a bug. It's as simple as:
 
 .. code-block:: bash
 
