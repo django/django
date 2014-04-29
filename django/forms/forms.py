@@ -616,8 +616,10 @@ class BoundField(object):
         label_suffix allows overriding the form's label_suffix.
         """
         contents = contents or self.label
+        if label_suffix is None:
+            label_suffix = (self.field.label_suffix if self.field.label_suffix is not None
+                            else self.form.label_suffix)
         # Only add the suffix if the label does not end in punctuation.
-        label_suffix = label_suffix if label_suffix is not None else self.form.label_suffix
         # Translators: If found as last label character, these punctuation
         # characters will prevent the default label_suffix to be appended to the label
         if label_suffix and contents and contents[-1] not in _(':?.!'):

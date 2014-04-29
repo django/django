@@ -119,6 +119,26 @@ We've specified ``auto_id=False`` to simplify the output::
     <tr><th>Your Web site:</th><td><input type="url" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
+``label_suffix``
+~~~~~~~~~~~~~~~~
+
+.. attribute:: Field.label_suffix
+
+.. versionadded:: 1.8
+
+The ``label_suffix`` argument lets you override the form's
+:attr:`~django.forms.Form.label_suffix` on a per-field basis::
+
+    >>> class ContactForm(forms.Form):
+    ...     age = forms.IntegerField()
+    ...     nationality = forms.CharField()
+    ...     captcha_answer = forms.IntegerField(label='2 + 2', label_suffix=' =')
+    >>> f = ContactForm(label_suffix='?')
+    >>> print(f.as_p())
+    <p><label for="id_age">Age?</label> <input id="id_age" name="age" type="number" /></p>
+    <p><label for="id_nationality">Nationality?</label> <input id="id_nationality" name="nationality" type="text" /></p>
+    <p><label for="id_captcha_answer">2 + 2 =</label> <input id="id_captcha_answer" name="captcha_answer" type="number" /></p>
+
 ``initial``
 ~~~~~~~~~~~
 
