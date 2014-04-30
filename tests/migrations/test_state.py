@@ -347,6 +347,7 @@ class StateTests(TestCase):
 
         class TestModel(models.Model):
             ct = models.ForeignKey("contenttypes.ContentType")
+
             class Meta:
                 app_label = "migrations"
                 apps = new_apps

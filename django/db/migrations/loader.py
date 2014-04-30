@@ -5,9 +5,6 @@ import sys
 from django.apps import apps
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.graph import MigrationGraph
-from django.db.migrations.migration import Migration
-from django.db.migrations.state import ModelState
-from django.db.migrations import operations
 from django.utils import six
 from django.conf import settings
 

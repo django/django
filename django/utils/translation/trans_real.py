@@ -196,7 +196,7 @@ def translation(language):
     Returns a translation object.
     """
     global _translations
-    if not language in _translations:
+    if language not in _translations:
         _translations[language] = DjangoTranslation(language)
     return _translations[language]
 
