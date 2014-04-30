@@ -53,8 +53,7 @@ class Command(BaseCommand):
         # Load the current graph state. Takes a connection, but it's not used
         # (makemigrations doesn't look at the database state).
         # Also make sure the graph is built without unmigrated apps shoehorned in.
-        loader = MigrationLoader(connections[DEFAULT_DB_ALIAS], load=False)
-        loader.build_graph()
+        loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
 
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any and they don't want to merge
