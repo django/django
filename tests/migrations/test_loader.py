@@ -61,7 +61,7 @@ class LoaderTests(TestCase):
             ],
         )
         # Now render it out!
-        project_state = migration_loader.graph.project_state(("migrations", "0002_second"))
+        project_state = migration_loader.project_state(("migrations", "0002_second"))
         self.assertEqual(len(project_state.models), 2)
 
         author_state = project_state.models["migrations", "author"]
@@ -76,6 +76,9 @@ class LoaderTests(TestCase):
             ["id", "author"]
         )
 
+        # Ensure we've included unmigrated apps in there too
+        self.assertIn("contenttypes", project_state.real_apps)
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_unmigdep"})
     def test_load_unmigrated_dependency(self):
         """
@@ -86,12 +89,11 @@ class LoaderTests(TestCase):
         self.assertEqual(
             migration_loader.graph.forwards_plan(("migrations", "0001_initial")),
             [
-                ("auth", "__first__"),
                 ("migrations", "0001_initial"),
             ],
         )
         # Now render it out!
-        project_state = migration_loader.graph.project_state(("migrations", "0001_initial"))
+        project_state = migration_loader.project_state(("migrations", "0001_initial"))
         self.assertEqual(len([m for a, m in project_state.models if a == "migrations"]), 1)
 
         book_state = project_state.models["migrations", "book"]

@@ -338,6 +338,31 @@ class StateTests(TestCase):
         with self.assertRaises(ValueError):
             rendered_state = project_state.render()
 
+    def test_real_apps(self):
+        """
+        Tests that including real apps can resolve dangling FK errors.
+        This test relies on the fact that contenttypes is always loaded.
+        """
+        new_apps = Apps()
+
+        class TestModel(models.Model):
+            ct = models.ForeignKey("contenttypes.ContentType")
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        # If we just stick it into an empty state it should fail
+        project_state = ProjectState()
+        project_state.add_model_state(ModelState.from_model(TestModel))
+        with self.assertRaises(ValueError):
+            rendered_state = project_state.render()
+
+        # If we include the real app it should succeed
+        project_state = ProjectState(real_apps=["contenttypes"])
+        project_state.add_model_state(ModelState.from_model(TestModel))
+        rendered_state = project_state.render()
+        self.assertEqual(len(rendered_state.get_models()), 2)
+
 
 class ModelStateTests(TestCase):
     def test_custom_model_base(self):
