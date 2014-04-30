@@ -204,6 +204,74 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
+pre_update
+----------
+
+.. data:: django.db.models.signals.pre_update
+   :module:
+
+.. versionadded 1.8::
+
+Sent at the beginning of a queryset's
+:meth:`~django.db.models.query.QuerySet.update` method. The connected signal may
+optionlly return a dict of extra data that will later be sent to the
+:data:`post_update` signal once the update is complete. Note that other
+connected signals may also override data in this dict if they are called 
+afterwards during the same update.
+
+Arguments sent with this signal:
+
+``sender``
+    The model class.
+
+``update_fields``
+    A dict that maps the fields and values given as ``**kwargs`` to
+    the queryset's :meth:`~django.db.models.query.QuerySet.update` method.
+
+``queryset``
+    A clone of the queryset on which ``update()`` is being called.
+
+    Note that this queryset is not yet evaluated. Also there is no guarantee
+    that this queryset will fetch the same rows that will ultimately be affected,
+    as the data may change in the database before the actual update happens.
+
+``using``
+    The database alias being used.
+
+post_update
+-----------
+
+.. data:: django.db.models.signals.post_update
+   :module:
+
+.. versionadded 1.8::
+
+Like :data:`pre_update`, but sent at the end of a queryset's
+:meth:`~django.db.models.query.QuerySet.update` method. Note that
+``post_update`` receivers do not have a ``querset`` arg. This is because
+querysets are lazily evaluated, and the call to
+:meth:`~django.db.models.query.QuerySet.update` will in most cases invalidate
+the original queryset. If you want to keep track of what objects changed during
+the update, you can return arbitrary data from a :data:`pre_update` receiver,
+and it will be passed to any :data:`post_update` receivers as the ``extra_data``
+argument.
+
+Arguments sent with this signal:
+
+``sender``
+    The model class.
+
+``update_fields``
+    A dict that maps the fields and values given as ``**kwargs`` to
+    the queryset's :meth:`~django.db.models.query.QuerySet.update` method.
+
+``extra_data``
+    A dict of data returned by signals connected to :data:`pre_update`, or an
+    empty dict if no data was returned.
+
+``using``
+    The database alias being used.
+
 m2m_changed
 -----------
 
