@@ -9,7 +9,6 @@ from django.apps import apps
 from django.conf import settings
 from django.core.management.base import CommandError
 from django.db import models, router
-from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
 
 
