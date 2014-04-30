@@ -361,7 +361,10 @@ class StateTests(TestCase):
         project_state = ProjectState(real_apps=["contenttypes"])
         project_state.add_model_state(ModelState.from_model(TestModel))
         rendered_state = project_state.render()
-        self.assertEqual(len(rendered_state.get_models()), 2)
+        self.assertEqual(
+            len([x for x in rendered_state.get_models() if x._meta.app_label == "migrations"]),
+            1,
+        )
 
 
 class ModelStateTests(TestCase):
