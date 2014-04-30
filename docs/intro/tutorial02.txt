@@ -419,7 +419,8 @@ This is shaping up well. Let's add some search capability::
 That adds a search box at the top of the change list. When somebody enters
 search terms, Django will search the ``question_text`` field. You can use as many
 fields as you'd like -- although because it uses a ``LIKE`` query behind the
-scenes, keep it reasonable, to keep your database happy.
+scenes, limiting the number of search fields to a reasonable number will make
+it easier for your database to do the search.
 
 Now's also a good time to note that change lists give you free pagination. The
 default is to display 100 items per page. Change-list pagination, search boxes,
