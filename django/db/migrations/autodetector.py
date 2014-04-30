@@ -50,17 +50,18 @@ class MigrationAutodetector(object):
         old_apps = self.from_state.render()
         new_apps = self.to_state.render()
         # Prepare lists of old/new model keys that we care about
-        # (i.e. ignoring proxy ones)
+        # (i.e. ignoring proxy ones and unmigrated ones)
+
         old_model_keys = []
         for al, mn in self.from_state.models.keys():
             model = old_apps.get_model(al, mn)
-            if not model._meta.proxy and model._meta.managed:
+            if not model._meta.proxy and model._meta.managed and al not in self.from_state.real_apps:
                 old_model_keys.append((al, mn))
 
         new_model_keys = []
         for al, mn in self.to_state.models.keys():
             model = new_apps.get_model(al, mn)
-            if not model._meta.proxy and model._meta.managed:
+            if not model._meta.proxy and model._meta.managed and al not in self.to_state.real_apps:
                 new_model_keys.append((al, mn))
 
         def _rel_agnostic_fields_def(fields):

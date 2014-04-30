@@ -135,7 +135,7 @@ class MigrationLoader(object):
         else:
             return self.disk_migrations[results[0]]
 
-    def build_graph(self, ignore_unmigrated=False):
+    def build_graph(self):
         """
         Builds a migration dependency graph using both the disk and database.
         You'll need to rebuild the graph if you apply migrations. This isn't
@@ -200,31 +200,10 @@ class MigrationLoader(object):
                 # even have migrations.
                 if parent[1] == "__first__" and parent not in self.graph:
                     if parent[0] in self.unmigrated_apps:
-                        if ignore_unmigrated:
-                            parent = None
-                        else:
-                            # This app isn't migrated, but something depends on it.
-                            # We'll add a fake initial migration for it into the
-                            # graph.
-                            app_config = apps.get_app_config(parent[0])
-                            ops = []
-                            for model in app_config.get_models():
-                                model_state = ModelState.from_model(model)
-                                ops.append(
-                                    operations.CreateModel(
-                                        name=model_state.name,
-                                        fields=model_state.fields,
-                                        options=model_state.options,
-                                        bases=model_state.bases,
-                                    )
-                                )
-                            new_migration = type(
-                                "FakeInitialMigration",
-                                (Migration, ),
-                                {"operations": ops},
-                            )(parent[1], parent[0])
-                            self.graph.add_node(parent, new_migration)
-                            self.applied_migrations.add(parent)
+                        # This app isn't migrated, but something depends on it.
+                        # The models will get auto-added into the state, though
+                        # so we're fine.
+                        continue
                     elif parent[0] in self.migrated_apps:
                         parent = list(self.graph.root_nodes(parent[0]))[0]
                     else:
@@ -245,6 +224,15 @@ class MigrationLoader(object):
                 conflicting_apps.add(app_label)
             seen_apps.setdefault(app_label, set()).add(migration_name)
         return dict((app_label, seen_apps[app_label]) for app_label in conflicting_apps)
+
+    def project_state(self, nodes=None, at_end=True):
+        """
+        Returns a ProjectState object representing the most recent state
+        that the migrations we loaded represent.
+
+        See graph.make_state for the meaning of "nodes" and "at_end"
+        """
+        return self.graph.make_state(nodes=nodes, at_end=at_end, real_apps=list(self.unmigrated_apps))
 
 
 class BadMigrationError(Exception):

@@ -1,7 +1,8 @@
 from django.apps import AppConfig
-from django.apps.registry import Apps
+from django.apps.registry import Apps, apps as global_apps
 from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_together
+from django.db.models.fields.related import do_pending_lookups
 from django.utils import six
 from django.utils.module_loading import import_string
 
@@ -17,9 +18,11 @@ class ProjectState(object):
     app level so that cross-app FKs/etc. resolve properly.
     """
 
-    def __init__(self, models=None):
+    def __init__(self, models=None, real_apps=None):
         self.models = models or {}
         self.apps = None
+        # Apps to include from main registry, usually unmigrated ones
+        self.real_apps = real_apps or []
 
     def add_model_state(self, model_state):
         self.models[(model_state.app_label, model_state.name.lower())] = model_state
@@ -27,20 +30,29 @@ class ProjectState(object):
     def clone(self):
         "Returns an exact copy of this ProjectState"
         return ProjectState(
-            models=dict((k, v.clone()) for k, v in self.models.items())
+            models=dict((k, v.clone()) for k, v in self.models.items()),
+            real_apps=self.real_apps,
         )
 
-    def render(self):
+    def render(self, include_real=None):
         "Turns the project state into actual models in a new Apps"
         if self.apps is None:
+            # Any apps in self.real_apps should have all their models included
+            # in the render. We don't use the original model instances as there
+            # are some variables that refer to the Apps object.
+            real_models = []
+            for app_label in self.real_apps:
+                app = global_apps.get_app_config(app_label)
+                for model in app.get_models():
+                    real_models.append(ModelState.from_model(model))
             # Populate the app registry with a stub for each application.
             app_labels = set(model_state.app_label for model_state in self.models.values())
-            self.apps = Apps([AppConfigStub(label) for label in sorted(app_labels)])
+            self.apps = Apps([AppConfigStub(label) for label in sorted(self.real_apps + list(app_labels))])
             # We keep trying to render the models in a loop, ignoring invalid
             # base errors, until the size of the unrendered models doesn't
             # decrease by at least one, meaning there's a base dependency loop/
             # missing base.
-            unrendered_models = list(self.models.values())
+            unrendered_models = list(self.models.values()) + real_models
             while unrendered_models:
                 new_unrendered_models = []
                 for model in unrendered_models:
@@ -53,14 +65,22 @@ class ProjectState(object):
                 unrendered_models = new_unrendered_models
             # make sure apps has no dangling references
             if self.apps._pending_lookups:
-                # Raise an error with a best-effort helpful message
-                # (only for the first issue). Error message should look like:
-                # "ValueError: Lookup failed for model referenced by
-                # field migrations.Book.author: migrations.Author"
-                dangling_lookup = list(self.apps._pending_lookups.items())[0]
-                raise ValueError("Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}".format(
-                    field=dangling_lookup[1][0][1],
-                    model=dangling_lookup[0]))
+                # There's some lookups left. See if we can first resolve them
+                # ourselves - sometimes fields are added after class_prepared is sent
+                for lookup_model, operations in self.apps._pending_lookups.items():
+                    try:
+                        model = self.apps.get_model(lookup_model[0], lookup_model[1])
+                    except LookupError:
+                        # Raise an error with a best-effort helpful message
+                        # (only for the first issue). Error message should look like:
+                        # "ValueError: Lookup failed for model referenced by
+                        # field migrations.Book.author: migrations.Author"
+                        raise ValueError("Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}".format(
+                            field=operations[0][1],
+                            model=lookup_model
+                        ))
+                    else:
+                        do_pending_lookups(model)
         return self.apps
 
     @classmethod
@@ -74,6 +94,8 @@ class ProjectState(object):
 
     def __eq__(self, other):
         if set(self.models.keys()) != set(other.models.keys()):
+            return False
+        if set(self.real_apps) != set(other.real_apps):
             return False
         return all(model == other.models[key] for key, model in self.models.items())
 

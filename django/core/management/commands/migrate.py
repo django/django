@@ -135,7 +135,7 @@ class Command(BaseCommand):
                 self.stdout.write("  No migrations needed.")
                 # If there's changes that aren't in migrations yet, tell them how to fix it.
                 autodetector = MigrationAutodetector(
-                    executor.loader.graph.project_state(),
+                    executor.loader.project_state(),
                     ProjectState.from_apps(apps),
                 )
                 changes = autodetector.changes(graph=executor.loader.graph)

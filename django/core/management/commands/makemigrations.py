@@ -54,7 +54,7 @@ class Command(BaseCommand):
         # (makemigrations doesn't look at the database state).
         # Also make sure the graph is built without unmigrated apps shoehorned in.
         loader = MigrationLoader(connections[DEFAULT_DB_ALIAS], load=False)
-        loader.build_graph(ignore_unmigrated=True)
+        loader.build_graph()
 
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any and they don't want to merge
@@ -78,7 +78,7 @@ class Command(BaseCommand):
 
         # Set up autodetector
         autodetector = MigrationAutodetector(
-            loader.graph.project_state(),
+            loader.project_state(),
             ProjectState.from_apps(apps),
             InteractiveMigrationQuestioner(specified_apps=app_labels),
         )

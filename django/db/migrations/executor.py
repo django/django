@@ -69,7 +69,7 @@ class MigrationExecutor(object):
         statements = []
         for migration, backwards in plan:
             with self.connection.schema_editor(collect_sql=True) as schema_editor:
-                project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
+                project_state = self.loader.project_state((migration.app_label, migration.name), at_end=False)
                 if not backwards:
                     migration.apply(project_state, schema_editor, collect_sql=True)
                 else:
@@ -90,7 +90,7 @@ class MigrationExecutor(object):
             else:
                 # Alright, do it normally
                 with self.connection.schema_editor() as schema_editor:
-                    project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
+                    project_state = self.loader.project_state((migration.app_label, migration.name), at_end=False)
                     migration.apply(project_state, schema_editor)
         # For replacement migrations, record individual statuses
         if migration.replaces:
@@ -110,7 +110,7 @@ class MigrationExecutor(object):
             self.progress_callback("unapply_start", migration, fake)
         if not fake:
             with self.connection.schema_editor() as schema_editor:
-                project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=False)
+                project_state = self.loader.project_state((migration.app_label, migration.name), at_end=False)
                 migration.unapply(project_state, schema_editor)
         # For replacement migrations, record individual statuses
         if migration.replaces:
@@ -128,7 +128,7 @@ class MigrationExecutor(object):
         tables it would create exist. This is intended only for use
         on initial migrations (as it only looks for CreateModel).
         """
-        project_state = self.loader.graph.project_state((migration.app_label, migration.name), at_end=True)
+        project_state = self.loader.project_state((migration.app_label, migration.name), at_end=True)
         apps = project_state.render()
         for operation in migration.operations:
             if isinstance(operation, migrations.CreateModel):

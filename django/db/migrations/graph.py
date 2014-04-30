@@ -121,7 +121,7 @@ class MigrationGraph(object):
     def __str__(self):
         return "Graph: %s nodes, %s edges" % (len(self.nodes), sum(len(x) for x in self.dependencies.values()))
 
-    def project_state(self, nodes=None, at_end=True):
+    def make_state(self, nodes=None, at_end=True, real_apps=None):
         """
         Given a migration node or nodes, returns a complete ProjectState for it.
         If at_end is False, returns the state before the migration has run.
@@ -140,7 +140,7 @@ class MigrationGraph(object):
                     if not at_end and migration in nodes:
                         continue
                     plan.append(migration)
-        project_state = ProjectState()
+        project_state = ProjectState(real_apps=real_apps)
         for node in plan:
             project_state = self.nodes[node].mutate_state(project_state)
         return project_state
