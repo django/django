@@ -1,7 +1,7 @@
 from unittest import skipIf
 
 from django.test import TestCase, override_settings
-from django.db import connection
+from django.db import connection, connections
 from django.db.migrations.loader import MigrationLoader, AmbiguityError
 from django.db.migrations.recorder import MigrationRecorder
 from django.utils import six
@@ -25,6 +25,12 @@ class RecorderTests(TestCase):
         self.assertEqual(
             recorder.applied_migrations(),
             set([("myapp", "0432_ponies")]),
+        )
+        # That should not affect records of another database
+        recorder_other = MigrationRecorder(connections['other'])
+        self.assertEqual(
+            recorder_other.applied_migrations(),
+            set(),
         )
         recorder.record_unapplied("myapp", "0432_ponies")
         self.assertEqual(
