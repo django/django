@@ -9,4 +9,5 @@ Django 1.6.5 fixes several bugs in 1.6.4.
 Bugfixes
 ========
 
-* ...
+* Made the ``year_lookup_bounds_for_datetime_field`` Oracle backend method
+  Python 3 compatible (`#22551 <http://code.djangoproject.com/ticket/22551>`_).
