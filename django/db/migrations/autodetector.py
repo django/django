@@ -1,6 +1,7 @@
 import re
 import datetime
 
+from django.db import models
 from django.db.migrations import operations
 from django.db.migrations.migration import Migration
 from django.db.migrations.questioner import MigrationQuestioner
@@ -299,7 +300,7 @@ class MigrationAutodetector(object):
             if found_rename:
                 continue
             # You can't just add NOT NULL fields with no default
-            if not field.null and not field.has_default():
+            if not field.null and not field.has_default() and not isinstance(field, models.ManyToManyField):
                 field = field.clone()
                 field.default = self.questioner.ask_not_null_addition(field_name, model_name)
                 self.add_to_migration(
