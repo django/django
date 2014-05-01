@@ -34,7 +34,7 @@ class Command(BaseCommand):
         make_option('--locale', '-l', dest='locale', action='append', default=[],
                     help='Locale(s) to process (e.g. de_AT). Default is to process all. Can be '
                          'used multiple times.'),
-        make_option('--exclude', '-e', dest='exclude', action='append', default=[],
+        make_option('--exclude', '-x', dest='exclude', action='append', default=[],
                     help='Locales to exclude. Default is none. Can be used multiple times.'),
     )
     help = 'Compiles .po files to .mo files for use with builtin gettext support.'

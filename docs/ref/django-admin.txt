@@ -143,7 +143,7 @@ specify the locale(s) to process. If not provided, all locales are processed.
 
 .. versionadded:: 1.8
 
-Use the :djadminopt:`--exclude` option (or its shorter version ``-e``) to
+Use the :djadminopt:`--exclude` option (or its shorter version ``-x``) to
 specify the locale(s) to exclude from processing. If not provided, no locales
 are excluded.
 
@@ -155,8 +155,8 @@ Example usage::
     django-admin.py compilemessages -l pt_BR -l fr
     django-admin.py compilemessages --exclude=pt_BR
     django-admin.py compilemessages --exclude=pt_BR --exclude=fr
-    django-admin.py compilemessages -e pt_BR
-    django-admin.py compilemessages -e pt_BR -e fr
+    django-admin.py compilemessages -x pt_BR
+    django-admin.py compilemessages -x pt_BR -x fr
 
 createcachetable
 ----------------
@@ -563,7 +563,7 @@ specify the locale(s) to process.
 
 .. versionadded:: 1.8
 
-Use the :djadminopt:`--exclude` option (or its shorter version ``-e``) to
+Use the :djadminopt:`--exclude` option (or its shorter version ``-x``) to
 specify the locale(s) to exclude from processing. If not provided, no locales
 are excluded.
 
@@ -575,8 +575,8 @@ Example usage::
     django-admin.py makemessages -l pt_BR -l fr
     django-admin.py makemessages --exclude=pt_BR
     django-admin.py makemessages --exclude=pt_BR --exclude=fr
-    django-admin.py makemessages -e pt_BR
-    django-admin.py makemessages -e pt_BR -e fr
+    django-admin.py makemessages -x pt_BR
+    django-admin.py makemessages -x pt_BR -x fr
 
 
 .. versionchanged:: 1.7
