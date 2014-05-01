@@ -28,7 +28,7 @@ from .models import (
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
     MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser,
     CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
-    Company, Employment, CustomPk, CustomPkTag)
+    Company, Employment, CustomPk, CustomPkTag, Classroom, School, Student)
 
 
 class BaseQuerysetTest(TestCase):
@@ -3287,6 +3287,14 @@ class Ticket21203Tests(TestCase):
         self.assertQuerysetEqual(qs, [c], lambda x: x)
         self.assertIs(qs[0].parent.parent_bool, True)
 
+class Ticket22429Tests(TestCase):
+    def test_ticket_22429(self):
+        ql = list(Student.objects.filter(~Q(classroom__school=F('school'))))
+        self.assertEqual(ql, [])
+
+        expected_qs = """SELECT "queries_student"."id", "queries_student"."school_id", "queries_student"."prefix", "queries_student"."student_id" FROM "queries_student" WHERE NOT ("queries_student"."id" IN (SELECT U2."student_id" AS "student_id" FROM "queries_student" U0 INNER JOIN "queries_classroom_students" U2 ON ( U0."id" = U2."student_id" ) INNER JOIN "queries_classroom" U3 ON ( U2."classroom_id" = U3."id" ) WHERE U3."school_id" = (U0."school_id")))"""
+        qs = str(Student.objects.filter(~Q(classroom__school=F('school'))).query)
+        self.assertEqual(expected_qs, qs)
 
 class ValuesJoinPromotionTests(TestCase):
     def test_values_no_promotion_for_existing(self):

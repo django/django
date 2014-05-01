@@ -1921,12 +1921,19 @@ class Query(object):
         # Lets still see if we can trim the first join from the inner query
         # (that is, self). We can't do this for LEFT JOINs because we would
         # miss those rows that have nothing on the outer side.
-        if self.alias_map[self.tables[pos + 1]].join_type != self.LOUTER:
+        join_table_name = join_field.model._meta.db_table
+        unref_alias = False
+        if join_table_name == self.tables[pos]:
+            join_table_name = self.tables[pos + 1]
+            unref_alias = True
+
+        if self.alias_map[join_table_name].join_type != self.LOUTER:
             select_fields = [r[0] for r in join_field.related_fields]
-            select_alias = self.tables[pos + 1]
-            self.unref_alias(self.tables[pos])
+            select_alias = join_table_name
+            if unref_alias:
+                self.unref_alias(self.tables[pos])
             extra_restriction = join_field.get_extra_restriction(
-                self.where_class, None, self.tables[pos + 1])
+                self.where_class, None, join_table_name)
             if extra_restriction:
                 self.where.add(extra_restriction, AND)
         else:

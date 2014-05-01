@@ -660,3 +660,19 @@ class Employment(models.Model):
     employer = models.ForeignKey(Company)
     employee = models.ForeignKey(Person)
     title = models.CharField(max_length=128)
+
+
+class School(models.Model):
+    school_id = models.CharField('School ID', max_length=10, unique=True)
+
+
+class Student(models.Model):
+    school = models.ForeignKey(School, related_name='students')
+    prefix = models.CharField('Prefix', max_length=3, blank=True, default='')
+    student_id = models.CharField('Student ID', max_length=15)
+
+
+class Classroom(models.Model):
+    school = models.ForeignKey(School, related_name='classrooms')
+    students = models.ManyToManyField(Student, related_name='classroom',
+                                      blank=True)
