@@ -987,6 +987,8 @@ class Model(six.with_metaclass(ModelBase)):
         errors = {}
         if exclude is None:
             exclude = []
+        else:
+            exclude = list(exclude)
 
         try:
             self.clean_fields(exclude=exclude)
