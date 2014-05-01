@@ -71,7 +71,7 @@ development version of Django and to generate patch files for the changes you
 make.
 
 To check whether or not you have Git installed, enter ``git`` into the command
-line. If you get messages saying that this command could be found, you'll have
+line. If you get messages saying that this command could not be found, you'll have
 to download and install it, see `Git's download page`__.
 
 If you're not that familiar with Git, you can always find out more about its
