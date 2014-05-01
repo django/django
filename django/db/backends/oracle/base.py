@@ -446,7 +446,7 @@ WHEN (new.%(col_name)s IS NULL)
         bounds = super(DatabaseOperations, self).year_lookup_bounds_for_datetime_field(value)
         if settings.USE_TZ:
             bounds = [b.astimezone(timezone.utc).replace(tzinfo=None) for b in bounds]
-        return [b.isoformat(b' ') for b in bounds]
+        return [b.isoformat(str(' ')) for b in bounds]
 
     def combine_expression(self, connector, sub_expressions):
         "Oracle requires special cases for %% and & operators in query expressions"
