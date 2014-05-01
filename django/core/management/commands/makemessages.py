@@ -163,7 +163,7 @@ class Command(NoArgsCommand):
         make_option('--locale', '-l', default=[], dest='locale', action='append',
             help='Creates or updates the message files for the given locale(s) (e.g. pt_BR). '
                  'Can be used multiple times.'),
-        make_option('--exclude', '-e', default=[], dest='exclude', action='append',
+        make_option('--exclude', '-x', default=[], dest='exclude', action='append',
                     help='Locales to exclude. Default is none. Can be used multiple times.'),
         make_option('--domain', '-d', default='django', dest='domain',
             help='The domain of the message files (default: "django").'),
