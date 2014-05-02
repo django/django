@@ -87,6 +87,9 @@ class Command(NoArgsCommand):
 
         if self.clear:
             self.clear_dir('')
+            
+        if hasattr(self.storage, "on_collectstatic"):
+            self.storage.on_collectstatic(self)            
 
         if self.symlink:
             handler = self.link_file

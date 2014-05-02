@@ -316,11 +316,17 @@ class ManifestFilesMixin(HashedFilesMixin):
                                    self).post_process(*args, **kwargs)
         for post_processed in all_post_processed:
             yield post_processed
+        self.save_manifest()
+    
+    def save_manifest(self):
         payload = {'paths': self.hashed_files, 'version': self.manifest_version}
         if self.exists(self.manifest_name):
             self.delete(self.manifest_name)
         contents = json.dumps(payload).encode('utf-8')
         self._save(self.manifest_name, ContentFile(contents))
+
+    def on_collectstatic(self, command):
+        self.hashed_files = OrderedDict()
 
 
 class _MappingCache(object):
