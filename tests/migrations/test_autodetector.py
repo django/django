@@ -7,6 +7,15 @@ from django.db.migrations.graph import MigrationGraph
 from django.db import models
 
 
+class DeconstructableObject(object):
+    """
+    A custom deconstructable object.
+    """
+
+    def deconstruct(self):
+        return self.__module__ + '.' + self.__class__.__name__, [], {}
+
+
 class AutodetectorTests(TestCase):
     """
     Tests the migration autodetector.
@@ -17,6 +26,8 @@ class AutodetectorTests(TestCase):
     author_name_longer = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=400))])
     author_name_renamed = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("names", models.CharField(max_length=200))])
     author_name_default = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default='Ada Lovelace'))])
+    author_name_deconstructable_1 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=DeconstructableObject()))])
+    author_name_deconstructable_2 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=DeconstructableObject()))])
     author_with_book = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
     author_renamed_with_book = ModelState("testapp", "Writer", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
     author_with_publisher_string = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("publisher_name", models.CharField(max_length=200))])
@@ -549,6 +560,17 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AddField")
         self.assertEqual(action.name, "name")
+
+    def test_custom_deconstructable(self):
+        """
+        Two instances which deconstruct to the same value aren't considered a
+        change.
+        """
+        before = self.make_project_state([self.author_name_deconstructable_1])
+        after = self.make_project_state([self.author_name_deconstructable_2])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertEqual(changes, {})
 
     def test_replace_string_with_foreignkey(self):
         """
