@@ -289,7 +289,7 @@ into ``kwargs`` yourself::
         "Implements comma-separated storage of lists"
 
         def __init__(self, separator=",", *args, **kwargs):
-            self.separator = ","
+            self.separator = separator
             super(CommaSepField, self).__init__(*args, **kwargs)
 
         def deconstruct(self):
