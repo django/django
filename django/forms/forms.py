@@ -142,7 +142,8 @@ class BaseForm(object):
         try:
             field = self.fields[name]
         except KeyError:
-            raise KeyError('Key %r not found in Form' % name)
+            raise KeyError(
+                "Key %r not found in '%s'" % (name, self.__class__.__name__))
         return BoundField(self, field, name)
 
     @property
