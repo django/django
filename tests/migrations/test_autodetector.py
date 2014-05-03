@@ -37,6 +37,10 @@ class AutodetectorTests(TestCase):
     author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author", ))
     author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author", ))
     author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author", ))
+    author_with_m2m = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("publishers", models.ManyToManyField("testapp.Publisher")),
+    ])
     publisher = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=100))])
     publisher_with_author = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("name", models.CharField(max_length=100))])
     publisher_with_book = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("otherapp.Book")), ("name", models.CharField(max_length=100))])
@@ -618,6 +622,28 @@ class AutodetectorTests(TestCase):
         action = migration.operations[1]
         self.assertEqual(action.__class__.__name__, "DeleteModel")
         self.assertEqual(action.name, "Publisher")
+
+    def test_add_many_to_many(self):
+        """
+        Adding a ManyToManyField should not prompt for a default (#22435).
+        """
+        class CustomQuestioner(MigrationQuestioner):
+            def ask_not_null_addition(self, field_name, model_name):
+                raise Exception("Should not have prompted for not null addition")
+
+        before = self.make_project_state([self.author_empty, self.publisher])
+        # Add ManyToManyField to author model
+        after = self.make_project_state([self.author_with_m2m, self.publisher])
+        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        migration = changes['testapp'][0]
+        # Right actions in right order?
+        self.assertEqual(len(migration.operations), 1)
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AddField")
+        self.assertEqual(action.name, "publishers")
 
     def test_many_to_many_removed_before_through_model(self):
         """
