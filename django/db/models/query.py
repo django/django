@@ -364,8 +364,7 @@ class QuerySet(object):
         """
         obj = self.model(**kwargs)
         self._for_write = True
-        with transaction.atomic(using=self.db):
-            obj.save(force_insert=True, using=self.db)
+        obj.save(force_insert=True, using=self.db)
         return obj
 
     def bulk_create(self, objs, batch_size=None):
@@ -448,7 +447,8 @@ class QuerySet(object):
         Used by get_or_create and update_or_create
         """
         try:
-            obj = self.create(**params)
+            with transaction.atomic(using=self.db):
+                obj = self.create(**params)
             return obj, True
         except IntegrityError:
             exc_info = sys.exc_info()
