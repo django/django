@@ -58,11 +58,11 @@ class FormsTestCase(TestCase):
         self.assertHTMLEqual(str(p['first_name']), '<input type="text" name="first_name" value="John" id="id_first_name" />')
         self.assertHTMLEqual(str(p['last_name']), '<input type="text" name="last_name" value="Lennon" id="id_last_name" />')
         self.assertHTMLEqual(str(p['birthday']), '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" />')
-        try:
+
+        nonexistenterror = "Key u?'nonexistentfield' not found in 'Person'"
+        with self.assertRaisesRegexp(KeyError, nonexistenterror):
             p['nonexistentfield']
             self.fail('Attempts to access non-existent fields should fail.')
-        except KeyError:
-            pass
 
         form_output = []
 
