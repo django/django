@@ -13,3 +13,7 @@ def get_person(request, pk):
 def no_template_used(request):
     template = loader.get_template_from_string("This is a string-based template")
     return HttpResponse(template.render(Context({})))
+
+
+def empty_response(request):
+    return HttpResponse('')

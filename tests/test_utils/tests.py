@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import unittest
 
 from django.conf.urls import url
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import connection
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
@@ -15,6 +15,7 @@ from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
 
 from .models import Person
+from .views import empty_response
 
 
 class SkippingTestCase(TestCase):
@@ -667,30 +668,42 @@ class AssertFieldOutputTests(SimpleTestCase):
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
 
-# for OverrideSettingsTests
-def fake_view(request):
-    pass
-
-
 class FirstUrls:
-    urlpatterns = [url(r'first/$', fake_view, name='first')]
+    urlpatterns = [url(r'first/$', empty_response, name='first')]
 
 
 class SecondUrls:
-    urlpatterns = [url(r'second/$', fake_view, name='second')]
+    urlpatterns = [url(r'second/$', empty_response, name='second')]
 
 
 class OverrideSettingsTests(TestCase):
-    """
-    #21518 -- If neither override_settings nor a settings_changed receiver
-    clears the URL cache between tests, then one of these two test methods will
-    fail.
-    """
+
+    # #21518 -- If neither override_settings nor a settings_changed receiver
+    # clears the URL cache between tests, then one of test_first or
+    # test_second will fail.
 
     @override_settings(ROOT_URLCONF=FirstUrls)
-    def test_first(self):
+    def test_urlconf_first(self):
         reverse('first')
 
     @override_settings(ROOT_URLCONF=SecondUrls)
-    def test_second(self):
+    def test_urlconf_second(self):
         reverse('second')
+
+    def test_urlconf_cache(self):
+        self.assertRaises(NoReverseMatch, lambda: reverse('first'))
+        self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+        with override_settings(ROOT_URLCONF=FirstUrls):
+            self.client.get(reverse('first'))
+            self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+            with override_settings(ROOT_URLCONF=SecondUrls):
+                self.assertRaises(NoReverseMatch, lambda: reverse('first'))
+                self.client.get(reverse('second'))
+
+            self.client.get(reverse('first'))
+            self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+        self.assertRaises(NoReverseMatch, lambda: reverse('first'))
+        self.assertRaises(NoReverseMatch, lambda: reverse('second'))
