@@ -19,8 +19,9 @@ class GeoQuerySet(QuerySet):
         super(GeoQuerySet, self).__init__(model=model, query=query, using=using, hints=hints)
         self.query = query or GeoQuery(self.model)
 
-    def values(self, *fields):
-        return self._clone(klass=GeoValuesQuerySet, setup=True, _fields=fields)
+    def values(self, *fields, **aliased_fields):
+        return self._clone(klass=GeoValuesQuerySet, setup=True, _fields=fields,
+                           _aliased_fields=aliased_fields)
 
     def values_list(self, *fields, **kwargs):
         flat = kwargs.pop('flat', False)
@@ -773,7 +774,7 @@ class GeoQuerySet(QuerySet):
             self.query.add_select_related([field_name])
             compiler = self.query.get_compiler(self.db)
             compiler.pre_sql_setup()
-            for (rel_table, rel_col), field in self.query.related_select_cols:
+            for (rel_table, rel_col), field, _ in self.query.related_select_cols:
                 if field == geo_field:
                     return compiler._field_column(geo_field, rel_table)
             raise ValueError("%r not in self.query.related_select_cols" % geo_field)

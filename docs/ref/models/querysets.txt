@@ -465,7 +465,7 @@ Examples (those after the first will only work on PostgreSQL)::
 values
 ~~~~~~
 
-.. method:: values(*fields)
+.. method:: values(*fields, **aliased_fields)
 
 Returns a ``ValuesQuerySet`` — a ``QuerySet`` subclass that returns
 dictionaries when used as an iterable, rather than model-instance objects.
@@ -496,6 +496,21 @@ Example::
     [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}],
     >>> Blog.objects.values('id', 'name')
     [{'id': 1, 'name': 'Beatles Blog'}]
+
+Additionally, the ``values()`` method takes optional keyword arguments,
+``**aliased_fields``, which give aliases under which the ``SELECT`` retrieves
+the fields. If used, the returned dictionary will contain the values of the
+fields under the corresponding alias provided.
+
+Example::
+
+    >>> Blog.objects.values('id', blog_name='name')
+    [{'id': 1, 'blog_name': 'Beatles Blog'}]
+
+.. versionchanged:: 1.8
+
+    The ability to create aliases through keyword arguments represented by the
+    ``**aliased_fields`` parameter above was added in Django 1.8.
 
 A few subtleties that are worth mentioning:
 

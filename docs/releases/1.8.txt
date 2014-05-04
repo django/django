@@ -135,7 +135,11 @@ Management Commands
 Models
 ^^^^^^
 
-* ...
+* :meth:`QuerySet.values() <django.db.models.query.QuerySet.values>` is now
+  capable of creating aliases for its results. This means the name of the keys
+  in the returned dictionaries can be customized to adapt them to typical
+  scenarios when sending serialized data to the client, possibly obsoleting
+  intermediate name-translation steps.
 
 Signals
 ^^^^^^^

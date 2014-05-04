@@ -103,6 +103,7 @@ class Query(object):
     subq_aliases = frozenset([alias_prefix])
     query_terms = QUERY_TERMS
     aggregates_module = base_aggregates_module
+    aliased_fields = {}
 
     compiler = 'SQLCompiler'
 
@@ -533,13 +534,18 @@ class Query(object):
 
         # Selection columns and extra extensions are those provided by 'rhs'.
         self.select = []
+        opts = self.get_meta()
         for col, field in rhs.select:
+            col_alias = None
+            if field.name in self.aliased_fields:
+                col_alias = field.name
+                field = opts.get_field_by_name(self.aliased_fields[col_alias])
             if isinstance(col, (list, tuple)):
                 new_col = change_map.get(col[0], col[0]), col[1]
-                self.select.append(SelectInfo(new_col, field))
+                self.select.append(SelectInfo(new_col, field, col_alias))
             else:
                 new_col = col.relabeled_clone(change_map)
-                self.select.append(SelectInfo(new_col, field))
+                self.select.append(SelectInfo(new_col, field, col_alias))
 
         if connector == OR:
             # It would be nice to be able to handle this, but the queries don't
@@ -775,7 +781,7 @@ class Query(object):
         self.having.relabel_aliases(change_map)
         if self.group_by:
             self.group_by = [relabel_column(col) for col in self.group_by]
-        self.select = [SelectInfo(relabel_column(s.col), s.field)
+        self.select = [SelectInfo(relabel_column(s.col), s.field, s.alias)
                        for s in self.select]
         if self._aggregates:
             self._aggregates = OrderedDict(
@@ -1600,12 +1606,17 @@ class Query(object):
             for name in field_names:
                 # Join promotion note - we must not remove any rows here, so
                 # if there is no existing joins, use outer join.
+                col_alias = None
+                if name in self.aliased_fields:
+                    col_alias = name
+                    name = self.aliased_fields[name]
                 field, targets, u2, joins, path = self.setup_joins(
                     name.split(LOOKUP_SEP), opts, alias, can_reuse=None,
                     allow_many=allow_m2m)
                 targets, final_alias, joins = self.trim_joins(targets, joins, path)
                 for target in targets:
-                    self.select.append(SelectInfo((final_alias, target.column), target))
+                    self.select.append(SelectInfo((final_alias, target.column),
+                                                  target, col_alias))
         except MultiJoin:
             raise FieldError("Invalid field name: '%s'" % name)
         except FieldError:
@@ -1661,7 +1672,7 @@ class Query(object):
         """
         self.group_by = []
 
-        for col, _ in self.select:
+        for col, _, _ in self.select:
             self.group_by.append(col)
 
     def add_count_column(self):
@@ -1935,7 +1946,7 @@ class Query(object):
             # values in select_fields. Lets punt this one for now.
             select_fields = [r[1] for r in join_field.related_fields]
             select_alias = self.tables[pos]
-        self.select = [SelectInfo((select_alias, f.column), f) for f in select_fields]
+        self.select = [SelectInfo((select_alias, f.column), f, None) for f in select_fields]
         return trimmed_prefix, contains_louter
 
     def is_nullable(self, field):

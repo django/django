@@ -27,8 +27,11 @@ JoinInfo = namedtuple('JoinInfo',
                       'table_name rhs_alias join_type lhs_alias '
                       'join_cols nullable join_field')
 
-# Pairs of column clauses to select, and (possibly None) field for the clause.
-SelectInfo = namedtuple('SelectInfo', 'col field')
+# A three-elements namedtuple containing:
+# * Pairs of column clauses to select
+# * Field for the clause (possibly None)
+# * ORM high level (QuerySet.values()) alias
+SelectInfo = namedtuple('SelectInfo', 'col field alias')
 
 # How many results to expect from a cursor.execute call
 MULTI = 'multi'
