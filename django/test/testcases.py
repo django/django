@@ -157,6 +157,7 @@ class SimpleTestCase(unittest.TestCase):
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
+    client_args = {}
     _overridden_settings = None
     _modified_settings = None
 
@@ -197,7 +198,8 @@ class SimpleTestCase(unittest.TestCase):
         if self._modified_settings:
             self._modified_context = modify_settings(self._modified_settings)
             self._modified_context.enable()
-        self.client = self.client_class()
+        # import ipdb; ipdb.set_trace()
+        self.client = self.client_class(**self.client_args)
         self._urlconf_setup()
         mail.outbox = []
 
@@ -1217,3 +1219,11 @@ class LiveServerTestCase(TransactionTestCase):
     def tearDownClass(cls):
         cls._tearDownClassInternal()
         super(LiveServerTestCase, cls).tearDownClass()
+
+    def __call__(self, result=None):
+        if hasattr(self, 'server_thread'):
+            self.client_args = {
+                  'SERVER_NAME': self.server_thread.host,
+                  'SERVER_PORT': self.server_thread.port,
+            }
+        super(LiveServerTestCase, self).__call__(result)

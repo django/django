@@ -162,6 +162,10 @@ class LiveServerViews(LiveServerBase):
         f = self.urlopen('/environ_view/?%s' % urlencode({'q': 'тест'}))
         self.assertIn(b"QUERY_STRING: 'q=%D1%82%D0%B5%D1%81%D1%82'", f.read())
 
+    def test_address(self):
+        r = self.client.get('/environ_view/')
+        self.assertIn(b"SERVER_PORT: {}".format(self.server_thread.port), r.content)
+        self.assertIn(b"SERVER_NAME: u'{}'".format(self.server_thread.host), r.content)
 
 class LiveServerDatabase(LiveServerBase):
 

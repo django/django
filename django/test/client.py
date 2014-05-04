@@ -335,9 +335,12 @@ class RequestFactory(object):
         r = {
             'PATH_INFO': self._get_path(parsed),
             'REQUEST_METHOD': str(method),
-            'SERVER_PORT': str('443') if secure else str('80'),
-            'wsgi.url_scheme': str('https') if secure else str('http'),
         }
+        if secure:
+            r.update({
+                'SERVER_PORT': str('443'),
+                'wsgi.url_scheme': str('https'),
+            })
         if data:
             r.update({
                 'CONTENT_LENGTH': len(data),
