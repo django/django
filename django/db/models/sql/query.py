@@ -1432,6 +1432,8 @@ class Query(object):
             alias = self.join(
                 connection, reuse=reuse, nullable=nullable, join_field=join.join_field)
             joins.append(alias)
+        if hasattr(final_field, 'field'):
+            final_field = final_field.field
         return final_field, targets, opts, joins, path
 
     def trim_joins(self, targets, joins, path):
