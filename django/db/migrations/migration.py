@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+
 class Migration(object):
     """
     The base class for all migrations.

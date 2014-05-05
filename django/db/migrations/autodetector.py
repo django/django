@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import re
 import datetime
 
@@ -380,7 +382,7 @@ class MigrationAutodetector(object):
     def add_to_migration(self, app_label, operation, new=False):
         migrations = self.migrations.setdefault(app_label, [])
         if not migrations or new:
-            subclass = type("Migration", (Migration,), {"operations": [], "dependencies": []})
+            subclass = type(str("Migration"), (Migration,), {"operations": [], "dependencies": []})
             instance = subclass("auto_%i" % (len(migrations) + 1), app_label)
             migrations.append(instance)
         migrations[-1].operations.append(operation)

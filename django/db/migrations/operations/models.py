@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.db import models, router
 from django.db.models.options import normalize_together
 from django.db.migrations.state import ModelState
