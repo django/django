@@ -1693,7 +1693,8 @@ Default: ``''`` (Empty string)
 
 URL that handles the media served from :setting:`MEDIA_ROOT`, used
 for :doc:`managing stored files </topics/files>`. It must end in a slash if set
-to a non-empty value.
+to a non-empty value. You will need to :ref:`configure these files to be served
+<serving-uploaded-files-in-development>` in both development and production.
 
 Example: ``"http://media.example.com/"``
 
@@ -2720,6 +2721,10 @@ If not ``None``, this will be used as the base path for
 :doc:`staticfiles app</ref/contrib/staticfiles>`.
 
 It must end in a slash if set to a non-empty value.
+
+You may need to :ref:`configure these files to be served in development
+<serving-static-files-in-development>` and will definitely need to do so
+:doc:`in production </howto/static-files/deployment>`.
 
 .. setting:: STATICFILES_DIRS
 
