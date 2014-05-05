@@ -75,6 +75,7 @@ details on how ``staticfiles`` finds your files.
     by putting those static files inside *another* directory named for the
     application itself.
 
+.. _serving-static-files-in-development:
 
 Serving static files during development.
 ========================================
@@ -107,6 +108,8 @@ this by adding the following snippet to your urls.py::
     Also this helper function only serves the actual :setting:`STATIC_ROOT`
     folder; it doesn't perform static files discovery like
     :mod:`django.contrib.staticfiles`.
+
+.. _serving-uploaded-files-in-development:
 
 Serving files uploaded by a user during development.
 ====================================================
