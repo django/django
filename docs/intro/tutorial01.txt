@@ -126,72 +126,6 @@ These files are:
 
 .. _more about packages: http://docs.python.org/tutorial/modules.html#packages
 
-The development server
-----------------------
-
-Let's verify this worked. Change into the outer :file:`mysite` directory, if
-you haven't already, and run the command:
-
-.. code-block:: bash
-
-   $ python manage.py runserver
-
-You'll see the following output on the command line:
-
-.. parsed-literal::
-
-    Performing system checks...
-
-    0 errors found
-    |today| - 15:50:53
-    Django version |version|, using settings 'mysite.settings'
-    Starting development server at http://127.0.0.1:8000/
-    Quit the server with CONTROL-C.
-
-You've started the Django development server, a lightweight Web server written
-purely in Python. We've included this with Django so you can develop things
-rapidly, without having to deal with configuring a production server -- such as
-Apache -- until you're ready for production.
-
-Now's a good time to note: **don't** use this server in anything resembling a
-production environment. It's intended only for use while developing. (We're in
-the business of making Web frameworks, not Web servers.)
-
-Now that the server's running, visit http://127.0.0.1:8000/ with your Web
-browser. You'll see a "Welcome to Django" page, in pleasant, light-blue pastel.
-It worked!
-
-.. admonition:: Changing the port
-
-    By default, the :djadmin:`runserver` command starts the development server
-    on the internal IP at port 8000.
-
-    If you want to change the server's port, pass
-    it as a command-line argument. For instance, this command starts the server
-    on port 8080:
-
-    .. code-block:: bash
-
-        $ python manage.py runserver 8080
-
-    If you want to change the server's IP, pass it along with the port. So to
-    listen on all public IPs (useful if you want to show off your work on other
-    computers), use:
-
-    .. code-block:: bash
-
-        $ python manage.py runserver 0.0.0.0:8000
-
-    Full docs for the development server can be found in the
-    :djadmin:`runserver` reference.
-
-.. admonition:: Automatic reloading of :djadmin:`runserver`
-
-    The development server automatically reloads Python code for each request
-    as needed. You don't need to restart the server for code changes to take
-    effect. However, some actions like adding files don't trigger a restart,
-    so you'll have to restart the server in these cases.
-
 Database setup
 --------------
 
@@ -317,6 +251,72 @@ database and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or
     :setting:`INSTALLED_APPS` before running :djadmin:`migrate`. The
     :djadmin:`migrate` command will only run migrations for apps in
     :setting:`INSTALLED_APPS`.
+
+The development server
+----------------------
+
+Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
+you haven't already, and run the following commands:
+
+.. code-block:: bash
+
+   $ python manage.py runserver
+
+You'll see the following output on the command line:
+
+.. parsed-literal::
+
+    Performing system checks...
+
+    0 errors found
+    |today| - 15:50:53
+    Django version |version|, using settings 'mysite.settings'
+    Starting development server at http://127.0.0.1:8000/
+    Quit the server with CONTROL-C.
+
+You've started the Django development server, a lightweight Web server written
+purely in Python. We've included this with Django so you can develop things
+rapidly, without having to deal with configuring a production server -- such as
+Apache -- until you're ready for production.
+
+Now's a good time to note: **don't** use this server in anything resembling a
+production environment. It's intended only for use while developing. (We're in
+the business of making Web frameworks, not Web servers.)
+
+Now that the server's running, visit http://127.0.0.1:8000/ with your Web
+browser. You'll see a "Welcome to Django" page, in pleasant, light-blue pastel.
+It worked!
+
+.. admonition:: Changing the port
+
+    By default, the :djadmin:`runserver` command starts the development server
+    on the internal IP at port 8000.
+
+    If you want to change the server's port, pass
+    it as a command-line argument. For instance, this command starts the server
+    on port 8080:
+
+    .. code-block:: bash
+
+        $ python manage.py runserver 8080
+
+    If you want to change the server's IP, pass it along with the port. So to
+    listen on all public IPs (useful if you want to show off your work on other
+    computers), use:
+
+    .. code-block:: bash
+
+        $ python manage.py runserver 0.0.0.0:8000
+
+    Full docs for the development server can be found in the
+    :djadmin:`runserver` reference.
+
+.. admonition:: Automatic reloading of :djadmin:`runserver`
+
+    The development server automatically reloads Python code for each request
+    as needed. You don't need to restart the server for code changes to take
+    effect. However, some actions like adding files don't trigger a restart,
+    so you'll have to restart the server in these cases.
 
 .. _creating-models:
 
