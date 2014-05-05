@@ -370,7 +370,7 @@ class Field(RegisterLookupMixin):
             path = path.replace("django.db.models.fields", "django.db.models")
         # Return basic info - other fields should override this.
         return (
-            self.name,
+            force_text(self.name, strings_only=True),
             path,
             [],
             keywords,
