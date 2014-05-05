@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from operator import attrgetter
 
 from django.apps import apps
@@ -1831,7 +1833,7 @@ def create_many_to_many_intermediary_model(field, klass):
     else:
         from_ = klass._meta.model_name
         to = to.lower()
-    meta = type('Meta', (object,), {
+    meta = type(str('Meta'), (object,), {
         'db_table': field._get_m2m_db_table(klass._meta),
         'managed': managed,
         'auto_created': klass,
