@@ -1397,6 +1397,18 @@ class Queries4Tests(BaseQuerysetTest):
         qs = Author.objects.order_by().order_by('name')
         self.assertTrue('ORDER BY' in qs.query.get_compiler(qs.db).as_sql()[0])
 
+    def test_order_by_reverse_fk(self):
+        # It is possible to order by reverse of foreign key, although that can lead
+        # to duplicate results.
+        c1 = SimpleCategory.objects.create(name="category1")
+        c2 = SimpleCategory.objects.create(name="category2")
+        CategoryItem.objects.create(category=c1)
+        CategoryItem.objects.create(category=c2)
+        CategoryItem.objects.create(category=c1)
+        self.assertQuerysetEqual(
+            SimpleCategory.objects.order_by('categoryitem', 'pk'),
+            [c1, c2, c1], lambda x: x)
+
     def test_ticket10181(self):
         # Avoid raising an EmptyResultSet if an inner query is probably
         # empty (and hence, not executed).
