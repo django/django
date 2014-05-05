@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.db import migrations
 from .loader import MigrationLoader
 from .recorder import MigrationRecorder
