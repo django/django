@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.fields.related import do_pending_lookups
 from django.utils import six
+from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 
 
@@ -132,7 +133,7 @@ class ModelState(object):
 
     def __init__(self, app_label, name, fields, options=None, bases=None):
         self.app_label = app_label
-        self.name = name
+        self.name = force_text(name)
         self.fields = fields
         self.options = options or {}
         self.bases = bases or (models.Model, )
