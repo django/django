@@ -4,7 +4,7 @@ from datetime import datetime
 from operator import attrgetter
 
 from django.core.exceptions import FieldError
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
 
 from .models import Author, Article, Tag, Game, Season, Player
 
@@ -121,6 +121,36 @@ class LookupTests(TestCase):
         self.assertEqual(Article.objects.in_bulk(iter([])), {})
         self.assertRaises(TypeError, Article.objects.in_bulk)
         self.assertRaises(TypeError, Article.objects.in_bulk, headline__startswith='Blah')
+
+    def test_in_bulk_lots_of_ids(self):
+        TEST_RANGE = 2000
+
+        Author.objects.all().delete()
+        authors = [Author(pk=i) for i in range(TEST_RANGE)]
+        Author.objects.bulk_create(authors)
+
+        auths = Author.objects.in_bulk(range(TEST_RANGE))
+
+        for i in range(TEST_RANGE):
+            self.assertEqual(auths[i], authors[i])
+
+    @skipIfDBFeature('supports_1000_query_parameters')
+    def test_in_bulk_efficiency(self):
+        TEST_RANGE = 2000
+
+        Author.objects.all().delete()
+        Author.objects.bulk_create([
+            Author(pk=i) for i in range(TEST_RANGE)
+        ])
+
+        from django.db import connection
+        from math import ceil
+        ops = connection.ops
+        batch_size = max(ops.bulk_batch_size(['pk'], range(TEST_RANGE)), 1)
+        expected_num_queries = ceil(TEST_RANGE // batch_size)
+
+        with self.assertNumQueries(expected_num_queries):
+            Author.objects.in_bulk(range(TEST_RANGE))
 
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
