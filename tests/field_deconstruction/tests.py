@@ -1,6 +1,8 @@
 import warnings
-from django.test import TestCase, override_settings
+
 from django.db import models
+from django.test import TestCase, override_settings
+from django.utils import six
 
 
 class FieldDeconstructionTests(TestCase):
@@ -15,14 +17,15 @@ class FieldDeconstructionTests(TestCase):
         # First try using a "normal" field
         field = models.CharField(max_length=65)
         name, path, args, kwargs = field.deconstruct()
-        self.assertEqual(name, None)
+        self.assertIsNone(name)
         field.set_attributes_from_name("is_awesome_test")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(name, "is_awesome_test")
+        self.assertIsInstance(name, six.text_type)
         # Now try with a ForeignKey
         field = models.ForeignKey("some_fake.ModelName")
         name, path, args, kwargs = field.deconstruct()
-        self.assertEqual(name, None)
+        self.assertIsNone(name)
         field.set_attributes_from_name("author")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(name, "author")

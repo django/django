@@ -124,6 +124,8 @@ class MigrationWriter(object):
                 dependencies.append("        migrations.swappable_dependency(settings.%s)," % dependency[1])
                 imports.add("from django.conf import settings")
             else:
+                # No need to output bytestrings for dependencies
+                dependency = tuple([force_text(s) for s in dependency])
                 dependencies.append("        %s," % self.serialize(dependency)[0])
         items["dependencies"] = "\n".join(dependencies) + "\n" if dependencies else ""
 
