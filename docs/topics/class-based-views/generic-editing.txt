@@ -180,12 +180,12 @@ you can use a custom :class:`~django.forms.ModelForm` to do this. First, add
 the foreign key relation to the model::
 
     # models.py
-    from django.contrib.auth import User
+    from django.contrib.auth import get_user_model
     from django.db import models
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
-        created_by = models.ForeignKey(User)
+        created_by = models.ForeignKey(get_user_model())
 
         # ...
 
