@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.utils.datastructures import OrderedSet
 from django.db.migrations.state import ProjectState
 

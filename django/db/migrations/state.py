@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.apps import AppConfig
 from django.apps.registry import Apps, apps as global_apps
 from django.db import models
@@ -244,7 +246,7 @@ class ModelState(object):
         meta_contents.update(self.options)
         if "unique_together" in meta_contents:
             meta_contents["unique_together"] = list(meta_contents["unique_together"])
-        meta = type("Meta", tuple(), meta_contents)
+        meta = type(str("Meta"), tuple(), meta_contents)
         # Then, work out our bases
         try:
             bases = tuple(

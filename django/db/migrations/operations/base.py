@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+
 class Operation(object):
     """
     Base class for migration operations.
