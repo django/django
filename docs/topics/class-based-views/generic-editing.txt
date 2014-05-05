@@ -168,7 +168,7 @@ you can use a custom :class:`~django.forms.ModelForm` to do this. First, add
 the foreign key relation to the model::
 
     # models.py
-    from django.contrib.auth import User
+    from django.contrib.auth.models import User
     from django.db import models
 
     class Author(models.Model):
