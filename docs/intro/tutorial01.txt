@@ -130,10 +130,11 @@ The development server
 ----------------------
 
 Let's verify this worked. Change into the outer :file:`mysite` directory, if
-you haven't already, and run the command:
+you haven't already, and run the following commands:
 
 .. code-block:: bash
 
+   $ python manage.py syncdb
    $ python manage.py runserver
 
 You'll see the following output on the command line:
