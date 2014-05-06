@@ -4,6 +4,7 @@ from collections import OrderedDict
 from optparse import make_option
 
 from django.apps import apps
+from django.db.models import ForeignKey
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
 from django.db import router, DEFAULT_DB_ALIAS
@@ -26,9 +27,9 @@ class Command(BaseCommand):
         make_option('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
             help='Use natural keys if they are available (deprecated: use --natural-foreign instead).'),
         make_option('--natural-foreign', action='store_true', dest='use_natural_foreign_keys', default=False,
-            help='Use natural foreign keys if they are available.'),
+            help='Use natural foreign keys.'),
         make_option('--natural-primary', action='store_true', dest='use_natural_primary_keys', default=False,
-            help='Use natural primary keys if they are available.'),
+            help='Do not provide primary keys.'),
         make_option('-a', '--all', action='store_true', dest='use_base_manager', default=False,
             help="Use Django's base manager to dump all models stored in the database, "
                  "including those that would otherwise be filtered or modified by a custom manager."),
@@ -166,11 +167,11 @@ class Command(BaseCommand):
 
 
 def sort_dependencies(app_list):
-    """Sort a list of (app_config, models) pairs into a single list of models.
+    """
+    Sort a list of (app_config, models) pairs into a single list of models.
 
-    The single list of models is sorted so that any model with a natural key
-    is serialized before a normal model, and any model with a natural key
-    dependency has it's dependencies serialized first.
+    The single list of models is sorted so that any model with a foreign
+    key or m2m dependency has its dependencies serialized first.
     """
     # Process the list of models, and get the list of dependencies
     model_dependencies = []
@@ -182,23 +183,20 @@ def sort_dependencies(app_list):
         for model in model_list:
             models.add(model)
             # Add any explicitly defined dependencies
-            if hasattr(model, 'natural_key'):
-                deps = getattr(model.natural_key, 'dependencies', [])
-                if deps:
-                    deps = [apps.get_model(dep) for dep in deps]
-            else:
-                deps = []
+            deps = [
+                apps.get_model(dep) for dep in
+                getattr(model.natural_key, 'dependencies', [])
+            ]
 
-            # Now add a dependency for any FK or M2M relation with
-            # a model that defines a natural key
+            # Now add a dependency for any FK or M2M relation
             for field in model._meta.fields:
-                if hasattr(field.rel, 'to'):
+                if isinstance(field, ForeignKey):
                     rel_model = field.rel.to
-                    if hasattr(rel_model, 'natural_key') and rel_model != model:
+                    if rel_model != model:
                         deps.append(rel_model)
             for field in model._meta.many_to_many:
                 rel_model = field.rel.to
-                if hasattr(rel_model, 'natural_key') and rel_model != model:
+                if rel_model != model:
                     deps.append(rel_model)
             model_dependencies.append((model, deps))
 

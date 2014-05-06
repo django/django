@@ -73,6 +73,15 @@ class BaseManager(object):
     def check(self, **kwargs):
         return []
 
+    def get_by_natural_key(self, *args):
+        fieldnames = self.model._natural_key_fieldnames()
+        if not fieldnames:
+            raise NotImplementedError(
+                'The %s class must provide a natural_key() method.' %
+                self.model.__name__
+            )
+        return self.get(**dict(zip(fieldnames, args)))
+
     @classmethod
     def _get_queryset_methods(cls, queryset_class):
         def create_method(name, method):

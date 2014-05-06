@@ -188,11 +188,10 @@ def build_instance(Model, data, db):
     natural keys, try to retrieve it from the database.
     """
     obj = Model(**data)
-    if (obj.pk is None and hasattr(Model, 'natural_key') and
-            hasattr(Model._default_manager, 'get_by_natural_key')):
-        natural_key = obj.natural_key()
+    if obj.pk is None:
         try:
+            natural_key = obj.natural_key()
             obj.pk = Model._default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
-        except Model.DoesNotExist:
+        except (Model.DoesNotExist, NotImplementedError):
             pass
     return obj

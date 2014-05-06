@@ -39,7 +39,7 @@ class Serializer(base.Serializer):
             "model": smart_text(obj._meta),
             "fields": self._current,
         }
-        if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
+        if not self.use_natural_primary_keys:
             data["pk"] = smart_text(obj._get_pk_val(), strings_only=True)
 
         return data
@@ -55,7 +55,7 @@ class Serializer(base.Serializer):
             self._current[field.name] = field.value_to_string(obj)
 
     def handle_fk_field(self, obj, field):
-        if self.use_natural_foreign_keys and hasattr(field.rel.to, 'natural_key'):
+        if self.use_natural_foreign_keys:
             related = getattr(obj, field.name)
             if related:
                 value = related.natural_key()
@@ -67,7 +67,7 @@ class Serializer(base.Serializer):
 
     def handle_m2m_field(self, obj, field):
         if field.rel.through._meta.auto_created:
-            if self.use_natural_foreign_keys and hasattr(field.rel.to, 'natural_key'):
+            if self.use_natural_foreign_keys:
                 m2m_value = lambda value: value.natural_key()
             else:
                 m2m_value = lambda value: smart_text(value._get_pk_val(), strings_only=True)
@@ -111,32 +111,26 @@ def Deserializer(object_list, **options):
 
             # Handle M2M relations
             if field.rel and isinstance(field.rel, models.ManyToManyRel):
-                if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
-                    def m2m_convert(value):
-                        if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
-                            return field.rel.to._default_manager.db_manager(db).get_by_natural_key(*value).pk
-                        else:
-                            return smart_text(field.rel.to._meta.pk.to_python(value))
-                else:
-                    m2m_convert = lambda v: smart_text(field.rel.to._meta.pk.to_python(v))
+                def m2m_convert(value):
+                    if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
+                        return field.rel.to._default_manager.db_manager(db).get_by_natural_key(*value).pk
+                    else:
+                        return smart_text(field.rel.to._meta.pk.to_python(value))
                 m2m_data[field.name] = [m2m_convert(pk) for pk in field_value]
 
             # Handle FK fields
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
                 if field_value is not None:
-                    if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
-                        if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
-                            obj = field.rel.to._default_manager.db_manager(db).get_by_natural_key(*field_value)
-                            value = getattr(obj, field.rel.field_name)
-                            # If this is a natural foreign key to an object that
-                            # has a FK/O2O as the foreign key, use the FK value
-                            if field.rel.to._meta.pk.rel:
-                                value = value.pk
-                        else:
-                            value = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
-                        data[field.attname] = value
+                    if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
+                        obj = field.rel.to._default_manager.db_manager(db).get_by_natural_key(*field_value)
+                        value = getattr(obj, field.rel.field_name)
+                        # If this is a natural foreign key to an object that
+                        # has a FK/O2O as the foreign key, use the FK value
+                        if field.rel.to._meta.pk.rel:
+                            value = value.pk
                     else:
-                        data[field.attname] = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                        value = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                    data[field.attname] = value
                 else:
                     data[field.attname] = None
 

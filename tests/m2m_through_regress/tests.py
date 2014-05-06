@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import json
+
 from django.core import management
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -74,7 +76,11 @@ class M2MThroughTestCase(TestCase):
 
         out = StringIO()
         management.call_command("dumpdata", "m2m_through_regress", format="json", stdout=out)
-        self.assertJSONEqual(out.getvalue().strip(), """[{"pk": %(m_pk)s, "model": "m2m_through_regress.membership", "fields": {"person": %(p_pk)s, "price": 100, "group": %(g_pk)s}}, {"pk": %(p_pk)s, "model": "m2m_through_regress.person", "fields": {"name": "Bob"}}, {"pk": %(g_pk)s, "model": "m2m_through_regress.group", "fields": {"name": "Roll"}}]""" % pks)
+        self.assertJSONEqual(out.getvalue().strip(), """
+        [
+        {"pk": %(p_pk)s, "model": "m2m_through_regress.person", "fields": {"name": "Bob"}},
+        {"pk": %(g_pk)s, "model": "m2m_through_regress.group", "fields": {"name": "Roll"}},
+        {"pk": %(m_pk)s, "model": "m2m_through_regress.membership", "fields": {"person": %(p_pk)s, "price": 100, "group": %(g_pk)s}}]""" % pks)
 
         out = StringIO()
         management.call_command("dumpdata", "m2m_through_regress", format="xml",
@@ -82,16 +88,16 @@ class M2MThroughTestCase(TestCase):
         self.assertXMLEqual(out.getvalue().strip(), """
 <?xml version="1.0" encoding="utf-8"?>
 <django-objects version="1.0">
-  <object pk="%(m_pk)s" model="m2m_through_regress.membership">
-    <field to="m2m_through_regress.person" name="person" rel="ManyToOneRel">%(p_pk)s</field>
-    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">%(g_pk)s</field>
-    <field type="IntegerField" name="price">100</field>
-  </object>
   <object pk="%(p_pk)s" model="m2m_through_regress.person">
     <field type="CharField" name="name">Bob</field>
   </object>
   <object pk="%(g_pk)s" model="m2m_through_regress.group">
     <field type="CharField" name="name">Roll</field>
+  </object>
+  <object pk="%(m_pk)s" model="m2m_through_regress.membership">
+    <field to="m2m_through_regress.person" name="person" rel="ManyToOneRel">%(p_pk)s</field>
+    <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">%(g_pk)s</field>
+    <field type="IntegerField" name="price">100</field>
   </object>
 </django-objects>
         """.strip() % pks)
@@ -230,7 +236,20 @@ class ThroughLoadDataTestCase(TestCase):
     fixtures = ["m2m_through"]
 
     def test_sequence_creation(self):
-        "Check that sequences on an m2m_through are created for the through model, not a phantom auto-generated m2m table. Refs #11107"
+        """
+        Check that sequences on an m2m_through are created for the through
+        model, not a phantom auto-generated m2m table. Refs #11107
+        """
         out = StringIO()
         management.call_command("dumpdata", "m2m_through_regress", format="json", stdout=out)
-        self.assertJSONEqual(out.getvalue().strip(), """[{"pk": 1, "model": "m2m_through_regress.usermembership", "fields": {"price": 100, "group": 1, "user": 1}}, {"pk": 1, "model": "m2m_through_regress.person", "fields": {"name": "Guido"}}, {"pk": 1, "model": "m2m_through_regress.group", "fields": {"name": "Python Core Group"}}]""")
+        self.assertJSONEqual(
+            out.getvalue().strip(),
+            json.dumps([
+                {'fields': {'name': 'Guido'},
+                 'model': 'm2m_through_regress.person', 'pk': 1},
+                {'fields': {'name': 'Python Core Group'},
+                 'model': 'm2m_through_regress.group', 'pk': 1},
+                {'fields': {'group': 1, 'price': 100, 'user': 1},
+                 'model': 'm2m_through_regress.usermembership', 'pk': 1}
+            ])
+        )

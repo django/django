@@ -17,6 +17,7 @@ from django.db.models.deletion import Collector
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
     OneToOneField, add_lazy_relation)
+from django.db.models.fields.related import ForeignKey
 from django.db.models.manager import ensure_default_manager
 from django.db.models.options import Options
 from django.db.models.query import Q
@@ -1408,6 +1409,45 @@ class Model(six.with_metaclass(ModelBase)):
                     )
                 )
         return errors
+
+    @classmethod
+    def _natural_key_fieldnames(cls):
+        """
+        Helper method for model.natural_key and manager.get_by_natural_key.
+
+        The fieldnames follow Django's double-underscore notation.
+
+        If no suitable fieldnames are found, the method will return an
+        empty sequence.
+        """
+        if cls._meta.unique_together:
+            unique_fieldnames = cls._meta.unique_together[0]
+        else:
+            unique_fieldnames = [
+                f.name for f in cls._meta.fields
+                if f.unique and not f.auto_created
+            ]
+        natural_key_fieldnames = []
+        for field_name in unique_fieldnames:
+            field, _, _, _ = cls._meta.get_field_by_name(field_name)
+            if isinstance(field, ForeignKey):
+                # recursively get natural key fieldnames for the FK
+                natural_key_fieldnames.extend(
+                    '%s__%s' % (field.name, i) for i in
+                    field.rel.to._natural_key_fieldnames()
+                )
+            else:
+                natural_key_fieldnames.append(field.name)
+        return natural_key_fieldnames
+
+    def natural_key(self):
+        fieldnames = self.__class__._natural_key_fieldnames()
+        if not fieldnames:
+            raise NotImplementedError(
+                'The %s class must provide a natural_key() method.' %
+                self.__class__.__name__
+            )
+        return tuple(reduce(getattr, f.split('__'), self) for f in fieldnames)
 
 
 ############################################

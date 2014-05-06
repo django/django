@@ -137,19 +137,10 @@ class Anchor(models.Model):
         ordering = ('id',)
 
 
-class NaturalKeyAnchorManager(models.Manager):
-    def get_by_natural_key(self, data):
-        return self.get(data=data)
-
-
 class NaturalKeyAnchor(models.Model):
-    objects = NaturalKeyAnchorManager()
 
     data = models.CharField(max_length=100, unique=True)
     title = models.CharField(max_length=100, null=True)
-
-    def natural_key(self):
-        return (self.data,)
 
 
 class UniqueAnchor(models.Model):

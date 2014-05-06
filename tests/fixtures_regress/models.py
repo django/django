@@ -155,7 +155,7 @@ class NKChild(Parent):
     objects = NKManager()
 
     def natural_key(self):
-        return self.data
+        return (self.data,)
 
     def __str__(self):
         return 'NKChild %s:%s' % (self.name, self.data)

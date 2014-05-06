@@ -539,8 +539,7 @@ class NaturalKeyFixtureTests(TestCase):
 
     def test_nk_on_serialize(self):
         """
-        Check that natural key requirements are taken into account
-        when serializing models
+        Check that serialization works with natural key options set to True
         """
         management.call_command(
             'loaddata',
@@ -562,7 +561,55 @@ class NaturalKeyFixtureTests(TestCase):
         )
         self.assertJSONEqual(
             stdout.getvalue(),
-            """[{"fields": {"main": null, "name": "Amazon"}, "model": "fixtures_regress.store"}, {"fields": {"main": null, "name": "Borders"}, "model": "fixtures_regress.store"}, {"fields": {"name": "Neal Stephenson"}, "model": "fixtures_regress.person"}, {"pk": 1, "model": "fixtures_regress.book", "fields": {"stores": [["Amazon"], ["Borders"]], "name": "Cryptonomicon", "author": ["Neal Stephenson"]}}]"""
+            json.dumps([
+                {'fields': {'main': None, 'name': 'Amazon'},
+                 'model': 'fixtures_regress.store'},
+                {'fields': {'main': None, 'name': 'Borders'},
+                 'model': 'fixtures_regress.store'},
+                {'fields': {'name': 'Neal Stephenson'},
+                 'model': 'fixtures_regress.person'},
+                {'fields': {'author': ['Neal Stephenson'],
+                            'name': 'Cryptonomicon',
+                            'stores': [['Amazon'], ['Borders']]},
+                 'model': 'fixtures_regress.book'}
+            ])
+        )
+
+    def test_no_nk_on_serialize(self):
+        """
+        Check that serialization works with natural key options set to False
+        """
+        management.call_command(
+            'loaddata',
+            'forward_ref_lookup.json',
+            verbosity=0,
+        )
+
+        stdout = StringIO()
+        management.call_command(
+            'dumpdata',
+            'fixtures_regress.book',
+            'fixtures_regress.person',
+            'fixtures_regress.store',
+            verbosity=0,
+            format='json',
+            use_natural_foreign_keys=False,
+            use_natural_primary_keys=False,
+            stdout=stdout,
+        )
+        self.assertJSONEqual(
+            stdout.getvalue(),
+            json.dumps([
+                {'fields': {'main': None, 'name': 'Amazon'},
+                 'model': 'fixtures_regress.store', 'pk': 2},
+                {'fields': {'main': None, 'name': 'Borders'},
+                 'model': 'fixtures_regress.store', 'pk': 3},
+                {'fields': {'name': 'Neal Stephenson'},
+                 'model': 'fixtures_regress.person', 'pk': 4},
+                {'fields': {'author': 4, 'name': 'Cryptonomicon',
+                            'stores': [2, 3]},
+                 'model': 'fixtures_regress.book', 'pk': 1},
+            ])
         )
 
     def test_dependency_sorting(self):
