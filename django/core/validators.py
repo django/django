@@ -51,7 +51,17 @@ class RegexValidator(object):
             raise ValidationError(self.message, code=self.code)
 
     def __eq__(self, other):
-        return isinstance(other, RegexValidator) and (self.regex == other.regex) and (self.message == other.message) and (self.code == other.code)
+        return (
+            isinstance(other, RegexValidator) and
+            self.regex.pattern == other.regex.pattern and
+            self.regex.flags == other.regex.flags and
+            (self.message == other.message) and
+            (self.code == other.code) and
+            (self.inverse_match == other.inverse_match)
+        )
+
+    def __ne__(self, other):
+        return not (self == other)
 
 
 @deconstructible
