@@ -19,6 +19,7 @@ __all__ = [
     'ungettext', 'ungettext_lazy',
     'pgettext', 'pgettext_lazy',
     'npgettext', 'npgettext_lazy',
+    'LANGUAGE_SESSION_KEY',
 ]
 
 LANGUAGE_SESSION_KEY = '_language'
