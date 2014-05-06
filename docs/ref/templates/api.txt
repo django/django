@@ -575,11 +575,16 @@ django.contrib.messages.context_processors.messages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
-``RequestContext`` will contain a single additional variable:
+``RequestContext`` will contain these two variables:
 
 * ``messages`` -- A list of messages (as strings) that have been set
-  via the user model (using ``user.message_set.create``) or through
-  the :doc:`messages framework </ref/contrib/messages>`.
+  via the :doc:`messages framework </ref/contrib/messages>`.
+* ``DEFAULT_MESSAGE_LEVELS`` -- A mapping of the message level names to
+  :ref:`their numeric value <message-level-constants>`.
+
+.. versionchanged:: 1.7
+
+       The ``DEFAULT_MESSAGE_LEVELS`` variable was added.
 
 Writing your own context processors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
