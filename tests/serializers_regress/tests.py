@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
-from unittest import skip, skipUnless
+from unittest import skipUnless
 import warnings
 
 try:
@@ -24,7 +24,7 @@ from django.core.serializers.base import DeserializationError
 from django.core.serializers.xml_serializer import DTDForbidden
 from django.db import connection, models
 from django.http import HttpResponse
-from django.test import TestCase
+from django.test import skipUnlessDBFeature, TestCase
 from django.utils import six
 from django.utils.functional import curry
 
@@ -481,8 +481,7 @@ def serializerTest(format, self):
     for klass, count in instance_count.items():
         self.assertEqual(count, klass.objects.count())
 
-if connection.vendor == 'mysql' and six.PY3:
-    serializerTest = skip("Existing MySQL DB-API drivers fail on binary data.")(serializerTest)
+serializerTest = skipUnlessDBFeature('supports_binary_field')(serializerTest)
 
 
 def naturalKeySerializerTest(format, self):

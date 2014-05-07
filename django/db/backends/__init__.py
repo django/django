@@ -481,6 +481,7 @@ class BaseDatabaseFeatures(object):
     can_return_id_from_insert = False
     has_bulk_insert = False
     uses_savepoints = False
+    can_release_savepoints = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
 
     # If True, don't use integer foreign keys referring to, e.g., positive
@@ -511,6 +512,8 @@ class BaseDatabaseFeatures(object):
     has_real_datatype = False
     supports_subqueries_in_group_by = True
     supports_bitwise_or = True
+
+    supports_binary_field = True
 
     # Do time/datetime fields have microsecond precision?
     supports_microsecond_precision = True
@@ -604,6 +607,9 @@ class BaseDatabaseFeatures(object):
     # Does the backend require the sqlparse library for splitting multi-line
     # statements before executing them?
     requires_sqlparse_for_splitting = True
+
+    # Suffix for backends that don't support "SELECT xxx;" queries.
+    bare_select_suffix = ''
 
     def __init__(self, connection):
         self.connection = connection
