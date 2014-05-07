@@ -5,6 +5,7 @@ from django.apps.registry import Apps, apps as global_apps
 from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.fields.related import do_pending_lookups
+from django.conf import settings
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
@@ -74,13 +75,23 @@ class ProjectState(object):
                     try:
                         model = self.apps.get_model(lookup_model[0], lookup_model[1])
                     except LookupError:
+                        # If the lookup failed to something that looks like AUTH_USER_MODEL,
+                        # give a better error message about how you can't change it (#22563)
+                        extra_message = ""
+                        if "%s.%s" % (lookup_model[0], lookup_model[1]) == settings.AUTH_USER_MODEL:
+                            extra_message = (
+                                "\nThe missing model matches AUTH_USER_MODEL; if you've changed the value of this" +
+                                "\nsetting after making a migration, be aware that this is not supported. If you" +
+                                "\nchange AUTH_USER_MODEL you must delete and recreate migrations for its app."
+                            )
                         # Raise an error with a best-effort helpful message
                         # (only for the first issue). Error message should look like:
                         # "ValueError: Lookup failed for model referenced by
                         # field migrations.Book.author: migrations.Author"
-                        raise ValueError("Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}".format(
-                            field=operations[0][1],
-                            model=lookup_model
+                        raise ValueError("Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}{extra_message}".format(
+                            field = operations[0][1],
+                            model = lookup_model,
+                            extra_message = extra_message,
                         ))
                     else:
                         do_pending_lookups(model)
