@@ -24,6 +24,10 @@ class Operation(object):
     # Can this migration be represented as SQL? (things like RunPython cannot)
     reduces_to_sql = True
 
+    # Should this operation be forced as atomic even on backends with no
+    # DDL transaction support (i.e., does it have no DDL, like RunPython)
+    atomic = False
+
     serialization_expand_args = []
 
     def __new__(cls, *args, **kwargs):
