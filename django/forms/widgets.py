@@ -429,6 +429,7 @@ class Textarea(Widget):
 
 class DateTimeBaseInput(TextInput):
     format_key = ''
+    supports_microseconds = False
 
     def __init__(self, attrs=None, format=None):
         super(DateTimeBaseInput, self).__init__(attrs)
@@ -863,6 +864,7 @@ class SplitDateTimeWidget(MultiWidget):
     """
     A Widget that splits datetime input into two <input type="text"> boxes.
     """
+    supports_microseconds = False
 
     def __init__(self, attrs=None, date_format=None, time_format=None):
         widgets = (DateInput(attrs=attrs, format=date_format),
