@@ -25,6 +25,13 @@ about each item can often be found in the release notes of two versions prior.
 * Using an incorrect count of unpacked values in the ``for`` template tag
   will raise an exception rather than fail silently.
 
+* The ``DatabaseCreation`` class on each database backend will be removed,
+  and all table/schema editing will be moved to be via ``SchemaEditor`` instead.
+
+* The legacy method of syncing apps without migrations will be removed,
+  and migrations will become compulsory for all apps. This includes automatic
+  loading of fixtures and support for initial SQL data.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
@@ -48,13 +55,6 @@ details on these changes.
 
 * ``allow_syncdb`` on database routers will no longer automatically become
   ``allow_migrate``.
-
-* The ``DatabaseCreation`` class on each database backend will be removed,
-  and all table/schema editing will be moved to be via ``SchemaEditor`` instead.
-
-* The legacy method of syncing apps without migrations will be removed,
-  and migrations will become compulsory for all apps. This includes automatic
-  loading of fixtures and support for initial SQL data.
 
 * All models will need to be defined inside an installed application or
   declare an explicit :attr:`~django.db.models.Options.app_label`.
