@@ -1,16 +1,9 @@
 from __future__ import unicode_literals
 
-import unittest
-
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
 
 from .models import Reporter, Article
-
-if connection.vendor == 'oracle':
-    expectedFailureOnOracle = unittest.expectedFailure
-else:
-    expectedFailureOnOracle = lambda f: f
 
 
 class IntrospectionTests(TestCase):
@@ -61,19 +54,16 @@ class IntrospectionTests(TestCase):
     def test_get_table_description_types(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
-        # The MySQL exception is due to the cursor.description returning the same constant for
-        # text and blob columns. TODO: use information_schema database to retrieve the proper
-        # field type on MySQL
         self.assertEqual(
             [datatype(r[1], r) for r in desc],
             ['AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
              'CharField', 'CharField', 'CharField', 'BigIntegerField',
-             'BinaryField' if connection.vendor != 'mysql' else 'TextField']
+             'BinaryField' if connection.features.can_introspect_binary_field else 'TextField']
         )
 
     # The following test fails on Oracle due to #17202 (can't correctly
     # inspect the length of character columns).
-    @expectedFailureOnOracle
+    @skipUnlessDBFeature('can_introspect_max_length')
     def test_get_table_description_col_lengths(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)

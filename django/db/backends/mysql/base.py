@@ -172,11 +172,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update_nowait = False
     supports_forward_references = False
     supports_long_model_names = False
+    supports_boolean_type = False
     # XXX MySQL DB-API drivers currently fail on binary data on Python 3.
     supports_binary_field = six.PY2
     supports_microsecond_precision = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
+    can_introspect_binary_field = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
     allows_auto_pk_0 = False

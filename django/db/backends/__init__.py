@@ -518,6 +518,8 @@ class BaseDatabaseFeatures(object):
     supports_subqueries_in_group_by = True
     supports_bitwise_or = True
 
+    supports_boolean_type = True
+
     supports_binary_field = True
 
     # Do time/datetime fields have microsecond precision?
@@ -562,6 +564,9 @@ class BaseDatabaseFeatures(object):
     # Does the backend reset sequences between tests?
     supports_sequence_reset = True
 
+    # Can the backend determine reliably the length of a CharField?
+    can_introspect_max_length = True
+
     # Confirm support for introspected foreign keys
     # Every database can do this reliably, except MySQL,
     # which can't do it for MyISAM tables
@@ -569,6 +574,24 @@ class BaseDatabaseFeatures(object):
 
     # Can the backend introspect an AutoField, instead of an IntegerField?
     can_introspect_autofield = False
+
+    # Can the backend introspect a BigIntegerField, instead of an IntegerField?
+    can_introspect_big_integer_field = True
+
+    # Can the backend introspect an BinaryField, instead of an TextField?
+    can_introspect_binary_field = True
+
+    # Can the backend introspect an IPAddressField, instead of an CharField?
+    can_introspect_ip_address_field = False
+
+    # Can the backend introspect a PositiveIntegerField, instead of an IntegerField?
+    can_introspect_positive_integer_field = False
+
+    # Can the backend introspect a SmallIntegerField, instead of an IntegerField?
+    can_introspect_small_integer_field = False
+
+    # Can the backend introspect a TimeField, instead of a DateTimeField?
+    can_introspect_time_field = True
 
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
@@ -615,6 +638,8 @@ class BaseDatabaseFeatures(object):
 
     # Suffix for backends that don't support "SELECT xxx;" queries.
     bare_select_suffix = ''
+
+    lowercases_column_names = False
 
     def __init__(self, connection):
         self.connection = connection
