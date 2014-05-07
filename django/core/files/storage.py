@@ -13,6 +13,7 @@ from django.utils.module_loading import import_string
 from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
 from django.utils._os import safe_join, abspathu
+from django.utils.deconstruct import deconstructible
 
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
@@ -144,6 +145,7 @@ class Storage(object):
         raise NotImplementedError('subclasses of Storage must provide a modified_time() method')
 
 
+@deconstructible
 class FileSystemStorage(Storage):
     """
     Standard filesystem storage
