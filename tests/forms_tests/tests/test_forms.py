@@ -11,10 +11,10 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import RegexValidator
 from django.forms import (
     BooleanField, CharField, CheckboxSelectMultiple, ChoiceField, DateField,
-    EmailField, FileField, FloatField, Form, forms, HiddenInput, IntegerField,
-    MultipleChoiceField, MultipleHiddenInput, MultiValueField,
+    DateTimeField, EmailField, FileField, FloatField, Form, forms, HiddenInput,
+    IntegerField, MultipleChoiceField, MultipleHiddenInput, MultiValueField,
     NullBooleanField, PasswordInput, RadioSelect, Select, SplitDateTimeField,
-    Textarea, TextInput, ValidationError, widgets,
+    Textarea, TextInput, TimeField, ValidationError, widgets
 )
 from django.forms.utils import ErrorList
 from django.http import QueryDict
@@ -1320,6 +1320,29 @@ class FormsTestCase(TestCase):
         self.assertEqual(unbound['username'].value(), 'djangonaut')
         self.assertEqual(bound['password'].value(), 'foo')
         self.assertEqual(unbound['password'].value(), None)
+
+    def test_initial_datetime_values(self):
+        now = datetime.datetime.now()
+        # Nix microseconds (since they should be ignored). #22502
+        now_no_ms = now.replace(microsecond=0)
+        if now == now_no_ms:
+            now = now.replace(microsecond=1)
+
+        def delayed_now():
+            return now
+
+        def delayed_now_time():
+            return now.time()
+
+        class DateTimeForm(Form):
+            auto_timestamp = DateTimeField(initial=delayed_now)
+            auto_time_only = TimeField(initial=delayed_now_time)
+            supports_microseconds = DateTimeField(initial=delayed_now, widget=TextInput)
+
+        unbound = DateTimeForm()
+        self.assertEqual(unbound['auto_timestamp'].value(), now_no_ms)
+        self.assertEqual(unbound['auto_time_only'].value(), now_no_ms.time())
+        self.assertEqual(unbound['supports_microseconds'].value(), now)
 
     def test_help_text(self):
         # You can specify descriptive text for a field by using the 'help_text' argument)
