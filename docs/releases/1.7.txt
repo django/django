@@ -128,6 +128,11 @@ built-in Django fields (``django/db/models/fields/__init__.py``) as several
 fields, including ``DecimalField`` and ``DateField``, override it and show how
 to call the method on the superclass and simply add or remove extra arguments.
 
+This also means that all arguments to fields must themselves be serializable;
+to see what we consider serializable, and to find out how to make your own
+classes serializable, read the
+:ref:`migration serialization documentation <migration-serializing>`.
+
 Calling custom ``QuerySet`` methods from the ``Manager``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -875,6 +880,22 @@ Instead, you are encouraged to load initial data in migrations if you need it
 (using the ``RunPython`` operation and your model classes);
 this has the added advantage that your initial data will not need updating
 every time you change the schema.
+
+deconstruct() and serializability
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django now requires all Field classes and all of their constructor arguments
+to be serializable. If you modify the constructor signature in your custom
+Field in any way, you'll need to implement a deconstruct() method;
+we've expanded the custom field documentation with :ref:`instructions
+on implementing this method <custom-field-deconstruct-method>`.
+
+The requirement for all field arguments to be
+:ref:`serializable <migration-serializing>` means that any custom class
+instances being passed into Field constructors - things like custom Storage
+subclasses, for instance - need to have a :ref:`deconstruct method defined on
+them as well <custom-deconstruct-method>`, though Django provides a handy
+class decorator that will work for most applications.
 
 App-loading changes
 ~~~~~~~~~~~~~~~~~~~
