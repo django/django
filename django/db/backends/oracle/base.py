@@ -111,6 +111,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
+    can_introspect_max_length = False
+    can_introspect_time_field = False
     atomic_transactions = False
     supports_combined_alters = False
     nulls_order_largest = True
@@ -118,6 +120,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     connection_persists_old_columns = True
     closed_cursor_error_class = InterfaceError
     bare_select_suffix = " FROM DUAL"
+    lowercases_column_names = True
 
 
 class DatabaseOperations(BaseDatabaseOperations):

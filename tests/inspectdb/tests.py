@@ -2,17 +2,12 @@
 from __future__ import unicode_literals
 
 import re
-from unittest import expectedFailure, skipUnless
+from unittest import skipUnless
 
 from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils.six import PY3, StringIO
-
-if connection.vendor == 'oracle':
-    expectedFailureOnOracle = expectedFailure
-else:
-    expectedFailureOnOracle = lambda f: f
 
 
 class InspectDBTestCase(TestCase):
@@ -44,30 +39,41 @@ class InspectDBTestCase(TestCase):
 
         return assertFieldType
 
-    # Inspecting Oracle DB doesn't produce correct results, see #19884
-    @expectedFailureOnOracle
     def test_field_types(self):
         """Test introspection of various Django field types"""
         assertFieldType = self.make_field_type_asserter()
 
-        assertFieldType('char_field', "models.CharField(max_length=10)")
-        assertFieldType('comma_separated_int_field', "models.CharField(max_length=99)")
+        # Inspecting Oracle DB doesn't produce correct results (#19884):
+        # - it gets max_length wrong: it returns a number of bytes.
+        # - it reports fields as blank=True when they aren't.
+        if (connection.features.can_introspect_max_length and
+                not connection.features.interprets_empty_strings_as_nulls):
+            assertFieldType('char_field', "models.CharField(max_length=10)")
+            assertFieldType('comma_separated_int_field', "models.CharField(max_length=99)")
         assertFieldType('date_field', "models.DateField()")
         assertFieldType('date_time_field', "models.DateTimeField()")
-        assertFieldType('email_field', "models.CharField(max_length=75)")
-        assertFieldType('file_field', "models.CharField(max_length=100)")
-        assertFieldType('file_path_field', "models.CharField(max_length=100)")
-        if connection.vendor == 'postgresql':
-            # Only PostgreSQL has a specific type
+        if (connection.features.can_introspect_max_length and
+                not connection.features.interprets_empty_strings_as_nulls):
+            assertFieldType('email_field', "models.CharField(max_length=75)")
+            assertFieldType('file_field', "models.CharField(max_length=100)")
+            assertFieldType('file_path_field', "models.CharField(max_length=100)")
+        if connection.features.can_introspect_ip_address_field:
             assertFieldType('ip_address_field', "models.GenericIPAddressField()")
             assertFieldType('gen_ip_adress_field', "models.GenericIPAddressField()")
-        else:
+        elif (connection.features.can_introspect_max_length and
+                not connection.features.interprets_empty_strings_as_nulls):
             assertFieldType('ip_address_field', "models.CharField(max_length=15)")
             assertFieldType('gen_ip_adress_field', "models.CharField(max_length=39)")
-        assertFieldType('slug_field', "models.CharField(max_length=50)")
-        assertFieldType('text_field', "models.TextField()")
-        assertFieldType('time_field', "models.TimeField()")
-        assertFieldType('url_field', "models.CharField(max_length=200)")
+        if (connection.features.can_introspect_max_length and
+                not connection.features.interprets_empty_strings_as_nulls):
+            assertFieldType('slug_field', "models.CharField(max_length=50)")
+        if not connection.features.interprets_empty_strings_as_nulls:
+            assertFieldType('text_field', "models.TextField()")
+        if connection.features.can_introspect_time_field:
+            assertFieldType('time_field', "models.TimeField()")
+        if (connection.features.can_introspect_max_length and
+                not connection.features.interprets_empty_strings_as_nulls):
+            assertFieldType('url_field', "models.CharField(max_length=200)")
 
     def test_number_field_types(self):
         """Test introspection of various Django field types"""
@@ -75,34 +81,48 @@ class InspectDBTestCase(TestCase):
 
         if not connection.features.can_introspect_autofield:
             assertFieldType('id', "models.IntegerField(primary_key=True)  # AutoField?")
-        assertFieldType('big_int_field', "models.BigIntegerField()")
-        if connection.vendor == 'mysql':
-            # No native boolean type on MySQL
-            assertFieldType('bool_field', "models.IntegerField()")
-            assertFieldType('null_bool_field', "models.IntegerField(blank=True, null=True)")
+
+        if connection.features.can_introspect_big_integer_field:
+            assertFieldType('big_int_field', "models.BigIntegerField()")
         else:
+            assertFieldType('big_int_field', "models.IntegerField()")
+
+        if connection.features.supports_boolean_type:
             assertFieldType('bool_field', "models.BooleanField()")
             assertFieldType('null_bool_field', "models.NullBooleanField()")
+        else:
+            assertFieldType('bool_field', "models.IntegerField()")
+            assertFieldType('null_bool_field', "models.IntegerField(blank=True, null=True)")
+
         if connection.vendor == 'sqlite':
-            # Guessed arguments, see #5014
+            # Guessed arguments on SQLite, see #5014
             assertFieldType('decimal_field', "models.DecimalField(max_digits=10, decimal_places=5)  "
                                              "# max_digits and decimal_places have been guessed, "
                                              "as this database handles decimal fields as float")
         else:
             assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
+
         assertFieldType('float_field', "models.FloatField()")
+
         assertFieldType('int_field', "models.IntegerField()")
-        if connection.vendor == 'sqlite':
+
+        if connection.features.can_introspect_positive_integer_field:
             assertFieldType('pos_int_field', "models.PositiveIntegerField()")
-            assertFieldType('pos_small_int_field', "models.PositiveSmallIntegerField()")
         else:
-            # 'unsigned' property undetected on other backends
             assertFieldType('pos_int_field', "models.IntegerField()")
-            if connection.vendor == 'postgresql':
+
+        if connection.features.can_introspect_positive_integer_field:
+            if connection.features.can_introspect_small_integer_field:
+                assertFieldType('pos_small_int_field', "models.PositiveSmallIntegerField()")
+            else:
+                assertFieldType('pos_small_int_field', "models.PositiveIntegerField()")
+        else:
+            if connection.features.can_introspect_small_integer_field:
                 assertFieldType('pos_small_int_field', "models.SmallIntegerField()")
             else:
                 assertFieldType('pos_small_int_field', "models.IntegerField()")
-        if connection.vendor in ('sqlite', 'postgresql'):
+
+        if connection.features.can_introspect_small_integer_field:
             assertFieldType('small_int_field', "models.SmallIntegerField()")
         else:
             assertFieldType('small_int_field', "models.IntegerField()")
@@ -156,7 +176,7 @@ class InspectDBTestCase(TestCase):
         out = StringIO()
         call_command('inspectdb', stdout=out)
         output = out.getvalue()
-        base_name = 'Field' if connection.vendor != 'oracle' else 'field'
+        base_name = 'field' if connection.features.lowercases_column_names else 'Field'
         self.assertIn("field = models.IntegerField()", output)
         self.assertIn("field_field = models.IntegerField(db_column='%s_')" % base_name, output)
         self.assertIn("field_field_0 = models.IntegerField(db_column='%s__')" % base_name, output)
