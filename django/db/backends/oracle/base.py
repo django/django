@@ -107,7 +107,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_zoneinfo_database = pytz is not None
     supports_bitwise_or = False
     can_defer_constraint_checks = True
-    ignores_nulls_in_unique_constraints = False
+    supports_partially_nullable_unique_constraints = False
     has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
