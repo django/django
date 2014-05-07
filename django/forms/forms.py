@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 import copy
+import datetime
 import warnings
 
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
@@ -593,6 +594,11 @@ class BoundField(object):
             data = self.form.initial.get(self.name, self.field.initial)
             if callable(data):
                 data = data()
+                # If this is an auto-generated default date, nix the
+                # microseconds for standardized handling. See #22502.
+                if (isinstance(data, (datetime.datetime, datetime.time)) and
+                        not getattr(self.field.widget, 'supports_microseconds', True)):
+                    data = data.replace(microsecond=0)
         else:
             data = self.field.bound_data(
                 self.data, self.form.initial.get(self.name, self.field.initial)
