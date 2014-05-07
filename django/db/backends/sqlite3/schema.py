@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.utils import six
 from django.apps.registry import Apps
 from django.db.backends.schema import BaseDatabaseSchemaEditor
@@ -19,6 +20,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Manual emulation of SQLite parameter quoting
         if isinstance(value, type(True)):
             return str(int(value))
+        elif isinstance(value, (Decimal, float)):
+            return str(value)
         elif isinstance(value, six.integer_types):
             return str(value)
         elif isinstance(value, six.string_types):
@@ -26,7 +29,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         elif value is None:
             return "NULL"
         else:
-            raise ValueError("Cannot quote parameter value %r" % value)
+            raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
     def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], rename_fields=[], override_uniques=None):
         """
@@ -52,7 +55,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # If there's a default, insert it into the copy map
             if field.has_default():
                 mapping[field.column] = self.quote_value(
-                    field.get_default()
+                    self.effective_default(field)
                 )
         # Add in any altered fields
         for (old_field, new_field) in alter_fields:
