@@ -34,6 +34,13 @@ You'll need to follow these steps:
    In addition, if your class provides local file storage, it must override
    the ``path()`` method.
 
+#. Your storage class must be :ref:`deconstructible <custom-deconstruct-method>`
+   so it can be serialized when it's used on a field in a migration. As long
+   as your field has arguments that are themselves
+   :ref:`serializable <migration-serializing>`, you can use the
+   ``django.utils.deconstruct.deconstructible`` class decorator for this
+   (that's what Django uses on FileSystemStorage).
+
 Your custom storage system may override any of the storage methods explained in
 :doc:`/ref/files/storage`, but you **must** implement the following methods:
 

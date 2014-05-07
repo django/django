@@ -520,6 +520,22 @@ available at the top level of a module it is not serializable.
 Django will write out the value as an instantiation of your class with the
 given arguments, similar to the way it writes out references to Django fields.
 
+As long as all of the arguments to your class' constructor are themselves
+serializable, you can just use the ``@deconstructible`` class decorator
+from ``django.utils.deconstruct`` to add the method::
+
+    from django.utils.deconstruct import deconstructible
+
+    @deconstructible
+    class MyCustomClass(object):
+
+        def __init__(self, foo=1):
+            ...
+
+The decorator adds logic to capture and preserve the arguments on their
+way into your constructor, and then returns those arguments exactly when
+deconstruct() is called.
+
 Upgrading from South
 --------------------
 
