@@ -80,7 +80,7 @@ Automatically loading initial data fixtures
 .. deprecated:: 1.7
 
     If an application uses migrations, there is no automatic loading of
-    fixtures. Since migrations will be required for applications in Django 1.9,
+    fixtures. Since migrations will be required for applications in Django 2.0,
     this behavior is considered deprecated. If you want to load initial data
     for an app, consider doing it in a migration.
 
@@ -114,7 +114,7 @@ Providing initial SQL data
 
     If an application uses migrations, there is no loading of initial SQL data
     (including backend-specific SQL data). Since migrations will be required
-    for applications in Django 1.9, this behavior is considered deprecated.
+    for applications in Django 2.0, this behavior is considered deprecated.
     If you want to use initial SQL for an app, consider doing it in a migration.
 
 Django provides a hook for passing the database arbitrary SQL that's executed
