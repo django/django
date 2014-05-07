@@ -96,6 +96,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     interprets_empty_strings_as_nulls = True
     uses_savepoints = True
+    can_release_savepoints = False
     has_select_for_update = True
     has_select_for_update_nowait = True
     can_return_id_from_insert = True
@@ -116,6 +117,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_literal_defaults = True
     connection_persists_old_columns = True
     closed_cursor_error_class = InterfaceError
+    bare_select_suffix = " FROM DUAL"
 
 
 class DatabaseOperations(BaseDatabaseOperations):

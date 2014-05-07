@@ -131,7 +131,6 @@ class SQLiteTests(TestCase):
             self.assertRaises(NotImplementedError,
                 models.Item.objects.all().aggregate, aggregate('last_modified'))
 
-
     def test_convert_values_to_handle_null_value(self):
         convert_values = DatabaseOperations(connection).convert_values
         self.assertIsNone(convert_values(None, AutoField(primary_key=True)))
@@ -464,9 +463,7 @@ class EscapingChecks(TestCase):
     EscapingChecksDebug test case, to also test CursorDebugWrapper.
     """
 
-    # For Oracle, when you want to select a value, you need to specify the
-    # special pseudo-table 'dual'; a select with no from clause is invalid.
-    bare_select_suffix = " FROM DUAL" if connection.vendor == 'oracle' else ""
+    bare_select_suffix = connection.features.bare_select_suffix
 
     def test_paramless_no_escaping(self):
         cursor = connection.cursor()
