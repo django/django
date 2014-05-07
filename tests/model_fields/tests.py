@@ -605,6 +605,7 @@ class FileFieldTests(unittest.TestCase):
 class BinaryFieldTests(test.TestCase):
     binary_data = b'\x00\x46\xFE'
 
+    @test.skipUnlessDBFeature('supports_binary_field')
     def test_set_and_retrieve(self):
         data_set = (self.binary_data, six.memoryview(self.binary_data))
         for bdata in data_set:
@@ -618,10 +619,6 @@ class BinaryFieldTests(test.TestCase):
             self.assertEqual(bytes(dm.data), bytes(bdata))
             # Test default value
             self.assertEqual(bytes(dm.short_data), b'\x08')
-
-    if connection.vendor == 'mysql' and six.PY3:
-        # Existing MySQL DB-API drivers fail on binary data.
-        test_set_and_retrieve = unittest.expectedFailure(test_set_and_retrieve)
 
     def test_max_length(self):
         dm = DataModel(short_data=self.binary_data * 4)
