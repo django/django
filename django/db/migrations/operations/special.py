@@ -86,7 +86,8 @@ class RunPython(Operation):
 
     reduces_to_sql = False
 
-    def __init__(self, code, reverse_code=None):
+    def __init__(self, code, reverse_code=None, atomic=True):
+        self.atomic = atomic
         # Forwards code
         if not callable(code):
             raise ValueError("RunPython must be supplied with a callable")

@@ -178,7 +178,7 @@ operation that adds that field and so will try to run it again).
 RunPython
 ---------
 
-.. class:: RunPython(code, reverse_code=None)
+.. class:: RunPython(code, reverse_code=None, atomic=True)
 
 Runs custom Python code in a historical context. ``code`` (and ``reverse_code``
 if supplied) should be callable objects that accept two arguments; the first is
@@ -229,6 +229,12 @@ either doing it outside the scope of the Django model system (e.g. triggers)
 or that you use :class:`SeparateDatabaseAndState` to add in operations that will
 reflect your changes to the model state - otherwise, the versioned ORM and
 the autodetector will stop working correctly.
+
+By default, ``RunPython`` will run its contents inside a transaction even
+on databases that do not support DDL transactions (for example, MySQL and
+Oracle). This should be safe, but may cause a crash if you attempt to use
+the ``schema_editor`` provided on these backends; in this case, please
+set ``atomic=False``.
 
 SeparateDatabaseAndState
 ------------------------
