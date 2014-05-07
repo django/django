@@ -143,8 +143,11 @@ class MigrationLoader(object):
         # Load disk data
         self.load_disk()
         # Load database data
-        recorder = MigrationRecorder(self.connection)
-        self.applied_migrations = recorder.applied_migrations()
+        if self.connection is None:
+            self.applied_migrations = set()
+        else:
+            recorder = MigrationRecorder(self.connection)
+            self.applied_migrations = recorder.applied_migrations()
         # Do a first pass to separate out replacing and non-replacing migrations
         normal = {}
         replacing = {}
