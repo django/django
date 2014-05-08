@@ -5,8 +5,7 @@ from optparse import make_option
 
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connections, DEFAULT_DB_ALIAS, migrations
-from django.db.migrations.migration import Migration
+from django.db.migrations import Migration
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.questioner import MigrationQuestioner, InteractiveMigrationQuestioner
@@ -194,7 +193,7 @@ class Command(BaseCommand):
                     biggest_number = max([x for x in numbers if x is not None])
                 except ValueError:
                     biggest_number = 1
-                subclass = type("Migration", (migrations.Migration, ), {
+                subclass = type("Migration", (Migration, ), {
                     "dependencies": [(app_label, migration.name) for migration in merge_migrations],
                 })
                 new_migration = subclass("%04i_merge" % (biggest_number + 1), app_label)
