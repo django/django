@@ -36,7 +36,11 @@ Minor features
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* Authorization backends can now raise
+  :class:`~django.core.exceptions.PermissionDenied` in
+  :meth:`~django.contrib.auth.models.User.has_perm`
+  and :meth:`~django.contrib.auth.models.User.has_module_perms`
+  to short-circuit permission checking.
 
 :mod:`django.contrib.formtools`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
