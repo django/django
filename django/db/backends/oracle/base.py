@@ -96,6 +96,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     interprets_empty_strings_as_nulls = True
     uses_savepoints = True
+    can_release_savepoints = False
     has_select_for_update = True
     has_select_for_update_nowait = True
     can_return_id_from_insert = True
@@ -106,16 +107,20 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_zoneinfo_database = pytz is not None
     supports_bitwise_or = False
     can_defer_constraint_checks = True
-    ignores_nulls_in_unique_constraints = False
+    supports_partially_nullable_unique_constraints = False
     has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
+    can_introspect_max_length = False
+    can_introspect_time_field = False
     atomic_transactions = False
     supports_combined_alters = False
     nulls_order_largest = True
     requires_literal_defaults = True
     connection_persists_old_columns = True
     closed_cursor_error_class = InterfaceError
+    bare_select_suffix = " FROM DUAL"
+    lowercases_column_names = True
 
 
 class DatabaseOperations(BaseDatabaseOperations):

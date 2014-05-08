@@ -650,7 +650,7 @@ class UniqueTest(TestCase):
         form = TripleForm({'left': '1', 'middle': '3', 'right': '1'})
         self.assertTrue(form.is_valid())
 
-    @skipUnlessDBFeature('ignores_nulls_in_unique_constraints')
+    @skipUnlessDBFeature('supports_nullable_unique_constraints')
     def test_unique_null(self):
         title = 'I May Be Wrong But I Doubt It'
         form = BookForm({'title': title, 'author': self.writer.pk})

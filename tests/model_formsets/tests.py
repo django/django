@@ -671,7 +671,7 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(book1.title, 'Flowers of Evil')
         self.assertEqual(book1.notes, 'English translation of Les Fleurs du Mal')
 
-    @skipUnlessDBFeature('ignores_nulls_in_unique_constraints')
+    @skipUnlessDBFeature('supports_partially_nullable_unique_constraints')
     def test_inline_formsets_with_nullable_unique_together(self):
         # Test inline formsets where the inline-edited object has a
         # unique_together constraint with a nullable member

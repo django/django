@@ -229,7 +229,7 @@ class OneToOneRegressionTests(TestCase):
 
         # Several instances of the origin are only possible if database allows
         # inserting multiple NULL rows for a unique constraint
-        if connection.features.ignores_nulls_in_unique_constraints:
+        if connection.features.supports_nullable_unique_constraints:
             UndergroundBar.objects.create()
 
             # When there are several instances of the origin

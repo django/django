@@ -3937,8 +3937,7 @@ class UserAdminTest(TestCase):
         ContentType.objects.clear_cache()
 
         expected_queries = 10
-        # Oracle doesn't implement "RELEASE SAVPOINT", see #20387.
-        if connection.vendor == 'oracle':
+        if not connection.features.can_release_savepoints:
             expected_queries -= 1
 
         with self.assertNumQueries(expected_queries):
@@ -3980,8 +3979,7 @@ class GroupAdminTest(TestCase):
         g = Group.objects.create(name="test_group")
 
         expected_queries = 8
-        # Oracle doesn't implement "RELEASE SAVPOINT", see #20387.
-        if connection.vendor == 'oracle':
+        if not connection.features.can_release_savepoints:
             expected_queries -= 1
 
         with self.assertNumQueries(expected_queries):

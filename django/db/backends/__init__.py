@@ -473,14 +473,20 @@ class BaseDatabaseFeatures(object):
     # Does the backend distinguish between '' and None?
     interprets_empty_strings_as_nulls = False
 
+    # Does the backend allow inserting duplicate NULL rows in a nullable
+    # unique field? All core backends implement this correctly, but other
+    # databases such as SQL Server do not.
+    supports_nullable_unique_constraints = True
+
     # Does the backend allow inserting duplicate rows when a unique_together
-    # constraint exists, but one of the unique_together columns is NULL?
-    ignores_nulls_in_unique_constraints = True
+    # constraint exists and some fields are nullable but not all of them?
+    supports_partially_nullable_unique_constraints = True
 
     can_use_chunked_reads = True
     can_return_id_from_insert = False
     has_bulk_insert = False
     uses_savepoints = False
+    can_release_savepoints = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
 
     # If True, don't use integer foreign keys referring to, e.g., positive
@@ -511,6 +517,10 @@ class BaseDatabaseFeatures(object):
     has_real_datatype = False
     supports_subqueries_in_group_by = True
     supports_bitwise_or = True
+
+    supports_boolean_type = True
+
+    supports_binary_field = True
 
     # Do time/datetime fields have microsecond precision?
     supports_microsecond_precision = True
@@ -554,6 +564,9 @@ class BaseDatabaseFeatures(object):
     # Does the backend reset sequences between tests?
     supports_sequence_reset = True
 
+    # Can the backend determine reliably the length of a CharField?
+    can_introspect_max_length = True
+
     # Confirm support for introspected foreign keys
     # Every database can do this reliably, except MySQL,
     # which can't do it for MyISAM tables
@@ -561,6 +574,24 @@ class BaseDatabaseFeatures(object):
 
     # Can the backend introspect an AutoField, instead of an IntegerField?
     can_introspect_autofield = False
+
+    # Can the backend introspect a BigIntegerField, instead of an IntegerField?
+    can_introspect_big_integer_field = True
+
+    # Can the backend introspect an BinaryField, instead of an TextField?
+    can_introspect_binary_field = True
+
+    # Can the backend introspect an IPAddressField, instead of an CharField?
+    can_introspect_ip_address_field = False
+
+    # Can the backend introspect a PositiveIntegerField, instead of an IntegerField?
+    can_introspect_positive_integer_field = False
+
+    # Can the backend introspect a SmallIntegerField, instead of an IntegerField?
+    can_introspect_small_integer_field = False
+
+    # Can the backend introspect a TimeField, instead of a DateTimeField?
+    can_introspect_time_field = True
 
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
@@ -604,6 +635,11 @@ class BaseDatabaseFeatures(object):
     # Does the backend require the sqlparse library for splitting multi-line
     # statements before executing them?
     requires_sqlparse_for_splitting = True
+
+    # Suffix for backends that don't support "SELECT xxx;" queries.
+    bare_select_suffix = ''
+
+    lowercases_column_names = False
 
     def __init__(self, connection):
         self.connection = connection

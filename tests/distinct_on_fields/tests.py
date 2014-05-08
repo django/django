@@ -8,6 +8,7 @@ from .models import Tag, Celebrity, Fan, Staff, StaffTag
 
 
 @skipUnlessDBFeature('can_distinct_on_fields')
+@skipUnlessDBFeature('supports_nullable_unique_constraints')
 class DistinctOnTests(TestCase):
     def setUp(self):
         t1 = Tag.objects.create(name='t1')
