@@ -3,7 +3,6 @@ import warnings
 from django.db import models
 from django.test import TestCase, override_settings
 from django.utils import six
-from django.core.files.storage import FileSystemStorage
 
 
 class FieldDeconstructionTests(TestCase):

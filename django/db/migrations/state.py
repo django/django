@@ -89,9 +89,9 @@ class ProjectState(object):
                         # "ValueError: Lookup failed for model referenced by
                         # field migrations.Book.author: migrations.Author"
                         raise ValueError("Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}{extra_message}".format(
-                            field = operations[0][1],
-                            model = lookup_model,
-                            extra_message = extra_message,
+                            field=operations[0][1],
+                            model=lookup_model,
+                            extra_message=extra_message,
                         ))
                     else:
                         do_pending_lookups(model)
