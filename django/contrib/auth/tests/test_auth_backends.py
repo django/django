@@ -398,13 +398,19 @@ class InActiveUserBackendTest(TestCase):
 
 class PermissionDeniedBackend(object):
     """
-    Always raises PermissionDenied.
+    Always raises PermissionDenied in `authenticate`, `has_perm` and `has_module_perms`.
     """
     supports_object_permissions = True
     supports_anonymous_user = True
     supports_inactive_user = True
 
     def authenticate(self, username=None, password=None):
+        raise PermissionDenied
+
+    def has_perm(self, user_obj, perm, obj=None):
+        raise PermissionDenied
+
+    def has_module_perms(self, user_obj, app_label):
         raise PermissionDenied
 
 
@@ -429,6 +435,26 @@ class PermissionDeniedBackendTest(TestCase):
         settings.AUTHENTICATION_BACKENDS) + (backend, ))
     def test_authenticates(self):
         self.assertEqual(authenticate(username='test', password='test'), self.user1)
+
+    @override_settings(AUTHENTICATION_BACKENDS=(backend, ) +
+            tuple(settings.AUTHENTICATION_BACKENDS))
+    def test_has_perm_denied(self):
+        content_type = ContentType.objects.get_for_model(Group)
+        perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
+        self.user1.user_permissions.add(perm)
+
+        self.assertIs(self.user1.has_perm('auth.test'), False)
+        self.assertIs(self.user1.has_module_perms('auth'), False)
+
+    @override_settings(AUTHENTICATION_BACKENDS=tuple(
+        settings.AUTHENTICATION_BACKENDS) + (backend, ))
+    def test_has_perm(self):
+        content_type = ContentType.objects.get_for_model(Group)
+        perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
+        self.user1.user_permissions.add(perm)
+
+        self.assertIs(self.user1.has_perm('auth.test'), True)
+        self.assertIs(self.user1.has_module_perms('auth'), True)
 
 
 class NewModelBackend(ModelBackend):
