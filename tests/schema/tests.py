@@ -9,7 +9,7 @@ from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
-    UniqueTest, Thing, TagThrough, BookWithM2MThrough)
+    UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough)
 
 
 class SchemaTests(TransactionTestCase):
@@ -401,6 +401,30 @@ class SchemaTests(TransactionTestCase):
         finally:
             # Cleanup model states
             AuthorWithM2M._meta.local_many_to_many.remove(new_field)
+
+    def test_m2m_through_alter(self):
+        """
+        Tests altering M2Ms with explicit through models (should no-op)
+        """
+        # Create the tables
+        with connection.schema_editor() as editor:
+            editor.create_model(AuthorTag)
+            editor.create_model(AuthorWithM2MThrough)
+            editor.create_model(TagM2MTest)
+        # Ensure the m2m table is there
+        self.assertEqual(len(self.column_classes(AuthorTag)), 3)
+        # "Alter" the field's blankness. This should not actually do anything.
+        with connection.schema_editor() as editor:
+            old_field = AuthorWithM2MThrough._meta.get_field_by_name("tags")[0]
+            new_field = ManyToManyField("schema.TagM2MTest", related_name="authors", through="AuthorTag")
+            new_field.contribute_to_class(AuthorWithM2MThrough, "tags")
+            editor.alter_field(
+                Author,
+                old_field,
+                new_field,
+            )
+        # Ensure the m2m table is still there
+        self.assertEqual(len(self.column_classes(AuthorTag)), 3)
 
     def test_m2m_repoint(self):
         """
