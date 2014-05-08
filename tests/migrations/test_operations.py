@@ -757,10 +757,12 @@ class OperationTests(MigrationTestBase):
         Tests the RunPython operation correctly handles the "atomic" keyword
         """
         project_state = self.set_up_test_model("test_runpythonatomic", mti_model=True)
+
         def inner_method(models, schema_editor):
             Pony = models.get_model("test_runpythonatomic", "Pony")
             Pony.objects.create(pink=1, weight=3.55)
             raise ValueError("Adrian hates ponies.")
+
         atomic_migration = Migration("test", "test_runpythonatomic")
         atomic_migration.operations = [migrations.RunPython(inner_method)]
         non_atomic_migration = Migration("test", "test_runpythonatomic")
@@ -787,7 +789,6 @@ class OperationTests(MigrationTestBase):
                 with connection.schema_editor() as editor:
                     non_atomic_migration.apply(project_state, editor)
             self.assertEqual(project_state.render().get_model("test_runpythonatomic", "Pony").objects.count(), 1)
-
 
 
 class MigrateNothingRouter(object):
