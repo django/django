@@ -24,6 +24,22 @@ class AuthorWithM2M(models.Model):
         apps = new_apps
 
 
+class AuthorWithM2MThrough(models.Model):
+    name = models.CharField(max_length=255)
+    tags = models.ManyToManyField("schema.TagM2MTest", related_name="authors", through="AuthorTag")
+
+    class Meta:
+        apps = new_apps
+
+
+class AuthorTag(models.Model):
+    author = models.ForeignKey("schema.AuthorWithM2MThrough")
+    tag = models.ForeignKey("schema.TagM2MTest")
+
+    class Meta:
+        apps = new_apps
+
+
 class Book(models.Model):
     author = models.ForeignKey(Author)
     title = models.CharField(max_length=100, db_index=True)
