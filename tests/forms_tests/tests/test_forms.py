@@ -13,7 +13,8 @@ from django.forms import (
     EmailField, FileField, FloatField, Form, forms, HiddenInput, IntegerField,
     MultipleChoiceField, MultipleHiddenInput, MultiValueField,
     NullBooleanField, PasswordInput, RadioSelect, Select, SplitDateTimeField,
-    Textarea, TextInput, ValidationError, widgets,
+    Textarea, TextInput, ValidationError, widgets, DateTimeField,
+    TimeField
 )
 from django.forms.utils import ErrorList
 from django.http import QueryDict
@@ -1276,9 +1277,24 @@ class FormsTestCase(TestCase):
         # It's possible to get to the value which would be used for rendering
         # the widget for a field by using the BoundField's value method.
 
+        now = datetime.datetime.now()
+        # Nix microseconds (since they should be ignored). #22502
+        now_no_ms = now.replace(microsecond=0)
+        if now == now_no_ms:
+            now = now.replace(microsecond=1)
+
+        def delayed_now():
+            return now
+
+        def delayed_now_time():
+            return now.time()
+
         class UserRegistration(Form):
             username = CharField(max_length=10, initial='djangonaut')
             password = CharField(widget=PasswordInput)
+            auto_timestamp = DateTimeField(initial=delayed_now)
+            auto_time_only = TimeField(initial=delayed_now_time)
+            supports_microseconds = DateTimeField(initial=delayed_now, widget=TextInput)
 
         unbound = UserRegistration()
         bound = UserRegistration({'password': 'foo'})
@@ -1286,6 +1302,9 @@ class FormsTestCase(TestCase):
         self.assertEqual(unbound['username'].value(), 'djangonaut')
         self.assertEqual(bound['password'].value(), 'foo')
         self.assertEqual(unbound['password'].value(), None)
+        self.assertEqual(unbound['auto_timestamp'].value(), now_no_ms)
+        self.assertEqual(unbound['auto_time_only'].value(), now_no_ms.time())
+        self.assertEqual(unbound['supports_microseconds'].value(), now)
 
     def test_help_text(self):
         # You can specify descriptive text for a field by using the 'help_text' argument)
