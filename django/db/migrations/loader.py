@@ -201,7 +201,10 @@ class MigrationLoader(object):
                 # makemigrations to declare dependencies on apps before they
                 # even have migrations.
                 if parent[1] == "__first__" and parent not in self.graph:
-                    if parent[0] in self.unmigrated_apps:
+                    if parent[0] == key[0]:
+                        # Ignore __first__ references to the same app (#22325)
+                        continue
+                    elif parent[0] in self.unmigrated_apps:
                         # This app isn't migrated, but something depends on it.
                         # The models will get auto-added into the state, though
                         # so we're fine.
