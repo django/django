@@ -296,6 +296,33 @@ class TestValidatorEquality(TestCase):
             RegexValidator(r'^(?:[a-z0-9\.\-]*)://'),
         )
 
+        self.assertNotEqual(
+            RegexValidator('', flags=re.IGNORECASE),
+            RegexValidator(''),
+        )
+
+        self.assertNotEqual(
+            RegexValidator(''),
+            RegexValidator('', inverse_match=True),
+        )
+
+    def test_regex_equality_nocache(self):
+        pattern = r'^(?:[a-z0-9\.\-]*)://'
+        left = RegexValidator(pattern)
+        re.purge()
+        right = RegexValidator(pattern)
+
+        self.assertEqual(
+            left,
+            right,
+        )
+
+    def test_regex_equality_blank(self):
+        self.assertEqual(
+            RegexValidator(),
+            RegexValidator(),
+        )
+
     def test_email_equality(self):
         self.assertEqual(
             EmailValidator(),
