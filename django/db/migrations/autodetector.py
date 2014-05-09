@@ -50,7 +50,7 @@ class MigrationAutodetector(object):
         """
         # We'll store migrations as lists by app names for now
         self.migrations = {}
-        old_apps = self.from_state.render()
+        old_apps = self.from_state.render(ignore_swappable=True)
         new_apps = self.to_state.render()
         # Prepare lists of old/new model keys that we care about
         # (i.e. ignoring proxy ones and unmigrated ones)
