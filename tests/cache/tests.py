@@ -285,6 +285,8 @@ class BaseCacheTests(object):
         cache.set("hello1", "goodbye1")
         self.assertEqual(cache.has_key("hello1"), True)
         self.assertEqual(cache.has_key("goodbye1"), False)
+        cache.set("no_expiry", "here", None)
+        self.assertEqual(cache.has_key("no_expiry"), True)
 
     def test_in(self):
         # The in operator can be used to inspect cache contents

@@ -29,8 +29,7 @@ class LocMemCache(BaseCache):
         self.validate_key(key)
         pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
         with self._lock.writer():
-            exp = self._expire_info.get(key, 0)
-            if exp is not None and exp <= time.time():
+            if self._has_expired(key):
                 self._set(key, pickled, timeout)
                 return True
             return False
@@ -40,8 +39,7 @@ class LocMemCache(BaseCache):
         self.validate_key(key)
         pickled = None
         with self._lock.reader():
-            exp = self._expire_info.get(key, 0)
-            if exp is None or exp > time.time():
+            if not self._has_expired(key):
                 pickled = self._cache[key]
         if pickled is not None:
             try:
@@ -85,10 +83,7 @@ class LocMemCache(BaseCache):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         with self._lock.reader():
-            exp = self._expire_info.get(key)
-            if exp is None:
-                return False
-            elif exp > time.time():
+            if not self._has_expired(key):
                 return True
 
         with self._lock.writer():
@@ -98,6 +93,12 @@ class LocMemCache(BaseCache):
             except KeyError:
                 pass
             return False
+
+    def _has_expired(self, key):
+        exp = self._expire_info.get(key, -1)
+        if exp is None or exp > time.time():
+            return False
+        return True
 
     def _cull(self):
         if self._cull_frequency == 0:
