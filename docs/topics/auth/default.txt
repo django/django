@@ -1205,6 +1205,26 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     A form for generating and emailing a one-time use link to reset a
     user's password.
 
+    .. method:: send_email(subject_template_name, email_template_name, context, from_email, to_email, [html_email_template_name=None])
+
+        .. versionadded:: 1.8
+
+        Uses the arguments to send an ``EmailMultiAlternatives``.
+        Can be overridden to customize how the email is sent to the user.
+
+        :param subject_template_name: the template for the subject.
+        :param email_template_name: the template for the email body.
+        :param context: context passed to the ``subject_template``, ``email_template``,
+            and ``html_email_template`` (if it is not ``None``).
+        :param from_email: the sender's email.
+        :param to_email: the email of the requester.
+        :param html_email_template_name: the template for the HTML body;
+            defaults to ``None``, in which case a plain text email is sent.
+
+        By default, ``save()`` populates the ``context`` with the
+        same variables that :func:`~django.contrib.auth.views.password_reset`
+        passes to its email context.
+
 .. class:: SetPasswordForm
 
     A form that lets a user change his/her password without entering the old
