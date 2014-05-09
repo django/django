@@ -38,7 +38,7 @@ class ProjectState(object):
             real_apps=self.real_apps,
         )
 
-    def render(self, include_real=None):
+    def render(self, include_real=None, ignore_swappable=False):
         "Turns the project state into actual models in a new Apps"
         if self.apps is None:
             # Any apps in self.real_apps should have all their models included
@@ -75,23 +75,15 @@ class ProjectState(object):
                     try:
                         model = self.apps.get_model(lookup_model[0], lookup_model[1])
                     except LookupError:
-                        # If the lookup failed to something that looks like AUTH_USER_MODEL,
-                        # give a better error message about how you can't change it (#22563)
-                        extra_message = ""
-                        if "%s.%s" % (lookup_model[0], lookup_model[1]) == settings.AUTH_USER_MODEL:
-                            extra_message = (
-                                "\nThe missing model matches AUTH_USER_MODEL; if you've changed the value of this" +
-                                "\nsetting after making a migration, be aware that this is not supported. If you" +
-                                "\nchange AUTH_USER_MODEL you must delete and recreate migrations for its app."
-                            )
+                        if "%s.%s" % (lookup_model[0], lookup_model[1]) == settings.AUTH_USER_MODEL and ignore_swappable:
+                            continue
                         # Raise an error with a best-effort helpful message
                         # (only for the first issue). Error message should look like:
                         # "ValueError: Lookup failed for model referenced by
                         # field migrations.Book.author: migrations.Author"
-                        raise ValueError("Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}{extra_message}".format(
+                        raise ValueError("Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}".format(
                             field=operations[0][1],
                             model=lookup_model,
-                            extra_message=extra_message,
                         ))
                     else:
                         do_pending_lookups(model)
