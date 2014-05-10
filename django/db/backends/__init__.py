@@ -518,8 +518,6 @@ class BaseDatabaseFeatures(object):
     supports_subqueries_in_group_by = True
     supports_bitwise_or = True
 
-    supports_boolean_type = True
-
     supports_binary_field = True
 
     # Do time/datetime fields have microsecond precision?
@@ -581,6 +579,9 @@ class BaseDatabaseFeatures(object):
     # Can the backend introspect an BinaryField, instead of an TextField?
     can_introspect_binary_field = True
 
+    # Can the backend introspect an BooleanField, instead of an IntegerField?
+    can_introspect_boolean_field = True
+
     # Can the backend introspect an IPAddressField, instead of an CharField?
     can_introspect_ip_address_field = False
 
@@ -639,7 +640,7 @@ class BaseDatabaseFeatures(object):
     # Suffix for backends that don't support "SELECT xxx;" queries.
     bare_select_suffix = ''
 
-    lowercases_column_names = False
+    uppercases_column_names = True
 
     def __init__(self, connection):
         self.connection = connection
