@@ -145,6 +145,74 @@ class RenameModel(Operation):
         return "Rename model %s to %s" % (self.old_name, self.new_name)
 
 
+class CreateProxyModel(Operation):
+    """
+    Create model proxy (for the ORM, no db interactions required)
+    """
+    serialization_expand_args = ['options']
+
+    def __init__(self, name, options=None, bases=None):
+        self.name = name
+        self.options = options or {}
+        self.bases = bases or (models.Model,)
+
+    def state_forwards(self, app_label, state):
+        state.models[app_label, self.name.lower()] = ModelState(app_label, self.name, [], self.options, self.bases)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def describe(self):
+        return "Create proxy model %s" % (self.name, )
+
+    def references_model(self, name, app_label=None):
+        strings_to_check = [self.name]
+        # Check we didn't inherit from the model
+        for base in self.bases:
+            if isinstance(base, six.string_types):
+                strings_to_check.append(base.split(".")[-1])
+        # Now go over all the strings and compare them
+        for string in strings_to_check:
+            if string.lower() == name.lower():
+                return True
+        return False
+
+    def __eq__(self, other):
+        return (
+            (self.__class__ == other.__class__) and
+            (self.name == other.name) and
+            (self.options == other.options) and
+            (self.bases == other.bases)
+        )
+
+
+class DeleteProxyModel(Operation):
+    """
+    Delete model proxy (for the ORM, no db interactions required)
+    """
+
+    def __init__(self, name):
+        self.name = name
+
+    def state_forwards(self, app_label, state):
+        del state.models[app_label, self.name.lower()]
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.name.lower()
+
+    def describe(self):
+        return "Delete proxy model %s" % (self.name, )
+
+
 class AlterModelTable(Operation):
     """
     Renames a model's table
