@@ -120,7 +120,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     connection_persists_old_columns = True
     closed_cursor_error_class = InterfaceError
     bare_select_suffix = " FROM DUAL"
-    lowercases_column_names = True
+    uppercases_column_names = False
 
 
 class DatabaseOperations(BaseDatabaseOperations):
