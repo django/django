@@ -53,19 +53,44 @@ class MigrationAutodetector(object):
         old_apps = self.from_state.render(ignore_swappable=True)
         new_apps = self.to_state.render()
         # Prepare lists of old/new model keys that we care about
-        # (i.e. ignoring proxy ones and unmigrated ones)
+        # (i.e. unmigrated ones)
 
         old_model_keys = []
         for al, mn in self.from_state.models.keys():
             model = old_apps.get_model(al, mn)
-            if not model._meta.proxy and model._meta.managed and al not in self.from_state.real_apps:
+            if model._meta.managed and al not in self.from_state.real_apps:
                 old_model_keys.append((al, mn))
 
         new_model_keys = []
         for al, mn in self.to_state.models.keys():
             model = new_apps.get_model(al, mn)
-            if not model._meta.proxy and model._meta.managed and al not in self.to_state.real_apps:
+            if model._meta.managed and al not in self.to_state.real_apps:
                 new_model_keys.append((al, mn))
+
+        # TODO good idea treat proxy to non-proxy as new (for field handling)?
+        kept_models = set(old_model_keys).intersection(new_model_keys)
+        for app_label, model_name in kept_models:
+            old_model_state = self.from_state.models[app_label, model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            if old_model_state.options.get('proxy') and not new_model_state.options.get('proxy'):
+                self.add_to_migration(
+                    app_label,
+                    operations.DeleteProxyModel(
+                        name=old_model_state.name,
+                    )
+                )
+                old_model_keys.remove((app_label, model_name))
+            if not old_model_state.options.get('proxy') and new_model_state.options.get('proxy'):
+                self.add_to_migration(
+                    app_label,
+                    operations.CreateProxyModel(
+                        name=new_model_state.name,
+                        options=new_model_state.options,
+                        bases=new_model_state.bases,
+                    )
+                )
+                new_model_keys.append((app_label, model_name))
+
 
         def _deep_deconstruct(obj, field=True):
             """
@@ -112,13 +137,30 @@ class MigrationAutodetector(object):
                     rem_model_fields_def = _rel_agnostic_fields_def(rem_model_state.fields)
                     if model_fields_def == rem_model_fields_def:
                         if self.questioner.ask_rename_model(rem_model_state, model_state):
-                            self.add_to_migration(
-                                app_label,
-                                operations.RenameModel(
-                                    old_name=rem_model_state.name,
-                                    new_name=model_state.name,
+                            if model_state.options.get('proxy'):
+                                self.add_to_migration(
+                                    app_label,
+                                    operations.DeleteProxyModel(
+                                        name=rem_model_state.name,
+                                    )
                                 )
-                            )
+                                self.add_to_migration(
+                                    app_label,
+                                    operations.CreateProxyModel(
+                                        name=model_state.name,
+                                        options=model_state.options,
+                                        bases=model_state.bases,
+                                    )
+                                )
+
+                            else:
+                                self.add_to_migration(
+                                    app_label,
+                                    operations.RenameModel(
+                                        old_name=rem_model_state.name,
+                                        new_name=model_state.name,
+                                    )
+                                )
                             renamed_models[app_label, model_name] = rem_model_name
                             renamed_models_rel['%s.%s' % (rem_model_state.app_label, rem_model_state.name)] = '%s.%s' % (model_state.app_label, model_state.name)
                             old_model_keys.remove((rem_app_label, rem_model_name))
@@ -127,12 +169,16 @@ class MigrationAutodetector(object):
 
         # Adding models. Phase 1 is adding models with no outward relationships.
         added_models = set(new_model_keys) - set(old_model_keys)
-        pending_add = {}
+        pending_related_fields = {}
+        pending_proxy_base = {}
         for app_label, model_name in added_models:
             model_state = self.to_state.models[app_label, model_name]
-            # Are there any relationships out from this model? if so, punt it to the next phase.
+            # Are there any relationships out from this model, or is it a proxy
+            # for another model? if so, punt it to the next phase.
             related_fields = []
-            for field in new_apps.get_model(app_label, model_name)._meta.local_fields:
+            options = new_apps.get_model(app_label, model_name)._meta
+            proxy_for_model = options.proxy_for_model
+            for field in options.local_fields:
                 if field.rel:
                     if field.rel.to:
                         related_fields.append((field.name, field.rel.to._meta.app_label, field.rel.to._meta.model_name))
@@ -144,7 +190,9 @@ class MigrationAutodetector(object):
                 if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
                     related_fields.append((field.name, field.rel.through._meta.app_label, field.rel.through._meta.model_name))
             if related_fields:
-                pending_add[app_label, model_name] = related_fields
+                pending_related_fields[app_label, model_name] = related_fields
+            elif proxy_for_model is not None:
+                pending_proxy_base[app_label, model_name] = (proxy_for_model._meta.app_label, proxy_for_model._meta.model_name)
             else:
                 self.add_to_migration(
                     app_label,
@@ -161,19 +209,24 @@ class MigrationAutodetector(object):
         pending_new_fks = []
         pending_unique_together = []
         added_phase_2 = set()
-        while pending_add:
+        while pending_related_fields or pending_proxy_base:
             # Is there one we can add that has all dependencies satisfied?
-            satisfied = [
+            satisfied_related_fields = [
                 (m, rf)
-                for m, rf in pending_add.items()
-                if all((al, mn) not in pending_add for f, al, mn in rf)
+                for m, rf in pending_related_fields.items()
+                if all((al, mn) not in (pending_related_fields.keys() + pending_proxy_base.keys())
+                for f, al, mn in rf)
             ]
-            if satisfied:
-                (app_label, model_name), related_fields = sorted(satisfied)[0]
+            satisfied_proxy_model_bases = [
+                m for m, parent in pending_proxy_base.items()
+                if parent not in (pending_related_fields.keys() + pending_proxy_base.keys())
+            ]
+            if satisfied_related_fields:
+                (app_label, model_name), related_fields = sorted(satisfied_related_fields)[0]
                 model_state = self.to_state.models[app_label, model_name]
                 self.add_to_migration(
                     app_label,
-                    operations.CreateModel(
+                     operations.CreateModel(
                         name=model_state.name,
                         fields=model_state.fields,
                         options=model_state.options,
@@ -184,9 +237,27 @@ class MigrationAutodetector(object):
                     new=any((al, mn) in added_phase_2 for f, al, mn in related_fields),
                 )
                 added_phase_2.add((app_label, model_name))
+            elif satisfied_proxy_model_bases:
+                (app_label, model_name) = sorted(satisfied_proxy_model_bases)[0]
+                model_state = self.to_state.models[app_label, model_name]
+                other_app_label, _ = pending_proxy_base[(app_label, model_name)]
+                self.add_to_migration(
+                    app_label,
+                    operations.CreateProxyModel(
+                        name=model_state.name,
+                        options=model_state.options,
+                        bases=model_state.bases,
+                    ),
+                    # If it's already been added in phase 2 put it in a new
+                    # migration for safety.
+                    # TODO: do we need this for proxies?
+                    new=any((al, mn) in added_phase_2 for f, al, mn in related_fields),
+                )
+                # TODO: do we need this for proxies?
+                added_phase_2.add((app_label, model_name))
             # Ah well, we'll need to split one. Pick deterministically.
             else:
-                (app_label, model_name), related_fields = sorted(pending_add.items())[0]
+                (app_label, model_name), related_fields = sorted(pending_related_fields.items())[0]
                 model_state = self.to_state.models[app_label, model_name]
                 # Defer unique together constraints creation, see ticket #22275
                 unique_together_constraints = model_state.options.pop('unique_together', None)
@@ -194,7 +265,7 @@ class MigrationAutodetector(object):
                     pending_unique_together.append((app_label, model_name,
                                                    unique_together_constraints))
                 # Work out the fields that need splitting out
-                bad_fields = dict((f, (al, mn)) for f, al, mn in related_fields if (al, mn) in pending_add)
+                bad_fields = dict((f, (al, mn)) for f, al, mn in related_fields if (al, mn) in pending_related_fields)
                 # Create the model, without those
                 self.add_to_migration(
                     app_label,
@@ -208,14 +279,19 @@ class MigrationAutodetector(object):
                 # Add the bad fields to be made in a phase 3
                 for field_name, (other_app_label, other_model_name) in bad_fields.items():
                     pending_new_fks.append((app_label, model_name, field_name, other_app_label))
-            for field_name, other_app_label, other_model_name in related_fields:
-                # If it depends on a swappable something, add a dynamic depend'cy
-                swappable_setting = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0].swappable_setting
-                if swappable_setting is not None:
-                    self.add_swappable_dependency(app_label, swappable_setting)
-                elif app_label != other_app_label:
+            if new_apps.get_model(app_label, model_name)._meta.proxy:
+                if app_label != other_app_label:
                     self.add_dependency(app_label, other_app_label)
-            del pending_add[app_label, model_name]
+                pending_proxy_base.pop((app_label, model_name))
+            else:
+                for field_name, other_app_label, other_model_name in related_fields:
+                    # If it depends on a swappable something, add a dynamic depend'cy
+                    swappable_setting = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0].swappable_setting
+                    if swappable_setting is not None:
+                        self.add_swappable_dependency(app_label, swappable_setting)
+                    elif app_label != other_app_label:
+                        self.add_dependency(app_label, other_app_label)
+                pending_related_fields.pop((app_label, model_name))
 
         # Phase 3 is adding the final set of FKs as separate new migrations.
         for app_label, model_name, field_name, other_app_label in pending_new_fks:
@@ -267,6 +343,7 @@ class MigrationAutodetector(object):
                         unique_together=new_model_state.options.get("unique_together", set()),
                     )
                 ))
+
         # New fields
         renamed_fields = {}
         for app_label, model_name, field_name in new_fields - old_fields:

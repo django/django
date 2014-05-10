@@ -57,6 +57,7 @@ class AutodetectorTests(TestCase):
     book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "author")]})
     book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "newfield")]})
     attribution = ModelState("otherapp", "Attribution", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("book", models.ForeignKey("otherapp.Book"))])
+    book_with_proxy_author = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.AuthorProxy")), ("title", models.CharField(max_length=200))])
     edition = ModelState("thirdapp", "Edition", [("id", models.AutoField(primary_key=True)), ("book", models.ForeignKey("otherapp.Book"))])
     custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))])
     knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
@@ -484,17 +485,24 @@ class AutodetectorTests(TestCase):
         self.assertEqual(action2.__class__.__name__, "AlterUniqueTogether")
         self.assertEqual(action2.unique_together, set([("title", "newfield")]))
 
-    def test_proxy_ignorance(self):
-        "Tests that the autodetector correctly ignores proxy models"
-        # First, we test adding a proxy model
+    def test_add_proxy(self):
+        "Tests adding a proxy model"
         before = self.make_project_state([self.author_empty])
         after = self.make_project_state([self.author_empty, self.author_proxy])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number of migrations?
-        self.assertEqual(len(changes), 0)
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right actions?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "CreateProxyModel")
+        self.assertEqual(action.name, "AuthorProxy")
 
-        # Now, we test turning a proxy model into a non-proxy model
+    def test_convert_to_proxy(self):
+        "Tests conversion of a non-proxy model to a proxy model"
         before = self.make_project_state([self.author_empty, self.author_proxy])
         after = self.make_project_state([self.author_empty, self.author_proxy_notproxy])
         autodetector = MigrationAutodetector(before, after)
@@ -503,11 +511,22 @@ class AutodetectorTests(TestCase):
         self.assertEqual(len(changes['testapp']), 1)
         # Right number of actions?
         migration = changes['testapp'][0]
-        self.assertEqual(len(migration.operations), 1)
-        # Right action?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        self.assertEqual(action.name, "AuthorProxy")
+        self.assertEqual(len(migration.operations), 2)
+        # Right actions?
+        action1, action2 = migration.operations
+        self.assertEqual(action1.__class__.__name__, "DeleteProxyModel")
+        self.assertEqual(action1.name, "AuthorProxy")
+        self.assertEqual(action2.__class__.__name__, "CreateModel")
+        self.assertEqual(action2.name, "AuthorProxy")
+
+    def test_fk_to_proxy_dependencies(self):
+        "Tests foreign keys to proxy model"
+        before = self.make_project_state([self.author_empty, self.author_proxy])
+        after = self.make_project_state([self.author_empty, self.author_proxy, self.book_with_proxy_author])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        migration = changes['otherapp'][0]
+        self.assertEqual(migration.dependencies, [('testapp', '__first__')])
 
     def test_unmanaged_ignorance(self):
         "Tests that the autodetector correctly ignores managed models"
