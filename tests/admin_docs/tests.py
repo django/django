@@ -81,7 +81,11 @@ class AdminDocViewTests(TestCase):
 
     def test_model_index(self):
         response = self.client.get(reverse('django-admindocs-models-index'))
-        self.assertContains(response, '<h2 id="app-auth">Auth</h2>', html=True)
+        self.assertContains(
+            response,
+            '<h2 id="app-auth">Authentication and Authorization (django.contrib.auth)</h2>',
+            html=True
+        )
 
     def test_template_detail(self):
         response = self.client.get(reverse('django-admindocs-templates',
