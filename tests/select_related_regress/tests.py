@@ -163,17 +163,13 @@ class SelectRelatedRegressTests(TestCase):
             self.assertTrue('LEFT OUTER' in str(qs.query))
 
     def test_regression_19870(self):
-        """
-        Regression for #19870
-
-        """
         hen = Hen.objects.create(name='Hen')
         Chick.objects.create(name='Chick', mother=hen)
 
         self.assertEqual(Chick.objects.all()[0].mother.name, 'Hen')
         self.assertEqual(Chick.objects.select_related()[0].mother.name, 'Hen')
 
-    def test_ticket_10733(self):
+    def test_regression_10733(self):
         a = A.objects.create(name='a', lots_of_text='lots_of_text_a', a_field='a_field')
         b = B.objects.create(name='b', lots_of_text='lots_of_text_b', b_field='b_field')
         c = C.objects.create(name='c', lots_of_text='lots_of_text_c', is_published=True,
@@ -188,3 +184,13 @@ class SelectRelatedRegressTests(TestCase):
             self.assertEqual(qs_c.c_b.lots_of_text, 'lots_of_text_b')
             self.assertEqual(qs_c.c_a.name, 'a')
             self.assertEqual(qs_c.c_b.name, 'b')
+
+    def test_regression_22508(self):
+        building = Building.objects.create(name='101')
+        device = Device.objects.create(name="router", building=building)
+        Port.objects.create(port_number='1', device=device)
+
+        device = Device.objects.get()
+        port = device.port_set.select_related('device__building').get()
+        with self.assertNumQueries(0):
+            port.device.building
