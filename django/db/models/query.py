@@ -246,6 +246,9 @@ class QuerySet(object):
             # Add the known related objects to the model, if there are any
             if self._known_related_objects:
                 for field, rel_objs in self._known_related_objects.items():
+                    # Avoid overwriting objects loaded e.g. by select_related
+                    if hasattr(obj, field.get_cache_name()):
+                        continue
                     pk = getattr(obj, field.get_attname())
                     try:
                         rel_obj = rel_objs[pk]
