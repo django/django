@@ -35,6 +35,7 @@ class AutodetectorTests(TestCase):
     author_with_custom_user = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("user", models.ForeignKey("thirdapp.CustomUser"))])
     author_proxy = ModelState("testapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
     author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author", ))
+    author_proxy_renamed = ModelState("testapp", "WriterProxy", [], {"proxy": True}, ("testapp.author", ))
     author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author", ))
     author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author", ))
     author_with_m2m = ModelState("testapp", "Author", [
@@ -241,6 +242,25 @@ class AutodetectorTests(TestCase):
         self.assertEqual(action.__class__.__name__, "AlterField")
         self.assertEqual(action.name, "author")
         self.assertEqual(action.field.rel.to.__name__, "Writer")
+
+    def test_rename_proxy_model(self):
+        "Tests autodetection of renamed proxy models"
+        # Make state
+        before = self.make_project_state([self.author_empty, self.author_proxy])
+        after = self.make_project_state([self.author_empty, self.author_proxy_renamed])
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename_model": True}))
+        changes = autodetector._detect_changes()
+
+        # Right number of migrations for model rename?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "RenameProxyModel")
+        self.assertEqual(action.old_name, "AuthorProxy")
+        self.assertEqual(action.new_name, "WriterProxy")
 
     def test_rename_model_with_renamed_rel_field(self):
         """

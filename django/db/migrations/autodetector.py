@@ -138,29 +138,16 @@ class MigrationAutodetector(object):
                     if model_fields_def == rem_model_fields_def:
                         if self.questioner.ask_rename_model(rem_model_state, model_state):
                             if model_state.options.get('proxy'):
-                                self.add_to_migration(
-                                    app_label,
-                                    operations.DeleteProxyModel(
-                                        name=rem_model_state.name,
-                                    )
-                                )
-                                self.add_to_migration(
-                                    app_label,
-                                    operations.CreateProxyModel(
-                                        name=model_state.name,
-                                        options=model_state.options,
-                                        bases=model_state.bases,
-                                    )
-                                )
-
+                                rename_operation = operations.RenameProxyModel
                             else:
-                                self.add_to_migration(
-                                    app_label,
-                                    operations.RenameModel(
-                                        old_name=rem_model_state.name,
-                                        new_name=model_state.name,
-                                    )
+                                rename_operation = operations.RenameModel
+                            self.add_to_migration(
+                                app_label,
+                                rename_operation(
+                                    old_name=rem_model_state.name,
+                                    new_name=model_state.name,
                                 )
+                            )
                             renamed_models[app_label, model_name] = rem_model_name
                             renamed_models_rel['%s.%s' % (rem_model_state.app_label, rem_model_state.name)] = '%s.%s' % (model_state.app_label, model_state.name)
                             old_model_keys.remove((rem_app_label, rem_model_name))

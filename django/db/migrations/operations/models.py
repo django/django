@@ -213,6 +213,36 @@ class DeleteProxyModel(Operation):
         return "Delete proxy model %s" % (self.name, )
 
 
+class RenameProxyModel(Operation):
+    """
+    Renames a proxy model (for the ORM, no db interactions required).
+    """
+
+    def __init__(self, old_name, new_name):
+        self.old_name = old_name
+        self.new_name = new_name
+
+    def state_forwards(self, app_label, state):
+        state.models[app_label, self.new_name.lower()] = state.models[app_label, self.old_name.lower()]
+        state.models[app_label, self.new_name.lower()].name = self.new_name
+        del state.models[app_label, self.old_name.lower()]
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def references_model(self, name, app_label=None):
+        return (
+            name.lower() == self.old_name.lower() or
+            name.lower() == self.new_name.lower()
+        )
+
+    def describe(self):
+        return "Rename proxy model %s to %s" % (self.old_name, self.new_name)
+
+
 class AlterModelTable(Operation):
     """
     Renames a model's table
