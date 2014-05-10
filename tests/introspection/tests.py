@@ -57,7 +57,8 @@ class IntrospectionTests(TestCase):
         self.assertEqual(
             [datatype(r[1], r) for r in desc],
             ['AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
-             'CharField', 'CharField', 'CharField', 'BigIntegerField',
+             'CharField', 'CharField', 'CharField',
+             'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
              'BinaryField' if connection.features.can_introspect_binary_field else 'TextField']
         )
 

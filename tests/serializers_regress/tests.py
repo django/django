@@ -449,6 +449,7 @@ class SerializerTests(TestCase):
         self.assertEqual(base_data, proxy_proxy_data.replace('proxy', ''))
 
 
+@skipUnlessDBFeature('supports_binary_field')
 def serializerTest(format, self):
 
     # Create all the objects defined in the test data
@@ -480,8 +481,6 @@ def serializerTest(format, self):
     # same as the number that was serialized.
     for klass, count in instance_count.items():
         self.assertEqual(count, klass.objects.count())
-
-serializerTest = skipUnlessDBFeature('supports_binary_field')(serializerTest)
 
 
 def naturalKeySerializerTest(format, self):

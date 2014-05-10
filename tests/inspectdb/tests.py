@@ -87,7 +87,7 @@ class InspectDBTestCase(TestCase):
         else:
             assertFieldType('big_int_field', "models.IntegerField()")
 
-        if connection.features.supports_boolean_type:
+        if connection.features.can_introspect_boolean_field:
             assertFieldType('bool_field', "models.BooleanField()")
             assertFieldType('null_bool_field', "models.NullBooleanField()")
         else:
@@ -176,7 +176,7 @@ class InspectDBTestCase(TestCase):
         out = StringIO()
         call_command('inspectdb', stdout=out)
         output = out.getvalue()
-        base_name = 'field' if connection.features.lowercases_column_names else 'Field'
+        base_name = 'field' if not connection.features.uppercases_column_names else 'Field'
         self.assertIn("field = models.IntegerField()", output)
         self.assertIn("field_field = models.IntegerField(db_column='%s_')" % base_name, output)
         self.assertIn("field_field_0 = models.IntegerField(db_column='%s__')" % base_name, output)
