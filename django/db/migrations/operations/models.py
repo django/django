@@ -64,6 +64,9 @@ class CreateModel(Operation):
             ([(k, f.deconstruct()[1:]) for k, f in self.fields] == [(k, f.deconstruct()[1:]) for k, f in other.fields])
         )
 
+    def __ne__(self, other):
+        return not (self == other)
+
 
 class DeleteModel(Operation):
     """
@@ -187,6 +190,9 @@ class CreateProxyModel(Operation):
             (self.options == other.options) and
             (self.bases == other.bases)
         )
+
+    def __ne__(self, other):
+        return not (self == other)
 
 
 class DeleteProxyModel(Operation):
