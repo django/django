@@ -36,6 +36,7 @@ class AutodetectorTests(TestCase):
     author_proxy = ModelState("testapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
     author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author", ))
     author_proxy_renamed = ModelState("testapp", "WriterProxy", [], {"proxy": True}, ("testapp.author", ))
+    author_proxy_otherapp = ModelState("otherapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
     author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author", ))
     author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author", ))
     author_with_m2m = ModelState("testapp", "Author", [
@@ -328,6 +329,20 @@ class AutodetectorTests(TestCase):
         self.assertEqual(migration1.dependencies, [])
         self.assertEqual(migration2.dependencies, [("testapp", "auto_1")])
         self.assertEqual(migration3.dependencies, [("otherapp", "auto_1")])
+
+    def test_proxy_dependency(self):
+        "Tests that being a proxy app automatically adds a dependency"
+        # Make state
+        before = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.author_empty, self.author_proxy_otherapp])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['otherapp']), 1)
+        migration = changes['otherapp'][0]
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "CreateProxyModel")
+        self.assertEqual(migration.dependencies, [("testapp", "__first__")])
 
     def test_same_app_no_fk_dependency(self):
         """
