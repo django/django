@@ -553,17 +553,20 @@ class MigrationAutodetector(object):
         but we put some effort in to the fallback name to avoid VCS conflicts
         if we can.
         """
+        create_ops = (operations.CreateModel, operations.CreateProxyModel)
+        delete_ops = (operations.DeleteModel, operations.DeleteProxyModel)
+
         if len(ops) == 1:
-            if isinstance(ops[0], operations.CreateModel):
+            if isinstance(ops[0], create_ops):
                 return ops[0].name.lower()
-            elif isinstance(ops[0], operations.DeleteModel):
+            elif isinstance(ops[0], delete_ops):
                 return "delete_%s" % ops[0].name.lower()
             elif isinstance(ops[0], operations.AddField):
                 return "%s_%s" % (ops[0].model_name.lower(), ops[0].name.lower())
             elif isinstance(ops[0], operations.RemoveField):
                 return "remove_%s_%s" % (ops[0].model_name.lower(), ops[0].name.lower())
         elif len(ops) > 1:
-            if all(isinstance(o, operations.CreateModel) for o in ops):
+            if all(isinstance(o, create_ops) for o in ops):
                 return "_".join(sorted(o.name.lower() for o in ops))
         return "auto_%s" % datetime.datetime.now().strftime("%Y%m%d_%H%M")
 
