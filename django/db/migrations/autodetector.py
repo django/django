@@ -213,7 +213,7 @@ class MigrationAutodetector(object):
                 model_state = self.to_state.models[app_label, model_name]
                 self.add_to_migration(
                     app_label,
-                     operations.CreateModel(
+                    operations.CreateModel(
                         name=model_state.name,
                         fields=model_state.fields,
                         options=model_state.options,
