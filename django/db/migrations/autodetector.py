@@ -89,7 +89,7 @@ class MigrationAutodetector(object):
                         bases=new_model_state.bases,
                     )
                 )
-                new_model_keys.append((app_label, model_name))
+                new_model_keys.remove((app_label, model_name))
 
 
         def _deep_deconstruct(obj, field=True):
