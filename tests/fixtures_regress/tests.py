@@ -768,8 +768,8 @@ class M2MNaturalKeyFixtureTests(TestCase):
         # The dependency sorting should not result in an error, and the
         # through model should have dependencies to the other models and as
         # such come last in the list.
-        self.assertEqual(sorted(sorted_deps[:3]), sorted([A, B, C]))
-        self.assertEqual(sorted(sorted_deps[3:]), sorted([AtoB, BtoC, CtoA]))
+        self.assertEqual(sorted_deps[:3], [A, B, C])
+        self.assertEqual(sorted_deps[3:], [AtoB, BtoC, CtoA])
 
     def test_dependency_sorting_m2m_complex_circular_2(self):
         """
@@ -789,7 +789,7 @@ class M2MNaturalKeyFixtureTests(TestCase):
             self.fail("Serialization dependency solving algorithm isn't "
                       "capable of handling circular M2M setups with "
                       "intermediate models plus natural key dependency hints.")
-        self.assertEqual(sorted(sorted_deps[:2]), sorted([M2MComplexCircular2A, M2MComplexCircular2B]))
+        self.assertEqual(sorted_deps[:2], [M2MComplexCircular2A, M2MComplexCircular2B])
         self.assertEqual(sorted_deps[2:], [M2MCircular2ThroughAB])
 
     def test_dump_and_load_m2m_simple(self):
