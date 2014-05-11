@@ -75,18 +75,21 @@ class MigrationAutodetector(object):
             if old_model_state.options.get('proxy') and not new_model_state.options.get('proxy'):
                 self.add_to_migration(
                     app_label,
-                    operations.DeleteProxyModel(
+                    operations.DeleteModel(
                         name=old_model_state.name,
+                        orm_only=True,
                     )
                 )
                 old_model_keys.remove((app_label, model_name))
             if not old_model_state.options.get('proxy') and new_model_state.options.get('proxy'):
                 self.add_to_migration(
                     app_label,
-                    operations.CreateProxyModel(
+                    operations.CreateModel(
                         name=new_model_state.name,
+                        fields=[],
                         options=new_model_state.options,
                         bases=new_model_state.bases,
+                        orm_only=True,
                     )
                 )
                 new_model_keys.remove((app_label, model_name))
@@ -138,14 +141,15 @@ class MigrationAutodetector(object):
                     if model_fields_def == rem_model_fields_def:
                         if self.questioner.ask_rename_model(rem_model_state, model_state):
                             if model_state.options.get('proxy'):
-                                rename_operation = operations.RenameProxyModel
+                                orm_only = True
                             else:
-                                rename_operation = operations.RenameModel
+                                orm_only = False
                             self.add_to_migration(
                                 app_label,
-                                rename_operation(
+                                operations.RenameModel(
                                     old_name=rem_model_state.name,
                                     new_name=model_state.name,
+                                    orm_only=orm_only,
                                 )
                             )
                             renamed_models[app_label, model_name] = rem_model_name
@@ -230,10 +234,12 @@ class MigrationAutodetector(object):
                 other_app_label, _ = pending_proxy_base[(app_label, model_name)]
                 self.add_to_migration(
                     app_label,
-                    operations.CreateProxyModel(
+                    operations.CreateModel(
                         name=model_state.name,
+                        fields=[],
                         options=model_state.options,
                         bases=model_state.bases,
+                        orm_only=True,
                     ),
                     # If it's already been added in phase 2 put it in a new
                     # migration for safety.
@@ -553,20 +559,18 @@ class MigrationAutodetector(object):
         but we put some effort in to the fallback name to avoid VCS conflicts
         if we can.
         """
-        create_ops = (operations.CreateModel, operations.CreateProxyModel)
-        delete_ops = (operations.DeleteModel, operations.DeleteProxyModel)
 
         if len(ops) == 1:
-            if isinstance(ops[0], create_ops):
+            if isinstance(ops[0], operations.CreateModel):
                 return ops[0].name.lower()
-            elif isinstance(ops[0], delete_ops):
+            elif isinstance(ops[0], operations.DeleteModel):
                 return "delete_%s" % ops[0].name.lower()
             elif isinstance(ops[0], operations.AddField):
                 return "%s_%s" % (ops[0].model_name.lower(), ops[0].name.lower())
             elif isinstance(ops[0], operations.RemoveField):
                 return "remove_%s_%s" % (ops[0].model_name.lower(), ops[0].name.lower())
         elif len(ops) > 1:
-            if all(isinstance(o, create_ops) for o in ops):
+            if all(isinstance(o, operations.CreateModel) for o in ops):
                 return "_".join(sorted(o.name.lower() for o in ops))
         return "auto_%s" % datetime.datetime.now().strftime("%Y%m%d_%H%M")
 

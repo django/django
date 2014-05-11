@@ -259,9 +259,10 @@ class AutodetectorTests(TestCase):
         self.assertEqual(len(migration.operations), 1)
         # Right action?
         action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "RenameProxyModel")
+        self.assertEqual(action.__class__.__name__, "RenameModel")
         self.assertEqual(action.old_name, "AuthorProxy")
         self.assertEqual(action.new_name, "WriterProxy")
+        self.assertTrue(action.orm_only)
 
     def test_rename_model_with_renamed_rel_field(self):
         """
@@ -341,7 +342,8 @@ class AutodetectorTests(TestCase):
         self.assertEqual(len(changes['otherapp']), 1)
         migration = changes['otherapp'][0]
         action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateProxyModel")
+        self.assertEqual(action.__class__.__name__, "CreateModel")
+        self.assertTrue(action.orm_only)
         self.assertEqual(migration.dependencies, [("testapp", "__first__")])
 
     def test_same_app_no_fk_dependency(self):
@@ -533,8 +535,9 @@ class AutodetectorTests(TestCase):
         self.assertEqual(len(migration.operations), 1)
         # Right actions?
         action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateProxyModel")
+        self.assertEqual(action.__class__.__name__, "CreateModel")
         self.assertEqual(action.name, "AuthorProxy")
+        self.assertTrue(action.orm_only)
 
     def test_convert_to_proxy(self):
         "Tests conversion of a non-proxy model to a proxy model"
@@ -549,10 +552,12 @@ class AutodetectorTests(TestCase):
         self.assertEqual(len(migration.operations), 2)
         # Right actions?
         action1, action2 = migration.operations
-        self.assertEqual(action1.__class__.__name__, "CreateProxyModel")
+        self.assertEqual(action1.__class__.__name__, "CreateModel")
         self.assertEqual(action1.name, "AuthorProxy")
+        self.assertTrue(action1.orm_only)
         self.assertEqual(action2.__class__.__name__, "DeleteModel")
         self.assertEqual(action2.name, "AuthorProxy")
+        self.assertFalse(action2.orm_only)
 
     def test_convert_from_proxy(self):
         "Tests conversion of a non-proxy model to a proxy model"
@@ -567,10 +572,12 @@ class AutodetectorTests(TestCase):
         self.assertEqual(len(migration.operations), 2)
         # Right actions?
         action1, action2 = migration.operations
-        self.assertEqual(action1.__class__.__name__, "DeleteProxyModel")
+        self.assertEqual(action1.__class__.__name__, "DeleteModel")
         self.assertEqual(action1.name, "AuthorProxy")
+        self.assertTrue(action1.orm_only)
         self.assertEqual(action2.__class__.__name__, "CreateModel")
         self.assertEqual(action2.name, "AuthorProxy")
+        self.assertFalse(action2.orm_only)
         self.assertEqual(len(action2.fields), 1)
 
     def test_fk_to_proxy_dependencies(self):
