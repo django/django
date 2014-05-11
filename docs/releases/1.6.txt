@@ -453,7 +453,7 @@ to the item above about changes in the test runners:
 The ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner`` test runner has been
 removed and the standalone GeoDjango tests execution setup it implemented isn't
 supported anymore. To run the GeoDjango tests simply use the new
-``DicoverRunner`` and specify the ``django.contrib.gis`` app.
+``DiscoverRunner`` and specify the ``django.contrib.gis`` app.
 
 Custom User models in tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
