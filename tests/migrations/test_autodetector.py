@@ -34,7 +34,7 @@ class AutodetectorTests(TestCase):
     author_with_publisher = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("publisher", models.ForeignKey("testapp.Publisher"))])
     author_with_custom_user = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("user", models.ForeignKey("thirdapp.CustomUser"))])
     author_proxy = ModelState("testapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
-    author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author", ))
+    author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [("author_ptr", models.OneToOneField("testapp.Author", primary_key=True))], {}, ("testapp.author", ))
     author_proxy_renamed = ModelState("testapp", "WriterProxy", [], {"proxy": True}, ("testapp.author", ))
     author_proxy_otherapp = ModelState("otherapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
     author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author", ))
@@ -538,24 +538,6 @@ class AutodetectorTests(TestCase):
 
     def test_convert_to_proxy(self):
         "Tests conversion of a non-proxy model to a proxy model"
-        before = self.make_project_state([self.author_empty, self.author_proxy])
-        after = self.make_project_state([self.author_empty, self.author_proxy_notproxy])
-        autodetector = MigrationAutodetector(before, after)
-        changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['testapp']), 1)
-        # Right number of actions?
-        migration = changes['testapp'][0]
-        self.assertEqual(len(migration.operations), 2)
-        # Right actions?
-        action1, action2 = migration.operations
-        self.assertEqual(action1.__class__.__name__, "DeleteProxyModel")
-        self.assertEqual(action1.name, "AuthorProxy")
-        self.assertEqual(action2.__class__.__name__, "CreateModel")
-        self.assertEqual(action2.name, "AuthorProxy")
-
-    def test_convert_from_proxy(self):
-        "Tests conversion of a non-proxy model to a proxy model"
         before = self.make_project_state([self.author_empty, self.author_proxy_notproxy])
         after = self.make_project_state([self.author_empty, self.author_proxy])
         autodetector = MigrationAutodetector(before, after)
@@ -571,6 +553,25 @@ class AutodetectorTests(TestCase):
         self.assertEqual(action1.name, "AuthorProxy")
         self.assertEqual(action2.__class__.__name__, "DeleteModel")
         self.assertEqual(action2.name, "AuthorProxy")
+
+    def test_convert_from_proxy(self):
+        "Tests conversion of a non-proxy model to a proxy model"
+        before = self.make_project_state([self.author_empty, self.author_proxy])
+        after = self.make_project_state([self.author_empty, self.author_proxy_notproxy])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 2)
+        # Right actions?
+        action1, action2 = migration.operations
+        self.assertEqual(action1.__class__.__name__, "DeleteProxyModel")
+        self.assertEqual(action1.name, "AuthorProxy")
+        self.assertEqual(action2.__class__.__name__, "CreateModel")
+        self.assertEqual(action2.name, "AuthorProxy")
+        self.assertEqual(len(action2.fields), 1)
 
     def test_fk_to_proxy_dependencies(self):
         "Tests foreign keys to proxy model"
