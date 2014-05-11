@@ -459,7 +459,7 @@ Cache
 * Defining the :setting:`TIMEOUT <CACHES-TIMEOUT>` argument of the
   :setting:`CACHES` setting as ``None`` will set the cache keys as
   "non-expiring" by default. Previously, it was only possible to pass
-  ``timeout=None` to the cache backend's ``set()`` method.
+  ``timeout=None`` to the cache backend's ``set()`` method.
 
 Cross Site Request Forgery
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -579,7 +579,7 @@ Internationalization
   is still read from in 1.7. Sessions will be migrated to the new key
   as they are written.
 
-* The :ttag:`blocktrans` now supports a ``trimmed`` option. This
+* The :ttag:`blocktrans` tag now supports a ``trimmed`` option. This
   option will remove newline characters from the beginning and the end of the
   content of the ``{% blocktrans %}`` tag, replace any whitespace at the
   beginning and end of a line and merge all lines into one using a space
@@ -738,8 +738,8 @@ Templates
   internal structure of each ``Context``'s stack doesn't matter as long as their
   flattened version is identical).
 
-* The :ttag:`widthratio` template tag now accepts an "as" parameter to capture
-  the result in a variable.
+* The :ttag:`widthratio` template tag now accepts an ``"as"`` parameter to
+  capture the result in a variable.
 
 * The :ttag:`include` template tag will now also accept anything with a
   ``render()`` method (such as a ``Template``) as an argument. String
@@ -1138,7 +1138,7 @@ Miscellaneous
   two ``Model`` instances without primary key values won't be considered
   equal (unless they are the same instance).
 
-* The :meth:`django.db.models.Model.__hash__` will now raise ``TypeError``
+* The :meth:`django.db.models.Model.__hash__` method will now raise ``TypeError``
   when called on an instance without a primary key value. This is done to
   avoid mutable ``__hash__`` values in containers.
 
@@ -1381,7 +1381,7 @@ to ``utils.py`` in an effort to unify all util and utils references:
 
 ``ModelAdmin.get_formsets`` has been deprecated in favor of the new
 :meth:`~django.contrib.admin.ModelAdmin.get_formsets_with_inlines`, in order to
-better handle the case of selecting showing inlines on a ``ModelAdmin``.
+better handle the case of selectively showing inlines on a ``ModelAdmin``.
 
 ``IPAddressField``
 ~~~~~~~~~~~~~~~~~~
@@ -1537,6 +1537,6 @@ will be removed in Django 1.8.
 
 Reorganization of database test settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-All database settings with a `TEST_` prefix have been deprecated in favor of
+All database settings with a ``TEST_`` prefix have been deprecated in favor of
 entries in a :setting:`TEST <DATABASE-TEST>` dictionary in the database
 settings. The old settings will be supported until Django 1.9.
