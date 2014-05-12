@@ -433,7 +433,7 @@ def unescape_string_literal(s):
 unescape_string_literal = allow_lazy(unescape_string_literal)
 
 
-def slugify(value):
+def slugify(value, replacement='_'):
     """
     Converts to lowercase, removes non-word characters (alphanumerics and
     underscores) and converts spaces to hyphens. Also strips leading and
@@ -441,7 +441,7 @@ def slugify(value):
     """
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub('[^\w\s-]', '', value).strip().lower()
-    return mark_safe(re.sub('[-\s]+', '-', value))
+    return mark_safe(re.sub('[-\s]+', replacement, value))
 slugify = allow_lazy(slugify, six.text_type)
 
 
