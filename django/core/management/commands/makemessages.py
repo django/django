@@ -399,6 +399,9 @@ class Command(NoArgsCommand):
             msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
+                    self.stdout.write(errors) # workaround exception bellow not shows errors
+                    import shutil
+                    shutil.copyfile(pofile, '%s.debug' % pofile)
                     raise CommandError(
                         "errors happened while running msgmerge\n%s" % errors)
                 elif self.verbosity > 0:
