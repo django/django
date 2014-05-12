@@ -17,3 +17,7 @@ Bugfixes
 
 * Fixed the SQL generated when filtering by a negated ``Q`` object that contains
   a ``F`` object. (`#22429 <http://code.djangoproject.com/ticket/22429>`_).
+
+* Avoided overwriting data fetched by ``select_related()`` in certain cases
+  which could cause minor performance regressions
+  (`#22508 <http://code.djangoproject.com/ticket/22508>`_).
