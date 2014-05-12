@@ -155,7 +155,7 @@ class NKChild(Parent):
     objects = NKManager()
 
     def natural_key(self):
-        return self.data
+        return (self.data,)
 
     def __str__(self):
         return 'NKChild %s:%s' % (self.name, self.data)
@@ -180,7 +180,7 @@ class Circle1(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle2']
 
 
@@ -188,7 +188,7 @@ class Circle2(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle1']
 
 
@@ -196,7 +196,7 @@ class Circle3(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle3']
 
 
@@ -204,7 +204,7 @@ class Circle4(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle5']
 
 
@@ -212,7 +212,7 @@ class Circle5(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle6']
 
 
@@ -220,7 +220,7 @@ class Circle6(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle4']
 
 
@@ -228,7 +228,7 @@ class ExternalDependency(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.book']
 
 
