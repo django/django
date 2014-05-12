@@ -777,14 +777,12 @@ class M2MNaturalKeyFixtureTests(TestCase):
         This test tests the circularity with explicit natural_key.dependencies
         """
         try:
-            sorted_deps = sort_dependencies(
-                [('fixtures_regress', [
+            sorted_deps = sort_dependencies([
+                ('fixtures_regress', [
                     M2MComplexCircular2A,
                     M2MComplexCircular2B,
-                    M2MCircular2ThroughAB]
-                  )
-                ]
-            )
+                    M2MCircular2ThroughAB])
+            ])
         except CommandError:
             self.fail("Serialization dependency solving algorithm isn't "
                       "capable of handling circular M2M setups with "
