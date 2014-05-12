@@ -158,7 +158,7 @@ class BaseDatabaseWrapper(object):
                 (self.use_debug_cursor is None and settings.DEBUG)):
             cursor = self.make_debug_cursor(self._cursor())
         else:
-            cursor = utils.CursorWrapper(self._cursor(), self)
+            cursor = self.make_cursor(self._cursor())
         return cursor
 
     def commit(self):
@@ -432,6 +432,12 @@ class BaseDatabaseWrapper(object):
         Creates a cursor that logs all queries in self.queries.
         """
         return utils.CursorDebugWrapper(cursor, self)
+
+    def make_cursor(self, cursor):
+        """
+        Creates a cursor without debug logging.
+        """
+        return utils.CursorWrapper(cursor, self)
 
     @contextmanager
     def temporary_connection(self):
