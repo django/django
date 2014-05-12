@@ -89,6 +89,36 @@ class TestUtilsHttp(unittest.TestCase):
             self.assertEqual(http.int_to_base36(n), b36)
             self.assertEqual(http.base36_to_int(b36), n)
 
+    def test_is_safe_url(self):
+        for bad_url in ('http://example.com',
+                        'http:///example.com',
+                        'https://example.com',
+                        'ftp://exampel.com',
+                        r'\\example.com',
+                        r'\\\example.com',
+                        r'/\\/example.com',
+                        r'\\\example.com',
+                        r'\\example.com',
+                        r'\\//example.com',
+                        r'/\/example.com',
+                        r'\/example.com',
+                        r'/\example.com',
+                        'http:///example.com',
+                        'http:/\//example.com',
+                        'http:\/example.com',
+                        'http:/\example.com',
+                        'javascript:alert("XSS")'):
+            self.assertFalse(http.is_safe_url(bad_url, host='testserver'), "%s should be blocked" % bad_url)
+        for good_url in ('/view/?param=http://example.com',
+                     '/view/?param=https://example.com',
+                     '/view?param=ftp://exampel.com',
+                     'view/?param=//example.com',
+                     'https://testserver/',
+                     'HTTPS://testserver/',
+                     '//testserver/',
+                     '/url%20with%20spaces/'):
+            self.assertTrue(http.is_safe_url(good_url, host='testserver'), "%s should be allowed" % good_url)
+
 
 class ETagProcessingTests(unittest.TestCase):
     def testParsing(self):
