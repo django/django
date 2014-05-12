@@ -14,8 +14,6 @@ class BaseHandler(object):
     response_fixes = [
         http.fix_location_header,
         http.conditional_content_removal,
-        http.fix_IE_for_attach,
-        http.fix_IE_for_vary,
     ]
 
     def __init__(self):
