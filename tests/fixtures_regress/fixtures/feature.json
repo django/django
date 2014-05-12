@@ -1,0 +1,17 @@
+[
+{
+  "fields": {
+    "channels": [],
+    "title": "Title of this feature article"
+  },
+  "model": "fixtures_regress.article",
+  "pk": 1
+},
+{
+  "fields": {
+    "channels": []
+  },
+  "model": "fixtures_regress.feature",
+  "pk": 1
+}
+]
