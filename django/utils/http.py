@@ -234,6 +234,18 @@ def is_safe_url(url, host=None):
     """
     if not url:
         return False
+    # Chrome treats \ completely as /
+    url = url.replace('\\', '/')
+    # Chrome considers any URL with more than two slashes to be absolute, but
+    # urlaprse is not so flexible. Treat any url with three slashes as unsafe.
+    if url.startswith('///'):
+        return False
     url_info = urlparse.urlparse(url)
+    # Forbid URLs like http:///example.com - with a scheme, but without a hostname.
+    # In that URL, example.com is not the hostname but, a path component. However,
+    # Chrome will still consider example.com to be the hostname, so we must not
+    # allow this syntax.
+    if not url_info[1] and url_info[0]:
+        return False
     return (not url_info[1] or url_info[1] == host) and \
         (not url_info[0] or url_info[0] in ['http', 'https'])
