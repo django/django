@@ -219,7 +219,7 @@ If you're taking advantage of the internationalization features of Django (see
 ensure that the environment used to start Apache is configured to accept
 non-ASCII file names. If your environment is not correctly configured, you
 will trigger ``UnicodeEncodeError`` exceptions when calling functions like
-``os.path()`` on filenames that contain non-ASCII characters.
+the ones in :mod:`os.path` on filenames that contain non-ASCII characters.
 
 To avoid these problems, the environment used to start Apache should contain
 settings analogous to the following::
