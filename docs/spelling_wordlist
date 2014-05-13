@@ -519,6 +519,7 @@ screenshots
 sdist
 semimajor
 semiminor
+serializability
 serializable
 serializer
 serializers
