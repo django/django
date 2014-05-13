@@ -404,12 +404,6 @@ Here's how Django uses the sites framework:
   redirect object is associated with a particular site. When Django searches
   for a redirect, it takes into account the current site.
 
-* In the comments framework, each comment is associated with a particular
-  site. When a comment is posted, its
-  :class:`~django.contrib.sites.models.Site` is set to the current site,
-  and when comments are listed via the appropriate template tag, only the
-  comments for the current site are displayed.
-
 * In the :mod:`flatpages framework <django.contrib.flatpages>`, each
   flatpage is associated with a particular site. When a flatpage is created,
   you specify its :class:`~django.contrib.sites.models.Site`, and the
