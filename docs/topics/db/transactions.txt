@@ -210,7 +210,7 @@ Django provides a single API to control database transactions.
 
     Open transactions have a performance cost for your database server. To
     minimize this overhead, keep your transactions as short as possible. This
-    is especially important of you're using :func:`atomic` in long-running
+    is especially important if you're using :func:`atomic` in long-running
     processes, outside of Django's request / response cycle.
 
 Autocommit
