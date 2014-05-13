@@ -719,11 +719,11 @@ Functions for working with Python modules.
     example::
 
         from django.utils.module_loading import import_string
-        ImproperlyConfigured = import_string('django.core.exceptions.ImproperlyConfigured')
+        ValidationError = import_string('django.core.exceptions.ValidationError')
 
     is equivalent to::
 
-        from django.core.exceptions import ImproperlyConfigured
+        from django.core.exceptions import ValidationError
 
 .. function:: import_by_path(dotted_path, error_prefix='')
 
