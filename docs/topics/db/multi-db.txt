@@ -675,8 +675,8 @@ how you can split these models across databases:
 - ``auth`` models — ``User``, ``Group`` and ``Permission`` — are linked
   together and linked to ``ContentType``, so they must be stored in the same
   database as ``ContentType``.
-- ``admin`` and ``comments`` depend on ``auth``, so their models must be in
-  the same database as ``auth``.
+- ``admin`` depends on ``auth``, so their models must be in the same database
+  as ``auth``.
 - ``flatpages`` and ``redirects`` depend on ``sites``, so their models must be
   in the same database as ``sites``.
 
