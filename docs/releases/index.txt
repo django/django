@@ -34,6 +34,7 @@ Final releases
 .. toctree::
    :maxdepth: 1
 
+   1.5.8
    1.5.7
    1.5.6
    1.5.5
@@ -48,6 +49,7 @@ Final releases
 .. toctree::
    :maxdepth: 1
 
+   1.4.13
    1.4.12
    1.4.11
    1.4.10
