@@ -240,9 +240,9 @@ class TestInline(TestCase):
 
         request = self.factory.get('/admin/admin_inlines/binarytree/add/')
         request.user = User(username='super', is_superuser=True)
-        response = modeladmin.changeform_view(request).render()
-        self.assertContains(response.render(), min_forms)
-        self.assertContains(response.render(), total_forms)
+        response = modeladmin.changeform_view(request)
+        self.assertContains(response, min_forms)
+        self.assertContains(response, total_forms)
 
     def test_custom_min_num(self):
         """
@@ -270,14 +270,14 @@ class TestInline(TestCase):
         request = self.factory.get('/admin/admin_inlines/binarytree/add/')
         request.user = User(username='super', is_superuser=True)
         response = modeladmin.changeform_view(request)
-        self.assertContains(response.render(), min_forms % 2)
-        self.assertContains(response.render(), total_forms % 5)
+        self.assertContains(response, min_forms % 2)
+        self.assertContains(response, total_forms % 5)
 
         request = self.factory.get("/admin/admin_inlines/binarytree/%d/" % bt_head.id)
         request.user = User(username='super', is_superuser=True)
         response = modeladmin.changeform_view(request, object_id=str(bt_head.id))
-        self.assertContains(response.render(), min_forms % 5)
-        self.assertContains(response.render(), total_forms % 9)
+        self.assertContains(response, min_forms % 5)
+        self.assertContains(response, total_forms % 9)
 
     def test_inline_nonauto_noneditable_pk(self):
         response = self.client.get('/admin/admin_inlines/author/add/')
