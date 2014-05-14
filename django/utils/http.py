@@ -275,7 +275,7 @@ def is_safe_url(url, host=None):
     # Chrome treats \ completely as /
     url = url.replace('\\', '/')
     # Chrome considers any URL with more than two slashes to be absolute, but
-    # urlaprse is not so flexible. Treat any url with three slashes as unsafe.
+    # urlparse is not so flexible. Treat any url with three slashes as unsafe.
     if url.startswith('///'):
         return False
     url_info = urlparse(url)
