@@ -8,7 +8,7 @@ from .models import (
     Inner4Tabular, NonAutoPKBook, Novel, ParentModelWithCustomPk, Poll,
     Profile, ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness,
     Sighting, SomeChildModel, SomeParentModel, SottoCapo, Title,
-    TitleCollection, Holder5, Inner5
+    TitleCollection
 )
 
 site = admin.AdminSite(name="admin")
@@ -171,18 +171,6 @@ class BinaryTreeAdmin(admin.TabularInline):
         return max_num
 
 
-# inline and admin for testing min_num
-
-class InnerMinNumInline(admin.TabularInline):
-    model = Inner5
-    min_num = 2
-    extra = 2
-
-
-class HolderMinNumAdmin(admin.ModelAdmin):
-    inlines = [InnerMinNumInline]
-
-
 # admin for #19524
 class SightingInline(admin.TabularInline):
     model = Sighting
@@ -224,4 +212,3 @@ site.register(ParentModelWithCustomPk, inlines=[ChildModel1Inline, ChildModel2In
 site.register(BinaryTree, inlines=[BinaryTreeAdmin])
 site.register(ExtraTerrestrial, inlines=[SightingInline])
 site.register(SomeParentModel, inlines=[SomeChildModelInline])
-site.register(Holder5, HolderMinNumAdmin)

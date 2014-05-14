@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.contrib.admin import TabularInline
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.auth.models import User, Permission
@@ -7,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 
 # local test models
-from .admin import InnerInline
+from .admin import InnerInline, site as admin_site
 from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
     ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
@@ -223,14 +224,50 @@ class TestInline(TestCase):
 
     def test_min_num(self):
         """
-        Ensure that min_num + extra dermine number of inlines.
+        Ensure that min_num and extra determine number of forms.
         """
-        min_forms = '<input id="id_inner5_set-MIN_NUM_FORMS" name="inner5_set-MIN_NUM_FORMS" type="hidden" value="2" />'
-        total_forms = '<input id="id_inner5_set-TOTAL_FORMS" name="inner5_set-TOTAL_FORMS" type="hidden" value="4" />'
+        class MinNumInline(TabularInline):
+            model = BinaryTree
+            min_num = 2
+            extra = 3
+        admin_site.unregister(BinaryTree)
+        admin_site.register(BinaryTree, inlines=MinNumInline)
 
-        response = self.client.get('/admin/admin_inlines/holder5/add/')
+        min_forms = '<input id="id_binarytree_set-MIN_NUM_FORMS" name="binarytree_set-MIN_NUM_FORMS" type="hidden" value="2" />'
+        total_forms = '<input id="id_binarytree_set-TOTAL_FORMS" name="binarytree_set-TOTAL_FORMS" type="hidden" value="5" />'
+
+        response = self.client.get('/admin/admin_inlines/binarytree/add/')
         self.assertContains(response, min_forms)
         self.assertContains(response, total_forms)
+
+    def test_custom_min_num(self):
+        """
+        Ensure that get_min_num is called and used correctly.
+        """
+        bt_head = BinaryTree.objects.create(name="Tree Head")
+        BinaryTree.objects.create(name="First Child", parent=bt_head)
+
+        class MinNumInline(TabularInline):
+            model = BinaryTree
+            extra = 3
+
+            def get_min_num(self, request, obj=None, **kwargs):
+                if obj:
+                    return 5
+                return 2
+        admin_site.unregister(BinaryTree)
+        admin_site.register(BinaryTree, inlines=MinNumInline)
+
+        min_forms = '<input id="id_binarytree_set-MIN_NUM_FORMS" name="binarytree_set-MIN_NUM_FORMS" type="hidden" value="%d" />'
+        total_forms = '<input id="id_binarytree_set-TOTAL_FORMS" name="binarytree_set-TOTAL_FORMS" type="hidden" value="%d" />'
+
+        response = self.client.get('/admin/admin_inlines/binarytree/add/')
+        self.assertContains(response, min_forms % 2)
+        self.assertContains(response, total_forms % 5)
+
+        response = self.client.get("/admin/admin_inlines/binarytree/%d/" % bt_head.id)
+        self.assertContains(response, min_forms % 5)
+        self.assertContains(response, total_forms % 8)
 
     def test_inline_nonauto_noneditable_pk(self):
         response = self.client.get('/admin/admin_inlines/author/add/')

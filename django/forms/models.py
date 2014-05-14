@@ -808,7 +808,7 @@ class BaseModelFormSet(BaseFormSet):
 
 def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                          formset=BaseModelFormSet, extra=1, can_delete=False,
-                         can_order=False, min_num=None, max_num=None, fields=None,exclude=None,
+                         can_order=False, min_num=None, max_num=None, fields=None, exclude=None,
                          widgets=None, validate_min=False, validate_max=False, localized_fields=None,
                          labels=None, help_texts=None, error_messages=None):
     """

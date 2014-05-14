@@ -1998,10 +1998,10 @@ The ``InlineModelAdmin`` class adds:
 
 .. attribute:: InlineModelAdmin.min_num
 
-    This controls the minimum number of forms to show in the inline.
-    See :ref:`model-formsets-min-num` for more information.
-
     .. versionadded:: 1.7
+
+    This controls the minimum number of forms to show in the inline.
+    See :func:`~django.forms.models.modelformset_factory` for more information.
 
     :meth:`InlineModelAdmin.get_min_num` also allows you to customize the
     maximum number of extra forms.

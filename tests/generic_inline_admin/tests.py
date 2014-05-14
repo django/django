@@ -11,9 +11,8 @@ from django.forms.models import ModelForm
 from django.test import TestCase, override_settings
 
 # local test models
-from .admin import MediaInline, MediaPermanentInline
-from .models import (Episode, EpisodeExtra, EpisodeMaxNum, Media,
-    EpisodePermanent, Category)
+from .admin import MediaInline, MediaPermanentInline, site as admin_site
+from .models import Episode, Media, EpisodePermanent, Category
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
@@ -165,8 +164,14 @@ class GenericInlineAdminParametersTest(TestCase):
         """
         With extra=0, there should be one form.
         """
-        e = self._create_object(EpisodeExtra)
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodeextra/%s/' % e.pk)
+        class ExtraInline(GenericTabularInline):
+            model = Media
+            extra = 0
+        admin_site.unregister(Episode)
+        admin_site.register(Episode, inlines=[ExtraInline])
+
+        e = self._create_object(Episode)
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
         formset = response.context['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 1)
         self.assertEqual(formset.initial_form_count(), 1)
@@ -175,10 +180,38 @@ class GenericInlineAdminParametersTest(TestCase):
         """
         With extra=5 and max_num=2, there should be only 2 forms.
         """
-        e = self._create_object(EpisodeMaxNum)
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episodemaxnum/%s/' % e.pk)
+        class MaxNumInline(GenericTabularInline):
+            model = Media
+            extra = 5
+            max_num = 2
+        admin_site.unregister(Episode)
+        admin_site.register(Episode, inlines=[MaxNumInline])
+
+        e = self._create_object(Episode)
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
         formset = response.context['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 2)
+        self.assertEqual(formset.initial_form_count(), 1)
+
+    def testMinNumParam(self):
+        """
+        With extra=3 and min_num=2, there should be five forms.
+        """
+        class MinNumInline(GenericTabularInline):
+            model = Media
+            extra = 3
+            min_num = 2
+        admin_site.unregister(Episode)
+        admin_site.register(Episode, inlines=[MinNumInline])
+
+        e = self._create_object(Episode)
+        from django.conf import settings
+        import sys
+        reload(sys.modules[settings.ROOT_URLCONF])
+        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
+        formset = response.context['inline_admin_formsets'][0].formset
+        import pdb; pdb.set_trace()
+        self.assertEqual(formset.total_form_count(), 5)
         self.assertEqual(formset.initial_form_count(), 1)
 
 
