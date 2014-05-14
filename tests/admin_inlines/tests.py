@@ -221,6 +221,17 @@ class TestInline(TestCase):
         self.assertContains(response, max_forms_input % 2)
         self.assertContains(response, total_forms_hidden)
 
+    def test_min_num(self):
+        """
+        Ensure that min_num + extra dermine number of inlines.
+        """
+        min_forms = '<input id="id_inner5_set-MIN_NUM_FORMS" name="inner5_set-MIN_NUM_FORMS" type="hidden" value="2" />'
+        total_forms = '<input id="id_inner5_set-TOTAL_FORMS" name="inner5_set-TOTAL_FORMS" type="hidden" value="4" />'
+
+        response = self.client.get('/admin/admin_inlines/holder5/add/')
+        self.assertContains(response, min_forms)
+        self.assertContains(response, total_forms)
+
     def test_inline_nonauto_noneditable_pk(self):
         response = self.client.get('/admin/admin_inlines/author/add/')
         self.assertContains(response,
