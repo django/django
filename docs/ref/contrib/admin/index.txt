@@ -1957,8 +1957,6 @@ The ``InlineModelAdmin`` class adds:
     :meth:`InlineModelAdmin.get_extra` also allows you to customize the number
     of extra forms.
 
-    .. _ref-contrib-admin-inline-max-num:
-
 .. attribute:: InlineModelAdmin.max_num
 
     This controls the maximum number of forms to show in the inline. This
