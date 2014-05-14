@@ -1,13 +1,14 @@
 ==========================
-Django 1.6.5 release notes
+Django 1.4.13 release notes
 ==========================
 
-*May 14, 2014*
+*May 13, 2014*
 
-Django 1.6.5 fixes two security issues and several several bugs in 1.6.4.
+Django 1.4.13 fixes two security issues in 1.4.12.
 
-Issue: Caches may incorrectly be allowed to store and serve private data
-========================================================================
+
+Caches may incorrectly be allowed to store and serve private data
+=================================================================
 In certain situations, Django may allow caches to store private data
 related to a particular session and then serve that data to requests
 with a different session, or no session at all. This can both lead to
@@ -28,8 +29,8 @@ requests with a ``Content-Disposition`` header, have also been removed as they
 were found to have similar issues.
 
 
-Issue: Malformed redirect URLs from user input not correctly validated
-======================================================================
+Malformed redirect URLs from user input not correctly validated
+===============================================================
 The validation for redirects did not correctly validate some malformed URLs,
 which are accepted by some browsers. This allows a user to be redirected to
 an unsafe URL unexpectedly.
@@ -44,19 +45,3 @@ with more liberal URL parsing.
 
 To remedy this, the validation in ``is_safe_url()`` has been tightened to be able
 to handle and correctly validate these malformed URLs.
-
-Bugfixes
-========
-
-* Made the ``year_lookup_bounds_for_datetime_field`` Oracle backend method
-  Python 3 compatible (`#22551 <http://code.djangoproject.com/ticket/22551>`_).
-
-* Fixed ``pgettext_lazy`` crash when receiving bytestring content on Python 2
-  (`#22565 <http://code.djangoproject.com/ticket/22565>`_).
-
-* Fixed the SQL generated when filtering by a negated ``Q`` object that contains
-  a ``F`` object. (`#22429 <http://code.djangoproject.com/ticket/22429>`_).
-
-* Avoided overwriting data fetched by ``select_related()`` in certain cases
-  which could cause minor performance regressions
-  (`#22508 <http://code.djangoproject.com/ticket/22508>`_).
