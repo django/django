@@ -120,16 +120,21 @@ class HttpResponseBase(six.Iterator):
                                                     'UNKNOWN STATUS CODE')
         self['Content-Type'] = content_type
 
-    def serialize_headers(self):
+    def serialize_headers(self, headers=None):
         """HTTP headers as a bytestring."""
+        if headers is None:
+            headers = self._headers
+
+        print headers
+
         def to_bytes(val, encoding):
             return val if isinstance(val, bytes) else val.encode(encoding)
 
-        headers = [
+        output = [
             (b': '.join([to_bytes(key, 'ascii'), to_bytes(value, 'latin-1')]))
-            for key, value in self._headers.values()
+            for key, value in headers.values()
         ]
-        return b'\r\n'.join(headers)
+        return b'\r\n'.join(output)
 
     if six.PY3:
         __bytes__ = serialize_headers
@@ -390,6 +395,47 @@ class StreamingHttpResponse(HttpResponseBase):
         return self.streaming_content
 
 
+class PartialHttpResponse(StreamingHttpResponse):
+    status_code = 206
+    separator = "THIS_STRING_SEPARATES"
+
+    def __init__(self, ranges, content, size, *args, **kwargs):
+        super(PartialHttpResponse, self).__init__(*args, **kwargs)
+        self.ranges = ranges
+        self.size = size
+        self._content = content
+
+        if len(self.ranges) > 1:
+            # We have a multipart/byteranges response.
+            self.content_type = self['Content-Type']
+            self['Content-Type'] = "multipart/byteranges; boundary=%s"
+        else:
+            self['Content-Length'] = len(ranges[0])
+            self['Content-Range'] = str(ranges[0])
+
+    def __iter__(self):
+        for byte_range in self.ranges:
+            if len(self.ranges) > 1:
+                yield self.make_bytes("--%s" % self.separator)
+                headers = {
+                    'Content-Type': self.content_type,
+                    'Content-Length': "%d" % len(byte_range)
+                }
+                yield self.serialize_headers(headers)
+            read = 0
+            length = len(byte_range)
+            self._content.seek(byte_range.start)
+            data = self._content.read()
+            read += len(data)
+            if read > length:
+                yield self.make_bytes(data[:length])
+                continue
+            else:
+                yield self.make_bytes(data)
+        if len(self.ranges) > 1:
+            yield self.make_bytes("--%s--" % self.separator)
+
+
 class HttpResponseRedirectBase(HttpResponse):
     allowed_schemes = ['http', 'https', 'ftp']
 
@@ -447,6 +493,14 @@ class HttpResponseNotAllowed(HttpResponse):
 
 class HttpResponseGone(HttpResponse):
     status_code = 410
+
+
+class HttpResponseNotSatisfiable(HttpResponse):
+    status_code = 416
+
+    def __init__(self, length, *args, **kwargs):
+        super(HttpResponseNotSatisfiable, self).__init__(*args, **kwargs)
+        self['Content-Range'] = 'bytes */%s' % length
 
 
 class HttpResponseServerError(HttpResponse):

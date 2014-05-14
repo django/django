@@ -11,9 +11,11 @@ import posixpath
 import re
 
 from django.http import (Http404, HttpResponse, HttpResponseRedirect,
-    HttpResponseNotModified, StreamingHttpResponse)
+    HttpResponseNotModified, HttpResponseNotSatisfiable,
+    StreamingHttpResponse, PartialHttpResponse)
 from django.template import loader, Template, Context, TemplateDoesNotExist
-from django.utils.http import http_date, parse_http_date
+from django.utils.http import (http_date, parse_http_date, parse_http_range,
+    http_range_valid)
 from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext as _, ugettext_lazy
 
@@ -54,20 +56,35 @@ def serve(request, path, document_root=None, show_indexes=False):
         raise Http404(_("Directory indexes are not allowed here."))
     if not os.path.exists(fullpath):
         raise Http404(_('"%(path)s" does not exist') % {'path': fullpath})
-    # Respect the If-Modified-Since header.
+    # Respect the If-Modified-Since and If-Range headers.
     statobj = os.stat(fullpath)
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj.st_mtime, statobj.st_size):
         return HttpResponseNotModified()
     content_type, encoding = mimetypes.guess_type(fullpath)
     content_type = content_type or 'application/octet-stream'
-    response = StreamingHttpResponse(open(fullpath, 'rb'),
-                                     content_type=content_type)
+    # Support simple HTTP byte range requests.
+    http_range = request.META.get('HTTP_RANGE')
+    if http_range:
+        if not was_modified_since(request.META.get('HTTP_IF_RANGE'),
+                                  statobj.st_mtime, statobj.st_size):
+            return HttpResponseNotModified()
+
+        ranges = parse_http_range(http_range, statobj.st_size)
+        if http_range_valid(ranges):
+            response = PartialHttpResponse(ranges, open(fullpath, 'rb'),
+                statobj.st_size, content_type=content_type)
+        else:
+            return HttpResponseNotSatisfiable(statobj.st_size)
+    else:
+        response = StreamingHttpResponse(open(fullpath, 'rb'),
+                                         content_type=content_type)
+        if stat.S_ISREG(statobj.st_mode):
+            response["Content-Length"] = statobj.st_size
+        if encoding:
+            response["Content-Encoding"] = encoding
     response["Last-Modified"] = http_date(statobj.st_mtime)
-    if stat.S_ISREG(statobj.st_mode):
-        response["Content-Length"] = statobj.st_size
-    if encoding:
-        response["Content-Encoding"] = encoding
+    response["Accept-Ranges"] = "bytes"
     return response
 
 

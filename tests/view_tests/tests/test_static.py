@@ -31,6 +31,7 @@ class StaticTests(SimpleTestCase):
                 self.assertEqual(fp.read(), response_content)
             self.assertEqual(len(response_content), int(response['Content-Length']))
             self.assertEqual(mimetypes.guess_type(file_path)[1], response.get('Content-Encoding', None))
+            self.assertEqual(response['Accept-Ranges'], 'bytes')
 
     def test_unknown_mime_type(self):
         response = self.client.get('/%s/file.unknown' % self.prefix)
@@ -94,6 +95,56 @@ class StaticTests(SimpleTestCase):
     def test_404(self):
         response = self.client.get('/%s/non_existing_resource' % self.prefix)
         self.assertEqual(404, response.status_code)
+
+    def test_valid_range(self):
+        file_name = 'file.txt'
+        response = self.client.get('/%s/%s' % (self.prefix, file_name),
+                                   HTTP_RANGE="bytes=0-9")
+
+        response_content = b''.join(response)
+        self.assertEqual(206, response.status_code)
+        self.assertEqual(response['Content-Range'], 'bytes 0-9/22')
+        self.assertEqual(response['Content-Length'], '10')
+        self.assertEqual(response_content, 'An example')
+
+    def test_invalid_range(self):
+        file_name = 'file.txt'
+        response = self.client.get('/%s/%s' % (self.prefix, file_name),
+                                   HTTP_RANGE="bytes=broken")
+
+        response_content = b''.join(response)
+        self.assertEqual(416, response.status_code)
+        self.assertEqual(response['Content-Range'], 'bytes */22')
+        self.assertEqual(len(response_content), 0)
+
+    def test_multiple_ranges(self):
+        file_name = 'file.txt'
+        response = self.client.get('/%s/%s' % (self.prefix, file_name),
+                                   HTTP_RANGE="bytes=0-5,8-10")
+
+        response_content = b''.join(response)
+        self.assertEqual(206, response.status_code)
+        self.assertEqual(response['Content-Range'], 'bytes */22')
+        self.assertEqual(len(response_content), 0)
+
+    def test_if_range_with_range(self):
+        file_name = 'file.txt'
+        response = self.client.get(
+            '/%s/%s' % (self.prefix, file_name),
+            HTTP_IF_RANGE='Mon, 18 Jan 2038 05:14:07 GMT',
+            HTTP_RANGE='bytes=0-9'
+        )
+        self.assertIsInstance(response, HttpResponseNotModified)
+
+    def test_if_range_missing_range(self):
+        file_name = 'file.txt'
+        response = self.client.get(
+            '/%s/%s' % (self.prefix, file_name),
+            HTTP_IF_RANGE='Mon, 18 Jan 2038 05:14:07 GMT'
+        )
+        response_content = b''.join(response)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(len(response_content), int(response['Content-Length']))
 
 
 class StaticHelperTest(StaticTests):
