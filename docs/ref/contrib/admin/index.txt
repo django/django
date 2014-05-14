@@ -1994,8 +1994,6 @@ The ``InlineModelAdmin`` class adds:
     :meth:`InlineModelAdmin.get_max_num` also allows you to customize the
     maximum number of extra forms.
 
-    .. _ref-contrib-admin-inline-min-num:
-
 .. attribute:: InlineModelAdmin.min_num
 
     .. versionadded:: 1.7
@@ -2004,7 +2002,7 @@ The ``InlineModelAdmin`` class adds:
     See :func:`~django.forms.models.modelformset_factory` for more information.
 
     :meth:`InlineModelAdmin.get_min_num` also allows you to customize the
-    maximum number of extra forms.
+    minimum number of displayed forms.
 
 .. attribute:: InlineModelAdmin.raw_id_fields
 

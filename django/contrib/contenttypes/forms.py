@@ -58,7 +58,7 @@ def generic_inlineformset_factory(model, form=ModelForm,
                                   extra=3, can_order=False, can_delete=True,
                                   max_num=None, formfield_callback=None,
                                   validate_max=False, for_concrete_model=True,
-                                  min_num=None, validate_min=False,):
+                                  min_num=None, validate_min=False):
     """
     Returns a ``GenericInlineFormSet`` for the given kwargs.
 

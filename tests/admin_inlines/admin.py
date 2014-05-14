@@ -8,7 +8,7 @@ from .models import (
     Inner4Tabular, NonAutoPKBook, Novel, ParentModelWithCustomPk, Poll,
     Profile, ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness,
     Sighting, SomeChildModel, SomeParentModel, SottoCapo, Title,
-    TitleCollection
+    TitleCollection,
 )
 
 site = admin.AdminSite(name="admin")
