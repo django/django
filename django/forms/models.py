@@ -808,9 +808,10 @@ class BaseModelFormSet(BaseFormSet):
 
 def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                          formset=BaseModelFormSet, extra=1, can_delete=False,
-                         can_order=False, min_num=None, max_num=None, fields=None, exclude=None,
-                         widgets=None, validate_min=False, validate_max=False, localized_fields=None,
-                         labels=None, help_texts=None, error_messages=None):
+                         can_order=False, max_num=None, fields=None, exclude=None,
+                         widgets=None, validate_max=False, localized_fields=None,
+                         labels=None, help_texts=None, error_messages=None,
+                         min_num=None, validate_min=False):
     """
     Returns a FormSet class for the given Django model class.
     """
@@ -977,9 +978,10 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
 def inlineformset_factory(parent_model, model, form=ModelForm,
                           formset=BaseInlineFormSet, fk_name=None,
                           fields=None, exclude=None, extra=3, can_order=False,
-                          can_delete=True, min_num=None, max_num=None, formfield_callback=None,
-                          widgets=None, validate_min=False, validate_max=False, localized_fields=None,
-                          labels=None, help_texts=None, error_messages=None):
+                          can_delete=True, max_num=None, formfield_callback=None,
+                          widgets=None, validate_max=False, localized_fields=None,
+                          labels=None, help_texts=None, error_messages=None,
+                          min_num=None, validate_min=False):
     """
     Returns an ``InlineFormSet`` for the given kwargs.
 

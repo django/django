@@ -4,11 +4,12 @@ import warnings
 
 from django.contrib import admin
 from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, RequestFactory
 
 # local test models
 from .admin import MediaInline, MediaPermanentInline, site as admin_site
@@ -135,6 +136,7 @@ class GenericInlineAdminParametersTest(TestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')
+        self.factory = RequestFactory()
 
     def tearDown(self):
         self.client.logout()
@@ -167,12 +169,15 @@ class GenericInlineAdminParametersTest(TestCase):
         class ExtraInline(GenericTabularInline):
             model = Media
             extra = 0
-        admin_site.unregister(Episode)
-        admin_site.register(Episode, inlines=[ExtraInline])
+
+        modeladmin = admin.ModelAdmin(Episode, admin_site)
+        modeladmin.inlines = [ExtraInline]
 
         e = self._create_object(Episode)
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
-        formset = response.context['inline_admin_formsets'][0].formset
+        request = self.factory.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
+        request.user = User(username='super', password='secret', is_superuser=True)
+        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        formset = response.context_data['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 1)
         self.assertEqual(formset.initial_form_count(), 1)
 
@@ -184,34 +189,37 @@ class GenericInlineAdminParametersTest(TestCase):
             model = Media
             extra = 5
             max_num = 2
-        admin_site.unregister(Episode)
-        admin_site.register(Episode, inlines=[MaxNumInline])
+
+        modeladmin = admin.ModelAdmin(Episode, admin_site)
+        modeladmin.inlines = [MaxNumInline]
 
         e = self._create_object(Episode)
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
-        formset = response.context['inline_admin_formsets'][0].formset
+        request = self.factory.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
+        request.user = User(username='super', password='secret', is_superuser=True)
+        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        formset = response.context_data['inline_admin_formsets'][0].formset
         self.assertEqual(formset.total_form_count(), 2)
         self.assertEqual(formset.initial_form_count(), 1)
 
     def testMinNumParam(self):
         """
-        With extra=3 and min_num=2, there should be five forms.
+        With extra=3 and min_num=2, there should be six forms.
+        See #22628 - this will change when that's fixed.
         """
         class MinNumInline(GenericTabularInline):
             model = Media
             extra = 3
             min_num = 2
-        admin_site.unregister(Episode)
-        admin_site.register(Episode, inlines=[MinNumInline])
+
+        modeladmin = admin.ModelAdmin(Episode, admin_site)
+        modeladmin.inlines = [MinNumInline]
 
         e = self._create_object(Episode)
-        from django.conf import settings
-        import sys
-        reload(sys.modules[settings.ROOT_URLCONF])
-        response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
-        formset = response.context['inline_admin_formsets'][0].formset
-        import pdb; pdb.set_trace()
-        self.assertEqual(formset.total_form_count(), 5)
+        request = self.factory.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
+        request.user = User(username='super', password='secret', is_superuser=True)
+        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        formset = response.context_data['inline_admin_formsets'][0].formset
+        self.assertEqual(formset.total_form_count(), 6)
         self.assertEqual(formset.initial_form_count(), 1)
 
 

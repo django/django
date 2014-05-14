@@ -371,15 +371,25 @@ class ModelFormsetTest(TestCase):
         # added to extra.
         qs = Author.objects.none()
 
-        AuthorFormSet = modelformset_factory(Author, fields="__all__")
+        AuthorFormSet = modelformset_factory(Author, fields="__all__", extra=0)
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 0)
 
-        AuthorFormSet = modelformset_factory(Author, fields="__all__", min_num=1)
+        AuthorFormSet = modelformset_factory(Author, fields="__all__", min_num=1, extra=0)
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 1)
 
         AuthorFormSet = modelformset_factory(Author, fields="__all__", min_num=1, extra=1)
+        formset = AuthorFormSet(queryset=qs)
+        self.assertEqual(len(formset.forms), 2)
+
+    def test_min_num_with_existing(self):
+        # Test the behavior of min_num with existing objects.
+        # See #22628 - this will change when that's fixed.
+        Author.objects.create(name='Charles Baudelaire')
+        qs = Author.objects.all()
+
+        AuthorFormSet = modelformset_factory(Author, fields="__all__", extra=0, min_num=1)
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 2)
 
