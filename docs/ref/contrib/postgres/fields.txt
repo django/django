@@ -1,10 +1,13 @@
 PostgreSQL specific model fields
 ================================
 
+All of these fields are available from the ``django.contrib.postgres.fields``
+module.
+
 .. currentmodule:: django.contrib.postgres.fields
 
-``django.contrib.postgres.fields.ArrayField``
---------------
+ArrayField
+----------
 
 .. class:: ArrayField(base_field, size=None, **options)
 
@@ -31,6 +34,9 @@ PostgreSQL specific model fields
         It is possible to nest array fields - you can specify an instance of
         ``ArrayField`` as the ``base_field``. For example::
 
+            from django.db import models
+            from django.contrib.postgres.fields import ArrayField
+
             class ChessBoard(models.Model):
                 board = ArrayField(
                     ArrayField(
@@ -55,8 +61,11 @@ PostgreSQL specific model fields
     When nesting ``ArrayField``, whether you use the `size` parameter or not,
     PostgreSQL requires that the arrays are rectangular::
 
+        from django.db import models
+        from django.contrib.postgres.fields import ArrayField
+
         class Board(models.Model):
-            pieces = ArrayField(ArrayField(IntegerField()))
+            pieces = ArrayField(ArrayField(models.IntegerField()))
 
         # Valid
         Board(pieces=[
@@ -79,9 +88,12 @@ Querying ArrayField
 There are a number of custom lookups and transforms for :class:`ArrayField`.
 We will use the following example model::
 
+    from django.db import models
+    from django.contrib.postgres.fields import ArrayField
+
     class Post(models.Model):
-        name = CharField(max_length=200)
-        tags = ArrayField(CharField(max_length=200), blank=True)
+        name = models.CharField(max_length=200)
+        tags = ArrayField(models.CharField(max_length=200), blank=True)
 
         def __str__(self):  # __unicode__ on python 2
             return self.name
@@ -205,4 +217,4 @@ Indexing ArrayField
 At present using :attr:`~django.db.models.Field.db_index` will create a
 ``btree`` index. This does not offer particularly significant help to querying.
 A more useful index is a ``GIN`` index, which you should create using a
-:class:`~django.db.models.operations.RunSQL` operation.
+:class:`~django.db.migrations.operations.RunSQL` operation.
