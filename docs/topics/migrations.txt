@@ -338,7 +338,7 @@ the file in the right place, suggest a name, and add dependencies for you)::
 
 Then, open up the file; it should look something like this::
 
-    # encoding: utf8
+    # -*- coding: utf-8 -*-
     from django.db import models, migrations
 
     class Migration(migrations.Migration):
@@ -365,7 +365,7 @@ combined values of ``first_name`` and ``last_name`` (we've come to our senses
 and realized that not everyone has first and last names). All we
 need to do is use the historical model and iterate over the rows::
 
-    # encoding: utf8
+    # -*- coding: utf-8 -*-
     from django.db import models, migrations
 
     def combine_names(apps, schema_editor):

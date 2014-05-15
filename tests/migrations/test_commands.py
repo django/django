@@ -184,7 +184,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
         with codecs.open(initial_file, 'r', encoding='utf-8') as fp:
             content = fp.read()
-            self.assertTrue('# encoding: utf8' in content)
+            self.assertTrue('# -*- coding: utf-8 -*-' in content)
             self.assertTrue('migrations.CreateModel' in content)
 
             if six.PY3:
