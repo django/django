@@ -509,7 +509,7 @@ for all other models it is simply the model's class.
 
 For example::
 
-    form django.db import models
+    from django.db import models
 
     class MyModel(models.Model):
         id = models.AutoField(primary_key=True)
