@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """Tests for jslex."""
-# encoding: utf-8
 # originally from https://bitbucket.org/ned/jslex
 
 from django.test import TestCase

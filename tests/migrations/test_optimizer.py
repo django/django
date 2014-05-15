@@ -1,4 +1,4 @@
-# encoding: utf8
+# -*- coding: utf-8 -*-
 
 from django.test import TestCase
 from django.db.migrations.optimizer import MigrationOptimizer
