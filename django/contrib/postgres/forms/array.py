@@ -5,6 +5,7 @@ from django.contrib.postgres.validators import ArrayMinLengthValidator, ArrayMax
 from django.core.exceptions import ValidationError
 from django import forms
 from django.utils.safestring import mark_safe
+from django.utils import six
 from django.utils.translation import string_concat, ugettext_lazy as _
 
 
@@ -26,7 +27,7 @@ class SimpleArrayField(forms.CharField):
 
     def prepare_value(self, value):
         if isinstance(value, list):
-            return self.delimiter.join(str(self.base_field.prepare_value(v)) for v in value)
+            return self.delimiter.join([six.text_type(self.base_field.prepare_value(v)) for v in value])
         return value
 
     def to_python(self, value):
@@ -96,7 +97,11 @@ class SplitArrayWidget(forms.Widget):
 
     def value_from_datadict(self, data, files, name):
         regex = re.compile(name + '_([0-9]+).*')
-        indexes = [int(regex.match(key).groups()[0]) for key in data.keys() if regex.match(key)]
+        indexes = []
+        for key in data:
+            match = regex.match(key)
+            if match:
+                indexes.append(int(match.groups()[0]))
         max_index = max(indexes)
         return [self.widget.value_from_datadict(data, files, '%s_%s' % (name, index)) for index in range(max_index + 1)]
 
@@ -126,9 +131,9 @@ class SplitArrayWidget(forms.Widget):
     def format_output(self, rendered_widgets):
         return ''.join(rendered_widgets)
 
-    def _get_media(self):
+    @property
+    def media(self):
         return self.widget.media
-    media = property(_get_media)
 
     def __deepcopy__(self, memo):
         obj = super(SplitArrayWidget, self).__deepcopy__(memo)

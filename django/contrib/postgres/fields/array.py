@@ -6,11 +6,15 @@ from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, Lookup, Transform, IntegerField
 from django.utils import six
-from django.utils.functional import cached_property
 from django.utils.translation import string_concat, ugettext_lazy as _
 
 
 __all__ = ['ArrayField']
+
+
+class AttributeSetter(object):
+    def __init__(self, name, value):
+        setattr(self, name, value)
 
 
 class ArrayField(Field):
@@ -88,9 +92,7 @@ class ArrayField(Field):
         if isinstance(value, six.string_types):
             # Assume we're deserializing
             vals = json.loads(value)
-            value = []
-            for val in vals:
-                value.append(self.base_field.to_python(val))
+            value = [self.base_field.to_python(val) for val in vals]
         return value
 
     def value_to_string(self, obj):
@@ -98,12 +100,9 @@ class ArrayField(Field):
         vals = self._get_val_from_obj(obj)
         base_field = self.base_field
 
-        class FakeObj(object):
-            def __init__(self, value):
-                setattr(self, base_field.attname, value)
-
         for val in vals:
-            values.append(base_field.value_to_string(FakeObj(val)))
+            obj = AttributeSetter(base_field.attname, val)
+            values.append(base_field.value_to_string(obj))
         return json.dumps(values)
 
     def get_transform(self, name):
@@ -115,7 +114,7 @@ class ArrayField(Field):
         except ValueError:
             pass
         else:
-            index = index + 1  # postgres uses 1-indexing
+            index += 1  # postgres uses 1-indexing
             return IndexTransformFactory(index, self.base_field)
         if re.match('\d+_\d+', name):
             start, end = name.split('_')
@@ -134,8 +133,8 @@ class ArrayField(Field):
                     code='item_invalid',
                     params={'nth': i},
                 )
-        if type(self.base_field) == ArrayField:
-            if len(set(len(i) for i in value)) > 1:
+        if isinstance(self.base_field, ArrayField):
+            if len({len(i) for i in value}) > 1:
                 raise exceptions.ValidationError(
                     self.error_messages['nested_array_mismatch'],
                     code='nested_array_mismatch',
@@ -193,7 +192,7 @@ ArrayField.register_lookup(ArrayOverlapLookup)
 class ArrayLenTransform(Transform):
     lookup_name = 'len'
 
-    @cached_property
+    @property
     def output_type(self):
         return IntegerField()
 
@@ -216,7 +215,7 @@ class IndexTransform(Transform):
         lhs, params = qn.compile(self.lhs)
         return '%s[%s]' % (lhs, self.index), params
 
-    @cached_property
+    @property
     def output_type(self):
         return self.base_field
 

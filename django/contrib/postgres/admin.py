@@ -2,7 +2,6 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.postgres import fields, forms
 from django.forms import Media
-from django.utils.html import format_html
 
 
 class AdminSplitArrayWidget(forms.SplitArrayWidget):
@@ -21,13 +20,11 @@ class AdminSplitArrayWidget(forms.SplitArrayWidget):
     def format_output(self, rendered_widgets):
         html_string = '<div class="arrayfield">'
         for widget in rendered_widgets:
-            html_string += '<div class="arrayfield-inner">'
-            html_string += widget
-            html_string += '</div>'
+            html_string += '<div class="arrayfield-inner">' + widget + '</div>'
         if self.extendible:
             html_string += '<a class="addlink">Add</a>'
         html_string += '</div>'
-        return format_html(html_string)
+        return html_string
 
 
 class PostgresModelAdmin(ModelAdmin):
