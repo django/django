@@ -500,7 +500,7 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
 
         This class used to be defined in ``django.contrib.contenttypes.generic``.
 
-.. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True)
+.. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True, min_num=None, validate_min=False)
 
     Returns a ``GenericInlineFormSet`` using
     :func:`~django.forms.models.modelformset_factory`.
@@ -520,6 +520,10 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
     .. versionchanged:: 1.7
 
         This function used to be defined in ``django.contrib.contenttypes.generic``.
+
+    .. versionchanged:: 1.7
+
+        ``min_num`` and ``validate_min`` were added.
 
 
 .. module:: django.contrib.contenttypes.admin

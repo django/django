@@ -119,6 +119,7 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "can_delete": can_delete,
             "can_order": False,
             "fields": fields,
+            "min_num": self.min_num,
             "max_num": self.max_num,
             "exclude": exclude
         }

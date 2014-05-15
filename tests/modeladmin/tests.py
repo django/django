@@ -1444,6 +1444,33 @@ class MaxNumCheckTests(CheckTestCase):
         self.assertIsValid(ValidationTestModelAdmin, ValidationTestModel)
 
 
+class MinNumCheckTests(CheckTestCase):
+
+    def test_not_integer(self):
+        class ValidationTestInline(TabularInline):
+            model = ValidationTestInlineModel
+            min_num = "hello"
+
+        class ValidationTestModelAdmin(ModelAdmin):
+            inlines = [ValidationTestInline]
+
+        self.assertIsInvalid(
+            ValidationTestModelAdmin, ValidationTestModel,
+            "The value of 'min_num' must be an integer.",
+            'admin.E205',
+            invalid_obj=ValidationTestInline)
+
+    def test_valid_case(self):
+        class ValidationTestInline(TabularInline):
+            model = ValidationTestInlineModel
+            min_num = 2
+
+        class ValidationTestModelAdmin(ModelAdmin):
+            inlines = [ValidationTestInline]
+
+        self.assertIsValid(ValidationTestModelAdmin, ValidationTestModel)
+
+
 class FormsetCheckTests(CheckTestCase):
 
     def test_invalid_type(self):
@@ -1460,7 +1487,7 @@ class FormsetCheckTests(CheckTestCase):
         self.assertIsInvalid(
             ValidationTestModelAdmin, ValidationTestModel,
             "The value of 'formset' must inherit from 'BaseModelFormSet'.",
-            'admin.E205',
+            'admin.E206',
             invalid_obj=ValidationTestInline)
 
     def test_valid_case(self):
