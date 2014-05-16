@@ -44,6 +44,7 @@ TEST_DATA = (
     (validate_email, 'email@127.0.0.1', ValidationError),
     (validate_email, 'example@invalid-.com', ValidationError),
     (validate_email, 'example@-invalid.com', ValidationError),
+    (validate_email, 'example@invalid.com-', ValidationError),
     (validate_email, 'example@inv-.alid-.com', ValidationError),
     (validate_email, 'example@inv-.-alid.com', ValidationError),
     (validate_email, 'test@example.com\n\n<script src="x.js">', ValidationError),
@@ -153,6 +154,7 @@ TEST_DATA = (
     (URLValidator(), 'http://.com', ValidationError),
     (URLValidator(), 'http://invalid-.com', ValidationError),
     (URLValidator(), 'http://-invalid.com', ValidationError),
+    (URLValidator(), 'http://invalid.com-', ValidationError),
     (URLValidator(), 'http://inv-.alid-.com', ValidationError),
     (URLValidator(), 'http://inv-.-alid.com', ValidationError),
 
