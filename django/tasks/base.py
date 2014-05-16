@@ -41,7 +41,7 @@ def get_backend(alias=DEFAULT_TASK_ALIAS):
     return backends[alias]
 
 class Task(object):
-    def __init__(self, func=None, name=None, using=None, options=None):
+    def __init__(self, func=None, name=None, using=DEFAULT_TASK_ALIAS, options=None):
         if not func and not (hasattr(self, 'run') and hasattr(self, 'name')):
             raise
         self.run = func

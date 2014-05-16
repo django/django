@@ -89,6 +89,14 @@ class TestTaskDecorator(unittest.TestCase):
         self.assertIn('some_name', registry._registry)
         self.assertIs(t, registry._registry['some_name'])
 
+    def test_decorated_task_can_be_invoked_by_name(self):
+        task(dummy_task, name='some_name')
+
+        tr = registry.delay_by_name('some_name', 1, 2, 3, answer=42)
+        self.assertIsInstance(tr, backends.DummyTaskResult)
+        self.assertEquals(backends.SUCCESS, tr.status())
+        self.assertEquals(((1, 2, 3), {'answer': 42}), tr.get_result())
+
 class TestTask(unittest.TestCase):
     def test_configure_clones_and_updates_alias_and_options(self):
         t = Task(lambda: 'XYZ', using='default', options={'priority': 1})
