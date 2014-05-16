@@ -46,7 +46,8 @@ Minor features
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
+  Django 1.2 have been removed.
 
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
