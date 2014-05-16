@@ -2,7 +2,9 @@ from __future__ import unicode_literals
 
 import datetime
 
+from django.db.models.fields import FieldDoesNotExist
 from django.test import TestCase
+from django.utils import six
 
 from .models import Article, Comment, Category
 
@@ -80,4 +82,41 @@ class DatesTests(TestCase):
                 datetime.date(2005, 7, 28),
             ],
             lambda d: d,
+        )
+
+    def test_dates_fails_when_no_arguments_are_provided(self):
+        self.assertRaises(
+            TypeError,
+            Article.objects.dates,
+        )
+
+    def test_dates_fails_when_given_invalid_field_argument(self):
+        six.assertRaisesRegex(
+            self,
+            FieldDoesNotExist,
+            "Article has no field named 'invalid_field'",
+            Article.objects.dates,
+            "invalid_field",
+            "year",
+        )
+
+    def test_dates_fails_when_given_invalid_kind_argument(self):
+        six.assertRaisesRegex(
+            self,
+            AssertionError,
+            "'kind' must be one of 'year', 'month' or 'day'.",
+            Article.objects.dates,
+            "pub_date",
+            "bad_kind",
+        )
+
+    def test_dates_fails_when_given_invalid_order_argument(self):
+        six.assertRaisesRegex(
+            self,
+            AssertionError,
+            "'order' must be either 'ASC' or 'DESC'.",
+            Article.objects.dates,
+            "pub_date",
+            "year",
+            order="bad order",
         )
