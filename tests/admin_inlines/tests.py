@@ -247,7 +247,6 @@ class TestInline(TestCase):
     def test_custom_min_num(self):
         """
         Ensure that get_min_num is called and used correctly.
-        See #22628 - this will change when that's fixed.
         """
         bt_head = BinaryTree.objects.create(name="Tree Head")
         BinaryTree.objects.create(name="First Child", parent=bt_head)
@@ -277,7 +276,7 @@ class TestInline(TestCase):
         request.user = User(username='super', is_superuser=True)
         response = modeladmin.changeform_view(request, object_id=str(bt_head.id))
         self.assertContains(response, min_forms % 5)
-        self.assertContains(response, total_forms % 9)
+        self.assertContains(response, total_forms % 8)
 
     def test_inline_nonauto_noneditable_pk(self):
         response = self.client.get('/admin/admin_inlines/author/add/')
