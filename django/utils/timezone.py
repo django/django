@@ -351,6 +351,8 @@ def make_aware(value, timezone):
     """
     Makes a naive datetime.datetime in a given time zone aware.
     """
+    if is_aware(value):
+        raise ValueError("make_aware expects a naive value, got %s" % value)
     if hasattr(timezone, 'localize'):
         # available for pytz time zones
         return timezone.localize(value, is_dst=None)
@@ -363,6 +365,8 @@ def make_naive(value, timezone):
     """
     Makes an aware datetime.datetime naive in a given time zone.
     """
+    if is_naive(value):
+        raise ValueError("make_naive expects an aware value, got %s" % value)
     value = value.astimezone(timezone)
     if hasattr(timezone, 'normalize'):
         # available for pytz time zones
