@@ -2,11 +2,10 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-
 from django.utils.module_loading import import_by_path
 
 
-DEFAULT_CACHE_ALIAS = 'default'
+DEFAULT_TASK_ALIAS = 'default'
 
 
 class InvalidTaskBackendError(Exception):
@@ -14,9 +13,8 @@ class InvalidTaskBackendError(Exception):
 
 
 def _get_task_backend(alias=None):
-
     if not alias:
-        alias = DEFAULT_CACHE_ALIAS
+        alias = DEFAULT_TASK_ALIAS
     try:
         conf = settings.QUEUES[alias]
     except KeyError:
