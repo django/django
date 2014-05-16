@@ -1,3 +1,5 @@
+import codecs
+
 from decimal import Decimal
 from django.utils import six
 from django.apps.registry import Apps
@@ -28,6 +30,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return '"%s"' % six.text_type(value)
         elif value is None:
             return "NULL"
+        elif isinstance(value, (bytes, memoryview, bytearray)):
+            # Bytes are only allowed for BLOB fields
+            # SQLite spec: BLOB literals are string literals containing hexadecimal data and preceded by a single "x" or "X" character.
+            # So bytes => decode as hex => output as X'deadbeef'
+            value = bytes(value)
+            hex_encoder = codecs.getencoder('hex_codec')
+            value_hex = hex_encoder(value)[0]
+            return "X'%s'" % value_hex.decode('ascii')
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
@@ -37,7 +47,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         # Work out the new fields dict / mapping
         body = dict((f.name, f) for f in model._meta.local_fields)
-        mapping = dict((f.column, f.column) for f in model._meta.local_fields)
+        # Since mapping might mix column names and default values, its values must be already quoted.
+        mapping = dict((f.column, self.quote_name(f.column)) for f in model._meta.local_fields)
         # If any of the new or altered fields is introducing a new PK,
         # remove the old one
         restore_pk_field = None
@@ -62,7 +73,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             del body[old_field.name]
             del mapping[old_field.column]
             body[new_field.name] = new_field
-            mapping[new_field.column] = old_field.column
+            mapping[new_field.column] = self.quote_name(old_field.column)
         # Remove any deleted fields
         for field in delete_fields:
             del body[field.name]
@@ -90,7 +101,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
             self.quote_name(temp_model._meta.db_table),
             ', '.join(self.quote_name(x) for x, y in field_maps),
-            ', '.join(self.quote_name(y) for x, y in field_maps),
+            ', '.join(y for x, y in field_maps),
             self.quote_name(model._meta.db_table),
         ))
         # Delete the old table (not using self.delete_model to avoid deleting

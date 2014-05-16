@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import unittest
 
 try:
@@ -311,6 +313,38 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adfl", editor, new_state, project_state)
         self.assertColumnNotExists("test_adfl_pony", "height")
+
+    def test_add_text_field(self):
+        """
+        Tests the AddField operation on TextField/BinaryField.
+
+        These two fields can't have a default on MySQL. Refs #22424.
+        """
+        project_state = self.set_up_test_model("test_adflmysql")
+
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_adflmysql", "Pony")
+        pony = Pony.objects.create(weight=42)
+
+        # Test the state alteration
+        new_state = self.apply_operations("test_adflmysql", project_state, [
+            migrations.AddField(
+                "Pony",
+                "text",
+                models.TextField(default='42'),
+            ),
+            migrations.AddField(
+                "Pony",
+                "blob",
+                models.BinaryField(default=b'42'),
+            ),
+        ])
+
+        new_apps = new_state.render()
+        Pony = new_apps.get_model("test_adflmysql", "Pony")
+        pony = Pony.objects.get(pk=pony.pk)
+        self.assertEqual(pony.text, '42')
+        self.assertEqual(bytes(pony.blob), b'42')
 
     def test_column_name_quoting(self):
         """
