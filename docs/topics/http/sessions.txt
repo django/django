@@ -681,6 +681,61 @@ Technical details
 * Django only sends a cookie if it needs to. If you don't set any session
   data, it won't send a session cookie.
 
+.. _extending-database-backed-session-engines:
+
+Extending database-backed session engines
+-----------------------------------------
+
+.. versionadded:: 1.8
+
+Creating a custom database-backed session engine built upon those included 
+in Django (namely ``db`` and ``cached_db``) may be done via the inheritance
+of the abstract session model :class:`models.AbstractSession`, and an either
+one of ``SessionStore`` classes.
+
+.. class:: models.AbstractSession
+
+    The abstract base session model. Includes everything that is available
+    for the default implementation of the ``Session`` model class.
+
+The example below shows a custom database-backed session engine, that includes
+an additional database column to store an account ID (thus providing an option
+to query the database for all active sessions for an account)::
+
+    from django.contrib.sessions.models import AbstractSession
+    from django.contrib.sessions.backends.db import SessionStore as DBStore
+    from django.db import models
+
+    class CustomSession(AbstractSession):
+        account_id = models.IntegerField(null=True, db_index=True)
+
+        @classmethod
+        def get_session_store_class(cls):
+            return SessionStore
+
+    class SessionStore(DBStore):
+        @classmethod
+        def get_session_class(cls):
+            return CustomSession
+
+        def create_session_instance(self, data):
+            obj = super(SessionStore, self).create_session_instance(data)
+            try:
+                account_id = int(data.get('_auth_user_id')) or None
+            except (ValueError, TypeError):
+                account_id = None
+            obj.account_id = account_id
+            return obj
+
+In case of a migration from the Django's built-in ``cached_db`` session store,
+to a custom one based on ``cached_db``, one should override the cache key prefix
+in order to prevent namespace clash::
+
+    class SessionStore(CachedDBStore):
+        cache_key_prefix = 'mysessions.custom_cached_db_backend'
+
+        # ...
+
 Session IDs in URLs
 ===================
 

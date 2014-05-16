@@ -10,7 +10,8 @@ class SessionManager(models.Manager):
         """
         Returns the given session dictionary serialized and encoded as a string.
         """
-        return SessionStore().encode(session_dict)
+        session_store_class = self.model.get_session_store_class()
+        return session_store_class().encode(session_dict)
 
     def save(self, session_key, session_dict, expire_date):
         s = self.model(session_key, self.encode(session_dict), expire_date)
@@ -22,7 +23,7 @@ class SessionManager(models.Manager):
 
 
 @python_2_unicode_compatible
-class Session(models.Model):
+class AbstractSession(models.Model):
     """
     Django provides full support for anonymous sessions. The session
     framework lets you store and retrieve arbitrary data on a
@@ -46,15 +47,25 @@ class Session(models.Model):
     objects = SessionManager()
 
     class Meta:
-        db_table = 'django_session'
+        abstract = True
         verbose_name = _('session')
         verbose_name_plural = _('sessions')
 
     def __str__(self):
         return self.session_key
 
+    @classmethod
+    def get_session_store_class(cls):
+        return SessionStore
+
     def get_decoded(self):
-        return SessionStore().decode(self.session_data)
+        session_store_class = self.get_session_store_class()
+        return session_store_class().decode(self.session_data)
+
+
+class Session(AbstractSession):
+    class Meta(AbstractSession.Meta):
+        db_table = 'django_session'
 
 
 # At bottom to avoid circular import

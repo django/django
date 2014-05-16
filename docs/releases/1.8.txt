@@ -177,6 +177,11 @@ Minor features
 * Session cookie is now deleted after
   :meth:`~django.contrib.sessions.backends.base.SessionBase.flush()` is called.
 
+* Session model and SessionStore classes for ``db`` and ``cached_db`` backends
+  are now reusable for a custom database session backend to be built upon those.
+  See :ref:`Extending database-backed session engines 
+  <extending-database-backed-session-engines>` for more details.
+
 :mod:`django.contrib.sitemaps`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

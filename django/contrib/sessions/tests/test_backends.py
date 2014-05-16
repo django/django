@@ -13,7 +13,7 @@ from django.contrib.sessions.backends.cache import SessionStore as CacheSession
 from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
 from django.contrib.sessions.backends.file import SessionStore as FileSession
 from django.contrib.sessions.backends.signed_cookies import SessionStore as CookieSession
-from django.contrib.sessions.models import Session
+from django.contrib.sessions.tests.custom_db_backend import SessionStore as CustomDatabaseSession
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.cache import caches
 from django.core.cache.backends.base import InvalidCacheBackendError
@@ -313,6 +313,11 @@ class SessionTestsMixin(object):
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
 
     backend = DatabaseSession
+    session_engine = 'django.contrib.sessions.backends.db'
+
+    @property
+    def session_class(self):
+        return self.backend.get_session_class()
 
     def test_session_str(self):
         "Session repr should be the session key."
@@ -320,7 +325,7 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         self.session.save()
 
         session_key = self.session.session_key
-        s = Session.objects.get(session_key=session_key)
+        s = self.session_class.objects.get(session_key=session_key)
 
         self.assertEqual(force_text(s), session_key)
 
@@ -332,7 +337,7 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         self.session['x'] = 1
         self.session.save()
 
-        s = Session.objects.get(session_key=self.session.session_key)
+        s = self.session_class.objects.get(session_key=self.session.session_key)
 
         self.assertEqual(s.get_decoded(), {'x': 1})
 
@@ -344,19 +349,18 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         self.session['y'] = 1
         self.session.save()
 
-        s = Session.objects.get(session_key=self.session.session_key)
+        s = self.session_class.objects.get(session_key=self.session.session_key)
         # Change it
-        Session.objects.save(s.session_key, {'y': 2}, s.expire_date)
+        self.session_class.objects.save(s.session_key, {'y': 2}, s.expire_date)
         # Clear cache, so that it will be retrieved from DB
         del self.session._session_cache
         self.assertEqual(self.session['y'], 2)
 
-    @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.db")
     def test_clearsessions_command(self):
         """
         Test clearsessions command for clearing expired sessions.
         """
-        self.assertEqual(0, Session.objects.count())
+        self.assertEqual(0, self.session_class.objects.count())
 
         # One object in the future
         self.session['foo'] = 'bar'
@@ -370,15 +374,39 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         other_session.save()
 
         # Two sessions are in the database before clearsessions...
-        self.assertEqual(2, Session.objects.count())
-        management.call_command('clearsessions')
+        self.assertEqual(2, self.session_class.objects.count())
+        with override_settings(SESSION_ENGINE=self.session_engine):
+            management.call_command('clearsessions')
         # ... and one is deleted.
-        self.assertEqual(1, Session.objects.count())
+        self.assertEqual(1, self.session_class.objects.count())
 
 
 @override_settings(USE_TZ=True)
 class DatabaseSessionWithTimeZoneTests(DatabaseSessionTests):
     pass
+
+
+class CustomDatabaseSessionTests(DatabaseSessionTests):
+    backend = CustomDatabaseSession
+    session_engine = 'django.contrib.sessions.tests.custom_db_backend'
+
+    def test_extra_session_field(self):
+        # Set the account ID to be picked up by a custom session storage
+        # and saved to a custom session model database column.
+        self.session['_auth_user_id'] = 42
+        self.session.save()
+
+        # Make sure that the customized create_session_instance() was called
+        s = self.session_class.objects.get(session_key=self.session.session_key)
+        self.assertEqual(s.account_id, 42)
+
+        # Make the session "anonymous"
+        self.session.pop('_auth_user_id')
+        self.session.save()
+
+        # Make sure that save() on an existing session did the right job
+        s = self.session_class.objects.get(session_key=self.session.session_key)
+        self.assertEqual(s.account_id, None)
 
 
 class CacheDBSessionTests(SessionTestsMixin, TestCase):

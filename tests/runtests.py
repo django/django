@@ -123,6 +123,7 @@ def setup(verbosity, test_labels):
         # these 'tests.migrations' modules don't actually exist, but this lets
         # us skip creating migrations for the test models.
         'auth': 'django.contrib.auth.tests.migrations',
+        'sessions': 'django.contrib.sessions.tests.migrations',
         'contenttypes': 'django.contrib.contenttypes.tests.migrations',
     }
 
