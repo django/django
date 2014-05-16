@@ -56,7 +56,7 @@ class MultiPartParser(object):
         """
 
         #
-        # Content-Type should containt multipart and the boundary information.
+        # Content-Type should contain multipart and the boundary information.
         #
 
         content_type = META.get('HTTP_CONTENT_TYPE', META.get('CONTENT_TYPE', ''))
