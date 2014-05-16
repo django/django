@@ -395,13 +395,12 @@ class ModelFormsetTest(TestCase):
 
     def test_min_num_with_existing(self):
         # Test the behavior of min_num with existing objects.
-        # See #22628 - this will change when that's fixed.
         Author.objects.create(name='Charles Baudelaire')
         qs = Author.objects.all()
 
         AuthorFormSet = modelformset_factory(Author, fields="__all__", extra=0, min_num=1)
         formset = AuthorFormSet(queryset=qs)
-        self.assertEqual(len(formset.forms), 2)
+        self.assertEqual(len(formset.forms), 1)
 
     def test_custom_save_method(self):
         class PoetForm(forms.ModelForm):

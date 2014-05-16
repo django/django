@@ -204,8 +204,7 @@ class GenericInlineAdminParametersTest(TestCase):
 
     def testMinNumParam(self):
         """
-        With extra=3 and min_num=2, there should be six forms.
-        See #22628 - this will change when that's fixed.
+        With extra=3 and min_num=2, there should be five forms.
         """
         class MinNumInline(GenericTabularInline):
             model = Media
@@ -220,7 +219,7 @@ class GenericInlineAdminParametersTest(TestCase):
         request.user = User(username='super', is_superuser=True)
         response = modeladmin.changeform_view(request, object_id=str(e.pk))
         formset = response.context_data['inline_admin_formsets'][0].formset
-        self.assertEqual(formset.total_form_count(), 6)
+        self.assertEqual(formset.total_form_count(), 5)
         self.assertEqual(formset.initial_form_count(), 1)
 
 
