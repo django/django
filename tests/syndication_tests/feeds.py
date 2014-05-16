@@ -8,13 +8,6 @@ from django.utils.timezone import get_fixed_timezone
 from .models import Article, Entry
 
 
-class ComplexFeed(views.Feed):
-    def get_object(self, request, foo=None):
-        if foo is not None:
-            raise ObjectDoesNotExist
-        return None
-
-
 class TestRss2Feed(views.Feed):
     title = 'My blog'
     description = 'A more thorough description of my blog.'
