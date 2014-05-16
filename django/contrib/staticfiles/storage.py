@@ -312,6 +312,7 @@ class ManifestFilesMixin(HashedFilesMixin):
                          (self.manifest_name, self.manifest_version))
 
     def post_process(self, *args, **kwargs):
+        self.hashed_files = OrderedDict()
         all_post_processed = super(ManifestFilesMixin,
                                    self).post_process(*args, **kwargs)
         for post_processed in all_post_processed:
