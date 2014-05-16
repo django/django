@@ -392,11 +392,11 @@ below.
 
 .. admonition:: When context processors are applied
 
-    When you use ``RequestContext``, the variables you supply directly
-    are added first, followed any variables supplied by context
-    processors. This means that a context processor may overwrite a
-    variable you've supplied, so take care to avoid variable names
-    which overlap with those supplied by your context processors.
+    Context processors are applied *after* the context itself is processed.
+    This means that a context processor may overwrite variables you've
+    supplied to your ``Context`` or ``RequestContext``, so take care
+    to avoid variable names that overlap with those supplied by your
+    context processors.
 
 Also, you can give ``RequestContext`` a list of additional processors, using the
 optional, third positional argument, ``processors``. In this example, the
@@ -431,6 +431,10 @@ optional, third positional argument, ``processors``. In this example, the
     Alternatively, use the :meth:`~django.shortcuts.render()` shortcut which is
     the same as a call to :func:`~django.shortcuts.render_to_response()` with a
     context_instance argument that forces the use of a ``RequestContext``.
+
+    Note that the contents of a supplied dictionary (``my_data_dictionary``
+    in this example) will take precedence over any variables supplied by
+    context processors or the ``RequestContext``.
 
 Here's what each of the default processors does:
 
