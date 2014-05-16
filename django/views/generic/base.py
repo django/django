@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import logging
+import warnings
 from functools import update_wrapper
 
 from django import http
@@ -8,6 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
 from django.utils.decorators import classonlymethod
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
 
 logger = logging.getLogger('django.request')
@@ -163,6 +165,20 @@ class RedirectView(View):
     url = None
     pattern_name = None
     query_string = False
+
+    def __init__(self, **kwargs):
+        """
+        When initializing the RedirectView we check if permanent is given,
+        if not we raise a deprecation warning and continue on as normal.
+        """
+        if 'permanent' not in kwargs:
+            warnings.warn(
+                ("Default value of permanent for RedirectViews will change "
+                 "from True to False in Django 1.9"),
+                RemovedInDjango19Warning
+            )
+
+        super(RedirectView, self).__init__(**kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
         """
