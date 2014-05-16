@@ -71,3 +71,28 @@ class TimezoneTests(unittest.TestCase):
     def test_pickling_unpickling(self):
         self.assertIsInstance(pickle.loads(pickle.dumps(timezone.UTC())), timezone.UTC)
         self.assertIsInstance(pickle.loads(pickle.dumps(timezone.LocalTimezone())), timezone.LocalTimezone)
+
+    def test_is_aware(self):
+        self.assertTrue(timezone.is_aware(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)))
+        self.assertFalse(timezone.is_aware(datetime.datetime(2011, 9, 1, 13, 20, 30)))
+
+    def test_is_naive(self):
+        self.assertFalse(timezone.is_naive(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)))
+        self.assertTrue(timezone.is_naive(datetime.datetime(2011, 9, 1, 13, 20, 30)))
+
+    def test_make_aware(self):
+        self.assertEqual(
+            timezone.make_aware(datetime.datetime(2011, 9, 1, 13, 20, 30), EAT),
+            datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT))
+        with self.assertRaises(ValueError):
+            timezone.make_aware(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT), EAT)
+
+    def test_make_naive(self):
+        self.assertEqual(
+            timezone.make_naive(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT), EAT),
+            datetime.datetime(2011, 9, 1, 13, 20, 30))
+        self.assertEqual(
+            timezone.make_naive(datetime.datetime(2011, 9, 1, 17, 20, 30, tzinfo=ICT), EAT),
+            datetime.datetime(2011, 9, 1, 13, 20, 30))
+        with self.assertRaises(ValueError):
+            timezone.make_naive(datetime.datetime(2011, 9, 1, 13, 20, 30), EAT)
