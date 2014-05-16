@@ -114,7 +114,7 @@ class BaseFormSet(object):
             return min(self.management_form.cleaned_data[TOTAL_FORM_COUNT], self.absolute_max)
         else:
             initial_forms = self.initial_form_count()
-            total_forms = initial_forms + self.extra
+            total_forms = max(initial_forms, self.min_num) + self.extra
             # Allow all existing related objects/inlines to be displayed,
             # but don't allow extra beyond max_num.
             if initial_forms > self.max_num >= 0:
@@ -158,8 +158,9 @@ class BaseFormSet(object):
                 defaults['initial'] = self.initial[i]
             except IndexError:
                 pass
-        # Allow extra forms to be empty.
-        if i >= self.initial_form_count():
+        # Allow extra forms to be empty, unless they're part of
+        # the minimum forms.
+        if i >= self.initial_form_count() and i >= self.min_num:
             defaults['empty_permitted'] = True
         defaults.update(kwargs)
         form = self.form(**defaults)
@@ -422,7 +423,6 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     # limit is simply max_num + DEFAULT_MAX_NUM (which is 2*DEFAULT_MAX_NUM
     # if max_num is None in the first place)
     absolute_max = max_num + DEFAULT_MAX_NUM
-    extra += min_num
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
              'min_num': min_num, 'max_num': max_num,
