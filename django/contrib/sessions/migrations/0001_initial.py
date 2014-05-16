@@ -19,11 +19,11 @@ class Migration(migrations.Migration):
                 ('expire_date', models.DateTimeField(verbose_name='expire date', db_index=True)),
             ],
             options={
+                'abstract': False,
                 'db_table': 'django_session',
                 'verbose_name': 'session',
                 'verbose_name_plural': 'sessions',
             },
-            bases=(models.Model,),
             managers=[
                 ('objects', django.contrib.sessions.models.SessionManager()),
             ],
