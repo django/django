@@ -670,19 +670,12 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
         self.assertEqual(hashed_files, manifest)
 
     def test_manifest_on_collectstatic(self):
-        '''
+        """
         staticfiles.json manifest doesn't persist stale/deleted records, see #22557
-        '''
+        """
         self.assertNotIn("old_deleted_file", storage.staticfiles_storage.hashed_files)
         storage.staticfiles_storage.hashed_files["old_deleted_file"] = "record"
-        if hasattr(storage, "save_manifest"):
-            storage.staticfiles_storage.save_manifest()
-        else:
-            #Test will run correctly without previous version of ManifestFilesMixin
-            #That did post-processing and saving in one method
-            found_files = {}
-            for p in storage.staticfiles_storage.post_process(found_files):
-                pass
+        storage.staticfiles_storage.save_manifest()
         storage.staticfiles_storage.load_manifest()
         self.assertEqual(
             storage.staticfiles_storage.hashed_files["old_deleted_file"], 
