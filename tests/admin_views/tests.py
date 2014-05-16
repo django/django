@@ -1777,6 +1777,30 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             args=(quote(self.pk),))
         self.assertContains(response, '<a href="%s" class="historylink"' % expected_link)
 
+    def test_redirect_on_add_view_continue_button(self):
+        """As soon as an object is added using "Save and continue editing"
+        button, the user should be redirected to the object's change_view.
+
+        In case primary key is a string containing some special characters
+        like slash or underscore, these characters must be escaped (see #22266)
+        """
+        response = self.client.post(
+            '/test_admin/admin/admin_views/modelwithstringprimarykey/add/',
+            {
+                'string_pk': '123/history',
+                "_continue": "1",  # Save and continue editing
+            }
+        )
+
+        self.assertEqual(response.status_code, 302)  # temporary redirect
+        self.assertEqual(
+            response['location'],
+            (
+                'http://testserver/test_admin/admin/admin_views/'
+                'modelwithstringprimarykey/123_2Fhistory/'  # PK is quoted
+            )
+        )
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF="admin_views.urls")
