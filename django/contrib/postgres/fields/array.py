@@ -63,8 +63,8 @@ class ArrayField(Field):
         self.base_field.set_attributes_from_name(name)
 
     @property
-    def definition(self):
-        return 'Array of %s' % self.base_field.definition
+    def description(self):
+        return 'Array of %s' % self.base_field.description
 
     def db_type(self, connection):
         size = self.size or ''
