@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from django.contrib.syndication import views
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils import feedgenerator
 from django.utils.timezone import get_fixed_timezone
 
