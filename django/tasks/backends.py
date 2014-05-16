@@ -70,12 +70,6 @@ class DummyTaskBackend(BaseBackend):
     def status(self, task_id):
         return UNKNOWN
 
-    def get_result(self, task_id):
-        try:
-            return self._results.pop(task_id)
-        except KeyError:
-            raise ResultUnavailable()
-
     def delay(self, task, *args, **kwargs):
         task_id = self._next_task_id
         self._next_task_id += 1
