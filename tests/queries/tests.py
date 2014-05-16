@@ -2145,6 +2145,129 @@ class ValuesQuerysetTests(BaseQuerysetTest):
         self.assertQuerysetEqual(qs, [72], self.identity)
 
 
+class QuerySetSupportsPythonIdioms(TestCase):
+
+    def setUp(self):
+        some_date = datetime.datetime(2014, 5, 16, 12, 1)
+        for i in range(1, 8):
+            Article.objects.create(
+                name="Article {}".format(i), created=some_date)
+
+    def get_ordered_articles(self):
+        return Article.objects.all().order_by('name')
+
+    def test_can_get_items_using_index_and_slice_notation(self):
+        self.assertEqual(self.get_ordered_articles()[0].name, 'Article 1')
+        self.assertQuerysetEqual(self.get_ordered_articles()[1:3],
+            ["<Article: Article 2>", "<Article: Article 3>"])
+
+    def test_slicing_with_steps_can_be_used(self):
+        self.assertQuerysetEqual(self.get_ordered_articles()[::2],
+            ["<Article: Article 1>",
+             "<Article: Article 3>",
+             "<Article: Article 5>",
+             "<Article: Article 7>"])
+
+    @unittest.skipUnless(six.PY2, "Python 2 only -- Python 3 doesn't have longs.")
+    def test_slicing_works_with_longs(self):
+        self.assertEqual(self.get_ordered_articles()[long(0)].name, 'Article 1')
+        self.assertQuerysetEqual(self.get_ordered_articles()[long(1):long(3)],
+            ["<Article: Article 2>", "<Article: Article 3>"])
+        self.assertQuerysetEqual(self.get_ordered_articles()[::long(2)],
+            ["<Article: Article 1>",
+            "<Article: Article 3>",
+            "<Article: Article 5>",
+            "<Article: Article 7>"])
+
+        # And can be mixed with ints.
+        self.assertQuerysetEqual(self.get_ordered_articles()[1:long(3)],
+            ["<Article: Article 2>", "<Article: Article 3>"])
+
+    def test_slicing_without_step_is_lazy(self):
+        with self.assertNumQueries(0):
+            self.get_ordered_articles()[0:5]
+
+    def test_slicing_with_tests_is_not_lazy(self):
+        with self.assertNumQueries(1):
+            self.get_ordered_articles()[0:5:3]
+
+    def test_slicing_can_slice_again_after_slicing(self):
+        self.assertQuerysetEqual(self.get_ordered_articles()[0:5][0:2],
+            ["<Article: Article 1>",
+             "<Article: Article 2>"])
+        self.assertQuerysetEqual(self.get_ordered_articles()[0:5][4:],
+            ["<Article: Article 5>"])
+        self.assertQuerysetEqual(self.get_ordered_articles()[0:5][5:], [])
+
+        # Some more tests!
+        self.assertQuerysetEqual(self.get_ordered_articles()[2:][0:2],
+            ["<Article: Article 3>", "<Article: Article 4>"])
+        self.assertQuerysetEqual(self.get_ordered_articles()[2:][:2],
+            ["<Article: Article 3>", "<Article: Article 4>"])
+        self.assertQuerysetEqual(self.get_ordered_articles()[2:][2:3],
+            ["<Article: Article 5>"])
+
+        # Using an offset without a limit is also possible.
+        self.assertQuerysetEqual(self.get_ordered_articles()[5:],
+            ["<Article: Article 6>",
+             "<Article: Article 7>"])
+
+    def test_slicing_cannot_filter_queryset_once_sliced(self):
+        six.assertRaisesRegex(
+            self,
+            AssertionError,
+            "Cannot filter a query once a slice has been taken.",
+            Article.objects.all()[0:5].filter,
+            id=1,
+        )
+
+    def test_slicing_cannot_reorder_queryset_once_sliced(self):
+        six.assertRaisesRegex(
+            self,
+            AssertionError,
+            "Cannot reorder a query once a slice has been taken.",
+            Article.objects.all()[0:5].order_by,
+            'id',
+        )
+
+    def test_slicing_cannot_combine_queries_once_sliced(self):
+        six.assertRaisesRegex(
+            self,
+            AssertionError,
+            "Cannot combine queries once a slice has been taken.",
+            lambda: Article.objects.all()[0:1] & Article.objects.all()[4:5]
+        )
+
+    def test_slicing_negative_indexing_not_supported_for_single_element(self):
+        """hint: inverting your ordering might do what you need"""
+        six.assertRaisesRegex(
+            self,
+            AssertionError,
+            "Negative indexing is not supported.",
+            lambda: Article.objects.all()[-1]
+        )
+
+    def test_slicing_negative_indexing_not_supported_for_range(self):
+        """hint: inverting your ordering might do what you need"""
+        six.assertRaisesRegex(
+            self,
+            AssertionError,
+            "Negative indexing is not supported.",
+            lambda: Article.objects.all()[0:-5]
+        )
+
+    def test_can_get_number_of_items_in_queryset_using_standard_len(self):
+        self.assertEqual(len(Article.objects.filter(name__exact='Article 1')), 1)
+
+    def test_can_combine_queries_using_and_and_or_operators(self):
+        s1 = Article.objects.filter(name__exact='Article 1')
+        s2 = Article.objects.filter(name__exact='Article 2')
+        self.assertQuerysetEqual((s1 | s2).order_by('name'),
+            ["<Article: Article 1>",
+             "<Article: Article 2>"])
+        self.assertQuerysetEqual(s1 & s2, [])
+
+
 class WeirdQuerysetSlicingTests(BaseQuerysetTest):
     def setUp(self):
         Number.objects.create(num=1)
