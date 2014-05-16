@@ -93,15 +93,13 @@ class DatabaseOperations(BaseDatabaseOperations):
     def no_limit_value(self):
         return None
 
+    def prepare_sql_script(self, sql, _allow_fallback=False):
+        return [sql]
+
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
-            return name # Quoting once is enough.
+            return name  # Quoting once is enough.
         return '"%s"' % name
-
-    def quote_parameter(self, value):
-        # Inner import so backend fails nicely if it's not present
-        import psycopg2
-        return psycopg2.extensions.adapt(value)
 
     def set_time_zone_sql(self):
         return "SET TIME ZONE %s"
@@ -175,7 +173,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                         style.SQL_KEYWORD('IS NOT'),
                         style.SQL_KEYWORD('FROM'),
                         style.SQL_TABLE(qn(model._meta.db_table))))
-                    break # Only one AutoField is allowed per model, so don't bother continuing.
+                    break  # Only one AutoField is allowed per model, so don't bother continuing.
             for f in model._meta.many_to_many:
                 if not f.rel.through:
                     output.append("%s setval(pg_get_serial_sequence('%s','%s'), coalesce(max(%s), 1), max(%s) %s null) %s %s;" %

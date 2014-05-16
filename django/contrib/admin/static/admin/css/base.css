@@ -796,6 +796,9 @@ table#change-history tbody th {
     text-decoration: underline;
 }
 
+#branding {
+    float: left;
+}
 #branding h1 {
     padding: 0 10px;
     font-size: 18px;
@@ -820,9 +823,7 @@ table#change-history tbody th {
 }
 
 #user-tools {
-    position: absolute;
-    top: 0;
-    right: 0;
+    float: right;
     padding: 1.2em 10px;
     font-size: 11px;
     text-align: right;

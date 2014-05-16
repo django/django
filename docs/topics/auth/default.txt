@@ -12,9 +12,9 @@ is.  For projects where authentication needs differ from the default, Django
 supports extensive :doc:`extension and customization
 </topics/auth/customizing>` of authentication.
 
-Django authentication provides both authentication and authorization, together
+Django authentication provides both authentication and authorization together
 and is generally referred to as the authentication system, as these features
-somewhat coupled.
+are somewhat coupled.
 
 .. _user-objects:
 
@@ -25,17 +25,18 @@ User objects
 authentication system. They typically represent the people interacting with
 your site and are used to enable things like restricting access, registering
 user profiles, associating content with creators etc. Only one class of user
-exists in Django's authentication framework, i.e., 'superusers' or admin
-'staff' users are just user objects with special attributes set, not different
-classes of user objects.
+exists in Django's authentication framework, i.e., :attr:`'superusers'
+<django.contrib.auth.models.User.is_superuser>` or admin :attr:`'staff'
+<django.contrib.auth.models.User.is_staff>` users are just user objects with
+special attributes set, not different classes of user objects.
 
 The primary attributes of the default user are:
 
-* username
-* password
-* email
-* first name
-* last name
+* :attr:`~django.contrib.auth.models.User.username`
+* :attr:`~django.contrib.auth.models.User.password`
+* :attr:`~django.contrib.auth.models.User.email`
+* :attr:`~django.contrib.auth.models.User.first_name`
+* :attr:`~django.contrib.auth.models.User.last_name`
 
 See the :class:`full API documentation <django.contrib.auth.models.User>` for
 full reference, the documentation that follows is more task oriented.
@@ -66,9 +67,8 @@ Creating superusers
 -------------------
 
 :djadmin:`manage.py migrate <migrate>` prompts you to create a superuser the
-first time you run it with ``'django.contrib.auth'`` in your
-:setting:`INSTALLED_APPS`. If you need to create a superuser at a later date,
-you can use a command line utility::
+first time you run it with ``'django.contrib.auth'`` installed. If you need to
+create a superuser at a later date, you can use a command line utility::
 
     $ python manage.py createsuperuser --username=joe --email=joe@example.com
 
@@ -100,7 +100,7 @@ You can also change a password programmatically, using
 .. code-block:: python
 
     >>> from django.contrib.auth.models import User
-    >>> u = User.objects.get(username__exact='john')
+    >>> u = User.objects.get(username='john')
     >>> u.set_password('new password')
     >>> u.save()
 
@@ -110,6 +110,12 @@ on the :ref:`authentication system's admin pages <auth-admin>`.
 Django also provides :ref:`views <built-in-auth-views>` and :ref:`forms
 <built-in-auth-forms>` that may be used to allow users to change their own
 passwords.
+
+.. versionadded:: 1.7
+
+Changing a user's password will log out all their sessions if the
+:class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` is
+enabled. See :ref:`session-invalidation-on-password-change` for details.
 
 Authenticating Users
 --------------------
@@ -135,6 +141,16 @@ Authenticating Users
         else:
             # the authentication system was unable to verify the username and password
             print("The username and password were incorrect.")
+
+    .. note::
+
+        This is a low level way to authenticate a set of credentials; for
+        example, it's used by the
+        :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`. Unless
+        you are writing your own authentication system, you probably won't use
+        this. Rather if you are looking for a way to limit access to logged in
+        users, see the :func:`~django.contrib.auth.decorators.login_required`
+        decorator.
 
 .. _topic-authorization:
 
@@ -247,6 +263,39 @@ The permission can then be assigned to a
 :class:`~django.contrib.auth.models.User` via its ``user_permissions``
 attribute or to a :class:`~django.contrib.auth.models.Group` via its
 ``permissions`` attribute.
+
+Permission caching
+------------------
+
+The :class:`~django.contrib.auth.backends.ModelBackend` caches permissions on
+the ``User`` object after the first time they need to be fetched for a
+permissions check. This is typically fine for the request-response cycle since
+permissions are not typically checked immediately after they are added (in the
+admin, for example). If you are adding permissions and checking them immediately
+afterward, in a test or view for example, the easiest solution is to re-fetch
+the ``User`` from the database. For example::
+
+    from django.contrib.auth.models import Permission, User
+    from django.shortcuts import get_object_or_404
+
+    def user_gains_perms(request, user_id):
+        user = get_object_or_404(User, pk=user_id)
+        # any permission check will cache the current set of permissions
+        user.has_perm('myapp.change_bar')
+
+        permission = Permission.objects.get(codename='change_bar')
+        user.user_permissions.add(permission)
+
+        # Checking the cached permission set
+        user.has_perm('myapp.change_bar')  # False
+
+        # Request new instance of User
+        user = get_object_or_404(User, pk=user_id)
+
+        # Permission cache is repopulated from the database
+        user.has_perm('myapp.change_bar')  # True
+
+        ...
 
 .. _auth-web-requests:
 
@@ -492,7 +541,7 @@ checks to make sure the user has an email in the desired domain::
 The permission_required decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: permission_required([login_url=None, raise_exception=False])
+.. function:: permission_required(perm, [login_url=None, raise_exception=False])
 
     It's a relatively common task to check whether a user has a particular
     permission. For that reason, Django provides a shortcut for that case: the
@@ -531,14 +580,81 @@ The permission_required decorator
         The :func:`~django.contrib.auth.decorators.permission_required`
         decorator can take a list of permissions as well as a single permission.
 
+.. _applying-permissions-to-generic-views:
+
 Applying permissions to generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To apply a permission to a :doc:`class-based generic view
 </ref/class-based-views/index>`, decorate the :meth:`View.dispatch
 <django.views.generic.base.View.dispatch>` method on the class. See
-:ref:`decorating-class-based-views` for details.
+:ref:`decorating-class-based-views` for details. Another approach is to
+:ref:`write a mixin that wraps as_view() <mixins_that_wrap_as_view>`.
 
+.. _session-invalidation-on-password-change:
+
+Session invalidation on password change
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.7
+
+.. warning::
+
+    This protection only applies if
+    :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware`
+    is enabled in :setting:`MIDDLEWARE_CLASSES`. It's included if
+    ``settings.py`` was generated by :djadmin:`startproject` on Django ≥ 1.7.
+
+If your :setting:`AUTH_USER_MODEL` inherits from
+:class:`~django.contrib.auth.models.AbstractBaseUser` or implements its own
+:meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`
+method, authenticated sessions will include the hash returned by this function.
+In the :class:`~django.contrib.auth.models.AbstractBaseUser` case, this is an
+HMAC of the password field. If the
+:class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` is
+enabled, Django verifies that the hash sent along with each request matches
+the one that's computed server-side. This allows a user to log out all of their
+sessions by changing their password.
+
+The default password change views included with Django,
+:func:`django.contrib.auth.views.password_change` and the
+``user_change_password`` view in the :mod:`django.contrib.auth` admin, update
+the session with the new password hash so that a user changing their own
+password won't log themselves out. If you have a custom password change view
+and wish to have similar behavior, use this function:
+
+.. function:: update_session_auth_hash(request, user)
+
+    This function takes the current request and the updated user object from
+    which the new session hash will be derived and updates the session hash
+    appropriately. Example usage::
+
+        from django.contrib.auth import update_session_auth_hash
+
+        def password_change(request):
+            if request.method == 'POST':
+                form = PasswordChangeForm(user=request.user, data=request.POST)
+                if form.is_valid():
+                    form.save()
+                    update_session_auth_hash(request, form.user)
+            else:
+                ...
+
+If you are upgrading an existing site and wish to enable this middleware without
+requiring all your users to re-login afterward, you should first upgrade to
+Django 1.7 and run it for a while so that as sessions are naturally recreated
+as users login, they include the session hash as described above. Once you
+start running your site with
+:class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware`, any
+users who have not logged in and had their session updated with the verification
+hash will have their existing session invalidated and be required to login.
+
+.. note::
+
+    Since
+    :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`
+    is based on :setting:`SECRET_KEY`, updating your site to use a new secret
+    will invalidate all existing sessions.
 
 .. _built-in-auth-views:
 
@@ -577,8 +693,7 @@ patterns.
       log the user in. Defaults to :file:`registration/login.html`.
 
     * ``redirect_field_name``: The name of a ``GET`` field containing the
-      URL to redirect to after login. Overrides ``next`` if the given
-      ``GET`` parameter is passed.
+      URL to redirect to after login. Defaults to ``next``.
 
     * ``authentication_form``: A callable (typically just a form class) to
       use for authentication. Defaults to
@@ -616,7 +731,7 @@ patterns.
     * ``site``: The current :class:`~django.contrib.sites.models.Site`,
       according to the :setting:`SITE_ID` setting. If you don't have the
       site framework installed, this will be set to an instance of
-      :class:`~django.contrib.sites.models.RequestSite`, which derives the
+      :class:`~django.contrib.sites.requests.RequestSite`, which derives the
       site name and domain from the current
       :class:`~django.http.HttpRequest`.
 
@@ -695,8 +810,8 @@ patterns.
       :file:`registration/logged_out.html` if no argument is supplied.
 
     * ``redirect_field_name``: The name of a ``GET`` field containing the
-      URL to redirect to after log out. Overrides ``next_page`` if the given
-      ``GET`` parameter is passed.
+      URL to redirect to after log out. Defaults to ``next``. Overrides the
+      ``next_page`` URL if the given ``GET`` parameter is passed.
 
     * ``current_app``: A hint indicating which application contains the current
       view. See the :ref:`namespaced URL resolution strategy
@@ -712,7 +827,7 @@ patterns.
     * ``site``: The current :class:`~django.contrib.sites.models.Site`,
       according to the :setting:`SITE_ID` setting. If you don't have the
       site framework installed, this will be set to an instance of
-      :class:`~django.contrib.sites.models.RequestSite`, which derives the
+      :class:`~django.contrib.sites.requests.RequestSite`, which derives the
       site name and domain from the current
       :class:`~django.http.HttpRequest`.
 
@@ -817,11 +932,6 @@ patterns.
     error message since this would expose their account's existence but no
     mail will be sent either.
 
-    .. versionchanged:: 1.6
-
-        Previously, error messages indicated whether a given email was
-        registered.
-
     **URL name:** ``password_reset``
 
     **Optional arguments:**
@@ -902,14 +1012,8 @@ patterns.
         Someone asked for password reset for email {{ email }}. Follow the link below:
         {{ protocol}}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
 
-    .. versionchanged:: 1.6
-
-      Reversing ``password_reset_confirm`` takes a ``uidb64`` argument instead
-      of ``uidb36``.
-
     The same template context is used for subject template. Subject must be
     single line plain text string.
-
 
 .. function:: password_reset_done(request[, template_name, current_app, extra_context])
 
@@ -941,11 +1045,6 @@ patterns.
     **Optional arguments:**
 
     * ``uidb64``: The user's id encoded in base 64. Defaults to ``None``.
-
-      .. versionchanged:: 1.6
-
-          The ``uidb64`` parameter was previously base 36 encoded and named
-          ``uidb36``.
 
     * ``token``: Token to check that the password is valid. Defaults to
       ``None``.

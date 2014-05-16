@@ -2,8 +2,8 @@ import sys
 from importlib import import_module
 from optparse import make_option
 
-from django.conf import settings
-from django.db import connections, router, transaction, models, DEFAULT_DB_ALIAS
+from django.apps import apps
+from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
 from django.core.management import call_command
 from django.core.management.base import NoArgsCommand, CommandError
 from django.core.management.color import no_style
@@ -28,8 +28,8 @@ class Command(NoArgsCommand):
            're-executed, and the initial_data fixture will be re-installed.')
 
     def handle_noargs(self, **options):
-        db = options.get('database')
-        connection = connections[db]
+        database = options.get('database')
+        connection = connections[database]
         verbosity = int(options.get('verbosity'))
         interactive = options.get('interactive')
         # The following are stealth options used by Django's internals.
@@ -41,9 +41,9 @@ class Command(NoArgsCommand):
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
-        for app_name in settings.INSTALLED_APPS:
+        for app_config in apps.get_app_configs():
             try:
-                import_module('.management', app_name)
+                import_module('.management', app_config.name)
             except ImportError:
                 pass
 
@@ -63,10 +63,11 @@ Are you sure you want to do this?
 
         if confirm == 'yes':
             try:
-                with transaction.commit_on_success_unless_managed():
-                    cursor = connection.cursor()
-                    for sql in sql_list:
-                        cursor.execute(sql)
+                with transaction.atomic(using=database,
+                                        savepoint=connection.features.can_rollback_ddl):
+                    with connection.cursor() as cursor:
+                        for sql in sql_list:
+                            cursor.execute(sql)
             except Exception as e:
                 new_msg = (
                     "Database %s couldn't be flushed. Possible reasons:\n"
@@ -78,7 +79,7 @@ Are you sure you want to do this?
                 six.reraise(CommandError, CommandError(new_msg), sys.exc_info()[2])
 
             if not inhibit_post_migrate:
-                self.emit_post_migrate(verbosity, interactive, db)
+                self.emit_post_migrate(verbosity, interactive, database)
 
             # Reinstall the initial_data fixture.
             if options.get('load_initial_data'):
@@ -93,6 +94,6 @@ Are you sure you want to do this?
         # Emit the post migrate signal. This allows individual applications to
         # respond as if the database had been migrated from scratch.
         all_models = []
-        for app in models.get_apps():
-            all_models.extend(router.get_migratable_models(app, database, include_auto_created=True))
+        for app_config in apps.get_app_configs():
+            all_models.extend(router.get_migratable_models(app_config, database, include_auto_created=True))
         emit_post_migrate_signal(set(all_models), verbosity, interactive, database)

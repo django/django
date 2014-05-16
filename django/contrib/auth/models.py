@@ -1,11 +1,10 @@
 from __future__ import unicode_literals
-import re
 
 from django.core.mail import send_mail
 from django.core import validators
 from django.db import models
 from django.db.models.manager import EmptyManager
-from django.utils.crypto import get_random_string
+from django.utils.crypto import get_random_string, salted_hmac
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -250,6 +249,13 @@ class AbstractBaseUser(models.Model):
     def get_short_name(self):
         raise NotImplementedError('subclasses of AbstractBaseUser must provide a get_short_name() method.')
 
+    def get_session_auth_hash(self):
+        """
+        Returns an HMAC of the password field.
+        """
+        key_salt = "django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash"
+        return salted_hmac(key_salt, self.password).hexdigest()
+
 
 # A few helper functions for common logic between User and AnonymousUser.
 def _user_get_all_permissions(user, obj):
@@ -359,10 +365,10 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
     Username, password and email are required. Other fields are optional.
     """
     username = models.CharField(_('username'), max_length=30, unique=True,
-        help_text=_('Required. 30 characters or fewer. Letters, numbers and '
-                    '@/./+/-/_ characters'),
+        help_text=_('Required. 30 characters or fewer. Letters, digits and '
+                    '@/./+/-/_ only.'),
         validators=[
-            validators.RegexValidator(re.compile('^[\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
+            validators.RegexValidator(r'^[\w.@+-]+$', _('Enter a valid username.'), 'invalid')
         ])
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)

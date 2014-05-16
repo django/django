@@ -14,10 +14,6 @@ __all__ = ['BaseValidator', 'InlineValidator']
 
 
 class BaseValidator(object):
-    def __init__(self):
-        # Before we can introspect models, they need to be fully loaded so that
-        # inter-relations are set up correctly. We force that here.
-        models.get_apps()
 
     def validate(self, cls, model):
         for m in dir(self):
@@ -70,7 +66,7 @@ class BaseValidator(object):
     def validate_fields(self, cls, model):
         " Validate that fields only refer to existing fields, doesn't contain duplicates. "
         # fields
-        if cls.fields: # default value is None
+        if cls.fields:  # default value is None
             check_isseq(cls, 'fields', cls.fields)
             self.check_field_spec(cls, model, cls.fields, 'fields')
             if cls.fieldsets:
@@ -81,7 +77,7 @@ class BaseValidator(object):
     def validate_fieldsets(self, cls, model):
         " Validate that fieldsets is properly formatted and doesn't contain duplicates. "
         from django.contrib.admin.options import flatten_fieldsets
-        if cls.fieldsets: # default value is None
+        if cls.fieldsets:  # default value is None
             check_isseq(cls, 'fieldsets', cls.fieldsets)
             for idx, fieldset in enumerate(cls.fieldsets):
                 check_isseq(cls, 'fieldsets[%d]' % idx, fieldset)
@@ -100,7 +96,7 @@ class BaseValidator(object):
 
     def validate_exclude(self, cls, model):
         " Validate that exclude is a sequence without duplicates. "
-        if cls.exclude: # default value is None
+        if cls.exclude:  # default value is None
             check_isseq(cls, 'exclude', cls.exclude)
             if len(cls.exclude) > len(set(cls.exclude)):
                 raise ImproperlyConfigured('There are duplicate field(s) in %s.exclude' % cls.__name__)
@@ -142,7 +138,7 @@ class BaseValidator(object):
                     raise ImproperlyConfigured("'%s.radio_fields['%s']' "
                             "is neither an instance of ForeignKey nor does "
                             "have choices set." % (cls.__name__, field))
-                if not val in (HORIZONTAL, VERTICAL):
+                if val not in (HORIZONTAL, VERTICAL):
                     raise ImproperlyConfigured("'%s.radio_fields['%s']' "
                             "is neither admin.HORIZONTAL nor admin.VERTICAL."
                             % (cls.__name__, field))
@@ -155,7 +151,7 @@ class BaseValidator(object):
             for field, val in cls.prepopulated_fields.items():
                 f = get_field(cls, model, 'prepopulated_fields', field)
                 if isinstance(f, (models.DateTimeField, models.ForeignKey,
-                    models.ManyToManyField)):
+                        models.ManyToManyField)):
                     raise ImproperlyConfigured("'%s.prepopulated_fields['%s']' "
                             "is either a DateTimeField, ForeignKey or "
                             "ManyToManyField. This isn't allowed."
@@ -163,6 +159,11 @@ class BaseValidator(object):
                 check_isseq(cls, "prepopulated_fields['%s']" % field, val)
                 for idx, f in enumerate(val):
                     get_field(cls, model, "prepopulated_fields['%s'][%d]" % (field, idx), f)
+
+    def validate_view_on_site_url(self, cls, model):
+        if hasattr(cls, 'view_on_site'):
+            if not callable(cls.view_on_site) and not isinstance(cls.view_on_site, bool):
+                raise ImproperlyConfigured("%s.view_on_site is not a callable or a boolean value." % cls.__name__)
 
     def validate_ordering(self, cls, model):
         " Validate that ordering refers to existing fields or is random. "
@@ -379,7 +380,7 @@ class ModelAdminValidator(BaseValidator):
 class InlineValidator(BaseValidator):
     def validate_fk_name(self, cls, model):
         " Validate that fk_name refers to a ForeignKey. "
-        if cls.fk_name: # default value is None
+        if cls.fk_name:  # default value is None
             f = get_field(cls, model, 'fk_name', cls.fk_name)
             if not isinstance(f, models.ForeignKey):
                 raise ImproperlyConfigured("'%s.fk_name is not an instance of "
@@ -405,13 +406,16 @@ def check_type(cls, attr, type_):
         raise ImproperlyConfigured("'%s.%s' should be a %s."
                 % (cls.__name__, attr, type_.__name__))
 
+
 def check_isseq(cls, label, obj):
     if not isinstance(obj, (list, tuple)):
         raise ImproperlyConfigured("'%s.%s' must be a list or tuple." % (cls.__name__, label))
 
+
 def check_isdict(cls, label, obj):
     if not isinstance(obj, dict):
         raise ImproperlyConfigured("'%s.%s' must be a dictionary." % (cls.__name__, label))
+
 
 def get_field(cls, model, label, field):
     try:
@@ -419,6 +423,7 @@ def get_field(cls, model, label, field):
     except models.FieldDoesNotExist:
         raise ImproperlyConfigured("'%s.%s' refers to field '%s' that is missing from model '%s.%s'."
                 % (cls.__name__, label, field, model._meta.app_label, model.__name__))
+
 
 def fetch_attr(cls, model, label, field):
     try:

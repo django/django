@@ -25,15 +25,15 @@ if HAS_GEOS:
 
 
 @skipUnless(HAS_GEOIP and getattr(settings, "GEOIP_PATH", None),
-    "GeoIP is required along with the GEOIP_DATA setting.")
+    "GeoIP is required along with the GEOIP_PATH setting.")
 class GeoIPTest(unittest.TestCase):
 
     def test01_init(self):
         "Testing GeoIP initialization."
-        g1 = GeoIP() # Everything inferred from GeoIP path
+        g1 = GeoIP()  # Everything inferred from GeoIP path
         path = settings.GEOIP_PATH
-        g2 = GeoIP(path, 0) # Passing in data path explicitly.
-        g3 = GeoIP.open(path, 0) # MaxMind Python API syntax.
+        g2 = GeoIP(path, 0)  # Passing in data path explicitly.
+        g3 = GeoIP.open(path, 0)  # MaxMind Python API syntax.
 
         for g in (g1, g2, g3):
             self.assertEqual(True, bool(g._country))
@@ -80,7 +80,7 @@ class GeoIPTest(unittest.TestCase):
                 self.assertEqual('US', func(query))
             for func in (g.country_name, g.country_name_by_addr, g.country_name_by_name):
                 self.assertEqual('United States', func(query))
-            self.assertEqual({'country_code' : 'US', 'country_name' : 'United States'},
+            self.assertEqual({'country_code': 'US', 'country_name': 'United States'},
                              g.country(query))
 
     @skipUnless(HAS_GEOS, "Geos is required")
@@ -96,7 +96,7 @@ class GeoIPTest(unittest.TestCase):
                 self.assertEqual('US', func(query))
             for func in (g.country_name, g.country_name_by_addr, g.country_name_by_name):
                 self.assertEqual('United States', func(query))
-            self.assertEqual({'country_code' : 'US', 'country_name' : 'United States'},
+            self.assertEqual({'country_code': 'US', 'country_name': 'United States'},
                              g.country(query))
 
             # City information dictionary.
@@ -106,7 +106,7 @@ class GeoIPTest(unittest.TestCase):
             self.assertEqual('TX', d['region'])
             self.assertEqual(713, d['area_code'])
             geom = g.geos(query)
-            self.assertTrue(isinstance(geom, GEOSGeometry))
+            self.assertIsInstance(geom, GEOSGeometry)
             lon, lat = (-95.4010, 29.7079)
             lat_lon = g.lat_lon(query)
             lat_lon = (lat_lon[1], lat_lon[0])
@@ -119,3 +119,5 @@ class GeoIPTest(unittest.TestCase):
         g = GeoIP()
         d = g.city("www.osnabrueck.de")
         self.assertEqual('Osnabrück', d['city'])
+        d = g.country('200.7.49.81')
+        self.assertEqual('Curaçao', d['country_name'])

@@ -94,9 +94,9 @@ class ModelFormCallableModelDefault(TestCase):
 
     def test_callable_initial_value(self):
         "The initial value for a callable default returning a queryset is the pk (refs #13769)"
-        obj1 = ChoiceOptionModel.objects.create(id=1, name='default')
-        obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
-        obj3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
+        ChoiceOptionModel.objects.create(id=1, name='default')
+        ChoiceOptionModel.objects.create(id=2, name='option 2')
+        ChoiceOptionModel.objects.create(id=3, name='option 3')
         self.assertHTMLEqual(ChoiceFieldForm().as_p(), """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
 <option value="1" selected="selected">ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
@@ -111,23 +111,23 @@ class ModelFormCallableModelDefault(TestCase):
 <option value="1" selected="selected">ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice" value="1" id="initial-id_multi_choice_0" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>
+</select><input type="hidden" name="initial-multi_choice" value="1" id="initial-id_multi_choice_0" /></p>
 <p><label for="id_multi_choice_int">Multi choice int:</label> <select multiple="multiple" name="multi_choice_int" id="id_multi_choice_int">
 <option value="1" selected="selected">ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice_int" value="1" id="initial-id_multi_choice_int_0" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
+</select><input type="hidden" name="initial-multi_choice_int" value="1" id="initial-id_multi_choice_int_0" /></p>""")
 
     def test_initial_instance_value(self):
         "Initial instances for model fields may also be instances (refs #7287)"
-        obj1 = ChoiceOptionModel.objects.create(id=1, name='default')
+        ChoiceOptionModel.objects.create(id=1, name='default')
         obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
         obj3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
         self.assertHTMLEqual(ChoiceFieldForm(initial={
-                'choice': obj2,
-                'choice_int': obj2,
-                'multi_choice': [obj2,obj3],
-                'multi_choice_int': ChoiceOptionModel.objects.exclude(name="default"),
+            'choice': obj2,
+            'choice_int': obj2,
+            'multi_choice': [obj2, obj3],
+            'multi_choice_int': ChoiceOptionModel.objects.exclude(name="default"),
         }).as_p(), """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
 <option value="1">ChoiceOption 1</option>
 <option value="2" selected="selected">ChoiceOption 2</option>
@@ -143,13 +143,13 @@ class ModelFormCallableModelDefault(TestCase):
 <option value="2" selected="selected">ChoiceOption 2</option>
 <option value="3" selected="selected">ChoiceOption 3</option>
 </select><input type="hidden" name="initial-multi_choice" value="2" id="initial-id_multi_choice_0" />
-<input type="hidden" name="initial-multi_choice" value="3" id="initial-id_multi_choice_1" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>
+<input type="hidden" name="initial-multi_choice" value="3" id="initial-id_multi_choice_1" /></p>
 <p><label for="id_multi_choice_int">Multi choice int:</label> <select multiple="multiple" name="multi_choice_int" id="id_multi_choice_int">
 <option value="1">ChoiceOption 1</option>
 <option value="2" selected="selected">ChoiceOption 2</option>
 <option value="3" selected="selected">ChoiceOption 3</option>
 </select><input type="hidden" name="initial-multi_choice_int" value="2" id="initial-id_multi_choice_int_0" />
-<input type="hidden" name="initial-multi_choice_int" value="3" id="initial-id_multi_choice_int_1" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
+<input type="hidden" name="initial-multi_choice_int" value="3" id="initial-id_multi_choice_int_1" /></p>""")
 
 
 class FormsModelTestCase(TestCase):
@@ -217,6 +217,7 @@ class FormsModelTestCase(TestCase):
         self.assertEqual(obj.value, 99)
         self.assertEqual(obj.def_date, datetime.date(1999, 3, 2))
 
+
 class RelatedModelFormTests(TestCase):
     def test_invalid_loading_order(self):
         """
@@ -238,14 +239,14 @@ class RelatedModelFormTests(TestCase):
         """
         Test for issue 10405
         """
-        class A(models.Model):
-            ref = models.ForeignKey("B")
+        class C(models.Model):
+            ref = models.ForeignKey("D")
 
-        class B(models.Model):
+        class D(models.Model):
             pass
 
         class Meta:
-            model = A
+            model = C
             fields = '__all__'
 
         self.assertTrue(issubclass(ModelFormMetaclass(str('Form'), (ModelForm,), {'Meta': Meta}), ModelForm))

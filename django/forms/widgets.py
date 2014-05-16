@@ -6,16 +6,15 @@ from __future__ import unicode_literals
 
 import copy
 from itertools import chain
-import warnings
 
 from django.conf import settings
 from django.forms.utils import flatatt, to_current_timezone
 from django.utils.datastructures import MultiValueDict, MergeDict
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.html import conditional_escape, format_html
 from django.utils.translation import ugettext_lazy
-from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
-from django.utils import datetime_safe, formats, six
+from django.utils import formats, six
 from django.utils.six.moves.urllib.parse import urljoin
 
 __all__ = (
@@ -28,7 +27,8 @@ __all__ = (
     'SplitDateTimeWidget', 'SplitHiddenDateTimeWidget',
 )
 
-MEDIA_TYPES = ('css','js')
+MEDIA_TYPES = ('css', 'js')
+
 
 @python_2_unicode_compatible
 class Media(object):
@@ -62,16 +62,16 @@ class Media(object):
         # We need to sort the keys, and iterate over the sorted list.
         media = sorted(self._css.keys())
         return chain(*[
-                [format_html('<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
-                    for path in self._css[medium]]
-                for medium in media])
+            [format_html('<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
+             for path in self._css[medium]]
+            for medium in media])
 
     def absolute_path(self, path, prefix=None):
         if path.startswith(('http://', 'https://', '/')):
             return path
         if prefix is None:
             if settings.STATIC_URL is None:
-                 # backwards compatibility
+                # backwards compatibility
                 prefix = settings.MEDIA_URL
             else:
                 prefix = settings.STATIC_URL
@@ -103,6 +103,7 @@ class Media(object):
             getattr(combined, 'add_' + name)(getattr(other, '_' + name, None))
         return combined
 
+
 def media_property(cls):
     def _media(self):
         # Get the media property of the superclass, if it exists
@@ -130,6 +131,7 @@ def media_property(cls):
             return base
     return property(_media)
 
+
 class MediaDefiningClass(type):
     """
     Metaclass for classes that can have media definitions.
@@ -142,6 +144,7 @@ class MediaDefiningClass(type):
             new_class.media = media_property(new_class)
 
         return new_class
+
 
 @python_2_unicode_compatible
 class SubWidget(object):
@@ -160,9 +163,9 @@ class SubWidget(object):
             args.append(self.choices)
         return self.parent_widget.render(*args)
 
+
 class Widget(six.with_metaclass(MediaDefiningClass)):
-    is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
-    needs_multipart_form = False # Determines does this widget need multipart form
+    needs_multipart_form = False  # Determines does this widget need multipart form
     is_localized = False
     is_required = False
 
@@ -177,6 +180,10 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
         obj.attrs = self.attrs.copy()
         memo[id(self)] = obj
         return obj
+
+    @property
+    def is_hidden(self):
+        return self.input_type == 'hidden' if hasattr(self, 'input_type') else False
 
     def subwidgets(self, name, value, attrs=None, choices=()):
         """
@@ -222,12 +229,13 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
         """
         return id_
 
+
 class Input(Widget):
     """
     Base class for all <input> widgets (except type='checkbox' and
     type='radio', which are special).
     """
-    input_type = None # Subclasses must define this.
+    input_type = None  # Subclasses must define this.
 
     def _format_value(self, value):
         if self.is_localized:
@@ -274,12 +282,13 @@ class PasswordInput(TextInput):
 
     def render(self, name, value, attrs=None):
         if not self.render_value:
-            value=None
+            value = None
         return super(PasswordInput, self).render(name, value, attrs)
+
 
 class HiddenInput(Input):
     input_type = 'hidden'
-    is_hidden = True
+
 
 class MultipleHiddenInput(HiddenInput):
     """
@@ -311,6 +320,7 @@ class MultipleHiddenInput(HiddenInput):
             return data.getlist(name)
         return data.get(name, None)
 
+
 class FileInput(Input):
     input_type = 'file'
     needs_multipart_form = True
@@ -324,6 +334,7 @@ class FileInput(Input):
 
 
 FILE_INPUT_CONTRADICTION = object()
+
 
 class ClearableFileInput(FileInput):
     initial_text = ugettext_lazy('Currently')
@@ -377,7 +388,8 @@ class ClearableFileInput(FileInput):
     def value_from_datadict(self, data, files, name):
         upload = super(ClearableFileInput, self).value_from_datadict(data, files, name)
         if not self.is_required and CheckboxInput().value_from_datadict(
-            data, files, self.clear_checkbox_name(name)):
+                data, files, self.clear_checkbox_name(name)):
+
             if upload:
                 # If the user contradicts themselves (uploads a new file AND
                 # checks the "clear" checkbox), we return a unique marker
@@ -387,9 +399,10 @@ class ClearableFileInput(FileInput):
             return False
         return upload
 
+
 class Textarea(Widget):
     def __init__(self, attrs=None):
-        # The 'rows' and 'cols' attributes are required for HTML correctness.
+        # Use slightly better defaults than HTML's 20x2 box
         default_attrs = {'cols': '40', 'rows': '10'}
         if attrs:
             default_attrs.update(attrs)
@@ -406,6 +419,8 @@ class Textarea(Widget):
 
 class DateTimeBaseInput(TextInput):
     format_key = ''
+    supports_microseconds = False
+
     def __init__(self, attrs=None, format=None):
         super(DateTimeBaseInput, self).__init__(attrs)
         self.format = format if format else None
@@ -512,6 +527,7 @@ class Select(Widget):
                 output.append(self.render_option(selected_choices, option_value, option_label))
         return '\n'.join(output)
 
+
 class NullBooleanSelect(Select):
     """
     A Select Widget intended to be used with NullBooleanField.
@@ -609,13 +625,6 @@ class RadioChoiceInput(ChoiceInput):
         self.value = force_text(self.value)
 
 
-class RadioInput(RadioChoiceInput):
-    def __init__(self, *args, **kwargs):
-        msg = "RadioInput has been deprecated. Use RadioChoiceInput instead."
-        warnings.warn(msg, DeprecationWarning, stacklevel=2)
-        super(RadioInput, self).__init__(*args, **kwargs)
-
-
 class CheckboxChoiceInput(ChoiceInput):
     input_type = 'checkbox'
 
@@ -642,7 +651,7 @@ class ChoiceFieldRenderer(object):
         self.choices = choices
 
     def __getitem__(self, idx):
-        choice = self.choices[idx] # Let the IndexError propogate
+        choice = self.choices[idx]  # Let the IndexError propagate
         return self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
 
     def __str__(self):
@@ -659,7 +668,7 @@ class ChoiceFieldRenderer(object):
         output = [start_tag]
         for i, choice in enumerate(self.choices):
             choice_value, choice_label = choice
-            if isinstance(choice_label, (tuple,list)):
+            if isinstance(choice_label, (tuple, list)):
                 attrs_plus = self.attrs.copy()
                 if id_:
                     attrs_plus['id'] += '_{0}'.format(i)
@@ -764,6 +773,10 @@ class MultiWidget(Widget):
         self.widgets = [w() if isinstance(w, type) else w for w in widgets]
         super(MultiWidget, self).__init__(attrs)
 
+    @property
+    def is_hidden(self):
+        return all(w.is_hidden for w in self.widgets)
+
     def render(self, name, value, attrs=None):
         if self.is_localized:
             for widget in self.widgets:
@@ -834,6 +847,7 @@ class SplitDateTimeWidget(MultiWidget):
     """
     A Widget that splits datetime input into two <input type="text"> boxes.
     """
+    supports_microseconds = False
 
     def __init__(self, attrs=None, date_format=None, time_format=None):
         widgets = (DateInput(attrs=attrs, format=date_format),
@@ -846,14 +860,12 @@ class SplitDateTimeWidget(MultiWidget):
             return [value.date(), value.time().replace(microsecond=0)]
         return [None, None]
 
+
 class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     """
     A Widget that splits datetime input into two <input type="hidden"> inputs.
     """
-    is_hidden = True
-
     def __init__(self, attrs=None, date_format=None, time_format=None):
         super(SplitHiddenDateTimeWidget, self).__init__(attrs, date_format, time_format)
         for widget in self.widgets:
             widget.input_type = 'hidden'
-            widget.is_hidden = True

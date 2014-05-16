@@ -43,6 +43,7 @@ class TokenGeneratorTest(TestCase):
         class Mocked(PasswordResetTokenGenerator):
             def __init__(self, today):
                 self._today_val = today
+
             def _today(self):
                 return self._today_val
 

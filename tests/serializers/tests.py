@@ -14,10 +14,9 @@ except ImportError:
     HAS_YAML = False
 
 
-from django.conf import settings
 from django.core import management, serializers
 from django.db import transaction, connection
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.test.utils import Approximate
 from django.utils import six
 from django.utils.six import StringIO
@@ -26,22 +25,18 @@ from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
     Score, Player, Team)
 
 
-class SerializerRegistrationTests(unittest.TestCase):
+@override_settings(
+    SERIALIZATION_MODULES={
+        "json2": "django.core.serializers.json",
+    }
+)
+class SerializerRegistrationTests(TestCase):
     def setUp(self):
-        self.old_SERIALIZATION_MODULES = getattr(settings, 'SERIALIZATION_MODULES', None)
         self.old_serializers = serializers._serializers
-
         serializers._serializers = {}
-        settings.SERIALIZATION_MODULES = {
-            "json2" : "django.core.serializers.json",
-        }
 
     def tearDown(self):
         serializers._serializers = self.old_serializers
-        if self.old_SERIALIZATION_MODULES:
-            settings.SERIALIZATION_MODULES = self.old_SERIALIZATION_MODULES
-        else:
-            delattr(settings, 'SERIALIZATION_MODULES')
 
     def test_register(self):
         "Registering a new serializer populates the full registry. Refs #14823"
@@ -75,6 +70,7 @@ class SerializerRegistrationTests(unittest.TestCase):
 
         self.assertIn('python', all_formats)
         self.assertNotIn('python', public_formats)
+
 
 class SerializersTestBase(object):
     @staticmethod
@@ -148,7 +144,7 @@ class SerializersTestBase(object):
         serialized field list - it replaces the pk identifier.
         """
         profile = AuthorProfile(author=self.joe,
-                                date_of_birth=datetime(1970,1,1))
+                                date_of_birth=datetime(1970, 1, 1))
         profile.save()
         serial_str = serializers.serialize(self.serializer_name,
                                            AuthorProfile.objects.all())
@@ -159,7 +155,7 @@ class SerializersTestBase(object):
 
     def test_serialize_field_subset(self):
         """Tests that output can be restricted to a subset of fields"""
-        valid_fields = ('headline','pub_date')
+        valid_fields = ('headline', 'pub_date')
         invalid_fields = ("author", "categories")
         serial_str = serializers.serialize(self.serializer_name,
                                     Article.objects.all(),
@@ -198,7 +194,7 @@ class SerializersTestBase(object):
         mv.save()
 
         with self.assertNumQueries(0):
-            serial_str = serializers.serialize(self.serializer_name, [mv])
+            serializers.serialize(self.serializer_name, [mv])
 
     def test_serialize_with_null_pk(self):
         """
@@ -246,9 +242,9 @@ class SerializersTestBase(object):
         # Regression for #12524 -- dates before 1000AD get prefixed
         # 0's on the year
         a = Article.objects.create(
-            author = self.jane,
-            headline = "Nobody remembers the early years",
-            pub_date = datetime(1, 2, 3, 4, 5, 6))
+            author=self.jane,
+            headline="Nobody remembers the early years",
+            pub_date=datetime(1, 2, 3, 4, 5, 6))
 
         serial_str = serializers.serialize(self.serializer_name, [a])
         date_values = self._get_field_values(serial_str, "pub_date")
@@ -276,16 +272,13 @@ class SerializersTransactionTestBase(object):
         Tests that objects ids can be referenced before they are
         defined in the serialization data.
         """
-        # The deserialization process needs to be contained
-        # within a transaction in order to test forward reference
-        # handling.
-        transaction.enter_transaction_management()
-        objs = serializers.deserialize(self.serializer_name, self.fwd_ref_str)
-        with connection.constraint_checks_disabled():
-            for obj in objs:
-                obj.save()
-        transaction.commit()
-        transaction.leave_transaction_management()
+        # The deserialization process needs to run in a transaction in order
+        # to test forward reference handling.
+        with transaction.atomic():
+            objs = serializers.deserialize(self.serializer_name, self.fwd_ref_str)
+            with connection.constraint_checks_disabled():
+                for obj in objs:
+                    obj.save()
 
         for model_cls in (Category, Author, Article):
             self.assertEqual(model_cls.objects.all().count(), 1)
@@ -342,6 +335,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
                     temp.append(child.nodeValue)
                 ret_list.append("".join(temp))
         return ret_list
+
 
 class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
     serializer_name = "xml"
@@ -443,6 +437,8 @@ class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, Transact
 
 
 YAML_IMPORT_ERROR_MESSAGE = r'No module named yaml'
+
+
 class YamlImportModuleMock(object):
     """Provides a wrapped import_module function to simulate yaml ImportError
 

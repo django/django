@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 from optparse import make_option
 
 from django.core.management.base import AppCommand
-from django.db import connections, models, DEFAULT_DB_ALIAS
+from django.db import connections, DEFAULT_DB_ALIAS
+
 
 class Command(AppCommand):
     help = 'Prints the SQL statements for resetting sequences for the given app name(s).'
@@ -17,6 +18,10 @@ class Command(AppCommand):
 
     output_transaction = True
 
-    def handle_app(self, app, **options):
+    def handle_app_config(self, app_config, **options):
+        if app_config.models_module is None:
+            return
         connection = connections[options.get('database')]
-        return '\n'.join(connection.ops.sequence_reset_sql(self.style, models.get_models(app, include_auto_created=True)))
+        models = app_config.get_models(include_auto_created=True)
+        statements = connection.ops.sequence_reset_sql(self.style, models)
+        return '\n'.join(statements)

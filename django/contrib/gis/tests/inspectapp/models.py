@@ -1,6 +1,8 @@
 from django.contrib.gis.db import models
 
+
 class AllOGRFields(models.Model):
+
     f_decimal = models.FloatField()
     f_float = models.FloatField()
     f_int = models.IntegerField()
@@ -12,3 +14,6 @@ class AllOGRFields(models.Model):
     point = models.PointField()
 
     objects = models.GeoManager()
+
+    class Meta:
+        app_label = 'inspectapp'

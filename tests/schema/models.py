@@ -1,11 +1,12 @@
+from django.apps.registry import Apps
 from django.db import models
-from django.db.models.loading import BaseAppCache
+from django.utils.encoding import python_2_unicode_compatible
 
 # Because we want to test creation and deletion of these as separate things,
-# these models are all inserted into a separate AppCache so the main test
+# these models are all inserted into a separate Apps so the main test
 # runner doesn't migrate them.
 
-new_app_cache = BaseAppCache()
+new_apps = Apps()
 
 
 class Author(models.Model):
@@ -13,14 +14,30 @@ class Author(models.Model):
     height = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
 
 
 class AuthorWithM2M(models.Model):
     name = models.CharField(max_length=255)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
+
+
+class AuthorWithM2MThrough(models.Model):
+    name = models.CharField(max_length=255)
+    tags = models.ManyToManyField("schema.TagM2MTest", related_name="authors", through="AuthorTag")
+
+    class Meta:
+        apps = new_apps
+
+
+class AuthorTag(models.Model):
+    author = models.ForeignKey("schema.AuthorWithM2MThrough")
+    tag = models.ForeignKey("schema.TagM2MTest")
+
+    class Meta:
+        apps = new_apps
 
 
 class Book(models.Model):
@@ -30,7 +47,7 @@ class Book(models.Model):
     # tags = models.ManyToManyField("Tag", related_name="books")
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
 
 
 class BookWithM2M(models.Model):
@@ -40,7 +57,22 @@ class BookWithM2M(models.Model):
     tags = models.ManyToManyField("TagM2MTest", related_name="books")
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
+
+
+class TagThrough(models.Model):
+    book = models.ForeignKey("schema.BookWithM2MThrough")
+    tag = models.ForeignKey("schema.TagM2MTest")
+
+    class Meta:
+        apps = new_apps
+
+
+class BookWithM2MThrough(models.Model):
+    tags = models.ManyToManyField("TagM2MTest", related_name="books", through=TagThrough)
+
+    class Meta:
+        apps = new_apps
 
 
 class BookWithSlug(models.Model):
@@ -50,7 +82,7 @@ class BookWithSlug(models.Model):
     slug = models.CharField(max_length=20, unique=True)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
         db_table = "schema_book"
 
 
@@ -59,7 +91,7 @@ class Tag(models.Model):
     slug = models.SlugField(unique=True)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
 
 
 class TagM2MTest(models.Model):
@@ -67,7 +99,7 @@ class TagM2MTest(models.Model):
     slug = models.SlugField(unique=True)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
 
 
 class TagIndexed(models.Model):
@@ -75,7 +107,7 @@ class TagIndexed(models.Model):
     slug = models.SlugField(unique=True)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
         index_together = [["slug", "title"]]
 
 
@@ -84,7 +116,7 @@ class TagUniqueRename(models.Model):
     slug2 = models.SlugField(unique=True)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
         db_table = "schema_tag"
 
 
@@ -93,5 +125,24 @@ class UniqueTest(models.Model):
     slug = models.SlugField(unique=False)
 
     class Meta:
-        app_cache = new_app_cache
+        apps = new_apps
         unique_together = ["year", "slug"]
+
+
+class BookWithLongName(models.Model):
+    author_foreign_key_with_really_long_field_name = models.ForeignKey(Author)
+
+    class Meta:
+        apps = new_apps
+
+
+# Based on tests/reserved_names/models.py
+@python_2_unicode_compatible
+class Thing(models.Model):
+    when = models.CharField(max_length=1, primary_key=True)
+
+    class Meta:
+        db_table = 'drop'
+
+    def __str__(self):
+        return self.when

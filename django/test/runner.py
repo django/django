@@ -1,3 +1,4 @@
+from importlib import import_module
 import os
 from optparse import make_option
 import unittest
@@ -5,7 +6,7 @@ from unittest import TestSuite, defaultTestLoader
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
 
 
@@ -17,7 +18,7 @@ class DiscoverRunner(object):
     test_suite = TestSuite
     test_runner = unittest.TextTestRunner
     test_loader = defaultTestLoader
-    reorder_by = (TestCase, )
+    reorder_by = (TestCase, SimpleTestCase)
     option_list = (
         make_option('-t', '--top-level-directory',
             action='store', dest='top_level', default=None,
@@ -89,11 +90,11 @@ class DiscoverRunner(object):
                     break
                 kwargs['top_level_dir'] = top_level
 
-            if not (tests and tests.countTestCases()):
-                # if no tests found, it's probably a package; try discovery
+            if not (tests and tests.countTestCases()) and is_discoverable(label):
+                # Try discovery if path is a package or directory
                 tests = self.test_loader.discover(start_dir=label, **kwargs)
 
-                # make unittest forget the top-level dir it calculated from this
+                # Make unittest forget the top-level dir it calculated from this
                 # run, to support running tests from two different top-levels.
                 self.test_loader._top_level_dir = None
 
@@ -150,10 +151,26 @@ class DiscoverRunner(object):
         return self.suite_result(suite, result)
 
 
+def is_discoverable(label):
+    """
+    Check if a test label points to a python package or file directory.
+
+    Relative labels like "." and ".." are seen as directories.
+    """
+    try:
+        mod = import_module(label)
+    except (ImportError, TypeError):
+        pass
+    else:
+        return hasattr(mod, '__path__')
+
+    return os.path.isdir(os.path.abspath(label))
+
+
 def dependency_ordered(test_databases, dependencies):
     """
     Reorder test_databases into an order that honors the dependencies
-    described in TEST_DEPENDENCIES.
+    described in TEST[DEPENDENCIES].
     """
     ordered_test_databases = []
     resolved_databases = set()
@@ -161,7 +178,7 @@ def dependency_ordered(test_databases, dependencies):
     # Maps db signature to dependencies of all it's aliases
     dependencies_map = {}
 
-    # sanity check - no DB can depend on it's own alias
+    # sanity check - no DB can depend on its own alias
     for sig, (_, aliases) in test_databases:
         all_deps = set()
         for alias in aliases:
@@ -187,7 +204,7 @@ def dependency_ordered(test_databases, dependencies):
 
         if not changed:
             raise ImproperlyConfigured(
-                "Circular dependency in TEST_DEPENDENCIES")
+                "Circular dependency in TEST[DEPENDENCIES]")
         test_databases = deferred
     return ordered_test_databases
 
@@ -203,10 +220,10 @@ def reorder_suite(suite, classes):
     """
     class_count = len(classes)
     suite_class = type(suite)
-    bins = [suite_class() for i in range(class_count+1)]
+    bins = [suite_class() for i in range(class_count + 1)]
     partition_suite(suite, classes, bins)
     for i in range(class_count):
-        bins[0].addTests(bins[i+1])
+        bins[0].addTests(bins[i + 1])
     return bins[0]
 
 
@@ -244,11 +261,11 @@ def setup_databases(verbosity, interactive, **kwargs):
     default_sig = connections[DEFAULT_DB_ALIAS].creation.test_db_signature()
     for alias in connections:
         connection = connections[alias]
-        if connection.settings_dict['TEST_MIRROR']:
+        test_settings = connection.settings_dict['TEST']
+        if test_settings['MIRROR']:
             # If the database is marked as a test mirror, save
             # the alias.
-            mirrored_aliases[alias] = (
-                connection.settings_dict['TEST_MIRROR'])
+            mirrored_aliases[alias] = test_settings['MIRROR']
         else:
             # Store a tuple with DB parameters that uniquely identify it.
             # If we have two aliases with the same values for that tuple,
@@ -259,27 +276,25 @@ def setup_databases(verbosity, interactive, **kwargs):
             )
             item[1].add(alias)
 
-            if 'TEST_DEPENDENCIES' in connection.settings_dict:
-                dependencies[alias] = (
-                    connection.settings_dict['TEST_DEPENDENCIES'])
+            if 'DEPENDENCIES' in test_settings:
+                dependencies[alias] = test_settings['DEPENDENCIES']
             else:
                 if alias != DEFAULT_DB_ALIAS and connection.creation.test_db_signature() != default_sig:
-                    dependencies[alias] = connection.settings_dict.get(
-                        'TEST_DEPENDENCIES', [DEFAULT_DB_ALIAS])
+                    dependencies[alias] = test_settings.get('DEPENDENCIES', [DEFAULT_DB_ALIAS])
 
     # Second pass -- actually create the databases.
     old_names = []
     mirrors = []
 
     for signature, (db_name, aliases) in dependency_ordered(
-        test_databases.items(), dependencies):
+            test_databases.items(), dependencies):
         test_db_name = None
         # Actually create the database for the first connection
         for alias in aliases:
             connection = connections[alias]
             if test_db_name is None:
                 test_db_name = connection.creation.create_test_db(
-                        verbosity, autoclobber=not interactive)
+                    verbosity, autoclobber=not interactive)
                 destroy = True
             else:
                 connection.settings_dict['NAME'] = test_db_name

@@ -26,6 +26,7 @@ from django.utils.timezone import get_default_timezone, is_aware, is_naive
 re_formatchars = re.compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
 
+
 class Formatter(object):
     def format(self, formatstr):
         pieces = []
@@ -35,6 +36,7 @@ class Formatter(object):
             elif piece:
                 pieces.append(re_escaped.sub(r'\1', piece))
         return ''.join(pieces)
+
 
 class TimeFormat(Formatter):
 
@@ -170,7 +172,7 @@ class TimeFormat(Formatter):
 
     def u(self):
         "Microseconds; i.e. '000000' to '999999'"
-        return '%06d' %self.data.microsecond
+        return '%06d' % self.data.microsecond
 
     def Z(self):
         """
@@ -267,7 +269,7 @@ class DateFormat(TimeFormat):
 
     def S(self):
         "English ordinal suffix for the day of the month, 2 characters; i.e. 'st', 'nd', 'rd' or 'th'"
-        if self.data.day in (11, 12, 13): # Special case
+        if self.data.day in (11, 12, 13):  # Special case
             return 'th'
         last = self.data.day % 10
         if last == 1:
@@ -301,7 +303,7 @@ class DateFormat(TimeFormat):
         weekday = self.data.weekday() + 1
         day_of_year = self.z()
         if day_of_year <= (8 - jan1_weekday) and jan1_weekday > 4:
-            if jan1_weekday == 5 or (jan1_weekday == 6 and calendar.isleap(self.data.year-1)):
+            if jan1_weekday == 5 or (jan1_weekday == 6 and calendar.isleap(self.data.year - 1)):
                 week_number = 53
             else:
                 week_number = 52

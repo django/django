@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+
 class Operation(object):
     """
     Base class for migration operations.
@@ -9,6 +12,9 @@ class Operation(object):
     Note that some operations won't modify memory state at all (e.g. data
     copying operations), and some will need their modifications to be
     optionally specified by the user (e.g. custom Python code snippets)
+
+    Due to the way this class deals with deconstruction, it should be
+    considered immutable.
     """
 
     # If this migration can be run in reverse.
@@ -17,6 +23,12 @@ class Operation(object):
 
     # Can this migration be represented as SQL? (things like RunPython cannot)
     reduces_to_sql = True
+
+    # Should this operation be forced as atomic even on backends with no
+    # DDL transaction support (i.e., does it have no DDL, like RunPython)
+    atomic = False
+
+    serialization_expand_args = []
 
     def __new__(cls, *args, **kwargs):
         # We capture the arguments to make returning them trivial
@@ -75,6 +87,15 @@ class Operation(object):
         unusable optimized migration.
         """
         return True
+
+    def references_field(self, model_name, name, app_label=None):
+        """
+        Returns True if there is a chance this operation references the given
+        field name, with an optional app label for accuracy.
+
+        Used for optimization. If in doubt, return True.
+        """
+        return self.references_model(model_name, app_label)
 
     def __repr__(self):
         return "<%s %s%s>" % (

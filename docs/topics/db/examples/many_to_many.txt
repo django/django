@@ -16,8 +16,7 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
     class Publication(models.Model):
         title = models.CharField(max_length=30)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.title
 
         class Meta:
@@ -27,15 +26,17 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
         headline = models.CharField(max_length=100)
         publications = models.ManyToManyField(Publication)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.headline
 
         class Meta:
             ordering = ('headline',)
 
 What follows are examples of operations that can be performed using the Python
-API facilities.
+API facilities. Note that if you are using :ref:`an intermediate model
+<intermediary-manytomany>` for a many-to-many relationship, some of the related
+manager's methods are disabled, so some of these examples won't work with such
+models.
 
 Create a couple of ``Publications``::
 
@@ -77,7 +78,7 @@ Adding a second time is OK::
 
     >>> a2.publications.add(p3)
 
-Adding an object of the wrong type raises :exc:`~exceptions.TypeError`::
+Adding an object of the wrong type raises :exc:`TypeError`::
 
     >>> a2.publications.add(a1)
     Traceback (most recent call last):
@@ -108,7 +109,7 @@ Create and add a ``Publication`` to an ``Article`` in one step using
 Many-to-many relationships can be queried using :ref:`lookups across
 relationships <lookups-that-span-relationships>`::
 
-    >>> Article.objects.filter(publications__id__exact=1)
+    >>> Article.objects.filter(publications__id=1)
     [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
     >>> Article.objects.filter(publications__pk=1)
     [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
@@ -140,7 +141,7 @@ The :meth:`~django.db.models.query.QuerySet.count` function respects
 Reverse m2m queries are supported (i.e., starting at the table that doesn't have
 a :class:`~django.db.models.ManyToManyField`)::
 
-    >>> Publication.objects.filter(id__exact=1)
+    >>> Publication.objects.filter(id=1)
     [<Publication: The Python Journal>]
     >>> Publication.objects.filter(pk=1)
     [<Publication: The Python Journal>]
@@ -148,7 +149,7 @@ a :class:`~django.db.models.ManyToManyField`)::
     >>> Publication.objects.filter(article__headline__startswith="NASA")
     [<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]
 
-    >>> Publication.objects.filter(article__id__exact=1)
+    >>> Publication.objects.filter(article__id=1)
     [<Publication: The Python Journal>]
     >>> Publication.objects.filter(article__pk=1)
     [<Publication: The Python Journal>]

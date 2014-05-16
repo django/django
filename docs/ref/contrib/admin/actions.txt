@@ -57,8 +57,7 @@ simple news application with an ``Article`` model::
         body = models.TextField()
         status = models.CharField(max_length=1, choices=STATUS_CHOICES)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.title
 
 A common task we might perform with a model like this is to update an
@@ -146,7 +145,7 @@ Handling errors in actions
 
 If there are foreseeable error conditions that may occur while running your
 action, you should gracefully inform the user of the problem. This means
-handling exceptions and and using
+handling exceptions and using
 :meth:`django.contrib.admin.ModelAdmin.message_user` to display a user friendly
 description of the problem in the response.
 

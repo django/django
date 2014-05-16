@@ -26,7 +26,8 @@ Basic configuration
 
 Once you've got mod_wsgi installed and activated, edit your Apache server's
 ``httpd.conf`` file and add the following. If you are using a version of Apache
-older than 2.4, replace ``Require all granted`` with ``Allow from all``.
+older than 2.4, replace ``Require all granted`` with ``Allow from all`` and
+also add the line ``Order deny,allow`` above it.
 
 .. code-block:: apache
 
@@ -35,7 +36,6 @@ older than 2.4, replace ``Require all granted`` with ``Allow from all``.
 
     <Directory /path/to/mysite.com/mysite>
     <Files wsgi.py>
-    Order deny,allow
     Require all granted
     </Files>
     </Directory>
@@ -74,12 +74,15 @@ Using a virtualenv
 If you install your project's Python dependencies inside a `virtualenv`_,
 you'll need to add the path to this virtualenv's ``site-packages`` directory to
 your Python path as well. To do this, add an additional path to your
-`WSGIPythonPath` directive, with multiple paths separated by a colon::
+``WSGIPythonPath`` directive, with multiple paths separated by a colon (``:``)
+if using a UNIX-like system, or a semicolon (``;``) if using Windows. If any
+part of a directory path contains a space character, the complete argument
+string to ``WSGIPythonPath`` must be quoted::
 
-    WSGIPythonPath /path/to/mysite.com:/path/to/your/venv/lib/python2.X/site-packages
+    WSGIPythonPath /path/to/mysite.com:/path/to/your/venv/lib/python3.X/site-packages
 
 Make sure you give the correct path to your virtualenv, and replace
-``python2.X`` with the correct Python version (e.g. ``python2.7``).
+``python3.X`` with the correct Python version (e.g. ``python3.4``).
 
 .. _virtualenv: http://www.virtualenv.org
 
@@ -139,23 +142,24 @@ will be served using mod_wsgi::
     Alias /static/ /path/to/mysite.com/static/
 
     <Directory /path/to/mysite.com/static>
-    Order deny,allow
-    Allow from all
+    Require all granted
     </Directory>
 
     <Directory /path/to/mysite.com/media>
-    Order deny,allow
-    Allow from all
+    Require all granted
     </Directory>
 
     WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
 
     <Directory /path/to/mysite.com/mysite>
     <Files wsgi.py>
-    Order allow,deny
-    Allow from all
+    Require all granted
     </Files>
     </Directory>
+
+If you are using a version of Apache older than 2.4, replace
+``Require all granted`` with ``Allow from all`` and also add the line
+``Order deny,allow`` above it.
 
 .. _lighttpd: http://www.lighttpd.net/
 .. _Nginx: http://wiki.nginx.org/Main
@@ -215,7 +219,7 @@ If you're taking advantage of the internationalization features of Django (see
 ensure that the environment used to start Apache is configured to accept
 non-ASCII file names. If your environment is not correctly configured, you
 will trigger ``UnicodeEncodeError`` exceptions when calling functions like
-``os.path()`` on filenames that contain non-ASCII characters.
+the ones in :mod:`os.path` on filenames that contain non-ASCII characters.
 
 To avoid these problems, the environment used to start Apache should contain
 settings analogous to the following::

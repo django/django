@@ -6,11 +6,6 @@ import re
 import sys
 from io import BytesIO
 from pprint import pformat
-try:
-    from urllib.parse import parse_qsl, urlencode, quote, urljoin
-except ImportError:
-    from urllib import urlencode, quote
-    from urlparse import parse_qsl, urljoin
 
 from django.conf import settings
 from django.core import signing
@@ -20,6 +15,7 @@ from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils import six
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
+from django.utils.six.moves.urllib.parse import parse_qsl, urlencode, quote, urljoin
 
 
 RAISE_ERROR = object()
@@ -66,7 +62,7 @@ class HttpRequest(object):
         """Returns the HTTP host using the environment or request headers."""
         # We try three options, in order of decreasing preference.
         if settings.USE_X_FORWARDED_HOST and (
-            'HTTP_X_FORWARDED_HOST' in self.META):
+                'HTTP_X_FORWARDED_HOST' in self.META):
             host = self.META['HTTP_X_FORWARDED_HOST']
         elif 'HTTP_HOST' in self.META:
             host = self.META['HTTP_HOST']
@@ -235,27 +231,27 @@ class HttpRequest(object):
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
             except MultiPartParserError:
-                # An error occured while parsing POST data. Since when
+                # An error occurred while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
                 # attempts to parse POST data again.
-                # Mark that an error occured. This allows self.__repr__ to
+                # Mark that an error occurred. This allows self.__repr__ to
                 # be explicit about it instead of simply representing an
                 # empty POST
-                # self._mark_post_parse_error()
+                self._mark_post_parse_error()
                 raise
         elif self.META.get('CONTENT_TYPE', '').startswith('application/x-www-form-urlencoded'):
             self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
         else:
             self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
 
-    ## File-like and iterator interface.
-    ##
-    ## Expects self._stream to be set to an appropriate source of bytes by
-    ## a corresponding request subclass (e.g. WSGIRequest).
-    ## Also when request data has already been read by request.POST or
-    ## request.body, self._stream points to a BytesIO instance
-    ## containing that data.
+    # File-like and iterator interface.
+    #
+    # Expects self._stream to be set to an appropriate source of bytes by
+    # a corresponding request subclass (e.g. WSGIRequest).
+    # Also when request data has already been read by request.POST or
+    # request.body, self._stream points to a BytesIO instance
+    # containing that data.
 
     def read(self, *args, **kwargs):
         self._read_started = True
@@ -520,6 +516,8 @@ def validate_host(host, allowed_hosts):
     Return ``True`` for a valid host, ``False`` otherwise.
 
     """
+    host = host[:-1] if host.endswith('.') else host
+
     for pattern in allowed_hosts:
         pattern = pattern.lower()
         match = (

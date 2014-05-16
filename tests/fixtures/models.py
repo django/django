@@ -9,7 +9,7 @@ in the application directory, or in one of the directories named in the
 """
 
 from django.contrib.auth.models import Permission
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -26,6 +26,7 @@ class Category(models.Model):
     class Meta:
         ordering = ('title',)
 
+
 @python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
@@ -36,6 +37,7 @@ class Article(models.Model):
 
     class Meta:
         ordering = ('-pub_date', 'headline')
+
 
 @python_2_unicode_compatible
 class Blog(models.Model):
@@ -53,21 +55,23 @@ class Tag(models.Model):
     name = models.CharField(max_length=100)
     tagged_type = models.ForeignKey(ContentType, related_name="fixtures_tag_set")
     tagged_id = models.PositiveIntegerField(default=0)
-    tagged = generic.GenericForeignKey(ct_field='tagged_type',
-                                       fk_field='tagged_id')
+    tagged = GenericForeignKey(ct_field='tagged_type', fk_field='tagged_id')
 
     def __str__(self):
         return '<%s: %s> tagged "%s"' % (self.tagged.__class__.__name__,
                                          self.tagged, self.name)
 
+
 class PersonManager(models.Manager):
     def get_by_natural_key(self, name):
         return self.get(name=name)
+
 
 @python_2_unicode_compatible
 class Person(models.Model):
     objects = PersonManager()
     name = models.CharField(max_length=100)
+
     def __str__(self):
         return self.name
 
@@ -77,13 +81,16 @@ class Person(models.Model):
     def natural_key(self):
         return (self.name,)
 
+
 class SpyManager(PersonManager):
     def get_queryset(self):
         return super(SpyManager, self).get_queryset().filter(cover_blown=False)
 
+
 class Spy(Person):
     objects = SpyManager()
     cover_blown = models.BooleanField(default=False)
+
 
 @python_2_unicode_compatible
 class Visa(models.Model):
@@ -93,6 +100,7 @@ class Visa(models.Model):
     def __str__(self):
         return '%s %s' % (self.person.name,
                           ', '.join(p.name for p in self.permissions.all()))
+
 
 @python_2_unicode_compatible
 class Book(models.Model):

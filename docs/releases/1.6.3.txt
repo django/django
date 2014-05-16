@@ -1,0 +1,186 @@
+==========================
+Django 1.6.3 release notes
+==========================
+
+*April 21, 2014*
+
+Django 1.6.3 fixes several bugs in 1.6.2, including three security issues,
+and makes one backwards-incompatible change:
+
+Unexpected code execution using ``reverse()``
+=============================================
+
+Django's URL handling is based on a mapping of regex patterns
+(representing the URLs) to callable views, and Django's own processing
+consists of matching a requested URL against those patterns to
+determine the appropriate view to invoke.
+
+Django also provides a convenience function --
+:func:`~django.core.urlresolvers.reverse` -- which performs this process
+in the opposite direction. The ``reverse()`` function takes
+information about a view and returns a URL which would invoke that
+view. Use of ``reverse()`` is encouraged for application developers,
+as the output of ``reverse()`` is always based on the current URL
+patterns, meaning developers do not need to change other code when
+making changes to URLs.
+
+One argument signature for ``reverse()`` is to pass a dotted Python
+path to the desired view. In this situation, Django will import the
+module indicated by that dotted path as part of generating the
+resulting URL. If such a module has import-time side effects, those
+side effects will occur.
+
+Thus it is possible for an attacker to cause unexpected code
+execution, given the following conditions:
+
+1. One or more views are present which construct a URL based on user
+   input (commonly, a "next" parameter in a querystring indicating
+   where to redirect upon successful completion of an action).
+
+2. One or more modules are known to an attacker to exist on the
+   server's Python import path, which perform code execution with side
+   effects on importing.
+
+To remedy this, ``reverse()`` will now only accept and import dotted
+paths based on the view-containing modules listed in the project's :doc:`URL
+pattern configuration </topics/http/urls>`, so as to ensure that only modules
+the developer intended to be imported in this fashion can or will be imported.
+
+Caching of anonymous pages could reveal CSRF token
+==================================================
+
+Django includes both a :doc:`caching framework </topics/cache>` and a system
+for :doc:`preventing cross-site request forgery (CSRF) attacks
+</ref/contrib/csrf/>`. The CSRF-protection system is based on a random nonce
+sent to the client in a cookie which must be sent by the client on future
+requests and, in forms, a hidden value which must be submitted back with the
+form.
+
+The caching framework includes an option to cache responses to
+anonymous (i.e., unauthenticated) clients.
+
+When the first anonymous request to a given page is by a client which
+did not have a CSRF cookie, the cache framework will also cache the
+CSRF cookie and serve the same nonce to other anonymous clients who
+do not have a CSRF cookie. This can allow an attacker to obtain a
+valid CSRF cookie value and perform attacks which bypass the check for
+the cookie.
+
+To remedy this, the caching framework will no longer cache such
+responses. The heuristic for this will be:
+
+1. If the incoming request did not submit any cookies, and
+
+2. If the response did send one or more cookies, and
+
+3. If the ``Vary: Cookie`` header is set on the response, then the
+   response will not be cached.
+
+MySQL typecasting
+=================
+
+The MySQL database is known to "typecast" on certain queries; for
+example, when querying a table which contains string values, but using
+a query which filters based on an integer value, MySQL will first
+silently coerce the strings to integers and return a result based on that.
+
+If a query is performed without first converting values to the
+appropriate type, this can produce unexpected results, similar to what
+would occur if the query itself had been manipulated.
+
+Django's model field classes are aware of their own types and most
+such classes perform explicit conversion of query arguments to the
+correct database-level type before querying. However, three model
+field classes did not correctly convert their arguments:
+
+* :class:`~django.db.models.FilePathField`
+* :class:`~django.db.models.GenericIPAddressField`
+* :class:`~django.db.models.IPAddressField`
+
+These three fields have been updated to convert their arguments to the
+correct types before querying.
+
+Additionally, developers of custom model fields are now warned via
+documentation to ensure their custom field classes will perform
+appropriate type conversions, and users of the :meth:`raw()
+<django.db.models.query.QuerySet.raw>` and :meth:`extra()
+<django.db.models.query.QuerySet.extra>` query methods -- which allow the
+developer to supply raw SQL or SQL fragments -- will be advised to ensure they
+perform appropriate manual type conversions prior to executing queries.
+
+``select_for_update()`` requires a transaction
+==============================================
+
+Historically, queries that use
+:meth:`~django.db.models.query.QuerySet.select_for_update()` could be
+executed in autocommit mode, outside of a transaction. Before Django
+1.6, Django's automatic transactions mode allowed this to be used to
+lock records until the next write operation. Django 1.6 introduced
+database-level autocommit; since then, execution in such a context
+voids the effect of ``select_for_update()``. It is, therefore, assumed
+now to be an error and raises an exception.
+
+This change was made because such errors can be caused by including an
+app which expects global transactions (e.g. :setting:`ATOMIC_REQUESTS
+<DATABASE-ATOMIC_REQUESTS>` set to ``True``), or Django's old autocommit
+behavior, in a project which runs without them; and further, such
+errors may manifest as data-corruption bugs.
+
+This change may cause test failures if you use ``select_for_update()``
+in a test class which is a subclass of
+:class:`~django.test.TransactionTestCase` rather than
+:class:`~django.test.TestCase`.
+
+Other bugfixes and changes
+==========================
+
+* Content retrieved from the GeoIP library is now properly decoded from its
+  default ``iso-8859-1`` encoding
+  (`#21996 <http://code.djangoproject.com/ticket/21996>`_).
+
+* Fixed ``AttributeError`` when using
+  :meth:`~django.db.models.query.QuerySet.bulk_create` with ``ForeignObject``
+  (`#21566 <http://code.djangoproject.com/ticket/21566>`_).
+
+* Fixed crash of ``QuerySet``\s that use ``F() + timedelta()`` when their query
+  was compiled more once
+  (`#21643 <http://code.djangoproject.com/ticket/21643>`_).
+
+* Prevented custom ``widget`` class attribute of
+  :class:`~django.forms.IntegerField` subclasses from being overwritten by the
+  code in their ``__init__`` method
+  (`#22245 <http://code.djangoproject.com/ticket/22245>`_).
+
+* Improved :func:`~django.utils.html.strip_tags` accuracy (but it still cannot
+  guarantee an HTML-safe result, as stated in the documentation).
+
+* Fixed a regression in the :mod:`django.contrib.gis` SQL compiler for
+  non-concrete fields (`#22250 <http://code.djangoproject.com/ticket/22250>`_).
+
+* Fixed :attr:`ModelAdmin.preserve_filters
+  <django.contrib.admin.ModelAdmin.preserve_filters>` when running a site with
+  a URL prefix (`#21795 <http://code.djangoproject.com/ticket/21795>`_).
+
+* Fixed a crash in the ``find_command`` management utility when the ``PATH``
+  environment variable wasn't set
+  (`#22256 <http://code.djangoproject.com/ticket/22256>`_).
+
+* Fixed :djadmin:`changepassword` on Windows
+  (`#22364 <https://code.djangoproject.com/ticket/22364>`_).
+
+* Avoided shadowing deadlock exceptions on MySQL
+  (`#22291 <https://code.djangoproject.com/ticket/22291>`_).
+
+* Wrapped database exceptions in ``_set_autocommit``
+  (`#22321 <https://code.djangoproject.com/ticket/22321>`_).
+
+* Fixed atomicity when closing a database connection or when the database server
+  disconnects (`#21239 <https://code.djangoproject.com/ticket/21239>`_ and
+  `#21202 <https://code.djangoproject.com/ticket/21202>`_)
+
+* Fixed regression in ``prefetch_related`` that caused the related objects
+  query to include an unnecessary join
+  (`#21760 <https://code.djangoproject.com/ticket/21760>`_).
+
+Additionally, Django's vendored version of six, :mod:`django.utils.six` has been
+upgraded to the latest release (1.6.1).

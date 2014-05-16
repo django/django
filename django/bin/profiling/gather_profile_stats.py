@@ -12,6 +12,7 @@ import os
 import pstats
 import sys
 
+
 def gather_stats(p):
     profiles = {}
     for f in os.listdir(p):

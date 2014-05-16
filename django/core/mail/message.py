@@ -3,9 +3,10 @@ from __future__ import unicode_literals
 import mimetypes
 import os
 import random
+import sys
 import time
-from email import charset as Charset, encoders as Encoders, message_from_string
-from email.generator import Generator
+from email import (charset as Charset, encoders as Encoders,
+    message_from_string, generator)
 from email.message import Message
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -121,13 +122,7 @@ def sanitize_address(addr, encoding):
     return formataddr((nm, addr))
 
 
-class SafeMIMEMessage(MIMEMessage):
-
-    def __setitem__(self, name, val):
-        # message/rfc822 attachments must be ASCII
-        name, val = forbid_multi_line_headers(name, val, 'ascii')
-        MIMEMessage.__setitem__(self, name, val)
-
+class MIMEMixin():
     def as_string(self, unixfrom=False):
         """Return the entire formatted message as a string.
         Optional `unixfrom' when True, means include the Unix From_ envelope
@@ -137,12 +132,36 @@ class SafeMIMEMessage(MIMEMessage):
         lines that begin with 'From '. See bug #13433 for details.
         """
         fp = six.StringIO()
-        g = Generator(fp, mangle_from_=False)
+        g = generator.Generator(fp, mangle_from_=False)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()
 
+    if six.PY2:
+        as_bytes = as_string
+    else:
+        def as_bytes(self, unixfrom=False):
+            """Return the entire formatted message as bytes.
+            Optional `unixfrom' when True, means include the Unix From_ envelope
+            header.
 
-class SafeMIMEText(MIMEText):
+            This overrides the default as_bytes() implementation to not mangle
+            lines that begin with 'From '. See bug #13433 for details.
+            """
+            fp = six.BytesIO()
+            g = generator.BytesGenerator(fp, mangle_from_=False)
+            g.flatten(self, unixfrom=unixfrom)
+            return fp.getvalue()
+
+
+class SafeMIMEMessage(MIMEMixin, MIMEMessage):
+
+    def __setitem__(self, name, val):
+        # message/rfc822 attachments must be ASCII
+        name, val = forbid_multi_line_headers(name, val, 'ascii')
+        MIMEMessage.__setitem__(self, name, val)
+
+
+class SafeMIMEText(MIMEMixin, MIMEText):
 
     def __init__(self, text, subtype, charset):
         self.encoding = charset
@@ -152,7 +171,13 @@ class SafeMIMEText(MIMEText):
             # We do it manually and trigger re-encoding of the payload.
             MIMEText.__init__(self, text, subtype, None)
             del self['Content-Transfer-Encoding']
-            self.set_payload(text, utf8_charset)
+            # Workaround for versions without http://bugs.python.org/issue19063
+            if (3, 2) < sys.version_info < (3, 3, 4):
+                payload = text.encode(utf8_charset.output_charset)
+                self._payload = payload.decode('ascii', 'surrogateescape')
+                self.set_charset(utf8_charset)
+            else:
+                self.set_payload(text, utf8_charset)
             self.replace_header('Content-Type', 'text/%s; charset="%s"' % (subtype, charset))
         else:
             MIMEText.__init__(self, text, subtype, charset)
@@ -161,21 +186,8 @@ class SafeMIMEText(MIMEText):
         name, val = forbid_multi_line_headers(name, val, self.encoding)
         MIMEText.__setitem__(self, name, val)
 
-    def as_string(self, unixfrom=False):
-        """Return the entire formatted message as a string.
-        Optional `unixfrom' when True, means include the Unix From_ envelope
-        header.
 
-        This overrides the default as_string() implementation to not mangle
-        lines that begin with 'From '. See bug #13433 for details.
-        """
-        fp = six.StringIO()
-        g = Generator(fp, mangle_from_=False)
-        g.flatten(self, unixfrom=unixfrom)
-        return fp.getvalue()
-
-
-class SafeMIMEMultipart(MIMEMultipart):
+class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
 
     def __init__(self, _subtype='mixed', boundary=None, _subparts=None, encoding=None, **_params):
         self.encoding = encoding
@@ -184,19 +196,6 @@ class SafeMIMEMultipart(MIMEMultipart):
     def __setitem__(self, name, val):
         name, val = forbid_multi_line_headers(name, val, self.encoding)
         MIMEMultipart.__setitem__(self, name, val)
-
-    def as_string(self, unixfrom=False):
-        """Return the entire formatted message as a string.
-        Optional `unixfrom' when True, means include the Unix From_ envelope
-        header.
-
-        This overrides the default as_string() implementation to not mangle
-        lines that begin with 'From '. See bug #13433 for details.
-        """
-        fp = six.StringIO()
-        g = Generator(fp, mangle_from_=False)
-        g.flatten(self, unixfrom=unixfrom)
-        return fp.getvalue()
 
 
 class EmailMessage(object):

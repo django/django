@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
 """Tests for jslex."""
-# encoding: utf-8
 # originally from https://bitbucket.org/ned/jslex
 
 from django.test import TestCase
 from django.utils.jslex import JsLexer, prepare_js_for_gettext
+
 
 class JsTokensTest(TestCase):
     LEX_CASES = [
@@ -62,16 +63,16 @@ class JsTokensTest(TestCase):
         (r"""/\[[^\]]+\]/gi""", [r"""regex /\[[^\]]+\]/gi"""]),
         ("""
             rexl.re = {
-            NAME: /^(?!\d)(?:\w)+|^"(?:[^"]|"")+"/,
-            UNQUOTED_LITERAL: /^@(?:(?!\d)(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/,
+            NAME: /^(?![0-9])(?:\w)+|^"(?:[^"]|"")+"/,
+            UNQUOTED_LITERAL: /^@(?:(?![0-9])(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/,
             QUOTED_LITERAL: /^'(?:[^']|'')*'/,
             NUMERIC_LITERAL: /^[0-9]+(?:\.[0-9]*(?:[eE][-+][0-9]+)?)?/,
             SYMBOL: /^(?:==|=|<>|<=|<|>=|>|!~~|!~|~~|~|!==|!=|!~=|!~|!|&|\||\.|\:|,|\(|\)|\[|\]|\{|\}|\?|\:|;|@|\^|\/\+|\/|\*|\+|-)/
             };
         """,
         ["id rexl", "punct .", "id re", "punct =", "punct {",
-         "id NAME", "punct :", r"""regex /^(?!\d)(?:\w)+|^"(?:[^"]|"")+"/""", "punct ,",
-         "id UNQUOTED_LITERAL", "punct :", r"""regex /^@(?:(?!\d)(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/""", "punct ,",
+         "id NAME", "punct :", r"""regex /^(?![0-9])(?:\w)+|^"(?:[^"]|"")+"/""", "punct ,",
+         "id UNQUOTED_LITERAL", "punct :", r"""regex /^@(?:(?![0-9])(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/""", "punct ,",
          "id QUOTED_LITERAL", "punct :", r"""regex /^'(?:[^']|'')*'/""", "punct ,",
          "id NUMERIC_LITERAL", "punct :", r"""regex /^[0-9]+(?:\.[0-9]*(?:[eE][-+][0-9]+)?)?/""", "punct ,",
          "id SYMBOL", "punct :", r"""regex /^(?:==|=|<>|<=|<|>=|>|!~~|!~|~~|~|!==|!=|!~=|!~|!|&|\||\.|\:|,|\(|\)|\[|\]|\{|\}|\?|\:|;|@|\^|\/\+|\/|\*|\+|-)/""",
@@ -80,8 +81,8 @@ class JsTokensTest(TestCase):
 
         ("""
             rexl.re = {
-            NAME: /^(?!\d)(?:\w)+|^"(?:[^"]|"")+"/,
-            UNQUOTED_LITERAL: /^@(?:(?!\d)(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/,
+            NAME: /^(?![0-9])(?:\w)+|^"(?:[^"]|"")+"/,
+            UNQUOTED_LITERAL: /^@(?:(?![0-9])(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/,
             QUOTED_LITERAL: /^'(?:[^']|'')*'/,
             NUMERIC_LITERAL: /^[0-9]+(?:\.[0-9]*(?:[eE][-+][0-9]+)?)?/,
             SYMBOL: /^(?:==|=|<>|<=|<|>=|>|!~~|!~|~~|~|!==|!=|!~=|!~|!|&|\||\.|\:|,|\(|\)|\[|\]|\{|\}|\?|\:|;|@|\^|\/\+|\/|\*|\+|-)/
@@ -89,8 +90,8 @@ class JsTokensTest(TestCase):
             str = '"';
         """,
         ["id rexl", "punct .", "id re", "punct =", "punct {",
-         "id NAME", "punct :", r"""regex /^(?!\d)(?:\w)+|^"(?:[^"]|"")+"/""", "punct ,",
-         "id UNQUOTED_LITERAL", "punct :", r"""regex /^@(?:(?!\d)(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/""", "punct ,",
+         "id NAME", "punct :", r"""regex /^(?![0-9])(?:\w)+|^"(?:[^"]|"")+"/""", "punct ,",
+         "id UNQUOTED_LITERAL", "punct :", r"""regex /^@(?:(?![0-9])(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/""", "punct ,",
          "id QUOTED_LITERAL", "punct :", r"""regex /^'(?:[^']|'')*'/""", "punct ,",
          "id NUMERIC_LITERAL", "punct :", r"""regex /^[0-9]+(?:\.[0-9]*(?:[eE][-+][0-9]+)?)?/""", "punct ,",
          "id SYMBOL", "punct :", r"""regex /^(?:==|=|<>|<=|<|>=|>|!~~|!~|~~|~|!==|!=|!~=|!~|!|&|\||\.|\:|,|\(|\)|\[|\]|\{|\}|\?|\:|;|@|\^|\/\+|\/|\*|\+|-)/""",
@@ -104,6 +105,7 @@ class JsTokensTest(TestCase):
           "punct .", "id replace", "punct (", r'regex /"/g', "punct ,", r'string "\\\""', "punct )", "punct +",
           r'string "\")"', "punct ;"]),
     ]
+
 
 def make_function(input, toks):
     def test_func(self):
@@ -206,6 +208,7 @@ GETTEXT_CASES = (
 
 class JsToCForGettextTest(TestCase):
     pass
+
 
 def make_function(js, c):
     def test_func(self):

@@ -3,16 +3,19 @@ from __future__ import unicode_literals
 
 import unittest
 
+from django.conf.urls import url
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import connection
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.html import HTMLParseError, parse_html
-from django.test.utils import CaptureQueriesContext, IgnoreAllDeprecationWarningsMixin
+from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
 
 from .models import Person
+from .views import empty_response
 
 
 class SkippingTestCase(TestCase):
@@ -49,16 +52,14 @@ class SkippingClassTestCase(TestCase):
         self.assertEqual(len(result.skipped), 1)
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertNumQueriesTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_assert_num_queries(self):
         def test_func():
             raise ValueError
 
-        self.assertRaises(ValueError,
-            self.assertNumQueries, 2, test_func
-        )
+        self.assertRaises(ValueError, self.assertNumQueries, 2, test_func)
 
     def test_assert_num_queries_with_client(self):
         person = Person.objects.create(name='test')
@@ -121,8 +122,8 @@ class AssertQuerysetEqualTests(TestCase):
         )
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class CaptureQueriesContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def setUp(self):
         self.person_pk = six.text_type(Person.objects.create(name='test').pk)
@@ -175,8 +176,8 @@ class CaptureQueriesContextManagerTests(TestCase):
         self.assertIn(self.person_pk, captured_queries[1]['sql'])
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertNumQueriesContextManagerTests(TestCase):
-    urls = 'test_utils.urls'
 
     def test_simple(self):
         with self.assertNumQueries(0):
@@ -194,6 +195,7 @@ class AssertNumQueriesContextManagerTests(TestCase):
             with self.assertNumQueries(2):
                 Person.objects.count()
         self.assertIn("1 queries executed, 2 expected", str(exc_info.exception))
+        self.assertIn("Captured queries were", str(exc_info.exception))
 
         with self.assertRaises(TypeError):
             with self.assertNumQueries(4000):
@@ -213,7 +215,9 @@ class AssertNumQueriesContextManagerTests(TestCase):
             self.client.get("/test_utils/get_person/%s/" % person.pk)
 
 
+@override_settings(ROOT_URLCONF='test_utils.urls')
 class AssertTemplateUsedContextManagerTests(TestCase):
+
     def test_usage(self):
         with self.assertTemplateUsed('template_used/base.html'):
             render_to_string('template_used/base.html')
@@ -270,6 +274,11 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 
+        with self.assertRaises(AssertionError) as cm:
+            response = self.client.get('/test_utils/no_template_used/')
+            self.assertTemplateUsed(response, 'template_used/base.html')
+        self.assertEqual(cm.exception.args[0], "No templates used to render the response")
+
     def test_failure(self):
         with self.assertRaises(TypeError):
             with self.assertTemplateUsed():
@@ -322,7 +331,7 @@ class HTMLEqualTests(TestCase):
         self.assertEqual(dom.children[0], "<p>foo</p> '</scr'+'ipt>' <span>bar</span>")
 
     def test_self_closing_tags(self):
-        self_closing_tags = ('br' , 'hr', 'input', 'img', 'meta', 'spacer',
+        self_closing_tags = ('br', 'hr', 'input', 'img', 'meta', 'spacer',
             'link', 'frame', 'base', 'col')
         for tag in self_closing_tags:
             dom = parse_html('<p>Hello <%s> world</p>' % tag)
@@ -534,6 +543,51 @@ class HTMLEqualTests(TestCase):
         self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
 
 
+class JSONEqualTests(TestCase):
+    def test_simple_equal(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr1": "foo", "attr2":"baz"}'
+        self.assertJSONEqual(json1, json2)
+
+    def test_simple_equal_unordered(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr2":"baz", "attr1": "foo"}'
+        self.assertJSONEqual(json1, json2)
+
+    def test_simple_equal_raise(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONEqual(json1, json2)
+
+    def test_equal_parsing_errors(self):
+        invalid_json = '{"attr1": "foo, "attr2":"baz"}'
+        valid_json = '{"attr1": "foo", "attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONEqual(invalid_json, valid_json)
+        with self.assertRaises(AssertionError):
+            self.assertJSONEqual(valid_json, invalid_json)
+
+    def test_simple_not_equal(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr2":"baz"}'
+        self.assertJSONNotEqual(json1, json2)
+
+    def test_simple_not_equal_raise(self):
+        json1 = '{"attr1": "foo", "attr2":"baz"}'
+        json2 = '{"attr1": "foo", "attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONNotEqual(json1, json2)
+
+    def test_not_equal_parsing_errors(self):
+        invalid_json = '{"attr1": "foo, "attr2":"baz"}'
+        valid_json = '{"attr1": "foo", "attr2":"baz"}'
+        with self.assertRaises(AssertionError):
+            self.assertJSONNotEqual(invalid_json, valid_json)
+        with self.assertRaises(AssertionError):
+            self.assertJSONNotEqual(valid_json, invalid_json)
+
+
 class XMLEqualTests(TestCase):
     def test_simple_equal(self):
         xml1 = "<elem attr1='a' attr2='b' />"
@@ -614,10 +668,42 @@ class AssertFieldOutputTests(SimpleTestCase):
         self.assertFieldOutput(MyCustomField, {}, {}, empty_value=None)
 
 
-class DoctestNormalizerTest(IgnoreAllDeprecationWarningsMixin, SimpleTestCase):
+class FirstUrls:
+    urlpatterns = [url(r'first/$', empty_response, name='first')]
 
-    def test_normalizer(self):
-        from django.test.simple import make_doctest
-        suite = make_doctest("test_utils.doctest_output")
-        failures = unittest.TextTestRunner(stream=six.StringIO()).run(suite)
-        self.assertEqual(failures.failures, [])
+
+class SecondUrls:
+    urlpatterns = [url(r'second/$', empty_response, name='second')]
+
+
+class OverrideSettingsTests(TestCase):
+
+    # #21518 -- If neither override_settings nor a settings_changed receiver
+    # clears the URL cache between tests, then one of test_first or
+    # test_second will fail.
+
+    @override_settings(ROOT_URLCONF=FirstUrls)
+    def test_urlconf_first(self):
+        reverse('first')
+
+    @override_settings(ROOT_URLCONF=SecondUrls)
+    def test_urlconf_second(self):
+        reverse('second')
+
+    def test_urlconf_cache(self):
+        self.assertRaises(NoReverseMatch, lambda: reverse('first'))
+        self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+        with override_settings(ROOT_URLCONF=FirstUrls):
+            self.client.get(reverse('first'))
+            self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+            with override_settings(ROOT_URLCONF=SecondUrls):
+                self.assertRaises(NoReverseMatch, lambda: reverse('first'))
+                self.client.get(reverse('second'))
+
+            self.client.get(reverse('first'))
+            self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+        self.assertRaises(NoReverseMatch, lambda: reverse('first'))
+        self.assertRaises(NoReverseMatch, lambda: reverse('second'))

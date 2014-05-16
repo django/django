@@ -24,7 +24,7 @@ class Person(models.Model):
 
     def save(self, *args, **kwargs):
         self.data.append("Before save")
-         # Call the "real" save() method
+        # Call the "real" save() method
         super(Person, self).save(*args, **kwargs)
         self.data.append("After save")
 

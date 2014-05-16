@@ -12,8 +12,7 @@ from django.contrib.auth.forms import (UserCreationForm, AuthenticationForm,
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.core import mail
 from django.forms.fields import Field, CharField
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils import translation
@@ -133,7 +132,7 @@ class AuthenticationFormTest(TestCase):
                              [force_text(form.error_messages['inactive'])])
 
     def test_custom_login_allowed_policy(self):
-        # The user is inactive, but our custom form policy allows him to log in.
+        # The user is inactive, but our custom form policy allows them to log in.
         data = {
             'username': 'inactive',
             'password': 'password',
@@ -360,14 +359,21 @@ class UserChangeFormTest(TestCase):
 
 
 @skipIfCustomUser
-@override_settings(USE_TZ=False, PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+@override_settings(
+    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
+    TEMPLATE_DIRS=(
+        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
+    ),
+    USE_TZ=False,
+)
 class PasswordResetFormTest(TestCase):
 
     fixtures = ['authtestdata.json']
 
     def create_dummy_user(self):
-        """creates a user and returns a tuple
-        (user_object, username, email)
+        """
+        Create a user and return a tuple (user_object, username, email).
         """
         username = 'jsmith'
         email = 'jsmith@example.com'
@@ -381,21 +387,16 @@ class PasswordResetFormTest(TestCase):
         self.assertEqual(form['email'].errors, [_('Enter a valid email address.')])
 
     def test_nonexistant_email(self):
-        # Test nonexistant email address. This should not fail because it would
-        # expose information about registered users.
+        """
+        Test nonexistent email address. This should not fail because it would
+        expose information about registered users.
+        """
         data = {'email': 'foo@bar.com'}
         form = PasswordResetForm(data)
         self.assertTrue(form.is_valid())
         self.assertEqual(len(mail.outbox), 0)
 
-    @override_settings(
-        TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
-        TEMPLATE_DIRS=(
-            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-        ),
-    )
     def test_cleaned_data(self):
-        # Regression test
         (user, username, email) = self.create_dummy_user()
         data = {'email': email}
         form = PasswordResetForm(data)
@@ -404,12 +405,6 @@ class PasswordResetFormTest(TestCase):
         self.assertEqual(form.cleaned_data['email'], email)
         self.assertEqual(len(mail.outbox), 1)
 
-    @override_settings(
-        TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
-        TEMPLATE_DIRS=(
-            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-        ),
-    )
     def test_custom_email_subject(self):
         data = {'email': 'testclient@example.com'}
         form = PasswordResetForm(data)
@@ -421,22 +416,26 @@ class PasswordResetFormTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, 'Custom password reset on example.com')
 
-    def test_bug_5605(self):
-        # bug #5605, preserve the case of the user name (before the @ in the
-        # email address) when creating a user.
+    def test_preserve_username_case(self):
+        """
+        Preserve the case of the user name (before the @ in the email address)
+        when creating a user (#5605).
+        """
         user = User.objects.create_user('forms_test2', 'tesT@EXAMple.com', 'test')
         self.assertEqual(user.email, 'tesT@example.com')
         user = User.objects.create_user('forms_test3', 'tesT', 'test')
         self.assertEqual(user.email, 'tesT')
 
     def test_inactive_user(self):
-        #tests that inactive user cannot
-        #receive password reset email
+        """
+        Test that inactive user cannot receive password reset email.
+        """
         (user, username, email) = self.create_dummy_user()
         user.is_active = False
         user.save()
         form = PasswordResetForm({'email': email})
         self.assertTrue(form.is_valid())
+        form.save()
         self.assertEqual(len(mail.outbox), 0)
 
     def test_unusable_password(self):
@@ -452,12 +451,6 @@ class PasswordResetFormTest(TestCase):
         form.save()
         self.assertEqual(len(mail.outbox), 0)
 
-    @override_settings(
-        TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
-        TEMPLATE_DIRS=(
-            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-        ),
-    )
     def test_save_plaintext_email(self):
         """
         Test the PasswordResetForm.save() method with no html_email_template_name
@@ -477,12 +470,6 @@ class PasswordResetFormTest(TestCase):
         self.assertEqual(message.get_all('to'), [email])
         self.assertTrue(re.match(r'^http://example.com/reset/[\w+/-]', message.get_payload()))
 
-    @override_settings(
-        TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',),
-        TEMPLATE_DIRS=(
-            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-        ),
-    )
     def test_save_html_email_template_name(self):
         """
         Test the PasswordResetFOrm.save() method with html_email_template_name

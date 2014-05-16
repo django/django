@@ -16,12 +16,16 @@ from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX, identify_hasher
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 
 
 UNMASKED_DIGITS_TO_SHOW = 6
 
-mask_password = lambda p: "%s%s" % (p[:UNMASKED_DIGITS_TO_SHOW], "*" * max(len(p) - UNMASKED_DIGITS_TO_SHOW, 0))
+
+def mask_password(password):
+    shown = password[:UNMASKED_DIGITS_TO_SHOW]
+    masked = "*" * max(len(password) - UNMASKED_DIGITS_TO_SHOW, 0)
+    return shown + masked
 
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
@@ -75,7 +79,7 @@ class UserCreationForm(forms.ModelForm):
     username = forms.RegexField(label=_("Username"), max_length=30,
         regex=r'^[\w.@+-]+$',
         help_text=_("Required. 30 characters or fewer. Letters, digits and "
-                      "@/./+/-/_ only."),
+                    "@/./+/-/_ only."),
         error_messages={
             'invalid': _("This value may contain only letters, numbers and "
                          "@/./+/-/_ characters.")})
@@ -124,7 +128,7 @@ class UserChangeForm(forms.ModelForm):
     username = forms.RegexField(
         label=_("Username"), max_length=30, regex=r"^[\w.@+-]+$",
         help_text=_("Required. 30 characters or fewer. Letters, digits and "
-                      "@/./+/-/_ only."),
+                    "@/./+/-/_ only."),
         error_messages={
             'invalid': _("This value may contain only letters, numbers and "
                          "@/./+/-/_ characters.")})
@@ -238,8 +242,9 @@ class PasswordResetForm(forms.Form):
         from django.core.mail import send_mail
         UserModel = get_user_model()
         email = self.cleaned_data["email"]
-        users = UserModel._default_manager.filter(email__iexact=email)
-        for user in users:
+        active_users = UserModel._default_manager.filter(
+            email__iexact=email, is_active=True)
+        for user in active_users:
             # Make sure that no email is sent to a user that actually has
             # a password marked as unusable
             if not user.has_usable_password():
@@ -343,6 +348,7 @@ class AdminPasswordChangeForm(forms.Form):
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
+    required_css_class = 'required'
     password1 = forms.CharField(label=_("Password"),
                                 widget=forms.PasswordInput)
     password2 = forms.CharField(label=_("Password (again)"),

@@ -11,7 +11,7 @@ from django.core import signals
 from django.core.exceptions import MiddlewareNotUsed, PermissionDenied, SuspiciousOperation
 from django.db import connections, transaction
 from django.utils.encoding import force_text
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 from django.utils import six
 from django.views import debug
 
@@ -23,8 +23,6 @@ class BaseHandler(object):
     response_fixes = [
         http.fix_location_header,
         http.conditional_content_removal,
-        http.fix_IE_for_attach,
-        http.fix_IE_for_vary,
     ]
 
     def __init__(self):
@@ -43,7 +41,7 @@ class BaseHandler(object):
 
         request_middleware = []
         for middleware_path in settings.MIDDLEWARE_CLASSES:
-            mw_class = import_by_path(middleware_path)
+            mw_class = import_string(middleware_path)
             try:
                 mw_instance = mw_class()
             except MiddlewareNotUsed:
@@ -126,7 +124,8 @@ class BaseHandler(object):
                     view_name = callback.__name__
                 else:                                           # CBV
                     view_name = callback.__class__.__name__ + '.__call__'
-                raise ValueError("The view %s.%s didn't return an HttpResponse object." % (callback.__module__, view_name))
+                raise ValueError("The view %s.%s didn't return an HttpResponse object. It returned None instead."
+                                 % (callback.__module__, view_name))
 
             # If the response supports deferred rendering, apply template
             # response middleware and then render the response
@@ -148,11 +147,11 @@ class BaseHandler(object):
                     callback, param_dict = resolver.resolve404()
                     response = callback(request, **param_dict)
                 except:
-                    # Get the exception info now and handle the current exception.
-                    # Only then manage the got_request_excpetion. 
-                    # Just in case another exception is thrown later.
-                    response = self.handle_uncaught_exception(request, resolver,
-                        sys.exc_info())
+                    response = self.handle_uncaught_exception(
+                        request,
+                        resolver,
+                        sys.exc_info()
+                    )
 
         except PermissionDenied:
             logger.warning(
@@ -165,49 +164,54 @@ class BaseHandler(object):
                 callback, param_dict = resolver.resolve403()
                 response = callback(request, **param_dict)
             except:
-                # Get the exception info now and handle the current exception.
-                # Only then manage the got_request_excpetion. 
-                # Just in case another exception is thrown later.
-                response = self.handle_uncaught_exception(request, resolver,
-                    sys.exc_info())
+                response = self.handle_uncaught_exception(
+                    request,
+                    resolver,
+                    sys.exc_info()
+                )
 
         except SuspiciousOperation as e:
             # The request logger receives events for any problematic request
             # The security logger receives events for all SuspiciousOperations
             security_logger = logging.getLogger('django.security.%s' %
                             e.__class__.__name__)
-            security_logger.error(force_text(e))
+            security_logger.error(
+                force_text(e),
+                extra={
+                    'status_code': 400,
+                    'request': request
+                })
 
             try:
                 callback, param_dict = resolver.resolve400()
                 response = callback(request, **param_dict)
             except:
-                # Get the exception info now and handle the current exception.
-                # Only then manage the got_request_excpetion. 
-                # Just in case another exception is thrown later.
-                response = self.handle_uncaught_exception(request, resolver,
-                    sys.exc_info())
-
+                response = self.handle_uncaught_exception(
+                    request,
+                    resolver,
+                    sys.exc_info()
+                )
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
             raise
 
         except: # Handle everything else.
-            # Get the exception info now and handle the current exception.
-            # Only then manage the got_request_excpetion. 
-            # Just in case another exception is thrown later.
-            response = self.handle_uncaught_exception(request, resolver,
-                sys.exc_info())
-
+            response = self.handle_uncaught_exception(
+                request,
+                resolver,
+                sys.exc_info()
+            )
         try:
             # Apply response middleware, regardless of the response
             for middleware_method in self._response_middleware:
                 response = middleware_method(request, response)
             response = self.apply_response_fixes(request, response)
         except: # Any exception should be gathered and handled
-            response = self.handle_uncaught_exception(request, resolver,
-                sys.exc_info())
-
+            response = self.handle_uncaught_exception(
+                request,
+                resolver,
+                sys.exc_info()
+            )
         return response
 
     def handle_uncaught_exception(self, request, resolver, exc_info):
@@ -222,7 +226,7 @@ class BaseHandler(object):
         """
 
         # First trigger the got_request_exception Signal to make sure that
-        # all handlers are executed; collect the responses to check for 
+        # all handlers are executed; collect the responses to check for
         # errors later on.
         signal_responses = signals.got_request_exception.send_robust(
             sender=self.__class__, request=request)
@@ -231,7 +235,7 @@ class BaseHandler(object):
         if settings.DEBUG_PROPAGATE_EXCEPTIONS:
             raise
 
-        # Log the "inital" error, which was basically the root cause and 
+        # Log the "inital" error, which was basically the root cause and
         # which is the most valuable resource for debugging.
         logger.error('Internal Server Error: %s', request.path,
             exc_info=exc_info,
@@ -241,19 +245,19 @@ class BaseHandler(object):
             }
         )
 
-        # Check whether the handlers executed as expected or if the handlers 
+        # Check whether the handlers executed as expected or if the handlers
         # itself raised further exceptions
         for signal_response in signal_responses:
-            if isinstance(signal_response[1], Exception):                
+            if isinstance(signal_response[1], Exception):
                 logger.error('Got Request Exception Handler Error: %s', request.path,
-                    #TODO: should we add the exc_info of the original error here?
-                    exc_info='',  
+                    #since we do not have a exc_info from the signal handlers
+                    exc_info=(None, None, None),
                     extra={
                         'status_code': 500,
                         'request': request,
                         'error': signal_response[1]
                     }
-                )  
+                )
 
         # After everything is logged, check if we are in DEBUG mode
         if settings.DEBUG:
@@ -267,7 +271,7 @@ class BaseHandler(object):
         try:
             callback, param_dict = resolver.resolve500()
             return callback(request, **param_dict)
-        except:
+        except Exception:
             # Last Resort: and just in the highly unlikely case that somehting
             # has gone wrong here, we return a minimal error message to the
             # user and log the issue.
@@ -279,8 +283,8 @@ class BaseHandler(object):
                     'request': request
                 }
             )
-            return http.HttpResponseServerError('<h1>Server Error (500)</h1>', 
-                content_type='text/html')            
+            return http.HttpResponseServerError('<h1>Server Error (500)</h1>',
+                content_type='text/html')
 
     def apply_response_fixes(self, request, response):
         """

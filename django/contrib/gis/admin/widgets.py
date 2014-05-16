@@ -10,7 +10,7 @@ from django.contrib.gis.geos import GEOSGeometry, GEOSException
 
 # Creating a template context that contains Django settings
 # values needed by admin map templates.
-geo_context = Context({'LANGUAGE_BIDI' : translation.get_language_bidi()})
+geo_context = Context({'LANGUAGE_BIDI': translation.get_language_bidi()})
 logger = logging.getLogger('django.contrib.gis')
 
 
@@ -53,7 +53,7 @@ class OpenLayersWidget(Textarea):
         self.params['name'] = name
         # note: we must switch out dashes for underscores since js
         # functions are created using the module variable
-        js_safe_name = self.params['name'].replace('-','_')
+        js_safe_name = self.params['name'].replace('-', '_')
         self.params['module'] = 'geodjango_%s' % js_safe_name
 
         if value:
@@ -87,6 +87,7 @@ class OpenLayersWidget(Textarea):
         # JavaScript construction utilities for the Bounds and Projection.
         def ol_bounds(extent):
             return 'new OpenLayers.Bounds(%s)' % str(extent)
+
         def ol_projection(srid):
             return 'new OpenLayers.Projection("EPSG:%s")' % srid
 

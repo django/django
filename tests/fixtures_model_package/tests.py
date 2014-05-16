@@ -5,6 +5,7 @@ import warnings
 from django.core import management
 from django.db import transaction
 from django.test import TestCase, TransactionTestCase
+from django.test.utils import override_system_checks
 from django.utils.six import StringIO
 
 from .models import Article, Book
@@ -17,7 +18,7 @@ class SampleTestCase(TestCase):
         "Test cases can load fixture objects into models defined in packages"
         self.assertEqual(Article.objects.count(), 3)
         self.assertQuerysetEqual(
-            Article.objects.all(),[
+            Article.objects.all(), [
                 "Django conquers world!",
                 "Copyright is fine the way it is",
                 "Poker has no place on ESPN",
@@ -30,6 +31,7 @@ class TestNoInitialDataLoading(TransactionTestCase):
 
     available_apps = ['fixtures_model_package']
 
+    @override_system_checks([])
     def test_migrate(self):
         with transaction.atomic():
             Book.objects.all().delete()
@@ -41,6 +43,7 @@ class TestNoInitialDataLoading(TransactionTestCase):
             )
             self.assertQuerysetEqual(Book.objects.all(), [])
 
+    @override_system_checks([])
     def test_flush(self):
         # Test presence of fixture (flush called by TransactionTestCase)
         self.assertQuerysetEqual(

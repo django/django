@@ -14,11 +14,11 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
     from_text = 'GeomFromText'
 
     Adapter = WKTAdapter
-    Adaptor = Adapter # Backwards-compatibility alias.
+    Adaptor = Adapter  # Backwards-compatibility alias.
 
     geometry_functions = {
-        'bbcontains': 'MBRContains', # For consistency w/PostGIS API
-        'bboverlaps': 'MBROverlaps', # .. ..
+        'bbcontains': 'MBRContains',  # For consistency w/PostGIS API
+        'bboverlaps': 'MBROverlaps',  # .. ..
         'contained': 'MBRWithin',    # .. ..
         'contains': 'MBRContains',
         'disjoint': 'MBRDisjoint',
@@ -49,9 +49,7 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
         return placeholder
 
     def spatial_lookup_sql(self, lvalue, lookup_type, value, field, qn):
-        alias, col, db_type = lvalue
-
-        geo_col = '%s.%s' % (qn(alias), qn(col))
+        geo_col, db_type = lvalue
 
         lookup_info = self.geometry_functions.get(lookup_type, False)
         if lookup_info:

@@ -3,16 +3,13 @@ from __future__ import unicode_literals
 from django.http import Http404
 from django.utils.translation import ugettext as _
 
+
 def feed(request, url, feed_dict=None):
     """Provided for backwards compatibility."""
     if not feed_dict:
         raise Http404(_("No feeds are registered."))
 
-    try:
-        slug, param = url.split('/', 1)
-    except ValueError:
-        slug, param = url, ''
-
+    slug = url.partition('/')[0]
     try:
         f = feed_dict[slug]
     except KeyError:

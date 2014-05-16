@@ -19,38 +19,39 @@ from sphinx.util.nodes import set_source_info
 simple_option_desc_re = re.compile(
     r'([-_a-zA-Z0-9]+)(\s*.*?)(?=,\s+(?:/|-|--)|$)')
 
+
 def setup(app):
     app.add_crossref_type(
-        directivename = "setting",
-        rolename      = "setting",
-        indextemplate = "pair: %s; setting",
+        directivename="setting",
+        rolename="setting",
+        indextemplate="pair: %s; setting",
     )
     app.add_crossref_type(
-        directivename = "templatetag",
-        rolename      = "ttag",
-        indextemplate = "pair: %s; template tag"
+        directivename="templatetag",
+        rolename="ttag",
+        indextemplate="pair: %s; template tag"
     )
     app.add_crossref_type(
-        directivename = "templatefilter",
-        rolename      = "tfilter",
-        indextemplate = "pair: %s; template filter"
+        directivename="templatefilter",
+        rolename="tfilter",
+        indextemplate="pair: %s; template filter"
     )
     app.add_crossref_type(
-        directivename = "fieldlookup",
-        rolename      = "lookup",
-        indextemplate = "pair: %s; field lookup type",
+        directivename="fieldlookup",
+        rolename="lookup",
+        indextemplate="pair: %s; field lookup type",
     )
     app.add_description_unit(
-        directivename = "django-admin",
-        rolename      = "djadmin",
-        indextemplate = "pair: %s; django-admin command",
-        parse_node    = parse_django_admin_node,
+        directivename="django-admin",
+        rolename="djadmin",
+        indextemplate="pair: %s; django-admin command",
+        parse_node=parse_django_admin_node,
     )
     app.add_description_unit(
-        directivename = "django-admin-option",
-        rolename      = "djadminopt",
-        indextemplate = "pair: %s; django-admin command-line option",
-        parse_node    = parse_django_adminopt_node,
+        directivename="django-admin-option",
+        rolename="djadminopt",
+        indextemplate="pair: %s; django-admin command-line option",
+        parse_node=parse_django_adminopt_node,
     )
     app.add_config_value('django_next_version', '0.0', True)
     app.add_directive('versionadded', VersionDirective)
@@ -98,11 +99,11 @@ def visit_snippet(self, node):
     linenos = node.rawsource.count('\n') >= self.highlightlinenothreshold - 1
     fname = node['filename']
     highlight_args = node.get('highlight_args', {})
-    if node.has_key('language'):
+    if 'language' in node:
         # code-block directives
         lang = node['language']
         highlight_args['force'] = True
-    if node.has_key('linenos'):
+    if 'linenos' in node:
         linenos = node['linenos']
 
     def warner(msg):
@@ -178,7 +179,7 @@ class SnippetWithFilename(Directive):
     option_spec = {'filename': directives.unchanged_required}
 
     def run(self):
-        code = u'\n'.join(self.content)
+        code = '\n'.join(self.content)
 
         literal = snippet_with_filename(code, code)
         if self.arguments:
@@ -228,18 +229,20 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     def visit_table(self, node):
         self.context.append(self.compact_p)
         self.compact_p = True
-        self._table_row_index = 0 # Needed by Sphinx
+        self._table_row_index = 0  # Needed by Sphinx
         self.body.append(self.starttag(node, 'table', CLASS='docutils'))
 
     def depart_table(self, node):
         self.compact_p = self.context.pop()
         self.body.append('</table>\n')
 
-    # <big>? Really?
     def visit_desc_parameterlist(self, node):
-        self.body.append('(')
+        self.body.append('(')  # by default sphinx puts <big> around the "("
         self.first_param = 1
+        self.optional_param_level = 0
         self.param_separator = node.child_text_separator
+        self.required_params_left = sum([isinstance(c, addnodes.desc_parameter)
+                                         for c in node.children])
 
     def depart_desc_parameterlist(self, node):
         self.body.append(')')
@@ -266,9 +269,9 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     # that work.
     #
     version_text = {
-        'deprecated':       'Deprecated in Django %s',
-        'versionchanged':   'Changed in Django %s',
-        'versionadded':     'New in Django %s',
+        'deprecated': 'Deprecated in Django %s',
+        'versionchanged': 'Changed in Django %s',
+        'versionadded': 'New in Django %s',
     }
 
     def visit_versionmodified(self, node):
@@ -292,12 +295,14 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
         SmartyPantsHTMLTranslator.visit_section(self, node)
         node['ids'] = old_ids
 
+
 def parse_django_admin_node(env, sig, signode):
     command = sig.split(' ')[0]
     env._django_curr_admin_command = command
     title = "django-admin.py %s" % sig
     signode += addnodes.desc_name(title, title)
     return sig
+
 
 def parse_django_adminopt_node(env, sig, signode):
     """A copy of sphinx.directives.CmdoptionDesc.parse_signature()"""
@@ -341,9 +346,9 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
         xrefs = self.env.domaindata["std"]["objects"]
         templatebuiltins = {
             "ttags": [n for ((t, n), (l, a)) in xrefs.items()
-                        if t == "templatetag" and l == "ref/templates/builtins"],
+                      if t == "templatetag" and l == "ref/templates/builtins"],
             "tfilters": [n for ((t, n), (l, a)) in xrefs.items()
-                        if t == "templatefilter" and l == "ref/templates/builtins"],
+                         if t == "templatefilter" and l == "ref/templates/builtins"],
         }
         outfilename = os.path.join(self.outdir, "templatebuiltins.js")
         with open(outfilename, 'w') as fp:

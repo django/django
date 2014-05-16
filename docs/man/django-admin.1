@@ -21,7 +21,7 @@ script found at the top level of each Django project directory.
 .BI cleanup
 Cleans out old data from the database (only expired sessions at the moment).
 .TP
-.BI "compilemessages [" "\-\-locale=LOCALE" "]"
+.BI "compilemessages [" "\-\-locale=LOCALE" "] [" "\-\-exclude=LOCALE" "]"
 Compiles .po files to .mo files for use with builtin gettext support.
 .TP
 .BI "createcachetable [" "tablename" "]"
@@ -40,7 +40,7 @@ Displays differences between the current
 and Django's default settings. Settings that don't appear in the defaults are
 followed by "###".
 .TP
-.BI "dumpdata [" "\-\-all" "] [" "\-\-format=FMT" "] [" "\-\-indent=NUM" "] [" "\-\-natural=NATURAL" "] [" "appname appname appname.Model ..." "]"
+.BI "dumpdata [" "\-\-all" "] [" "\-\-format=FMT" "] [" "\-\-indent=NUM" "] [" "\-\-natural=NATURAL" "] [" "app_label app_label app_label.Model ..." "]"
 Outputs to standard output all data in the database associated with the named
 application(s).
 .TP
@@ -54,12 +54,12 @@ model module.
 .BI "loaddata [" "fixture fixture ..." "]"
 Searches for and loads the contents of the named fixture into the database.
 .TP
-.BI "install [" "appname ..." "]"
+.BI "install [" "app_label ..." "]"
 Executes
 .B sqlall
 for the given app(s) in the current database.
 .TP
-.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "] [" "\-\-symlinks" "] [" "\-\-ignore=PATTERN" "] [" "\-\-no\-default\-ignore" "] [" "\-\-no\-wrap" "] [" "\-\-no\-location" "]"
+.BI "makemessages [" "\-\-locale=LOCALE" "] [" "\-\-exclude=LOCALE" "] [" "\-\-domain=DOMAIN" "] [" "\-\-extension=EXTENSION" "] [" "\-\-all" "] [" "\-\-symlinks" "] [" "\-\-ignore=PATTERN" "] [" "\-\-no\-default\-ignore" "] [" "\-\-no\-wrap" "] [" "\-\-no\-location" "]"
 Runs over the entire source tree of the current directory and pulls out all
 strings marked for translation. It creates (or updates) a message file in the
 conf/locale (in the django tree) or locale (for project and application) directory.
@@ -79,33 +79,30 @@ The
 option forces the use of the standard Python interpreter even when IPython is
 installed.
 .TP
-.BI "sql [" "appname ..." "]"
+.BI "sql [" "app_label ..." "]"
 Prints the CREATE TABLE SQL statements for the given app name(s).
 .TP
-.BI "sqlall [" "appname ..." "]"
+.BI "sqlall [" "app_label ..." "]"
 Prints the CREATE TABLE, initial\-data and CREATE INDEX SQL statements for the
 given model module name(s).
 .TP
-.BI "sqlclear [" "appname ..." "]"
+.BI "sqlclear [" "app_label ..." "]"
 Prints the DROP TABLE SQL statements for the given app name(s).
 .TP
-.BI "sqlcustom [" "appname ..." "]"
+.BI "sqlcustom [" "app_label ..." "]"
 Prints the custom SQL statements for the given app name(s).
 .TP
-.BI "sqlflush [" "appname ..." "]"
+.BI "sqlflush [" "app_label ..." "]"
 Prints the SQL statements that would be executed for the "flush" command.
 .TP
-.BI "sqlindexes [" "appname ..." "]"
+.BI "sqlindexes [" "app_label ..." "]"
 Prints the CREATE INDEX SQL statements for the given model module name(s).
 .TP
-.BI "sqlinitialdata [" "appname ..." "]"
-Prints the initial INSERT SQL statements for the given app name(s).
-.TP
-.BI "sqlsequencereset [" "appname ..." "]"
+.BI "sqlsequencereset [" "app_label ..." "]"
 Prints the SQL statements for resetting PostgreSQL sequences for the
 given app name(s).
 .TP
-.BI "startapp [" "\-\-template=PATH_OR_URL" "] [" "\-\-extension=EXTENSION" "] [" "\-\-name=FILENAME" "] [" "appname" "] [" "destination" "]"
+.BI "startapp [" "\-\-template=PATH_OR_URL" "] [" "\-\-extension=EXTENSION" "] [" "\-\-name=FILENAME" "] [" "app_label" "] [" "destination" "]"
 Creates a Django app directory structure for the given app name in
 the current directory or the optional destination.
 .TP
@@ -117,7 +114,7 @@ in the current directory or the optional destination.
 Runs migrations for apps containing migrations, and just creates missing tables
 for apps without migrations.
 .TP
-.BI "test [" "\-\-verbosity" "] [" "\-\-failfast" "] [" "appname ..." "]"
+.BI "test [" "\-\-verbosity" "] [" "\-\-failfast" "] [" "app_label ..." "]"
 Runs the test suite for the specified applications, or the entire project if
 no apps are specified
 .TP
@@ -176,6 +173,9 @@ output a full stack trace whenever an exception is raised.
 .I \-l, \-\-locale=LOCALE
 The locale to process when using makemessages or compilemessages.
 .TP
+.I \-x, \-\-exclude=LOCALE
+The locale to exclude from processing when using makemessages or compilemessages.
+.TP
 .I \-d, \-\-domain=DOMAIN
 The domain of the message files (default: "django") when using makemessages.
 .TP
@@ -192,7 +192,8 @@ Ignore files or directories matching this glob-style pattern. Use multiple
 times to ignore more (makemessages command).
 .TP
 .I \-\-no\-default\-ignore
-Don't ignore the common private glob-style patterns 'CVS', '.*' and '*~' (makemessages command).
+Don't ignore the common private glob-style patterns 'CVS', '.*', '*~' and '*.pyc'
+(makemessages command).
 .TP
 .I \-\-no\-wrap
 Don't break long message lines into several lines (makemessages command).

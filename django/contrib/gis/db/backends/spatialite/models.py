@@ -1,9 +1,10 @@
 """
  The GeometryColumns and SpatialRefSys models for the SpatiaLite backend.
 """
-from django.db import models
+from django.db import connection, models
 from django.contrib.gis.db.backends.base import SpatialRefSysMixin
 from django.utils.encoding import python_2_unicode_compatible
+
 
 @python_2_unicode_compatible
 class GeometryColumns(models.Model):
@@ -24,16 +25,16 @@ class GeometryColumns(models.Model):
     @classmethod
     def table_name_col(cls):
         """
-        Returns the name of the metadata column used to store the
-        the feature table name.
+        Returns the name of the metadata column used to store the feature table
+        name.
         """
         return 'f_table_name'
 
     @classmethod
     def geom_col_name(cls):
         """
-        Returns the name of the metadata column used to store the
-        the feature geometry column.
+        Returns the name of the metadata column used to store the feature
+        geometry column.
         """
         return 'f_geometry_column'
 
@@ -41,6 +42,7 @@ class GeometryColumns(models.Model):
         return "%s.%s - %dD %s field (SRID: %d)" % \
                (self.f_table_name, self.f_geometry_column,
                 self.coord_dimension, self.type, self.srid)
+
 
 class SpatialRefSys(models.Model, SpatialRefSysMixin):
     """
@@ -51,9 +53,13 @@ class SpatialRefSys(models.Model, SpatialRefSysMixin):
     auth_srid = models.IntegerField()
     ref_sys_name = models.CharField(max_length=256)
     proj4text = models.CharField(max_length=2048)
+    if connection.ops.spatial_version[0] >= 4:
+        srtext = models.CharField(max_length=2048)
 
     @property
     def wkt(self):
+        if hasattr(self, 'srtext'):
+            return self.srtext
         from django.contrib.gis.gdal import SpatialReference
         return SpatialReference(self.proj4text).wkt
 

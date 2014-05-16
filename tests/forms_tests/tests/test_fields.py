@@ -33,7 +33,14 @@ import os
 from decimal import Decimal
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import *
+from django.forms import (
+    BooleanField, CharField, ChoiceField, ComboField, DateField, DateTimeField,
+    DecimalField, EmailField, Field, FileField, FilePathField, FloatField,
+    Form, forms, HiddenInput, IntegerField, MultipleChoiceField,
+    NullBooleanField, NumberInput, PasswordInput, RadioSelect, RegexField,
+    SplitDateTimeField, TextInput, Textarea, TimeField, TypedChoiceField,
+    TypedMultipleChoiceField, URLField, ValidationError, Widget,
+)
 from django.test import SimpleTestCase
 from django.utils import formats
 from django.utils import six
@@ -141,14 +148,13 @@ class FieldsTests(SimpleTestCase):
         # Return an empty dictionary if max_length is None
         f = CharField()
         self.assertEqual(f.widget_attrs(TextInput()), {})
-
-        # Or if the widget is not TextInput or PasswordInput
-        f = CharField(max_length=10)
-        self.assertEqual(f.widget_attrs(HiddenInput()), {})
+        self.assertEqual(f.widget_attrs(Textarea()), {})
 
         # Otherwise, return a maxlength attribute equal to max_length
+        f = CharField(max_length=10)
         self.assertEqual(f.widget_attrs(TextInput()), {'maxlength': '10'})
         self.assertEqual(f.widget_attrs(PasswordInput()), {'maxlength': '10'})
+        self.assertEqual(f.widget_attrs(Textarea()), {'maxlength': '10'})
 
     # IntegerField ################################################################
 
@@ -233,6 +239,18 @@ class FieldsTests(SimpleTestCase):
         f1 = IntegerField(localize=True)
         self.assertWidgetRendersTo(f1, '<input id="id_f" name="f" type="text" />')
 
+    def test_integerfield_subclass(self):
+        """
+        Test that class-defined widget is not overwritten by __init__ (#22245).
+        """
+        class MyIntegerField(IntegerField):
+            widget = Textarea
+
+        f = MyIntegerField()
+        self.assertEqual(f.widget.__class__, Textarea)
+        f = MyIntegerField(localize=True)
+        self.assertEqual(f.widget.__class__, Textarea)
+
     # FloatField ##################################################################
 
     def test_floatfield_1(self):
@@ -274,6 +292,10 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(0.5, f.clean('0.5'))
         self.assertEqual(f.max_value, 1.5)
         self.assertEqual(f.min_value, 0.5)
+
+    def test_floatfield_widget_attrs(self):
+        f = FloatField(widget=NumberInput(attrs={'step': 0.01, 'max': 1.0, 'min': 0.0}))
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" min="0.0" max="1.0" type="number" id="id_f" />')
 
     def test_floatfield_localized(self):
         """
@@ -385,6 +407,8 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.widget_attrs(NumberInput()), {'step': '1e-19'})
         f = DecimalField(max_digits=20)
         self.assertEqual(f.widget_attrs(NumberInput()), {'step': 'any'})
+        f = DecimalField(max_digits=6, widget=NumberInput(attrs={'step': '0.01'}))
+        self.assertWidgetRendersTo(f, '<input step="0.01" name="f" type="number" id="id_f" />')
 
     def test_decimalfield_localized(self):
         """
@@ -576,7 +600,7 @@ class FieldsTests(SimpleTestCase):
     # RegexField ##################################################################
 
     def test_regexfield_1(self):
-        f = RegexField('^\d[A-F]\d$')
+        f = RegexField('^[0-9][A-F][0-9]$')
         self.assertEqual('2A2', f.clean('2A2'))
         self.assertEqual('3F3', f.clean('3F3'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '3G3')
@@ -585,14 +609,14 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
 
     def test_regexfield_2(self):
-        f = RegexField('^\d[A-F]\d$', required=False)
+        f = RegexField('^[0-9][A-F][0-9]$', required=False)
         self.assertEqual('2A2', f.clean('2A2'))
         self.assertEqual('3F3', f.clean('3F3'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '3G3')
         self.assertEqual('', f.clean(''))
 
     def test_regexfield_3(self):
-        f = RegexField(re.compile('^\d[A-F]\d$'))
+        f = RegexField(re.compile('^[0-9][A-F][0-9]$'))
         self.assertEqual('2A2', f.clean('2A2'))
         self.assertEqual('3F3', f.clean('3F3'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '3G3')
@@ -600,13 +624,13 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '2A2 ')
 
     def test_regexfield_4(self):
-        f = RegexField('^\d\d\d\d$', error_message='Enter a four-digit number.')
+        f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
         self.assertEqual('1234', f.clean('1234'))
         self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, '123')
         self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, 'abcd')
 
     def test_regexfield_5(self):
-        f = RegexField('^\d+$', min_length=5, max_length=10)
+        f = RegexField('^[0-9]+$', min_length=5, max_length=10)
         self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 5 characters (it has 3).'", f.clean, '123')
         six.assertRaisesRegex(self, ValidationError, "'Ensure this value has at least 5 characters \(it has 3\)\.', u?'Enter a valid value\.'", f.clean, 'abc')
         self.assertEqual('12345', f.clean('12345'))
@@ -624,7 +648,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_change_regex_after_init(self):
         f = RegexField('^[a-z]+$')
-        f.regex = '^\d+$'
+        f.regex = '^[0-9]+$'
         self.assertEqual('1234', f.clean('1234'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, 'abcd')
 
@@ -684,7 +708,7 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(SimpleUploadedFile, type(f.clean(SimpleUploadedFile('name', b'Some File Content'), 'files/test4.pdf')))
 
     def test_filefield_2(self):
-        f = FileField(max_length = 5)
+        f = FileField(max_length=5)
         self.assertRaisesMessage(ValidationError, "'Ensure this filename has at most 5 characters (it has 18).'", f.clean, SimpleUploadedFile('test_maxlength.txt', b'hello world'))
         self.assertEqual('files/test1.pdf', f.clean('', 'files/test1.pdf'))
         self.assertEqual('files/test2.pdf', f.clean(None, 'files/test2.pdf'))
@@ -724,14 +748,14 @@ class FieldsTests(SimpleTestCase):
         self.assertWidgetRendersTo(f, '<input type="url" name="f" id="id_f" />')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, '')
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
-        self.assertEqual('http://localhost/', f.clean('http://localhost'))
-        self.assertEqual('http://example.com/', f.clean('http://example.com'))
-        self.assertEqual('http://example.com./', f.clean('http://example.com.'))
-        self.assertEqual('http://www.example.com/', f.clean('http://www.example.com'))
+        self.assertEqual('http://localhost', f.clean('http://localhost'))
+        self.assertEqual('http://example.com', f.clean('http://example.com'))
+        self.assertEqual('http://example.com.', f.clean('http://example.com.'))
+        self.assertEqual('http://www.example.com', f.clean('http://www.example.com'))
         self.assertEqual('http://www.example.com:8000/test', f.clean('http://www.example.com:8000/test'))
-        self.assertEqual('http://valid-with-hyphens.com/', f.clean('valid-with-hyphens.com'))
-        self.assertEqual('http://subdomain.domain.com/', f.clean('subdomain.domain.com'))
-        self.assertEqual('http://200.8.9.10/', f.clean('http://200.8.9.10'))
+        self.assertEqual('http://valid-with-hyphens.com', f.clean('valid-with-hyphens.com'))
+        self.assertEqual('http://subdomain.domain.com', f.clean('subdomain.domain.com'))
+        self.assertEqual('http://200.8.9.10', f.clean('http://200.8.9.10'))
         self.assertEqual('http://200.8.9.10:8000/test', f.clean('http://200.8.9.10:8000/test'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'foo')
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://')
@@ -744,7 +768,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://-invalid.com')
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://inv-.alid-.com')
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://inv-.-alid.com')
-        self.assertEqual('http://valid-----hyphens.com/', f.clean('http://valid-----hyphens.com'))
+        self.assertEqual('http://valid-----hyphens.com', f.clean('http://valid-----hyphens.com'))
         self.assertEqual('http://some.idn.xyz\xe4\xf6\xfc\xdfabc.domain.com:123/blah', f.clean('http://some.idn.xyzäöüßabc.domain.com:123/blah'))
         self.assertEqual('http://www.example.com/s/http://code.djangoproject.com/ticket/13804', f.clean('www.example.com/s/http://code.djangoproject.com/ticket/13804'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, '[a')
@@ -753,18 +777,18 @@ class FieldsTests(SimpleTestCase):
     def test_url_regex_ticket11198(self):
         f = URLField()
         # hangs "forever" if catastrophic backtracking in ticket:#11198 not fixed
-        self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://%s' % ("X"*200,))
+        self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://%s' % ("X" * 200,))
 
         # a second test, to make sure the problem is really addressed, even on
         # domains that don't fail the domain label length check in the regex
-        self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://%s' % ("X"*60,))
+        self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://%s' % ("X" * 60,))
 
     def test_urlfield_2(self):
         f = URLField(required=False)
         self.assertEqual('', f.clean(''))
         self.assertEqual('', f.clean(None))
-        self.assertEqual('http://example.com/', f.clean('http://example.com'))
-        self.assertEqual('http://www.example.com/', f.clean('http://www.example.com'))
+        self.assertEqual('http://example.com', f.clean('http://example.com'))
+        self.assertEqual('http://www.example.com', f.clean('http://www.example.com'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'foo')
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://')
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://example')
@@ -774,25 +798,22 @@ class FieldsTests(SimpleTestCase):
     def test_urlfield_5(self):
         f = URLField(min_length=15, max_length=20)
         self.assertWidgetRendersTo(f, '<input id="id_f" type="url" name="f" maxlength="20" />')
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 15 characters (it has 13).'", f.clean, 'http://f.com')
-        self.assertEqual('http://example.com/', f.clean('http://example.com'))
-        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (it has 38).'", f.clean, 'http://abcdefghijklmnopqrstuvwxyz.com')
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at least 15 characters (it has 12).'", f.clean, 'http://f.com')
+        self.assertEqual('http://example.com', f.clean('http://example.com'))
+        self.assertRaisesMessage(ValidationError, "'Ensure this value has at most 20 characters (it has 37).'", f.clean, 'http://abcdefghijklmnopqrstuvwxyz.com')
 
     def test_urlfield_6(self):
         f = URLField(required=False)
-        self.assertEqual('http://example.com/', f.clean('example.com'))
+        self.assertEqual('http://example.com', f.clean('example.com'))
         self.assertEqual('', f.clean(''))
-        self.assertEqual('https://example.com/', f.clean('https://example.com'))
+        self.assertEqual('https://example.com', f.clean('https://example.com'))
 
     def test_urlfield_7(self):
         f = URLField()
-        self.assertEqual('http://example.com/', f.clean('http://example.com'))
+        self.assertEqual('http://example.com', f.clean('http://example.com'))
         self.assertEqual('http://example.com/test', f.clean('http://example.com/test'))
-
-    def test_urlfield_8(self):
-        # ticket #11826
-        f = URLField()
-        self.assertEqual('http://example.com/?some_param=some_value', f.clean('http://example.com?some_param=some_value'))
+        self.assertEqual('http://example.com?some_param=some_value',
+                         f.clean('http://example.com?some_param=some_value'))
 
     def test_urlfield_9(self):
         f = URLField()
@@ -898,7 +919,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. John is not one of the available choices.'", f.clean, 'John')
 
     def test_choicefield_4(self):
-        f = ChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
+        f = ChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3', 'A'), ('4', 'B'))), ('5', 'Other')])
         self.assertEqual('1', f.clean(1))
         self.assertEqual('1', f.clean('1'))
         self.assertEqual('3', f.clean(3))
@@ -948,6 +969,23 @@ class FieldsTests(SimpleTestCase):
         # has_changed should not trigger required validation
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
         self.assertFalse(f._has_changed(None, ''))
+        self.assertFalse(f._has_changed(1, '1'))
+
+    def test_typedchoicefield_special_coerce(self):
+        """
+        Test a coerce function which results in a value not present in choices.
+        Refs #21397.
+        """
+        def coerce_func(val):
+            return Decimal('1.%s' % val)
+
+        f = TypedChoiceField(choices=[(1, "1"), (2, "2")], coerce=coerce_func, required=True)
+        self.assertEqual(Decimal('1.2'), f.clean('2'))
+        self.assertRaisesMessage(ValidationError,
+            "'This field is required.'", f.clean, '')
+        self.assertRaisesMessage(ValidationError,
+            "'Select a valid choice. 3 is not one of the available choices.'",
+            f.clean, '3')
 
     # NullBooleanField ############################################################
 
@@ -984,6 +1022,7 @@ class FieldsTests(SimpleTestCase):
         # Make sure we're compatible with MySQL, which uses 0 and 1 for its boolean
         # values. (#9609)
         NULLBOOL_CHOICES = (('1', 'Yes'), ('0', 'No'), ('', 'Unknown'))
+
         class MySQLNullBooleanForm(Form):
             nullbool0 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
             nullbool1 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
@@ -1035,7 +1074,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. 3 is not one of the available choices.'", f.clean, ['3'])
 
     def test_multiplechoicefield_3(self):
-        f = MultipleChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3','A'),('4','B'))), ('5','Other')])
+        f = MultipleChoiceField(choices=[('Numbers', (('1', 'One'), ('2', 'Two'))), ('Letters', (('3', 'A'), ('4', 'B'))), ('5', 'Other')])
         self.assertEqual(['1'], f.clean([1]))
         self.assertEqual(['1'], f.clean(['1']))
         self.assertEqual(['1', '5'], f.clean([1, 5]))
@@ -1043,7 +1082,7 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(['1', '5'], f.clean(['1', 5]))
         self.assertEqual(['1', '5'], f.clean(['1', '5']))
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['6'])
-        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['1','6'])
+        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['1', '6'])
 
     def test_multiplechoicefield_changed(self):
         f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two'), ('3', 'Three')])
@@ -1076,8 +1115,8 @@ class FieldsTests(SimpleTestCase):
 
     def test_typedmultiplechoicefield_4(self):
         f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int)
-        self.assertEqual([1, -1], f.clean(['1','-1']))
-        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 2 is not one of the available choices.'", f.clean, ['1','2'])
+        self.assertEqual([1, -1], f.clean(['1', '-1']))
+        self.assertRaisesMessage(ValidationError, "'Select a valid choice. 2 is not one of the available choices.'", f.clean, ['1', '2'])
 
     def test_typedmultiplechoicefield_5(self):
         # Even more weirdness: if you have a valid choice but your coercion function
@@ -1102,7 +1141,24 @@ class FieldsTests(SimpleTestCase):
         f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
         self.assertFalse(f._has_changed(None, ''))
 
-   # ComboField ##################################################################
+    def test_typedmultiplechoicefield_special_coerce(self):
+        """
+        Test a coerce function which results in a value not present in choices.
+        Refs #21397.
+        """
+        def coerce_func(val):
+            return Decimal('1.%s' % val)
+
+        f = TypedMultipleChoiceField(
+            choices=[(1, "1"), (2, "2")], coerce=coerce_func, required=True)
+        self.assertEqual([Decimal('1.2')], f.clean(['2']))
+        self.assertRaisesMessage(ValidationError,
+            "'This field is required.'", f.clean, [])
+        self.assertRaisesMessage(ValidationError,
+            "'Select a valid choice. 3 is not one of the available choices.'",
+            f.clean, ['3'])
+
+    # ComboField ##################################################################
 
     def test_combofield_1(self):
         f = ComboField(fields=[CharField(max_length=20), EmailField()])
@@ -1134,14 +1190,14 @@ class FieldsTests(SimpleTestCase):
         f.choices = [p for p in f.choices if p[0].endswith('.py')]
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/utils.py', 'utils.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
@@ -1155,14 +1211,14 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, match='^.*?\.py$')
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/utils.py', 'utils.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
@@ -1174,16 +1230,16 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, recursive=True, match='^.*?\.py$')
         f.choices.sort()
         expected = [
-                ('/django/forms/__init__.py', '__init__.py'),
-                ('/django/forms/extras/__init__.py', 'extras/__init__.py'),
-                ('/django/forms/extras/widgets.py', 'extras/widgets.py'),
-                ('/django/forms/fields.py', 'fields.py'),
-                ('/django/forms/forms.py', 'forms.py'),
-                ('/django/forms/formsets.py', 'formsets.py'),
-                ('/django/forms/models.py', 'models.py'),
-                ('/django/forms/util.py', 'util.py'),
-                ('/django/forms/utils.py', 'utils.py'),
-                ('/django/forms/widgets.py', 'widgets.py')
+            ('/django/forms/__init__.py', '__init__.py'),
+            ('/django/forms/extras/__init__.py', 'extras/__init__.py'),
+            ('/django/forms/extras/widgets.py', 'extras/widgets.py'),
+            ('/django/forms/fields.py', 'fields.py'),
+            ('/django/forms/forms.py', 'forms.py'),
+            ('/django/forms/formsets.py', 'formsets.py'),
+            ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/util.py', 'util.py'),
+            ('/django/forms/utils.py', 'utils.py'),
+            ('/django/forms/widgets.py', 'widgets.py')
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])

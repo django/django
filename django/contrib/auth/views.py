@@ -11,11 +11,12 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 
 # Avoid shadowing the login() and logout() views below.
-from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout, get_user_model
+from django.contrib.auth import (REDIRECT_FIELD_NAME, login as auth_login,
+    logout as auth_logout, get_user_model, update_session_auth_hash)
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, PasswordChangeForm
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 
 
 @sensitive_post_parameters()
@@ -98,7 +99,7 @@ def logout(request, next_page=None,
 
 def logout_then_login(request, login_url=None, current_app=None, extra_context=None):
     """
-    Logs out the user if he is logged in. Then redirects to the log-in page.
+    Logs out the user if they are logged in. Then redirects to the log-in page.
     """
     if not login_url:
         login_url = settings.LOGIN_URL
@@ -234,6 +235,7 @@ def password_reset_confirm(request, uidb64=None, token=None,
     return TemplateResponse(request, template_name, context,
                             current_app=current_app)
 
+
 def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',
                             current_app=None, extra_context=None):
@@ -263,6 +265,11 @@ def password_change(request,
         form = password_change_form(user=request.user, data=request.POST)
         if form.is_valid():
             form.save()
+            # Updating the password logs out all other sessions for the user
+            # except the current one if
+            # django.contrib.auth.middleware.SessionAuthenticationMiddleware
+            # is enabled.
+            update_session_auth_hash(request, form.user)
             return HttpResponseRedirect(post_change_redirect)
     else:
         form = password_change_form(user=request.user)

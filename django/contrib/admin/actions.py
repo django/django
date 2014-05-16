@@ -11,6 +11,7 @@ from django.template.response import TemplateResponse
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy, ugettext as _
 
+
 def delete_selected(modeladmin, request, queryset):
     """
     Default action which deletes the selected objects.
@@ -70,7 +71,6 @@ def delete_selected(modeladmin, request, queryset):
         "perms_lacking": perms_needed,
         "protected": protected,
         "opts": opts,
-        "app_label": app_label,
         'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
     }
 

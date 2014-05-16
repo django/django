@@ -1,0 +1,22 @@
+==========================
+Django 1.6.4 release notes
+==========================
+
+*April 28, 2014*
+
+Django 1.6.4 fixes several bugs in 1.6.3.
+
+Bugfixes
+========
+
+* Added backwards compatibility support for the :mod:`django.contrib.messages`
+  cookie format of Django 1.4 and earlier to facilitate upgrading to 1.6 from
+  1.4 (`#22426 <http://code.djangoproject.com/ticket/22426>`_).
+
+* Restored the ability to :meth:`~django.core.urlresolvers.reverse` views
+  created using :func:`functools.partial()`
+  (`#22486 <http://code.djangoproject.com/ticket/22486>`_).
+
+* Fixed the ``object_id`` of the ``LogEntry`` that's created after a user
+  password change in the admin
+  (`#22515 <http://code.djangoproject.com/ticket/22515>`_).

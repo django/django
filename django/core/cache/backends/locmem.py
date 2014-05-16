@@ -27,13 +27,9 @@ class LocMemCache(BaseCache):
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        try:
-            pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
-        except pickle.PickleError:
-            return False
+        pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
         with self._lock.writer():
-            exp = self._expire_info.get(key)
-            if exp is None or exp <= time.time():
+            if self._has_expired(key):
                 self._set(key, pickled, timeout)
                 return True
             return False
@@ -43,8 +39,7 @@ class LocMemCache(BaseCache):
         self.validate_key(key)
         pickled = None
         with self._lock.reader():
-            exp = self._expire_info.get(key, 0)
-            if exp is None or exp > time.time():
+            if not self._has_expired(key):
                 pickled = self._cache[key]
         if pickled is not None:
             try:
@@ -69,13 +64,9 @@ class LocMemCache(BaseCache):
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        try:
-            pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
-        except pickle.PickleError:
-            pass
-        else:
-            with self._lock.writer():
-                self._set(key, pickled, timeout)
+        pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+        with self._lock.writer():
+            self._set(key, pickled, timeout)
 
     def incr(self, key, delta=1, version=None):
         value = self.get(key, version=version)
@@ -83,23 +74,16 @@ class LocMemCache(BaseCache):
             raise ValueError("Key '%s' not found" % key)
         new_value = value + delta
         key = self.make_key(key, version=version)
-        try:
-            pickled = pickle.dumps(new_value, pickle.HIGHEST_PROTOCOL)
-        except pickle.PickleError:
-            pass
-        else:
-            with self._lock.writer():
-                self._cache[key] = pickled
+        pickled = pickle.dumps(new_value, pickle.HIGHEST_PROTOCOL)
+        with self._lock.writer():
+            self._cache[key] = pickled
         return new_value
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         with self._lock.reader():
-            exp = self._expire_info.get(key)
-            if exp is None:
-                return False
-            elif exp > time.time():
+            if not self._has_expired(key):
                 return True
 
         with self._lock.writer():
@@ -109,6 +93,12 @@ class LocMemCache(BaseCache):
             except KeyError:
                 pass
             return False
+
+    def _has_expired(self, key):
+        exp = self._expire_info.get(key, -1)
+        if exp is None or exp > time.time():
+            return False
+        return True
 
     def _cull(self):
         if self._cull_frequency == 0:

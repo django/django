@@ -160,16 +160,13 @@ by the core team if:
 
 * There is no "-1" vote from any member of the core team.
 
-* The :ref:`BDFLs<django-bdfls>` haven't stepped in and executed their
-  positive or negative veto.
-
 When calling for a vote, the caller should specify a deadline by which
 votes must be received. One week is generally suggested as the minimum
 amount of time.
 
 Since this process allows any core committer to veto a proposal, any "-1"
-votes (or BDFL vetos) should be accompanied by an explanation that explains
-what it would take to convert that "-1" into at least a "+0".
+votes should be accompanied by an explanation that explains what it would
+take to convert that "-1" into at least a "+0".
 
 Whenever possible, these formal votes should be announced and held in
 public on the |django-developers| mailing list. However, overly sensitive

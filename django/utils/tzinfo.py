@@ -6,12 +6,13 @@ from datetime import timedelta, tzinfo
 import time
 import warnings
 
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str, force_text, DEFAULT_LOCALE_ENCODING
 
 warnings.warn(
     "django.utils.tzinfo will be removed in Django 1.9. "
     "Use django.utils.timezone instead.",
-    PendingDeprecationWarning)
+    RemovedInDjango19Warning, stacklevel=2)
 
 
 # Python's doc say: "A tzinfo subclass must have an __init__() method that can
@@ -25,7 +26,7 @@ class FixedOffset(tzinfo):
         warnings.warn(
             "django.utils.tzinfo.FixedOffset will be removed in Django 1.9. "
             "Use django.utils.timezone.get_fixed_timezone instead.",
-            PendingDeprecationWarning)
+            RemovedInDjango19Warning)
         if isinstance(offset, timedelta):
             self.__offset = offset
             offset = self.__offset.seconds // 60
@@ -50,6 +51,7 @@ class FixedOffset(tzinfo):
     def dst(self, dt):
         return timedelta(0)
 
+
 # This implementation is used for display purposes. It uses an approximation
 # for DST computations on dates >= 2038.
 
@@ -62,7 +64,7 @@ class LocalTimezone(tzinfo):
         warnings.warn(
             "django.utils.tzinfo.LocalTimezone will be removed in Django 1.9. "
             "Use django.utils.timezone.get_default_timezone instead.",
-            PendingDeprecationWarning)
+            RemovedInDjango19Warning)
         tzinfo.__init__(self)
         self.__dt = dt
         self._tzname = self.tzname(dt)

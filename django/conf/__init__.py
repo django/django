@@ -7,16 +7,12 @@ a list of all possible variables.
 """
 
 import importlib
-import logging
 import os
-import sys
 import time     # Needed for Windows
-import warnings
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import LazyObject, empty
-from django.utils.module_loading import import_by_path
 from django.utils import six
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -34,11 +30,8 @@ class LazySettings(LazyObject):
         is used the first time we need any settings at all, if the user has not
         previously configured the settings manually.
         """
-        try:
-            settings_module = os.environ[ENVIRONMENT_VARIABLE]
-            if not settings_module: # If it's set but is an empty string.
-                raise KeyError
-        except KeyError:
+        settings_module = os.environ.get(ENVIRONMENT_VARIABLE)
+        if not settings_module:
             desc = ("setting %s" % name) if name else "settings"
             raise ImproperlyConfigured(
                 "Requested %s, but settings are not configured. "
@@ -47,33 +40,11 @@ class LazySettings(LazyObject):
                 % (desc, ENVIRONMENT_VARIABLE))
 
         self._wrapped = Settings(settings_module)
-        self._configure_logging()
 
     def __getattr__(self, name):
         if self._wrapped is empty:
             self._setup(name)
         return getattr(self._wrapped, name)
-
-    def _configure_logging(self):
-        """
-        Setup logging from LOGGING_CONFIG and LOGGING settings.
-        """
-        if not sys.warnoptions:
-            # Route warnings through python logging
-            logging.captureWarnings(True)
-            # Allow DeprecationWarnings through the warnings filters
-            warnings.simplefilter("default", DeprecationWarning)
-
-        if self.LOGGING_CONFIG:
-            from django.utils.log import DEFAULT_LOGGING
-            # First find the logging configuration function ...
-            logging_config_func = import_by_path(self.LOGGING_CONFIG)
-
-            logging_config_func(DEFAULT_LOGGING)
-
-            # ... then invoke it with the logging settings
-            if self.LOGGING:
-                logging_config_func(self.LOGGING)
 
     def configure(self, default_settings=global_settings, **options):
         """
@@ -87,7 +58,6 @@ class LazySettings(LazyObject):
         for name, value in options.items():
             setattr(holder, name, value)
         self._wrapped = holder
-        self._configure_logging()
 
     @property
     def configured(self):
@@ -107,11 +77,6 @@ class BaseSettings(object):
         elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, six.string_types):
             raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
                 "to a tuple, not a string.")
-        elif name == "INSTALLED_APPS":
-            value = list(value)  # force evaluation of generators on Python 3
-            if len(value) != len(set(value)):
-                raise ImproperlyConfigured("The INSTALLED_APPS setting must contain unique values.")
-
         object.__setattr__(self, name, value)
 
 
@@ -119,7 +84,7 @@ class Settings(BaseSettings):
     def __init__(self, settings_module):
         # update this dict from global settings (but only for ALL_CAPS settings)
         for setting in dir(global_settings):
-            if setting == setting.upper():
+            if setting.isupper():
                 setattr(self, setting, getattr(global_settings, setting))
 
         # store the settings module in case someone later cares
@@ -134,17 +99,17 @@ class Settings(BaseSettings):
             )
 
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
-
+        self._explicit_settings = set()
         for setting in dir(mod):
-            if setting == setting.upper():
+            if setting.isupper():
                 setting_value = getattr(mod, setting)
 
                 if (setting in tuple_settings and
                         isinstance(setting_value, six.string_types)):
                     raise ImproperlyConfigured("The %s setting must be a tuple. "
                             "Please fix your settings." % setting)
-
                 setattr(self, setting, setting_value)
+                self._explicit_settings.add(setting)
 
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
@@ -160,6 +125,9 @@ class Settings(BaseSettings):
             # we don't do this unconditionally (breaks Windows).
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
+
+    def is_overridden(self, setting):
+        return setting in self._explicit_settings
 
 
 class UserSettingsHolder(BaseSettings):
@@ -185,13 +153,20 @@ class UserSettingsHolder(BaseSettings):
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        return super(UserSettingsHolder, self).__setattr__(name, value)
+        super(UserSettingsHolder, self).__setattr__(name, value)
 
     def __delattr__(self, name):
         self._deleted.add(name)
-        return super(UserSettingsHolder, self).__delattr__(name)
+        if hasattr(self, name):
+            super(UserSettingsHolder, self).__delattr__(name)
 
     def __dir__(self):
         return list(self.__dict__) + dir(self.default_settings)
+
+    def is_overridden(self, setting):
+        deleted = (setting in self._deleted)
+        set_locally = (setting in self.__dict__)
+        set_on_default = getattr(self.default_settings, 'is_overridden', lambda s: False)(setting)
+        return (deleted or set_locally or set_on_default)
 
 settings = LazySettings()

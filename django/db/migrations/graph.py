@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.utils.datastructures import OrderedSet
 from django.db.migrations.state import ProjectState
 
@@ -63,14 +65,14 @@ class MigrationGraph(object):
             raise ValueError("Node %r not a valid node" % (node, ))
         return self.dfs(node, lambda x: self.dependents.get(x, set()))
 
-    def root_nodes(self):
+    def root_nodes(self, app=None):
         """
         Returns all root nodes - that is, nodes with no dependencies inside
         their app. These are the starting point for an app.
         """
         roots = set()
         for node in self.nodes:
-            if not any(key[0] == node[0] for key in self.dependencies.get(node, set())):
+            if not any(key[0] == node[0] for key in self.dependencies.get(node, set())) and (not app or app == node[0]):
                 roots.add(node)
         return roots
 
@@ -93,6 +95,7 @@ class MigrationGraph(object):
         Dynamic programming based depth first search, for finding dependencies.
         """
         cache = {}
+
         def _dfs(start, get_children, path):
             # If we already computed this, use that (dynamic programming)
             if (start, get_children) in cache:
@@ -120,7 +123,7 @@ class MigrationGraph(object):
     def __str__(self):
         return "Graph: %s nodes, %s edges" % (len(self.nodes), sum(len(x) for x in self.dependencies.values()))
 
-    def project_state(self, nodes=None, at_end=True):
+    def make_state(self, nodes=None, at_end=True, real_apps=None):
         """
         Given a migration node or nodes, returns a complete ProjectState for it.
         If at_end is False, returns the state before the migration has run.
@@ -139,10 +142,13 @@ class MigrationGraph(object):
                     if not at_end and migration in nodes:
                         continue
                     plan.append(migration)
-        project_state = ProjectState()
+        project_state = ProjectState(real_apps=real_apps)
         for node in plan:
             project_state = self.nodes[node].mutate_state(project_state)
         return project_state
+
+    def __contains__(self, node):
+        return node in self.nodes
 
 
 class CircularDependencyError(Exception):

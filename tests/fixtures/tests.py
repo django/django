@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import os
 import warnings
 
 from django.contrib.sites.models import Site
@@ -37,19 +38,25 @@ class SubclassTestCaseFixtureLoadingTests(TestCaseFixtureLoadingTests):
 
 class DumpDataAssertMixin(object):
 
-    def _dumpdata_assert(self, args, output, format='json',
+    def _dumpdata_assert(self, args, output, format='json', filename=None,
                          natural_foreign_keys=False, natural_primary_keys=False,
                          use_base_manager=False, exclude_list=[], primary_keys=''):
         new_io = six.StringIO()
         management.call_command('dumpdata', *args, **{'format': format,
                                                       'stdout': new_io,
                                                       'stderr': new_io,
+                                                      'output': filename,
                                                       'use_natural_foreign_keys': natural_foreign_keys,
                                                       'use_natural_primary_keys': natural_primary_keys,
                                                       'use_base_manager': use_base_manager,
                                                       'exclude': exclude_list,
                                                       'primary_keys': primary_keys})
-        command_output = new_io.getvalue().strip()
+        if filename:
+            with open(filename, "r") as f:
+                command_output = f.read()
+            os.remove(filename)
+        else:
+            command_output = new_io.getvalue().strip()
         if format == "json":
             self.assertJSONEqual(command_output, output)
         elif format == "xml":
@@ -92,6 +99,10 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
         # Specify a dump that specifies Article both explicitly and implicitly
         self._dumpdata_assert(['fixtures.Article', 'fixtures'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}, {"pk": 10, "model": "fixtures.book", "fields": {"name": "Achieving self-awareness of Python programs", "authors": []}}]')
+
+        # Specify a dump that specifies Article both explicitly and implicitly,
+        # but lists the app first (#22025).
+        self._dumpdata_assert(['fixtures', 'fixtures.Article'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}, {"pk": 10, "model": "fixtures.book", "fields": {"name": "Achieving self-awareness of Python programs", "authors": []}}]')
 
         # Same again, but specify in the reverse order
         self._dumpdata_assert(['fixtures'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}, {"pk": 10, "model": "fixtures.book", "fields": {"name": "Achieving self-awareness of Python programs", "authors": []}}]')
@@ -278,6 +289,11 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 primary_keys='2,3'
             )
 
+    def test_dumpdata_with_file_output(self):
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
+        self._dumpdata_assert(['fixtures'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}, {"pk": 10, "model": "fixtures.book", "fields": {"name": "Achieving self-awareness of Python programs", "authors": []}}]',
+                filename='dumpdata.json')
+
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
         management.call_command('loaddata', 'fixture4.json', verbosity=0)
@@ -300,7 +316,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         ])
 
     def test_ambiguous_compressed_fixture(self):
-        # The name "fixture5" is ambigous, so loading it will raise an error
+        # The name "fixture5" is ambiguous, so loading it will raise an error
         with self.assertRaises(management.CommandError) as cm:
             management.call_command('loaddata', 'fixture5', verbosity=0)
             self.assertIn("Multiple fixtures named 'fixture5'", cm.exception.args[0])
@@ -329,6 +345,20 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             management.call_command('loaddata', 'invalid.json', verbosity=0)
             self.assertIn("Could not load fixtures.Article(pk=1):", cm.exception.args[0])
 
+    def test_loaddata_app_option(self):
+        """
+        Verifies that the --app option works.
+        """
+        with warnings.catch_warnings():
+            # Ignore: No fixture named ...
+            warnings.filterwarnings("ignore", category=UserWarning)
+            management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="someotherapp")
+        self.assertQuerysetEqual(Article.objects.all(), [])
+        management.call_command('loaddata', 'db_fixture_1', verbosity=0, app_label="fixtures")
+        self.assertQuerysetEqual(Article.objects.all(), [
+            '<Article: Who needs more than one database?>',
+        ])
+
     def test_loading_using(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier explicitly
         management.call_command('loaddata', 'db_fixture_1', verbosity=0, using='default')
@@ -340,10 +370,9 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_unmatched_identifier_loading(self):
         # Try to load db fixture 3. This won't load because the database identifier doesn't match
-        with warnings.catch_warnings(record=True):
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=UserWarning)
             management.call_command('loaddata', 'db_fixture_3', verbosity=0)
-
-        with warnings.catch_warnings(record=True):
             management.call_command('loaddata', 'db_fixture_3', verbosity=0, using='default')
         self.assertQuerysetEqual(Article.objects.all(), [])
 

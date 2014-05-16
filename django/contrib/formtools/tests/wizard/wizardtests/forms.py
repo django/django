@@ -15,20 +15,24 @@ from django.contrib.formtools.wizard.views import WizardView
 temp_storage_location = tempfile.mkdtemp(dir=os.environ.get('DJANGO_TEST_TEMP_DIR'))
 temp_storage = FileSystemStorage(location=temp_storage_location)
 
+
 class Page1(forms.Form):
     name = forms.CharField(max_length=100)
     user = forms.ModelChoiceField(queryset=User.objects.all())
     thirsty = forms.NullBooleanField()
+
 
 class Page2(forms.Form):
     address1 = forms.CharField(max_length=100)
     address2 = forms.CharField(max_length=100)
     file1 = forms.FileField()
 
+
 class Page3(forms.Form):
     random_crap = forms.CharField(max_length=100)
 
 Page4 = formset_factory(Page3, extra=2)
+
 
 class ContactWizard(WizardView):
     file_storage = temp_storage
@@ -51,6 +55,7 @@ class ContactWizard(WizardView):
             context.update({'another_var': True})
         return context
 
+
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
@@ -58,8 +63,10 @@ class UserForm(forms.ModelForm):
 
 UserFormSet = modelformset_factory(User, form=UserForm)
 
+
 class SessionContactWizard(ContactWizard):
     storage_name = 'django.contrib.formtools.wizard.storage.session.SessionStorage'
+
 
 class CookieContactWizard(ContactWizard):
     storage_name = 'django.contrib.formtools.wizard.storage.cookie.CookieStorage'

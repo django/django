@@ -1,7 +1,34 @@
 """
-Useful auxilliary data structures for query construction. Not useful outside
+Useful auxiliary data structures for query construction. Not useful outside
 the SQL domain.
 """
+
+
+class Col(object):
+    def __init__(self, alias, target, source):
+        self.alias, self.target, self.source = alias, target, source
+
+    def as_sql(self, qn, connection):
+        return "%s.%s" % (qn(self.alias), qn(self.target.column)), []
+
+    @property
+    def output_type(self):
+        return self.source
+
+    def relabeled_clone(self, relabels):
+        return self.__class__(relabels.get(self.alias, self.alias), self.target, self.source)
+
+    def get_group_by_cols(self):
+        return [(self.alias, self.target.column)]
+
+    def get_lookup(self, name):
+        return self.output_type.get_lookup(name)
+
+    def get_transform(self, name):
+        return self.output_type.get_transform(name)
+
+    def prepare(self):
+        return self
 
 
 class EmptyResultSet(Exception):

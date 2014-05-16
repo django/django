@@ -2,6 +2,8 @@ from django.db.models.fields import Field
 from django.db.models.sql.expressions import SQLEvaluator
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis import forms
+from django.contrib.gis.db.models.constants import GIS_LOOKUPS
+from django.contrib.gis.db.models.lookups import GISLookup
 from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.utils import six
@@ -10,6 +12,7 @@ from django.utils import six
 # spatial database alias. This cache exists so that the database isn't queried
 # for SRID info each time a distance query is constructed.
 _srid_cache = {}
+
 
 def get_srid_info(srid, connection):
     """
@@ -26,11 +29,11 @@ def get_srid_info(srid, connection):
         # No `spatial_ref_sys` table in spatial backend (e.g., MySQL).
         return None, None, None
 
-    if not connection.alias in _srid_cache:
+    if connection.alias not in _srid_cache:
         # Initialize SRID dictionary for database if it doesn't exist.
         _srid_cache[connection.alias] = {}
 
-    if not srid in _srid_cache[connection.alias]:
+    if srid not in _srid_cache[connection.alias]:
         # Use `SpatialRefSys` model to query for spatial reference info.
         sr = SpatialRefSys.objects.using(connection.alias).get(srid=srid)
         units, units_name = sr.units
@@ -38,6 +41,7 @@ def get_srid_info(srid, connection):
         _srid_cache[connection.alias][srid] = (units, units_name, spheroid)
 
     return _srid_cache[connection.alias][srid]
+
 
 class GeometryField(Field):
     "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -47,7 +51,7 @@ class GeometryField(Field):
     form_class = forms.GeometryField
 
     # Geodetic units.
-    geodetic_units = ('Decimal Degree', 'degree')
+    geodetic_units = ('decimal degree', 'degree')
 
     description = _("The base GIS field -- maps to the OpenGIS Specification Geometry type.")
 
@@ -103,6 +107,19 @@ class GeometryField(Field):
 
         super(GeometryField, self).__init__(**kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(GeometryField, self).deconstruct()
+        # Always include SRID for less fragility; include others if they're
+        # not the default values.
+        kwargs['srid'] = self.srid
+        if self.dim != 2:
+            kwargs['dim'] = self.dim
+        if self.spatial_index is not True:
+            kwargs['spatial_index'] = self.spatial_index
+        if self.geography is not False:
+            kwargs['geography'] = self.geography
+        return name, path, args, kwargs
+
     # The following functions are used to get the units, their name, and
     # the spheroid corresponding to the SRID of the GeometryField.
     def _get_srid_info(self, connection):
@@ -130,7 +147,7 @@ class GeometryField(Field):
         Returns true if this field's SRID corresponds with a coordinate
         system that uses non-projected units (e.g., latitude/longitude).
         """
-        return self.units_name(connection) in self.geodetic_units
+        return self.units_name(connection).lower() in self.geodetic_units
 
     def get_distance(self, value, lookup_type, connection):
         """
@@ -186,7 +203,7 @@ class GeometryField(Field):
         the SRID set for the field.  For example, if the input geometry
         has no SRID, then that of the field will be returned.
         """
-        gsrid = geom.srid # SRID of given geometry.
+        gsrid = geom.srid  # SRID of given geometry.
         if gsrid is None or self.srid == -1 or (gsrid == -1 and self.srid != -1):
             return self.srid
         else:
@@ -203,12 +220,12 @@ class GeometryField(Field):
         return connection.ops.geo_db_type(self)
 
     def formfield(self, **kwargs):
-        defaults = {'form_class' : self.form_class,
-                    'geom_type' : self.geom_type,
-                    'srid' : self.srid,
+        defaults = {'form_class': self.form_class,
+                    'geom_type': self.geom_type,
+                    'srid': self.srid,
                     }
         defaults.update(kwargs)
-        if (self.dim > 2 and not 'widget' in kwargs and
+        if (self.dim > 2 and 'widget' not in kwargs and
                 not getattr(defaults['form_class'].widget, 'supports_3d', False)):
             defaults['widget'] = forms.Textarea
         return super(GeometryField, self).formfield(**defaults)
@@ -269,36 +286,47 @@ class GeometryField(Field):
         """
         return connection.ops.get_geom_placeholder(self, value)
 
+for lookup_name in GIS_LOOKUPS:
+    lookup = type(lookup_name, (GISLookup,), {'lookup_name': lookup_name})
+    GeometryField.register_lookup(lookup)
+
+
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
     geom_type = 'POINT'
     form_class = forms.PointField
     description = _("Point")
 
+
 class LineStringField(GeometryField):
     geom_type = 'LINESTRING'
     form_class = forms.LineStringField
     description = _("Line string")
+
 
 class PolygonField(GeometryField):
     geom_type = 'POLYGON'
     form_class = forms.PolygonField
     description = _("Polygon")
 
+
 class MultiPointField(GeometryField):
     geom_type = 'MULTIPOINT'
     form_class = forms.MultiPointField
     description = _("Multi-point")
+
 
 class MultiLineStringField(GeometryField):
     geom_type = 'MULTILINESTRING'
     form_class = forms.MultiLineStringField
     description = _("Multi-line string")
 
+
 class MultiPolygonField(GeometryField):
     geom_type = 'MULTIPOLYGON'
     form_class = forms.MultiPolygonField
     description = _("Multi polygon")
+
 
 class GeometryCollectionField(GeometryField):
     geom_type = 'GEOMETRYCOLLECTION'

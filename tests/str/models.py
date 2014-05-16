@@ -27,6 +27,7 @@ class Article(models.Model):
         # in ASCII.
         return self.headline
 
+
 @python_2_unicode_compatible
 class InternationalArticle(models.Model):
     headline = models.CharField(max_length=100)

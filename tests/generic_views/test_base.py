@@ -5,10 +5,11 @@ import unittest
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, override_settings
 from django.views.generic import View, TemplateView, RedirectView
 
 from . import views
+
 
 class SimpleView(View):
     """
@@ -76,7 +77,7 @@ class ViewTest(unittest.TestCase):
         Test that a view can't be accidentally instantiated before deployment
         """
         try:
-            view = SimpleView(key='value').as_view()
+            SimpleView(key='value').as_view()
             self.fail('Should not be able to instantiate a view')
         except AttributeError:
             pass
@@ -86,7 +87,7 @@ class ViewTest(unittest.TestCase):
         Test that a view can't be accidentally instantiated before deployment
         """
         try:
-            view = SimpleView.as_view('value')
+            SimpleView.as_view('value')
             self.fail('Should not be able to use non-keyword arguments instantiating a view')
         except TypeError:
             pass
@@ -227,9 +228,18 @@ class ViewTest(unittest.TestCase):
             self.assertNotIn(attribute, dir(bare_view))
             self.assertIn(attribute, dir(view))
 
+    def test_direct_instantiation(self):
+        """
+        It should be possible to use the view by directly instantiating it
+        without going through .as_view() (#21564).
+        """
+        view = PostOnlyView()
+        response = view.dispatch(self.rf.head('/'))
+        self.assertEqual(response.status_code, 405)
 
+
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class TemplateViewTest(TestCase):
-    urls = 'generic_views.urls'
 
     rf = RequestFactory()
 
@@ -317,8 +327,8 @@ class TemplateViewTest(TestCase):
         self.assertEqual(response['Content-Type'], 'text/plain')
 
 
+@override_settings(ROOT_URLCONF='generic_views.urls')
 class RedirectViewTest(TestCase):
-    urls = 'generic_views.urls'
 
     rf = RequestFactory()
 
@@ -419,6 +429,15 @@ class RedirectViewTest(TestCase):
         # we can't use self.rf.get because it always sets QUERY_STRING
         response = RedirectView.as_view(url='/bar/')(self.rf.request(PATH_INFO='/foo/'))
         self.assertEqual(response.status_code, 301)
+
+    def test_direct_instantiation(self):
+        """
+        It should be possible to use the view without going through .as_view()
+        (#21564).
+        """
+        view = RedirectView()
+        response = view.dispatch(self.rf.head('/foo/'))
+        self.assertEqual(response.status_code, 410)
 
 
 class GetContextDataTest(unittest.TestCase):

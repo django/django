@@ -157,7 +157,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # Skip indexes across multiple fields
             if len(info) != 1:
                 continue
-            name = info[0][2] # seqno, cid, name
+            name = info[0][2]  # seqno, cid, name
             indexes[name] = {'primary_key': indexes.get(name, {}).get("primary_key", False),
                              'unique': unique}
         return indexes

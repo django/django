@@ -117,7 +117,7 @@ overriding
 :meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
 as discussed above. It actually provides a fairly sophisticated set of options,
 but the main one that most people are going to use is
-``<app_label>/<object_name>_detail.html``. The ``_detail`` part can be changed
+``<app_label>/<model_name>_detail.html``. The ``_detail`` part can be changed
 by setting
 :attr:`~django.views.generic.detail.SingleObjectTemplateResponseMixin.template_name_suffix`
 on a subclass to something else. (For instance, the :doc:`generic edit
@@ -163,7 +163,7 @@ as with :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
 above, this overrides ``get_template_names()`` to provide :meth:`a range of
 options <django.views.generic.list.MultipleObjectTemplateResponseMixin>`,
 with the most commonly-used being
-``<app_label>/<object_name>_list.html``, with the ``_list`` part again
+``<app_label>/<model_name>_list.html``, with the ``_list`` part again
 being taken from the
 :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
 attribute. (The date based generic views use suffixes such as ``_archive``,
@@ -219,7 +219,7 @@ processing to work on a particular object, identified from the URL,
 we'll want the functionality provided by
 :class:`~django.views.generic.detail.SingleObjectMixin`.
 
-We'll demonstrate this with the publisher modelling we used in the
+We'll demonstrate this with the ``Author`` model we used in the
 :doc:`generic class-based views introduction<generic-display>`.
 
 .. code-block:: python
@@ -256,13 +256,13 @@ mixin.
 We can hook this into our URLs easily enough::
 
     # urls.py
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from books.views import RecordInterest
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         #...
-        url(r'^author/(?P<pk>\d+)/interest/$', RecordInterest.as_view(), name='author-interest'),
-    )
+        url(r'^author/(?P<pk>[0-9]+)/interest/$', RecordInterest.as_view(), name='author-interest'),
+    ]
 
 Note the ``pk`` named group, which
 :meth:`~django.views.generic.detail.SingleObjectMixin.get_object` uses
@@ -303,7 +303,7 @@ object. In order to do this, we need to have two different querysets:
     Since both :class:`~django.views.generic.detail.SingleObjectMixin` and
     :class:`ListView` will
     put things in the context data under the value of
-    ``context_object_name`` if it's set, we'll instead explictly
+    ``context_object_name`` if it's set, we'll instead explicitly
     ensure the ``Publisher`` is in the context data. :class:`ListView`
     will add in the suitable ``page_obj`` and ``paginator`` for us
     providing we remember to call ``super()``.

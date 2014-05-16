@@ -13,25 +13,31 @@ from django.utils.encoding import python_2_unicode_compatible
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
+
     class Meta:
         ordering = ('name', )
+
 
 @python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
     author = models.ForeignKey(Author, blank=True, null=True)
+
     class Meta:
         ordering = ('-pub_date', 'headline')
 
     def __str__(self):
         return self.headline
 
+
 class Tag(models.Model):
     articles = models.ManyToManyField(Article)
     name = models.CharField(max_length=100)
+
     class Meta:
         ordering = ('name', )
+
 
 @python_2_unicode_compatible
 class Season(models.Model):
@@ -40,6 +46,7 @@ class Season(models.Model):
 
     def __str__(self):
         return six.text_type(self.year)
+
 
 @python_2_unicode_compatible
 class Game(models.Model):
@@ -50,6 +57,7 @@ class Game(models.Model):
     def __str__(self):
         return "%s at %s" % (self.away, self.home)
 
+
 @python_2_unicode_compatible
 class Player(models.Model):
     name = models.CharField(max_length=100)
@@ -57,3 +65,15 @@ class Player(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# To test __search lookup a fulltext index is needed. This
+# is only available when using MySQL 5.6, or when using MyISAM
+# tables. As 5.6 isn't common yet, lets use MyISAM table for
+# testing. The table is manually created by the test method.
+class MyISAMArticle(models.Model):
+    headline = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'myisam_article'
+        managed = False

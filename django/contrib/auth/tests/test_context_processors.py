@@ -7,8 +7,7 @@ from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.context_processors import PermWrapper, PermLookupDict
 from django.db.models import Q
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils._os import upath
 
 
@@ -67,6 +66,7 @@ class PermWrapperTests(TestCase):
     TEMPLATE_DIRS=(
         os.path.join(os.path.dirname(upath(__file__)), 'templates'),
     ),
+    ROOT_URLCONF='django.contrib.auth.tests.urls',
     USE_TZ=False,                           # required for loading the fixture
     PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
 )
@@ -74,7 +74,6 @@ class AuthContextProcessorTests(TestCase):
     """
     Tests for the ``django.contrib.auth.context_processors.auth`` processor
     """
-    urls = 'django.contrib.auth.tests.urls'
     fixtures = ['context-processors-users.xml']
 
     @override_settings(

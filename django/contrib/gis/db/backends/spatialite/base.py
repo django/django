@@ -9,7 +9,9 @@ from django.contrib.gis.db.backends.spatialite.client import SpatiaLiteClient
 from django.contrib.gis.db.backends.spatialite.creation import SpatiaLiteCreation
 from django.contrib.gis.db.backends.spatialite.introspection import SpatiaLiteIntrospection
 from django.contrib.gis.db.backends.spatialite.operations import SpatiaLiteOperations
+from django.contrib.gis.db.backends.spatialite.schema import SpatialiteSchemaEditor
 from django.utils import six
+
 
 class DatabaseWrapper(SQLiteDatabaseWrapper):
     def __init__(self, *args, **kwargs):
@@ -35,6 +37,10 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         self.client = SpatiaLiteClient(self)
         self.creation = SpatiaLiteCreation(self)
         self.introspection = SpatiaLiteIntrospection(self)
+
+    def schema_editor(self, *args, **kwargs):
+        "Returns a new instance of this backend's SchemaEditor"
+        return SpatialiteSchemaEditor(self, *args, **kwargs)
 
     def get_new_connection(self, conn_params):
         conn = super(DatabaseWrapper, self).get_new_connection(conn_params)

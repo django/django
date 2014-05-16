@@ -19,8 +19,6 @@ General notes
 Persistent connections
 ----------------------
 
-.. versionadded:: 1.6
-
 Persistent connections avoid the overhead of re-establishing a connection to
 the database in each request. They're controlled by the
 :setting:`CONN_MAX_AGE` parameter which defines the maximum lifetime of a
@@ -114,33 +112,10 @@ will do some additional queries to set these parameters.
 
 .. _ALTER ROLE: http://www.postgresql.org/docs/current/interactive/sql-alterrole.html
 
-.. _postgresql-autocommit-mode:
-
-Autocommit mode
----------------
-
-.. versionchanged:: 1.6
-
-In previous versions of Django, database-level autocommit could be enabled by
-setting the ``autocommit`` key in the :setting:`OPTIONS` part of your database
-configuration in :setting:`DATABASES`::
-
-    DATABASES = {
-        # ...
-        'OPTIONS': {
-            'autocommit': True,
-        },
-    }
-
-Since Django 1.6, autocommit is turned on by default. This configuration is
-ignored and can be safely removed.
-
 .. _database-isolation-level:
 
 Isolation level
 ---------------
-
-.. versionadded:: 1.6
 
 Like PostgreSQL itself, Django defaults to the ``READ COMMITTED`` `isolation
 level`_. If you need a higher isolation level such as ``REPEATABLE READ`` or
@@ -209,12 +184,12 @@ in the server configuration.
 
 Until MySQL 5.5.4, the default engine was MyISAM_ [#]_. The main drawbacks of
 MyISAM are that it doesn't support transactions or enforce foreign-key
-constraints. On the plus side, it's currently the only engine that supports
-full-text indexing and searching.
+constraints. On the plus side, it was the only engine that supported full-text
+indexing and searching until MySQL 5.6.4.
 
 Since MySQL 5.5.5, the default storage engine is InnoDB_. This engine is fully
 transactional and supports foreign key references. It's probably the best
-choice at this point. However, note that the the InnoDB autoincrement counter
+choice at this point. However, note that the InnoDB autoincrement counter
 is lost on a MySQL restart because it does not remember the
 ``AUTO_INCREMENT`` value, instead recreating it as "max(id)+1". This may
 result in an inadvertent reuse of :class:`~django.db.models.AutoField` values.
@@ -237,11 +212,38 @@ running ``migrate``::
    had reports that the Windows Community Server installer sets up InnoDB as
    the default storage engine, for example.
 
-MySQLdb
--------
+.. _mysql-db-api-drivers:
 
-`MySQLdb`_ is the Python interface to MySQL. Version 1.2.1p2 or later is
-required for full MySQL support in Django.
+MySQL DB API Drivers
+--------------------
+
+The Python Database API is described in `PEP 249`_. MySQL has two prominent
+drivers that implement this API:
+
+.. _PEP 249: http://www.python.org/dev/peps/pep-0249/
+
+- `MySQLdb`_ is a native driver that has been developed and supported for over
+  a decade by Andy Dustman.
+- `MySQL Connector/Python`_ is a pure Python driver from Oracle that does not
+  require the MySQL client library or any Python modules outside the standard
+  library.
+
+.. _MySQLdb: https://pypi.python.org/pypi/MySQL-python/1.2.4
+.. _MySQL Connector/Python: http://dev.mysql.com/downloads/connector/python
+
+Both drivers are thread-safe and both provide connection pooling. The major
+difference is that MySQL Connector/Python supports Python 3.
+
+In addition to a DB API driver, Django needs an adapter to access the database
+drivers from its ORM. Django provides an adapter for MySQLdb while MySQL
+Connector/Python includes `its own`_.
+
+.. _its own: http://dev.mysql.com/doc/refman/5.6/en/connector-python-django-backend.html
+
+MySQLdb
+~~~~~~~
+
+Django requires MySQLdb version 1.2.1p2 or later.
 
 .. note::
     If you see ``ImportError: cannot import name ImmutableSet`` when trying to
@@ -253,25 +255,41 @@ required for full MySQL support in Django.
 
 .. note::
     There are known issues with the way MySQLdb converts date strings into
-    datetime objects. Specifically, date strings with value 0000-00-00 are valid for
-    MySQL but will be converted into None by MySQLdb.
+    datetime objects. Specifically, date strings with value 0000-00-00 are
+    valid for MySQL but will be converted into None by MySQLdb.
 
     This means you should be careful while using loaddata/dumpdata with rows
     that may have 0000-00-00 values, as they will be converted to None.
 
-.. _MySQLdb: http://sourceforge.net/projects/mysql-python
+.. note::
+    At the time of writing, the latest release of MySQLdb (1.2.4) doesn't
+    support Python 3. In order to use MySQLdb under Python 3, you'll have to
+    install an unofficial fork, such as `MySQL-for-Python-3`_.
 
-Python 3
---------
-
-At the time of writing, the latest release of MySQLdb (1.2.4) doesn't support
-Python 3. In order to use MySQL under Python 3, you'll have to install an
-unofficial fork, such as `MySQL-for-Python-3`_.
-
-This port is still in alpha. In particular, it doesn't support binary data,
-making it impossible to use :class:`django.db.models.BinaryField`.
+    This port is still in alpha. In particular, it doesn't support binary
+    data, making it impossible to use :class:`django.db.models.BinaryField`.
 
 .. _MySQL-for-Python-3: https://github.com/clelland/MySQL-for-Python-3
+
+MySQL Connector/Python
+~~~~~~~~~~~~~~~~~~~~~~
+
+MySQL Connector/Python is available through two `release branches`_: Generally
+Available (GA, currently 1.0.x) and Development (Dev, currently 1.1.x beta).
+The Django adapter is currently only available in the Dev branch.
+
+.. _release branches: http://dev.mysql.com/downloads/connector/python/
+
+.. _mysql-time-zone-definitions:
+
+Time zone definitions
+---------------------
+
+If you plan on using Django's :doc:`timezone support </topics/i18n/timezones>`,
+use `mysql_tzinfo_to_sql`_ to load time zone tables into the MySQL database.
+This needs to be done just once for your MySQL server, not per database.
+
+.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.5/en/mysql-tzinfo-to-sql.html
 
 Creating your database
 ----------------------
@@ -299,7 +317,7 @@ the model definition.
 .. _documented thoroughly: http://dev.mysql.com/doc/refman/5.0/en/charset.html
 
 By default, with a UTF-8 database, MySQL will use the
-``utf8_general_ci_swedish`` collation. This results in all string equality
+``utf8_general_ci`` collation. This results in all string equality
 comparisons being done in a *case-insensitive* manner. That is, ``"Fred"`` and
 ``"freD"`` are considered equal at the database level. If you have a unique
 constraint on a field, it would be illegal to try to insert both ``"aa"`` and
@@ -336,7 +354,7 @@ bytestrings (which shouldn't be too difficult) as described above is the
 recommended solution.
 
 Should you decide to use ``utf8_bin`` collation for some of your tables with
-MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_collation_ci_swedish``
+MySQLdb 1.2.1p2 or 1.2.2, you should still use ``utf8_general_ci``
 (the default) collation for the ``django.contrib.sessions.models.Session``
 table (usually called ``django_session``) and the
 ``django.contrib.admin.models.LogEntry`` table (usually called
@@ -344,6 +362,15 @@ table (usually called ``django_session``) and the
 :class:`~django.db.models.TextField` internally.
 
 .. _fixed in MySQLdb 1.2.2: http://sourceforge.net/tracker/index.php?func=detail&aid=1495765&group_id=22307&atid=374932
+
+Please note that according to `MySQL Unicode Character Sets`_, comparisons for
+the ``utf8_general_ci`` collation are faster, but slightly less correct, than
+comparisons for ``utf8_unicode_ci``. If this is acceptable for your application,
+you should use ``utf8_general_ci`` because it is faster. If this is not acceptable
+(for example, if you require German dictionary order), use ``utf8_unicode_ci``
+because it is more accurate.
+
+.. _MySQL Unicode Character Sets: http://dev.mysql.com/doc/refman/5.7/en/charset-unicode-sets.html
 
 Connecting to the database
 --------------------------
@@ -480,6 +507,22 @@ MySQL does not support the ``NOWAIT`` option to the ``SELECT ... FOR UPDATE``
 statement. If ``select_for_update()`` is used with ``nowait=True`` then a
 ``DatabaseError`` will be raised.
 
+Automatic typecasting can cause unexpected results
+--------------------------------------------------
+
+When performing a query on a string type, but with an integer value, MySQL will
+coerce the types of all values in the table to an integer before performing the
+comparison. If your table contains the values ``'abc'``, ``'def'`` and you
+query for ``WHERE mycolumn=0``, both rows will match. Similarly, ``WHERE mycolumn=1``
+will match the value ``'abc1'``. Therefore, string type fields included in Django
+will always cast the value to a string before using it in a query.
+
+If you implement custom model fields that inherit from :class:`~django.db.models.Field`
+directly, are overriding :meth:`~django.db.models.Field.get_prep_value`, or use
+:meth:`extra() <django.db.models.query.QuerySet.extra>` or
+:meth:`raw() <django.db.models.Manager.raw>`, you should ensure that you
+perform the appropriate typecasting.
+
 .. _sqlite-notes:
 
 SQLite notes
@@ -511,7 +554,7 @@ are passed into the query. So the :lookup:`iexact` filter will behave exactly
 the same as the :lookup:`exact` filter in these cases.
 
 Some possible workarounds for this are `documented at sqlite.org`_, but they
-aren't utilised by the default SQLite backend in Django, as incorporating them
+aren't utilized by the default SQLite backend in Django, as incorporating them
 would be fairly difficult to do robustly. Thus, Django exposes the default
 SQLite behavior and you should be aware of this when doing case-insensitive or
 substring filtering.
@@ -560,7 +603,7 @@ Version 3.6.2
 --------------
 
 SQLite version 3.6.2 (released August 30, 2008) introduced a bug into ``SELECT
-DISTINCT`` handling that is triggered by, amongst other things, Django's
+DISTINCT`` handling that is triggered by, among other things, Django's
 ``DateQuerySet`` (returned by the ``dates()`` method on a queryset).
 
 You should avoid using this version of SQLite with Django. Either upgrade to
@@ -572,9 +615,8 @@ version of SQLite.
 Using newer versions of the SQLite DB-API 2.0 driver
 ----------------------------------------------------
 
-For versions of Python 2.5 or newer that include ``sqlite3`` in the standard
-library Django will now use a ``pysqlite2`` interface in preference to
-``sqlite3`` if it finds one is available.
+Django will use a ``pysqlite2`` module in preference to ``sqlite3`` as shipped
+with the Python standard library if it finds one is available.
 
 This provides the ability to upgrade both the DB-API 2.0 interface or SQLite 3
 itself to versions newer than the ones included with your particular Python
@@ -726,7 +768,7 @@ Threaded option
 ----------------
 
 If you plan to run Django in a multithreaded environment (e.g. Apache using the
-the default MPM module on any modern operating system), then you **must** set
+default MPM module on any modern operating system), then you **must** set
 the ``threaded`` option of your Oracle database configuration to True::
 
             'OPTIONS': {
@@ -758,6 +800,22 @@ Naming issues
 Oracle imposes a name length limit of 30 characters. To accommodate this, the
 backend truncates database identifiers to fit, replacing the final four
 characters of the truncated name with a repeatable MD5 hash value.
+Additionally, the backend turns database identifiers to all-uppercase.
+
+To prevent these transformations (this is usually required only when dealing
+with legacy databases or accessing tables which belong to other users), use
+a quoted name as the value for ``db_table``::
+
+    class LegacyModel(models.Model):
+        class Meta:
+       	    db_table = '"name_left_in_lowercase"'
+
+    class ForeignModel(models.Model):
+        class Meta:
+       	    db_table = '"OTHER_USER"."NAME_ONLY_SEEMS_OVER_30"'
+
+Quoted names can also be used with Django's other supported database
+backends; except for Oracle, however, the quotes have no effect.
 
 When running ``migrate``, an ``ORA-06552`` error may be encountered if
 certain Oracle keywords are used as the name of a model field or the
@@ -803,9 +861,9 @@ Using a 3rd-party database backend
 In addition to the officially supported databases, there are backends provided
 by 3rd parties that allow you to use other databases with Django:
 
-* `Sybase SQL Anywhere`_
+* `SAP SQL Anywhere`_
 * `IBM DB2`_
-* `Microsoft SQL Server 2005`_
+* `Microsoft SQL Server`_
 * Firebird_
 * ODBC_
 * ADSDB_
@@ -815,9 +873,9 @@ vary considerably. Queries regarding the specific capabilities of these
 unofficial backends, along with any support queries, should be directed to
 the support channels provided by each 3rd party project.
 
-.. _Sybase SQL Anywhere: http://code.google.com/p/sqlany-django/
+.. _SAP SQL Anywhere: https://github.com/sqlanywhere/sqlany-django
 .. _IBM DB2: http://code.google.com/p/ibm-db/
-.. _Microsoft SQL Server 2005: http://code.google.com/p/django-mssql/
-.. _Firebird: http://code.google.com/p/django-firebird/
-.. _ODBC: https://github.com/aurorasoftware/django-pyodbc/
+.. _Microsoft SQL Server: http://django-mssql.readthedocs.org/en/latest/
+.. _Firebird: https://github.com/maxirobaina/django-firebird
+.. _ODBC: https://github.com/lionheart/django-pyodbc/
 .. _ADSDB: http://code.google.com/p/adsdb-django/

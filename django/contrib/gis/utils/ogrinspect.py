@@ -9,6 +9,7 @@ from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.field import OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime
 from django.utils import six
 
+
 def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
     """
     Given a DataSource, generates a dictionary that may be used
@@ -47,6 +48,7 @@ def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
         prefix = ''
     _mapping[geom_name] = prefix + str(gtype).upper()
     return _mapping
+
 
 def ogrinspect(*args, **kwargs):
     """
@@ -117,6 +119,7 @@ def ogrinspect(*args, **kwargs):
     Note: This routine calls the _ogrinspect() helper to do the heavy lifting.
     """
     return '\n'.join(s for s in _ogrinspect(*args, **kwargs))
+
 
 def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=None,
                 multi_geom=False, name_field=None, imports=True,

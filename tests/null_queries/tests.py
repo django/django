@@ -12,7 +12,8 @@ class NullQueriesTests(TestCase):
         """
         Regression test for the use of None as a query value.
 
-        None is interpreted as an SQL NULL, but only in __exact queries.
+        None is interpreted as an SQL NULL, but only in __exact and __iexact
+        queries.
         Set up some initial polls and choices
         """
         p1 = Poll(question='Why?')
@@ -26,23 +27,23 @@ class NullQueriesTests(TestCase):
         # but every 'id' field has a value).
         self.assertQuerysetEqual(Choice.objects.filter(choice__exact=None), [])
 
+        # The same behavior for iexact query.
+        self.assertQuerysetEqual(Choice.objects.filter(choice__iexact=None), [])
+
         # Excluding the previous result returns everything.
         self.assertQuerysetEqual(
-                Choice.objects.exclude(choice=None).order_by('id'),
-                [
-                    '<Choice: Choice: Because. in poll Q: Why? >',
-                    '<Choice: Choice: Why Not? in poll Q: Why? >'
-                ]
+            Choice.objects.exclude(choice=None).order_by('id'),
+            [
+                '<Choice: Choice: Because. in poll Q: Why? >',
+                '<Choice: Choice: Why Not? in poll Q: Why? >'
+            ]
         )
 
         # Valid query, but fails because foo isn't a keyword
         self.assertRaises(FieldError, Choice.objects.filter, foo__exact=None)
 
-        # Can't use None on anything other than __exact
+        # Can't use None on anything other than __exact and __iexact
         self.assertRaises(ValueError, Choice.objects.filter, id__gt=None)
-
-        # Can't use None on anything other than __exact
-        self.assertRaises(ValueError, Choice.objects.filter, foo__gt=None)
 
         # Related managers use __exact=None implicitly if the object hasn't been saved.
         p2 = Poll(question="How?")
@@ -63,7 +64,7 @@ class NullQueriesTests(TestCase):
             ['<OuterA: OuterA object>']
         )
 
-        inner_obj = Inner.objects.create(first=obj)
+        Inner.objects.create(first=obj)
         self.assertQuerysetEqual(
             Inner.objects.filter(first__inner__third=None),
             ['<Inner: Inner object>']
@@ -71,7 +72,7 @@ class NullQueriesTests(TestCase):
 
         # Ticket #13815: check if <reverse>_isnull=False does not produce
         # faulty empty lists
-        objB = OuterB.objects.create(data="reverse")
+        OuterB.objects.create(data="reverse")
         self.assertQuerysetEqual(
             OuterB.objects.filter(inner__isnull=False),
             []

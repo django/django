@@ -2,8 +2,6 @@
 Authentication using ``REMOTE_USER``
 ====================================
 
-.. currentmodule:: django.contrib.auth.backends
-
 This document describes how to make use of external authentication sources
 (where the Web server sets the ``REMOTE_USER`` environment variable) in your
 Django applications.  This type of authentication solution is typically seen on
@@ -22,12 +20,11 @@ When the Web server takes care of authentication it typically sets the
 Django, ``REMOTE_USER`` is made available in the :attr:`request.META
 <django.http.HttpRequest.META>` attribute.  Django can be configured to make
 use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware`` and
-``RemoteUserBackend`` classes found in :mod:`django.contrib.auth`.
+:class:`~django.contrib.auth.backends.RemoteUserBackend` classes found in
+:mod:`django.contrib.auth`.
 
 Configuration
 =============
-
-.. class:: django.contrib.auth.middleware.RemoteUserMiddleware
 
 First, you must add the
 :class:`django.contrib.auth.middleware.RemoteUserMiddleware` to the
@@ -35,14 +32,15 @@ First, you must add the
 :class:`django.contrib.auth.middleware.AuthenticationMiddleware`::
 
     MIDDLEWARE_CLASSES = (
-        ...
+        '...',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.auth.middleware.RemoteUserMiddleware',
-        ...
-        )
+        '...',
+    )
 
 Next, you must replace the :class:`~django.contrib.auth.backends.ModelBackend`
-with ``RemoteUserBackend`` in the :setting:`AUTHENTICATION_BACKENDS` setting::
+with :class:`~django.contrib.auth.backends.RemoteUserBackend` in the
+:setting:`AUTHENTICATION_BACKENDS` setting::
 
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.RemoteUserBackend',
@@ -50,7 +48,7 @@ with ``RemoteUserBackend`` in the :setting:`AUTHENTICATION_BACKENDS` setting::
 
 With this setup, ``RemoteUserMiddleware`` will detect the username in
 ``request.META['REMOTE_USER']`` and will authenticate and auto-login that user
-using the ``RemoteUserBackend``.
+using the :class:`~django.contrib.auth.backends.RemoteUserBackend`.
 
 .. note::
    Since the ``RemoteUserBackend`` inherits from ``ModelBackend``, you will
@@ -66,48 +64,6 @@ If your authentication mechanism uses a custom HTTP header and not
     class CustomHeaderMiddleware(RemoteUserMiddleware):
         header = 'HTTP_AUTHUSER'
 
-
-``RemoteUserBackend``
-=====================
-
-.. class:: django.contrib.auth.backends.RemoteUserBackend
-
 If you need more control, you can create your own authentication backend
-that inherits from ``RemoteUserBackend`` and overrides certain parts:
-
-Attributes
-~~~~~~~~~~
-
-.. attribute:: RemoteUserBackend.create_unknown_user
-
-    ``True`` or ``False``.  Determines whether or not a
-    :class:`~django.contrib.auth.models.User` object is created if not already
-    in the database.  Defaults to ``True``.
-
-Methods
-~~~~~~~
-
-.. method:: RemoteUserBackend.authenticate(remote_user)
-
-    The username passed as ``remote_user`` is considered trusted. This method
-    simply returns the ``User`` object with the given username, creating a new
-    ``User`` object if :attr:`~RemoteUserBackend.create_unknown_user` is
-    ``True``.
-
-    Returns ``None`` if :attr:`~RemoteUserBackend.create_unknown_user` is
-    ``False`` and a ``User`` object with the given username is not found in the
-    database.
-
-.. method:: RemoteUserBackend.clean_username(username)
-
-   Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
-   information) prior to using it to get or create a
-   :class:`~django.contrib.auth.models.User` object.  Returns the cleaned
-   username.
-
-.. method:: RemoteUserBackend.configure_user(user)
-
-   Configures a newly created user.  This method is called immediately after a
-   new user is created, and can be used to perform custom setup actions, such
-   as setting the user's groups based on attributes in an LDAP directory.
-   Returns the user object.
+that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and
+override one or more of its attributes and methods.

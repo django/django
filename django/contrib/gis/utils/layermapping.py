@@ -24,48 +24,53 @@ from django.utils.encoding import force_text
 class LayerMapError(Exception):
     pass
 
+
 class InvalidString(LayerMapError):
     pass
+
 
 class InvalidDecimal(LayerMapError):
     pass
 
+
 class InvalidInteger(LayerMapError):
     pass
 
+
 class MissingForeignKey(LayerMapError):
     pass
+
 
 class LayerMapping(object):
     "A class that maps OGR Layers to GeoDjango Models."
 
     # Acceptable 'base' types for a multi-geometry type.
-    MULTI_TYPES = {1 : OGRGeomType('MultiPoint'),
-                   2 : OGRGeomType('MultiLineString'),
-                   3 : OGRGeomType('MultiPolygon'),
-                   OGRGeomType('Point25D').num : OGRGeomType('MultiPoint25D'),
-                   OGRGeomType('LineString25D').num : OGRGeomType('MultiLineString25D'),
-                   OGRGeomType('Polygon25D').num : OGRGeomType('MultiPolygon25D'),
+    MULTI_TYPES = {1: OGRGeomType('MultiPoint'),
+                   2: OGRGeomType('MultiLineString'),
+                   3: OGRGeomType('MultiPolygon'),
+                   OGRGeomType('Point25D').num: OGRGeomType('MultiPoint25D'),
+                   OGRGeomType('LineString25D').num: OGRGeomType('MultiLineString25D'),
+                   OGRGeomType('Polygon25D').num: OGRGeomType('MultiPolygon25D'),
                    }
 
     # Acceptable Django field types and corresponding acceptable OGR
     # counterparts.
     FIELD_TYPES = {
-        models.AutoField : OFTInteger,
-        models.IntegerField : (OFTInteger, OFTReal, OFTString),
-        models.FloatField : (OFTInteger, OFTReal),
-        models.DateField : OFTDate,
-        models.DateTimeField : OFTDateTime,
-        models.EmailField : OFTString,
-        models.TimeField : OFTTime,
-        models.DecimalField : (OFTInteger, OFTReal),
-        models.CharField : OFTString,
-        models.SlugField : OFTString,
-        models.TextField : OFTString,
-        models.URLField : OFTString,
-        models.BigIntegerField : (OFTInteger, OFTReal, OFTString),
-        models.SmallIntegerField : (OFTInteger, OFTReal, OFTString),
-        models.PositiveSmallIntegerField : (OFTInteger, OFTReal, OFTString),
+        models.AutoField: OFTInteger,
+        models.IntegerField: (OFTInteger, OFTReal, OFTString),
+        models.FloatField: (OFTInteger, OFTReal),
+        models.DateField: OFTDate,
+        models.DateTimeField: OFTDateTime,
+        models.EmailField: OFTString,
+        models.TimeField: OFTTime,
+        models.DecimalField: (OFTInteger, OFTReal),
+        models.CharField: OFTString,
+        models.SlugField: OFTString,
+        models.TextField: OFTString,
+        models.URLField: OFTString,
+        models.BigIntegerField: (OFTInteger, OFTReal, OFTString),
+        models.SmallIntegerField: (OFTInteger, OFTReal, OFTString),
+        models.PositiveSmallIntegerField: (OFTInteger, OFTReal, OFTString),
     }
 
     def __init__(self, model, data, mapping, layer=0,
@@ -92,7 +97,7 @@ class LayerMapping(object):
         self.mapping = mapping
         self.model = model
 
-        # Checking the layer -- intitialization of the object will fail if
+        # Checking the layer -- initialization of the object will fail if
         # things don't check out before hand.
         self.check_layer()
 
@@ -124,7 +129,7 @@ class LayerMapping(object):
 
         if unique:
             self.check_unique(unique)
-            transaction_mode = 'autocommit' # Has to be set to autocommit.
+            transaction_mode = 'autocommit'  # Has to be set to autocommit.
             self.unique = unique
         else:
             self.unique = None
@@ -234,7 +239,7 @@ class LayerMapping(object):
                     raise TypeError('ForeignKey mapping must be of dictionary type.')
             else:
                 # Is the model field type supported by LayerMapping?
-                if not model_field.__class__ in self.FIELD_TYPES:
+                if model_field.__class__ not in self.FIELD_TYPES:
                     raise LayerMapError('Django field type "%s" has no OGR mapping (yet).' % fld_name)
 
                 # Is the OGR field in the Layer?
@@ -272,7 +277,7 @@ class LayerMapping(object):
         if isinstance(unique, (list, tuple)):
             # List of fields to determine uniqueness with
             for attr in unique:
-                if not attr in self.mapping:
+                if attr not in self.mapping:
                     raise ValueError
         elif isinstance(unique, six.string_types):
             # Only a single field passed in.
@@ -281,7 +286,7 @@ class LayerMapping(object):
         else:
             raise TypeError('Unique keyword argument must be set with a tuple, list, or string.')
 
-    #### Keyword argument retrieval routines ####
+    # Keyword argument retrieval routines ####
     def feature_kwargs(self, feat):
         """
         Given an OGR Feature, this will return a dictionary of keyword arguments
@@ -322,7 +327,7 @@ class LayerMapping(object):
         of the feature kwargs.
         """
         if isinstance(self.unique, six.string_types):
-            return {self.unique : kwargs[self.unique]}
+            return {self.unique: kwargs[self.unique]}
         else:
             return dict((fld, kwargs[fld]) for fld in self.unique)
 
@@ -334,7 +339,7 @@ class LayerMapping(object):
         otherwise the proper exception is raised.
         """
         if (isinstance(ogr_field, OFTString) and
-            isinstance(model_field, (models.CharField, models.TextField))):
+                isinstance(model_field, (models.CharField, models.TextField))):
             if self.encoding:
                 # The encoding for OGR data sources may be specified here
                 # (e.g., 'cp437' for Census Bureau boundary files).
@@ -354,7 +359,7 @@ class LayerMapping(object):
             # Getting the decimal value as a tuple.
             dtup = d.as_tuple()
             digits = dtup[1]
-            d_idx = dtup[2] # index where the decimal is
+            d_idx = dtup[2]  # index where the decimal is
 
             # Maximum amount of precision, or digits to the left of the decimal.
             max_prec = model_field.max_digits - model_field.decimal_places
@@ -484,7 +489,7 @@ class LayerMapping(object):
 
          progress:
            When this keyword is set, status information will be printed giving
-           the number of features processed and sucessfully saved.  By default,
+           the number of features processed and successfully saved.  By default,
            progress information will pe printed every 1000 features processed,
            however, this default may be overridden by setting this keyword with an
            integer for the desired interval.
@@ -595,7 +600,7 @@ class LayerMapping(object):
             for i, end in enumerate(indices):
                 # Constructing the slice to use for this step; the last slice is
                 # special (e.g, [100:] instead of [90:100]).
-                if i+1 == n_i:
+                if i + 1 == n_i:
                     step_slice = slice(beg, None)
                 else:
                     step_slice = slice(beg, end)

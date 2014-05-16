@@ -33,14 +33,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_field_type(self, data_type, description):
         # If it's a NUMBER with scale == 0, consider it an IntegerField
-        if data_type == cx_Oracle.NUMBER and description[5] == 0:
-            if description[4] > 11:
-                return 'BigIntegerField'
-            else:
-                return 'IntegerField'
-        else:
-            return super(DatabaseIntrospection, self).get_field_type(
-                data_type, description)
+        if data_type == cx_Oracle.NUMBER:
+            precision, scale = description[4:6]
+            if scale == 0:
+                if precision > 11:
+                    return 'BigIntegerField'
+                elif precision == 1:
+                    return 'BooleanField'
+                else:
+                    return 'IntegerField'
+            elif scale == -127:
+                return 'FloatField'
+
+        return super(DatabaseIntrospection, self).get_field_type(data_type, description)
 
     def get_table_list(self, cursor):
         "Returns a list of table names in the current database."
@@ -52,8 +57,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cursor.execute("SELECT * FROM %s WHERE ROWNUM < 2" % self.connection.ops.quote_name(table_name))
         description = []
         for desc in cursor.description:
-            name = force_text(desc[0]) # cx_Oracle always returns a 'str' on both Python 2 and 3
-            name = name % {} # cx_Oracle, for some reason, doubles percent signs.
+            name = force_text(desc[0])  # cx_Oracle always returns a 'str' on both Python 2 and 3
+            name = name % {}  # cx_Oracle, for some reason, doubles percent signs.
             description.append(FieldInfo(*(name.lower(),) + desc[1:]))
         return description
 

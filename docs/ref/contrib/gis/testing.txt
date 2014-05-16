@@ -92,6 +92,15 @@ Create local PostgreSQL database
 
 3. Start this database ``pg_ctl -D /path/to/user/db start``
 
+Create a database using PostGIS version 2
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When testing projects using :ref:`PostGIS 2 <spatialdb_template91>`,
+the test database is created using the ``CREATE EXTENSION postgis``
+instruction, provided that no template ``template_postgis`` (or named
+accordingly to :setting:`POSTGIS_TEMPLATE`) exists in the current
+database.
+
 Windows
 -------
 
@@ -122,7 +131,7 @@ Settings
 Only relevant when using a SpatiaLite version 2.3.
 
 By default, the GeoDjango test runner looks for the :ref:`file containing the
-SpatiaLite dababase-initialization SQL code <create_spatialite_db>` in the
+SpatiaLite database-initialization SQL code <create_spatialite_db>` in the
 same directory where it was invoked (by default the same directory where
 ``manage.py`` is located). To use a different location, add the following to
 your settings::
@@ -159,6 +168,8 @@ in :mod:`django.contrib.gis`::
             'USER': 'geodjango',
        }
     }
+
+    SECRET_KEY = 'django_tests_secret_key'
 
 Assuming the settings above were in a ``postgis.py`` file in the same
 directory as ``runtests.py``, then all Django and GeoDjango tests would

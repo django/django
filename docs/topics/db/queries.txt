@@ -23,16 +23,14 @@ models, which comprise a Weblog application:
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
     class Author(models.Model):
         name = models.CharField(max_length=50)
         email = models.EmailField()
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
     class Entry(models.Model):
@@ -46,8 +44,7 @@ models, which comprise a Weblog application:
         n_pingbacks = models.IntegerField()
         rating = models.IntegerField()
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.headline
 
 Creating objects
@@ -131,6 +128,8 @@ go, include multiple arguments in the call to
     >>> entry.authors.add(john, paul, george, ringo)
 
 Django will complain if you try to assign or add an object of the wrong type.
+
+.. _retrieving-objects:
 
 Retrieving objects
 ==================
@@ -411,7 +410,7 @@ can specify the field name suffixed with ``_id``. In this case, the value
 parameter is expected to contain the raw value of the foreign model's primary
 key. For example:
 
-    >>> Entry.objects.filter(blog_id__exact=4)
+    >>> Entry.objects.filter(blog_id=4)
 
 If you pass an invalid keyword argument, a lookup function will raise
 ``TypeError``.
@@ -448,8 +447,8 @@ probably use:
 
         >>> Blog.objects.get(name__iexact="beatles blog")
 
-    Would match a ``Blog`` titled "Beatles Blog", "beatles blog", or even
-    "BeAtlES blOG".
+    Would match a ``Blog`` titled ``"Beatles Blog"``, ``"beatles blog"``, or
+    even ``"BeAtlES blOG"``.
 
 :lookup:`contains`
     Case-sensitive containment test. For example::
@@ -489,7 +488,7 @@ want.
 This example retrieves all ``Entry`` objects with a ``Blog`` whose ``name``
 is ``'Beatles Blog'``::
 
-    >>> Entry.objects.filter(blog__name__exact='Beatles Blog')
+    >>> Entry.objects.filter(blog__name='Beatles Blog')
 
 This spanning can be as deep as you'd like.
 
@@ -610,11 +609,15 @@ and use that ``F()`` object in the query::
     >>> Entry.objects.filter(n_comments__gt=F('n_pingbacks'))
 
 Django supports the use of addition, subtraction, multiplication,
-division and modulo arithmetic with ``F()`` objects, both with constants
+division, modulo, and power arithmetic with ``F()`` objects, both with constants
 and with other ``F()`` objects. To find all the blog entries with more than
 *twice* as many comments as pingbacks, we modify the query::
 
     >>> Entry.objects.filter(n_comments__gt=F('n_pingbacks') * 2)
+
+.. versionadded:: 1.7
+
+    The power operator ``**`` was added.
 
 To find all the entries where the rating of the entry is less than the
 sum of the pingback count and comment count, we would issue the
@@ -1154,11 +1157,19 @@ query you can use the following syntax::
 
     class Entry(models.Model):
         #...
-        objects = models.Manager() # Default Manager
-        entries = EntryManager() # Custom Manager
+        objects = models.Manager()  # Default Manager
+        entries = EntryManager()    # Custom Manager
 
-    >>> b = Blog.objects.get(id=1)
-    >>> b.entry_set(manager='entries').all()
+    b = Blog.objects.get(id=1)
+    b.entry_set(manager='entries').all()
+
+If ``EntryManager`` performed default filtering in its ``get_queryset()``
+method, that filtering would apply to the ``all()`` call.
+
+Of course, specifying a custom reverse manager also enables you to call its
+custom methods::
+
+    b.entry_set(manager='entries').is_published()
 
 Additional methods to handle related objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1276,11 +1287,16 @@ relationship on one end.
 But how is this possible, given that a model class doesn't know which other
 model classes are related to it until those other model classes are loaded?
 
-The answer lies in the :setting:`INSTALLED_APPS` setting. The first time any
-model is loaded, Django iterates over every model in :setting:`INSTALLED_APPS`
-and creates the backward relationships in memory as needed. Essentially, one of
-the functions of :setting:`INSTALLED_APPS` is to tell Django the entire model
-domain.
+The answer lies in the :data:`app registry <django.apps.apps>`. When Django
+starts, it imports each application listed in :setting:`INSTALLED_APPS`, and
+then the ``models`` module inside each application. Whenever a new model class
+is created, Django adds backward-relationships to any related models. If the
+related models haven't been imported yet, Django keeps tracks of the
+relationships and adds them when the related models eventually are imported.
+
+For this reason, it's particularly important that all the models you're using
+be defined in applications listed in :setting:`INSTALLED_APPS`. Otherwise,
+backwards relations may not work properly.
 
 Queries over related objects
 ----------------------------

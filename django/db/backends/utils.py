@@ -36,15 +36,18 @@ class CursorWrapper(object):
 
     def __exit__(self, type, value, traceback):
         # Ticket #17671 - Close instead of passing thru to avoid backend
-        # specific behavior.
-        self.close()
+        # specific behavior. Catch errors liberally because errors in cleanup
+        # code aren't useful.
+        try:
+            self.close()
+        except self.db.Database.Error:
+            pass
 
     # The following methods cannot be implemented in __getattr__, because the
     # code must run when the method is invoked, not just when it is accessed.
 
     def callproc(self, procname, params=None):
         self.db.validate_no_broken_transaction()
-        self.db.set_dirty()
         with self.db.wrap_database_errors:
             if params is None:
                 return self.cursor.callproc(procname)
@@ -53,7 +56,6 @@ class CursorWrapper(object):
 
     def execute(self, sql, params=None):
         self.db.validate_no_broken_transaction()
-        self.db.set_dirty()
         with self.db.wrap_database_errors:
             if params is None:
                 return self.cursor.execute(sql)
@@ -62,7 +64,6 @@ class CursorWrapper(object):
 
     def executemany(self, sql, param_list):
         self.db.validate_no_broken_transaction()
-        self.db.set_dirty()
         with self.db.wrap_database_errors:
             return self.cursor.executemany(sql, param_list)
 
@@ -112,26 +113,26 @@ class CursorDebugWrapper(CursorWrapper):
 ###############################################
 
 def typecast_date(s):
-    return datetime.date(*map(int, s.split('-'))) if s else None # returns None if s is null
+    return datetime.date(*map(int, s.split('-'))) if s else None  # returns None if s is null
 
 
-def typecast_time(s): # does NOT store time zone information
+def typecast_time(s):  # does NOT store time zone information
     if not s:
         return None
     hour, minutes, seconds = s.split(':')
-    if '.' in seconds: # check whether seconds have a fractional part
+    if '.' in seconds:  # check whether seconds have a fractional part
         seconds, microseconds = seconds.split('.')
     else:
         microseconds = '0'
     return datetime.time(int(hour), int(minutes), int(seconds), int(float('.' + microseconds) * 1000000))
 
 
-def typecast_timestamp(s): # does NOT store time zone information
+def typecast_timestamp(s):  # does NOT store time zone information
     # "2005-07-29 15:48:00.590358-05"
     # "2005-07-29 09:56:00-05"
     if not s:
         return None
-    if not ' ' in s:
+    if ' ' not in s:
         return typecast_date(s)
     d, t = s.split()
     # Extract timezone information, if it exists. Currently we just throw
@@ -147,7 +148,7 @@ def typecast_timestamp(s): # does NOT store time zone information
     dates = d.split('-')
     times = t.split(':')
     seconds = times[2]
-    if '.' in seconds: # check whether seconds have a fractional part
+    if '.' in seconds:  # check whether seconds have a fractional part
         seconds, microseconds = seconds.split('.')
     else:
         microseconds = '0'

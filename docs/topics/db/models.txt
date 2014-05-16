@@ -190,9 +190,9 @@ ones:
         >>> p = Person(name="Fred Flintstone", shirt_size="L")
         >>> p.save()
         >>> p.shirt_size
-        u'L'
+        'L'
         >>> p.get_shirt_size_display()
-        u'Large'
+        'Large'
 
 :attr:`~Field.default`
     The default value for the field. This can be a value or a callable
@@ -417,16 +417,14 @@ something like this::
     class Person(models.Model):
         name = models.CharField(max_length=128)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
     class Group(models.Model):
         name = models.CharField(max_length=128)
         members = models.ManyToManyField(Person, through='Membership')
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
     class Membership(models.Model):
@@ -436,29 +434,37 @@ something like this::
         invite_reason = models.CharField(max_length=64)
 
 When you set up the intermediary model, you explicitly specify foreign
-keys to the models that are involved in the ManyToMany relation. This
+keys to the models that are involved in the many-to-many relationship. This
 explicit declaration defines how the two models are related.
 
 There are a few restrictions on the intermediate model:
 
 * Your intermediate model must contain one - and *only* one - foreign key
-  to the target model (this would be ``Person`` in our example). If you
-  have more than one foreign key, a validation error will be raised.
+  to the source model (this would be ``Group`` in our example), or you must
+  explicitly specify the foreign keys Django should use for the relationship
+  using :attr:`ManyToManyField.through_fields <ManyToManyField.through_fields>`.
+  If you have more than one foreign key and ``through_fields`` is not
+  specified, a validation error will be raised. A similar restriction applies
+  to the foreign key to the target model (this would be ``Person`` in our
+  example).
 
-* Your intermediate model must contain one - and *only* one - foreign key
-  to the source model (this would be ``Group`` in our example). If you
-  have more than one foreign key, a validation error will be raised.
-
-* The only exception to this is a model which has a many-to-many
-  relationship to itself, through an intermediary model. In this
-  case, two foreign keys to the same model are permitted, but they
-  will be treated as the two (different) sides of the many-to-many
-  relation.
+* For a model which has a many-to-many relationship to itself through an
+  intermediary model, two foreign keys to the same model are permitted, but
+  they will be treated as the two (different) sides of the many-to-many
+  relationship. If there are *more* than two foreign keys though, you
+  must also specify ``through_fields`` as above, or a validation error
+  will be raised.
 
 * When defining a many-to-many relationship from a model to
   itself, using an intermediary model, you *must* use
   :attr:`symmetrical=False <ManyToManyField.symmetrical>` (see
   :ref:`the model field reference <manytomany-arguments>`).
+
+.. versionchanged:: 1.7
+
+    In Django 1.6 and earlier, intermediate models containing more than one
+    foreign key to any of the models involved in the many-to-many relationship
+    used to be prohibited.
 
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
 your intermediary model (``Membership``, in this case), you're ready to start
@@ -470,7 +476,7 @@ the intermediate model::
     >>> beatles = Group.objects.create(name="The Beatles")
     >>> m1 = Membership(person=ringo, group=beatles,
     ...     date_joined=date(1962, 8, 16),
-    ...     invite_reason= "Needed a new drummer.")
+    ...     invite_reason="Needed a new drummer.")
     >>> m1.save()
     >>> beatles.members.all()
     [<Person: Ringo Starr>]
@@ -478,7 +484,7 @@ the intermediate model::
     [<Group: The Beatles>]
     >>> m2 = Membership.objects.create(person=paul, group=beatles,
     ...     date_joined=date(1960, 8, 1),
-    ...     invite_reason= "Wanted to form a band.")
+    ...     invite_reason="Wanted to form a band.")
     >>> beatles.members.all()
     [<Person: Ringo Starr>, <Person: Paul McCartney>]
 
@@ -505,8 +511,11 @@ disabled for similar reasons. However, the
 :meth:`~django.db.models.fields.related.RelatedManager.clear` method can be
 used to remove all many-to-many relationships for an instance::
 
-    # Beatles have broken up
+    >>> # Beatles have broken up
     >>> beatles.members.clear()
+    >>> # Note that this deletes the intermediate model instances
+    >>> Membership.objects.all()
+    []
 
 Once you have established the many-to-many relationships by creating instances
 of your intermediate model, you can issue queries. Just as with normal
@@ -532,7 +541,7 @@ querying the ``Membership`` model::
     >>> ringos_membership.date_joined
     datetime.date(1962, 8, 16)
     >>> ringos_membership.invite_reason
-    u'Needed a new drummer.'
+    'Needed a new drummer.'
 
 Another way to access the same information is by querying the
 :ref:`many-to-many reverse relationship<m2m-reverse-relationships>` from a
@@ -542,7 +551,7 @@ Another way to access the same information is by querying the
     >>> ringos_membership.date_joined
     datetime.date(1962, 8, 16)
     >>> ringos_membership.invite_reason
-    u'Needed a new drummer.'
+    'Needed a new drummer.'
 
 
 One-to-one relationships
@@ -661,6 +670,19 @@ Meta`` to a model is completely optional.
 
 A complete list of all possible ``Meta`` options can be found in the :doc:`model
 option reference </ref/models/options>`.
+
+.. _model-attributes:
+
+Model attributes
+================
+
+``objects``
+    The most important attribute of a model is the
+    :class:`~django.db.models.Manager`. It's the interface through which
+    database query operations are provided to Django models and is used to
+    :ref:`retrieve the instances <retrieving-objects>` from the database. If no
+    custom ``Manager`` is defined, the default name is ``objects``. Managers
+    are only accessible via model classes, not the model instances.
 
 .. _model-methods:
 
@@ -957,7 +979,7 @@ The reverse name of the ``common.ChildA.m2m`` field will be
 reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
 It is up to you how you use the ``'%(class)s'`` and ``'%(app_label)s`` portion
 to construct your related name, but if you forget to use it, Django will raise
-errors when you validate your models (or run :djadmin:`migrate`).
+errors when you perform system checks (or run :djadmin:`migrate`).
 
 If you don't specify a :attr:`~django.db.models.ForeignKey.related_name`
 attribute for a field in an abstract base class, the default reverse name will
@@ -1008,7 +1030,8 @@ of the model name::
 
 However, if ``p`` in the above example was *not* a ``Restaurant`` (it had been
 created directly as a ``Place`` object or was the parent of some other class),
-referring to ``p.restaurant`` would raise a Restaurant.DoesNotExist exception.
+referring to ``p.restaurant`` would raise a ``Restaurant.DoesNotExist``
+exception.
 
 ``Meta`` and multi-table inheritance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1050,7 +1073,7 @@ are putting those types of relations on a subclass of another model,
 you **must** specify the
 :attr:`~django.db.models.ForeignKey.related_name` attribute on each
 such field. If you forget, Django will raise an error when you run
-:djadmin:`validate` or :djadmin:`migrate`.
+:djadmin:`check` or :djadmin:`migrate`.
 
 For example, using the above ``Place`` class again, let's create another
 subclass with a :class:`~django.db.models.ManyToManyField`::
@@ -1239,6 +1262,8 @@ So, the general rules are:
    This sets things up so that the proxy model is an exact copy of the
    storage structure of the original model when data is saved.
 
+.. _model-multiple-inheritance-topic:
+
 Multiple inheritance
 --------------------
 
@@ -1255,6 +1280,67 @@ field or method to every class that inherits the mix-in. Try to keep your
 inheritance hierarchies as simple and straightforward as possible so that you
 won't have to struggle to work out where a particular piece of information is
 coming from.
+
+.. versionchanged:: 1.7
+
+Before Django 1.7, inheriting from multiple models that had an ``id`` primary
+key field did not raise an error, but could result in data loss. For example,
+consider these models (which no longer validate due to the clashing ``id``
+fields)::
+
+    class Article(models.Model):
+        headline = models.CharField(max_length=50)
+        body = models.TextField()
+
+    class Book(models.Model):
+        title = models.CharField(max_length=50)
+
+    class BookReview(Book, Article):
+        pass
+
+This snippet demonstrates how creating a child object overwrote the value of a
+previously created parent object::
+
+    >>> article = Article.objects.create(headline='Some piece of news.')
+    >>> review = BookReview.objects.create(
+    ...     headline='Review of Little Red Riding Hood.',
+    ...     title='Little Red Riding Hood')
+    >>>
+    >>> assert Article.objects.get(pk=article.pk).headline == article.headline
+    Traceback (most recent call last):
+      File "<console>", line 1, in <module>
+    AssertionError
+    >>> # the "Some piece of news." headline has been overwritten.
+    >>> Article.objects.get(pk=article.pk).headline
+    'Review of Little Red Riding Hood.'
+
+To properly use multiple inheritance, you can use an explicit
+:class:`~django.db.models.AutoField` in the base models::
+
+    class Article(models.Model):
+        article_id = models.AutoField(primary_key=True)
+        ...
+
+    class Book(models.Model):
+        book_id = models.AutoField(primary_key=True)
+        ...
+
+    class BookReview(Book, Article):
+        pass
+
+Or use a common ancestor to hold the :class:`~django.db.models.AutoField`::
+
+    class Piece(models.Model):
+        pass
+
+    class Article(Piece):
+        ...
+
+    class Book(Piece):
+        ...
+
+    class BookReview(Book, Article):
+        pass
 
 Field name "hiding" is not permitted
 -------------------------------------

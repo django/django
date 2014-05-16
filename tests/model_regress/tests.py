@@ -121,16 +121,16 @@ class ModelTests(TestCase):
 
         # Regression test for #18969
         self.assertQuerysetEqual(
-                Party.objects.filter(when__year=1), [
-                        datetime.date(1, 3, 3),
-                ],
-                attrgetter("when")
+            Party.objects.filter(when__year=1), [
+                datetime.date(1, 3, 3),
+            ],
+            attrgetter("when")
         )
         self.assertQuerysetEqual(
-                Party.objects.filter(when__year='1'), [
-                        datetime.date(1, 3, 3),
-                ],
-                attrgetter("when")
+            Party.objects.filter(when__year='1'), [
+                datetime.date(1, 3, 3),
+            ],
+            attrgetter("when")
         )
 
     if (3,) <= sys.version_info < (3, 3) and connection.vendor == 'mysql':
@@ -140,7 +140,7 @@ class ModelTests(TestCase):
 
     def test_date_filter_null(self):
         # Date filtering was failing with NULL date values in SQLite
-        # (regression test for #3501, amongst other things).
+        # (regression test for #3501, among other things).
         Party.objects.create(when=datetime.datetime(1999, 1, 1))
         Party.objects.create()
         p = Party.objects.filter(when__month=1)[0]
@@ -217,7 +217,7 @@ class ModelTests(TestCase):
 
 class ModelValidationTest(TestCase):
     def test_pk_validation(self):
-        one = NonAutoPK.objects.create(name="one")
+        NonAutoPK.objects.create(name="one")
         again = NonAutoPK(name="one")
         self.assertRaises(ValidationError, again.validate_unique)
 

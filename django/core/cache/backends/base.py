@@ -5,7 +5,7 @@ import time
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 
 
 class InvalidCacheBackendError(ImproperlyConfigured):
@@ -45,17 +45,18 @@ def get_key_func(key_func):
         if callable(key_func):
             return key_func
         else:
-            return import_by_path(key_func)
+            return import_string(key_func)
     return default_key_func
 
 
 class BaseCache(object):
     def __init__(self, params):
         timeout = params.get('timeout', params.get('TIMEOUT', 300))
-        try:
-            timeout = int(timeout)
-        except (ValueError, TypeError):
-            timeout = 300
+        if timeout is not None:
+            try:
+                timeout = int(timeout)
+            except (ValueError, TypeError):
+                timeout = 300
         self.default_timeout = timeout
 
         options = params.get('OPTIONS', {})
@@ -233,9 +234,9 @@ class BaseCache(object):
         if value is None:
             raise ValueError("Key '%s' not found" % key)
 
-        self.set(key, value, version=version+delta)
+        self.set(key, value, version=version + delta)
         self.delete(key, version=version)
-        return version+delta
+        return version + delta
 
     def decr_version(self, key, delta=1, version=None):
         """Substracts delta from the cache version for the supplied key. Returns

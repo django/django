@@ -28,6 +28,7 @@ def normalize_name(name):
     new = re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', '_\\1', name)
     return new.lower().strip('_')
 
+
 class StepsHelper(object):
 
     def __init__(self, wizard):
@@ -122,7 +123,7 @@ class WizardView(TemplateView):
 
     @classmethod
     def get_initkwargs(cls, form_list=None, initial_dict=None,
-        instance_dict=None, condition_dict=None, *args, **kwargs):
+            instance_dict=None, condition_dict=None, *args, **kwargs):
         """
         Creates a dict with all needed parameters for the form wizard instances.
 
@@ -184,8 +185,8 @@ class WizardView(TemplateView):
                 if (isinstance(field, forms.FileField) and
                         not hasattr(cls, 'file_storage')):
                     raise NoFileStorageConfigured(
-                            "You need to define 'file_storage' in your "
-                            "wizard view in order to handle file uploads.")
+                        "You need to define 'file_storage' in your "
+                        "wizard view in order to handle file uploads.")
 
         # build the kwargs for the wizardview instances
         kwargs['form_list'] = computed_form_list
@@ -334,7 +335,7 @@ class WizardView(TemplateView):
         validate, `render_revalidation_failure` should get called.
         If everything is fine call `done`.
         """
-        final_form_list = []
+        final_forms = OrderedDict()
         # walk through the form list and try to validate the data again.
         for form_key in self.get_form_list():
             form_obj = self.get_form(step=form_key,
@@ -342,12 +343,12 @@ class WizardView(TemplateView):
                 files=self.storage.get_step_files(form_key))
             if not form_obj.is_valid():
                 return self.render_revalidation_failure(form_key, form_obj, **kwargs)
-            final_form_list.append(form_obj)
+            final_forms[form_key] = form_obj
 
         # render the done view and reset the wizard before returning the
         # response. This is needed to prevent from rendering done with the
         # same data twice.
-        done_response = self.done(final_form_list, **kwargs)
+        done_response = self.done(final_forms.values(), form_dict=final_forms, **kwargs)
         self.storage.reset()
         return done_response
 
@@ -367,7 +368,7 @@ class WizardView(TemplateView):
     def get_form_initial(self, step):
         """
         Returns a dictionary which will be passed to the form for `step`
-        as `initial`. If no initial data was provied while initializing the
+        as `initial`. If no initial data was provided while initializing the
         form wizard, a empty dictionary will be returned.
         """
         return self.initial_dict.get(step, {})
@@ -375,7 +376,7 @@ class WizardView(TemplateView):
     def get_form_instance(self, step):
         """
         Returns a object which will be passed to the form for `step`
-        as `instance`. If no instance object was provied while initializing
+        as `instance`. If no instance object was provided while initializing
         the form wizard, None will be returned.
         """
         return self.instance_dict.get(step, None)
@@ -537,8 +538,7 @@ class WizardView(TemplateView):
         context variables are:
 
          * all extra data stored in the storage backend
-         * `form` - form instance of the current step
-         * `wizard` - the wizard instance itself
+         * `wizard` - a dictionary representation of the wizard instance
 
         Example:
 

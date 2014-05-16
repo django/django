@@ -1,11 +1,10 @@
 from functools import update_wrapper
 from django.http import Http404, HttpResponseRedirect
 from django.contrib.admin import ModelAdmin, actions
-from django.contrib.admin.forms import AdminAuthenticationForm
-from django.contrib.auth import logout as auth_logout, REDIRECT_FIELD_NAME
-from django.contrib.contenttypes import views as contenttype_views
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.views.decorators.csrf import csrf_protect
 from django.db.models.base import ModelBase
+from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
@@ -14,8 +13,6 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.views.decorators.cache import never_cache
 from django.conf import settings
-
-LOGIN_FORM_KEY = 'this_is_the_login_form'
 
 
 class AlreadyRegistered(Exception):
@@ -99,7 +96,7 @@ class AdminSite(object):
                     admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
 
                 if admin_class is not ModelAdmin and settings.DEBUG:
-                    admin_class.validate(model)
+                    admin_class.check(model)
 
                 # Instantiate the admin class to save in the registry
                 self._registry[model] = admin_class(model, self)
@@ -156,20 +153,16 @@ class AdminSite(object):
         """
         Check that all things needed to run the admin have been correctly installed.
 
-        The default implementation checks that LogEntry, ContentType and the
-        auth context processor are installed.
+        The default implementation checks that admin and contenttypes apps are
+        installed, as well as the auth context processor.
         """
-        from django.contrib.admin.models import LogEntry
-        from django.contrib.contenttypes.models import ContentType
-
-        if not LogEntry._meta.installed:
-            raise ImproperlyConfigured("Put 'django.contrib.admin' in your "
-                "INSTALLED_APPS setting in order to use the admin application.")
-        if not ContentType._meta.installed:
+        if not apps.is_installed('django.contrib.admin'):
+            raise ImproperlyConfigured("Put 'django.contrib.admin' in "
+                "your INSTALLED_APPS setting in order to use the admin application.")
+        if not apps.is_installed('django.contrib.contenttypes'):
             raise ImproperlyConfigured("Put 'django.contrib.contenttypes' in "
                 "your INSTALLED_APPS setting in order to use the admin application.")
-        if not ('django.contrib.auth.context_processors.auth' in settings.TEMPLATE_CONTEXT_PROCESSORS or
-            'django.core.context_processors.auth' in settings.TEMPLATE_CONTEXT_PROCESSORS):
+        if 'django.contrib.auth.context_processors.auth' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
             raise ImproperlyConfigured("Put 'django.contrib.auth.context_processors.auth' "
                 "in your TEMPLATE_CONTEXT_PROCESSORS setting in order to use the admin application.")
 
@@ -184,12 +177,12 @@ class AdminSite(object):
             class MyAdminSite(AdminSite):
 
                 def get_urls(self):
-                    from django.conf.urls import patterns, url
+                    from django.conf.urls import url
 
                     urls = super(MyAdminSite, self).get_urls()
-                    urls += patterns('',
+                    urls += [
                         url(r'^my_view/$', self.admin_view(some_view))
-                    )
+                    ]
                     return urls
 
         By default, admin_views are marked non-cacheable using the
@@ -197,13 +190,17 @@ class AdminSite(object):
         cacheable=True.
         """
         def inner(request, *args, **kwargs):
-            if LOGIN_FORM_KEY in request.POST and request.user.is_authenticated():
-                auth_logout(request)
             if not self.has_permission(request):
                 if request.path == reverse('admin:logout', current_app=self.name):
                     index_path = reverse('admin:index', current_app=self.name)
                     return HttpResponseRedirect(index_path)
-                return self.login(request)
+                # Inner import to prevent django.contrib.admin (app) from
+                # importing django.contrib.auth.models.User (unrelated model).
+                from django.contrib.auth.views import redirect_to_login
+                return redirect_to_login(
+                    request.get_full_path(),
+                    reverse('admin:login', current_app=self.name)
+                )
             return view(request, *args, **kwargs)
         if not cacheable:
             inner = never_cache(inner)
@@ -214,7 +211,11 @@ class AdminSite(object):
         return update_wrapper(inner, view)
 
     def get_urls(self):
-        from django.conf.urls import patterns, url, include
+        from django.conf.urls import url, include
+        # Since this module gets imported in the application's root package,
+        # it cannot import models from other applications at the module level,
+        # and django.contrib.contenttypes.views imports ContentType.
+        from django.contrib.contenttypes import views as contenttype_views
 
         if settings.DEBUG:
             self.check_dependencies()
@@ -225,22 +226,23 @@ class AdminSite(object):
             return update_wrapper(wrapper, view)
 
         # Admin-site-wide views.
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^$', wrap(self.index), name='index'),
+            url(r'^login/$', self.login, name='login'),
             url(r'^logout/$', wrap(self.logout), name='logout'),
             url(r'^password_change/$', wrap(self.password_change, cacheable=True), name='password_change'),
             url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True), name='password_change_done'),
             url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
             url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$', wrap(contenttype_views.shortcut), name='view_on_site'),
-        )
+        ]
 
         # Add in each model's views, and create a list of valid URLS for the
         # app_index
         valid_app_labels = []
         for model, model_admin in six.iteritems(self._registry):
-            urlpatterns += patterns('',
-                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls))
-            )
+            urlpatterns += [
+                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
+            ]
             if model._meta.app_label not in valid_app_labels:
                 valid_app_labels.append(model._meta.app_label)
 
@@ -248,9 +250,9 @@ class AdminSite(object):
         # labels for which we need to allow access to the app_index view,
         if valid_app_labels:
             regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
-            urlpatterns += patterns('',
+            urlpatterns += [
                 url(regex, wrap(self.app_index), name='app_list'),
-            )
+            ]
         return urlpatterns
 
     @property
@@ -271,10 +273,12 @@ class AdminSite(object):
         """
         Handles the "change password" task -- both form display and validation.
         """
+        from django.contrib.admin.forms import AdminPasswordChangeForm
         from django.contrib.auth.views import password_change
         url = reverse('admin:password_change_done', current_app=self.name)
         defaults = {
             'current_app': self.name,
+            'password_change_form': AdminPasswordChangeForm,
             'post_change_redirect': url,
             'extra_context': self.each_context(),
         }
@@ -329,12 +333,23 @@ class AdminSite(object):
         """
         Displays the login form for the given HttpRequest.
         """
+        if request.method == 'GET' and self.has_permission(request):
+            # Already logged-in, redirect to admin index
+            index_path = reverse('admin:index', current_app=self.name)
+            return HttpResponseRedirect(index_path)
+
         from django.contrib.auth.views import login
+        # Since this module gets imported in the application's root package,
+        # it cannot import models from other applications at the module level,
+        # and django.contrib.admin.forms eventually imports User.
+        from django.contrib.admin.forms import AdminAuthenticationForm
         context = dict(self.each_context(),
             title=_('Log in'),
             app_path=request.get_full_path(),
         )
-        context[REDIRECT_FIELD_NAME] = request.get_full_path()
+        if (REDIRECT_FIELD_NAME not in request.GET and
+                REDIRECT_FIELD_NAME not in request.POST):
+            context[REDIRECT_FIELD_NAME] = request.get_full_path()
         context.update(extra_context or {})
 
         defaults = {
@@ -383,7 +398,7 @@ class AdminSite(object):
                         app_dict[app_label]['models'].append(model_dict)
                     else:
                         app_dict[app_label] = {
-                            'name': app_label.title(),
+                            'name': apps.get_app_config(app_label).verbose_name,
                             'app_label': app_label,
                             'app_url': reverse('admin:app_list', kwargs={'app_label': app_label}, current_app=self.name),
                             'has_module_perms': has_module_perms,
@@ -392,13 +407,14 @@ class AdminSite(object):
 
         # Sort the apps alphabetically.
         app_list = list(six.itervalues(app_dict))
-        app_list.sort(key=lambda x: x['name'])
+        app_list.sort(key=lambda x: x['name'].lower())
 
         # Sort the models alphabetically within each app.
         for app in app_list:
             app['models'].sort(key=lambda x: x['name'])
 
-        context = dict(self.each_context(),
+        context = dict(
+            self.each_context(),
             title=self.index_title,
             app_list=app_list,
         )
@@ -409,6 +425,7 @@ class AdminSite(object):
 
     def app_index(self, request, app_label, extra_context=None):
         user = request.user
+        app_name = apps.get_app_config(app_label).verbose_name
         has_module_perms = user.has_module_perms(app_label)
         if not has_module_perms:
             raise PermissionDenied
@@ -443,7 +460,7 @@ class AdminSite(object):
                         # something to display, add in the necessary meta
                         # information.
                         app_dict = {
-                            'name': app_label.title(),
+                            'name': app_name,
                             'app_label': app_label,
                             'app_url': '',
                             'has_module_perms': has_module_perms,
@@ -454,7 +471,7 @@ class AdminSite(object):
         # Sort the models alphabetically within each app.
         app_dict['models'].sort(key=lambda x: x['name'])
         context = dict(self.each_context(),
-            title=_('%s administration') % capfirst(app_label),
+            title=_('%(app)s administration') % {'app': app_name},
             app_list=[app_dict],
             app_label=app_label,
         )

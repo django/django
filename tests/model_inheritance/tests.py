@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 from django.core.exceptions import FieldError
+from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
@@ -10,8 +11,8 @@ from django.utils import six
 
 from .models import (
     Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place, Post,
-    Restaurant, Student, StudentWorker, Supplier, Worker, MixinModel,
-    Title, Base, SubBase)
+    Restaurant, Student, Supplier, Worker, MixinModel,
+    Title, Copy, Base, SubBase)
 
 
 class ModelInheritanceTests(TestCase):
@@ -47,38 +48,6 @@ class ModelInheritanceTests(TestCase):
         # However, the CommonInfo class cannot be used as a normal model (it
         # doesn't exist as a model).
         self.assertRaises(AttributeError, lambda: CommonInfo.objects.all())
-
-        # A StudentWorker which does not exist is both a Student and Worker
-        # which does not exist.
-        self.assertRaises(
-            Student.DoesNotExist,
-            StudentWorker.objects.get, pk=12321321
-        )
-        self.assertRaises(
-            Worker.DoesNotExist,
-            StudentWorker.objects.get, pk=12321321
-        )
-
-        # MultipleObjectsReturned is also inherited.
-        # This is written out "long form", rather than using __init__/create()
-        # because of a bug with diamond inheritance (#10808)
-        sw1 = StudentWorker()
-        sw1.name = "Wilma"
-        sw1.age = 35
-        sw1.save()
-        sw2 = StudentWorker()
-        sw2.name = "Betty"
-        sw2.age = 24
-        sw2.save()
-
-        self.assertRaises(
-            Student.MultipleObjectsReturned,
-            StudentWorker.objects.get, pk__lt=sw2.pk + 100
-        )
-        self.assertRaises(
-            Worker.MultipleObjectsReturned,
-            StudentWorker.objects.get, pk__lt=sw2.pk + 100
-        )
 
     def test_multiple_table(self):
         post = Post.objects.create(title="Lorem Ipsum")
@@ -371,3 +340,40 @@ class ModelInheritanceTests(TestCase):
         # accidentally found).
         self.assertQuerysetEqual(
             s.titles.all(), [])
+
+
+class InheritanceSameModelNameTests(TestCase):
+
+    def setUp(self):
+        # The Title model has distinct accessors for both
+        # model_inheritance.Copy and model_inheritance_same_model_name.Copy
+        # models.
+        self.title = Title.objects.create(title='Lorem Ipsum')
+
+    def test_inheritance_related_name(self):
+        self.assertEqual(
+            self.title.attached_model_inheritance_copy_set.create(
+                content='Save $ on V1agr@',
+                url='http://v1agra.com/',
+                title='V1agra is spam',
+            ), Copy.objects.get(
+                content='Save $ on V1agr@',
+            ))
+
+    def test_inheritance_with_same_model_name(self):
+        with self.modify_settings(
+                INSTALLED_APPS={'append': ['model_inheritance.same_model_name']}):
+            call_command('migrate', verbosity=0)
+            from .same_model_name.models import Copy
+            self.assertEqual(
+                self.title.attached_same_model_name_copy_set.create(
+                    content='The Web framework for perfectionists with deadlines.',
+                    url='http://www.djangoproject.com/',
+                    title='Django Rocks'
+                ), Copy.objects.get(
+                    content='The Web framework for perfectionists with deadlines.',
+                ))
+
+    def test_related_name_attribute_exists(self):
+        # The Post model doesn't have an attribute called 'attached_%(app_label)s_%(class)s_set'.
+        self.assertFalse(hasattr(self.title, 'attached_%(app_label)s_%(class)s_set'))

@@ -294,6 +294,18 @@ primary key if there is no :attr:`Meta.ordering
 
 ...since the ``Blog`` model has no default ordering specified.
 
+.. versionadded:: 1.7
+
+    Note that it is also possible to order a queryset by a related field,
+    without incurring the cost of a JOIN, by referring to the ``_id`` of the
+    related field::
+
+        # No Join
+        Entry.objects.order_by('blog_id')
+
+        # Join
+        Entry.objects.order_by('blog__id')
+
 Be cautious when ordering by fields in related models if you are also using
 :meth:`distinct()`. See the note in :meth:`distinct` for an explanation of how
 related model ordering can change the expected results.
@@ -435,6 +447,21 @@ Examples (those after the first will only work on PostgreSQL)::
     >>> Entry.objects.order_by('author', 'pub_date').distinct('author')
     [...]
 
+.. note::
+    Keep in mind that :meth:`order_by` uses any default related model ordering
+    that has been defined. You might have to explicitly order by the relation
+    ``_id`` or referenced field to make sure the ``DISTINCT ON`` expressions
+    match those at the beginning of the ``ORDER BY`` clause. For example, if
+    the ``Blog`` model defined an :attr:`~django.db.models.Options.ordering` by
+    ``name``::
+
+        Entry.objects.order_by('blog').distinct('blog')
+
+    ...wouldn't work because the query would be ordered by ``blog__name`` thus
+    mismatching the ``DISTINCT ON`` expression. You'd have to explicitly order
+    by the relation `_id` field (``blog_id`` in this case) or the referenced
+    one (``blog__pk``) to make sure both expressions match.
+
 values
 ~~~~~~
 
@@ -484,7 +511,7 @@ A few subtleties that are worth mentioning:
   For example::
 
     >>> Entry.objects.values()
-    [{'blog_id': 1, 'headline': u'First Entry', ...}, ...]
+    [{'blog_id': 1, 'headline': 'First Entry', ...}, ...]
 
     >>> Entry.objects.values('blog')
     [{'blog': 1}, ...]
@@ -502,14 +529,23 @@ A few subtleties that are worth mentioning:
   made after a ``values()`` call will have its extra selected fields
   ignored.
 
+* Calling :meth:`only()` and :meth:`defer()` after ``values()`` doesn't make
+  sense, so doing so will raise a ``NotImplementedError``.
+
+.. versionadded:: 1.7
+
+    The last point above is new. Previously, calling :meth:`only()` and
+    :meth:`defer()` after ``values()`` was allowed, but it either crashed or
+    returned incorrect results.
+
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
 from a small number of the available fields and you won't need the
 functionality of a model instance object. It's more efficient to select only
 the fields you need to use.
 
-Finally, note a ``ValuesQuerySet`` is a subclass of ``QuerySet``, so it has all
-methods of ``QuerySet``. You can call ``filter()`` on it, or ``order_by()``, or
-whatever. Yes, that means these two calls are identical::
+Finally, note that a ``ValuesQuerySet`` is a subclass of ``QuerySet`` and it
+implements most of the same methods. You can call ``filter()`` on it,
+``order_by()``, etc. That means that these two calls are identical::
 
     Blog.objects.values().order_by('id')
     Blog.objects.order_by('id').values()
@@ -545,7 +581,7 @@ respective field passed into the ``values_list()`` call — so the first item is
 the first field, etc. For example::
 
     >>> Entry.objects.values_list('id', 'headline')
-    [(1, u'First entry'), ...]
+    [(1, 'First entry'), ...]
 
 If you only pass in a single field, you can also pass in the ``flat``
 parameter. If ``True``, this will mean the returned results are single values,
@@ -576,16 +612,7 @@ Returns a ``DateQuerySet`` — a ``QuerySet`` that evaluates to a list of
 :class:`datetime.date` objects representing all available dates of a
 particular kind within the contents of the ``QuerySet``.
 
-.. versionchanged:: 1.6
-
-    ``dates`` used to return a list of :class:`datetime.datetime` objects.
-
 ``field`` should be the name of a ``DateField`` of your model.
-
-.. versionchanged:: 1.6
-
-    ``dates`` used to accept operating on a ``DateTimeField``.
-
 ``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
 ``datetime.date`` object in the result list is "truncated" to the given
 ``type``.
@@ -614,8 +641,6 @@ Examples::
 
 datetimes
 ~~~~~~~~~
-
-.. versionadded:: 1.6
 
 .. method:: datetimes(field, kind, order='ASC', tzinfo=None)
 
@@ -760,8 +785,6 @@ follow all non-null foreign keys it can find - nullable foreign keys must be
 specified. This is not recommended in most cases as it is likely to make the
 underlying query more complex, and return more data, than is actually needed.
 
-.. versionadded:: 1.6
-
 If you need to clear the list of related fields added by past calls of
 ``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter::
 
@@ -798,8 +821,8 @@ relationship, and does the 'joining' in Python. This allows it to prefetch
 many-to-many and many-to-one objects, which cannot be done using
 ``select_related``, in addition to the foreign key and one-to-one relationships
 that are supported by ``select_related``. It also supports prefetching of
-:class:`~django.contrib.contenttypes.generic.GenericRelation` and
-:class:`~django.contrib.contenttypes.generic.GenericForeignKey`.
+:class:`~django.contrib.contenttypes.fields.GenericRelation` and
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey`.
 
 For example, suppose you have these models::
 
@@ -812,17 +835,16 @@ For example, suppose you have these models::
         name = models.CharField(max_length=50)
         toppings = models.ManyToManyField(Topping)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
-            return u"%s (%s)" % (self.name, u", ".join([topping.name
-                                                        for topping in self.toppings.all()]))
+        def __str__(self):              # __unicode__ on Python 2
+            return "%s (%s)" % (self.name, ", ".join([topping.name
+                                                      for topping in self.toppings.all()]))
 
 and run::
 
     >>> Pizza.objects.all()
-    [u"Hawaiian (ham, pineapple)", u"Seafood (prawns, smoked salmon)"...
+    ["Hawaiian (ham, pineapple)", "Seafood (prawns, smoked salmon)"...
 
-The problem with this is that every time ``Pizza.__unicode__()`` asks for
+The problem with this is that every time ``Pizza.__str__()`` asks for
 ``self.toppings.all()`` it has to query the database, so
 ``Pizza.objects.all()`` will run a query on the Toppings table for **every**
 item in the Pizza ``QuerySet``.
@@ -898,7 +920,7 @@ objects have already been fetched, and it will skip fetching them again.
 
 Chaining ``prefetch_related`` calls will accumulate the lookups that are
 prefetched. To clear any ``prefetch_related`` behavior, pass ``None`` as a
-parameter::
+parameter:
 
    >>> non_prefetched = qs.prefetch_related(None)
 
@@ -925,6 +947,109 @@ profile for your use case!
 Note that if you use ``iterator()`` to run the query, ``prefetch_related()``
 calls will be ignored since these two optimizations do not make sense together.
 
+.. versionadded:: 1.7
+
+You can use the :class:`~django.db.models.Prefetch` object to further control
+the prefetch operation.
+
+In its simplest form ``Prefetch`` is equivalent to the traditional string based
+lookups:
+
+    >>> Restaurant.objects.prefetch_related(Prefetch('pizzas__toppings'))
+
+You can provide a custom queryset with the optional ``queryset`` argument.
+This can be used to change the default ordering of the queryset:
+
+    >>> Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas__toppings', queryset=Toppings.objects.order_by('name')))
+
+Or to call :meth:`~django.db.models.query.QuerySet.select_related()` when
+applicable to reduce the number of queries even further:
+
+    >>> Pizza.objects.prefetch_related(
+    ...     Prefetch('restaurants', queryset=Restaurant.objects.select_related('best_pizza')))
+
+You can also assign the prefetched result to a custom attribute with the optional
+``to_attr`` argument. The result will be stored directly in a list.
+
+This allows prefetching the same relation multiple times with a different
+``QuerySet``; for instance:
+
+    >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
+    >>> Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas', to_attr='menu'),
+    ...     Prefetch('pizzas', queryset=vegetarian_pizzas, to_attr='vegetarian_menu'))
+
+Lookups created with custom ``to_attr`` can still be traversed as usual by other
+lookups:
+
+    >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
+    >>> Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas', queryset=vegetarian_pizzas, to_attr='vegetarian_menu'),
+    ...     'vegetarian_menu__toppings')
+
+Using ``to_attr`` is recommended when filtering down the prefetch result as it is
+less ambiguous than storing a filtered result in the related manager's cache:
+
+    >>> queryset = Pizza.objects.filter(vegetarian=True)
+    >>>
+    >>> # Recommended:
+    >>> restaurants = Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas', queryset=queryset, to_attr='vegetarian_pizzas'))
+    >>> vegetarian_pizzas = restaurants[0].vegetarian_pizzas
+    >>>
+    >>> # Not recommended:
+    >>> restaurants = Restaurant.objects.prefetch_related(
+    ...     Prefetch('pizzas', queryset=queryset))
+    >>> vegetarian_pizzas = restaurants[0].pizzas.all()
+
+Custom prefetching also works with single related relations like
+forward ``ForeignKey`` or ``OneToOneField``. Generally you'll want to use
+:meth:`select_related()` for these relations, but there are a number of cases
+where prefetching with a custom ``QuerySet`` is useful:
+
+* You want to use a ``QuerySet`` that performs further prefetching
+  on related models.
+
+* You want to prefetch only a subset of the related objects.
+
+* You want to use performance optimization techniques like
+  :meth:`deferred fields <defer()>`:
+
+    >>> queryset = Pizza.objects.only('name')
+    >>>
+    >>> restaurants = Restaurant.objects.prefetch_related(
+    ...     Prefetch('best_pizza', queryset=queryset))
+
+.. note::
+
+    The ordering of lookups matters.
+
+    Take the following examples:
+
+       >>> prefetch_related('pizzas__toppings', 'pizzas')
+
+    This works even though it's unordered because ``'pizzas__toppings'``
+    already contains all the needed information, therefore the second argument
+    ``'pizzas'`` is actually redundant.
+
+        >>> prefetch_related('pizzas__toppings', Prefetch('pizzas', queryset=Pizza.objects.all()))
+
+    This will raise a ``ValueError`` because of the attempt to redefine the
+    queryset of a previously seen lookup. Note that an implicit queryset was
+    created to traverse ``'pizzas'`` as part of the ``'pizzas__toppings'``
+    lookup.
+
+        >>> prefetch_related('pizza_list__toppings', Prefetch('pizzas', to_attr='pizza_list'))
+
+    This will trigger an ``AttributeError`` because ``'pizza_list'`` doesn't exist yet
+    when ``'pizza_list__toppings'`` is being processed.
+
+    This consideration is not limited to the use of ``Prefetch`` objects. Some
+    advanced techniques may require that the lookups be performed in a
+    specific order to avoid creating extra queries; therefore it's recommended
+    to always carefully order ``prefetch_related`` arguments.
+
 extra
 ~~~~~
 
@@ -934,6 +1059,13 @@ Sometimes, the Django query syntax by itself can't easily express a complex
 ``WHERE`` clause. For these edge cases, Django provides the ``extra()``
 ``QuerySet`` modifier — a hook for injecting specific clauses into the SQL
 generated by a ``QuerySet``.
+
+.. warning::
+
+    You should be very careful whenever you use ``extra()``. Every time you use
+    it, you should escape any parameters that the user can control by using
+    ``params`` in order to protect against SQL injection attacks . Please
+    read more about :ref:`SQL injection protection <sql-injection-protection>`.
 
 By definition, these extra lookups may not be portable to different database
 engines (because you're explicitly writing SQL code) and violate the DRY
@@ -1090,6 +1222,16 @@ of the arguments is required, but you should use at least one of them.
   Good::
 
       Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
+
+.. warning::
+
+    If you are performing queries on MySQL, note that MySQL's silent type coercion
+    may cause unexpected results when mixing types. If you query on a string
+    type column, but with an integer value, MySQL will coerce the types of all values
+    in the table to an integer before performing the comparison. For example, if your
+    table contains the values ``'abc'``, ``'def'`` and you query for ``WHERE mycolumn=0``,
+    both rows will match. To prevent this, perform the correct typecasting
+    before using the value in a query.
 
 defer
 ~~~~~
@@ -1267,8 +1409,18 @@ do not support ``nowait``, such as MySQL, will cause a
 :exc:`~django.db.DatabaseError` to be raised. This is in order to prevent code
 unexpectedly blocking.
 
+Evaluating a queryset with ``select_for_update`` in autocommit mode is
+an error because the rows are then not locked. If allowed, this would
+facilitate data corruption, and could easily be caused by calling,
+outside of any transaction, code that expects to be run in one.
+
 Using ``select_for_update`` on backends which do not support
 ``SELECT ... FOR UPDATE`` (such as SQLite) will have no effect.
+
+.. versionchanged:: 1.6.3
+
+    It is now an error to execute a query with ``select_for_update()`` in
+    autocommit mode. With earlier releases in the 1.6 series it was a no-op.
 
 raw
 ~~~
@@ -1284,7 +1436,7 @@ Takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
 can be iterated over just like an normal ``QuerySet`` to provide object instances.
 
-See the :ref:`executing-raw-queries` for more information.
+See the :doc:`/topics/db/sql` for more information.
 
 .. warning::
 
@@ -1363,10 +1515,6 @@ get_or_create
 A convenience method for looking up an object with the given ``kwargs`` (may be
 empty if your model has defaults for all fields), creating one if necessary.
 
-.. versionchanged:: 1.6
-
-    Older versions of Django required ``kwargs``.
-
 Returns a tuple of ``(object, created)``, where ``object`` is the retrieved or
 created object and ``created`` is a boolean specifying whether a new object was
 created.
@@ -1432,11 +1580,11 @@ where ``get_or_create`` will raise an :exc:`~django.db.IntegrityError` but the
 object won't appear in a subsequent :meth:`~django.db.models.query.QuerySet.get`
 call.
 
-Finally, a word on using ``get_or_create()`` in Django views: please make sure
-to use it only in ``POST`` requests unless you have a good reason not to
-``GET`` requests shouldn't have any effect on data; use ``POST`` whenever a
-request to a page has a side effect on your data. For more, see `Safe methods`_
-in the HTTP spec.
+Finally, a word on using ``get_or_create()`` in Django views. Please make sure
+to use it only in ``POST`` requests unless you have a good reason not to.
+``GET`` requests shouldn't have any effect on data. Instead, use ``POST``
+whenever a request to a page has a side effect on your data. For more, see
+`Safe methods`_ in the HTTP spec.
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
 
@@ -1540,6 +1688,7 @@ This has a number of caveats though:
 * It does not work with child models in a multi-table inheritance scenario.
 * If the model's primary key is an :class:`~django.db.models.AutoField` it
   does not retrieve and set the primary key attribute, as ``save()`` does.
+* It does not work with many-to-many relationships.
 
 The ``batch_size`` parameter controls how many objects are created in single
 query. The default is to create all objects in one batch, except for SQLite
@@ -1650,16 +1799,13 @@ earliest
 
 .. method:: earliest(field_name=None)
 
-.. versionadded:: 1.6
-
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.
 
 first
 ~~~~~
-.. method:: first()
 
-.. versionadded:: 1.6
+.. method:: first()
 
 Returns the first object matched by the queryset, or ``None`` if there
 is no matching object. If the ``QuerySet`` has no ordering defined, then the
@@ -1680,8 +1826,6 @@ equivalent to the above example::
 last
 ~~~~
 .. method:: last()
-
-.. versionadded:: 1.6
 
 Works like  :meth:`first()`, but returns the last object in the queryset.
 
@@ -1909,6 +2053,12 @@ specified as keyword arguments to the ``QuerySet`` methods :meth:`filter()`,
 For an introduction, see :ref:`models and database queries documentation
 <field-lookups-intro>`.
 
+Django's inbuilt lookups are listed below. It is also possible to write
+:doc:`custom lookups </ref/models/custom-lookups>` for model fields.
+
+As a convenience when no lookup type is provided (like in
+``Entry.objects.get(id=14)``) the lookup type is assumed to be :lookup:`exact`.
+
 .. fieldlookup:: exact
 
 exact
@@ -1943,9 +2093,15 @@ iexact
 
 Case-insensitive exact match.
 
+.. versionchanged:: 1.7
+
+    If the value provided for comparison is ``None``, it will be interpreted
+    as an SQL ``NULL`` (see :lookup:`isnull` for more details).
+
 Example::
 
     Blog.objects.get(name__iexact='beatles blog')
+    Blog.objects.get(name__iexact=None)
 
 SQL equivalent::
 
@@ -2046,6 +2202,8 @@ extract two field values, where only one is expected::
     # Bad code! Will raise a TypeError.
     inner_qs = Blog.objects.filter(name__contains='Ch').values('name', 'id')
     entries = Entry.objects.filter(blog__name__in=inner_qs)
+
+.. _nested-queries-performance:
 
 .. admonition:: Performance considerations
 
@@ -2309,8 +2467,6 @@ in the database <database-time-zone-definitions>`.
 hour
 ~~~~
 
-.. versionadded:: 1.6
-
 For datetime fields, an exact hour match. Takes an integer between 0 and 23.
 
 Example::
@@ -2331,8 +2487,6 @@ zone before filtering.
 minute
 ~~~~~~
 
-.. versionadded:: 1.6
-
 For datetime fields, an exact minute match. Takes an integer between 0 and 59.
 
 Example::
@@ -2352,8 +2506,6 @@ zone before filtering.
 
 second
 ~~~~~~
-
-.. versionadded:: 1.6
 
 For datetime fields, an exact second match. Takes an integer between 0 and 59.
 

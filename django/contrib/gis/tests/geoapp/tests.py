@@ -24,7 +24,7 @@ if HAS_GEOS and not spatialite:
 
 
 def postgis_bug_version():
-    spatial_version = getattr(connection.ops, "spatial_version", (0,0,0))
+    spatial_version = getattr(connection.ops, "spatial_version", (0, 0, 0))
     return spatial_version and (2, 0, 0) <= spatial_version <= (2, 0, 1)
 
 
@@ -84,7 +84,7 @@ class GeoModelTest(TestCase):
         # Creating a State object using a built Polygon
         ply = Polygon(shell, inner)
         nullstate = State(name='NullState', poly=ply)
-        self.assertEqual(4326, nullstate.poly.srid) # SRID auto-set from None
+        self.assertEqual(4326, nullstate.poly.srid)  # SRID auto-set from None
         nullstate.save()
 
         ns = State.objects.get(name='NullState')
@@ -111,18 +111,18 @@ class GeoModelTest(TestCase):
         "Testing automatic transform for lookups and inserts."
         # San Antonio in 'WGS84' (SRID 4326)
         sa_4326 = 'POINT (-98.493183 29.424170)'
-        wgs_pnt = fromstr(sa_4326, srid=4326) # Our reference point in WGS84
+        wgs_pnt = fromstr(sa_4326, srid=4326)  # Our reference point in WGS84
 
         # Oracle doesn't have SRID 3084, using 41157.
         if oracle:
             # San Antonio in 'Texas 4205, Southern Zone (1983, meters)' (SRID 41157)
             # Used the following Oracle SQL to get this value:
             #  SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_CS.TRANSFORM(SDO_GEOMETRY('POINT (-98.493183 29.424170)', 4326), 41157)) FROM DUAL;
-            nad_wkt  = 'POINT (300662.034646583 5416427.45974934)'
+            nad_wkt = 'POINT (300662.034646583 5416427.45974934)'
             nad_srid = 41157
         else:
             # San Antonio in 'NAD83(HARN) / Texas Centric Lambert Conformal' (SRID 3084)
-            nad_wkt = 'POINT (1645978.362408288754523 6276356.025927528738976)' # Used ogr.py in gdal 1.4.1 for this transform
+            nad_wkt = 'POINT (1645978.362408288754523 6276356.025927528738976)'  # Used ogr.py in gdal 1.4.1 for this transform
             nad_srid = 3084
 
         # Constructing & querying with a point from a different SRID. Oracle
@@ -156,7 +156,7 @@ class GeoModelTest(TestCase):
         c = City()
         self.assertEqual(c.point, None)
 
-    @no_spatialite # SpatiaLite does not support abstract geometry columns
+    @no_spatialite  # SpatiaLite does not support abstract geometry columns
     def test_geometryfield(self):
         "Testing the general GeometryField."
         Feature(name='Point', geom=Point(1, 1)).save()
@@ -201,7 +201,7 @@ class GeoModelTest(TestCase):
         as_text = 'ST_AsText' if postgis else 'asText'
         cities2 = City.objects.raw('select id, name, %s(point) from geoapp_city' % as_text)
         self.assertEqual(len(cities1), len(list(cities2)))
-        self.assertTrue(isinstance(cities2[0].point, Point))
+        self.assertIsInstance(cities2[0].point, Point)
 
 
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
@@ -242,8 +242,8 @@ class GeoLookupTest(TestCase):
 
         # Now testing contains on the countries using the points for
         #  Houston and Wellington.
-        tx = Country.objects.get(mpoly__contains=houston.point) # Query w/GEOSGeometry
-        nz = Country.objects.get(mpoly__contains=wellington.point.hex) # Query w/EWKBHEX
+        tx = Country.objects.get(mpoly__contains=houston.point)  # Query w/GEOSGeometry
+        nz = Country.objects.get(mpoly__contains=wellington.point.hex)  # Query w/EWKBHEX
         self.assertEqual('Texas', tx.name)
         self.assertEqual('New Zealand', nz.name)
 
@@ -254,9 +254,9 @@ class GeoLookupTest(TestCase):
 
         # Pueblo and Oklahoma City (even though OK City is within the bounding box of Texas)
         # are not contained in Texas or New Zealand.
-        self.assertEqual(0, len(Country.objects.filter(mpoly__contains=pueblo.point))) # Query w/GEOSGeometry object
+        self.assertEqual(0, len(Country.objects.filter(mpoly__contains=pueblo.point)))  # Query w/GEOSGeometry object
         self.assertEqual((mysql and 1) or 0,
-                         len(Country.objects.filter(mpoly__contains=okcity.point.wkt))) # Qeury w/WKT
+                         len(Country.objects.filter(mpoly__contains=okcity.point.wkt)))  # Qeury w/WKT
 
         # OK City is contained w/in bounding box of Texas.
         if not oracle:
@@ -345,7 +345,7 @@ class GeoLookupTest(TestCase):
         nmi = State.objects.create(name='Northern Mariana Islands', poly=None)
         self.assertEqual(nmi.poly, None)
 
-        # Assigning a geomery and saving -- then UPDATE back to NULL.
+        # Assigning a geometry and saving -- then UPDATE back to NULL.
         nmi.poly = 'POLYGON((0 0,1 0,1 1,1 0,0 0))'
         nmi.save()
         State.objects.filter(name='Northern Mariana Islands').update(poly=None)
@@ -359,7 +359,7 @@ class GeoLookupTest(TestCase):
         pnt1 = fromstr('POINT (649287.0363174 4177429.4494686)', srid=2847)
         pnt2 = fromstr('POINT(-98.4919715741052 29.4333344025053)', srid=4326)
 
-        # Not passing in a geometry as first param shoud
+        # Not passing in a geometry as first param should
         # raise a type error when initializing the GeoQuerySet
         self.assertRaises(ValueError, Country.objects.filter, mpoly__relate=(23, 'foo'))
 
@@ -435,8 +435,11 @@ class GeoQuerySetTest(TestCase):
                 self.assertEqual(c.mpoly.difference(geom), c.difference)
                 if not spatialite:
                     self.assertEqual(c.mpoly.intersection(geom), c.intersection)
-                self.assertEqual(c.mpoly.sym_difference(geom), c.sym_difference)
-                self.assertEqual(c.mpoly.union(geom), c.union)
+                # Ordering might differ in collections
+                self.assertSetEqual(set(g.wkt for g in c.mpoly.sym_difference(geom)),
+                                    set(g.wkt for g in c.sym_difference))
+                self.assertSetEqual(set(g.wkt for g in c.mpoly.union(geom)),
+                                    set(g.wkt for g in c.union))
 
     @skipUnless(getattr(connection.ops, 'envelope', False), 'Database does not support envelope operation')
     def test_envelope(self):
@@ -446,7 +449,7 @@ class GeoQuerySetTest(TestCase):
             self.assertIsInstance(country.envelope, Polygon)
 
     @no_mysql
-    @no_spatialite # SpatiaLite does not have an Extent function
+    @no_spatialite  # SpatiaLite does not have an Extent function
     def test_extent(self):
         "Testing the `extent` GeoQuerySet method."
         # Reference query:
@@ -534,7 +537,7 @@ class GeoQuerySetTest(TestCase):
 
     def test_gml(self):
         "Testing GML output from the database using GeoQuerySet.gml()."
-        if mysql or (spatialite and not connection.ops.gml) :
+        if mysql or (spatialite and not connection.ops.gml):
             self.assertRaises(NotImplementedError, Country.objects.all().gml, field_name='mpoly')
             return
 
@@ -618,7 +621,7 @@ class GeoQuerySetTest(TestCase):
                 self.assertEqual(1, c.num_geom)
 
     @no_mysql
-    @no_spatialite # SpatiaLite can only count vertices in LineStrings
+    @no_spatialite  # SpatiaLite can only count vertices in LineStrings
     def test_num_points(self):
         "Testing the `num_points` GeoQuerySet method."
         for c in Country.objects.num_points():
@@ -635,15 +638,15 @@ class GeoQuerySetTest(TestCase):
         # Reference values.
         if oracle:
             # SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOM.SDO_POINTONSURFACE(GEOAPP_COUNTRY.MPOLY, 0.05)) FROM GEOAPP_COUNTRY;
-            ref = {'New Zealand' : fromstr('POINT (174.616364 -36.100861)', srid=4326),
-                   'Texas' : fromstr('POINT (-103.002434 36.500397)', srid=4326),
+            ref = {'New Zealand': fromstr('POINT (174.616364 -36.100861)', srid=4326),
+                   'Texas': fromstr('POINT (-103.002434 36.500397)', srid=4326),
                    }
 
         elif postgis or spatialite:
             # Using GEOSGeometry to compute the reference point on surface values
             # -- since PostGIS also uses GEOS these should be the same.
-            ref = {'New Zealand' : Country.objects.get(name='New Zealand').mpoly.point_on_surface,
-                   'Texas' : Country.objects.get(name='Texas').mpoly.point_on_surface
+            ref = {'New Zealand': Country.objects.get(name='New Zealand').mpoly.point_on_surface,
+                   'Texas': Country.objects.get(name='Texas').mpoly.point_on_surface
                    }
 
         for c in Country.objects.point_on_surface():
@@ -671,7 +674,7 @@ class GeoQuerySetTest(TestCase):
     def test_scale(self):
         "Testing the `scale` GeoQuerySet method."
         xfac, yfac = 2, 3
-        tol = 5 # XXX The low precision tolerance is for SpatiaLite
+        tol = 5  # XXX The low precision tolerance is for SpatiaLite
         qs = Country.objects.scale(xfac, yfac, model_att='scaled')
         for c in qs:
             for p1, p2 in zip(c.mpoly, c.scaled):
@@ -740,7 +743,7 @@ class GeoQuerySetTest(TestCase):
         # Pre-transformed points for Houston and Pueblo.
         htown = fromstr('POINT(1947516.83115183 6322297.06040572)', srid=3084)
         ptown = fromstr('POINT(992363.390841912 481455.395105533)', srid=2774)
-        prec = 3 # Precision is low due to version variations in PROJ and GDAL.
+        prec = 3  # Precision is low due to version variations in PROJ and GDAL.
 
         # Asserting the result of the transform operation with the values in
         #  the pre-transformed points.  Oracle does not have the 3084 SRID.
@@ -775,9 +778,9 @@ class GeoQuerySetTest(TestCase):
     def test_unionagg(self):
         "Testing the `unionagg` (aggregate union) GeoQuerySet method."
         tx = Country.objects.get(name='Texas').mpoly
-        # Houston, Dallas -- Oracle has different order.
+        # Houston, Dallas -- Ordering may differ depending on backend or GEOS version.
         union1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
-        union2 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
+        union2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)')
         qs = City.objects.filter(point__within=tx)
         self.assertRaises(TypeError, qs.unionagg, 'name')
         # Using `field_name` keyword argument in one query and specifying an
@@ -786,11 +789,16 @@ class GeoQuerySetTest(TestCase):
         u1 = qs.unionagg(field_name='point')
         u2 = qs.order_by('name').unionagg()
         tol = 0.00001
-        if oracle:
-            union = union2
-        else:
-            union = union1
-        self.assertEqual(True, union.equals_exact(u1, tol))
-        self.assertEqual(True, union.equals_exact(u2, tol))
+        self.assertEqual(True, union1.equals_exact(u1, tol) or union2.equals_exact(u1, tol))
+        self.assertEqual(True, union1.equals_exact(u2, tol) or union2.equals_exact(u2, tol))
         qs = City.objects.filter(name='NotACity')
         self.assertEqual(None, qs.unionagg(field_name='point'))
+
+    def test_non_concrete_field(self):
+        pkfield = City._meta.get_field_by_name('id')[0]
+        orig_pkfield_col = pkfield.column
+        pkfield.column = None
+        try:
+            list(City.objects.all())
+        finally:
+            pkfield.column = orig_pkfield_col

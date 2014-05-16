@@ -11,9 +11,11 @@ from datetime import date as real_date, datetime as real_datetime
 import re
 import time
 
+
 class date(real_date):
     def strftime(self, fmt):
         return strftime(self, fmt)
+
 
 class datetime(real_datetime):
     def strftime(self, fmt):
@@ -28,9 +30,11 @@ class datetime(real_datetime):
     def date(self):
         return date(self.year, self.month, self.day)
 
+
 def new_date(d):
     "Generate a safe date from a datetime.date object."
     return date(d.year, d.month, d.day)
+
 
 def new_datetime(d):
     """
@@ -45,6 +49,7 @@ def new_datetime(d):
 # Allowed if there's an even number of "%"s because they are escaped.
 _illegal_formatting = re.compile(r"((^|[^%])(%%)*%[sy])")
 
+
 def _findall(text, substr):
     # Also finds overlaps
     sites = []
@@ -54,8 +59,9 @@ def _findall(text, substr):
         if j == -1:
             break
         sites.append(j)
-        i=j+1
+        i = j + 1
     return sites
+
 
 def strftime(dt, fmt):
     if dt.year >= 1900:
@@ -77,8 +83,8 @@ def strftime(dt, fmt):
     s1 = time.strftime(fmt, (year,) + timetuple[1:])
     sites1 = _findall(s1, str(year))
 
-    s2 = time.strftime(fmt, (year+28,) + timetuple[1:])
-    sites2 = _findall(s2, str(year+28))
+    s2 = time.strftime(fmt, (year + 28,) + timetuple[1:])
+    sites2 = _findall(s2, str(year + 28))
 
     sites = []
     for site in sites1:
@@ -88,5 +94,5 @@ def strftime(dt, fmt):
     s = s1
     syear = "%04d" % (dt.year,)
     for site in sites:
-        s = s[:site] + syear + s[site+4:]
+        s = s[:site] + syear + s[site + 4:]
     return s

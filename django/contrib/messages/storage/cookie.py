@@ -33,18 +33,22 @@ class MessageDecoder(json.JSONDecoder):
     def process_messages(self, obj):
         if isinstance(obj, list) and obj:
             if obj[0] == MessageEncoder.message_key:
+                if len(obj) == 3:
+                    # Compatibility with previously-encoded messages
+                    return Message(*obj[1:])
                 if obj[1]:
                     obj[3] = mark_safe(obj[3])
                 return Message(*obj[2:])
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):
             return dict((key, self.process_messages(value))
-                         for key, value in six.iteritems(obj))
+                        for key, value in six.iteritems(obj))
         return obj
 
     def decode(self, s, **kwargs):
         decoded = super(MessageDecoder, self).decode(s, **kwargs)
         return self.process_messages(decoded)
+
 
 class CookieStorage(BaseStorage):
     """
@@ -99,8 +103,9 @@ class CookieStorage(BaseStorage):
         encoded_data = self._encode(messages)
         if self.max_cookie_size:
             # data is going to be stored eventually by SimpleCookie, which
-            # adds it's own overhead, which we must account for.
-            cookie = SimpleCookie() # create outside the loop
+            # adds its own overhead, which we must account for.
+            cookie = SimpleCookie()  # create outside the loop
+
             def stored_length(val):
                 return len(cookie.value_encode(val)[1])
 

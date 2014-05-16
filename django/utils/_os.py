@@ -1,6 +1,7 @@
 import os
 import stat
 import sys
+import tempfile
 from os.path import join, normcase, normpath, abspath, isabs, sep, dirname
 
 from django.utils.encoding import force_text
@@ -34,6 +35,7 @@ else:
             path = join(os.getcwdu(), path)
         return normpath(path)
 
+
 def upath(path):
     """
     Always return a unicode path.
@@ -41,6 +43,7 @@ def upath(path):
     if six.PY2 and not isinstance(path, six.text_type):
         return path.decode(fs_encoding)
     return path
+
 
 def npath(path):
     """
@@ -50,6 +53,7 @@ def npath(path):
     if six.PY2 and not isinstance(path, bytes):
         return path.encode(fs_encoding)
     return path
+
 
 def safe_join(base, *paths):
     """
@@ -71,8 +75,8 @@ def safe_join(base, *paths):
     #  b) The final path must be the same as the base path.
     #  c) The base path must be the most root path (meaning either "/" or "C:\\")
     if (not normcase(final_path).startswith(normcase(base_path + sep)) and
-        normcase(final_path) != normcase(base_path) and
-        dirname(normcase(base_path)) != normcase(base_path)):
+            normcase(final_path) != normcase(base_path) and
+            dirname(normcase(base_path)) != normcase(base_path)):
         raise ValueError('The joined path (%s) is located outside of the base '
                          'path component (%s)' % (final_path, base_path))
     return final_path
@@ -96,3 +100,24 @@ def rmtree_errorhandler(func, path, exc_info):
     os.chmod(path, stat.S_IWRITE)
     # use the original function to repeat the operation
     func(path)
+
+
+def symlinks_supported():
+    """
+    A function to check if creating symlinks are supported in the
+    host platform and/or if they are allowed to be created (e.g.
+    on Windows it requires admin permissions).
+    """
+    tmpdir = tempfile.mkdtemp()
+    original_path = os.path.join(tmpdir, 'original')
+    symlink_path = os.path.join(tmpdir, 'symlink')
+    os.makedirs(original_path)
+    try:
+        os.symlink(original_path, symlink_path)
+        supported = True
+    except (OSError, NotImplementedError, AttributeError):
+        supported = False
+    else:
+        os.remove(symlink_path)
+    finally:
+        return supported

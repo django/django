@@ -6,10 +6,12 @@ try:
 except ImportError:
     resource_string = None
 
+from django.apps import apps
 from django.conf import settings
 from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader
 from django.utils import six
+
 
 class Loader(BaseLoader):
     is_usable = resource_string is not None
@@ -22,12 +24,12 @@ class Loader(BaseLoader):
         """
         if resource_string is not None:
             pkg_name = 'templates/' + template_name
-            for app in settings.INSTALLED_APPS:
+            for app_config in apps.get_app_configs():
                 try:
-                    resource = resource_string(app, pkg_name)
+                    resource = resource_string(app_config.name, pkg_name)
                 except Exception:
                     continue
                 if six.PY2:
                     resource = resource.decode(settings.FILE_CHARSET)
-                return (resource, 'egg:%s:%s' % (app, pkg_name))
+                return (resource, 'egg:%s:%s' % (app_config.name, pkg_name))
         raise TemplateDoesNotExist(template_name)

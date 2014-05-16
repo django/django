@@ -1,7 +1,7 @@
-from django.conf.urls import patterns
+from django.conf.urls import url
 
-urlpatterns = patterns('',
-    (r'^noslash$', 'view'),
-    (r'^slash/$', 'view'),
-    (r'^needsquoting#/$', 'view'),
-)
+urlpatterns = [
+    url(r'^noslash$', 'middleware.views.empty_view'),
+    url(r'^slash/$', 'middleware.views.empty_view'),
+    url(r'^needsquoting#/$', 'middleware.views.empty_view'),
+]

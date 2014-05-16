@@ -27,6 +27,7 @@ class Plant(models.Model):
         # For testing when upper case letter in app name; regression for #4057
         db_table = "Fixtures_regress_plant"
 
+
 @python_2_unicode_compatible
 class Stuff(models.Model):
     name = models.CharField(max_length=20, null=True)
@@ -154,7 +155,7 @@ class NKChild(Parent):
     objects = NKManager()
 
     def natural_key(self):
-        return self.data
+        return (self.data,)
 
     def __str__(self):
         return 'NKChild %s:%s' % (self.name, self.data)
@@ -179,7 +180,7 @@ class Circle1(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle2']
 
 
@@ -187,7 +188,7 @@ class Circle2(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle1']
 
 
@@ -195,7 +196,7 @@ class Circle3(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle3']
 
 
@@ -203,7 +204,7 @@ class Circle4(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle5']
 
 
@@ -211,7 +212,7 @@ class Circle5(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle6']
 
 
@@ -219,7 +220,7 @@ class Circle6(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle4']
 
 
@@ -227,10 +228,104 @@ class ExternalDependency(models.Model):
     name = models.CharField(max_length=255)
 
     def natural_key(self):
-        return self.name
+        return (self.name,)
     natural_key.dependencies = ['fixtures_regress.book']
 
 
 # Model for regression test of #11101
 class Thingy(models.Model):
     name = models.CharField(max_length=255)
+
+
+@python_2_unicode_compatible
+class BaseNKModel(models.Model):
+    """
+    Base model with a natural_key and a manager with `get_by_natural_key`
+    """
+    data = models.CharField(max_length=20, unique=True)
+    objects = NKManager()
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.data
+
+    def natural_key(self):
+        return (self.data,)
+
+
+class M2MSimpleA(BaseNKModel):
+    b_set = models.ManyToManyField("M2MSimpleB")
+
+
+class M2MSimpleB(BaseNKModel):
+    pass
+
+
+class M2MSimpleCircularA(BaseNKModel):
+    b_set = models.ManyToManyField("M2MSimpleCircularB")
+
+
+class M2MSimpleCircularB(BaseNKModel):
+    a_set = models.ManyToManyField("M2MSimpleCircularA")
+
+
+class M2MComplexA(BaseNKModel):
+    b_set = models.ManyToManyField("M2MComplexB", through="M2MThroughAB")
+
+
+class M2MComplexB(BaseNKModel):
+    pass
+
+
+class M2MThroughAB(BaseNKModel):
+    a = models.ForeignKey(M2MComplexA)
+    b = models.ForeignKey(M2MComplexB)
+
+
+class M2MComplexCircular1A(BaseNKModel):
+    b_set = models.ManyToManyField("M2MComplexCircular1B",
+                                   through="M2MCircular1ThroughAB")
+
+
+class M2MComplexCircular1B(BaseNKModel):
+    c_set = models.ManyToManyField("M2MComplexCircular1C",
+                                   through="M2MCircular1ThroughBC")
+
+
+class M2MComplexCircular1C(BaseNKModel):
+    a_set = models.ManyToManyField("M2MComplexCircular1A",
+                                   through="M2MCircular1ThroughCA")
+
+
+class M2MCircular1ThroughAB(BaseNKModel):
+    a = models.ForeignKey(M2MComplexCircular1A)
+    b = models.ForeignKey(M2MComplexCircular1B)
+
+
+class M2MCircular1ThroughBC(BaseNKModel):
+    b = models.ForeignKey(M2MComplexCircular1B)
+    c = models.ForeignKey(M2MComplexCircular1C)
+
+
+class M2MCircular1ThroughCA(BaseNKModel):
+    c = models.ForeignKey(M2MComplexCircular1C)
+    a = models.ForeignKey(M2MComplexCircular1A)
+
+
+class M2MComplexCircular2A(BaseNKModel):
+    b_set = models.ManyToManyField("M2MComplexCircular2B",
+                                   through="M2MCircular2ThroughAB")
+
+
+class M2MComplexCircular2B(BaseNKModel):
+    def natural_key(self):
+        return (self.data,)
+    # Fake the dependency for a circularity
+    natural_key.dependencies = ["fixtures_regress.M2MComplexCircular2A"]
+
+
+class M2MCircular2ThroughAB(BaseNKModel):
+    a = models.ForeignKey(M2MComplexCircular2A)
+    b = models.ForeignKey(M2MComplexCircular2B)

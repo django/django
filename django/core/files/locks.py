@@ -1,10 +1,13 @@
 """
 Portable file locking utilities.
 
-Based partially on example by Jonathan Feignberg <jdf@pobox.com> in the Python
-Cookbook, licensed under the Python Software License.
+Based partially on an example by Jonathan Feignberg in the Python
+Cookbook [1] (licensed under the Python Software License) and a ctypes port by
+Anatoly Techtonik for Roundup [2] (license [3]).
 
-    http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65203
+[1] http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65203
+[2] http://sourceforge.net/p/roundup/code/ci/default/tree/roundup/backends/portalocker.py
+[3] http://sourceforge.net/p/roundup/code/ci/default/tree/COPYING.txt
 
 Example Usage::
 
@@ -13,57 +16,98 @@ Example Usage::
     ...     locks.lock(f, locks.LOCK_EX)
     ...     f.write('Django')
 """
+import os
 
-__all__ = ('LOCK_EX','LOCK_SH','LOCK_NB','lock','unlock')
+__all__ = ('LOCK_EX', 'LOCK_SH', 'LOCK_NB', 'lock', 'unlock')
 
-system_type = None
 
-try:
-    import win32con
-    import win32file
-    import pywintypes
-    LOCK_EX = win32con.LOCKFILE_EXCLUSIVE_LOCK
-    LOCK_SH = 0
-    LOCK_NB = win32con.LOCKFILE_FAIL_IMMEDIATELY
-    __overlapped = pywintypes.OVERLAPPED()
-    system_type = 'nt'
-except (ImportError, AttributeError):
-    pass
-
-try:
-    import fcntl
-    LOCK_EX = fcntl.LOCK_EX
-    LOCK_SH = fcntl.LOCK_SH
-    LOCK_NB = fcntl.LOCK_NB
-    system_type = 'posix'
-except (ImportError, AttributeError):
-    pass
-
-def fd(f):
+def _fd(f):
     """Get a filedescriptor from something which could be a file or an fd."""
     return f.fileno() if hasattr(f, 'fileno') else f
 
-if system_type == 'nt':
-    def lock(file, flags):
-        hfile = win32file._get_osfhandle(fd(file))
-        win32file.LockFileEx(hfile, flags, 0, -0x10000, __overlapped)
 
-    def unlock(file):
-        hfile = win32file._get_osfhandle(fd(file))
-        win32file.UnlockFileEx(hfile, 0, -0x10000, __overlapped)
-elif system_type == 'posix':
-    def lock(file, flags):
-        fcntl.lockf(fd(file), flags)
+if os.name == 'nt':
+    import msvcrt
+    from ctypes import (sizeof, c_ulong, c_void_p, c_int64,
+                        Structure, Union, POINTER, windll, byref)
+    from ctypes.wintypes import BOOL, DWORD, HANDLE
 
-    def unlock(file):
-        fcntl.lockf(fd(file), fcntl.LOCK_UN)
+    LOCK_SH = 0  # the default
+    LOCK_NB = 0x1  # LOCKFILE_FAIL_IMMEDIATELY
+    LOCK_EX = 0x2  # LOCKFILE_EXCLUSIVE_LOCK
+
+    # --- Adapted from the pyserial project ---
+    # detect size of ULONG_PTR
+    if sizeof(c_ulong) != sizeof(c_void_p):
+        ULONG_PTR = c_int64
+    else:
+        ULONG_PTR = c_ulong
+    PVOID = c_void_p
+
+    # --- Union inside Structure by stackoverflow:3480240 ---
+    class _OFFSET(Structure):
+        _fields_ = [
+            ('Offset', DWORD),
+            ('OffsetHigh', DWORD)]
+
+    class _OFFSET_UNION(Union):
+        _anonymous_ = ['_offset']
+        _fields_ = [
+            ('_offset', _OFFSET),
+            ('Pointer', PVOID)]
+
+    class OVERLAPPED(Structure):
+        _anonymous_ = ['_offset_union']
+        _fields_ = [
+            ('Internal', ULONG_PTR),
+            ('InternalHigh', ULONG_PTR),
+            ('_offset_union', _OFFSET_UNION),
+            ('hEvent', HANDLE)]
+
+    LPOVERLAPPED = POINTER(OVERLAPPED)
+
+    # --- Define function prototypes for extra safety ---
+    LockFileEx = windll.kernel32.LockFileEx
+    LockFileEx.restype = BOOL
+    LockFileEx.argtypes = [HANDLE, DWORD, DWORD, DWORD, DWORD, LPOVERLAPPED]
+    UnlockFileEx = windll.kernel32.UnlockFileEx
+    UnlockFileEx.restype = BOOL
+    UnlockFileEx.argtypes = [HANDLE, DWORD, DWORD, DWORD, LPOVERLAPPED]
+
+    def lock(f, flags):
+        hfile = msvcrt.get_osfhandle(_fd(f))
+        overlapped = OVERLAPPED()
+        ret = LockFileEx(hfile, flags, 0, 0, 0xFFFF0000, byref(overlapped))
+        return bool(ret)
+
+    def unlock(f):
+        hfile = msvcrt.get_osfhandle(_fd(f))
+        overlapped = OVERLAPPED()
+        ret = UnlockFileEx(hfile, 0, 0, 0xFFFF0000, byref(overlapped))
+        return bool(ret)
 else:
-    # File locking is not supported.
-    LOCK_EX = LOCK_SH = LOCK_NB = None
+    try:
+        import fcntl
+        LOCK_SH = fcntl.LOCK_SH  # shared lock
+        LOCK_NB = fcntl.LOCK_NB  # non-blocking
+        LOCK_EX = fcntl.LOCK_EX
+    except (ImportError, AttributeError):
+        # File locking is not supported.
+        LOCK_EX = LOCK_SH = LOCK_NB = 0
 
-    # Dummy functions that don't do anything.
-    def lock(file, flags):
-        pass
+        # Dummy functions that don't do anything.
+        def lock(f, flags):
+            # File is not locked
+            return False
 
-    def unlock(file):
-        pass
+        def unlock(f):
+            # File is unlocked
+            return True
+    else:
+        def lock(f, flags):
+            ret = fcntl.flock(_fd(f), flags)
+            return (ret == 0)
+
+        def unlock(f):
+            ret = fcntl.flock(_fd(f), fcntl.LOCK_UN)
+            return (ret == 0)

@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 import unittest
 
+
 class HttpResponseTests(unittest.TestCase):
 
     def test_status_code(self):

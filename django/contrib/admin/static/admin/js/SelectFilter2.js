@@ -40,7 +40,7 @@ window.SelectFilter = {
         selector_div.className = is_stacked ? 'selector stacked' : 'selector';
 
         // <div class="selector-available">
-        var selector_available = quickElement('div', selector_div, '');
+        var selector_available = quickElement('div', selector_div);
         selector_available.className = 'selector-available';
         var title_available = quickElement('h2', selector_available, interpolate(gettext('Available %s') + ' ', [field_name]));
         quickElement('img', title_available, '', 'src', admin_static_prefix + 'img/icon-unknown.gif', 'width', '10', 'height', '10', 'class', 'help help-tooltip', 'title', interpolate(gettext('This is the list of available %s. You may choose some by selecting them in the box below and then clicking the "Choose" arrow between the two boxes.'), [field_name]));
@@ -62,15 +62,15 @@ window.SelectFilter = {
         choose_all.className = 'selector-chooseall';
 
         // <ul class="selector-chooser">
-        var selector_chooser = quickElement('ul', selector_div, '');
+        var selector_chooser = quickElement('ul', selector_div);
         selector_chooser.className = 'selector-chooser';
-        var add_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Choose'), 'title', gettext('Choose'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_from","' + field_id + '_to"); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_add_link');
+        var add_link = quickElement('a', quickElement('li', selector_chooser), gettext('Choose'), 'title', gettext('Choose'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_from","' + field_id + '_to"); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_add_link');
         add_link.className = 'selector-add';
-        var remove_link = quickElement('a', quickElement('li', selector_chooser, ''), gettext('Remove'), 'title', gettext('Remove'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_to","' + field_id + '_from"); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_remove_link');
+        var remove_link = quickElement('a', quickElement('li', selector_chooser), gettext('Remove'), 'title', gettext('Remove'), 'href', 'javascript: (function(){ SelectBox.move("' + field_id + '_to","' + field_id + '_from"); SelectFilter.refresh_icons("' + field_id + '");})()', 'id', field_id + '_remove_link');
         remove_link.className = 'selector-remove';
 
         // <div class="selector-chosen">
-        var selector_chosen = quickElement('div', selector_div, '');
+        var selector_chosen = quickElement('div', selector_div);
         selector_chosen.className = 'selector-chosen';
         var title_chosen = quickElement('h2', selector_chosen, interpolate(gettext('Chosen %s') + ' ', [field_name]));
         quickElement('img', title_chosen, '', 'src', admin_static_prefix + 'img/icon-unknown.gif', 'width', '10', 'height', '10', 'class', 'help help-tooltip', 'title', interpolate(gettext('This is the list of chosen %s. You may remove some by selecting them in the box below and then clicking the "Remove" arrow between the two boxes.'), [field_name]));

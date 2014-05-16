@@ -1,10 +1,10 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from .models import Guitarist
 
 
+@override_settings(ROOT_URLCONF='model_permalink.urls')
 class PermalinkTests(TestCase):
-    urls = 'model_permalink.urls'
 
     def test_permalink(self):
         g = Guitarist(name='Adrien Moignard', slug='adrienmoignard')

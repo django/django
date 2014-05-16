@@ -1,16 +1,13 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import os
 
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils._os import upath
 from django.utils import six
 from django.utils import translation
-
-from i18n import TransRealMixin
 
 
 @override_settings(
@@ -24,7 +21,7 @@ from i18n import TransRealMixin
         ('fr', 'French'),
     ),
 )
-class ContentTypeTests(TransRealMixin, TestCase):
+class ContentTypeTests(TestCase):
     def test_verbose_name(self):
         company_type = ContentType.objects.get(app_label='i18n', model='company')
         with translation.override('en'):

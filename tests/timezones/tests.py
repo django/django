@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import datetime
-import os
 import re
 import sys
 from unittest import skipIf
@@ -13,15 +12,13 @@ try:
 except ImportError:
     pytz = None
 
-from django.conf import settings
 from django.core import serializers
 from django.core.urlresolvers import reverse
-from django.db import connection
 from django.db.models import Min, Max
 from django.http import HttpRequest
 from django.template import Context, RequestContext, Template, TemplateSyntaxError
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test.utils import override_settings, requires_tz_support
+from django.test import TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature
+from django.test.utils import requires_tz_support
 from django.utils import six
 from django.utils import timezone
 
@@ -116,7 +113,7 @@ class LegacyDatabaseTests(TestCase):
         Event.objects.create(dt=dt)
         event = Event.objects.get()
         self.assertIsNone(event.dt.tzinfo)
-        # django.db.backend.utils.typecast_dt will just drop the
+        # django.db.backends.utils.typecast_dt will just drop the
         # timezone, so a round-trip in the database alters the data (!)
         # interpret the naive datetime in local time and you get a wrong value
         self.assertNotEqual(event.dt.replace(tzinfo=EAT), dt)
@@ -142,7 +139,7 @@ class LegacyDatabaseTests(TestCase):
         Event.objects.create(dt=dt)
         event = Event.objects.get()
         self.assertIsNone(event.dt.tzinfo)
-        # django.db.backend.utils.typecast_dt will just drop the
+        # django.db.backends.utils.typecast_dt will just drop the
         # timezone, so a round-trip in the database alters the data (!)
         # interpret the naive datetime in local time and you get a wrong value
         self.assertNotEqual(event.dt.replace(tzinfo=EAT), dt)
@@ -208,56 +205,62 @@ class LegacyDatabaseTests(TestCase):
         morning_min_dt = datetime.datetime(2011, 9, 1, 3, 20, 40)
         afternoon_min_dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
         self.assertQuerysetEqual(
-                Session.objects.annotate(dt=Min('events__dt')).order_by('dt'),
-                [morning_min_dt, afternoon_min_dt],
-                transform=lambda d: d.dt)
+            Session.objects.annotate(dt=Min('events__dt')).order_by('dt'),
+            [morning_min_dt, afternoon_min_dt],
+            transform=lambda d: d.dt)
         self.assertQuerysetEqual(
-                Session.objects.annotate(dt=Min('events__dt')).filter(dt__lt=afternoon_min_dt),
-                [morning_min_dt],
-                transform=lambda d: d.dt)
+            Session.objects.annotate(dt=Min('events__dt')).filter(dt__lt=afternoon_min_dt),
+            [morning_min_dt],
+            transform=lambda d: d.dt)
         self.assertQuerysetEqual(
-                Session.objects.annotate(dt=Min('events__dt')).filter(dt__gte=afternoon_min_dt),
-                [afternoon_min_dt],
-                transform=lambda d: d.dt)
+            Session.objects.annotate(dt=Min('events__dt')).filter(dt__gte=afternoon_min_dt),
+            [afternoon_min_dt],
+            transform=lambda d: d.dt)
 
     def test_query_datetimes(self):
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 1, 30, 0))
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 4, 30, 0))
-        self.assertQuerysetEqual(Event.objects.datetimes('dt', 'year'),
-                [datetime.datetime(2011, 1, 1, 0, 0, 0)],
-                transform=lambda d: d)
-        self.assertQuerysetEqual(Event.objects.datetimes('dt', 'month'),
-                [datetime.datetime(2011, 1, 1, 0, 0, 0)],
-                transform=lambda d: d)
-        self.assertQuerysetEqual(Event.objects.datetimes('dt', 'day'),
-                [datetime.datetime(2011, 1, 1, 0, 0, 0)],
-                transform=lambda d: d)
-        self.assertQuerysetEqual(Event.objects.datetimes('dt', 'hour'),
-                [datetime.datetime(2011, 1, 1, 1, 0, 0),
-                 datetime.datetime(2011, 1, 1, 4, 0, 0)],
-                transform=lambda d: d)
-        self.assertQuerysetEqual(Event.objects.datetimes('dt', 'minute'),
-                [datetime.datetime(2011, 1, 1, 1, 30, 0),
-                 datetime.datetime(2011, 1, 1, 4, 30, 0)],
-                transform=lambda d: d)
-        self.assertQuerysetEqual(Event.objects.datetimes('dt', 'second'),
-                [datetime.datetime(2011, 1, 1, 1, 30, 0),
-                 datetime.datetime(2011, 1, 1, 4, 30, 0)],
-                transform=lambda d: d)
+        self.assertQuerysetEqual(
+            Event.objects.datetimes('dt', 'year'),
+            [datetime.datetime(2011, 1, 1, 0, 0, 0)],
+            transform=lambda d: d)
+        self.assertQuerysetEqual(
+            Event.objects.datetimes('dt', 'month'),
+            [datetime.datetime(2011, 1, 1, 0, 0, 0)],
+            transform=lambda d: d)
+        self.assertQuerysetEqual(
+            Event.objects.datetimes('dt', 'day'),
+            [datetime.datetime(2011, 1, 1, 0, 0, 0)],
+            transform=lambda d: d)
+        self.assertQuerysetEqual(
+            Event.objects.datetimes('dt', 'hour'),
+            [datetime.datetime(2011, 1, 1, 1, 0, 0),
+             datetime.datetime(2011, 1, 1, 4, 0, 0)],
+            transform=lambda d: d)
+        self.assertQuerysetEqual(
+            Event.objects.datetimes('dt', 'minute'),
+            [datetime.datetime(2011, 1, 1, 1, 30, 0),
+             datetime.datetime(2011, 1, 1, 4, 30, 0)],
+            transform=lambda d: d)
+        self.assertQuerysetEqual(
+            Event.objects.datetimes('dt', 'second'),
+            [datetime.datetime(2011, 1, 1, 1, 30, 0),
+             datetime.datetime(2011, 1, 1, 4, 30, 0)],
+            transform=lambda d: d)
 
     def test_raw_sql(self):
         # Regression test for #17755
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
         event = Event.objects.create(dt=dt)
         self.assertQuerysetEqual(
-                Event.objects.raw('SELECT * FROM timezones_event WHERE dt = %s', [dt]),
-                [event],
-                transform=lambda d: d)
+            Event.objects.raw('SELECT * FROM timezones_event WHERE dt = %s', [dt]),
+            [event],
+            transform=lambda d: d)
 
     def test_filter_date_field_with_aware_datetime(self):
         # Regression test for #17742
         day = datetime.date(2011, 9, 1)
-        event = AllDayEvent.objects.create(day=day)
+        AllDayEvent.objects.create(day=day)
         # This is 2011-09-02T01:30:00+03:00 in EAT
         dt = datetime.datetime(2011, 9, 1, 22, 30, 0, tzinfo=UTC)
         self.assertTrue(AllDayEvent.objects.filter(day__gte=dt).exists())
@@ -456,88 +459,100 @@ class NewDatabaseTests(TestCase):
         morning_min_dt = datetime.datetime(2011, 9, 1, 3, 20, 40, tzinfo=EAT)
         afternoon_min_dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
         self.assertQuerysetEqual(
-                Session.objects.annotate(dt=Min('events__dt')).order_by('dt'),
-                [morning_min_dt, afternoon_min_dt],
-                transform=lambda d: d.dt)
+            Session.objects.annotate(dt=Min('events__dt')).order_by('dt'),
+            [morning_min_dt, afternoon_min_dt],
+            transform=lambda d: d.dt)
         self.assertQuerysetEqual(
-                Session.objects.annotate(dt=Min('events__dt')).filter(dt__lt=afternoon_min_dt),
-                [morning_min_dt],
-                transform=lambda d: d.dt)
+            Session.objects.annotate(dt=Min('events__dt')).filter(dt__lt=afternoon_min_dt),
+            [morning_min_dt],
+            transform=lambda d: d.dt)
         self.assertQuerysetEqual(
-                Session.objects.annotate(dt=Min('events__dt')).filter(dt__gte=afternoon_min_dt),
-                [afternoon_min_dt],
-                transform=lambda d: d.dt)
+            Session.objects.annotate(dt=Min('events__dt')).filter(dt__gte=afternoon_min_dt),
+            [afternoon_min_dt],
+            transform=lambda d: d.dt)
 
     @skipUnlessDBFeature('has_zoneinfo_database')
     def test_query_datetimes(self):
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT))
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT))
-        self.assertQuerysetEqual(Event.objects.datetimes('dt', 'year'),
-                [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)],
-                transform=lambda d: d)
-        self.assertQuerysetEqual(Event.objects.datetimes('dt', 'month'),
-                [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)],
-                transform=lambda d: d)
-        self.assertQuerysetEqual(Event.objects.datetimes('dt', 'day'),
-                [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)],
-                transform=lambda d: d)
-        self.assertQuerysetEqual(Event.objects.datetimes('dt', 'hour'),
-                [datetime.datetime(2011, 1, 1, 1, 0, 0, tzinfo=EAT),
-                 datetime.datetime(2011, 1, 1, 4, 0, 0, tzinfo=EAT)],
-                transform=lambda d: d)
-        self.assertQuerysetEqual(Event.objects.datetimes('dt', 'minute'),
-                [datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT),
-                 datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT)],
-                transform=lambda d: d)
-        self.assertQuerysetEqual(Event.objects.datetimes('dt', 'second'),
-                [datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT),
-                 datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT)],
-                transform=lambda d: d)
+        self.assertQuerysetEqual(
+            Event.objects.datetimes('dt', 'year'),
+            [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)],
+            transform=lambda d: d)
+        self.assertQuerysetEqual(
+            Event.objects.datetimes('dt', 'month'),
+            [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)],
+            transform=lambda d: d)
+        self.assertQuerysetEqual(
+            Event.objects.datetimes('dt', 'day'),
+            [datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=EAT)],
+            transform=lambda d: d)
+        self.assertQuerysetEqual(
+            Event.objects.datetimes('dt', 'hour'),
+            [datetime.datetime(2011, 1, 1, 1, 0, 0, tzinfo=EAT),
+             datetime.datetime(2011, 1, 1, 4, 0, 0, tzinfo=EAT)],
+            transform=lambda d: d)
+        self.assertQuerysetEqual(
+            Event.objects.datetimes('dt', 'minute'),
+            [datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT),
+             datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT)],
+            transform=lambda d: d)
+        self.assertQuerysetEqual(
+            Event.objects.datetimes('dt', 'second'),
+            [datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT),
+             datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT)],
+            transform=lambda d: d)
 
     @skipUnlessDBFeature('has_zoneinfo_database')
     def test_query_datetimes_in_other_timezone(self):
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=EAT))
         Event.objects.create(dt=datetime.datetime(2011, 1, 1, 4, 30, 0, tzinfo=EAT))
         with timezone.override(UTC):
-            self.assertQuerysetEqual(Event.objects.datetimes('dt', 'year'),
-                    [datetime.datetime(2010, 1, 1, 0, 0, 0, tzinfo=UTC),
-                     datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)],
-                    transform=lambda d: d)
-            self.assertQuerysetEqual(Event.objects.datetimes('dt', 'month'),
-                    [datetime.datetime(2010, 12, 1, 0, 0, 0, tzinfo=UTC),
-                     datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)],
-                    transform=lambda d: d)
-            self.assertQuerysetEqual(Event.objects.datetimes('dt', 'day'),
-                    [datetime.datetime(2010, 12, 31, 0, 0, 0, tzinfo=UTC),
-                     datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)],
-                    transform=lambda d: d)
-            self.assertQuerysetEqual(Event.objects.datetimes('dt', 'hour'),
-                    [datetime.datetime(2010, 12, 31, 22, 0, 0, tzinfo=UTC),
-                     datetime.datetime(2011, 1, 1, 1, 0, 0, tzinfo=UTC)],
-                    transform=lambda d: d)
-            self.assertQuerysetEqual(Event.objects.datetimes('dt', 'minute'),
-                    [datetime.datetime(2010, 12, 31, 22, 30, 0, tzinfo=UTC),
-                     datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=UTC)],
-                    transform=lambda d: d)
-            self.assertQuerysetEqual(Event.objects.datetimes('dt', 'second'),
-                    [datetime.datetime(2010, 12, 31, 22, 30, 0, tzinfo=UTC),
-                     datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=UTC)],
-                    transform=lambda d: d)
+            self.assertQuerysetEqual(
+                Event.objects.datetimes('dt', 'year'),
+                [datetime.datetime(2010, 1, 1, 0, 0, 0, tzinfo=UTC),
+                 datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)],
+                transform=lambda d: d)
+            self.assertQuerysetEqual(
+                Event.objects.datetimes('dt', 'month'),
+                [datetime.datetime(2010, 12, 1, 0, 0, 0, tzinfo=UTC),
+                 datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)],
+                transform=lambda d: d)
+            self.assertQuerysetEqual(
+                Event.objects.datetimes('dt', 'day'),
+                [datetime.datetime(2010, 12, 31, 0, 0, 0, tzinfo=UTC),
+                 datetime.datetime(2011, 1, 1, 0, 0, 0, tzinfo=UTC)],
+                transform=lambda d: d)
+            self.assertQuerysetEqual(
+                Event.objects.datetimes('dt', 'hour'),
+                [datetime.datetime(2010, 12, 31, 22, 0, 0, tzinfo=UTC),
+                 datetime.datetime(2011, 1, 1, 1, 0, 0, tzinfo=UTC)],
+                transform=lambda d: d)
+            self.assertQuerysetEqual(
+                Event.objects.datetimes('dt', 'minute'),
+                [datetime.datetime(2010, 12, 31, 22, 30, 0, tzinfo=UTC),
+                 datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=UTC)],
+                transform=lambda d: d)
+            self.assertQuerysetEqual(
+                Event.objects.datetimes('dt', 'second'),
+                [datetime.datetime(2010, 12, 31, 22, 30, 0, tzinfo=UTC),
+                 datetime.datetime(2011, 1, 1, 1, 30, 0, tzinfo=UTC)],
+                transform=lambda d: d)
 
     def test_raw_sql(self):
         # Regression test for #17755
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
         event = Event.objects.create(dt=dt)
         self.assertQuerysetEqual(
-                Event.objects.raw('SELECT * FROM timezones_event WHERE dt = %s', [dt]),
-                [event],
-                transform=lambda d: d)
+            Event.objects.raw('SELECT * FROM timezones_event WHERE dt = %s', [dt]),
+            [event],
+            transform=lambda d: d)
 
     @requires_tz_support
     def test_filter_date_field_with_aware_datetime(self):
         # Regression test for #17742
         day = datetime.date(2011, 9, 1)
-        event = AllDayEvent.objects.create(day=day)
+        AllDayEvent.objects.create(day=day)
         # This is 2011-09-02T01:30:00+03:00 in EAT
         dt = datetime.datetime(2011, 9, 1, 22, 30, 0, tzinfo=UTC)
         self.assertFalse(AllDayEvent.objects.filter(day__gte=dt).exists())
@@ -735,8 +750,8 @@ class TemplateTests(TestCase):
         templates = {
             'notag': Template("{% load tz %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}"),
             'noarg': Template("{% load tz %}{% localtime %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
-            'on':    Template("{% load tz %}{% localtime on %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
-            'off':   Template("{% load tz %}{% localtime off %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
+            'on': Template("{% load tz %}{% localtime on %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
+            'off': Template("{% load tz %}{% localtime off %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
         }
 
         # Transform a list of keys in 'datetimes' to the expected template
@@ -750,26 +765,26 @@ class TemplateTests(TestCase):
             'utc': {
                 'notag': t('eat', 'eat', 'utc', 'ict'),
                 'noarg': t('eat', 'eat', 'utc', 'ict'),
-                'on':    t('eat', 'eat', 'utc', 'ict'),
-                'off':   t('utc', 'eat', 'utc', 'ict'),
+                'on': t('eat', 'eat', 'utc', 'ict'),
+                'off': t('utc', 'eat', 'utc', 'ict'),
             },
             'eat': {
                 'notag': t('eat', 'eat', 'utc', 'ict'),
                 'noarg': t('eat', 'eat', 'utc', 'ict'),
-                'on':    t('eat', 'eat', 'utc', 'ict'),
-                'off':   t('eat', 'eat', 'utc', 'ict'),
+                'on': t('eat', 'eat', 'utc', 'ict'),
+                'off': t('eat', 'eat', 'utc', 'ict'),
             },
             'ict': {
                 'notag': t('eat', 'eat', 'utc', 'ict'),
                 'noarg': t('eat', 'eat', 'utc', 'ict'),
-                'on':    t('eat', 'eat', 'utc', 'ict'),
-                'off':   t('ict', 'eat', 'utc', 'ict'),
+                'on': t('eat', 'eat', 'utc', 'ict'),
+                'off': t('ict', 'eat', 'utc', 'ict'),
             },
             'naive': {
                 'notag': t('naive', 'eat', 'utc', 'ict'),
                 'noarg': t('naive', 'eat', 'utc', 'ict'),
-                'on':    t('naive', 'eat', 'utc', 'ict'),
-                'off':   t('naive', 'eat', 'utc', 'ict'),
+                'on': t('naive', 'eat', 'utc', 'ict'),
+                'off': t('naive', 'eat', 'utc', 'ict'),
             }
         }
 
@@ -844,14 +859,16 @@ class TemplateTests(TestCase):
         """
         Test the {% timezone %} templatetag.
         """
-        tpl = Template("{% load tz %}"
-                "{{ dt }}|"
-                "{% timezone tz1 %}"
-                    "{{ dt }}|"
-                    "{% timezone tz2 %}"
-                        "{{ dt }}"
-                    "{% endtimezone %}"
-                "{% endtimezone %}")
+        tpl = Template(
+            "{% load tz %}"
+            "{{ dt }}|"
+            "{% timezone tz1 %}"
+            "{{ dt }}|"
+            "{% timezone tz2 %}"
+            "{{ dt }}"
+            "{% endtimezone %}"
+            "{% endtimezone %}"
+        )
         ctx = Context({'dt': datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC),
                        'tz1': ICT, 'tz2': None})
         self.assertEqual(tpl.render(ctx), "2011-09-01T13:20:30+03:00|2011-09-01T17:20:30+07:00|2011-09-01T13:20:30+03:00")
@@ -1053,10 +1070,10 @@ class NewFormsTests(TestCase):
 
 
 @override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True,
-                  PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
+                  PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                  ROOT_URLCONF='timezones.urls')
 class AdminTests(TestCase):
 
-    urls = 'timezones.urls'
     fixtures = ['tz_users.xml']
 
     def setUp(self):

@@ -1,7 +1,7 @@
 {% extends "admin/index.html" %}
 {% load i18n %}
 
-{% block bodyclass %}app-{{ app_label }} {{ block.super }}{% endblock %}
+{% block bodyclass %}{{ block.super }} app-{{ app_label }}{% endblock %}
 
 {% if not is_popup %}
 {% block breadcrumbs %}
@@ -9,7 +9,7 @@
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
 &rsaquo;
 {% for app in app_list %}
-{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}
+{{ app.name }}
 {% endfor %}
 </div>
 {% endblock %}

@@ -93,7 +93,7 @@ class ImageFieldTestMixin(object):
             self.assertEqual(getattr(instance, height_field_name), height)
 
 
-@skipIf(Image is None, "PIL is required to test ImageField")
+@skipIf(Image is None, "Pillow is required to test ImageField")
 class ImageFieldTests(ImageFieldTestMixin, TestCase):
     """
     Tests for ImageField that don't need to be run with each of the
@@ -159,7 +159,7 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
         self.assertEqual(p.mugshot.closed, True)
 
         # After asking for the size, the file should still be closed.
-        _ = p.mugshot.size
+        p.mugshot.size
         self.assertEqual(p.mugshot.closed, True)
 
     def test_pickle(self):
@@ -180,7 +180,7 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
         self.assertEqual(p.mugshot, loaded_p.mugshot)
 
 
-@skipIf(Image is None, "PIL is required to test ImageField")
+@skipIf(Image is None, "Pillow is required to test ImageField")
 class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
     """
     Tests behavior of an ImageField and its dimensions fields.
@@ -294,7 +294,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
         self.assertEqual(p.mugshot.was_opened, True)
 
 
-@skipIf(Image is None, "PIL is required to test ImageField")
+@skipIf(Image is None, "Pillow is required to test ImageField")
 class ImageFieldNoDimensionsTests(ImageFieldTwoDimensionsTests):
     """
     Tests behavior of an ImageField with no dimension fields.
@@ -303,7 +303,7 @@ class ImageFieldNoDimensionsTests(ImageFieldTwoDimensionsTests):
     PersonModel = Person
 
 
-@skipIf(Image is None, "PIL is required to test ImageField")
+@skipIf(Image is None, "Pillow is required to test ImageField")
 class ImageFieldOneDimensionTests(ImageFieldTwoDimensionsTests):
     """
     Tests behavior of an ImageField with one dimensions field.
@@ -312,7 +312,7 @@ class ImageFieldOneDimensionTests(ImageFieldTwoDimensionsTests):
     PersonModel = PersonWithHeight
 
 
-@skipIf(Image is None, "PIL is required to test ImageField")
+@skipIf(Image is None, "Pillow is required to test ImageField")
 class ImageFieldDimensionsFirstTests(ImageFieldTwoDimensionsTests):
     """
     Tests behavior of an ImageField where the dimensions fields are
@@ -322,7 +322,7 @@ class ImageFieldDimensionsFirstTests(ImageFieldTwoDimensionsTests):
     PersonModel = PersonDimensionsFirst
 
 
-@skipIf(Image is None, "PIL is required to test ImageField")
+@skipIf(Image is None, "Pillow is required to test ImageField")
 class ImageFieldUsingFileTests(ImageFieldTwoDimensionsTests):
     """
     Tests behavior of an ImageField when assigning it a File instance
@@ -333,7 +333,7 @@ class ImageFieldUsingFileTests(ImageFieldTwoDimensionsTests):
     File = File
 
 
-@skipIf(Image is None, "PIL is required to test ImageField")
+@skipIf(Image is None, "Pillow is required to test ImageField")
 class TwoImageFieldTests(ImageFieldTestMixin, TestCase):
     """
     Tests a model with two ImageFields.

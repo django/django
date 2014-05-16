@@ -110,6 +110,17 @@ Related objects reference
         the ``blog`` :class:`~django.db.models.ForeignKey` doesn't have
         ``null=True``, this is invalid.
 
+        .. versionchanged 1.7::
+
+        For :class:`~django.db.models.ForeignKey` objects, this method accepts
+        a ``bulk`` argument to control how to perform the operation.
+        If ``True`` (the default), ``QuerySet.update()`` is used.
+        If ``bulk=False``, the ``save()`` method of each individual model
+        instance is called instead. This triggers the
+        :data:`~django.db.models.signals.pre_save` and
+        :data:`~django.db.models.signals.post_save` signals and comes at the
+        expense of performance.
+
     .. method:: clear()
 
         Removes all objects from the related object set::
@@ -121,14 +132,19 @@ Related objects reference
         them.
 
         Just like ``remove()``, ``clear()`` is only available on
-        :class:`~django.db.models.ForeignKey`\s where ``null=True``.
+        :class:`~django.db.models.ForeignKey`\s where ``null=True`` and it also
+        accepts the ``bulk`` keyword argument.
 
     .. note::
 
        Note that ``add()``, ``create()``, ``remove()``, and ``clear()`` all
-       apply database changes immediately for all types of related fields. In other
-       words, there is no need to call ``save()`` on either end of the
+       apply database changes immediately for all types of related fields. In
+       other words, there is no need to call ``save()`` on either end of the
        relationship.
+
+       Also, if you are using :ref:`an intermediate model
+       <intermediary-manytomany>` for a many-to-many relationship, some of the
+       related manager's methods are disabled.
 
 .. _direct-assignment:
 

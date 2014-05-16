@@ -92,8 +92,7 @@ different strategy and broader scope,
 ``QuerySet`` that will prefetch each of the specified related lookups in a
 single batch as soon as the query begins to be evaluated. Unlike
 ``select_related``, it does the joins in Python, not in the database, and
-supports many-to-many relationships,
-:class:`~django.contrib.contenttypes.generic.GenericForeignKey` and more. This
+supports many-to-many relationships, ``GenericForeignKey`` and more. This
 allows you to fix a very common performance problem in which your code ends up
 doing O(n) database queries (or worse) if objects on your primary ``QuerySet``
 each have many related objects that you also need.
@@ -771,7 +770,7 @@ Check their documentation for details.
 `COMMENTS_BANNED_USERS_GROUP` setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django's :doc:`comments app </ref/contrib/comments/index>` has historically
+Django's comments app has historically
 supported excluding the comments of a special user group, but we've never
 documented the feature properly and didn't enforce the exclusion in other parts
 of the app such as the template tags. To fix this problem, we removed the code
@@ -793,8 +792,7 @@ a custom comment model manager to exclude the user group, like this::
             return qs
 
 Save this model manager in your custom comment app (e.g. in
-``my_comments_app/managers.py``) and add it your
-:ref:`custom comment app model <custom-comment-app-api>`::
+``my_comments_app/managers.py``) and add it your custom comment app model::
 
     from django.db import models
     from django.contrib.comments.models import Comment
@@ -805,9 +803,6 @@ Save this model manager in your custom comment app (e.g. in
         title = models.CharField(max_length=300)
 
         objects = BanningCommentManager()
-
-For more details, see the documentation about
-:doc:`customizing the comments framework </ref/contrib/comments/custom>`.
 
 `IGNORABLE_404_STARTS` and `IGNORABLE_404_ENDS` settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1057,7 +1052,7 @@ names, like ``django.contrib.*``. The expansion was performed by a
 filesystem-based implementation of ``from <package> import *``. Unfortunately,
 `this can't be done reliably`_.
 
-This behavior was never documented. Since it is un-pythonic and not obviously
+This behavior was never documented. Since it is unpythonic and not obviously
 useful, it was removed in Django 1.4. If you relied on it, you must edit your
 settings file to list all your applications explicitly.
 

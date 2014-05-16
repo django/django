@@ -166,7 +166,7 @@ and the :setting:`SECRET_KEY` setting.
     cookie backend might open you up to `replay attacks`_. Unlike other session
     backends which keep a server-side record of each session and invalidate it
     when a user logs out, cookie-based sessions are not invalidated when a user
-    logs out. Thus if an attacker steals a user's cookie, he or she can use that
+    logs out. Thus if an attacker steals a user's cookie, they can use that
     cookie to login as that user even if the user logs out. Cookies will only
     be detected as 'stale' if they are older than your
     :setting:`SESSION_COOKIE_AGE`.
@@ -219,39 +219,44 @@ You can edit it multiple times.
 
       Example: ``fav_color = request.session.pop('fav_color')``
 
-    .. method:: keys
+    .. method:: keys()
 
-    .. method:: items
+    .. method:: items()
 
-    .. method:: setdefault
+    .. method:: setdefault()
 
-    .. method:: clear
+    .. method:: clear()
 
     It also has these methods:
 
-    .. method:: flush
+    .. method:: flush()
 
-      Delete the current session data from the session and regenerate the
-      session key value that is sent back to the user in the cookie. This is
-      used if you want to ensure that the previous session data can't be
-      accessed again from the user's browser (for example, the
+      Delete the current session data from the session and delete the session
+      cookie. This is used if you want to ensure that the previous session data
+      can't be accessed again from the user's browser (for example, the
       :func:`django.contrib.auth.logout()` function calls it).
 
-    .. method:: set_test_cookie
+      .. versionchanged:: 1.8
+
+          Deletion of the session cookie is a behavior new in Django 1.8.
+          Previously, the behavior was to regenerate the session key value that
+          was sent back to the user in the cookie.
+
+    .. method:: set_test_cookie()
 
       Sets a test cookie to determine whether the user's browser supports
       cookies. Due to the way cookies work, you won't be able to test this
       until the user's next page request. See `Setting test cookies`_ below for
       more information.
 
-    .. method:: test_cookie_worked
+    .. method:: test_cookie_worked()
 
       Returns either ``True`` or ``False``, depending on whether the user's
       browser accepted the test cookie. Due to the way cookies work, you'll
       have to call ``set_test_cookie()`` on a previous, separate page request.
       See `Setting test cookies`_ below for more information.
 
-    .. method:: delete_test_cookie
+    .. method:: delete_test_cookie()
 
       Deletes the test cookie. Use this to clean up after yourself.
 
@@ -280,7 +285,7 @@ You can edit it multiple times.
       purposes. Session expiration is computed from the last time the
       session was *modified*.
 
-    .. method:: get_expiry_age
+    .. method:: get_expiry_age()
 
       Returns the number of seconds until this session expires. For sessions
       with no custom expiration (or those set to expire at browser close), this
@@ -295,7 +300,7 @@ You can edit it multiple times.
         ``None``. Defaults to the value stored in the session by
         :meth:`set_expiry`, if there is one, or ``None``.
 
-    .. method:: get_expiry_date
+    .. method:: get_expiry_date()
 
       Returns the date this session will expire. For sessions with no custom
       expiration (or those set to expire at browser close), this will equal the
@@ -303,28 +308,32 @@ You can edit it multiple times.
 
       This function accepts the same keyword arguments as :meth:`get_expiry_age`.
 
-    .. method:: get_expire_at_browser_close
+    .. method:: get_expire_at_browser_close()
 
       Returns either ``True`` or ``False``, depending on whether the user's
       session cookie will expire when the user's Web browser is closed.
 
-    .. method:: SessionBase.clear_expired
+    .. method:: clear_expired()
 
       Removes expired sessions from the session store. This class method is
       called by :djadmin:`clearsessions`.
+
+    .. method:: cycle_key()
+
+      Creates a new session key while retaining the current session data.
+      :func:`django.contrib.auth.login()` calls this method to mitigate against
+      session fixation.
 
 .. _session_serialization:
 
 Session serialization
 ---------------------
 
-.. versionchanged:: 1.6
-
 Before version 1.6, Django defaulted to using :mod:`pickle` to serialize
 session data before storing it in the backend. If you're using the :ref:`signed
 cookie session backend<cookie-session-backend>` and :setting:`SECRET_KEY` is
 known by an attacker (there isn't an inherent vulnerability in Django that
-would cause it to leak), the attacker could insert a string into his session
+would cause it to leak), the attacker could insert a string into their session
 which, when unpickled, executes arbitrary code on the server. The technique for
 doing so is simple and easily available on the internet. Although the cookie
 session storage signs the cookie-stored data to prevent tampering, a
@@ -491,7 +500,6 @@ Using sessions out of views
 An API is available to manipulate session data outside of a view::
 
     >>> from django.contrib.sessions.backends.db import SessionStore
-    >>> import datetime
     >>> s = SessionStore()
     >>> # stored as seconds since epoch since datetimes are not serializable in JSON.
     >>> s['last_login'] = 1376587691
@@ -503,7 +511,7 @@ An API is available to manipulate session data outside of a view::
     >>> s['last_login']
     1376587691
 
-In order to prevent session fixation attacks, sessions keys that don't exist
+In order to mitigate session fixation attacks, sessions keys that don't exist
 are regenerated::
 
     >>> from django.contrib.sessions.backends.db import SessionStore
@@ -585,8 +593,8 @@ log in every time they open a browser.
 
 If :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` is set to ``True``, Django will
 use browser-length cookies -- cookies that expire as soon as the user closes
-his or her browser. Use this if you want people to have to log in every time
-they open a browser.
+their browser. Use this if you want people to have to log in every time they
+open a browser.
 
 This setting is a global default and can be overwritten at a per-session level
 by explicitly calling the :meth:`~backends.base.SessionBase.set_expiry` method
@@ -643,6 +651,26 @@ behavior:
 * :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE`
 * :setting:`SESSION_FILE_PATH`
 * :setting:`SESSION_SAVE_EVERY_REQUEST`
+
+.. _topics-session-security:
+
+Session security
+================
+
+Subdomains within a site are able to set cookies on the client for the whole
+domain. This makes session fixation possible if cookies are permitted from
+subdomains not controlled by trusted users.
+
+For example, an attacker could log into ``good.example.com`` and get a valid
+session for their account. If the attacker has control over ``bad.example.com``,
+they can use it to send their session key to you since a subdomain is permitted
+to set cookies on ``*.example.com``. When you visit ``good.example.com``,
+you'll be logged in as the attacker and might inadvertently enter your
+sensitive personal data (e.g. credit card info) into the attackers account.
+
+Another possible attack would be if ``good.example.com`` sets its
+:setting:`SESSION_COOKIE_DOMAIN` to ``".example.com"`` which would cause
+session cookies from that site to be sent to ``bad.example.com``.
 
 Technical details
 =================

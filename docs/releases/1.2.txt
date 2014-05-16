@@ -43,14 +43,14 @@ Django 1.2 introduces several large, important new features, including:
 These are just the highlights; full details and a complete list of features `may
 be found below`_.
 
-.. _may be found below: `what's new in django 1.2`_
+.. _may be found below: `What's new in Django 1.2`_
 
 .. seealso::
 
     `Django Advent`_ covered the release of Django 1.2 with a series of
     articles and tutorials that cover some of the new features in depth.
 
-.. _django advent: http://djangoadvent.com/
+.. _django advent: https://github.com/djangoadvent/djangoadvent-articles
 
 Wherever possible these features have been introduced in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>` policy.
@@ -352,7 +352,7 @@ are now included:
 
 GeoDjango now supports the rich capabilities added
 in the `PostGIS 1.5 release <http://postgis.refractions.net/documentation/manual-1.5/>`_.
-New features include suppport for the :ref:`geography type <geography-type>`
+New features include support for the :ref:`geography type <geography-type>`
 and enabling of :ref:`distance queries <distance-queries>`
 with non-point geometries on geographic coordinate systems.
 
@@ -721,8 +721,9 @@ value and interpretation of the ``max_num`` parameter to the
 :ref:`django.forms.formsets.formset_factory() <formsets-max-num>` and
 :ref:`django.forms.models.modelformset_factory()
 <model-formsets-max-num>` functions has changed slightly. This
-change also affects the way the ``max_num`` argument is :ref:`used for
-inline admin objects <ref-contrib-admin-inline-max-num>`
+change also affects the way the
+:attr:`~django.contrib.admin.InlineModelAdmin.max_num` argument is used for
+inline admin objects.
 
 Previously, the default value for ``max_num`` was ``0`` (zero).
 FormSets then used the boolean value of ``max_num`` to determine if a

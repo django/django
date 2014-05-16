@@ -3,8 +3,6 @@ PostgreSQL database backend for Django.
 
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
-import logging
-import sys
 
 from django.conf import settings
 from django.db.backends import (BaseDatabaseFeatures, BaseDatabaseWrapper,
@@ -36,8 +34,6 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
 psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString)
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
 
-logger = logging.getLogger('django.db.backends')
-
 
 def utc_tzinfo_factory(offset):
     if offset != 0:
@@ -48,7 +44,6 @@ def utc_tzinfo_factory(offset):
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     can_return_id_from_insert = True
-    requires_rollback_on_dirty_transaction = True
     has_real_datatype = True
     can_defer_constraint_checks = True
     has_select_for_update = True
@@ -57,11 +52,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     uses_savepoints = True
     supports_tablespaces = True
     supports_transactions = True
+    can_introspect_ip_address_field = True
+    can_introspect_small_integer_field = True
     can_distinct_on_fields = True
     can_rollback_ddl = True
     supports_combined_alters = True
     nulls_order_largest = True
     closed_cursor_error_class = InterfaceError
+    has_case_insensitive_like = False
+    requires_sqlparse_for_splitting = False
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -83,6 +82,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': 'LIKE UPPER(%s)',
     }
 
+    pattern_ops = {
+        'startswith': "LIKE %s || '%%%%'",
+        'istartswith': "LIKE UPPER(%s) || '%%%%'",
+    }
+
     Database = Database
 
     def __init__(self, *args, **kwargs):
@@ -101,13 +105,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def get_connection_params(self):
         settings_dict = self.settings_dict
-        if not settings_dict['NAME']:
+        # None may be used to connect to the default 'postgres' db
+        if settings_dict['NAME'] == '':
             from django.core.exceptions import ImproperlyConfigured
             raise ImproperlyConfigured(
                 "settings.DATABASES is improperly configured. "
                 "Please supply the NAME value.")
         conn_params = {
-            'database': settings_dict['NAME'],
+            'database': settings_dict['NAME'] or 'postgres',
         }
         conn_params.update(settings_dict['OPTIONS'])
         if 'autocommit' in conn_params:
@@ -141,38 +146,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 conn_tz = get_parameter_status('TimeZone')
 
             if conn_tz != tz:
-                # Set the time zone in autocommit mode (see #17062)
-                self.set_autocommit(True)
-                self.connection.cursor().execute(
-                    self.ops.set_time_zone_sql(), [tz]
-                )
-        self.connection.set_isolation_level(self.isolation_level)
+                cursor = self.connection.cursor()
+                try:
+                    cursor.execute(self.ops.set_time_zone_sql(), [tz])
+                finally:
+                    cursor.close()
+                # Commit after setting the time zone (see #17062)
+                if not self.get_autocommit():
+                    self.connection.commit()
 
     def create_cursor(self):
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
         return cursor
-
-    def close(self):
-        self.validate_thread_sharing()
-        if self.connection is None:
-            return
-
-        try:
-            self.connection.close()
-            self.connection = None
-        except Database.Error:
-            # In some cases (database restart, network connection lost etc...)
-            # the connection to the database is lost without giving Django a
-            # notification. If we don't set self.connection to None, the error
-            # will occur a every request.
-            self.connection = None
-            logger.warning('psycopg2 error while closing the connection.',
-                exc_info=sys.exc_info()
-            )
-            raise
-        finally:
-            self.set_clean()
 
     def _set_isolation_level(self, isolation_level):
         assert isolation_level in range(1, 5)     # Use set_autocommit for level = 0
@@ -182,14 +168,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             self.connection.set_isolation_level(isolation_level)
 
     def _set_autocommit(self, autocommit):
-        if self.psycopg2_version >= (2, 4, 2):
-            self.connection.autocommit = autocommit
-        else:
-            if autocommit:
-                level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+        with self.wrap_database_errors:
+            if self.psycopg2_version >= (2, 4, 2):
+                self.connection.autocommit = autocommit
             else:
-                level = self.isolation_level
-            self.connection.set_isolation_level(level)
+                if autocommit:
+                    level = psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+                else:
+                    level = self.isolation_level
+                self.connection.set_isolation_level(level)
 
     def check_constraints(self, table_names=None):
         """
@@ -203,7 +190,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         try:
             # Use a psycopg cursor directly, bypassing Django's utilities.
             self.connection.cursor().execute("SELECT 1")
-        except DatabaseError:
+        except Database.Error:
             return False
         else:
             return True

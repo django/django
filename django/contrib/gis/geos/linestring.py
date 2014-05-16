@@ -6,6 +6,7 @@ from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos import prototypes as capi
 from django.utils.six.moves import xrange
 
+
 class LineString(GEOSGeometry):
     _init_func = capi.create_linestring
     _minlength = 2
@@ -46,7 +47,7 @@ class LineString(GEOSGeometry):
                     raise TypeError('Dimension mismatch.')
             numpy_coords = False
         elif numpy and isinstance(coords, numpy.ndarray):
-            shape = coords.shape # Using numpy's shape.
+            shape = coords.shape  # Using numpy's shape.
             if len(shape) != 2:
                 raise TypeError('Too many dimensions.')
             self._checkdim(shape[1])
@@ -58,11 +59,11 @@ class LineString(GEOSGeometry):
 
         # Creating a coordinate sequence object because it is easier to
         # set the points using GEOSCoordSeq.__setitem__().
-        cs = GEOSCoordSeq(capi.create_cs(ncoords, ndim), z=bool(ndim==3))
+        cs = GEOSCoordSeq(capi.create_cs(ncoords, ndim), z=bool(ndim == 3))
 
         for i in xrange(ncoords):
             if numpy_coords:
-                cs[i] = coords[i,:]
+                cs[i] = coords[i, :]
             elif isinstance(coords[i], Point):
                 cs[i] = coords[i].tuple
             else:
@@ -90,8 +91,8 @@ class LineString(GEOSGeometry):
     _get_single_internal = _get_single_external
 
     def _set_list(self, length, items):
-        ndim = self._cs.dims #
-        hasz = self._cs.hasz # I don't understand why these are different
+        ndim = self._cs.dims
+        hasz = self._cs.hasz  # I don't understand why these are different
 
         # create a new coordinate sequence and populate accordingly
         cs = GEOSCoordSeq(capi.create_cs(length, ndim), z=hasz)
@@ -129,7 +130,7 @@ class LineString(GEOSGeometry):
         """
         lst = [func(i) for i in xrange(len(self))]
         if numpy:
-            return numpy.array(lst) # ARRRR!
+            return numpy.array(lst)  # ARRRR!
         else:
             return lst
 
@@ -160,6 +161,7 @@ class LineString(GEOSGeometry):
             return None
         else:
             return self._listarr(self._cs.getZ)
+
 
 # LinearRings are LineStrings used within Polygons.
 class LinearRing(LineString):

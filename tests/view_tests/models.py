@@ -5,6 +5,7 @@ Regression tests for Django built-in views.
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+
 @python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=100)
@@ -13,7 +14,8 @@ class Author(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return '/views/authors/%s/' % self.id
+        return '/authors/%s/' % self.id
+
 
 @python_2_unicode_compatible
 class BaseArticle(models.Model):
@@ -31,8 +33,10 @@ class BaseArticle(models.Model):
     def __str__(self):
         return self.title
 
+
 class Article(BaseArticle):
     date_created = models.DateTimeField()
+
 
 class UrlArticle(BaseArticle):
     """
@@ -43,6 +47,7 @@ class UrlArticle(BaseArticle):
     def get_absolute_url(self):
         return '/urlarticles/%s/' % self.slug
     get_absolute_url.purge = True
+
 
 class DateArticle(BaseArticle):
     """

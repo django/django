@@ -1,6 +1,8 @@
-from django.conf.urls import patterns
+from django.conf.urls import url
+from django.contrib.sitemaps import views
 
 from .http import SimpleSitemap
+
 
 class HTTPSSitemap(SimpleSitemap):
     protocol = 'https'
@@ -9,8 +11,8 @@ secure_sitemaps = {
     'simple': HTTPSSitemap,
 }
 
-urlpatterns = patterns('django.contrib.sitemaps.views',
-    (r'^secure/index\.xml$', 'index', {'sitemaps': secure_sitemaps}),
-    (r'^secure/sitemap-(?P<section>.+)\.xml$', 'sitemap',
+urlpatterns = [
+    url(r'^secure/index\.xml$', views.index, {'sitemaps': secure_sitemaps}),
+    url(r'^secure/sitemap-(?P<section>.+)\.xml$', views.sitemap,
         {'sitemaps': secure_sitemaps}),
-)
+]

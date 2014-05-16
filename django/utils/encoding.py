@@ -9,6 +9,7 @@ from django.utils.functional import Promise
 from django.utils import six
 from django.utils.six.moves.urllib.parse import quote
 
+
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
         self.obj = obj
@@ -18,6 +19,7 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
         original = UnicodeDecodeError.__str__(self)
         return '%s. You passed in %r (%s)' % (original, self.obj,
                 type(self.obj))
+
 
 def python_2_unicode_compatible(klass):
     """
@@ -36,6 +38,7 @@ def python_2_unicode_compatible(klass):
         klass.__str__ = lambda self: self.__unicode__().encode('utf-8')
     return klass
 
+
 def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     Returns a text object representing 's' -- unicode on Python 2 and str on
@@ -48,6 +51,7 @@ def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
         return s
     return force_text(s, encoding, strings_only, errors)
 
+
 def is_protected_type(obj):
     """Determine if the object instance is of a protected type.
 
@@ -56,6 +60,7 @@ def is_protected_type(obj):
     """
     return isinstance(obj, six.integer_types + (type(None), float, Decimal,
         datetime.datetime, datetime.date, datetime.time))
+
 
 def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
@@ -97,6 +102,7 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
             s = ' '.join([force_text(arg, encoding, strings_only,
                     errors) for arg in s])
     return s
+
 
 def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
@@ -166,6 +172,7 @@ force_str.__doc__ = """
 Apply force_text in Python 3 and force_bytes in Python 2.
 """
 
+
 def iri_to_uri(iri):
     """
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
@@ -193,6 +200,7 @@ def iri_to_uri(iri):
         return iri
     return quote(force_bytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
 
+
 def filepath_to_uri(path):
     """Convert a file system path to a URI portion that is suitable for
     inclusion in a URL.
@@ -211,6 +219,7 @@ def filepath_to_uri(path):
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
     return quote(force_bytes(path).replace(b"\\", b"/"), safe=b"/~!*()'")
+
 
 def get_system_encoding():
     """

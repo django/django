@@ -12,7 +12,7 @@ User authentication in Django
 .. module:: django.contrib.auth
    :synopsis: Django's authentication framework.
 
-Django comes with an user authentication system. It handles user accounts,
+Django comes with a user authentication system. It handles user accounts,
 groups, permissions and cookie-based user sessions. This section of the
 documentation explains how the default implementation works out of the box, as
 well as how to :doc:`extend and customize </topics/auth/customizing>` it to

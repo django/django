@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase, CreateError
-from django.core.cache import get_cache
+from django.core.cache import caches
 from django.utils.six.moves import xrange
 
 KEY_PREFIX = "django.contrib.sessions.cache"
@@ -11,7 +11,7 @@ class SessionStore(SessionBase):
     A cache-based session store.
     """
     def __init__(self, session_key=None):
-        self._cache = get_cache(settings.SESSION_CACHE_ALIAS)
+        self._cache = caches[settings.SESSION_CACHE_ALIAS]
         super(SessionStore, self).__init__(session_key)
 
     @property

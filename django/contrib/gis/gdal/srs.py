@@ -120,7 +120,7 @@ class SpatialReference(GDALBase):
         0
         >>> print(srs['UNIT|AUTHORITY']) # For the units authority, have to use the pipe symbole.
         EPSG
-        >>> print(srs['UNIT|AUTHORITY', 1]) # The authority value for the untis
+        >>> print(srs['UNIT|AUTHORITY', 1]) # The authority value for the units
         9122
         """
         if isinstance(target, tuple):
@@ -327,6 +327,7 @@ class SpatialReference(GDALBase):
     def xml(self, dialect=''):
         "Returns the XML representation of this Spatial Reference."
         return capi.to_xml(self.ptr, byref(c_char_p()), dialect)
+
 
 class CoordTransform(GDALBase):
     "The coordinate system transformation object."

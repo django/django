@@ -3,8 +3,7 @@ import datetime
 import pickle
 import unittest
 
-from django.test.utils import override_settings
-from django.utils import six
+from django.test import override_settings
 from django.utils import timezone
 
 

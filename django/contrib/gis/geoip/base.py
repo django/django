@@ -5,7 +5,7 @@ from ctypes import c_char_p
 from django.core.validators import ipv4_re
 from django.contrib.gis.geoip.libgeoip import GEOIP_SETTINGS
 from django.contrib.gis.geoip.prototypes import (
-    GeoIPRecord, GeoIPTag, GeoIP_open, GeoIP_delete, GeoIP_database_info,
+    GeoIP_open, GeoIP_delete, GeoIP_database_info,
     GeoIP_lib_version, GeoIP_record_by_addr, GeoIP_record_by_name,
     GeoIP_country_code_by_addr, GeoIP_country_code_by_name,
     GeoIP_country_name_by_addr, GeoIP_country_name_by_name)
@@ -17,9 +17,11 @@ from django.utils.encoding import force_bytes
 free_regex = re.compile(r'^GEO-\d{3}FREE')
 lite_regex = re.compile(r'^GEO-\d{3}LITE')
 
+
 #### GeoIP classes ####
 class GeoIPException(Exception):
     pass
+
 
 class GeoIP(object):
     # The flags for GeoIP memory caching.
@@ -41,11 +43,11 @@ class GeoIP(object):
     #
     # GEOIP_MMAP_CACHE - load database into mmap shared memory ( not available
     #       on Windows).
-    GEOIP_STANDARD     = 0
+    GEOIP_STANDARD = 0
     GEOIP_MEMORY_CACHE = 1
-    GEOIP_CHECK_CACHE  = 2
-    GEOIP_INDEX_CACHE  = 4
-    GEOIP_MMAP_CACHE   = 8
+    GEOIP_CHECK_CACHE = 2
+    GEOIP_INDEX_CACHE = 4
+    GEOIP_MMAP_CACHE = 8
     cache_options = dict((opt, None) for opt in (0, 1, 2, 4, 8))
 
     # Paths to the city & country binary databases.
@@ -190,13 +192,13 @@ class GeoIP(object):
 
     def country(self, query):
         """
-        Returns a dictonary with with the country code and name when given an
+        Returns a dictionary with the country code and name when given an
         IP address or a Fully Qualified Domain Name (FQDN).  For example, both
         '24.124.1.80' and 'djangoproject.com' are valid parameters.
         """
         # Returning the country code and name
-        return {'country_code' : self.country_code(query),
-                'country_name' : self.country_name(query),
+        return {'country_code': self.country_code(query),
+                'country_name': self.country_name(query),
                 }
 
     #### Coordinate retrieval routines ####

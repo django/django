@@ -5,8 +5,9 @@ from functools import partial
 from importlib import import_module
 from inspect import getargspec, getcallargs
 
+from django.apps import apps
 from django.conf import settings
-from django.template.context import (BaseContext, Context, RequestContext,
+from django.template.context import (BaseContext, Context, RequestContext,  # NOQA: imported for backwards compatibility
     ContextPopException)
 from django.utils.itercompat import is_iterable
 from django.utils.text import (smart_split, unescape_string_literal,
@@ -68,17 +69,21 @@ libraries = {}
 builtins = []
 
 # True if TEMPLATE_STRING_IF_INVALID contains a format string (%s). None means
-# uninitialised.
+# uninitialized.
 invalid_var_format_string = None
+
 
 class TemplateSyntaxError(Exception):
     pass
 
+
 class TemplateDoesNotExist(Exception):
     pass
 
+
 class TemplateEncodingError(Exception):
     pass
+
 
 @python_2_unicode_compatible
 class VariableDoesNotExist(Exception):
@@ -88,11 +93,12 @@ class VariableDoesNotExist(Exception):
         self.params = params
 
     def __str__(self):
-        return self.msg % tuple(force_text(p, errors='replace')
-                                 for p in self.params)
+        return self.msg % tuple(force_text(p, errors='replace') for p in self.params)
+
 
 class InvalidTemplateLibrary(Exception):
     pass
+
 
 class Origin(object):
     def __init__(self, name):
@@ -104,6 +110,7 @@ class Origin(object):
     def __str__(self):
         return self.name
 
+
 class StringOrigin(Origin):
     def __init__(self, source):
         super(StringOrigin, self).__init__(UNKNOWN_SOURCE)
@@ -112,9 +119,9 @@ class StringOrigin(Origin):
     def reload(self):
         return self.source
 
+
 class Template(object):
-    def __init__(self, template_string, origin=None,
-                 name='<Unknown Template>'):
+    def __init__(self, template_string, origin=None, name=None):
         try:
             template_string = force_text(template_string)
         except UnicodeDecodeError:
@@ -142,6 +149,7 @@ class Template(object):
         finally:
             context.render_context.pop()
 
+
 def compile_string(template_string, origin):
     "Compiles template_string into NodeList ready for rendering"
     if settings.TEMPLATE_DEBUG:
@@ -152,6 +160,7 @@ def compile_string(template_string, origin):
     lexer = lexer_class(template_string, origin)
     parser = parser_class(lexer.tokenize())
     return parser.parse()
+
 
 class Token(object):
     def __init__(self, token_type, contents):
@@ -179,6 +188,7 @@ class Token(object):
                 bit = ' '.join(trans_bit)
             split.append(bit)
         return split
+
 
 class Lexer(object):
     def __init__(self, template_string, origin):
@@ -231,6 +241,7 @@ class Lexer(object):
         self.lineno += token_string.count('\n')
         return token
 
+
 class Parser(object):
     def __init__(self, tokens):
         self.tokens = tokens
@@ -246,9 +257,9 @@ class Parser(object):
         while self.tokens:
             token = self.next_token()
             # Use the raw values here for TOKEN_* for a tiny performance boost.
-            if token.token_type == 0: # TOKEN_TEXT
+            if token.token_type == 0:  # TOKEN_TEXT
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
-            elif token.token_type == 1: # TOKEN_VAR
+            elif token.token_type == 1:  # TOKEN_VAR
                 if not token.contents:
                     self.empty_variable(token)
                 try:
@@ -258,7 +269,7 @@ class Parser(object):
                         raise
                 var_node = self.create_variable_node(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
-            elif token.token_type == 2: # TOKEN_BLOCK
+            elif token.token_type == 2:  # TOKEN_BLOCK
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
@@ -365,6 +376,7 @@ class Parser(object):
             return self.filters[filter_name]
         else:
             raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+
 
 class TokenParser(object):
     """
@@ -519,6 +531,7 @@ filter_raw_string = r"""
 
 filter_re = re.compile(filter_raw_string, re.UNICODE | re.VERBOSE)
 
+
 class FilterExpression(object):
     """
     Parses a variable token and its optional filters (all as a single string),
@@ -532,9 +545,6 @@ class FilterExpression(object):
         2
         >>> fe.var
         <Variable: 'variable'>
-
-    This class should never be instantiated outside of the
-    get_filters_from_token helper function.
     """
     def __init__(self, token, parser):
         self.token = token
@@ -640,6 +650,7 @@ class FilterExpression(object):
     def __str__(self):
         return self.token
 
+
 def resolve_variable(path, context):
     """
     Returns the resolved variable, which may contain attribute syntax, within
@@ -648,6 +659,7 @@ def resolve_variable(path, context):
     Deprecated; use the Variable class instead.
     """
     return Variable(path).resolve(context)
+
 
 class Variable(object):
     """
@@ -772,12 +784,12 @@ class Variable(object):
                     elif getattr(current, 'alters_data', False):
                         current = settings.TEMPLATE_STRING_IF_INVALID
                     else:
-                        try: # method call (assuming no args required)
+                        try:  # method call (assuming no args required)
                             current = current()
                         except TypeError:
                             try:
                                 getcallargs(current)
-                            except TypeError: # arguments *were* required
+                            except TypeError:  # arguments *were* required
                                 current = settings.TEMPLATE_STRING_IF_INVALID  # invalid method call
                             else:
                                 raise
@@ -788,6 +800,7 @@ class Variable(object):
                 raise
 
         return current
+
 
 class Node(object):
     # Set this to True for nodes that must be first in the template (although
@@ -818,6 +831,7 @@ class Node(object):
                 nodes.extend(nodelist.get_nodes_by_type(nodetype))
         return nodes
 
+
 class NodeList(list):
     # Set to True the first time a non-TextNode is inserted by
     # extend_nodelist().
@@ -843,6 +857,7 @@ class NodeList(list):
     def render_node(self, node, context):
         return node.render(context)
 
+
 class TextNode(Node):
     def __init__(self, s):
         self.s = s
@@ -853,6 +868,7 @@ class TextNode(Node):
 
     def render(self, context):
         return self.s
+
 
 def render_value_in_context(value, context):
     """
@@ -868,6 +884,7 @@ def render_value_in_context(value, context):
         return escape(value)
     else:
         return value
+
 
 class VariableNode(Node):
     def __init__(self, filter_expression):
@@ -888,6 +905,7 @@ class VariableNode(Node):
 
 # Regex for token keyword arguments
 kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")
+
 
 def token_kwargs(bits, parser, support_legacy=False):
     """
@@ -937,6 +955,7 @@ def token_kwargs(bits, parser, support_legacy=False):
                 return kwargs
             del bits[:1]
     return kwargs
+
 
 def parse_bits(parser, bits, params, varargs, varkw, defaults,
                takes_context, name):
@@ -1005,6 +1024,7 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
             (name, ", ".join("'%s'" % p for p in unhandled_params)))
     return args, kwargs
 
+
 def generic_tag_compiler(parser, token, params, varargs, varkw, defaults,
                          name, takes_context, node_class):
     """
@@ -1014,6 +1034,7 @@ def generic_tag_compiler(parser, token, params, varargs, varkw, defaults,
     args, kwargs = parse_bits(parser, bits, params, varargs, varkw,
                               defaults, takes_context, name)
     return node_class(takes_context, args, kwargs)
+
 
 class TagHelperNode(Node):
     """
@@ -1031,9 +1052,9 @@ class TagHelperNode(Node):
         resolved_args = [var.resolve(context) for var in self.args]
         if self.takes_context:
             resolved_args = [context] + resolved_args
-        resolved_kwargs = dict((k, v.resolve(context))
-                                for k, v in self.kwargs.items())
+        resolved_kwargs = dict((k, v.resolve(context)) for k, v in self.kwargs.items())
         return resolved_args, resolved_kwargs
+
 
 class Library(object):
     def __init__(self):
@@ -1220,6 +1241,7 @@ class Library(object):
             return func
         return dec
 
+
 def is_library_missing(name):
     """Check if library that failed to load cannot be found under any
     templatetags directory or does exist but fails to import.
@@ -1235,6 +1257,7 @@ def is_library_missing(name):
         return not module_has_submodule(package, module)
     except ImportError:
         return is_library_missing(path)
+
 
 def import_library(taglib_module):
     """
@@ -1264,6 +1287,7 @@ def import_library(taglib_module):
 
 templatetags_modules = []
 
+
 def get_templatetags_modules():
     """
     Return the list of all available template tag modules.
@@ -1276,15 +1300,19 @@ def get_templatetags_modules():
         # Populate list once per process. Mutate the local list first, and
         # then assign it to the global name to ensure there are no cases where
         # two threads try to populate it simultaneously.
-        for app_module in ['django'] + list(settings.INSTALLED_APPS):
+
+        templatetags_modules_candidates = ['django.templatetags']
+        templatetags_modules_candidates += ['%s.templatetags' % app_config.name
+            for app_config in apps.get_app_configs()]
+        for templatetag_module in templatetags_modules_candidates:
             try:
-                templatetag_module = '%s.templatetags' % app_module
                 import_module(templatetag_module)
                 _templatetags_modules.append(templatetag_module)
             except ImportError:
                 continue
         templatetags_modules = _templatetags_modules
     return templatetags_modules
+
 
 def get_library(library_name):
     """
@@ -1323,3 +1351,4 @@ def add_to_builtins(module):
 
 add_to_builtins('django.template.defaulttags')
 add_to_builtins('django.template.defaultfilters')
+add_to_builtins('django.template.loader_tags')

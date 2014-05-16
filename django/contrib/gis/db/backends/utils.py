@@ -3,6 +3,7 @@ A collection of utility routines and classes used by the spatial
 backends.
 """
 
+
 class SpatialOperation(object):
     """
     Base class for generating spatial SQL.
@@ -19,14 +20,15 @@ class SpatialOperation(object):
         return self.sql_template % self.params(geo_col, geometry), []
 
     def params(self, geo_col, geometry):
-        params = {'function' : self.function,
-                  'geo_col' : geo_col,
-                  'geometry' : geometry,
-                  'operator' : self.operator,
-                  'result' : self.result,
+        params = {'function': self.function,
+                  'geo_col': geo_col,
+                  'geometry': geometry,
+                  'operator': self.operator,
+                  'result': self.result,
                   }
         params.update(self.extra)
         return params
+
 
 class SpatialFunction(SpatialOperation):
     """
@@ -36,9 +38,9 @@ class SpatialFunction(SpatialOperation):
 
     def __init__(self, func, result='', operator='', **kwargs):
         # Getting the function prefix.
-        default = {'function' : func,
-                   'operator' : operator,
-                   'result' : result
+        default = {'function': func,
+                   'operator': operator,
+                   'result': result
                    }
         kwargs.update(default)
         super(SpatialFunction, self).__init__(**kwargs)

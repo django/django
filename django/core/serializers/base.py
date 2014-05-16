@@ -5,18 +5,23 @@ import warnings
 
 from django.db import models
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango19Warning
+
 
 class SerializerDoesNotExist(KeyError):
     """The requested serializer was not found."""
     pass
 
+
 class SerializationError(Exception):
     """Something bad happened during serialization."""
     pass
 
+
 class DeserializationError(Exception):
     """Something bad happened during deserialization."""
     pass
+
 
 class Serializer(object):
     """
@@ -38,7 +43,7 @@ class Serializer(object):
         self.use_natural_keys = options.pop("use_natural_keys", False)
         if self.use_natural_keys:
             warnings.warn("``use_natural_keys`` is deprecated; use ``use_natural_foreign_keys`` instead.",
-                PendingDeprecationWarning)
+                RemovedInDjango19Warning)
         self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False) or self.use_natural_keys
         self.use_natural_primary_keys = options.pop('use_natural_primary_keys', False)
 
@@ -117,6 +122,7 @@ class Serializer(object):
         if callable(getattr(self.stream, 'getvalue', None)):
             return self.stream.getvalue()
 
+
 class Deserializer(six.Iterator):
     """
     Abstract base deserializer class.
@@ -131,10 +137,6 @@ class Deserializer(six.Iterator):
             self.stream = six.StringIO(stream_or_string)
         else:
             self.stream = stream_or_string
-        # hack to make sure that the models have all been loaded before
-        # deserialization starts (otherwise subclass calls to get_model()
-        # and friends might fail...)
-        models.get_apps()
 
     def __iter__(self):
         return self
@@ -142,6 +144,7 @@ class Deserializer(six.Iterator):
     def __next__(self):
         """Iteration iterface -- return the next item in the stream"""
         raise NotImplementedError('subclasses of Deserializer must provide a __next__() method')
+
 
 class DeserializedObject(object):
     """
@@ -175,6 +178,7 @@ class DeserializedObject(object):
         # prevent a second (possibly accidental) call to save() from saving
         # the m2m data twice.
         self.m2m_data = None
+
 
 def build_instance(Model, data, db):
     """

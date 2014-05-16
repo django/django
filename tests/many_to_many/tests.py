@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.db import transaction
 from django.test import TestCase
 from django.utils import six
 
@@ -54,9 +55,11 @@ class ManyToManyTests(TestCase):
 
         # Adding an object of the wrong type raises TypeError
         with six.assertRaisesRegex(self, TypeError, "'Publication' instance expected, got <Article.*"):
-            a6.publications.add(a5)
+            with transaction.atomic():
+                a6.publications.add(a5)
+
         # Add a Publication directly via publications.add by using keyword arguments.
-        p4 = a6.publications.create(title='Highlights for Adults')
+        a6.publications.create(title='Highlights for Adults')
         self.assertQuerysetEqual(a6.publications.all(),
             [
                 '<Publication: Highlights for Adults>',
@@ -81,7 +84,7 @@ class ManyToManyTests(TestCase):
                                  ['<Publication: Science News>'])
 
         # Adding via the other end using keywords
-        new_article = self.p2.article_set.create(headline='Carbon-free diet works wonders')
+        self.p2.article_set.create(headline='Carbon-free diet works wonders')
         self.assertQuerysetEqual(
             self.p2.article_set.all(),
             [
@@ -172,7 +175,7 @@ class ManyToManyTests(TestCase):
         self.assertEqual(Article.objects.filter(publications__title__startswith="Science").count(), 4)
         self.assertEqual(Article.objects.filter(publications__title__startswith="Science").distinct().count(), 3)
         self.assertQuerysetEqual(
-            Article.objects.filter(publications__in=[self.p1.id,self.p2.id]).distinct(),
+            Article.objects.filter(publications__in=[self.p1.id, self.p2.id]).distinct(),
             [
                 '<Article: Django lets you build Web apps easily>',
                 '<Article: NASA finds intelligent life on Earth>',
@@ -180,7 +183,7 @@ class ManyToManyTests(TestCase):
                 '<Article: Oxygen-free diet works wonders>',
             ])
         self.assertQuerysetEqual(
-            Article.objects.filter(publications__in=[self.p1.id,self.p2]).distinct(),
+            Article.objects.filter(publications__in=[self.p1.id, self.p2]).distinct(),
             [
                 '<Article: Django lets you build Web apps easily>',
                 '<Article: NASA finds intelligent life on Earth>',
@@ -188,7 +191,7 @@ class ManyToManyTests(TestCase):
                 '<Article: Oxygen-free diet works wonders>',
             ])
         self.assertQuerysetEqual(
-            Article.objects.filter(publications__in=[self.p1,self.p2]).distinct(),
+            Article.objects.filter(publications__in=[self.p1, self.p2]).distinct(),
             [
                 '<Article: Django lets you build Web apps easily>',
                 '<Article: NASA finds intelligent life on Earth>',
@@ -227,7 +230,7 @@ class ManyToManyTests(TestCase):
                                  ['<Publication: The Python Journal>'])
 
         self.assertQuerysetEqual(
-            Publication.objects.filter(article__in=[self.a1.id,self.a2.id]).distinct(),
+            Publication.objects.filter(article__in=[self.a1.id, self.a2.id]).distinct(),
             [
                 '<Publication: Highlights for Children>',
                 '<Publication: Science News>',
@@ -235,7 +238,7 @@ class ManyToManyTests(TestCase):
                 '<Publication: The Python Journal>',
             ])
         self.assertQuerysetEqual(
-            Publication.objects.filter(article__in=[self.a1.id,self.a2]).distinct(),
+            Publication.objects.filter(article__in=[self.a1.id, self.a2]).distinct(),
             [
                 '<Publication: Highlights for Children>',
                 '<Publication: Science News>',
@@ -243,7 +246,7 @@ class ManyToManyTests(TestCase):
                 '<Publication: The Python Journal>',
             ])
         self.assertQuerysetEqual(
-            Publication.objects.filter(article__in=[self.a1,self.a2]).distinct(),
+            Publication.objects.filter(article__in=[self.a1, self.a2]).distinct(),
             [
                 '<Publication: Highlights for Children>',
                 '<Publication: Science News>',
@@ -366,6 +369,30 @@ class ManyToManyTests(TestCase):
                                  ['<Article: NASA finds intelligent life on Earth>'])
         self.assertQuerysetEqual(self.a4.publications.all(),
                                  ['<Publication: Science Weekly>'])
+
+    def test_forward_assign_with_queryset(self):
+        # Ensure that querysets used in m2m assignments are pre-evaluated
+        # so their value isn't affected by the clearing operation in
+        # ManyRelatedObjectsDescriptor.__set__. Refs #19816.
+        self.a1.publications = [self.p1, self.p2]
+
+        qs = self.a1.publications.filter(title='The Python Journal')
+        self.a1.publications = qs
+
+        self.assertEqual(1, self.a1.publications.count())
+        self.assertEqual(1, qs.count())
+
+    def test_reverse_assign_with_queryset(self):
+        # Ensure that querysets used in M2M assignments are pre-evaluated
+        # so their value isn't affected by the clearing operation in
+        # ReverseManyRelatedObjectsDescriptor.__set__. Refs #19816.
+        self.p1.article_set = [self.a1, self.a2]
+
+        qs = self.p1.article_set.filter(headline='Django lets you build Web apps easily')
+        self.p1.article_set = qs
+
+        self.assertEqual(1, self.p1.article_set.count())
+        self.assertEqual(1, qs.count())
 
     def test_clear(self):
         # Relation sets can be cleared:

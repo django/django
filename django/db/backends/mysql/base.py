@@ -152,6 +152,14 @@ class CursorWrapper(object):
     def __iter__(self):
         return iter(self.cursor)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        # Ticket #17671 - Close instead of passing thru to avoid backend
+        # specific behavior.
+        self.close()
+
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
@@ -164,12 +172,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update_nowait = False
     supports_forward_references = False
     supports_long_model_names = False
+    # XXX MySQL DB-API drivers currently fail on binary data on Python 3.
+    supports_binary_field = six.PY2
     supports_microsecond_precision = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
+    can_introspect_binary_field = False
+    can_introspect_boolean_field = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
-    allows_primary_key_0 = False
+    allows_auto_pk_0 = False
     uses_savepoints = True
     atomic_transactions = False
     supports_check_constraints = False
@@ -180,15 +192,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
-        cursor = self.connection.cursor()
-        cursor.execute('CREATE TABLE INTROSPECT_TEST (X INT)')
-        # This command is MySQL specific; the second column
-        # will tell you the default table type of the created
-        # table. Since all Django's test tables will have the same
-        # table type, that's enough to evaluate the feature.
-        cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
-        result = cursor.fetchone()
-        cursor.execute('DROP TABLE INTROSPECT_TEST')
+        with self.connection.cursor() as cursor:
+            cursor.execute('CREATE TABLE INTROSPECT_TEST (X INT)')
+            # This command is MySQL specific; the second column
+            # will tell you the default table type of the created
+            # table. Since all Django's test tables will have the same
+            # table type, that's enough to evaluate the feature.
+            cursor.execute("SHOW TABLE STATUS WHERE Name='INTROSPECT_TEST'")
+            result = cursor.fetchone()
+            cursor.execute('DROP TABLE INTROSPECT_TEST')
         return result[1]
 
     @cached_property
@@ -207,13 +219,19 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             return False
 
         # Test if the time zone definitions are installed.
-        cursor = self.connection.cursor()
-        cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
-        return cursor.fetchone() is not None
+        with self.connection.cursor() as cursor:
+            cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
+            return cursor.fetchone() is not None
 
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.mysql.compiler"
+
+    # MySQL stores positive fields as UNSIGNED ints.
+    integer_field_ranges = dict(BaseDatabaseOperations.integer_field_ranges,
+        PositiveSmallIntegerField=(0, 4294967295),
+        PositiveIntegerField=(0, 18446744073709551615),
+    )
 
     def date_extract_sql(self, lookup_type, field_name):
         # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
@@ -226,7 +244,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def date_trunc_sql(self, lookup_type, field_name):
         fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
-        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s') # Use double percents to escape.
+        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')  # Use double percents to escape.
         format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
         try:
             i = fields.index(lookup_type) + 1
@@ -259,7 +277,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             params = []
         fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
-        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s') # Use double percents to escape.
+        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s')  # Use double percents to escape.
         format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
         try:
             i = fields.index(lookup_type) + 1
@@ -300,13 +318,8 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def quote_name(self, name):
         if name.startswith("`") and name.endswith("`"):
-            return name # Quoting once is enough.
+            return name  # Quoting once is enough.
         return "`%s`" % name
-
-    def quote_parameter(self, value):
-        # Inner import to allow module to fail to load gracefully
-        import MySQLdb.converters
-        return MySQLdb.escape(value, MySQLdb.converters.conversions)
 
     def random_function_sql(self):
         return 'RAND()'
@@ -332,13 +345,15 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Truncate already resets the AUTO_INCREMENT field from
         # MySQL version 5.0.13 onwards. Refs #16961.
         if self.connection.mysql_version < (5, 0, 13):
-            return ["%s %s %s %s %s;" %
-                    (style.SQL_KEYWORD('ALTER'),
+            return [
+                "%s %s %s %s %s;" % (
+                    style.SQL_KEYWORD('ALTER'),
                     style.SQL_KEYWORD('TABLE'),
                     style.SQL_TABLE(self.quote_name(sequence['table'])),
                     style.SQL_KEYWORD('AUTO_INCREMENT'),
                     style.SQL_FIELD('= 1'),
-                    ) for sequence in sequences]
+                ) for sequence in sequences
+            ]
         else:
             return []
 
@@ -385,6 +400,14 @@ class DatabaseOperations(BaseDatabaseOperations):
     def bulk_insert_sql(self, fields, num_values):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
         return "VALUES " + ", ".join([items_sql] * num_values)
+
+    def combine_expression(self, connector, sub_expressions):
+        """
+        MySQL requires special cases for ^ operators in query expressions
+        """
+        if connector == '^':
+            return 'POW(%s)' % ','.join(sub_expressions)
+        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -451,13 +474,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn
 
     def init_connection_state(self):
-        cursor = self.connection.cursor()
-        # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
-        # on a recently-inserted row will return when the field is tested for
-        # NULL.  Disabling this value brings this aspect of MySQL in line with
-        # SQL standards.
-        cursor.execute('SET SQL_AUTO_IS_NULL = 0')
-        cursor.close()
+        with self.cursor() as cursor:
+            # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
+            # on a recently-inserted row will return when the field is tested for
+            # NULL.  Disabling this value brings this aspect of MySQL in line with
+            # SQL standards.
+            cursor.execute('SET SQL_AUTO_IS_NULL = 0')
 
     def create_cursor(self):
         cursor = self.connection.cursor()
@@ -470,7 +492,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             pass
 
     def _set_autocommit(self, autocommit):
-        self.connection.autocommit(autocommit)
+        with self.wrap_database_errors:
+            self.connection.autocommit(autocommit)
 
     def disable_constraint_checking(self):
         """
@@ -534,7 +557,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def is_usable(self):
         try:
             self.connection.ping()
-        except DatabaseError:
+        except Database.Error:
             return False
         else:
             return True

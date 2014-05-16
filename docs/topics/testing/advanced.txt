@@ -45,13 +45,13 @@ The following is a simple unit test using the request factory::
             # Every test needs access to the request factory.
             self.factory = RequestFactory()
             self.user = User.objects.create_user(
-                first_name='jacob', email='jacob@…', password='top_secret')
+                username='jacob', email='jacob@…', password='top_secret')
 
         def test_details(self):
             # Create an instance of a GET request.
             request = self.factory.get('/customer/details')
 
-            # Recall that middleware are not suported. You can simulate a
+            # Recall that middleware are not supported. You can simulate a
             # logged-in user by setting request.user manually.
             request.user = self.user
 
@@ -166,8 +166,6 @@ Advanced features of ``TransactionTestCase``
 
 .. attribute:: TransactionTestCase.available_apps
 
-    .. versionadded:: 1.6
-
     .. warning::
 
         This attribute is a private API. It may be changed or removed without
@@ -251,6 +249,11 @@ automatically as part of the setup of ``./manage.py test``. You only
 need to manually invoke this method if you're not using running your
 tests via Django's test runner.
 
+.. versionchanged:: 1.7
+
+If you are not using a management command to invoke the tests, you will also
+need to first setup Django itself using :func:`django.setup()`.
+
 .. _other-testing-frameworks:
 
 Using different testing frameworks
@@ -294,8 +297,6 @@ Defining a test runner
 ----------------------
 
 .. currentmodule:: django.test.runner
-
-.. versionadded:: 1.6
 
 A test runner is a class defining a ``run_tests()`` method. Django ships
 with a ``DiscoverRunner`` class that defines the default Django testing
@@ -354,7 +355,7 @@ Attributes
     the individual tests and format the results. By default it is set to
     ``unittest.TextTestRunner``. Despite the unfortunate similarity in
     naming conventions, this is not the same type of class as
-    ``DiscoverRunner``, which covers a broader set of responsibilites. You
+    ``DiscoverRunner``, which covers a broader set of responsibilities. You
     can override this attribute to modify the way tests are run and reported.
 
 .. attribute:: DiscoverRunner.test_loader
@@ -377,21 +378,9 @@ Methods
 
     Run the test suite.
 
-    ``test_labels`` is a list of strings describing the tests to be run. A test
-    label can take one of four forms:
-
-    * ``path.to.test_module.TestCase.test_method`` -- Run a single test method
-      in a test case.
-    * ``path.to.test_module.TestCase`` -- Run all the test methods in a test
-      case.
-    * ``path.to.module`` -- Search for and run all tests in the named Python
-      package or module.
-    * ``path/to/directory`` -- Search for and run all tests below the named
-      directory.
-
-    If ``test_labels`` has a value of ``None``, the test runner will search for
-    tests in all files below the current directory whose names match its
-    ``pattern`` (see above).
+    ``test_labels`` allows you to specify which tests to run and supports
+    several formats (see :meth:`DiscoverRunner.build_suite` for a list of
+    supported formats).
 
     ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
     suite that is executed by the test runner. These extra tests are run
@@ -410,15 +399,20 @@ Methods
     Constructs a test suite that matches the test labels provided.
 
     ``test_labels`` is a list of strings describing the tests to be run. A test
-    label can take one of three forms:
+    label can take one of four forms:
 
-    * ``app.TestCase.test_method`` -- Run a single test method in a test
+    * ``path.to.test_module.TestCase.test_method`` -- Run a single test method
+      in a test case.
+    * ``path.to.test_module.TestCase`` -- Run all the test methods in a test
       case.
-    * ``app.TestCase`` -- Run all the test methods in a test case.
-    * ``app`` -- Search for and run all tests in the named application.
+    * ``path.to.module`` -- Search for and run all tests in the named Python
+      package or module.
+    * ``path/to/directory`` -- Search for and run all tests below the named
+      directory.
 
-    If ``test_labels`` has a value of ``None``, the test runner should run
-    search for tests in all the applications in :setting:`INSTALLED_APPS`.
+    If ``test_labels`` has a value of ``None``, the test runner will search for
+    tests in all files below the current directory whose names match its
+    ``pattern`` (see above).
 
     ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
     suite that is executed by the test runner. These extra tests are run
@@ -549,4 +543,4 @@ For more options like annotated HTML listings detailing missed lines, see the
 `coverage.py`_ docs.
 
 .. _coverage.py: http://nedbatchelder.com/code/coverage/
-.. _install coverage.py: http://pypi.python.org/pypi/coverage
+.. _install coverage.py: https://pypi.python.org/pypi/coverage

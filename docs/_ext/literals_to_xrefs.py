@@ -19,7 +19,7 @@ ROLES = (
     'func',
     'lookup',
     'meth',
-    'mod' ,
+    'mod',
     "djadminopt",
     "ref",
     "setting",
@@ -36,6 +36,7 @@ ALWAYS_SKIP = [
     "True",
     "False",
 ]
+
 
 def fixliterals(fname):
     with open(fname) as fp:
@@ -67,8 +68,8 @@ def fixliterals(fname):
             new.append(m.group(0))
             continue
 
-        sys.stdout.write("\n"+"-"*80+"\n")
-        sys.stdout.write(data[prev_start+1:m.start()])
+        sys.stdout.write("\n" + "-" * 80 + "\n")
+        sys.stdout.write(data[prev_start + 1:m.start()])
         sys.stdout.write(colorize(m.group(0), fg="red"))
         sys.stdout.write(data[m.end():next_end])
         sys.stdout.write("\n\n")

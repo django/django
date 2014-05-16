@@ -39,13 +39,13 @@ View
 
     **Example urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import MyView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^mine/$', MyView.as_view(), name='my-view'),
-        )
+        ]
 
     **Attributes**
 
@@ -105,6 +105,7 @@ TemplateView
     This view inherits methods and attributes from the following views:
 
     * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.base.ContextMixin`
     * :class:`django.views.generic.base.View`
 
     **Method Flowchart**
@@ -130,18 +131,18 @@ TemplateView
 
     **Example urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import HomePageView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^$', HomePageView.as_view(), name='home'),
-        )
+        ]
 
     **Context**
 
-    * ``params``: The dictionary of keyword arguments captured from the URL
-      pattern that served the view.
+    * Populated (through :class:`~django.views.generic.base.ContextMixin`) with
+      the keyword arguments captured from the URL pattern that served the view.
 
 RedirectView
 ------------
@@ -191,17 +192,16 @@ RedirectView
 
     **Example urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         from django.views.generic.base import RedirectView
 
         from article.views import ArticleCounterRedirectView, ArticleDetail
 
-        urlpatterns = patterns('',
-
-            url(r'^counter/(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
-            url(r'^details/(?P<pk>\d+)/$', ArticleDetail.as_view(), name='article-detail'),
+        urlpatterns = [
+            url(r'^counter/(?P<pk>[0-9]+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^details/(?P<pk>[0-9]+)/$', ArticleDetail.as_view(), name='article-detail'),
             url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
-        )
+        ]
 
     **Attributes**
 
@@ -211,8 +211,6 @@ RedirectView
         HTTP error.
 
     .. attribute:: pattern_name
-
-        .. versionadded:: 1.6
 
         The name of the URL pattern to redirect to. Reversing will be done
         using the same args and kwargs as are passed in for this view.
@@ -233,12 +231,19 @@ RedirectView
 
     **Methods**
 
-    .. method:: get_redirect_url(**kwargs)
+    .. method:: get_redirect_url(*args, **kwargs)
 
         Constructs the target URL for redirection.
 
         The default implementation uses :attr:`url` as a starting
-        string, performs expansion of ``%`` parameters in that string, as well
-        as the appending of query string if requested by :attr:`query_string`.
+        string and performs expansion of ``%`` named parameters in that string
+        using the named groups captured in the URL.
+
+        If :attr:`url` is not set, ``get_redirect_url()`` tries to reverse the
+        :attr:`pattern_name` using what was captured in the URL (both named and
+        unnamed groups are used).
+
+        If requested by :attr:`query_string`, it will also append the query
+        string to the generated URL.
         Subclasses may implement any behavior they wish, as long as the method
         returns a redirect-ready URL string.

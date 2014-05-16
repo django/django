@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.contrib.contenttypes.generic import generic_inlineformset_factory
+from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import FieldError
 from django.test import TestCase
 from django.utils import six
 
@@ -19,7 +20,7 @@ class GenericRelationsTests(TestCase):
         platypus = Animal.objects.create(
             common_name="Platypus", latin_name="Ornithorhynchus anatinus"
         )
-        eggplant = Vegetable.objects.create(name="Eggplant", is_yucky=True)
+        Vegetable.objects.create(name="Eggplant", is_yucky=True)
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         quartz = Mineral.objects.create(name="Quartz", hardness=7)
 
@@ -42,11 +43,22 @@ class GenericRelationsTests(TestCase):
         # You can easily access the content object like a foreign key.
         t = TaggedItem.objects.get(tag="salty")
         self.assertEqual(t.content_object, bacon)
+        qs = TaggedItem.objects.filter(animal__isnull=False).order_by('animal__common_name', 'tag')
+        self.assertQuerysetEqual(
+            qs, ["<TaggedItem: hairy>", "<TaggedItem: yellow>", "<TaggedItem: fatty>"]
+        )
+        mpk = ManualPK.objects.create(id=1)
+        mpk.tags.create(tag='mpk')
+        from django.db.models import Q
+        qs = TaggedItem.objects.filter(Q(animal__isnull=False) | Q(manualpk__id=1)).order_by('tag')
+        self.assertQuerysetEqual(
+            qs, ["fatty", "hairy", "mpk", "yellow"], lambda x: x.tag)
+        mpk.delete()
 
         # Recall that the Mineral class doesn't have an explicit GenericRelation
         # defined. That's OK, because you can create TaggedItems explicitly.
         tag1 = TaggedItem.objects.create(content_object=quartz, tag="shiny")
-        tag2 = TaggedItem.objects.create(content_object=quartz, tag="clearish")
+        TaggedItem.objects.create(content_object=quartz, tag="clearish")
 
         # However, excluding GenericRelations means your lookups have to be a
         # bit more explicit.
@@ -98,23 +110,23 @@ class GenericRelationsTests(TestCase):
         )
 
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz.pk),
-                ('fatty', Animal, platypus.pk),
-                ('fatty', Vegetable, bacon.pk),
-                ('hairy', Animal, lion.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk),
-                ('yellow', Animal, lion.pk)
+            ('clearish', Mineral, quartz.pk),
+            ('fatty', Animal, platypus.pk),
+            ('fatty', Vegetable, bacon.pk),
+            ('hairy', Animal, lion.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk),
+            ('yellow', Animal, lion.pk)
         ],
             comp_func
         )
         lion.delete()
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz.pk),
-                ('fatty', Animal, platypus.pk),
-                ('fatty', Vegetable, bacon.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk)
+            ('clearish', Mineral, quartz.pk),
+            ('fatty', Animal, platypus.pk),
+            ('fatty', Vegetable, bacon.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk)
         ],
             comp_func
         )
@@ -124,11 +136,11 @@ class GenericRelationsTests(TestCase):
         quartz_pk = quartz.pk
         quartz.delete()
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz_pk),
-                ('fatty', Animal, platypus.pk),
-                ('fatty', Vegetable, bacon.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk)
+            ('clearish', Mineral, quartz_pk),
+            ('fatty', Animal, platypus.pk),
+            ('fatty', Vegetable, bacon.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk)
         ],
             comp_func
         )
@@ -138,10 +150,10 @@ class GenericRelationsTests(TestCase):
         tag.delete()
         self.assertQuerysetEqual(bacon.tags.all(), ["<TaggedItem: salty>"])
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-                ('clearish', Mineral, quartz_pk),
-                ('fatty', Animal, platypus.pk),
-                ('salty', Vegetable, bacon.pk),
-                ('shiny', Animal, platypus.pk)
+            ('clearish', Mineral, quartz_pk),
+            ('fatty', Animal, platypus.pk),
+            ('salty', Vegetable, bacon.pk),
+            ('shiny', Animal, platypus.pk)
         ],
             comp_func
         )
@@ -150,6 +162,27 @@ class GenericRelationsTests(TestCase):
         self.assertQuerysetEqual(Animal.objects.filter(tags__content_type=ctype), [
             "<Animal: Platypus>"
         ])
+
+    def test_assign_with_queryset(self):
+        # Ensure that querysets used in reverse GFK assignments are pre-evaluated
+        # so their value isn't affected by the clearing operation in
+        # ManyRelatedObjectsDescriptor.__set__. Refs #19816.
+        bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
+        bacon.tags.create(tag="fatty")
+        bacon.tags.create(tag="salty")
+        self.assertEqual(2, bacon.tags.count())
+
+        qs = bacon.tags.filter(tag="fatty")
+        bacon.tags = qs
+
+        self.assertEqual(1, bacon.tags.count())
+        self.assertEqual(1, qs.count())
+
+    def test_generic_relation_related_name_default(self):
+        # Test that GenericRelation by default isn't usable from
+        # the reverse side.
+        with self.assertRaises(FieldError):
+            TaggedItem.objects.filter(vegetable__isnull=True)
 
     def test_multiple_gfk(self):
         # Simple tests for multiple GenericForeignKeys
@@ -290,11 +323,13 @@ class GenericRelationsTests(TestCase):
 class CustomWidget(forms.TextInput):
     pass
 
+
 class TaggedItemForm(forms.ModelForm):
     class Meta:
         model = TaggedItem
         fields = '__all__'
         widgets = {'tag': CustomWidget}
+
 
 class GenericInlineFormsetTest(TestCase):
     def test_generic_inlineformset_factory(self):

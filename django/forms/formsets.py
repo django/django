@@ -13,7 +13,7 @@ from django.utils.six.moves import xrange
 from django.utils.translation import ungettext, ugettext as _
 
 
-__all__ = ('BaseFormSet', 'all_valid')
+__all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
 
 # special field names
 TOTAL_FORM_COUNT = 'TOTAL_FORMS'
@@ -28,6 +28,7 @@ DEFAULT_MIN_NUM = 0
 
 # default maximum number of forms in a formset, to prevent memory exhaustion
 DEFAULT_MAX_NUM = 1000
+
 
 class ManagementForm(Form):
     """
@@ -44,6 +45,7 @@ class ManagementForm(Form):
         self.base_fields[MIN_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         self.base_fields[MAX_NUM_FORM_COUNT] = IntegerField(required=False, widget=HiddenInput)
         super(ManagementForm, self).__init__(*args, **kwargs)
+
 
 @python_2_unicode_compatible
 class BaseFormSet(object):
@@ -112,7 +114,7 @@ class BaseFormSet(object):
             return min(self.management_form.cleaned_data[TOTAL_FORM_COUNT], self.absolute_max)
         else:
             initial_forms = self.initial_form_count()
-            total_forms = initial_forms + self.extra
+            total_forms = max(initial_forms, self.min_num) + self.extra
             # Allow all existing related objects/inlines to be displayed,
             # but don't allow extra beyond max_num.
             if initial_forms > self.max_num >= 0:
@@ -151,13 +153,14 @@ class BaseFormSet(object):
         if self.is_bound:
             defaults['data'] = self.data
             defaults['files'] = self.files
-        if self.initial and not 'initial' in kwargs:
+        if self.initial and 'initial' not in kwargs:
             try:
                 defaults['initial'] = self.initial[i]
             except IndexError:
                 pass
-        # Allow extra forms to be empty.
-        if i >= self.initial_form_count():
+        # Allow extra forms to be empty, unless they're part of
+        # the minimum forms.
+        if i >= self.initial_form_count() and i >= self.min_num:
             defaults['empty_permitted'] = True
         defaults.update(kwargs)
         form = self.form(**defaults)
@@ -241,9 +244,10 @@ class BaseFormSet(object):
             # None should be sorted below anything else. Allowing None as
             # a comparison value makes it so we can leave ordering fields
             # blank.
+
             def compare_ordering_key(k):
                 if k[1] is None:
-                    return (1, 0) # +infinity, larger than any number
+                    return (1, 0)  # +infinity, larger than any number
                 return (0, k[1])
             self._ordering.sort(key=compare_ordering_key)
         # Return a list of form.cleaned_data dicts in the order specified by
@@ -305,7 +309,7 @@ class BaseFormSet(object):
                     # should not cause the entire formset to be invalid.
                     continue
             forms_valid &= form.is_valid()
-        return forms_valid and not bool(self.non_form_errors())
+        return forms_valid and not self.non_form_errors()
 
     def full_clean(self):
         """
@@ -315,22 +319,22 @@ class BaseFormSet(object):
         self._errors = []
         self._non_form_errors = self.error_class()
 
-        if not self.is_bound: # Stop further processing.
+        if not self.is_bound:  # Stop further processing.
             return
         for i in range(0, self.total_form_count()):
             form = self.forms[i]
             self._errors.append(form.errors)
         try:
             if (self.validate_max and
-                self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
-                self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
+                    self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
+                    self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
                 raise ValidationError(ungettext(
                     "Please submit %d or fewer forms.",
                     "Please submit %d or fewer forms.", self.max_num) % self.max_num,
                     code='too_many_forms',
                 )
             if (self.validate_min and
-                self.total_form_count() - len(self.deleted_forms) < self.min_num):
+                    self.total_form_count() - len(self.deleted_forms) < self.min_num):
                 raise ValidationError(ungettext(
                     "Please submit %d or more forms.",
                     "Please submit %d or more forms.", self.min_num) % self.min_num,
@@ -338,13 +342,13 @@ class BaseFormSet(object):
             # Give self.clean() a chance to do cross-form validation.
             self.clean()
         except ValidationError as e:
-            self._non_form_errors = self.error_class(e.messages)
+            self._non_form_errors = self.error_class(e.error_list)
 
     def clean(self):
         """
         Hook for doing any extra formset-wide cleaning after Form.clean() has
         been called on every form. Any ValidationError raised by this method
-        will not be associated with a particular form; it will be accesible
+        will not be associated with a particular form; it will be accessible
         via formset.non_form_errors()
         """
         pass
@@ -360,7 +364,7 @@ class BaseFormSet(object):
         if self.can_order:
             # Only pre-fill the ordering field for initial forms.
             if index is not None and index < self.initial_form_count():
-                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), initial=index+1, required=False)
+                form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), initial=index + 1, required=False)
             else:
                 form.fields[ORDERING_FIELD_NAME] = IntegerField(label=_('Order'), required=False)
         if self.can_delete:
@@ -406,6 +410,7 @@ class BaseFormSet(object):
         forms = ' '.join(form.as_ul() for form in self)
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
+
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None, validate_max=False,
                     min_num=None, validate_min=False):
@@ -418,13 +423,13 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     # limit is simply max_num + DEFAULT_MAX_NUM (which is 2*DEFAULT_MAX_NUM
     # if max_num is None in the first place)
     absolute_max = max_num + DEFAULT_MAX_NUM
-    extra += min_num
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
              'min_num': min_num, 'max_num': max_num,
-             'absolute_max': absolute_max, 'validate_min' : validate_min,
-             'validate_max' : validate_max}
+             'absolute_max': absolute_max, 'validate_min': validate_min,
+             'validate_max': validate_max}
     return type(form.__name__ + str('FormSet'), (formset,), attrs)
+
 
 def all_valid(formsets):
     """Returns true if every formset in formsets is valid."""

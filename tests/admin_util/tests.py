@@ -5,8 +5,8 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.admin.utils import (display_for_field, flatten_fieldsets,
-    label_for_field, lookup_field, NestedObjects)
+from django.contrib.admin.utils import (display_for_field, flatten,
+    flatten_fieldsets, label_for_field, lookup_field, NestedObjects)
 from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.contrib.sites.models import Site
 from django.db import models, DEFAULT_DB_ALIAS
@@ -16,13 +16,12 @@ from django.utils.formats import localize
 from django.utils.safestring import mark_safe
 from django.utils import six
 
-from .models import Article, Count, Event, Location, EventGuide
+from .models import Article, Count, Event, Location, EventGuide, Vehicle, Car
 
 
 class NestedObjectsTests(TestCase):
     """
     Tests for ``NestedObject`` utility collection.
-
     """
     def setUp(self):
         self.n = NestedObjects(using=DEFAULT_DB_ALIAS)
@@ -80,6 +79,17 @@ class NestedObjectsTests(TestCase):
         with self.assertNumQueries(2):
             # One for Location, one for Guest, and no query for EventGuide
             n.collect(objs)
+
+    def test_relation_on_abstract(self):
+        """
+        #21846 -- Check that `NestedObjects.collect()` doesn't trip
+        (AttributeError) on the special notation for relations on abstract
+        models (related_name that contains %(app_label)s and/or %(class)s).
+        """
+        n = NestedObjects(using=DEFAULT_DB_ALIAS)
+        Car.objects.create()
+        n.collect([Vehicle.objects.first()])
+
 
 class UtilTests(SimpleTestCase):
     def test_values_from_lookup_field(self):
@@ -229,9 +239,8 @@ class UtilTests(SimpleTestCase):
         )
         self.assertEqual(
             label_for_field("test_from_model", Article,
-                model_admin = MockModelAdmin,
-                return_attr = True
-            ),
+                model_admin=MockModelAdmin,
+                return_attr=True),
             ("not Really the Model", MockModelAdmin.test_from_model)
         )
 
@@ -295,7 +304,7 @@ class UtilTests(SimpleTestCase):
         # safestring should not be escaped
         class MyForm(forms.Form):
             text = forms.CharField(label=mark_safe('<i>text</i>'))
-            cb   = forms.BooleanField(label=mark_safe('<i>cb</i>'))
+            cb = forms.BooleanField(label=mark_safe('<i>cb</i>'))
 
         form = MyForm()
         self.assertHTMLEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
@@ -306,13 +315,24 @@ class UtilTests(SimpleTestCase):
         # normal strings needs to be escaped
         class MyForm(forms.Form):
             text = forms.CharField(label='&text')
-            cb   = forms.BooleanField(label='&cb')
+            cb = forms.BooleanField(label='&cb')
 
         form = MyForm()
         self.assertHTMLEqual(helpers.AdminField(form, 'text', is_first=False).label_tag(),
                              '<label for="id_text" class="required inline">&amp;text:</label>')
         self.assertHTMLEqual(helpers.AdminField(form, 'cb', is_first=False).label_tag(),
                              '<label for="id_cb" class="vCheckboxLabel required inline">&amp;cb</label>')
+
+    def test_flatten(self):
+        flat_all = ['url', 'title', 'content', 'sites']
+        inputs = (
+            ((), []),
+            (('url', 'title', ('content', 'sites')), flat_all),
+            (('url', 'title', 'content', 'sites'), flat_all),
+            ((('url', 'title'), ('content', 'sites')), flat_all)
+        )
+        for orig, expected in inputs:
+            self.assertEqual(flatten(orig), expected)
 
     def test_flatten_fieldsets(self):
         """

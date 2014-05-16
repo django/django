@@ -2,6 +2,7 @@ from django.contrib.messages.storage.base import BaseStorage
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.contrib.messages.storage.session import SessionStorage
 
+
 class FallbackStorage(BaseStorage):
     """
     Tries to store all messages in the first backend, storing any unstored

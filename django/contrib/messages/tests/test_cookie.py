@@ -5,8 +5,7 @@ from django.contrib.messages.tests.base import BaseTests
 from django.contrib.messages.storage.cookie import (CookieStorage,
     MessageEncoder, MessageDecoder)
 from django.contrib.messages.storage.base import Message
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 from django.utils.safestring import SafeData, mark_safe
 
 
@@ -77,7 +76,7 @@ class CookieTest(BaseTests, TestCase):
         response = self.get_response()
         storage.add(constants.INFO, 'test')
         for m in storage:
-            pass # Iterate through the storage to simulate consumption of messages.
+            pass  # Iterate through the storage to simulate consumption of messages.
         storage.update(response)
         self.assertEqual(response.cookies['messages'].value, '')
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
@@ -154,3 +153,25 @@ class CookieTest(BaseTests, TestCase):
             encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
         self.assertNotIsInstance(
             encode_decode("<b>Hello Django!</b>"), SafeData)
+
+    def test_pre_1_5_message_format(self):
+        """
+        For ticket #22426. Tests whether messages that were set in the cookie
+        before the addition of is_safedata are decoded correctly.
+        """
+
+        # Encode the messages using the current encoder.
+        messages = [Message(constants.INFO, 'message %s') for x in range(5)]
+        encoder = MessageEncoder(separators=(',', ':'))
+        encoded_messages = encoder.encode(messages)
+
+        # Remove the is_safedata flag from the messages in order to imitate
+        # the behavior of before 1.5 (monkey patching).
+        encoded_messages = json.loads(encoded_messages)
+        for obj in encoded_messages:
+            obj.pop(1)
+        encoded_messages = json.dumps(encoded_messages, separators=(',', ':'))
+
+        # Decode the messages in the old format (without is_safedata)
+        decoded_messages = json.loads(encoded_messages, cls=MessageDecoder)
+        self.assertEqual(messages, decoded_messages)

@@ -35,7 +35,7 @@ class ActionAdmin(admin.ModelAdmin):
     def get_urls(self):
         # Add the URL of our custom 'add_view' view to the front of the URLs
         # list.  Remove the existing one(s) first
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         def wrap(view):
             def wrapper(*args, **kwargs):
@@ -46,13 +46,14 @@ class ActionAdmin(admin.ModelAdmin):
 
         view_name = '%s_%s_add' % info
 
-        return patterns('',
+        return [
             url(r'^!add/$', wrap(self.add_view), name=view_name),
-        ) + self.remove_url(view_name)
+        ] + self.remove_url(view_name)
 
 
 class Person(models.Model):
     name = models.CharField(max_length=20)
+
 
 class PersonAdmin(admin.ModelAdmin):
 
@@ -67,6 +68,7 @@ class PersonAdmin(admin.ModelAdmin):
 
 class Car(models.Model):
     name = models.CharField(max_length=20)
+
 
 class CarAdmin(admin.ModelAdmin):
 

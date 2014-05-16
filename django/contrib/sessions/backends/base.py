@@ -12,7 +12,7 @@ from django.utils.crypto import get_random_string
 from django.utils.crypto import salted_hmac
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_text
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
 
 from django.contrib.sessions.exceptions import SuspiciousSession
 
@@ -20,12 +20,14 @@ from django.contrib.sessions.exceptions import SuspiciousSession
 # on case insensitive file systems.
 VALID_KEY_CHARS = string.ascii_lowercase + string.digits
 
+
 class CreateError(Exception):
     """
     Used internally as a consistent exception type to catch from save (see the
     docstring for SessionBase.save() for details).
     """
     pass
+
 
 class SessionBase(object):
     """
@@ -38,7 +40,7 @@ class SessionBase(object):
         self._session_key = session_key
         self.accessed = False
         self.modified = False
-        self.serializer = import_by_path(settings.SESSION_SERIALIZER)
+        self.serializer = import_string(settings.SESSION_SERIALIZER)
 
     def __contains__(self, key):
         return key in self._session
@@ -139,6 +141,13 @@ class SessionBase(object):
         self._session_cache = {}
         self.accessed = True
         self.modified = True
+
+    def is_empty(self):
+        "Returns True when there is no session_key and the session is empty"
+        try:
+            return not bool(self._session_key) and not self._session_cache
+        except AttributeError:
+            return True
 
     def _get_new_session_key(self):
         "Returns session key that isn't being used."
@@ -266,7 +275,7 @@ class SessionBase(object):
         """
         self.clear()
         self.delete()
-        self.create()
+        self._session_key = None
 
     def cycle_key(self):
         """

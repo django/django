@@ -105,7 +105,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_foreign_keys = False
     supports_check_constraints = False
     autocommits_when_autocommit_is_off = True
+    can_introspect_positive_integer_field = True
+    can_introspect_small_integer_field = True
+    supports_transactions = True
     atomic_transactions = False
+    can_rollback_ddl = True
     supports_paramstyle_pyformat = False
     supports_sequence_reset = False
 
@@ -122,14 +126,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         rule out support for STDDEV. We need to manually check
         whether the call works.
         """
-        cursor = self.connection.cursor()
-        cursor.execute('CREATE TABLE STDDEV_TEST (X INT)')
-        try:
-            cursor.execute('SELECT STDDEV(*) FROM STDDEV_TEST')
-            has_support = True
-        except utils.DatabaseError:
-            has_support = False
-        cursor.execute('DROP TABLE STDDEV_TEST')
+        with self.connection.cursor() as cursor:
+            cursor.execute('CREATE TABLE STDDEV_TEST (X INT)')
+            try:
+                cursor.execute('SELECT STDDEV(*) FROM STDDEV_TEST')
+                has_support = True
+            except utils.DatabaseError:
+                has_support = False
+            cursor.execute('DROP TABLE STDDEV_TEST')
         return has_support
 
     @cached_property
@@ -212,27 +216,8 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
-            return name # Quoting once is enough.
+            return name  # Quoting once is enough.
         return '"%s"' % name
-
-    def quote_parameter(self, value):
-        # Inner import to allow nice failure for backend if not present
-        import _sqlite3
-        try:
-            value = _sqlite3.adapt(value)
-        except _sqlite3.ProgrammingError:
-            pass
-        # Manual emulation of SQLite parameter quoting
-        if isinstance(value, six.integer_types):
-            return str(value)
-        elif isinstance(value, six.string_types):
-            return six.text_type(value)
-        elif isinstance(value, type(True)):
-            return str(int(value))
-        elif value is None:
-            return "NULL"
-        else:
-            raise ValueError("Cannot quote parameter value %r" % value)
 
     def no_limit_value(self):
         return -1
@@ -304,6 +289,17 @@ class DatabaseOperations(BaseDatabaseOperations):
         res.extend(["UNION ALL SELECT %s" % ", ".join(["%s"] * len(fields))] * (num_values - 1))
         return " ".join(res)
 
+    def combine_expression(self, connector, sub_expressions):
+        # SQLite doesn't have a power function, so we fake it with a
+        # user-defined function django_power that's registered in connect().
+        if connector == '^':
+            return 'django_power(%s)' % ','.join(sub_expressions)
+        return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+
+    def integer_field_range(self, internal_type):
+        # SQLite doesn't enforce any integer constraints
+        return (None, None)
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'sqlite'
@@ -325,6 +321,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'endswith': "LIKE %s ESCAPE '\\'",
         'istartswith': "LIKE %s ESCAPE '\\'",
         'iendswith': "LIKE %s ESCAPE '\\'",
+    }
+
+    pattern_ops = {
+        'startswith': "LIKE %s || '%%%%'",
+        'istartswith': "LIKE UPPER(%s) || '%%%%'",
     }
 
     Database = Database
@@ -376,6 +377,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("django_datetime_trunc", 3, _sqlite_datetime_trunc)
         conn.create_function("regexp", 2, _sqlite_regexp)
         conn.create_function("django_format_dtdelta", 5, _sqlite_format_dtdelta)
+        conn.create_function("django_power", 2, _sqlite_power)
         return conn
 
     def init_connection_state(self):
@@ -413,7 +415,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             level = ''
         # 'isolation_level' is a misleading API.
         # SQLite always runs at the SERIALIZABLE isolation level.
-        self.connection.isolation_level = level
+        with self.wrap_database_errors:
+            self.connection.isolation_level = level
 
     def check_constraints(self, table_names=None):
         """
@@ -567,3 +570,7 @@ def _sqlite_format_dtdelta(dt, conn, days, secs, usecs):
 
 def _sqlite_regexp(re_pattern, re_string):
     return bool(re.search(re_pattern, force_text(re_string))) if re_string is not None else False
+
+
+def _sqlite_power(x, y):
+    return x ** y

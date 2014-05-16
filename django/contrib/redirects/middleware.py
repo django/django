@@ -1,8 +1,9 @@
 from __future__ import unicode_literals
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib.redirects.models import Redirect
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
 from django import http
 
@@ -14,7 +15,7 @@ class RedirectFallbackMiddleware(object):
     response_redirect_class = http.HttpResponsePermanentRedirect
 
     def __init__(self):
-        if 'django.contrib.sites' not in settings.INSTALLED_APPS:
+        if not apps.is_installed('django.contrib.sites'):
             raise ImproperlyConfigured(
                 "You cannot use RedirectFallbackMiddleware when "
                 "django.contrib.sites is not installed."

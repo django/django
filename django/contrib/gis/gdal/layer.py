@@ -18,6 +18,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils import six
 from django.utils.six.moves import xrange
 
+
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
@@ -194,7 +195,7 @@ class Layer(GDALBase):
         Returns a list containing the given field name for every Feature
         in the Layer.
         """
-        if not field_name in self.fields:
+        if field_name not in self.fields:
             raise OGRException('invalid field name: %s' % field_name)
         return [feat.get(field_name) for feat in self]
 

@@ -6,6 +6,7 @@ from django.contrib.gis.geos import prototypes as capi
 from django.utils import six
 from django.utils.six.moves import xrange
 
+
 class Polygon(GEOSGeometry):
     _minlength = 1
 
@@ -37,11 +38,11 @@ class Polygon(GEOSGeometry):
         # If initialized as Polygon(shell, (LinearRing, LinearRing)) [for backward-compatibility]
         if n_holes == 1 and isinstance(init_holes[0], (tuple, list)):
             if len(init_holes[0]) == 0:
-                init_holes  = ()
-                n_holes     = 0
+                init_holes = ()
+                n_holes = 0
             elif isinstance(init_holes[0][0], LinearRing):
-                init_holes  = init_holes[0]
-                n_holes     = len(init_holes)
+                init_holes = init_holes[0]
+                n_holes = len(init_holes)
 
         polygon = self._create_polygon(n_holes + 1, (ext_ring,) + init_holes)
         super(Polygon, self).__init__(polygon, **kwargs)
@@ -133,7 +134,7 @@ class Polygon(GEOSGeometry):
             return capi.get_extring(self.ptr)
         else:
             # Getting the interior ring, have to subtract 1 from the index.
-            return capi.get_intring(self.ptr, index-1)
+            return capi.get_intring(self.ptr, index - 1)
 
     def _get_single_external(self, index):
         return GEOSGeometry(capi.geom_clone(self._get_single_internal(index)), srid=self.srid)
@@ -169,6 +170,6 @@ class Polygon(GEOSGeometry):
     @property
     def kml(self):
         "Returns the KML representation of this Polygon."
-        inner_kml = ''.join("<innerBoundaryIs>%s</innerBoundaryIs>" % self[i+1].kml
-                             for i in xrange(self.num_interior_rings))
+        inner_kml = ''.join("<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
+            for i in xrange(self.num_interior_rings))
         return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (self[0].kml, inner_kml)

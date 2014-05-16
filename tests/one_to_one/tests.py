@@ -6,6 +6,7 @@ from django.test import TestCase
 from .models import (Place, Restaurant, Waiter, ManualPrimaryKey, RelatedModel,
     MultiModel)
 
+
 class OneToOneTests(TestCase):
 
     def setUp(self):
@@ -24,6 +25,10 @@ class OneToOneTests(TestCase):
         # p2 doesn't have an associated restaurant.
         with self.assertRaisesMessage(Restaurant.DoesNotExist, 'Place has no restaurant'):
             self.p2.restaurant
+        # The exception raised on attribute access when a related object
+        # doesn't exist should be an instance of a subclass of `AttributeError`
+        # refs #21563
+        self.assertFalse(hasattr(self.p2, 'restaurant'))
 
     def test_setter(self):
         # Set the place using assignment notation. Because place is the primary
@@ -85,6 +90,7 @@ class OneToOneTests(TestCase):
         w = self.r.waiter_set.create(name='Joe')
         w.save()
         self.assertEqual(repr(w), '<Waiter: Joe the waiter at Demon Dogs the restaurant>')
+
         # Query the waiters
         def assert_filter_waiters(**params):
             self.assertQuerysetEqual(Waiter.objects.filter(**params), [

@@ -20,6 +20,12 @@ class Small(object):
     def __str__(self):
         return '%s%s' % (force_text(self.first), force_text(self.second))
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.first == other.first and self.second == other.second
+        return False
+
+
 class SmallField(six.with_metaclass(models.SubfieldBase, models.Field)):
     """
     Turns the "Small" class into a Django field. Because of the similarities
@@ -51,13 +57,14 @@ class SmallField(six.with_metaclass(models.SubfieldBase, models.Field)):
             return []
         raise TypeError('Invalid lookup type: %r' % lookup_type)
 
+
 class SmallerField(SmallField):
     pass
 
 
 class JSONField(six.with_metaclass(models.SubfieldBase, models.TextField)):
 
-    description = ("JSONField automatically serializes and desializes values to "
+    description = ("JSONField automatically serializes and deserializes values to "
         "and from JSON.")
 
     def to_python(self, value):
@@ -72,3 +79,8 @@ class JSONField(six.with_metaclass(models.SubfieldBase, models.TextField)):
         if value is None:
             return None
         return json.dumps(value)
+
+
+class CustomTypedField(models.TextField):
+    def db_type(self, connection):
+        return 'custom_field'

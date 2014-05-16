@@ -8,8 +8,10 @@ from django.contrib.gis.gdal.prototypes.errcheck import (
     check_arg_errcode, check_errcode, check_geom, check_geom_offset,
     check_pointer, check_srs, check_str_arg, check_string, check_const_string)
 
+
 class gdal_char_p(c_char_p):
     pass
+
 
 def double_output(func, argtypes, errcheck=False, strarg=False):
     "Generates a ctypes function that returns a double value."
@@ -20,6 +22,7 @@ def double_output(func, argtypes, errcheck=False, strarg=False):
     if strarg:
         func.errcheck = check_str_arg
     return func
+
 
 def geom_output(func, argtypes, offset=None):
     """
@@ -36,17 +39,20 @@ def geom_output(func, argtypes, offset=None):
     else:
         # Error code returned, geometry is returned by-reference.
         func.restype = c_int
+
         def geomerrcheck(result, func, cargs):
             return check_geom_offset(result, func, cargs, offset)
         func.errcheck = geomerrcheck
 
     return func
 
+
 def int_output(func, argtypes):
     "Generates a ctypes function that returns an integer value."
     func.argtypes = argtypes
     func.restype = c_int
     return func
+
 
 def srs_output(func, argtypes):
     """
@@ -58,6 +64,7 @@ def srs_output(func, argtypes):
     func.restype = c_void_p
     func.errcheck = check_srs
     return func
+
 
 def const_string_output(func, argtypes, offset=None, decoding=None):
     func.argtypes = argtypes
@@ -74,6 +81,7 @@ def const_string_output(func, argtypes, offset=None, decoding=None):
     func.errcheck = _check_const
 
     return func
+
 
 def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     """
@@ -96,12 +104,13 @@ def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     # given offset.
     def _check_str(result, func, cargs):
         res = check_string(result, func, cargs,
-                            offset=offset, str_result=str_result)
+            offset=offset, str_result=str_result)
         if res and decoding:
             res = res.decode(decoding)
         return res
     func.errcheck = _check_str
     return func
+
 
 def void_output(func, argtypes, errcheck=True):
     """
@@ -119,6 +128,7 @@ def void_output(func, argtypes, errcheck=True):
         func.restype = None
 
     return func
+
 
 def voidptr_output(func, argtypes):
     "For functions that return c_void_p."

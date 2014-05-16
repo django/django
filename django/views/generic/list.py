@@ -65,8 +65,8 @@ class MultipleObjectMixin(ContextMixin):
             return (paginator, page, page.object_list, page.has_other_pages())
         except InvalidPage as e:
             raise Http404(_('Invalid page (%(page_number)s): %(message)s') % {
-                                'page_number': page_number,
-                                'message': str(e)
+                'page_number': page_number,
+                'message': str(e)
             })
 
     def get_paginate_by(self, queryset):
@@ -150,7 +150,7 @@ class BaseListView(MultipleObjectMixin, View):
             # it's better to do a cheap query than to load the unpaginated
             # queryset in memory.
             if (self.get_paginate_by(self.object_list) is not None
-                and hasattr(self.object_list, 'exists')):
+                    and hasattr(self.object_list, 'exists')):
                 is_empty = not self.object_list.exists()
             else:
                 is_empty = len(self.object_list) == 0

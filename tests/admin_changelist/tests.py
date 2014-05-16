@@ -6,10 +6,11 @@ from django.contrib import admin
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.templatetags.admin_list import pagination
 from django.contrib.admin.views.main import ChangeList, SEARCH_VAR, ALL_VAR
+from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.template import Context, Template
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.utils import formats
 from django.utils import six
@@ -25,8 +26,8 @@ from .models import (Event, Child, Parent, Genre, Band, Musician, Group,
     UnorderedObject, OrderedObject, CustomIdUser)
 
 
+@override_settings(ROOT_URLCONF="admin_changelist.urls")
 class ChangeListTests(TestCase):
-    urls = "admin_changelist.urls"
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -190,7 +191,7 @@ class ChangeListTests(TestCase):
     def test_distinct_for_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
-        results shouldn't apper more than once. Basic ManyToMany.
+        results shouldn't appear more than once. Basic ManyToMany.
         """
         blues = Genre.objects.create(name='Blues')
         band = Band.objects.create(name='B.B. King Review', nr_of_members=11)
@@ -214,7 +215,7 @@ class ChangeListTests(TestCase):
     def test_distinct_for_through_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
-        results shouldn't apper more than once. With an intermediate model.
+        results shouldn't appear more than once. With an intermediate model.
         """
         lead = Musician.objects.create(name='Vox')
         band = Group.objects.create(name='The Hype')
@@ -237,7 +238,7 @@ class ChangeListTests(TestCase):
     def test_distinct_for_inherited_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
-        results shouldn't apper more than once. Model managed in the
+        results shouldn't appear more than once. Model managed in the
         admin inherits from the one that defins the relationship.
         """
         lead = Musician.objects.create(name='John')
@@ -261,7 +262,7 @@ class ChangeListTests(TestCase):
     def test_distinct_for_m2m_to_inherited_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
-        results shouldn't apper more than once. Target of the relationship
+        results shouldn't appear more than once. Target of the relationship
         inherits from another.
         """
         lead = ChordsMusician.objects.create(name='Player A')
@@ -661,3 +662,46 @@ class AdminLogNodeTestCase(TestCase):
         # Rendering should be u'' since this templatetag just logs,
         # it doesn't render any string.
         self.assertEqual(template.render(context), '')
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                   ROOT_URLCONF="admin_changelist.urls")
+class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
+
+    available_apps = ['admin_changelist'] + AdminSeleniumWebDriverTestCase.available_apps
+    fixtures = ['users.json']
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+    def test_add_row_selection(self):
+        """
+        Ensure that the status line for selected rows gets updated correcly (#22038)
+        """
+        self.admin_login(username='super', password='secret')
+        self.selenium.get('%s%s' % (self.live_server_url,
+                                    '/admin/auth/user/'))
+
+        form_id = '#changelist-form'
+
+        # Test amount of rows in the Changelist
+        rows = self.selenium.find_elements_by_css_selector(
+            '%s #result_list tbody tr' % form_id)
+        self.assertEqual(len(rows), 1)
+
+        # Test current selection
+        selection_indicator = self.selenium.find_element_by_css_selector(
+            '%s .action-counter' % form_id)
+        self.assertEqual(selection_indicator.text, "0 of 1 selected")
+
+        # Select a row and check again
+        row_selector = self.selenium.find_element_by_css_selector(
+            '%s #result_list tbody tr:first-child .action-select' % form_id)
+        row_selector.click()
+        self.assertEqual(selection_indicator.text, "1 of 1 selected")
+
+
+class SeleniumChromeTests(SeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+
+class SeleniumIETests(SeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'

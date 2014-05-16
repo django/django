@@ -6,11 +6,15 @@ reader and writer classes.
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.geos.prototypes.io import _WKTReader, _WKBReader, WKBWriter, WKTWriter
 
+__all__ = ['WKBWriter', 'WKTWriter', 'WKBReader', 'WKTReader']
+
+
 # Public classes for (WKB|WKT)Reader, which return GEOSGeometry
 class WKBReader(_WKBReader):
     def read(self, wkb):
         "Returns a GEOSGeometry for the given WKB buffer."
         return GEOSGeometry(super(WKBReader, self).read(wkb))
+
 
 class WKTReader(_WKTReader):
     def read(self, wkt):

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import copy
+import codecs
 import os
 import shutil
 
-from django.core.management import call_command
-from django.db.models.loading import cache
-from django.test.utils import override_settings
+from django.apps import apps
+from django.core.management import call_command, CommandError
+from django.test import override_settings, override_system_checks
 from django.utils import six
 from django.utils._os import upath
 from django.utils.encoding import force_text
@@ -21,6 +21,10 @@ class MigrateTests(MigrationTestBase):
     Tests running the migrate command.
     """
 
+    # `auth` app is imported, but not installed in these tests (thanks to
+    # MigrationTestBase), so we need to exclude checks registered by this app.
+
+    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate(self):
         """
@@ -49,6 +53,7 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
+    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate_list(self):
         """
@@ -71,6 +76,38 @@ class MigrateTests(MigrationTestBase):
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
 
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_migrate_conflict_exit(self):
+        """
+        Makes sure that migrate exits if it detects a conflict.
+        """
+        with self.assertRaises(CommandError):
+            call_command("migrate", "migrations")
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_makemigrations_conflict_exit(self):
+        """
+        Makes sure that makemigrations exits if it detects a conflict.
+        """
+        with self.assertRaises(CommandError):
+            call_command("makemigrations")
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_makemigrations_merge_basic(self):
+        """
+        Makes sure that makemigrations doesn't error if you ask for
+        merge mode with a conflict present. Doesn't test writing of the merge
+        file, as that requires temp directories.
+        """
+        try:
+            call_command("makemigrations", merge=True, verbosity=0)
+        except CommandError:
+            self.fail("Makemigrations errored in merge mode with conflicts")
+
+    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate(self):
         """
@@ -103,13 +140,12 @@ class MakeMigrationsTests(MigrationTestBase):
         self.test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
         self.migration_dir = os.path.join(self.test_dir, 'migrations_%d' % self.creation_counter)
         self.migration_pkg = "migrations.migrations_%d" % self.creation_counter
-        self._old_app_models = copy.deepcopy(cache.app_models)
-        self._old_app_store = copy.deepcopy(cache.app_store)
+        self._old_models = apps.app_configs['migrations'].models.copy()
 
     def tearDown(self):
-        cache.app_models = self._old_app_models
-        cache.app_store = self._old_app_store
-        cache._get_models_cache = {}
+        apps.app_configs['migrations'].models = self._old_models
+        apps.all_models['migrations'] = self._old_models
+        apps.clear_cache()
 
         os.chdir(self.test_dir)
         try:
@@ -123,9 +159,12 @@ class MakeMigrationsTests(MigrationTestBase):
             return
         shutil.rmtree(dname)
 
+    # `auth` app is imported, but not installed in this test (thanks to
+    # MigrationTestBase), so we need to exclude checks registered by this app.
+    @override_system_checks([])
     def test_files_content(self):
         self.assertTableNotExists("migrations_unicodemodel")
-        cache.register_models('migrations', UnicodeModel)
+        apps.register_model('migrations', UnicodeModel)
         with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
             call_command("makemigrations", "migrations", verbosity=0)
 
@@ -143,9 +182,9 @@ class MakeMigrationsTests(MigrationTestBase):
         # Check for existing 0001_initial.py file in migration folder
         self.assertTrue(os.path.exists(initial_file))
 
-        with open(initial_file, 'r') as fp:
-            content = force_text(fp.read())
-            self.assertTrue('# encoding: utf8' in content)
+        with codecs.open(initial_file, 'r', encoding='utf-8') as fp:
+            content = fp.read()
+            self.assertTrue('# -*- coding: utf-8 -*-' in content)
             self.assertTrue('migrations.CreateModel' in content)
 
             if six.PY3:
@@ -159,9 +198,12 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertTrue('\\xda\\xd1\\xcd\\xa2\\xd3\\xd0\\xc9' in content)  # title.verbose_name
                 self.assertTrue('\\u201c\\xd0j\\xe1\\xf1g\\xf3\\u201d' in content)  # title.default
 
+    # `auth` app is imported, but not installed in this test (thanks to
+    # MigrationTestBase), so we need to exclude checks registered by this app.
+    @override_system_checks([])
     def test_failing_migration(self):
         #21280 - If a migration fails to serialize, it shouldn't generate an empty file.
-        cache.register_models('migrations', UnserializableModel)
+        apps.register_model('migrations', UnserializableModel)
 
         with six.assertRaisesRegex(self, ValueError, r'Cannot serialize'):
             with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):

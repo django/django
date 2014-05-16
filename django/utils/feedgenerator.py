@@ -32,8 +32,9 @@ from django.utils.six import StringIO
 from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.timezone import is_aware
 
+
 def rfc2822_date(date):
-    # We can't use strftime() because it produces locale-dependant results, so
+    # We can't use strftime() because it produces locale-dependent results, so
     # we have to map english month and day names manually
     months = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',)
     days = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
@@ -53,6 +54,7 @@ def rfc2822_date(date):
     else:
         return time_str + '-0000'
 
+
 def rfc3339_date(date):
     # Support datetime objects older than 1900
     date = datetime_safe.new_datetime(date)
@@ -67,6 +69,7 @@ def rfc3339_date(date):
     else:
         return time_str + 'Z'
 
+
 def get_tag_uri(url, date):
     """
     Creates a TagURI.
@@ -78,6 +81,7 @@ def get_tag_uri(url, date):
     if date is not None:
         d = ',%s' % datetime_safe.new_datetime(date).strftime('%Y-%m-%d')
     return 'tag:%s%s:%s/%s' % (bits.hostname, d, bits.path, bits.fragment)
+
 
 class SyndicationFeed(object):
     "Base class for all syndication feeds. Subclasses should provide write()"
@@ -109,9 +113,9 @@ class SyndicationFeed(object):
         self.items = []
 
     def add_item(self, title, link, description, author_email=None,
-        author_name=None, author_link=None, pubdate=None, comments=None,
-        unique_id=None, unique_id_is_permalink=None, enclosure=None,
-        categories=(), item_copyright=None, ttl=None, updateddate=None, **kwargs):
+            author_name=None, author_link=None, pubdate=None, comments=None,
+            unique_id=None, unique_id_is_permalink=None, enclosure=None,
+            categories=(), item_copyright=None, ttl=None, updateddate=None, **kwargs):
         """
         Adds an item to the feed. All args are expected to be Python Unicode
         objects except pubdate and updateddate, which are datetime.datetime
@@ -204,6 +208,7 @@ class SyndicationFeed(object):
 
         return latest_date or datetime.datetime.now()
 
+
 class Enclosure(object):
     "Represents an RSS enclosure"
     def __init__(self, url, length, mime_type):
@@ -211,8 +216,10 @@ class Enclosure(object):
         self.length, self.mime_type = length, mime_type
         self.url = iri_to_uri(url)
 
+
 class RssFeed(SyndicationFeed):
     mime_type = 'application/rss+xml; charset=utf-8'
+
     def write(self, outfile, encoding):
         handler = SimplerXMLGenerator(outfile, encoding)
         handler.startDocument()
@@ -253,17 +260,21 @@ class RssFeed(SyndicationFeed):
     def endChannelElement(self, handler):
         handler.endElement("channel")
 
+
 class RssUserland091Feed(RssFeed):
     _version = "0.91"
+
     def add_item_elements(self, handler, item):
         handler.addQuickElement("title", item['title'])
         handler.addQuickElement("link", item['link'])
         if item['description'] is not None:
             handler.addQuickElement("description", item['description'])
 
+
 class Rss201rev2Feed(RssFeed):
     # Spec: http://blogs.law.harvard.edu/tech/rss
     _version = "2.0"
+
     def add_item_elements(self, handler, item):
         handler.addQuickElement("title", item['title'])
         handler.addQuickElement("link", item['link'])
@@ -301,6 +312,7 @@ class Rss201rev2Feed(RssFeed):
         # Categories.
         for cat in item['categories']:
             handler.addQuickElement("category", cat)
+
 
 class Atom1Feed(SyndicationFeed):
     # Spec: http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html

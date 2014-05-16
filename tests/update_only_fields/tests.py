@@ -128,7 +128,7 @@ class UpdateOnlyFieldsTests(TestCase):
         a1 = Account.objects.create(num=1)
         a2 = Account.objects.create(num=2)
 
-        e1.accounts = [a1,a2]
+        e1.accounts = [a1, a2]
 
         with self.assertRaises(ValueError):
             e1.save(update_fields=['accounts'])
@@ -192,10 +192,12 @@ class UpdateOnlyFieldsTests(TestCase):
     def test_update_fields_signals(self):
         p = Person.objects.create(name='Sara', gender='F')
         pre_save_data = []
+
         def pre_save_receiver(**kwargs):
             pre_save_data.append(kwargs['update_fields'])
         pre_save.connect(pre_save_receiver)
         post_save_data = []
+
         def post_save_receiver(**kwargs):
             post_save_data.append(kwargs['update_fields'])
         post_save.connect(post_save_receiver)
@@ -222,10 +224,12 @@ class UpdateOnlyFieldsTests(TestCase):
     def test_empty_update_fields(self):
         s = Person.objects.create(name='Sara', gender='F')
         pre_save_data = []
+
         def pre_save_receiver(**kwargs):
             pre_save_data.append(kwargs['update_fields'])
         pre_save.connect(pre_save_receiver)
         post_save_data = []
+
         def post_save_receiver(**kwargs):
             post_save_data.append(kwargs['update_fields'])
         post_save.connect(post_save_receiver)

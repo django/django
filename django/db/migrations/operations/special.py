@@ -1,7 +1,6 @@
-import re
-import textwrap
+from __future__ import unicode_literals
+
 from .base import Operation
-from django.utils import six
 
 
 class SeparateDatabaseAndState(Operation):
@@ -33,7 +32,7 @@ class SeparateDatabaseAndState(Operation):
         base_state = to_state
         for pos, database_operation in enumerate(reversed(self.database_operations)):
             to_state = base_state.clone()
-            for dbop in self.database_operations[:-(pos+1)]:
+            for dbop in self.database_operations[:-(pos + 1)]:
                 dbop.state_forwards(app_label, to_state)
             from_state = base_state.clone()
             database_operation.state_forwards(app_label, from_state)
@@ -45,20 +44,16 @@ class SeparateDatabaseAndState(Operation):
 
 class RunSQL(Operation):
     """
-    Runs some raw SQL - a single statement by default, but it will attempt
-    to parse and split it into multiple statements if multiple=True.
-
-    A reverse SQL statement may be provided.
+    Runs some raw SQL. A reverse SQL statement may be provided.
 
     Also accepts a list of operations that represent the state change effected
     by this SQL change, in case it's custom column/table creation/deletion.
     """
 
-    def __init__(self, sql, reverse_sql=None, state_operations=None, multiple=False):
+    def __init__(self, sql, reverse_sql=None, state_operations=None):
         self.sql = sql
         self.reverse_sql = reverse_sql
         self.state_operations = state_operations or []
-        self.multiple = multiple
 
     @property
     def reversible(self):
@@ -68,30 +63,15 @@ class RunSQL(Operation):
         for state_operation in self.state_operations:
             state_operation.state_forwards(app_label, state)
 
-    def _split_sql(self, sql):
-        regex = r"(?mx) ([^';]* (?:'[^']*'[^';]*)*)"
-        comment_regex = r"(?mx) (?:^\s*$)|(?:--.*$)"
-        # First, strip comments
-        sql = "\n".join([x.strip().replace("%", "%%") for x in re.split(comment_regex, sql) if x.strip()])
-        # Now get each statement
-        for st in re.split(regex, sql)[1:][::2]:
-            yield st
-
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        if self.multiple:
-            statements = self._split_sql(self.sql)
-        else:
-            statements = [self.sql]
+        statements = schema_editor.connection.ops.prepare_sql_script(self.sql)
         for statement in statements:
             schema_editor.execute(statement)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_sql is None:
             raise NotImplementedError("You cannot reverse this operation")
-        if self.multiple:
-            statements = self._split_sql(self.reverse_sql)
-        else:
-            statements = [self.reverse_sql]
+        statements = schema_editor.connection.ops.prepare_sql_script(self.reverse_sql)
         for statement in statements:
             schema_editor.execute(statement)
 
@@ -105,27 +85,24 @@ class RunPython(Operation):
     """
 
     reduces_to_sql = False
-    reversible = False
 
-    def __init__(self, code, reverse_code=None):
+    def __init__(self, code, reverse_code=None, atomic=True):
+        self.atomic = atomic
         # Forwards code
-        if isinstance(code, six.string_types):
-            # Trim any leading whitespace that is at the start of all code lines
-            # so users can nicely indent code in migration files
-            code = textwrap.dedent(code)
-            # Run the code through a parser first to make sure it's at least
-            # syntactically correct
-            self.code = compile(code, "<string>", "exec")
-        else:
-            self.code = code
+        if not callable(code):
+            raise ValueError("RunPython must be supplied with a callable")
+        self.code = code
         # Reverse code
         if reverse_code is None:
             self.reverse_code = None
-        elif isinstance(reverse_code, six.string_types):
-            reverse_code = textwrap.dedent(reverse_code)
-            self.reverse_code = compile(reverse_code, "<string>", "exec")
         else:
+            if not callable(reverse_code):
+                raise ValueError("RunPython must be supplied with callable arguments")
             self.reverse_code = reverse_code
+
+    @property
+    def reversible(self):
+        return self.reverse_code is not None
 
     def state_forwards(self, app_label, state):
         # RunPython objects have no state effect. To add some, combine this
@@ -134,29 +111,15 @@ class RunPython(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         # We now execute the Python code in a context that contains a 'models'
-        # object, representing the versioned models as an AppCache.
+        # object, representing the versioned models as an app registry.
         # We could try to override the global cache, but then people will still
         # use direct imports, so we go with a documentation approach instead.
-        if six.callable(self.code):
-            self.code(models=from_state.render(), schema_editor=schema_editor)
-        else:
-            context = {
-                "models": from_state.render(),
-                "schema_editor": schema_editor,
-            }
-            eval(self.code, context)
+        self.code(from_state.render(), schema_editor)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_code is None:
             raise NotImplementedError("You cannot reverse this operation")
-        elif six.callable(self.reverse_code):
-            self.reverse_code(models=from_state.render(), schema_editor=schema_editor)
-        else:
-            context = {
-                "models": from_state.render(),
-                "schema_editor": schema_editor,
-            }
-            eval(self.reverse_code, context)
+        self.reverse_code(from_state.render(), schema_editor)
 
     def describe(self):
         return "Raw Python operation"

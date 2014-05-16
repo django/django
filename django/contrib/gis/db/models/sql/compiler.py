@@ -10,6 +10,7 @@ from django.utils import timezone
 
 SQLCompiler = compiler.SQLCompiler
 
+
 class GeoSQLCompiler(compiler.SQLCompiler):
 
     def get_columns(self, with_aliases=False):
@@ -20,12 +21,12 @@ class GeoSQLCompiler(compiler.SQLCompiler):
 
         If 'with_aliases' is true, any column names that are duplicated
         (without the table names) are given unique aliases. This is needed in
-        some cases to avoid ambiguitity with nested queries.
+        some cases to avoid ambiguity with nested queries.
 
         This routine is overridden from Query to handle customized selection of
         geometry columns.
         """
-        qn = self.quote_name_unless_alias
+        qn = self
         qn2 = self.connection.ops.quote_name
         result = ['(%s) AS %s' % (self.get_extra_select_format(alias) % col[0], qn2(alias))
                   for alias, col in six.iteritems(self.query.extra_select)]
@@ -123,7 +124,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         seen = self.query.included_inherited_models.copy()
         if start_alias:
             seen[None] = start_alias
-        for field, model in opts.get_fields_with_model():
+        for field, model in opts.get_concrete_fields_with_model():
             if from_parent and model is not None and issubclass(from_parent, model):
                 # Avoid loading data for already loaded parents.
                 continue
@@ -132,7 +133,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
             if table in only_load and field.column not in only_load[table]:
                 continue
             if as_pairs:
-                result.append((alias, field.column))
+                result.append((alias, field))
                 aliases.add(alias)
                 continue
             # This part of the function is customized for GeoQuery. We
@@ -249,17 +250,22 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         return "%s.%s" % (self.quote_name_unless_alias(table_alias),
                           self.connection.ops.quote_name(column or field.column))
 
+
 class SQLInsertCompiler(compiler.SQLInsertCompiler, GeoSQLCompiler):
     pass
+
 
 class SQLDeleteCompiler(compiler.SQLDeleteCompiler, GeoSQLCompiler):
     pass
 
+
 class SQLUpdateCompiler(compiler.SQLUpdateCompiler, GeoSQLCompiler):
     pass
 
+
 class SQLAggregateCompiler(compiler.SQLAggregateCompiler, GeoSQLCompiler):
     pass
+
 
 class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
     """
@@ -286,6 +292,7 @@ class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
                     date = date.date()
                 yield date
 
+
 class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, GeoSQLCompiler):
     """
     This is overridden for GeoDjango to properly cast date columns, since
@@ -307,7 +314,7 @@ class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, GeoSQLCompiler):
                     datetime = self.resolve_columns(row, fields)[offset]
                 elif needs_string_cast:
                     datetime = typecast_timestamp(str(datetime))
-                # Datetimes are artifically returned in UTC on databases that
+                # Datetimes are artificially returned in UTC on databases that
                 # don't support time zone. Restore the zone used in the query.
                 if settings.USE_TZ:
                     datetime = datetime.replace(tzinfo=None)

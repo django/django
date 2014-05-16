@@ -241,7 +241,7 @@ such alias were specified, it would be the rather long ``'book__pubdate__min'``.
 
 This doesn't apply just to foreign keys. It also works with many-to-many
 relations. For example, we can ask for every author, annotated with the total
-number of pages considering all the books he/she has (co-)authored (note how we
+number of pages considering all the books the author has (co-)authored (note how we
 use ``'book'`` to specify the ``Author`` -> ``Book`` reverse many-to-many hop)::
 
     >>> Author.objects.annotate(total_pages=Sum('book__pages'))

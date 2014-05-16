@@ -7,6 +7,7 @@ from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.prototypes.errcheck import check_predicate
 from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
+
 ## Binary & unary predicate functions ##
 def binary_predicate(func, *args):
     "For GEOS binary predicate functions."
@@ -17,6 +18,7 @@ def binary_predicate(func, *args):
     func.restype = c_char
     func.errcheck = check_predicate
     return func
+
 
 def unary_predicate(func):
     "For GEOS unary predicate functions."

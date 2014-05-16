@@ -1,7 +1,6 @@
 import hashlib
 import logging
 import re
-import warnings
 
 from django.conf import settings
 from django.core.mail import mail_managers
@@ -107,12 +106,6 @@ class CommonMiddleware(object):
         """
         Calculate the ETag, if needed.
         """
-        if settings.SEND_BROKEN_LINK_EMAILS:
-            warnings.warn("SEND_BROKEN_LINK_EMAILS is deprecated. "
-                "Use BrokenLinkEmailsMiddleware instead.",
-                DeprecationWarning, stacklevel=2)
-            BrokenLinkEmailsMiddleware().process_response(request, response)
-
         if settings.USE_ETAGS:
             if response.has_header('ETag'):
                 etag = response['ETag']
@@ -122,7 +115,7 @@ class CommonMiddleware(object):
                 etag = '"%s"' % hashlib.md5(response.content).hexdigest()
             if etag is not None:
                 if (200 <= response.status_code < 300
-                    and request.META.get('HTTP_IF_NONE_MATCH') == etag):
+                        and request.META.get('HTTP_IF_NONE_MATCH') == etag):
                     cookies = response.cookies
                     response = http.HttpResponseNotModified()
                     response.cookies = cookies

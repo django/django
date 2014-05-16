@@ -2,12 +2,11 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
+from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.backends.db import SessionStore
 from django.db.models import Count
-from django.db.models.loading import cache
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
 
 from .models import (
     ResolveThis, Item, RelatedItem, Child, Leaf, Proxy, SimpleItem, Feature,
@@ -93,42 +92,26 @@ class DeferRegressionTest(TestCase):
             list)
 
     def test_ticket_11936(self):
-        # Regression for #11936 - loading.get_models should not return deferred
-        # models by default.
-        # Run a couple of defer queries so that app-cache must contain some
-        # deferred classes. It might contain a lot more classes depending on
-        # the order the tests are ran.
+        app_config = apps.get_app_config("defer_regress")
+        # Regression for #11936 - get_models should not return deferred models
+        # by default. Run a couple of defer queries so that app registry must
+        # contain some deferred classes. It might contain a lot more classes
+        # depending on the order the tests are ran.
         list(Item.objects.defer("name"))
         list(Child.objects.defer("value"))
-        klasses = set(
-            map(
-                attrgetter("__name__"),
-                cache.get_models(cache.get_app("defer_regress"))
-            )
-        )
+        klasses = {model.__name__ for model in app_config.get_models()}
         self.assertIn("Child", klasses)
         self.assertIn("Item", klasses)
         self.assertNotIn("Child_Deferred_value", klasses)
         self.assertNotIn("Item_Deferred_name", klasses)
-        self.assertFalse(any(
-            k._deferred for k in cache.get_models(cache.get_app("defer_regress"))))
+        self.assertFalse(any(k._deferred for k in app_config.get_models()))
 
-        klasses_with_deferred = set(
-            map(
-                attrgetter("__name__"),
-                cache.get_models(
-                    cache.get_app("defer_regress"), include_deferred=True
-                ),
-            )
-        )
+        klasses_with_deferred = {model.__name__ for model in app_config.get_models(include_deferred=True)}
         self.assertIn("Child", klasses_with_deferred)
         self.assertIn("Item", klasses_with_deferred)
         self.assertIn("Child_Deferred_value", klasses_with_deferred)
         self.assertIn("Item_Deferred_name", klasses_with_deferred)
-        self.assertTrue(any(
-            k._deferred for k in cache.get_models(
-                cache.get_app("defer_regress"), include_deferred=True))
-        )
+        self.assertTrue(any(k._deferred for k in app_config.get_models(include_deferred=True)))
 
     @override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer')
     def test_ticket_12163(self):
@@ -244,6 +227,7 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(
             new_class.__name__,
             'Item_Deferred_this_is_some_very_long_attribute_nac34b1f495507dad6b02e2cb235c875e')
+
 
 class DeferAnnotateSelectRelatedTest(TestCase):
     def test_defer_annotate_select_related(self):

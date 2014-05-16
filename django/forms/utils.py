@@ -1,18 +1,24 @@
 from __future__ import unicode_literals
 
-import warnings
+import json
+import sys
+
+try:
+    from collections import UserList
+except ImportError:  # Python 2
+    from UserList import UserList
 
 from django.conf import settings
-from django.utils.html import format_html, format_html_join
 from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.html import format_html, format_html_join, escape
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.utils import six
-import sys
 
 # Import ValidationError so that it can be imported from this
 # module to maintain backwards compatibility.
 from django.core.exceptions import ValidationError
+
 
 def flatatt(attrs):
     """
@@ -23,19 +29,19 @@ def flatatt(attrs):
 
     The result is passed through 'mark_safe'.
     """
-    for attr_name, value in attrs.items():
-        if type(value) is bool:
-            warnings.warn(
-                "In Django 1.8, widget attribute %(attr_name)s=%(bool_value)s "
-                "will %(action)s. To preserve current behavior, use the "
-                "string '%(bool_value)s' instead of the boolean value." % {
-                    'attr_name': attr_name,
-                    'action': "be rendered as '%s'" % attr_name if value else "not be rendered",
-                    'bool_value': value,
-                },
-                DeprecationWarning
-            )
-    return format_html_join('', ' {0}="{1}"', sorted(attrs.items()))
+    boolean_attrs = []
+    for attr, value in list(attrs.items()):
+        if value is True:
+            boolean_attrs.append((attr,))
+            del attrs[attr]
+        elif value is False:
+            del attrs[attr]
+
+    return (
+        format_html_join('', ' {0}="{1}"', sorted(attrs.items())) +
+        format_html_join('', ' {0}', sorted(boolean_attrs))
+    )
+
 
 @python_2_unicode_compatible
 class ErrorDict(dict):
@@ -44,45 +50,84 @@ class ErrorDict(dict):
 
     The dictionary keys are the field names, and the values are the errors.
     """
-    def __str__(self):
-        return self.as_ul()
+    def as_data(self):
+        return {f: e.as_data() for f, e in self.items()}
+
+    def as_json(self, escape_html=False):
+        return json.dumps({f: e.get_json_data(escape_html) for f, e in self.items()})
 
     def as_ul(self):
         if not self:
             return ''
-        return format_html('<ul class="errorlist">{0}</ul>',
-                           format_html_join('', '<li>{0}{1}</li>',
-                                            ((k, force_text(v))
-                                             for k, v in self.items())
-                           ))
+        return format_html(
+            '<ul class="errorlist">{0}</ul>',
+            format_html_join('', '<li>{0}{1}</li>', ((k, force_text(v)) for k, v in self.items()))
+        )
 
     def as_text(self):
-        return '\n'.join('* %s\n%s' % (k, '\n'.join('  * %s' % force_text(i) for i in v)) for k, v in self.items())
+        output = []
+        for field, errors in self.items():
+            output.append('* %s' % field)
+            output.append('\n'.join('  * %s' % e for e in errors))
+        return '\n'.join(output)
+
+    def __str__(self):
+        return self.as_ul()
+
 
 @python_2_unicode_compatible
-class ErrorList(list):
+class ErrorList(UserList, list):
     """
     A collection of errors that knows how to display itself in various formats.
     """
+    def as_data(self):
+        return ValidationError(self.data).error_list
+
+    def get_json_data(self, escape_html=False):
+        errors = []
+        for error in self.as_data():
+            message = list(error)[0]
+            errors.append({
+                'message': escape(message) if escape_html else message,
+                'code': error.code or '',
+            })
+        return errors
+
+    def as_json(self, escape_html=False):
+        return json.dumps(self.get_json_data(escape_html))
+
+    def as_ul(self):
+        if not self.data:
+            return ''
+        return format_html(
+            '<ul class="errorlist">{0}</ul>',
+            format_html_join('', '<li>{0}</li>', ((force_text(e),) for e in self))
+        )
+
+    def as_text(self):
+        return '\n'.join('* %s' % e for e in self)
+
     def __str__(self):
         return self.as_ul()
 
-    def as_ul(self):
-        if not self:
-            return ''
-        return format_html('<ul class="errorlist">{0}</ul>',
-                           format_html_join('', '<li>{0}</li>',
-                                            ((force_text(e),) for e in self)
-                                            )
-                           )
-
-    def as_text(self):
-        if not self:
-            return ''
-        return '\n'.join('* %s' % force_text(e) for e in self)
-
     def __repr__(self):
-        return repr([force_text(e) for e in self])
+        return repr(list(self))
+
+    def __contains__(self, item):
+        return item in list(self)
+
+    def __eq__(self, other):
+        return list(self) == other
+
+    def __ne__(self, other):
+        return list(self) != other
+
+    def __getitem__(self, i):
+        error = self.data[i]
+        if isinstance(error, ValidationError):
+            return list(error)[0]
+        return force_text(error)
+
 
 # Utilities for time zone support in DateTimeField et al.
 
@@ -108,6 +153,7 @@ def from_current_timezone(value):
                 params=params,
             ), sys.exc_info()[2])
     return value
+
 
 def to_current_timezone(value):
     """

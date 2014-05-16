@@ -8,6 +8,7 @@ from django.template.base import TemplateDoesNotExist
 from django.template.loader import BaseLoader, get_template_from_string, find_template_loader, make_origin
 from django.utils.encoding import force_bytes
 
+
 class Loader(BaseLoader):
     is_usable = True
 
@@ -52,6 +53,7 @@ class Loader(BaseLoader):
                     pass
                 else:
                     result = (template, make_origin(display_name, loader, name, dirs))
+                    break
         self.find_template_cache[key] = result
         if result:
             return result

@@ -9,9 +9,9 @@ from django.conf import settings
 if __name__ == '__main__':
     settings.configure()
 
-import imp
 import os.path
 import sys
+import types
 import unittest
 
 try:
@@ -23,6 +23,7 @@ except ImportError:
 from django.template import TemplateDoesNotExist, Context
 from django.template.loaders.eggs import Loader as EggLoader
 from django.template import loader
+from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils._os import upath
 from django.utils.six import StringIO
@@ -32,6 +33,7 @@ from django.utils.six import StringIO
 class MockLoader(object):
     pass
 
+
 def create_egg(name, resources):
     """
     Creates a mock egg with a list of resources.
@@ -39,14 +41,16 @@ def create_egg(name, resources):
     name: The name of the module.
     resources: A dictionary of resources. Keys are the names and values the data.
     """
-    egg = imp.new_module(name)
+    egg = types.ModuleType(name)
     egg.__loader__ = MockLoader()
+    egg.__path__ = ['/some/bogus/path/']
+    egg.__file__ = '/some/bogus/path/__init__.pyc'
     egg._resources = resources
     sys.modules[name] = egg
 
 
 @unittest.skipUnless(pkg_resources, 'setuptools is not installed')
-class EggLoaderTest(unittest.TestCase):
+class EggLoaderTest(TestCase):
     def setUp(self):
         # Defined here b/c at module scope we may not have pkg_resources
         class MockProvider(pkg_resources.NullProvider):
@@ -66,6 +70,9 @@ class EggLoaderTest(unittest.TestCase):
             def _get(self, path):
                 return self.module._resources[path].read()
 
+            def _fn(self, base, resource_name):
+                return os.path.normcase(resource_name)
+
         pkg_resources._provider_factories[MockLoader] = MockProvider
 
         self.empty_egg = create_egg("egg_empty", {})
@@ -73,54 +80,44 @@ class EggLoaderTest(unittest.TestCase):
             os.path.normcase('templates/y.html'): StringIO("y"),
             os.path.normcase('templates/x.txt'): StringIO("x"),
         })
-        self._old_installed_apps = settings.INSTALLED_APPS
-        settings.INSTALLED_APPS = []
 
-    def tearDown(self):
-        settings.INSTALLED_APPS = self._old_installed_apps
-
+    @override_settings(INSTALLED_APPS=['egg_empty'])
     def test_empty(self):
         "Loading any template on an empty egg should fail"
-        settings.INSTALLED_APPS = ['egg_empty']
         egg_loader = EggLoader()
         self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "not-existing.html")
 
+    @override_settings(INSTALLED_APPS=['egg_1'])
     def test_non_existing(self):
         "Template loading fails if the template is not in the egg"
-        settings.INSTALLED_APPS = ['egg_1']
         egg_loader = EggLoader()
         self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "not-existing.html")
 
+    @override_settings(INSTALLED_APPS=['egg_1'])
     def test_existing(self):
         "A template can be loaded from an egg"
-        settings.INSTALLED_APPS = ['egg_1']
         egg_loader = EggLoader()
         contents, template_name = egg_loader.load_template_source("y.html")
         self.assertEqual(contents, "y")
         self.assertEqual(template_name, "egg:egg_1:templates/y.html")
 
     def test_not_installed(self):
-        "Loading an existent template from an egg not included in INSTALLED_APPS should fail"
-        settings.INSTALLED_APPS = []
+        "Loading an existent template from an egg not included in any app should fail"
         egg_loader = EggLoader()
         self.assertRaises(TemplateDoesNotExist, egg_loader.load_template_source, "y.html")
 
 
-class CachedLoader(unittest.TestCase):
-    def setUp(self):
-        self.old_TEMPLATE_LOADERS = settings.TEMPLATE_LOADERS
-        settings.TEMPLATE_LOADERS = (
-            ('django.template.loaders.cached.Loader', (
-                    'django.template.loaders.filesystem.Loader',
-            )
-            ),
-        )
-    def tearDown(self):
-        settings.TEMPLATE_LOADERS = self.old_TEMPLATE_LOADERS
-
+@override_settings(
+    TEMPLATE_LOADERS=(
+        ('django.template.loaders.cached.Loader', (
+            'django.template.loaders.filesystem.Loader',
+        )),
+    )
+)
+class CachedLoader(TestCase):
     def test_templatedir_caching(self):
         "Check that the template directories form part of the template cache key. Refs #13573"
-        # Retrive a template specifying a template directory to check
+        # Retrieve a template specifying a template directory to check
         t1, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'first'),))
         # Now retrieve the same template name, but from a different directory
         t2, name = loader.find_template('test.html', (os.path.join(os.path.dirname(upath(__file__)), 'templates', 'second'),))
@@ -144,17 +141,12 @@ class CachedLoader(unittest.TestCase):
                          "Cached template loader doesn't cache file lookup misses. It should.")
 
 
-class RenderToStringTest(unittest.TestCase):
-
-    def setUp(self):
-        self._old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
-        settings.TEMPLATE_DIRS = (
-            os.path.join(os.path.dirname(upath(__file__)), 'templates'),
-        )
-
-    def tearDown(self):
-        settings.TEMPLATE_DIRS = self._old_TEMPLATE_DIRS
-
+@override_settings(
+    TEMPLATE_DIRS=(
+        os.path.join(os.path.dirname(upath(__file__)), 'templates'),
+    )
+)
+class RenderToStringTest(TestCase):
     def test_basic(self):
         self.assertEqual(loader.render_to_string('test_context.html'), 'obj:')
 
@@ -171,13 +163,25 @@ class RenderToStringTest(unittest.TestCase):
 
     def test_empty_list(self):
         six.assertRaisesRegex(self, TemplateDoesNotExist,
-                                'No template names provided$',
-                                loader.render_to_string, [])
+            'No template names provided$',
+            loader.render_to_string, [])
 
     def test_select_templates_from_empty_list(self):
         six.assertRaisesRegex(self, TemplateDoesNotExist,
-                                'No template names provided$',
-                                loader.select_template, [])
+            'No template names provided$',
+            loader.select_template, [])
+
+    def test_no_empty_dict_pushed_to_stack(self):
+        """
+        No empty dict should be pushed to the context stack when render_to_string
+        is called without any argument (#21741).
+        """
+
+        # The stack should have a length of 1, corresponding to the builtins
+        self.assertEqual('1',
+            loader.render_to_string('test_context_stack.html').strip())
+        self.assertEqual('1',
+            loader.render_to_string('test_context_stack.html', context_instance=Context()).strip())
 
 
 class TemplateDirsOverrideTest(unittest.TestCase):
@@ -199,3 +203,33 @@ class TemplateDirsOverrideTest(unittest.TestCase):
         for dirs in self.dirs_iter:
             template = loader.select_template(['test_dirs.html'], dirs=dirs)
             self.assertEqual(template.render(Context({})), 'spam eggs\n')
+
+
+@override_settings(
+    TEMPLATE_LOADERS=(
+        ('django.template.loaders.cached.Loader', (
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        )),
+    )
+)
+class PriorityCacheLoader(TestCase):
+    def test_basic(self):
+        """
+        Check that the order of template loader works. Refs #21460.
+        """
+        t1, name = loader.find_template('priority/foo.html')
+        self.assertEqual(t1.render(Context({})), 'priority\n')
+
+
+@override_settings(
+    TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',
+                      'django.template.loaders.app_directories.Loader',),
+)
+class PriorityLoader(TestCase):
+    def test_basic(self):
+        """
+        Check that the order of template loader works. Refs #21460.
+        """
+        t1, name = loader.find_template('priority/foo.html')
+        self.assertEqual(t1.render(Context({})), 'priority\n')

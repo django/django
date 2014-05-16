@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.contrib.gis.geos import fromstr, Point, LineString, LinearRing, Polygon
 from django.utils.functional import total_ordering
 from django.utils.safestring import mark_safe
@@ -52,7 +54,8 @@ class GEvent(object):
 
     def __str__(self):
         "Returns the parameter part of a GEvent."
-        return mark_safe('"%s", %s' %(self.event, self.action))
+        return mark_safe('"%s", %s' % (self.event, self.action))
+
 
 @python_2_unicode_compatible
 class GOverlayBase(object):
@@ -70,6 +73,7 @@ class GOverlayBase(object):
     def __str__(self):
         "The string representation is the JavaScript API call."
         return mark_safe('%s(%s)' % (self.__class__.__name__, self.js_params))
+
 
 class GPolygon(GOverlayBase):
     """
@@ -130,6 +134,7 @@ class GPolygon(GOverlayBase):
         return '%s, "%s", %s, %s, "%s", %s' % (self.points, self.stroke_color, self.stroke_weight, self.stroke_opacity,
                                                self.fill_color, self.fill_opacity)
 
+
 class GPolyline(GOverlayBase):
     """
     A Python wrapper for the Google GPolyline object.  For more information
@@ -153,7 +158,7 @@ class GPolyline(GOverlayBase):
           opacity:
             The opacity of the polyline, between 0 and 1.  Defaults to 1.
         """
-        # If a GEOS geometry isn't passed in, try to contsruct one.
+        # If a GEOS geometry isn't passed in, try to construct one.
         if isinstance(geom, six.string_types):
             geom = fromstr(geom)
         if isinstance(geom, (tuple, list)):
@@ -253,6 +258,7 @@ class GIcon(object):
         # equal hash(GIcon('varname')).
         return hash(self.__class__) ^ hash(self.varname)
 
+
 class GMarker(GOverlayBase):
     """
     A Python wrapper for the Google GMarker object.  For more information
@@ -303,7 +309,7 @@ class GMarker(GOverlayBase):
         super(GMarker, self).__init__()
 
     def latlng_from_coords(self, coords):
-        return 'new GLatLng(%s,%s)' %(coords[1], coords[0])
+        return 'new GLatLng(%s,%s)' % (coords[1], coords[0])
 
     def options(self):
         result = []

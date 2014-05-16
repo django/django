@@ -1,13 +1,12 @@
-from django.conf import settings
-from django.test import TestCase
-from django.test.utils import override_settings
+from django.test import TestCase, override_settings
+
 
 @override_settings(
     TEMPLATE_CONTEXT_PROCESSORS=('django.core.context_processors.static',),
     STATIC_URL='/path/to/static/media/',
+    ROOT_URLCONF='view_tests.generic_urls',
 )
 class ShortcutTests(TestCase):
-    urls = 'view_tests.generic_urls'
 
     def test_render_to_response(self):
         response = self.client.get('/shortcuts/render_to_response/')

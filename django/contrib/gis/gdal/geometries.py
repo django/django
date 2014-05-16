@@ -50,7 +50,6 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
 from django.contrib.gis.gdal.geomtype import OGRGeomType
-from django.contrib.gis.gdal.libgdal import GDAL_VERSION
 from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
 
 # Getting the ctypes prototype functions that interface w/the GDAL C library.
@@ -67,7 +66,7 @@ from django.utils.six.moves import xrange
 #
 # The OGR_G_* routines are relevant here.
 
-#### OGRGeometry Class ####
+
 class OGRGeometry(GDALBase):
     "Generally encapsulates an OGR geometry."
 
@@ -155,7 +154,7 @@ class OGRGeometry(GDALBase):
         "Constructs a Polygon from a bounding box (4-tuple)."
         x0, y0, x1, y1 = bbox
         return OGRGeometry('POLYGON((%s %s, %s %s, %s %s, %s %s, %s %s))' % (
-                x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
+            x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
 
     ### Geometry set-like operations ###
     # g = g1 | g2
@@ -205,7 +204,7 @@ class OGRGeometry(GDALBase):
 
     def _set_coord_dim(self, dim):
         "Sets the coordinate dimension of this Geometry."
-        if not dim in (2, 3):
+        if dim not in (2, 3):
             raise ValueError('Geometry dimension must be either 2 or 3')
         capi.set_coord_dim(self.ptr, dim)
 
@@ -339,9 +338,9 @@ class OGRGeometry(GDALBase):
     def wkb(self):
         "Returns the WKB representation of the Geometry."
         if sys.byteorder == 'little':
-            byteorder = 1 # wkbNDR (from ogr_core.h)
+            byteorder = 1  # wkbNDR (from ogr_core.h)
         else:
-            byteorder = 0 # wkbXDR
+            byteorder = 0  # wkbXDR
         sz = self.wkb_size
         # Creating the unsigned character buffer, and passing it in by reference.
         buf = (c_ubyte * sz)()
@@ -391,14 +390,6 @@ class OGRGeometry(GDALBase):
             klone.transform(coord_trans)
             return klone
 
-        # Have to get the coordinate dimension of the original geometry
-        # so it can be used to reset the transformed geometry's dimension
-        # afterwards.  This is done because of GDAL bug (in versions prior
-        # to 1.7) that turns geometries 3D after transformation, see:
-        #  http://trac.osgeo.org/gdal/changeset/17792
-        if GDAL_VERSION < (1, 7):
-            orig_dim = self.coord_dim
-
         # Depending on the input type, use the appropriate OGR routine
         # to perform the transformation.
         if isinstance(coord_trans, CoordTransform):
@@ -411,20 +402,6 @@ class OGRGeometry(GDALBase):
         else:
             raise TypeError('Transform only accepts CoordTransform, '
                             'SpatialReference, string, and integer objects.')
-
-        # Setting with original dimension, see comment above.
-        if GDAL_VERSION < (1, 7):
-            if isinstance(self, GeometryCollection):
-                # With geometry collections have to set dimension on
-                # each internal geometry reference, as the collection
-                # dimension isn't affected.
-                for i in xrange(len(self)):
-                    internal_ptr = capi.get_geom_ref(self.ptr, i)
-                    if orig_dim != capi.get_coord_dim(internal_ptr):
-                        capi.set_coord_dim(internal_ptr, orig_dim)
-            else:
-                if self.coord_dim != orig_dim:
-                    self.coord_dim = orig_dim
 
     def transform_to(self, srs):
         "For backwards-compatibility."
@@ -522,6 +499,7 @@ class OGRGeometry(GDALBase):
         """
         return self._geomgen(capi.geom_union, other)
 
+
 # The subclasses for OGR Geometry.
 class Point(OGRGeometry):
 
@@ -549,6 +527,7 @@ class Point(OGRGeometry):
         elif self.coord_dim == 3:
             return (self.x, self.y, self.z)
     coords = tuple
+
 
 class LineString(OGRGeometry):
 
@@ -605,9 +584,11 @@ class LineString(OGRGeometry):
         if self.coord_dim == 3:
             return self._listarr(capi.getz)
 
+
 # LinearRings are used in Polygons.
 class LinearRing(LineString):
     pass
+
 
 class Polygon(OGRGeometry):
 
@@ -631,7 +612,7 @@ class Polygon(OGRGeometry):
     @property
     def shell(self):
         "Returns the shell of this Polygon."
-        return self[0] # First ring is the shell
+        return self[0]  # First ring is the shell
     exterior_ring = shell
 
     @property
@@ -653,6 +634,7 @@ class Polygon(OGRGeometry):
         p = OGRGeometry(OGRGeomType('Point'))
         capi.get_centroid(self.ptr, p.ptr)
         return p
+
 
 # Geometry Collection base class.
 class GeometryCollection(OGRGeometry):
@@ -700,30 +682,33 @@ class GeometryCollection(OGRGeometry):
         return tuple(self[i].tuple for i in xrange(self.geom_count))
     coords = tuple
 
+
 # Multiple Geometry types.
 class MultiPoint(GeometryCollection):
     pass
 
+
 class MultiLineString(GeometryCollection):
     pass
+
 
 class MultiPolygon(GeometryCollection):
     pass
 
 # Class mapping dictionary (using the OGRwkbGeometryType as the key)
-GEO_CLASSES = {1 : Point,
-               2 : LineString,
-               3 : Polygon,
-               4 : MultiPoint,
-               5 : MultiLineString,
-               6 : MultiPolygon,
-               7 : GeometryCollection,
+GEO_CLASSES = {1: Point,
+               2: LineString,
+               3: Polygon,
+               4: MultiPoint,
+               5: MultiLineString,
+               6: MultiPolygon,
+               7: GeometryCollection,
                101: LinearRing,
-               1 + OGRGeomType.wkb25bit : Point,
-               2 + OGRGeomType.wkb25bit : LineString,
-               3 + OGRGeomType.wkb25bit : Polygon,
-               4 + OGRGeomType.wkb25bit : MultiPoint,
-               5 + OGRGeomType.wkb25bit : MultiLineString,
-               6 + OGRGeomType.wkb25bit : MultiPolygon,
-               7 + OGRGeomType.wkb25bit : GeometryCollection,
+               1 + OGRGeomType.wkb25bit: Point,
+               2 + OGRGeomType.wkb25bit: LineString,
+               3 + OGRGeomType.wkb25bit: Polygon,
+               4 + OGRGeomType.wkb25bit: MultiPoint,
+               5 + OGRGeomType.wkb25bit: MultiLineString,
+               6 + OGRGeomType.wkb25bit: MultiPolygon,
+               7 + OGRGeomType.wkb25bit: GeometryCollection,
                }

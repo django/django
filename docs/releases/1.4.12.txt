@@ -1,0 +1,14 @@
+===========================
+Django 1.4.12 release notes
+===========================
+
+*April 28, 2014*
+
+Django 1.4.12 fixes a regression in the 1.4.11 security release.
+
+Bugfixes
+========
+
+* Restored the ability to :meth:`~django.core.urlresolvers.reverse` views
+  created using :func:`functools.partial()`
+  (`#22486 <http://code.djangoproject.com/ticket/22486>`_)

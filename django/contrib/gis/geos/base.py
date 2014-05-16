@@ -18,6 +18,7 @@ try:
 except ImportError:
     numpy = False
 
+
 class GEOSBase(object):
     """
     Base object for GEOS objects that has a pointer access property

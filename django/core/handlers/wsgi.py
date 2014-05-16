@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import cgi
 import codecs
 import logging
 import sys
@@ -13,11 +14,13 @@ from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
+from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str, force_text
+from django.utils.functional import cached_property
 from django.utils import six
 
 # For backwards compatibility -- lots of code uses this in the wild!
-from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT
+from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT  # NOQA
 
 logger = logging.getLogger('django.request')
 
@@ -52,7 +55,7 @@ class LimitedStream(object):
         elif size < len(self.buffer):
             result = self.buffer[:size]
             self.buffer = self.buffer[size:]
-        else: # size >= len(self.buffer)
+        else:  # size >= len(self.buffer)
             result = self.buffer + self._read_limited(size - len(self.buffer))
             self.buffer = b''
         return result
@@ -94,7 +97,7 @@ class WSGIRequest(http.HttpRequest):
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
-        _, content_params = self._parse_content_type(environ.get('CONTENT_TYPE', ''))
+        _, content_params = cgi.parse_header(environ.get('CONTENT_TYPE', ''))
         if 'charset' in content_params:
             try:
                 codecs.lookup(content_params['charset'])
@@ -114,37 +117,18 @@ class WSGIRequest(http.HttpRequest):
     def _get_scheme(self):
         return self.environ.get('wsgi.url_scheme')
 
-    def _parse_content_type(self, ctype):
-        """
-        Media Types parsing according to RFC 2616, section 3.7.
-
-        Returns the data type and parameters. For example:
-        Input: "text/plain; charset=iso-8859-1"
-        Output: ('text/plain', {'charset': 'iso-8859-1'})
-        """
-        content_type, _, params = ctype.partition(';')
-        content_params = {}
-        for parameter in params.split(';'):
-            k, _, v = parameter.strip().partition('=')
-            content_params[k] = v
-        return content_type, content_params
-
     def _get_request(self):
         warnings.warn('`request.REQUEST` is deprecated, use `request.GET` or '
-                      '`request.POST` instead.', PendingDeprecationWarning, 2)
+                      '`request.POST` instead.', RemovedInDjango19Warning, 2)
         if not hasattr(self, '_request'):
             self._request = datastructures.MergeDict(self.POST, self.GET)
         return self._request
 
-    def _get_get(self):
-        if not hasattr(self, '_get'):
-            # The WSGI spec says 'QUERY_STRING' may be absent.
-            raw_query_string = get_bytes_from_wsgi(self.environ, 'QUERY_STRING', '')
-            self._get = http.QueryDict(raw_query_string, encoding=self._encoding)
-        return self._get
-
-    def _set_get(self, get):
-        self._get = get
+    @cached_property
+    def GET(self):
+        # The WSGI spec says 'QUERY_STRING' may be absent.
+        raw_query_string = get_bytes_from_wsgi(self.environ, 'QUERY_STRING', '')
+        return http.QueryDict(raw_query_string, encoding=self._encoding)
 
     def _get_post(self):
         if not hasattr(self, '_post'):
@@ -154,23 +138,17 @@ class WSGIRequest(http.HttpRequest):
     def _set_post(self, post):
         self._post = post
 
-    def _get_cookies(self):
-        if not hasattr(self, '_cookies'):
-            raw_cookie = get_str_from_wsgi(self.environ, 'HTTP_COOKIE', '')
-            self._cookies = http.parse_cookie(raw_cookie)
-        return self._cookies
-
-    def _set_cookies(self, cookies):
-        self._cookies = cookies
+    @cached_property
+    def COOKIES(self):
+        raw_cookie = get_str_from_wsgi(self.environ, 'HTTP_COOKIE', '')
+        return http.parse_cookie(raw_cookie)
 
     def _get_files(self):
         if not hasattr(self, '_files'):
             self._load_post_and_files()
         return self._files
 
-    GET = property(_get_get, _set_get)
     POST = property(_get_post, _set_post)
-    COOKIES = property(_get_cookies, _set_cookies)
     FILES = property(_get_files)
     REQUEST = property(_get_request)
 
@@ -185,7 +163,7 @@ class WSGIHandler(base.BaseHandler):
         if self._request_middleware is None:
             with self.initLock:
                 try:
-                    # Check that middleware is still uninitialised.
+                    # Check that middleware is still uninitialized.
                     if self._request_middleware is None:
                         self.load_middleware()
                 except:

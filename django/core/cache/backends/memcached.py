@@ -2,18 +2,17 @@
 
 import time
 import pickle
-from threading import local
 
 from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
-
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase
+from django.utils.deprecation import RenameMethodsBase, RemovedInDjango19Warning
 from django.utils.encoding import force_str
+from django.utils.functional import cached_property
 
 
 class BaseMemcachedCacheMethods(RenameMethodsBase):
     renamed_methods = (
-        ('_get_memcache_timeout', 'get_backend_timeout', PendingDeprecationWarning),
+        ('_get_memcache_timeout', 'get_backend_timeout', RemovedInDjango19Warning),
     )
 
 
@@ -60,7 +59,7 @@ class BaseMemcachedCache(six.with_metaclass(BaseMemcachedCacheMethods, BaseCache
             # in memcache backends, a negative timeout must be passed.
             timeout = -1
 
-        if timeout > 2592000: # 60*60*24*30, 30 days
+        if timeout > 2592000:  # 60*60*24*30, 30 days
             # See http://code.google.com/p/memcached/wiki/FAQ
             # "You can set expire times up to 30 days in the future. After that
             # memcached interprets it as a date, and will expire the item after
@@ -157,6 +156,7 @@ class BaseMemcachedCache(six.with_metaclass(BaseMemcachedCacheMethods, BaseCache
     def clear(self):
         self._cache.flush_all()
 
+
 class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
     def __init__(self, server, params):
@@ -171,28 +171,19 @@ class MemcachedCache(BaseMemcachedCache):
             self._client = self._lib.Client(self._servers, pickleProtocol=pickle.HIGHEST_PROTOCOL)
         return self._client
 
+
 class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
     def __init__(self, server, params):
         import pylibmc
-        self._local = local()
         super(PyLibMCCache, self).__init__(server, params,
                                            library=pylibmc,
                                            value_not_found_exception=pylibmc.NotFound)
 
-    @property
+    @cached_property
     def _cache(self):
-        # PylibMC uses cache options as the 'behaviors' attribute.
-        # It also needs to use threadlocals, because some versions of
-        # PylibMC don't play well with the GIL.
-        client = getattr(self._local, 'client', None)
-        if client:
-            return client
-
         client = self._lib.Client(self._servers)
         if self._options:
             client.behaviors = self._options
-
-        self._local.client = client
 
         return client
