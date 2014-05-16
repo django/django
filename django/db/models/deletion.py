@@ -183,7 +183,7 @@ class Collector(object):
                 parent_objs = [getattr(obj, ptr.name) for obj in new_objs]
                 self.collect(parent_objs, source=model,
                              source_attr=ptr.rel.related_name,
-                             collect_related=False,
+                             collect_related=True,
                              reverse_dependency=True)
 
         if collect_related:

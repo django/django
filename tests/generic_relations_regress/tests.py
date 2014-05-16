@@ -1,3 +1,4 @@
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q, Sum
 from django.db.utils import IntegrityError
 from django.test import TestCase, skipIfDBFeature
@@ -247,3 +248,21 @@ class GenericRelationTests(TestCase):
         form.save()
         links = HasLinkThing._meta.get_field_by_name('links')[0]
         self.assertEqual(links.save_form_data_calls, 1)
+
+    def test_inherited_models_delete(self):
+        """
+        Test that when deleting a class that inherits a GenericRelation,
+        the correct related object is deleted on cascade.
+        """
+        restaurant = Restaurant.objects.create()
+        place = Place.objects.get(pk=restaurant.pk)
+        link1 = Link.objects.create(content_object=restaurant)
+        link2 = Link.objects.create(content_object=place)
+        place_ct = ContentType.objects.get_for_model(Place)
+        self.assertEqual(list(Link.objects.all().order_by('id')),
+                         [link1, link2])
+        self.assertEqual(
+            list(Link.objects.filter(content_type=place_ct)),
+            [link2])
+        restaurant.delete()
+        self.assertEqual(list(Link.objects.all()), [])
