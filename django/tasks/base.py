@@ -7,15 +7,14 @@ from django.utils.module_loading import import_by_path
 
 DEFAULT_TASK_ALIAS = 'default'
 
+# backends cache to make sure we don't create one per connection
+# all the backends should be thread-safe
+backends = {}
 
 class InvalidTaskBackendError(Exception):
     pass
 
-
-def _get_task_backend(alias=None):
-    # TODO: copy structure from caches - CacheHandler
-    if not alias:
-        alias = DEFAULT_TASK_ALIAS
+def _create_task_backend(alias):
     try:
         conf = settings.QUEUES[alias]
     except KeyError:
@@ -32,6 +31,19 @@ def _get_task_backend(alias=None):
 
     return backend_cls(**args)
 
+def get_backend(alias=None):
+    # note that this code is similar to django.core.cache.CacheHandler and
+    # might benefit from refactoring
+    if not alias:
+        alias = DEFAULT_TASK_ALIAS
+
+    try:
+        return backends[alias]
+    except KeyError:
+        pass
+
+    backends[alias] = _create_task_backend(alias)
+    return backends[alias]
 
 class Task(object):
     def __init__(self, func=None, name=None, using=None, options=None):
@@ -52,7 +64,7 @@ class Task(object):
 
     @property
     def backend(self):
-        return _get_task_backend(self.alias)
+        return get_backend(self.alias)
 
     def clone(self, using=None, **options):
         opts = self.options.copy()
