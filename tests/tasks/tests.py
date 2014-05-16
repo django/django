@@ -1,7 +1,7 @@
 import unittest
 
 from django.test import override_settings, SimpleTestCase
-from django.tasks import registry, task, Task, backends
+from django.tasks import registry, task, Task, backends, get_backend, base
 
 def dummy_task(*args, **kwargs):
     return args, kwargs
@@ -18,6 +18,17 @@ dummier_task = DummierTask()
     }
 )
 class TestDummyBackend(SimpleTestCase):
+    def tearDown(self):
+        super(TestDummyBackend, self).tearDown()
+        # clear backends cache
+        base.backends.clear()
+
+    def test_backends_are_cached(self):
+        backend = get_backend()
+        backend2 = get_backend()
+
+        self.assertIs(backend, backend2)
+
     def test_delay_runs_and_returns_result_with_status_and_result(self):
         t = Task(dummy_task)
         o = object()

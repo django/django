@@ -1,4 +1,4 @@
-from django.tasks.base import Task
+from django.tasks.base import Task, get_backend
 from django.tasks.backends import TaskResult
 from django.tasks.register import registry
 
