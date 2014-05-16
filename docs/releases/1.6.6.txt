@@ -1,0 +1,13 @@
+==========================
+Django 1.6.6 release notes
+==========================
+
+*Under development*
+
+Django 1.6.6 fixes several bugs in 1.6.5.
+
+Bugfixes
+========
+
+* Corrected email and URL validation to reject a trailing dash
+  (`#22579 <http://code.djangoproject.com/ticket/22579>`_).
