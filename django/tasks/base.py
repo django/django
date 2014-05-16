@@ -31,12 +31,7 @@ def _create_task_backend(alias):
 
     return backend_cls(alias, **args)
 
-def get_backend(alias=None):
-    # note that this code is similar to django.core.cache.CacheHandler and
-    # might benefit from refactoring
-    if not alias:
-        alias = DEFAULT_TASK_ALIAS
-
+def get_backend(alias=DEFAULT_TASK_ALIAS):
     try:
         return backends[alias]
     except KeyError:
