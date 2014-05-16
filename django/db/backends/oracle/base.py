@@ -748,6 +748,7 @@ class OracleParam(object):
                 param = timezone.make_aware(param, default_timezone)
             param = Oracle_datetime.from_datetime(param.astimezone(timezone.utc))
 
+        string_size = 0
         # Oracle doesn't recognize True and False correctly in Python 3.
         # The conversion done below works both in 2 and 3.
         if param is True:
@@ -756,15 +757,20 @@ class OracleParam(object):
             param = "0"
         if hasattr(param, 'bind_parameter'):
             self.force_bytes = param.bind_parameter(cursor)
-        elif isinstance(param, six.memoryview):
+        elif isinstance(param, Database.Binary):
             self.force_bytes = param
         else:
+            # To transmit to the database, we need Unicode if supported
+            # To get size right, we must consider bytes.
             self.force_bytes = convert_unicode(param, cursor.charset,
                                              strings_only)
+            if isinstance(self.force_bytes, six.string_types):
+                # We could optimize by only converting up to 4000 bytes here
+                string_size = len(force_bytes(param, cursor.charset, strings_only))
         if hasattr(param, 'input_size'):
             # If parameter has `input_size` attribute, use that.
             self.input_size = param.input_size
-        elif isinstance(param, six.string_types) and len(param) > 4000:
+        elif string_size > 4000:
             # Mark any string param greater than 4000 characters as a CLOB.
             self.input_size = Database.CLOB
         else:
