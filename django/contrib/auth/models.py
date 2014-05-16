@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.core import validators
 from django.db import models
@@ -267,18 +268,32 @@ def _user_get_all_permissions(user, obj):
 
 
 def _user_has_perm(user, perm, obj):
+    """
+    A backend can raise `PermissionDenied` to short-circuit permission checking.
+    """
     for backend in auth.get_backends():
-        if hasattr(backend, "has_perm"):
+        if not hasattr(backend, 'has_perm'):
+            continue
+        try:
             if backend.has_perm(user, perm, obj):
                 return True
+        except PermissionDenied:
+            return False
     return False
 
 
 def _user_has_module_perms(user, app_label):
+    """
+    A backend can raise `PermissionDenied` to short-circuit permission checking.
+    """
     for backend in auth.get_backends():
-        if hasattr(backend, "has_module_perms"):
+        if not hasattr(backend, 'has_module_perms'):
+            continue
+        try:
             if backend.has_module_perms(user, app_label):
                 return True
+        except PermissionDenied:
+            return False
     return False
 
 
