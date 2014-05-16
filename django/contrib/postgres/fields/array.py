@@ -1,5 +1,4 @@
 import json
-import re
 
 from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
@@ -116,10 +115,13 @@ class ArrayField(Field):
         else:
             index += 1  # postgres uses 1-indexing
             return IndexTransformFactory(index, self.base_field)
-        if re.match('\d+_\d+', name):
+        try:
             start, end = name.split('_')
             start = int(start) + 1
             end = int(end) + 1
+        except ValueError:
+            pass
+        else:
             return SliceTransformFactory(start, end)
 
     def validate(self, value, model_instance):
