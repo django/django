@@ -186,7 +186,7 @@ class SplitArrayField(forms.Field):
             if null_index:
                 cleaned_data = cleaned_data[:null_index]
                 errors = errors[:null_index]
-        errors = filter(None, errors)
+        errors = list(filter(None, errors))
         if errors:
             raise ValidationError(errors)
         return cleaned_data
