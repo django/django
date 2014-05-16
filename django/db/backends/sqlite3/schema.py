@@ -1,3 +1,5 @@
+import codecs
+
 from decimal import Decimal
 from django.utils import six
 from django.apps.registry import Apps
@@ -28,6 +30,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return '"%s"' % six.text_type(value)
         elif value is None:
             return "NULL"
+        elif isinstance(value, (bytes, bytearray, six.memoryview)):
+            # Bytes are only allowed for BLOB fields, encoded as string
+            # literals containing hexadecimal data and preceded by a single "X"
+            # character:
+            # value = b'\x01\x02' => value_hex = b'0102' => return X'0102'
+            value = bytes(value)
+            hex_encoder = codecs.getencoder('hex_codec')
+            value_hex, _length = hex_encoder(value)
+            # Use 'ascii' encoding for b'01' => '01', no need to use force_text here.
+            return "X'%s'" % value_hex.decode('ascii')
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
@@ -37,7 +49,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         # Work out the new fields dict / mapping
         body = dict((f.name, f) for f in model._meta.local_fields)
-        mapping = dict((f.column, f.column) for f in model._meta.local_fields)
+        # Since mapping might mix column names and default values,
+        # its values must be already quoted.
+        mapping = dict((f.column, self.quote_name(f.column)) for f in model._meta.local_fields)
         # If any of the new or altered fields is introducing a new PK,
         # remove the old one
         restore_pk_field = None
@@ -62,7 +76,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             del body[old_field.name]
             del mapping[old_field.column]
             body[new_field.name] = new_field
-            mapping[new_field.column] = old_field.column
+            mapping[new_field.column] = self.quote_name(old_field.column)
         # Remove any deleted fields
         for field in delete_fields:
             del body[field.name]
@@ -90,7 +104,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
             self.quote_name(temp_model._meta.db_table),
             ', '.join(self.quote_name(x) for x, y in field_maps),
-            ', '.join(self.quote_name(y) for x, y in field_maps),
+            ', '.join(y for x, y in field_maps),
             self.quote_name(model._meta.db_table),
         ))
         # Delete the old table (not using self.delete_model to avoid deleting
