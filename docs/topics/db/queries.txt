@@ -146,8 +146,9 @@ and a filter is a limiting clause such as ``WHERE`` or ``LIMIT``.
 
 You get a :class:`~django.db.models.query.QuerySet` by using your model's
 :class:`~django.db.models.Manager`. Each model has at least one
-:class:`~django.db.models.Manager`, and it's called ``objects`` by
-default. Access it directly via the model class, like so::
+:class:`~django.db.models.Manager`, and it's called
+:attr:`~django.db.models.Model.objects` by default. Access it directly via the
+model class, like so::
 
     >>> Blog.objects
     <django.db.models.manager.Manager object at ...>
