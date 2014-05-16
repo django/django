@@ -318,16 +318,17 @@ class OperationTests(MigrationTestBase):
         """
         Tests the AddField operation on TextField/BinaryField.
 
-        These two fields can't have a default on MySQL. Refs #22424.
+        These two fields can't have a default on MySQL, and require special
+        quoting on SQLite. Refs #22424 and #22626.
         """
-        project_state = self.set_up_test_model("test_adflmysql")
+        project_state = self.set_up_test_model("test_adfl")
 
         new_apps = project_state.render()
-        Pony = new_apps.get_model("test_adflmysql", "Pony")
+        Pony = new_apps.get_model("test_adfl", "Pony")
         pony = Pony.objects.create(weight=42)
 
         # Test the state alteration
-        new_state = self.apply_operations("test_adflmysql", project_state, [
+        new_state = self.apply_operations("test_adfl", project_state, [
             migrations.AddField(
                 "Pony",
                 "text",
@@ -341,9 +342,10 @@ class OperationTests(MigrationTestBase):
         ])
 
         new_apps = new_state.render()
-        Pony = new_apps.get_model("test_adflmysql", "Pony")
+        Pony = new_apps.get_model("test_adfl", "Pony")
         pony = Pony.objects.get(pk=pony.pk)
         self.assertEqual(pony.text, '42')
+        # SQLite returns buffer/memoryview, cast to bytes for checking.
         self.assertEqual(bytes(pony.blob), b'42')
 
     def test_column_name_quoting(self):
