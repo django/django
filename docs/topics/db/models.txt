@@ -681,8 +681,9 @@ Model attributes
     :class:`~django.db.models.Manager`. It's the interface through which
     database query operations are provided to Django models and is used to
     :ref:`retrieve the instances <retrieving-objects>` from the database. If no
-    custom ``Manager`` is defined, the default name is ``objects``. Managers
-    are only accessible via model classes, not the model instances.
+    custom ``Manager`` is defined, the default name is
+    :attr:`~django.db.models.Model.objects`. Managers are only accessible via
+    model classes, not the model instances.
 
 .. _model-methods:
 
