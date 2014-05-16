@@ -423,7 +423,7 @@ class DateFieldTests(IsolatedModelsTestCase):
                     "may be present.",
                     hint=None,
                     obj=field,
-                    id='fields.E151',
+                    id='fields.E160',
                 )]
                 checks = field.check()
                 self.assertEqual(checks, expected)
