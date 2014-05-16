@@ -61,7 +61,8 @@ manipulating the data of your Web application. Learn more about it below:
 * **Models:**
   :doc:`Model syntax <topics/db/models>` |
   :doc:`Field types <ref/models/fields>` |
-  :doc:`Meta options <ref/models/options>`
+  :doc:`Meta options <ref/models/options>` |
+  :doc:`Model class <ref/models/class>`
 
 * **QuerySets:**
   :doc:`Executing queries <topics/db/queries>` |
