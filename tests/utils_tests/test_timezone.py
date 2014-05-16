@@ -3,10 +3,17 @@ import datetime
 import pickle
 import unittest
 
+try:
+    import pytz
+except ImportError:
+    pytz = None
+
 from django.test import override_settings
 from django.utils import timezone
 
 
+if pytz is not None:
+    CET = pytz.timezone("Europe/Paris")
 EAT = timezone.get_fixed_timezone(180)      # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)      # Asia/Bangkok
 
@@ -18,6 +25,10 @@ class TimezoneTests(unittest.TestCase):
         local_tz = timezone.LocalTimezone()
         local_now = timezone.localtime(now, local_tz)
         self.assertEqual(local_now.tzinfo, local_tz)
+
+    def test_localtime_naive(self):
+        with self.assertRaises(ValueError):
+            timezone.localtime(datetime.datetime.now())
 
     def test_localtime_out_of_range(self):
         local_tz = timezone.LocalTimezone()
@@ -96,3 +107,22 @@ class TimezoneTests(unittest.TestCase):
             datetime.datetime(2011, 9, 1, 13, 20, 30))
         with self.assertRaises(ValueError):
             timezone.make_naive(datetime.datetime(2011, 9, 1, 13, 20, 30), EAT)
+
+    @unittest.skipIf(pytz is None, "this test requires pytz")
+    def test_make_aware(self):
+        self.assertEqual(
+            timezone.make_aware(datetime.datetime(2011, 9, 1, 12, 20, 30), CET),
+            CET.localize(datetime.datetime(2011, 9, 1, 12, 20, 30)))
+        with self.assertRaises(ValueError):
+            timezone.make_aware(CET.localize(datetime.datetime(2011, 9, 1, 12, 20, 30)), CET)
+
+    @unittest.skipIf(pytz is None, "this test requires pytz")
+    def test_make_aware_pytz(self):
+        self.assertEqual(
+            timezone.make_naive(CET.localize(datetime.datetime(2011, 9, 1, 12, 20, 30)), CET),
+            datetime.datetime(2011, 9, 1, 12, 20, 30))
+        self.assertEqual(
+            timezone.make_naive(pytz.timezone("Asia/Bangkok").localize(datetime.datetime(2011, 9, 1, 17, 20, 30)), CET),
+            datetime.datetime(2011, 9, 1, 12, 20, 30))
+        with self.assertRaises(ValueError):
+            timezone.make_naive(datetime.datetime(2011, 9, 1, 12, 20, 30), CET)
