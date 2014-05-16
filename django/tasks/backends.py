@@ -14,6 +14,13 @@ class TaskResult(object):
         self._backend = backend
         self.task_id = task_id
 
+    def __repr__(self):
+        return '<TaskResult %s - %r>' % (self.alias, self.task_id)
+
+    @ property
+    def alias(self):
+        return self._backend.alias
+
     def status(self, **kwargs):
         return self._backend.status(self.task_id, **kwargs)
 
@@ -22,8 +29,8 @@ class TaskResult(object):
 
 
 class BaseBackend(object):
-    def __init__(self, **kwargs):
-        pass
+    def __init__(self, alias, **kwargs):
+        self.alias = alias
 
     def status(self, task_id):
         """

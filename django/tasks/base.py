@@ -29,7 +29,7 @@ def _create_task_backend(alias):
         raise InvalidTaskBackendError("Could not find backend '%s': %s" % (
             backend, e))
 
-    return backend_cls(**args)
+    return backend_cls(alias, **args)
 
 def get_backend(alias=None):
     # note that this code is similar to django.core.cache.CacheHandler and
