@@ -477,6 +477,9 @@ The default form widget for this field is a
 and a shortcut for "Today". Includes an additional ``invalid_date`` error
 message key.
 
+The options ``auto_now_add``, ``auto_now``, and ``default`` are mutually exclusive.
+Any combination of these options will result in an error.
+
 .. note::
     As currently implemented, setting ``auto_now`` or ``auto_now_add`` to
     ``True`` will cause the field to have ``editable=False`` and ``blank=True``

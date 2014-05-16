@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 import unittest
 
+from datetime import datetime
+
 from django.core.checks import Error
 from django.db import connection, models
 
@@ -399,3 +401,29 @@ class ImageFieldTests(IsolatedModelsTestCase):
             ),
         ]
         self.assertEqual(errors, expected)
+
+
+class DateFieldTests(IsolatedModelsTestCase):
+
+    def test_auto_now_and_auto_now_add_raise_error(self):
+            dn = datetime.now
+            mutually_exclusive_combinations = (
+                (True, True, dn),
+                (True, False, dn),
+                (False, True, dn),
+                (True, True, None)
+            )
+
+            for auto_now, auto_now_add, default in mutually_exclusive_combinations:
+                field = models.DateTimeField(name="field", auto_now=auto_now, auto_now_add=auto_now_add,
+                              default=default)
+                expected = [Error(
+                    "The options auto_now, auto_now_add, and default "
+                    "are mutually exclusive. Only one of these options "
+                    "must be present.",
+                    hint=None,
+                    obj=field,
+                    id='fields.E151',
+                )]
+                checks = field.check()
+                self.assertEqual(checks, expected)
