@@ -48,6 +48,9 @@ class Node(object):
         return '(%s: %s)' % (self.connector, ', '.join([str(c) for c in
                 self.children]))
 
+    def __repr__(self):
+        return "<%s: %s>" % (self.__class__.__name__, self)
+
     def __deepcopy__(self, memodict):
         """
         Utility method used by copy.deepcopy().
