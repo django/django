@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import copy
+import inspect
 import sys
 from functools import update_wrapper
 import warnings
@@ -299,7 +300,8 @@ class ModelBase(type):
                 cls.add_to_class(mgr_name, new_manager)
 
     def add_to_class(cls, name, value):
-        if hasattr(value, 'contribute_to_class'):
+        # We should call the contirbute_to_class method only if it's bound
+        if not inspect.isclass(value) and hasattr(value, 'contribute_to_class'):
             value.contribute_to_class(cls, name)
         else:
             setattr(cls, name, value)
