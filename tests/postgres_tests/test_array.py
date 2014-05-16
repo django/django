@@ -33,6 +33,12 @@ class TestSaveLoad(TestCase):
         loaded = DateTimeArrayModel.objects.get()
         self.assertEqual(instance.field, loaded.field)
 
+    def test_tuples(self):
+        instance = IntegerArrayModel(field=(1,))
+        instance.save()
+        loaded = IntegerArrayModel.objects.get()
+        self.assertSequenceEqual(instance.field, loaded.field)
+
     def test_integers_passed_as_strings(self):
         # This checks that get_prep_value is deferred properly
         instance = IntegerArrayModel(field=['1'])

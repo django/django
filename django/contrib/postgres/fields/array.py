@@ -70,7 +70,7 @@ class ArrayField(Field):
         return '%s[%s]' % (self.base_field.db_type(connection), size)
 
     def get_prep_value(self, value):
-        if isinstance(value, list):
+        if isinstance(value, list) or isinstance(value, tuple):
             return [self.base_field.get_prep_value(i) for i in value]
         return value
 
