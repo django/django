@@ -12,13 +12,13 @@ class InvalidCacheBackendError(Exception):
 class TaskResult(object):
     def __init__(self, backend, task_id):
         self._backend = backend
-        self._task_id = task_id
+        self.task_id = task_id
 
     def status(self, **kwargs):
-        return self._backend.status(self._task_id, **kwargs)
+        return self._backend.status(self.task_id, **kwargs)
 
     def get_result(self, **kwargs):
-        return self._backend.get_result(self._task_id, **kwargs)
+        return self._backend.get_result(self.task_id, **kwargs)
 
 
 class BaseBackend(object):
