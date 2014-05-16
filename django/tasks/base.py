@@ -13,6 +13,7 @@ class InvalidTaskBackendError(Exception):
 
 
 def _get_task_backend(alias=None):
+    # TODO: copy structure from caches - CacheHandler
     if not alias:
         alias = DEFAULT_TASK_ALIAS
     try:
@@ -22,15 +23,14 @@ def _get_task_backend(alias=None):
 
     args = conf.copy()
     backend = args.pop('BACKEND')
-    connection = args.pop('CONNECTION', None)
     try:
-        # Trying to import the given backend, in case it's a dotted path
+        # import the given backend
         backend_cls = import_by_path(backend)
     except ImproperlyConfigured as e:
         raise InvalidTaskBackendError("Could not find backend '%s': %s" % (
             backend, e))
 
-    return backend_cls(connection, **args)
+    return backend_cls(**args)
 
 
 class Task(object):

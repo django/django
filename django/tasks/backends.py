@@ -22,8 +22,8 @@ class TaskResult(object):
 
 
 class BaseBackend(object):
-    def __init__(self, connection, **kwargs):
-        self._connection = connection
+    def __init__(self, **kwargs):
+        pass
 
     def status(self, task_id):
         """
@@ -41,12 +41,6 @@ class BaseBackend(object):
         If the task has ran and returned a result, return that result.
 
         If not, raise a ResultUnavailable exception
-        """
-        raise NotImplementedError
-
-    def remove_task(self, task_id, *args, **kwargs):
-        """
-        Given task_id, attempt to remove it from the queue
         """
         raise NotImplementedError
 
