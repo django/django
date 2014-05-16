@@ -58,15 +58,15 @@ class BaseStaticFilesTestCase(object):
         # run and pick up changes in settings.STATICFILES_DIRS.
         finders.get_finder.cache_clear()
 
-        testfiles_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test')
+        self.testfiles_path = os.path.join(TEST_ROOT, 'apps', 'test', 'static', 'test')
         # To make sure SVN doesn't hangs itself with the non-ASCII characters
         # during checkout, we actually create one file dynamically.
-        self._nonascii_filepath = os.path.join(testfiles_path, '\u2297.txt')
+        self._nonascii_filepath = os.path.join(self.testfiles_path, '\u2297.txt')
         with codecs.open(self._nonascii_filepath, 'w', 'utf-8') as f:
             f.write("\u2297 in the app dir")
         # And also create the stupid hidden file to dwarf the setup.py's
         # package data handling.
-        self._hidden_filepath = os.path.join(testfiles_path, '.hidden')
+        self._hidden_filepath = os.path.join(self.testfiles_path, '.hidden')
         with codecs.open(self._hidden_filepath, 'w', 'utf-8') as f:
             f.write("should be ignored")
         self._backup_filepath = os.path.join(
@@ -647,6 +647,19 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
     """
     Tests for the Cache busting storage
     """
+
+    def setUp(self):
+        super(TestCollectionManifestStorage, self).setUp()
+
+        self._clear_filename = os.path.join(self.testfiles_path, 'cleared.txt')
+        with open(self._clear_filename, 'w') as f:
+            f.write('to be deleted in one test')
+
+    def tearDown(self):
+        super(TestCollectionManifestStorage, self).tearDown()
+        if os.path.exists(self._clear_filename):
+            os.unlink(self._clear_filename)
+
     def test_manifest_exists(self):
         filename = storage.staticfiles_storage.manifest_name
         path = storage.staticfiles_storage.path(filename)
@@ -663,6 +676,31 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
         hashed_files = storage.staticfiles_storage.hashed_files
         manifest = storage.staticfiles_storage.load_manifest()
         self.assertEqual(hashed_files, manifest)
+
+    def test_clear_empties_manifest(self):
+        # collect the additional file
+        self.run_collectstatic()
+
+        hashed_files = storage.staticfiles_storage.hashed_files
+        self.assertIn('test/cleared.txt', hashed_files)
+
+        manifest_content = storage.staticfiles_storage.load_manifest()
+        self.assertIn('test/cleared.txt', manifest_content)
+
+        original_path = storage.staticfiles_storage.path('test/cleared.txt')
+        self.assertTrue(os.path.exists(original_path))
+
+        # delete the original file form the app, collect with clear
+        os.unlink(self._clear_filename)
+        self.run_collectstatic(clear=True)
+
+        self.assertFileNotFound(original_path)
+
+        hashed_files = storage.staticfiles_storage.hashed_files
+        self.assertNotIn('test/cleared.txt', hashed_files)
+
+        manifest_content = storage.staticfiles_storage.load_manifest()
+        self.assertNotIn('test/cleared.txt', manifest_content)
 
 
 # we set DEBUG to False here since the template tag wouldn't work otherwise
