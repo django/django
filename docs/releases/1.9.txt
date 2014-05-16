@@ -254,7 +254,10 @@ Minor features
 :mod:`django.contrib.sessions`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The session model and ``SessionStore`` classes for the ``db`` and
+  ``cached_db`` backends are refactored to allow a custom database session
+  backend to build upon them. See
+  :ref:`extending-database-backed-session-engines` for more details.
 
 :mod:`django.contrib.sitemaps`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
