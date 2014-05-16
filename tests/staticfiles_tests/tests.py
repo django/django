@@ -669,6 +669,20 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
         manifest = storage.staticfiles_storage.load_manifest()
         self.assertEqual(hashed_files, manifest)
 
+    def test_manifest_on_collectstatic(self):
+        """
+        staticfiles.json manifest doesn't persist stale/deleted records, see #22557
+        """
+        self.assertNotIn("old_deleted_file", storage.staticfiles_storage.hashed_files)
+        storage.staticfiles_storage.hashed_files["old_deleted_file"] = "record"
+        storage.staticfiles_storage.save_manifest()
+        storage.staticfiles_storage.load_manifest()
+        self.assertEqual(
+            storage.staticfiles_storage.hashed_files["old_deleted_file"], 
+            "record")
+        self.run_collectstatic()
+        self.assertNotIn("old_deleted_file", storage.staticfiles_storage.hashed_files)
+
 
 # we set DEBUG to False here since the template tag wouldn't work otherwise
 @override_settings(**dict(
