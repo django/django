@@ -81,7 +81,7 @@ class TestTaskDecorator(unittest.TestCase):
 class TestTask(unittest.TestCase):
     def test_configure_clones_and_updates_alias_and_options(self):
         t = Task(lambda: 'XYZ', using='default', options={'priority': 1})
-        t2 = t.configure(using='special', priority=3)
+        t2 = t.clone(using='special', priority=3)
 
         self.assertEqual('default', t.alias)
         self.assertEqual({'priority': 1}, t.options)

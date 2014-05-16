@@ -54,20 +54,16 @@ class Task(object):
     def backend(self):
         return _get_task_backend(self.alias)
 
-    def _clone(self, **kwargs):
+    def clone(self, using=None, **options):
+        opts = self.options.copy()
+        opts.update(options)
         d = {
             'func': self.run,
             'name': self.name,
-            'using': self.alias,
-            'options': self.options
+            'using': using or self.alias,
+            'options': opts
         }
-        d.update(kwargs)
         return Task(**d)
-
-    def configure(self, using=None, **options):
-        opts = self.options.copy()
-        opts.update(options)
-        return self._clone(options=opts, using=using or self.alias)
 
     def delay(self, *args, **kwargs):
         return self.backend.delay(self, *args, **kwargs)
