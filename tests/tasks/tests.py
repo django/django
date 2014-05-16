@@ -1,6 +1,7 @@
 import unittest
 
-from django.tasks import registry, task, Task
+from django.test import override_settings, SimpleTestCase
+from django.tasks import registry, task, Task, backends
 
 def dummy_task(*args, **kwargs):
     return args, kwargs
@@ -10,6 +11,33 @@ class DummierTask(object):
         return args, kwargs
 
 dummier_task = DummierTask()
+
+@override_settings(
+    QUEUES = {
+        'default': {'BACKEND': 'django.tasks.backends.DummyTaskBackend'},
+    }
+)
+class TestDummyBackend(SimpleTestCase):
+    def test_delay_runs_and_returns_result_with_status_and_result(self):
+        t = Task(dummy_task)
+        o = object()
+        r = t.delay(1, o, 'xyz', a=42)
+
+        self.assertIsInstance(r, backends.DummyTaskResult)
+        self.assertEquals(backends.SUCCESS, r.status())
+        self.assertEquals(((1, o, 'xyz'), {'a': 42}), r.get_result())
+
+    def test_failing_task_reports_failure_and_returns_exception(self):
+        e = KeyError('Nope!')
+        def t():
+            raise e
+        t = Task(t)
+        r = t.delay()
+
+        self.assertIsInstance(r, backends.DummyTaskResult)
+        self.assertEquals(backends.FAILED, r.status())
+        self.assertIs(e, r.get_result())
+
 
 class TestTaskDecorator(unittest.TestCase):
     def tearDown(self):

@@ -9,8 +9,19 @@ class ResultUnavailable(Exception):
 class InvalidCacheBackendError(Exception):
     pass
 
-class BaseBackend(object):
+class TaskResult(object):
+    def __init__(self, backend, task_id):
+        self._backend = backend
+        self._task_id = task_id
 
+    def status(self, **kwargs):
+        return self._backend.status(self._task_id, **kwargs)
+
+    def get_result(self, **kwargs):
+        return self._backend.get_result(self._task_id, **kwargs)
+
+
+class BaseBackend(object):
     def __init__(self, connection, **kwargs):
         self._connection = connection
 
@@ -45,19 +56,24 @@ class BaseBackend(object):
         """
         raise NotImplementedError
 
+class DummyTaskResult(TaskResult):
+    def __init__(self, backend, task_id, status, result):
+        super(DummyTaskResult, self).__init__(backend, task_id)
+        self._status = status
+        self._result = result
+
+    def status(self, **kwargs):
+        return self._status
+
+    def get_result(self, **kwargs):
+        return self._result
 
 class DummyTaskBackend(BaseBackend):
     def __init__(self, *args, **kwargs):
         super(DummyTaskBackend, self).__init__(*args, **kwargs)
         self._next_task_id = 1
-        self._results = {}
-        self._fails = set()
 
     def status(self, task_id):
-        if task_id in self._fails:
-            return FAILED
-        elif task_id in self._results:
-            return SUCCESS
         return UNKNOWN
 
     def kill(self, task_id):
@@ -72,9 +88,12 @@ class DummyTaskBackend(BaseBackend):
     def delay(self, task, *args, **kwargs):
         task_id = self._next_task_id
         self._next_task_id += 1
+        result = None
+        status = SUCCESS
         try:
-            self._results[task_id] = task(*args, **kwargs)
-        except:
-            self._fails.add(task_id)
+            result = task(*args, **kwargs)
+        except Exception as e:
+            result = e
+            status = FAILED
 
-        return task_id
+        return DummyTaskResult(self, task_id, status, result)
