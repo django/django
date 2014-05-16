@@ -34,12 +34,15 @@ def _get_task_backend(alias=None):
 
 
 class Task(object):
-    def __init__(self, func=None, name=None):
+    def __init__(self, func=None, name=None, using=None, options=None):
         if not func and not (hasattr(self, 'run') and hasattr(self, 'name')):
             raise
         self.run = func
+        self.alias = using
+        self.options = options or {}
         if name is not None:
             self.name = name
+        # name hasn't been defined on class
         elif not hasattr(self, 'name'):
             n = getattr(func, '__name__', func.__class__.__name__)
             self.name = '%s.%s' % (func.__module__, n)
@@ -47,12 +50,27 @@ class Task(object):
     def __repr__(self):
         return "<task %s>" % self.name
 
-    def _get_backend(self, alias=None):
-        return _get_task_backend(alias)
+    @property
+    def backend(self):
+        return _get_task_backend(self.alias)
+
+    def _clone(self, **kwargs):
+        d = {
+            'func': self.run,
+            'name': self.name,
+            'using': self.alias,
+            'options': self.options
+        }
+        d.update(kwargs)
+        return Task(**d)
+
+    def configure(self, using=None, **options):
+        opts = self.options.copy()
+        opts.update(options)
+        return self._clone(options=opts, using=using or self.alias)
 
     def delay(self, *args, **kwargs):
-        backend = self._get_backend()
-        return backend.delay(self, *args, **kwargs)
+        return self.backend.delay(self, *args, **kwargs)
 
     def __call__(self, *args, **kwargs):
         # call it right away

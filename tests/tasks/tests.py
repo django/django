@@ -79,6 +79,16 @@ class TestTaskDecorator(unittest.TestCase):
         self.assertIs(t, registry._registry['some_name'])
 
 class TestTask(unittest.TestCase):
+    def test_configure_clones_and_updates_alias_and_options(self):
+        t = Task(lambda: 'XYZ', using='default', options={'priority': 1})
+        t2 = t.configure(using='special', priority=3)
+
+        self.assertEqual('default', t.alias)
+        self.assertEqual({'priority': 1}, t.options)
+
+        self.assertEqual('special', t2.alias)
+        self.assertEqual({'priority': 3}, t2.options)
+        
     def test_task_works_as_original_callable(self):
         o = object()
         def f():
