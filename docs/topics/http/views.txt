@@ -199,11 +199,9 @@ Behind the scenes, Django determines the 500 view by looking for
 ``handler500`` in your root URLconf, and falling back to
 ``django.views.defaults.server_error`` if you did not define one.
 
-One thing to note about 500 views:
-
-* If :setting:`DEBUG` is set to ``True`` (in your settings module), then
-  your 500 view will never be used, and the traceback will be displayed
-  instead, with some debug information.
+If :setting:`DEBUG` is set to ``True`` (in your settings module), then
+your 500 view will never be used, and the traceback will be displayed
+instead, with some debug information.
 
 .. _http_forbidden_view:
 
