@@ -1,4 +1,5 @@
 from importlib import import_module
+from locale import getdefaultlocale
 
 from django.core.management.base import CommandError
 from django.core.management.templates import TemplateCommand
@@ -27,5 +28,30 @@ class Command(TemplateCommand):
         # Create a random SECRET_KEY hash to put it in the main settings.
         chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
         options['secret_key'] = get_random_string(50, chars)
+
+        # Find out the language code to set in the settings.
+        try:
+            # translate e.g. sv_SE to django locale format "sv-se"
+            default_language_code = getdefaultlocale()[0].lower().replace("_", "-")
+
+            # now check if this is actually a locale django supports out of the box
+            from django.conf import global_settings
+            available_languages = dict(global_settings.LANGUAGES)
+
+            # try to see if the exact variant exists translated, e.g. "pt-br"
+            if default_language_code in available_languages:
+                language_code = default_language_code
+            # otherwise, check that at least the main language exists, e.g. "pt-br" => "pt".
+            elif default_language_code.split('-')[0] in available_languages:
+                language_code = default_language_code
+            # if all else fails, default US english
+            else:
+                language_code = 'en-us'
+
+        except:
+            # If anything whatsoever goes wrong, just fallback to default language
+            language_code = 'en-us'
+
+        options['language_code'] = language_code
 
         super(Command, self).handle('project', project_name, target, **options)
