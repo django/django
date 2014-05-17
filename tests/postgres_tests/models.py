@@ -16,3 +16,7 @@ class CharArrayModel(models.Model):
 
 class DateTimeArrayModel(models.Model):
     field = ArrayField(models.DateTimeField())
+
+
+class NestedIntegerArrayModel(models.Model):
+    field = ArrayField(ArrayField(models.IntegerField()))

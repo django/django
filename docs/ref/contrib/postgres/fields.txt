@@ -211,6 +211,14 @@ lookups available after the transform do not change. For example::
     However these slices and those used in :lookup:`indexes <arrayfield.index>`
     use 0-based indexing to be consistent with Python.
 
+.. admonition:: Multidimensional arrays with indexes and slices
+
+    PostgreSQL has some rather esoteric behaviour when using indexes and slices
+    on multidimensional arrays. It will always work to use indexes to reach
+    down to the final underlying data, but most other slices behave strangely
+    at the database level and cannot be supported in a logical, consistent
+    fashion by Django.
+
 Indexing ArrayField
 ^^^^^^^^^^^^^^^^^^^
 

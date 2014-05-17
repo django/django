@@ -118,7 +118,7 @@ class ArrayField(Field):
         try:
             start, end = name.split('_')
             start = int(start) + 1
-            end = int(end) + 1
+            end = int(end)  # don't add one here because postgres slices are weird
         except ValueError:
             pass
         else:

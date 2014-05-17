@@ -9,7 +9,7 @@ from django import forms
 from django.test import TestCase
 from django.utils import timezone
 
-from .models import IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel, DateTimeArrayModel
+from .models import IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel, DateTimeArrayModel, NestedIntegerArrayModel
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
@@ -55,6 +55,12 @@ class TestSaveLoad(TestCase):
         instance = IntegerArrayModel(field=None)
         with self.assertRaises(IntegrityError):
             instance.save()
+
+    def test_nested(self):
+        instance = NestedIntegerArrayModel(field=[[1, 2], [3, 4]])
+        instance.save()
+        loaded = NestedIntegerArrayModel.objects.get()
+        self.assertEqual(instance.field, loaded.field)
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')
@@ -123,6 +129,21 @@ class TestQuerying(TestCase):
             self.objs[0:3]
         )
 
+    def test_index_nested(self):
+        instance = NestedIntegerArrayModel.objects.create(field=[[1, 2], [3, 4]])
+        self.assertSequenceEqual(
+            NestedIntegerArrayModel.objects.filter(field__0__0=1),
+            [instance]
+        )
+
+    @unittest.expectedFailure
+    def test_index_used_on_nested_data(self):
+        instance = NestedIntegerArrayModel.objects.create(field=[[1, 2], [3, 4]])
+        self.assertSequenceEqual(
+            NestedIntegerArrayModel.objects.filter(field__0=[1, 2]),
+            [instance]
+        )
+
     def test_overlap(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__overlap=[1, 2]),
@@ -137,8 +158,21 @@ class TestQuerying(TestCase):
 
     def test_slice(self):
         self.assertSequenceEqual(
-            NullableIntegerArrayModel.objects.filter(field__1_2=[3]),
+            NullableIntegerArrayModel.objects.filter(field__0_1=[2]),
+            self.objs[1:3]
+        )
+
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__0_2=[2, 3]),
             self.objs[2:3]
+        )
+
+    @unittest.expectedFailure
+    def test_slice_nested(self):
+        instance = NestedIntegerArrayModel.objects.create(field=[[1, 2], [3, 4]])
+        self.assertSequenceEqual(
+            NestedIntegerArrayModel.objects.filter(field__0__0_1=[1]),
+            [instance]
         )
 
 
