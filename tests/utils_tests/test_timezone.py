@@ -109,7 +109,7 @@ class TimezoneTests(unittest.TestCase):
             timezone.make_naive(datetime.datetime(2011, 9, 1, 13, 20, 30), EAT)
 
     @unittest.skipIf(pytz is None, "this test requires pytz")
-    def test_make_aware(self):
+    def test_make_aware2(self):
         self.assertEqual(
             timezone.make_aware(datetime.datetime(2011, 9, 1, 12, 20, 30), CET),
             CET.localize(datetime.datetime(2011, 9, 1, 12, 20, 30)))

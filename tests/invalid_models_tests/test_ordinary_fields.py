@@ -6,7 +6,7 @@ import unittest
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
 from django.test.utils import override_settings
-from django.utils.timezone import make_aware, now
+from django.utils.timezone import now
 
 from .base import IsolatedModelsTestCase
 
@@ -207,7 +207,7 @@ class DateFieldTests(IsolatedModelsTestCase):
             field1 = models.DateTimeField(auto_now=True, auto_now_add=False, default=now)
             field2 = models.DateTimeField(auto_now=False, auto_now_add=True, default=now)
             field3 = models.DateTimeField(auto_now=True, auto_now_add=True, default=None)
-            
+
         expected = []
         checks = []
         for i in range(4):
