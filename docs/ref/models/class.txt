@@ -1,0 +1,34 @@
+=====================
+Model class reference
+=====================
+
+.. currentmodule:: django.db.models
+
+This document covers a set of features of the :class:`~django.db.models.Model`
+class. The description of :class:`~django.db.models.Model` instance API could
+be found in :doc:`Model instance reference </ref/models/instances>`, the
+``Meta`` class is described in :doc:`Meta options </ref/models/options>`.
+
+Attributes
+==========
+.. attribute:: Model.objects
+
+
+    Each non-abstract :class:`~django.db.models.Model` class must have a
+    :class:`~django.db.models.Manager` instance added to it.
+    Django ensures, that in your model class you have  at least a
+    default ``Manager`` specified. If you don't add your own ``Manager``,
+    Django will add an attribute ``objects`` containing default
+    :class:`~django.db.models.Manager` instance. If you add your own
+    :class:`~django.db.models.Manager` instance attribute, default one does not
+    appear. Consider the following example::
+
+        from django.db import models
+
+        class Person(models.Model):
+            # Add manager with another name
+            people = models.Manager()
+
+    More details on model managers in :doc:`Managers </topics/db/managers>`
+    and in :ref:`Retrieving objects <retrieving-objects>`.
+
