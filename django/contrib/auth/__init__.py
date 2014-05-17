@@ -91,6 +91,7 @@ def login(request, user):
             # session if the existing session corresponds to a different
             # authenticated user.
             request.session.flush()
+            request.session.create()
     else:
         request.session.cycle_key()
     request.session[SESSION_KEY] = user.pk
@@ -118,6 +119,7 @@ def logout(request):
     language = request.session.get(LANGUAGE_SESSION_KEY)
 
     request.session.flush()
+    request.session.create()
 
     if language is not None:
         request.session[LANGUAGE_SESSION_KEY] = language

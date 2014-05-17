@@ -52,6 +52,8 @@ class SessionStore(SessionBase):
         True, a database error will be raised if the saving operation doesn't
         create a *new* entry (as opposed to possibly updating an existing
         entry).
+
+        Note: to create a session, you should use create()
         """
         obj = Session(
             session_key=self._get_or_create_session_key(),
@@ -59,13 +61,14 @@ class SessionStore(SessionBase):
             expire_date=self.get_expiry_date()
         )
         using = router.db_for_write(Session, instance=obj)
-        try:
-            with transaction.atomic(using=using):
-                obj.save(force_insert=must_create, using=using)
-        except IntegrityError:
-            if must_create:
+        if must_create:
+            try:
+                with transaction.atomic(using=using):
+                    obj.save(force_insert=must_create, using=using)
+            except IntegrityError:
                 raise CreateError
-            raise
+        else:
+            Session.objects.using(using).filter(pk=obj.session_key).update(session_data=obj.session_data, expire_date=obj.expire_date)
 
     def delete(self, session_key=None):
         if session_key is None:
