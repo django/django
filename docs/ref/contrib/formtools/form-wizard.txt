@@ -707,24 +707,22 @@ Usage of ``NamedUrlWizardView``
 .. class:: NamedUrlSessionWizardView
 .. class:: NamedUrlCookieWizardView
 
-There is a :class:`WizardView` subclass which adds named-urls support to the
-wizard. By doing this, you can have single urls for every step. You can also
-use the :class:`NamedUrlSessionWizardView` or :class:`NamedUrlCookieWizardView`
-classes which preselect the backend used for storing information (server-side
-sessions and browser cookies respectively).
+``NamedUrlWizardView`` is a :class:`WizardView` subclass which adds named-urls
+support to the wizard. This allows you to have separate URLs for every step.
+You can also use the :class:`NamedUrlSessionWizardView` or :class:`NamedUrlCookieWizardView`
+classes which preselect the backend used for storing information (Django sessions and
+browser cookies respectively).
 
-To use the named urls, you have to change the ``urls.py``.
+To use the named URLs, you should not only use the :class:`NamedUrlWizardView` instead of
+:class:`WizardView`, but you will also have to change your ``urls.py``.
 
-Below you will see an example of a contact wizard with two steps, step 1 with
-"contactdata" as its name and step 2 with "leavemessage" as its name.
+The :meth:`~WizardView.as_view` method takes two additional arguments:
 
-Additionally you have to pass two more arguments to the
-:meth:`~WizardView.as_view` method:
+* a required ``url_name`` -- the name of the url (as provided in the ``urls.py``)
+* an optional ``done_step_name`` -- the name of the done step, to be used in the URL
 
-* ``url_name`` -- the name of the url (as provided in the urls.py)
-* ``done_step_name`` -- the name in the url for the done step
-
-Example code for the changed ``urls.py`` file::
+This is an example of a ``urls.py`` for a contact wizard with two steps, step 1 named
+``contactdata`` and step 2 named ``leavemessage``::
 
     from django.conf.urls import url, patterns
 
@@ -749,9 +747,9 @@ Advanced ``NamedUrlWizardView`` methods
 
 .. method:: NamedUrlWizardView.get_step_url(step)
 
-    This method returns the URL for a specific step.
+This method returns the URL for a specific step.
 
-    Default implementation::
+Default implementation::
 
-        def get_step_url(self, step):
-            return reverse(self.url_name, kwargs={'step': step})
+    def get_step_url(self, step):
+        return reverse(self.url_name, kwargs={'step': step})
