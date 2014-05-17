@@ -361,6 +361,9 @@ every *second* object of the first 10::
 
     >>> Entry.objects.all()[:10:2]
 
+Further filtering or ordering of a sliced queryset is prohibited due to the
+ambiguous nature of how that might work.
+
 To retrieve a *single* object rather than a list
 (e.g. ``SELECT foo FROM bar LIMIT 1``), use a simple index instead of a
 slice. For example, this returns the first ``Entry`` in the database, after

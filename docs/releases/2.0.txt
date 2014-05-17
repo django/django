@@ -314,6 +314,18 @@ If you wish to keep this restriction in the admin when editing users, set
     admin.site.unregister(User)
     admin.site.register(User, MyUserAdmin)
 
+``QuerySet.reverse()`` and ``last()`` are prohibited after slicing
+------------------------------------------------------------------
+
+Calling ``QuerySet.reverse()`` or ``last()`` on a sliced queryset leads to
+unexpected results due to the slice being applied after reordering. This is
+now prohibited, e.g.::
+
+    >>> Model.objects.all()[:2].reverse()
+    Traceback (most recent call last):
+    ...
+    TypeError: Cannot reverse a query once a slice has been taken.
+
 Miscellaneous
 -------------
 

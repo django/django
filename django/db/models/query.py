@@ -944,6 +944,8 @@ class QuerySet:
 
     def reverse(self):
         """Reverse the ordering of the QuerySet."""
+        if not self.query.can_filter():
+            raise TypeError('Cannot reverse a query once a slice has been taken.')
         clone = self._clone()
         clone.query.standard_ordering = not clone.query.standard_ordering
         return clone
