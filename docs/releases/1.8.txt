@@ -45,7 +45,13 @@ Minor features
 :mod:`django.contrib.formtools`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* A :doc:`form wizard </ref/contrib/formtools/form-wizard>` using the
+  :class:`~django.contrib.formtools.wizard.views.CookieWizardView` will now ignore
+  an invalid cookie, and the wizard will restart from the first step. An invalid
+  cookie can occur in cases of intentional manipulation, but also after a secret
+  key change. Previously, this would raise ``WizardViewCookieModified``, a
+  ``SuspiciousOperation``, causing an exception for any user with an invalid cookie
+  upon every request to the wizard, until the cookie is removed.
 
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
