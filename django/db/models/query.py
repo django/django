@@ -1790,15 +1790,6 @@ def prefetch_related_objects(result_cache, related_lookups):
                     done_queries[prefetch_to] = obj_list
                     auto_lookups.extend(normalize_prefetch_lookups(additional_lookups, prefetch_to))
                 followed_descriptors.add(descriptor)
-            elif isinstance(getattr(first_obj, through_attr), list):
-                # The current part of the lookup relates to a custom Prefetch.
-                # This means that obj.attr is a list of related objects, and
-                # thus we must turn the obj.attr lists into a single related
-                # object list.
-                new_list = []
-                for obj in obj_list:
-                    new_list.extend(getattr(obj, through_attr))
-                obj_list = new_list
             else:
                 # Either a singly related object that has already been fetched
                 # (e.g. via select_related), or hopefully some other property
@@ -1815,7 +1806,13 @@ def prefetch_related_objects(result_cache, related_lookups):
                         continue
                     if new_obj is None:
                         continue
-                    new_obj_list.append(new_obj)
+                    # We special-case `list` rather than something more generic
+                    # like `Iterable` because we don't want to accidentally match
+                    # user models that define __iter__.
+                    if isinstance(new_obj, list):
+                        new_obj_list.extend(new_obj)
+                    else:
+                        new_obj_list.append(new_obj)
                 obj_list = new_obj_list
 
 
