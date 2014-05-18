@@ -1228,6 +1228,38 @@ see the explicit TLS setting :setting:`EMAIL_USE_TLS`.
 Note that :setting:`EMAIL_USE_TLS`/:setting:`EMAIL_USE_SSL` are mutually
 exclusive, so only set one of those settings to ``True``.
 
+.. setting:: EMAIL_SSL_CERTFILE
+
+EMAIL_SSL_CERTFILE
+------------------
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
+optionally specify the path to a PEM-formatted certificate chain file to use
+for the SSL connection.
+
+.. setting:: EMAIL_SSL_KEYFILE
+
+EMAIL_SSL_KEYFILE
+-----------------
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
+optionally specify the path to a PEM-formatted private key file to use for the
+SSL connection.
+
+Note that setting :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE`
+doesn't result in any certificate checking. They're passed to the underlying SSL
+connection. Please refer to the documentation of Python's
+:func:`python:ssl.wrap_socket` function for details on how the certificate chain
+file and private key file are handled.
+
 .. setting:: FILE_CHARSET
 
 FILE_CHARSET
@@ -2926,6 +2958,8 @@ Email
 * :setting:`EMAIL_HOST_PASSWORD`
 * :setting:`EMAIL_HOST_USER`
 * :setting:`EMAIL_PORT`
+* :setting:`EMAIL_SSL_CERTFILE`
+* :setting:`EMAIL_SSL_KEYFILE`
 * :setting:`EMAIL_SUBJECT_PREFIX`
 * :setting:`EMAIL_USE_TLS`
 * :setting:`MANAGERS`
