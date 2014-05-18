@@ -9,7 +9,7 @@ from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils.encoding import force_text
 
-from .models import (Author, Book, Reader, Qualification, Teacher, Department,
+from .models import (Author, Bio, Book, Reader, Qualification, Teacher, Department,
     TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors, AuthorWithAge,
     BookWithYear, BookReview, Person, House, Room, Employee, Comment,
     LessonEntry, WordEntry, Author2)
@@ -191,6 +191,20 @@ class PrefetchRelatedTests(TestCase):
                                      ["Amy"],
                                      ["Amy"],
                                      ["Amy", "Belinda"]])
+
+    def test_reverse_one_to_one_then_m2m(self):
+        """
+        Test that we can follow a m2m relation after going through
+        the select_related reverse of a o2o.
+        """
+        qs = Author.objects.prefetch_related('bio__books').select_related('bio')
+
+        with self.assertNumQueries(1):
+            list(qs.all())
+
+        Bio.objects.create(author=self.author1)
+        with self.assertNumQueries(2):
+            list(qs.all())
 
     def test_attribute_error(self):
         qs = Reader.objects.all().prefetch_related('books_read__xyz')
@@ -449,6 +463,52 @@ class CustomPrefetchTests(TestCase):
                     Prefetch('favorite_tags'),
                 ),
                 [['tags_lst', 'content_object'], ['favorite_tags']]
+            )
+        self.assertEqual(lst1, lst2)
+
+    def test_traverse_single_item_property(self):
+        # Control lookups.
+        with self.assertNumQueries(5):
+            lst1 = self.traverse_qs(
+                Person.objects.prefetch_related(
+                    'houses__rooms',
+                    'primary_house__occupants__houses',
+                ),
+                [['primary_house', 'occupants', 'houses']]
+            )
+
+        # Test lookups.
+        with self.assertNumQueries(5):
+            lst2 = self.traverse_qs(
+                Person.objects.prefetch_related(
+                    'houses__rooms',
+                    Prefetch('primary_house__occupants', to_attr='occupants_lst'),
+                    'primary_house__occupants_lst__houses',
+                ),
+                [['primary_house', 'occupants_lst', 'houses']]
+            )
+        self.assertEqual(lst1, lst2)
+
+    def test_traverse_multiple_items_property(self):
+        # Control lookups.
+        with self.assertNumQueries(4):
+            lst1 = self.traverse_qs(
+                Person.objects.prefetch_related(
+                    'houses',
+                    'all_houses__occupants__houses',
+                ),
+                [['all_houses', 'occupants', 'houses']]
+            )
+
+        # Test lookups.
+        with self.assertNumQueries(4):
+            lst2 = self.traverse_qs(
+                Person.objects.prefetch_related(
+                    'houses',
+                    Prefetch('all_houses__occupants', to_attr='occupants_lst'),
+                    'all_houses__occupants_lst__houses',
+                ),
+                [['all_houses', 'occupants_lst', 'houses']]
             )
         self.assertEqual(lst1, lst2)
 
