@@ -57,9 +57,9 @@ def find_management_module(app_name):
     # of the app_name but the project directory itself isn't on the path.
     try:
         f, path, descr = imp.find_module(part, path)
-    except ImportError as e:
+    except ImportError:
         if os.path.basename(os.getcwd()) != part:
-            raise e
+            raise
     else:
         if f:
             f.close()
