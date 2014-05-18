@@ -3,10 +3,10 @@ from django.tasks.backends import TaskResult
 from django.tasks.register import registry
 
 
-def task(name_or_func=None, name=None):
+def task(name_or_func=None, name=None, using=None, options=None):
     # @task
     if callable(name_or_func):
-        t = Task(func=name_or_func, name=name)
+        t = Task(func=name_or_func, name=name, using=using, options=options)
         registry.register(t)
         return t
 
