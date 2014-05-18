@@ -341,6 +341,12 @@ class OperationTests(MigrationTestBase):
                 "digits",
                 models.CharField(max_length=10, default="42"),
             ),
+            # Manual quoting is fragile and could trip on quotes. Refs #xyz.
+            migrations.AddField(
+                "Pony",
+                "quotes",
+                models.CharField(max_length=10, default='"\'"'),
+            ),
         ])
 
         new_apps = new_state.render()
@@ -349,6 +355,7 @@ class OperationTests(MigrationTestBase):
         self.assertEqual(pony.text, "some text")
         self.assertEqual(pony.empty, "")
         self.assertEqual(pony.digits, "42")
+        self.assertEqual(pony.quotes, '"\'"')
 
     def test_add_textfield(self):
         """
@@ -377,6 +384,12 @@ class OperationTests(MigrationTestBase):
                 "digits",
                 models.TextField(default="42"),
             ),
+            # Manual quoting is fragile and could trip on quotes. Refs #xyz.
+            migrations.AddField(
+                "Pony",
+                "quotes",
+                models.TextField(default='"\'"'),
+            ),
         ])
 
         new_apps = new_state.render()
@@ -385,6 +398,7 @@ class OperationTests(MigrationTestBase):
         self.assertEqual(pony.text, "some text")
         self.assertEqual(pony.empty, "")
         self.assertEqual(pony.digits, "42")
+        self.assertEqual(pony.quotes, '"\'"')
 
     def test_add_binaryfield(self):
         """
@@ -413,6 +427,12 @@ class OperationTests(MigrationTestBase):
                 "digits",
                 models.BinaryField(default=b"42"),
             ),
+            # Manual quoting is fragile and could trip on quotes. Refs #xyz.
+            migrations.AddField(
+                "Pony",
+                "quotes",
+                models.BinaryField(default=b'"\'"'),
+            ),
         ])
 
         new_apps = new_state.render()
@@ -422,6 +442,7 @@ class OperationTests(MigrationTestBase):
         self.assertEqual(bytes(pony.blob), b"some text")
         self.assertEqual(bytes(pony.empty), b"")
         self.assertEqual(bytes(pony.digits), b"42")
+        self.assertEqual(bytes(pony.quotes), b'"\'"')
 
     def test_column_name_quoting(self):
         """
