@@ -17,7 +17,8 @@ class DatabaseValidation(BaseDatabaseValidation):
         if getattr(field, 'rel', None) is None:
             field_type = field.db_type(connection)
 
-            if (field_type.startswith('varchar')  # Look for CharFields...
+            if (field_type is not None  # Not all fields have a db_type (whyever...)
+                    and field_type.startswith('varchar')  # Look for CharFields...
                     and field.unique  # ... that are unique
                     and (field.max_length is None or int(field.max_length) > 255)):
                 errors.append(
