@@ -17,11 +17,11 @@ class TaskResult(object):
     def __repr__(self):
         return '<TaskResult %s - %r>' % (self.alias, self.task_id)
 
-    @ property
+    @property
     def alias(self):
         return self._backend.alias
 
-    def status(self, **kwargs):
+    def get_status(self, **kwargs):
         return self._backend.status(self.task_id, **kwargs)
 
     def get_result(self, **kwargs):
@@ -32,7 +32,7 @@ class BaseBackend(object):
     def __init__(self, alias, **kwargs):
         self.alias = alias
 
-    def status(self, task_id):
+    def get_status(self, task_id):
         """
         The current status of the task.
 
@@ -63,7 +63,7 @@ class DummyTaskResult(TaskResult):
         self._status = status
         self._result = result
 
-    def status(self, **kwargs):
+    def get_status(self, **kwargs):
         return self._status
 
     def get_result(self, **kwargs):
@@ -74,7 +74,7 @@ class DummyTaskBackend(BaseBackend):
         super(DummyTaskBackend, self).__init__(*args, **kwargs)
         self._next_task_id = 1
 
-    def status(self, task_id):
+    def get_status(self, task_id):
         return UNKNOWN
 
     def delay(self, task, *args, **kwargs):

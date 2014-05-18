@@ -35,7 +35,7 @@ class TestDummyBackend(SimpleTestCase):
         r = t.delay(1, o, 'xyz', a=42)
 
         self.assertIsInstance(r, backends.DummyTaskResult)
-        self.assertEquals(backends.SUCCESS, r.status())
+        self.assertEquals(backends.SUCCESS, r.get_status())
         self.assertEquals(((1, o, 'xyz'), {'a': 42}), r.get_result())
 
     def test_failing_task_reports_failure_and_returns_exception(self):
@@ -46,7 +46,7 @@ class TestDummyBackend(SimpleTestCase):
         r = t.delay()
 
         self.assertIsInstance(r, backends.DummyTaskResult)
-        self.assertEquals(backends.FAILED, r.status())
+        self.assertEquals(backends.FAILED, r.get_status())
         self.assertIs(e, r.get_result())
 
 
@@ -94,7 +94,7 @@ class TestTaskDecorator(unittest.TestCase):
 
         tr = registry.delay_by_name('some_name', 1, 2, 3, answer=42)
         self.assertIsInstance(tr, backends.DummyTaskResult)
-        self.assertEquals(backends.SUCCESS, tr.status())
+        self.assertEquals(backends.SUCCESS, tr.get_status())
         self.assertEquals(((1, 2, 3), {'answer': 42}), tr.get_result())
 
 class TestTask(unittest.TestCase):
