@@ -4,16 +4,18 @@ import datetime
 import pickle
 from operator import attrgetter
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
 from django.db import connections, router, DEFAULT_DB_ALIAS, transaction
+from django.db.backends.utils import truncate_name
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import TestCase, override_settings
 from django.utils.six import StringIO
 
-from .models import Book, Person, Pet, Review, UserProfile
+from .models import *
 from .routers import TestRouter, AuthRouter, WriteRouter
 
 
@@ -2070,3 +2072,27 @@ class RouteForWriteTestCase(TestCase):
             self.assertEqual(e.mode, RouterUsed.WRITE)
             self.assertEqual(e.model, Book)
             self.assertEqual(e.hints, {'instance': auth})
+
+class LongNameTestCase(TestCase):
+    """
+    Test to check if model truncation works fine when using multiple databases.
+    Ref. #13528
+    """
+    def test_long_model_name(self):
+        obj1 = VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.objects.using('default').create()
+        obj2 = VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.objects.using('other').create()
+        max_length = None
+        for db in settings.DATABASES.keys():
+            max_name_length = connections[db].ops.max_name_length()
+            if max_name_length is None:
+                continue
+            else:
+                if max_length is None:
+                    max_length = max_name_length
+                elif max_name_length < max_length:
+                    max_length = max_name_length
+        db_table = truncate_name('multiple_database_verylongmodelnamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz', max_length)
+
+        # Both the objects should have their model db_name with minimum limit for the databases.
+        self.assertEqual(obj1._meta.db_table, db_table)
+        self.assertEqual(obj2._meta.db_table, db_table)
