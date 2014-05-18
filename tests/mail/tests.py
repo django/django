@@ -969,6 +969,34 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         backend = smtp.EmailBackend()
         self.assertFalse(backend.use_ssl)
 
+    @override_settings(EMAIL_SSL_CERTFILE='foo')
+    def test_email_ssl_certfile_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.ssl_certfile, 'foo')
+
+    @override_settings(EMAIL_SSL_CERTFILE='foo')
+    def test_email_ssl_certfile_override_settings(self):
+        backend = smtp.EmailBackend(ssl_certfile='bar')
+        self.assertEqual(backend.ssl_certfile, 'bar')
+
+    def test_email_ssl_certfile_default_disabled(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.ssl_certfile, None)
+
+    @override_settings(EMAIL_SSL_KEYFILE='foo')
+    def test_email_ssl_keyfile_use_settings(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.ssl_keyfile, 'foo')
+
+    @override_settings(EMAIL_SSL_KEYFILE='foo')
+    def test_email_ssl_keyfile_override_settings(self):
+        backend = smtp.EmailBackend(ssl_keyfile='bar')
+        self.assertEqual(backend.ssl_keyfile, 'bar')
+
+    def test_email_ssl_keyfile_default_disabled(self):
+        backend = smtp.EmailBackend()
+        self.assertEqual(backend.ssl_keyfile, None)
+
     @override_settings(EMAIL_USE_TLS=True)
     def test_email_tls_attempts_starttls(self):
         backend = smtp.EmailBackend()
