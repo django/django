@@ -445,13 +445,14 @@ can :ref:`write your own email backend <topic-custom-email-backend>`.
 SMTP backend
 ~~~~~~~~~~~~
 
-.. class:: backends.smtp.EmailBackend([host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, **kwargs])
+.. class:: backends.smtp.EmailBackend([host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs])
 
     This is the default backend. Email will be sent through a SMTP server.
     The server address and authentication credentials are set in the
     :setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
-    :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS` and
-    :setting:`EMAIL_USE_SSL` settings in your settings file.
+    :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS`,
+    :setting:`EMAIL_USE_SSL`, :setting:`EMAIL_SSL_CERTFILE` and
+    :setting:`EMAIL_SSL_KEYFILE` settings in your settings file.
 
     The SMTP backend is the default configuration inherited by Django. If you
     want to specify it explicitly, put the following in your settings::
@@ -480,6 +481,11 @@ SMTP backend
 
         If unspecified, the default ``timeout`` will be the one provided by
         :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
+
+    .. versionchanged:: 1.8
+
+        The ``ssl_keyfile`` and ``ssl_certfile`` parameters and
+        corresponding settings were added.
 
 .. _topic-email-console-backend:
 
