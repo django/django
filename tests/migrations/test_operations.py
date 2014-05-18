@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import unittest
 
 try:
@@ -311,6 +313,115 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adfl", editor, new_state, project_state)
         self.assertColumnNotExists("test_adfl_pony", "height")
+
+    def test_add_charfield(self):
+        """
+        Tests the AddField operation on TextField.
+        """
+        project_state = self.set_up_test_model("test_adchfl")
+
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_adchfl", "Pony")
+        pony = Pony.objects.create(weight=42)
+
+        new_state = self.apply_operations("test_adchfl", project_state, [
+            migrations.AddField(
+                "Pony",
+                "text",
+                models.CharField(max_length=10, default="some text"),
+            ),
+            migrations.AddField(
+                "Pony",
+                "empty",
+                models.CharField(max_length=10, default=""),
+            ),
+            # If not properly quoted digits would be interpreted as an int.
+            migrations.AddField(
+                "Pony",
+                "digits",
+                models.CharField(max_length=10, default="42"),
+            ),
+        ])
+
+        new_apps = new_state.render()
+        Pony = new_apps.get_model("test_adchfl", "Pony")
+        pony = Pony.objects.get(pk=pony.pk)
+        self.assertEqual(pony.text, "some text")
+        self.assertEqual(pony.empty, "")
+        self.assertEqual(pony.digits, "42")
+
+    def test_add_textfield(self):
+        """
+        Tests the AddField operation on TextField.
+        """
+        project_state = self.set_up_test_model("test_adtxtfl")
+
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_adtxtfl", "Pony")
+        pony = Pony.objects.create(weight=42)
+
+        new_state = self.apply_operations("test_adtxtfl", project_state, [
+            migrations.AddField(
+                "Pony",
+                "text",
+                models.TextField(default="some text"),
+            ),
+            migrations.AddField(
+                "Pony",
+                "empty",
+                models.TextField(default=""),
+            ),
+            # If not properly quoted digits would be interpreted as an int.
+            migrations.AddField(
+                "Pony",
+                "digits",
+                models.TextField(default="42"),
+            ),
+        ])
+
+        new_apps = new_state.render()
+        Pony = new_apps.get_model("test_adtxtfl", "Pony")
+        pony = Pony.objects.get(pk=pony.pk)
+        self.assertEqual(pony.text, "some text")
+        self.assertEqual(pony.empty, "")
+        self.assertEqual(pony.digits, "42")
+
+    def test_add_binaryfield(self):
+        """
+        Tests the AddField operation on TextField/BinaryField.
+        """
+        project_state = self.set_up_test_model("test_adbinfl")
+
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_adbinfl", "Pony")
+        pony = Pony.objects.create(weight=42)
+
+        new_state = self.apply_operations("test_adbinfl", project_state, [
+            migrations.AddField(
+                "Pony",
+                "blob",
+                models.BinaryField(default=b"some text"),
+            ),
+            migrations.AddField(
+                "Pony",
+                "empty",
+                models.BinaryField(default=b""),
+            ),
+            # If not properly quoted digits would be interpreted as an int.
+            migrations.AddField(
+                "Pony",
+                "digits",
+                models.BinaryField(default=b"42"),
+            ),
+        ])
+
+        new_apps = new_state.render()
+        Pony = new_apps.get_model("test_adbinfl", "Pony")
+        pony = Pony.objects.get(pk=pony.pk)
+        # SQLite returns buffer/memoryview, cast to bytes for checking.
+        self.assertEqual(bytes(pony.blob), b"some text")
+        self.assertEqual(bytes(pony.empty), b"")
+        self.assertEqual(bytes(pony.digits), b"42")
 
     def test_column_name_quoting(self):
         """
