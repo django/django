@@ -195,7 +195,7 @@ class PrefetchRelatedTests(TestCase):
     def test_reverse_one_to_one_then_m2m(self):
         """
         Test that we can follow a m2m relation after going through
-        the select_related reverse of a o2o.
+        the select_related reverse of an o2o.
         """
         qs = Author.objects.prefetch_related('bio__books').select_related('bio')
 
@@ -559,13 +559,16 @@ class CustomPrefetchTests(TestCase):
         inner_rooms_qs = Room.objects.filter(pk__in=[self.room1_1.pk, self.room1_2.pk])
         houses_qs_prf = House.objects.prefetch_related(
             Prefetch('rooms', queryset=inner_rooms_qs, to_attr='rooms_lst'))
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             lst2 = list(Person.objects.prefetch_related(
-                Prefetch('houses', queryset=houses_qs_prf.filter(pk=self.house1.pk), to_attr='houses_lst')))
+                Prefetch('houses', queryset=houses_qs_prf.filter(pk=self.house1.pk), to_attr='houses_lst'),
+                Prefetch('houses_lst__rooms_lst__main_room_of')
+            ))
 
         self.assertEqual(len(lst2[0].houses_lst[0].rooms_lst), 2)
         self.assertEqual(lst2[0].houses_lst[0].rooms_lst[0], self.room1_1)
         self.assertEqual(lst2[0].houses_lst[0].rooms_lst[1], self.room1_2)
+        self.assertEqual(lst2[0].houses_lst[0].rooms_lst[0].main_room_of, self.house1)
         self.assertEqual(len(lst2[1].houses_lst), 0)
 
         # Test ReverseSingleRelatedObjectDescriptor.
