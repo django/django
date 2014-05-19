@@ -218,19 +218,47 @@ Backwards incompatible changes in 1.8
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
-* Some operations on related objects such as
-  :meth:`~django.db.models.fields.related.RelatedManager.add()` or
-  :ref:`direct assignment<direct-assignment>` ran multiple data modifying
-  queries without wrapping them in transactions. To reduce the risk of data
-  corruption, all data modifying methods that affect multiple related objects
-  (i.e. ``add()``, ``remove()``, ``clear()``, and
-  :ref:`direct assignment<direct-assignment>`) now perform their data modifying
-  queries from within a transaction, provided your database supports
-  transactions.
+Related object operations are run in a transaction
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  This has one backwards incompatible side effect, signal handlers triggered
-  from these methods are now executed within the method's transaction and
-  any exception in a signal handler will prevent the whole operation.
+Some operations on related objects such as
+:meth:`~django.db.models.fields.related.RelatedManager.add()` or
+:ref:`direct assignment<direct-assignment>` ran multiple data modifying
+queries without wrapping them in transactions. To reduce the risk of data
+corruption, all data modifying methods that affect multiple related objects
+(i.e. ``add()``, ``remove()``, ``clear()``, and :ref:`direct assignment
+<direct-assignment>`) now perform their data modifying queries from within a
+transaction, provided your database supports transactions.
+
+This has one backwards incompatible side effect, signal handlers triggered from
+these methods are now executed within the method's transaction and any
+exception in a signal handler will prevent the whole operation.
+
+Unassigning unsaved objects to relations raises an error
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Assigning unsaved objects to a :class:`~django.db.models.ForeignKey`,
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey`, and
+:class:`~django.db.models.OneToOneField` now raises a :exc:`ValueError`.
+
+Previously, the assignment of an unsaved object would be silently ignored.
+For example::
+
+    >>> book = Book.objects.create(name="Django")
+    >>> book.author = Author(name="John")
+    >>> book.author.save()
+    >>> book.save()
+
+    >>> Book.objects.get(name="Django")
+    >>> book.author
+    >>>
+
+Now, an error will be raised to prevent data loss::
+
+    >>> book.author = Author(name="john")
+    Traceback (most recent call last):
+    ...
+    ValueError: Cannot assign "<Author: John>": "Author" instance isn't saved in the database.
 
 Miscellaneous
 ~~~~~~~~~~~~~

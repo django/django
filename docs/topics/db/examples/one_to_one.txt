@@ -89,6 +89,25 @@ Set the place back again, using assignment in the reverse direction::
     >>> p1.restaurant
     <Restaurant: Demon Dogs the restaurant>
 
+Note that you must save an object before it can be assigned to a one-to-one
+relationship. For example, creating an ``Restaurant`` with unsaved ``Place``
+raises ``ValueError``::
+
+    >>> p3 = Place(name='Demon Dogs', address='944 W. Fullerton')
+    >>> Restaurant(place=p3, serves_hot_dogs=True, serves_pizza=False)
+    Traceback (most recent call last):
+    ...
+    ValueError: 'Cannot assign "<Place: Demon Dogs>": "Place" instance isn't saved in the database.'
+    >>> p.restaurant = Restaurant(place=p, serves_hot_dogs=True, serves_pizza=False)
+    Traceback (most recent call last):
+    ...
+    ValueError: 'Cannot assign "<Restaurant: Demon Dogs the restaurant>": "Restaurant" instance isn't saved in the database.'
+
+.. versionchanged:: 1.8
+
+    Previously, assigning unsaved objects did not raise an error and could
+    result in silent data loss.
+
 Restaurant.objects.all() just returns the Restaurants, not the Places.  Note
 that there are two restaurants - Ace Hardware the Restaurant was created in the
 call to r.place = p2::
