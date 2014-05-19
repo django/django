@@ -111,7 +111,7 @@ class SQLFuncFactory(object):
         return SQLFunc(self.name, *args, **kwargs)
 
 
-class CustomField(models.Field):
+class CustomField(models.TextField):
 
     def get_lookup(self, lookup_name):
         if lookup_name.startswith('lookupfunc_'):
