@@ -154,11 +154,20 @@ Django provides format definitions for many locales, but sometimes you might
 want to create your own, because a format files doesn't exist for your locale,
 or because you want to overwrite some of the values.
 
-To use custom formats, specify the path where you'll place format files first.
-To do that, just set your :setting:`FORMAT_MODULE_PATH` setting to the package
-where format files will exist, for instance::
 
-    FORMAT_MODULE_PATH = 'mysite.formats'
+.. versionchanged:: 1.8
+
+    The ability to specify FORMAT_MODULE_PATH as a list was added. Previously,
+    only a single string value was supported.
+
+To use custom formats, specify the path where you'll place format files
+first. To do that, just set your :setting:`FORMAT_MODULE_PATH` setting to
+the package where format files will exist, for instance::
+
+    FORMAT_MODULE_PATH = [
+        'mysite.formats',
+        'some_app.formats',
+    ]
 
 Files are not placed directly in this directory, but in a directory named as
 the locale, and must be named ``formats.py``.
