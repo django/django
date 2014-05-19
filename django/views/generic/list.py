@@ -4,6 +4,7 @@ from django.core.paginator import Paginator, InvalidPage
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query import QuerySet
 from django.http import Http404
+from django.utils import six
 from django.utils.translation import ugettext as _
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 
@@ -20,6 +21,7 @@ class MultipleObjectMixin(ContextMixin):
     context_object_name = None
     paginator_class = Paginator
     page_kwarg = 'page'
+    ordering = None
 
     def get_queryset(self):
         """
@@ -42,7 +44,19 @@ class MultipleObjectMixin(ContextMixin):
                     'cls': self.__class__.__name__
                 }
             )
+        ordering = self.get_ordering()
+        if ordering:
+            if isinstance(ordering, six.string_types):
+                ordering = (ordering,)
+            queryset = queryset.order_by(*ordering)
+
         return queryset
+
+    def get_ordering(self):
+        """
+        Return the field or fields to use for ordering the queryset.
+        """
+        return self.ordering
 
     def paginate_queryset(self, queryset, page_size):
         """
