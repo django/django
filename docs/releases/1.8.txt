@@ -323,3 +323,21 @@ Using an incorrect count of unpacked values in the :ttag:`for` template tag
 
 Using an incorrect count of unpacked values in :ttag:`for` tag will raise an
 exception rather than fail silently in Django 2.0.
+
+Passing a dotted path to :func:`~django.core.urlresolvers.reverse()` and :ttag:`url`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Reversing URLs by Python path is an expensive operation as it causes the
+path being reversed to be imported. This behavior has also resulted in a
+`security issue`_. Use :ref:`named URL patterns <naming-url-patterns>`
+for reversing instead.
+
+If you are using :mod:`django.contrib.sitemaps`, add the ``name`` argument to
+the ``url`` that references :func:`django.contrib.sitemaps.views.sitemap`:
+
+    url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
+        {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
+
+to ensure compatibility when reversing by Python path is removed in Django 2.0.
+
+.. _security issue: https://www.djangoproject.com/weblog/2014/apr/21/security/#s-issue-unexpected-code-execution-using-reverse

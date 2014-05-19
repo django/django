@@ -32,6 +32,9 @@ about each item can often be found in the release notes of two versions prior.
   and migrations will become compulsory for all apps. This includes automatic
   loading of fixtures and support for initial SQL data.
 
+* The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
+  Python path will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
