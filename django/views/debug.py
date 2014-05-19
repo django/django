@@ -16,6 +16,7 @@ from django.utils.html import escape
 from django.utils.encoding import force_bytes, smart_text
 from django.utils.module_loading import import_string
 from django.utils import six
+from django.utils.translation import ugettext as _
 
 HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE')
 
@@ -511,7 +512,17 @@ def technical_404_response(request, exception):
 def default_urlconf(request):
     "Create an empty URLconf 404 error response."
     t = Template(DEFAULT_URLCONF_TEMPLATE, name='Default URLconf template')
-    c = Context({})
+
+    c = Context({
+        "title": _("Welcome to Django"),
+        "heading": _("It worked!"),
+        "subheading": _("Congratulations on your first Django-powered page."),
+        "instructions": _("Of course, you haven't actually done any work yet. "
+            "Next, start your first app by running <code>python manage.py startapp [app_label]</code>."),
+        "explanation": _("You're seeing this message because you have <code>DEBUG = True</code> in your "
+            "Django settings file and you haven't configured any URLs. Get to work!"),
+    })
+
     return HttpResponse(t.render(c), content_type='text/html')
 
 #
@@ -1121,7 +1132,7 @@ DEFAULT_URLCONF_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en"><head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="robots" content="NONE,NOARCHIVE"><title>Welcome to Django</title>
+  <meta name="robots" content="NONE,NOARCHIVE"><title>{{ title }}</title>
   <style type="text/css">
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
@@ -1147,21 +1158,19 @@ DEFAULT_URLCONF_TEMPLATE = """
 
 <body>
 <div id="summary">
-  <h1>It worked!</h1>
-  <h2>Congratulations on your first Django-powered page.</h2>
+  <h1>{{ heading }}</h1>
+  <h2>{{ subheading }}</h2>
 </div>
 
 <div id="instructions">
   <p>
-    Of course, you haven't actually done any work yet.
-    Next, start your first app by running <code>python manage.py startapp [app_label]</code>.
+    {{ instructions }}
   </p>
 </div>
 
 <div id="explanation">
   <p>
-    You're seeing this message because you have <code>DEBUG = True</code> in your
-    Django settings file and you haven't configured any URLs. Get to work!
+    {{ explanation }}
   </p>
 </div>
 </body></html>
