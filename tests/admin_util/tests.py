@@ -109,8 +109,9 @@ class UtilTests(SimpleTestCase):
 
         simple_function = lambda obj: SIMPLE_FUNCTION
 
+        site_obj = Site.objects.create(domain=SITE_NAME)
         article = Article(
-            site=Site(domain=SITE_NAME),
+            site=site_obj,
             title=TITLE_TEXT,
             created=CREATED_DATE,
         )
