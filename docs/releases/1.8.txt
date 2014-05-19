@@ -133,7 +133,10 @@ Forms
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* :setting:`FORMAT_MODULE_PATH` can now be a list of strings representing
+  module paths. This allows importing several format modules from different
+  reusable apps. It also allows overriding those custom formats in your main
+  Django project.
 
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
