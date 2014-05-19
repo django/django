@@ -387,7 +387,7 @@ class FileStorageTests(FileStorageTestsBase):
         self.assertTrue(self.storage.exists(src_name))
         self.assertTrue(self.storage.exists(dst_name))
 
-    def test_copy_file_no_path_walking(self):
+    def test_copy_file_no_suspicious_operation(self):
         f = ContentFile('content content')
         src_name = self.storage.save('initial.file', f)
         with self.assertRaises(SuspiciousOperation):
@@ -408,11 +408,18 @@ class FileStorageTests(FileStorageTestsBase):
         self.assertFalse(self.storage.exists(src_name))
         self.assertTrue(self.storage.exists(dst_name))
 
-    def test_move_file_no_path_walking(self):
+    def test_move_file_no_suspicious_operation(self):
         f = ContentFile('content content')
         src_name = self.storage.save('initial.file', f)
         with self.assertRaises(SuspiciousOperation):
             self.storage.move(src_name, '/tmp/passwd')
+
+    def test_move_file_no_directory_traversal(self):
+        f = ContentFile('content content')
+        src_name = self.storage.save('initial.file', f)
+        with self.assertRaises(SuspiciousOperation):
+            self.storage.move(src_name, '../../../../../../../../tmp/passwd')
+
 
 
 class CustomStorage(FileSystemStorage):
