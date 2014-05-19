@@ -106,14 +106,14 @@ class RemoteUserBackend(ModelBackend):
         # instead we use get_or_create when creating unknown users since it has
         # built-in safeguards for multiple threads.
         if self.create_unknown_user:
-            user, created = UserModel.objects.get_or_create(**{
+            user, created = UserModel._default_manager.get_or_create(**{
                 UserModel.USERNAME_FIELD: username
             })
             if created:
                 user = self.configure_user(user)
         else:
             try:
-                user = UserModel.objects.get_by_natural_key(username)
+                user = UserModel._default_manager.get_by_natural_key(username)
             except UserModel.DoesNotExist:
                 pass
         return user
