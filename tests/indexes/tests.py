@@ -1,5 +1,5 @@
 from django.core.management.color import no_style
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.db import connection, connections, DEFAULT_DB_ALIAS
 from django.test import TestCase
 from django.utils.unittest import skipUnless
 
@@ -25,3 +25,10 @@ class IndexesTests(TestCase):
         # unique=True and db_index=True should only create the varchar-specific
         # index (#19441).
         self.assertIn('("slug" varchar_pattern_ops)', index_sql[4])
+
+    @skipUnless(connection.vendor == 'postgresql',
+        "This is a postgresql-specific issue")
+    def test_postgresql_virtual_relation_indexes(self):
+        """Test indexes are not created for related objects"""
+        index_sql = connection.creation.sql_indexes_for_model(Article, no_style())
+        self.assertEqual(len(index_sql), 1)
