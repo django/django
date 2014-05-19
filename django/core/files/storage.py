@@ -150,14 +150,14 @@ class Storage(object):
         Move the file specified by src_name to dst_name. This method will raise
         ValueError if dst_name already exists.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a move() method')
 
     def copy(self, src_name, dst_name):
         """
         Copy the file specified by src_name to dst_name. This method will raise
         ValueError if dst_name already exists.
         """
-        raise NotImplementedError()
+        raise NotImplementedError('subclasses of Storage must provide a copy() method')
 
 
 @deconstructible
