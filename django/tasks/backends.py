@@ -10,6 +10,10 @@ class InvalidCacheBackendError(Exception):
     pass
 
 class TaskResult(object):
+    """
+    Wrapper class representing a status of a task. Provides methods to retrieve
+    the task's status and result value/error.
+    """
     def __init__(self, backend, task_id):
         self._backend = backend
         self.task_id = task_id
@@ -22,9 +26,18 @@ class TaskResult(object):
         return self._backend.alias
 
     def get_status(self, **kwargs):
+        """
+        Retrieve the status of the task from the backend.
+        """
         return self._backend.status(self.task_id, **kwargs)
 
     def get_result(self, **kwargs):
+        """
+        Retrieve the result of the task from the backend if the task has
+        successfully finished or the causing error if the task has failed.
+
+        raises ResultUnavailable exception when there is no result available.
+        """
         return self._backend.get_result(self.task_id, **kwargs)
 
 
@@ -53,11 +66,15 @@ class BaseBackend(object):
 
     def delay(self, task, *args, **kwargs):
         """
-        Enqueue provided task
+        Enqueue provided task and return TaskResult instance.
         """
         raise NotImplementedError
 
 class DummyTaskResult(TaskResult):
+    """
+    TaskResult subclass used by DummyTaskBackend. It embeds the status and the
+    result.
+    """
     def __init__(self, backend, task_id, status, result):
         super(DummyTaskResult, self).__init__(backend, task_id)
         self._status = status
@@ -70,12 +87,21 @@ class DummyTaskResult(TaskResult):
         return self._result
 
 class DummyTaskBackend(BaseBackend):
+    """
+    Dummy backend that executes tasks in-place and returns an instance of
+    DummyTaskResult containing the status (SUCCESS/FAILED) and the result of
+    the task's execution.
+    """
     def __init__(self, *args, **kwargs):
         super(DummyTaskBackend, self).__init__(*args, **kwargs)
         self._next_task_id = 1
 
     def get_status(self, task_id):
         return UNKNOWN
+
+    def get_result(self, task_id):
+        raise ResultUnavailable(
+            "DummyTaskBackend doesn't support storing and retrieving results.")
 
     def delay(self, task, *args, **kwargs):
         task_id = self._next_task_id
