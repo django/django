@@ -492,16 +492,16 @@ strictly_below
 
 *Availability*: PostGIS
 
-Tests if the geometry field's bounding box is strictly above the lookup
+Tests if the geometry field's bounding box is strictly below the lookup
 geometry's bounding box.
 
 Example::
 
-    Zipcode.objects.filter(poly__strictly_above=geom)
+    Zipcode.objects.filter(poly__strictly_below=geom)
 
 PostGIS equivalent::
 
-    SELECT ... WHERE poly |>> geom
+    SELECT ... WHERE poly <<| geom
 
 
 .. _distance-lookups:
