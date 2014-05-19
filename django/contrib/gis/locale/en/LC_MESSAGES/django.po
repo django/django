@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -13,76 +13,80 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: views.py:9
-msgid "No feeds are registered."
+#: contrib/gis/apps.py:8
+msgid "GIS"
 msgstr ""
 
-#: views.py:19
-#, python-format
-msgid "Slug %r isn't registered."
-msgstr ""
-
-#: db/models/fields.py:51
+#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 
-#: db/models/fields.py:270
+#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr ""
 
-#: db/models/fields.py:274
+#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr ""
 
-#: db/models/fields.py:278
+#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr ""
 
-#: db/models/fields.py:282
+#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr ""
 
-#: db/models/fields.py:286
+#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr ""
 
-#: db/models/fields.py:290
+#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr ""
 
-#: db/models/fields.py:294
+#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr ""
 
-#: forms/fields.py:23
+#: contrib/gis/forms/fields.py:22
 msgid "No geometry value provided."
 msgstr ""
 
-#: forms/fields.py:24
+#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr ""
 
-#: forms/fields.py:25
+#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr ""
 
-#: forms/fields.py:26
+#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
 
-#: sitemaps/views.py:46
+#: contrib/gis/sitemaps/views.py:56
 #, python-format
 msgid "No sitemap available for section: %r"
 msgstr ""
 
-#: sitemaps/views.py:60
+#: contrib/gis/sitemaps/views.py:70
 #, python-format
 msgid "Page %s empty"
 msgstr ""
 
-#: sitemaps/views.py:62
+#: contrib/gis/sitemaps/views.py:72
 #, python-format
 msgid "No page '%s'"
+msgstr ""
+
+#: contrib/gis/views.py:10
+msgid "No feeds are registered."
+msgstr ""
+
+#: contrib/gis/views.py:16
+#, python-format
+msgid "Slug %r isn't registered."
 msgstr ""

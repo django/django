@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -13,22 +13,26 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: models.py:38
+#: contrib/sessions/apps.py:8
+msgid "Sessions"
+msgstr ""
+
+#: contrib/sessions/models.py:38
 msgid "session key"
 msgstr ""
 
-#: models.py:40
+#: contrib/sessions/models.py:40
 msgid "session data"
 msgstr ""
 
-#: models.py:41
+#: contrib/sessions/models.py:41
 msgid "expire date"
 msgstr ""
 
-#: models.py:46
+#: contrib/sessions/models.py:46
 msgid "session"
 msgstr ""
 
-#: models.py:47
+#: contrib/sessions/models.py:47
 msgid "sessions"
 msgstr ""
