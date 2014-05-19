@@ -260,8 +260,6 @@ class Command(NoArgsCommand):
             self.locale_paths = [os.path.abspath(os.path.join('conf', 'locale'))]
             self.default_locale_path = self.locale_paths[0]
             self.invoked_for_django = True
-            # Ignoring all contrib apps
-            self.ignore_patterns += ['contrib/*']
         else:
             self.locale_paths.extend(list(settings.LOCALE_PATHS))
             # Allow to run makemessages inside an app dir
