@@ -47,15 +47,10 @@ def iter_format_modules(lang, format_module_path=None):
     Does the heavy lifting of finding format modules.
     """
     if check_for_language(lang):
-        format_locations = []
-        if settings.FORMAT_MODULE_PATH:
-            if isinstance(settings.FORMAT_MODULE_PATH, six.string_types):
-                format_module_path_setting = [settings.FORMAT_MODULE_PATH]
-            else:
-                format_module_path_setting = settings.FORMAT_MODULE_PATH
-            for path in format_module_path_setting:
-                format_locations.append(path + '.%s')
-        format_locations.append('django.conf.locale.%s')
+        format_locations = ['django.conf.locale.%s']
+        if format_module_path:
+            format_locations.append(format_module_path + '.%s')
+            format_locations.reverse()
         locale = to_locale(lang)
         locales = [locale]
         if '_' in locale:
