@@ -732,7 +732,8 @@ by default, but in case it is not, you'll need to grant permissions like so:
 Connecting to the database
 --------------------------
 
-Your Django settings.py file should look something like this for Oracle::
+To connect using the service name of your Oracle database, your ``settings.py``
+file should look something like this::
 
     DATABASES = {
         'default': {
@@ -746,8 +747,9 @@ Your Django settings.py file should look something like this for Oracle::
     }
 
 
-If you don't use a ``tnsnames.ora`` file or a similar naming method that
-recognizes the SID ("xe" in this example), then fill in both
+In this case, you should leave both :setting:`HOST` and :setting:`PORT` empty.
+However, if you don't use a ``tnsnames.ora`` file or a similar naming method
+and want to connect using the SID ("xe" in this example), then fill in both
 :setting:`HOST` and :setting:`PORT` like so::
 
     DATABASES = {
@@ -761,8 +763,9 @@ recognizes the SID ("xe" in this example), then fill in both
         }
     }
 
-You should supply both :setting:`HOST` and :setting:`PORT`, or leave both
-as empty strings.
+You should either supply both :setting:`HOST` and :setting:`PORT`, or leave
+both as empty strings. Django will use a different connect descriptor depending
+on that choice.
 
 Threaded option
 ----------------
