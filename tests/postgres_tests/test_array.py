@@ -373,15 +373,6 @@ class TestSplitFormField(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors, {'array': ['Item 2 in the array did not validate: This field is required.']})
 
-    def test_extending_data(self):
-        class SplitForm(forms.Form):
-            array = SplitArrayField(forms.CharField(), size=3)
-
-        data = {'array_0': 'a', 'array_1': 'b', 'array_2': 'c', 'array_3': 'd', 'array_4': 'e'}
-        form = SplitForm(data)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data, {'array': ['a', 'b', 'c', 'd', 'e']})
-
     def test_rendering(self):
         class SplitForm(forms.Form):
             array = SplitArrayField(forms.CharField(), size=3)

@@ -1,5 +1,4 @@
 import copy
-import re
 
 from django.contrib.postgres.validators import ArrayMinLengthValidator, ArrayMaxLengthValidator
 from django.core.exceptions import ValidationError
@@ -96,14 +95,8 @@ class SplitArrayWidget(forms.Widget):
         return self.widget.is_hidden
 
     def value_from_datadict(self, data, files, name):
-        regex = re.compile(name + '_([0-9]+).*')
-        indexes = []
-        for key in data:
-            match = regex.match(key)
-            if match:
-                indexes.append(int(match.groups()[0]))
-        max_index = max(indexes)
-        return [self.widget.value_from_datadict(data, files, '%s_%s' % (name, index)) for index in range(max_index + 1)]
+        return [self.widget.value_from_datadict(data, files, '%s_%s' % (name, index))
+                for index in range(self.size)]
 
     def id_for_label(self, id_):
         # See the comment for RadioSelect.id_for_label()
