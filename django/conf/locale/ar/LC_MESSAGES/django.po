@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Moayad Mardini <moayad.m@gmail.com>, 2014.
 # Jannis Leidel <jannis@leidel.info>, 2011.
 # Ossama Khayat <okhayat@gmail.com>, 2011.
 msgid ""
@@ -8,8 +9,8 @@ msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:47+0000\n"
-"Last-Translator: Ossama Khayat <okhayat@gmail.com>\n"
+"PO-Revision-Date: 2014-05-19 16:11+0000\n"
+"Last-Translator: Moayad Mardini <moayad.m@gmail.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/django/language/"
 "ar/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,7 @@ msgstr ""
 
 #: conf/global_settings.py:48
 msgid "Afrikaans"
-msgstr ""
+msgstr "الأفرقانية"
 
 #: conf/global_settings.py:49
 msgid "Arabic"
@@ -37,7 +38,7 @@ msgstr "البلغاريّة"
 
 #: conf/global_settings.py:52
 msgid "Belarusian"
-msgstr ""
+msgstr "البلاروسية"
 
 #: conf/global_settings.py:53
 msgid "Bengali"
@@ -45,7 +46,7 @@ msgstr "البنغاليّة"
 
 #: conf/global_settings.py:54
 msgid "Breton"
-msgstr ""
+msgstr "البريتانية"
 
 #: conf/global_settings.py:55
 msgid "Bosnian"
@@ -85,7 +86,7 @@ msgstr "الإنجليزيّة البريطانيّة"
 
 #: conf/global_settings.py:64
 msgid "Esperanto"
-msgstr ""
+msgstr "إسبرانتو"
 
 #: conf/global_settings.py:65
 msgid "Spanish"
@@ -93,19 +94,19 @@ msgstr "الإسبانيّة"
 
 #: conf/global_settings.py:66
 msgid "Argentinian Spanish"
-msgstr "الأسبانية الأرجنتينية"
+msgstr "الإسبانيّة الأرجنتينية"
 
 #: conf/global_settings.py:67
 msgid "Mexican Spanish"
-msgstr "الأسبانية المكسيكية"
+msgstr "الإسبانيّة المكسيكية"
 
 #: conf/global_settings.py:68
 msgid "Nicaraguan Spanish"
-msgstr ""
+msgstr "إسبانيّة نيكاراجوا"
 
 #: conf/global_settings.py:69
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "إسبانيّة فينزويللا"
 
 #: conf/global_settings.py:70
 msgid "Estonian"
@@ -157,7 +158,7 @@ msgstr "الهنغاريّة"
 
 #: conf/global_settings.py:82
 msgid "Interlingua"
-msgstr ""
+msgstr "إنترلنغوا"
 
 #: conf/global_settings.py:83
 msgid "Indonesian"
