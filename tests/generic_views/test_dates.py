@@ -120,6 +120,22 @@ class ArchiveIndexViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['date_list']), list(reversed(sorted(res.context['date_list']))))
 
+    def test_archive_view_custom_sorting(self):
+        Book.objects.create(name="Zebras for Dummies", pages=600, pubdate=datetime.date(2007, 5, 1))
+        res = self.client.get('/dates/books/sortedbyname/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(list(res.context['date_list']), list(Book.objects.dates('pubdate', 'year', 'DESC')))
+        self.assertEqual(list(res.context['latest']), list(Book.objects.order_by('name').all()))
+        self.assertTemplateUsed(res, 'generic_views/book_archive.html')
+
+    def test_archive_view_custom_sorting_dec(self):
+        Book.objects.create(name="Zebras for Dummies", pages=600, pubdate=datetime.date(2007, 5, 1))
+        res = self.client.get('/dates/books/sortedbynamedec/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(list(res.context['date_list']), list(Book.objects.dates('pubdate', 'year', 'DESC')))
+        self.assertEqual(list(res.context['latest']), list(Book.objects.order_by('-name').all()))
+        self.assertTemplateUsed(res, 'generic_views/book_archive.html')
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class YearArchiveViewTests(TestCase):
@@ -176,6 +192,26 @@ class YearArchiveViewTests(TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate__year=2006)))
         self.assertEqual(list(res.context['object_list']), list(Book.objects.filter(pubdate__year=2006)))
+        self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
+
+    def test_year_view_custom_sort_order(self):
+        # Zebras comes after Dreaming by name, but before on '-pubdate' which is the default sorting
+        Book.objects.create(name="Zebras for Dummies", pages=600, pubdate=datetime.date(2006, 9, 1))
+        res = self.client.get('/dates/books/2006/sortedbyname/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(list(res.context['date_list']), [datetime.date(2006, 5, 1), datetime.date(2006, 9, 1)])
+        self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate__year=2006).order_by('name')))
+        self.assertEqual(list(res.context['object_list']), list(Book.objects.filter(pubdate__year=2006).order_by('name')))
+        self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
+
+    def test_year_view_two_custom_sort_orders(self):
+        Book.objects.create(name="Zebras for Dummies", pages=300, pubdate=datetime.date(2006, 9, 1))
+        Book.objects.create(name="Hunting Hippos", pages=400, pubdate=datetime.date(2006, 3, 1))
+        res = self.client.get('/dates/books/2006/sortedbypageandnamedec/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(list(res.context['date_list']), [datetime.date(2006, 3, 1), datetime.date(2006, 5, 1), datetime.date(2006, 9, 1)])
+        self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate__year=2006).order_by('pages', '-name')))
+        self.assertEqual(list(res.context['object_list']), list(Book.objects.filter(pubdate__year=2006).order_by('pages', '-name')))
         self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
 
     def test_year_view_invalid_pattern(self):

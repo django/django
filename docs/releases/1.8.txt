@@ -175,6 +175,15 @@ Forms
   will also update ``UploadedFile.content_type`` with the image's content type
   as determined by Pillow.
 
+Generic Views
+^^^^^^^^^^^^^
+
+* Generic views that use :class:`~django.views.generic.list.MultipleObjectMixin`
+  may now specify the ordering applied to the
+  :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` by setting
+  :attr:`~django.views.generic.list.MultipleObjectMixin.ordering` or overriding
+  :meth:`~django.views.generic.list.MultipleObjectMixin.get_ordering()`.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 

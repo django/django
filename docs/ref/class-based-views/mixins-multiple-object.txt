@@ -71,6 +71,13 @@ MultipleObjectMixin
             retrieve it with :meth:`get_queryset` which takes care of the
             cloning behind the scenes.
 
+    .. attribute:: ordering
+
+        .. versionadded:: 1.8
+
+        A string or list of strings specifying the ordering to apply to the ``queryset``.
+        Valid values are the same as those for :meth:`~django.db.models.query.QuerySet.order_by`.
+
     .. attribute:: paginate_by
 
         An integer specifying how many objects should be displayed per page. If
@@ -109,6 +116,15 @@ MultipleObjectMixin
 
         Get the list of items for this view. This must be an iterable and may
         be a queryset (in which queryset-specific behavior will be enabled).
+
+    .. method:: get_ordering()
+
+        .. versionadded:: 1.8
+
+        Returns a string (or iterable of strings) that defines the ordering that
+        will be applied to the ``queryset``.
+
+        Returns :attr:`ordering` by default.
 
     .. method:: paginate_queryset(queryset, page_size)
 
