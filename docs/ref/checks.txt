@@ -101,6 +101,7 @@ Related Fields
 * **fields.E337**: Field specifies ``through_fields`` but does not provide the names of the two link fields that should be used for the relation through ``<model>``.
 * **fields.E338**: The intermediary model ``<through model>`` has no field ``<field name>``.
 * **fields.E339**: ``<model>.<field name>`` is not a foreign key to ``<model>``.
+* **fields.E340**: ``<model>.<field name>`` is a foreign key having ``blank=True`` with ``null=False``.
 
 Signals
 ~~~~~~~

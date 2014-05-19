@@ -1625,6 +1625,7 @@ class ForeignKey(ForeignObject):
     def check(self, **kwargs):
         errors = super(ForeignKey, self).check(**kwargs)
         errors.extend(self._check_on_delete())
+        errors.extend(self._check_blank_foreign_key())
         return errors
 
     def _check_on_delete(self):
@@ -1645,6 +1646,19 @@ class ForeignKey(ForeignObject):
                     hint='Set a default value, or change the on_delete rule.',
                     obj=self,
                     id='fields.E321',
+                )
+            ]
+        else:
+            return []
+
+    def _check_blank_foreign_key(self):
+        if self.null is False and self.blank is True:
+            return [
+                checks.Error(
+                    'Field specifies blank=True with null=False.',
+                    hint='Set null=True argument on the field.',
+                    obj=self,
+                    id='fields.E340',
                 )
             ]
         else:

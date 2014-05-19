@@ -43,6 +43,29 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_blank_foreign_key(self):
+        class Model1(models.Model):
+            field = models.CharField(max_length=30)
+
+        class Model2(models.Model):
+            field2 = models.ForeignKey(Model1, blank=True, related_name="f2")
+            field3 = models.ForeignKey(Model1, blank=True, null=True, related_name="f3")
+
+        f1 = Model2._meta.get_field('field2')
+        f2 = Model2._meta.get_field('field3')
+        errors1 = f1.check()
+        expected = [
+            Error(
+                "Field specifies blank=True with null=False.",
+                hint="Set null=True argument on the field.",
+                obj=f1,
+                id='fields.E340',
+            ),
+        ]
+        errors2 = f2.check()
+        self.assertEqual(errors1, expected)
+        self.assertEqual(errors2, [])
+
     def test_many_to_many_to_missing_model(self):
         class Model(models.Model):
             m2m = models.ManyToManyField("Rel2")
