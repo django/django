@@ -33,6 +33,8 @@ class Command(BaseCommand):
             help='Tells Django to NOT use threading.'),
         make_option('--noreload', action='store_false', dest='use_reloader', default=True,
             help='Tells Django to NOT use the auto-reloader.'),
+        make_option('--nodaemon', action='store_false', dest='daemon_threads', default=True,
+            help='Tells Django to use NON-daemon threads.'),
     )
     help = "Starts a lightweight Web server for development."
     args = '[optional port number, or ipaddr:port]'
@@ -97,6 +99,7 @@ class Command(BaseCommand):
         from django.utils import translation
 
         threading = options.get('use_threading')
+        daemon_threads = options.get('daemon_threads')
         shutdown_message = options.get('shutdown_message', '')
         quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
 
@@ -130,7 +133,8 @@ class Command(BaseCommand):
         try:
             handler = self.get_handler(*args, **options)
             run(self.addr, int(self.port), handler,
-                ipv6=self.use_ipv6, threading=threading)
+                ipv6=self.use_ipv6, threading=threading,
+                daemon_threads=daemon_threads)
         except socket.error as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
