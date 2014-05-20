@@ -36,18 +36,33 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             return migration.unapply(project_state, editor)
 
-    def set_up_test_model(self, app_label, second_model=False, related_model=False, mti_model=False):
+    def set_up_test_model(self, app_label, second_model=False, third_model=False, related_model=False, mti_model=False):
         """
         Creates a test model state and database table.
         """
         # Delete the tables if they already exist
         with connection.cursor() as cursor:
+            # Start with ManyToMany tables
+            try:
+                cursor.execute("DROP TABLE %s_pony_stables" % app_label)
+            except DatabaseError:
+                pass
+            try:
+                cursor.execute("DROP TABLE %s_pony_vans" % app_label)
+            except DatabaseError:
+                pass
+
+            # Then standard model tables
             try:
                 cursor.execute("DROP TABLE %s_pony" % app_label)
             except DatabaseError:
                 pass
             try:
                 cursor.execute("DROP TABLE %s_stable" % app_label)
+            except DatabaseError:
+                pass
+            try:
+                cursor.execute("DROP TABLE %s_van" % app_label)
             except DatabaseError:
                 pass
         # Make the "current" state
@@ -62,6 +77,13 @@ class OperationTests(MigrationTestBase):
         if second_model:
             operations.append(migrations.CreateModel(
                 "Stable",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ]
+            ))
+        if third_model:
+            operations.append(migrations.CreateModel(
+                "Van",
                 [
                     ("id", models.AutoField(primary_key=True)),
                 ]
@@ -536,6 +558,27 @@ class OperationTests(MigrationTestBase):
         new_apps = project_state.render()
         Pony = new_apps.get_model("test_alflmm", "Pony")
         self.assertTrue(Pony._meta.get_field('stables').blank)
+
+    def test_repoint_field_m2m(self):
+        project_state = self.set_up_test_model("test_alflmm", second_model=True, third_model=True)
+
+        project_state = self.apply_operations("test_alflmm", project_state, operations=[
+            migrations.AddField("Pony", "places", models.ManyToManyField("Stable", related_name="ponies"))
+        ])
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_alflmm", "Pony")
+
+        project_state = self.apply_operations("test_alflmm", project_state, operations=[
+            migrations.AlterField("Pony", "places", models.ManyToManyField(to="Van", related_name="ponies"))
+        ])
+
+        # Ensure the new field actually works
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_alflmm", "Pony")
+        p = Pony.objects.create(pink=False, weight=4.55)
+        p.places.create()
+        self.assertEqual(p.places.count(), 1)
+        p.places.all().delete()
 
     def test_remove_field_m2m(self):
         project_state = self.set_up_test_model("test_rmflmm", second_model=True)
