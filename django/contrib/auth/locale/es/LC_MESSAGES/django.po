@@ -140,7 +140,7 @@ msgstr "Contraseña nueva"
 
 #: forms.py:273
 msgid "New password confirmation"
-msgstr "Contraseña nueva (confirmación):"
+msgstr "Contraseña nueva (confirmación)"
 
 #: forms.py:302
 msgid "Your old password was entered incorrectly. Please enter it again."
