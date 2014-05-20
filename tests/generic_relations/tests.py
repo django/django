@@ -4,6 +4,7 @@ from django import forms
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
+from django.db.models import Q
 from django.test import TestCase
 from django.utils import six
 
@@ -14,154 +15,189 @@ from .models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
 
 
 class GenericRelationsTests(TestCase):
-    def test_generic_relations(self):
-        # Create the world in 7 lines of code...
-        lion = Animal.objects.create(common_name="Lion", latin_name="Panthera leo")
-        platypus = Animal.objects.create(
-            common_name="Platypus", latin_name="Ornithorhynchus anatinus"
-        )
+    def setUp(self):
+        self.lion = Animal.objects.create(
+            common_name="Lion", latin_name="Panthera leo")
+        self.platypus = Animal.objects.create(
+            common_name="Platypus", latin_name="Ornithorhynchus anatinus")
         Vegetable.objects.create(name="Eggplant", is_yucky=True)
-        bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
-        quartz = Mineral.objects.create(name="Quartz", hardness=7)
+        self.bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
+        self.quartz = Mineral.objects.create(name="Quartz", hardness=7)
 
-        # Objects with declared GenericRelations can be tagged directly -- the
-        # API mimics the many-to-many API.
-        bacon.tags.create(tag="fatty")
-        bacon.tags.create(tag="salty")
-        lion.tags.create(tag="yellow")
-        lion.tags.create(tag="hairy")
-        platypus.tags.create(tag="fatty")
-        self.assertQuerysetEqual(lion.tags.all(), [
+        # Tagging stuff.
+        self.bacon.tags.create(tag="fatty")
+        self.bacon.tags.create(tag="salty")
+        self.lion.tags.create(tag="yellow")
+        self.lion.tags.create(tag="hairy")
+
+        # Original list of tags:
+        self.comp_func = lambda obj: (
+            obj.tag, obj.content_type.model_class(), obj.object_id
+        )
+
+    def test_generic_relations_m2m_mimic(self):
+        """
+        Objects with declared GenericRelations can be tagged directly -- the
+        API mimics the many-to-many API.
+        """
+        self.assertQuerysetEqual(self.lion.tags.all(), [
             "<TaggedItem: hairy>",
             "<TaggedItem: yellow>"
         ])
-        self.assertQuerysetEqual(bacon.tags.all(), [
+        self.assertQuerysetEqual(self.bacon.tags.all(), [
             "<TaggedItem: fatty>",
             "<TaggedItem: salty>"
         ])
 
-        # You can easily access the content object like a foreign key.
-        t = TaggedItem.objects.get(tag="salty")
-        self.assertEqual(t.content_object, bacon)
-        qs = TaggedItem.objects.filter(animal__isnull=False).order_by('animal__common_name', 'tag')
+    def test_access_content_object(self):
+        """
+        Test accessing the content object like a foreign key.
+        """
+        tagged_item = TaggedItem.objects.get(tag="salty")
+        self.assertEqual(tagged_item.content_object, self.bacon)
+
+    def test_query_content_object(self):
+        qs = TaggedItem.objects.filter(
+            animal__isnull=False).order_by('animal__common_name', 'tag')
         self.assertQuerysetEqual(
-            qs, ["<TaggedItem: hairy>", "<TaggedItem: yellow>", "<TaggedItem: fatty>"]
+            qs, ["<TaggedItem: hairy>", "<TaggedItem: yellow>"]
         )
+
         mpk = ManualPK.objects.create(id=1)
         mpk.tags.create(tag='mpk')
-        from django.db.models import Q
-        qs = TaggedItem.objects.filter(Q(animal__isnull=False) | Q(manualpk__id=1)).order_by('tag')
+        qs = TaggedItem.objects.filter(
+            Q(animal__isnull=False) | Q(manualpk__id=1)).order_by('tag')
         self.assertQuerysetEqual(
-            qs, ["fatty", "hairy", "mpk", "yellow"], lambda x: x.tag)
-        mpk.delete()
+            qs, ["hairy", "mpk", "yellow"], lambda x: x.tag)
 
+    def test_exclude_generic_relations(self):
+        """
+        Test lookups over an object without GenericRelations.
+        """
         # Recall that the Mineral class doesn't have an explicit GenericRelation
         # defined. That's OK, because you can create TaggedItems explicitly.
-        tag1 = TaggedItem.objects.create(content_object=quartz, tag="shiny")
-        TaggedItem.objects.create(content_object=quartz, tag="clearish")
-
         # However, excluding GenericRelations means your lookups have to be a
         # bit more explicit.
-        ctype = ContentType.objects.get_for_model(quartz)
+        TaggedItem.objects.create(content_object=self.quartz, tag="shiny")
+        TaggedItem.objects.create(content_object=self.quartz, tag="clearish")
+
+        ctype = ContentType.objects.get_for_model(self.quartz)
         q = TaggedItem.objects.filter(
-            content_type__pk=ctype.id, object_id=quartz.id
+            content_type__pk=ctype.id, object_id=self.quartz.id
         )
         self.assertQuerysetEqual(q, [
             "<TaggedItem: clearish>",
             "<TaggedItem: shiny>"
         ])
 
-        # You can set a generic foreign key in the way you'd expect.
-        tag1.content_object = platypus
-        tag1.save()
-        self.assertQuerysetEqual(platypus.tags.all(), [
-            "<TaggedItem: fatty>",
-            "<TaggedItem: shiny>"
-        ])
-        q = TaggedItem.objects.filter(
-            content_type__pk=ctype.id, object_id=quartz.id
-        )
-        self.assertQuerysetEqual(q, ["<TaggedItem: clearish>"])
+    def test_access_via_content_type(self):
+        """
+        Test lookups through content type.
+        """
+        self.lion.delete()
+        self.platypus.tags.create(tag="fatty")
 
-        # Queries across generic relations respect the content types. Even
-        # though there are two TaggedItems with a tag of "fatty", this query
-        # only pulls out the one with the content type related to Animals.
+        ctype = ContentType.objects.get_for_model(self.platypus)
+
+        self.assertQuerysetEqual(
+            Animal.objects.filter(tags__content_type=ctype),
+            ["<Animal: Platypus>"])
+
+    def test_set_foreign_key(self):
+        """
+        You can set a generic foreign key in the way you'd expect.
+        """
+        tag1 = TaggedItem.objects.create(content_object=self.quartz, tag="shiny")
+        tag1.content_object = self.platypus
+        tag1.save()
+
+        self.assertQuerysetEqual(
+            self.platypus.tags.all(),
+            ["<TaggedItem: shiny>"])
+
+    def test_queries_across_generic_relations(self):
+        """
+        Queries across generic relations respect the content types. Even though
+        there are two TaggedItems with a tag of "fatty", this query only pulls
+        out the one with the content type related to Animals.
+        """
         self.assertQuerysetEqual(Animal.objects.order_by('common_name'), [
             "<Animal: Lion>",
             "<Animal: Platypus>"
         ])
-        # Create another fatty tagged instance with different PK to ensure
-        # there is a content type restriction in the generated queries below.
-        mpk = ManualPK.objects.create(id=lion.pk)
+
+    def test_queries_content_type_restriction(self):
+        """
+        Create another fatty tagged instance with different PK to ensure there
+        is a content type restriction in the generated queries below.
+        """
+        mpk = ManualPK.objects.create(id=self.lion.pk)
         mpk.tags.create(tag="fatty")
-        self.assertQuerysetEqual(Animal.objects.filter(tags__tag='fatty'), [
-            "<Animal: Platypus>"
-        ])
-        self.assertQuerysetEqual(Animal.objects.exclude(tags__tag='fatty'), [
-            "<Animal: Lion>"
-        ])
-        mpk.delete()
+        self.platypus.tags.create(tag="fatty")
 
-        # If you delete an object with an explicit Generic relation, the related
-        # objects are deleted when the source object is deleted.
-        # Original list of tags:
-        comp_func = lambda obj: (
-            obj.tag, obj.content_type.model_class(), obj.object_id
+        self.assertQuerysetEqual(
+            Animal.objects.filter(tags__tag='fatty'), ["<Animal: Platypus>"])
+        self.assertQuerysetEqual(
+            Animal.objects.exclude(tags__tag='fatty'), ["<Animal: Lion>"])
+
+    def test_object_deletion_with_generic_relation(self):
+        """
+        If you delete an object with an explicit Generic relation, the related
+        objects are deleted when the source object is deleted.
+        """
+        self.assertQuerysetEqual(TaggedItem.objects.all(), [
+            ('fatty', Vegetable, self.bacon.pk),
+            ('hairy', Animal, self.lion.pk),
+            ('salty', Vegetable, self.bacon.pk),
+            ('yellow', Animal, self.lion.pk)
+        ],
+            self.comp_func
         )
+        self.lion.delete()
 
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-            ('clearish', Mineral, quartz.pk),
-            ('fatty', Animal, platypus.pk),
-            ('fatty', Vegetable, bacon.pk),
-            ('hairy', Animal, lion.pk),
-            ('salty', Vegetable, bacon.pk),
-            ('shiny', Animal, platypus.pk),
-            ('yellow', Animal, lion.pk)
+            ('fatty', Vegetable, self.bacon.pk),
+            ('salty', Vegetable, self.bacon.pk),
         ],
-            comp_func
-        )
-        lion.delete()
-        self.assertQuerysetEqual(TaggedItem.objects.all(), [
-            ('clearish', Mineral, quartz.pk),
-            ('fatty', Animal, platypus.pk),
-            ('fatty', Vegetable, bacon.pk),
-            ('salty', Vegetable, bacon.pk),
-            ('shiny', Animal, platypus.pk)
-        ],
-            comp_func
+            self.comp_func
         )
 
-        # If Generic Relation is not explicitly defined, any related objects
-        # remain after deletion of the source object.
-        quartz_pk = quartz.pk
-        quartz.delete()
+    def test_object_deletion_without_generic_relation(self):
+        """
+        If Generic Relation is not explicitly defined, any related objects
+        remain after deletion of the source object.
+        """
+        TaggedItem.objects.create(content_object=self.quartz, tag="clearish")
+        quartz_pk = self.quartz.pk
+        self.quartz.delete()
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
             ('clearish', Mineral, quartz_pk),
-            ('fatty', Animal, platypus.pk),
-            ('fatty', Vegetable, bacon.pk),
-            ('salty', Vegetable, bacon.pk),
-            ('shiny', Animal, platypus.pk)
+            ('fatty', Vegetable, self.bacon.pk),
+            ('hairy', Animal, self.lion.pk),
+            ('salty', Vegetable, self.bacon.pk),
+            ('yellow', Animal, self.lion.pk),
         ],
-            comp_func
+            self.comp_func
         )
-        # If you delete a tag, the objects using the tag are unaffected
-        # (other than losing a tag)
-        tag = TaggedItem.objects.order_by("id")[0]
+
+    def test_tag_deletion_related_objects_unaffected(self):
+        """
+        If you delete a tag, the objects using the tag are unaffected (other
+        than losing a tag).
+        """
+        ctype = ContentType.objects.get_for_model(self.lion)
+        tag = TaggedItem.objects.get(
+            content_type__pk=ctype.id, object_id=self.lion.id, tag="hairy")
         tag.delete()
-        self.assertQuerysetEqual(bacon.tags.all(), ["<TaggedItem: salty>"])
+
+        self.assertQuerysetEqual(self.lion.tags.all(), ["<TaggedItem: yellow>"])
         self.assertQuerysetEqual(TaggedItem.objects.all(), [
-            ('clearish', Mineral, quartz_pk),
-            ('fatty', Animal, platypus.pk),
-            ('salty', Vegetable, bacon.pk),
-            ('shiny', Animal, platypus.pk)
+            ('fatty', Vegetable, self.bacon.pk),
+            ('salty', Vegetable, self.bacon.pk),
+            ('yellow', Animal, self.lion.pk)
         ],
-            comp_func
+            self.comp_func
         )
-        TaggedItem.objects.filter(tag='fatty').delete()
-        ctype = ContentType.objects.get_for_model(lion)
-        self.assertQuerysetEqual(Animal.objects.filter(tags__content_type=ctype), [
-            "<Animal: Platypus>"
-        ])
 
     def test_assign_with_queryset(self):
         # Ensure that querysets used in reverse GFK assignments are pre-evaluated
