@@ -150,8 +150,8 @@ class AuthenticationFormTest(TestCase):
         class PickyAuthenticationForm(AuthenticationForm):
             def confirm_login_allowed(self, user):
                 if user.username == "inactive":
-                    raise forms.ValidationError(_("This user is disallowed."))
-                raise forms.ValidationError(_("Sorry, nobody's allowed in."))
+                    raise forms.ValidationError("This user is disallowed.")
+                raise forms.ValidationError("Sorry, nobody's allowed in.")
 
         form = PickyAuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
