@@ -1,5 +1,5 @@
 import codecs
-
+import copy
 from decimal import Decimal
 from django.utils import six
 from django.apps.registry import Apps
@@ -86,6 +86,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 return self.delete_model(field.rel.through)
         # Work inside a new app registry
         apps = Apps()
+
+        # Provide isolated instances of the fields to the new model body
+        # Instantiating the new model with an alternate db_table will alter
+        # the internal references of some of the provided fields.
+        body = copy.deepcopy(body)
+
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
@@ -96,6 +102,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         meta = type("Meta", tuple(), meta_contents)
         body['Meta'] = meta
         body['__module__'] = model.__module__
+
         temp_model = type(model._meta.object_name, model.__bases__, body)
         # Create a new table with that format
         self.create_model(temp_model)
@@ -148,28 +155,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             self._remake_table(model, delete_fields=[field])
 
-    def alter_field(self, model, old_field, new_field, strict=False):
-        """
-        Allows a field's type, uniqueness, nullability, default, column,
-        constraints etc. to be modified.
-        Requires a copy of the old field as well so we can only perform
-        changes that are required.
-        If strict is true, raises errors if the old column does not match old_field precisely.
-        """
-        old_db_params = old_field.db_parameters(connection=self.connection)
-        old_type = old_db_params['type']
-        new_db_params = new_field.db_parameters(connection=self.connection)
-        new_type = new_db_params['type']
-        if old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
-            return self._alter_many_to_many(model, old_field, new_field, strict)
-        elif old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and not old_field.rel.through._meta.auto_created and not new_field.rel.through._meta.auto_created):
-            # Both sides have through models; this is a no-op.
-            return
-        elif old_type is None or new_type is None:
-            raise ValueError("Cannot alter field %s into %s - they are not compatible types (you cannot alter to or from M2M fields, or add or remove through= on M2M fields)" % (
-                old_field,
-                new_field,
-            ))
+    def _alter_field(self, model, old_field, new_field, old_type, new_type, old_db_params, new_db_params, strict=False):
+        """Actually perform a "physical" (non-ManyToMany) field update."""
         # Alter by remaking table
         self._remake_table(model, alter_fields=[(old_field, new_field)])
 
@@ -186,6 +173,17 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         Alters M2Ms to repoint their to= endpoints.
         """
         if old_field.rel.through._meta.db_table == new_field.rel.through._meta.db_table:
+            # The field name didn't change, but some options did; we have to propagate this altering.
+            self._remake_table(
+                old_field.rel.through,
+                alter_fields=[(
+                    # We need the field that points to the target model, so we can tell alter_field to change it -
+                    # this is m2m_reverse_field_name() (as opposed to m2m_field_name, which points to our model)
+                    old_field.rel.through._meta.get_field_by_name(old_field.m2m_reverse_field_name())[0],
+                    new_field.rel.through._meta.get_field_by_name(new_field.m2m_reverse_field_name())[0],
+                )],
+                override_uniques=(new_field.m2m_field_name(), new_field.m2m_reverse_field_name()),
+            )
             return
 
         # Make a new through table
