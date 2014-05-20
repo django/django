@@ -646,6 +646,9 @@ class BaseDatabaseFeatures(object):
     # Suffix for backends that don't support "SELECT xxx;" queries.
     bare_select_suffix = ''
 
+    # If NULL is implied on columns without needing to be explicitly specified
+    implied_column_null = False
+
     uppercases_column_names = True
 
     def __init__(self, connection):
