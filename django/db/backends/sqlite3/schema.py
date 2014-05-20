@@ -27,7 +27,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         elif isinstance(value, six.integer_types):
             return str(value)
         elif isinstance(value, six.string_types):
-            return '"%s"' % six.text_type(value)
+            return "'%s'" % six.text_type(value).replace("\'", "\'\'")
         elif value is None:
             return "NULL"
         elif isinstance(value, (bytes, bytearray, six.memoryview)):
