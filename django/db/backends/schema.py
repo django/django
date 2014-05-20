@@ -132,9 +132,9 @@ class BaseDatabaseSchemaEditor(object):
         if (field.empty_strings_allowed and not field.primary_key and
                 self.connection.features.interprets_empty_strings_as_nulls):
             null = True
-        if null:
+        if null and not self.connection.features.implied_column_null:
             sql += " NULL"
-        else:
+        elif not null:
             sql += " NOT NULL"
         # Primary key/unique outputs
         if field.primary_key:
