@@ -148,6 +148,10 @@ class BaseDatabaseSchemaEditor(object):
         # Return the sql
         return sql, params
 
+    def pre_create_sql(self, model, field):
+        db_params = field.db_parameters(self.connection)
+        return db_params.get('pre_create_sql')
+
     def prepare_default(self, value):
         """
         Only used for backends which have requires_literal_defaults feature
@@ -190,9 +194,14 @@ class BaseDatabaseSchemaEditor(object):
         Will also create any accompanying indexes or unique constraints.
         """
         # Create column SQL, add FK deferreds if needed
+        pre_create_sqls = []
         column_sqls = []
         params = []
         for field in model._meta.local_fields:
+            # Pre create SQL
+            sql = self.pre_create_sql(model, field)
+            if sql:
+                pre_create_sqls.append(sql)
             # SQL
             definition, extra_params = self.column_sql(model, field)
             if definition is None:
@@ -251,6 +260,9 @@ class BaseDatabaseSchemaEditor(object):
             column_sqls.append(self.sql_create_table_unique % {
                 "columns": ", ".join(self.quote_name(column) for column in columns),
             })
+        # Run the pre create sql
+        for sql in pre_create_sqls:
+            self.execute(sql, [])
         # Make the table
         sql = self.sql_create_table % {
             "table": self.quote_name(model._meta.db_table),
@@ -380,6 +392,8 @@ class BaseDatabaseSchemaEditor(object):
         # Special-case implicit M2M tables
         if isinstance(field, ManyToManyField) and field.rel.through._meta.auto_created:
             return self.create_model(field.rel.through)
+        # Pre create SQL
+        pre_create_sql = self.pre_create_sql(model, field)
         # Get the column's definition
         definition, params = self.column_sql(model, field, include_default=True)
         # It might not actually have a column behind it
@@ -389,6 +403,8 @@ class BaseDatabaseSchemaEditor(object):
         db_params = field.db_parameters(connection=self.connection)
         if db_params['check']:
             definition += " CHECK (%s)" % db_params['check']
+        if self.pre_create_sql:
+            self.execute(pre_create_sql, [])
         # Build the SQL and run it
         sql = self.sql_create_column % {
             "table": self.quote_name(model._meta.db_table),
