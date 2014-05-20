@@ -165,6 +165,8 @@ Management Commands
 * The :djadminopt:`--ignorenonexistent` option of the :djadmin:`loaddata`
   management command now ignores data for models that no longer exist.
 
+* :djadmin:`runserver` now uses daemon threads for faster reloading.
+
 Models
 ^^^^^^
 
