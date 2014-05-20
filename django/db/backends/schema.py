@@ -499,6 +499,12 @@ class BaseDatabaseSchemaEditor(object):
                 old_field,
                 new_field,
             ))
+
+        self._alter_field(model, old_field, new_field, old_type, new_type, old_db_params, new_db_params, strict)
+
+    def _alter_field(self, model, old_field, new_field, old_type, new_type, old_db_params, new_db_params, strict=False):
+        """Actually perform a "physical" (non-ManyToMany) field update."""
+
         # Has unique been removed?
         if old_field.unique and (not new_field.unique or (not old_field.primary_key and new_field.primary_key)):
             # Find the unique constraint for this field
