@@ -7,6 +7,7 @@ import shutil
 
 from django.apps import apps
 from django.core.management import call_command, CommandError
+from django.db.migrations import questioner
 from django.test import override_settings, override_system_checks
 from django.utils import six
 from django.utils._os import upath
@@ -211,3 +212,153 @@ class MakeMigrationsTests(MigrationTestBase):
             call_command("makemigrations", merge=True, verbosity=0)
         except CommandError:
             self.fail("Makemigrations errored in merge mode with conflicts")
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_makemigrations_merge_no_conflict(self):
+        """
+        Makes sure that makemigrations exits if in merge mode with no conflicts.
+        """
+        stdout = six.StringIO()
+        try:
+            call_command("makemigrations", merge=True, stdout=stdout)
+        except CommandError:
+            self.fail("Makemigrations errored in merge mode with no conflicts")
+        self.assertIn("No conflicts detected to merge.", stdout.getvalue())
+
+    @override_system_checks([])
+    def test_makemigrations_no_app_sys_exit(self):
+        """
+        Makes sure that makemigrations exits if a non-existent app is specified.
+        """
+        stderr = six.StringIO()
+        with self.assertRaises(SystemExit):
+            call_command("makemigrations", "this_app_does_not_exist", stderr=stderr)
+        self.assertIn("'this_app_does_not_exist' could not be found.", stderr.getvalue())
+
+    @override_system_checks([])
+    def test_makemigrations_empty_no_app_specified(self):
+        """
+        Makes sure that makemigrations exits if no app is specified with 'empty' mode.
+        """
+        with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
+            self.assertRaises(CommandError, call_command, "makemigrations", empty=True)
+
+    @override_system_checks([])
+    def test_makemigrations_empty_migration(self):
+        """
+        Makes sure that makemigrations properly constructs an empty migration.
+        """
+        with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
+            try:
+                call_command("makemigrations", "migrations", empty=True, verbosity=0)
+            except CommandError:
+                self.fail("Makemigrations errored in creating empty migration for a proper app.")
+
+        initial_file = os.path.join(self.migration_dir, "0001_initial.py")
+
+        # Check for existing 0001_initial.py file in migration folder
+        self.assertTrue(os.path.exists(initial_file))
+
+        with codecs.open(initial_file, 'r', encoding='utf-8') as fp:
+            content = fp.read()
+            self.assertTrue('# -*- coding: utf-8 -*-' in content)
+
+            # Remove all whitespace to check for empty dependencies and operations
+            content = content.replace(' ', '')
+            self.assertIn('dependencies=[\n]', content)
+            self.assertIn('operations=[\n]', content)
+
+    @override_system_checks([])
+    def test_makemigrations_no_changes_no_apps(self):
+        """
+        Makes sure that makemigrations exits when there are no changes and no apps are specified.
+        """
+        stdout = six.StringIO()
+        call_command("makemigrations", stdout=stdout)
+        self.assertIn("No changes detected", stdout.getvalue())
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_changes"})
+    def test_makemigrations_no_changes(self):
+        """
+        Makes sure that makemigrations exits when there are no changes to an app.
+        """
+        stdout = six.StringIO()
+        call_command("makemigrations", "migrations", stdout=stdout)
+        self.assertIn("No changes detected in app 'migrations'", stdout.getvalue())
+
+    @override_system_checks([])
+    def test_makemigrations_migrations_announce(self):
+        """
+        Makes sure that makemigrations announces the migration at the default verbosity level.
+        """
+        stdout = six.StringIO()
+        with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
+            call_command("makemigrations", "migrations", stdout=stdout)
+        self.assertIn("Migrations for 'migrations'", stdout.getvalue())
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_ancestor"})
+    def test_makemigrations_no_common_ancestor(self):
+        """
+        Makes sure that makemigrations fails to merge migrations with no common ancestor.
+        """
+        with self.assertRaises(ValueError) as context:
+            call_command("makemigrations", "migrations", merge=True)
+        exception_message = str(context.exception)
+        self.assertIn("Could not find common ancestor of", exception_message)
+        self.assertIn("0002_second", exception_message)
+        self.assertIn("0002_conflicting_second", exception_message)
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_makemigrations_interactive_reject(self):
+        """
+        Makes sure that makemigrations enters and exits interactive mode properly.
+        """
+        # Monkeypatch interactive questioner to auto reject
+        old_input = questioner.input
+        questioner.input = lambda _: "N"
+        try:
+            call_command("makemigrations", "migrations", merge=True, interactive=True, verbosity=0)
+            merge_file = os.path.join(self.test_dir, 'test_migrations_conflict', '0003_merge.py')
+            self.assertFalse(os.path.exists(merge_file))
+        except CommandError:
+            self.fail("Makemigrations failed while running interactive questioner")
+        finally:
+            questioner.input = old_input
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_makemigrations_interactive_accept(self):
+        """
+        Makes sure that makemigrations enters interactive mode and merges properly.
+        """
+        # Monkeypatch interactive questioner to auto accept
+        old_input = questioner.input
+        questioner.input = lambda _: "y"
+        stdout = six.StringIO()
+        try:
+            call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=stdout)
+            merge_file = os.path.join(self.test_dir, 'test_migrations_conflict', '0003_merge.py')
+            self.assertTrue(os.path.exists(merge_file))
+            os.remove(merge_file)
+            self.assertFalse(os.path.exists(merge_file))
+        except CommandError:
+            self.fail("Makemigrations failed while running interactive questioner")
+        finally:
+            questioner.input = old_input
+        self.assertIn("Created new merge migration", stdout.getvalue())
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_makemigrations_handle_merge(self):
+        """
+        Makes sure that makemigrations properly merges the conflicting migrations.
+        """
+        stdout = six.StringIO()
+        call_command("makemigrations", "migrations", merge=True, stdout=stdout)
+        self.assertIn("Merging migrations", stdout.getvalue())
+        self.assertIn("Branch 0002_second", stdout.getvalue())
+        self.assertIn("Branch 0002_conflicting_second", stdout.getvalue())
