@@ -86,28 +86,6 @@ class MigrateTests(MigrationTestBase):
             call_command("migrate", "migrations")
 
     @override_system_checks([])
-    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
-    def test_makemigrations_conflict_exit(self):
-        """
-        Makes sure that makemigrations exits if it detects a conflict.
-        """
-        with self.assertRaises(CommandError):
-            call_command("makemigrations")
-
-    @override_system_checks([])
-    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
-    def test_makemigrations_merge_basic(self):
-        """
-        Makes sure that makemigrations doesn't error if you ask for
-        merge mode with a conflict present. Doesn't test writing of the merge
-        file, as that requires temp directories.
-        """
-        try:
-            call_command("makemigrations", merge=True, verbosity=0)
-        except CommandError:
-            self.fail("Makemigrations errored in merge mode with conflicts")
-
-    @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_sqlmigrate(self):
         """
@@ -211,3 +189,25 @@ class MakeMigrationsTests(MigrationTestBase):
 
         initial_file = os.path.join(self.migration_dir, "0001_initial.py")
         self.assertFalse(os.path.exists(initial_file))
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_makemigrations_conflict_exit(self):
+        """
+        Makes sure that makemigrations exits if it detects a conflict.
+        """
+        with self.assertRaises(CommandError):
+            call_command("makemigrations")
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_makemigrations_merge_basic(self):
+        """
+        Makes sure that makemigrations doesn't error if you ask for
+        merge mode with a conflict present. Doesn't test writing of the merge
+        file, as that requires temp directories.
+        """
+        try:
+            call_command("makemigrations", merge=True, verbosity=0)
+        except CommandError:
+            self.fail("Makemigrations errored in merge mode with conflicts")
