@@ -64,16 +64,16 @@ The following is a simple unit test using the request factory::
 Tests and multiple databases
 ============================
 
-.. _topics-testing-masterslave:
+.. _topics-testing-leaderfollower:
 
-Testing master/slave configurations
+Testing leader/follower configurations
 -----------------------------------
 
-If you're testing a multiple database configuration with master/slave
+If you're testing a multiple database configuration with leader/follower
 replication, this strategy of creating test databases poses a problem.
 When the test databases are created, there won't be any replication,
-and as a result, data created on the master won't be seen on the
-slave.
+and as a result, data created on the leader won't be seen on the
+follower.
 
 To compensate for this, Django allows you to define that a database is
 a *test mirror*. Consider the following (simplified) example database
@@ -83,34 +83,34 @@ configuration::
         'default': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'myproject',
-            'HOST': 'dbmaster',
+            'HOST': 'dbleader',
              # ... plus some other settings
         },
-        'slave': {
+        'follower': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'myproject',
-            'HOST': 'dbslave',
+            'HOST': 'dbfollower',
             'TEST_MIRROR': 'default'
             # ... plus some other settings
         }
     }
 
-In this setup, we have two database servers: ``dbmaster``, described
-by the database alias ``default``, and ``dbslave`` described by the
-alias ``slave``. As you might expect, ``dbslave`` has been configured
-by the database administrator as a read slave of ``dbmaster``, so in
-normal activity, any write to ``default`` will appear on ``slave``.
+In this setup, we have two database servers: ``dbleader``, described
+by the database alias ``default``, and ``dbfollower`` described by the
+alias ``follower``. As you might expect, ``dbfollower`` has been configured
+by the database administrator as a read follower of ``dbleader``, so in
+normal activity, any write to ``default`` will appear on ``follower``.
 
 If Django created two independent test databases, this would break any
-tests that expected replication to occur. However, the ``slave``
+tests that expected replication to occur. However, the ``follower``
 database has been configured as a test mirror (using the
 :setting:`TEST_MIRROR` setting), indicating that under testing,
-``slave`` should be treated as a mirror of ``default``.
+``follower`` should be treated as a mirror of ``default``.
 
-When the test environment is configured, a test version of ``slave``
-will *not* be created. Instead the connection to ``slave``
+When the test environment is configured, a test version of ``follower``
+will *not* be created. Instead the connection to ``follower``
 will be redirected to point at ``default``. As a result, writes to
-``default`` will appear on ``slave`` -- but because they are actually
+``default`` will appear on ``follower`` -- but because they are actually
 the same database, not because there is data replication between the
 two databases.
 
