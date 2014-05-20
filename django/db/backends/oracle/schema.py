@@ -1,5 +1,6 @@
 import copy
 import datetime
+import binascii
 
 from django.utils import six
 from django.db.backends.schema import BaseDatabaseSchemaEditor
@@ -21,7 +22,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
             return "'%s'" % value
         elif isinstance(value, six.string_types):
-            return repr(value)
+            return "'%s'" % six.text_type(value).replace("\'", "\'\'")
+        elif isinstance(value, buffer):
+            return "'%s'" % binascii.hexlify(value)
         elif isinstance(value, bool):
             return "1" if value else "0"
         else:

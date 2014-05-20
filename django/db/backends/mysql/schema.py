@@ -30,11 +30,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def quote_value(self, value):
         # Inner import to allow module to fail to load gracefully
         import MySQLdb.converters
-
-        if isinstance(value, six.string_types):
-            return '"%s"' % six.text_type(value)
-        else:
-            return MySQLdb.escape(value, MySQLdb.converters.conversions)
+        return MySQLdb.escape(value, MySQLdb.converters.conversions)
 
     def skip_default(self, field):
         """
@@ -49,8 +45,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Simulate the effect of a one-off default.
         if self.skip_default(field) and field.default not in {None, NOT_PROVIDED}:
             effective_default = self.effective_default(field)
-            self.execute('UPDATE %(table)s SET %(column)s=%(default)s' % {
+            self.execute('UPDATE %(table)s SET %(column)s = %%s' % {
                 'table': self.quote_name(model._meta.db_table),
                 'column': self.quote_name(field.column),
-                'default': self.quote_value(effective_default),
-            })
+            }, [effective_default])
