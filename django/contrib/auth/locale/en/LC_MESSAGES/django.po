@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:17+0200\n"
+"POT-Creation-Date: 2014-05-20 12:20+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -265,14 +265,6 @@ msgstr ""
 #: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr ""
-
-#: contrib/auth/tests/test_forms.py:153
-msgid "This user is disallowed."
-msgstr ""
-
-#: contrib/auth/tests/test_forms.py:154
-msgid "Sorry, nobody's allowed in."
 msgstr ""
 
 #: contrib/auth/tests/test_forms.py:387
