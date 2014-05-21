@@ -1089,7 +1089,7 @@ class RouterTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('Source database should have a copy of saved object')
 
-        # This isn't a real primary-replica database, so restore the original from other
+        # This isn't a real primary/replica database, so restore the original from other
         dive = Book.objects.using('other').get(title='Dive into Python')
         self.assertEqual(dive._state.db, 'other')
 
@@ -1111,7 +1111,7 @@ class RouterTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('Source database should have a copy of saved object')
 
-        # This isn't a real primary-replica database, so restore the original from other
+        # This isn't a real primary/replica database, so restore the original from other
         dive = Book.objects.using('other').get(title='Dive into Python')
         self.assertEqual(dive._state.db, 'other')
 
@@ -1133,7 +1133,7 @@ class RouterTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('Source database should have a copy of saved object')
 
-        # This isn't a real primary-replica database, so restore the original from other
+        # This isn't a real primary/replica database, so restore the original from other
         dive = Book.objects.using('other').get(title='Dive into Python')
 
         # If you assign a FK object when the base object hasn't
@@ -1361,7 +1361,7 @@ class RouterTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('Source database should have a copy of saved object')
 
-        # This isn't a real primary-replica database, so restore the original from other
+        # This isn't a real primary/replica database, so restore the original from other
         dive = Book.objects.using('other').get(title='Dive into Python')
         self.assertEqual(dive._state.db, 'other')
 
