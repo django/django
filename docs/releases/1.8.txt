@@ -203,6 +203,9 @@ Management Commands
   command is now always the ``dest`` name specified in the command option
   definition (as long as the command uses the new :py:mod:`argparse` module).
 
+* The :djadmin:`dbshell` command now supports MySQL's optional SSL certificate
+  authority setting (``--ssl-ca``).
+
 Models
 ^^^^^^
 
