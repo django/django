@@ -7,6 +7,7 @@ try:
 except ImportError:
     sqlparse = None
 
+from django import test
 from django.db import connection, migrations, models, router
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
@@ -422,6 +423,7 @@ class OperationTests(MigrationTestBase):
         self.assertEqual(pony.digits, "42")
         self.assertEqual(pony.quotes, '"\'"')
 
+    @test.skipUnlessDBFeature('supports_binary_field')
     def test_add_binaryfield(self):
         """
         Tests the AddField operation on TextField/BinaryField.
