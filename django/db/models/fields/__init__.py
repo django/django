@@ -738,7 +738,7 @@ class Field(RegisterLookupMixin):
         if self.choices:
             return first_choice + list(self.choices)
         rel_model = self.rel.to
-        limit_choices_to = limit_choices_to and limit_choices_to or self.get_limit_choices_to()
+        limit_choices_to = limit_choices_to or self.get_limit_choices_to()
         if hasattr(self.rel, 'get_related_field'):
             lst = [(getattr(x, self.rel.get_related_field().attname),
                    smart_text(x))
