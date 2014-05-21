@@ -281,6 +281,9 @@ You can override the error messages from ``NON_FIELD_ERRORS`` raised by model
 validation by adding the :data:`~django.core.exceptions.NON_FIELD_ERRORS` key
 to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` class::
 
+    from django.forms import ModelForm
+    from django.core.exceptions import NON_FIELD_ERRORS
+
     class ArticleForm(ModelForm):
         class Meta:
             error_messages = {
