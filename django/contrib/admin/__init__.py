@@ -6,7 +6,8 @@ from django.contrib.admin.options import (HORIZONTAL, VERTICAL,
     ModelAdmin, StackedInline, TabularInline)
 from django.contrib.admin.filters import (ListFilter, SimpleListFilter,
     FieldListFilter, BooleanFieldListFilter, RelatedFieldListFilter,
-    ChoicesFieldListFilter, DateFieldListFilter, AllValuesFieldListFilter)
+    ChoicesFieldListFilter, DateFieldListFilter, AllValuesFieldListFilter,
+    RelatedOnlyFieldListFilter)
 from django.contrib.admin.sites import AdminSite, site
 from django.utils.module_loading import autodiscover_modules
 
@@ -15,7 +16,7 @@ __all__ = [
     "StackedInline", "TabularInline", "AdminSite", "site", "ListFilter",
     "SimpleListFilter", "FieldListFilter", "BooleanFieldListFilter",
     "RelatedFieldListFilter", "ChoicesFieldListFilter", "DateFieldListFilter",
-    "AllValuesFieldListFilter", "autodiscover",
+    "AllValuesFieldListFilter", "RelatedOnlyFieldListFilter", "autodiscover",
 ]
 
 

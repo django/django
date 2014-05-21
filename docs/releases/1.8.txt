@@ -39,6 +39,11 @@ Minor features
   :attr:`~django.contrib.admin.InlineModelAdmin.show_change_link` that
   supports showing a link to an inline object's change form.
 
+* Use the new ``django.contrib.admin.RelatedOnlyFieldListFilter`` in
+  :attr:`ModelAdmin.list_filter <django.contrib.admin.ModelAdmin.list_filter>`
+  to limit the ``list_filter`` choices to foreign objects which are attached to
+  those from the ``ModelAdmin``.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
