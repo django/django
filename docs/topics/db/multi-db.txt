@@ -691,7 +691,7 @@ In addition, some objects are automatically created just after
   database).
 
 For common setups with multiple databases, it isn't useful to have these
-objects in more than one database. Common setups include primary / replica and
+objects in more than one database. Common setups include primary/replica and
 connecting to external databases. Therefore, it's recommended:
 
 - either to run :djadmin:`migrate` only for the default database;
