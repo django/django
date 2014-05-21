@@ -1,6 +1,5 @@
 from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.db.models import NOT_PROVIDED
-from django.utils import six
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
