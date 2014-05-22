@@ -240,3 +240,71 @@ X-Frame-Options middleware
 .. class:: XFrameOptionsMiddleware
 
 Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickjacking/>`.
+
+.. _middleware-ordering:
+
+Middleware ordering
+===================
+
+Here are some hints about the ordering of various Django middleware classes:
+
+#. :class:`~django.middleware.cache.UpdateCacheMiddleware`
+
+   Before those that modify the ``Vary`` header (``SessionMiddleware``,
+   ``GZipMiddleware``, ``LocaleMiddleware``).
+
+#. :class:`~django.middleware.gzip.GZipMiddleware`
+
+   Before any middleware that may change or use the response body.
+
+   After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
+
+#. :class:`~django.middleware.http.ConditionalGetMiddleware`
+
+   Before ``CommonMiddleware``: uses its ``Etag`` header when
+   :setting:`USE_ETAGS` = ``True``.
+
+#. :class:`~django.contrib.sessions.middleware.SessionMiddleware`
+
+   After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
+
+#. :class:`~django.middleware.locale.LocaleMiddleware`
+
+   One of the topmost, after ``SessionMiddleware`` (uses session data) and
+   ``CacheMiddleware`` (modifies ``Vary`` header).
+
+#. :class:`~django.middleware.common.CommonMiddleware`
+
+   Before any middleware that may change the response (it calculates ``ETags``).
+
+   After ``GZipMiddleware`` so it won't calculate an ``ETag`` header on gzipped
+   contents.
+
+   Close to the top: it redirects when :setting:`APPEND_SLASH` or
+   :setting:`PREPEND_WWW` are set to ``True``.
+
+#. :class:`~django.middleware.csrf.CsrfViewMiddleware`
+
+   Before any view middleware that assumes that CSRF attacks have been dealt
+   with.
+
+#. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+
+   After ``SessionMiddleware``: uses session storage.
+
+#. :class:`~django.contrib.messages.middleware.MessageMiddleware`
+
+   After ``SessionMiddleware``: can use session-based storage.
+
+#. :class:`~django.middleware.cache.FetchFromCacheMiddleware`
+
+   After any middleware that modifies the ``Vary`` header: that header is used
+   to pick a value for the cache hash-key.
+
+#. :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
+
+   Should be near the bottom as it's a last-resort type of middleware.
+
+#. :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
+
+   Should be near the bottom as it's a last-resort type of middleware.
