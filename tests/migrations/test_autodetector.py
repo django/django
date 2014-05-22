@@ -241,7 +241,7 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AlterField")
         self.assertEqual(action.name, "author")
-        self.assertEqual(action.field.rel.to.__name__, "Writer")
+        self.assertEqual(action.field.rel.to, "testapp.Writer")
 
     def test_rename_model_with_renamed_rel_field(self):
         """
@@ -278,7 +278,7 @@ class AutodetectorTests(TestCase):
         action = migration.operations[1]
         self.assertEqual(action.__class__.__name__, "AlterField")
         self.assertEqual(action.name, "writer")
-        self.assertEqual(action.field.rel.to.__name__, "Writer")
+        self.assertEqual(action.field.rel.to, "testapp.Writer")
 
     def test_fk_dependency(self):
         "Tests that having a ForeignKey automatically adds a dependency"
