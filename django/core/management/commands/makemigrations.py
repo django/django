@@ -77,7 +77,7 @@ class Command(BaseCommand):
         autodetector = MigrationAutodetector(
             loader.project_state(),
             ProjectState.from_apps(apps),
-            InteractiveMigrationQuestioner(specified_apps=app_labels),
+            InteractiveMigrationQuestioner(specified_apps=app_labels, dry_run=self.dry_run),
         )
 
         # If they want to make an empty migration, make one for each app
