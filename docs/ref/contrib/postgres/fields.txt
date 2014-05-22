@@ -157,6 +157,20 @@ the SQL operator ``&&``. For example::
     >>> Post.objects.filter(tags__overlap=['thoughts', 'tutorial'])
     [<Post: First post>, <Post: Second post>, <Post: Third post>]
 
+.. fieldlookup:: arrayfield.len
+
+len
+~~~
+
+Returns the length of the array. The lookups available afterwards are those
+available for :class:`~django.db.models.IntegerField`. For example::
+
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='Second post', tags=['thoughts'])
+
+    >>> Post.objects.filter(tags__len=1)
+    [<Post: Second post>]
+
 .. fieldlookup:: arrayfield.index
 
 Index transforms
