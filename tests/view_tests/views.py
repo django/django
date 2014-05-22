@@ -46,6 +46,10 @@ def raises500(request):
     except Exception:
         return technical_500_response(request, *sys.exc_info())
 
+def raises_unhandled_exception(request):
+    # We need to raise an unhandled Excpeption to test the handling
+    # in the core handler
+    raise Exception('Bad Request')
 
 def raises400(request):
     raise SuspiciousOperation

@@ -487,9 +487,11 @@ def patch_logger(logger_name, log_level):
     and provides a simple mock-like list of messages received
     """
     calls = []
-
     def replacement(msg, *args, **kwargs):
-        calls.append(msg % args)
+        if kwargs:
+            calls.append((msg % args, kwargs))
+        else:
+            calls.append(msg % args)
     logger = logging.getLogger(logger_name)
     orig = getattr(logger, log_level)
     setattr(logger, log_level, replacement)

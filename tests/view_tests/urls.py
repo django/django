@@ -56,6 +56,7 @@ urlpatterns = [
     url(r'raises403/$', views.raises403),
     url(r'raises404/$', views.raises404),
     url(r'raises500/$', views.raises500),
+    url(r'raises_unhandled_exception/$', views.raises_unhandled_exception),
 
     # i18n views
     url(r'^i18n/', include('django.conf.urls.i18n')),

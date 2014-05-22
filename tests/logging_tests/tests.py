@@ -370,13 +370,13 @@ class SecurityLoggerTest(TestCase):
         with patch_logger('django.security.SuspiciousOperation', 'error') as calls:
             self.client.get('/suspicious/')
             self.assertEqual(len(calls), 1)
-            self.assertEqual(calls[0], 'dubious')
+            self.assertEqual(calls[0][0], 'dubious')
 
     def test_suspicious_operation_uses_sublogger(self):
         with patch_logger('django.security.DisallowedHost', 'error') as calls:
             self.client.get('/suspicious_spec/')
             self.assertEqual(len(calls), 1)
-            self.assertEqual(calls[0], 'dubious')
+            self.assertEqual(calls[0][0], 'dubious')
 
     @override_settings(
         ADMINS=(('admin', 'admin@example.com'),),
