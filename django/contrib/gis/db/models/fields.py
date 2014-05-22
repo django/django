@@ -2,8 +2,7 @@ from django.db.models.fields import Field
 from django.db.models.sql.expressions import SQLEvaluator
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis import forms
-from django.contrib.gis.db.models.constants import GIS_LOOKUPS
-from django.contrib.gis.db.models.lookups import GISLookup
+from django.contrib.gis.db.models.lookups import gis_lookups
 from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.utils import six
@@ -243,16 +242,15 @@ class GeometryField(Field):
         parameters into the correct units for the coordinate system of the
         field.
         """
-        if lookup_type in connection.ops.gis_terms:
-            # special case for isnull lookup
-            if lookup_type == 'isnull':
-                return []
-
+        # special case for isnull lookup
+        if lookup_type == 'isnull':
+            return []
+        elif lookup_type in self.class_lookups:
             # Populating the parameters list, and wrapping the Geometry
             # with the Adapter of the spatial backend.
             if isinstance(value, (tuple, list)):
                 params = [connection.ops.Adapter(value[0])]
-                if lookup_type in connection.ops.distance_functions:
+                if self.class_lookups[lookup_type].distance:
                     # Getting the distance parameter in the units of the field.
                     params += self.get_distance(value[1:], lookup_type, connection)
                 elif lookup_type in connection.ops.truncate_params:
@@ -291,9 +289,9 @@ class GeometryField(Field):
         """
         return connection.ops.get_geom_placeholder(self, value)
 
-for lookup_name in GIS_LOOKUPS:
-    lookup = type(lookup_name, (GISLookup,), {'lookup_name': lookup_name})
-    GeometryField.register_lookup(lookup)
+
+for klass in gis_lookups.values():
+    GeometryField.register_lookup(klass)
 
 
 # The OpenGIS Geometry Type Fields
