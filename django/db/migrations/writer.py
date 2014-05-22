@@ -206,7 +206,9 @@ class MigrationWriter(object):
             if isinstance(value, set):
                 format = "set([%s])"
             elif isinstance(value, tuple):
-                format = "(%s)" if len(value) > 1 else "(%s,)"
+                # When len(value)==0, the empty tuple should be serialized as
+                # "()", not "(,)" because (,) is invalid Python syntax.
+                format = "(%s)" if len(value) != 1 else "(%s,)"
             else:
                 format = "[%s]"
             return format % (", ".join(strings)), imports
@@ -296,7 +298,9 @@ class MigrationWriter(object):
                 item_string, item_imports = cls.serialize(item)
                 imports.update(item_imports)
                 strings.append(item_string)
-            format = "(%s)" if len(strings) > 1 else "(%s,)"
+            # When len(strings)==0, the empty iterable should be serialized as
+            # "()", not "(,)" because (,) is invalid Python syntax.
+            format = "(%s)" if len(strings) != 1 else "(%s,)"
             return format % (", ".join(strings)), imports
         # Uh oh.
         else:
