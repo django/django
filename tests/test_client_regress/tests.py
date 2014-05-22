@@ -1048,6 +1048,14 @@ class SessionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'YES')
 
+    def test_session_initiated(self):
+        session = self.client.session
+        session['session_var'] = 'foo'
+        session.save()
+
+        response = self.client.get('/check_session/')
+        self.assertEqual(response.content, b'foo')
+
     def test_logout(self):
         """Logout should work whether the user is logged in or not (#9978)."""
         self.client.logout()

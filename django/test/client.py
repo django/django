@@ -393,6 +393,11 @@ class Client(RequestFactory):
             cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
             if cookie:
                 return engine.SessionStore(cookie.value)
+            else:
+                s = engine.SessionStore()
+                s.save()
+                self.cookies[settings.SESSION_COOKIE_NAME] = s.session_key
+                return s
         return {}
     session = property(_session)
 
