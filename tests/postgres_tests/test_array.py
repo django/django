@@ -1,3 +1,4 @@
+import json
 import unittest
 
 from django.contrib.postgres.fields import ArrayField
@@ -226,7 +227,7 @@ class TestSerialization(TestCase):
     def test_dumping(self):
         instance = IntegerArrayModel(field=[1, 2])
         data = serializers.serialize('json', [instance])
-        self.assertEqual(data, self.test_data)
+        self.assertEqual(json.loads(data), json.loads(self.test_data))
 
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
