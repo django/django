@@ -143,6 +143,12 @@ class ModelState(object):
         # Sanity-check that fields is NOT a dict. It must be ordered.
         if isinstance(self.fields, dict):
             raise ValueError("ModelState.fields cannot be a dict - it must be a list of 2-tuples.")
+        # Sanity-check that fields are NOT already bound to a model.
+        for name, field in fields:
+            if hasattr(field, 'model'):
+                raise ValueError(
+                    'ModelState.fields cannot be bound to a model - "%s" is.' % name
+                )
 
     @classmethod
     def from_model(cls, model):
@@ -226,19 +232,19 @@ class ModelState(object):
             bases,
         )
 
-    def clone(self):
-        "Returns an exact copy of this ModelState"
-        # We deep-clone the fields using deconstruction
-        fields = []
+    def construct_fields(self):
+        "Deep-clone the fields using deconstruction"
         for name, field in self.fields:
             _, path, args, kwargs = field.deconstruct()
             field_class = import_string(path)
-            fields.append((name, field_class(*args, **kwargs)))
-        # Now make a copy
+            yield name, field_class(*args, **kwargs)
+
+    def clone(self):
+        "Returns an exact copy of this ModelState"
         return self.__class__(
             app_label=self.app_label,
             name=self.name,
-            fields=fields,
+            fields=list(self.construct_fields()),
             options=dict(self.options),
             bases=self.bases,
         )
@@ -260,7 +266,7 @@ class ModelState(object):
         except LookupError:
             raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
         # Turn fields into a dict for the body, add other bits
-        body = dict(self.fields)
+        body = dict(self.construct_fields())
         body['Meta'] = meta
         body['__module__'] = "__fake__"
         # Then, make a Model object
