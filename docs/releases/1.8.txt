@@ -612,6 +612,9 @@ Miscellaneous
   :func:`~django.core.urlresolvers.reverse_lazy` now return Unicode strings
   instead of byte strings.
 
+* GIS-specific lookups have been refactored to use the
+  :class:`django.db.models.Lookup` API.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
