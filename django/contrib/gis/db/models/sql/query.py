@@ -1,7 +1,7 @@
 from django.db import connections
 from django.db.models.query import sql
+from django.db.models.sql.constants import QUERY_TERMS
 
-from django.contrib.gis.db.models.constants import ALL_TERMS
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.lookups import GISLookup
 from django.contrib.gis.db.models.sql import aggregates as gis_aggregates
@@ -13,7 +13,7 @@ class GeoQuery(sql.Query):
     A single spatial SQL query.
     """
     # Overridding the valid query terms.
-    query_terms = ALL_TERMS
+    query_terms = QUERY_TERMS | set(GeometryField.class_lookups.keys())
     aggregates_module = gis_aggregates
 
     compiler = 'GeoSQLCompiler'

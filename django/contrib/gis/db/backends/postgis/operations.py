@@ -1,73 +1,46 @@
 import re
-from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.gis.db.backends.base import BaseSpatialOperations
-from django.contrib.gis.db.backends.utils import SpatialOperation, SpatialFunction
 from django.contrib.gis.db.backends.postgis.adapter import PostGISAdapter
+from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.postgresql_psycopg2.base import DatabaseOperations
 from django.db.utils import ProgrammingError
-from django.utils import six
 from django.utils.functional import cached_property
 
 from .models import PostGISGeometryColumns, PostGISSpatialRefSys
 
 
-#### Classes used in constructing PostGIS spatial SQL ####
-class PostGISOperator(SpatialOperation):
-    "For PostGIS operators (e.g. `&&`, `~`)."
-    def __init__(self, operator):
-        super(PostGISOperator, self).__init__(operator=operator)
+class PostGISOperator(SpatialOperator):
+    def __init__(self, geography=False, **kwargs):
+        # Only a subset of the operators and functions are available
+        # for the geography type.
+        self.geography = geography
+        super(PostGISOperator, self).__init__(**kwargs)
+
+    def as_sql(self, connection, lookup, *args):
+        if lookup.lhs.source.geography and not self.geography:
+            raise ValueError('PostGIS geography does not support the "%s" '
+                             'function/operator.' % (self.func or self.op,))
+        return super(PostGISOperator, self).as_sql(connection, lookup, *args)
 
 
-class PostGISFunction(SpatialFunction):
-    "For PostGIS function calls (e.g., `ST_Contains(table, geom)`)."
-    def __init__(self, prefix, function, **kwargs):
-        super(PostGISFunction, self).__init__(prefix + function, **kwargs)
+class PostGISDistanceOperator(PostGISOperator):
+    sql_template = '%(func)s(%(lhs)s, %(rhs)s) %(op)s %%s'
 
-
-class PostGISFunctionParam(PostGISFunction):
-    "For PostGIS functions that take another parameter (e.g. DWithin, Relate)."
-    sql_template = '%(function)s(%(geo_col)s, %(geometry)s, %%s)'
-
-
-class PostGISDistance(PostGISFunction):
-    "For PostGIS distance operations."
-    dist_func = 'Distance'
-    sql_template = '%(function)s(%(geo_col)s, %(geometry)s) %(operator)s %%s'
-
-    def __init__(self, prefix, operator):
-        super(PostGISDistance, self).__init__(prefix, self.dist_func,
-                                              operator=operator)
-
-
-class PostGISSpheroidDistance(PostGISFunction):
-    "For PostGIS spherical distance operations (using the spheroid)."
-    dist_func = 'distance_spheroid'
-    sql_template = '%(function)s(%(geo_col)s, %(geometry)s, %%s) %(operator)s %%s'
-
-    def __init__(self, prefix, operator):
-        # An extra parameter in `end_subst` is needed for the spheroid string.
-        super(PostGISSpheroidDistance, self).__init__(prefix, self.dist_func,
-                                                      operator=operator)
-
-
-class PostGISSphereDistance(PostGISDistance):
-    "For PostGIS spherical distance operations."
-    dist_func = 'distance_sphere'
-
-
-class PostGISRelate(PostGISFunctionParam):
-    "For PostGIS Relate(<geom>, <pattern>) calls."
-    pattern_regex = re.compile(r'^[012TF\*]{9}$')
-
-    def __init__(self, prefix, pattern):
-        if not self.pattern_regex.match(pattern):
-            raise ValueError('Invalid intersection matrix pattern "%s".' % pattern)
-        super(PostGISRelate, self).__init__(prefix, 'Relate')
+    def as_sql(self, connection, lookup, template_params, sql_params):
+        if not lookup.lhs.source.geography and lookup.lhs.source.geodetic(connection):
+            sql_template = self.sql_template
+            if len(lookup.rhs) == 3 and lookup.rhs[-1] == 'spheroid':
+                template_params.update({'op': self.op, 'func': 'ST_Distance_Spheroid'})
+                sql_template = '%(func)s(%(lhs)s, %(rhs)s, %%s) %(op)s %%s'
+            else:
+                template_params.update({'op': self.op, 'func': 'ST_Distance_Sphere'})
+            return sql_template % template_params, sql_params
+        return super(PostGISDistanceOperator, self).as_sql(connection, lookup, template_params, sql_params)
 
 
 class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
@@ -82,104 +55,43 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
     Adapter = PostGISAdapter
     Adaptor = Adapter  # Backwards-compatibility alias.
 
+    gis_operators = {
+        'bbcontains': PostGISOperator(op='~'),
+        'bboverlaps': PostGISOperator(op='&&', geography=True),
+        'contained': PostGISOperator(op='@'),
+        'contains': PostGISOperator(func='ST_Contains'),
+        'overlaps_left': PostGISOperator(op='&<'),
+        'overlaps_right': PostGISOperator(op='&>'),
+        'overlaps_below': PostGISOperator(op='&<|'),
+        'overlaps_above': PostGISOperator(op='|&>'),
+        'left': PostGISOperator(op='<<'),
+        'right': PostGISOperator(op='>>'),
+        'strictly_below': PostGISOperator(op='<<|'),
+        'stricly_above': PostGISOperator(op='|>>'),
+        'same_as': PostGISOperator(op='~='),
+        'exact': PostGISOperator(op='~='),  # alias of same_as
+        'contains_properly': PostGISOperator(func='ST_ContainsProperly'),
+        'coveredby': PostGISOperator(func='ST_CoveredBy', geography=True),
+        'covers': PostGISOperator(func='ST_Covers', geography=True),
+        'crosses': PostGISOperator(func='ST_Crosses)'),
+        'disjoint': PostGISOperator(func='ST_Disjoint'),
+        'equals': PostGISOperator(func='ST_Equals'),
+        'intersects': PostGISOperator(func='ST_Intersects', geography=True),
+        'overlaps': PostGISOperator(func='ST_Overlaps'),
+        'relate': PostGISOperator(func='ST_Relate'),
+        'touches': PostGISOperator(func='ST_Touches'),
+        'within': PostGISOperator(func='ST_Within'),
+        'dwithin': PostGISOperator(func='ST_DWithin', geography=True),
+        'distance_gt': PostGISDistanceOperator(func='ST_Distance', op='>', geography=True),
+        'distance_gte': PostGISDistanceOperator(func='ST_Distance', op='>=', geography=True),
+        'distance_lt': PostGISDistanceOperator(func='ST_Distance', op='<', geography=True),
+        'distance_lte': PostGISDistanceOperator(func='ST_Distance', op='<=', geography=True),
+    }
+
     def __init__(self, connection):
         super(PostGISOperations, self).__init__(connection)
 
         prefix = self.geom_func_prefix
-        # PostGIS-specific operators. The commented descriptions of these
-        # operators come from Section 7.6 of the PostGIS 1.4 documentation.
-        self.geometry_operators = {
-            # The "&<" operator returns true if A's bounding box overlaps or
-            # is to the left of B's bounding box.
-            'overlaps_left': PostGISOperator('&<'),
-            # The "&>" operator returns true if A's bounding box overlaps or
-            # is to the right of B's bounding box.
-            'overlaps_right': PostGISOperator('&>'),
-            # The "<<" operator returns true if A's bounding box is strictly
-            # to the left of B's bounding box.
-            'left': PostGISOperator('<<'),
-            # The ">>" operator returns true if A's bounding box is strictly
-            # to the right of B's bounding box.
-            'right': PostGISOperator('>>'),
-            # The "&<|" operator returns true if A's bounding box overlaps or
-            # is below B's bounding box.
-            'overlaps_below': PostGISOperator('&<|'),
-            # The "|&>" operator returns true if A's bounding box overlaps or
-            # is above B's bounding box.
-            'overlaps_above': PostGISOperator('|&>'),
-            # The "<<|" operator returns true if A's bounding box is strictly
-            # below B's bounding box.
-            'strictly_below': PostGISOperator('<<|'),
-            # The "|>>" operator returns true if A's bounding box is strictly
-            # above B's bounding box.
-            'strictly_above': PostGISOperator('|>>'),
-            # The "~=" operator is the "same as" operator. It tests actual
-            # geometric equality of two features. So if A and B are the same feature,
-            # vertex-by-vertex, the operator returns true.
-            'same_as': PostGISOperator('~='),
-            'exact': PostGISOperator('~='),
-            # The "@" operator returns true if A's bounding box is completely contained
-            # by B's bounding box.
-            'contained': PostGISOperator('@'),
-            # The "~" operator returns true if A's bounding box completely contains
-            #  by B's bounding box.
-            'bbcontains': PostGISOperator('~'),
-            # The "&&" operator returns true if A's bounding box overlaps
-            # B's bounding box.
-            'bboverlaps': PostGISOperator('&&'),
-        }
-
-        self.geometry_functions = {
-            'equals': PostGISFunction(prefix, 'Equals'),
-            'disjoint': PostGISFunction(prefix, 'Disjoint'),
-            'touches': PostGISFunction(prefix, 'Touches'),
-            'crosses': PostGISFunction(prefix, 'Crosses'),
-            'within': PostGISFunction(prefix, 'Within'),
-            'overlaps': PostGISFunction(prefix, 'Overlaps'),
-            'contains': PostGISFunction(prefix, 'Contains'),
-            'intersects': PostGISFunction(prefix, 'Intersects'),
-            'relate': (PostGISRelate, six.string_types),
-            'coveredby': PostGISFunction(prefix, 'CoveredBy'),
-            'covers': PostGISFunction(prefix, 'Covers'),
-            'contains_properly': PostGISFunction(prefix, 'ContainsProperly'),
-        }
-
-        # Valid distance types and substitutions
-        dtypes = (Decimal, Distance, float) + six.integer_types
-
-        def get_dist_ops(operator):
-            "Returns operations for both regular and spherical distances."
-            return {'cartesian': PostGISDistance(prefix, operator),
-                    'sphere': PostGISSphereDistance(prefix, operator),
-                    'spheroid': PostGISSpheroidDistance(prefix, operator),
-                    }
-        self.distance_functions = {
-            'distance_gt': (get_dist_ops('>'), dtypes),
-            'distance_gte': (get_dist_ops('>='), dtypes),
-            'distance_lt': (get_dist_ops('<'), dtypes),
-            'distance_lte': (get_dist_ops('<='), dtypes),
-            'dwithin': (PostGISFunctionParam(prefix, 'DWithin'), dtypes)
-        }
-
-        # Adding the distance functions to the geometries lookup.
-        self.geometry_functions.update(self.distance_functions)
-
-        # Only a subset of the operators and functions are available
-        # for the geography type.
-        self.geography_functions = self.distance_functions.copy()
-        self.geography_functions.update({
-            'coveredby': self.geometry_functions['coveredby'],
-            'covers': self.geometry_functions['covers'],
-            'intersects': self.geometry_functions['intersects'],
-        })
-        self.geography_operators = {
-            'bboverlaps': PostGISOperator('&&'),
-        }
-
-        # Creating a dictionary lookup of all GIS terms for PostGIS.
-        self.gis_terms = {'isnull'}
-        self.gis_terms.update(self.geometry_operators)
-        self.gis_terms.update(self.geometry_functions)
 
         self.area = prefix + 'Area'
         self.bounding_circle = prefix + 'MinimumBoundingCircle'
@@ -451,95 +363,6 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             return tuple(map(int, [m.group(1), m.group(2), m.group(3)]))
         else:
             raise Exception('Could not determine PROJ.4 version from PostGIS.')
-
-    def num_params(self, lookup_type, num_param):
-        """
-        Helper routine that returns a boolean indicating whether the number of
-        parameters is correct for the lookup type.
-        """
-        def exactly_two(np):
-            return np == 2
-
-        def two_to_three(np):
-            return np >= 2 and np <= 3
-        if (lookup_type in self.distance_functions and
-                lookup_type != 'dwithin'):
-            return two_to_three(num_param)
-        else:
-            return exactly_two(num_param)
-
-    def spatial_lookup_sql(self, lvalue, lookup_type, value, field, qn):
-        """
-        Constructs spatial SQL from the given lookup value tuple a
-        (alias, col, db_type), the lookup type string, lookup value, and
-        the geometry field.
-        """
-        geo_col, db_type = lvalue
-
-        if lookup_type in self.geometry_operators:
-            if field.geography and lookup_type not in self.geography_operators:
-                raise ValueError('PostGIS geography does not support the '
-                                 '"%s" lookup.' % lookup_type)
-            # Handling a PostGIS operator.
-            op = self.geometry_operators[lookup_type]
-            return op.as_sql(geo_col, self.get_geom_placeholder(field, value))
-        elif lookup_type in self.geometry_functions:
-            if field.geography and lookup_type not in self.geography_functions:
-                raise ValueError('PostGIS geography type does not support the '
-                                 '"%s" lookup.' % lookup_type)
-
-            # See if a PostGIS geometry function matches the lookup type.
-            tmp = self.geometry_functions[lookup_type]
-
-            # Lookup types that are tuples take tuple arguments, e.g., 'relate' and
-            # distance lookups.
-            if isinstance(tmp, tuple):
-                # First element of tuple is the PostGISOperation instance, and the
-                # second element is either the type or a tuple of acceptable types
-                # that may passed in as further parameters for the lookup type.
-                op, arg_type = tmp
-
-                # Ensuring that a tuple _value_ was passed in from the user
-                if not isinstance(value, (tuple, list)):
-                    raise ValueError('Tuple required for `%s` lookup type.' % lookup_type)
-
-                # Geometry is first element of lookup tuple.
-                geom = value[0]
-
-                # Number of valid tuple parameters depends on the lookup type.
-                nparams = len(value)
-                if not self.num_params(lookup_type, nparams):
-                    raise ValueError('Incorrect number of parameters given for `%s` lookup type.' % lookup_type)
-
-                # Ensuring the argument type matches what we expect.
-                if not isinstance(value[1], arg_type):
-                    raise ValueError('Argument type should be %s, got %s instead.' % (arg_type, type(value[1])))
-
-                # For lookup type `relate`, the op instance is not yet created (has
-                # to be instantiated here to check the pattern parameter).
-                if lookup_type == 'relate':
-                    op = op(self.geom_func_prefix, value[1])
-                elif lookup_type in self.distance_functions and lookup_type != 'dwithin':
-                    if not field.geography and field.geodetic(self.connection):
-                        # Setting up the geodetic operation appropriately.
-                        if nparams == 3 and value[2] == 'spheroid':
-                            op = op['spheroid']
-                        else:
-                            op = op['sphere']
-                    else:
-                        op = op['cartesian']
-            else:
-                op = tmp
-                geom = value
-
-            # Calling the `as_sql` function on the operation instance.
-            return op.as_sql(geo_col, self.get_geom_placeholder(field, geom))
-
-        elif lookup_type == 'isnull':
-            # Handling 'isnull' lookup type
-            return "%s IS %sNULL" % (geo_col, ('' if value else 'NOT ')), []
-
-        raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))
 
     def spatial_aggregate_sql(self, agg):
         """

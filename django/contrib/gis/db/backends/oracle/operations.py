@@ -244,6 +244,12 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
             else:
                 return 'SDO_GEOMETRY(%%s, %s)' % f.srid
 
+    def check_relate_argument(self, arg):
+        masks = 'TOUCH|OVERLAPBDYDISJOINT|OVERLAPBDYINTERSECT|EQUAL|INSIDE|COVEREDBY|CONTAINS|COVERS|ANYINTERACT|ON'
+        mask_regex = re.compile(r'^(%s)(\+(%s))*$' % (masks, masks), re.I)
+        if not self.mask_regex.match(arg):
+            raise ValueError('Invalid SDO_RELATE mask: "%s"' % (self.relate_func, arg))
+
     def spatial_lookup_sql(self, lvalue, lookup_type, value, field, qn):
         "Returns the SQL WHERE clause for use in Oracle spatial SQL construction."
         geo_col, db_type = lvalue
