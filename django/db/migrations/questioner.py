@@ -18,9 +18,10 @@ class MigrationQuestioner(object):
     interactive subclass is what the command-line arguments will use.
     """
 
-    def __init__(self, defaults=None, specified_apps=None):
+    def __init__(self, defaults=None, specified_apps=None, dry_run=None):
         self.defaults = defaults or {}
         self.specified_apps = specified_apps or set()
+        self.dry_run = dry_run
 
     def ask_initial(self, app_label):
         "Should we create an initial migration for the app?"
@@ -93,37 +94,39 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
 
     def ask_not_null_addition(self, field_name, model_name):
         "Adding a NOT NULL field to a model"
-        choice = self._choice_input(
-            "You are trying to add a non-nullable field '%s' to %s without a default;\n" % (field_name, model_name) +
-            "we can't do that (the database needs something to populate existing rows).\n" +
-            "Please select a fix:",
-            [
-                "Provide a one-off default now (will be set on all existing rows)",
-                "Quit, and let me add a default in models.py",
-            ]
-        )
-        if choice == 2:
-            sys.exit(3)
-        else:
-            print("Please enter the default value now, as valid Python")
-            print("The datetime module is available, so you can do e.g. datetime.date.today()")
-            while True:
-                if six.PY3:
-                    # Six does not correctly abstract over the fact that
-                    # py3 input returns a unicode string, while py2 raw_input
-                    # returns a bytestring.
-                    code = input(">>> ")
-                else:
-                    code = input(">>> ").decode(sys.stdin.encoding)
-                if not code:
-                    print("Please enter some code, or 'exit' (with no quotes) to exit.")
-                elif code == "exit":
-                    sys.exit(1)
-                else:
-                    try:
-                        return eval(code, {}, {"datetime": datetime_safe})
-                    except (SyntaxError, NameError) as e:
-                        print("Invalid input: %s" % e)
+        if not self.dry_run:
+            choice = self._choice_input(
+                "You are trying to add a non-nullable field '%s' to %s without a default;\n" % (field_name, model_name) +
+                "we can't do that (the database needs something to populate existing rows).\n" +
+                "Please select a fix:",
+                [
+                    "Provide a one-off default now (will be set on all existing rows)",
+                    "Quit, and let me add a default in models.py",
+                ]
+            )
+            if choice == 2:
+                sys.exit(3)
+            else:
+                print("Please enter the default value now, as valid Python")
+                print("The datetime module is available, so you can do e.g. datetime.date.today()")
+                while True:
+                    if six.PY3:
+                        # Six does not correctly abstract over the fact that
+                        # py3 input returns a unicode string, while py2 raw_input
+                        # returns a bytestring.
+                        code = input(">>> ")
+                    else:
+                        code = input(">>> ").decode(sys.stdin.encoding)
+                    if not code:
+                        print("Please enter some code, or 'exit' (with no quotes) to exit.")
+                    elif code == "exit":
+                        sys.exit(1)
+                    else:
+                        try:
+                            return eval(code, {}, {"datetime": datetime_safe})
+                        except (SyntaxError, NameError) as e:
+                            print("Invalid input: %s" % e)
+        return None
 
     def ask_rename(self, model_name, old_name, new_name, field_instance):
         "Was this field really renamed?"

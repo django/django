@@ -6,6 +6,7 @@ import os
 import shutil
 
 from django.apps import apps
+from django.db import models
 from django.core.management import call_command, CommandError
 from django.db.migrations import questioner
 from django.test import override_settings, override_system_checks
@@ -362,3 +363,22 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertIn("Merging migrations", stdout.getvalue())
         self.assertIn("Branch 0002_second", stdout.getvalue())
         self.assertIn("Branch 0002_conflicting_second", stdout.getvalue())
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_default"})
+    def test_makemigrations_dry_run(self):
+        """
+        Ticket #22676 -- `makemigrations --dry-run` should not ask for defaults.
+        """
+
+        class SillyModel(models.Model):
+            silly_field = models.BooleanField(default=False)
+            silly_date = models.DateField()  # Added field without a default
+
+            class Meta:
+                app_label = "migrations"
+
+        stdout = six.StringIO()
+        call_command("makemigrations", "migrations", dry_run=True, stdout=stdout)
+        # Output the expected changes directly, without asking for defaults
+        self.assertIn("Add field silly_date to sillymodel", stdout.getvalue())
