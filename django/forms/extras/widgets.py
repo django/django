@@ -48,7 +48,7 @@ class SelectDateWidget(Widget):
     day_field = '%s_day'
     year_field = '%s_year'
 
-    def __init__(self, attrs=None, years=None, months=None):
+    def __init__(self, attrs=None, years=None, months=None, empty_label=None):
         self.attrs = attrs or {}
 
         # Optional list or tuple of years to use in the "year" select box.
@@ -63,6 +63,9 @@ class SelectDateWidget(Widget):
             self.months = months
         else:
             self.months = MONTHS
+
+        if empty_label is not None:
+            self.none_value = (0, empty_label)
 
     def render(self, name, value, attrs=None):
         try:

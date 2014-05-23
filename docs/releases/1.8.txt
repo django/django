@@ -136,6 +136,10 @@ Forms
   a form's :attr:`~django.forms.Form.label_suffix` while using  shortcuts such
   as ``{{ form.as_p }}`` in templates.
 
+* :class:`~django.forms.extras.widgets.SelectDateWidget` now accepts an
+  :attr:`~django.forms.extras.widgets.SelectDateWidget.empty_label` argument, which will
+  override the top list choice label when :class:`~django.forms.DateField` is not required.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
