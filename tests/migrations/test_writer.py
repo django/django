@@ -131,7 +131,7 @@ class WriterTests(TestCase):
         tuple) default_permissions = ()
         """
         empty_tuple = ()
-        one_item_tuple = ('a')
+        one_item_tuple = ('a',)
         many_items_tuple = ('a', 'b', 'c')
         self.assertSerializedEqual(empty_tuple)
         self.assertSerializedEqual(one_item_tuple)
