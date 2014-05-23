@@ -85,7 +85,16 @@ class ModelBase(type):
 
         if getattr(meta, 'app_label', None) is None:
 
-            if app_config is None:
+            if new_class.__module__ == '__main__':
+                # Special case definitions which are almost certainly from the
+                # shell; this makes it easier for people to write simple test
+                # models which won't be saved in the database.
+                # c.f. http://stackoverflow.com/q/23757143 which shows this is
+                # a common desire and issue that people run into.
+                # This may cause issues in other places, but it's generally a
+                # good tradeoff.
+                kwargs = {'app_label': '__main__'}
+            elif app_config is None:
                 # If the model is imported before the configuration for its
                 # application is created (#21719), or isn't in an installed
                 # application (#21680), use the legacy logic to figure out the
