@@ -297,6 +297,11 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 <option value="2013">2013</option>
 </select>""")
 
+        w = SelectDateWidget(years=('2014',), empty_label='empty_label')
+
+        # Rendering the default state with empty_label setted.
+        self.assertInHTML('<option value="0">empty_label</option>', w.render('mydate', ''), count=3)
+
         a = GetDate({'mydate_month': '4', 'mydate_day': '1', 'mydate_year': '2008'})
         self.assertTrue(a.is_valid())
         self.assertEqual(a.cleaned_data['mydate'], datetime.date(2008, 4, 1))

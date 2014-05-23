@@ -781,3 +781,15 @@ Composite widgets
                 5:_('may'), 6:_('jun'), 7:_('jul'), 8:_('aug'),
                 9:_('sep'), 10:_('oct'), 11:_('nov'), 12:_('dec')
             }
+
+    .. attribute:: SelectDateWidget.empty_label
+
+        .. versionadded:: 1.8
+
+        If the :class:`~django.forms.DateField` is not required,
+        :class:`SelectDateWidget` will have an empty choice at the top of
+        the list. You can change the text of this label
+        (which is ``---`` by default) with the ``empty_label`` attribute::
+
+            # A custom empty label
+            field1 = forms.DateField(widget=SelectDateWidget(empty_label="Nothing"))
