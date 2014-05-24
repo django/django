@@ -22,7 +22,7 @@ class GeoQuery(sql.Query):
 
     #### Methods overridden from the base Query class ####
     def __init__(self, model):
-        super(GeoQuery, self).__init__(model) #, where)
+        super(GeoQuery, self).__init__(model)
         # The following attributes are customized for the GeoQuerySet.
         # The SpatialBackend classes contain backend-specific routines and functions.
         self.custom_select = {}
