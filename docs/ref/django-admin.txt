@@ -660,6 +660,15 @@ for advanced users and should not be used unless you are familiar with
 the migration format, migration operations, and the dependencies between
 your migrations.
 
+.. django-admin-option:: --dry-run
+
+The ``--dry-run`` option shows what migrations would be made without
+actually writing any migrations files to disk.
+
+.. django-admin-option:: --merge
+
+The ``--merge`` option enables fixing of migration conflicts.
+
 migrate [<app_label> [<migrationname>]]
 ---------------------------------------
 
