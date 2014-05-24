@@ -2228,27 +2228,53 @@ class ModelFormInheritanceTests(TestCase):
         self.assertEqual(list(ModelForm().fields.keys()), ['name', 'age'])
 
     def test_field_shadowing(self):
-        class ModelForm(forms.ModelForm):
+        class WriterModelForm(forms.ModelForm):
             class Meta:
                 model = Writer
                 fields = '__all__'
 
-        class Mixin(object):
-            age = None
+        class ShadowAgeMixin(object):
+            ignore_fields = ['age']
 
-        class Form(forms.Form):
+        class FormWithAgeField(forms.Form):
             age = forms.IntegerField()
 
-        class Form2(forms.Form):
+        class FormWithFooField(forms.Form):
             foo = forms.IntegerField()
 
-        self.assertEqual(list(ModelForm().fields.keys()), ['name'])
-        self.assertEqual(list(type(str('NewForm'), (Mixin, Form), {})().fields.keys()), [])
-        self.assertEqual(list(type(str('NewForm'), (Form2, Mixin, Form), {})().fields.keys()), ['foo'])
-        self.assertEqual(list(type(str('NewForm'), (Mixin, ModelForm, Form), {})().fields.keys()), ['name'])
-        self.assertEqual(list(type(str('NewForm'), (ModelForm, Mixin, Form), {})().fields.keys()), ['name'])
-        self.assertEqual(list(type(str('NewForm'), (ModelForm, Form, Mixin), {})().fields.keys()), ['name', 'age'])
-        self.assertEqual(list(type(str('NewForm'), (ModelForm, Form), {'age': None})().fields.keys()), ['name'])
+        class FormWithMediaField(forms.Form):
+            media = forms.CharField()
+
+        class FormWithCleanField(forms.Form):
+            clean = forms.BooleanField()
+
+        class FormWithCleanMethod(forms.Form):
+            def clean(self):
+                return {}
+
+        def get_fields(bases, attrs=None):
+            return list(type(str('NewForm'), bases, attrs or {})().fields.keys())
+
+        # Refs #8620.
+        self.assertEqual(get_fields((ShadowAgeMixin, FormWithAgeField)), [])
+        self.assertEqual(get_fields((FormWithAgeField, ShadowAgeMixin)), ['age'])
+        self.assertEqual(get_fields((FormWithFooField, ShadowAgeMixin, FormWithAgeField)), ['foo'])
+
+        self.assertEqual(list(WriterModelForm().fields.keys()), ['name'])
+        self.assertEqual(get_fields((WriterModelForm, FormWithAgeField)), ['name', 'age'])
+        self.assertEqual(get_fields((WriterModelForm, FormWithAgeField), {'ignore_fields': ['age']}), ['name'])
+        self.assertEqual(get_fields((ShadowAgeMixin, WriterModelForm, FormWithAgeField)), ['name'])
+        self.assertEqual(get_fields((WriterModelForm, ShadowAgeMixin, FormWithAgeField)), ['name'])
+        self.assertEqual(get_fields((WriterModelForm, FormWithAgeField, ShadowAgeMixin)), ['name', 'age'])
+
+        # Refs #22510.
+        self.assertEqual(list(FormWithMediaField().fields.keys()), ['media'])
+        self.assertEqual(get_fields((FormWithAgeField, FormWithMediaField)), ['media', 'age'])
+        self.assertEqual(get_fields((FormWithMediaField, FormWithAgeField)), ['age', 'media'])
+        self.assertEqual(get_fields((FormWithMediaField, FormWithAgeField), {'ignore_fields': ['media']}), ['age'])
+        self.assertEqual(get_fields((FormWithCleanMethod, FormWithCleanField)), ['clean'])
+        self.assertEqual(get_fields((FormWithCleanField, FormWithCleanMethod)), ['clean'])
+        self.assertEqual(get_fields((FormWithCleanField, FormWithCleanMethod), {'ignore_fields': ['clean']}), [])
 
 
 class StumpJokeForm(forms.ModelForm):
