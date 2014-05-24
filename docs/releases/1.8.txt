@@ -157,6 +157,12 @@ Management Commands
 * The :djadminopt:`--ignorenonexistent` option of the :djadmin:`loaddata`
   management command now ignores data for models that no longer exist.
 
+* :djadmin:`test` now features colored output. If necessary, colored output
+  can be supressed using the :djadminopt:`--no-color` option. Windows users
+  will need to have the `ANSICON library`_ installed for this to work.
+
+.. _ANSICON library: https://github.com/adoxa/ansicon
+
 Models
 ^^^^^^
 

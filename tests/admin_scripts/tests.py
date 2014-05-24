@@ -22,6 +22,7 @@ from django import conf, get_version
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import BaseCommand, CommandError, call_command
+from django.core.management.color import make_style, supports_color
 from django.db import connection
 from django.utils.encoding import force_text
 from django.utils._os import npath, upath
@@ -29,6 +30,8 @@ from django.utils.six import StringIO
 from django.test import LiveServerTestCase, TestCase, override_settings
 from django.test.runner import DiscoverRunner
 from django.test.utils import str_prefix
+from django.utils import six
+from django.utils.termcolors import parse_color_setting
 
 
 test_dir = os.path.realpath(os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project'))
@@ -1205,10 +1208,49 @@ class CustomTestRunner(DiscoverRunner):
         pass
 
 
+@unittest.skipIf(not getattr(settings, 'RUN_FROM_MANAGE_TEST_COMMAND', False),
+                 "not inside ManageTestCommand subprocess")
+class PassingTest(unittest.TestCase):
+    """
+    Test case that always passes to facilitate testing of the `test`
+    management command. See ManageTestCommand below.
+    """
+
+    def setUp(self):
+        # This is a hack to turn on colored output when running
+        # inside a subprocess, as will be the case when this test
+        # case is run via the run_manage method, see ManageTestCommand
+        # below
+        color_settings = parse_color_setting('test_success=green')
+        self._resultForDoCleanups.style = make_style(color_settings)
+        self._resultForDoCleanups.terminator = '\x1b[0m'
+
+    def test_passes(self):
+        self.assertTrue(True)
+
+
 class ManageTestCommand(AdminScriptTestCase):
     def setUp(self):
         from django.core.management.commands.test import Command as TestCommand
         self.cmd = TestCommand()
+        self.write_settings('settings.py', sdict={
+            'RUN_FROM_MANAGE_TEST_COMMAND': True,
+        })
+
+    def tearDown(self):
+        self.remove_settings('settings.py')
+
+    @unittest.skipIf(
+        not supports_color() or sys.platform == 'win32' or six.PY3,
+        "terminal does not support color")
+    def test_colored(self):
+        out, err = self.run_manage(['test', 'admin_scripts.tests.PassingTest'])
+        self.assertIn('\x1b[32m.\x1b[0m', err)
+
+    def test_uncolored(self):
+        out, err = self.run_manage(
+            ['test', 'admin_scripts.tests.PassingTest', '--no-color'])
+        self.assertNotIn('\x1b[32m.\x1b[0m', err)
 
     def test_liveserver(self):
         """

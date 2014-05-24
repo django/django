@@ -93,6 +93,11 @@ PALETTES = {
         'MIGRATE_LABEL': {},
         'MIGRATE_SUCCESS': {},
         'MIGRATE_FAILURE': {},
+        'TEST_SUCCESS': {},
+        'TEST_FAILURE': {},
+        'TEST_SKIP': {},
+        'TEST_EXPECTED_FAILURE': {},
+        'TEST_UNEXPECTED_SUCCESS': {},
     },
     DARK_PALETTE: {
         'ERROR': {'fg': 'red', 'opts': ('bold',)},
@@ -113,6 +118,11 @@ PALETTES = {
         'MIGRATE_LABEL': {'opts': ('bold',)},
         'MIGRATE_SUCCESS': {'fg': 'green', 'opts': ('bold',)},
         'MIGRATE_FAILURE': {'fg': 'red', 'opts': ('bold',)},
+        'TEST_SUCCESS': {'fg': 'green'},
+        'TEST_FAILURE': {'fg': 'red', 'opts': ('bold',)},
+        'TEST_SKIP': {},
+        'TEST_EXPECTED_FAILURE': {},
+        'TEST_UNEXPECTED_SUCCESS': {},
     },
     LIGHT_PALETTE: {
         'ERROR': {'fg': 'red', 'opts': ('bold',)},
@@ -133,6 +143,11 @@ PALETTES = {
         'MIGRATE_LABEL': {'opts': ('bold',)},
         'MIGRATE_SUCCESS': {'fg': 'green', 'opts': ('bold',)},
         'MIGRATE_FAILURE': {'fg': 'red', 'opts': ('bold',)},
+        'TEST_SUCCESS': {'fg': 'green'},
+        'TEST_FAILURE': {'fg': 'red', 'opts': ('bold',)},
+        'TEST_SKIP': {},
+        'TEST_EXPECTED_FAILURE': {},
+        'TEST_UNEXPECTED_SUCCESS': {},
     }
 }
 DEFAULT_PALETTE = DARK_PALETTE

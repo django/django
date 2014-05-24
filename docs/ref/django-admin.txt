@@ -1299,6 +1299,14 @@ The ``--liveserver`` option can be used to override the default address where
 the live server (used with :class:`~django.test.LiveServerTestCase`) is
 expected to run from. The default value is ``localhost:8081``.
 
+.. versionadded:: 1.8
+
+If the Pygments library is available, the tracebacks of failing tests will be
+colored. Windows users will need to have the `ANSICON library`_ installed to
+get colored output.
+
+.. _ANSICON library: https://github.com/adoxa/ansicon
+
 testserver <fixture fixture ...>
 --------------------------------
 
@@ -1652,6 +1660,14 @@ number of roles in which color is used:
 * ``http_not_found`` - A 404 HTTP Not Found server response.
 * ``http_bad_request`` - A 4XX HTTP Bad Request server response other than 404.
 * ``http_server_error`` - A 5XX HTTP Server Error response.
+
+.. versionadded:: 1.8
+
+* ``test_success`` - A passing test.
+* ``test_failure`` - A failing test.
+* ``test_skip`` - A skipped test.
+* ``test_expected_failure`` - A test that's expectedly failing.
+* ``test_unexpected_success`` - A test that's unexpectedly passing.
 
 Each of these roles can be assigned a specific foreground and
 background color, from the following list:
