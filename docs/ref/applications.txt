@@ -238,6 +238,15 @@ Methods
         separate from the production settings, ``manage.py test`` would still
         execute some queries against your **production** database!
 
+    .. note::
+
+        In the usual initialization process, the ``ready`` method is only called
+        once by Django. But in some corner cases, particularly in tests which
+        are fiddling with installed applications, ``ready`` might be called more
+        than once. In that case, either write idempotents methods, or put a flag
+        on your ``AppConfig`` classes to prevent re-running code which should
+        be executed exactly one time.
+
 .. _namespace package:
 
 Namespace packages as apps (Python 3.3+)
