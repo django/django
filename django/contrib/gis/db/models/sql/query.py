@@ -3,9 +3,9 @@ from django.db.models.query import sql
 
 from django.contrib.gis.db.models.constants import ALL_TERMS
 from django.contrib.gis.db.models.fields import GeometryField
+from django.contrib.gis.db.models.lookups import GISLookup
 from django.contrib.gis.db.models.sql import aggregates as gis_aggregates
 from django.contrib.gis.db.models.sql.conversion import AreaField, DistanceField, GeomField
-from django.contrib.gis.db.models.sql.where import GeoWhereNode
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 
@@ -21,11 +21,10 @@ class GeoQuery(sql.Query):
     compiler = 'GeoSQLCompiler'
 
     #### Methods overridden from the base Query class ####
-    def __init__(self, model, where=GeoWhereNode):
-        super(GeoQuery, self).__init__(model, where)
+    def __init__(self, model):
+        super(GeoQuery, self).__init__(model) #, where)
         # The following attributes are customized for the GeoQuerySet.
-        # The GeoWhereNode and SpatialBackend classes contain backend-specific
-        # routines and functions.
+        # The SpatialBackend classes contain backend-specific routines and functions.
         self.custom_select = {}
         self.transformed_srid = None
         self.extra_select_fields = {}
@@ -108,4 +107,4 @@ class GeoQuery(sql.Query):
         else:
             # Otherwise, check by the given field name -- which may be
             # a lookup to a _related_ geographic field.
-            return GeoWhereNode._check_geo_field(self.model._meta, field_name)
+            return GISLookup._check_geo_field(self.model._meta, field_name)
