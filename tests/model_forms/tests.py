@@ -2227,7 +2227,7 @@ class ModelFormInheritanceTests(TestCase):
 
         self.assertEqual(list(ModelForm().fields.keys()), ['name', 'age'])
 
-    def test_field_shadowing(self):
+    def test_field_removal(self):
         class ModelForm(forms.ModelForm):
             class Meta:
                 model = Writer
@@ -2249,6 +2249,24 @@ class ModelFormInheritanceTests(TestCase):
         self.assertEqual(list(type(str('NewForm'), (ModelForm, Mixin, Form), {})().fields.keys()), ['name'])
         self.assertEqual(list(type(str('NewForm'), (ModelForm, Form, Mixin), {})().fields.keys()), ['name', 'age'])
         self.assertEqual(list(type(str('NewForm'), (ModelForm, Form), {'age': None})().fields.keys()), ['name'])
+
+    def test_field_removal_name_clashes(self):
+        """Regression test for https://code.djangoproject.com/ticket/22510."""
+
+        class MyForm(forms.ModelForm):
+            media = forms.CharField()
+
+            class Meta:
+                model = Writer
+                fields = '__all__'
+
+        class SubForm(MyForm):
+            media = None
+
+        self.assertIn('media', MyForm().fields)
+        self.assertNotIn('media', SubForm().fields)
+        self.assertTrue(hasattr(MyForm, 'media'))
+        self.assertTrue(hasattr(SubForm, 'media'))
 
 
 class StumpJokeForm(forms.ModelForm):

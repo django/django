@@ -982,10 +982,20 @@ classes::
 
 .. versionadded:: 1.7
 
-* It's possible to opt-out from a ``Field`` inherited from a parent class by
-  shadowing it. While any non-``Field`` value works for this purpose, it's
-  recommended to use ``None`` to make it explicit that a field is being
-  nullified.
+* It's possible to declaratively remove a ``Field`` inherited from a parent
+  class by setting the name to be ``None`` on the subclass. For example::
+
+    >>> from django import forms
+
+    >>> class ParentForm(forms.Form):
+    ...     name = forms.CharField()
+    ...     age = forms.IntegerField()
+
+    >>> class ChildForm(ParentForm):
+    ...     name = None
+
+    >>> ChildForm().fields.keys()
+    ... ['age']
 
 .. _form-prefix:
 
