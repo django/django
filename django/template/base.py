@@ -58,7 +58,14 @@ UNKNOWN_SOURCE = '<unknown source>'
 
 # match a variable or block tag and capture the entire tag, including start/end
 # delimiters
-tag_re = re.compile(r'{%\s*(?P<block>.+?)\s*%}|{{\s*(?P<var>.+?)\s*}}|{#\s*(?P<comment>.+?)\s*#}')
+tag_re = re.compile(
+    '|'.join([
+        r'%s\s*(?P<block>.+?)\s*%s' % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END)),
+        r'%s\s*(?P<var>.+?)\s*%s' % (re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END)),
+        r'%s\s*(?P<comment>.+?)\s*%s' % (re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END)),
+    ]),
+    re.DOTALL,
+)
 
 
 # global dictionary of libraries that have been loaded using get_library
