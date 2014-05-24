@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-from __future__ import division
-
 import logging
+from optparse import OptionParser
 import os
 import shutil
 import subprocess
@@ -11,6 +10,11 @@ import warnings
 
 import django
 from django import contrib
+from django.apps import apps, AppConfig
+from django.conf import settings
+from django.db import connection
+from django.test import TransactionTestCase, TestCase
+from django.test.utils import get_runner
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils._os import upath
 from django.utils import six
@@ -57,7 +61,6 @@ ALWAYS_INSTALLED_APPS = [
 
 def get_test_modules():
     from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
-    from django.db import connection
     modules = []
     discovery_paths = [
         (None, RUNTESTS_DIR),
@@ -83,15 +86,10 @@ def get_test_modules():
 
 
 def get_installed():
-    from django.apps import apps
     return [app_config.name for app_config in apps.get_app_configs()]
 
 
 def setup(verbosity, test_labels):
-    from django.apps import apps, AppConfig
-    from django.conf import settings
-    from django.test import TransactionTestCase, TestCase
-
     print("Testing against Django installed in '%s'" % os.path.dirname(django.__file__))
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
@@ -171,8 +169,6 @@ def setup(verbosity, test_labels):
 
 
 def teardown(state):
-    from django.conf import settings
-
     try:
         # Removing the temporary TEMP_DIR. Ensure we pass in unicode
         # so that it will successfully remove temp trees containing
@@ -188,12 +184,10 @@ def teardown(state):
 
 
 def django_tests(verbosity, interactive, failfast, test_labels):
-    from django.conf import settings
     state = setup(verbosity, test_labels)
     extra_tests = []
 
     # Run the test suite, including the extra validation tests.
-    from django.test.utils import get_runner
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
     TestRunner = get_runner(settings)
@@ -313,7 +307,6 @@ def paired_tests(paired_test, options, test_labels):
 
 
 if __name__ == "__main__":
-    from optparse import OptionParser
     usage = "%prog [options] [module module module ...]"
     parser = OptionParser(usage=usage)
     parser.add_option(
