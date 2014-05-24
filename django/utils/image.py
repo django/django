@@ -76,7 +76,6 @@ import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import RemovedInDjango18Warning
-from django.utils.translation import ugettext_lazy as _
 
 
 Image = None
@@ -106,7 +105,7 @@ def _detect_image_library():
         except ImportError as err:
             # Neither worked, so it's likely not installed.
             raise ImproperlyConfigured(
-                _("Neither Pillow nor PIL could be imported: %s") % err
+                "Neither Pillow nor PIL could be imported: %s" % err
             )
 
     # ``Image.alpha_composite`` was added to Pillow in SHA: e414c6 & is not
@@ -131,8 +130,8 @@ def _detect_image_library():
                     import _imaging as PIL_imaging
                 except ImportError as err:
                     raise ImproperlyConfigured(
-                        _("The '_imaging' module for the PIL could not be "
-                          "imported: %s") % err
+                        "The '_imaging' module for the PIL could not be "
+                        "imported: %s" % err
                     )
 
     # Try to import ImageFile as well.
