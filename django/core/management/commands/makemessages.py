@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import fnmatch
 import glob
 import io
@@ -56,6 +58,7 @@ class TranslatableFile(object):
         Uses the xgettext GNU gettext utility.
         """
 
+        from django.conf import settings
         from django.utils.translation import templatize
 
         if command.verbosity > 1:
@@ -64,12 +67,12 @@ class TranslatableFile(object):
         if domain == 'djangojs' and file_ext in command.extensions:
             is_templatized = True
             orig_file = os.path.join(self.dirpath, self.file)
-            with open(orig_file) as fp:
+            with io.open(orig_file, encoding=settings.FILE_CHARSET) as fp:
                 src_data = fp.read()
             src_data = prepare_js_for_gettext(src_data)
             thefile = '%s.c' % self.file
             work_file = os.path.join(self.dirpath, thefile)
-            with open(work_file, "w") as fp:
+            with io.open(work_file, "w", encoding='utf-8') as fp:
                 fp.write(src_data)
             args = [
                 'xgettext',
@@ -88,11 +91,11 @@ class TranslatableFile(object):
             orig_file = os.path.join(self.dirpath, self.file)
             is_templatized = file_ext in command.extensions
             if is_templatized:
-                with open(orig_file, 'r' if six.PY3 else 'rU') as fp:
+                with io.open(orig_file, 'r', encoding=settings.FILE_CHARSET) as fp:
                     src_data = fp.read()
                 thefile = '%s.py' % self.file
                 content = templatize(src_data, orig_file[2:])
-                with open(os.path.join(self.dirpath, thefile), "w") as fp:
+                with io.open(os.path.join(self.dirpath, thefile), "w", encoding='utf-8') as fp:
                     fp.write(content)
             work_file = os.path.join(self.dirpath, thefile)
             args = [
@@ -126,6 +129,8 @@ class TranslatableFile(object):
                 # Print warnings
                 command.stdout.write(errors)
         if msgs:
+            if six.PY2:
+                msgs = msgs.decode('utf-8')
             # Write/append messages to pot file
             potfile = os.path.join(self.locale_dir, '%s.pot' % str(domain))
             if is_templatized:
@@ -154,7 +159,7 @@ def write_pot_file(potfile, msgs):
         msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
     else:
         msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
-    with open(potfile, 'a') as fp:
+    with io.open(potfile, 'a', encoding='utf-8') as fp:
         fp.write(msgs)
 
 
@@ -318,13 +323,15 @@ class Command(NoArgsCommand):
                 continue
             args = ['msguniq'] + self.msguniq_options + [potfile]
             msgs, errors, status = popen_wrapper(args)
+            if six.PY2:
+                msgs = msgs.decode('utf-8')
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
                         "errors happened while running msguniq\n%s" % errors)
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
-            with open(potfile, 'w') as fp:
+            with io.open(potfile, 'w', encoding='utf-8') as fp:
                 fp.write(msgs)
             potfiles.append(potfile)
         return potfiles
@@ -395,6 +402,8 @@ class Command(NoArgsCommand):
         if os.path.exists(pofile):
             args = ['msgmerge'] + self.msgmerge_options + [pofile, potfile]
             msgs, errors, status = popen_wrapper(args)
+            if six.PY2:
+                msgs = msgs.decode('utf-8')
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
@@ -402,13 +411,13 @@ class Command(NoArgsCommand):
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
         else:
-            with open(potfile, 'r') as fp:
+            with io.open(potfile, 'r', encoding='utf-8') as fp:
                 msgs = fp.read()
             if not self.invoked_for_django:
                 msgs = self.copy_plural_forms(msgs, locale)
         msgs = msgs.replace(
             "#. #-#-#-#-#  %s.pot (PACKAGE VERSION)  #-#-#-#-#\n" % self.domain, "")
-        with open(pofile, 'w') as fp:
+        with io.open(pofile, 'w', encoding='utf-8') as fp:
             fp.write(msgs)
 
         if self.no_obsolete:
@@ -435,7 +444,7 @@ class Command(NoArgsCommand):
         for domain in domains:
             django_po = os.path.join(django_dir, 'conf', 'locale', locale, 'LC_MESSAGES', '%s.po' % domain)
             if os.path.exists(django_po):
-                with io.open(django_po, 'r' if six.PY3 else 'rU', encoding='utf-8') as fp:
+                with io.open(django_po, 'r', encoding='utf-8') as fp:
                     m = plural_forms_re.search(fp.read())
                 if m:
                     plural_form_line = force_str(m.group('value'))
