@@ -219,6 +219,8 @@ class BaseHandler(object):
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 
+        response._closable_objects.append(request)
+
         return response
 
     def handle_uncaught_exception(self, request, resolver, exc_info):
