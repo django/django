@@ -27,6 +27,7 @@ class CookieStorage(storage.BaseStorage):
         return json.loads(data, cls=json.JSONDecoder)
 
     def update_response(self, response):
+        super(CookieStorage, self).update_response(response)
         if self.data:
             response.set_signed_cookie(self.prefix, self.encoder.encode(self.data))
         else:

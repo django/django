@@ -85,3 +85,19 @@ class TestStorage(object):
         storage.extra_data['test'] = True
 
         self.assertTrue('test' in storage.extra_data)
+
+    def test_reset_deletes_tmp_files(self):
+        request = get_request()
+        storage = self.get_storage()('wizard1', request, temp_storage)
+
+        step = 'start'
+        file_ = SimpleUploadedFile('file.txt', b'content')
+        storage.set_step_files(step, {'file': file_})
+
+        with storage.get_step_files(step)['file'] as file:
+            tmp_name = file.name
+
+        self.assertTrue(storage.file_storage.exists(tmp_name))
+
+        storage.reset()
+        self.assertFalse(storage.file_storage.exists(tmp_name))
