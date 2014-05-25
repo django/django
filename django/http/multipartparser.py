@@ -228,6 +228,7 @@ class MultiPartParser(object):
                                     break
 
                     except SkipFile:
+                        self._close_files()
                         # Just use up the rest of this file...
                         exhaust(field_stream)
                     else:
@@ -237,6 +238,7 @@ class MultiPartParser(object):
                     # If this is neither a FIELD or a FILE, just exhaust the stream.
                     exhaust(stream)
         except StopUpload as e:
+            self._close_files()
             if not e.connection_reset:
                 exhaust(self._input_data)
         else:
@@ -267,6 +269,14 @@ class MultiPartParser(object):
     def IE_sanitize(self, filename):
         """Cleanup filename from Internet Explorer full paths."""
         return filename and filename[filename.rfind("\\") + 1:].strip()
+
+    def _close_files(self):
+        # Free up all file handles.
+        # FIXME: this currently assumes that upload handlers store the file as 'file'
+        # We should document that... (Maybe add handler.free_file to complement new_file)
+        for handler in self._upload_handlers:
+            if hasattr(handler, 'file'):
+                handler.file.close()
 
 
 class LazyStream(six.Iterator):

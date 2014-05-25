@@ -96,9 +96,6 @@ class InMemoryUploadedFile(UploadedFile):
     def open(self, mode=None):
         self.file.seek(0)
 
-    def close(self):
-        pass
-
     def chunks(self, chunk_size=None):
         self.file.seek(0)
         yield self.read()
