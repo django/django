@@ -60,7 +60,7 @@ class FormsTestCase(TestCase):
         self.assertHTMLEqual(str(p['birthday']), '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" />')
 
         nonexistenterror = "Key u?'nonexistentfield' not found in 'Person'"
-        with self.assertRaisesRegex(KeyError, nonexistenterror):
+        with six.assertRaisesRegex(self, KeyError, nonexistenterror):
             p['nonexistentfield']
             self.fail('Attempts to access non-existent fields should fail.')
 
