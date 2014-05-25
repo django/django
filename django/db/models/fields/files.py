@@ -89,7 +89,7 @@ class FieldFile(File):
         setattr(self.instance, self.field.name, self.name)
 
         # Update the filesize cache
-        self._size = content.size
+        self._size = self.storage.size(self.name)
         self._committed = True
 
         # Save the object because it has changed, unless save is False
