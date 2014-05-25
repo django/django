@@ -36,6 +36,7 @@ class StaticTests(SimpleTestCase):
     def test_unknown_mime_type(self):
         response = self.client.get('/%s/file.unknown' % self.prefix)
         self.assertEqual('application/octet-stream', response['Content-Type'])
+        response.close()
 
     def test_copes_with_empty_path_component(self):
         file_name = 'file.txt'
