@@ -5,6 +5,7 @@ import os
 import re
 import sys
 from io import BytesIO
+from itertools import chain
 from pprint import pformat
 
 from django.conf import settings
@@ -255,6 +256,11 @@ class HttpRequest(object):
             self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
         else:
             self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
+
+    def close(self):
+        if hasattr(self, '_files'):
+            for f in chain.from_iterable(l[1] for l in self._files.lists()):
+                f.close()
 
     # File-like and iterator interface.
     #

@@ -327,6 +327,37 @@ class FileUploadTests(TestCase):
             self.assertEqual(got.get('file1'), 1)
             self.assertEqual(got.get('file2'), 2)
 
+    def test_fileuploads_closed_at_request_end(self):
+        file = tempfile.NamedTemporaryFile
+        with file() as f1, file() as f2a, file() as f2b:
+            response = self.client.post('/fd_closing/t/', {
+                'file': f1,
+                'file2': (f2a, f2b),
+            })
+
+        request = response.wsgi_request
+        # Check that the files got actually parsed.
+        self.assertTrue(hasattr(request, '_files'))
+
+        file = request._files['file']
+        self.assertTrue(file.closed)
+
+        files = request._files.getlist('file2')
+        self.assertTrue(files[0].closed)
+        self.assertTrue(files[1].closed)
+
+    def test_no_parsing_triggered_by_fd_closing(self):
+        file = tempfile.NamedTemporaryFile
+        with file() as f1, file() as f2a, file() as f2b:
+            response = self.client.post('/fd_closing/f/', {
+                'file': f1,
+                'file2': (f2a, f2b),
+            })
+
+        request = response.wsgi_request
+        # Check that the fd closing logic doesn't trigger parsing of the stream
+        self.assertFalse(hasattr(request, '_files'))
+
     def test_file_error_blocking(self):
         """
         The server should not block when there are upload errors (bug #8622).

@@ -504,6 +504,10 @@ File Uploads
   attribute is now optional. If it is omitted or given ``None`` or an empty
   string, a subdirectory won't be used for storing the uploaded files.
 
+* Uploaded files are now explicitly closed before the response is delivered to
+  the client. Partially uploaded files are also closed as long as they are
+  named ``file`` in the upload handler.
+
 Forms
 ^^^^^
 

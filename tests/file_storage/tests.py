@@ -19,7 +19,8 @@ from django.core.cache import cache
 from django.core.exceptions import SuspiciousOperation
 from django.core.files.base import File, ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
-from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.uploadedfile import (InMemoryUploadedFile, SimpleUploadedFile,
+    TemporaryUploadedFile)
 from django.test import LiveServerTestCase, SimpleTestCase
 from django.test import override_settings
 from django.utils import six
@@ -205,6 +206,23 @@ class FileStorageTests(unittest.TestCase):
             os.path.join(self.temp_dir, 'path', 'to', 'test.file')))
 
         self.storage.delete('path/to/test.file')
+
+    def test_save_doesnt_close(self):
+        with TemporaryUploadedFile('test', 'text/plain', 1, 'utf8') as file:
+            file.write(b'1')
+            file.seek(0)
+            self.assertFalse(file.closed)
+            self.storage.save('path/to/test.file', file)
+            self.assertFalse(file.closed)
+            self.assertFalse(file.file.closed)
+
+        file = InMemoryUploadedFile(six.StringIO('1'), '', 'test',
+                                    'text/plain', 1, 'utf8')
+        with file:
+            self.assertFalse(file.closed)
+            self.storage.save('path/to/test.file', file)
+            self.assertFalse(file.closed)
+            self.assertFalse(file.file.closed)
 
     def test_file_path(self):
         """
