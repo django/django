@@ -400,7 +400,7 @@ The lookup registration API is explained below.
 
 .. method:: get_transform(lookup_name)
 
-    Django uses ``get_transform(lookup_name)`` to fetch lookups. The
+    Django uses ``get_transform(lookup_name)`` to fetch transforms. The
     implementation of ``get_transform()`` looks for a subclass which is registered
     for the current class with the correct ``transform_name``.
 
