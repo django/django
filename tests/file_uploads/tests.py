@@ -271,12 +271,10 @@ class FileUploadTests(TestCase):
         file = tempfile.NamedTemporaryFile
         with file() as smallfile, file() as bigfile:
             # A small file (under the 5M quota)
-            smallfile = tempfile.NamedTemporaryFile()
             smallfile.write(b'a' * (2 ** 21))
             smallfile.seek(0)
 
             # A big file (over the quota)
-            bigfile = tempfile.NamedTemporaryFile()
             bigfile.write(b'a' * (10 * 2 ** 20))
             bigfile.seek(0)
 

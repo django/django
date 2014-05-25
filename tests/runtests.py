@@ -10,7 +10,7 @@ import warnings
 
 import django
 from django import contrib
-from django.apps import apps, AppConfig
+from django.apps import apps
 from django.conf import settings
 from django.db import connection
 from django.test import TransactionTestCase, TestCase
