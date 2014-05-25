@@ -15,4 +15,5 @@ urlpatterns = patterns('',
     (r'^getlist_count/$', views.file_upload_getlist_count),
     (r'^upload_errors/$', views.file_upload_errors),
     (r'^filename_case/$', views.file_upload_filename_case_view),
+    (r'^fd_closing/(?P<access>t|f)/$', views.file_upload_fd_closing),
 )

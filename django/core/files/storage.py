@@ -209,7 +209,6 @@ class FileSystemStorage(Storage):
                 # This file has a file path that we can move.
                 if hasattr(content, 'temporary_file_path'):
                     file_move_safe(content.temporary_file_path(), full_path)
-                    content.close()
 
                 # This is a normal uploadedfile that we can stream.
                 else:
@@ -228,7 +227,6 @@ class FileSystemStorage(Storage):
                                 _file = os.fdopen(fd, mode)
                             _file.write(chunk)
                     finally:
-                        content.close()
                         locks.unlock(fd)
                         if _file is not None:
                             _file.close()
