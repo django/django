@@ -67,7 +67,7 @@ Tests and multiple databases
 .. _topics-testing-primaryreplica:
 
 Testing primary/replica configurations
------------------------------------
+--------------------------------------
 
 If you're testing a multiple database configuration with primary/replica
 (referred to as master/slave by some databases) replication, this strategy of
