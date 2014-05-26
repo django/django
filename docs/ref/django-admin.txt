@@ -663,7 +663,9 @@ your migrations.
 .. django-admin-option:: --dry-run
 
 The ``--dry-run`` option shows what migrations would be made without
-actually writing any migrations files to disk.
+actually writing any migrations files to disk. Using this option along with
+``--verbosity 3`` will also show the complete migrations files that would be
+written.
 
 .. django-admin-option:: --merge
 

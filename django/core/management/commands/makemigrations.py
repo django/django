@@ -123,8 +123,8 @@ class Command(BaseCommand):
                     self.stdout.write("  %s:\n" % (self.style.MIGRATE_LABEL(writer.filename),))
                     for operation in migration.operations:
                         self.stdout.write("    - %s\n" % operation.describe())
-                # Write it
                 if not self.dry_run:
+                    # Write the migrations file to the disk.
                     migrations_directory = os.path.dirname(writer.path)
                     if not directory_created.get(app_label, False):
                         if not os.path.isdir(migrations_directory):
@@ -137,6 +137,12 @@ class Command(BaseCommand):
                     migration_string = writer.as_string()
                     with open(writer.path, "wb") as fh:
                         fh.write(migration_string)
+                elif self.verbosity == 3:
+                    # Alternatively, makemigrations --dry-run --verbosity 3
+                    # will output the migrations to stdout rather than saving
+                    # the file to the disk.
+                    self.stdout.write(self.style.MIGRATE_HEADING("Full migrations file '%s':" % writer.filename) + "\n")
+                    self.stdout.write("%s\n" % writer.as_string())
 
     def handle_merge(self, loader, conflicts):
         """
