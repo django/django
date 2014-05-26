@@ -134,7 +134,7 @@ passed. It uses the SQL operator ``<@``. For example::
     >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
 
     >>> Post.objects.filter(tags__contained_by=['thoughts', 'django'])
-    [<Post: First post>]
+    [<Post: First post>, <Post: Second post>]
 
     >>> Post.objects.filter(tags__contained_by=['thoughts', 'django', 'tutorial'])
     [<Post: First post>, <Post: Second post>, <Post: Third post>]
