@@ -382,3 +382,34 @@ class MakeMigrationsTests(MigrationTestBase):
         call_command("makemigrations", "migrations", dry_run=True, stdout=stdout)
         # Output the expected changes directly, without asking for defaults
         self.assertIn("Add field silly_date to sillymodel", stdout.getvalue())
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_default"})
+    def test_makemigrations_dry_run_verbosity_3(self):
+        """
+        Ticket #22675 -- Allow `makemigrations --dry-run` to output the
+        migrations file to stdout (with verbosity == 3).
+        """
+
+        class SillyModel(models.Model):
+            silly_field = models.BooleanField(default=False)
+            silly_char = models.CharField(default="")
+
+            class Meta:
+                app_label = "migrations"
+
+        stdout = six.StringIO()
+        call_command("makemigrations", "migrations", dry_run=True, stdout=stdout, verbosity=3)
+
+        # Normal --dry-run output
+        self.assertIn("- Add field silly_char to sillymodel", stdout.getvalue())
+
+        # Additional output caused by verbosity 3
+        # The complete migrations file that would be written
+        self.assertIn("# -*- coding: utf-8 -*-", stdout.getvalue())
+        self.assertIn("class Migration(migrations.Migration):", stdout.getvalue())
+        self.assertIn("dependencies = [", stdout.getvalue())
+        self.assertIn("('migrations', '0001_initial'),", stdout.getvalue())
+        self.assertIn("migrations.AddField(", stdout.getvalue())
+        self.assertIn("model_name='sillymodel',", stdout.getvalue())
+        self.assertIn("name='silly_char',", stdout.getvalue())
