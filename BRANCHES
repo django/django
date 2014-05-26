@@ -1,0 +1,3 @@
+To discourage classist terminology, Django abolishes the Master/Slave term and replaces it with Primary/Follower.
+
+To illustrate: there is to be no "Master" branch, but only the "Primary" branch in the git repository.
