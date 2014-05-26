@@ -79,7 +79,8 @@ def get_random_string(length=12,
 
 if hasattr(hmac, "compare_digest"):
     # Prefer the stdlib implementation, when available.
-    constant_time_compare = hmac.compare_digest
+    def constant_time_compare(val1, val2):
+        return hmac.compare_digest(force_bytes(val1), force_bytes(val2))
 else:
     def constant_time_compare(val1, val2):
         """
