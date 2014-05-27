@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
-from django.http import Http404
-from django.shortcuts import get_object_or_404, get_list_or_404
-from django.test import TestCase
+from freedom.http import Http404
+from freedom.shortcuts import get_object_or_404, get_list_or_404
+from freedom.test import TestCase
 
 from .models import Author, Article
 
@@ -90,7 +90,7 @@ class GetObjectOr404Tests(TestCase):
         # raises a helpful ValueError message
         self.assertRaisesMessage(
             ValueError,
-            "Object is of type 'str', but must be a Django Model, Manager, "
+            "Object is of type 'str', but must be a Freedom Model, Manager, "
             "or QuerySet",
             get_object_or_404, str("Article"), title__icontains="Run"
         )
@@ -100,7 +100,7 @@ class GetObjectOr404Tests(TestCase):
 
         self.assertRaisesMessage(
             ValueError,
-            "Object is of type 'CustomClass', but must be a Django Model, "
+            "Object is of type 'CustomClass', but must be a Freedom Model, "
             "Manager, or QuerySet",
             get_object_or_404, CustomClass, title__icontains="Run"
         )
@@ -108,7 +108,7 @@ class GetObjectOr404Tests(TestCase):
         # Works for lists too
         self.assertRaisesMessage(
             ValueError,
-            "Object is of type 'list', but must be a Django Model, Manager, "
+            "Object is of type 'list', but must be a Freedom Model, Manager, "
             "or QuerySet",
             get_list_or_404, [Article], title__icontains="Run"
         )

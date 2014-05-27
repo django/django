@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
+<freedom-objects version="1.0">
   <object pk="1" model="admin_views.book">
     <field type="CharField" name="name">Book 1</field>
   </object>
@@ -42,4 +42,4 @@
     <field type="CharField" name="xtra">ChapterXtra1 2</field>
     <field type="ForeignKey" name="chap">3</field>
   </object>
-</django-objects>
+</freedom-objects>

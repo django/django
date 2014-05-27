@@ -179,7 +179,7 @@ location available in your ``PATH``.  For example::
     $ cd spatialite-tools-osx-x86-2.3.1/bin
     $ sudo cp spatialite /Library/Frameworks/SQLite3.framework/Programs
 
-Finally, for GeoDjango to be able to find the KyngChaos SpatiaLite library,
+Finally, for GeoFreedom to be able to find the KyngChaos SpatiaLite library,
 add the following to your ``settings.py``:
 
 .. code-block:: python
@@ -199,7 +199,7 @@ metadata tables in your database in order to perform spatial queries.
 If you're using SpatiaLite 2.4 or newer, use the ``spatialite`` utility to
 call the ``InitSpatialMetaData()`` function, like this::
 
-   $ spatialite geodjango.db "SELECT InitSpatialMetaData();"
+   $ spatialite geofreedom.db "SELECT InitSpatialMetaData();"
    the SPATIAL_REF_SYS table already contains some row(s)
     InitSpatiaMetaData ()error:"table spatial_ref_sys already exists"
    0
@@ -217,11 +217,11 @@ First, get it from the `SpatiaLite Resources`__ page::
 
 Then, use the ``spatialite`` command to initialize a spatial database::
 
-   $ spatialite geodjango.db < init_spatialite-2.3.sql
+   $ spatialite geofreedom.db < init_spatialite-2.3.sql
 
 .. note::
 
-    The parameter ``geodjango.db`` is the *filename* of the SQLite database
+    The parameter ``geofreedom.db`` is the *filename* of the SQLite database
     you want to use.  Use the same in the :setting:`DATABASES` ``"name"`` key
     inside your ``settings.py``.
 

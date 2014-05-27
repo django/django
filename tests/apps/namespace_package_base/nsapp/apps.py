@@ -1,7 +1,7 @@
 import os
 
-from django.apps import AppConfig
-from django.utils._os import upath
+from freedom.apps import AppConfig
+from freedom.utils._os import upath
 
 
 class NSAppConfig(AppConfig):

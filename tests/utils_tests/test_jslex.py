@@ -2,8 +2,8 @@
 """Tests for jslex."""
 # originally from https://bitbucket.org/ned/jslex
 
-from django.test import TestCase
-from django.utils.jslex import JsLexer, prepare_js_for_gettext
+from freedom.test import TestCase
+from freedom.utils.jslex import JsLexer, prepare_js_for_gettext
 
 
 class JsTokensTest(TestCase):

@@ -1,10 +1,10 @@
 ==========================
-Django 1.2.1 release notes
+Freedom 1.2.1 release notes
 ==========================
 
-Django 1.2.1 was released almost immediately after 1.2.0 to correct two small
+Freedom 1.2.1 was released almost immediately after 1.2.0 to correct two small
 bugs: one was in the documentation packaging script, the other was a bug_ that
 affected datetime form field widgets when localization was enabled.
 
-.. _bug: https://code.djangoproject.com/ticket/13560
+.. _bug: https://code.freedomproject.com/ticket/13560
 

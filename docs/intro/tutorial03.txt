@@ -1,5 +1,5 @@
 =====================================
-Writing your first Django app, part 3
+Writing your first Freedom app, part 3
 =====================================
 
 This tutorial begins where :doc:`Tutorial 2 </intro/tutorial02>` left off. We're
@@ -9,7 +9,7 @@ interface -- "views."
 Philosophy
 ==========
 
-A view is a "type" of Web page in your Django application that generally serves
+A view is a "type" of Web page in your Freedom application that generally serves
 a specific function and has a specific template. For example, in a blog
 application, you might have the following views:
 
@@ -39,24 +39,24 @@ In our poll application, we'll have the following four views:
 * Vote action -- handles voting for a particular choice in a particular
   question.
 
-In Django, web pages and other content are delivered by views. Each view is
+In Freedom, web pages and other content are delivered by views. Each view is
 represented by a simple Python function (or method, in the case of class-based
-views). Django will choose a view by examining the URL that's requested (to be
+views). Freedom will choose a view by examining the URL that's requested (to be
 precise, the part of the URL after the domain name).
 
 Now in your time on the web you may have come across such beauties as
 "ME2/Sites/dirmod.asp?sid=&type=gen&mod=Core+Pages&gid=A6CD4967199A42D9B65B1B".
-You will be pleased to know that Django allows us much more elegant
+You will be pleased to know that Freedom allows us much more elegant
 *URL patterns* than that.
 
 A URL pattern is simply the general form of a URL - for example:
 ``/newsarchive/<year>/<month>/``.
 
-To get from a URL to a view, Django uses what are known as 'URLconfs'. A
+To get from a URL to a view, Freedom uses what are known as 'URLconfs'. A
 URLconf maps URL patterns (described as regular expressions) to views.
 
 This tutorial provides basic instruction in the use of URLconfs, and you can
-refer to :mod:`django.core.urlresolvers` for more information.
+refer to :mod:`freedom.core.urlresolvers` for more information.
 
 Write your first view
 =====================
@@ -67,13 +67,13 @@ and put the following Python code in it:
 .. snippet::
     :filename: polls/views.py
 
-    from django.http import HttpResponse
+    from freedom.http import HttpResponse
 
 
     def index(request):
         return HttpResponse("Hello, world. You're at the polls index.")
 
-This is the simplest view possible in Django. To call the view, we need to map
+This is the simplest view possible in Freedom. To call the view, we need to map
 it to a URL - and for this we need a URLconf.
 
 To create a URLconf in the polls directory, create a file called ``urls.py``.
@@ -92,7 +92,7 @@ In the ``polls/urls.py`` file include the following code:
 .. snippet::
     :filename: polls/urls.py
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     from polls import views
 
@@ -101,14 +101,14 @@ In the ``polls/urls.py`` file include the following code:
     ]
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
-``mysite/urls.py`` insert an :func:`~django.conf.urls.include`, leaving you
+``mysite/urls.py`` insert an :func:`~freedom.conf.urls.include`, leaving you
 with:
 
 .. snippet::
     :filename: mysite/urls.py
 
-    from django.conf.urls import include, url
-    from django.contrib import admin
+    from freedom.conf.urls import include, url
+    from freedom.contrib import admin
 
     urlpatterns = [
         url(r'^polls/', include('polls.urls')),
@@ -118,25 +118,25 @@ with:
 .. admonition:: Doesn't match what you see?
 
     If you're seeing ``admin.autodiscover()`` before the definition of
-    ``urlpatterns``, you're probably using a version of Django that doesn't
+    ``urlpatterns``, you're probably using a version of Freedom that doesn't
     match this tutorial version.  You'll want to either switch to the older
-    tutorial or the newer Django version.
+    tutorial or the newer Freedom version.
 
 You have now wired an ``index`` view into the URLconf. Go to
 http://localhost:8000/polls/ in your browser, and you should see the text
 "*Hello, world. You're at the polls index.*", which you defined in the
 ``index`` view.
 
-The :func:`~django.conf.urls.url` function is passed four arguments, two
+The :func:`~freedom.conf.urls.url` function is passed four arguments, two
 required: ``regex`` and ``view``, and two optional: ``kwargs``, and ``name``.
 At this point, it's worth reviewing what these arguments are for.
 
-:func:`~django.conf.urls.url` argument: regex
+:func:`~freedom.conf.urls.url` argument: regex
 ---------------------------------------------
 
 The term "regex" is a commonly used short form meaning "regular expression",
 which is a syntax for matching patterns in strings, or in this case, url
-patterns. Django starts at the first regular expression and makes its way down
+patterns. Freedom starts at the first regular expression and makes its way down
 the list,  comparing the requested URL against each regular expression until it
 finds one that matches.
 
@@ -159,26 +159,26 @@ aren't too complex as noted above).
 
 .. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
 
-:func:`~django.conf.urls.url` argument: view
+:func:`~freedom.conf.urls.url` argument: view
 --------------------------------------------
 
-When Django finds a regular expression match, Django calls the specified view
-function, with an :class:`~django.http.HttpRequest` object as the first
+When Freedom finds a regular expression match, Freedom calls the specified view
+function, with an :class:`~freedom.http.HttpRequest` object as the first
 argument and any “captured” values from the regular expression as other
 arguments. If the regex uses simple captures, values are passed as positional
 arguments; if it uses named captures, values are passed as keyword arguments.
 We'll give an example of this in a bit.
 
-:func:`~django.conf.urls.url` argument: kwargs
+:func:`~freedom.conf.urls.url` argument: kwargs
 ----------------------------------------------
 
 Arbitrary keyword arguments can be passed in a dictionary to the target view. We
-aren't going to use this feature of Django in the tutorial.
+aren't going to use this feature of Freedom in the tutorial.
 
-:func:`~django.conf.urls.url` argument: name
+:func:`~freedom.conf.urls.url` argument: name
 ---------------------------------------------
 
-Naming your URL lets you refer to it unambiguously from elsewhere in Django
+Naming your URL lets you refer to it unambiguously from elsewhere in Freedom
 especially templates. This powerful feature allows you to make  global changes
 to the url patterns of your project while only touching a single file.
 
@@ -202,12 +202,12 @@ slightly different, because they take an argument:
         return HttpResponse("You're voting on question %s." % question_id)
 
 Wire these new views into the ``polls.urls`` module by adding the following
-:func:`~django.conf.urls.url` calls:
+:func:`~freedom.conf.urls.url` calls:
 
 .. snippet::
     :filename: polls/urls.py
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     from polls import views
 
@@ -227,19 +227,19 @@ method and display whatever ID you provide in the URL. Try
 "/polls/34/results/" and "/polls/34/vote/" too -- these will display the
 placeholder results and voting pages.
 
-When somebody requests a page from your Web site -- say, "/polls/34/", Django
+When somebody requests a page from your Web site -- say, "/polls/34/", Freedom
 will load the ``mysite.urls`` Python module because it's pointed to by the
 :setting:`ROOT_URLCONF` setting. It finds the variable named ``urlpatterns``
 and traverses the regular expressions in order. The
-:func:`~django.conf.urls.include` functions we are using simply reference
+:func:`~freedom.conf.urls.include` functions we are using simply reference
 other URLconfs. Note that the regular expressions for the
-:func:`~django.conf.urls.include` functions don't have a ``$`` (end-of-string
-match character) but rather a trailing slash. Whenever Django encounters
-:func:`~django.conf.urls.include`, it chops off whatever part of the URL
+:func:`~freedom.conf.urls.include` functions don't have a ``$`` (end-of-string
+match character) but rather a trailing slash. Whenever Freedom encounters
+:func:`~freedom.conf.urls.include`, it chops off whatever part of the URL
 matched up to that point and sends the remaining string to the included
 URLconf for further processing.
 
-The idea behind :func:`~django.conf.urls.include` is to make it easy to
+The idea behind :func:`~freedom.conf.urls.include` is to make it easy to
 plug-and-play URLs. Since polls are in their own URLconf
 (``polls/urls.py``), they can be placed under "/polls/", or under
 "/fun_polls/", or under "/content/polls/", or any other path root, and the
@@ -247,9 +247,9 @@ app will still work.
 
 Here's what happens if a user goes to "/polls/34/" in this system:
 
-* Django will find the match at ``'^polls/'``
+* Freedom will find the match at ``'^polls/'``
 
-* Then, Django will strip off the matching text (``"polls/"``) and send the
+* Then, Freedom will strip off the matching text (``"polls/"``) and send the
   remaining text -- ``"34/"`` -- to the 'polls.urls' URLconf for
   further processing which matches ``r'^(?P<question_id>[0-9]+)/$'`` resulting in a
   call to the ``detail()`` view like so::
@@ -275,18 +275,18 @@ Write views that actually do something
 ======================================
 
 Each view is responsible for doing one of two things: returning an
-:class:`~django.http.HttpResponse` object containing the content for the
-requested page, or raising an exception such as :exc:`~django.http.Http404`. The
+:class:`~freedom.http.HttpResponse` object containing the content for the
+requested page, or raising an exception such as :exc:`~freedom.http.Http404`. The
 rest is up to you.
 
 Your view can read records from a database, or not. It can use a template
-system such as Django's -- or a third-party Python template system -- or not.
+system such as Freedom's -- or a third-party Python template system -- or not.
 It can generate a PDF file, output XML, create a ZIP file on the fly, anything
 you want, using whatever Python libraries you want.
 
-All Django wants is that :class:`~django.http.HttpResponse`. Or an exception.
+All Freedom wants is that :class:`~freedom.http.HttpResponse`. Or an exception.
 
-Because it's convenient, let's use Django's own database API, which we covered
+Because it's convenient, let's use Freedom's own database API, which we covered
 in :doc:`Tutorial 1 </intro/tutorial01>`. Here's one stab at the ``index()``
 view, which displays the latest 5 poll questions in the system, separated by
 commas, according to publication date:
@@ -294,7 +294,7 @@ commas, according to publication date:
 .. snippet::
     :filename: polls/views.py
 
-    from django.http import HttpResponse
+    from freedom.http import HttpResponse
 
     from polls.models import Question
 
@@ -306,17 +306,17 @@ commas, according to publication date:
 
 There's a problem here, though: the page's design is hard-coded in the view. If
 you want to change the way the page looks, you'll have to edit this Python code.
-So let's use Django's template system to separate the design from Python by
+So let's use Freedom's template system to separate the design from Python by
 creating a template that the view can use.
 
 First, create a directory called ``templates`` in your ``polls`` directory.
-Django will look for templates in there.
+Freedom will look for templates in there.
 
-Django's :setting:`TEMPLATE_LOADERS` setting contains a list of callables that
+Freedom's :setting:`TEMPLATE_LOADERS` setting contains a list of callables that
 know how to import templates from various sources. One of the defaults is
-:class:`django.template.loaders.app_directories.Loader` which looks for a
+:class:`freedom.template.loaders.app_directories.Loader` which looks for a
 "templates" subdirectory in each of the :setting:`INSTALLED_APPS` - this is how
-Django knows to find the polls templates even though we didn't modify
+Freedom knows to find the polls templates even though we didn't modify
 :setting:`TEMPLATE_DIRS`, as we did in :ref:`Tutorial 2
 <ref-customizing-your-projects-templates>`.
 
@@ -335,22 +335,22 @@ directory called ``polls``, and within that create a file called
 ``index.html``. In other words, your template should be at
 ``polls/templates/polls/index.html``. Because of how the ``app_directories``
 template loader works as described above, you can refer to this template within
-Django simply as ``polls/index.html``.
+Freedom simply as ``polls/index.html``.
 
 .. admonition:: Template namespacing
 
     Now we *might* be able to get away with putting our templates directly in
     ``polls/templates`` (rather than creating another ``polls`` subdirectory),
-    but it would actually be a bad idea. Django will choose the first template
+    but it would actually be a bad idea. Freedom will choose the first template
     it finds whose name matches, and if you had a template with the same name
-    in a *different* application, Django would be unable to distinguish between
-    them. We need to be able to point Django at the right one, and the easiest
+    in a *different* application, Freedom would be unable to distinguish between
+    them. We need to be able to point Freedom at the right one, and the easiest
     way to ensure this is by *namespacing* them. That is, by putting those
     templates inside *another* directory named for the application itself.
 
 Put the following code in that template:
 
-.. snippet:: html+django
+.. snippet:: html+freedom
     :filename: polls/templates/polls/index.html
 
     {% if latest_question_list %}
@@ -368,8 +368,8 @@ Now let's update our ``index`` view in ``polls/views.py`` to use the template:
 .. snippet::
     :filename: polls/views.py
 
-    from django.http import HttpResponse
-    from django.template import RequestContext, loader
+    from freedom.http import HttpResponse
+    from freedom.template import RequestContext, loader
 
     from polls.models import Question
 
@@ -390,18 +390,18 @@ Load the page by pointing your browser at "/polls/", and you should see a
 bulleted-list containing the "What's up" question from Tutorial 1. The link points
 to the question's detail page.
 
-A shortcut: :func:`~django.shortcuts.render`
+A shortcut: :func:`~freedom.shortcuts.render`
 --------------------------------------------
 
 It's a very common idiom to load a template, fill a context and return an
-:class:`~django.http.HttpResponse` object with the result of the rendered
-template. Django provides a shortcut. Here's the full ``index()`` view,
+:class:`~freedom.http.HttpResponse` object with the result of the rendered
+template. Freedom provides a shortcut. Here's the full ``index()`` view,
 rewritten:
 
 .. snippet::
     :filename: polls/views.py
 
-    from django.shortcuts import render
+    from freedom.shortcuts import render
 
     from polls.models import Question
 
@@ -412,13 +412,13 @@ rewritten:
         return render(request, 'polls/index.html', context)
 
 Note that once we've done this in all these views, we no longer need to import
-:mod:`~django.template.loader`, :class:`~django.template.RequestContext` and
-:class:`~django.http.HttpResponse` (you'll want to keep ``HttpResponse`` if you
+:mod:`~freedom.template.loader`, :class:`~freedom.template.RequestContext` and
+:class:`~freedom.http.HttpResponse` (you'll want to keep ``HttpResponse`` if you
 still have the stub methods for ``detail``, ``results``, and ``vote``).
 
-The :func:`~django.shortcuts.render` function takes the request object as its
+The :func:`~freedom.shortcuts.render` function takes the request object as its
 first argument, a template name as its second argument and a dictionary as its
-optional third argument. It returns an :class:`~django.http.HttpResponse`
+optional third argument. It returns an :class:`~freedom.http.HttpResponse`
 object of the given template rendered with the given context.
 
 Raising a 404 error
@@ -430,8 +430,8 @@ for a given poll. Here's the view:
 .. snippet::
     :filename: polls/views.py
 
-    from django.http import Http404
-    from django.shortcuts import render
+    from freedom.http import Http404
+    from freedom.shortcuts import render
 
     from polls.models import Question
     # ...
@@ -442,31 +442,31 @@ for a given poll. Here's the view:
             raise Http404
         return render(request, 'polls/detail.html', {'question': question})
 
-The new concept here: The view raises the :exc:`~django.http.Http404` exception
+The new concept here: The view raises the :exc:`~freedom.http.Http404` exception
 if a question with the requested ID doesn't exist.
 
 We'll discuss what you could put in that ``polls/detail.html`` template a bit
 later, but if you'd like to quickly get the above example working, a file
 containing just:
 
-.. snippet:: html+django
+.. snippet:: html+freedom
     :filename: polls/templates/polls/detail.html
 
     {{ question }}
 
 will get you started for now.
 
-A shortcut: :func:`~django.shortcuts.get_object_or_404`
+A shortcut: :func:`~freedom.shortcuts.get_object_or_404`
 -------------------------------------------------------
 
-It's a very common idiom to use :meth:`~django.db.models.query.QuerySet.get`
-and raise :exc:`~django.http.Http404` if the object doesn't exist. Django
+It's a very common idiom to use :meth:`~freedom.db.models.query.QuerySet.get`
+and raise :exc:`~freedom.http.Http404` if the object doesn't exist. Freedom
 provides a shortcut. Here's the ``detail()`` view, rewritten:
 
 .. snippet::
     :filename: polls/views.py
 
-    from django.shortcuts import render, get_object_or_404
+    from freedom.shortcuts import render, get_object_or_404
 
     from polls.models import Question
     # ...
@@ -474,29 +474,29 @@ provides a shortcut. Here's the ``detail()`` view, rewritten:
         question = get_object_or_404(Question, pk=question_id)
         return render(request, 'polls/detail.html', {'question': question})
 
-The :func:`~django.shortcuts.get_object_or_404` function takes a Django model
+The :func:`~freedom.shortcuts.get_object_or_404` function takes a Freedom model
 as its first argument and an arbitrary number of keyword arguments, which it
-passes to the :meth:`~django.db.models.query.QuerySet.get` function of the
-model's manager. It raises :exc:`~django.http.Http404` if the object doesn't
+passes to the :meth:`~freedom.db.models.query.QuerySet.get` function of the
+model's manager. It raises :exc:`~freedom.http.Http404` if the object doesn't
 exist.
 
 .. admonition:: Philosophy
 
-    Why do we use a helper function :func:`~django.shortcuts.get_object_or_404`
+    Why do we use a helper function :func:`~freedom.shortcuts.get_object_or_404`
     instead of automatically catching the
-    :exc:`~django.core.exceptions.ObjectDoesNotExist` exceptions at a higher
-    level, or having the model API raise :exc:`~django.http.Http404` instead of
-    :exc:`~django.core.exceptions.ObjectDoesNotExist`?
+    :exc:`~freedom.core.exceptions.ObjectDoesNotExist` exceptions at a higher
+    level, or having the model API raise :exc:`~freedom.http.Http404` instead of
+    :exc:`~freedom.core.exceptions.ObjectDoesNotExist`?
 
     Because that would couple the model layer to the view layer. One of the
-    foremost design goals of Django is to maintain loose coupling. Some
-    controlled coupling is introduced in the :mod:`django.shortcuts` module.
+    foremost design goals of Freedom is to maintain loose coupling. Some
+    controlled coupling is introduced in the :mod:`freedom.shortcuts` module.
 
-There's also a :func:`~django.shortcuts.get_list_or_404` function, which works
-just as :func:`~django.shortcuts.get_object_or_404` -- except using
-:meth:`~django.db.models.query.QuerySet.filter` instead of
-:meth:`~django.db.models.query.QuerySet.get`. It raises
-:exc:`~django.http.Http404` if the list is empty.
+There's also a :func:`~freedom.shortcuts.get_list_or_404` function, which works
+just as :func:`~freedom.shortcuts.get_object_or_404` -- except using
+:meth:`~freedom.db.models.query.QuerySet.filter` instead of
+:meth:`~freedom.db.models.query.QuerySet.get`. It raises
+:exc:`~freedom.http.Http404` if the list is empty.
 
 Use the template system
 =======================
@@ -505,7 +505,7 @@ Back to the ``detail()`` view for our poll application. Given the context
 variable ``question``, here's what the ``polls/detail.html`` template might look
 like:
 
-.. snippet:: html+django
+.. snippet:: html+freedom
     :filename: polls/templates/polls/detail.html
 
     <h1>{{ question.question_text }}</h1>
@@ -516,7 +516,7 @@ like:
     </ul>
 
 The template system uses dot-lookup syntax to access variable attributes. In
-the example of ``{{ question.question_text }}``, first Django does a dictionary lookup
+the example of ``{{ question.question_text }}``, first Freedom does a dictionary lookup
 on the object ``question``. Failing that, it tries an attribute lookup -- which
 works, in this case. If attribute lookup had failed, it would've tried a
 list-index lookup.
@@ -534,17 +534,17 @@ Removing hardcoded URLs in templates
 Remember, when we wrote the link to a question in the ``polls/index.html``
 template, the link was partially hardcoded like this:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>
 
 The problem with this hardcoded, tightly-coupled approach is that it becomes
 challenging to change URLs on projects with a lot of templates. However, since
-you defined the name argument in the :func:`~django.conf.urls.url` functions in
+you defined the name argument in the :func:`~freedom.conf.urls.url` functions in
 the ``polls.urls`` module, you can remove a reliance on specific URL paths
 defined in your url configurations by using the ``{% url %}`` template tag:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
 
@@ -569,11 +569,11 @@ template (or templates) you would change it in ``polls/urls.py``::
 Namespacing URL names
 ======================
 
-The tutorial project has just one app, ``polls``. In real Django projects,
-there might be five, ten, twenty apps or more. How does Django differentiate
+The tutorial project has just one app, ``polls``. In real Freedom projects,
+there might be five, ten, twenty apps or more. How does Freedom differentiate
 the URL names between them? For example, the ``polls`` app has a ``detail``
 view, and so might an app on the same project that is for a blog. How does one
-make it so that Django knows which app view to create for a url when using the
+make it so that Freedom knows which app view to create for a url when using the
 ``{% url %}`` template tag?
 
 The answer is to add namespaces to your root URLconf. In the ``mysite/urls.py``
@@ -583,8 +583,8 @@ it to include namespacing:
 .. snippet::
     :filename: mysite/urls.py
 
-    from django.conf.urls import include, url
-    from django.contrib import admin
+    from freedom.conf.urls import include, url
+    from freedom.contrib import admin
 
     urlpatterns = [
         url(r'^polls/', include('polls.urls', namespace="polls")),
@@ -593,14 +593,14 @@ it to include namespacing:
 
 Now change your ``polls/index.html`` template from:
 
-.. snippet:: html+django
+.. snippet:: html+freedom
     :filename: polls/templates/polls/index.html
 
     <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
 
 to point at the namespaced detail view:
 
-.. snippet:: html+django
+.. snippet:: html+freedom
     :filename: polls/templates/polls/index.html
 
     <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>

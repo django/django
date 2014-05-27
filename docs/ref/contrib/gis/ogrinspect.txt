@@ -4,10 +4,10 @@
 OGR Inspection
 ==============
 
-.. module:: django.contrib.gis.utils.ogrinspect
+.. module:: freedom.contrib.gis.utils.ogrinspect
    :synopsis: Utilities for inspecting OGR data sources.
 
-.. currentmodule:: django.contrib.gis.utils
+.. currentmodule:: freedom.contrib.gis.utils
 
 ``ogrinspect``
 ==============

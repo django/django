@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from freedom.conf.urls import url
 
 urlpatterns = [
     url(r'^noslash$', 'middleware.views.empty_view'),

@@ -3,11 +3,11 @@ A second, custom AdminSite -- see tests.CustomAdminSiteTests.
 """
 from __future__ import unicode_literals
 
-from django.conf.urls import url
-from django.contrib import admin
-from django.http import HttpResponse
-from django.contrib.auth.models import User
-from django.contrib.auth.admin import UserAdmin
+from freedom.conf.urls import url
+from freedom.contrib import admin
+from freedom.http import HttpResponse
+from freedom.contrib.auth.models import User
+from freedom.contrib.auth.admin import UserAdmin
 
 from . import models, forms, admin as base_admin
 
@@ -31,7 +31,7 @@ class Admin2(admin.AdminSite):
         ] + super(Admin2, self).get_urls()
 
     def my_view(self, request):
-        return HttpResponse("Django is a magical pony!")
+        return HttpResponse("Freedom is a magical pony!")
 
 
 class UserLimitedAdmin(UserAdmin):

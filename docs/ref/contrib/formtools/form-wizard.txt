@@ -2,10 +2,10 @@
 Form wizard
 ===========
 
-.. module:: django.contrib.formtools.wizard.views
+.. module:: freedom.contrib.formtools.wizard.views
     :synopsis: Splits forms across multiple Web pages.
 
-Django comes with an optional "form wizard" application that splits
+Freedom comes with an optional "form wizard" application that splits
 :doc:`forms </topics/forms/index>` across multiple Web pages. It maintains
 state in one of the backends so that the full server-side processing can be
 delayed until the submission of the final form.
@@ -40,7 +40,7 @@ Usage
 This application handles as much machinery for you as possible. Generally,
 you just have to do these things:
 
-1. Define a number of :class:`~django.forms.Form` classes -- one per
+1. Define a number of :class:`~freedom.forms.Form` classes -- one per
    wizard page.
 
 2. Create a :class:`WizardView` subclass that specifies what to do once
@@ -51,7 +51,7 @@ you just have to do these things:
    generic template to handle every one of the forms, or you can define a
    specific template for each form.
 
-4. Add ``django.contrib.formtools`` to your
+4. Add ``freedom.contrib.formtools`` to your
    :setting:`INSTALLED_APPS` list in your settings file.
 
 5. Point your URLconf at your :class:`WizardView` :meth:`~WizardView.as_view`
@@ -61,8 +61,8 @@ Defining ``Form`` classes
 -------------------------
 
 The first step in creating a form wizard is to create the
-:class:`~django.forms.Form` classes.  These should be standard
-:class:`django.forms.Form` classes, covered in the :doc:`forms documentation
+:class:`~freedom.forms.Form` classes.  These should be standard
+:class:`freedom.forms.Form` classes, covered in the :doc:`forms documentation
 </topics/forms/index>`.  These classes can live anywhere in your codebase,
 but convention is to put them in a file called :file:`forms.py` in your
 application.
@@ -71,7 +71,7 @@ For example, let's write a "contact form" wizard, where the first page's form
 collects the sender's email address and subject, and the second page collects
 the message itself. Here's what the :file:`forms.py` might look like::
 
-    from django import forms
+    from freedom import forms
 
     class ContactForm1(forms.Form):
         subject = forms.CharField(max_length=100)
@@ -83,7 +83,7 @@ the message itself. Here's what the :file:`forms.py` might look like::
 
 .. note::
 
-    In order to use :class:`~django.forms.FileField` in any form, see the
+    In order to use :class:`~freedom.forms.FileField` in any form, see the
     section :ref:`Handling files <wizard-files>` below to learn more about
     what to do.
 
@@ -94,7 +94,7 @@ Creating a ``WizardView`` subclass
 .. class:: CookieWizardView
 
 The next step is to create a
-:class:`django.contrib.formtools.wizard.views.WizardView` subclass. You can
+:class:`freedom.contrib.formtools.wizard.views.WizardView` subclass. You can
 also use the :class:`SessionWizardView` or :class:`CookieWizardView` classes
 which preselect the backend used for storing information during execution of the
 wizard (as their names indicate, server-side sessions and browser cookies
@@ -108,7 +108,7 @@ respectively).
 
 We will use the :class:`SessionWizardView` in all examples but is completely
 fine to use the :class:`CookieWizardView` instead. As with your
-:class:`~django.forms.Form` classes, this :class:`WizardView` class can live
+:class:`~freedom.forms.Form` classes, this :class:`WizardView` class can live
 anywhere in your codebase, but convention is to put it in :file:`views.py`.
 
 The only requirement on this subclass is that it implement a
@@ -118,13 +118,13 @@ The only requirement on this subclass is that it implement a
 
     This method specifies what should happen when the data for *every* form is
     submitted and validated. This method is passed a list and dictionary of
-    validated :class:`~django.forms.Form` instances.
+    validated :class:`~freedom.forms.Form` instances.
 
     In this simplistic example, rather than performing any database operation,
     the method simply renders a template of the validated data::
 
-        from django.shortcuts import render_to_response
-        from django.contrib.formtools.wizard.views import SessionWizardView
+        from freedom.shortcuts import render_to_response
+        from freedom.contrib.formtools.wizard.views import SessionWizardView
 
         class ContactWizard(SessionWizardView):
             def done(self, form_list, **kwargs):
@@ -136,8 +136,8 @@ The only requirement on this subclass is that it implement a
     good Web citizen and redirect after processing the data. Here's another
     example::
 
-        from django.http import HttpResponseRedirect
-        from django.contrib.formtools.wizard.views import SessionWizardView
+        from freedom.http import HttpResponseRedirect
+        from freedom.contrib.formtools.wizard.views import SessionWizardView
 
         class ContactWizard(SessionWizardView):
             def done(self, form_list, **kwargs):
@@ -169,19 +169,19 @@ Next, you'll need to create a template that renders the wizard's forms. By
 default, every form uses a template called
 :file:`formtools/wizard/wizard_form.html`. You can change this template name
 by overriding either the
-:attr:`~django.views.generic.base.TemplateResponseMixin.template_name` attribute
+:attr:`~freedom.views.generic.base.TemplateResponseMixin.template_name` attribute
 or the
-:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
+:meth:`~freedom.views.generic.base.TemplateResponseMixin.get_template_names()`
 method, which are documented in the
-:class:`~django.views.generic.base.TemplateResponseMixin` documentation.  The
+:class:`~freedom.views.generic.base.TemplateResponseMixin` documentation.  The
 latter one allows you to use a different template for each form (:ref:`see the
 example below <wizard-template-for-each-form>`).
 
 This template expects a ``wizard`` object that has various items attached to
 it:
 
-* ``form`` -- The :class:`~django.forms.Form` or
-  :class:`~django.forms.formsets.BaseFormSet` instance for the current step
+* ``form`` -- The :class:`~freedom.forms.Form` or
+  :class:`~freedom.forms.formsets.BaseFormSet` instance for the current step
   (either empty or with errors).
 
 * ``steps`` -- A helper object to access the various steps related data:
@@ -203,7 +203,7 @@ subclass.
 
 Here's a full example template:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% extends "base.html" %}
     {% load i18n %}
@@ -249,9 +249,9 @@ Hooking the wizard into a URLconf
 Finally, we need to specify which forms to use in the wizard, and then
 deploy the new :class:`WizardView` object at a URL in the ``urls.py``. The
 wizard's ``as_view()`` method takes a list of your
-:class:`~django.forms.Form` classes as an argument during instantiation::
+:class:`~freedom.forms.Form` classes as an argument during instantiation::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard
@@ -279,8 +279,8 @@ the next step. In the final step, they will confirm the purchase.
 
 Here's what the view code might look like::
 
-    from django.http import HttpResponseRedirect
-    from django.contrib.formtools.wizard.views import SessionWizardView
+    from freedom.http import HttpResponseRedirect
+    from freedom.contrib.formtools.wizard.views import SessionWizardView
 
     FORMS = [("address", myapp.forms.AddressForm),
              ("paytype", myapp.forms.PaymentChoiceForm),
@@ -326,7 +326,7 @@ The first element in the pair is a string that corresponds to the name of the
 step and the second is the form class.
 
 In this example, the
-:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names()`
+:meth:`~freedom.views.generic.base.TemplateResponseMixin.get_template_names()`
 method returns a list containing a single template, which is selected based on
 the name of the current step.
 
@@ -358,7 +358,7 @@ Advanced ``WizardView`` methods
 .. method:: WizardView.get_form_initial(step)
 
     Returns a dictionary which will be passed as the
-    :attr:`~django.forms.Form.initial` argument when instantiating the Form
+    :attr:`~freedom.forms.Form.initial` argument when instantiating the Form
     instance for step ``step``. If no initial data was provided while
     initializing the form wizard, an empty dictionary should be returned.
 
@@ -379,10 +379,10 @@ Advanced ``WizardView`` methods
 
 .. method:: WizardView.get_form_instance(step)
 
-    This method will be called only if a :class:`~django.forms.ModelForm` is
+    This method will be called only if a :class:`~freedom.forms.ModelForm` is
     used as the form for step ``step``.
 
-    Returns an :class:`~django.db.models.Model` object which will be passed as
+    Returns an :class:`~freedom.db.models.Model` object which will be passed as
     the ``instance`` argument when instantiating the ``ModelForm`` for step
     ``step``.  If no instance object was provided while initializing the form
     wizard, ``None`` will be returned.
@@ -404,8 +404,8 @@ Advanced ``WizardView`` methods
     * ``wizard`` -- a dictionary representation of the wizard instance with the
       following key/values:
 
-      * ``form`` -- :class:`~django.forms.Form` or
-        :class:`~django.forms.formsets.BaseFormSet` instance for the current step
+      * ``form`` -- :class:`~freedom.forms.Form` or
+        :class:`~freedom.forms.formsets.BaseFormSet` instance for the current step
       * ``steps`` -- A helper object to access the various steps related data
       * ``management_form`` -- all the management data for the current step
 
@@ -463,7 +463,7 @@ Advanced ``WizardView`` methods
 .. method:: WizardView.process_step(form)
 
     Hook for modifying the wizard's internal state, given a fully validated
-    :class:`~django.forms.Form` object. The Form is guaranteed to have clean,
+    :class:`~freedom.forms.Form` object. The Form is guaranteed to have clean,
     valid data.
 
     This method gives you a way to post-process the form data before the data
@@ -571,12 +571,12 @@ Providing initial data for the forms
 
 .. attribute:: WizardView.initial_dict
 
-    Initial data for a wizard's :class:`~django.forms.Form` objects can be
+    Initial data for a wizard's :class:`~freedom.forms.Form` objects can be
     provided using the optional :attr:`~WizardView.initial_dict` keyword
     argument. This argument should be a dictionary mapping the steps to
     dictionaries containing the initial data for each step. The dictionary of
     initial data will be passed along to the constructor of the step's
-    :class:`~django.forms.Form`::
+    :class:`~freedom.forms.Form`::
 
         >>> from myapp.forms import ContactForm1, ContactForm2
         >>> from myapp.views import ContactWizard
@@ -607,18 +607,18 @@ Handling files
 
 .. attribute:: WizardView.file_storage
 
-To handle :class:`~django.forms.FileField` within any step form of the wizard,
+To handle :class:`~freedom.forms.FileField` within any step form of the wizard,
 you have to add a ``file_storage`` to your :class:`WizardView` subclass.
 
 This storage will temporarily store the uploaded files for the wizard. The
 ``file_storage`` attribute should be a
-:class:`~django.core.files.storage.Storage` subclass.
+:class:`~freedom.core.files.storage.Storage` subclass.
 
-Django provides a built-in storage class (see :ref:`the built-in filesystem
+Freedom provides a built-in storage class (see :ref:`the built-in filesystem
 storage class <builtin-fs-storage>`)::
 
-    from django.conf import settings
-    from django.core.files.storage import FileSystemStorage
+    from freedom.conf import settings
+    from freedom.core.files.storage import FileSystemStorage
 
     class CustomWizardView(WizardView):
         ...
@@ -648,7 +648,7 @@ used to show a message form only if a checkbox in the first step was checked.
 
 The steps are defined in a ``forms.py`` file::
 
-    from django import forms
+    from freedom import forms
 
     class ContactForm1(forms.Form):
         subject = forms.CharField(max_length=100)
@@ -660,8 +660,8 @@ The steps are defined in a ``forms.py`` file::
 
 We define our wizard in a ``views.py``::
 
-    from django.shortcuts import render_to_response
-    from django.contrib.formtools.wizard.views import SessionWizardView
+    from freedom.shortcuts import render_to_response
+    from freedom.contrib.formtools.wizard.views import SessionWizardView
 
     def show_message_form_condition(wizard):
         # try to get the cleaned data of step 1
@@ -678,7 +678,7 @@ We define our wizard in a ``views.py``::
 
 We need to add the ``ContactWizard`` to our ``urls.py`` file::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard, show_message_form_condition
@@ -717,7 +717,7 @@ Usage of ``NamedUrlWizardView``
 ``NamedUrlWizardView`` is a :class:`WizardView` subclass which adds named-urls
 support to the wizard. This allows you to have separate URLs for every step.
 You can also use the :class:`NamedUrlSessionWizardView` or :class:`NamedUrlCookieWizardView`
-classes which preselect the backend used for storing information (Django sessions and
+classes which preselect the backend used for storing information (Freedom sessions and
 browser cookies respectively).
 
 To use the named URLs, you should not only use the :class:`NamedUrlWizardView` instead of
@@ -731,7 +731,7 @@ The :meth:`~WizardView.as_view` method takes two additional arguments:
 This is an example of a ``urls.py`` for a contact wizard with two steps, step 1 named
 ``contactdata`` and step 2 named ``leavemessage``::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard

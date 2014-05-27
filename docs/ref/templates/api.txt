@@ -1,15 +1,15 @@
 ====================================================
-The Django template language: For Python programmers
+The Freedom template language: For Python programmers
 ====================================================
 
-.. module:: django.template
-    :synopsis: Django's template system
+.. module:: freedom.template
+    :synopsis: Freedom's template system
 
-This document explains the Django template system from a technical
+This document explains the Freedom template system from a technical
 perspective -- how it works and how to extend it. If you're just looking for
 reference on the language syntax, see :doc:`/topics/templates`.
 
-If you're looking to use the Django template system as part of another
+If you're looking to use the Freedom template system as part of another
 application -- i.e., without the rest of the framework -- make sure to read
 the `configuration`_ section later in this document.
 
@@ -19,7 +19,7 @@ Basics
 ======
 
 A **template** is a text document, or a normal Python string, that is marked-up
-using the Django template language. A template can contain **block tags** or
+using the Freedom template language. A template can contain **block tags** or
 **variables**.
 
 A **block tag** is a symbol within a template that does something.
@@ -32,7 +32,7 @@ Block tags are surrounded by ``"{%"`` and ``"%}"``.
 
 Example template with block tags:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% if is_logged_in %}Thanks for logging in!{% else %}Please log in.{% endif %}
 
@@ -42,7 +42,7 @@ Variable tags are surrounded by ``"{{"`` and ``"}}"``.
 
 Example template with variables:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     My first name is {{ first_name }}. My last name is {{ last_name }}.
 
@@ -67,13 +67,13 @@ Compiling a string
 ------------------
 
 The easiest way to create a ``Template`` object is by instantiating it
-directly. The class lives at :class:`django.template.Template`. The constructor
+directly. The class lives at :class:`freedom.template.Template`. The constructor
 takes one argument -- the raw template code::
 
-    >>> from django.template import Template
+    >>> from freedom.template import Template
     >>> t = Template("My name is {{ my_name }}.")
     >>> print(t)
-    <django.template.Template instance>
+    <freedom.template.Template instance>
 
 .. admonition:: Behind the scenes
 
@@ -91,7 +91,7 @@ Rendering a context
 
 Once you have a compiled ``Template`` object, you can render a context -- or
 multiple contexts -- with it. The ``Context`` class lives at
-:class:`django.template.Context`, and the constructor takes two (optional)
+:class:`freedom.template.Context`, and the constructor takes two (optional)
 arguments:
 
 * A dictionary mapping variable names to variable values.
@@ -103,7 +103,7 @@ arguments:
 Call the ``Template`` object's ``render()`` method with the context to "fill" the
 template::
 
-    >>> from django.template import Context, Template
+    >>> from freedom.template import Context, Template
     >>> t = Template("My name is {{ my_name }}.")
 
     >>> c = Context({"my_name": "Adrian"})
@@ -135,7 +135,7 @@ if one exists in the template context.
 The template system uses the first lookup type that works. It's short-circuit
 logic. Here are a few examples::
 
-    >>> from django.template import Context, Template
+    >>> from freedom.template import Context, Template
     >>> t = Template("My name is {{ person.first_name }}.")
     >>> d = {"person": {"first_name": "Joe", "last_name": "Johnson"}}
     >>> t.render(Context(d))
@@ -191,10 +191,10 @@ straight lookups. Here are some things to keep in mind:
     >>> t.render(Context({"person": p}))
     "My name is ."
 
-  Note that :exc:`django.core.exceptions.ObjectDoesNotExist`, which is the
-  base class for all Django database API ``DoesNotExist`` exceptions, has
-  ``silent_variable_failure = True``. So if you're using Django templates
-  with Django model objects, any ``DoesNotExist`` exception will fail
+  Note that :exc:`freedom.core.exceptions.ObjectDoesNotExist`, which is the
+  base class for all Freedom database API ``DoesNotExist`` exceptions, has
+  ``silent_variable_failure = True``. So if you're using Freedom templates
+  with Freedom model objects, any ``DoesNotExist`` exception will fail
   silently.
 
 * A variable can only be called if it has no required arguments. Otherwise,
@@ -206,8 +206,8 @@ straight lookups. Here are some things to keep in mind:
   it'd be either foolish or a security hole to allow the template system
   to access them.
 
-  A good example is the :meth:`~django.db.models.Model.delete` method on
-  each Django model object. The template system shouldn't be allowed to do
+  A good example is the :meth:`~freedom.db.models.Model.delete` method on
+  each Freedom model object. The template system shouldn't be allowed to do
   something like this::
 
     I will now delete this valuable data. {{ data.delete }}
@@ -216,8 +216,8 @@ straight lookups. Here are some things to keep in mind:
   variable. The template system won't call a variable if it has
   ``alters_data=True`` set, and will instead replace the variable with
   :setting:`TEMPLATE_STRING_IF_INVALID`, unconditionally.  The
-  dynamically-generated :meth:`~django.db.models.Model.delete` and
-  :meth:`~django.db.models.Model.save` methods on Django model objects get
+  dynamically-generated :meth:`~freedom.db.models.Model.delete` and
+  :meth:`~freedom.db.models.Model.save` methods on Freedom model objects get
   ``alters_data=True`` automatically. Example::
 
     def sensitive_function(self):
@@ -284,7 +284,7 @@ fully-populated dictionary to ``Context()``. But you can add and delete items
 from a ``Context`` object once it's been instantiated, too, using standard
 dictionary syntax::
 
-    >>> from django.template import Context
+    >>> from freedom.template import Context
     >>> c = Context({"foo": "bar"})
     >>> c['foo']
     'bar'
@@ -301,7 +301,7 @@ dictionary syntax::
 
 A ``Context`` object is a stack. That is, you can ``push()`` and ``pop()`` it.
 If you ``pop()`` too much, it'll raise
-``django.template.ContextPopException``::
+``freedom.template.ContextPopException``::
 
     >>> c = Context()
     >>> c['foo'] = 'first level'
@@ -320,7 +320,7 @@ If you ``pop()`` too much, it'll raise
     >>> c.pop()
     Traceback (most recent call last):
     ...
-    django.template.ContextPopException
+    freedom.template.ContextPopException
 
 .. versionadded:: 1.7
 
@@ -412,10 +412,10 @@ Subclassing Context: RequestContext
 
 .. class:: RequestContext
 
-Django comes with a special ``Context`` class,
-``django.template.RequestContext``, that acts slightly differently than the
-normal ``django.template.Context``. The first difference is that it takes an
-:class:`~django.http.HttpRequest` as its first argument. For example::
+Freedom comes with a special ``Context`` class,
+``freedom.template.RequestContext``, that acts slightly differently than the
+normal ``freedom.template.Context``. The first difference is that it takes an
+:class:`~freedom.http.HttpRequest` as its first argument. For example::
 
     c = RequestContext(request, {
         'foo': 'bar',
@@ -429,16 +429,16 @@ called **context processors** -- that take a request object as their argument
 and return a dictionary of items to be merged into the context. By default,
 :setting:`TEMPLATE_CONTEXT_PROCESSORS` is set to::
 
-    ("django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
-    "django.contrib.messages.context_processors.messages")
+    ("freedom.contrib.auth.context_processors.auth",
+    "freedom.core.context_processors.debug",
+    "freedom.core.context_processors.i18n",
+    "freedom.core.context_processors.media",
+    "freedom.core.context_processors.static",
+    "freedom.core.context_processors.tz",
+    "freedom.contrib.messages.context_processors.messages")
 
 In addition to these, ``RequestContext`` always uses
-``django.core.context_processors.csrf``.  This is a security
+``freedom.core.context_processors.csrf``.  This is a security
 related context processor required by the admin and other contrib apps, and,
 in case of accidental misconfiguration, it is deliberately hardcoded in and
 cannot be turned off by the :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
@@ -460,8 +460,8 @@ Also, you can give ``RequestContext`` a list of additional processors, using the
 optional, third positional argument, ``processors``. In this example, the
 ``RequestContext`` instance gets a ``ip_address`` variable::
 
-    from django.http import HttpResponse
-    from django.template import RequestContext
+    from freedom.http import HttpResponse
+    from freedom.template import RequestContext
 
     def ip_address_processor(request):
         return {'ip_address': request.META['REMOTE_ADDR']}
@@ -475,16 +475,16 @@ optional, third positional argument, ``processors``. In this example, the
 
 .. note::
 
-    If you're using Django's :func:`~django.shortcuts.render_to_response()`
+    If you're using Freedom's :func:`~freedom.shortcuts.render_to_response()`
     shortcut to populate a template with the contents of a dictionary, your
     template will be passed a ``Context`` instance by default (not a
     ``RequestContext``). To use a ``RequestContext`` in your template
     rendering, pass an optional third argument to
-    :func:`~django.shortcuts.render_to_response()`: a ``RequestContext``
+    :func:`~freedom.shortcuts.render_to_response()`: a ``RequestContext``
     instance. Your code might look like this::
 
-        from django.shortcuts import render_to_response
-        from django.template import RequestContext
+        from freedom.shortcuts import render_to_response
+        from freedom.template import RequestContext
 
         def some_view(request):
             # ...
@@ -492,8 +492,8 @@ optional, third positional argument, ``processors``. In this example, the
                                       my_data_dictionary,
                                       context_instance=RequestContext(request))
 
-    Alternatively, use the :meth:`~django.shortcuts.render()` shortcut which is
-    the same as a call to :func:`~django.shortcuts.render_to_response()` with a
+    Alternatively, use the :meth:`~freedom.shortcuts.render()` shortcut which is
+    the same as a call to :func:`~freedom.shortcuts.render_to_response()` with a
     context_instance argument that forces the use of a ``RequestContext``.
 
     Note that the contents of a supplied dictionary (``my_data_dictionary``
@@ -502,7 +502,7 @@ optional, third positional argument, ``processors``. In this example, the
 
 Here's what each of the default processors does:
 
-django.contrib.auth.context_processors.auth
+freedom.contrib.auth.context_processors.auth
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
@@ -513,12 +513,12 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
   logged in).
 
 * ``perms`` -- An instance of
-  ``django.contrib.auth.context_processors.PermWrapper``, representing the
+  ``freedom.contrib.auth.context_processors.PermWrapper``, representing the
   permissions that the currently logged-in user has.
 
-.. currentmodule:: django.core.context_processors
+.. currentmodule:: freedom.core.context_processors
 
-django.core.context_processors.debug
+freedom.core.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
@@ -532,7 +532,7 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
   representing every SQL query that has happened so far during the request
   and how long it took. The list is in order by query.
 
-django.core.context_processors.i18n
+freedom.core.context_processors.i18n
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
@@ -544,14 +544,14 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 
 See :doc:`/topics/i18n/index` for more.
 
-django.core.context_processors.media
+freedom.core.context_processors.media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
 value of the :setting:`MEDIA_URL` setting.
 
-django.core.context_processors.static
+freedom.core.context_processors.static
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: static
@@ -560,22 +560,22 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a variable ``STATIC_URL``, providing the
 value of the :setting:`STATIC_URL` setting.
 
-django.core.context_processors.csrf
+freedom.core.context_processors.csrf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This processor adds a token that is needed by the :ttag:`csrf_token` template
 tag for protection against :doc:`Cross Site Request Forgeries
 </ref/contrib/csrf>`.
 
-django.core.context_processors.request
+freedom.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
 ``RequestContext`` will contain a variable ``request``, which is the current
-:class:`~django.http.HttpRequest`. Note that this processor is not enabled by default;
+:class:`~freedom.http.HttpRequest`. Note that this processor is not enabled by default;
 you'll have to activate it.
 
-django.contrib.messages.context_processors.messages
+freedom.contrib.messages.context_processors.messages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
@@ -594,11 +594,11 @@ Writing your own context processors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A context processor has a very simple interface: It's just a Python function
-that takes one argument, an :class:`~django.http.HttpRequest` object, and
+that takes one argument, an :class:`~freedom.http.HttpRequest` object, and
 returns a dictionary that gets added to the template context. Each context
 processor *must* return a dictionary.
 
-Custom context processors can live anywhere in your code base. All Django cares
+Custom context processors can live anywhere in your code base. All Freedom cares
 about is that your custom context processors are pointed-to by your
 :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
 
@@ -609,7 +609,7 @@ Generally, you'll store templates in files on your filesystem rather than using
 the low-level ``Template`` API yourself. Save templates in a directory
 specified as a **template directory**.
 
-Django searches for template directories in a number of places, depending on
+Freedom searches for template directories in a number of places, depending on
 your template-loader settings (see "Loader types" below), but the most basic
 way of specifying template directories is by using the :setting:`TEMPLATE_DIRS`
 setting.
@@ -617,7 +617,7 @@ setting.
 The TEMPLATE_DIRS setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Tell Django what your template directories are by using the
+Tell Freedom what your template directories are by using the
 :setting:`TEMPLATE_DIRS` setting in your settings file. This should be set to a
 list or tuple of strings that contain full paths to your template
 directory(ies). Example::
@@ -638,15 +638,15 @@ Note that these paths should use Unix-style forward slashes, even on Windows.
 The Python API
 ~~~~~~~~~~~~~~
 
-.. module:: django.template.loader
+.. module:: freedom.template.loader
 
-``django.template.loader`` has two functions to load templates from files:
+``freedom.template.loader`` has two functions to load templates from files:
 
 .. function:: get_template(template_name[, dirs])
 
     ``get_template`` returns the compiled template (a ``Template`` object) for
     the template with the given name. If the template doesn't exist, it raises
-    ``django.template.TemplateDoesNotExist``.
+    ``freedom.template.TemplateDoesNotExist``.
 
     To override the :setting:`TEMPLATE_DIRS` setting, use the ``dirs``
     parameter. The ``dirs`` parameter may be a tuple or list.
@@ -668,21 +668,21 @@ The Python API
        The ``dirs`` parameter was added.
 
 For example, if you call ``get_template('story_detail.html')`` and have the
-above :setting:`TEMPLATE_DIRS` setting, here are the files Django will look for,
+above :setting:`TEMPLATE_DIRS` setting, here are the files Freedom will look for,
 in order:
 
 * ``/home/html/templates/lawrence.com/story_detail.html``
 * ``/home/html/templates/default/story_detail.html``
 
 If you call ``select_template(['story_253_detail.html', 'story_detail.html'])``,
-here's what Django will look for:
+here's what Freedom will look for:
 
 * ``/home/html/templates/lawrence.com/story_253_detail.html``
 * ``/home/html/templates/default/story_253_detail.html``
 * ``/home/html/templates/lawrence.com/story_detail.html``
 * ``/home/html/templates/default/story_detail.html``
 
-When Django finds a template that exists, it stops looking.
+When Freedom finds a template that exists, it stops looking.
 
 .. admonition:: Tip
 
@@ -698,7 +698,7 @@ Using subdirectories
 
 It's possible -- and preferable -- to organize templates in subdirectories of
 the template directory. The convention is to make a subdirectory for each
-Django app, with subdirectories within those subdirectories as needed.
+Freedom app, with subdirectories within those subdirectories as needed.
 
 Do this for your own sanity. Storing all templates in the root level of a
 single directory gets messy.
@@ -718,34 +718,34 @@ Using the same :setting:`TEMPLATE_DIRS` setting from above, this example
 Loader types
 ~~~~~~~~~~~~
 
-By default, Django uses a filesystem-based template loader, but Django comes
+By default, Freedom uses a filesystem-based template loader, but Freedom comes
 with a few other template loaders, which know how to load templates from other
 sources.
 
 Some of these other loaders are disabled by default, but you can activate them
 by editing your :setting:`TEMPLATE_LOADERS` setting. :setting:`TEMPLATE_LOADERS`
 should be a tuple of strings, where each string represents a template loader
-class. Here are the template loaders that come with Django:
+class. Here are the template loaders that come with Freedom:
 
-.. currentmodule:: django.template.loaders
+.. currentmodule:: freedom.template.loaders
 
-``django.template.loaders.filesystem.Loader``
+``freedom.template.loaders.filesystem.Loader``
 
 .. class:: filesystem.Loader
 
     Loads templates from the filesystem, according to :setting:`TEMPLATE_DIRS`.
     This loader is enabled by default.
 
-``django.template.loaders.app_directories.Loader``
+``freedom.template.loaders.app_directories.Loader``
 
 .. class:: app_directories.Loader
 
-    Loads templates from Django apps on the filesystem. For each app in
+    Loads templates from Freedom apps on the filesystem. For each app in
     :setting:`INSTALLED_APPS`, the loader looks for a ``templates``
-    subdirectory. If the directory exists, Django looks for templates in there.
+    subdirectory. If the directory exists, Freedom looks for templates in there.
 
     This means you can store templates with your individual apps. This also
-    makes it easy to distribute Django apps with default templates.
+    makes it easy to distribute Freedom apps with default templates.
 
     For example, for this setting::
 
@@ -760,12 +760,12 @@ class. Here are the template loaders that come with Django:
     ... and will use the one it finds first.
 
     The order of :setting:`INSTALLED_APPS` is significant! For example, if you
-    want to customize the Django admin, you might choose to override the
-    standard ``admin/base_site.html`` template, from ``django.contrib.admin``,
+    want to customize the Freedom admin, you might choose to override the
+    standard ``admin/base_site.html`` template, from ``freedom.contrib.admin``,
     with your own ``admin/base_site.html`` in ``myproject.polls``. You must
     then make sure that your ``myproject.polls`` comes *before*
-    ``django.contrib.admin`` in :setting:`INSTALLED_APPS`, otherwise
-    ``django.contrib.admin``’s will be loaded first and yours will be ignored.
+    ``freedom.contrib.admin`` in :setting:`INSTALLED_APPS`, otherwise
+    ``freedom.contrib.admin``’s will be loaded first and yours will be ignored.
 
     Note that the loader performs an optimization when it is first imported:
     it caches a list of which :setting:`INSTALLED_APPS` packages have a
@@ -773,7 +773,7 @@ class. Here are the template loaders that come with Django:
 
     This loader is enabled by default.
 
-``django.template.loaders.eggs.Loader``
+``freedom.template.loaders.eggs.Loader``
 
 .. class:: eggs.Loader
 
@@ -782,12 +782,12 @@ class. Here are the template loaders that come with Django:
 
     This loader is disabled by default.
 
-``django.template.loaders.cached.Loader``
+``freedom.template.loaders.cached.Loader``
 
 .. class:: cached.Loader
 
     By default, the templating system will read and compile your templates every
-    time they need to be rendered. While the Django templating system is quite
+    time they need to be rendered. While the Freedom templating system is quite
     fast, the overhead from reading and compiling templates can add up.
 
     The cached template loader is a class-based loader that you configure with
@@ -800,15 +800,15 @@ class. Here are the template loaders that come with Django:
     ``app_directories`` template loaders you might use the following settings::
 
         TEMPLATE_LOADERS = (
-            ('django.template.loaders.cached.Loader', (
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
+            ('freedom.template.loaders.cached.Loader', (
+                'freedom.template.loaders.filesystem.Loader',
+                'freedom.template.loaders.app_directories.Loader',
             )),
         )
 
     .. note::
 
-        All of the built-in Django template tags are safe to use with the
+        All of the built-in Freedom template tags are safe to use with the
         cached loader, but if you're using custom template tags that come from
         third party packages, or that you wrote yourself, you should ensure
         that the ``Node`` implementation for each tag is thread-safe. For more
@@ -817,11 +817,11 @@ class. Here are the template loaders that come with Django:
 
     This loader is disabled by default.
 
-Django uses the template loaders in order according to the
+Freedom uses the template loaders in order according to the
 :setting:`TEMPLATE_LOADERS` setting. It uses each loader until a loader finds a
 match.
 
-.. currentmodule:: django.template
+.. currentmodule:: freedom.template
 
 Template origin
 ~~~~~~~~~~~~~~~
@@ -834,7 +834,7 @@ When :setting:`TEMPLATE_DEBUG` is ``True`` template objects will have an
 .. class:: loader.LoaderOrigin
 
     Templates created from a template loader will use the
-    ``django.template.loader.LoaderOrigin`` class.
+    ``freedom.template.loader.LoaderOrigin`` class.
 
     .. attribute:: name
 
@@ -850,7 +850,7 @@ When :setting:`TEMPLATE_DEBUG` is ``True`` template objects will have an
 .. class:: StringOrigin
 
     Templates created from a ``Template`` class will use the
-    ``django.template.StringOrigin`` class.
+    ``freedom.template.StringOrigin`` class.
 
     .. attribute:: source
 
@@ -862,17 +862,17 @@ The ``render_to_string`` shortcut
 .. function:: loader.render_to_string(template_name, dictionary=None, context_instance=None)
 
 To cut down on the repetitive nature of loading and rendering
-templates, Django provides a shortcut function which largely
+templates, Freedom provides a shortcut function which largely
 automates the process: ``render_to_string()`` in
-:mod:`django.template.loader`, which loads a template, renders it and
+:mod:`freedom.template.loader`, which loads a template, renders it and
 returns the resulting string::
 
-    from django.template.loader import render_to_string
+    from freedom.template.loader import render_to_string
     rendered = render_to_string('my_template.html', {'foo': 'bar'})
 
 The ``render_to_string`` shortcut takes one required argument --
 ``template_name``, which should be the name of the template to load
-and render (or a list of template names, in which case Django will use
+and render (or a list of template names, in which case Freedom will use
 the first template in the list that exists) -- and two optional arguments:
 
 dictionary
@@ -881,12 +881,12 @@ dictionary
     positional argument.
 
 context_instance
-    An instance of :class:`~django.template.Context` or a subclass (e.g., an
-    instance of :class:`~django.template.RequestContext`) to use as the
+    An instance of :class:`~freedom.template.Context` or a subclass (e.g., an
+    instance of :class:`~freedom.template.RequestContext`) to use as the
     template's context. This can also be passed as the third positional argument.
 
-See also the :func:`~django.shortcuts.render_to_response()` shortcut, which
-calls ``render_to_string`` and feeds the result into an :class:`~django.http.HttpResponse`
+See also the :func:`~freedom.shortcuts.render_to_response()` shortcut, which
+calls ``render_to_string`` and feeds the result into an :class:`~freedom.http.HttpResponse`
 suitable for returning directly from a view.
 
 Configuring the template system in standalone mode
@@ -896,21 +896,21 @@ Configuring the template system in standalone mode
 
     This section is only of interest to people trying to use the template
     system as an output component in another application. If you're using the
-    template system as part of a Django application, nothing here applies to
+    template system as part of a Freedom application, nothing here applies to
     you.
 
-Normally, Django will load all the configuration information it needs from its
+Normally, Freedom will load all the configuration information it needs from its
 own default configuration file, combined with the settings in the module given
 in the :envvar:`DJANGO_SETTINGS_MODULE` environment variable. But if you're
-using the template system independently of the rest of Django, the environment
+using the template system independently of the rest of Freedom, the environment
 variable approach isn't very convenient, because you probably want to configure
 the template system in line with the rest of your application rather than
 dealing with settings files and pointing to them via environment variables.
 
 To solve this problem, you need to use the manual configuration option described
-in :ref:`settings-without-django-settings-module`. Simply import the appropriate
+in :ref:`settings-without-freedom-settings-module`. Simply import the appropriate
 pieces of the templating system and then, *before* you call any of the
-templating functions, call :func:`django.conf.settings.configure()` with any
+templating functions, call :func:`freedom.conf.settings.configure()` with any
 settings you wish to specify. You might want to consider setting at least
 :setting:`TEMPLATE_DIRS` (if you're going to use template loaders),
 :setting:`DEFAULT_CHARSET` (although the default of ``utf-8`` is probably fine)
@@ -924,39 +924,39 @@ and any setting starting with ``TEMPLATE_`` is of obvious interest.
 Using an alternative template language
 ======================================
 
-The Django ``Template`` and ``Loader`` classes implement a simple API for
+The Freedom ``Template`` and ``Loader`` classes implement a simple API for
 loading and rendering templates. By providing some simple wrapper classes that
 implement this API we can use third party template systems like `Jinja2
 <http://jinja.pocoo.org/docs/>`_ or `Cheetah <http://www.cheetahtemplate.org/>`_. This
-allows us to use third-party template libraries without giving up useful Django
-features like the Django ``Context`` object and handy shortcuts like
-:func:`~django.shortcuts.render_to_response()`.
+allows us to use third-party template libraries without giving up useful Freedom
+features like the Freedom ``Context`` object and handy shortcuts like
+:func:`~freedom.shortcuts.render_to_response()`.
 
-The core component of the Django templating system is the ``Template`` class.
+The core component of the Freedom templating system is the ``Template`` class.
 This class has a very simple interface: it has a constructor that takes a single
 positional argument specifying the template string, and a ``render()`` method
-that takes a :class:`~django.template.Context` object and returns a string
+that takes a :class:`~freedom.template.Context` object and returns a string
 containing the rendered response.
 
 Suppose we're using a template language that defines a ``Template`` object with
 a ``render()`` method that takes a dictionary rather than a ``Context`` object.
-We can write a simple wrapper that implements the Django ``Template`` interface::
+We can write a simple wrapper that implements the Freedom ``Template`` interface::
 
     import some_template_language
     class Template(some_template_language.Template):
         def render(self, context):
-            # flatten the Django Context into a single dictionary.
+            # flatten the Freedom Context into a single dictionary.
             context_dict = {}
             for d in context.dicts:
                 context_dict.update(d)
             return super(Template, self).render(context_dict)
 
 That's all that's required to make our fictional ``Template`` class compatible
-with the Django loading and rendering system!
+with the Freedom loading and rendering system!
 
 The next step is to write a ``Loader`` class that returns instances of our custom
-template class instead of the default :class:`~django.template.Template`. Custom ``Loader``
-classes should inherit from ``django.template.loader.BaseLoader`` and override
+template class instead of the default :class:`~freedom.template.Template`. Custom ``Loader``
+classes should inherit from ``freedom.template.loader.BaseLoader`` and override
 the ``load_template_source()`` method, which takes a ``template_name`` argument,
 loads the template from disk (or elsewhere), and returns a tuple:
 ``(template_string, template_origin)``.
@@ -966,10 +966,10 @@ string by calling ``load_template_source()``, instantiates a ``Template`` from
 the template source, and returns a tuple: ``(template, template_origin)``. Since
 this is the method that actually instantiates the ``Template``, we'll need to
 override it to use our custom template class instead. We can inherit from the
-builtin :class:`django.template.loaders.app_directories.Loader` to take advantage
+builtin :class:`freedom.template.loaders.app_directories.Loader` to take advantage
 of the ``load_template_source()`` method implemented there::
 
-    from django.template.loaders import app_directories
+    from freedom.template.loaders import app_directories
     class Loader(app_directories.Loader):
         is_usable = True
 
@@ -978,6 +978,6 @@ of the ``load_template_source()`` method implemented there::
             template = Template(source)
             return template, origin
 
-Finally, we need to modify our project settings, telling Django to use our custom
+Finally, we need to modify our project settings, telling Freedom to use our custom
 loader. Now we can write all of our templates in our alternative template
-language while continuing to use the rest of the Django templating system.
+language while continuing to use the rest of the Freedom templating system.

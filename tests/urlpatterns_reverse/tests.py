@@ -7,16 +7,16 @@ from __future__ import unicode_literals
 import sys
 import unittest
 
-from django.contrib.auth.models import User
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.core.urlresolvers import (reverse, reverse_lazy, resolve, get_callable,
+from freedom.contrib.auth.models import User
+from freedom.conf import settings
+from freedom.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from freedom.core.urlresolvers import (reverse, reverse_lazy, resolve, get_callable,
     get_resolver, NoReverseMatch, Resolver404, ResolverMatch, RegexURLResolver,
     RegexURLPattern)
-from django.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanentRedirect
-from django.shortcuts import redirect
-from django.test import TestCase, override_settings
-from django.utils import six
+from freedom.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanentRedirect
+from freedom.shortcuts import redirect
+from freedom.test import TestCase, override_settings
+from freedom.utils import six
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -314,7 +314,7 @@ class ReverseLazySettingsTest(AdminScriptTestCase):
     """
     def setUp(self):
         self.write_settings('settings.py', extra="""
-from django.core.urlresolvers import reverse_lazy
+from freedom.core.urlresolvers import reverse_lazy
 LOGIN_URL = reverse_lazy('login')""")
 
     def tearDown(self):

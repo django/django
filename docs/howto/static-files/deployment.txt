@@ -4,7 +4,7 @@ Deploying static files
 
 .. seealso::
 
-    For an introduction to the use of :mod:`django.contrib.staticfiles`, see
+    For an introduction to the use of :mod:`freedom.contrib.staticfiles`, see
     :doc:`/howto/static-files/index`.
 
 .. _staticfiles-production:
@@ -17,7 +17,7 @@ The basic outline of putting static files into production is simple: run the
 the collected static files directory (:setting:`STATIC_ROOT`) to be moved to
 the static file server and served. Depending on :setting:`STATICFILES_STORAGE`,
 files may need to be moved to a new location manually or the :func:`post_process
-<django.contrib.staticfiles.storage.StaticFilesStorage.post_process>` method
+<freedom.contrib.staticfiles.storage.StaticFilesStorage.post_process>` method
 of the ``Storage`` class might take care of that.
 
 Of course, as with all deployment tasks, the devil's in the details. Every
@@ -39,7 +39,7 @@ serving your site, the process may look something like:
 
 You'll probably want to automate this process, especially if you've got
 multiple web servers. There's any number of ways to do this automation, but
-one option that many Django developers enjoy is `Fabric
+one option that many Freedom developers enjoy is `Fabric
 <http://fabfile.org/>`_.
 
 Below, and in the following sections, we'll show off a few example fabfiles
@@ -66,8 +66,8 @@ something like::
 Serving static files from a dedicated server
 --------------------------------------------
 
-Most larger Django sites use a separate Web server -- i.e., one that's not also
-running Django -- for serving static files. This server often runs a different
+Most larger Freedom sites use a separate Web server -- i.e., one that's not also
+running Freedom -- for serving static files. This server often runs a different
 type of web server -- faster but less full-featured. Some common choices are:
 
 * lighttpd_
@@ -85,7 +85,7 @@ type of web server -- faster but less full-featured. Some common choices are:
 Configuring these servers is out of scope of this document; check each
 server's respective documentation for instructions.
 
-Since your static file server won't be running Django, you'll need to modify
+Since your static file server won't be running Freedom, you'll need to modify
 the deployment strategy to look something like:
 
 * When your static files change, run :djadmin:`collectstatic` locally.
@@ -148,12 +148,12 @@ as changing your :setting:`STATICFILES_STORAGE` setting.
 For details on how you'd write one of these backends, see
 :doc:`/howto/custom-file-storage`. There are 3rd party apps available that
 provide storage backends for many common file storage APIs. A good starting
-point is the `overview at djangopackages.com
-<https://www.djangopackages.com/grids/g/storage-backends/>`_.
+point is the `overview at freedompackages.com
+<https://www.freedompackages.com/grids/g/storage-backends/>`_.
 
 Learn more
 ==========
 
 For complete details on all the settings, commands, template tags, and other
-pieces included in :mod:`django.contrib.staticfiles`, see :doc:`the
+pieces included in :mod:`freedom.contrib.staticfiles`, see :doc:`the
 staticfiles reference </ref/contrib/staticfiles>`.

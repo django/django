@@ -2,17 +2,17 @@
 Middleware
 ==========
 
-Middleware is a framework of hooks into Django's request/response processing.
-It's a light, low-level "plugin" system for globally altering Django's input
+Middleware is a framework of hooks into Freedom's request/response processing.
+It's a light, low-level "plugin" system for globally altering Freedom's input
 or output.
 
 Each middleware component is responsible for doing some specific function. For
-example, Django includes a middleware component,
-:class:`~django.contrib.auth.middleware.AuthenticationMiddleware`, that
+example, Freedom includes a middleware component,
+:class:`~freedom.contrib.auth.middleware.AuthenticationMiddleware`, that
 associates users with requests using sessions.
 
 This document explains how middleware works, how you activate middleware, and
-how to write your own middleware. Django ships with some built-in middleware
+how to write your own middleware. Freedom ships with some built-in middleware
 you can use right out of the box. They're documented in the :doc:`built-in
 middleware reference </ref/middleware>`.
 
@@ -20,39 +20,39 @@ Activating middleware
 =====================
 
 To activate a middleware component, add it to the
-:setting:`MIDDLEWARE_CLASSES` tuple in your Django settings.
+:setting:`MIDDLEWARE_CLASSES` tuple in your Freedom settings.
 
 In :setting:`MIDDLEWARE_CLASSES`, each middleware component is represented by
 a string: the full Python path to the middleware's class name. For example,
-here's the default value created by :djadmin:`django-admin.py startproject
+here's the default value created by :djadmin:`freedom-admin.py startproject
 <startproject>`::
 
     MIDDLEWARE_CLASSES = (
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'freedom.contrib.sessions.middleware.SessionMiddleware',
+        'freedom.middleware.common.CommonMiddleware',
+        'freedom.middleware.csrf.CsrfViewMiddleware',
+        'freedom.contrib.auth.middleware.AuthenticationMiddleware',
+        'freedom.contrib.messages.middleware.MessageMiddleware',
+        'freedom.middleware.clickjacking.XFrameOptionsMiddleware',
     )
 
-A Django installation doesn't require any middleware —
+A Freedom installation doesn't require any middleware —
 :setting:`MIDDLEWARE_CLASSES` can be empty, if you'd like — but it's strongly
 suggested that you at least use
-:class:`~django.middleware.common.CommonMiddleware`.
+:class:`~freedom.middleware.common.CommonMiddleware`.
 
 The order in :setting:`MIDDLEWARE_CLASSES` matters because a middleware can
 depend on other middleware. For instance,
-:class:`~django.contrib.auth.middleware.AuthenticationMiddleware` stores the
+:class:`~freedom.contrib.auth.middleware.AuthenticationMiddleware` stores the
 authenticated user in the session; therefore, it must run after
-:class:`~django.contrib.sessions.middleware.SessionMiddleware`. See
-:ref:`middleware-ordering` for some common hints about ordering of Django
+:class:`~freedom.contrib.sessions.middleware.SessionMiddleware`. See
+:ref:`middleware-ordering` for some common hints about ordering of Freedom
 middleware classes.
 
 Hooks and application order
 ===========================
 
-During the request phase, before calling the view, Django applies middleware
+During the request phase, before calling the view, Freedom applies middleware
 in the order it's defined in :setting:`MIDDLEWARE_CLASSES`, top-down. Two
 hooks are available:
 
@@ -89,18 +89,18 @@ Python class that defines one or more of the following methods:
 
 .. method:: process_request(request)
 
-``request`` is an :class:`~django.http.HttpRequest` object.
+``request`` is an :class:`~freedom.http.HttpRequest` object.
 
-``process_request()`` is called on each request, before Django decides which
+``process_request()`` is called on each request, before Freedom decides which
 view to execute.
 
-It should return either ``None`` or an :class:`~django.http.HttpResponse`
-object. If it returns ``None``, Django will continue processing this request,
+It should return either ``None`` or an :class:`~freedom.http.HttpResponse`
+object. If it returns ``None``, Freedom will continue processing this request,
 executing any other ``process_request()`` middleware, then, ``process_view()``
 middleware, and finally, the appropriate view. If it returns an
-:class:`~django.http.HttpResponse` object, Django won't bother calling any
+:class:`~freedom.http.HttpResponse` object, Freedom won't bother calling any
 other request, view or exception middleware, or the appropriate view; it'll
-apply response middleware to that :class:`~django.http.HttpResponse`, and
+apply response middleware to that :class:`~freedom.http.HttpResponse`, and
 return the result.
 
 .. _view-middleware:
@@ -110,37 +110,37 @@ return the result.
 
 .. method:: process_view(request, view_func, view_args, view_kwargs)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``view_func`` is
-the Python function that Django is about to use. (It's the actual function
+``request`` is an :class:`~freedom.http.HttpRequest` object. ``view_func`` is
+the Python function that Freedom is about to use. (It's the actual function
 object, not the name of the function as a string.) ``view_args`` is a list of
 positional arguments that will be passed to the view, and ``view_kwargs`` is a
 dictionary of keyword arguments that will be passed to the view. Neither
 ``view_args`` nor ``view_kwargs`` include the first view argument
 (``request``).
 
-``process_view()`` is called just before Django calls the view.
+``process_view()`` is called just before Freedom calls the view.
 
-It should return either ``None`` or an :class:`~django.http.HttpResponse`
-object. If it returns ``None``, Django will continue processing this request,
+It should return either ``None`` or an :class:`~freedom.http.HttpResponse`
+object. If it returns ``None``, Freedom will continue processing this request,
 executing any other ``process_view()`` middleware and, then, the appropriate
-view. If it returns an :class:`~django.http.HttpResponse` object, Django won't
+view. If it returns an :class:`~freedom.http.HttpResponse` object, Freedom won't
 bother calling any other view or exception middleware, or the appropriate
 view; it'll apply response middleware to that
-:class:`~django.http.HttpResponse`, and return the result.
+:class:`~freedom.http.HttpResponse`, and return the result.
 
 .. note::
 
-    Accessing :attr:`request.POST <django.http.HttpRequest.POST>` or
-    :attr:`request.REQUEST <django.http.HttpRequest.REQUEST>` inside middleware
+    Accessing :attr:`request.POST <freedom.http.HttpRequest.POST>` or
+    :attr:`request.REQUEST <freedom.http.HttpRequest.REQUEST>` inside middleware
     from ``process_request`` or ``process_view`` will prevent any view running
     after the middleware from being able to :ref:`modify the upload handlers
     for the request <modifying_upload_handlers_on_the_fly>`, and should
     normally be avoided.
 
-    The :class:`~django.middleware.csrf.CsrfViewMiddleware` class can be
+    The :class:`~freedom.middleware.csrf.CsrfViewMiddleware` class can be
     considered an exception, as it provides the
-    :func:`~django.views.decorators.csrf.csrf_exempt` and
-    :func:`~django.views.decorators.csrf.csrf_protect` decorators which allow
+    :func:`~freedom.views.decorators.csrf.csrf_exempt` and
+    :func:`~freedom.views.decorators.csrf.csrf_protect` decorators which allow
     views to explicitly control at what point the CSRF validation should occur.
 
 .. _template-response-middleware:
@@ -150,18 +150,18 @@ view; it'll apply response middleware to that
 
 .. method:: process_template_response(request, response)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is
-the :class:`~django.template.response.TemplateResponse` object (or equivalent)
-returned by a Django view or by a middleware.
+``request`` is an :class:`~freedom.http.HttpRequest` object. ``response`` is
+the :class:`~freedom.template.response.TemplateResponse` object (or equivalent)
+returned by a Freedom view or by a middleware.
 
 ``process_template_response()`` is called just after the view has finished
 executing, if the response instance has a ``render()`` method, indicating that
-it is a :class:`~django.template.response.TemplateResponse` or equivalent.
+it is a :class:`~freedom.template.response.TemplateResponse` or equivalent.
 
 It must return a response object that implements a ``render`` method. It could
 alter the given ``response`` by changing ``response.template_name`` and
 ``response.context_data``, or it could create and return a brand-new
-:class:`~django.template.response.TemplateResponse` or equivalent.
+:class:`~freedom.template.response.TemplateResponse` or equivalent.
 
 You don't need to explicitly render responses -- responses will be
 automatically rendered once all template response middleware has been
@@ -177,25 +177,25 @@ includes ``process_template_response()``.
 
 .. method:: process_response(request, response)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is
-the :class:`~django.http.HttpResponse` or
-:class:`~django.http.StreamingHttpResponse` object returned by a Django view
+``request`` is an :class:`~freedom.http.HttpRequest` object. ``response`` is
+the :class:`~freedom.http.HttpResponse` or
+:class:`~freedom.http.StreamingHttpResponse` object returned by a Freedom view
 or by a middleware.
 
 ``process_response()`` is called on all responses before they're returned to
 the browser.
 
-It must return an :class:`~django.http.HttpResponse` or
-:class:`~django.http.StreamingHttpResponse` object. It could alter the given
+It must return an :class:`~freedom.http.HttpResponse` or
+:class:`~freedom.http.StreamingHttpResponse` object. It could alter the given
 ``response``, or it could create and return a brand-new
-:class:`~django.http.HttpResponse` or
-:class:`~django.http.StreamingHttpResponse`.
+:class:`~freedom.http.HttpResponse` or
+:class:`~freedom.http.StreamingHttpResponse`.
 
 Unlike the ``process_request()`` and ``process_view()`` methods, the
 ``process_response()`` method is always called, even if the
 ``process_request()`` and ``process_view()`` methods of the same middleware
 class were skipped (because an earlier middleware method returned an
-:class:`~django.http.HttpResponse`). In particular, this means that your
+:class:`~freedom.http.HttpResponse`). In particular, this means that your
 ``process_response()`` method cannot rely on setup done in
 ``process_request()``.
 
@@ -206,8 +206,8 @@ reverse order, from the bottom up. This means classes defined at the end of
 Dealing with streaming responses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Unlike :class:`~django.http.HttpResponse`,
-:class:`~django.http.StreamingHttpResponse` does not have a ``content``
+Unlike :class:`~freedom.http.HttpResponse`,
+:class:`~freedom.http.StreamingHttpResponse` does not have a ``content``
 attribute. As a result, middleware can no longer assume that all responses
 will have a ``content`` attribute. If they need access to the content, they
 must test for streaming responses and adjust their behavior accordingly::
@@ -234,13 +234,13 @@ must test for streaming responses and adjust their behavior accordingly::
 
 .. method:: process_exception(request, exception)
 
-``request`` is an :class:`~django.http.HttpRequest` object. ``exception`` is an
+``request`` is an :class:`~freedom.http.HttpRequest` object. ``exception`` is an
 ``Exception`` object raised by the view function.
 
-Django calls ``process_exception()`` when a view raises an exception.
+Freedom calls ``process_exception()`` when a view raises an exception.
 ``process_exception()`` should return either ``None`` or an
-:class:`~django.http.HttpResponse` object. If it returns an
-:class:`~django.http.HttpResponse` object, the template response and response
+:class:`~freedom.http.HttpResponse` object. If it returns an
+:class:`~freedom.http.HttpResponse` object, the template response and response
 middleware will be applied, and the resulting response returned to the
 browser. Otherwise, default exception handling kicks in.
 
@@ -256,7 +256,7 @@ essentially placeholders for the ``process_*`` methods. If you do need some
 global state you may use ``__init__`` to set up. However, keep in mind a couple
 of caveats:
 
-* Django initializes your middleware without any arguments, so you can't
+* Freedom initializes your middleware without any arguments, so you can't
   define ``__init__`` as requiring any arguments.
 
 * Unlike the ``process_*`` methods which get called once per request,
@@ -268,7 +268,7 @@ Marking middleware as unused
 
 It's sometimes useful to determine at run-time whether a piece of middleware
 should be used. In these cases, your middleware's ``__init__`` method may
-raise :exc:`django.core.exceptions.MiddlewareNotUsed`. Django will then remove
+raise :exc:`freedom.core.exceptions.MiddlewareNotUsed`. Freedom will then remove
 that piece of middleware from the middleware process.
 
 Guidelines
@@ -276,13 +276,13 @@ Guidelines
 
 * Middleware classes don't have to subclass anything.
 
-* The middleware class can live anywhere on your Python path. All Django
+* The middleware class can live anywhere on your Python path. All Freedom
   cares about is that the :setting:`MIDDLEWARE_CLASSES` setting includes
   the path to it.
 
-* Feel free to look at :doc:`Django's available middleware
+* Feel free to look at :doc:`Freedom's available middleware
   </ref/middleware>` for examples.
 
 * If you write a middleware component that you think would be useful to
   other people, contribute to the community! :doc:`Let us know
-  </internals/contributing/index>`, and we'll consider adding it to Django.
+  </internals/contributing/index>`, and we'll consider adding it to Freedom.

@@ -2,14 +2,14 @@
 Release notes
 =============
 
-Release notes for the official Django releases. Each release note will tell you
+Release notes for the official Freedom releases. Each release note will tell you
 what's new in each version, and will also describe any backwards-incompatible
 changes made in that version.
 
-For those :doc:`upgrading to a new version of Django</howto/upgrade-version>`,
+For those :doc:`upgrading to a new version of Freedom</howto/upgrade-version>`,
 you will need to check all the backwards-incompatible changes and
 :doc:`deprecated features</internals/deprecation>` for each 'final' release
-from the one after your current Django version, up to and including the new
+from the one after your current Freedom version, up to and including the new
 version.
 
 Final releases
@@ -137,7 +137,7 @@ Pre-1.0 releases
 Security releases
 =================
 
-Whenever a security issue is disclosed via :doc:`Django's security
+Whenever a security issue is disclosed via :doc:`Freedom's security
 policies </internals/security>`, appropriate release notes are now
 added to all affected release series.
 
@@ -148,7 +148,7 @@ Development releases
 ====================
 
 These notes are retained for historical purposes. If you are upgrading
-between formal Django releases, you don't need to worry about these
+between formal Freedom releases, you don't need to worry about these
 notes.
 
 .. toctree::

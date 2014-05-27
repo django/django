@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 import unittest
 import datetime
 
-from django.utils import six
-from django.utils.encoding import (force_bytes, force_text, filepath_to_uri,
+from freedom.utils import six
+from freedom.utils.encoding import (force_bytes, force_text, filepath_to_uri,
         python_2_unicode_compatible)
 
 

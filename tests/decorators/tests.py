@@ -2,16 +2,16 @@ from functools import wraps, update_wrapper
 from unittest import TestCase
 import warnings
 
-from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-from django.http import HttpResponse, HttpRequest, HttpResponseNotAllowed
-from django.middleware.clickjacking import XFrameOptionsMiddleware
-from django.utils.decorators import method_decorator
-from django.utils.functional import allow_lazy, lazy, memoize
-from django.views.decorators.cache import cache_page, never_cache, cache_control
-from django.views.decorators.clickjacking import xframe_options_deny, xframe_options_sameorigin, xframe_options_exempt
-from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe, condition
-from django.views.decorators.vary import vary_on_headers, vary_on_cookie
+from freedom.contrib.admin.views.decorators import staff_member_required
+from freedom.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from freedom.http import HttpResponse, HttpRequest, HttpResponseNotAllowed
+from freedom.middleware.clickjacking import XFrameOptionsMiddleware
+from freedom.utils.decorators import method_decorator
+from freedom.utils.functional import allow_lazy, lazy, memoize
+from freedom.views.decorators.cache import cache_page, never_cache, cache_control
+from freedom.views.decorators.clickjacking import xframe_options_deny, xframe_options_sameorigin, xframe_options_exempt
+from freedom.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe, condition
+from freedom.views.decorators.vary import vary_on_headers, vary_on_cookie
 
 
 def fully_decorated(request):
@@ -33,32 +33,32 @@ def compose(*functions):
 
 
 full_decorator = compose(
-    # django.views.decorators.http
+    # freedom.views.decorators.http
     require_http_methods(["GET"]),
     require_GET,
     require_POST,
     require_safe,
     condition(lambda r: None, lambda r: None),
 
-    # django.views.decorators.vary
+    # freedom.views.decorators.vary
     vary_on_headers('Accept-language'),
     vary_on_cookie,
 
-    # django.views.decorators.cache
+    # freedom.views.decorators.cache
     cache_page(60 * 15),
     cache_control(private=True),
     never_cache,
 
-    # django.contrib.auth.decorators
+    # freedom.contrib.auth.decorators
     # Apply user_passes_test twice to check #9474
     user_passes_test(lambda u: True),
     login_required,
     permission_required('change_world'),
 
-    # django.contrib.admin.views.decorators
+    # freedom.contrib.admin.views.decorators
     staff_member_required,
 
-    # django.utils.functional
+    # freedom.utils.functional
     allow_lazy,
     lazy,
 )
@@ -74,7 +74,7 @@ class DecoratorsTest(TestCase):
 
     def test_attributes(self):
         """
-        Tests that django decorators set certain attributes of the wrapped
+        Tests that freedom decorators set certain attributes of the wrapped
         function.
         """
         self.assertEqual(fully_decorated.__name__, 'fully_decorated')

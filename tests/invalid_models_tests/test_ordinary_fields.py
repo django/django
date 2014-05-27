@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 import unittest
 
-from django.core.checks import Error, Warning as DjangoWarning
-from django.db import connection, models
-from django.test.utils import override_settings
-from django.utils.timezone import now
+from freedom.core.checks import Error, Warning as FreedomWarning
+from freedom.db import connection, models
+from freedom.test.utils import override_settings
+from freedom.utils.timezone import now
 
 from .base import IsolatedModelsTestCase
 
@@ -27,7 +27,7 @@ class AutoFieldTests(IsolatedModelsTestCase):
         class Model(models.Model):
             field = models.AutoField(primary_key=False)
 
-            # Prevent Django from autocreating `id` AutoField, which would
+            # Prevent Freedom from autocreating `id` AutoField, which would
             # result in an error, because a model must have exactly one
             # AutoField.
             another = models.IntegerField(primary_key=True)
@@ -180,7 +180,7 @@ class CharFieldTests(IsolatedModelsTestCase):
     @unittest.skipUnless(connection.vendor == 'mysql',
                          "Test valid only for MySQL")
     def test_too_long_char_field_under_mysql(self):
-        from django.db.backends.mysql.validation import DatabaseValidation
+        from freedom.db.backends.mysql.validation import DatabaseValidation
 
         class Model(models.Model):
             field = models.CharField(unique=True, max_length=256)
@@ -236,21 +236,21 @@ class DateFieldTests(IsolatedModelsTestCase):
         errors.extend(field_d.check())
         errors.extend(field_now.check())  # doesn't raise a warning
         expected = [
-            DjangoWarning(
+            FreedomWarning(
                 'Fixed default value provided.',
                 hint='It seems you set a fixed date / time / datetime '
                      'value as default for this field. This may not be '
                      'what you want. If you want to have the current date '
-                     'as default, use `django.utils.timezone.now`',
+                     'as default, use `freedom.utils.timezone.now`',
                 obj=field_dt,
                 id='fields.W161',
             ),
-            DjangoWarning(
+            FreedomWarning(
                 'Fixed default value provided.',
                 hint='It seems you set a fixed date / time / datetime '
                      'value as default for this field. This may not be '
                      'what you want. If you want to have the current date '
-                     'as default, use `django.utils.timezone.now`',
+                     'as default, use `freedom.utils.timezone.now`',
                 obj=field_d,
                 id='fields.W161',
             )
@@ -280,21 +280,21 @@ class DateTimeFieldTests(IsolatedModelsTestCase):
         errors.extend(field_d.check())
         errors.extend(field_now.check())  # doesn't raise a warning
         expected = [
-            DjangoWarning(
+            FreedomWarning(
                 'Fixed default value provided.',
                 hint='It seems you set a fixed date / time / datetime '
                      'value as default for this field. This may not be '
                      'what you want. If you want to have the current date '
-                     'as default, use `django.utils.timezone.now`',
+                     'as default, use `freedom.utils.timezone.now`',
                 obj=field_dt,
                 id='fields.W161',
             ),
-            DjangoWarning(
+            FreedomWarning(
                 'Fixed default value provided.',
                 hint='It seems you set a fixed date / time / datetime '
                      'value as default for this field. This may not be '
                      'what you want. If you want to have the current date '
-                     'as default, use `django.utils.timezone.now`',
+                     'as default, use `freedom.utils.timezone.now`',
                 obj=field_d,
                 id='fields.W161',
             )
@@ -528,21 +528,21 @@ class TimeFieldTests(IsolatedModelsTestCase):
         errors.extend(field_t.check())
         errors.extend(field_now.check())  # doesn't raise a warning
         expected = [
-            DjangoWarning(
+            FreedomWarning(
                 'Fixed default value provided.',
                 hint='It seems you set a fixed date / time / datetime '
                      'value as default for this field. This may not be '
                      'what you want. If you want to have the current date '
-                     'as default, use `django.utils.timezone.now`',
+                     'as default, use `freedom.utils.timezone.now`',
                 obj=field_dt,
                 id='fields.W161',
             ),
-            DjangoWarning(
+            FreedomWarning(
                 'Fixed default value provided.',
                 hint='It seems you set a fixed date / time / datetime '
                      'value as default for this field. This may not be '
                      'what you want. If you want to have the current date '
-                     'as default, use `django.utils.timezone.now`',
+                     'as default, use `freedom.utils.timezone.now`',
                 obj=field_t,
                 id='fields.W161',
             )

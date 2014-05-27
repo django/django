@@ -1,1 +1,1 @@
-# Django settings for {{ project_name }} test project.
+# Freedom settings for {{ project_name }} test project.

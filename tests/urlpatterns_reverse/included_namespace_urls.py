@@ -1,6 +1,6 @@
 import warnings
 
-from django.conf.urls import patterns, url, include
+from freedom.conf.urls import patterns, url, include
 
 from .namespace_urls import URLObject
 from .views import view_class_instance
@@ -8,9 +8,9 @@ from .views import view_class_instance
 
 testobj3 = URLObject('testapp', 'test-ns3')
 
-# test deprecated patterns() function. convert to list of urls() in Django 2.0
+# test deprecated patterns() function. convert to list of urls() in Freedom 2.0
 with warnings.catch_warnings(record=True) as w:
-    warnings.filterwarnings('ignore', module='django.conf.urls')
+    warnings.filterwarnings('ignore', module='freedom.conf.urls')
 
     urlpatterns = patterns('urlpatterns_reverse.views',
         url(r'^normal/$', 'empty_view', name='inc-normal-view'),

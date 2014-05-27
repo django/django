@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.db import DEFAULT_DB_ALIAS
+from freedom.db import DEFAULT_DB_ALIAS
 
 
 class TestRouter(object):

@@ -14,31 +14,31 @@ import time
 import unittest
 import warnings
 
-from django.conf import settings
-from django.core import management
-from django.core.cache import (cache, caches, CacheKeyWarning,
+from freedom.conf import settings
+from freedom.core import management
+from freedom.core.cache import (cache, caches, CacheKeyWarning,
     InvalidCacheBackendError, DEFAULT_CACHE_ALIAS)
-from django.core.context_processors import csrf
-from django.db import connection, connections, router, transaction
-from django.core.cache.utils import make_template_fragment_key
-from django.http import HttpResponse, StreamingHttpResponse
-from django.middleware.cache import (FetchFromCacheMiddleware,
+from freedom.core.context_processors import csrf
+from freedom.db import connection, connections, router, transaction
+from freedom.core.cache.utils import make_template_fragment_key
+from freedom.http import HttpResponse, StreamingHttpResponse
+from freedom.middleware.cache import (FetchFromCacheMiddleware,
     UpdateCacheMiddleware, CacheMiddleware)
-from django.middleware.csrf import CsrfViewMiddleware
-from django.template import Template
-from django.template.response import TemplateResponse
-from django.test import TestCase, TransactionTestCase, RequestFactory, override_settings
-from django.test.utils import IgnoreDeprecationWarningsMixin
-from django.utils import six
-from django.utils import timezone
-from django.utils import translation
-from django.utils.cache import (patch_vary_headers, get_cache_key,
+from freedom.middleware.csrf import CsrfViewMiddleware
+from freedom.template import Template
+from freedom.template.response import TemplateResponse
+from freedom.test import TestCase, TransactionTestCase, RequestFactory, override_settings
+from freedom.test.utils import IgnoreDeprecationWarningsMixin
+from freedom.utils import six
+from freedom.utils import timezone
+from freedom.utils import translation
+from freedom.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
-from django.utils.encoding import force_text
-from django.views.decorators.cache import cache_page
+from freedom.utils.encoding import force_text
+from freedom.views.decorators.cache import cache_page
 
 try:    # Use the same idiom as in cache backends
-    from django.utils.six.moves import cPickle as pickle
+    from freedom.utils.six.moves import cPickle as pickle
 except ImportError:
     import pickle
 
@@ -62,7 +62,7 @@ class Unpickable(object):
 
 @override_settings(CACHES={
     'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        'BACKEND': 'freedom.core.cache.backends.dummy.DummyCache',
     }
 })
 class DummyCacheTests(TestCase):
@@ -871,18 +871,18 @@ class BaseCacheTests(object):
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
     def test_add_fail_on_pickleerror(self):
-        "See https://code.djangoproject.com/ticket/21200"
+        "See https://code.freedomproject.com/ticket/21200"
         with self.assertRaises(pickle.PickleError):
             cache.add('unpickable', Unpickable())
 
     def test_set_fail_on_pickleerror(self):
-        "See https://code.djangoproject.com/ticket/21200"
+        "See https://code.freedomproject.com/ticket/21200"
         with self.assertRaises(pickle.PickleError):
             cache.set('unpickable', Unpickable())
 
 
 @override_settings(CACHES=caches_setting_for_tests(
-    BACKEND='django.core.cache.backends.db.DatabaseCache',
+    BACKEND='freedom.core.cache.backends.db.DatabaseCache',
     # Spaces are used in the table name to ensure quoting/escaping is working
     LOCATION='test cache table'
 ))
@@ -953,22 +953,22 @@ class DBCacheRouter(object):
     """A router that puts the cache table on the 'other' database."""
 
     def db_for_read(self, model, **hints):
-        if model._meta.app_label == 'django_cache':
+        if model._meta.app_label == 'freedom_cache':
             return 'other'
 
     def db_for_write(self, model, **hints):
-        if model._meta.app_label == 'django_cache':
+        if model._meta.app_label == 'freedom_cache':
             return 'other'
 
     def allow_migrate(self, db, model):
-        if model._meta.app_label == 'django_cache':
+        if model._meta.app_label == 'freedom_cache':
             return db == 'other'
 
 
 @override_settings(
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'BACKEND': 'freedom.core.cache.backends.db.DatabaseCache',
             'LOCATION': 'my_cache_table',
         },
     },
@@ -1014,7 +1014,7 @@ class PicklingSideEffect(object):
 
 
 @override_settings(CACHES=caches_setting_for_tests(
-    BACKEND='django.core.cache.backends.locmem.LocMemCache',
+    BACKEND='freedom.core.cache.backends.locmem.LocMemCache',
 ))
 class LocMemCacheTests(BaseCacheTests, TestCase):
 
@@ -1036,9 +1036,9 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         caches['custom_key2']._expire_info = cache._expire_info
 
     @override_settings(CACHES={
-        'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'},
+        'default': {'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache'},
         'other': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'other'
         },
     })
@@ -1075,7 +1075,7 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
 # your memcache server.
 memcached_params = {}
 for _cache_params in settings.CACHES.values():
-    if _cache_params['BACKEND'].startswith('django.core.cache.backends.memcached.'):
+    if _cache_params['BACKEND'].startswith('freedom.core.cache.backends.memcached.'):
         memcached_params = _cache_params
 
 
@@ -1100,12 +1100,12 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
 
     # Explicitly display a skipped test if no configured cache uses MemcachedCache
     @unittest.skipUnless(
-        memcached_params.get('BACKEND') == 'django.core.cache.backends.memcached.MemcachedCache',
+        memcached_params.get('BACKEND') == 'freedom.core.cache.backends.memcached.MemcachedCache',
         "cache with python-memcached library not available")
     def test_memcached_uses_highest_pickle_version(self):
         # Regression test for #19810
         for cache_key, cache_config in settings.CACHES.items():
-            if cache_config['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache':
+            if cache_config['BACKEND'] == 'freedom.core.cache.backends.memcached.MemcachedCache':
                 self.assertEqual(caches[cache_key]._cache.pickleProtocol,
                                  pickle.HIGHEST_PROTOCOL)
 
@@ -1119,7 +1119,7 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
 
 
 @override_settings(CACHES=caches_setting_for_tests(
-    BACKEND='django.core.cache.backends.filebased.FileBasedCache',
+    BACKEND='freedom.core.cache.backends.filebased.FileBasedCache',
 ))
 class FileBasedCacheTests(BaseCacheTests, TestCase):
     """
@@ -1186,14 +1186,14 @@ class CustomCacheKeyValidationTests(TestCase):
 class GetCacheTests(IgnoreDeprecationWarningsMixin, TestCase):
 
     def test_simple(self):
-        from django.core.cache import caches, get_cache
+        from freedom.core.cache import caches, get_cache
         self.assertIsInstance(
             caches[DEFAULT_CACHE_ALIAS],
             get_cache('default').__class__
         )
 
         cache = get_cache(
-            'django.core.cache.backends.dummy.DummyCache',
+            'freedom.core.cache.backends.dummy.DummyCache',
             **{'TIMEOUT': 120}
         )
         self.assertEqual(cache.default_timeout, 120)
@@ -1201,14 +1201,14 @@ class GetCacheTests(IgnoreDeprecationWarningsMixin, TestCase):
         self.assertRaises(InvalidCacheBackendError, get_cache, 'does_not_exist')
 
     def test_close(self):
-        from django.core import signals
+        from freedom.core import signals
         self.assertFalse(cache.closed)
         signals.request_finished.send(self.__class__)
         self.assertTrue(cache.closed)
 
     def test_close_deprecated(self):
-        from django.core.cache import get_cache
-        from django.core import signals
+        from freedom.core.cache import get_cache
+        from freedom.core import signals
         cache = get_cache('cache.closeable_cache.CacheClass')
         self.assertFalse(cache.closed)
         signals.request_finished.send(self.__class__)
@@ -1217,7 +1217,7 @@ class GetCacheTests(IgnoreDeprecationWarningsMixin, TestCase):
 
 DEFAULT_MEMORY_CACHES_SETTINGS = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'unique-snowflake',
     }
 }
@@ -1244,7 +1244,7 @@ class DefaultNonExpiringCacheKeyTests(TestCase):
         """The default expiration time of a cache key is 5 minutes.
 
         This value is defined inside the __init__() method of the
-        :class:`django.core.cache.backends.base.BaseCache` type.
+        :class:`freedom.core.cache.backends.base.BaseCache` type.
         """
         self.assertEqual(300, self.DEFAULT_TIMEOUT)
 
@@ -1296,13 +1296,13 @@ class DefaultNonExpiringCacheKeyTests(TestCase):
     CACHE_MIDDLEWARE_SECONDS=1,
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
         },
     },
     USE_I18N=False,
 )
 class CacheUtils(TestCase):
-    """TestCase for django.utils.cache functions."""
+    """TestCase for freedom.utils.cache functions."""
 
     def setUp(self):
         self.host = 'www.example.com'
@@ -1429,7 +1429,7 @@ class CacheUtils(TestCase):
 @override_settings(
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
             'KEY_PREFIX': 'cacheprefix',
         },
     },
@@ -1443,7 +1443,7 @@ class PrefixedCacheUtils(CacheUtils):
     CACHE_MIDDLEWARE_KEY_PREFIX='test',
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
         },
     },
 )
@@ -1491,7 +1491,7 @@ class CacheHEADTest(TestCase):
     CACHE_MIDDLEWARE_KEY_PREFIX='settingsprefix',
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
         },
     },
     LANGUAGES=(
@@ -1735,7 +1735,7 @@ class CacheI18nTest(TestCase):
 @override_settings(
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
             'KEY_PREFIX': 'cacheprefix'
         },
     },
@@ -1758,10 +1758,10 @@ def csrf_view(request):
     CACHE_MIDDLEWARE_SECONDS=30,
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
         },
         'other': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'other',
             'TIMEOUT': '1',
         },
@@ -1800,7 +1800,7 @@ class CacheMiddlewareTest(TestCase):
 
         self.assertEqual(as_view_decorator.cache_timeout, 30)  # Timeout value for 'default' cache, i.e. 30
         self.assertEqual(as_view_decorator.key_prefix, '')
-        self.assertEqual(as_view_decorator.cache_alias, 'default')  # Value of DEFAULT_CACHE_ALIAS from django.core.cache
+        self.assertEqual(as_view_decorator.cache_alias, 'default')  # Value of DEFAULT_CACHE_ALIAS from freedom.core.cache
 
         # Next, test with custom values:
         as_view_decorator_with_custom = CacheMiddleware(cache_timeout=60, cache_alias='other', key_prefix='foo')
@@ -1918,7 +1918,7 @@ class CacheMiddlewareTest(TestCase):
 
     def test_sensitive_cookie_not_cached(self):
         """
-        Django must prevent caching of responses that set a user-specific (and
+        Freedom must prevent caching of responses that set a user-specific (and
         maybe security sensitive) cookie in response to a cookie-less request.
         """
         csrf_middleware = CsrfViewMiddleware()
@@ -1943,7 +1943,7 @@ class CacheMiddlewareTest(TestCase):
     CACHE_MIDDLEWARE_SECONDS=1,
     CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
         },
     },
     USE_I18N=False,
@@ -2041,7 +2041,7 @@ class TestWithTemplateResponse(TestCase):
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class TestEtagWithAdmin(TestCase):
-    # See https://code.djangoproject.com/ticket/16003
+    # See https://code.freedomproject.com/ticket/16003
 
     def test_admin(self):
         with self.settings(USE_ETAGS=False):

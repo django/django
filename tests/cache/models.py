@@ -1,6 +1,6 @@
-from django.utils import timezone
+from freedom.utils import timezone
 
-from django.db import models
+from freedom.db import models
 
 
 def expensive_calculation():

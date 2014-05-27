@@ -5,10 +5,10 @@ from __future__ import unicode_literals
 
 from unittest import TestCase
 
-from django.template import (TokenParser, FilterExpression, Parser, Variable,
+from freedom.template import (TokenParser, FilterExpression, Parser, Variable,
     Template, TemplateSyntaxError, Library)
-from django.test import override_settings
-from django.utils import six
+from freedom.test import override_settings
+from freedom.utils import six
 
 
 class ParserTests(TestCase):
@@ -93,7 +93,7 @@ class ParserTests(TestCase):
         msg = "Could not parse the remainder: '@bar' from 'foo@bar'"
         with six.assertRaisesRegex(self, TemplateSyntaxError, msg) as cm:
             Template("{% if 1 %}{{ foo@bar }}{% endif %}")
-        self.assertEqual(cm.exception.django_template_source[1], (10, 23))
+        self.assertEqual(cm.exception.freedom_template_source[1], (10, 23))
 
     def test_filter_args_count(self):
         p = Parser("")

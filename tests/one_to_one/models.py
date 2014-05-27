@@ -7,8 +7,8 @@ In this example, a ``Place`` optionally can be a ``Restaurant``.
 """
 from __future__ import unicode_literals
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

@@ -5,11 +5,11 @@ Class-based generic views
 =========================
 
 Writing Web applications can be monotonous, because we repeat certain patterns
-again and again. Django tries to take away some of that monotony at the model
+again and again. Freedom tries to take away some of that monotony at the model
 and template layers, but Web developers also experience this boredom at the view
 level.
 
-Django's *generic views* were developed to ease that pain. They take certain
+Freedom's *generic views* were developed to ease that pain. They take certain
 common idioms and patterns found in view development and abstract them so that
 you can quickly write common views of data without having to write too much
 code.
@@ -18,7 +18,7 @@ We can recognize certain common tasks, like displaying a list of objects, and
 write code that displays a list of *any* object. Then the model in question can
 be passed as an extra argument to the URLconf.
 
-Django ships with generic views to do the following:
+Freedom ships with generic views to do the following:
 
 * Display list and detail pages for a single object. If we were creating an
   application to manage conferences then a ``TalkListView`` and a
@@ -41,7 +41,7 @@ Extending generic views
 There's no question that using generic views can speed up development
 substantially. In most projects, however, there comes a moment when the
 generic views no longer suffice. Indeed, the most common question asked by new
-Django developers is how to make generic views handle a wider array of
+Freedom developers is how to make generic views handle a wider array of
 situations.
 
 This is one of the reasons generic views were redesigned for the 1.3 release -
@@ -62,9 +62,9 @@ or you could write your own as needed.
 Generic views of objects
 ========================
 
-:class:`~django.views.generic.base.TemplateView` certainly is useful, but
-Django's generic views really shine when it comes to presenting views of your
-database content. Because it's such a common task, Django comes with a handful
+:class:`~freedom.views.generic.base.TemplateView` certainly is useful, but
+Freedom's generic views really shine when it comes to presenting views of your
+database content. Because it's such a common task, Freedom comes with a handful
 of built-in generic views that make generating list and detail views of objects
 incredibly easy.
 
@@ -76,7 +76,7 @@ individual object.
 We'll be using these models::
 
     # models.py
-    from django.db import models
+    from freedom.db import models
 
     class Publisher(models.Model):
         name = models.CharField(max_length=30)
@@ -110,7 +110,7 @@ We'll be using these models::
 Now we need to define a view::
 
     # views.py
-    from django.views.generic import ListView
+    from freedom.views.generic import ListView
     from books.models import Publisher
 
     class PublisherList(ListView):
@@ -119,7 +119,7 @@ Now we need to define a view::
 Finally hook that view into your urls::
 
     # urls.py
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from books.views import PublisherList
 
     urlpatterns = [
@@ -129,7 +129,7 @@ Finally hook that view into your urls::
 That's all the Python code we need to write. We still need to write a template,
 however. We could explicitly tell the view which template to use by adding a
 ``template_name`` attribute to the view, but in the absence of an explicit
-template Django will infer one from the object's name. In this case, the
+template Freedom will infer one from the object's name. In this case, the
 inferred template will be ``"books/publisher_list.html"`` -- the "books" part
 comes from the name of the app that defines the model, while the "publisher"
 bit is just the lowercased version of the model's name.
@@ -137,7 +137,7 @@ bit is just the lowercased version of the model's name.
 .. note::
 
     Thus, when (for example) the
-    :class:`django.template.loaders.app_directories.Loader` template loader is
+    :class:`freedom.template.loaders.app_directories.Loader` template loader is
     enabled in :setting:`TEMPLATE_LOADERS`, a template location could be:
     /path/to/project/books/templates/books/publisher_list.html
 
@@ -145,7 +145,7 @@ This template will be rendered against a context containing a variable called
 ``object_list`` that contains all the publisher objects. A very simple template
 might look like the following:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% extends "base.html" %}
 
@@ -174,7 +174,7 @@ isn't all that "friendly" to template authors: they have to "just know" that
 they're dealing with publishers here.
 
 Well, if you're dealing with a model object, this is already done for you. When
-you are dealing with an object or queryset, Django is able to populate the
+you are dealing with an object or queryset, Freedom is able to populate the
 context using the lower cased version of the model class' name. This is
 provided in addition to the default ``object_list`` entry, but contains exactly
 the same data, i.e. ``publisher_list``.
@@ -184,7 +184,7 @@ context variable. The ``context_object_name`` attribute on a generic view
 specifies the context variable to use::
 
     # views.py
-    from django.views.generic import ListView
+    from freedom.views.generic import ListView
     from books.models import Publisher
 
     class PublisherList(ListView):
@@ -203,16 +203,16 @@ Adding extra context
 Often you simply need to present some extra information beyond that
 provided by the generic view. For example, think of showing a list of
 all the books on each publisher detail page. The
-:class:`~django.views.generic.detail.DetailView` generic view provides
+:class:`~freedom.views.generic.detail.DetailView` generic view provides
 the publisher to the context, but how do we get additional information
 in that template?
 
-The answer is to subclass :class:`~django.views.generic.detail.DetailView`
+The answer is to subclass :class:`~freedom.views.generic.detail.DetailView`
 and provide your own implementation of the ``get_context_data`` method.
 The default implementation simply adds the object being displayed to the
 template, but you can override it to send more::
 
-    from django.views.generic import DetailView
+    from freedom.views.generic import DetailView
     from books.models import Publisher, Book
 
     class PublisherDetail(DetailView):
@@ -251,7 +251,7 @@ objects. However, the ``model`` argument is not the only way to
 specify the objects that the view will operate upon -- you can also
 specify the list of objects using the ``queryset`` argument::
 
-    from django.views.generic import DetailView
+    from freedom.views.generic import DetailView
     from books.models import Publisher
 
     class PublisherDetail(DetailView):
@@ -263,14 +263,14 @@ Specifying ``model = Publisher`` is really just shorthand for saying
 ``queryset = Publisher.objects.all()``. However, by using ``queryset``
 to define a filtered list of objects you can be more specific about the
 objects that will be visible in the view (see :doc:`/topics/db/queries`
-for more information about :class:`~django.db.models.query.QuerySet` objects,
+for more information about :class:`~freedom.db.models.query.QuerySet` objects,
 and see the :doc:`class-based views reference </ref/class-based-views/index>`
 for the complete details).
 
 To pick a simple example, we might want to order a list of books by
 publication date, with the most recent first::
 
-    from django.views.generic import ListView
+    from freedom.views.generic import ListView
     from books.models import Book
 
     class BookList(ListView):
@@ -282,7 +282,7 @@ you'll usually want to do more than just reorder objects. If you want to
 present a list of books by a particular publisher, you can use the same
 technique::
 
-    from django.views.generic import ListView
+    from freedom.views.generic import ListView
     from books.models import Book
 
     class AcmeBookList(ListView):
@@ -318,7 +318,7 @@ what if we wanted to write a view that displayed all the books by some arbitrary
 publisher?
 
 Handily, the ``ListView`` has a
-:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset` method we
+:meth:`~freedom.views.generic.list.MultipleObjectMixin.get_queryset` method we
 can override. Previously, it has just been returning the value of the
 ``queryset`` attribute, but now we can add more logic.
 
@@ -330,7 +330,7 @@ various useful things are stored on ``self``; as well as the request
 Here, we have a URLconf with a single captured group::
 
     # urls.py
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from books.views import PublisherBookList
 
     urlpatterns = [
@@ -340,8 +340,8 @@ Here, we have a URLconf with a single captured group::
 Next, we'll write the ``PublisherBookList`` view itself::
 
     # views.py
-    from django.shortcuts import get_object_or_404
-    from django.views.generic import ListView
+    from freedom.shortcuts import get_object_or_404
+    from freedom.views.generic import ListView
     from books.models import Book, Publisher
 
     class PublisherBookList(ListView):
@@ -380,7 +380,7 @@ Imagine we had a ``last_accessed`` field on our ``Author`` model that we were
 using to keep track of the last time anybody looked at that author::
 
     # models.py
-    from django.db import models
+    from freedom.db import models
 
     class Author(models.Model):
         salutation = models.CharField(max_length=10)
@@ -396,7 +396,7 @@ updated.
 First, we'd need to add an author detail bit in the URLconf to point to a
 custom view::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from books.views import AuthorDetailView
 
     urlpatterns = [
@@ -407,8 +407,8 @@ custom view::
 Then we'd write our new view -- ``get_object`` is the method that retrieves the
 object -- so we simply override it and wrap the call::
 
-    from django.views.generic import DetailView
-    from django.utils import timezone
+    from freedom.views.generic import DetailView
+    from freedom.utils import timezone
     from books.models import Author
 
     class AuthorDetailView(DetailView):
@@ -432,4 +432,4 @@ object -- so we simply override it and wrap the call::
 
     If you want to call the group something else, you can set ``pk_url_kwarg``
     on the view. More details can be found in the reference for
-    :class:`~django.views.generic.detail.DetailView`
+    :class:`~freedom.views.generic.detail.DetailView`

@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
-from django.contrib.auth.models import User
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.contrib.auth.models import User
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

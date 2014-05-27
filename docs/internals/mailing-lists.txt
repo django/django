@@ -5,118 +5,118 @@ Mailing lists
 .. Important::
 
     Please report security issues **only** to
-    security@djangoproject.com.  This is a private list only open to
-    long-time, highly trusted Django developers, and its archives are
+    security@freedomproject.com.  This is a private list only open to
+    long-time, highly trusted Freedom developers, and its archives are
     not public. For further details, please see :doc:`our security
     policies </internals/security>`.
 
-Django has several official mailing lists on Google Groups that are open to
+Freedom has several official mailing lists on Google Groups that are open to
 anyone.
 
-.. _django-users-mailing-list:
+.. _freedom-users-mailing-list:
 
-``django-users``
+``freedom-users``
 ----------------
 
 This is the right place if you are looking to ask any question regarding the
-installation, usage, or debugging of Django.
+installation, usage, or debugging of Freedom.
 
 .. note::
 
     If it's the first time you send an email to this list, your email must be
     accepted first so don't worry if :ref:`your message does not appear
-    <message-does-not-appear-on-django-users>` instantly.
+    <message-does-not-appear-on-freedom-users>` instantly.
 
-* `django-users mailing archive`_
-* `django-users subscription email address`_
-* `django-users posting email`_
+* `freedom-users mailing archive`_
+* `freedom-users subscription email address`_
+* `freedom-users posting email`_
 
-.. _django-users mailing archive: https://groups.google.com/d/forum/django-users
-.. _django-users subscription email address: mailto:django-users+subscribe@googlegroups.com
-.. _django-users posting email: mailto:django-users@googlegroups.com
+.. _freedom-users mailing archive: https://groups.google.com/d/forum/freedom-users
+.. _freedom-users subscription email address: mailto:freedom-users+subscribe@googlegroups.com
+.. _freedom-users posting email: mailto:freedom-users@googlegroups.com
 
-.. _django-core-mentorship-mailing-list:
+.. _freedom-core-mentorship-mailing-list:
 
-``django-core-mentorship``
+``freedom-core-mentorship``
 --------------------------
 
-The Django Core Development Mentorship list is intended to provide a welcoming
+The Freedom Core Development Mentorship list is intended to provide a welcoming
 introductory environment for developers interested in contributing to core
-Django development.
+Freedom development.
 
-* `django-core-mentorship mailing archive`_
-* `django-core-mentorship subscription email address`_
-* `django-core-mentorship posting email`_
+* `freedom-core-mentorship mailing archive`_
+* `freedom-core-mentorship subscription email address`_
+* `freedom-core-mentorship posting email`_
 
-.. _django-core-mentorship mailing archive: https://groups.google.com/d/forum/django-core-mentorship
-.. _django-core-mentorship subscription email address: mailto:django-core-mentorship+subscribe@googlegroups.com
-.. _django-core-mentorship posting email: mailto:django-core-mentorship@googlegroups.com
+.. _freedom-core-mentorship mailing archive: https://groups.google.com/d/forum/freedom-core-mentorship
+.. _freedom-core-mentorship subscription email address: mailto:freedom-core-mentorship+subscribe@googlegroups.com
+.. _freedom-core-mentorship posting email: mailto:freedom-core-mentorship@googlegroups.com
 
-.. _django-developers-mailing-list:
+.. _freedom-developers-mailing-list:
 
-``django-developers``
+``freedom-developers``
 ---------------------
 
-The discussion about the development of Django itself takes place here.
+The discussion about the development of Freedom itself takes place here.
 
 .. note::
 
     Please make use of
-    :ref:`django-users mailing list <django-users-mailing-list>` if you want
+    :ref:`freedom-users mailing list <freedom-users-mailing-list>` if you want
     to ask for tech support, doing so in this list is inappropriate.
 
-* `django-developers mailing archive`_
-* `django-developers subscription email address`_
-* `django-developers posting email`_
+* `freedom-developers mailing archive`_
+* `freedom-developers subscription email address`_
+* `freedom-developers posting email`_
 
-.. _django-developers mailing archive: https://groups.google.com/d/forum/django-developers
-.. _django-developers subscription email address: mailto:django-developers+subscribe@googlegroups.com
-.. _django-developers posting email: mailto:django-developers@googlegroups.com
+.. _freedom-developers mailing archive: https://groups.google.com/d/forum/freedom-developers
+.. _freedom-developers subscription email address: mailto:freedom-developers+subscribe@googlegroups.com
+.. _freedom-developers posting email: mailto:freedom-developers@googlegroups.com
 
-.. _django-i18n-mailing-list:
+.. _freedom-i18n-mailing-list:
 
-``django-i18n``
+``freedom-i18n``
 ---------------
 
 This is the place to discuss the internationalization and localization of
-Django's components.
+Freedom's components.
 
-* `django-i18n mailing archive`_
-* `django-i18n subscription email address`_
-* `django-i18n posting email`_
+* `freedom-i18n mailing archive`_
+* `freedom-i18n subscription email address`_
+* `freedom-i18n posting email`_
 
-.. _django-i18n mailing archive: https://groups.google.com/d/forum/django-i18n
-.. _django-i18n subscription email address: mailto:django-i18n+subscribe@googlegroups.com
-.. _django-i18n posting email: mailto:django-i18n@googlegroups.com
+.. _freedom-i18n mailing archive: https://groups.google.com/d/forum/freedom-i18n
+.. _freedom-i18n subscription email address: mailto:freedom-i18n+subscribe@googlegroups.com
+.. _freedom-i18n posting email: mailto:freedom-i18n@googlegroups.com
 
-.. _django-announce-mailing-list:
+.. _freedom-announce-mailing-list:
 
-``django-announce``
+``freedom-announce``
 -------------------
 
-A (very) low-traffic list for announcing new releases of Django and important
+A (very) low-traffic list for announcing new releases of Freedom and important
 bugfixes.
 
-* `django-announce mailing archive`_
-* `django-announce subscription email address`_
-* `django-announce posting email`_
+* `freedom-announce mailing archive`_
+* `freedom-announce subscription email address`_
+* `freedom-announce posting email`_
 
-.. _django-announce mailing archive: https://groups.google.com/d/forum/django-announce
-.. _django-announce subscription email address: mailto:django-announce+subscribe@googlegroups.com
-.. _django-announce posting email: mailto:django-announce@googlegroups.com
+.. _freedom-announce mailing archive: https://groups.google.com/d/forum/freedom-announce
+.. _freedom-announce subscription email address: mailto:freedom-announce+subscribe@googlegroups.com
+.. _freedom-announce posting email: mailto:freedom-announce@googlegroups.com
 
-.. _django-updates-mailing-list:
+.. _freedom-updates-mailing-list:
 
-``django-updates``
+``freedom-updates``
 ------------------
 
 All the ticket updates are mailed automatically to this list, which is tracked
 by developers and interested community members.
 
-* `django-updates mailing archive`_
-* `django-updates subscription email address`_
-* `django-updates posting email`_
+* `freedom-updates mailing archive`_
+* `freedom-updates subscription email address`_
+* `freedom-updates posting email`_
 
-.. _django-updates mailing archive: https://groups.google.com/d/forum/django-updates
-.. _django-updates subscription email address: mailto:django-updates+subscribe@googlegroups.com
-.. _django-updates posting email: mailto:django-updates@googlegroups.com
+.. _freedom-updates mailing archive: https://groups.google.com/d/forum/freedom-updates
+.. _freedom-updates subscription email address: mailto:freedom-updates+subscribe@googlegroups.com
+.. _freedom-updates posting email: mailto:freedom-updates@googlegroups.com

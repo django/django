@@ -2,26 +2,26 @@
 Database transactions
 =====================
 
-.. module:: django.db.transaction
+.. module:: freedom.db.transaction
 
-Django gives you a few ways to control how database transactions are managed.
+Freedom gives you a few ways to control how database transactions are managed.
 
 Managing database transactions
 ==============================
 
-Django's default transaction behavior
+Freedom's default transaction behavior
 -------------------------------------
 
-Django's default behavior is to run in autocommit mode. Each query is
+Freedom's default behavior is to run in autocommit mode. Each query is
 immediately committed to the database, unless a transaction is active.
 :ref:`See below for details <autocommit-details>`.
 
-Django uses transactions or savepoints automatically to guarantee the
+Freedom uses transactions or savepoints automatically to guarantee the
 integrity of ORM operations that require multiple queries, especially
 :ref:`delete() <topics-db-queries-delete>` and :ref:`update()
 <topics-db-queries-update>` queries.
 
-Django's :class:`~django.test.TestCase` class also wraps each test in a
+Freedom's :class:`~freedom.test.TestCase` class also wraps each test in a
 transaction for performance reasons.
 
 .. _tying-transactions-to-http-requests:
@@ -34,9 +34,9 @@ transaction. Set :setting:`ATOMIC_REQUESTS <DATABASE-ATOMIC_REQUESTS>` to
 ``True`` in the configuration of each database for which you want to enable
 this behavior.
 
-It works like this. Before calling a view function, Django starts a
-transaction. If the response is produced without problems, Django commits the
-transaction. If the view produces an exception, Django rolls back the
+It works like this. Before calling a view function, Freedom starts a
+transaction. If the response is produced without problems, Freedom commits the
+transaction. If the view produces an exception, Freedom rolls back the
 transaction.
 
 You may perform partial commits and rollbacks in your view code, typically with
@@ -52,7 +52,7 @@ all the changes will be committed, or none of them.
 
 .. admonition:: Per-request transactions and streaming responses
 
-    When a view returns a :class:`~django.http.StreamingHttpResponse`, reading
+    When a view returns a :class:`~freedom.http.StreamingHttpResponse`, reading
     the contents of the response will often execute code to generate the
     content. Since the view has already returned, such code runs outside of
     the transaction.
@@ -76,7 +76,7 @@ still possible to prevent views from running in a transaction.
     This decorator will negate the effect of :setting:`ATOMIC_REQUESTS
     <DATABASE-ATOMIC_REQUESTS>` for a given view::
 
-        from django.db import transaction
+        from freedom.db import transaction
 
         @transaction.non_atomic_requests
         def my_view(request):
@@ -91,7 +91,7 @@ still possible to prevent views from running in a transaction.
 Controlling transactions explicitly
 -----------------------------------
 
-Django provides a single API to control database transactions.
+Freedom provides a single API to control database transactions.
 
 .. function:: atomic(using=None, savepoint=True)
 
@@ -107,7 +107,7 @@ Django provides a single API to control database transactions.
 
     ``atomic`` is usable both as a `decorator`_::
 
-        from django.db import transaction
+        from freedom.db import transaction
 
         @transaction.atomic
         def viewfunc(request):
@@ -116,10 +116,10 @@ Django provides a single API to control database transactions.
 
     and as a `context manager`_::
 
-        from django.db import transaction
+        from freedom.db import transaction
 
         def viewfunc(request):
-            # This code executes in autocommit mode (Django's default).
+            # This code executes in autocommit mode (Freedom's default).
             do_stuff()
 
             with transaction.atomic():
@@ -132,7 +132,7 @@ Django provides a single API to control database transactions.
     Wrapping ``atomic`` in a try/except block allows for natural handling of
     integrity errors::
 
-        from django.db import IntegrityError, transaction
+        from freedom.db import IntegrityError, transaction
 
         @transaction.atomic
         def viewfunc(request):
@@ -156,18 +156,18 @@ Django provides a single API to control database transactions.
 
     .. admonition:: Avoid catching exceptions inside ``atomic``!
 
-        When exiting an ``atomic`` block, Django looks at whether it's exited
+        When exiting an ``atomic`` block, Freedom looks at whether it's exited
         normally or with an exception to determine whether to commit or roll
         back. If you catch and handle exceptions inside an ``atomic`` block,
-        you may hide from Django the fact that a problem has happened. This
+        you may hide from Freedom the fact that a problem has happened. This
         can result in unexpected behavior.
 
-        This is mostly a concern for :exc:`~django.db.DatabaseError` and its
-        subclasses such as :exc:`~django.db.IntegrityError`. After such an
-        error, the transaction is broken and Django will perform a rollback at
+        This is mostly a concern for :exc:`~freedom.db.DatabaseError` and its
+        subclasses such as :exc:`~freedom.db.IntegrityError`. After such an
+        error, the transaction is broken and Freedom will perform a rollback at
         the end of the ``atomic`` block. If you attempt to run database
-        queries before the rollback happens, Django will raise a
-        :class:`~django.db.transaction.TransactionManagementError`. You may
+        queries before the rollback happens, Freedom will raise a
+        :class:`~freedom.db.transaction.TransactionManagementError`. You may
         also encounter this behavior when an ORM-related signal handler raises
         an exception.
 
@@ -176,7 +176,7 @@ Django provides a single API to control database transactions.
         purpose. This pattern has another advantage: it delimits explicitly
         which operations will be rolled back if an exception occurs.
 
-        If you catch exceptions raised by raw SQL queries, Django's behavior
+        If you catch exceptions raised by raw SQL queries, Freedom's behavior
         is unspecified and database-dependent.
 
     In order to guarantee atomicity, ``atomic`` disables some APIs. Attempting
@@ -184,10 +184,10 @@ Django provides a single API to control database transactions.
     connection within an ``atomic`` block will raise an exception.
 
     ``atomic`` takes a ``using`` argument which should be the name of a
-    database. If this argument isn't provided, Django uses the ``"default"``
+    database. If this argument isn't provided, Freedom uses the ``"default"``
     database.
 
-    Under the hood, Django's transaction management code:
+    Under the hood, Freedom's transaction management code:
 
     - opens a transaction when entering the outermost ``atomic`` block;
     - creates a savepoint when entering an inner ``atomic`` block;
@@ -195,7 +195,7 @@ Django provides a single API to control database transactions.
     - commits or rolls back the transaction when exiting the outermost block.
 
     You can disable the creation of savepoints for inner blocks by setting the
-    ``savepoint`` argument to ``False``. If an exception occurs, Django will
+    ``savepoint`` argument to ``False``. If an exception occurs, Freedom will
     perform the rollback when exiting the first parent block with a savepoint
     if there is one, and the outermost block otherwise. Atomicity is still
     guaranteed by the outer transaction. This option should only be used if
@@ -211,14 +211,14 @@ Django provides a single API to control database transactions.
     Open transactions have a performance cost for your database server. To
     minimize this overhead, keep your transactions as short as possible. This
     is especially important if you're using :func:`atomic` in long-running
-    processes, outside of Django's request / response cycle.
+    processes, outside of Freedom's request / response cycle.
 
 Autocommit
 ==========
 
 .. _autocommit-details:
 
-Why Django uses autocommit
+Why Freedom uses autocommit
 --------------------------
 
 In the SQL standards, each SQL query starts a transaction, unless one is
@@ -233,7 +233,7 @@ transaction, but the transaction also gets automatically committed or rolled
 back, depending on whether the query succeeded.
 
 :pep:`249`, the Python Database API Specification v2.0, requires autocommit to
-be initially turned off. Django overrides this default and turns autocommit
+be initially turned off. Freedom overrides this default and turns autocommit
 on.
 
 To avoid this, you can :ref:`deactivate the transaction management
@@ -244,14 +244,14 @@ To avoid this, you can :ref:`deactivate the transaction management
 Deactivating transaction management
 -----------------------------------
 
-You can totally disable Django's transaction management for a given database
+You can totally disable Freedom's transaction management for a given database
 by setting :setting:`AUTOCOMMIT <DATABASE-AUTOCOMMIT>` to ``False`` in its
-configuration. If you do this, Django won't enable autocommit, and won't
+configuration. If you do this, Freedom won't enable autocommit, and won't
 perform any commits. You'll get the regular behavior of the underlying
 database library.
 
 This requires you to commit explicitly every transaction, even those started
-by Django or by third-party libraries. Thus, this is best used in situations
+by Freedom or by third-party libraries. Thus, this is best used in situations
 where you want to run your own transaction-controlling middleware or do
 something really strange.
 
@@ -271,7 +271,7 @@ Low-level APIs
 Autocommit
 ----------
 
-Django provides a straightforward API in the :mod:`django.db.transaction`
+Freedom provides a straightforward API in the :mod:`freedom.db.transaction`
 module to manage the autocommit state of each database connection.
 
 .. function:: get_autocommit(using=None)
@@ -279,20 +279,20 @@ module to manage the autocommit state of each database connection.
 .. function:: set_autocommit(autocommit, using=None)
 
 These functions take a ``using`` argument which should be the name of a
-database. If it isn't provided, Django uses the ``"default"`` database.
+database. If it isn't provided, Freedom uses the ``"default"`` database.
 
 Autocommit is initially turned on. If you turn it off, it's your
 responsibility to restore it.
 
 Once you turn autocommit off, you get the default behavior of your database
-adapter, and Django won't help you. Although that behavior is specified in
+adapter, and Freedom won't help you. Although that behavior is specified in
 :pep:`249`, implementations of adapters aren't always consistent with one
 another. Review the documentation of the adapter you're using carefully.
 
 You must ensure that no transaction is active, usually by issuing a
 :func:`commit` or a :func:`rollback`, before turning autocommit back on.
 
-Django will refuse to turn autocommit off when an :func:`atomic` block is
+Freedom will refuse to turn autocommit off when an :func:`atomic` block is
 active, because that would break atomicity.
 
 Transactions
@@ -302,21 +302,21 @@ A transaction is an atomic set of database queries. Even if your program
 crashes, the database guarantees that either all the changes will be applied,
 or none of them.
 
-Django doesn't provide an API to start a transaction. The expected way to
+Freedom doesn't provide an API to start a transaction. The expected way to
 start a transaction is to disable autocommit with :func:`set_autocommit`.
 
 Once you're in a transaction, you can choose either to apply the changes
 you've performed until this point with :func:`commit`, or to cancel them with
-:func:`rollback`. These functions are defined in :mod:`django.db.transaction`.
+:func:`rollback`. These functions are defined in :mod:`freedom.db.transaction`.
 
 .. function:: commit(using=None)
 
 .. function:: rollback(using=None)
 
 These functions take a ``using`` argument which should be the name of a
-database. If it isn't provided, Django uses the ``"default"`` database.
+database. If it isn't provided, Freedom uses the ``"default"`` database.
 
-Django will refuse to commit or to rollback when an :func:`atomic` block is
+Freedom will refuse to commit or to rollback when an :func:`atomic` block is
 active, because that would break atomicity.
 
 .. _topics-db-transactions-savepoints:
@@ -331,7 +331,7 @@ the InnoDB storage engine) backends. Other backends provide the savepoint
 functions, but they're empty operations -- they don't actually do anything.
 
 Savepoints aren't especially useful if you are using autocommit, the default
-behavior of Django. However, once you open a transaction with :func:`atomic`,
+behavior of Freedom. However, once you open a transaction with :func:`atomic`,
 you build up a series of database operations awaiting a commit or rollback. If
 you issue a rollback, the entire transaction is rolled back. Savepoints
 provide the ability to perform a fine-grained rollback, rather than the full
@@ -346,7 +346,7 @@ Each of these functions takes a ``using`` argument which should be the name of
 a database for which the behavior applies.  If no ``using`` argument is
 provided then the ``"default"`` database is used.
 
-Savepoints are controlled by three functions in :mod:`django.db.transaction`:
+Savepoints are controlled by three functions in :mod:`freedom.db.transaction`:
 
 .. function:: savepoint(using=None)
 
@@ -373,7 +373,7 @@ In addition, there's a utility function:
 
 The following example demonstrates the use of savepoints::
 
-    from django.db import transaction
+    from freedom.db import transaction
 
     # open a transaction
     @transaction.atomic
@@ -442,9 +442,9 @@ depends on your MySQL version and the table types you're using. (By
 peculiarities are outside the scope of this article, but the MySQL site has
 `information on MySQL transactions`_.
 
-If your MySQL setup does *not* support transactions, then Django will always
+If your MySQL setup does *not* support transactions, then Freedom will always
 function in autocommit mode: statements will be executed and committed as soon
-as they're called. If your MySQL setup *does* support transactions, Django
+as they're called. If your MySQL setup *does* support transactions, Freedom
 will handle transactions as explained in this document.
 
 .. _information on MySQL transactions: http://dev.mysql.com/doc/refman/5.0/en/sql-syntax-transactions.html
@@ -455,7 +455,7 @@ Handling exceptions within PostgreSQL transactions
 .. note::
 
     This section is relevant only if you're implementing your own transaction
-    management. This problem cannot occur in Django's default mode and
+    management. This problem cannot occur in Freedom's default mode and
     :func:`atomic` handles it automatically.
 
 Inside a transaction, when a call to a PostgreSQL cursor raises an exception
@@ -508,24 +508,24 @@ In this example, ``a.save()`` will not be undone in the case where
 
 .. _transactions-upgrading-from-1.5:
 
-Changes from Django 1.5 and earlier
+Changes from Freedom 1.5 and earlier
 ===================================
 
-The features described below were deprecated in Django 1.6 and will be removed
-in Django 1.8. They're documented in order to ease the migration to the new
+The features described below were deprecated in Freedom 1.6 and will be removed
+in Freedom 1.8. They're documented in order to ease the migration to the new
 transaction management APIs.
 
 Legacy APIs
 -----------
 
-The following functions, defined in ``django.db.transaction``, provided a way
+The following functions, defined in ``freedom.db.transaction``, provided a way
 to control transactions on a per-function or per-code-block basis. They could
 be used as decorators or as context managers, and they accepted a ``using``
 argument, exactly like :func:`atomic`.
 
 .. function:: autocommit
 
-    Enable Django's default autocommit behavior.
+    Enable Freedom's default autocommit behavior.
 
     Transactions will be committed as soon as you call ``model.save()``,
     ``model.delete()``, or any other function that writes to the database.
@@ -534,16 +534,16 @@ argument, exactly like :func:`atomic`.
 
     Use a single transaction for all the work done in a function.
 
-    If the function returns successfully, then Django will commit all work done
+    If the function returns successfully, then Freedom will commit all work done
     within the function at that point. If the function raises an exception,
-    though, Django will roll back the transaction.
+    though, Freedom will roll back the transaction.
 
 .. function:: commit_manually
 
-    Tells Django you'll be managing the transaction on your own.
+    Tells Freedom you'll be managing the transaction on your own.
 
     Whether you are writing or simply reading from the database, you must
-    ``commit()`` or ``rollback()`` explicitly or Django will raise a
+    ``commit()`` or ``rollback()`` explicitly or Freedom will raise a
     :exc:`TransactionManagementError` exception. This is required when reading
     from the database because ``SELECT`` statements may call functions which
     modify tables, and thus it is impossible to know if any data has been
@@ -555,19 +555,19 @@ Transaction states
 ------------------
 
 The three functions described above relied on a concept called "transaction
-states". This mechanism was deprecated in Django 1.6, but it's still available
-until Django 1.8.
+states". This mechanism was deprecated in Freedom 1.6, but it's still available
+until Freedom 1.8.
 
 At any time, each database connection is in one of these two states:
 
 - **auto mode**: autocommit is enabled;
 - **managed mode**: autocommit is disabled.
 
-Django starts in auto mode. ``TransactionMiddleware``,
+Freedom starts in auto mode. ``TransactionMiddleware``,
 :func:`commit_on_success` and :func:`commit_manually` activate managed mode;
 :func:`autocommit` activates auto mode.
 
-Internally, Django keeps a stack of states. Activations and deactivations must
+Internally, Freedom keeps a stack of states. Activations and deactivations must
 be balanced.
 
 For example, :func:`commit_on_success` switches to managed mode when entering
@@ -588,7 +588,7 @@ API changes
 Transaction middleware
 ~~~~~~~~~~~~~~~~~~~~~~
 
-In Django 1.6, ``TransactionMiddleware`` is deprecated and replaced by
+In Freedom 1.6, ``TransactionMiddleware`` is deprecated and replaced by
 :setting:`ATOMIC_REQUESTS <DATABASE-ATOMIC_REQUESTS>`. While the general
 behavior is the same, there are two differences.
 
@@ -608,7 +608,7 @@ applies to the view itself.
 Managing transactions
 ~~~~~~~~~~~~~~~~~~~~~
 
-Starting with Django 1.6, :func:`atomic` is the only supported API for
+Starting with Freedom 1.6, :func:`atomic` is the only supported API for
 defining a transaction. Unlike the deprecated APIs, it's nestable and always
 guarantees atomicity.
 
@@ -622,7 +622,7 @@ context managers breaks atomicity.
 Managing autocommit
 ~~~~~~~~~~~~~~~~~~~
 
-Django 1.6 introduces an explicit :ref:`API for managing autocommit
+Freedom 1.6 introduces an explicit :ref:`API for managing autocommit
 <managing-autocommit>`.
 
 To disable autocommit temporarily, instead of::
@@ -664,13 +664,13 @@ to ``False`` in the configuration of each database, as explained in
 Backwards incompatibilities
 ---------------------------
 
-Since version 1.6, Django uses database-level autocommit in auto mode.
+Since version 1.6, Freedom uses database-level autocommit in auto mode.
 Previously, it implemented application-level autocommit by triggering a commit
 after each ORM write.
 
 As a consequence, each database query (for instance, an ORM read) started a
 transaction that lasted until the next ORM write. Such "automatic
-transactions" no longer exist in Django 1.6.
+transactions" no longer exist in Freedom 1.6.
 
 There are four known scenarios where this is backwards-incompatible.
 
@@ -693,12 +693,12 @@ Select for update
 ~~~~~~~~~~~~~~~~~
 
 If you were relying on "automatic transactions" to provide locking between
-:meth:`~django.db.models.query.QuerySet.select_for_update` and a subsequent
+:meth:`~freedom.db.models.query.QuerySet.select_for_update` and a subsequent
 write operation — an extremely fragile design, but nonetheless possible — you
-must wrap the relevant code in :func:`atomic`. Since Django 1.6.3, executing
-a query with :meth:`~django.db.models.query.QuerySet.select_for_update` in
+must wrap the relevant code in :func:`atomic`. Since Freedom 1.6.3, executing
+a query with :meth:`~freedom.db.models.query.QuerySet.select_for_update` in
 autocommit mode will raise a
-:exc:`~django.db.transaction.TransactionManagementError`.
+:exc:`~freedom.db.transaction.TransactionManagementError`.
 
 Using a high isolation level
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -721,6 +721,6 @@ Using unsupported database features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 With triggers, views, or functions, it's possible to make ORM reads result in
-database modifications. Django 1.5 and earlier doesn't deal with this case and
+database modifications. Freedom 1.5 and earlier doesn't deal with this case and
 it's theoretically possible to observe a different behavior after upgrading to
-Django 1.6 or later. In doubt, use :func:`atomic` to enforce integrity.
+Freedom 1.6 or later. In doubt, use :func:`atomic` to enforce integrity.

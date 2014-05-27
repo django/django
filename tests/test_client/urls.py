@@ -1,5 +1,5 @@
-from django.conf.urls import url
-from django.views.generic import RedirectView
+from freedom.conf.urls import url
+from freedom.views.generic import RedirectView
 
 from . import views
 
@@ -30,8 +30,8 @@ urlpatterns = [
     url(r'^broken_view/$', views.broken_view),
     url(r'^mail_sending_view/$', views.mail_sending_view),
     url(r'^mass_mail_sending_view/$', views.mass_mail_sending_view),
-    url(r'^django_project_redirect/$', views.django_project_redirect),
+    url(r'^freedom_project_redirect/$', views.freedom_project_redirect),
 
-    url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'login.html'}),
-    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout'),
+    url(r'^accounts/login/$', 'freedom.contrib.auth.views.login', {'template_name': 'login.html'}),
+    url(r'^accounts/logout/$', 'freedom.contrib.auth.views.logout'),
 ]

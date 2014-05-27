@@ -4,11 +4,11 @@ import datetime
 from decimal import Decimal
 import re
 
-from django.db import connection
-from django.db.models import Avg, Sum, Count, Max, Min
-from django.test import TestCase
-from django.test.utils import Approximate
-from django.test.utils import CaptureQueriesContext
+from freedom.db import connection
+from freedom.db.models import Avg, Sum, Count, Max, Min
+from freedom.test import TestCase
+from freedom.test.utils import Approximate
+from freedom.test.utils import CaptureQueriesContext
 
 from .models import Author, Publisher, Book, Store
 
@@ -70,10 +70,10 @@ class BaseAggregateTestCase(TestCase):
     def test_annotate_basic(self):
         self.assertQuerysetEqual(
             Book.objects.annotate().order_by('pk'), [
-                "The Definitive Guide to Django: Web Development Done Right",
-                "Sams Teach Yourself Django in 24 Hours",
-                "Practical Django Projects",
-                "Python Web Development with Django",
+                "The Definitive Guide to Freedom: Web Development Done Right",
+                "Sams Teach Yourself Freedom in 24 Hours",
+                "Practical Freedom Projects",
+                "Python Web Development with Freedom",
                 "Artificial Intelligence: A Modern Approach",
                 "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp"
             ],
@@ -84,7 +84,7 @@ class BaseAggregateTestCase(TestCase):
         b = books.get(pk=1)
         self.assertEqual(
             b.name,
-            'The Definitive Guide to Django: Web Development Done Right'
+            'The Definitive Guide to Freedom: Web Development Done Right'
         )
         self.assertEqual(b.mean_age, 34.5)
 
@@ -93,9 +93,9 @@ class BaseAggregateTestCase(TestCase):
         self.assertQuerysetEqual(
             books, [
                 ('Artificial Intelligence: A Modern Approach', 51.5),
-                ('Practical Django Projects', 29.0),
-                ('Python Web Development with Django', Approximate(30.3, places=1)),
-                ('Sams Teach Yourself Django in 24 Hours', 45.0)
+                ('Practical Freedom Projects', 29.0),
+                ('Python Web Development with Freedom', Approximate(30.3, places=1)),
+                ('Sams Teach Yourself Freedom in 24 Hours', 45.0)
             ],
             lambda b: (b.name, b.authors__age__avg),
         )
@@ -105,10 +105,10 @@ class BaseAggregateTestCase(TestCase):
             books, [
                 ('Artificial Intelligence: A Modern Approach', 2),
                 ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1),
-                ('Practical Django Projects', 1),
-                ('Python Web Development with Django', 3),
-                ('Sams Teach Yourself Django in 24 Hours', 1),
-                ('The Definitive Guide to Django: Web Development Done Right', 2)
+                ('Practical Freedom Projects', 1),
+                ('Python Web Development with Freedom', 3),
+                ('Sams Teach Yourself Freedom in 24 Hours', 1),
+                ('The Definitive Guide to Freedom: Web Development Done Right', 2)
             ],
             lambda b: (b.name, b.num_authors)
         )
@@ -149,10 +149,10 @@ class BaseAggregateTestCase(TestCase):
             books, [
                 ('Artificial Intelligence: A Modern Approach', 7),
                 ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 9),
-                ('Practical Django Projects', 3),
-                ('Python Web Development with Django', 7),
-                ('Sams Teach Yourself Django in 24 Hours', 1),
-                ('The Definitive Guide to Django: Web Development Done Right', 3)
+                ('Practical Freedom Projects', 3),
+                ('Python Web Development with Freedom', 7),
+                ('Sams Teach Yourself Freedom in 24 Hours', 1),
+                ('The Definitive Guide to Freedom: Web Development Done Right', 3)
             ],
             lambda b: (b.name, b.publisher__num_awards__sum)
         )
@@ -178,7 +178,7 @@ class BaseAggregateTestCase(TestCase):
                     "id": 1,
                     "isbn": "159059725",
                     "mean_age": 34.5,
-                    "name": "The Definitive Guide to Django: Web Development Done Right",
+                    "name": "The Definitive Guide to Freedom: Web Development Done Right",
                     "pages": 447,
                     "price": Approximate(Decimal("30")),
                     "pubdate": datetime.date(2007, 12, 6),
@@ -203,7 +203,7 @@ class BaseAggregateTestCase(TestCase):
         self.assertEqual(
             list(books), [
                 {
-                    "name": "The Definitive Guide to Django: Web Development Done Right"
+                    "name": "The Definitive Guide to Freedom: Web Development Done Right"
                 }
             ]
         )
@@ -216,7 +216,7 @@ class BaseAggregateTestCase(TestCase):
                     "id": 1,
                     "isbn": "159059725",
                     "mean_age": 34.5,
-                    "name": "The Definitive Guide to Django: Web Development Done Right",
+                    "name": "The Definitive Guide to Freedom: Web Development Done Right",
                     "pages": 447,
                     "price": Approximate(Decimal("30")),
                     "pubdate": datetime.date(2007, 12, 6),
@@ -446,7 +446,7 @@ class BaseAggregateTestCase(TestCase):
         books = Book.objects.annotate(num_authors=Count("authors__name")).filter(num_authors__exact=2).order_by("pk")
         self.assertQuerysetEqual(
             books, [
-                "The Definitive Guide to Django: Web Development Done Right",
+                "The Definitive Guide to Freedom: Web Development Done Right",
                 "Artificial Intelligence: A Modern Approach",
             ],
             lambda b: b.name

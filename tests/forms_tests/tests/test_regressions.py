@@ -3,14 +3,14 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django.forms import (
+from freedom.forms import (
     CharField, ChoiceField, Form, HiddenInput, IntegerField, ModelForm,
     ModelMultipleChoiceField, MultipleChoiceField, RadioSelect, Select,
     TextInput,
 )
-from django.test import TestCase
-from django.utils import translation
-from django.utils.translation import gettext_lazy, ugettext_lazy
+from freedom.test import TestCase
+from freedom.utils import translation
+from freedom.utils.translation import gettext_lazy, ugettext_lazy
 
 from forms_tests.models import Cheese
 
@@ -110,7 +110,7 @@ class FormsRegressionsTestCase(TestCase):
         # might be presented in non-HTML contexts. Instead, the message is just marked
         # for escaping by the template engine. So we'll need to construct a little
         # silly template to trigger the escaping.
-        from django.template import Template, Context
+        from freedom.template import Template, Context
         t = Template('{{ form.errors }}')
 
         class SomeForm(Form):

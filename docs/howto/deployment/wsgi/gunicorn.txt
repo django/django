@@ -1,5 +1,5 @@
 ===============================
-How to use Django with Gunicorn
+How to use Freedom with Gunicorn
 ===============================
 
 .. highlight:: bash
@@ -9,11 +9,11 @@ dependencies and is easy to install and use.
 
 .. _Gunicorn: http://gunicorn.org/
 
-There are two ways to use Gunicorn with Django. One is to have Gunicorn treat
-Django as just another WSGI application. The second is to use Gunicorn's
-special `integration with Django`_.
+There are two ways to use Gunicorn with Freedom. One is to have Gunicorn treat
+Freedom as just another WSGI application. The second is to use Gunicorn's
+special `integration with Freedom`_.
 
-.. _integration with Django: http://docs.gunicorn.org/en/latest/run.html#django-manage-py
+.. _integration with Freedom: http://docs.gunicorn.org/en/latest/run.html#freedom-manage-py
 
 Installing Gunicorn
 ===================
@@ -23,7 +23,7 @@ details, see the `gunicorn documentation`_.
 
 .. _gunicorn documentation: http://gunicorn.org/install.html
 
-Running Django in Gunicorn as a generic WSGI application
+Running Freedom in Gunicorn as a generic WSGI application
 ========================================================
 
 When Gunicorn is installed, a ``gunicorn`` command is available which starts
@@ -36,7 +36,7 @@ Where ``APP_MODULE`` is of the pattern ``MODULE_NAME:VARIABLE_NAME``. The
 module name should be a full dotted path. The variable name refers to a WSGI
 callable that should be found in the specified module.
 
-So for a typical Django project, invoking gunicorn would look like::
+So for a typical Freedom project, invoking gunicorn would look like::
 
     gunicorn myproject.wsgi:application
 
@@ -45,19 +45,19 @@ ensure that is to run this command from the same directory as your
 ``manage.py`` file.)
 
 
-Using Gunicorn's Django integration
+Using Gunicorn's Freedom integration
 ===================================
 
 .. note::
 
-    If you are using Django 1.4 or newer, it’s highly recommended to simply run
+    If you are using Freedom 1.4 or newer, it’s highly recommended to simply run
     your application with the WSGI interface using the ``gunicorn`` command
     as described above.
 
-To use Gunicorn's built-in Django integration, first add ``"gunicorn"`` to
+To use Gunicorn's built-in Freedom integration, first add ``"gunicorn"`` to
 :setting:`INSTALLED_APPS`. Then run ``python manage.py run_gunicorn``.
 
-This provides a few Django-specific niceties:
+This provides a few Freedom-specific niceties:
 
 * sets the gunicorn process name to be that of the project
 

@@ -1,7 +1,7 @@
-from django.apps.registry import Apps
-from django.db import models
-from django.db.migrations.state import ProjectState, ModelState, InvalidBasesError
-from django.test import TestCase
+from freedom.apps.registry import Apps
+from freedom.db import models
+from freedom.db.migrations.state import ProjectState, ModelState, InvalidBasesError
+from freedom.test import TestCase
 
 from .models import ModelWithCustomBase
 

@@ -14,12 +14,12 @@ except ImportError:
     HAS_YAML = False
 
 
-from django.core import management, serializers
-from django.db import transaction, connection
-from django.test import TestCase, TransactionTestCase, override_settings
-from django.test.utils import Approximate
-from django.utils import six
-from django.utils.six import StringIO
+from freedom.core import management, serializers
+from freedom.db import transaction, connection
+from freedom.test import TestCase, TransactionTestCase, override_settings
+from freedom.test.utils import Approximate
+from freedom.utils import six
+from freedom.utils.six import StringIO
 
 from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
     Score, Player, Team)
@@ -27,7 +27,7 @@ from .models import (Category, Author, Article, AuthorProfile, Actor, Movie,
 
 @override_settings(
     SERIALIZATION_MODULES={
-        "json2": "django.core.serializers.json",
+        "json2": "freedom.core.serializers.json",
     }
 )
 class SerializerRegistrationTests(TestCase):
@@ -40,7 +40,7 @@ class SerializerRegistrationTests(TestCase):
 
     def test_register(self):
         "Registering a new serializer populates the full registry. Refs #14823"
-        serializers.register_serializer('json3', 'django.core.serializers.json')
+        serializers.register_serializer('json3', 'freedom.core.serializers.json')
 
         public_formats = serializers.get_public_serializer_formats()
         self.assertIn('json3', public_formats)
@@ -50,7 +50,7 @@ class SerializerRegistrationTests(TestCase):
     def test_unregister(self):
         "Unregistering a serializer doesn't cause the registry to be repopulated. Refs #14823"
         serializers.unregister_serializer('xml')
-        serializers.register_serializer('json3', 'django.core.serializers.json')
+        serializers.register_serializer('json3', 'freedom.core.serializers.json')
 
         public_formats = serializers.get_public_serializer_formats()
 
@@ -290,14 +290,14 @@ class SerializersTransactionTestBase(object):
 class XmlSerializerTestCase(SerializersTestBase, TestCase):
     serializer_name = "xml"
     pkless_str = """<?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
+<freedom-objects version="1.0">
     <object model="serializers.category">
         <field type="CharField" name="name">Reference</field>
     </object>
     <object model="serializers.category">
         <field type="CharField" name="name">Non-fiction</field>
     </object>
-</django-objects>"""
+</freedom-objects>"""
 
     @staticmethod
     def _comparison_value(value):
@@ -340,7 +340,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
 class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
     serializer_name = "xml"
     fwd_ref_str = """<?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
+<freedom-objects version="1.0">
     <object pk="1" model="serializers.article">
         <field to="serializers.author" name="author" rel="ManyToOneRel">1</field>
         <field type="CharField" name="headline">Forward references pose no problem</field>
@@ -354,7 +354,7 @@ class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, Transacti
     </object>
     <object pk="1" model="serializers.category">
         <field type="CharField" name="name">Reference</field></object>
-</django-objects>"""
+</freedom-objects>"""
 
 
 class JsonSerializerTestCase(SerializersTestBase, TestCase):
@@ -443,7 +443,7 @@ class YamlImportModuleMock(object):
     """Provides a wrapped import_module function to simulate yaml ImportError
 
     In order to run tests that verify the behavior of the YAML serializer
-    when run on a system that has yaml installed (like the django CI server),
+    when run on a system that has yaml installed (like the freedom CI server),
     mock import_module, so that it raises an ImportError when the yaml
     serializer is being imported.  The importlib.import_module() call is
     being made in the serializers.register_serializer().

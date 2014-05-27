@@ -1,18 +1,18 @@
 from __future__ import unicode_literals
 
-from django.apps import apps
-from django.core.management.color import no_style
-from django.core.management.sql import (sql_create, sql_delete, sql_indexes,
+from freedom.apps import apps
+from freedom.core.management.color import no_style
+from freedom.core.management.sql import (sql_create, sql_delete, sql_indexes,
     sql_destroy_indexes, sql_all)
-from django.db import connections, DEFAULT_DB_ALIAS, router
-from django.test import TestCase
-from django.utils import six
+from freedom.db import connections, DEFAULT_DB_ALIAS, router
+from freedom.test import TestCase
+from freedom.utils import six
 
 # See also initial_sql_regress for 'custom_sql_for_model' tests
 
 
 class SQLCommandsTestCase(TestCase):
-    """Tests for several functions in django/core/management/sql.py"""
+    """Tests for several functions in freedom/core/management/sql.py"""
     def count_ddl(self, output, cmd):
         return len([o for o in output if o.startswith(cmd)])
 

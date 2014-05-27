@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
-from django.apps import apps
-from django.conf import settings
-from django.db import connection
-from django.core.management.color import no_style
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from freedom.apps import apps
+from freedom.conf import settings
+from freedom.db import connection
+from freedom.core.management.color import no_style
+from freedom.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import Article, ArticleRef, Authors, Reviewers, Scientist, ScientistRef
 

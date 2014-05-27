@@ -2,17 +2,17 @@
 Related objects reference
 =========================
 
-.. currentmodule:: django.db.models.fields.related
+.. currentmodule:: freedom.db.models.fields.related
 
 .. class:: RelatedManager
 
     A "related manager" is a manager used in a one-to-many or many-to-many
     related context. This happens in two cases:
 
-    * The "other side" of a :class:`~django.db.models.ForeignKey` relation.
+    * The "other side" of a :class:`~freedom.db.models.ForeignKey` relation.
       That is::
 
-            from django.db import models
+            from freedom.db import models
 
             class Reporter(models.Model):
                 # ...
@@ -24,7 +24,7 @@ Related objects reference
       In the above example, the methods below will be available on
       the manager ``reporter.article_set``.
 
-    * Both sides of a :class:`~django.db.models.ManyToManyField` relation::
+    * Both sides of a :class:`~freedom.db.models.ManyToManyField` relation::
 
             class Topping(models.Model):
                 # ...
@@ -47,14 +47,14 @@ Related objects reference
             >>> b.entry_set.add(e) # Associates Entry e with Blog b.
 
         In the example above, in the case of a
-        :class:`~django.db.models.ForeignKey` relationship,
+        :class:`~freedom.db.models.ForeignKey` relationship,
         ``e.save()`` is called by the related manager to perform the update.
         Using ``add()`` with a many-to-many relationship, however, will not
         call any ``save()`` methods, but rather create the relationships
         using :meth:`QuerySet.bulk_create()
-        <django.db.models.query.QuerySet.bulk_create>`. If you need to execute
+        <freedom.db.models.query.QuerySet.bulk_create>`. If you need to execute
         some custom logic when a relationship is created, listen to the
-        :data:`~django.db.models.signals.m2m_changed` signal.
+        :data:`~freedom.db.models.signals.m2m_changed` signal.
 
     .. method:: create(**kwargs)
 
@@ -83,7 +83,7 @@ Related objects reference
 
         Note that there's no need to specify the keyword argument of the model
         that defines the relationship. In the above example, we don't pass the
-        parameter ``blog`` to ``create()``. Django figures out that the new
+        parameter ``blog`` to ``create()``. Freedom figures out that the new
         ``Entry`` object's ``blog`` field should be set to ``b``.
 
     .. method:: remove(obj1, [obj2, ...])
@@ -97,28 +97,28 @@ Related objects reference
         Similar to :meth:`add()`, ``e.save()`` is called in the example above
         to perform the update. Using ``remove()`` with a many-to-many
         relationship, however, will delete the relationships using
-        :meth:`QuerySet.delete()<django.db.models.query.QuerySet.delete>` which
+        :meth:`QuerySet.delete()<freedom.db.models.query.QuerySet.delete>` which
         means no model ``save()`` methods are called; listen to the
-        :data:`~django.db.models.signals.m2m_changed` signal if you wish to
+        :data:`~freedom.db.models.signals.m2m_changed` signal if you wish to
         execute custom code when a relationship is deleted.
 
-        For :class:`~django.db.models.ForeignKey` objects, this method only
+        For :class:`~freedom.db.models.ForeignKey` objects, this method only
         exists if ``null=True``. If the related field can't be set to ``None``
         (``NULL``), then an object can't be removed from a relation without
         being added to another. In the above example, removing ``e`` from
         ``b.entry_set()`` is equivalent to doing ``e.blog = None``, and because
-        the ``blog`` :class:`~django.db.models.ForeignKey` doesn't have
+        the ``blog`` :class:`~freedom.db.models.ForeignKey` doesn't have
         ``null=True``, this is invalid.
 
         .. versionchanged 1.7::
 
-        For :class:`~django.db.models.ForeignKey` objects, this method accepts
+        For :class:`~freedom.db.models.ForeignKey` objects, this method accepts
         a ``bulk`` argument to control how to perform the operation.
         If ``True`` (the default), ``QuerySet.update()`` is used.
         If ``bulk=False``, the ``save()`` method of each individual model
         instance is called instead. This triggers the
-        :data:`~django.db.models.signals.pre_save` and
-        :data:`~django.db.models.signals.post_save` signals and comes at the
+        :data:`~freedom.db.models.signals.pre_save` and
+        :data:`~freedom.db.models.signals.post_save` signals and comes at the
         expense of performance.
 
     .. method:: clear()
@@ -132,7 +132,7 @@ Related objects reference
         them.
 
         Just like ``remove()``, ``clear()`` is only available on
-        :class:`~django.db.models.ForeignKey`\s where ``null=True`` and it also
+        :class:`~freedom.db.models.ForeignKey`\s where ``null=True`` and it also
         accepts the ``bulk`` keyword argument.
 
     .. note::

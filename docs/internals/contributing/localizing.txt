@@ -1,31 +1,31 @@
 =================
-Localizing Django
+Localizing Freedom
 =================
 
-Various parts of Django, such as the admin site and validation error messages,
+Various parts of Freedom, such as the admin site and validation error messages,
 are internationalized. This means they display differently depending on each
-user's language or country. For this, Django uses the same internationalization
-and localization infrastructure available to Django applications, described in
+user's language or country. For this, Freedom uses the same internationalization
+and localization infrastructure available to Freedom applications, described in
 the :doc:`i18n documentation </topics/i18n/index>`.
 
 Translations
 ------------
 
-Translations are contributed by Django users worldwide. The translation work is
+Translations are contributed by Freedom users worldwide. The translation work is
 coordinated at `Transifex`_.
 
 If you find an incorrect translation or want to discuss specific translations,
-go to the `Django project page`_. If you would like to help out with
+go to the `Freedom project page`_. If you would like to help out with
 translating or add a language that isn't yet translated, here's what to do:
 
-* Join the :ref:`Django i18n mailing list <django-i18n-mailing-list>` and
+* Join the :ref:`Freedom i18n mailing list <freedom-i18n-mailing-list>` and
   introduce yourself.
 
-* Make sure you read the notes about :ref:`specialties-of-django-i18n`.
+* Make sure you read the notes about :ref:`specialties-of-freedom-i18n`.
 
-* Sign up at `Transifex`_ and visit the `Django project page`_.
+* Sign up at `Transifex`_ and visit the `Freedom project page`_.
 
-* On the `Django project page`_, choose the language you want to work on,
+* On the `Freedom project page`_, choose the language you want to work on,
   **or** -- in case the language doesn't exist yet --
   request a new language team by clicking on the "Request language" link
   and selecting the appropriate language.
@@ -54,13 +54,13 @@ the date, time and numbers formatting particularities of your locale. See
 
 The format files aren't managed by the use of Transifex. To change them, you
 must :doc:`create a patch<writing-code/submitting-patches>` against the
-Django source tree, as for any code change:
+Freedom source tree, as for any code change:
 
 * Create a diff against the current Git master branch.
 
-* Open a ticket in Django's ticket system, set its ``Component`` field to
+* Open a ticket in Freedom's ticket system, set its ``Component`` field to
   ``Translations``, and attach the patch to it.
 
 .. _Transifex: https://www.transifex.com/
-.. _Django project page: https://www.transifex.com/projects/p/django/
+.. _Freedom project page: https://www.transifex.com/projects/p/freedom/
 .. _Transifex User Guide: http://support.transifex.com/

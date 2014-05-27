@@ -1,8 +1,8 @@
 ===============
-Django settings
+Freedom settings
 ===============
 
-A Django settings file contains all the configuration of your Django
+A Freedom settings file contains all the configuration of your Freedom
 installation. This document explains how settings work and which settings are
 available.
 
@@ -32,14 +32,14 @@ Because a settings file is a Python module, the following apply:
 
 * It can import values from other settings files.
 
-.. _django-settings-module:
+.. _freedom-settings-module:
 
 Designating the settings
 ========================
 
 .. envvar:: DJANGO_SETTINGS_MODULE
 
-When you use Django, you have to tell it which settings you're using. Do this
+When you use Freedom, you have to tell it which settings you're using. Do this
 by using an environment variable, ``DJANGO_SETTINGS_MODULE``.
 
 The value of ``DJANGO_SETTINGS_MODULE`` should be in Python path syntax, e.g.
@@ -48,28 +48,28 @@ Python `import search path`_.
 
 .. _import search path: http://diveintopython.net/getting_to_know_python/everything_is_an_object.html
 
-The django-admin.py utility
+The freedom-admin.py utility
 ---------------------------
 
-When using :doc:`django-admin.py </ref/django-admin>`, you can either set the
+When using :doc:`freedom-admin.py </ref/freedom-admin>`, you can either set the
 environment variable once, or explicitly pass in the settings module each time
 you run the utility.
 
 Example (Unix Bash shell)::
 
     export DJANGO_SETTINGS_MODULE=mysite.settings
-    django-admin.py runserver
+    freedom-admin.py runserver
 
 Example (Windows shell)::
 
     set DJANGO_SETTINGS_MODULE=mysite.settings
-    django-admin.py runserver
+    freedom-admin.py runserver
 
 Use the ``--settings`` command-line argument to specify the settings manually::
 
-    django-admin.py runserver --settings=mysite.settings
+    freedom-admin.py runserver --settings=mysite.settings
 
-.. _django-admin.py: ../django-admin/
+.. _freedom-admin.py: ../freedom-admin/
 
 On the server (mod_wsgi)
 --------------------------
@@ -81,18 +81,18 @@ application what settings file to use. Do that with ``os.environ``::
 
     os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
 
-Read the :doc:`Django mod_wsgi documentation
+Read the :doc:`Freedom mod_wsgi documentation
 </howto/deployment/wsgi/modwsgi>` for more information and other common
-elements to a Django WSGI application.
+elements to a Freedom WSGI application.
 
 Default settings
 ================
 
-A Django settings file doesn't have to define any settings if it doesn't need
+A Freedom settings file doesn't have to define any settings if it doesn't need
 to. Each setting has a sensible default value. These defaults live in the
-module :file:`django/conf/global_settings.py`.
+module :file:`freedom/conf/global_settings.py`.
 
-Here's the algorithm Django uses in compiling settings:
+Here's the algorithm Freedom uses in compiling settings:
 
 * Load settings from ``global_settings.py``.
 * Load settings from the specified settings file, overriding the global
@@ -106,28 +106,28 @@ Seeing which settings you've changed
 
 There's an easy way to view which of your settings deviate from the default
 settings. The command ``python manage.py diffsettings`` displays differences
-between the current settings file and Django's default settings.
+between the current settings file and Freedom's default settings.
 
 For more, see the :djadmin:`diffsettings` documentation.
 
 Using settings in Python code
 =============================
 
-In your Django apps, use settings by importing the object
-``django.conf.settings``. Example::
+In your Freedom apps, use settings by importing the object
+``freedom.conf.settings``. Example::
 
-    from django.conf import settings
+    from freedom.conf import settings
 
     if settings.DEBUG:
         # Do something
 
-Note that ``django.conf.settings`` isn't a module -- it's an object. So
+Note that ``freedom.conf.settings`` isn't a module -- it's an object. So
 importing individual settings is not possible::
 
-    from django.conf.settings import DEBUG  # This won't work.
+    from freedom.conf.settings import DEBUG  # This won't work.
 
 Also note that your code should *not* import from either ``global_settings`` or
-your own settings file. ``django.conf.settings`` abstracts the concepts of
+your own settings file. ``freedom.conf.settings`` abstracts the concepts of
 default settings and site-specific settings; it presents a single interface.
 It also decouples the code that uses settings from the location of your
 settings.
@@ -138,7 +138,7 @@ Altering settings at runtime
 You shouldn't alter settings in your applications at runtime. For example,
 don't do this in a view::
 
-    from django.conf import settings
+    from freedom.conf import settings
 
     settings.DEBUG = True   # Don't do this!
 
@@ -161,15 +161,15 @@ Creating your own settings
 ==========================
 
 There's nothing stopping you from creating your own settings, for your own
-Django apps. Just follow these conventions:
+Freedom apps. Just follow these conventions:
 
 * Setting names are in all uppercase.
 * Don't reinvent an already-existing setting.
 
-For settings that are sequences, Django itself uses tuples, rather than lists,
+For settings that are sequences, Freedom itself uses tuples, rather than lists,
 but this is only a convention.
 
-.. _settings-without-django-settings-module:
+.. _settings-without-freedom-settings-module:
 
 Using settings without setting DJANGO_SETTINGS_MODULE
 =====================================================
@@ -179,14 +179,14 @@ environment variable. For example, if you're using the template system by
 itself, you likely don't want to have to set up an environment variable
 pointing to a settings module.
 
-In these cases, you can configure Django's settings manually. Do this by
+In these cases, you can configure Freedom's settings manually. Do this by
 calling:
 
-.. function:: django.conf.settings.configure(default_settings, **settings)
+.. function:: freedom.conf.settings.configure(default_settings, **settings)
 
 Example::
 
-    from django.conf import settings
+    from freedom.conf import settings
 
     settings.configure(DEBUG=True, TEMPLATE_DEBUG=True,
         TEMPLATE_DIRS=('/home/web-apps/myapp', '/home/web-apps/base'))
@@ -195,13 +195,13 @@ Pass ``configure()`` as many keyword arguments as you'd like, with each keyword
 argument representing a setting and its value. Each argument name should be all
 uppercase, with the same name as the settings described above. If a particular
 setting is not passed to ``configure()`` and is needed at some later point,
-Django will use the default setting value.
+Freedom will use the default setting value.
 
-Configuring Django in this fashion is mostly necessary -- and, indeed,
+Configuring Freedom in this fashion is mostly necessary -- and, indeed,
 recommended -- when you're using a piece of the framework inside a larger
 application.
 
-Consequently, when configured via ``settings.configure()``, Django will not
+Consequently, when configured via ``settings.configure()``, Freedom will not
 make any modifications to the process environment variables (see the
 documentation of :setting:`TIME_ZONE` for why this would normally occur). It's
 assumed that you're already in full control of your environment in these
@@ -211,7 +211,7 @@ Custom default settings
 -----------------------
 
 If you'd like default values to come from somewhere other than
-``django.conf.global_settings``, you can pass in a module or class that
+``freedom.conf.global_settings``, you can pass in a module or class that
 provides the default settings as the ``default_settings`` argument (or as the
 first positional argument) in the call to ``configure()``.
 
@@ -219,7 +219,7 @@ In this example, default settings are taken from ``myapp_defaults``, and the
 :setting:`DEBUG` setting is set to ``True``, regardless of its value in
 ``myapp_defaults``::
 
-    from django.conf import settings
+    from freedom.conf import settings
     from myapp import myapp_defaults
 
     settings.configure(default_settings=myapp_defaults, DEBUG=True)
@@ -230,11 +230,11 @@ is equivalent::
     settings.configure(myapp_defaults, DEBUG=True)
 
 Normally, you will not need to override the defaults in this fashion. The
-Django defaults are sufficiently tame that you can safely use them. Be aware
-that if you do pass in a new default module, it entirely *replaces* the Django
+Freedom defaults are sufficiently tame that you can safely use them. Be aware
+that if you do pass in a new default module, it entirely *replaces* the Freedom
 defaults, so you must specify a value for every possible setting that might be
 used in that code you are importing. Check in
-``django.conf.settings.global_settings`` for the full list.
+``freedom.conf.settings.global_settings`` for the full list.
 
 Either configure() or DJANGO_SETTINGS_MODULE is required
 --------------------------------------------------------
@@ -244,19 +244,19 @@ If you're not setting the ``DJANGO_SETTINGS_MODULE`` environment variable, you
 settings.
 
 If you don't set ``DJANGO_SETTINGS_MODULE`` and don't call ``configure()``,
-Django will raise an ``ImportError`` exception the first time a setting
+Freedom will raise an ``ImportError`` exception the first time a setting
 is accessed.
 
 If you set ``DJANGO_SETTINGS_MODULE``, access settings values somehow, *then*
-call ``configure()``, Django will raise a ``RuntimeError`` indicating
+call ``configure()``, Freedom will raise a ``RuntimeError`` indicating
 that settings have already been configured. There is a property just for this
 purpose:
 
-.. attribute: django.conf.settings.configured
+.. attribute: freedom.conf.settings.configured
 
 For example::
 
-    from django.conf import settings
+    from freedom.conf import settings
     if not settings.configured:
         settings.configure(myapp_defaults, DEBUG=True)
 

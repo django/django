@@ -1,8 +1,8 @@
 ======================================
-``django.conf.urls`` utility functions
+``freedom.conf.urls`` utility functions
 ======================================
 
-.. module:: django.conf.urls
+.. module:: freedom.conf.urls
 
 patterns()
 ----------
@@ -11,16 +11,16 @@ patterns()
 
 .. deprecated:: 1.8
 
-    ``urlpatterns`` should be a plain list of :func:`django.conf.urls.url`
+    ``urlpatterns`` should be a plain list of :func:`freedom.conf.urls.url`
     instances instead.
 
 A function that takes a prefix, and an arbitrary number of URL patterns, and
-returns a list of URL patterns in the format Django needs.
+returns a list of URL patterns in the format Freedom needs.
 
 The first argument to ``patterns()`` is a string ``prefix``. Here's the example
-URLconf from the :doc:`Django overview </intro/overview>`::
+URLconf from the :doc:`Freedom overview </intro/overview>`::
 
-    from django.conf.urls import patterns, url
+    from freedom.conf.urls import patterns, url
 
     urlpatterns = patterns('',
         url(r'^articles/([0-9]{4})/$', 'news.views.year_archive'),
@@ -35,7 +35,7 @@ each view function.
 
 With this in mind, the above example can be written more concisely as::
 
-    from django.conf.urls import patterns, url
+    from freedom.conf.urls import patterns, url
 
     urlpatterns = patterns('news.views',
         url(r'^articles/([0-9]{4})/$', 'year_archive'),
@@ -43,7 +43,7 @@ With this in mind, the above example can be written more concisely as::
         url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', 'article_detail'),
     )
 
-Note that you don't put a trailing dot (``"."``) in the prefix. Django puts
+Note that you don't put a trailing dot (``"."``) in the prefix. Freedom puts
 that in automatically.
 
 The remaining arguments should be tuples in this format::
@@ -78,12 +78,12 @@ The ``optional_dictionary`` and ``optional_name`` parameters are described in
 static()
 --------
 
-.. function:: static.static(prefix, view='django.views.static.serve', **kwargs)
+.. function:: static.static(prefix, view='freedom.views.static.serve', **kwargs)
 
 Helper function to return a URL pattern for serving files in debug mode::
 
-    from django.conf import settings
-    from django.conf.urls.static import static
+    from freedom.conf import settings
+    from freedom.conf.urls.static import static
 
     urlpatterns = [
         # ... the rest of your URLconf goes here ...
@@ -136,7 +136,7 @@ include()
     :type namespace: string
     :arg app_name: Application namespace for the URL entries being included
     :type app_name: string
-    :arg pattern_list: Iterable of :func:`django.conf.urls.url` instances
+    :arg pattern_list: Iterable of :func:`freedom.conf.urls.url` instances
     :arg app_namespace: Application namespace for the URL entries being included
     :type app_namespace: string
     :arg instance_namespace: Instance namespace for the URL entries being included
@@ -153,7 +153,7 @@ A callable, or a string representing the full Python import path to the view
 that should be called if the HTTP client has sent a request that caused an error
 condition and a response with a status code of 400.
 
-By default, this is ``'django.views.defaults.bad_request'``. That default
+By default, this is ``'freedom.views.defaults.bad_request'``. That default
 value should suffice.
 
 See the documentation about :ref:`the 400 (bad request) view
@@ -168,7 +168,7 @@ A callable, or a string representing the full Python import path to the view
 that should be called if the user doesn't have the permissions required to
 access a resource.
 
-By default, this is ``'django.views.defaults.permission_denied'``. That default
+By default, this is ``'freedom.views.defaults.permission_denied'``. That default
 value should suffice.
 
 See the documentation about :ref:`the 403 (HTTP Forbidden) view
@@ -182,7 +182,7 @@ handler404
 A callable, or a string representing the full Python import path to the view
 that should be called if none of the URL patterns match.
 
-By default, this is ``'django.views.defaults.page_not_found'``. That default
+By default, this is ``'freedom.views.defaults.page_not_found'``. That default
 value should suffice.
 
 See the documentation about :ref:`the 404 (HTTP Not Found) view
@@ -197,7 +197,7 @@ A callable, or a string representing the full Python import path to the view
 that should be called in case of server errors. Server errors happen when you
 have runtime errors in view code.
 
-By default, this is ``'django.views.defaults.server_error'``. That default
+By default, this is ``'freedom.views.defaults.server_error'``. That default
 value should suffice.
 
 See the documentation about :ref:`the 500 (HTTP Internal Server Error) view

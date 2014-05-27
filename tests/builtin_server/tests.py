@@ -8,8 +8,8 @@ from wsgiref import simple_server
 
 
 # If data is too large, socket will choke, so write chunks no larger than 32MB
-# at a time. The rationale behind the 32MB can be found on Django's Trac:
-# https://code.djangoproject.com/ticket/5596#comment:4
+# at a time. The rationale behind the 32MB can be found on Freedom's Trac:
+# https://code.freedomproject.com/ticket/5596#comment:4
 MAX_SOCKET_CHUNK_SIZE = 32 * 1024 * 1024  # 32 MB
 
 

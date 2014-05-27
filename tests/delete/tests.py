@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
-from django.db import models, IntegrityError, connection
-from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
-from django.utils.six.moves import xrange
+from freedom.db import models, IntegrityError, connection
+from freedom.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
+from freedom.utils.six.moves import xrange
 
 from .models import (R, RChild, S, T, A, M, MR, MRNull,
     create_a, get_default_r, User, Avatar, HiddenUser, HiddenUserProfile,
@@ -165,7 +165,7 @@ class DeletionTests(TestCase):
         self.assertFalse(m.m2m_through_null.exists())
 
     def test_bulk(self):
-        from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
+        from freedom.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
         s = S.objects.create(r=R.objects.create())
         for i in xrange(2 * GET_ITERATOR_CHUNK_SIZE):
             T.objects.create(s=s)

@@ -2,21 +2,21 @@
 Request and response objects
 ============================
 
-.. module:: django.http
+.. module:: freedom.http
    :synopsis: Classes dealing with HTTP requests and responses.
 
 Quick overview
 ==============
 
-Django uses request and response objects to pass state through the system.
+Freedom uses request and response objects to pass state through the system.
 
-When a page is requested, Django creates an :class:`HttpRequest` object that
-contains metadata about the request. Then Django loads the appropriate view,
+When a page is requested, Freedom creates an :class:`HttpRequest` object that
+contains metadata about the request. Then Freedom loads the appropriate view,
 passing the :class:`HttpRequest` as the first argument to the view function.
 Each view is responsible for returning an :class:`HttpResponse` object.
 
 This document explains the APIs for :class:`HttpRequest` and
-:class:`HttpResponse` objects, which are defined in the :mod:`django.http`
+:class:`HttpResponse` objects, which are defined in the :mod:`freedom.http`
 module.
 
 HttpRequest objects
@@ -132,7 +132,7 @@ All attributes should be considered read-only, unless stated otherwise below.
 
     A dictionary-like object containing all uploaded files. Each key in
     ``FILES`` is the ``name`` from the ``<input type="file" name="" />``. Each
-    value in ``FILES`` is an :class:`~django.core.files.uploadedfile.UploadedFile`.
+    value in ``FILES`` is an :class:`~freedom.core.files.uploadedfile.UploadedFile`.
 
     See :doc:`/topics/files` for more information.
 
@@ -173,36 +173,36 @@ All attributes should be considered read-only, unless stated otherwise below.
 
     An object of type :setting:`AUTH_USER_MODEL` representing the currently
     logged-in user. If the user isn't currently logged in, ``user`` will be set
-    to an instance of :class:`django.contrib.auth.models.AnonymousUser`. You
+    to an instance of :class:`freedom.contrib.auth.models.AnonymousUser`. You
     can tell them apart with
-    :meth:`~django.contrib.auth.models.User.is_authenticated`, like so::
+    :meth:`~freedom.contrib.auth.models.User.is_authenticated`, like so::
 
         if request.user.is_authenticated():
             # Do something for logged-in users.
         else:
             # Do something for anonymous users.
 
-    ``user`` is only available if your Django installation has the
-    :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+    ``user`` is only available if your Freedom installation has the
+    :class:`~freedom.contrib.auth.middleware.AuthenticationMiddleware`
     activated. For more, see :doc:`/topics/auth/index`.
 
 .. attribute:: HttpRequest.session
 
     A readable-and-writable, dictionary-like object that represents the current
-    session. This is only available if your Django installation has session
+    session. This is only available if your Freedom installation has session
     support activated. See the :doc:`session documentation
     </topics/http/sessions>` for full details.
 
 .. attribute:: HttpRequest.urlconf
 
-    Not defined by Django itself, but will be read if other code (e.g., a custom
+    Not defined by Freedom itself, but will be read if other code (e.g., a custom
     middleware class) sets it. When present, this will be used as the root
     URLconf for the current request, overriding the :setting:`ROOT_URLCONF`
-    setting. See :ref:`how-django-processes-a-request` for details.
+    setting. See :ref:`how-freedom-processes-a-request` for details.
 
 .. attribute:: HttpRequest.resolver_match
 
-    An instance of :class:`~django.core.urlresolvers.ResolverMatch` representing
+    An instance of :class:`~freedom.core.urlresolvers.ResolverMatch` representing
     the resolved url. This attribute is only set after url resolving took place,
     which means it's available in all views but not in middleware methods which
     are executed before url resolving takes place (like ``process_request``, you
@@ -246,8 +246,8 @@ Methods
 
         This middleware should be positioned before any other middleware that
         relies on the value of :meth:`~HttpRequest.get_host()` -- for instance,
-        :class:`~django.middleware.common.CommonMiddleware` or
-        :class:`~django.middleware.csrf.CsrfViewMiddleware`.
+        :class:`~freedom.middleware.common.CommonMiddleware` or
+        :class:`~freedom.middleware.csrf.CsrfViewMiddleware`.
 
 .. method:: HttpRequest.get_full_path()
 
@@ -269,7 +269,7 @@ Methods
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
 
    Returns a cookie value for a signed cookie, or raises a
-   ``django.core.signing.BadSignature`` exception if the signature is
+   ``freedom.core.signing.BadSignature`` exception if the signature is
    no longer valid. If you provide the ``default`` argument the exception
    will be suppressed and that default value will be returned instead.
 
@@ -340,7 +340,7 @@ QueryDict objects
 .. class:: QueryDict
 
 In an :class:`HttpRequest` object, the ``GET`` and ``POST`` attributes are instances
-of ``django.http.QueryDict``. :class:`QueryDict` is a dictionary-like
+of ``freedom.http.QueryDict``. :class:`QueryDict` is a dictionary-like
 class customized to deal with multiple values for the same key. This is
 necessary because some HTML form elements, notably
 ``<select multiple="multiple">``, pass multiple values for the same key.
@@ -359,7 +359,7 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Returns the value for the given key. If the key has more than one value,
     ``__getitem__()`` returns the last value. Raises
-    ``django.utils.datastructures.MultiValueDictKeyError`` if the key does not
+    ``freedom.utils.datastructures.MultiValueDictKeyError`` if the key does not
     exist. (This is a subclass of Python's standard ``KeyError``, so you can
     stick to catching ``KeyError``.)
 
@@ -521,11 +521,11 @@ HttpResponse objects
 .. class:: HttpResponse
 
 In contrast to :class:`HttpRequest` objects, which are created automatically by
-Django, :class:`HttpResponse` objects are your responsibility. Each view you
+Freedom, :class:`HttpResponse` objects are your responsibility. Each view you
 write is responsible for instantiating, populating and returning an
 :class:`HttpResponse`.
 
-The :class:`HttpResponse` class lives in the :mod:`django.http` module.
+The :class:`HttpResponse` class lives in the :mod:`freedom.http` module.
 
 Usage
 -----
@@ -536,7 +536,7 @@ Passing strings
 Typical usage is to pass the contents of the page, as a string, to the
 :class:`HttpResponse` constructor::
 
-    >>> from django.http import HttpResponse
+    >>> from freedom.http import HttpResponse
     >>> response = HttpResponse("Here's the text of the Web page.")
     >>> response = HttpResponse("Text only, please.", content_type="text/plain")
 
@@ -570,9 +570,9 @@ Note that unlike a dictionary, ``del`` doesn't raise ``KeyError`` if the header
 field doesn't exist.
 
 For setting the ``Cache-Control`` and ``Vary`` header fields, it is recommended
-to use the :func:`~django.utils.cache.patch_cache_control` and
-:func:`~django.utils.cache.patch_vary_headers` methods from
-:mod:`django.utils.cache`, since these fields can have multiple, comma-separated
+to use the :func:`~freedom.utils.cache.patch_cache_control` and
+:func:`~freedom.utils.cache.patch_vary_headers` methods from
+:mod:`freedom.utils.cache`, since these fields can have multiple, comma-separated
 values. The "patch" methods ensure that other values, e.g. added by a
 middleware, are not removed.
 
@@ -589,7 +589,7 @@ this is how you might return a Microsoft Excel spreadsheet::
     >>> response = HttpResponse(my_data, content_type='application/vnd.ms-excel')
     >>> response['Content-Disposition'] = 'attachment; filename="foo.xls"'
 
-There's nothing Django-specific about the ``Content-Disposition`` header, but
+There's nothing Freedom-specific about the ``Content-Disposition`` header, but
 it's easy to forget the syntax, so we've included it here.
 
 Attributes
@@ -693,7 +693,7 @@ Methods
 
         Both :rfc:`2109` and :rfc:`6265` state that user agents should support
         cookies of at least 4096 bytes. For many browsers this is also the
-        maximum size. Django will not raise an exception if there's an attempt
+        maximum size. Freedom will not raise an exception if there's an attempt
         to store a cookie of more than 4096 bytes, but many browsers will not
         set the cookie correctly.
 
@@ -734,9 +734,9 @@ Methods
 HttpResponse subclasses
 -----------------------
 
-Django includes a number of ``HttpResponse`` subclasses that handle different
+Freedom includes a number of ``HttpResponse`` subclasses that handle different
 types of HTTP responses. Like ``HttpResponse``, these subclasses live in
-:mod:`django.http`.
+:mod:`freedom.http`.
 
 .. class:: HttpResponseRedirect
 
@@ -791,8 +791,8 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 .. note::
 
     If a custom subclass of :class:`HttpResponse` implements a ``render``
-    method, Django will treat it as emulating a
-    :class:`~django.template.response.SimpleTemplateResponse`, and the
+    method, Freedom will treat it as emulating a
+    :class:`~freedom.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
 
 JsonResponse objects
@@ -802,7 +802,7 @@ JsonResponse objects
 
 .. class:: JsonResponse
 
-.. method:: JsonResponse.__init__(data, encoder=DjangoJSONEncoder, safe=True, **kwargs)
+.. method:: JsonResponse.__init__(data, encoder=FreedomJSONEncoder, safe=True, **kwargs)
 
    An :class:`HttpResponse` subclass that helps to create a JSON-encoded
    response. It inherits most behavior from its superclass with a couple
@@ -815,7 +815,7 @@ JsonResponse objects
    object.
 
    The ``encoder``, which defaults to
-   ``django.core.serializers.json.DjangoJSONEncoder``, will be used to
+   ``freedom.core.serializers.json.FreedomJSONEncoder``, will be used to
    serialize the data. See :ref:`JSON serialization
    <serialization-formats-json>` for more details about this serializer.
 
@@ -829,7 +829,7 @@ Usage
 
 Typical usage could look like::
 
-    >>> from django.http import JsonResponse
+    >>> from freedom.http import JsonResponse
     >>> response = JsonResponse({'foo': 'bar'})
     >>> response.content
     '{"foo": "bar"}'
@@ -850,8 +850,8 @@ Without passing ``safe=False``, a :exc:`TypeError` will be raised.
     Before the `5th edition of EcmaScript
     <http://www.ecma-international.org/publications/standards/Ecma-262.htm>`_
     it was possible to poison the JavaScript ``Array`` constructor. For this
-    reason, Django does not allow passing non-dict objects to the
-    :class:`~django.http.JsonResponse` constructor by default.  However, most
+    reason, Freedom does not allow passing non-dict objects to the
+    :class:`~freedom.http.JsonResponse` constructor by default.  However, most
     modern browsers implement EcmaScript 5 which removes this attack vector.
     Therefore it is possible to disable this security precaution.
 
@@ -871,13 +871,13 @@ StreamingHttpResponse objects
 .. class:: StreamingHttpResponse
 
 The :class:`StreamingHttpResponse` class is used to stream a response from
-Django to the browser. You might want to do this if generating the response
+Freedom to the browser. You might want to do this if generating the response
 takes too long or uses too much memory. For instance, it's useful for
 :ref:`generating large CSV files <streaming-csv-files>`.
 
 .. admonition:: Performance considerations
 
-    Django is designed for short-lived requests. Streaming responses will tie
+    Freedom is designed for short-lived requests. Streaming responses will tie
     a worker process for the entire duration of the response. This may result
     in poor performance.
 

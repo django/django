@@ -8,7 +8,7 @@ to get started? This is the section for you.
 First steps
 -----------
 
-Start with these easy tasks to discover Django's development process.
+Start with these easy tasks to discover Freedom's development process.
 
 * **Sign the Contributor License Agreement**
 
@@ -44,7 +44,7 @@ Start with these easy tasks to discover Django's development process.
 
 * **Write some documentation**
 
-  Django's documentation is great but it can always be improved. Did you find
+  Freedom's documentation is great but it can always be improved. Did you find
   a typo? Do you think that something should be clarified? Go ahead and
   suggest a documentation patch! See also the guide on
   :doc:`writing-documentation`, in particular the tips for
@@ -56,18 +56,18 @@ Start with these easy tasks to discover Django's development process.
       several that are useful for triaging tickets and reviewing patches as
       suggested above.
 
-      .. _reports page: https://code.djangoproject.com/wiki/Reports
+      .. _reports page: https://code.freedomproject.com/wiki/Reports
 
-.. _CLA: https://www.djangoproject.com/foundation/cla/
-.. _Contributor License Agreement FAQ: https://www.djangoproject.com/foundation/cla/faq/
-.. _unreviewed ticket: https://code.djangoproject.com/query?status=!closed&stage=Unreviewed
+.. _CLA: https://www.freedomproject.com/foundation/cla/
+.. _Contributor License Agreement FAQ: https://www.freedomproject.com/foundation/cla/faq/
+.. _unreviewed ticket: https://code.freedomproject.com/query?status=!closed&stage=Unreviewed
 
 
 Guidelines
 ----------
 
 As a newcomer on a large project, it's easy to experience frustration. Here's
-some advice to make your work on Django more useful and rewarding.
+some advice to make your work on Freedom more useful and rewarding.
 
 * **Pick a subject area that you care about, that you are familiar with, or
   that you want to learn about**
@@ -101,7 +101,7 @@ some advice to make your work on Django more useful and rewarding.
 
   Sometimes it can be scary to put your opinion out to the world and say "this
   ticket is correct" or "this patch needs work", but it's the only way the
-  project moves forward. The contributions of the broad Django community
+  project moves forward. The contributions of the broad Freedom community
   ultimately have a much greater impact than that of the core developers. We
   can't do it without YOU!
 
@@ -127,7 +127,7 @@ some advice to make your work on Django more useful and rewarding.
   writing the very first tests for that feature, not that you get a pass from
   writing tests altogether.
 
-.. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
+.. _easy pickings: https://code.freedomproject.com/query?status=!closed&easy=1
 
 .. _new-contributors-faq:
 
@@ -137,11 +137,11 @@ FAQ
 1. **This ticket I care about has been ignored for days/weeks/months! What can
    I do to get it committed?**
 
-   First off, it's not personal. Django is entirely developed by volunteers
+   First off, it's not personal. Freedom is entirely developed by volunteers
    (even the core developers), and sometimes folks just don't have time. The
-   best thing to do is to send a gentle reminder to the |django-developers|
+   best thing to do is to send a gentle reminder to the |freedom-developers|
    mailing list asking for review on the ticket, or to bring it up in the
-   #django-dev IRC channel.
+   #freedom-dev IRC channel.
 
 2. **I'm sure my ticket is absolutely 100% perfect, can I mark it as RFC
    myself?**

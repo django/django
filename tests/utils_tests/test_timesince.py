@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 import datetime
 import unittest
 
-from django.test.utils import requires_tz_support
-from django.utils.timesince import timesince, timeuntil
-from django.utils import timezone
+from freedom.test.utils import requires_tz_support
+from freedom.utils.timesince import timesince, timeuntil
+from freedom.utils import timezone
 
 
 class TimesinceTests(unittest.TestCase):

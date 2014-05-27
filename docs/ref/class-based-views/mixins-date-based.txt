@@ -2,7 +2,7 @@
 Date-based mixins
 =================
 
-.. currentmodule:: django.views.generic.dates
+.. currentmodule:: freedom.views.generic.dates
 
 .. note::
 
@@ -50,7 +50,7 @@ YearMixin
 
         Returns a date object containing the first day of the year after the
         date provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~freedom.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
@@ -58,7 +58,7 @@ YearMixin
 
         Returns a date object containing the first day of the year before the
         date provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~freedom.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
@@ -102,7 +102,7 @@ MonthMixin
 
         Returns a date object containing the first day of the month after the
         date provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~freedom.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
@@ -110,7 +110,7 @@ MonthMixin
 
         Returns a date object containing the first day of the month before the
         date provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~freedom.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
@@ -154,14 +154,14 @@ DayMixin
 
         Returns a date object containing the next valid day after the date
         provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~freedom.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
     .. method:: get_previous_day(date)
 
         Returns a date object containing the previous valid day. This function
-        can also return ``None`` or raise an :class:`~django.http.Http404`
+        can also return ``None`` or raise an :class:`~freedom.http.Http404`
         exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
@@ -207,7 +207,7 @@ WeekMixin
 
         Returns a date object containing the first day of the week after the
         date provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~freedom.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
@@ -215,7 +215,7 @@ WeekMixin
 
         Returns a date object containing the first day of the week before the
         date provided. This function can also return ``None`` or raise an
-        :class:`~django.http.Http404` exception, depending on the values of
+        :class:`~freedom.http.Http404` exception, depending on the values of
         :attr:`~BaseDateListView.allow_empty` and
         :attr:`~DateMixin.allow_future`.
 
@@ -272,7 +272,7 @@ BaseDateListView
 
     A base class that provides common behavior for all date-based views. There
     won't normally be a reason to instantiate
-    :class:`~django.views.generic.dates.BaseDateListView`; instantiate one of
+    :class:`~freedom.views.generic.dates.BaseDateListView`; instantiate one of
     the subclasses instead.
 
     While this view (and its subclasses) are executing, ``self.object_list``
@@ -282,8 +282,8 @@ BaseDateListView
 
     **Mixins**
 
-    * :class:`~django.views.generic.dates.DateMixin`
-    * :class:`~django.views.generic.list.MultipleObjectMixin`
+    * :class:`~freedom.views.generic.dates.DateMixin`
+    * :class:`~freedom.views.generic.list.MultipleObjectMixin`
 
     **Methods and Attributes**
 
@@ -294,7 +294,7 @@ BaseDateListView
         will display an empty page instead of raising a 404.
 
         This is identical to
-        :attr:`django.views.generic.list.MultipleObjectMixin.allow_empty`,
+        :attr:`freedom.views.generic.list.MultipleObjectMixin.allow_empty`,
         except for the default value, which is ``False``.
 
     .. attribute:: date_list_period
@@ -312,7 +312,7 @@ BaseDateListView
         ``object_list`` is the list of objects. ``extra_context`` is a
         dictionary of context data that will be added to any context data
         provided by the
-        :class:`~django.views.generic.list.MultipleObjectMixin`.
+        :class:`~freedom.views.generic.list.MultipleObjectMixin`.
 
     .. method:: get_dated_queryset(**lookup)
 
@@ -333,4 +333,4 @@ BaseDateListView
         ``date_type`` isn't provided, the result of
         :meth:`~BaseDateListView.get_date_list_period` is used. ``date_type``
         and ``ordering`` are simply passed to
-        :meth:`QuerySet.dates()<django.db.models.query.QuerySet.dates>`.
+        :meth:`QuerySet.dates()<freedom.db.models.query.QuerySet.dates>`.

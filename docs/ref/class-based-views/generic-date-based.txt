@@ -2,9 +2,9 @@
 Generic date views
 ==================
 
-.. module:: django.views.generic.dates
+.. module:: freedom.views.generic.dates
 
-Date-based generic views, provided in :mod:`django.views.generic.dates`, are
+Date-based generic views, provided in :mod:`freedom.views.generic.dates`, are
 views for displaying drilldown pages for date-based data.
 
 .. note::
@@ -12,8 +12,8 @@ views for displaying drilldown pages for date-based data.
     Some of the examples on this page assume that an ``Article`` model has been
     defined as follows in ``myapp/models.py``::
 
-        from django.db import models
-        from django.core.urlresolvers import reverse
+        from freedom.db import models
+        from freedom.core.urlresolvers import reverse
 
         class Article(models.Model):
             title = models.CharField(max_length=200)
@@ -33,23 +33,23 @@ ArchiveIndexView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseArchiveIndexView`
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`freedom.views.generic.base.TemplateResponseMixin`
+    * :class:`freedom.views.generic.dates.BaseArchiveIndexView`
+    * :class:`freedom.views.generic.dates.BaseDateListView`
+    * :class:`freedom.views.generic.list.MultipleObjectMixin`
+    * :class:`freedom.views.generic.dates.DateMixin`
+    * :class:`freedom.views.generic.base.View`
 
     **Context**
 
     In addition to the context provided by
-    :class:`django.views.generic.list.MultipleObjectMixin` (via
-    :class:`django.views.generic.dates.BaseDateListView`), the template's
+    :class:`freedom.views.generic.list.MultipleObjectMixin` (via
+    :class:`freedom.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
     * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
+      :meth:`DateQuerySet<freedom.db.models.query.QuerySet.dates>` object
       containing all years that have objects available according to
       ``queryset``, represented as
       :class:`datetime.datetime<python:datetime.datetime>` objects, in
@@ -65,8 +65,8 @@ ArchiveIndexView
 
     **Example myapp/views.py**::
 
-        from django.conf.urls import url
-        from django.views.generic.dates import ArchiveIndexView
+        from freedom.conf.urls import url
+        from freedom.views.generic.dates import ArchiveIndexView
 
         from myapp.models import Article
 
@@ -78,7 +78,7 @@ ArchiveIndexView
 
     **Example myapp/article_archive.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+freedom
 
         <ul>
             {% for article in latest %}
@@ -99,14 +99,14 @@ YearArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseYearArchiveView`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`freedom.views.generic.base.TemplateResponseMixin`
+    * :class:`freedom.views.generic.dates.BaseYearArchiveView`
+    * :class:`freedom.views.generic.dates.YearMixin`
+    * :class:`freedom.views.generic.dates.BaseDateListView`
+    * :class:`freedom.views.generic.list.MultipleObjectMixin`
+    * :class:`freedom.views.generic.dates.DateMixin`
+    * :class:`freedom.views.generic.base.View`
 
     .. attribute:: make_object_list
 
@@ -124,12 +124,12 @@ YearArchiveView
     **Context**
 
     In addition to the context provided by
-    :class:`django.views.generic.list.MultipleObjectMixin` (via
-    :class:`django.views.generic.dates.BaseDateListView`), the template's
+    :class:`freedom.views.generic.list.MultipleObjectMixin` (via
+    :class:`freedom.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
     * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
+      :meth:`DateQuerySet<freedom.db.models.query.QuerySet.dates>` object
       containing all months that have objects available according to
       ``queryset``, represented as
       :class:`datetime.datetime<python:datetime.datetime>` objects, in
@@ -154,7 +154,7 @@ YearArchiveView
 
     **Example myapp/views.py**::
 
-        from django.views.generic.dates import YearArchiveView
+        from freedom.views.generic.dates import YearArchiveView
 
         from myapp.models import Article
 
@@ -166,7 +166,7 @@ YearArchiveView
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from freedom.conf.urls import url
 
         from myapp.views import ArticleYearArchiveView
 
@@ -178,7 +178,7 @@ YearArchiveView
 
     **Example myapp/article_archive_year.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+freedom
 
         <ul>
             {% for date in date_list %}
@@ -206,25 +206,25 @@ MonthArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseMonthArchiveView`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`freedom.views.generic.base.TemplateResponseMixin`
+    * :class:`freedom.views.generic.dates.BaseMonthArchiveView`
+    * :class:`freedom.views.generic.dates.YearMixin`
+    * :class:`freedom.views.generic.dates.MonthMixin`
+    * :class:`freedom.views.generic.dates.BaseDateListView`
+    * :class:`freedom.views.generic.list.MultipleObjectMixin`
+    * :class:`freedom.views.generic.dates.DateMixin`
+    * :class:`freedom.views.generic.base.View`
 
     **Context**
 
     In addition to the context provided by
-    :class:`~django.views.generic.list.MultipleObjectMixin` (via
-    :class:`~django.views.generic.dates.BaseDateListView`), the template's
+    :class:`~freedom.views.generic.list.MultipleObjectMixin` (via
+    :class:`~freedom.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
     * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
+      :meth:`DateQuerySet<freedom.db.models.query.QuerySet.dates>` object
       containing all days that have objects available in the given month,
       according to ``queryset``, represented as
       :class:`datetime.datetime<python:datetime.datetime>` objects, in
@@ -249,7 +249,7 @@ MonthArchiveView
 
     **Example myapp/views.py**::
 
-        from django.views.generic.dates import MonthArchiveView
+        from freedom.views.generic.dates import MonthArchiveView
 
         from myapp.models import Article
 
@@ -261,7 +261,7 @@ MonthArchiveView
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from freedom.conf.urls import url
 
         from myapp.views import ArticleMonthArchiveView
 
@@ -278,7 +278,7 @@ MonthArchiveView
 
     **Example myapp/article_archive_month.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+freedom
 
         <ul>
             {% for article in object_list %}
@@ -306,21 +306,21 @@ WeekArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseWeekArchiveView`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.WeekMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`freedom.views.generic.base.TemplateResponseMixin`
+    * :class:`freedom.views.generic.dates.BaseWeekArchiveView`
+    * :class:`freedom.views.generic.dates.YearMixin`
+    * :class:`freedom.views.generic.dates.WeekMixin`
+    * :class:`freedom.views.generic.dates.BaseDateListView`
+    * :class:`freedom.views.generic.list.MultipleObjectMixin`
+    * :class:`freedom.views.generic.dates.DateMixin`
+    * :class:`freedom.views.generic.base.View`
 
     **Context**
 
     In addition to the context provided by
-    :class:`~django.views.generic.list.MultipleObjectMixin` (via
-    :class:`~django.views.generic.dates.BaseDateListView`), the template's
+    :class:`~freedom.views.generic.list.MultipleObjectMixin` (via
+    :class:`~freedom.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
     * ``week``: A :class:`~datetime.date` object
@@ -342,7 +342,7 @@ WeekArchiveView
 
     **Example myapp/views.py**::
 
-        from django.views.generic.dates import WeekArchiveView
+        from freedom.views.generic.dates import WeekArchiveView
 
         from myapp.models import Article
 
@@ -355,7 +355,7 @@ WeekArchiveView
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from freedom.conf.urls import url
 
         from myapp.views import ArticleWeekArchiveView
 
@@ -368,7 +368,7 @@ WeekArchiveView
 
     **Example myapp/article_archive_week.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+freedom
 
         <h1>Week {{ week|date:'W' }}</h1>
 
@@ -410,22 +410,22 @@ DayArchiveView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseDayArchiveView`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
-    * :class:`django.views.generic.dates.DayMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`freedom.views.generic.base.TemplateResponseMixin`
+    * :class:`freedom.views.generic.dates.BaseDayArchiveView`
+    * :class:`freedom.views.generic.dates.YearMixin`
+    * :class:`freedom.views.generic.dates.MonthMixin`
+    * :class:`freedom.views.generic.dates.DayMixin`
+    * :class:`freedom.views.generic.dates.BaseDateListView`
+    * :class:`freedom.views.generic.list.MultipleObjectMixin`
+    * :class:`freedom.views.generic.dates.DateMixin`
+    * :class:`freedom.views.generic.base.View`
 
     **Context**
 
     In addition to the context provided by
-    :class:`~django.views.generic.list.MultipleObjectMixin` (via
-    :class:`~django.views.generic.dates.BaseDateListView`), the template's
+    :class:`~freedom.views.generic.list.MultipleObjectMixin` (via
+    :class:`~freedom.views.generic.dates.BaseDateListView`), the template's
     context will be:
 
     * ``day``: A :class:`~datetime.date` object
@@ -457,7 +457,7 @@ DayArchiveView
 
     **Example myapp/views.py**::
 
-        from django.views.generic.dates import DayArchiveView
+        from freedom.views.generic.dates import DayArchiveView
 
         from myapp.models import Article
 
@@ -469,7 +469,7 @@ DayArchiveView
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from freedom.conf.urls import url
 
         from myapp.views import ArticleDayArchiveView
 
@@ -482,7 +482,7 @@ DayArchiveView
 
     **Example myapp/article_archive_day.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+freedom
 
         <h1>{{ day }}</h1>
 
@@ -508,22 +508,22 @@ TodayArchiveView
 .. class:: TodayArchiveView
 
     A day archive page showing all objects for *today*. This is exactly the
-    same as :class:`django.views.generic.dates.DayArchiveView`, except today's
+    same as :class:`freedom.views.generic.dates.DayArchiveView`, except today's
     date is used instead of the ``year``/``month``/``day`` arguments.
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.list.MultipleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseTodayArchiveView`
-    * :class:`django.views.generic.dates.BaseDayArchiveView`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
-    * :class:`django.views.generic.dates.DayMixin`
-    * :class:`django.views.generic.dates.BaseDateListView`
-    * :class:`django.views.generic.list.MultipleObjectMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.list.MultipleObjectTemplateResponseMixin`
+    * :class:`freedom.views.generic.base.TemplateResponseMixin`
+    * :class:`freedom.views.generic.dates.BaseTodayArchiveView`
+    * :class:`freedom.views.generic.dates.BaseDayArchiveView`
+    * :class:`freedom.views.generic.dates.YearMixin`
+    * :class:`freedom.views.generic.dates.MonthMixin`
+    * :class:`freedom.views.generic.dates.DayMixin`
+    * :class:`freedom.views.generic.dates.BaseDateListView`
+    * :class:`freedom.views.generic.list.MultipleObjectMixin`
+    * :class:`freedom.views.generic.dates.DateMixin`
+    * :class:`freedom.views.generic.base.View`
 
     **Notes**
 
@@ -531,7 +531,7 @@ TodayArchiveView
 
     **Example myapp/views.py**::
 
-        from django.views.generic.dates import TodayArchiveView
+        from freedom.views.generic.dates import TodayArchiveView
 
         from myapp.models import Article
 
@@ -543,7 +543,7 @@ TodayArchiveView
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
+        from freedom.conf.urls import url
 
         from myapp.views import ArticleTodayArchiveView
 
@@ -571,16 +571,16 @@ DateDetailView
 
     **Ancestors (MRO)**
 
-    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.dates.BaseDateDetailView`
-    * :class:`django.views.generic.dates.YearMixin`
-    * :class:`django.views.generic.dates.MonthMixin`
-    * :class:`django.views.generic.dates.DayMixin`
-    * :class:`django.views.generic.dates.DateMixin`
-    * ``django.views.generic.detail.BaseDetailView``
-    * :class:`django.views.generic.detail.SingleObjectMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`freedom.views.generic.base.TemplateResponseMixin`
+    * :class:`freedom.views.generic.dates.BaseDateDetailView`
+    * :class:`freedom.views.generic.dates.YearMixin`
+    * :class:`freedom.views.generic.dates.MonthMixin`
+    * :class:`freedom.views.generic.dates.DayMixin`
+    * :class:`freedom.views.generic.dates.DateMixin`
+    * ``freedom.views.generic.detail.BaseDetailView``
+    * :class:`freedom.views.generic.detail.SingleObjectMixin`
+    * :class:`freedom.views.generic.base.View`
 
     **Context**
 
@@ -593,8 +593,8 @@ DateDetailView
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import url
-        from django.views.generic.dates import DateDetailView
+        from freedom.conf.urls import url
+        from freedom.views.generic.dates import DateDetailView
 
         urlpatterns = [
             url(r'^(?P<year>[0-9]+)/(?P<month>[-\w]+)/(?P<day>[0-9]+)/(?P<pk>[0-9]+)/$',
@@ -604,7 +604,7 @@ DateDetailView
 
     **Example myapp/article_detail.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+freedom
 
         <h1>{{ object.title }}</h1>
 
@@ -612,9 +612,9 @@ DateDetailView
 
     All of the generic views listed above have matching ``Base`` views that
     only differ in that they do not include the
-    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    :class:`~freedom.views.generic.list.MultipleObjectTemplateResponseMixin`
     (for the archive views) or
-    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    :class:`~freedom.views.generic.detail.SingleObjectTemplateResponseMixin`
     (for the :class:`DateDetailView`):
 
     .. class:: BaseArchiveIndexView

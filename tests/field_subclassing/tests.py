@@ -2,9 +2,9 @@ from __future__ import unicode_literals
 
 import inspect
 
-from django.core import exceptions, serializers
-from django.db import connection
-from django.test import TestCase
+from freedom.core import exceptions, serializers
+from freedom.db import connection
+from freedom.test import TestCase
 
 from .fields import Small, CustomTypedField
 from .models import ChoicesModel, DataModel, MyModel, OtherModel

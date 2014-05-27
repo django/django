@@ -5,12 +5,12 @@ from operator import attrgetter
 import sys
 import unittest
 
-from django.core.exceptions import ValidationError
-from django.test import TestCase, skipUnlessDBFeature
-from django.utils import six
-from django.utils.timezone import get_fixed_timezone
-from django.db import connection, router
-from django.db.models.sql import InsertQuery
+from freedom.core.exceptions import ValidationError
+from freedom.test import TestCase, skipUnlessDBFeature
+from freedom.utils import six
+from freedom.utils.timezone import get_fixed_timezone
+from freedom.db import connection, router
+from freedom.db.models.sql import InsertQuery
 
 from .models import (Worker, Article, Party, Event, Department,
     BrokenUnicodeMethod, NonAutoPK, Model1, Model2, Model3)

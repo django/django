@@ -2,16 +2,16 @@
 """
 42. Serialization
 
-``django.core.serializers`` provides interfaces to converting Django
+``freedom.core.serializers`` provides interfaces to converting Freedom
 ``QuerySet`` objects to and from "flat" data (i.e. strings).
 """
 from __future__ import unicode_literals
 
 from decimal import Decimal
 
-from django.db import models
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils import six
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

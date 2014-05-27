@@ -1,9 +1,9 @@
 """
-Regression tests for Django built-in views.
+Regression tests for Freedom built-in views.
 """
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

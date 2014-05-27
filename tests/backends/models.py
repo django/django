@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-from django.contrib.contenttypes.fields import (
+from freedom.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
-from django.contrib.contenttypes.models import ContentType
-from django.db import models, connection
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.contrib.contenttypes.models import ContentType
+from freedom.db import models, connection
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

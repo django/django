@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
+from freedom.db import connection
+from freedom.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
 
 from .models import Reporter, Article
 
@@ -15,23 +15,23 @@ class IntrospectionTests(TestCase):
         self.assertTrue(Article._meta.db_table in tl,
                      "'%s' isn't in table_list()." % Article._meta.db_table)
 
-    def test_django_table_names(self):
+    def test_freedom_table_names(self):
         with connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
-            tl = connection.introspection.django_table_names()
-            cursor.execute("DROP TABLE django_ixn_test_table;")
-            self.assertTrue('django_ixn_testcase_table' not in tl,
-                         "django_table_names() returned a non-Django table")
+            cursor.execute('CREATE TABLE freedom_ixn_test_table (id INTEGER);')
+            tl = connection.introspection.freedom_table_names()
+            cursor.execute("DROP TABLE freedom_ixn_test_table;")
+            self.assertTrue('freedom_ixn_testcase_table' not in tl,
+                         "freedom_table_names() returned a non-Freedom table")
 
-    def test_django_table_names_retval_type(self):
+    def test_freedom_table_names_retval_type(self):
         # Ticket #15216
         with connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
+            cursor.execute('CREATE TABLE freedom_ixn_test_table (id INTEGER);')
 
-        tl = connection.introspection.django_table_names(only_existing=True)
+        tl = connection.introspection.freedom_table_names(only_existing=True)
         self.assertIs(type(tl), list)
 
-        tl = connection.introspection.django_table_names(only_existing=False)
+        tl = connection.introspection.freedom_table_names(only_existing=False)
         self.assertIs(type(tl), list)
 
     def test_installed_models(self):
@@ -74,7 +74,7 @@ class IntrospectionTests(TestCase):
         )
 
     # Oracle forces null=True under the hood in some cases (see
-    # https://docs.djangoproject.com/en/dev/ref/databases/#null-and-empty-strings)
+    # https://docs.freedomproject.com/en/dev/ref/databases/#null-and-empty-strings)
     # so its idea about null_ok in cursor.description is different from ours.
     @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_get_table_description_nullable(self):
@@ -89,9 +89,9 @@ class IntrospectionTests(TestCase):
     @skipUnlessDBFeature('has_real_datatype')
     def test_postgresql_real_type(self):
         with connection.cursor() as cursor:
-            cursor.execute("CREATE TABLE django_ixn_real_test_table (number REAL);")
-            desc = connection.introspection.get_table_description(cursor, 'django_ixn_real_test_table')
-            cursor.execute('DROP TABLE django_ixn_real_test_table;')
+            cursor.execute("CREATE TABLE freedom_ixn_real_test_table (number REAL);")
+            desc = connection.introspection.get_table_description(cursor, 'freedom_ixn_real_test_table')
+            cursor.execute('DROP TABLE freedom_ixn_real_test_table;')
         self.assertEqual(datatype(desc[0][1], desc[0]), 'FloatField')
 
     def test_get_relations(self):

@@ -12,15 +12,15 @@ try:
 except ImportError:
     pytz = None
 
-from django.core import serializers
-from django.core.urlresolvers import reverse
-from django.db.models import Min, Max
-from django.http import HttpRequest
-from django.template import Context, RequestContext, Template, TemplateSyntaxError
-from django.test import TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature
-from django.test.utils import requires_tz_support
-from django.utils import six
-from django.utils import timezone
+from freedom.core import serializers
+from freedom.core.urlresolvers import reverse
+from freedom.db.models import Min, Max
+from freedom.http import HttpRequest
+from freedom.template import Context, RequestContext, Template, TemplateSyntaxError
+from freedom.test import TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature
+from freedom.test.utils import requires_tz_support
+from freedom.utils import six
+from freedom.utils import timezone
 
 from .forms import EventForm, EventSplitForm, EventLocalizedForm, EventModelForm, EventLocalizedModelForm
 from .models import Event, MaybeEvent, Session, SessionEvent, Timestamp, AllDayEvent
@@ -113,7 +113,7 @@ class LegacyDatabaseTests(TestCase):
         Event.objects.create(dt=dt)
         event = Event.objects.get()
         self.assertIsNone(event.dt.tzinfo)
-        # django.db.backends.utils.typecast_dt will just drop the
+        # freedom.db.backends.utils.typecast_dt will just drop the
         # timezone, so a round-trip in the database alters the data (!)
         # interpret the naive datetime in local time and you get a wrong value
         self.assertNotEqual(event.dt.replace(tzinfo=EAT), dt)
@@ -139,7 +139,7 @@ class LegacyDatabaseTests(TestCase):
         Event.objects.create(dt=dt)
         event = Event.objects.get()
         self.assertIsNone(event.dt.tzinfo)
-        # django.db.backends.utils.typecast_dt will just drop the
+        # freedom.db.backends.utils.typecast_dt will just drop the
         # timezone, so a round-trip in the database alters the data (!)
         # interpret the naive datetime in local time and you get a wrong value
         self.assertNotEqual(event.dt.replace(tzinfo=EAT), dt)
@@ -932,7 +932,7 @@ class TemplateTests(TestCase):
     @skipIf(sys.platform.startswith('win'), "Windows uses non-standard time zone names")
     def test_tz_template_context_processor(self):
         """
-        Test the django.core.context_processors.tz template context processor.
+        Test the freedom.core.context_processors.tz template context processor.
         """
         tpl = Template("{{ TIME_ZONE }}")
         self.assertEqual(tpl.render(Context()), "")
@@ -1070,7 +1070,7 @@ class NewFormsTests(TestCase):
 
 
 @override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True,
-                  PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+                  PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                   ROOT_URLCONF='timezones.urls')
 class AdminTests(TestCase):
 

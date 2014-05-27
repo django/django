@@ -1,5 +1,5 @@
-from django import forms
-from django.forms.extras import SelectDateWidget
+from freedom import forms
+from freedom.forms.extras import SelectDateWidget
 
 from .models import Company
 

@@ -3,21 +3,21 @@ from __future__ import unicode_literals
 from datetime import date
 import warnings
 
-from django import forms
-from django.contrib.admin.options import (ModelAdmin, TabularInline,
+from freedom import forms
+from freedom.contrib.admin.options import (ModelAdmin, TabularInline,
      HORIZONTAL, VERTICAL)
-from django.contrib.admin.sites import AdminSite
-from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
-from django.contrib.admin.validation import ModelAdminValidator
-from django.contrib.admin import (SimpleListFilter,
+from freedom.contrib.admin.sites import AdminSite
+from freedom.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
+from freedom.contrib.admin.validation import ModelAdminValidator
+from freedom.contrib.admin import (SimpleListFilter,
      BooleanFieldListFilter)
-from django.core.checks import Error
-from django.core.exceptions import ImproperlyConfigured
-from django.forms.models import BaseModelFormSet
-from django.forms.widgets import Select
-from django.test import TestCase
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
+from freedom.core.checks import Error
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.forms.models import BaseModelFormSet
+from freedom.forms.widgets import Select
+from freedom.test import TestCase
+from freedom.utils import six
+from freedom.utils.deprecation import RemovedInFreedom19Warning
 
 from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
 
@@ -1508,7 +1508,7 @@ class CustomModelAdminTests(CheckTestCase):
     def test_deprecation(self):
         "Deprecated Custom Validator definitions still work with the check framework."
         with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RemovedInDjango19Warning)
+            warnings.simplefilter("ignore", category=RemovedInFreedom19Warning)
 
             class CustomValidator(ModelAdminValidator):
                 def validate_me(self, model_admin, model):

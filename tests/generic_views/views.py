@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse, reverse_lazy
-from django.utils.decorators import method_decorator
-from django.views import generic
+from freedom.contrib.auth.decorators import login_required
+from freedom.core.paginator import Paginator
+from freedom.core.urlresolvers import reverse, reverse_lazy
+from freedom.utils.decorators import method_decorator
+from freedom.views import generic
 
 from .test_forms import AuthorForm, ContactForm
 from .models import Artist, Author, Book, Page, BookSigning

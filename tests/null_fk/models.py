@@ -2,8 +2,8 @@
 Regression tests for proper working of ForeignKey(null=True).
 """
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 class SystemDetails(models.Model):

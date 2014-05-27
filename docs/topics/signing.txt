@@ -2,15 +2,15 @@
 Cryptographic signing
 =====================
 
-.. module:: django.core.signing
-   :synopsis: Django's signing framework.
+.. module:: freedom.core.signing
+   :synopsis: Freedom's signing framework.
 
 The golden rule of Web application security is to never trust data from
 untrusted sources. Sometimes it can be useful to pass data through an
 untrusted medium. Cryptographically signed values can be passed through an
 untrusted channel safe in the knowledge that any tampering will be detected.
 
-Django provides both a low-level API for signing values and a high-level API
+Freedom provides both a low-level API for signing values and a high-level API
 for setting and reading signed cookies, one of the most common uses of
 signing in Web applications.
 
@@ -28,7 +28,7 @@ You may also find signing useful for the following:
 Protecting the SECRET_KEY
 =========================
 
-When you create a new Django project using :djadmin:`startproject`, the
+When you create a new Freedom project using :djadmin:`startproject`, the
 ``settings.py`` file is generated automatically and gets a random
 :setting:`SECRET_KEY` value. This value is the key to securing signed
 data -- it is vital you keep this secure, or attackers could use it to
@@ -37,10 +37,10 @@ generate their own signed values.
 Using the low-level API
 =======================
 
-Django's signing methods live in the ``django.core.signing`` module.
+Freedom's signing methods live in the ``freedom.core.signing`` module.
 To sign a value, first instantiate a ``Signer`` instance::
 
-    >>> from django.core.signing import Signer
+    >>> from freedom.core.signing import Signer
     >>> signer = Signer()
     >>> value = signer.sign('My string')
     >>> value
@@ -54,9 +54,9 @@ You can retrieve the original value using the ``unsign`` method::
     'My string'
 
 If the signature or value have been altered in any way, a
-``django.core.signing.BadSignature`` exception will be raised::
+``freedom.core.signing.BadSignature`` exception will be raised::
 
-    >>> from django.core import signing
+    >>> from freedom.core import signing
     >>> value += 'm'
     >>> try:
     ...    original = signer.unsign(value)
@@ -114,7 +114,7 @@ Verifying timestamped values
 timestamp to the value. This allows you to confirm that a signed value was
 created within a specified period of time::
 
-    >>> from django.core.signing import TimestampSigner
+    >>> from freedom.core.signing import TimestampSigner
     >>> signer = TimestampSigner()
     >>> value = signer.sign('hello')
     >>> value
@@ -147,7 +147,7 @@ pickle module, but use JSON serialization under the hood. JSON ensures that
 even if your :setting:`SECRET_KEY` is stolen an attacker will not be able
 to execute arbitrary commands by exploiting the pickle format::
 
-    >>> from django.core import signing
+    >>> from freedom.core import signing
     >>> value = signing.dumps({"foo": "bar"})
     >>> value
     'eyJmb28iOiJiYXIifQ:1NMg1b:zGcDE4-TCkaeGzLeW9UQwZesciI'
@@ -158,17 +158,17 @@ Because of the nature of JSON (there is no native distinction between lists
 and tuples) if you pass in a tuple, you will get a list from
 ``signing.loads(object)``::
 
-    >>> from django.core import signing
+    >>> from freedom.core import signing
     >>> value = signing.dumps(('a','b','c'))
     >>> signing.loads(value)
     ['a', 'b', 'c']
 
-.. function:: dumps(obj, key=None, salt='django.core.signing', compress=False)
+.. function:: dumps(obj, key=None, salt='freedom.core.signing', compress=False)
 
     Returns URL-safe, sha1 signed base64 compressed JSON string. Serialized
     object is signed using :class:`~TimestampSigner`.
 
-.. function:: loads(string, key=None, salt='django.core.signing', max_age=None)
+.. function:: loads(string, key=None, salt='freedom.core.signing', max_age=None)
 
     Reverse of ``dumps()``, raises ``BadSignature`` if signature fails.
     Checks ``max_age`` (in seconds) if given.

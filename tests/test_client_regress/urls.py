@@ -1,5 +1,5 @@
-from django.conf.urls import url, include
-from django.views.generic import RedirectView
+from freedom.conf.urls import url, include
+from freedom.views.generic import RedirectView
 
 from . import views
 

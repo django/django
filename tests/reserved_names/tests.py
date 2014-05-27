@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.test import TestCase
+from freedom.test import TestCase
 
 from .models import Thing
 

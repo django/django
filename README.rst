@@ -1,11 +1,11 @@
-Django is a high-level Python Web framework that encourages rapid development
+Freedom is a high-level Python Web framework that encourages rapid development
 and clean, pragmatic design. Thanks for checking it out.
 
 All documentation is in the "docs" directory and online at
-https://docs.djangoproject.com/en/stable/. If you're just getting started,
+https://docs.freedomproject.com/en/stable/. If you're just getting started,
 here's how we recommend you read the docs:
 
-* First, read docs/intro/install.txt for instructions on installing Django.
+* First, read docs/intro/install.txt for instructions on installing Freedom.
 
 * Next, work through the tutorials in order (docs/intro/tutorial01.txt,
   docs/intro/tutorial02.txt, etc.).
@@ -21,23 +21,23 @@ here's how we recommend you read the docs:
 
 Docs are updated rigorously. If you find any problems in the docs, or think
 they should be clarified in any way, please take 30 seconds to fill out a
-ticket here: https://code.djangoproject.com/newticket
+ticket here: https://code.freedomproject.com/newticket
 
 To get more help:
 
-* Join the #django channel on irc.freenode.net. Lots of helpful people hang out
-  there. Read the archives at http://django-irc-logs.com/.
+* Join the #freedom channel on irc.freenode.net. Lots of helpful people hang out
+  there. Read the archives at http://freedom-irc-logs.com/.
 
-* Join the django-users mailing list, or read the archives, at
-  https://groups.google.com/group/django-users.
+* Join the freedom-users mailing list, or read the archives, at
+  https://groups.google.com/group/freedom-users.
 
-To contribute to Django:
+To contribute to Freedom:
 
-* Check out https://www.djangoproject.com/community/ for information about
+* Check out https://www.freedomproject.com/community/ for information about
   getting involved.
 
-To run Django's test suite:
+To run Freedom's test suite:
 
 * Follow the instructions in the "Unit tests" section of
   docs/internals/contributing/writing-code/unit-tests.txt, published online at
-  https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
+  https://docs.freedomproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests

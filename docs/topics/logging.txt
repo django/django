@@ -2,13 +2,13 @@
 Logging
 =======
 
-.. module:: django.utils.log
-   :synopsis: Logging tools for Django applications
+.. module:: freedom.utils.log
+   :synopsis: Logging tools for Freedom applications
 
 A quick logging primer
 ======================
 
-Django uses Python's builtin :mod:`logging` module to perform system logging.
+Freedom uses Python's builtin :mod:`logging` module to perform system logging.
 The usage of this module is discussed in detail in Python's own documentation.
 However, if you've never used Python's logging framework (or even if you have),
 here's a quick primer.
@@ -203,7 +203,7 @@ formatters to ensure that logging output is output in a useful way.
 
 Python's logging library provides several techniques to configure
 logging, ranging from a programmatic interface to configuration files.
-By default, Django uses the `dictConfig format`_.
+By default, Freedom uses the `dictConfig format`_.
 
 In order to configure logging, you use :setting:`LOGGING` to define a
 dictionary of logging settings. These settings describes the loggers,
@@ -211,10 +211,10 @@ handlers, filters and formatters that you want in your logging setup,
 and the log levels and other properties that you want those components
 to have.
 
-Prior to Django 1.5, the :setting:`LOGGING` setting always overwrote the
-:ref:`default Django logging configuration <default-logging-configuration>`.
-From Django 1.5 forward, it is possible to get the project's logging
-configuration merged with Django's defaults, hence you can decide if you want to
+Prior to Freedom 1.5, the :setting:`LOGGING` setting always overwrote the
+:ref:`default Freedom logging configuration <default-logging-configuration>`.
+From Freedom 1.5 forward, it is possible to get the project's logging
+configuration merged with Freedom's defaults, hence you can decide if you want to
 add to, or replace the existing configuration.
 
 If the ``disable_existing_loggers`` key in the :setting:`LOGGING` dictConfig is
@@ -222,7 +222,7 @@ set to ``True`` (which is the default) the default configuration is completely
 overridden. Alternatively you can redefine some or all of the loggers by
 setting ``disable_existing_loggers`` to ``False``.
 
-Logging is configured as part of the general Django ``setup()`` function.
+Logging is configured as part of the general Freedom ``setup()`` function.
 Therefore, you can be certain that loggers are always ready for use in your
 project code.
 
@@ -236,7 +236,7 @@ information about logging configuration dictionaries. However, to give
 you a taste of what is possible, here are a couple examples.
 
 First, here's a simple configuration which writes all request logging from the
-:ref:`django-request-logger` logger to a local file::
+:ref:`freedom-request-logger` logger to a local file::
 
     LOGGING = {
         'version': 1,
@@ -245,11 +245,11 @@ First, here's a simple configuration which writes all request logging from the
             'file': {
                 'level': 'DEBUG',
                 'class': 'logging.FileHandler',
-                'filename': '/path/to/django/debug.log',
+                'filename': '/path/to/freedom/debug.log',
             },
         },
         'loggers': {
-            'django.request': {
+            'freedom.request': {
                 'handlers': ['file'],
                 'level': 'DEBUG',
                 'propagate': True,
@@ -258,7 +258,7 @@ First, here's a simple configuration which writes all request logging from the
     }
 
 If you use this example, be sure to change the ``'filename'`` path to a
-location that's writable by the user that's running the Django application.
+location that's writable by the user that's running the Freedom application.
 
 Second, here's an example of a fairly complex logging setup, configured using
 :func:`logging.config.dictConfig`::
@@ -292,17 +292,17 @@ Second, here's an example of a fairly complex logging setup, configured using
             },
             'mail_admins': {
                 'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
+                'class': 'freedom.utils.log.AdminEmailHandler',
                 'filters': ['special']
             }
         },
         'loggers': {
-            'django': {
+            'freedom': {
                 'handlers': ['null'],
                 'propagate': True,
                 'level': 'INFO',
             },
-            'django.request': {
+            'freedom.request': {
                 'handlers': ['mail_admins'],
                 'level': 'ERROR',
                 'propagate': False,
@@ -358,14 +358,14 @@ This logging configuration does the following things:
 
 * Configures three loggers:
 
-  * ``django``, which passes all messages at ``INFO`` or higher
+  * ``freedom``, which passes all messages at ``INFO`` or higher
     to the ``null`` handler.
 
-  * ``django.request``, which passes all ``ERROR`` messages to
+  * ``freedom.request``, which passes all ``ERROR`` messages to
     the ``mail_admins`` handler. In addition, this logger is
     marked to *not* propagate messages. This means that log
-    messages written to ``django.request`` will not be handled
-    by the ``django`` logger.
+    messages written to ``freedom.request`` will not be handled
+    by the ``freedom`` logger.
 
   * ``myproject.custom``, which passes all messages at ``INFO``
     or higher that also pass the ``special`` filter to two
@@ -383,7 +383,7 @@ If you don't want to use Python's dictConfig format to configure your
 logger, you can specify your own configuration scheme.
 
 The :setting:`LOGGING_CONFIG` setting defines the callable that will
-be used to configure Django's loggers. By default, it points at
+be used to configure Freedom's loggers. By default, it points at
 Python's :func:`logging.config.dictConfig()` function. However, if you want to
 use a different configuration process, you can use any other callable
 that takes a single argument. The contents of :setting:`LOGGING` will
@@ -400,30 +400,30 @@ configuration process.
 .. note::
     Setting :setting:`LOGGING_CONFIG` to ``None`` only means that the
     configuration process is disabled, not logging itself. If you
-    disable the configuration process, Django will still make logging
+    disable the configuration process, Freedom will still make logging
     calls, falling back to whatever default logging behavior is
     defined.
 
-Django's logging extensions
+Freedom's logging extensions
 ===========================
 
-Django provides a number of utilities to handle the unique
+Freedom provides a number of utilities to handle the unique
 requirements of logging in Web server environment.
 
 Loggers
 -------
 
-Django provides four built-in loggers.
+Freedom provides four built-in loggers.
 
-``django``
+``freedom``
 ~~~~~~~~~~
 
-``django`` is the catch-all logger. No messages are posted directly to
+``freedom`` is the catch-all logger. No messages are posted directly to
 this logger.
 
-.. _django-request-logger:
+.. _freedom-request-logger:
 
-``django.request``
+``freedom.request``
 ~~~~~~~~~~~~~~~~~~
 
 Log messages related to the handling of requests. 5XX responses are
@@ -438,7 +438,7 @@ Messages to this logger have the following extra context:
 * ``request``: The request object that generated the logging
   message.
 
-``django.db.backends``
+``freedom.db.backends``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Messages relating to the interaction of code with the database. For example,
@@ -460,31 +460,31 @@ This logging does not include framework-level initialization (e.g.
 ``COMMIT``, and ``ROLLBACK``). Turn on query logging in your database if you
 wish to view all database queries.
 
-``django.security.*``
+``freedom.security.*``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The security loggers will receive messages on any occurrence of
-:exc:`~django.core.exceptions.SuspiciousOperation`. There is a sub-logger for
+:exc:`~freedom.core.exceptions.SuspiciousOperation`. There is a sub-logger for
 each sub-type of SuspiciousOperation. The level of the log event depends on
 where the exception is handled.  Most occurrences are logged as a warning, while
 any ``SuspiciousOperation`` that reaches the WSGI handler will be logged as an
 error. For example, when an HTTP ``Host`` header is included in a request from
-a client that does not match :setting:`ALLOWED_HOSTS`, Django will return a 400
+a client that does not match :setting:`ALLOWED_HOSTS`, Freedom will return a 400
 response, and an error message will be logged to the
-``django.security.DisallowedHost`` logger.
+``freedom.security.DisallowedHost`` logger.
 
-Only the parent ``django.security`` logger is configured by default, and all
-child loggers will propagate to the parent logger. The ``django.security``
-logger is configured the same as the ``django.request`` logger, and any error
+Only the parent ``freedom.security`` logger is configured by default, and all
+child loggers will propagate to the parent logger. The ``freedom.security``
+logger is configured the same as the ``freedom.request`` logger, and any error
 events will be mailed to admins. Requests resulting in a 400 response due to
-a ``SuspiciousOperation`` will not be logged to the ``django.request`` logger,
-but only to the ``django.security`` logger.
+a ``SuspiciousOperation`` will not be logged to the ``freedom.request`` logger,
+but only to the ``freedom.security`` logger.
 
 To silence a particular type of SuspiciousOperation, you can override that
 specific logger following this example::
 
         'loggers': {
-            'django.security.DisallowedHost': {
+            'freedom.security.DisallowedHost': {
                 'handlers': ['null'],
                 'propagate': False,
             },
@@ -492,7 +492,7 @@ specific logger following this example::
 Handlers
 --------
 
-Django provides one log handler in addition to those provided by the
+Freedom provides one log handler in addition to those provided by the
 Python logging module.
 
 .. class:: AdminEmailHandler(include_html=False, email_backend=None)
@@ -511,19 +511,19 @@ Python logging module.
     containing the full content of the debug Web page that would have been
     produced if :setting:`DEBUG` were ``True``. To set this value in your
     configuration, include it in the handler definition for
-    ``django.utils.log.AdminEmailHandler``, like this::
+    ``freedom.utils.log.AdminEmailHandler``, like this::
 
         'handlers': {
             'mail_admins': {
                 'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
+                'class': 'freedom.utils.log.AdminEmailHandler',
                 'include_html': True,
             }
         },
 
     Note that this HTML version of the email contains a full traceback,
     with names and values of local variables at each level of the stack, plus
-    the values of your Django settings. This information is potentially very
+    the values of your Freedom settings. This information is potentially very
     sensitive, and you may not want to send it over email. Consider using
     something such as `Sentry`_ to get the best of both worlds -- the
     rich information of full tracebacks plus the security of *not* sending the
@@ -538,8 +538,8 @@ Python logging module.
         'handlers': {
             'mail_admins': {
                 'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'email_backend': 'django.core.mail.backends.filebased.EmailBackend',
+                'class': 'freedom.utils.log.AdminEmailHandler',
+                'email_backend': 'freedom.core.mail.backends.filebased.EmailBackend',
             }
         },
 
@@ -552,7 +552,7 @@ Python logging module.
 Filters
 -------
 
-Django provides two log filters in addition to those provided by the Python
+Freedom provides two log filters in addition to those provided by the Python
 logging module.
 
 .. class:: CallbackFilter(callback)
@@ -562,11 +562,11 @@ logging module.
    through the filter. Handling of that record will not proceed if the callback
    returns False.
 
-   For instance, to filter out :exc:`~django.http.UnreadablePostError`
+   For instance, to filter out :exc:`~freedom.http.UnreadablePostError`
    (raised when a user cancels an upload) from the admin emails, you would
    create a filter function::
 
-    from django.http import UnreadablePostError
+    from freedom.http import UnreadablePostError
 
     def skip_unreadable_post(record):
         if record.exc_info:
@@ -579,7 +579,7 @@ logging module.
 
         'filters': {
             'skip_unreadable_posts': {
-                '()': 'django.utils.log.CallbackFilter',
+                '()': 'freedom.utils.log.CallbackFilter',
                 'callback': skip_unreadable_post,
             }
         },
@@ -587,7 +587,7 @@ logging module.
             'mail_admins': {
                 'level': 'ERROR',
                 'filters': ['skip_unreadable_posts'],
-                'class': 'django.utils.log.AdminEmailHandler'
+                'class': 'freedom.utils.log.AdminEmailHandler'
             }
         },
 
@@ -601,14 +601,14 @@ logging module.
 
        'filters': {
             'require_debug_false': {
-                '()': 'django.utils.log.RequireDebugFalse',
+                '()': 'freedom.utils.log.RequireDebugFalse',
             }
         },
         'handlers': {
             'mail_admins': {
                 'level': 'ERROR',
                 'filters': ['require_debug_false'],
-                'class': 'django.utils.log.AdminEmailHandler'
+                'class': 'freedom.utils.log.AdminEmailHandler'
             }
         },
 
@@ -619,14 +619,14 @@ logging module.
 
 .. _default-logging-configuration:
 
-Django's default logging configuration
+Freedom's default logging configuration
 ======================================
 
-By default, Django configures the ``django.request`` logger so that all messages
+By default, Freedom configures the ``freedom.request`` logger so that all messages
 with ``ERROR`` or ``CRITICAL`` level are sent to :class:`AdminEmailHandler`, as
 long as the :setting:`DEBUG` setting is set to ``False``.
 
-All messages reaching the ``django`` catch-all logger when :setting:`DEBUG` is
+All messages reaching the ``freedom`` catch-all logger when :setting:`DEBUG` is
 ``True`` are sent to the console. They are simply discarded (sent to
 ``NullHandler``) when :setting:`DEBUG` is ``False``.
 

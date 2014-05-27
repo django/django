@@ -12,15 +12,15 @@ import sys
 from tempfile import NamedTemporaryFile, mkdtemp, mkstemp
 from unittest import skipIf
 
-from django.core import mail
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
-from django.template.base import TemplateDoesNotExist
-from django.test import TestCase, RequestFactory, override_settings
-from django.test.utils import override_with_test_loader
-from django.utils.encoding import force_text, force_bytes
-from django.utils import six
-from django.views.debug import ExceptionReporter
+from freedom.core import mail
+from freedom.core.files.uploadedfile import SimpleUploadedFile
+from freedom.core.urlresolvers import reverse
+from freedom.template.base import TemplateDoesNotExist
+from freedom.test import TestCase, RequestFactory, override_settings
+from freedom.test.utils import override_with_test_loader
+from freedom.utils.encoding import force_text, force_bytes
+from freedom.utils import six
+from freedom.views.debug import ExceptionReporter
 
 from .. import BrokenException, except_args
 from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
@@ -149,7 +149,7 @@ class DebugViewTests(TestCase):
         response = self.client.get('/')
         self.assertContains(
             response,
-            "<h2>Congratulations on your first Django-powered page.</h2>"
+            "<h2>Congratulations on your first Freedom-powered page.</h2>"
         )
 
     @override_settings(ROOT_URLCONF='view_tests.regression_21530_urls')

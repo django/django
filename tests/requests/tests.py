@@ -6,17 +6,17 @@ from io import BytesIO
 from itertools import chain
 import time
 
-from django.core.exceptions import SuspiciousOperation
-from django.core.handlers.wsgi import WSGIRequest, LimitedStream
-from django.http import (HttpRequest, HttpResponse, parse_cookie,
+from freedom.core.exceptions import SuspiciousOperation
+from freedom.core.handlers.wsgi import WSGIRequest, LimitedStream
+from freedom.http import (HttpRequest, HttpResponse, parse_cookie,
     build_request_repr, UnreadablePostError, RawPostDataException)
-from django.test import SimpleTestCase, override_settings
-from django.test.client import FakePayload
-from django.test.utils import str_prefix
-from django.utils import six
-from django.utils.http import cookie_date, urlencode
-from django.utils.six.moves.urllib.parse import urlencode as original_urlencode
-from django.utils.timezone import utc
+from freedom.test import SimpleTestCase, override_settings
+from freedom.test.client import FakePayload
+from freedom.test.utils import str_prefix
+from freedom.utils import six
+from freedom.utils.http import cookie_date, urlencode
+from freedom.utils.six.moves.urllib.parse import urlencode as original_urlencode
+from freedom.utils.timezone import utc
 
 
 class RequestsTests(SimpleTestCase):

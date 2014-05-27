@@ -1,4 +1,4 @@
-from django.core.management.base import NoArgsCommand
+from freedom.core.management.base import NoArgsCommand
 
 
 class InvalidCommand(NoArgsCommand):

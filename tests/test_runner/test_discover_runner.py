@@ -2,8 +2,8 @@ from contextlib import contextmanager
 import os
 from unittest import TestSuite, TextTestRunner, defaultTestLoader
 
-from django.test import TestCase
-from django.test.runner import DiscoverRunner
+from freedom.test import TestCase
+from freedom.test.runner import DiscoverRunner
 
 
 @contextmanager
@@ -34,16 +34,16 @@ class DiscoverRunnerTest(TestCase):
 
         self.assertEqual(count, 1)
 
-    def test_dotted_test_class_django_testcase(self):
+    def test_dotted_test_class_freedom_testcase(self):
         count = DiscoverRunner().build_suite(
-            ["test_discovery_sample.tests_sample.TestDjangoTestCase"],
+            ["test_discovery_sample.tests_sample.TestFreedomTestCase"],
         ).countTestCases()
 
         self.assertEqual(count, 1)
 
-    def test_dotted_test_method_django_testcase(self):
+    def test_dotted_test_method_freedom_testcase(self):
         count = DiscoverRunner().build_suite(
-            ["test_discovery_sample.tests_sample.TestDjangoTestCase.test_sample"],
+            ["test_discovery_sample.tests_sample.TestFreedomTestCase.test_sample"],
         ).countTestCases()
 
         self.assertEqual(count, 1)
@@ -108,8 +108,8 @@ class DiscoverRunnerTest(TestCase):
             suite = DiscoverRunner().build_suite(["test_discovery_sample/"])
             self.assertEqual(
                 suite._tests[0].__class__.__name__,
-                'TestDjangoTestCase',
-                msg="TestDjangoTestCase should be the first test case")
+                'TestFreedomTestCase',
+                msg="TestFreedomTestCase should be the first test case")
             self.assertEqual(
                 suite._tests[1].__class__.__name__,
                 'TestZimpleTestCase',

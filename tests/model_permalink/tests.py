@@ -1,4 +1,4 @@
-from django.test import TestCase, override_settings
+from freedom.test import TestCase, override_settings
 
 from .models import Guitarist
 

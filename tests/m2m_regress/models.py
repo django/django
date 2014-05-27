@@ -1,6 +1,6 @@
-from django.contrib.auth import models as auth
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.contrib.auth import models as auth
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 # No related name is needed here, since symmetrical relations are not

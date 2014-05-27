@@ -5,8 +5,8 @@ import pickle
 import sys
 from unittest import TestCase
 
-from django.utils import six
-from django.utils.functional import LazyObject, SimpleLazyObject, empty
+from freedom.utils import six
+from freedom.utils.functional import LazyObject, SimpleLazyObject, empty
 
 
 class Foo(object):

@@ -1,4 +1,4 @@
-from django.db import models
+from freedom.db import models
 
 
 class ThingItem(object):
@@ -23,7 +23,7 @@ class Things(object):
 class ThingWithIterableChoices(models.Model):
 
     # Testing choices= Iterable of Iterables
-    #   See: https://code.djangoproject.com/ticket/20430
+    #   See: https://code.freedomproject.com/ticket/20430
     thing = models.CharField(max_length=100, blank=True, choices=Things())
 
     class Meta:

@@ -1,16 +1,16 @@
 import json
 import warnings
 
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.core.serializers.json import DjangoJSONEncoder
-from django.template import RequestContext
-from django.template.loader import render_to_string
-from django.test import Client
-from django.test.client import CONTENT_TYPE_RE
-from django.test.utils import setup_test_environment
+from freedom.conf import settings
+from freedom.contrib.auth.decorators import login_required
+from freedom.http import HttpResponse, HttpResponseRedirect
+from freedom.shortcuts import render_to_response
+from freedom.core.serializers.json import FreedomJSONEncoder
+from freedom.template import RequestContext
+from freedom.template.loader import render_to_string
+from freedom.test import Client
+from freedom.test.client import CONTENT_TYPE_RE
+from freedom.test.utils import setup_test_environment
 
 
 class CustomTestException(Exception):
@@ -121,7 +121,7 @@ def return_json_file(request):
 
     # This just checks that the uploaded data is JSON
     obj_dict = json.loads(request.body.decode(charset))
-    obj_json = json.dumps(obj_dict, cls=DjangoJSONEncoder, ensure_ascii=False)
+    obj_json = json.dumps(obj_dict, cls=FreedomJSONEncoder, ensure_ascii=False)
     response = HttpResponse(obj_json.encode(charset), status=200,
                             content_type='application/json; charset=%s' % charset)
     response['Content-Disposition'] = 'attachment; filename=testfile.json'

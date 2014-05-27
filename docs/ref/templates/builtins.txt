@@ -2,7 +2,7 @@
 Built-in template tags and filters
 ==================================
 
-This document describes Django's built-in template tags and filters. It is
+This document describes Freedom's built-in template tags and filters. It is
 recommended that you use the :doc:`automatic documentation
 </ref/contrib/admin/admindocs>`, if available, as this will also include
 documentation for any custom tags or filters installed.
@@ -12,7 +12,7 @@ documentation for any custom tags or filters installed.
 Built-in tag reference
 ----------------------
 
-.. highlightlang:: html+django
+.. highlightlang:: html+freedom
 
 .. templatetag:: autoescape
 
@@ -184,7 +184,7 @@ call to ``{% cycle %}`` doesn't specify ``silent``::
     {% cycle rowcolors %}
 
 For backward compatibility, the ``{% cycle %}`` tag supports the much inferior
-old syntax from previous Django versions. You shouldn't use this in any new
+old syntax from previous Freedom versions. You shouldn't use this in any new
 projects, but for the sake of the people who are still using it, here's what it
 looks like::
 
@@ -216,9 +216,9 @@ This tag can be used in two ways:
   ``"base.html"`` as the name of the parent template to extend.
 
 * ``{% extends variable %}`` uses the value of ``variable``. If the variable
-  evaluates to a string, Django will use that string as the name of the
+  evaluates to a string, Freedom will use that string as the name of the
   parent template. If the variable evaluates to a ``Template`` object,
-  Django will use that object as the parent template.
+  Freedom will use that object as the parent template.
 
 See :ref:`template-inheritance` for more information.
 
@@ -550,7 +550,7 @@ operators, from lowest to highest, is as follows:
 (This follows Python exactly). So, for example, the following complex
 :ttag:`if` tag:
 
-.. code-block:: django
+.. code-block:: freedom
 
     {% if a == b or c == d and e %}
 
@@ -867,7 +867,7 @@ an attribute "description," you could use::
     {% regroup cities by country.description as country_list %}
 
 Or, if ``country`` is a field with ``choices``, it will have a
-:meth:`~django.db.models.Model.get_FOO_display` method available as an
+:meth:`~freedom.db.models.Model.get_FOO_display` method available as an
 attribute, allowing  you to group on the display string rather than the
 ``choices`` key::
 
@@ -927,7 +927,7 @@ file are evaluated as template code, within the current context::
     {% ssi '/home/html/ljworld.com/includes/right_generic.html' parsed %}
 
 Note that if you use ``{% ssi %}``, you'll need to define
-:setting:`ALLOWED_INCLUDE_ROOTS` in your Django settings, as a security
+:setting:`ALLOWED_INCLUDE_ROOTS` in your Freedom settings, as a security
 measure.
 
 .. note::
@@ -975,7 +975,7 @@ url
 
 Returns an absolute path reference (a URL without the domain name) matching a
 given view function and optional parameters. Any special characters in the
-resulting path will be encoded using :func:`~django.utils.encoding.iri_to_uri`.
+resulting path will be encoded using :func:`~freedom.utils.encoding.iri_to_uri`.
 
 This is a way to output links without violating the DRY principle by having to
 hard-code URLs in your templates::
@@ -1020,7 +1020,7 @@ refer to the name of the pattern in the ``url`` tag instead of using the
 path to the view.
 
 Note that if the URL you're reversing doesn't exist, you'll get an
-:exc:`~django.core.urlresolvers.NoReverseMatch` exception raised, which will
+:exc:`~freedom.core.urlresolvers.NoReverseMatch` exception raised, which will
 cause your site to display an error page.
 
 If you'd like to retrieve a URL without displaying it, you can use a slightly
@@ -1062,7 +1062,7 @@ verbatim
 Stops the template engine from rendering the contents of this block tag.
 
 A common use is to allow a Javascript template layer that collides with
-Django's syntax. For example::
+Freedom's syntax. For example::
 
     {% verbatim %}
         {{if dying}}Still alive.{{/if}}
@@ -1172,8 +1172,8 @@ For example::
 
     {{ value|addslashes }}
 
-If ``value`` is ``"I'm using Django"``, the output will be
-``"I\'m using Django"``.
+If ``value`` is ``"I'm using Freedom"``, the output will be
+``"I\'m using Freedom"``.
 
 .. templatefilter:: capfirst
 
@@ -1187,7 +1187,7 @@ For example::
 
     {{ value|capfirst }}
 
-If ``value`` is ``"django"``, the output will be ``"Django"``.
+If ``value`` is ``"freedom"``, the output will be ``"Freedom"``.
 
 .. templatefilter:: center
 
@@ -1200,7 +1200,7 @@ For example::
 
     "{{ value|center:"15" }}"
 
-If ``value`` is ``"Django"``, the output will be ``"     Django    "``.
+If ``value`` is ``"Freedom"``, the output will be ``"     Freedom    "``.
 
 .. templatefilter:: cut
 
@@ -1227,7 +1227,7 @@ Uses a similar format as PHP's ``date()`` function (http://php.net/date)
 with some differences.
 
 .. note::
-    These format characters are not used in Django outside of templates. They
+    These format characters are not used in Freedom outside of templates. They
     were designed to be compatible with PHP to ease transitioning for designers.
 
 .. _date-and-time-formatting-specifiers:
@@ -1331,7 +1331,7 @@ for example, ``"es"``, then for::
     {{ value|date:"SHORT_DATE_FORMAT" }}
 
 the output would be the string ``"09/01/2008"`` (the ``"SHORT_DATE_FORMAT"``
-format specifier for the ``es`` locale as shipped with Django is ``"d/m/Y"``).
+format specifier for the ``es`` locale as shipped with Freedom is ``"d/m/Y"``).
 
 When used without a format string::
 
@@ -1515,7 +1515,7 @@ If ``value`` is 123456789, the output would be ``117.7 MB``.
 
     Strictly speaking, ``filesizeformat`` does not conform to the International
     System of Units which recommends using KiB, MiB, GiB, etc. when byte sizes
-    are calculated in powers of 1024 (which is the case here). Instead, Django
+    are calculated in powers of 1024 (which is the case here). Instead, Freedom
     uses traditional unit names (KB, MB, GB, etc.) corresponding to names that
     are more commonly used.
 
@@ -1760,7 +1760,7 @@ For example::
 
     "{{ value|ljust:"10" }}"
 
-If ``value`` is ``Django``, the output will be ``"Django    "``.
+If ``value`` is ``Freedom``, the output will be ``"Freedom    "``.
 
 .. templatefilter:: lower
 
@@ -1893,7 +1893,7 @@ For example::
 
     "{{ value|rjust:"10" }}"
 
-If ``value`` is ``Django``, the output will be ``"    Django"``.
+If ``value`` is ``Freedom``, the output will be ``"    Freedom"``.
 
 .. templatefilter:: safe
 
@@ -1909,7 +1909,7 @@ autoescaping is off, this filter has no effect.
     make the contents unsafe again. For example, the following code
     prints the variable as is, unescaped:
 
-    .. code-block:: html+django
+    .. code-block:: html+freedom
 
         {{ var|safe|escape }}
 
@@ -2028,7 +2028,7 @@ for example, ``"de"``, then for::
     {{ value|time:"TIME_FORMAT" }}
 
 the output will be the string ``"01:23:00"`` (The ``"TIME_FORMAT"`` format
-specifier for the ``de`` locale as shipped with Django is ``"H:i:s"``).
+specifier for the ``de`` locale as shipped with Freedom is ``"H:i:s"``).
 
 The ``time`` filter will only accept parameters in the format string that
 relate to the time of day, not the date (for obvious reasons). If you need to
@@ -2051,7 +2051,7 @@ used, without applying any localization.
 .. versionchanged:: 1.7
 
     The ability to receive and act on values with attached timezone
-    information was added in Django 1.7.
+    information was added in Freedom 1.7.
 
 .. templatefilter:: timesince
 
@@ -2261,7 +2261,7 @@ This template tag works on links prefixed with ``http://``, ``https://``, or
 
 It also supports domain-only links ending in one of the original top level
 domains (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
-``.org``). For example, ``djangoproject.com`` gets converted.
+``.org``). For example, ``freedomproject.com`` gets converted.
 
 Links can have trailing punctuation (periods, commas, close-parens) and leading
 punctuation (opening parens), and ``urlize`` will still do the right thing.
@@ -2273,9 +2273,9 @@ For example::
 
     {{ value|urlize }}
 
-If ``value`` is ``"Check out www.djangoproject.com"``, the output will be
-``"Check out <a href="http://www.djangoproject.com"
-rel="nofollow">www.djangoproject.com</a>"``.
+If ``value`` is ``"Check out www.freedomproject.com"``, the output will be
+``"Check out <a href="http://www.freedomproject.com"
+rel="nofollow">www.freedomproject.com</a>"``.
 
 In addition to web links, ``urlize`` also converts email addresses into
 ``mailto:`` links. If ``value`` is
@@ -2284,7 +2284,7 @@ In addition to web links, ``urlize`` also converts email addresses into
 
 The ``urlize`` filter also takes an optional parameter ``autoescape``. If
 ``autoescape`` is ``True``, the link text and URLs will be escaped using
-Django's built-in :tfilter:`escape` filter. The default value for
+Freedom's built-in :tfilter:`escape` filter. The default value for
 ``autoescape`` is ``True``.
 
 .. note::
@@ -2307,9 +2307,9 @@ For example::
 
     {{ value|urlizetrunc:15 }}
 
-If ``value`` is ``"Check out www.djangoproject.com"``, the output would be
-``'Check out <a href="http://www.djangoproject.com"
-rel="nofollow">www.djangopr...</a>'``.
+If ``value`` is ``"Check out www.freedomproject.com"``, the output would be
+``'Check out <a href="http://www.freedomproject.com"
+rel="nofollow">www.freedompr...</a>'``.
 
 As with urlize_, this filter should only be applied to plain text.
 
@@ -2372,7 +2372,7 @@ Value       Argument                Outputs
 Internationalization tags and filters
 -------------------------------------
 
-Django provides template tags and filters to control each aspect of
+Freedom provides template tags and filters to control each aspect of
 :doc:`internationalization </topics/i18n/index>` in templates. They allow for
 granular control of translations, formatting, and time zone conversions.
 
@@ -2407,18 +2407,18 @@ See :ref:`time-zones-in-templates`.
 Other tags and filters libraries
 --------------------------------
 
-Django comes with a couple of other template-tag libraries that you have to
+Freedom comes with a couple of other template-tag libraries that you have to
 enable explicitly in your :setting:`INSTALLED_APPS` setting and enable in your
 template with the :ttag:`{% load %}<load>` tag.
 
-django.contrib.humanize
+freedom.contrib.humanize
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-A set of Django template filters useful for adding a "human touch" to data. See
+A set of Freedom template filters useful for adding a "human touch" to data. See
 :doc:`/ref/contrib/humanize`.
 
 
-django.contrib.webdesign
+freedom.contrib.webdesign
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 A collection of template tags that can be useful while designing a Web site,
@@ -2432,13 +2432,13 @@ static
 static
 """"""
 
-.. highlight:: html+django
+.. highlight:: html+freedom
 
-To link to static files that are saved in :setting:`STATIC_ROOT` Django ships
+To link to static files that are saved in :setting:`STATIC_ROOT` Freedom ships
 with a :ttag:`static` template tag. You can use this regardless if you're
-using :class:`~django.template.RequestContext` or not.
+using :class:`~freedom.template.RequestContext` or not.
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% load static %}
     <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
@@ -2446,7 +2446,7 @@ using :class:`~django.template.RequestContext` or not.
 It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% load static %}
     <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
@@ -2454,7 +2454,7 @@ It is also able to consume standard context variables, e.g. assuming a
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% load static %}
     {% static "images/hi.jpg" as myphoto %}
@@ -2462,7 +2462,7 @@ slightly different call:
 
 .. note::
 
-    The :mod:`staticfiles<django.contrib.staticfiles>` contrib app also ships
+    The :mod:`staticfiles<freedom.contrib.staticfiles>` contrib app also ships
     with a :ttag:`static template tag<staticfiles-static>` which uses
     ``staticfiles'`` :setting:`STATICFILES_STORAGE` to build the URL of the
     given path (rather than simply using :func:`urllib.parse.urljoin` with the
@@ -2478,7 +2478,7 @@ slightly different call:
 get_static_prefix
 """""""""""""""""
 
-.. highlight:: html+django
+.. highlight:: html+freedom
 
 You should prefer the :ttag:`static` template tag, but if you need more control
 over exactly where and how :setting:`STATIC_URL` is injected into the template,
@@ -2501,7 +2501,7 @@ the value multiple times::
 get_media_prefix
 """"""""""""""""
 
-.. highlight:: html+django
+.. highlight:: html+freedom
 
 Similar to the :ttag:`get_static_prefix`, ``get_media_prefix`` populates a
 template variable with the media prefix :setting:`MEDIA_URL`, e.g.::

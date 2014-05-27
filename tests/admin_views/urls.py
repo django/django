@@ -1,10 +1,10 @@
-from django.conf.urls import include, url
+from freedom.conf.urls import include, url
 
 from . import views, customadmin, admin
 
 
 urlpatterns = [
-    url(r'^test_admin/admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^test_admin/admin/doc/', include('freedom.contrib.admindocs.urls')),
     url(r'^test_admin/admin/secure-view/$', views.secure_view),
     url(r'^test_admin/admin/', include(admin.site.urls)),
     url(r'^test_admin/admin2/', include(customadmin.site.urls)),

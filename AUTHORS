@@ -1,4 +1,4 @@
-Django was originally created in late 2003 at World Online, the Web division
+Freedom was originally created in late 2003 at World Online, the Web division
 of the Lawrence Journal-World newspaper in Lawrence, Kansas.
 
 The PRIMARY AUTHORS are (and/or have been):
@@ -48,12 +48,12 @@ The PRIMARY AUTHORS are (and/or have been):
     * Baptiste Mispelon
     * Daniele Procida
 
-More information on the main contributors to Django can be found in
+More information on the main contributors to Freedom can be found in
 docs/internals/committers.txt.
 
 And here is an inevitably incomplete list of MUCH-APPRECIATED CONTRIBUTORS --
 people who have submitted patches, reported bugs, added translations, helped
-answer newbie questions, and generally made Django that much better:
+answer newbie questions, and generally made Freedom that much better:
 
     Gisle Aas <gisle@aas.no>
     Chris Adams
@@ -74,7 +74,7 @@ answer newbie questions, and generally made Django that much better:
     Dagur Páll Ammendrup <dagurp@gmail.com>
     Collin Anderson <cmawebsite@gmail.com>
     Jeff Anderson <jefferya@programmerq.net>
-    Marian Andre <django@andre.sk>
+    Marian Andre <freedom@andre.sk>
     Andreas
     Victor Andrée
     andy@jadedplanet.net
@@ -185,7 +185,7 @@ answer newbie questions, and generally made Django that much better:
     flavio.curella@gmail.com
     Tome Cvitan <tome@cvitan.com>
     John D'Agostino <john.dagostino@gmail.com>
-    dackze+django@gmail.com
+    dackze+freedom@gmail.com
     Jim Dalton <jim.dalton@gmail.com>
     Mihai Damian <yang_damian@yahoo.com>
     David Danier <david.danier@team23.de>
@@ -255,7 +255,7 @@ answer newbie questions, and generally made Django that much better:
     Jorge Gajon <gajon@gajon.org>
     gandalf@owca.info
     Marc Garcia <marc.garcia@accopensys.com>
-    Andy Gayton <andy-django@thecablelounge.com>
+    Andy Gayton <andy-freedom@thecablelounge.com>
     geber@datacollect.com
     Jeffrey Gelens <jeffrey@gelens.org>
     Baishampayan Ghose
@@ -271,7 +271,7 @@ answer newbie questions, and generally made Django that much better:
     David Gouldin <dgouldin@gmail.com>
     pradeep.gowda@gmail.com
     Collin Grady <collin@collingrady.com>
-    Luke Granger-Brown <django@lukegb.com>
+    Luke Granger-Brown <freedom@lukegb.com>
     Gabriel Grant <g@briel.ca>
     Martin Green
     Daniel Greenfeld
@@ -288,7 +288,7 @@ answer newbie questions, and generally made Django that much better:
     dAniel hAhler
     hambaloney
     Nasimul Haque <nasim.haque@gmail.com>
-    Will Hardy <django@willhardy.com.au>
+    Will Hardy <freedom@willhardy.com.au>
     Brian Harring <ferringb@gmail.com>
     Brant Harris
     Pascal Hartig <phartig@rdrei.net>
@@ -297,7 +297,7 @@ answer newbie questions, and generally made Django that much better:
     Hawkeye
     Kent Hauser <kent@khauser.net>
     Joe Heck <http://www.rhonabwy.com/wp/>
-    Joel Heenan <joelh-django@planetjoel.com>
+    Joel Heenan <joelh-freedom@planetjoel.com>
     Mikko Hellsing <mikko@sorl.net>
     Sebastian Hillig <sebastian.hillig@gmail.com>
     hipertracker@gmail.com
@@ -313,7 +313,7 @@ answer newbie questions, and generally made Django that much better:
     Matt Hoskins <skaffenuk@googlemail.com>
     Tareque Hossain <http://www.codexn.com>
     Richard House <Richard.House@i-logue.com>
-    Robert Rock Howard <http://djangomojo.com/>
+    Robert Rock Howard <http://freedommojo.com/>
     John Huddleston <huddlej@wwu.edu>
     Rob Hudson <http://rob.cogit8.org/>
     Jason Huggins <http://www.jrandolph.com/blog/>
@@ -338,7 +338,7 @@ answer newbie questions, and generally made Django that much better:
     junzhang.jn@gmail.com
     Krzysztof Jurewicz <krzysztof.jurewicz@gmail.com>
     Xia Kai <http://blog.xiaket.org/>
-    Antti Kaihola <http://djangopeople.net/akaihola/>
+    Antti Kaihola <http://freedompeople.net/akaihola/>
     Peter van Kampen
     Bahadır Kandemir <bahadir@pardus.org.tr>
     Karderio <karderio@gmail.com>
@@ -419,7 +419,7 @@ answer newbie questions, and generally made Django that much better:
     Martin Maney <http://www.chipy.org/Martin_Maney>
     Michael Manfre <mmanfre@gmail.com>
     Javier Mansilla <javimansilla@gmail.com>
-    masonsimon+django@gmail.com
+    masonsimon+freedom@gmail.com
     Manuzhai
     Petr Marhoun <petr.marhoun@gmail.com>
     Petar Marić <http://www.petarmaric.com/>
@@ -472,7 +472,7 @@ answer newbie questions, and generally made Django that much better:
     Alasdair Nicol <http://al.sdair.co.uk/>
     Ryan Niemeyer <https://profiles.google.com/ryan.niemeyer/about>
     Filip Noetzel <http://filip.noetzel.co.uk/>
-    Afonso Fernández Nogueira <fonzzo.django@gmail.com>
+    Afonso Fernández Nogueira <fonzzo.freedom@gmail.com>
     Neal Norwitz <nnorwitz@google.com>
     Todd O'Bryan <toddobryan@mac.com>
     Alex Ogier <alex.ogier@gmail.com>
@@ -509,7 +509,7 @@ answer newbie questions, and generally made Django that much better:
     polpak@yahoo.com
     Ross Poulton <ross@rossp.org>
     Mihai Preda <mihai_preda@yahoo.com>
-    Matthias Pronk <django@masida.nl>
+    Matthias Pronk <freedom@masida.nl>
     Jyrki Pulliainen <jyrki.pulliainen@gmail.com>
     Thejaswi Puthraya <thejaswi.puthraya@gmail.com>
     Johann Queuniet <johann.queuniet@adh.naellia.eu>
@@ -537,7 +537,7 @@ answer newbie questions, and generally made Django that much better:
     Alex Robbins <alexander.j.robbins@gmail.com>
     Matt Robenolt <m@robenolt.com>
     Henrique Romano <onaiort@gmail.com>
-    Erik Romijn <django@solidlinks.nl>
+    Erik Romijn <freedom@solidlinks.nl>
     Armin Ronacher
     Daniel Roseman <http://roseman.org.uk/>
     Rozza <ross.lawley@gmail.com>
@@ -627,8 +627,8 @@ answer newbie questions, and generally made Django that much better:
     tibimicu@gmx.net
     tobias@neuyork.de
     Tom Tobin
-    Joe Topjian <http://joe.terrarum.net/geek/code/python/django/>
-    torne-django@wolfpuppy.org.uk
+    Joe Topjian <http://joe.terrarum.net/geek/code/python/freedom/>
+    torne-freedom@wolfpuppy.org.uk
     Matthew Tretter <m@tthewwithanm.com>
     Jeff Triplett <jeff.triplett@gmail.com>
     tstromberg@google.com
@@ -653,7 +653,7 @@ answer newbie questions, and generally made Django that much better:
     Chris Wagner <cw264701@ohio.edu>
     Rick Wagner <rwagner@physics.ucsd.edu>
     Gavin Wahl <gavinwahl@gmail.com>
-    wam-djangobug@wamber.net
+    wam-freedombug@wamber.net
     Albert Wang <aywang31@gmail.com>
     Wang Chun <wangchun@exoweb.net>
     Filip Wasilewski <filip.wasilewski@gmail.com>
@@ -663,7 +663,7 @@ answer newbie questions, and generally made Django that much better:
     Lakin Wecker <lakin@structuredabstraction.com>
     Chris Wesseling <Chris.Wesseling@cwi.nl>
     Benjamin Wohlwend <piquadrat@gmail.com>
-    James Wheare <django@sparemint.com>
+    James Wheare <freedom@sparemint.com>
     Mike Wiacek <mjwiacek@google.com>
     Frank Wierzbicki
     charly.wilhelm@gmail.com
@@ -693,7 +693,7 @@ answer newbie questions, and generally made Django that much better:
 
 A big THANK YOU goes to:
 
-    Rob Curley and Ralph Gage for letting us open-source Django.
+    Rob Curley and Ralph Gage for letting us open-source Freedom.
 
     Frank Wiles for making excellent arguments for open-sourcing, and for
     his sage sysadmin advice.

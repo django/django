@@ -1,5 +1,5 @@
-from django import forms
-from django.contrib.admin.forms import AdminAuthenticationForm
+from freedom import forms
+from freedom.contrib.admin.forms import AdminAuthenticationForm
 
 
 class CustomAdminAuthenticationForm(AdminAuthenticationForm):

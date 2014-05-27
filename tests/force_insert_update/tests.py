@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.db import transaction, IntegrityError, DatabaseError
-from django.test import TestCase
+from freedom.db import transaction, IntegrityError, DatabaseError
+from freedom.test import TestCase
 
 from .models import (Counter, WithCustomPK, InheritedCounter, ProxyCounter,
                      SubCounter)

@@ -1,5 +1,5 @@
-from django.test import TransactionTestCase
-from django.db import connection
+from freedom.test import TransactionTestCase
+from freedom.db import connection
 
 
 class MigrationTestBase(TransactionTestCase):

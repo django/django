@@ -8,10 +8,10 @@ Web page (using an HTTP ``GET`` request) to avoid sending all the data for
 something the client has already retrieved. However, the same headers can be
 used for all HTTP methods (``POST``, ``PUT``, ``DELETE``, etc).
 
-For each page (response) that Django sends back from a view, it might provide
+For each page (response) that Freedom sends back from a view, it might provide
 two HTTP headers: the ``ETag`` header and the ``Last-Modified`` header. These
 headers are optional on HTTP responses. They can be set by your view function,
-or you can rely on the :class:`~django.middleware.common.CommonMiddleware`
+or you can rely on the :class:`~freedom.middleware.common.CommonMiddleware`
 middleware to set the ``ETag`` header.
 
 When the client next requests the same resource, it might send along a header
@@ -34,7 +34,7 @@ The ``condition`` decorator
 
 Sometimes (in fact, quite often) you can create functions to rapidly compute the ETag_
 value or the last-modified time for a resource, **without** needing to do all
-the computations needed to construct the full view. Django can then use these
+the computations needed to construct the full view. Freedom can then use these
 functions to provide an "early bailout" option for the view processing.
 Telling the client that the content has not been modified since the last
 request, perhaps.
@@ -42,7 +42,7 @@ request, perhaps.
 .. _ETag: http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.11
 
 These two functions are passed as parameters the
-``django.views.decorators.http.condition`` decorator. This decorator uses
+``freedom.views.decorators.http.condition`` decorator. This decorator uses
 the two functions (you only need to supply one, if you can't compute both
 quantities easily and quickly) to work out if the headers in the HTTP request
 match those on the resource. If they don't match, a new copy of the resource
@@ -64,7 +64,7 @@ Using this feature usefully is probably best explained with an example.
 Suppose you have this pair of models, representing a simple blog system::
 
     import datetime
-    from django.db import models
+    from freedom.db import models
 
     class Blog(models.Model):
         ...
@@ -85,7 +85,7 @@ One way to do this would be::
 You can then use this function to provide early detection of an unchanged page
 for your front page view::
 
-    from django.views.decorators.http import condition
+    from freedom.views.decorators.http import condition
 
     @condition(last_modified_func=latest_entry)
     def front_page(request, blog_id):
@@ -97,11 +97,11 @@ Shortcuts for only computing one value
 As a general rule, if you can provide functions to compute *both* the ETag and
 the last modified time, you should do so. You don't know which headers any
 given HTTP client will send you, so be prepared to handle both. However,
-sometimes only one value is easy to compute and Django provides decorators
+sometimes only one value is easy to compute and Freedom provides decorators
 that handle only ETag or only last-modified computations.
 
-The ``django.views.decorators.http.etag`` and
-``django.views.decorators.http.last_modified`` decorators are passed the same
+The ``freedom.views.decorators.http.etag`` and
+``freedom.views.decorators.http.last_modified`` decorators are passed the same
 type of functions as the ``condition`` decorator. Their signatures are::
 
     etag(etag_func)
@@ -175,10 +175,10 @@ every time.
 Comparison with middleware conditional processing
 =================================================
 
-You may notice that Django already provides simple and straightforward
+You may notice that Freedom already provides simple and straightforward
 conditional ``GET`` handling via the
-:class:`django.middleware.http.ConditionalGetMiddleware` and
-:class:`~django.middleware.common.CommonMiddleware`. Whilst certainly being
+:class:`freedom.middleware.http.ConditionalGetMiddleware` and
+:class:`~freedom.middleware.common.CommonMiddleware`. Whilst certainly being
 easy to use and suitable for many situations, those pieces of middleware
 functionality have limitations for advanced usage:
 

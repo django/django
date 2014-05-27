@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
-from django.db import models
-from django.db.models import signals
-from django.dispatch import receiver
-from django.test import TestCase
-from django.utils import six
+from freedom.db import models
+from freedom.db.models import signals
+from freedom.dispatch import receiver
+from freedom.test import TestCase
+from freedom.utils import six
 
 from .models import Author, Book, Car, Person
 

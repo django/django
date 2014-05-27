@@ -1,4 +1,4 @@
-Thanks for downloading Django.
+Thanks for downloading Freedom.
 
 To install it, make sure you have Python 2.7 or greater installed. Then run
 this command from the command prompt:
@@ -7,7 +7,7 @@ this command from the command prompt:
 
 If you're upgrading from a previous version, you need to remove it first.
 
-AS AN ALTERNATIVE, you can just copy the entire "django" directory to Python's
+AS AN ALTERNATIVE, you can just copy the entire "freedom" directory to Python's
 site-packages directory, which is located wherever your Python installation
 lives. Some places you might check are:
 

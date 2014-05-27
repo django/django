@@ -4,11 +4,11 @@ import os
 import unittest
 import warnings
 
-from django.test import SimpleTestCase, RequestFactory, override_settings
-from django.utils import six, translation
-from django.utils.deprecation import RenameMethodsBase
-from django.utils.encoding import force_text
-from django.utils.functional import memoize
+from freedom.test import SimpleTestCase, RequestFactory, override_settings
+from freedom.utils import six, translation
+from freedom.utils.deprecation import RenameMethodsBase
+from freedom.utils.encoding import force_text
+from freedom.utils.functional import memoize
 
 
 class RenameManagerMethods(RenameMethodsBase):
@@ -221,8 +221,8 @@ class DeprecatingMemoizeTest(SimpleTestCase):
             memoize(lambda x: x, {}, 1)
             msg = str(recorded.pop().message)
             self.assertEqual(msg,
-                'memoize wrapper is deprecated and will be removed in Django '
-                '1.9. Use django.utils.lru_cache instead.')
+                'memoize wrapper is deprecated and will be removed in Freedom '
+                '1.9. Use freedom.utils.lru_cache instead.')
 
 
 class DeprecatingSimpleTestCaseUrls(unittest.TestCase):
@@ -244,5 +244,5 @@ class DeprecatingSimpleTestCaseUrls(unittest.TestCase):
                 msg = force_text(recorded.pop().message)
                 self.assertEqual(msg,
                     "SimpleTestCase.urls is deprecated and will be removed in "
-                    "Django 2.0. Use @override_settings(ROOT_URLCONF=...) "
+                    "Freedom 2.0. Use @override_settings(ROOT_URLCONF=...) "
                     "in TempTestCase instead.")

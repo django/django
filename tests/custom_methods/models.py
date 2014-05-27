@@ -6,8 +6,8 @@ Any method you add to a model will be available to instances.
 
 import datetime
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
@@ -29,7 +29,7 @@ class Article(models.Model):
         Verbose version of get_articles_from_same_day_1, which does a custom
         database query for the sake of demonstration.
         """
-        from django.db import connection
+        from freedom.db import connection
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT id, headline, pub_date

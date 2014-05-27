@@ -2,9 +2,9 @@
 Testing tools
 =============
 
-.. currentmodule:: django.test
+.. currentmodule:: freedom.test
 
-Django provides a small set of tools that come in handy when writing tests.
+Freedom provides a small set of tools that come in handy when writing tests.
 
 .. _test-client:
 
@@ -12,7 +12,7 @@ The test client
 ---------------
 
 The test client is a Python class that acts as a dummy Web browser, allowing
-you to test your views and interact with your Django-powered application
+you to test your views and interact with your Freedom-powered application
 programmatically.
 
 Some of the things you can do with the test client are:
@@ -24,30 +24,30 @@ Some of the things you can do with the test client are:
 * See the chain of redirects (if any) and check the URL and status code at
   each step.
 
-* Test that a given request is rendered by a given Django template, with
+* Test that a given request is rendered by a given Freedom template, with
   a template context that contains certain values.
 
 Note that the test client is not intended to be a replacement for Selenium_ or
-other "in-browser" frameworks. Django's test client has a different focus. In
+other "in-browser" frameworks. Freedom's test client has a different focus. In
 short:
 
-* Use Django's test client to establish that the correct template is being
+* Use Freedom's test client to establish that the correct template is being
   rendered and that the template is passed the correct context data.
 
 * Use in-browser frameworks like Selenium_ to test *rendered* HTML and the
-  *behavior* of Web pages, namely JavaScript functionality. Django also
+  *behavior* of Web pages, namely JavaScript functionality. Freedom also
   provides special support for those frameworks; see the section on
-  :class:`~django.test.LiveServerTestCase` for more details.
+  :class:`~freedom.test.LiveServerTestCase` for more details.
 
 A comprehensive test suite should use a combination of both test types.
 
 Overview and a quick example
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use the test client, instantiate ``django.test.Client`` and retrieve
+To use the test client, instantiate ``freedom.test.Client`` and retrieve
 Web pages::
 
-    >>> from django.test import Client
+    >>> from freedom.test import Client
     >>> c = Client()
     >>> response = c.post('/login/', {'username': 'john', 'password': 'smith'})
     >>> response.status_code
@@ -63,7 +63,7 @@ Note a few important things about how the test client works:
 
 * The test client does *not* require the Web server to be running. In fact,
   it will run just fine with no Web server running at all! That's because
-  it avoids the overhead of HTTP and deals directly with the Django
+  it avoids the overhead of HTTP and deals directly with the Freedom
   framework. This helps make the unit tests run quickly.
 
 * When retrieving pages, remember to specify the *path* of the URL, not the
@@ -76,7 +76,7 @@ Note a few important things about how the test client works:
       >>> c.get('http://www.example.com/login/')
 
   The test client is not capable of retrieving Web pages that are not
-  powered by your Django project. If you need to retrieve other Web pages,
+  powered by your Freedom project. If you need to retrieve other Web pages,
   use a Python standard library module such as :mod:`urllib`.
 
 * To resolve URLs, the test client uses whatever URLconf is pointed-to by
@@ -87,9 +87,9 @@ Note a few important things about how the test client works:
   template-related functionality, is only available *while tests are
   running*.
 
-  The reason for this is that Django's test runner performs a bit of black
+  The reason for this is that Freedom's test runner performs a bit of black
   magic in order to determine which template was loaded by a given view.
-  This black magic (essentially a patching of Django's template system in
+  This black magic (essentially a patching of Freedom's template system in
   memory) only happens during test running.
 
 * By default, the test client will disable any CSRF checks
@@ -101,13 +101,13 @@ Note a few important things about how the test client works:
   ``enforce_csrf_checks`` argument when you construct your
   client::
 
-      >>> from django.test import Client
+      >>> from freedom.test import Client
       >>> csrf_client = Client(enforce_csrf_checks=True)
 
 Making requests
 ~~~~~~~~~~~~~~~
 
-Use the ``django.test.Client`` class to make requests.
+Use the ``freedom.test.Client`` class to make requests.
 
 .. class:: Client(enforce_csrf_checks=False, **defaults)
 
@@ -118,8 +118,8 @@ Use the ``django.test.Client`` class to make requests.
         >>> c = Client(HTTP_USER_AGENT='Mozilla/5.0')
 
     The values from the ``extra`` keywords arguments passed to
-    :meth:`~django.test.Client.get()`,
-    :meth:`~django.test.Client.post()`, etc. have precedence over
+    :meth:`~freedom.test.Client.get()`,
+    :meth:`~freedom.test.Client.post()`, etc. have precedence over
     the defaults passed to the class constructor.
 
     The ``enforce_csrf_checks`` argument can be used to test CSRF
@@ -156,7 +156,7 @@ Use the ``django.test.Client`` class to make requests.
 
         ...will send the HTTP header ``HTTP_X_REQUESTED_WITH`` to the
         details view, which is a good way to test code paths that use the
-        :meth:`django.http.HttpRequest.is_ajax()` method.
+        :meth:`freedom.http.HttpRequest.is_ajax()` method.
 
         .. admonition:: CGI specification
 
@@ -318,7 +318,7 @@ Use the ``django.test.Client`` class to make requests.
 
     .. method:: Client.login(**credentials)
 
-        If your site uses Django's :doc:`authentication system</topics/auth/index>`
+        If your site uses Freedom's :doc:`authentication system</topics/auth/index>`
         and you deal with logging in users, you can use the test client's
         ``login()`` method to simulate the effect of a user logging into the
         site.
@@ -331,7 +331,7 @@ Use the ``django.test.Client`` class to make requests.
         :ref:`authentication backend <authentication-backends>` you're using
         (which is configured by your :setting:`AUTHENTICATION_BACKENDS`
         setting). If you're using the standard authentication backend provided
-        by Django (``ModelBackend``), ``credentials`` should be the user's
+        by Freedom (``ModelBackend``), ``credentials`` should be the user's
         username and password, provided as keyword arguments::
 
             >>> c = Client()
@@ -351,31 +351,31 @@ Use the ``django.test.Client`` class to make requests.
         using a test database, which contains no users by default. As a result,
         user accounts that are valid on your production site will not work
         under test conditions. You'll need to create users as part of the test
-        suite -- either manually (using the Django model API) or with a test
+        suite -- either manually (using the Freedom model API) or with a test
         fixture. Remember that if you want your test user to have a password,
         you can't set the user's password by setting the password attribute
         directly -- you must use the
-        :meth:`~django.contrib.auth.models.User.set_password()` function to
+        :meth:`~freedom.contrib.auth.models.User.set_password()` function to
         store a correctly hashed password. Alternatively, you can use the
-        :meth:`~django.contrib.auth.models.UserManager.create_user` helper
+        :meth:`~freedom.contrib.auth.models.UserManager.create_user` helper
         method to create a new user with a correctly hashed password.
 
     .. method:: Client.logout()
 
-        If your site uses Django's :doc:`authentication system</topics/auth/index>`,
+        If your site uses Freedom's :doc:`authentication system</topics/auth/index>`,
         the ``logout()`` method can be used to simulate the effect of a user
         logging out of your site.
 
         After you call this method, the test client will have all the cookies
         and session data cleared to defaults. Subsequent requests will appear
-        to come from an :class:`~django.contrib.auth.models.AnonymousUser`.
+        to come from an :class:`~freedom.contrib.auth.models.AnonymousUser`.
 
 Testing responses
 ~~~~~~~~~~~~~~~~~
 
 The ``get()`` and ``post()`` methods both return a ``Response`` object. This
 ``Response`` object is *not* the same as the ``HttpResponse`` object returned
-Django views; the test response object has some additional data useful for
+Freedom views; the test response object has some additional data useful for
 test code to verify.
 
 Specifically, a ``Response`` object has the following attributes:
@@ -444,7 +444,7 @@ will be visible in the test case. You can then use a standard ``try ... except``
 block or :meth:`~unittest.TestCase.assertRaises` to test for exceptions.
 
 The only exceptions that are not visible to the test client are ``Http404``,
-``PermissionDenied`` and ``SystemExit``. Django catches these exceptions
+``PermissionDenied`` and ``SystemExit``. Freedom catches these exceptions
 internally and converts them into the appropriate HTTP response codes. In these
 cases, you can check ``response.status_code`` in your test.
 
@@ -488,7 +488,7 @@ Example
 The following is a simple unit test using the test client::
 
     import unittest
-    from django.test import Client
+    from freedom.test import Client
 
     class SimpleTest(unittest.TestCase):
         def setUp(self):
@@ -507,24 +507,24 @@ The following is a simple unit test using the test client::
 
 .. seealso::
 
-    :class:`django.test.RequestFactory`
+    :class:`freedom.test.RequestFactory`
 
-.. _django-testcase-subclasses:
+.. _freedom-testcase-subclasses:
 
 Provided test case classes
 --------------------------
 
 Normal Python unit test classes extend a base class of
-:class:`unittest.TestCase`. Django provides a few extensions of this base class:
+:class:`unittest.TestCase`. Freedom provides a few extensions of this base class:
 
 .. _testcase_hierarchy_diagram:
 
-.. figure:: _images/django_unittest_classes_hierarchy.*
-   :alt: Hierarchy of Django unit testing classes (TestCase subclasses)
+.. figure:: _images/freedom_unittest_classes_hierarchy.*
+   :alt: Hierarchy of Freedom unit testing classes (TestCase subclasses)
    :width: 508
    :height: 328
 
-   Hierarchy of Django unit testing classes
+   Hierarchy of Freedom unit testing classes
 
 SimpleTestCase
 ~~~~~~~~~~~~~~
@@ -555,10 +555,10 @@ functionality like:
     for equality.
 
 * The ability to run tests with :ref:`modified settings <overriding-settings>`.
-* Using the :attr:`~SimpleTestCase.client` :class:`~django.test.Client`.
+* Using the :attr:`~SimpleTestCase.client` :class:`~freedom.test.Client`.
 * Custom test-time :attr:`URL maps <SimpleTestCase.urls>`.
 
-If you need any of the other more complex and heavyweight Django-specific
+If you need any of the other more complex and heavyweight Freedom-specific
 features like:
 
 * Testing or using the ORM.
@@ -567,8 +567,8 @@ features like:
 * The remaining specialized :meth:`assert*
   <TransactionTestCase.assertQuerysetEqual>` methods.
 
-then you should use :class:`~django.test.TransactionTestCase` or
-:class:`~django.test.TestCase` instead.
+then you should use :class:`~freedom.test.TransactionTestCase` or
+:class:`~freedom.test.TestCase` instead.
 
 ``SimpleTestCase`` inherits from ``unittest.TestCase``.
 
@@ -577,12 +577,12 @@ TransactionTestCase
 
 .. class:: TransactionTestCase()
 
-Django's ``TestCase`` class (described below) makes use of database transaction
+Freedom's ``TestCase`` class (described below) makes use of database transaction
 facilities to speed up the process of resetting the database to a known state
 at the beginning of each test. A consequence of this, however, is that the
-effects of transaction commit and rollback cannot be tested by a Django
+effects of transaction commit and rollback cannot be tested by a Freedom
 ``TestCase`` class. If your test requires testing of such transactional
-behavior, you should use a Django ``TransactionTestCase``.
+behavior, you should use a Freedom ``TransactionTestCase``.
 
 ``TransactionTestCase`` and ``TestCase`` are identical except for the manner
 in which the database is reset to a known state and the ability for test code
@@ -611,7 +611,7 @@ to test the effects of commit and rollback:
     database. This can cause your tests to pass or fail unexpectedly. Always
     use ``TransactionTestCase`` when testing transactional behavior.
 
-``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase`.
+``TransactionTestCase`` inherits from :class:`~freedom.test.SimpleTestCase`.
 
 TestCase
 ~~~~~~~~
@@ -621,9 +621,9 @@ TestCase
 This class provides some additional capabilities that can be useful for testing
 Web sites.
 
-Converting a normal :class:`unittest.TestCase` to a Django :class:`TestCase` is
+Converting a normal :class:`unittest.TestCase` to a Freedom :class:`TestCase` is
 easy: Just change the base class of your test from ``'unittest.TestCase'`` to
-``'django.test.TestCase'``. All of the standard Python unit test functionality
+``'freedom.test.TestCase'``. All of the standard Python unit test functionality
 will continue to be available, but it will be augmented with some useful
 additions, including:
 
@@ -633,10 +633,10 @@ additions, including:
 
 * Creates a TestClient instance.
 
-* Django-specific assertions for testing for things like redirection and form
+* Freedom-specific assertions for testing for things like redirection and form
   errors.
 
-``TestCase`` inherits from :class:`~django.test.TransactionTestCase`.
+``TestCase`` inherits from :class:`~freedom.test.TransactionTestCase`.
 
 .. _live-test-server:
 
@@ -646,10 +646,10 @@ LiveServerTestCase
 .. class:: LiveServerTestCase()
 
 ``LiveServerTestCase`` does basically the same as
-:class:`~django.test.TransactionTestCase` with one extra feature: it launches a
-live Django server in the background on setup, and shuts it down on teardown.
+:class:`~freedom.test.TransactionTestCase` with one extra feature: it launches a
+live Freedom server in the background on setup, and shuts it down on teardown.
 This allows the use of automated test clients other than the
-:ref:`Django dummy client <test-client>` such as, for example, the Selenium_
+:ref:`Freedom dummy client <test-client>` such as, for example, the Selenium_
 client, to execute a series of functional tests inside a browser and simulate a
 real user's actions.
 
@@ -701,7 +701,7 @@ Then, add a ``LiveServerTestCase``-based test to your app's tests module
 
 .. code-block:: python
 
-    from django.test import LiveServerTestCase
+    from freedom.test import LiveServerTestCase
     from selenium.webdriver.firefox.webdriver import WebDriver
 
     class MySeleniumTests(LiveServerTestCase):
@@ -744,12 +744,12 @@ out the `full reference`_ for more details.
 
 .. versionchanged:: 1.7
 
-    Before Django 1.7 ``LiveServerTestCase`` used to rely on the
+    Before Freedom 1.7 ``LiveServerTestCase`` used to rely on the
     :doc:`staticfiles contrib app </howto/static-files/index>` to get the
     static assets of the application(s) under test transparently served at their
     expected locations during the execution of these tests.
 
-    In Django 1.7 this dependency of core functionality on a ``contrib``
+    In Freedom 1.7 this dependency of core functionality on a ``contrib``
     application has been removed, because of which ``LiveServerTestCase``
     ability in this respect has been retrofitted to simply publish the contents
     of the file system under :setting:`STATIC_ROOT` at the :setting:`STATIC_URL`
@@ -757,7 +757,7 @@ out the `full reference`_ for more details.
 
     If you use the ``staticfiles`` app in your project and need to perform live
     testing then you might want to consider using the
-    :class:`~django.contrib.staticfiles.testing.StaticLiveServerCase` subclass
+    :class:`~freedom.contrib.staticfiles.testing.StaticLiveServerCase` subclass
     shipped with it instead because it's the one that implements the original
     behavior now. See :ref:`the relevant documentation
     <staticfiles-testing-support>` for more details.
@@ -806,15 +806,15 @@ Default test client
 
 .. attribute:: SimpleTestCase.client
 
-Every test case in a ``django.test.*TestCase`` instance has access to an
-instance of a Django test client. This client can be accessed as
+Every test case in a ``freedom.test.*TestCase`` instance has access to an
+instance of a Freedom test client. This client can be accessed as
 ``self.client``. This client is recreated for each test, so you don't have to
 worry about state (such as cookies) carrying over from one test to another.
 
 This means, instead of instantiating a ``Client`` in each test::
 
     import unittest
-    from django.test import Client
+    from freedom.test import Client
 
     class SimpleTest(unittest.TestCase):
         def test_details(self):
@@ -829,7 +829,7 @@ This means, instead of instantiating a ``Client`` in each test::
 
 ...you can just refer to ``self.client``, like so::
 
-    from django.test import TestCase
+    from freedom.test import TestCase
 
     class SimpleTest(TestCase):
         def test_details(self):
@@ -849,7 +849,7 @@ If you want to use a different ``Client`` class (for example, a subclass
 with customized behavior), use the :attr:`~SimpleTestCase.client_class` class
 attribute::
 
-    from django.test import TestCase, Client
+    from freedom.test import TestCase, Client
 
     class MyTestClient(Client):
         # Specialized methods for your environment...
@@ -870,10 +870,10 @@ Fixture loading
 
 A test case for a database-backed Web site isn't much use if there isn't any
 data in the database. To make it easy to put test data into the database,
-Django's custom ``TransactionTestCase`` class provides a way of loading
+Freedom's custom ``TransactionTestCase`` class provides a way of loading
 **fixtures**.
 
-A fixture is a collection of data that Django knows how to import into a
+A fixture is a collection of data that Freedom knows how to import into a
 database. For example, if your site has user accounts, you might set up a
 fixture of fake user accounts in order to populate your database during tests.
 
@@ -886,7 +886,7 @@ documentation<dumpdata>` for more details.
 
     If you've ever run :djadmin:`manage.py migrate<migrate>`, you've
     already used a fixture without even knowing it! When you call
-    :djadmin:`migrate` in the database for the first time, Django
+    :djadmin:`migrate` in the database for the first time, Freedom
     installs a fixture called ``initial_data``. This gives you a way
     of populating a new database with any initial data, such as a
     default set of categories.
@@ -896,19 +896,19 @@ documentation<dumpdata>` for more details.
 
 .. admonition:: Initial SQL data and testing
 
-    Django provides a second way to insert initial data into models --
+    Freedom provides a second way to insert initial data into models --
     the :ref:`custom SQL hook <initial-sql>`. However, this technique
     *cannot* be used to provide initial data for testing purposes.
-    Django's test framework flushes the contents of the test database
+    Freedom's test framework flushes the contents of the test database
     after each test; as a result, any data added using the custom SQL
     hook will be lost.
 
 Once you've created a fixture and placed it in a ``fixtures`` directory in one
 of your :setting:`INSTALLED_APPS`, you can use it in your unit tests by
-specifying a ``fixtures`` class attribute on your :class:`django.test.TestCase`
+specifying a ``fixtures`` class attribute on your :class:`freedom.test.TestCase`
 subclass::
 
-    from django.test import TestCase
+    from freedom.test import TestCase
     from myapp.models import Animal
 
     class AnimalTestCase(TestCase):
@@ -924,11 +924,11 @@ subclass::
 
 Here's specifically what will happen:
 
-* At the start of each test case, before ``setUp()`` is run, Django will
+* At the start of each test case, before ``setUp()`` is run, Freedom will
   flush the database, returning the database to the state it was in
   directly after :djadmin:`migrate` was called.
 
-* Then, all the named fixtures are installed. In this example, Django will
+* Then, all the named fixtures are installed. In this example, Freedom will
   install any JSON fixture named ``mammals``, followed by any fixture named
   ``birds``. See the :djadmin:`loaddata` documentation for more
   details on defining and installing fixtures.
@@ -958,7 +958,7 @@ tests can't rely upon the fact that your views will be available at a
 particular URL.
 
 In order to provide a reliable URL space for your test,
-``django.test.*TestCase`` classes provide the ability to customize the URLconf
+``freedom.test.*TestCase`` classes provide the ability to customize the URLconf
 configuration for the duration of the execution of a test suite. If your
 ``*TestCase`` instance defines an ``urls`` attribute, the ``*TestCase`` will use
 the value of that attribute as the :setting:`ROOT_URLCONF` for the duration
@@ -966,7 +966,7 @@ of that test.
 
 For example::
 
-    from django.test import TestCase
+    from freedom.test import TestCase
 
     class TestMyViews(TestCase):
         urls = 'myapp.test_urls'
@@ -985,16 +985,16 @@ Multi-database support
 
 .. attribute:: TransactionTestCase.multi_db
 
-Django sets up a test database corresponding to every database that is
+Freedom sets up a test database corresponding to every database that is
 defined in the :setting:`DATABASES` definition in your settings
-file. However, a big part of the time taken to run a Django TestCase
+file. However, a big part of the time taken to run a Freedom TestCase
 is consumed by the call to ``flush`` that ensures that you have a
 clean database at the start of each test run. If you have multiple
 databases, multiple flushes are required (one for each database),
 which can be a time consuming activity -- especially if your tests
 don't need to test multi-database activity.
 
-As an optimization, Django only flushes the ``default`` database at
+As an optimization, Freedom only flushes the ``default`` database at
 the start of each test run. If your setup contains multiple databases,
 and you have a test that requires every database to be clean, you can
 use the ``multi_db`` attribute on the test suite to request a full
@@ -1025,10 +1025,10 @@ Overriding settings
 
 For testing purposes it's often useful to change a setting temporarily and
 revert to the original value after running the testing code. For this use case
-Django provides a standard Python context manager (see :pep:`343`) called
-:meth:`~django.test.SimpleTestCase.settings`, which can be used like this::
+Freedom provides a standard Python context manager (see :pep:`343`) called
+:meth:`~freedom.test.SimpleTestCase.settings`, which can be used like this::
 
-    from django.test import TestCase
+    from freedom.test import TestCase
 
     class LoginTestCase(TestCase):
 
@@ -1052,21 +1052,21 @@ in the ``with`` block and reset its value to the previous state afterwards.
 
 It can prove unwieldy to redefine settings that contain a list of values. In
 practice, adding or removing values is often sufficient. The
-:meth:`~django.test.SimpleTestCase.modify_settings` context manager makes it
+:meth:`~freedom.test.SimpleTestCase.modify_settings` context manager makes it
 easy::
 
-    from django.test import TestCase
+    from freedom.test import TestCase
 
     class MiddlewareTestCase(TestCase):
 
         def test_cache_middleware(self):
             with self.modify_settings(MIDDLEWARE_CLASSES={
-                'append': 'django.middleware.cache.FetchFromCacheMiddleware',
-                'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+                'append': 'freedom.middleware.cache.FetchFromCacheMiddleware',
+                'prepend': 'freedom.middleware.cache.UpdateCacheMiddleware',
                 'remove': [
-                    'django.contrib.sessions.middleware.SessionMiddleware',
-                    'django.contrib.auth.middleware.AuthenticationMiddleware',
-                    'django.contrib.messages.middleware.MessageMiddleware',
+                    'freedom.contrib.sessions.middleware.SessionMiddleware',
+                    'freedom.contrib.auth.middleware.AuthenticationMiddleware',
+                    'freedom.contrib.messages.middleware.MessageMiddleware',
                 ],
             }):
                 response = self.client.get('/')
@@ -1078,11 +1078,11 @@ neither does ``remove`` when the value doesn't exist.
 
 .. function:: override_settings
 
-In case you want to override a setting for a test method, Django provides the
-:func:`~django.test.override_settings` decorator (see :pep:`318`). It's used
+In case you want to override a setting for a test method, Freedom provides the
+:func:`~freedom.test.override_settings` decorator (see :pep:`318`). It's used
 like this::
 
-    from django.test import TestCase, override_settings
+    from freedom.test import TestCase, override_settings
 
     class LoginTestCase(TestCase):
 
@@ -1091,9 +1091,9 @@ like this::
             response = self.client.get('/sekrit/')
             self.assertRedirects(response, '/other/login/?next=/sekrit/')
 
-The decorator can also be applied to :class:`~django.test.TestCase` classes::
+The decorator can also be applied to :class:`~freedom.test.TestCase` classes::
 
-    from django.test import TestCase, override_settings
+    from freedom.test import TestCase, override_settings
 
     @override_settings(LOGIN_URL='/other/login/')
     class LoginTestCase(TestCase):
@@ -1104,22 +1104,22 @@ The decorator can also be applied to :class:`~django.test.TestCase` classes::
 
 .. versionchanged:: 1.7
 
-    Previously, ``override_settings`` was imported from ``django.test.utils``.
+    Previously, ``override_settings`` was imported from ``freedom.test.utils``.
 
 .. function:: modify_settings
 
 .. versionadded:: 1.7
 
-Likewise, Django provides the :func:`~django.test.modify_settings`
+Likewise, Freedom provides the :func:`~freedom.test.modify_settings`
 decorator::
 
-    from django.test import TestCase, modify_settings
+    from freedom.test import TestCase, modify_settings
 
     class MiddlewareTestCase(TestCase):
 
         @modify_settings(MIDDLEWARE_CLASSES={
-            'append': 'django.middleware.cache.FetchFromCacheMiddleware',
-            'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+            'append': 'freedom.middleware.cache.FetchFromCacheMiddleware',
+            'prepend': 'freedom.middleware.cache.UpdateCacheMiddleware',
         })
         def test_cache_middleware(self):
             response = self.client.get('/')
@@ -1127,11 +1127,11 @@ decorator::
 
 The decorator can also be applied to test case classes::
 
-    from django.test import TestCase, modify_settings
+    from freedom.test import TestCase, modify_settings
 
     @modify_settings(MIDDLEWARE_CLASSES={
-        'append': 'django.middleware.cache.FetchFromCacheMiddleware',
-        'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
+        'append': 'freedom.middleware.cache.FetchFromCacheMiddleware',
+        'prepend': 'freedom.middleware.cache.UpdateCacheMiddleware',
     })
     class MiddlewareTestCase(TestCase):
 
@@ -1146,23 +1146,23 @@ The decorator can also be applied to test case classes::
     tweak the above examples to assign the return value to a different name
     than ``LoginTestCase`` or ``MiddlewareTestCase``, you may be surprised to
     find that the original test case classes are still equally affected by the
-    decorator. For a given class, :func:`~django.test.modify_settings` is
-    always applied after :func:`~django.test.override_settings`.
+    decorator. For a given class, :func:`~freedom.test.modify_settings` is
+    always applied after :func:`~freedom.test.override_settings`.
 
 .. warning::
 
     The settings file contains some settings that are only consulted during
-    initialization of Django internals. If you change them with
+    initialization of Freedom internals. If you change them with
     ``override_settings``, the setting is changed if you access it via the
-    ``django.conf.settings`` module, however, Django's internals access it
-    differently. Effectively, using :func:`~django.test.override_settings` or
-    :func:`~django.test.modify_settings` with these settings is probably not
+    ``freedom.conf.settings`` module, however, Freedom's internals access it
+    differently. Effectively, using :func:`~freedom.test.override_settings` or
+    :func:`~freedom.test.modify_settings` with these settings is probably not
     going to do what you expect it to do.
 
     We do not recommend altering the :setting:`DATABASES` setting. Altering
     the :setting:`CACHES` setting is possible, but a bit tricky if you are
     using internals that make using of caching, like
-    :mod:`django.contrib.sessions`. For example, you will have to reinitialize
+    :mod:`freedom.contrib.sessions`. For example, you will have to reinitialize
     the session backend in a test that uses cached sessions and overrides
     :setting:`CACHES`.
 
@@ -1185,11 +1185,11 @@ have been overridden, like this::
 
 When overriding settings, make sure to handle the cases in which your app's
 code uses a cache or similar feature that retains state even if the setting is
-changed. Django provides the :data:`django.test.signals.setting_changed`
+changed. Freedom provides the :data:`freedom.test.signals.setting_changed`
 signal that lets you register callbacks to clean up and otherwise reset state
 when settings are changed.
 
-Django itself uses this signal to reset various data:
+Freedom itself uses this signal to reset various data:
 
 ================================ ========================
 Overridden settings              Data reset
@@ -1205,7 +1205,7 @@ MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage
 Emptying the test outbox
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you use any of Django's custom ``TestCase`` classes, the test runner will
+If you use any of Freedom's custom ``TestCase`` classes, the test runner will
 clear the contents of the test email outbox at the start of each test case.
 
 For more detail on email services during tests, see `Email services`_ below.
@@ -1217,7 +1217,7 @@ Assertions
 
 As Python's normal :class:`unittest.TestCase` class implements assertion methods
 such as :meth:`~unittest.TestCase.assertTrue` and
-:meth:`~unittest.TestCase.assertEqual`, Django's custom :class:`TestCase` class
+:meth:`~unittest.TestCase.assertEqual`, Freedom's custom :class:`TestCase` class
 provides a number of custom assertion methods that are useful for testing Web
 applications:
 
@@ -1264,7 +1264,7 @@ your test suite.
 
     ``field`` is the name of the field on the form to check. If ``field``
     has a value of ``None``, non-field errors (errors you can access via
-    :meth:`form.non_field_errors() <django.forms.Form.non_field_errors>`) will
+    :meth:`form.non_field_errors() <freedom.forms.Form.non_field_errors>`) will
     be checked.
 
     ``errors`` is an error string, or a list of error strings, that are
@@ -1284,7 +1284,7 @@ your test suite.
 
     ``field`` is the name of the field on the form to check. If ``field``
     has a value of ``None``, non-field errors (errors you can access via
-    :meth:`form.non_field_errors() <django.forms.Form.non_field_errors>`) will
+    :meth:`form.non_field_errors() <freedom.forms.Form.non_field_errors>`) will
     be checked.
 
     ``errors`` is an error string, or a list of error strings, that are
@@ -1355,7 +1355,7 @@ your test suite.
 
     If ``fetch_redirect_response`` is ``False``, the final page won't be
     loaded. Since the test client can't fetch externals URLs, this is
-    particularly useful if ``expected_url`` isn't part of your Django app.
+    particularly useful if ``expected_url`` isn't part of your Freedom app.
 
     .. versionadded:: 1.7
 
@@ -1498,35 +1498,35 @@ your test suite.
 Email services
 --------------
 
-If any of your Django views send email using :doc:`Django's email
+If any of your Freedom views send email using :doc:`Freedom's email
 functionality </topics/email>`, you probably don't want to send email each time
-you run a test using that view. For this reason, Django's test runner
-automatically redirects all Django-sent email to a dummy outbox. This lets you
+you run a test using that view. For this reason, Freedom's test runner
+automatically redirects all Freedom-sent email to a dummy outbox. This lets you
 test every aspect of sending email -- from the number of messages sent to the
 contents of each message -- without actually sending the messages.
 
 The test runner accomplishes this by transparently replacing the normal
 email backend with a testing backend.
 (Don't worry -- this has no effect on any other email senders outside of
-Django, such as your machine's mail server, if you're running one.)
+Freedom, such as your machine's mail server, if you're running one.)
 
-.. currentmodule:: django.core.mail
+.. currentmodule:: freedom.core.mail
 
-.. data:: django.core.mail.outbox
+.. data:: freedom.core.mail.outbox
 
 During test running, each outgoing email is saved in
-``django.core.mail.outbox``. This is a simple list of all
-:class:`~django.core.mail.EmailMessage` instances that have been sent.
+``freedom.core.mail.outbox``. This is a simple list of all
+:class:`~freedom.core.mail.EmailMessage` instances that have been sent.
 The ``outbox`` attribute is a special attribute that is created *only* when
 the ``locmem`` email backend is used. It doesn't normally exist as part of the
-:mod:`django.core.mail` module and you can't import it directly. The code
+:mod:`freedom.core.mail` module and you can't import it directly. The code
 below shows how to access this attribute correctly.
 
-Here's an example test that examines ``django.core.mail.outbox`` for length
+Here's an example test that examines ``freedom.core.mail.outbox`` for length
 and contents::
 
-    from django.core import mail
-    from django.test import TestCase
+    from freedom.core import mail
+    from freedom.test import TestCase
 
     class EmailTest(TestCase):
         def test_send_email(self):
@@ -1542,10 +1542,10 @@ and contents::
             self.assertEqual(mail.outbox[0].subject, 'Subject here')
 
 As noted :ref:`previously <emptying-test-outbox>`, the test outbox is emptied
-at the start of every test in a Django ``*TestCase``. To empty the outbox
+at the start of every test in a Freedom ``*TestCase``. To empty the outbox
 manually, assign the empty list to ``mail.outbox``::
 
-    from django.core import mail
+    from freedom.core import mail
 
     # Empty the test outbox
     mail.outbox = []
@@ -1555,7 +1555,7 @@ manually, assign the empty list to ``mail.outbox``::
 Skipping tests
 --------------
 
-.. currentmodule:: django.test
+.. currentmodule:: freedom.test
 
 The unittest library provides the :func:`@skipIf <unittest.skipIf>` and
 :func:`@skipUnless <unittest.skipUnless>` decorators to allow you to skip tests
@@ -1567,14 +1567,14 @@ succeed, you could decorate the test case with :func:`@skipIf
 <unittest.skipIf>`. Then, the test runner will report that the test wasn't
 executed and why, instead of failing the test or omitting the test altogether.
 
-To supplement these test skipping behaviors, Django provides two
+To supplement these test skipping behaviors, Freedom provides two
 additional skip decorators. Instead of testing a generic boolean,
 these decorators check the capabilities of the database, and skip the
 test if the database doesn't support a specific named feature.
 
 The decorators use a string identifier to describe database features.
 This string corresponds to attributes of the database connection
-features class. See ``django.db.backends.BaseDatabaseFeatures``
+features class. See ``freedom.db.backends.BaseDatabaseFeatures``
 class for a full list of database features that can be used as a basis
 for skipping tests.
 

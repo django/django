@@ -2,13 +2,13 @@ from __future__ import unicode_literals
 
 from unittest import expectedFailure
 
-from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
-from django import forms
-from django.test import TestCase, override_settings
-from django.test.client import RequestFactory
-from django.views.generic.base import View
-from django.views.generic.edit import FormMixin, ModelFormMixin, CreateView
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.core.urlresolvers import reverse
+from freedom import forms
+from freedom.test import TestCase, override_settings
+from freedom.test.client import RequestFactory
+from freedom.views.generic.base import View
+from freedom.views.generic.edit import FormMixin, ModelFormMixin, CreateView
 
 from . import views
 from .models import Artist, Author
@@ -203,7 +203,7 @@ class UpdateViewTests(TestCase):
         res = self.client.put('/edit/author/%d/update/' % a.pk,
                         {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'})
         # Here is the expected failure. PUT data are not processed in any special
-        # way by django. So the request will equal to a POST without data, hence
+        # way by freedom. So the request will equal to a POST without data, hence
         # the form will be invalid and redisplayed with errors (status code 200).
         # See also #12635
         self.assertEqual(res.status_code, 302)

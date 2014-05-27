@@ -10,10 +10,10 @@ from __future__ import unicode_literals
 
 from datetime import date, datetime, time, timedelta
 
-from django.test.utils import str_prefix, TZ_SUPPORT
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.safestring import mark_safe
-from django.utils import timezone
+from freedom.test.utils import str_prefix, TZ_SUPPORT
+from freedom.utils.encoding import python_2_unicode_compatible
+from freedom.utils.safestring import mark_safe
+from freedom.utils import timezone
 
 # These two classes are used to test auto-escaping of __unicode__ output.
 
@@ -319,8 +319,8 @@ def get_filter_tests():
         'length01': ('{{ list|length }}', {'list': ['4', None, True, {}]}, '4'),
         'length02': ('{{ list|length }}', {'list': []}, '0'),
         'length03': ('{{ string|length }}', {'string': ''}, '0'),
-        'length04': ('{{ string|length }}', {'string': 'django'}, '6'),
-        'length05': ('{% if string|length == 6 %}Pass{% endif %}', {'string': mark_safe('django')}, 'Pass'),
+        'length04': ('{{ string|length }}', {'string': 'freedom'}, '6'),
+        'length05': ('{% if string|length == 6 %}Pass{% endif %}', {'string': mark_safe('freedom')}, 'Pass'),
         # Invalid uses that should fail silently.
         'length06': ('{{ int|length }}', {'int': 7}, ''),
         'length07': ('{{ None|length }}', {'None': None}, ''),
@@ -331,12 +331,12 @@ def get_filter_tests():
         'length_is03': ('{% if mystring|length_is:"4" %}Four{% endif %}', {'mystring': 'word'}, 'Four'),
         'length_is04': ('{% if mystring|length_is:"4" %}Four{% else %}Not Four{% endif %}', {'mystring': 'Python'}, 'Not Four'),
         'length_is05': ('{% if mystring|length_is:"4" %}Four{% else %}Not Four{% endif %}', {'mystring': ''}, 'Not Four'),
-        'length_is06': ('{% with var|length as my_length %}{{ my_length }}{% endwith %}', {'var': 'django'}, '6'),
+        'length_is06': ('{% with var|length as my_length %}{{ my_length }}{% endwith %}', {'var': 'freedom'}, '6'),
         # Boolean return value from length_is should not be coerced to a string
         'length_is07': (r'{% if "X"|length_is:0 %}Length is 0{% else %}Length not 0{% endif %}', {}, 'Length not 0'),
         'length_is08': (r'{% if "X"|length_is:1 %}Length is 1{% else %}Length not 1{% endif %}', {}, 'Length is 1'),
         # Invalid uses that should fail silently.
-        'length_is09': ('{{ var|length_is:"fish" }}', {'var': 'django'}, ''),
+        'length_is09': ('{{ var|length_is:"fish" }}', {'var': 'freedom'}, ''),
         'length_is10': ('{{ int|length_is:"1" }}', {'int': 7}, ''),
         'length_is11': ('{{ none|length_is:"1" }}', {'none': None}, ''),
 

@@ -2,22 +2,22 @@
 from __future__ import unicode_literals
 import warnings
 
-from django.contrib import admin
-from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.models import User
-from django.contrib.contenttypes.admin import GenericTabularInline
-from django.contrib.contenttypes.forms import generic_inlineformset_factory
-from django.forms.formsets import DEFAULT_MAX_NUM
-from django.forms.models import ModelForm
-from django.test import TestCase, override_settings, RequestFactory
-from django.utils.deprecation import RemovedInDjango19Warning
+from freedom.contrib import admin
+from freedom.contrib.admin.sites import AdminSite
+from freedom.contrib.auth.models import User
+from freedom.contrib.contenttypes.admin import GenericTabularInline
+from freedom.contrib.contenttypes.forms import generic_inlineformset_factory
+from freedom.forms.formsets import DEFAULT_MAX_NUM
+from freedom.forms.models import ModelForm
+from freedom.test import TestCase, override_settings, RequestFactory
+from freedom.utils.deprecation import RemovedInFreedom19Warning
 
 # local test models
 from .admin import MediaInline, MediaPermanentInline, site as admin_site
 from .models import Episode, Media, EpisodePermanent, Category
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    TEMPLATE_DEBUG=True,
                    ROOT_URLCONF="generic_inline_admin.urls")
 class GenericAdminViewTest(TestCase):
@@ -33,7 +33,7 @@ class GenericAdminViewTest(TestCase):
         # Can't load content via a fixture (since the GenericForeignKey
         # relies on content type IDs, which will vary depending on what
         # other tests have been run), thus we do it here.
-        e = Episode.objects.create(name='This Week in Django')
+        e = Episode.objects.create(name='This Week in Freedom')
         self.episode_pk = e.pk
         m = Media(content_object=e, url='http://example.com/podcast.mp3')
         m.save()
@@ -65,7 +65,7 @@ class GenericAdminViewTest(TestCase):
         A smoke test to ensure POST on add_view works.
         """
         post_data = {
-            "name": "This Week in Django",
+            "name": "This Week in Freedom",
             # inline data
             "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": "1",
             "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": "0",
@@ -79,7 +79,7 @@ class GenericAdminViewTest(TestCase):
         A smoke test to ensure POST on edit_view works.
         """
         post_data = {
-            "name": "This Week in Django",
+            "name": "This Week in Freedom",
             # inline data
             "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": "3",
             "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": "2",
@@ -97,7 +97,7 @@ class GenericAdminViewTest(TestCase):
 
     def testGenericInlineFormset(self):
         EpisodeMediaFormSet = generic_inlineformset_factory(Media, can_delete=False, exclude=['description', 'keywords'], extra=3)
-        e = Episode.objects.get(name='This Week in Django')
+        e = Episode.objects.get(name='This Week in Freedom')
 
         # Works with no queryset
         formset = EpisodeMediaFormSet(instance=e)
@@ -125,12 +125,12 @@ class GenericAdminViewTest(TestCase):
             exclude=('url',))
 
         # Regression test for #12340.
-        e = Episode.objects.get(name='This Week in Django')
+        e = Episode.objects.get(name='This Week in Freedom')
         formset = inline_formset(instance=e)
         self.assertTrue(formset.get_queryset().ordered)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF="generic_inline_admin.urls")
 class GenericInlineAdminParametersTest(TestCase):
     fixtures = ['users.xml']
@@ -149,7 +149,7 @@ class GenericInlineAdminParametersTest(TestCase):
         content type IDs, which will vary depending on what other tests
         have been run), thus we do it here.
         """
-        e = model.objects.create(name='This Week in Django')
+        e = model.objects.create(name='This Week in Freedom')
         Media.objects.create(content_object=e, url='http://example.com/podcast.mp3')
         return e
 
@@ -223,7 +223,7 @@ class GenericInlineAdminParametersTest(TestCase):
         self.assertEqual(formset.initial_form_count(), 1)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF="generic_inline_admin.urls")
 class GenericInlineAdminWithUniqueTogetherTest(TestCase):
     fixtures = ['users.xml']
@@ -417,7 +417,7 @@ class GenericInlineModelAdminTest(TestCase):
             # Verify that the deprecation warning was triggered when get_formsets was called
             # This verifies that we called that method.
             self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, RemovedInDjango19Warning))
+            self.assertTrue(issubclass(w[0].category, RemovedInFreedom19Warning))
 
         class EpisodeAdmin(admin.ModelAdmin):
             inlines = [

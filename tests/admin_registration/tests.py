@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
-from django.contrib import admin
-from django.contrib.admin.decorators import register
-from django.contrib.admin.sites import site
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from freedom.contrib import admin
+from freedom.contrib.admin.decorators import register
+from freedom.contrib.admin.sites import site
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.test import TestCase
 
 from .models import Person, Place, Location, Traveler
 

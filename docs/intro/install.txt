@@ -1,7 +1,7 @@
 Quick install guide
 ===================
 
-Before you can use Django, you'll need to get it installed. We have a
+Before you can use Freedom, you'll need to get it installed. We have a
 :doc:`complete installation guide </topics/install>` that covers all the
 possibilities; this guide will guide you to a simple, minimal installation
 that'll work while you walk through the introduction.
@@ -9,7 +9,7 @@ that'll work while you walk through the introduction.
 Install Python
 --------------
 
-Being a Python Web framework, Django requires Python. It works with Python 2.7,
+Being a Python Web framework, Freedom requires Python. It works with Python 2.7,
 3.2, 3.3, or 3.4. All these versions of Python include a lightweight database
 called SQLite_ so you won't need to set up a database just yet.
 
@@ -18,7 +18,7 @@ called SQLite_ so you won't need to set up a database just yet.
 Get the latest version of Python at http://www.python.org/download/ or with
 your operating system's package manager.
 
-.. admonition:: Django on Jython
+.. admonition:: Freedom on Jython
 
     If you use Jython_ (a Python implementation for the Java platform), you'll
     need to follow a few additional steps. See :doc:`/howto/jython` for details.
@@ -40,52 +40,52 @@ This step is only necessary if you'd like to work with a "large" database engine
 like PostgreSQL, MySQL, or Oracle. To install such a database, consult the
 :ref:`database installation information <database-installation>`.
 
-Remove any old versions of Django
+Remove any old versions of Freedom
 ---------------------------------
 
-If you are upgrading your installation of Django from a previous version, you
-will need to :ref:`uninstall the old Django version before installing the new
-version <removing-old-versions-of-django>`.
+If you are upgrading your installation of Freedom from a previous version, you
+will need to :ref:`uninstall the old Freedom version before installing the new
+version <removing-old-versions-of-freedom>`.
 
-Install Django
+Install Freedom
 --------------
 
-You've got three easy options to install Django:
+You've got three easy options to install Freedom:
 
-* Install a version of Django :doc:`provided by your operating system
+* Install a version of Freedom :doc:`provided by your operating system
   distribution </misc/distributions>`. This is the quickest option for those
-  who have operating systems that distribute Django.
+  who have operating systems that distribute Freedom.
 
 * :ref:`Install an official release <installing-official-release>`. This
   is the best approach for users who want a stable version number and aren't
-  concerned about running a slightly older version of Django.
+  concerned about running a slightly older version of Freedom.
 
 * :ref:`Install the latest development version
   <installing-development-version>`. This is best for users who want the
   latest-and-greatest features and aren't afraid of running brand-new code.
 
 .. admonition:: Always refer to the documentation that corresponds to the
-    version of Django you're using!
+    version of Freedom you're using!
 
     If you do either of the first two steps, keep an eye out for parts of the
     documentation marked **new in development version**. That phrase flags
-    features that are only available in development versions of Django, and
+    features that are only available in development versions of Freedom, and
     they likely won't work with an official release.
 
 
 Verifying
 ---------
 
-To verify that Django can be seen by Python, type ``python`` from your shell.
-Then at the Python prompt, try to import Django:
+To verify that Freedom can be seen by Python, type ``python`` from your shell.
+Then at the Python prompt, try to import Freedom:
 
 .. parsed-literal::
 
-    >>> import django
-    >>> print(django.get_version())
+    >>> import freedom
+    >>> print(freedom.get_version())
     |version|
 
-You may have another version of Django installed.
+You may have another version of Freedom installed.
 
 That's it!
 ----------

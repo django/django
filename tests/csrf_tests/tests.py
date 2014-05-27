@@ -2,13 +2,13 @@
 from __future__ import unicode_literals
 import logging
 
-from django.conf import settings
-from django.core.context_processors import csrf
-from django.http import HttpRequest, HttpResponse
-from django.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH
-from django.template import RequestContext, Template
-from django.test import TestCase, override_settings
-from django.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
+from freedom.conf import settings
+from freedom.core.context_processors import csrf
+from freedom.http import HttpRequest, HttpResponse
+from freedom.middleware.csrf import CsrfViewMiddleware, CSRF_KEY_LENGTH
+from freedom.template import RequestContext, Template
+from freedom.test import TestCase, override_settings
+from freedom.views.decorators.csrf import csrf_exempt, requires_csrf_token, ensure_csrf_cookie
 
 
 # Response/views used for CsrfResponseMiddleware and CsrfViewMiddleware tests
@@ -372,7 +372,7 @@ class CsrfViewMiddlewareTest(TestCase):
             def emit(self, record):
                 raise Exception("This shouldn't have happened!")
 
-        logger = logging.getLogger('django.request')
+        logger = logging.getLogger('freedom.request')
         test_handler = TestHandler()
         old_log_level = logger.level
         try:

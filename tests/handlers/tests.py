@@ -2,13 +2,13 @@
 
 from __future__ import unicode_literals
 
-from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
-from django.core.signals import request_started, request_finished
-from django.db import close_old_connections, connection
-from django.test import RequestFactory, TestCase, TransactionTestCase
-from django.test import override_settings
-from django.utils.encoding import force_str
-from django.utils import six
+from freedom.core.handlers.wsgi import WSGIHandler, WSGIRequest
+from freedom.core.signals import request_started, request_finished
+from freedom.db import close_old_connections, connection
+from freedom.test import RequestFactory, TestCase, TransactionTestCase
+from freedom.test import override_settings
+from freedom.utils.encoding import force_str
+from freedom.utils import six
 
 
 class HandlerTests(TestCase):

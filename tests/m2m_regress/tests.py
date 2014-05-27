@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import FieldError
-from django.test import TestCase
-from django.utils import six
+from freedom.core.exceptions import FieldError
+from freedom.test import TestCase
+from freedom.utils import six
 
 from .models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
     SelfReferChildSibling, Worksheet, RegressionModelSplit)

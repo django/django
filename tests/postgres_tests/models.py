@@ -1,5 +1,5 @@
-from django.contrib.postgres.fields import ArrayField
-from django.db import models
+from freedom.contrib.postgres.fields import ArrayField
+from freedom.db import models
 
 
 class IntegerArrayModel(models.Model):

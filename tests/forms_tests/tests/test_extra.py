@@ -4,19 +4,19 @@ from __future__ import unicode_literals
 import datetime
 import warnings
 
-from django.forms import (
+from freedom.forms import (
     CharField, DateField, EmailField, FileField, Form, GenericIPAddressField,
     HiddenInput, ImageField, IPAddressField, MultipleChoiceField,
     MultiValueField, MultiWidget, PasswordInput, SelectMultiple, SlugField,
     SplitDateTimeField, SplitDateTimeWidget, TextInput, URLField,
 )
-from django.forms.extras import SelectDateWidget
-from django.forms.utils import ErrorList
-from django.test import TestCase, override_settings
-from django.utils import six
-from django.utils import translation
-from django.utils.dates import MONTHS_AP
-from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
+from freedom.forms.extras import SelectDateWidget
+from freedom.forms.utils import ErrorList
+from freedom.test import TestCase, override_settings
+from freedom.utils import six
+from freedom.utils import translation
+from freedom.utils.dates import MONTHS_AP
+from freedom.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 
 from .test_error_messages import AssertFormErrorsMixin
 
@@ -446,7 +446,7 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
 
     def test_generic_ipaddress_as_generic(self):
         # The edge cases of the IPv6 validation code are not deeply tested
-        # here, they are covered in the tests for django.utils.ipv6
+        # here, they are covered in the tests for freedom.utils.ipv6
         f = GenericIPAddressField()
         self.assertFormErrors(['This field is required.'], f.clean, '')
         self.assertFormErrors(['This field is required.'], f.clean, None)

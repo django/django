@@ -5,23 +5,23 @@ import copy
 import datetime
 import warnings
 
-from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
-from django.forms import (
+from freedom.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from freedom.core.files.uploadedfile import SimpleUploadedFile
+from freedom.core.urlresolvers import reverse
+from freedom.forms import (
     BooleanField, CheckboxInput, CheckboxSelectMultiple, ChoiceField,
     ClearableFileInput, DateInput, DateTimeField, DateTimeInput, FileInput,
     Form, HiddenInput, MultipleHiddenInput, MultiWidget, NullBooleanSelect,
     PasswordInput, RadioSelect, Select, SelectMultiple, SplitDateTimeWidget,
     Textarea, TextInput, TimeInput,
 )
-from django.forms.widgets import RadioFieldRenderer
-from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.safestring import mark_safe
-from django.utils import six
-from django.utils.translation import activate, deactivate, override
-from django.test import TestCase, override_settings
-from django.utils.encoding import python_2_unicode_compatible, force_text
+from freedom.forms.widgets import RadioFieldRenderer
+from freedom.utils.deprecation import RemovedInFreedom19Warning
+from freedom.utils.safestring import mark_safe
+from freedom.utils import six
+from freedom.utils.translation import activate, deactivate, override
+from freedom.test import TestCase, override_settings
+from freedom.utils.encoding import python_2_unicode_compatible, force_text
 
 from ..models import Article
 
@@ -989,7 +989,7 @@ beatle J R Ringo False""")
         self.assertHTMLEqual(w.render('time', t), '<input type="time" name="time" value="12:51" />')
 
     def test_splithiddendatetime(self):
-        from django.forms.widgets import SplitHiddenDateTimeWidget
+        from freedom.forms.widgets import SplitHiddenDateTimeWidget
 
         w = SplitHiddenDateTimeWidget()
         self.assertHTMLEqual(w.render('date', ''), '<input type="hidden" name="date_0" /><input type="hidden" name="date_1" />')
@@ -1039,7 +1039,7 @@ class FormsI18NWidgetsTestCase(TestCase):
             self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="17/09/2007 12:51:34" />')
 
     def test_splithiddendatetime(self):
-        from django.forms.widgets import SplitHiddenDateTimeWidget
+        from freedom.forms.widgets import SplitHiddenDateTimeWidget
 
         w = SplitHiddenDateTimeWidget()
         self.assertHTMLEqual(w.render('date', datetime.datetime(2007, 9, 17, 12, 51)), '<input type="hidden" name="date_0" value="17.09.2007" /><input type="hidden" name="date_1" value="12:51:00" />')
@@ -1095,7 +1095,7 @@ class WidgetTests(TestCase):
             field = DateTimeField(widget=SplitDateTimeWidget, required=False)
 
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=RemovedInDjango19Warning)
+            warnings.filterwarnings("ignore", category=RemovedInFreedom19Warning)
             form = SplitDateForm({'field': ''})
             self.assertTrue(form.is_valid())
             form = SplitDateForm({'field': ['', '']})
@@ -1105,7 +1105,7 @@ class WidgetTests(TestCase):
             field = DateTimeField(widget=SplitDateTimeWidget, required=True)
 
         with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=RemovedInDjango19Warning)
+            warnings.filterwarnings("ignore", category=RemovedInFreedom19Warning)
             form = SplitDateRequiredForm({'field': ''})
             self.assertFalse(form.is_valid())
             form = SplitDateRequiredForm({'field': ['', '']})

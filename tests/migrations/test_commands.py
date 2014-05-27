@@ -5,14 +5,14 @@ import codecs
 import os
 import shutil
 
-from django.apps import apps
-from django.db import models
-from django.core.management import call_command, CommandError
-from django.db.migrations import questioner
-from django.test import override_settings, override_system_checks
-from django.utils import six
-from django.utils._os import upath
-from django.utils.encoding import force_text
+from freedom.apps import apps
+from freedom.db import models
+from freedom.core.management import call_command, CommandError
+from freedom.db.migrations import questioner
+from freedom.test import override_settings, override_system_checks
+from freedom.utils import six
+from freedom.utils._os import upath
+from freedom.utils.encoding import force_text
 
 from .models import UnicodeModel, UnserializableModel
 from .test_base import MigrationTestBase

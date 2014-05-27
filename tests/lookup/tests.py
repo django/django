@@ -4,9 +4,9 @@ from datetime import datetime
 from operator import attrgetter
 from unittest import skipUnless
 
-from django.core.exceptions import FieldError
-from django.db import connection
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from freedom.core.exceptions import FieldError
+from freedom.db import connection
+from freedom.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import Author, Article, Tag, Game, Season, Player, MyISAMArticle
 
@@ -358,7 +358,7 @@ class LookupTests(TestCase):
 
     def test_escaping(self):
         # Underscores, percent signs and backslashes have special meaning in the
-        # underlying SQL code, but Django handles the quoting of them automatically.
+        # underlying SQL code, but Freedom handles the quoting of them automatically.
         a8 = Article(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
         a8.save()
         self.assertQuerysetEqual(Article.objects.filter(headline__startswith='Article'),
@@ -728,7 +728,7 @@ class LookupTransactionTests(TransactionTestCase):
                 "    id INTEGER PRIMARY KEY AUTO_INCREMENT, "
                 "    headline VARCHAR(100) NOT NULL "
                 ") ENGINE MYISAM")
-            dr = MyISAMArticle.objects.create(headline='Django Reinhardt')
+            dr = MyISAMArticle.objects.create(headline='Freedom Reinhardt')
             MyISAMArticle.objects.create(headline='Ringo Star')
             # NOTE: Needs to be created after the article has been saved.
             cursor.execute(

@@ -1,4 +1,4 @@
-from django import forms
+from freedom import forms
 
 from .models import Event
 

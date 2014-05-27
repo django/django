@@ -1,5 +1,5 @@
 =====================================
-Writing your first Django app, part 5
+Writing your first Freedom app, part 5
 =====================================
 
 This tutorial begins where :doc:`Tutorial 4 </intro/tutorial04>` left off.
@@ -33,11 +33,11 @@ Why you need to create tests
 So why create tests, and why now?
 
 You may feel that you have quite enough on your plate just learning
-Python/Django, and having yet another thing to learn and do may seem
+Python/Freedom, and having yet another thing to learn and do may seem
 overwhelming and perhaps unnecessary. After all, our polls application is
 working quite happily now; going through the trouble of creating automated
 tests is not going to make it work any better. If creating the polls
-application is the last bit of Django programming you will ever do, then true,
+application is the last bit of Freedom programming you will ever do, then true,
 you don't need to know how to create automated tests. But, if that's not the
 case, now is an excellent time to learn.
 
@@ -84,7 +84,7 @@ Tests make your code more attractive
 
 You might have created a brilliant piece of software, but you will find that
 many other developers will simply refuse to look at it because it lacks tests;
-without tests, they won't trust it. Jacob Kaplan-Moss, one of Django's
+without tests, they won't trust it. Jacob Kaplan-Moss, one of Freedom's
 original developers, says "Code without tests is broken by design."
 
 That other developers want to see tests in your software before they take it
@@ -97,7 +97,7 @@ The previous points are written from the point of view of a single developer
 maintaining an application. Complex applications will be maintained by teams.
 Tests guarantee that colleagues don't inadvertently break your code (and that
 you don't break theirs without knowing). If you want to make a living as a
-Django programmer, you must be good at writing tests!
+Freedom programmer, you must be good at writing tests!
 
 Basic testing strategies
 ========================
@@ -140,7 +140,7 @@ you'll see that the ``Question`` change list claims it was published recently.
 You can also see this using the :djadmin:`shell`::
 
     >>> import datetime
-    >>> from django.utils import timezone
+    >>> from freedom.utils import timezone
     >>> from polls.models import Question
     >>> # create a Question instance with pub_date 30 days in the future
     >>> future_question = Question(pub_date=timezone.now() + datetime.timedelta(days=30))
@@ -167,8 +167,8 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
 
     import datetime
 
-    from django.utils import timezone
-    from django.test import TestCase
+    from freedom.utils import timezone
+    from freedom.test import TestCase
 
     from polls.models import Question
 
@@ -183,7 +183,7 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
             future_question = Question(pub_date=time)
             self.assertEqual(future_question.was_published_recently(), False)
 
-What we have done here is created a :class:`django.test.TestCase` subclass
+What we have done here is created a :class:`freedom.test.TestCase` subclass
 with a method that creates a ``Question`` instance with a ``pub_date`` in the
 future. We then check the output of ``was_published_recently()`` - which
 *ought* to be False.
@@ -217,7 +217,7 @@ What happened is this:
 
 * ``python manage.py test polls`` looked for tests in the ``polls`` application
 
-* it found a subclass of the :class:`django.test.TestCase` class
+* it found a subclass of the :class:`freedom.test.TestCase` class
 
 * it created a special database for the purpose of testing
 
@@ -325,10 +325,10 @@ through a web browser.
 
 Before we try to fix anything, let's have a look at the tools at our disposal.
 
-The Django test client
+The Freedom test client
 ----------------------
 
-Django provides a test :class:`~django.test.Client` to simulate a user
+Freedom provides a test :class:`~freedom.test.Client` to simulate a user
 interacting with the code at the view level.  We can use it in ``tests.py``
 or even in the :djadmin:`shell`.
 
@@ -336,10 +336,10 @@ We will start again with the :djadmin:`shell`, where we need to do a couple of
 things that won't be necessary in ``tests.py``. The first is to set up the test
 environment in the :djadmin:`shell`::
 
-    >>> from django.test.utils import setup_test_environment
+    >>> from freedom.test.utils import setup_test_environment
     >>> setup_test_environment()
 
-:meth:`~django.test.utils.setup_test_environment` installs a template renderer
+:meth:`~freedom.test.utils.setup_test_environment` installs a template renderer
 which will allow us to examine some additional attributes on responses such as
 ``response.context`` that otherwise wouldn't be available. Note that this
 method *does not* setup a test database, so the following will be run against
@@ -347,10 +347,10 @@ the existing database and the output may differ slightly depending on what
 questions you already created.
 
 Next we need to import the test client class (later in ``tests.py`` we will use
-the :class:`django.test.TestCase` class, which comes with its own client, so
+the :class:`freedom.test.TestCase` class, which comes with its own client, so
 this won't be required)::
 
-    >>> from django.test import Client
+    >>> from freedom.test import Client
     >>> # create an instance of the client for our use
     >>> client = Client()
 
@@ -363,7 +363,7 @@ With that ready, we can ask the client to do some work for us::
     404
     >>> # on the other hand we should expect to find something at '/polls/'
     >>> # we'll use 'reverse()' rather than a hardcoded URL
-    >>> from django.core.urlresolvers import reverse
+    >>> from freedom.core.urlresolvers import reverse
     >>> response = client.get(reverse('polls:index'))
     >>> response.status_code
     200
@@ -373,7 +373,7 @@ With that ready, we can ask the client to do some work for us::
     >>> # in ``settings.py`` is not correct. If you need to change it,
     >>> # you will also need to restart your shell session
     >>> from polls.models import Question
-    >>> from django.utils import timezone
+    >>> from freedom.utils import timezone
     >>> # create a Question and save it
     >>> q = Question(question_text="Who is your favorite Beatle?", pub_date=timezone.now())
     >>> q.save()
@@ -391,7 +391,7 @@ The list of polls shows polls that aren't published yet (i.e. those that have a
 ``pub_date`` in the future). Let's fix that.
 
 In :doc:`Tutorial 4 </intro/tutorial04>` we introduced a class-based view,
-based on :class:`~django.views.generic.list.ListView`:
+based on :class:`~freedom.views.generic.list.ListView`:
 
 .. snippet::
     :filename: polls/views.py
@@ -414,7 +414,7 @@ an import:
 .. snippet::
     :filename: polls/views.py
 
-    from django.utils import timezone
+    from freedom.utils import timezone
 
 and then we must amend the ``get_queryset`` method like so:
 
@@ -449,7 +449,7 @@ Add the following to ``polls/tests.py``:
 .. snippet::
     :filename: polls/tests.py
 
-    from django.core.urlresolvers import reverse
+    from freedom.core.urlresolvers import reverse
 
 and we'll create a shortcut function to create questions as well as a new test
 class:
@@ -534,10 +534,10 @@ repetition out of the process of creating questions.
 
 ``test_index_view_with_no_questions`` doesn't create any questions, but checks
 the message: "No polls are available." and verifies the ``latest_question_list``
-is empty. Note that the :class:`django.test.TestCase` class provides some
+is empty. Note that the :class:`freedom.test.TestCase` class provides some
 additional assertion methods. In these examples, we use
-:meth:`~django.test.SimpleTestCase.assertContains()` and
-:meth:`~django.test.TransactionTestCase.assertQuerysetEqual()`.
+:meth:`~freedom.test.SimpleTestCase.assertContains()` and
+:meth:`~freedom.test.TransactionTestCase.assertQuerysetEqual()`.
 
 In ``test_index_view_with_a_past_question``, we create a question and verify that it
 appears in the list.
@@ -661,10 +661,10 @@ achieve some very clever things.
 For example, while our tests here have covered some of the internal logic of a
 model and the way our views publish information, you can use an "in-browser"
 framework such as Selenium_ to test the way your HTML actually renders in a
-browser. These tools allow you to check not just the behavior of your Django
+browser. These tools allow you to check not just the behavior of your Freedom
 code, but also, for example, of your JavaScript. It's quite something to see
 the tests launch a browser, and start interacting with your site, as if a human
-being were driving it! Django includes :class:`~django.test.LiveServerTestCase`
+being were driving it! Freedom includes :class:`~freedom.test.LiveServerTestCase`
 to facilitate integration with tools like Selenium.
 
 If you have a complex application, you may want to run tests automatically
@@ -677,7 +677,7 @@ a piece of code, it usually means that code should be refactored or removed.
 Coverage will help to identify dead code. See
 :ref:`topics-testing-code-coverage` for details.
 
-:doc:`Testing in Django </topics/testing/index>` has comprehensive
+:doc:`Testing in Freedom </topics/testing/index>` has comprehensive
 information about testing.
 
 .. _Selenium: http://seleniumhq.org/
@@ -686,9 +686,9 @@ information about testing.
 What's next?
 ============
 
-For full details on testing, see :doc:`Testing in Django
+For full details on testing, see :doc:`Testing in Freedom
 </topics/testing/index>`.
 
-When you're comfortable with testing Django views, read
+When you're comfortable with testing Freedom views, read
 :doc:`part 6 of this tutorial</intro/tutorial06>` to learn about
 static files management.

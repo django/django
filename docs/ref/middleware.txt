@@ -2,10 +2,10 @@
 Middleware
 ==========
 
-.. module:: django.middleware
-   :synopsis: Django's built-in middleware classes.
+.. module:: freedom.middleware
+   :synopsis: Freedom's built-in middleware classes.
 
-This document explains all middleware components that come with Django. For
+This document explains all middleware components that come with Freedom. For
 information on how to use them and how to write your own middleware, see
 the :doc:`middleware usage guide </topics/http/middleware>`.
 
@@ -15,21 +15,21 @@ Available middleware
 Cache middleware
 ----------------
 
-.. module:: django.middleware.cache
+.. module:: freedom.middleware.cache
    :synopsis: Middleware for the site-wide cache.
 
 .. class:: UpdateCacheMiddleware
 
 .. class:: FetchFromCacheMiddleware
 
-Enable the site-wide cache. If these are enabled, each Django-powered page will
+Enable the site-wide cache. If these are enabled, each Freedom-powered page will
 be cached for as long as the :setting:`CACHE_MIDDLEWARE_SECONDS` setting
 defines. See the :doc:`cache documentation </topics/cache>`.
 
 "Common" middleware
 -------------------
 
-.. module:: django.middleware.common
+.. module:: freedom.middleware.common
    :synopsis: Middleware adding "common" conveniences for perfectionists.
 
 .. class:: CommonMiddleware
@@ -45,7 +45,7 @@ Adds a few conveniences for perfectionists:
   If :setting:`APPEND_SLASH` is ``True`` and the initial URL doesn't end
   with a slash, and it is not found in the URLconf, then a new URL is
   formed by appending a slash at the end. If this new URL is found in the
-  URLconf, then Django redirects the request to this new URL. Otherwise,
+  URLconf, then Freedom redirects the request to this new URL. Otherwise,
   the initial URL is processed as usual.
 
   For example, ``foo.com/bar`` will be redirected to ``foo.com/bar/`` if
@@ -62,7 +62,7 @@ Adds a few conveniences for perfectionists:
   normalize URLs.
 
 * Handles ETags based on the :setting:`USE_ETAGS` setting. If
-  :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag
+  :setting:`USE_ETAGS` is set to ``True``, Freedom will calculate an ETag
   for each request by MD5-hashing the page content, and it'll take care of
   sending ``Not Modified`` responses, if appropriate.
 
@@ -74,7 +74,7 @@ Adds a few conveniences for perfectionists:
 GZip middleware
 ---------------
 
-.. module:: django.middleware.gzip
+.. module:: freedom.middleware.gzip
    :synopsis: Middleware to serve GZipped content for performance.
 
 .. class:: GZipMiddleware
@@ -84,7 +84,7 @@ GZip middleware
     Security researchers recently revealed that when compression techniques
     (including ``GZipMiddleware``) are used on a website, the site becomes
     exposed to a number of possible attacks. These approaches can be used to
-    compromise, among other things, Django's CSRF protection. Before using
+    compromise, among other things, Freedom's CSRF protection. Before using
     ``GZipMiddleware`` on your site, you should consider very carefully whether
     you are subject to these attacks. If you're in *any* doubt about whether
     you're affected, you should avoid using ``GZipMiddleware``. For more
@@ -114,12 +114,12 @@ It will NOT compress content if any of the following are true:
   not to be performed on certain content types.
 
 You can apply GZip compression to individual views using the
-:func:`~django.views.decorators.gzip.gzip_page()` decorator.
+:func:`~freedom.views.decorators.gzip.gzip_page()` decorator.
 
 Conditional GET middleware
 --------------------------
 
-.. module:: django.middleware.http
+.. module:: freedom.middleware.http
    :synopsis: Middleware handling advanced HTTP features.
 
 .. class:: ConditionalGetMiddleware
@@ -127,7 +127,7 @@ Conditional GET middleware
 Handles conditional GET operations. If the response has a ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
-:class:`~django.http.HttpResponseNotModified`.
+:class:`~freedom.http.HttpResponseNotModified`.
 
 Also sets the ``Date`` and ``Content-Length`` response-headers.
 
@@ -136,13 +136,13 @@ Reverse proxy middleware
 
 .. class:: SetRemoteAddrFromForwardedFor
 
-This middleware was removed in Django 1.1. See :ref:`the release notes
+This middleware was removed in Freedom 1.1. See :ref:`the release notes
 <removed-setremoteaddrfromforwardedfor-middleware>` for details.
 
 Locale middleware
 -----------------
 
-.. module:: django.middleware.locale
+.. module:: freedom.middleware.locale
    :synopsis: Middleware to enable language selection based on the request.
 
 .. class:: LocaleMiddleware
@@ -153,14 +153,14 @@ content for each user. See the :doc:`internationalization documentation
 
 .. attribute:: LocaleMiddleware.response_redirect_class
 
-Defaults to :class:`~django.http.HttpResponseRedirect`. Subclass
+Defaults to :class:`~freedom.http.HttpResponseRedirect`. Subclass
 ``LocaleMiddleware`` and override the attribute to customize the redirects
 issued by the middleware.
 
 Message middleware
 ------------------
 
-.. module:: django.contrib.messages.middleware
+.. module:: freedom.contrib.messages.middleware
    :synopsis: Message middleware.
 
 .. class:: MessageMiddleware
@@ -171,7 +171,7 @@ Enables cookie- and session-based message support. See the
 Session middleware
 ------------------
 
-.. module:: django.contrib.sessions.middleware
+.. module:: freedom.contrib.sessions.middleware
    :synopsis: Session middleware.
 
 .. class:: SessionMiddleware
@@ -182,7 +182,7 @@ Enables session support. See the :doc:`session documentation
 Site middleware
 ---------------
 
-.. module:: django.contrib.sites.middleware
+.. module:: freedom.contrib.sites.middleware
   :synopsis: Site middleware.
 
 .. class:: CurrentSiteMiddleware
@@ -195,7 +195,7 @@ Adds the ``site`` attribute representing the current site to every incoming
 Authentication middleware
 -------------------------
 
-.. module:: django.contrib.auth.middleware
+.. module:: freedom.contrib.auth.middleware
   :synopsis: Authentication middleware.
 
 .. class:: AuthenticationMiddleware
@@ -215,13 +215,13 @@ Middleware for utilizing Web server provided authentication. See
 
 Allows a user's sessions to be invalidated when their password changes. See
 :ref:`session-invalidation-on-password-change` for details. This middleware must
-appear after :class:`django.contrib.auth.middleware.AuthenticationMiddleware`
+appear after :class:`freedom.contrib.auth.middleware.AuthenticationMiddleware`
 in :setting:`MIDDLEWARE_CLASSES`.
 
 CSRF protection middleware
 --------------------------
 
-.. module:: django.middleware.csrf
+.. module:: freedom.middleware.csrf
    :synopsis: Middleware adding protection against Cross Site Request
               Forgeries.
 
@@ -234,7 +234,7 @@ fields to POST forms and checking requests for the correct value. See the
 X-Frame-Options middleware
 --------------------------
 
-.. module:: django.middleware.clickjacking
+.. module:: freedom.middleware.clickjacking
    :synopsis: Clickjacking protection
 
 .. class:: XFrameOptionsMiddleware
@@ -246,34 +246,34 @@ Simple :doc:`clickjacking protection via the X-Frame-Options header </ref/clickj
 Middleware ordering
 ===================
 
-Here are some hints about the ordering of various Django middleware classes:
+Here are some hints about the ordering of various Freedom middleware classes:
 
-#. :class:`~django.middleware.cache.UpdateCacheMiddleware`
+#. :class:`~freedom.middleware.cache.UpdateCacheMiddleware`
 
    Before those that modify the ``Vary`` header (``SessionMiddleware``,
    ``GZipMiddleware``, ``LocaleMiddleware``).
 
-#. :class:`~django.middleware.gzip.GZipMiddleware`
+#. :class:`~freedom.middleware.gzip.GZipMiddleware`
 
    Before any middleware that may change or use the response body.
 
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
 
-#. :class:`~django.middleware.http.ConditionalGetMiddleware`
+#. :class:`~freedom.middleware.http.ConditionalGetMiddleware`
 
    Before ``CommonMiddleware``: uses its ``Etag`` header when
    :setting:`USE_ETAGS` = ``True``.
 
-#. :class:`~django.contrib.sessions.middleware.SessionMiddleware`
+#. :class:`~freedom.contrib.sessions.middleware.SessionMiddleware`
 
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
 
-#. :class:`~django.middleware.locale.LocaleMiddleware`
+#. :class:`~freedom.middleware.locale.LocaleMiddleware`
 
    One of the topmost, after ``SessionMiddleware`` (uses session data) and
    ``CacheMiddleware`` (modifies ``Vary`` header).
 
-#. :class:`~django.middleware.common.CommonMiddleware`
+#. :class:`~freedom.middleware.common.CommonMiddleware`
 
    Before any middleware that may change the response (it calculates ``ETags``).
 
@@ -283,28 +283,28 @@ Here are some hints about the ordering of various Django middleware classes:
    Close to the top: it redirects when :setting:`APPEND_SLASH` or
    :setting:`PREPEND_WWW` are set to ``True``.
 
-#. :class:`~django.middleware.csrf.CsrfViewMiddleware`
+#. :class:`~freedom.middleware.csrf.CsrfViewMiddleware`
 
    Before any view middleware that assumes that CSRF attacks have been dealt
    with.
 
-#. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+#. :class:`~freedom.contrib.auth.middleware.AuthenticationMiddleware`
 
    After ``SessionMiddleware``: uses session storage.
 
-#. :class:`~django.contrib.messages.middleware.MessageMiddleware`
+#. :class:`~freedom.contrib.messages.middleware.MessageMiddleware`
 
    After ``SessionMiddleware``: can use session-based storage.
 
-#. :class:`~django.middleware.cache.FetchFromCacheMiddleware`
+#. :class:`~freedom.middleware.cache.FetchFromCacheMiddleware`
 
    After any middleware that modifies the ``Vary`` header: that header is used
    to pick a value for the cache hash-key.
 
-#. :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
+#. :class:`~freedom.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
 
    Should be near the bottom as it's a last-resort type of middleware.
 
-#. :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
+#. :class:`~freedom.contrib.redirects.middleware.RedirectFallbackMiddleware`
 
    Should be near the bottom as it's a last-resort type of middleware.

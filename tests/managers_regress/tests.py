@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
-from django.apps import apps
-from django.db import models
-from django.template import Context, Template
-from django.test import TestCase, override_settings
-from django.utils.encoding import force_text
+from freedom.apps import apps
+from freedom.db import models
+from freedom.template import Context, Template
+from freedom.test import TestCase, override_settings
+from freedom.utils.encoding import force_text
 
 from .models import (
     Child1,

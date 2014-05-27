@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import FieldError
-from django.test import TestCase
+from freedom.core.exceptions import FieldError
+from freedom.test import TestCase
 
 from .models import User, Poll, Choice
 

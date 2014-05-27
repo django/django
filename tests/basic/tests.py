@@ -3,15 +3,15 @@ from __future__ import unicode_literals
 from datetime import datetime
 import threading
 
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.db import connections, DEFAULT_DB_ALIAS
-from django.db import DatabaseError
-from django.db.models.fields import Field, FieldDoesNotExist
-from django.db.models.manager import BaseManager
-from django.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet, MAX_GET_RESULTS
-from django.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.utils import six
-from django.utils.translation import ugettext_lazy
+from freedom.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from freedom.db import connections, DEFAULT_DB_ALIAS
+from freedom.db import DatabaseError
+from freedom.db.models.fields import Field, FieldDoesNotExist
+from freedom.db.models.manager import BaseManager
+from freedom.db.models.query import QuerySet, EmptyQuerySet, ValuesListQuerySet, MAX_GET_RESULTS
+from freedom.test import TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
+from freedom.utils import six
+from freedom.utils.translation import ugettext_lazy
 
 from .models import Article, SelfRef, ArticleSelectOnSave
 
@@ -51,7 +51,7 @@ class ModelTest(TestCase):
         self.assertQuerysetEqual(Article.objects.all(),
             ['<Article: Area woman programs in Python>'])
 
-        # Django provides a rich database lookup API.
+        # Freedom provides a rich database lookup API.
         self.assertEqual(Article.objects.get(id__exact=a.id), a)
         self.assertEqual(Article.objects.get(headline__startswith='Area woman'), a)
         self.assertEqual(Article.objects.get(pub_date__year=2005), a)
@@ -85,7 +85,7 @@ class ModelTest(TestCase):
             [],
         )
 
-        # Django raises an Article.DoesNotExist exception for get() if the
+        # Freedom raises an Article.DoesNotExist exception for get() if the
         # parameters don't match any object.
         six.assertRaisesRegex(
             self,
@@ -111,7 +111,7 @@ class ModelTest(TestCase):
             pub_date__week_day=6,
         )
 
-        # Lookup by a primary key is the most common case, so Django
+        # Lookup by a primary key is the most common case, so Freedom
         # provides a shortcut for primary-key exact lookups.
         # The following is identical to articles.get(id=a.id).
         self.assertEqual(Article.objects.get(pk=a.id), a)
@@ -135,7 +135,7 @@ class ModelTest(TestCase):
 
         self.assertEqual(Article.objects.count(), 2)
 
-        # Django raises an Article.MultipleObjectsReturned exception if the
+        # Freedom raises an Article.MultipleObjectsReturned exception if the
         # lookup matches more than one object
         six.assertRaisesRegex(
             self,
@@ -243,13 +243,13 @@ class ModelTest(TestCase):
         a5.save()
         self.assertEqual(a5.headline, 'Article 6')
 
-        # If you leave off a field with "default" set, Django will use
+        # If you leave off a field with "default" set, Freedom will use
         # the default.
         a6 = Article(pub_date=datetime(2005, 7, 31))
         a6.save()
         self.assertEqual(a6.headline, 'Default headline')
 
-        # For DateTimeFields, Django saves as much precision (in seconds)
+        # For DateTimeFields, Freedom saves as much precision (in seconds)
         # as you give it.
         a7 = Article(
             headline='Article 7',
@@ -870,7 +870,7 @@ class SelectOnSaveTests(TestCase):
             with self.assertNumQueries(2):
                 asos.save()
                 self.assertTrue(FakeQuerySet.called)
-            # This is not wanted behavior, but this is how Django has always
+            # This is not wanted behavior, but this is how Freedom has always
             # behaved for databases that do not return correct information
             # about matched rows for UPDATE.
             with self.assertRaises(DatabaseError):

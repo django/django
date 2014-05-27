@@ -1,13 +1,13 @@
 .. _ref-gis-forms-api:
 
 ===================
-GeoDjango Forms API
+GeoFreedom Forms API
 ===================
 
-.. module:: django.contrib.gis.forms
-   :synopsis: GeoDjango forms API.
+.. module:: freedom.contrib.gis.forms
+   :synopsis: GeoFreedom forms API.
 
-GeoDjango provides some specialized form fields and widgets in order to visually
+GeoFreedom provides some specialized form fields and widgets in order to visually
 display and edit geolocalized data on a map. By default, they use
 `OpenLayers`_-powered maps, with a base WMS layer provided by `Metacarta`_.
 
@@ -17,7 +17,7 @@ display and edit geolocalized data on a map. By default, they use
 Field arguments
 ===============
 In addition to the regular :ref:`form field arguments <core-field-arguments>`,
-GeoDjango form fields take the following optional arguments.
+GeoFreedom form fields take the following optional arguments.
 
 ``srid``
 ~~~~~~~~
@@ -84,10 +84,10 @@ Form field classes
 Form widgets
 ============
 
-.. module:: django.contrib.gis.widgets
-   :synopsis: GeoDjango widgets API.
+.. module:: freedom.contrib.gis.widgets
+   :synopsis: GeoFreedom widgets API.
 
-GeoDjango form widgets allow you to display and edit geographic data on a
+GeoFreedom form widgets allow you to display and edit geographic data on a
 visual map.
 Note that none of the currently available widgets supports 3D geometries, hence
 geometry fields will fallback using a simple ``Textarea`` widget for such data.
@@ -95,8 +95,8 @@ geometry fields will fallback using a simple ``Textarea`` widget for such data.
 Widget attributes
 ~~~~~~~~~~~~~~~~~
 
-GeoDjango widgets are template-based, so their attributes are mostly different
-from other Django widget attributes.
+GeoFreedom widgets are template-based, so their attributes are mostly different
+from other Freedom widget attributes.
 
 
 .. attribute:: BaseGeometryWidget.geom_type
@@ -126,10 +126,10 @@ from other Django widget attributes.
 
     The template used to render the map widget.
 
-You can pass widget attributes in the same manner that for any other Django
+You can pass widget attributes in the same manner that for any other Freedom
 widget. For example::
 
-    from django.contrib.gis import forms
+    from freedom.contrib.gis import forms
 
     class MyGeoForm(forms.Form):
         point = forms.PointField(widget=
@@ -144,14 +144,14 @@ Widget classes
 
     This is an abstract base widget containing the logic needed by subclasses.
     You cannot directly use this widget for a geometry field.
-    Note that the rendering of GeoDjango widgets is based on a template,
+    Note that the rendering of GeoFreedom widgets is based on a template,
     identified by the :attr:`template_name` class attribute.
 
 ``OpenLayersWidget``
 
 .. class:: OpenLayersWidget
 
-    This is the default widget used by all GeoDjango form fields.
+    This is the default widget used by all GeoFreedom form fields.
     ``template_name`` is ``gis/openlayers.html``.
 
     ``OpenLayersWidget`` and :class:`OSMWidget` use the ``openlayers.js`` file

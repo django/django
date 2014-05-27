@@ -1,11 +1,11 @@
 from copy import deepcopy
 import datetime
 
-from django.core.exceptions import MultipleObjectsReturned, FieldError
-from django.db import transaction
-from django.test import TestCase
-from django.utils import six
-from django.utils.translation import ugettext_lazy
+from freedom.core.exceptions import MultipleObjectsReturned, FieldError
+from freedom.db import transaction
+from freedom.test import TestCase
+from freedom.utils import six
+from freedom.utils.translation import ugettext_lazy
 
 from .models import Article, Reporter
 

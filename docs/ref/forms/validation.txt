@@ -85,9 +85,9 @@ overridden:
   Note that any errors raised by your ``Form.clean()`` override will not
   be associated with any field in particular. They go into a special
   "field" (called ``__all__``), which you can access via the
-  :meth:`~django.forms.Form.non_field_errors` method if you need to. If you
+  :meth:`~freedom.forms.Form.non_field_errors` method if you need to. If you
   want to attach errors to a specific field in the form, you need to call
-  :meth:`~django.forms.Form.add_error()`.
+  :meth:`~freedom.forms.Form.add_error()`.
 
   Also note that there are special considerations when overriding
   the ``clean()`` method of a ``ModelForm`` subclass. (see the
@@ -179,8 +179,8 @@ to override your error message you can still opt for the less verbose::
 
 .. versionadded:: 1.7
 
-The :meth:`Form.errors.as_data() <django.forms.Form.errors.as_data()>` and
-:meth:`Form.errors.as_json() <django.forms.Form.errors.as_json()>` methods
+The :meth:`Form.errors.as_data() <freedom.forms.Form.errors.as_data()>` and
+:meth:`Form.errors.as_json() <freedom.forms.Form.errors.as_json()>` methods
 greatly benefit from fully featured ``ValidationError``\s (with a ``code`` name
 and a ``params`` dictionary).
 
@@ -219,19 +219,19 @@ previous features.
 Using validators
 ~~~~~~~~~~~~~~~~
 
-Django's form (and model) fields support use of simple utility functions and
+Freedom's form (and model) fields support use of simple utility functions and
 classes known as validators. A validator is merely a callable object or
 function that takes a value and simply returns nothing if the value is valid or
-raises a :exc:`~django.core.exceptions.ValidationError` if not. These can be
+raises a :exc:`~freedom.core.exceptions.ValidationError` if not. These can be
 passed to a field's constructor, via the field's ``validators`` argument, or
-defined on the :class:`~django.forms.Field` class itself with the
+defined on the :class:`~freedom.forms.Field` class itself with the
 ``default_validators`` attribute.
 
 Simple validators can be used to validate values inside the field, let's have
-a look at Django's ``SlugField``::
+a look at Freedom's ``SlugField``::
 
-    from django.forms import CharField
-    from django.core import validators
+    from freedom.forms import CharField
+    from freedom.core import validators
 
     class SlugField(CharField):
         default_validators = [validators.validate_slug]
@@ -247,9 +247,9 @@ is equivalent to::
     slug = forms.CharField(validators=[validators.validate_slug])
 
 Common cases such as validating against an email or a regular expression can be
-handled using existing validator classes available in Django. For example,
+handled using existing validator classes available in Freedom. For example,
 ``validators.validate_slug`` is an instance of
-a :class:`~django.core.validators.RegexValidator` constructed with the first
+a :class:`~freedom.core.validators.RegexValidator` constructed with the first
 argument being the pattern: ``^[-a-zA-Z0-9_]+$``. See the section on
 :doc:`writing validators </ref/validators>` to see a list of what is already
 available and for an example of how to write a validator.
@@ -260,8 +260,8 @@ Form field default cleaning
 Let's firstly create a custom form field that validates its input is a string
 containing comma-separated email addresses. The full class looks like this::
 
-    from django import forms
-    from django.core.validators import validate_email
+    from freedom import forms
+    from freedom.core.validators import validate_email
 
     class MultiEmailField(forms.Field):
         def to_python(self, value):
@@ -309,7 +309,7 @@ we want to make sure that the ``recipients`` field always contains the address
 don't want to put it into the general ``MultiEmailField`` class. Instead, we
 write a cleaning method that operates on the ``recipients`` field, like so::
 
-    from django import forms
+    from freedom import forms
 
     class ContactForm(forms.Form):
         # Everything as before.
@@ -326,15 +326,15 @@ write a cleaning method that operates on the ``recipients`` field, like so::
 
 Sometimes you may want to add an error message to a particular field from the
 form's ``clean()`` method, in which case you can use
-:meth:`~django.forms.Form.add_error()`. Note that this won't always be
+:meth:`~freedom.forms.Form.add_error()`. Note that this won't always be
 appropriate and the more typical situation is to raise a ``ValidationError``
 from , which is turned into a form-wide error that is available through the
-:meth:`Form.non_field_errors() <django.forms.Form.non_field_errors>` method.
+:meth:`Form.non_field_errors() <freedom.forms.Form.non_field_errors>` method.
 
 Cleaning and validating fields that depend on each other
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: django.forms.Form.clean()
+.. method:: freedom.forms.Form.clean()
 
 Suppose we add another requirement to our contact form: if the ``cc_myself``
 field is ``True``, the ``subject`` must contain the word ``"help"``. We are
@@ -357,7 +357,7 @@ common method is to display the error at the top of the form. To create such
 an error, you can raise a ``ValidationError`` from the ``clean()`` method. For
 example::
 
-    from django import forms
+    from freedom import forms
 
     class ContactForm(forms.Form):
         # Everything as before.
@@ -376,7 +376,7 @@ example::
 
 .. versionchanged:: 1.7
 
-    In previous versions of Django, ``form.clean()`` was required to return
+    In previous versions of Freedom, ``form.clean()`` was required to return
     a dictionary of ``cleaned_data``. This method may still return a dictionary
     of data to be used, but it's no longer required.
 
@@ -394,7 +394,7 @@ here and leaving it up to you and your designers to work out what works
 effectively in your particular situation. Our new code (replacing the previous
 sample) looks like this::
 
-    from django import forms
+    from freedom import forms
 
     class ContactForm(forms.Form):
         # Everything as before.

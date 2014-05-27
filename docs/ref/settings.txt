@@ -11,12 +11,12 @@ Settings
     Be careful when you override settings, especially when the default value
     is a non-empty tuple or dictionary, such as :setting:`MIDDLEWARE_CLASSES`
     and :setting:`TEMPLATE_CONTEXT_PROCESSORS`. Make sure you keep the
-    components required by the features of Django you wish to use.
+    components required by the features of Freedom you wish to use.
 
 Core settings
 =============
 
-Here's a list of settings available in Django core and their default values.
+Here's a list of settings available in Freedom core and their default values.
 Settings provided by contrib apps are listed below, followed by a topical index
 of the core settings.
 
@@ -47,13 +47,13 @@ ADMINS
 Default: ``()`` (Empty tuple)
 
 A tuple that lists people who get code error notifications. When
-``DEBUG=False`` and a view raises an exception, Django will email these people
+``DEBUG=False`` and a view raises an exception, Freedom will email these people
 with the full exception information. Each member of the tuple should be a tuple
 of (Full name, email address). Example::
 
     (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
 
-Note that Django will email *all* of these people whenever an error happens.
+Note that Freedom will email *all* of these people whenever an error happens.
 See :doc:`/howto/error-reporting` for more information.
 
 .. setting:: ALLOWED_HOSTS
@@ -63,7 +63,7 @@ ALLOWED_HOSTS
 
 Default: ``[]`` (Empty list)
 
-A list of strings representing the host/domain names that this Django site can
+A list of strings representing the host/domain names that this Freedom site can
 serve. This is a security measure to prevent an attacker from poisoning caches
 and password reset emails with links to malicious hosts by submitting requests
 with a fake HTTP ``Host`` header, which is possible even under many
@@ -81,7 +81,7 @@ middleware; if so this middleware must be listed first in
 
 .. versionchanged:: 1.7
 
-    In previous versions of Django, if you wanted to also allow the
+    In previous versions of Freedom, if you wanted to also allow the
     `fully qualified domain name (FQDN)`_, which some browsers can send in the
     ``Host`` header, you had to explicitly add another ``ALLOWED_HOSTS`` entry
     that included a trailing period. This entry could also be a subdomain
@@ -92,21 +92,21 @@ middleware; if so this middleware must be listed first in
             '.example.com.', # Also allow FQDN and subdomains
         ]
 
-    In Django 1.7, the trailing dot is stripped when performing host validation,
+    In Freedom 1.7, the trailing dot is stripped when performing host validation,
     thus an entry with a trailing dot isn't required.
 
 .. _`fully qualified domain name (FQDN)`: http://en.wikipedia.org/wiki/Fully_qualified_domain_name
 
 If the ``Host`` header (or ``X-Forwarded-Host`` if
 :setting:`USE_X_FORWARDED_HOST` is enabled) does not match any value in this
-list, the :meth:`django.http.HttpRequest.get_host()` method will raise
-:exc:`~django.core.exceptions.SuspiciousOperation`.
+list, the :meth:`freedom.http.HttpRequest.get_host()` method will raise
+:exc:`~freedom.core.exceptions.SuspiciousOperation`.
 
 When :setting:`DEBUG` is ``True`` or when running tests, host validation is
 disabled; any host will be accepted. Thus it's usually only necessary to set it
 in production.
 
-This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
+This validation only applies via :meth:`~freedom.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
@@ -138,7 +138,7 @@ same URL with a slash appended. Note that the redirect may cause any data
 submitted in a POST request to be lost.
 
 The :setting:`APPEND_SLASH` setting is only used if
-:class:`~django.middleware.common.CommonMiddleware` is installed
+:class:`~freedom.middleware.common.CommonMiddleware` is installed
 (see :doc:`/topics/http/middleware`). See also :setting:`PREPEND_WWW`.
 
 .. setting:: CACHES
@@ -150,12 +150,12 @@ Default::
 
     {
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
         }
     }
 
 A dictionary containing the settings for all caches to be used with
-Django. It is a nested dictionary whose contents maps cache aliases
+Freedom. It is a nested dictionary whose contents maps cache aliases
 to a dictionary containing the options for an individual cache.
 
 The :setting:`CACHES` setting must configure a ``default`` cache;
@@ -173,14 +173,14 @@ Default: ``''`` (Empty string)
 
 The cache backend to use. The built-in cache backends are:
 
-* ``'django.core.cache.backends.db.DatabaseCache'``
-* ``'django.core.cache.backends.dummy.DummyCache'``
-* ``'django.core.cache.backends.filebased.FileBasedCache'``
-* ``'django.core.cache.backends.locmem.LocMemCache'``
-* ``'django.core.cache.backends.memcached.MemcachedCache'``
-* ``'django.core.cache.backends.memcached.PyLibMCCache'``
+* ``'freedom.core.cache.backends.db.DatabaseCache'``
+* ``'freedom.core.cache.backends.dummy.DummyCache'``
+* ``'freedom.core.cache.backends.filebased.FileBasedCache'``
+* ``'freedom.core.cache.backends.locmem.LocMemCache'``
+* ``'freedom.core.cache.backends.memcached.MemcachedCache'``
+* ``'freedom.core.cache.backends.memcached.PyLibMCCache'``
 
-You can use a cache backend that doesn't ship with Django by setting
+You can use a cache backend that doesn't ship with Freedom by setting
 :setting:`BACKEND <CACHES-BACKEND>` to a fully-qualified path of a cache
 backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 
@@ -210,7 +210,7 @@ KEY_PREFIX
 Default: ``''`` (Empty string)
 
 A string that will be automatically included (prepended by default) to
-all cache keys used by the Django server.
+all cache keys used by the Freedom server.
 
 See the :ref:`cache documentation <cache_key_prefixing>` for more information.
 
@@ -227,8 +227,8 @@ identifying name for a local memory cache. e.g.::
 
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/django_cache',
+            'BACKEND': 'freedom.core.cache.backends.filebased.FileBasedCache',
+            'LOCATION': '/var/tmp/freedom_cache',
         }
     }
 
@@ -266,7 +266,7 @@ VERSION
 
 Default: ``1``
 
-The default version number for cache keys generated by the Django server.
+The default version number for cache keys generated by the Freedom server.
 
 See the :ref:`cache documentation <cache_versioning>` for more information.
 
@@ -339,7 +339,7 @@ site request forgery protection.  It should be set to a string such as
 ``".example.com"`` to allow a POST request from a form on one subdomain to be
 accepted by a view served from another subdomain.
 
-Please note that the presence of this setting does not imply that Django's CSRF
+Please note that the presence of this setting does not imply that Freedom's CSRF
 protection is safe from cross-subdomain attacks by default - please see the
 :ref:`CSRF limitations <csrf-limitations>` section.
 
@@ -372,9 +372,9 @@ CSRF_COOKIE_PATH
 Default: ``'/'``
 
 The path set on the CSRF cookie. This should either match the URL path of your
-Django installation or be a parent of that path.
+Freedom installation or be a parent of that path.
 
-This is useful if you have multiple Django instances running under the same
+This is useful if you have multiple Freedom instances running under the same
 hostname. They can use different cookie paths, and each instance will only see
 its own CSRF cookie.
 
@@ -394,7 +394,7 @@ cookie is only sent under an HTTPS connection.
 CSRF_FAILURE_VIEW
 -----------------
 
-Default: ``'django.views.csrf.csrf_failure'``
+Default: ``'freedom.views.csrf.csrf_failure'``
 
 A dotted path to the view function to be used when an incoming request
 is rejected by the CSRF protection.  The function should have this signature::
@@ -413,7 +413,7 @@ DATABASES
 Default: ``{}`` (Empty dictionary)
 
 A dictionary containing the settings for all databases to be used with
-Django. It is a nested dictionary whose contents maps database aliases
+Freedom. It is a nested dictionary whose contents maps database aliases
 to a dictionary containing the options for an individual database.
 
 The :setting:`DATABASES` setting must configure a ``default`` database;
@@ -424,7 +424,7 @@ SQLite. This can be configured using the following::
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
+            'ENGINE': 'freedom.db.backends.sqlite3',
             'NAME': 'mydatabase',
         }
     }
@@ -436,7 +436,7 @@ other database types. This example is for PostgreSQL::
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'freedom.db.backends.postgresql_psycopg2',
             'NAME': 'mydatabase',
             'USER': 'mydatabaseuser',
             'PASSWORD': 'mypassword',
@@ -465,7 +465,7 @@ AUTOCOMMIT
 
 Default: ``True``
 
-Set this to ``False`` if you want to :ref:`disable Django's transaction
+Set this to ``False`` if you want to :ref:`disable Freedom's transaction
 management <deactivate-transaction-management>` and implement your own.
 
 .. setting:: DATABASE-ENGINE
@@ -477,12 +477,12 @@ Default: ``''`` (Empty string)
 
 The database backend to use. The built-in database backends are:
 
-* ``'django.db.backends.postgresql_psycopg2'``
-* ``'django.db.backends.mysql'``
-* ``'django.db.backends.sqlite3'``
-* ``'django.db.backends.oracle'``
+* ``'freedom.db.backends.postgresql_psycopg2'``
+* ``'freedom.db.backends.mysql'``
+* ``'freedom.db.backends.sqlite3'``
+* ``'freedom.db.backends.oracle'``
 
-You can use a database backend that doesn't ship with Django by setting
+You can use a database backend that doesn't ship with Freedom by setting
 ``ENGINE`` to a fully-qualified path (i.e.
 ``mypackage.backends.whatever``).
 
@@ -532,7 +532,7 @@ CONN_MAX_AGE
 Default: ``0``
 
 The lifetime of a database connection, in seconds. Use ``0`` to close database
-connections at the end of each request — Django's historical behavior — and
+connections at the end of each request — Freedom's historical behavior — and
 ``None`` for unlimited persistent connections.
 
 .. setting:: OPTIONS
@@ -704,7 +704,7 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The username to use when connecting to the Oracle database that will be used
-when running tests. If not provided, Django will use ``'test_' + USER``.
+when running tests. If not provided, Freedom will use ``'test_' + USER``.
 
 .. setting:: TEST_PASSWD
 
@@ -716,7 +716,7 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The password to use when connecting to the Oracle database that will be used
-when running tests. If not provided, Django will use a hardcoded default value.
+when running tests. If not provided, Freedom will use a hardcoded default value.
 
 .. setting:: TEST_TBLSPACE
 
@@ -728,7 +728,7 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The name of the tablespace that will be used when running tests. If not
-provided, Django will use ``'test_' + NAME``.
+provided, Freedom will use ``'test_' + NAME``.
 
 .. setting:: TEST_TBLSPACE_TMP
 
@@ -740,7 +740,7 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The name of the temporary tablespace that will be used when running tests. If
-not provided, Django will use ``'test_' + NAME + '_temp'``.
+not provided, Freedom will use ``'test_' + NAME + '_temp'``.
 
 .. setting:: OLD_TEST_CHARSET
 
@@ -897,7 +897,7 @@ Default::
 A tuple of formats that will be accepted when inputting data on a date field.
 Formats will be tried in order, using the first valid one. Note that these
 format strings use Python's datetime_ module syntax, not the format strings
-from the ``date`` Django template tag.
+from the ``date`` Freedom template tag.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
@@ -945,7 +945,7 @@ Default::
 A tuple of formats that will be accepted when inputting data on a datetime
 field. Formats will be tried in order, using the first valid one. Note that
 these format strings use Python's datetime_ module syntax, not the format
-strings from the ``date`` Django template tag.
+strings from the ``date`` Freedom template tag.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
@@ -969,12 +969,12 @@ Did you catch that? NEVER deploy a site into production with :setting:`DEBUG`
 turned on.
 
 One of the main features of debug mode is the display of detailed error pages.
-If your app raises an exception when :setting:`DEBUG` is ``True``, Django will
+If your app raises an exception when :setting:`DEBUG` is ``True``, Freedom will
 display a detailed traceback, including a lot of metadata about your
-environment, such as all the currently defined Django settings (from
+environment, such as all the currently defined Freedom settings (from
 ``settings.py``).
 
-As a security measure, Django will *not* include settings that might be
+As a security measure, Freedom will *not* include settings that might be
 sensitive (or offensive), such as :setting:`SECRET_KEY`. Specifically, it will
 exclude any setting whose name includes any of the following:
 
@@ -993,14 +993,14 @@ that are inappropriate for public consumption. File paths, configuration
 options and the like all give attackers extra information about your server.
 
 It is also important to remember that when running with :setting:`DEBUG`
-turned on, Django will remember every SQL query it executes. This is useful
+turned on, Freedom will remember every SQL query it executes. This is useful
 when you're debugging, but it'll rapidly consume memory on a production server.
 
 Finally, if :setting:`DEBUG` is ``False``, you also need to properly set
 the :setting:`ALLOWED_HOSTS` setting. Failing to do so will result in all
 requests being returned as "Bad Request (400)".
 
-.. _django/views/debug.py: https://github.com/django/django/blob/master/django/views/debug.py
+.. _freedom/views/debug.py: https://github.com/freedom/freedom/blob/master/freedom/views/debug.py
 
 .. setting:: DEBUG_PROPAGATE_EXCEPTIONS
 
@@ -1009,7 +1009,7 @@ DEBUG_PROPAGATE_EXCEPTIONS
 
 Default: ``False``
 
-If set to True, Django's normal exception handling of view functions
+If set to True, Freedom's normal exception handling of view functions
 will be suppressed, and exceptions will propagate upwards.  This can
 be useful for some test setups, and should never be used on a live
 site.
@@ -1057,10 +1057,10 @@ the ``Content-Type`` header.
 DEFAULT_EXCEPTION_REPORTER_FILTER
 ---------------------------------
 
-Default: :class:`django.views.debug.SafeExceptionReporterFilter`
+Default: :class:`freedom.views.debug.SafeExceptionReporterFilter`
 
 Default exception reporter filter class to be used if none has been assigned to
-the :class:`~django.http.HttpRequest` instance yet.
+the :class:`~freedom.http.HttpRequest` instance yet.
 See :ref:`Filtering error reports<filtering-error-reports>`.
 
 .. setting:: DEFAULT_FILE_STORAGE
@@ -1068,7 +1068,7 @@ See :ref:`Filtering error reports<filtering-error-reports>`.
 DEFAULT_FILE_STORAGE
 --------------------
 
-Default: :class:`django.core.files.storage.FileSystemStorage`
+Default: :class:`freedom.core.files.storage.FileSystemStorage`
 
 Default file storage class to be used for any file-related operations that don't
 specify a particular storage system. See :doc:`/topics/files`.
@@ -1121,7 +1121,7 @@ This is only used if ``CommonMiddleware`` is installed (see
 EMAIL_BACKEND
 -------------
 
-Default: ``'django.core.mail.backends.smtp.EmailBackend'``
+Default: ``'freedom.core.mail.backends.smtp.EmailBackend'``
 
 The backend to use for sending emails. For the list of available backends see
 :doc:`/topics/email`.
@@ -1156,7 +1156,7 @@ Default: ``''`` (Empty string)
 Password to use for the SMTP server defined in :setting:`EMAIL_HOST`. This
 setting is used in conjunction with :setting:`EMAIL_HOST_USER` when
 authenticating to the SMTP server. If either of these settings is empty,
-Django won't attempt authentication.
+Freedom won't attempt authentication.
 
 See also :setting:`EMAIL_HOST_USER`.
 
@@ -1168,7 +1168,7 @@ EMAIL_HOST_USER
 Default: ``''`` (Empty string)
 
 Username to use for the SMTP server defined in :setting:`EMAIL_HOST`.
-If empty, Django won't attempt authentication.
+If empty, Freedom won't attempt authentication.
 
 See also :setting:`EMAIL_HOST_PASSWORD`.
 
@@ -1186,10 +1186,10 @@ Port to use for the SMTP server defined in :setting:`EMAIL_HOST`.
 EMAIL_SUBJECT_PREFIX
 --------------------
 
-Default: ``'[Django] '``
+Default: ``'[Freedom] '``
 
-Subject-line prefix for email messages sent with ``django.core.mail.mail_admins``
-or ``django.core.mail.mail_managers``. You'll probably want to include the
+Subject-line prefix for email messages sent with ``freedom.core.mail.mail_admins``
+or ``freedom.core.mail.mail_managers``. You'll probably want to include the
 trailing space.
 
 .. setting:: EMAIL_USE_TLS
@@ -1238,8 +1238,8 @@ FILE_UPLOAD_HANDLERS
 
 Default::
 
-    ("django.core.files.uploadhandler.MemoryFileUploadHandler",
-     "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
+    ("freedom.core.files.uploadhandler.MemoryFileUploadHandler",
+     "freedom.core.files.uploadhandler.TemporaryFileUploadHandler",)
 
 A tuple of handlers to use for uploading. See :doc:`/topics/files` for details.
 
@@ -1310,7 +1310,7 @@ FILE_UPLOAD_TEMP_DIR
 Default: ``None``
 
 The directory to store data temporarily while uploading files. If ``None``,
-Django will use the standard temporary directory for the operating system. For
+Freedom will use the standard temporary directory for the operating system. For
 example, this will default to '/tmp' on \*nix-style operating systems.
 
 See :doc:`/topics/files` for details.
@@ -1364,12 +1364,12 @@ FORMAT_MODULE_PATH
 Default: ``None``
 
 A full Python path to a Python package that contains format definitions for
-project locales. If not ``None``, Django will check for a ``formats.py``
+project locales. If not ``None``, Freedom will check for a ``formats.py``
 file, under the directory named as the current locale, and will use the
 formats defined on this file.
 
 For example, if :setting:`FORMAT_MODULE_PATH` is set to ``mysite.formats``,
-and current language is ``en`` (English), Django will expect a directory tree
+and current language is ``en`` (English), Freedom will expect a directory tree
 like::
 
     mysite/
@@ -1388,7 +1388,7 @@ like::
             'some_app.formats',
         ]
 
-    When Django searches for a certain format, it will go through all given
+    When Freedom searches for a certain format, it will go through all given
     Python paths until it finds a module that actually defines the given
     format. This means that formats defined in packages farther up in the list
     will take precendence over the same formats in packages farther down.
@@ -1410,13 +1410,13 @@ Default: ``()``
 List of compiled regular expression objects describing URLs that should be
 ignored when reporting HTTP 404 errors via email (see
 :doc:`/howto/error-reporting`). Regular expressions are matched against
-:meth:`request's full paths <django.http.HttpRequest.get_full_path>` (including
+:meth:`request's full paths <freedom.http.HttpRequest.get_full_path>` (including
 query string, if any). Use this if your site does not provide a commonly
 requested file such as ``favicon.ico`` or ``robots.txt``, or if it gets
 hammered by script kiddies.
 
 This is only used if
-:class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled (see
+:class:`~freedom.middleware.common.BrokenLinkEmailsMiddleware` is enabled (see
 :doc:`/topics/http/middleware`).
 
 .. setting:: INSTALLED_APPS
@@ -1427,7 +1427,7 @@ INSTALLED_APPS
 Default: ``()`` (Empty tuple)
 
 A tuple of strings designating all applications that are enabled in this
-Django installation. Each string should be a dotted Python path to:
+Freedom installation. Each string should be a dotted Python path to:
 
 * an application configuration class, or
 * a package containing a application.
@@ -1441,21 +1441,21 @@ Django installation. Each string should be a dotted Python path to:
 .. admonition:: Use the application registry for introspection
 
     Your code should never access :setting:`INSTALLED_APPS` directly. Use
-    :attr:`django.apps.apps` instead.
+    :attr:`freedom.apps.apps` instead.
 
 .. admonition:: Application names and labels must be unique in
                 :setting:`INSTALLED_APPS`
 
-    Application :attr:`names <django.apps.AppConfig.name>` — the dotted Python
+    Application :attr:`names <freedom.apps.AppConfig.name>` — the dotted Python
     path to the application package — must be unique. There is no way to
     include the same application twice, short of duplicating its code under
     another name.
 
-    Application :attr:`labels <django.apps.AppConfig.label>` — by default the
+    Application :attr:`labels <freedom.apps.AppConfig.label>` — by default the
     final part of the name — must be unique too. For example, you can't
-    include both ``django.contrib.auth`` and ``myproject.auth``. However, you
+    include both ``freedom.contrib.auth`` and ``myproject.auth``. However, you
     can relabel an application with a custom configuration that defines a
-    different :attr:`~django.apps.AppConfig.label`.
+    different :attr:`~freedom.apps.AppConfig.label`.
 
     These rules apply regardless of whether :setting:`INSTALLED_APPS`
     references application configuration classes on application packages.
@@ -1498,7 +1498,7 @@ It serves two purposes:
 * If the locale middleware is active, it provides the fallback translation when
   no translation exist for a given literal to the user's preferred language.
 
-See :ref:`how-django-discovers-language-preference` for more details.
+See :ref:`how-freedom-discovers-language-preference` for more details.
 
 .. _list of language identifiers: http://www.i18nguy.com/unicode/language-identifiers.html
 
@@ -1541,7 +1541,7 @@ deletes the old one.
 LANGUAGE_COOKIE_NAME
 --------------------
 
-Default: ``'django_language'``
+Default: ``'freedom_language'``
 
 The name of the cookie to use for the language cookie. This can be whatever
 you want (but should be different from :setting:`SESSION_COOKIE_NAME`). See
@@ -1557,9 +1557,9 @@ LANGUAGE_COOKIE_PATH
 Default: ``/``
 
 The path set on the language cookie. This should either match the URL path of your
-Django installation or be a parent of that path.
+Freedom installation or be a parent of that path.
 
-This is useful if you have multiple Django instances running under the same
+This is useful if you have multiple Freedom instances running under the same
 hostname. They can use different cookie paths and each instance will only see
 its own language cookie.
 
@@ -1580,9 +1580,9 @@ LANGUAGES
 Default: A tuple of all available languages. This list is continually growing
 and including a copy here would inevitably become rapidly out of date. You can
 see the current list of translated languages by looking in
-``django/conf/global_settings.py`` (or view the `online source`_).
+``freedom/conf/global_settings.py`` (or view the `online source`_).
 
-.. _online source: https://github.com/django/django/blob/master/django/conf/global_settings.py
+.. _online source: https://github.com/freedom/freedom/blob/master/freedom/conf/global_settings.py
 
 The list is a tuple of two-tuples in the format
 (:term:`language code<language code>`, ``language name``) -- for example,
@@ -1591,15 +1591,15 @@ This specifies which languages are available for language selection. See
 :doc:`/topics/i18n/index`.
 
 Generally, the default value should suffice. Only set this setting if you want
-to restrict language selection to a subset of the Django-provided languages.
+to restrict language selection to a subset of the Freedom-provided languages.
 
 If you define a custom :setting:`LANGUAGES` setting, you can mark the
 language names as translation strings using the
-:func:`~django.utils.translation.ugettext_lazy` function.
+:func:`~freedom.utils.translation.ugettext_lazy` function.
 
 Here's a sample settings file::
 
-    from django.utils.translation import ugettext_lazy as _
+    from freedom.utils.translation import ugettext_lazy as _
 
     LANGUAGES = (
         ('de', _('German')),
@@ -1613,8 +1613,8 @@ LOCALE_PATHS
 
 Default: ``()`` (Empty tuple)
 
-A tuple of directories where Django looks for translation files.
-See :ref:`how-django-discovers-translations`.
+A tuple of directories where Freedom looks for translation files.
+See :ref:`how-freedom-discovers-translations`.
 
 Example::
 
@@ -1623,7 +1623,7 @@ Example::
         '/var/local/translations/locale'
     )
 
-Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
+Freedom will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
 directories containing the actual translation files.
 
 .. setting:: LOGGING
@@ -1642,9 +1642,9 @@ errors to an email log handler when :setting:`DEBUG` is ``False``. See also
 :ref:`configuring-logging`.
 
 You can see the default logging configuration by looking in
-``django/utils/log.py`` (or view the `online source`__).
+``freedom/utils/log.py`` (or view the `online source`__).
 
-__ https://github.com/django/django/blob/master/django/utils/log.py
+__ https://github.com/freedom/freedom/blob/master/freedom/utils/log.py
 
 .. setting:: LOGGING_CONFIG
 
@@ -1654,7 +1654,7 @@ LOGGING_CONFIG
 Default: ``'logging.config.dictConfig'``
 
 A path to a callable that will be used to configure logging in the
-Django project. Points at a instance of Python's `dictConfig`_
+Freedom project. Points at a instance of Python's `dictConfig`_
 configuration method by default.
 
 If you set :setting:`LOGGING_CONFIG` to ``None``, the logging
@@ -1662,7 +1662,7 @@ configuration process will be skipped.
 
 .. versionchanged:: 1.7
 
-    Previously, the default value was ``'django.utils.log.dictConfig'``.
+    Previously, the default value was ``'freedom.utils.log.dictConfig'``.
 
 .. _dictConfig: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
@@ -1675,7 +1675,7 @@ Default: ``()`` (Empty tuple)
 
 A tuple in the same format as :setting:`ADMINS` that specifies who should get
 broken link notifications when
-:class:`~django.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
+:class:`~freedom.middleware.common.BrokenLinkEmailsMiddleware` is enabled.
 
 .. setting:: MEDIA_ROOT
 
@@ -1731,11 +1731,11 @@ MIDDLEWARE_CLASSES
 
 Default::
 
-    ('django.middleware.common.CommonMiddleware',
-     'django.contrib.sessions.middleware.SessionMiddleware',
-     'django.middleware.csrf.CsrfViewMiddleware',
-     'django.contrib.auth.middleware.AuthenticationMiddleware',
-     'django.contrib.messages.middleware.MessageMiddleware',)
+    ('freedom.middleware.common.CommonMiddleware',
+     'freedom.contrib.sessions.middleware.SessionMiddleware',
+     'freedom.middleware.csrf.CsrfViewMiddleware',
+     'freedom.contrib.auth.middleware.AuthenticationMiddleware',
+     'freedom.contrib.messages.middleware.MessageMiddleware',)
 
 A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
 
@@ -1764,11 +1764,11 @@ MONTH_DAY_FORMAT
 
 Default: ``'F j'``
 
-The default formatting to use for date fields on Django admin change-list
+The default formatting to use for date fields on Freedom admin change-list
 pages -- and, possibly, by other parts of the system -- in cases when only the
 month and day are displayed.
 
-For example, when a Django admin change-list page is being filtered by a date
+For example, when a Freedom admin change-list page is being filtered by a date
 drilldown, the header for a given day displays the day and month. Different
 locales have different formats. For example, U.S. English would say
 "January 1," whereas Spanish might say "1 Enero."
@@ -1805,7 +1805,7 @@ PREPEND_WWW
 Default: ``False``
 
 Whether to prepend the "www." subdomain to URLs that don't have it. This is only
-used if :class:`~django.middleware.common.CommonMiddleware` is installed
+used if :class:`~freedom.middleware.common.CommonMiddleware` is installed
 (see :doc:`/topics/http/middleware`). See also :setting:`APPEND_SLASH`.
 
 .. setting:: ROOT_URLCONF
@@ -1816,9 +1816,9 @@ ROOT_URLCONF
 Default: Not defined
 
 A string representing the full Python import path to your root URLconf. For example:
-``"mydjangoapps.urls"``. Can be overridden on a per-request basis by
+``"myfreedomapps.urls"``. Can be overridden on a per-request basis by
 setting the attribute ``urlconf`` on the incoming ``HttpRequest``
-object. See :ref:`how-django-processes-a-request` for details.
+object. See :ref:`how-freedom-processes-a-request` for details.
 
 .. setting:: SECRET_KEY
 
@@ -1827,20 +1827,20 @@ SECRET_KEY
 
 Default: ``''`` (Empty string)
 
-A secret key for a particular Django installation. This is used to provide
+A secret key for a particular Freedom installation. This is used to provide
 :doc:`cryptographic signing </topics/signing>`, and should be set to a unique,
 unpredictable value.
 
-:djadmin:`django-admin.py startproject <startproject>` automatically adds a
+:djadmin:`freedom-admin.py startproject <startproject>` automatically adds a
 randomly-generated ``SECRET_KEY`` to each new project.
 
-Django will refuse to start if :setting:`SECRET_KEY` is not set.
+Freedom will refuse to start if :setting:`SECRET_KEY` is not set.
 
 .. warning::
 
     **Keep this value secret.**
 
-    Running Django with a known :setting:`SECRET_KEY` defeats many of Django's
+    Running Freedom with a known :setting:`SECRET_KEY` defeats many of Freedom's
     security protections, and can lead to privilege escalation and remote code
     execution vulnerabilities.
 
@@ -1857,17 +1857,17 @@ method.
 
 This takes some explanation. By default, ``is_secure()`` is able to determine
 whether a request is secure by looking at whether the requested URL uses
-"https://". This is important for Django's CSRF protection, and may be used
+"https://". This is important for Freedom's CSRF protection, and may be used
 by your own code or third-party apps.
 
-If your Django app is behind a proxy, though, the proxy may be "swallowing" the
+If your Freedom app is behind a proxy, though, the proxy may be "swallowing" the
 fact that a request is HTTPS, using a non-HTTPS connection between the proxy
-and Django. In this case, ``is_secure()`` would always return ``False`` -- even
+and Freedom. In this case, ``is_secure()`` would always return ``False`` -- even
 for requests that were made via HTTPS by the end user.
 
 In this situation, you'll want to configure your proxy to set a custom HTTP
-header that tells Django whether the request came in via HTTPS, and you'll want
-to set ``SECURE_PROXY_SSL_HEADER`` so that Django knows what header to look
+header that tells Freedom whether the request came in via HTTPS, and you'll want
+to set ``SECURE_PROXY_SSL_HEADER`` so that Freedom knows what header to look
 for.
 
 You'll need to set a tuple with two elements -- the name of the header to look
@@ -1875,14 +1875,14 @@ for and the required value. For example::
 
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-Here, we're telling Django that we trust the ``X-Forwarded-Proto`` header
+Here, we're telling Freedom that we trust the ``X-Forwarded-Proto`` header
 that comes from our proxy, and any time its value is ``'https'``, then the
 request is guaranteed to be secure (i.e., it originally came in via HTTPS).
 Obviously, you should *only* set this setting if you control your proxy or
 have some other guarantee that it sets/strips this header appropriately.
 
 Note that the header needs to be in the format as used by ``request.META`` --
-all caps and likely starting with ``HTTP_``. (Remember, Django automatically
+all caps and likely starting with ``HTTP_``. (Remember, Freedom automatically
 adds ``'HTTP_'`` to the start of x-header names before making the header
 available in ``request.META``.)
 
@@ -1895,11 +1895,11 @@ available in ``request.META``.)
     Make sure ALL of the following are true before setting this (assuming the
     values from the example above):
 
-    * Your Django app is behind a proxy.
+    * Your Freedom app is behind a proxy.
     * Your proxy strips the ``X-Forwarded-Proto`` header from all incoming
       requests. In other words, if end users include that header in their
       requests, the proxy will discard it.
-    * Your proxy sets the ``X-Forwarded-Proto`` header and sends it to Django,
+    * Your proxy sets the ``X-Forwarded-Proto`` header and sends it to Freedom,
       but only for requests that originally come in via HTTPS.
 
     If any of those are not true, you should keep this setting set to ``None``
@@ -1931,7 +1931,7 @@ The email address that error messages come from, such as those sent to
 .. admonition:: Why are my emails sent from a different address?
 
     This address is used only for error messages. It is *not* the address that
-    regular email messages sent with :meth:`~django.core.mail.send_mail()`
+    regular email messages sent with :meth:`~freedom.core.mail.send_mail()`
     come from; for that, see :setting:`DEFAULT_FROM_EMAIL`.
 
 .. setting:: SHORT_DATE_FORMAT
@@ -1967,7 +1967,7 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 SIGNING_BACKEND
 ---------------
 
-Default: ``'django.core.signing.TimestampSigner'``
+Default: ``'freedom.core.signing.TimestampSigner'``
 
 The backend used for signing cookies and other data.
 
@@ -1996,13 +1996,13 @@ TEMPLATE_CONTEXT_PROCESSORS
 
 Default::
 
-    ("django.contrib.auth.context_processors.auth",
-    "django.core.context_processors.debug",
-    "django.core.context_processors.i18n",
-    "django.core.context_processors.media",
-    "django.core.context_processors.static",
-    "django.core.context_processors.tz",
-    "django.contrib.messages.context_processors.messages")
+    ("freedom.contrib.auth.context_processors.auth",
+    "freedom.core.context_processors.debug",
+    "freedom.core.context_processors.i18n",
+    "freedom.core.context_processors.media",
+    "freedom.core.context_processors.static",
+    "freedom.core.context_processors.tz",
+    "freedom.contrib.messages.context_processors.messages")
 
 A tuple of callables that are used to populate the context in ``RequestContext``.
 These callables take a request object as their argument and return a dictionary
@@ -2020,7 +2020,7 @@ error page will display a detailed report for any exception raised during
 template rendering. This report contains the relevant snippet of the template,
 with the appropriate line highlighted.
 
-Note that Django only displays fancy error pages if :setting:`DEBUG` is ``True``, so
+Note that Freedom only displays fancy error pages if :setting:`DEBUG` is ``True``, so
 you'll want to set that to take advantage of this setting.
 
 See also :setting:`DEBUG`.
@@ -2033,7 +2033,7 @@ TEMPLATE_DIRS
 Default: ``()`` (Empty tuple)
 
 List of locations of the template source files searched by
-:class:`django.template.loaders.filesystem.Loader`, in search order.
+:class:`freedom.template.loaders.filesystem.Loader`, in search order.
 
 Note that these paths should use Unix-style forward slashes, even on Windows.
 
@@ -2046,8 +2046,8 @@ TEMPLATE_LOADERS
 
 Default::
 
-     ('django.template.loaders.filesystem.Loader',
-      'django.template.loaders.app_directories.Loader')
+     ('freedom.template.loaders.filesystem.Loader',
+      'freedom.template.loaders.app_directories.Loader')
 
 A tuple of template loader classes, specified as strings. Each ``Loader`` class
 knows how to import templates from a particular source. Optionally, a tuple can be
@@ -2070,7 +2070,7 @@ misspelled) variables. See :ref:`invalid-template-variables`..
 TEST_RUNNER
 -----------
 
-Default: ``'django.test.runner.DiscoverRunner'``
+Default: ``'freedom.test.runner.DiscoverRunner'``
 
 The name of the class to use for starting the test suite. See
 :ref:`other-testing-frameworks`.
@@ -2122,7 +2122,7 @@ Default::
 A tuple of formats that will be accepted when inputting data on a time field.
 Formats will be tried in order, using the first valid one. Note that these
 format strings use Python's datetime_ module syntax, not the format strings
-from the ``date`` Django template tag.
+from the ``date`` Freedom template tag.
 
 When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
 precedence and will be applied instead.
@@ -2142,40 +2142,40 @@ A string representing the time zone for this installation, or ``None``. See
 the `list of time zones`_.
 
 .. note::
-    Since Django was first released with the :setting:`TIME_ZONE` set to
+    Since Freedom was first released with the :setting:`TIME_ZONE` set to
     ``'America/Chicago'``, the global setting (used if nothing is defined in
     your project's ``settings.py``) remains ``'America/Chicago'`` for backwards
     compatibility. New project templates default to ``'UTC'``.
 
 Note that this isn't necessarily the time zone of the server. For example, one
-server may serve multiple Django-powered sites, each with a separate time zone
+server may serve multiple Freedom-powered sites, each with a separate time zone
 setting.
 
-When :setting:`USE_TZ` is ``False``, this is the time zone in which Django
+When :setting:`USE_TZ` is ``False``, this is the time zone in which Freedom
 will store all datetimes. When :setting:`USE_TZ` is ``True``, this is the
-default time zone that Django will use to display datetimes in templates and
+default time zone that Freedom will use to display datetimes in templates and
 to interpret datetimes entered in forms.
 
-Django sets the ``os.environ['TZ']`` variable to the time zone you specify in
+Freedom sets the ``os.environ['TZ']`` variable to the time zone you specify in
 the :setting:`TIME_ZONE` setting. Thus, all your views and models will
-automatically operate in this time zone. However, Django won't set the ``TZ``
+automatically operate in this time zone. However, Freedom won't set the ``TZ``
 environment variable under the following conditions:
 
 * If you're using the manual configuration option as described in
   :ref:`manually configuring settings
-  <settings-without-django-settings-module>`, or
+  <settings-without-freedom-settings-module>`, or
 
-* If you specify ``TIME_ZONE = None``. This will cause Django to fall back to
+* If you specify ``TIME_ZONE = None``. This will cause Freedom to fall back to
   using the system timezone. However, this is discouraged when :setting:`USE_TZ
   = True <USE_TZ>`, because it makes conversions between local time and UTC
   less reliable.
 
-If Django doesn't set the ``TZ`` environment variable, it's up to you
+If Freedom doesn't set the ``TZ`` environment variable, it's up to you
 to ensure your processes are running in the correct environment.
 
 .. note::
-    Django cannot reliably use alternate time zones in a Windows environment.
-    If you're running Django on Windows, :setting:`TIME_ZONE` must be set to
+    Freedom cannot reliably use alternate time zones in a Windows environment.
+    If you're running Freedom on Windows, :setting:`TIME_ZONE` must be set to
     match the system time zone.
 
 .. _list of time zones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
@@ -2201,9 +2201,9 @@ USE_I18N
 
 Default: ``True``
 
-A boolean that specifies whether Django's translation system should be enabled.
+A boolean that specifies whether Freedom's translation system should be enabled.
 This provides an easy way to turn it off, for performance. If this is set to
-``False``, Django will make some optimizations so as not to load the
+``False``, Freedom will make some optimizations so as not to load the
 translation machinery.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
@@ -2216,14 +2216,14 @@ USE_L10N
 Default: ``False``
 
 A boolean that specifies if localized formatting of data will be enabled by
-default or not. If this is set to ``True``, e.g. Django will display numbers and
+default or not. If this is set to ``True``, e.g. Freedom will display numbers and
 dates using the format of the current locale.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin.py
+    The default :file:`settings.py` file created by :djadmin:`freedom-admin.py
     startproject <startproject>` includes ``USE_L10N = True`` for convenience.
 
 .. setting:: USE_THOUSAND_SEPARATOR
@@ -2235,7 +2235,7 @@ Default: ``False``
 
 A boolean that specifies whether to display numbers using a thousand separator.
 When :setting:`USE_L10N` is set to ``True`` and if this is also set to
-``True``, Django will use the values of :setting:`THOUSAND_SEPARATOR` and
+``True``, Freedom will use the values of :setting:`THOUSAND_SEPARATOR` and
 :setting:`NUMBER_GROUPING` to format numbers.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
@@ -2249,15 +2249,15 @@ USE_TZ
 Default: ``False``
 
 A boolean that specifies if datetimes will be timezone-aware by default or not.
-If this is set to ``True``, Django will use timezone-aware datetimes internally.
-Otherwise, Django will use naive datetimes in local time.
+If this is set to ``True``, Freedom will use timezone-aware datetimes internally.
+Otherwise, Freedom will use naive datetimes in local time.
 
 See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 
 .. note::
 
     The default :file:`settings.py` file created by
-    :djadmin:`django-admin.py startproject <startproject>` includes
+    :djadmin:`freedom-admin.py startproject <startproject>` includes
     ``USE_TZ = True`` for convenience.
 
 .. setting:: USE_X_FORWARDED_HOST
@@ -2278,15 +2278,15 @@ WSGI_APPLICATION
 
 Default: ``None``
 
-The full Python path of the WSGI application object that Django's built-in
-servers (e.g. :djadmin:`runserver`) will use. The :djadmin:`django-admin.py
+The full Python path of the WSGI application object that Freedom's built-in
+servers (e.g. :djadmin:`runserver`) will use. The :djadmin:`freedom-admin.py
 startproject <startproject>` management command will create a simple
 ``wsgi.py`` file with an ``application`` callable in it, and point this setting
 to that ``application``.
 
-If not set, the return value of ``django.core.wsgi.get_wsgi_application()``
+If not set, the return value of ``freedom.core.wsgi.get_wsgi_application()``
 will be used. In this case, the behavior of :djadmin:`runserver` will be
-identical to previous Django versions.
+identical to previous Freedom versions.
 
 .. setting:: YEAR_MONTH_FORMAT
 
@@ -2295,11 +2295,11 @@ YEAR_MONTH_FORMAT
 
 Default: ``'F Y'``
 
-The default formatting to use for date fields on Django admin change-list
+The default formatting to use for date fields on Freedom admin change-list
 pages -- and, possibly, by other parts of the system -- in cases when only the
 year and month are displayed.
 
-For example, when a Django admin change-list page is being filtered by a date
+For example, when a Freedom admin change-list page is being filtered by a date
 drilldown, the header for a given month displays the month and the year.
 Different locales have different formats. For example, U.S. English would say
 "January 2006," whereas another locale might say "2006/January."
@@ -2316,21 +2316,21 @@ X_FRAME_OPTIONS
 Default: ``'SAMEORIGIN'``
 
 The default value for the X-Frame-Options header used by
-:class:`~django.middleware.clickjacking.XFrameOptionsMiddleware`. See the
+:class:`~freedom.middleware.clickjacking.XFrameOptionsMiddleware`. See the
 :doc:`clickjacking protection </ref/clickjacking/>` documentation.
 
 
 Auth
 ====
 
-Settings for :mod:`django.contrib.auth`.
+Settings for :mod:`freedom.contrib.auth`.
 
 .. setting:: AUTHENTICATION_BACKENDS
 
 AUTHENTICATION_BACKENDS
 -----------------------
 
-Default: ``('django.contrib.auth.backends.ModelBackend',)``
+Default: ``('freedom.contrib.auth.backends.ModelBackend',)``
 
 A tuple of authentication backend classes (as strings) to use when attempting to
 authenticate a user. See the :ref:`authentication backends documentation
@@ -2355,7 +2355,7 @@ Default: ``'/accounts/profile/'``
 The URL where requests are redirected after login when the
 ``contrib.auth.login`` view gets no ``next`` parameter.
 
-This is used by the :func:`~django.contrib.auth.decorators.login_required`
+This is used by the :func:`~freedom.contrib.auth.decorators.login_required`
 decorator, for example.
 
 This setting also accepts view function names and :ref:`named URL patterns
@@ -2370,7 +2370,7 @@ LOGIN_URL
 Default: ``'/accounts/login/'``
 
 The URL where requests are redirected for login, especially when using the
-:func:`~django.contrib.auth.decorators.login_required` decorator.
+:func:`~freedom.contrib.auth.decorators.login_required` decorator.
 
 This setting also accepts view function names and :ref:`named URL patterns
 <naming-url-patterns>` which can be used to reduce configuration duplication
@@ -2393,7 +2393,7 @@ PASSWORD_RESET_TIMEOUT_DAYS
 Default: ``3``
 
 The number of days a password reset link is valid for. Used by the
-:mod:`django.contrib.auth` password reset mechanism.
+:mod:`freedom.contrib.auth` password reset mechanism.
 
 .. setting:: PASSWORD_HASHERS
 
@@ -2404,20 +2404,20 @@ See :ref:`auth_password_storage`.
 
 Default::
 
-    ('django.contrib.auth.hashers.PBKDF2PasswordHasher',
-     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-     'django.contrib.auth.hashers.BCryptPasswordHasher',
-     'django.contrib.auth.hashers.SHA1PasswordHasher',
-     'django.contrib.auth.hashers.MD5PasswordHasher',
-     'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
-     'django.contrib.auth.hashers.CryptPasswordHasher',)
+    ('freedom.contrib.auth.hashers.PBKDF2PasswordHasher',
+     'freedom.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+     'freedom.contrib.auth.hashers.BCryptPasswordHasher',
+     'freedom.contrib.auth.hashers.SHA1PasswordHasher',
+     'freedom.contrib.auth.hashers.MD5PasswordHasher',
+     'freedom.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
+     'freedom.contrib.auth.hashers.CryptPasswordHasher',)
 
 .. _settings-messages:
 
 Messages
 ========
 
-Settings for :mod:`django.contrib.messages`.
+Settings for :mod:`freedom.contrib.messages`.
 
 .. setting:: MESSAGE_LEVEL
 
@@ -2435,7 +2435,7 @@ framework. See :ref:`message levels <message-level>` for more details.
    the built-in constants, you must import the constants module directly to
    avoid the potential for circular imports, e.g.::
 
-       from django.contrib.messages import constants as message_constants
+       from freedom.contrib.messages import constants as message_constants
        MESSAGE_LEVEL = message_constants.DEBUG
 
    If desired, you may specify the numeric values for the constants directly
@@ -2447,19 +2447,19 @@ framework. See :ref:`message levels <message-level>` for more details.
 MESSAGE_STORAGE
 ---------------
 
-Default: ``'django.contrib.messages.storage.fallback.FallbackStorage'``
+Default: ``'freedom.contrib.messages.storage.fallback.FallbackStorage'``
 
-Controls where Django stores message data. Valid values are:
+Controls where Freedom stores message data. Valid values are:
 
-* ``'django.contrib.messages.storage.fallback.FallbackStorage'``
-* ``'django.contrib.messages.storage.session.SessionStorage'``
-* ``'django.contrib.messages.storage.cookie.CookieStorage'``
+* ``'freedom.contrib.messages.storage.fallback.FallbackStorage'``
+* ``'freedom.contrib.messages.storage.session.SessionStorage'``
+* ``'freedom.contrib.messages.storage.cookie.CookieStorage'``
 
 See :ref:`message storage backends <message-storage-backends>` for more details.
 
 The backends that use cookies --
-:class:`~django.contrib.messages.storage.cookie.CookieStorage` and
-:class:`~django.contrib.messages.storage.fallback.FallbackStorage` --
+:class:`~freedom.contrib.messages.storage.cookie.CookieStorage` and
+:class:`~freedom.contrib.messages.storage.fallback.FallbackStorage` --
 use the value of :setting:`SESSION_COOKIE_DOMAIN`, :setting:`SESSION_COOKIE_SECURE`
 and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
 
@@ -2487,7 +2487,7 @@ to override. See :ref:`message-displaying` above for more details.
    the built-in constants, you must import the ``constants`` module directly to
    avoid the potential for circular imports, e.g.::
 
-       from django.contrib.messages import constants as message_constants
+       from freedom.contrib.messages import constants as message_constants
        MESSAGE_TAGS = {message_constants.INFO: ''}
 
    If desired, you may specify the numeric values for the constants directly
@@ -2499,7 +2499,7 @@ to override. See :ref:`message-displaying` above for more details.
 Sessions
 ========
 
-Settings for :mod:`django.contrib.sessions`.
+Settings for :mod:`freedom.contrib.sessions`.
 
 .. setting:: SESSION_CACHE_ALIAS
 
@@ -2537,7 +2537,7 @@ standard domain cookies, existing user cookies will be set to the old
 domain. This may result in them being unable to log in as long as these cookies
 persist.
 
-This setting also affects cookies set by :mod:`django.contrib.messages`.
+This setting also affects cookies set by :mod:`freedom.contrib.messages`.
 
 .. setting:: SESSION_COOKIE_HTTPONLY
 
@@ -2558,7 +2558,7 @@ protected cookie data.
 
 .. versionadded:: 1.7
 
-This setting also affects cookies set by :mod:`django.contrib.messages`.
+This setting also affects cookies set by :mod:`freedom.contrib.messages`.
 
 .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 
@@ -2580,9 +2580,9 @@ SESSION_COOKIE_PATH
 Default: ``'/'``
 
 The path set on the session cookie. This should either match the URL path of your
-Django installation or be parent of that path.
+Freedom installation or be parent of that path.
 
-This is useful if you have multiple Django instances running under the same
+This is useful if you have multiple Freedom instances running under the same
 hostname. They can use different cookie paths, and each instance will only see
 its own session cookie.
 
@@ -2599,22 +2599,22 @@ ensure that the cookie is only sent under an HTTPS connection.
 
 .. versionadded:: 1.7
 
-This setting also affects cookies set by :mod:`django.contrib.messages`.
+This setting also affects cookies set by :mod:`freedom.contrib.messages`.
 
 .. setting:: SESSION_ENGINE
 
 SESSION_ENGINE
 --------------
 
-Default: ``django.contrib.sessions.backends.db``
+Default: ``freedom.contrib.sessions.backends.db``
 
-Controls where Django stores session data. Included engines are:
+Controls where Freedom stores session data. Included engines are:
 
-* ``'django.contrib.sessions.backends.db'``
-* ``'django.contrib.sessions.backends.file'``
-* ``'django.contrib.sessions.backends.cache'``
-* ``'django.contrib.sessions.backends.cached_db'``
-* ``'django.contrib.sessions.backends.signed_cookies'``
+* ``'freedom.contrib.sessions.backends.db'``
+* ``'freedom.contrib.sessions.backends.file'``
+* ``'freedom.contrib.sessions.backends.cache'``
+* ``'freedom.contrib.sessions.backends.cached_db'``
+* ``'freedom.contrib.sessions.backends.signed_cookies'``
 
 See :ref:`configuring-sessions` for more details.
 
@@ -2636,8 +2636,8 @@ SESSION_FILE_PATH
 Default: ``None``
 
 If you're using file-based session storage, this sets the directory in
-which Django will store session data. When the default value (``None``) is
-used, Django will use the standard temporary directory for the system.
+which Freedom will store session data. When the default value (``None``) is
+used, Freedom will use the standard temporary directory for the system.
 
 
 .. setting:: SESSION_SAVE_EVERY_REQUEST
@@ -2656,22 +2656,22 @@ that is, if any of its dictionary values have been assigned or deleted.
 SESSION_SERIALIZER
 ------------------
 
-Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
+Default: ``'freedom.contrib.sessions.serializers.JSONSerializer'``
 
 Full import path of a serializer class to use for serializing session data.
 Included serializers are:
 
-* ``'django.contrib.sessions.serializers.PickleSerializer'``
-* ``'django.contrib.sessions.serializers.JSONSerializer'``
+* ``'freedom.contrib.sessions.serializers.PickleSerializer'``
+* ``'freedom.contrib.sessions.serializers.JSONSerializer'``
 
 See :ref:`session_serialization` for details, including a warning regarding
 possible remote code execution when using
-:class:`~django.contrib.sessions.serializers.PickleSerializer`.
+:class:`~freedom.contrib.sessions.serializers.PickleSerializer`.
 
 Sites
 =====
 
-Settings for :mod:`django.contrib.sites`.
+Settings for :mod:`freedom.contrib.sites`.
 
 .. setting:: SITE_ID
 
@@ -2680,7 +2680,7 @@ SITE_ID
 
 Default: Not defined
 
-The ID, as an integer, of the current site in the ``django_site`` database
+The ID, as an integer, of the current site in the ``freedom_site`` database
 table. This is used so that application data can hook into specific sites
 and a single database can manage content for multiple sites.
 
@@ -2690,7 +2690,7 @@ and a single database can manage content for multiple sites.
 Static files
 ============
 
-Settings for :mod:`django.contrib.staticfiles`.
+Settings for :mod:`freedom.contrib.staticfiles`.
 
 .. setting:: STATIC_ROOT
 
@@ -2785,7 +2785,7 @@ This would allow you to refer to the local file
 ``'/opt/webfiles/stats/polls_20101022.tar.gz'`` with
 ``'/static/downloads/polls_20101022.tar.gz'`` in your templates, e.g.:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     <a href="{% static "downloads/polls_20101022.tar.gz" %}">
 
@@ -2794,13 +2794,13 @@ This would allow you to refer to the local file
 STATICFILES_STORAGE
 -------------------
 
-Default: ``'django.contrib.staticfiles.storage.StaticFilesStorage'``
+Default: ``'freedom.contrib.staticfiles.storage.StaticFilesStorage'``
 
 The file storage engine to use when collecting static files with the
 :djadmin:`collectstatic` management command.
 
 A ready-to-use instance of the storage backend defined in this setting
-can be found at ``django.contrib.staticfiles.storage.staticfiles_storage``.
+can be found at ``freedom.contrib.staticfiles.storage.staticfiles_storage``.
 
 For an example, see :ref:`staticfiles-from-cdn`.
 
@@ -2811,21 +2811,21 @@ STATICFILES_FINDERS
 
 Default::
 
-    ("django.contrib.staticfiles.finders.FileSystemFinder",
-     "django.contrib.staticfiles.finders.AppDirectoriesFinder")
+    ("freedom.contrib.staticfiles.finders.FileSystemFinder",
+     "freedom.contrib.staticfiles.finders.AppDirectoriesFinder")
 
 The list of finder backends that know how to find static files in
 various locations.
 
 The default will find files stored in the :setting:`STATICFILES_DIRS` setting
-(using ``django.contrib.staticfiles.finders.FileSystemFinder``) and in a
+(using ``freedom.contrib.staticfiles.finders.FileSystemFinder``) and in a
 ``static`` subdirectory of each app (using
-``django.contrib.staticfiles.finders.AppDirectoriesFinder``). If multiple
+``freedom.contrib.staticfiles.finders.AppDirectoriesFinder``). If multiple
 files with the same name are present, the first file that is found will be
 used.
 
 One finder is disabled by default:
-``django.contrib.staticfiles.finders.DefaultStorageFinder``. If added to
+``freedom.contrib.staticfiles.finders.DefaultStorageFinder``. If added to
 your :setting:`STATICFILES_FINDERS` setting, it will look for static files in
 the default file storage as defined by the :setting:`DEFAULT_FILE_STORAGE`
 setting.

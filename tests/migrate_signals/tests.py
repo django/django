@@ -1,9 +1,9 @@
-from django.apps import apps
-from django.core import management
-from django.db.models import signals
-from django.test import TestCase
-from django.test.utils import override_system_checks
-from django.utils import six
+from freedom.apps import apps
+from freedom.core import management
+from freedom.db.models import signals
+from freedom.test import TestCase
+from freedom.test.utils import override_system_checks
+from freedom.utils import six
 
 
 APP_CONFIG = apps.get_app_config('migrate_signals')

@@ -9,8 +9,8 @@ For each field that has ``choices``, a model instance gets a
 field. This method returns the "human-readable" value of the field.
 """
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 GENDER_CHOICES = (

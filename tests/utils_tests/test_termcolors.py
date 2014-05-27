@@ -1,6 +1,6 @@
 import unittest
 
-from django.utils.termcolors import (parse_color_setting, PALETTES,
+from freedom.utils.termcolors import (parse_color_setting, PALETTES,
     DEFAULT_PALETTE, LIGHT_PALETTE, DARK_PALETTE, NOCOLOR_PALETTE, colorize)
 
 

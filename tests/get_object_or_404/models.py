@@ -10,8 +10,8 @@ performing a ``filter()`` lookup and raising a ``Http404`` exception if a
 ``DoesNotExist`` exception was raised during the ``filter()`` call.
 """
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

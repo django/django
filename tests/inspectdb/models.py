@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 import warnings
 
-from django.db import models
+from freedom.db import models
 
 
 class People(models.Model):

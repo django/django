@@ -2,9 +2,9 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from django.core.exceptions import ValidationError
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.core.exceptions import ValidationError
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 def validate_answer_to_universe(value):

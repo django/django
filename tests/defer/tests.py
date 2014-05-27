@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.db.models.query_utils import DeferredAttribute, InvalidQuery
-from django.test import TestCase
+from freedom.db.models.query_utils import DeferredAttribute, InvalidQuery
+from freedom.test import TestCase
 
 from .models import Secondary, Primary, Child, BigChild, ChildProxy
 

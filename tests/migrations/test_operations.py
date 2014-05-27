@@ -7,13 +7,13 @@ try:
 except ImportError:
     sqlparse = None
 
-from django import test
-from django.db import connection, migrations, models, router
-from django.db.migrations.migration import Migration
-from django.db.migrations.state import ProjectState
-from django.db.models.fields import NOT_PROVIDED
-from django.db.transaction import atomic
-from django.db.utils import IntegrityError, DatabaseError
+from freedom import test
+from freedom.db import connection, migrations, models, router
+from freedom.db.migrations.migration import Migration
+from freedom.db.migrations.state import ProjectState
+from freedom.db.models.fields import NOT_PROVIDED
+from freedom.db.transaction import atomic
+from freedom.db.utils import IntegrityError, DatabaseError
 
 from .test_base import MigrationTestBase
 

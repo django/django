@@ -1,7 +1,7 @@
 .. _contents:
 
 =============================
-Django documentation contents
+Freedom documentation contents
 =============================
 
 .. toctree::

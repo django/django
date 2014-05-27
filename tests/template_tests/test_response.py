@@ -5,13 +5,13 @@ import pickle
 import time
 from datetime import datetime
 
-from django.test import RequestFactory, TestCase
-from django.conf import settings
-from django.template import Template, Context
-from django.template.response import (TemplateResponse, SimpleTemplateResponse,
+from freedom.test import RequestFactory, TestCase
+from freedom.conf import settings
+from freedom.template import Template, Context
+from freedom.template.response import (TemplateResponse, SimpleTemplateResponse,
                                       ContentNotRenderedError)
-from django.test import override_settings
-from django.utils._os import upath
+from freedom.test import override_settings
+from freedom.utils._os import upath
 
 
 def test_processor(request):
@@ -316,8 +316,8 @@ class CustomURLConfTest(TestCase):
 @override_settings(
     CACHE_MIDDLEWARE_SECONDS=2.0,
     MIDDLEWARE_CLASSES=list(settings.MIDDLEWARE_CLASSES) + [
-        'django.middleware.cache.FetchFromCacheMiddleware',
-        'django.middleware.cache.UpdateCacheMiddleware',
+        'freedom.middleware.cache.FetchFromCacheMiddleware',
+        'freedom.middleware.cache.UpdateCacheMiddleware',
     ],
     ROOT_URLCONF='template_tests.alternate_urls',
 )

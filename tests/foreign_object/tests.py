@@ -4,10 +4,10 @@ from operator import attrgetter
 from .models import (
     Country, Person, Group, Membership, Friendship, Article,
     ArticleTranslation, ArticleTag, ArticleIdea, NewsArticle)
-from django.test import TestCase, skipUnlessDBFeature
-from django.utils.translation import activate
-from django.core.exceptions import FieldError
-from django import forms
+from freedom.test import TestCase, skipUnlessDBFeature
+from freedom.utils.translation import activate
+from freedom.core.exceptions import FieldError
+from freedom import forms
 
 # Note that these tests are testing internal implementation details.
 # ForeignObject is not part of public API.
@@ -382,7 +382,7 @@ class MultiColumnFKTests(TestCase):
 
     @skipUnlessDBFeature('has_bulk_insert')
     def test_batch_create_foreign_object(self):
-        """ See: https://code.djangoproject.com/ticket/21566 """
+        """ See: https://code.freedomproject.com/ticket/21566 """
         objs = [Person(name="abcd_%s" % i, person_country=self.usa) for i in range(0, 5)]
         Person.objects.bulk_create(objs, 10)
 

@@ -1,10 +1,10 @@
 from unittest import skipIf
 
-from django.test import TestCase, override_settings
-from django.db import connection, connections
-from django.db.migrations.loader import MigrationLoader, AmbiguityError
-from django.db.migrations.recorder import MigrationRecorder
-from django.utils import six
+from freedom.test import TestCase, override_settings
+from freedom.db import connection, connections
+from freedom.db.migrations.loader import MigrationLoader, AmbiguityError
+from freedom.db.migrations.recorder import MigrationRecorder
+from freedom.utils import six
 
 
 class RecorderTests(TestCase):

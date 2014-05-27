@@ -17,18 +17,18 @@ import sys
 import unittest
 import warnings
 
-import django
-from django import conf, get_version
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.core.management import BaseCommand, CommandError, call_command
-from django.db import connection
-from django.utils.encoding import force_text
-from django.utils._os import npath, upath
-from django.utils.six import StringIO
-from django.test import LiveServerTestCase, TestCase, override_settings
-from django.test.runner import DiscoverRunner
-from django.test.utils import str_prefix
+import freedom
+from freedom import conf, get_version
+from freedom.conf import settings
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.core.management import BaseCommand, CommandError, call_command
+from freedom.db import connection
+from freedom.utils.encoding import force_text
+from freedom.utils._os import npath, upath
+from freedom.utils.six import StringIO
+from freedom.test import LiveServerTestCase, TestCase, override_settings
+from freedom.test.runner import DiscoverRunner
+from freedom.test.utils import str_prefix
 
 
 test_dir = os.path.realpath(os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project'))
@@ -67,7 +67,7 @@ class AdminScriptTestCase(unittest.TestCase):
                     settings_file.write("%s = %s\n" % (s, o))
 
             if apps is None:
-                apps = ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts']
+                apps = ['freedom.contrib.auth', 'freedom.contrib.contenttypes', 'admin_scripts']
 
             settings_file.write("INSTALLED_APPS = %s\n" % apps)
 
@@ -106,7 +106,7 @@ class AdminScriptTestCase(unittest.TestCase):
         first_package_re = re.compile(r'(^[^\.]+)\.')
         for backend in settings.DATABASES.values():
             result = first_package_re.findall(backend['ENGINE'])
-            if result and result != ['django']:
+            if result and result != ['freedom']:
                 backend_pkg = __import__(result[0])
                 backend_dir = os.path.dirname(backend_pkg.__file__)
                 paths.append(os.path.dirname(backend_dir))
@@ -114,12 +114,12 @@ class AdminScriptTestCase(unittest.TestCase):
 
     def run_test(self, script, args, settings_file=None, apps=None):
         base_dir = os.path.dirname(test_dir)
-        # The base dir for Django's tests is one level up.
+        # The base dir for Freedom's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
-        # The base dir for Django is one level above the test dir. We don't use
-        # `import django` to figure that out, so we don't pick up a Django
+        # The base dir for Freedom is one level above the test dir. We don't use
+        # `import freedom` to figure that out, so we don't pick up a Freedom
         # from site-packages or similar.
-        django_dir = os.path.dirname(tests_dir)
+        freedom_dir = os.path.dirname(tests_dir)
         ext_backend_base_dirs = self._ext_backend_paths()
 
         # Define a temporary environment for the subprocess
@@ -136,7 +136,7 @@ class AdminScriptTestCase(unittest.TestCase):
             test_environ['DJANGO_SETTINGS_MODULE'] = str(settings_file)
         elif 'DJANGO_SETTINGS_MODULE' in test_environ:
             del test_environ['DJANGO_SETTINGS_MODULE']
-        python_path = [base_dir, django_dir, tests_dir]
+        python_path = [base_dir, freedom_dir, tests_dir]
         python_path.extend(ext_backend_base_dirs)
         # Use native strings for better compatibility
         test_environ[str(python_path_var_name)] = npath(os.pathsep.join(python_path))
@@ -152,9 +152,9 @@ class AdminScriptTestCase(unittest.TestCase):
 
         return out, err
 
-    def run_django_admin(self, args, settings_file=None):
-        script_dir = os.path.abspath(os.path.join(os.path.dirname(upath(django.__file__)), 'bin'))
-        return self.run_test(os.path.join(script_dir, 'django-admin.py'), args, settings_file)
+    def run_freedom_admin(self, args, settings_file=None):
+        script_dir = os.path.abspath(os.path.join(os.path.dirname(upath(freedom.__file__)), 'bin'))
+        return self.run_test(os.path.join(script_dir, 'freedom-admin.py'), args, settings_file)
 
     def run_manage(self, args, settings_file=None):
         def safe_remove(path):
@@ -196,37 +196,37 @@ class AdminScriptTestCase(unittest.TestCase):
 ##########################################################################
 # DJANGO ADMIN TESTS
 # This first series of test classes checks the environment processing
-# of the django-admin.py script
+# of the freedom-admin.py script
 ##########################################################################
 
 
-class DjangoAdminNoSettings(AdminScriptTestCase):
-    "A series of tests for django-admin.py when there is no settings.py file."
+class FreedomAdminNoSettings(AdminScriptTestCase):
+    "A series of tests for freedom-admin.py when there is no settings.py file."
 
     def test_builtin_command(self):
-        "no settings: django-admin builtin commands fail with an error when no settings provided"
+        "no settings: freedom-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_bad_settings(self):
-        "no settings: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "no settings: freedom-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_builtin_with_bad_environment(self):
-        "no settings: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "no settings: freedom-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_freedom_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
 
-class DjangoAdminDefaultSettings(AdminScriptTestCase):
-    """A series of tests for django-admin.py when using a settings.py file that
+class FreedomAdminDefaultSettings(AdminScriptTestCase):
+    """A series of tests for freedom-admin.py when using a settings.py file that
     contains the test application.
     """
     def setUp(self):
@@ -236,198 +236,198 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         self.remove_settings('settings.py')
 
     def test_builtin_command(self):
-        "default: django-admin builtin commands fail with an error when no settings provided"
+        "default: freedom-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
-        "default: django-admin builtin commands succeed if settings are provided as argument"
+        "default: freedom-admin builtin commands succeed if settings are provided as argument"
         args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_environment(self):
-        "default: django-admin builtin commands succeed if settings are provided in the environment"
+        "default: freedom-admin builtin commands succeed if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_freedom_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_bad_settings(self):
-        "default: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "default: freedom-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_builtin_with_bad_environment(self):
-        "default: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "default: freedom-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_freedom_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_custom_command(self):
-        "default: django-admin can't execute user commands if it isn't provided settings"
+        "default: freedom-admin can't execute user commands if it isn't provided settings"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "settings are not configured")
 
     def test_custom_command_with_settings(self):
-        "default: django-admin can execute user commands if settings are provided as argument"
+        "default: freedom-admin can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=test_project.settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
     def test_custom_command_with_environment(self):
-        "default: django-admin can execute user commands if settings are provided in environment"
+        "default: freedom-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_freedom_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
 
-class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
-    """A series of tests for django-admin.py when using a settings.py file that
+class FreedomAdminFullPathDefaultSettings(AdminScriptTestCase):
+    """A series of tests for freedom-admin.py when using a settings.py file that
     contains the test application specified using a full path.
     """
     def setUp(self):
-        self.write_settings('settings.py', ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts'])
+        self.write_settings('settings.py', ['freedom.contrib.auth', 'freedom.contrib.contenttypes', 'admin_scripts'])
 
     def tearDown(self):
         self.remove_settings('settings.py')
 
     def test_builtin_command(self):
-        "fulldefault: django-admin builtin commands fail with an error when no settings provided"
+        "fulldefault: freedom-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
-        "fulldefault: django-admin builtin commands succeed if a settings file is provided"
+        "fulldefault: freedom-admin builtin commands succeed if a settings file is provided"
         args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_environment(self):
-        "fulldefault: django-admin builtin commands succeed if the environment contains settings"
+        "fulldefault: freedom-admin builtin commands succeed if the environment contains settings"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_freedom_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_bad_settings(self):
-        "fulldefault: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "fulldefault: freedom-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_builtin_with_bad_environment(self):
-        "fulldefault: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "fulldefault: freedom-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_freedom_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_custom_command(self):
-        "fulldefault: django-admin can't execute user commands unless settings are provided"
+        "fulldefault: freedom-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "settings are not configured")
 
     def test_custom_command_with_settings(self):
-        "fulldefault: django-admin can execute user commands if settings are provided as argument"
+        "fulldefault: freedom-admin can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=test_project.settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
     def test_custom_command_with_environment(self):
-        "fulldefault: django-admin can execute user commands if settings are provided in environment"
+        "fulldefault: freedom-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_freedom_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
 
-class DjangoAdminMinimalSettings(AdminScriptTestCase):
-    """A series of tests for django-admin.py when using a settings.py file that
+class FreedomAdminMinimalSettings(AdminScriptTestCase):
+    """A series of tests for freedom-admin.py when using a settings.py file that
     doesn't contain the test application.
     """
     def setUp(self):
-        self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
+        self.write_settings('settings.py', apps=['freedom.contrib.auth', 'freedom.contrib.contenttypes'])
 
     def tearDown(self):
         self.remove_settings('settings.py')
 
     def test_builtin_command(self):
-        "minimal: django-admin builtin commands fail with an error when no settings provided"
+        "minimal: freedom-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
-        "minimal: django-admin builtin commands fail if settings are provided as argument"
+        "minimal: freedom-admin builtin commands fail if settings are provided as argument"
         args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_environment(self):
-        "minimal: django-admin builtin commands fail if settings are provided in the environment"
+        "minimal: freedom-admin builtin commands fail if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_freedom_admin(args, 'test_project.settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
     def test_builtin_with_bad_settings(self):
-        "minimal: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "minimal: freedom-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_builtin_with_bad_environment(self):
-        "minimal: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "minimal: freedom-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_freedom_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_custom_command(self):
-        "minimal: django-admin can't execute user commands unless settings are provided"
+        "minimal: freedom-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "settings are not configured")
 
     def test_custom_command_with_settings(self):
-        "minimal: django-admin can't execute user commands, even if settings are provided as argument"
+        "minimal: freedom-admin can't execute user commands, even if settings are provided as argument"
         args = ['noargs_command', '--settings=test_project.settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_environment(self):
-        "minimal: django-admin can't execute user commands, even if settings are provided in environment"
+        "minimal: freedom-admin can't execute user commands, even if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_freedom_admin(args, 'test_project.settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
 
-class DjangoAdminAlternateSettings(AdminScriptTestCase):
-    """A series of tests for django-admin.py when using a settings file
+class FreedomAdminAlternateSettings(AdminScriptTestCase):
+    """A series of tests for freedom-admin.py when using a settings file
     with a name other than 'settings.py'.
     """
     def setUp(self):
@@ -437,70 +437,70 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         self.remove_settings('alternate_settings.py')
 
     def test_builtin_command(self):
-        "alternate: django-admin builtin commands fail with an error when no settings provided"
+        "alternate: freedom-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
-        "alternate: django-admin builtin commands succeed if settings are provided as argument"
+        "alternate: freedom-admin builtin commands succeed if settings are provided as argument"
         args = ['sqlall', '--settings=test_project.alternate_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_environment(self):
-        "alternate: django-admin builtin commands succeed if settings are provided in the environment"
+        "alternate: freedom-admin builtin commands succeed if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'test_project.alternate_settings')
+        out, err = self.run_freedom_admin(args, 'test_project.alternate_settings')
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_bad_settings(self):
-        "alternate: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "alternate: freedom-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_builtin_with_bad_environment(self):
-        "alternate: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "alternate: freedom-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_freedom_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_custom_command(self):
-        "alternate: django-admin can't execute user commands unless settings are provided"
+        "alternate: freedom-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "settings are not configured")
 
     def test_custom_command_with_settings(self):
-        "alternate: django-admin can execute user commands if settings are provided as argument"
+        "alternate: freedom-admin can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=test_project.alternate_settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
     def test_custom_command_with_environment(self):
-        "alternate: django-admin can execute user commands if settings are provided in environment"
+        "alternate: freedom-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args, 'test_project.alternate_settings')
+        out, err = self.run_freedom_admin(args, 'test_project.alternate_settings')
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
 
-class DjangoAdminMultipleSettings(AdminScriptTestCase):
-    """A series of tests for django-admin.py when multiple settings files
+class FreedomAdminMultipleSettings(AdminScriptTestCase):
+    """A series of tests for freedom-admin.py when multiple settings files
     (including the default 'settings.py') are available. The default settings
     file is insufficient for performing the operations described, so the
     alternate settings must be used by the running script.
     """
     def setUp(self):
-        self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
+        self.write_settings('settings.py', apps=['freedom.contrib.auth', 'freedom.contrib.contenttypes'])
         self.write_settings('alternate_settings.py')
 
     def tearDown(self):
@@ -508,64 +508,64 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         self.remove_settings('alternate_settings.py')
 
     def test_builtin_command(self):
-        "alternate: django-admin builtin commands fail with an error when no settings provided"
+        "alternate: freedom-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_settings(self):
-        "alternate: django-admin builtin commands succeed if settings are provided as argument"
+        "alternate: freedom-admin builtin commands succeed if settings are provided as argument"
         args = ['sqlall', '--settings=test_project.alternate_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_environment(self):
-        "alternate: django-admin builtin commands succeed if settings are provided in the environment"
+        "alternate: freedom-admin builtin commands succeed if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'test_project.alternate_settings')
+        out, err = self.run_freedom_admin(args, 'test_project.alternate_settings')
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_bad_settings(self):
-        "alternate: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "alternate: freedom-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_builtin_with_bad_environment(self):
-        "alternate: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "alternate: freedom-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_freedom_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_custom_command(self):
-        "alternate: django-admin can't execute user commands unless settings are provided"
+        "alternate: freedom-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "settings are not configured")
 
     def test_custom_command_with_settings(self):
-        "alternate: django-admin can execute user commands if settings are provided as argument"
+        "alternate: freedom-admin can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=test_project.alternate_settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
     def test_custom_command_with_environment(self):
-        "alternate: django-admin can execute user commands if settings are provided in environment"
+        "alternate: freedom-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args, 'test_project.alternate_settings')
+        out, err = self.run_freedom_admin(args, 'test_project.alternate_settings')
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:NoArgsCommand")
 
 
-class DjangoAdminSettingsDirectory(AdminScriptTestCase):
+class FreedomAdminSettingsDirectory(AdminScriptTestCase):
     """
-    A series of tests for django-admin.py when the settings file is in a
+    A series of tests for freedom-admin.py when the settings file is in a
     directory. (see #9751).
     """
 
@@ -579,7 +579,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         "directory: startapp creates the correct directory"
         args = ['startapp', 'settings_test']
         app_path = os.path.join(test_dir, 'settings_test')
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_freedom_admin(args, 'test_project.settings')
         self.addCleanup(shutil.rmtree, app_path)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
@@ -589,50 +589,50 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         template_path = os.path.join(custom_templates_dir, 'app_template')
         args = ['startapp', '--template', template_path, 'custom_settings_test']
         app_path = os.path.join(test_dir, 'custom_settings_test')
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_freedom_admin(args, 'test_project.settings')
         self.addCleanup(shutil.rmtree, app_path)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         self.assertTrue(os.path.exists(os.path.join(app_path, 'api.py')))
 
     def test_builtin_command(self):
-        "directory: django-admin builtin commands fail with an error when no settings provided"
+        "directory: freedom-admin builtin commands fail with an error when no settings provided"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, 'settings are not configured')
 
     def test_builtin_with_bad_settings(self):
-        "directory: django-admin builtin commands fail if settings file (from argument) doesn't exist"
+        "directory: freedom-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['sqlall', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_builtin_with_bad_environment(self):
-        "directory: django-admin builtin commands fail if settings file (from environment) doesn't exist"
+        "directory: freedom-admin builtin commands fail if settings file (from environment) doesn't exist"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'bad_settings')
+        out, err = self.run_freedom_admin(args, 'bad_settings')
         self.assertNoOutput(out)
         self.assertOutput(err, "Could not import settings 'bad_settings'")
 
     def test_custom_command(self):
-        "directory: django-admin can't execute user commands unless settings are provided"
+        "directory: freedom-admin can't execute user commands unless settings are provided"
         args = ['noargs_command']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "settings are not configured")
 
     def test_builtin_with_settings(self):
-        "directory: django-admin builtin commands succeed if settings are provided as argument"
+        "directory: freedom-admin builtin commands succeed if settings are provided as argument"
         args = ['sqlall', '--settings=test_project.settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
     def test_builtin_with_environment(self):
-        "directory: django-admin builtin commands succeed if settings are provided in the environment"
+        "directory: freedom-admin builtin commands succeed if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        out, err = self.run_freedom_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
@@ -740,7 +740,7 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
     contains the test application specified using a full path.
     """
     def setUp(self):
-        self.write_settings('settings.py', ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts'])
+        self.write_settings('settings.py', ['freedom.contrib.auth', 'freedom.contrib.contenttypes', 'admin_scripts'])
 
     def tearDown(self):
         self.remove_settings('settings.py')
@@ -807,7 +807,7 @@ class ManageMinimalSettings(AdminScriptTestCase):
     doesn't contain the test application.
     """
     def setUp(self):
-        self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
+        self.write_settings('settings.py', apps=['freedom.contrib.auth', 'freedom.contrib.contenttypes'])
 
     def tearDown(self):
         self.remove_settings('settings.py')
@@ -954,7 +954,7 @@ class ManageMultipleSettings(AdminScriptTestCase):
     alternate settings must be used by the running script.
     """
     def setUp(self):
-        self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
+        self.write_settings('settings.py', apps=['freedom.contrib.auth', 'freedom.contrib.contenttypes'])
         self.write_settings('alternate_settings.py')
 
     def tearDown(self):
@@ -1070,7 +1070,7 @@ class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
         self.write_settings('settings.py', sdict={'MEDIA_URL': '"/no_ending_slash"'})
         args = ['help']
         out, err = self.run_manage(args)
-        self.assertOutput(out, 'only Django core commands are listed')
+        self.assertOutput(out, 'only Freedom core commands are listed')
         self.assertNoOutput(err)
 
 
@@ -1111,9 +1111,9 @@ class ManageCheck(AdminScriptTestCase):
             apps=[
                 'admin_scripts.complex_app',
                 'admin_scripts.simple_app',
-                'django.contrib.admin.apps.SimpleAdminConfig',
-                'django.contrib.auth',
-                'django.contrib.contenttypes',
+                'freedom.contrib.admin.apps.SimpleAdminConfig',
+                'freedom.contrib.auth',
+                'freedom.contrib.contenttypes',
             ],
             sdict={
                 'DEBUG': True
@@ -1130,9 +1130,9 @@ class ManageCheck(AdminScriptTestCase):
 
         self.write_settings('settings.py',
             apps=['admin_scripts.app_with_import',
-                  'django.contrib.auth',
-                  'django.contrib.contenttypes',
-                  'django.contrib.sites'],
+                  'freedom.contrib.auth',
+                  'freedom.contrib.contenttypes',
+                  'freedom.contrib.sites'],
             sdict={'DEBUG': True})
         args = ['check']
         out, err = self.run_manage(args)
@@ -1144,8 +1144,8 @@ class ManageCheck(AdminScriptTestCase):
 
         self.write_settings('settings.py',
             apps=['admin_scripts.app_raising_messages',
-                  'django.contrib.auth',
-                  'django.contrib.contenttypes'],
+                  'freedom.contrib.auth',
+                  'freedom.contrib.contenttypes'],
             sdict={'DEBUG': True})
         args = ['check']
         out, err = self.run_manage(args)
@@ -1168,7 +1168,7 @@ class ManageCheck(AdminScriptTestCase):
 
     def test_warning_does_not_halt(self):
         """
-        When there are only warnings or less serious messages, then Django
+        When there are only warnings or less serious messages, then Freedom
         should not prevent user from launching their project, so `check`
         command should not raise `CommandError` exception.
 
@@ -1178,8 +1178,8 @@ class ManageCheck(AdminScriptTestCase):
 
         self.write_settings('settings.py',
             apps=['admin_scripts.app_raising_warning',
-                  'django.contrib.auth',
-                  'django.contrib.contenttypes'],
+                  'freedom.contrib.auth',
+                  'freedom.contrib.contenttypes'],
             sdict={'DEBUG': True})
         args = ['check']
         out, err = self.run_manage(args)
@@ -1207,7 +1207,7 @@ class CustomTestRunner(DiscoverRunner):
 
 class ManageTestCommand(AdminScriptTestCase):
     def setUp(self):
-        from django.core.management.commands.test import Command as TestCommand
+        from freedom.core.management.commands.test import Command as TestCommand
         self.cmd = TestCommand()
 
     def test_liveserver(self):
@@ -1242,7 +1242,7 @@ class ManageTestCommand(AdminScriptTestCase):
 
 class ManageRunserver(AdminScriptTestCase):
     def setUp(self):
-        from django.core.management.commands.runserver import Command
+        from freedom.core.management.commands.runserver import Command
 
         def monkey_run(*args, **options):
             return
@@ -1347,7 +1347,7 @@ class CommandTypes(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertOutput(out, "Usage: manage.py subcommand [options] [args]")
         self.assertOutput(out, "Type 'manage.py help <subcommand>' for help on a specific subcommand.")
-        self.assertOutput(out, '[django]')
+        self.assertOutput(out, '[freedom]')
         self.assertOutput(out, 'startapp')
         self.assertOutput(out, 'startproject')
 
@@ -1357,7 +1357,7 @@ class CommandTypes(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNotInOutput(out, 'Usage:')
         self.assertNotInOutput(out, 'Options:')
-        self.assertNotInOutput(out, '[django]')
+        self.assertNotInOutput(out, '[freedom]')
         self.assertOutput(out, 'startapp')
         self.assertOutput(out, 'startproject')
         self.assertNotInOutput(out, '\n\n')
@@ -1501,7 +1501,7 @@ class CommandTypes(AdminScriptTestCase):
         args = ['app_command', 'auth']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
+        self.assertOutput(out, "EXECUTE:AppCommand name=freedom.contrib.auth, options=")
         self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
     def test_app_command_no_apps(self):
@@ -1515,9 +1515,9 @@ class CommandTypes(AdminScriptTestCase):
         args = ['app_command', 'auth', 'contenttypes']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
+        self.assertOutput(out, "EXECUTE:AppCommand name=freedom.contrib.auth, options=")
         self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
-        self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.contenttypes, options=")
+        self.assertOutput(out, "EXECUTE:AppCommand name=freedom.contrib.contenttypes, options=")
         self.assertOutput(out, str_prefix(", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
 
     def test_app_command_invalid_app_label(self):
@@ -1555,7 +1555,7 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_requires_model_validation_and_requires_system_checks_both_defined(self):
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.core.management.base')
+            warnings.filterwarnings('ignore', module='freedom.core.management.base')
             from .management.commands.validation_command import InvalidCommand
             self.assertRaises(ImproperlyConfigured, InvalidCommand)
 
@@ -1568,15 +1568,15 @@ class Discovery(TestCase):
         """
         with self.settings(INSTALLED_APPS=['admin_scripts.complex_app',
                                            'admin_scripts.simple_app',
-                                           'django.contrib.auth',
-                                           'django.contrib.contenttypes']):
+                                           'freedom.contrib.auth',
+                                           'freedom.contrib.contenttypes']):
             out = StringIO()
             call_command('duplicate', stdout=out)
             self.assertEqual(out.getvalue().strip(), 'complex_app')
         with self.settings(INSTALLED_APPS=['admin_scripts.simple_app',
                                            'admin_scripts.complex_app',
-                                           'django.contrib.auth',
-                                           'django.contrib.contenttypes']):
+                                           'freedom.contrib.auth',
+                                           'freedom.contrib.contenttypes']):
             out = StringIO()
             call_command('duplicate', stdout=out)
             self.assertEqual(out.getvalue().strip(), 'simple_app')
@@ -1585,14 +1585,14 @@ class Discovery(TestCase):
 class ArgumentOrder(AdminScriptTestCase):
     """Tests for 2-stage argument parsing scheme.
 
-    django-admin command arguments are parsed in 2 parts; the core arguments
+    freedom-admin command arguments are parsed in 2 parts; the core arguments
     (--settings, --traceback and --pythonpath) are parsed using a Lax parser.
     This Lax parser ignores any unknown options. Then the full settings are
     passed to the command parser, which extracts commands of interest to the
     individual command.
     """
     def setUp(self):
-        self.write_settings('settings.py', apps=['django.contrib.auth', 'django.contrib.contenttypes'])
+        self.write_settings('settings.py', apps=['freedom.contrib.auth', 'freedom.contrib.contenttypes'])
         self.write_settings('alternate_settings.py')
 
     def tearDown(self):
@@ -1636,14 +1636,14 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
 
     available_apps = [
         'admin_scripts',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
+        'freedom.contrib.auth',
+        'freedom.contrib.contenttypes',
+        'freedom.contrib.sessions',
     ]
 
     def test_wrong_args(self):
         "Make sure passing the wrong kinds of arguments raises a CommandError"
-        out, err = self.run_django_admin(['startproject'])
+        out, err = self.run_freedom_admin(['startproject'])
         self.assertNoOutput(out)
         self.assertOutput(err, "you must provide a project name")
 
@@ -1653,12 +1653,12 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'testproject')
         self.addCleanup(shutil.rmtree, testproject_dir, True)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
 
         # running again..
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "already exists")
 
@@ -1669,7 +1669,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             testproject_dir = os.path.join(test_dir, bad_name)
             self.addCleanup(shutil.rmtree, testproject_dir, True)
 
-            out, err = self.run_django_admin(args)
+            out, err = self.run_freedom_admin(args)
             self.assertOutput(err, "Error: '%s' is not a valid project name. "
                 "Please make sure the name begins with a letter or underscore." % bad_name)
             self.assertFalse(os.path.exists(testproject_dir))
@@ -1681,12 +1681,12 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         os.mkdir(testproject_dir)
         self.addCleanup(shutil.rmtree, testproject_dir)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'manage.py')))
 
         # running again..
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "already exists")
 
@@ -1697,7 +1697,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'customtestproject')
         self.addCleanup(shutil.rmtree, testproject_dir, True)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
@@ -1709,7 +1709,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'customtestproject')
         self.addCleanup(shutil.rmtree, testproject_dir, True)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
@@ -1721,7 +1721,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'tarballtestproject')
         self.addCleanup(shutil.rmtree, testproject_dir, True)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
@@ -1734,7 +1734,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         os.mkdir(testproject_dir)
         self.addCleanup(shutil.rmtree, testproject_dir)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
@@ -1747,7 +1747,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'urltestproject')
         self.addCleanup(shutil.rmtree, testproject_dir, True)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
@@ -1760,7 +1760,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'urltestproject')
         self.addCleanup(shutil.rmtree, testproject_dir, True)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
@@ -1772,7 +1772,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'customtestproject')
         self.addCleanup(shutil.rmtree, testproject_dir, True)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
@@ -1790,7 +1790,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'project_dir')
         os.mkdir(testproject_dir)
         self.addCleanup(shutil.rmtree, testproject_dir)
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         test_manage_py = os.path.join(testproject_dir, 'manage.py')
         with open(test_manage_py, 'r') as fp:
@@ -1823,7 +1823,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         template_path = os.path.join(custom_templates_dir, 'project_template')
         args = ['startproject', '--template', template_path, 'yet_another_project', 'project_dir2']
         testproject_dir = os.path.join(test_dir, 'project_dir2')
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Destination directory '%s' does not exist, please create it first." % testproject_dir)
         self.assertFalse(os.path.exists(testproject_dir))
@@ -1835,7 +1835,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(test_dir, 'customtestproject')
         self.addCleanup(shutil.rmtree, testproject_dir, True)
 
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         path = os.path.join(testproject_dir, 'ticket-18091-non-ascii-template.txt')

@@ -1,0 +1,32 @@
+from freedom.conf.urls import url
+from freedom.contrib.admindocs import views
+
+urlpatterns = [
+    url('^$',
+        views.BaseAdminDocsView.as_view(template_name='admin_doc/index.html'),
+        name='freedom-admindocs-docroot'),
+    url('^bookmarklets/$',
+        views.BookmarkletsView.as_view(),
+        name='freedom-admindocs-bookmarklets'),
+    url('^tags/$',
+        views.TemplateTagIndexView.as_view(),
+        name='freedom-admindocs-tags'),
+    url('^filters/$',
+        views.TemplateFilterIndexView.as_view(),
+        name='freedom-admindocs-filters'),
+    url('^views/$',
+        views.ViewIndexView.as_view(),
+        name='freedom-admindocs-views-index'),
+    url('^views/(?P<view>[^/]+)/$',
+        views.ViewDetailView.as_view(),
+        name='freedom-admindocs-views-detail'),
+    url('^models/$',
+        views.ModelIndexView.as_view(),
+        name='freedom-admindocs-models-index'),
+    url('^models/(?P<app_label>[^\.]+)\.(?P<model_name>[^/]+)/$',
+        views.ModelDetailView.as_view(),
+        name='freedom-admindocs-models-detail'),
+    url('^templates/(?P<template>.*)/$',
+        views.TemplateDetailView.as_view(),
+        name='freedom-admindocs-templates'),
+]

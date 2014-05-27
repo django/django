@@ -1,29 +1,29 @@
 ================================
-Django 1.3 beta 1 release notes
+Freedom 1.3 beta 1 release notes
 ================================
 
-Welcome to Django 1.3 beta 1!
+Welcome to Freedom 1.3 beta 1!
 
 This is the second in a series of preview/development releases leading
-up to the eventual release of Django 1.3. This release is primarily
+up to the eventual release of Freedom 1.3. This release is primarily
 targeted at developers who are interested in trying out new features
-and testing the Django codebase to help identify and resolve bugs
+and testing the Freedom codebase to help identify and resolve bugs
 prior to the final 1.3 release.
 
 As such, this release is *not* intended for production use, and any such use
 is discouraged.
 
-What's new in Django 1.3 beta 1
+What's new in Freedom 1.3 beta 1
 ===============================
 
 Further tweaks to the staticfiles app
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.3 ships with a new contrib app :mod:`django.contrib.staticfiles`
+Freedom 1.3 ships with a new contrib app :mod:`freedom.contrib.staticfiles`
 to help developers handle the static media files (images, CSS, JavaScript,
 etc.) that are needed to render a complete web page.
 
-The :mod:`~django.contrib.staticfiles` app ships with the ability to
+The :mod:`~freedom.contrib.staticfiles` app ships with the ability to
 automatically serve static files during development (if the :setting:`DEBUG`
 setting is ``True``) when using the :djadmin:`runserver` management command.
 Based on feedback from the community this release adds two new options to the
@@ -69,7 +69,7 @@ Backwards-incompatible changes in 1.3 alpha 2
 Change to admin lookup filters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The Django admin has long had an undocumented "feature" allowing savvy
+The Freedom admin has long had an undocumented "feature" allowing savvy
 users to manipulate the query string of changelist pages to filter the
 list of objects displayed. However, this also creates a security
 issue, as a staff user with sufficient knowledge of model structure
@@ -85,8 +85,8 @@ whitelist the relations you choose to expose for filtering.
 Introduction of STATIC_URL and STATIC_ROOT settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The newly introduced :mod:`~django.contrib.staticfiles` app -- which extends
-Django's abilities to handle static files for apps and projects -- required the
+The newly introduced :mod:`~freedom.contrib.staticfiles` app -- which extends
+Freedom's abilities to handle static files for apps and projects -- required the
 addition of two new settings to refer to those files in templates and code,
 especially in contrast to the :setting:`MEDIA_URL` and :setting:`MEDIA_ROOT`
 settings that refer to user-uploaded files.
@@ -95,7 +95,7 @@ Prior to 1.3 alpha 2 these settings were called ``STATICFILES_URL`` and
 ``STATICFILES_ROOT`` to follow the naming scheme for app-centric settings.
 Based on feedback from the community it became apparent that those settings
 created confusion, especially given the fact that handling static files is also
-desired outside the use of the optional :mod:`~django.contrib.staticfiles` app.
+desired outside the use of the optional :mod:`~freedom.contrib.staticfiles` app.
 
 As a result, we took the following steps to rectify the issue:
 
@@ -106,14 +106,14 @@ As a result, we took the following steps to rectify the issue:
 
 * :setting:`STATIC_URL` (formally ``STATICFILES_URL``)
 
-* The ``django.contrib.staticfiles.templatetags.staticfiles.get_staticfiles_prefix``
-  template tag was moved to Django's core (``django.templatetags.static``) and
+* The ``freedom.contrib.staticfiles.templatetags.staticfiles.get_staticfiles_prefix``
+  template tag was moved to Freedom's core (``freedom.templatetags.static``) and
   renamed to :ttag:`get_static_prefix`.
 
-* The ``django.contrib.staticfiles.context_processors.staticfiles``
-  context processor was moved to Django's core
-  (``django.core.context_processors.static``) and renamed to
-  :func:`~django.core.context_processors.static`.
+* The ``freedom.contrib.staticfiles.context_processors.staticfiles``
+  context processor was moved to Freedom's core
+  (``freedom.core.context_processors.static``) and renamed to
+  :func:`~freedom.core.context_processors.static`.
 
 * :ref:`form-asset-paths` now uses :setting:`STATIC_URL` as the prefix
   **if the value is not None**, and falls back to the previously used
@@ -128,18 +128,18 @@ A side effect of this duplication was the missing adoption of the changes made
 in r12634_ to support a broader set of characters for usernames.
 
 This release refactors the admin's login mechanism to use a subclass of the
-:class:`~django.contrib.auth.forms.AuthenticationForm` instead of a manual
+:class:`~freedom.contrib.auth.forms.AuthenticationForm` instead of a manual
 form validation. The previously undocumented method
-``'django.contrib.admin.sites.AdminSite.display_login_form'`` has been removed
-in favor of a new :attr:`~django.contrib.admin.AdminSite.login_form`
+``'freedom.contrib.admin.sites.AdminSite.display_login_form'`` has been removed
+in favor of a new :attr:`~freedom.contrib.admin.AdminSite.login_form`
 attribute.
 
-.. _r12634: https://code.djangoproject.com/changeset/12634
+.. _r12634: https://code.freedomproject.com/changeset/12634
 
 Changes to ``USStateField``
 ===========================
 
-The ``django.contrib.localflavor`` application contains collections
+The ``freedom.contrib.localflavor`` application contains collections
 of code relevant to specific countries or cultures. One such is
 ``USStateField``, which provides a field for storing the two-letter postal
 abbreviation of a U.S. state. This field has consistently caused problems,
@@ -150,29 +150,29 @@ compromises over the list of choices resulted in some users feeling
 the field supported too many locations, while others felt it supported
 too few.
 
-In Django 1.3 we're taking a new approach to this problem, implemented
+In Freedom 1.3 we're taking a new approach to this problem, implemented
 as a pair of changes:
 
 * The choice list for ``USStateField`` has changed. Previously, it
   consisted of the 50 U.S. states, the District of Columbia and
-  U.S. overseas territories. As of Django 1.3 it includes all previous
+  U.S. overseas territories. As of Freedom 1.3 it includes all previous
   choices, plus the U.S. Armed Forces postal codes.
 
 * A new model field,
-  ``django.contrib.localflavor.us.models.USPostalCodeField``, has
+  ``freedom.contrib.localflavor.us.models.USPostalCodeField``, has
   been added which draws its choices from a list of all postal
   abbreviations recognized by the U.S Postal Service. This includes
   all abbreviations recognized by ``USStateField``, plus three
   independent nations -- the Federated States of Micronesia, the
   Republic of the Marshall Islands and the Republic of Palau -- which
   are serviced under treaty by the U.S. postal system. A new form
-  widget, ``django.contrib.localflavor.us.forms.USPSSelect``, is
+  widget, ``freedom.contrib.localflavor.us.forms.USPSSelect``, is
   also available and provides the same set of choices.
 
 Additionally, several finer-grained choice tuples are provided which
 allow mixing and matching of subsets of the U.S. states and
 territories, and other locations serviced by the U.S. postal
-system. Consult the ``django.contrib.localflavor`` documentation
+system. Consult the ``freedom.contrib.localflavor`` documentation
 for more details.
 
 The change to ``USStateField`` is technically backwards-incompatible for
@@ -181,20 +181,20 @@ need to support U.S. mailing addresses without Armed Forces locations,
 see the list of choice tuples available in the localflavor
 documentation.
 
-The Django 1.3 roadmap
+The Freedom 1.3 roadmap
 ======================
 
-Before the final Django 1.3 release, several other preview/development
+Before the final Freedom 1.3 release, several other preview/development
 releases will be made available. The current schedule consists of at
 least the following:
 
-* Week of **January 24, 2011**: First Django 1.3 release
+* Week of **January 24, 2011**: First Freedom 1.3 release
   candidate. String freeze for translations.
 
-* Week of **January 31, 2011**: Django 1.3 final release.
+* Week of **January 31, 2011**: Freedom 1.3 final release.
 
 If necessary, additional beta or release-candidate packages
-will be issued prior to the final 1.3 release. Django 1.3 will be
+will be issued prior to the final 1.3 release. Freedom 1.3 will be
 released approximately one week after the final release candidate.
 
 
@@ -203,28 +203,28 @@ What you can do to help
 
 In order to provide a high-quality 1.3 release, we need your help. Although this
 beta release is, again, *not* intended for production use, you can help the
-Django team by trying out the beta codebase in a safe test environment and
-reporting any bugs or issues you encounter. The Django ticket tracker is the
+Freedom team by trying out the beta codebase in a safe test environment and
+reporting any bugs or issues you encounter. The Freedom ticket tracker is the
 central place to search for open issues:
 
-* https://code.djangoproject.com/timeline
+* https://code.freedomproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem you're
 running into.
 
-Additionally, discussion of Django development, including progress toward the
-1.3 release, takes place daily on the django-developers mailing list:
+Additionally, discussion of Freedom development, including progress toward the
+1.3 release, takes place daily on the freedom-developers mailing list:
 
-* http://groups.google.com/group/django-developers
+* http://groups.google.com/group/freedom-developers
 
-... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
-interested in helping out with Django's development, feel free to join the
+... and in the ``#freedom-dev`` IRC channel on ``irc.freenode.net``. If you're
+interested in helping out with Freedom's development, feel free to join the
 discussions there.
 
-Django's online documentation also includes pointers on how to contribute to
-Django:
+Freedom's online documentation also includes pointers on how to contribute to
+Freedom:
 
-* :doc:`How to contribute to Django </internals/contributing/index>`
+* :doc:`How to contribute to Freedom </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing documentation or simply
 triaging tickets and helping to test proposed bugfixes -- are always welcome and

@@ -1,6 +1,6 @@
-from django.apps.registry import Apps
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.apps.registry import Apps
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 # Because we want to test creation and deletion of these as separate things,
 # these models are all inserted into a separate Apps so the main test

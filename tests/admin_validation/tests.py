@@ -2,11 +2,11 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django import forms
-from django.contrib import admin
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
-from django.test.utils import str_prefix
+from freedom import forms
+from freedom.contrib import admin
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.test import TestCase
+from freedom.test.utils import str_prefix
 
 from .models import Song, Book, Album, TwoAlbumFKAndAnE, City
 
@@ -45,7 +45,7 @@ class ValidationTestCase(TestCase):
             ]
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             SongAdmin.validate(Song)
 
     def test_custom_modelforms_with_fields_fieldsets(self):
@@ -53,7 +53,7 @@ class ValidationTestCase(TestCase):
         # Regression test for #8027: custom ModelForms with fields/fieldsets
         """
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             ValidFields.validate(Song)
 
     def test_custom_get_form_with_fieldsets(self):
@@ -63,7 +63,7 @@ class ValidationTestCase(TestCase):
         Refs #19445.
         """
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             ValidFormFieldsets.validate(Song)
 
     def test_exclude_values(self):
@@ -127,7 +127,7 @@ class ValidationTestCase(TestCase):
             raw_id_fields = ('nonexisting',)
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             self.assertRaisesMessage(ImproperlyConfigured,
                 "'RawIdNonexistingAdmin.raw_id_fields' refers to field 'nonexisting' that is missing from model 'admin_validation.Album'.",
                 RawIdNonexistingAdmin.validate,
@@ -148,7 +148,7 @@ class ValidationTestCase(TestCase):
             inlines = [TwoAlbumFKAndAnEInline]
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             MyAdmin.validate(Album)
 
     def test_inline_self_validation(self):
@@ -171,7 +171,7 @@ class ValidationTestCase(TestCase):
             inlines = [TwoAlbumFKAndAnEInline]
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             MyAdmin.validate(Album)
 
     def test_readonly(self):
@@ -179,7 +179,7 @@ class ValidationTestCase(TestCase):
             readonly_fields = ("title",)
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             SongAdmin.validate(Song)
 
     def test_readonly_on_method(self):
@@ -190,7 +190,7 @@ class ValidationTestCase(TestCase):
             readonly_fields = (my_function,)
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             SongAdmin.validate(Song)
 
     def test_readonly_on_modeladmin(self):
@@ -201,7 +201,7 @@ class ValidationTestCase(TestCase):
                 pass
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             SongAdmin.validate(Song)
 
     def test_readonly_method_on_model(self):
@@ -209,7 +209,7 @@ class ValidationTestCase(TestCase):
             readonly_fields = ("readonly_method_on_model",)
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             SongAdmin.validate(Song)
 
     def test_nonexistant_field(self):
@@ -241,7 +241,7 @@ class ValidationTestCase(TestCase):
                 return "Status unknown."
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             SongAdmin.validate(Song)
 
     def test_readonly_lambda(self):
@@ -249,7 +249,7 @@ class ValidationTestCase(TestCase):
             readonly_fields = (lambda obj: "test",)
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             SongAdmin.validate(Song)
 
     def test_graceful_m2m_fail(self):
@@ -284,7 +284,7 @@ class ValidationTestCase(TestCase):
             fields = ('price', ('name', 'subtitle'))
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             NestedFieldsAdmin.validate(Book)
 
     def test_nested_fieldsets(self):
@@ -294,7 +294,7 @@ class ValidationTestCase(TestCase):
             )
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             NestedFieldsetAdmin.validate(Book)
 
     def test_explicit_through_override(self):
@@ -313,7 +313,7 @@ class ValidationTestCase(TestCase):
         # If the through model is still a string (and hasn't been resolved to a model)
         # the validation will fail.
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             BookAdmin.validate(Book)
 
     def test_non_model_fields(self):
@@ -329,7 +329,7 @@ class ValidationTestCase(TestCase):
             fields = ['title', 'extra_data']
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             FieldsOnFormOnlyAdmin.validate(Song)
 
     def test_non_model_first_field(self):
@@ -349,5 +349,5 @@ class ValidationTestCase(TestCase):
             fields = ['extra_data', 'title']
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             FieldsOnFormOnlyAdmin.validate(Song)

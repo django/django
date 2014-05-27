@@ -12,16 +12,16 @@ import threading
 from smtplib import SMTPException
 from ssl import SSLError
 
-from django.core import mail
-from django.core.mail import (EmailMessage, mail_admins, mail_managers,
+from freedom.core import mail
+from freedom.core.mail import (EmailMessage, mail_admins, mail_managers,
         EmailMultiAlternatives, send_mail, send_mass_mail)
-from django.core.mail.backends import console, dummy, locmem, filebased, smtp
-from django.core.mail.message import BadHeaderError
-from django.test import SimpleTestCase
-from django.test import override_settings
-from django.utils.encoding import force_text, force_bytes
-from django.utils.six import PY3, StringIO, binary_type
-from django.utils.translation import ugettext_lazy
+from freedom.core.mail.backends import console, dummy, locmem, filebased, smtp
+from freedom.core.mail.message import BadHeaderError
+from freedom.test import SimpleTestCase
+from freedom.test import override_settings
+from freedom.utils.encoding import force_text, force_bytes
+from freedom.utils.six import PY3, StringIO, binary_type
+from freedom.utils.translation import ugettext_lazy
 
 if PY3:
     from email.utils import parseaddr
@@ -294,19 +294,19 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_backend_arg(self):
         """Test backend argument of mail.get_connection()"""
-        self.assertIsInstance(mail.get_connection('django.core.mail.backends.smtp.EmailBackend'), smtp.EmailBackend)
-        self.assertIsInstance(mail.get_connection('django.core.mail.backends.locmem.EmailBackend'), locmem.EmailBackend)
-        self.assertIsInstance(mail.get_connection('django.core.mail.backends.dummy.EmailBackend'), dummy.EmailBackend)
-        self.assertIsInstance(mail.get_connection('django.core.mail.backends.console.EmailBackend'), console.EmailBackend)
+        self.assertIsInstance(mail.get_connection('freedom.core.mail.backends.smtp.EmailBackend'), smtp.EmailBackend)
+        self.assertIsInstance(mail.get_connection('freedom.core.mail.backends.locmem.EmailBackend'), locmem.EmailBackend)
+        self.assertIsInstance(mail.get_connection('freedom.core.mail.backends.dummy.EmailBackend'), dummy.EmailBackend)
+        self.assertIsInstance(mail.get_connection('freedom.core.mail.backends.console.EmailBackend'), console.EmailBackend)
         tmp_dir = tempfile.mkdtemp()
         try:
-            self.assertIsInstance(mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir), filebased.EmailBackend)
+            self.assertIsInstance(mail.get_connection('freedom.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir), filebased.EmailBackend)
         finally:
             shutil.rmtree(tmp_dir)
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
     @override_settings(
-        EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+        EMAIL_BACKEND='freedom.core.mail.backends.locmem.EmailBackend',
         ADMINS=[('nobody', 'nobody@example.com')],
         MANAGERS=[('nobody', 'nobody@example.com')])
     def test_connection_arg(self):
@@ -334,13 +334,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         mail_admins('Admin message', 'Content', connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, '[Django] Admin message')
+        self.assertEqual(connection.test_outbox[0].subject, '[Freedom] Admin message')
 
         connection = mail.get_connection('mail.custombackend.EmailBackend')
         mail_managers('Manager message', 'Content', connection=connection)
         self.assertEqual(mail.outbox, [])
         self.assertEqual(len(connection.test_outbox), 1)
-        self.assertEqual(connection.test_outbox[0].subject, '[Django] Manager message')
+        self.assertEqual(connection.test_outbox[0].subject, '[Freedom] Manager message')
 
     def test_dont_mangle_from_in_body(self):
         # Regression for #13433 - Make sure that EmailMessage doesn't mangle
@@ -397,7 +397,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         # Verify that the child message header is not base64 encoded
         self.assertTrue(str('Child Subject') in parent_s)
 
-        # Feature test: try attaching Django's EmailMessage object directly to the mail.
+        # Feature test: try attaching Freedom's EmailMessage object directly to the mail.
         parent_msg = EmailMessage('Parent Subject', 'Some parent body', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
         parent_msg.attach(content=child_msg, mimetype='message/rfc822')
         parent_s = parent_msg.message().as_string()
@@ -408,9 +408,9 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
 class PythonGlobalState(SimpleTestCase):
     """
-    Tests for #12422 -- Django smarts (#2472/#11212) with charset of utf-8 text
+    Tests for #12422 -- Freedom smarts (#2472/#11212) with charset of utf-8 text
     parts shouldn't pollute global email Python package charset registry when
-    django.mail.message is imported.
+    freedom.mail.message is imported.
     """
 
     def test_utf8(self):
@@ -529,7 +529,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         mail_managers('Subject', 'Content', html_message='HTML Content')
         message = self.get_the_message()
 
-        self.assertEqual(message.get('subject'), '[Django] Subject')
+        self.assertEqual(message.get('subject'), '[Freedom] Subject')
         self.assertEqual(message.get_all('to'), ['nobody@example.com'])
         self.assertTrue(message.is_multipart())
         self.assertEqual(len(message.get_payload()), 2)
@@ -544,7 +544,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         mail_admins('Subject', 'Content', html_message='HTML Content')
         message = self.get_the_message()
 
-        self.assertEqual(message.get('subject'), '[Django] Subject')
+        self.assertEqual(message.get('subject'), '[Freedom] Subject')
         self.assertEqual(message.get_all('to'), ['nobody@example.com'])
         self.assertTrue(message.is_multipart())
         self.assertEqual(len(message.get_payload()), 2)
@@ -563,12 +563,12 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         """
         mail_managers(ugettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
-        self.assertEqual(message.get('subject'), '[Django] Subject')
+        self.assertEqual(message.get('subject'), '[Freedom] Subject')
 
         self.flush_mailbox()
         mail_admins(ugettext_lazy('Subject'), 'Content')
         message = self.get_the_message()
-        self.assertEqual(message.get('subject'), '[Django] Subject')
+        self.assertEqual(message.get('subject'), '[Freedom] Subject')
 
     @override_settings(ADMINS=(), MANAGERS=())
     def test_empty_admins(self):
@@ -622,11 +622,11 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         """
         Regression test for #15042
         """
-        self.assertTrue(send_mail("Subject", "Content", "tester", ["django"]))
+        self.assertTrue(send_mail("Subject", "Content", "tester", ["freedom"]))
         message = self.get_the_message()
         self.assertEqual(message.get('subject'), 'Subject')
         self.assertEqual(message.get('from'), "tester")
-        self.assertEqual(message.get('to'), "django")
+        self.assertEqual(message.get('to'), "freedom")
 
     def test_close_connection(self):
         """
@@ -661,7 +661,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
 
 
 class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
-    email_backend = 'django.core.mail.backends.locmem.EmailBackend'
+    email_backend = 'freedom.core.mail.backends.locmem.EmailBackend'
 
     def get_mailbox_content(self):
         return [m.message() for m in mail.outbox]
@@ -691,7 +691,7 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
 
 class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
-    email_backend = 'django.core.mail.backends.filebased.EmailBackend'
+    email_backend = 'freedom.core.mail.backends.filebased.EmailBackend'
 
     def setUp(self):
         super(FileBackendTests, self).setUp()
@@ -748,7 +748,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
 
 class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
-    email_backend = 'django.core.mail.backends.console.EmailBackend'
+    email_backend = 'freedom.core.mail.backends.console.EmailBackend'
 
     def setUp(self):
         super(ConsoleBackendTests, self).setUp()
@@ -773,7 +773,7 @@ class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):
         Test that the console backend can be pointed at an arbitrary stream.
         """
         s = StringIO()
-        connection = mail.get_connection('django.core.mail.backends.console.EmailBackend', stream=s)
+        connection = mail.get_connection('freedom.core.mail.backends.console.EmailBackend', stream=s)
         send_mail('Subject', 'Content', 'from@example.com', ['to@example.com'], connection=connection)
         message = force_bytes(s.getvalue().split('\n' + ('-' * 79) + '\n')[0])
         self.assertMessageHasHeaders(message, {
@@ -851,7 +851,7 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
 
 
 class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
-    email_backend = 'django.core.mail.backends.smtp.EmailBackend'
+    email_backend = 'freedom.core.mail.backends.smtp.EmailBackend'
 
     @classmethod
     def setUpClass(cls):
@@ -990,7 +990,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def test_connection_timeout_default(self):
         """Test that the connection's timeout value is None by default."""
-        connection = mail.get_connection('django.core.mail.backends.smtp.EmailBackend')
+        connection = mail.get_connection('freedom.core.mail.backends.smtp.EmailBackend')
         self.assertEqual(connection.timeout, None)
 
     def test_connection_timeout_custom(self):

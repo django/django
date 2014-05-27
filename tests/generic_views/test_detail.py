@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.test import TestCase, override_settings
-from django.views.generic.base import View
+from freedom.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from freedom.test import TestCase, override_settings
+from freedom.views.generic.base import View
 
 from .models import Artist, Author, Page
 

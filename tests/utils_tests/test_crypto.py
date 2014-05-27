@@ -4,7 +4,7 @@ import binascii
 import hashlib
 import unittest
 
-from django.utils.crypto import constant_time_compare, pbkdf2
+from freedom.utils.crypto import constant_time_compare, pbkdf2
 
 
 class TestUtilsCryptoMisc(unittest.TestCase):

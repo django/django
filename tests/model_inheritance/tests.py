@@ -2,12 +2,12 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
-from django.core.management import call_command
-from django.db import connection
-from django.test import TestCase
-from django.test.utils import CaptureQueriesContext
-from django.utils import six
+from freedom.core.exceptions import FieldError
+from freedom.core.management import call_command
+from freedom.db import connection
+from freedom.test import TestCase
+from freedom.test.utils import CaptureQueriesContext
+from freedom.utils import six
 
 from .models import (
     Chef, CommonInfo, ItalianRestaurant, ParkingLot, Place, Post,
@@ -55,7 +55,7 @@ class ModelInheritanceTests(TestCase):
         post.attached_comment_set.create(content="Save $ on V1agr@", is_spam=True)
         post.attached_link_set.create(
             content="The Web framework for perfections with deadlines.",
-            url="http://www.djangoproject.com/"
+            url="http://www.freedomproject.com/"
         )
 
         # The Post model doesn't have an attribute called
@@ -368,8 +368,8 @@ class InheritanceSameModelNameTests(TestCase):
             self.assertEqual(
                 self.title.attached_same_model_name_copy_set.create(
                     content='The Web framework for perfectionists with deadlines.',
-                    url='http://www.djangoproject.com/',
-                    title='Django Rocks'
+                    url='http://www.freedomproject.com/',
+                    title='Freedom Rocks'
                 ), Copy.objects.get(
                     content='The Web framework for perfectionists with deadlines.',
                 ))

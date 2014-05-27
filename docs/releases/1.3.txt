@@ -1,21 +1,21 @@
 ========================
-Django 1.3 release notes
+Freedom 1.3 release notes
 ========================
 
 *March 23, 2011*
 
-Welcome to Django 1.3!
+Welcome to Freedom 1.3!
 
-Nearly a year in the making, Django 1.3 includes quite a few `new
+Nearly a year in the making, Freedom 1.3 includes quite a few `new
 features`_ and plenty of bug fixes and improvements to existing
 features. These release notes cover the new features in 1.3, as well
 as some `backwards-incompatible changes`_ you'll want to be aware of
-when upgrading from Django 1.2 or older versions.
+when upgrading from Freedom 1.2 or older versions.
 
 Overview
 ========
 
-Django 1.3's focus has mostly been on resolving smaller, long-standing
+Freedom 1.3's focus has mostly been on resolving smaller, long-standing
 feature requests, but that hasn't prevented a few fairly significant
 new features from landing, including:
 
@@ -25,7 +25,7 @@ new features from landing, including:
 
 * Contrib support for `easy handling of static files`_.
 
-* Django's testing framework now supports (and ships with a copy of)
+* Freedom's testing framework now supports (and ships with a copy of)
   `the unittest2 library`_.
 
 There's plenty more, of course; see the coverage of `new features`_
@@ -33,17 +33,17 @@ below for a full rundown and details.
 
 Wherever possible, of course, new features are introduced in a
 backwards-compatible manner per :doc:`our API stability policy
-</misc/api-stability>` policy. As a result of this policy, Django 1.3
+</misc/api-stability>` policy. As a result of this policy, Freedom 1.3
 `begins the deprecation process for some features`_.
 
 Some changes, unfortunately, are genuinely backwards-incompatible; in
 most cases these are due to security issues or bugs which simply
-couldn't be fixed any other way. Django 1.3 includes a few of these,
+couldn't be fixed any other way. Freedom 1.3 includes a few of these,
 and descriptions of them -- along with the (minor) modifications
 you'll need to make to handle them -- are documented in the list of
 `backwards-incompatible changes`_ below.
 
-.. _new features: `What's new in Django 1.3`_
+.. _new features: `What's new in Freedom 1.3`_
 .. _backwards-incompatible changes: backwards-incompatible-changes-1.3_
 .. _using Python's logging facilities: `Logging`_
 .. _easy handling of static files: `Extended static files handling`_
@@ -53,24 +53,24 @@ you'll need to make to handle them -- are documented in the list of
 Python compatibility
 ====================
 
-The release of Django 1.2 was notable for having the first shift in
-Django's Python compatibility policy; prior to Django 1.2, Django
-supported any 2.x version of Python from 2.3 up. As of Django 1.2, the
+The release of Freedom 1.2 was notable for having the first shift in
+Freedom's Python compatibility policy; prior to Freedom 1.2, Freedom
+supported any 2.x version of Python from 2.3 up. As of Freedom 1.2, the
 minimum requirement was raised to Python 2.4.
 
-Django 1.3 continues to support Python 2.4, but will be the final
-Django release series to do so; beginning with Django 1.4, the minimum
+Freedom 1.3 continues to support Python 2.4, but will be the final
+Freedom release series to do so; beginning with Freedom 1.4, the minimum
 supported Python version will be 2.5. A document outlining our full
 timeline for deprecating Python 2.x and moving to Python 3.x will be
-published shortly after the release of Django 1.3.
+published shortly after the release of Freedom 1.3.
 
-What's new in Django 1.3
+What's new in Freedom 1.3
 ========================
 
 Class-based views
 ~~~~~~~~~~~~~~~~~
 
-Django 1.3 adds a framework that allows you to use a class as a view.
+Freedom 1.3 adds a framework that allows you to use a class as a view.
 This means you can compose a view out of a collection of methods that
 can be subclassed and overridden to provide common views of data without
 having to write too much code.
@@ -83,28 +83,28 @@ extended.
 See :doc:`the documentation on class-based generic views</topics/class-based-views/index>`
 for more details. There is also a document to help you `convert
 your function-based generic views to class-based
-views <https://docs.djangoproject.com/en/1.4/topics/generic-views-migration/>`_.
+views <https://docs.freedomproject.com/en/1.4/topics/generic-views-migration/>`_.
 
 Logging
 ~~~~~~~
 
-Django 1.3 adds framework-level support for Python's ``logging``
+Freedom 1.3 adds framework-level support for Python's ``logging``
 module.  This means you can now easily configure and control logging
-as part of your Django project. A number of logging handlers and
-logging calls have been added to Django's own code as well -- most
+as part of your Freedom project. A number of logging handlers and
+logging calls have been added to Freedom's own code as well -- most
 notably, the error emails sent on a HTTP 500 server error are now
-handled as a logging activity. See :doc:`the documentation on Django's
+handled as a logging activity. See :doc:`the documentation on Freedom's
 logging interface </topics/logging>` for more details.
 
 Extended static files handling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.3 ships with a new contrib app --
-``django.contrib.staticfiles`` -- to help developers handle the static
+Freedom 1.3 ships with a new contrib app --
+``freedom.contrib.staticfiles`` -- to help developers handle the static
 media files (images, CSS, Javascript, etc.) that are needed to render
 a complete web page.
 
-In previous versions of Django, it was common to place static assets
+In previous versions of Freedom, it was common to place static assets
 in :setting:`MEDIA_ROOT` along with user-uploaded files, and serve
 them both at :setting:`MEDIA_URL`. Part of the purpose of introducing
 the ``staticfiles`` app is to make it easier to keep static files
@@ -121,20 +121,20 @@ unittest2 support
 ~~~~~~~~~~~~~~~~~
 
 Python 2.7 introduced some major changes to the ``unittest`` library,
-adding some extremely useful features. To ensure that every Django
-project can benefit from these new features, Django ships with a copy
+adding some extremely useful features. To ensure that every Freedom
+project can benefit from these new features, Freedom ships with a copy
 of unittest2_, a copy of the Python 2.7 unittest library, backported
 for Python 2.4 compatibility.
 
-To access this library, Django provides the ``django.utils.unittest``
+To access this library, Freedom provides the ``freedom.utils.unittest``
 module alias. If you are using Python 2.7, or you have installed
-``unittest2`` locally, Django will map the alias to the installed
-version of the unittest library. Otherwise, Django will use its own
+``unittest2`` locally, Freedom will map the alias to the installed
+version of the unittest library. Otherwise, Freedom will use its own
 bundled version of unittest2.
 
 To take advantage of this alias, simply use::
 
-    from django.utils import unittest
+    from freedom.utils import unittest
 
 wherever you would have historically used::
 
@@ -159,14 +159,14 @@ Users of Python 2.5 and above may now use transaction management functions as
 Configurable delete-cascade
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:class:`~django.db.models.ForeignKey` and
-:class:`~django.db.models.OneToOneField` now accept an
-:attr:`~django.db.models.ForeignKey.on_delete` argument to customize behavior
+:class:`~freedom.db.models.ForeignKey` and
+:class:`~freedom.db.models.OneToOneField` now accept an
+:attr:`~freedom.db.models.ForeignKey.on_delete` argument to customize behavior
 when the referenced object is deleted. Previously, deletes were always
 cascaded; available alternatives now include set null, set default, set to any
 value, protect, or do nothing.
 
-For more information, see the :attr:`~django.db.models.ForeignKey.on_delete`
+For more information, see the :attr:`~freedom.db.models.ForeignKey.on_delete`
 documentation.
 
 Contextual markers and comments for translatable strings
@@ -184,7 +184,7 @@ For more information, see :ref:`contextual-markers` and
 Improvements to built-in template tags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A number of improvements have been made to Django's built-in template tags:
+A number of improvements have been made to Freedom's built-in template tags:
 
 * The :ttag:`include` tag now accepts a ``with`` option, allowing
   you to specify context variables to the included template
@@ -207,27 +207,27 @@ example, you may want to change the template that is used, or put
 additional data into the context.
 
 However, you can't (easily) modify the content of a basic
-:class:`~django.http.HttpResponse` after it has been constructed. To
-overcome this limitation, Django 1.3 adds a new
-:class:`~django.template.response.TemplateResponse` class. Unlike basic
-:class:`~django.http.HttpResponse` objects,
-:class:`~django.template.response.TemplateResponse` objects retain the details
+:class:`~freedom.http.HttpResponse` after it has been constructed. To
+overcome this limitation, Freedom 1.3 adds a new
+:class:`~freedom.template.response.TemplateResponse` class. Unlike basic
+:class:`~freedom.http.HttpResponse` objects,
+:class:`~freedom.template.response.TemplateResponse` objects retain the details
 of the template and context that was provided by the view to compute
 the response. The final output of the response is not computed until
 it is needed, later in the response process.
 
 For more details, see the :doc:`documentation </ref/template-response>`
-on the :class:`~django.template.response.TemplateResponse` class.
+on the :class:`~freedom.template.response.TemplateResponse` class.
 
 Caching changes
 ~~~~~~~~~~~~~~~
 
-Django 1.3 sees the introduction of several improvements to the
-Django's caching infrastructure.
+Freedom 1.3 sees the introduction of several improvements to the
+Freedom's caching infrastructure.
 
-Firstly, Django now supports multiple named caches. In the same way
-that Django 1.2 introduced support for multiple database connections,
-Django 1.3 allows you to use the new :setting:`CACHES` setting to
+Firstly, Freedom now supports multiple named caches. In the same way
+that Freedom 1.2 introduced support for multiple database connections,
+Freedom 1.3 allows you to use the new :setting:`CACHES` setting to
 define multiple named cache connections.
 
 Secondly, :ref:`versioning <cache_versioning>`, :ref:`site-wide
@@ -242,7 +242,7 @@ Finally, support for pylibmc_ has been added to the memcached cache
 backend.
 
 For more details, see the :doc:`documentation on
-caching in Django</topics/cache>`.
+caching in Freedom</topics/cache>`.
 
 .. _pylibmc: http://sendapatch.se/projects/pylibmc/
 
@@ -255,11 +255,11 @@ for permissions.  This is useful for further centralizing the
 permission handling. See the :doc:`authentication docs </topics/auth/index>`
 for more details.
 
-GeoDjango
+GeoFreedom
 ~~~~~~~~~
 
-The GeoDjango test suite is now included when
-:ref:`running the Django test suite <running-unit-tests>` with ``runtests.py``
+The GeoFreedom test suite is now included when
+:ref:`running the Freedom test suite <running-unit-tests>` with ``runtests.py``
 when using :ref:`spatial database backends <spatial-backends>`.
 
 :setting:`MEDIA_URL` and :setting:`STATIC_URL` must end in a slash
@@ -275,56 +275,56 @@ a consistent way to combine paths in templates.
 Project settings which provide either of both settings without a trailing
 slash will now raise a ``PendingDeprecationWarning``.
 
-In Django 1.4 this same condition will raise ``DeprecationWarning``,
-and in Django 1.5 will raise an ``ImproperlyConfigured`` exception.
+In Freedom 1.4 this same condition will raise ``DeprecationWarning``,
+and in Freedom 1.5 will raise an ``ImproperlyConfigured`` exception.
 
 Everything else
 ~~~~~~~~~~~~~~~
 
-Django :doc:`1.1 <1.1>` and :doc:`1.2 <1.2>` added
-lots of big ticket items to Django, like multiple-database support,
+Freedom :doc:`1.1 <1.1>` and :doc:`1.2 <1.2>` added
+lots of big ticket items to Freedom, like multiple-database support,
 model validation, and a session-based messages framework. However,
 this focus on big features came at the cost of lots of smaller
 features.
 
-To compensate for this, the focus of the Django 1.3 development
+To compensate for this, the focus of the Freedom 1.3 development
 process has been on adding lots of smaller, long standing feature
 requests. These include:
 
 * Improved tools for accessing and manipulating the current
-  :class:`~django.contrib.sites.models.Site` object in
+  :class:`~freedom.contrib.sites.models.Site` object in
   :doc:`the sites framework </ref/contrib/sites>`.
 
-* A :class:`~django.test.RequestFactory` for mocking requests
+* A :class:`~freedom.test.RequestFactory` for mocking requests
   in tests.
 
 * A new test assertion --
-  :meth:`~django.test.TransactionTestCase.assertNumQueries` -- making it
+  :meth:`~freedom.test.TransactionTestCase.assertNumQueries` -- making it
   easier to test the database activity associated with a view.
 
 * Support for lookups spanning relations in admin's
-  :attr:`~django.contrib.admin.ModelAdmin.list_filter`.
+  :attr:`~freedom.contrib.admin.ModelAdmin.list_filter`.
 
 * Support for HTTPOnly_ cookies.
 
-* :meth:`~django.core.mail.mail_admins()` and
-  :meth:`~django.core.mail.mail_managers()` now support easily attaching
+* :meth:`~freedom.core.mail.mail_admins()` and
+  :meth:`~freedom.core.mail.mail_managers()` now support easily attaching
   HTML content to messages.
 
-* :class:`~django.core.mail.EmailMessage` now supports CC's.
+* :class:`~freedom.core.mail.EmailMessage` now supports CC's.
 
 * Error emails now include more of the detail and formatting of the
   debug server error page.
 
-* :meth:`~django.template.Library.simple_tag` now accepts a
+* :meth:`~freedom.template.Library.simple_tag` now accepts a
   ``takes_context`` argument, making it easier to write simple
   template tags that require access to template context.
 
-* A new :meth:`~django.shortcuts.render()` shortcut -- an alternative
-  to :meth:`~django.shortcuts.render_to_response()` providing a
-  :class:`~django.template.RequestContext` by default.
+* A new :meth:`~freedom.shortcuts.render()` shortcut -- an alternative
+  to :meth:`~freedom.shortcuts.render_to_response()` providing a
+  :class:`~freedom.template.RequestContext` by default.
 
-* Support for combining :class:`F expressions <django.db.models.F>`
+* Support for combining :class:`F expressions <freedom.db.models.F>`
   with timedelta values when retrieving or updating database values.
 
 .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
@@ -337,19 +337,19 @@ Backwards-incompatible changes in 1.3
 CSRF validation now applies to AJAX requests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Prior to Django 1.2.5, Django's CSRF-prevention system exempted AJAX
+Prior to Freedom 1.2.5, Freedom's CSRF-prevention system exempted AJAX
 requests from CSRF verification; due to `security issues`_ reported to
 us, however, *all* requests are now subjected to CSRF
-verification. Consult :doc:`the Django CSRF documentation
+verification. Consult :doc:`the Freedom CSRF documentation
 </ref/contrib/csrf>` for details on how to handle CSRF verification in
 AJAX requests.
 
-.. _security issues: https://www.djangoproject.com/weblog/2011/feb/08/security/
+.. _security issues: https://www.freedomproject.com/weblog/2011/feb/08/security/
 
 Restricted filters in admin interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Prior to Django 1.2.5, the Django administrative interface allowed
+Prior to Freedom 1.2.5, the Freedom administrative interface allowed
 filtering on any model field or relation -- not just those specified
 in ``list_filter`` -- via query string manipulation. Due to security
 issues reported to us, however, query string lookup arguments in the
@@ -359,13 +359,13 @@ admin must be for fields or relations specified in ``list_filter`` or
 Deleting a model doesn't delete associated files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In earlier Django versions, when a model instance containing a
-:class:`~django.db.models.FileField` was deleted,
-:class:`~django.db.models.FileField` took it upon itself to also delete the
+In earlier Freedom versions, when a model instance containing a
+:class:`~freedom.db.models.FileField` was deleted,
+:class:`~freedom.db.models.FileField` took it upon itself to also delete the
 file from the backend storage. This opened the door to several data-loss
 scenarios, including rolled-back transactions and fields on different models
-referencing the same file. In Django 1.3, when a model is deleted the
-:class:`~django.db.models.FileField`’s ``delete()`` method won't be called. If
+referencing the same file. In Freedom 1.3, when a model is deleted the
+:class:`~freedom.db.models.FileField`’s ``delete()`` method won't be called. If
 you need cleanup of orphaned files, you'll need to handle it yourself (for
 instance, with a custom management command that can be run manually or
 scheduled to run periodically via e.g. cron).
@@ -373,17 +373,17 @@ scheduled to run periodically via e.g. cron).
 PasswordInput default rendering behavior
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`~django.forms.PasswordInput` form widget, intended for use
+The :class:`~freedom.forms.PasswordInput` form widget, intended for use
 with form fields which represent passwords, accepts a boolean keyword
 argument ``render_value`` indicating whether to send its data back to
 the browser when displaying a submitted form with errors. Prior to
-Django 1.3, this argument defaulted to ``True``, meaning that the
+Freedom 1.3, this argument defaulted to ``True``, meaning that the
 submitted password would be sent back to the browser as part of the
 form. Developers who wished to add a bit of additional security by
 excluding that value from the redisplayed form could instantiate a
-:class:`~django.forms.PasswordInput` passing ``render_value=False`` .
+:class:`~freedom.forms.PasswordInput` passing ``render_value=False`` .
 
-Due to the sensitive nature of passwords, however, Django 1.3 takes
+Due to the sensitive nature of passwords, however, Freedom 1.3 takes
 this step automatically; the default value of ``render_value`` is now
 ``False``, and developers who want the password value returned to the
 browser on a submission with errors (the previous behavior) must now
@@ -396,8 +396,8 @@ explicitly indicate this. For example::
 Clearable default widget for FileField
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.3 now includes a :class:`~django.forms.ClearableFileInput` form widget
-in addition to :class:`~django.forms.FileInput`. ``ClearableFileInput`` renders
+Freedom 1.3 now includes a :class:`~freedom.forms.ClearableFileInput` form widget
+in addition to :class:`~freedom.forms.FileInput`. ``ClearableFileInput`` renders
 with a checkbox to clear the field's value (if the field has a value and is not
 required); ``FileInput`` provided no means for clearing an existing file from
 a ``FileField``.
@@ -411,7 +411,7 @@ To return to the previous rendering (without the ability to clear the
 ``ClearableFileInput``. For instance, in a ``ModelForm`` for a hypothetical
 ``Document`` model with a ``FileField`` named ``document``::
 
-    from django import forms
+    from freedom import forms
     from myapp.models import Document
 
     class DocumentForm(forms.ModelForm):
@@ -422,7 +422,7 @@ To return to the previous rendering (without the ability to clear the
 New index on database session table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Prior to Django 1.3, the database table used by the database backend
+Prior to Freedom 1.3, the database table used by the database backend
 for the :doc:`sessions </topics/http/sessions>` app had no index on
 the ``expire_date`` column. As a result, date-based queries on the
 session table -- such as the query that is needed to purge old
@@ -440,7 +440,7 @@ command::
 No more naughty words
 ~~~~~~~~~~~~~~~~~~~~~
 
-Django has historically provided (and enforced) a list of profanities.
+Freedom has historically provided (and enforced) a list of profanities.
 The comments app has enforced this list of profanities, preventing people from
 submitting comments that contained one of those profanities.
 
@@ -460,12 +460,12 @@ would be well advised to seek out a better, less naive approach to the
 problem.
 
 .. _Scunthorpe problem: http://en.wikipedia.org/wiki/Scunthorpe_problem
-.. _commit that implemented this change: https://code.djangoproject.com/changeset/13996
+.. _commit that implemented this change: https://code.freedomproject.com/changeset/13996
 
 Localflavor changes
 ~~~~~~~~~~~~~~~~~~~
 
-Django 1.3 introduces the following backwards-incompatible changes to
+Freedom 1.3 introduces the following backwards-incompatible changes to
 local flavors:
 
 * Canada (ca) -- The province "Newfoundland and Labrador" has had its
@@ -485,7 +485,7 @@ local flavors:
 FormSet updates
 ~~~~~~~~~~~~~~~
 
-In Django 1.3 ``FormSet`` creation behavior is modified slightly. Historically
+In Freedom 1.3 ``FormSet`` creation behavior is modified slightly. Historically
 the class didn't make a distinction between not being passed data and being
 passed empty dictionary. This was inconsistent with behavior in other parts of
 the framework. Starting with 1.3 if you pass in empty dictionary the
@@ -524,7 +524,7 @@ behavior::
     >>> Template("{{ full_name }}").render(Context({'full_name': user.get_full_name}))
     u'&lt;bound method User.get_full_name of &lt;...
 
-This has been resolved in Django 1.3 - the result in both cases will be ``u'Joe
+This has been resolved in Freedom 1.3 - the result in both cases will be ``u'Joe
 Bloggs'``. Although the previous behavior was not useful for a template language
 designed for web designers, and was never deliberately supported, it is possible
 that some templates may be broken by this change.
@@ -532,7 +532,7 @@ that some templates may be broken by this change.
 Use of custom SQL to load initial data in tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django provides a custom SQL hooks as a way to inject hand-crafted SQL
+Freedom provides a custom SQL hooks as a way to inject hand-crafted SQL
 into the database synchronization process. One of the possible uses
 for this custom SQL is to insert data into your database. If your
 custom SQL contains ``INSERT`` statements, those insertions will be
@@ -540,7 +540,7 @@ performed every time your database is synchronized. This includes the
 synchronization of any test databases that are created when you run a
 test suite.
 
-However, in the process of testing the Django 1.3, it was discovered
+However, in the process of testing the Freedom 1.3, it was discovered
 that this feature has never completely worked as advertised. When
 using database backends that don't support transactions, or when using
 a TransactionTestCase, data that has been inserted using custom SQL
@@ -548,7 +548,7 @@ will not be visible during the testing process.
 
 Unfortunately, there was no way to rectify this problem without
 introducing a backwards incompatibility. Rather than leave
-SQL-inserted initial data in an uncertain state, Django now enforces
+SQL-inserted initial data in an uncertain state, Freedom now enforces
 the policy that data inserted by custom SQL will *not* be visible
 during testing.
 
@@ -563,15 +563,15 @@ Changed priority of translation loading
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Work has been done to simplify, rationalize and properly document the algorithm
-used by Django at runtime to build translations from the different translations
+used by Freedom at runtime to build translations from the different translations
 found on disk, namely:
 
-For translatable literals found in Python code and templates (``'django'``
+For translatable literals found in Python code and templates (``'freedom'``
 gettext domain):
 
 * Priorities of translations included with applications listed in the
   :setting:`INSTALLED_APPS` setting were changed. To provide a behavior
-  consistent with other parts of Django that also use such setting (templates,
+  consistent with other parts of Freedom that also use such setting (templates,
   etc.) now, when building the translation that will be made available, the
   apps listed first have higher precedence than the ones listed later.
 
@@ -589,10 +589,10 @@ gettext domain):
   translations). See the `corresponding deprecated features section`_
   of this document.
 
-For translatable literals found in Javascript code (``'djangojs'`` gettext
+For translatable literals found in Javascript code (``'freedomjs'`` gettext
 domain):
 
-* Similarly to the ``'django'`` domain translations: Overriding of
+* Similarly to the ``'freedom'`` domain translations: Overriding of
   translations shipped with applications by using the :setting:`LOCALE_PATHS`
   setting is now possible for this domain too. These translations have higher
   precedence than the translations of Python packages passed to the
@@ -611,15 +611,15 @@ Transaction management
 When using managed transactions -- that is, anything but the default
 autocommit mode -- it is important when a transaction is marked as
 "dirty". Dirty transactions are committed by the ``commit_on_success``
-decorator or the ``django.middleware.transaction.TransactionMiddleware``, and
+decorator or the ``freedom.middleware.transaction.TransactionMiddleware``, and
 ``commit_manually`` forces them to be closed explicitly; clean transactions
 "get a pass", which means they are usually rolled back at the end of a request
 when the connection is closed.
 
-Until Django 1.3, transactions were only marked dirty when Django was
+Until Freedom 1.3, transactions were only marked dirty when Freedom was
 aware of a modifying operation performed in them; that is, either some
 model was saved, some bulk update or delete was performed, or the user
-explicitly called ``transaction.set_dirty()``. In Django 1.3, a
+explicitly called ``transaction.set_dirty()``. In Freedom 1.3, a
 transaction is marked dirty when *any* database operation is
 performed.
 
@@ -627,30 +627,30 @@ As a result of this change, you no longer need to set a transaction
 dirty explicitly when you execute raw SQL or use a data-modifying
 ``SELECT``. However, you *do* need to explicitly close any read-only
 transactions that are being managed using
-:func:`~django.db.transaction.commit_manually`. For example::
+:func:`~freedom.db.transaction.commit_manually`. For example::
 
       @transaction.commit_manually
       def my_view(request, name):
           obj = get_object_or_404(MyObject, name__iexact=name)
           return render_to_response('template', {'object':obj})
 
-Prior to Django 1.3, this would work without error. However, under
-Django 1.3, this will raise a
-:class:`~django.db.transaction.TransactionManagementError` because
+Prior to Freedom 1.3, this would work without error. However, under
+Freedom 1.3, this will raise a
+:class:`~freedom.db.transaction.TransactionManagementError` because
 the read operation that retrieves the ``MyObject`` instance leaves the
 transaction in a dirty state.
 
 No password reset for inactive users
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Prior to Django 1.3, inactive users were able to request a password reset email
-and reset their password. In Django 1.3 inactive users will receive the same
+Prior to Freedom 1.3, inactive users were able to request a password reset email
+and reset their password. In Freedom 1.3 inactive users will receive the same
 message as a nonexistent account.
 
 Password reset view now accepts ``from_email``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :func:`django.contrib.auth.views.password_reset` view now accepts a
+The :func:`freedom.contrib.auth.views.password_reset` view now accepts a
 ``from_email`` parameter, which is passed to the ``password_reset_form``’s
 ``save()`` method as a keyword argument. If you are using this view with a
 custom password reset form, then you will need to ensure your form's ``save()``
@@ -661,22 +661,22 @@ method accepts this keyword argument.
 Features deprecated in 1.3
 ==========================
 
-Django 1.3 deprecates some features from earlier releases.
+Freedom 1.3 deprecates some features from earlier releases.
 These features are still supported, but will be gradually phased out
 over the next few release cycles.
 
 Code taking advantage of any of the features below will raise a
-``PendingDeprecationWarning`` in Django 1.3. This warning will be
+``PendingDeprecationWarning`` in Freedom 1.3. This warning will be
 silent by default, but may be turned on using Python's :mod:`warnings`
 module, or by running Python with a ``-Wd`` or ``-Wall`` flag.
 
-In Django 1.4, these warnings will become a ``DeprecationWarning``,
-which is *not* silent. In Django 1.5 support for these features will
+In Freedom 1.4, these warnings will become a ``DeprecationWarning``,
+which is *not* silent. In Freedom 1.5 support for these features will
 be removed entirely.
 
 .. seealso::
 
-    For more details, see the documentation :doc:`Django's release process
+    For more details, see the documentation :doc:`Freedom's release process
     </internals/release-process>` and our :doc:`deprecation timeline
     </internals/deprecation>`.
 
@@ -690,48 +690,48 @@ has shifted all of his efforts toward the lighter, slimmer, more stable, and
 more flexible ``mod_wsgi`` backend.
 
 If you are currently using the ``mod_python`` request handler, you
-should redeploy your Django projects using another request handler.
+should redeploy your Freedom projects using another request handler.
 :doc:`mod_wsgi </howto/deployment/wsgi/modwsgi>` is the request handler
-recommended by the Django project, but :doc:`FastCGI
+recommended by the Freedom project, but :doc:`FastCGI
 </howto/deployment/fastcgi>` is also supported. Support for
-``mod_python`` deployment will be removed in Django 1.5.
+``mod_python`` deployment will be removed in Freedom 1.5.
 
 Function-based generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As a result of the introduction of class-based generic views, the
-function-based generic views provided by Django have been deprecated.
+function-based generic views provided by Freedom have been deprecated.
 The following modules and the views they contain have been deprecated:
 
-* ``django.views.generic.create_update``
-* ``django.views.generic.date_based``
-* ``django.views.generic.list_detail``
-* ``django.views.generic.simple``
+* ``freedom.views.generic.create_update``
+* ``freedom.views.generic.date_based``
+* ``freedom.views.generic.list_detail``
+* ``freedom.views.generic.simple``
 
 Test client response ``template`` attribute
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django's :ref:`test client <test-client>` returns
-:class:`~django.test.Response` objects annotated with extra testing
-information. In Django versions prior to 1.3, this included a ``template``
+Freedom's :ref:`test client <test-client>` returns
+:class:`~freedom.test.Response` objects annotated with extra testing
+information. In Freedom versions prior to 1.3, this included a ``template``
 attribute containing information about templates rendered in generating the
-response: either None, a single :class:`~django.template.Template` object, or a
-list of :class:`~django.template.Template` objects. This inconsistency in
+response: either None, a single :class:`~freedom.template.Template` object, or a
+list of :class:`~freedom.template.Template` objects. This inconsistency in
 return values (sometimes a list, sometimes not) made the attribute difficult
 to work with.
 
-In Django 1.3 the ``template`` attribute is deprecated in favor of a new
-:attr:`~django.test.Response.templates` attribute, which is always a
+In Freedom 1.3 the ``template`` attribute is deprecated in favor of a new
+:attr:`~freedom.test.Response.templates` attribute, which is always a
 list, even if it has only a single element or no elements.
 
-``DjangoTestRunner``
+``FreedomTestRunner``
 ~~~~~~~~~~~~~~~~~~~~
 
 As a result of the introduction of support for unittest2, the features
-of ``django.test.simple.DjangoTestRunner`` (including fail-fast
+of ``freedom.test.simple.FreedomTestRunner`` (including fail-fast
 and Ctrl-C test termination) have been made redundant. In view of this
-redundancy, ``DjangoTestRunner`` has been turned into an empty placeholder
-class, and will be removed entirely in Django 1.5.
+redundancy, ``FreedomTestRunner`` has been turned into an empty placeholder
+class, and will be removed entirely in Freedom 1.5.
 
 Changes to :ttag:`url` and :ttag:`ssi`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -754,8 +754,8 @@ syntax, but interpret the argument as a constant. This means it isn't
 possible to use a context variable as the target of a :ttag:`url` and
 :ttag:`ssi` tag.
 
-Django 1.3 marks the start of the process to correct this historical
-accident. Django 1.3 adds a new template library -- ``future`` -- that
+Freedom 1.3 marks the start of the process to correct this historical
+accident. Freedom 1.3 adds a new template library -- ``future`` -- that
 provides alternate implementations of the :ttag:`url` and :ttag:`ssi`
 template tags. This ``future`` library implement behavior that makes
 the handling of the first argument consistent with the handling of all
@@ -769,8 +769,8 @@ should be replaced with::
     {% url 'sample' %}
 
 The tags implementing the old behavior have been deprecated, and in
-Django 1.5, the old behavior will be replaced with the new behavior.
-To ensure compatibility with future versions of Django, existing
+Freedom 1.5, the old behavior will be replaced with the new behavior.
+To ensure compatibility with future versions of Freedom, existing
 templates should be modified to use the new ``future`` libraries and
 syntax.
 
@@ -783,13 +783,13 @@ A side effect of this duplication was the missing adoption of the changes made
 in r12634_ to support a broader set of characters for usernames.
 
 This release refactors the admin's login mechanism to use a subclass of the
-:class:`~django.contrib.auth.forms.AuthenticationForm` instead of a manual
+:class:`~freedom.contrib.auth.forms.AuthenticationForm` instead of a manual
 form validation. The previously undocumented method
-``'django.contrib.admin.sites.AdminSite.display_login_form'`` has been removed
-in favor of a new :attr:`~django.contrib.admin.AdminSite.login_form`
+``'freedom.contrib.admin.sites.AdminSite.display_login_form'`` has been removed
+in favor of a new :attr:`~freedom.contrib.admin.AdminSite.login_form`
 attribute.
 
-.. _r12634: https://code.djangoproject.com/changeset/12634
+.. _r12634: https://code.freedomproject.com/changeset/12634
 
 ``reset`` and ``sqlreset`` management commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -799,20 +799,20 @@ can be used to delete everything. You can also use ALTER TABLE or DROP TABLE
 statements manually.
 
 
-GeoDjango
+GeoFreedom
 ~~~~~~~~~
 
 * The function-based :setting:`TEST_RUNNER` previously used to execute
-  the GeoDjango test suite, ``django.contrib.gis.tests.run_gis_tests``, was
+  the GeoFreedom test suite, ``freedom.contrib.gis.tests.run_gis_tests``, was
   deprecated for the class-based runner,
-  ``django.contrib.gis.tests.GeoDjangoTestSuiteRunner``.
+  ``freedom.contrib.gis.tests.GeoFreedomTestSuiteRunner``.
 
 * Previously, calling
-  :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` would
+  :meth:`~freedom.contrib.gis.geos.GEOSGeometry.transform` would
   silently do nothing when GDAL wasn't available.  Now, a
-  :class:`~django.contrib.gis.geos.GEOSException` is properly raised
+  :class:`~freedom.contrib.gis.geos.GEOSException` is properly raised
   to indicate possible faulty application code.  A warning is now
-  raised if :meth:`~django.contrib.gis.geos.GEOSGeometry.transform` is
+  raised if :meth:`~freedom.contrib.gis.geos.GEOSGeometry.transform` is
   called when the SRID of the geometry is less than 0 or ``None``.
 
 ``CZBirthNumberField.clean``
@@ -820,23 +820,23 @@ GeoDjango
 
 Previously this field's ``clean()`` method accepted a second, gender, argument
 which allowed stronger validation checks to be made, however since this
-argument could never actually be passed from the Django form machinery it is
+argument could never actually be passed from the Freedom form machinery it is
 now pending deprecation.
 
 ``CompatCookie``
 ~~~~~~~~~~~~~~~~
 
-Previously, ``django.http`` exposed an undocumented ``CompatCookie`` class,
+Previously, ``freedom.http`` exposed an undocumented ``CompatCookie`` class,
 which was a bugfix wrapper around the standard library ``SimpleCookie``. As the
 fixes are moving upstream, this is now deprecated - you should use ``from
-django.http import SimpleCookie`` instead.
+freedom.http import SimpleCookie`` instead.
 
 .. _loading_of_project_level_translations:
 
 Loading of *project-level* translations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This release of Django starts the deprecation process for inclusion of
+This release of Freedom starts the deprecation process for inclusion of
 translations located under the so-called *project path* in the translation
 building process performed at runtime. The :setting:`LOCALE_PATHS` setting can
 be used for the same task by adding the filesystem path to a ``locale``
@@ -868,30 +868,30 @@ Rationale for this decision:
   for JavaScript literals. This deprecation removes such
   inconsistency.
 
-``PermWrapper`` moved to ``django.contrib.auth.context_processors``
+``PermWrapper`` moved to ``freedom.contrib.auth.context_processors``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In Django 1.2, we began the process of changing the location of the
-``auth`` context processor from ``django.core.context_processors`` to
-``django.contrib.auth.context_processors``. However, the
+In Freedom 1.2, we began the process of changing the location of the
+``auth`` context processor from ``freedom.core.context_processors`` to
+``freedom.contrib.auth.context_processors``. However, the
 ``PermWrapper`` support class was mistakenly omitted from that
-migration. In Django 1.3, the ``PermWrapper`` class has also been
-moved to ``django.contrib.auth.context_processors``, along with the
+migration. In Freedom 1.3, the ``PermWrapper`` class has also been
+moved to ``freedom.contrib.auth.context_processors``, along with the
 ``PermLookupDict`` support class. The new classes are functionally
 identical to their old versions; only the module location has changed.
 
 Removal of ``XMLField``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-When Django was first released, Django included an ``XMLField`` that performed
+When Freedom was first released, Freedom included an ``XMLField`` that performed
 automatic XML validation for any field input. However, this validation function
 hasn't been performed since the introduction of ``newforms``, prior to the 1.0
 release. As a result, ``XMLField`` as currently implemented is functionally
-indistinguishable from a simple :class:`~django.db.models.TextField`.
+indistinguishable from a simple :class:`~freedom.db.models.TextField`.
 
-For this reason, Django 1.3 has fast-tracked the deprecation of
+For this reason, Freedom 1.3 has fast-tracked the deprecation of
 ``XMLField`` -- instead of a two-release deprecation, ``XMLField``
-will be removed entirely in Django 1.4.
+will be removed entirely in Freedom 1.4.
 
 It's easy to update your code to accommodate this change -- just
 replace all uses of ``XMLField`` with ``TextField``, and remove the

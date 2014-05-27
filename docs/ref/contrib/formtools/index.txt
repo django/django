@@ -1,9 +1,9 @@
-django.contrib.formtools
+freedom.contrib.formtools
 ========================
 
-.. module:: django.contrib.formtools
+.. module:: freedom.contrib.formtools
 
-A set of high-level abstractions for Django forms (:mod:`django.forms`).
+A set of high-level abstractions for Freedom forms (:mod:`freedom.forms`).
 
 .. toctree::
    :maxdepth: 1

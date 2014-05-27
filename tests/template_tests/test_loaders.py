@@ -4,7 +4,7 @@ Test cases for the template loaders
 Note: This test requires setuptools!
 """
 
-from django.conf import settings
+from freedom.conf import settings
 
 if __name__ == '__main__':
     settings.configure()
@@ -20,13 +20,13 @@ except ImportError:
     pkg_resources = None
 
 
-from django.template import TemplateDoesNotExist, Context
-from django.template.loaders.eggs import Loader as EggLoader
-from django.template import loader
-from django.test import TestCase, override_settings
-from django.utils import six
-from django.utils._os import upath
-from django.utils.six import StringIO
+from freedom.template import TemplateDoesNotExist, Context
+from freedom.template.loaders.eggs import Loader as EggLoader
+from freedom.template import loader
+from freedom.test import TestCase, override_settings
+from freedom.utils import six
+from freedom.utils._os import upath
+from freedom.utils.six import StringIO
 
 
 # Mock classes and objects for pkg_resources functions.
@@ -109,8 +109,8 @@ class EggLoaderTest(TestCase):
 
 @override_settings(
     TEMPLATE_LOADERS=(
-        ('django.template.loaders.cached.Loader', (
-            'django.template.loaders.filesystem.Loader',
+        ('freedom.template.loaders.cached.Loader', (
+            'freedom.template.loaders.filesystem.Loader',
         )),
     )
 )
@@ -207,9 +207,9 @@ class TemplateDirsOverrideTest(unittest.TestCase):
 
 @override_settings(
     TEMPLATE_LOADERS=(
-        ('django.template.loaders.cached.Loader', (
-            'django.template.loaders.filesystem.Loader',
-            'django.template.loaders.app_directories.Loader',
+        ('freedom.template.loaders.cached.Loader', (
+            'freedom.template.loaders.filesystem.Loader',
+            'freedom.template.loaders.app_directories.Loader',
         )),
     )
 )
@@ -223,8 +223,8 @@ class PriorityCacheLoader(TestCase):
 
 
 @override_settings(
-    TEMPLATE_LOADERS=('django.template.loaders.filesystem.Loader',
-                      'django.template.loaders.app_directories.Loader',),
+    TEMPLATE_LOADERS=('freedom.template.loaders.filesystem.Loader',
+                      'freedom.template.loaders.app_directories.Loader',),
 )
 class PriorityLoader(TestCase):
     def test_basic(self):

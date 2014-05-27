@@ -2,40 +2,40 @@
 Signals
 =======
 
-.. module:: django.dispatch
+.. module:: freedom.dispatch
    :synopsis: Signal dispatch
 
-Django includes a "signal dispatcher" which helps allow decoupled applications
+Freedom includes a "signal dispatcher" which helps allow decoupled applications
 get notified when actions occur elsewhere in the framework. In a nutshell,
 signals allow certain *senders* to notify a set of *receivers* that some action
 has taken place. They're especially useful when many pieces of code may be
 interested in the same events.
 
-Django provides a :doc:`set of built-in signals </ref/signals>` that let user
-code get notified by Django itself of certain actions. These include some useful
+Freedom provides a :doc:`set of built-in signals </ref/signals>` that let user
+code get notified by Freedom itself of certain actions. These include some useful
 notifications:
 
-* :data:`django.db.models.signals.pre_save` &
-  :data:`django.db.models.signals.post_save`
+* :data:`freedom.db.models.signals.pre_save` &
+  :data:`freedom.db.models.signals.post_save`
 
-  Sent before or after a model's :meth:`~django.db.models.Model.save` method
+  Sent before or after a model's :meth:`~freedom.db.models.Model.save` method
   is called.
 
-* :data:`django.db.models.signals.pre_delete` &
-  :data:`django.db.models.signals.post_delete`
+* :data:`freedom.db.models.signals.pre_delete` &
+  :data:`freedom.db.models.signals.post_delete`
 
-  Sent before or after a model's :meth:`~django.db.models.Model.delete`
-  method or queryset's :meth:`~django.db.models.query.QuerySet.delete`
+  Sent before or after a model's :meth:`~freedom.db.models.Model.delete`
+  method or queryset's :meth:`~freedom.db.models.query.QuerySet.delete`
   method is called.
 
-* :data:`django.db.models.signals.m2m_changed`
+* :data:`freedom.db.models.signals.m2m_changed`
 
-  Sent when a :class:`~django.db.models.ManyToManyField` on a model is changed.
+  Sent when a :class:`~freedom.db.models.ManyToManyField` on a model is changed.
 
-* :data:`django.core.signals.request_started` &
-  :data:`django.core.signals.request_finished`
+* :data:`freedom.core.signals.request_started` &
+  :data:`freedom.core.signals.request_finished`
 
-  Sent when Django starts or finishes an HTTP request.
+  Sent when Freedom starts or finishes an HTTP request.
 
 See the :doc:`built-in signal documentation </ref/signals>` for a complete list,
 and a complete explanation of each signal.
@@ -58,7 +58,7 @@ called when the signal is sent by using the :meth:`Signal.connect` method:
     :param sender: Specifies a particular sender to receive signals from. See
         :ref:`connecting-to-specific-signals` for more information.
 
-    :param weak: Django stores signal handlers as weak references by
+    :param weak: Freedom stores signal handlers as weak references by
         default. Thus, if your receiver is a local function, it may be
         garbage collected. To prevent this, pass ``weak=False`` when you call
         the signal's ``connect()`` method.
@@ -69,7 +69,7 @@ called when the signal is sent by using the :meth:`Signal.connect` method:
 
 Let's see how this works by registering a signal that
 gets called after each HTTP request is finished. We'll be connecting to the
-:data:`~django.core.signals.request_finished` signal.
+:data:`~freedom.core.signals.request_finished` signal.
 
 .. _receiver-functions:
 
@@ -90,13 +90,13 @@ keyword arguments (``**kwargs``); all signal handlers must take these arguments.
 We'll look at senders `a bit later`_, but right now look at the ``**kwargs``
 argument. All signals send keyword arguments, and may change those keyword
 arguments at any time. In the case of
-:data:`~django.core.signals.request_finished`, it's documented as sending no
+:data:`~freedom.core.signals.request_finished`, it's documented as sending no
 arguments, which means we might be tempted to write our signal handling as
 ``my_callback(sender)``.
 
 .. _a bit later: `connecting to signals sent by specific senders`_
 
-This would be wrong -- in fact, Django will throw an error if you do so. That's
+This would be wrong -- in fact, Freedom will throw an error if you do so. That's
 because at any point arguments could get added to the signal and your receiver
 must be able to handle those new arguments.
 
@@ -110,7 +110,7 @@ manual connect route:
 
 .. code-block:: python
 
-    from django.core.signals import request_finished
+    from freedom.core.signals import request_finished
 
     request_finished.connect(my_callback)
 
@@ -124,8 +124,8 @@ Here's how you connect with the decorator:
 
 .. code-block:: python
 
-    from django.core.signals import request_finished
-    from django.dispatch import receiver
+    from freedom.core.signals import request_finished
+    from freedom.dispatch import receiver
 
     @receiver(request_finished)
     def my_callback(sender, **kwargs):
@@ -142,15 +142,15 @@ Now, our ``my_callback`` function will be called each time a request finishes.
 
     In practice, signal handlers are usually defined in a ``signals``
     submodule of the application they relate to. Signal receivers are
-    connected in the :meth:`~django.apps.AppConfig.ready` method of your
+    connected in the :meth:`~freedom.apps.AppConfig.ready` method of your
     application configuration class. If you're using the :func:`receiver`
     decorator, simply import the ``signals`` submodule inside
-    :meth:`~django.apps.AppConfig.ready`.
+    :meth:`~freedom.apps.AppConfig.ready`.
 
     .. versionchanged:: 1.7
 
-        Since :meth:`~django.apps.AppConfig.ready` didn't exist in previous
-        versions of Django, signal registration usually happened in the
+        Since :meth:`~freedom.apps.AppConfig.ready` didn't exist in previous
+        versions of Freedom, signal registration usually happened in the
         ``models`` module.
 
 .. _connecting-to-specific-signals:
@@ -160,19 +160,19 @@ Connecting to signals sent by specific senders
 
 Some signals get sent many times, but you'll only be interested in receiving a
 certain subset of those signals. For example, consider the
-:data:`django.db.models.signals.pre_save` signal sent before a model gets saved.
+:data:`freedom.db.models.signals.pre_save` signal sent before a model gets saved.
 Most of the time, you don't need to know when *any* model gets saved -- just
 when one *specific* model is saved.
 
 In these cases, you can register to receive signals sent only by particular
-senders. In the case of :data:`django.db.models.signals.pre_save`, the sender
+senders. In the case of :data:`freedom.db.models.signals.pre_save`, the sender
 will be the model class being saved, so you can indicate that you only want
 signals sent by some model:
 
 .. code-block:: python
 
-    from django.db.models.signals import pre_save
-    from django.dispatch import receiver
+    from freedom.db.models.signals import pre_save
+    from freedom.dispatch import receiver
     from myapp.models import MyModel
 
     @receiver(pre_save, sender=MyModel)
@@ -204,7 +204,7 @@ bound to the signal once for each unique ``dispatch_uid`` value.
 
 .. code-block:: python
 
-    from django.core.signals import request_finished
+    from freedom.core.signals import request_finished
 
     request_finished.connect(my_callback, dispatch_uid="my_unique_identifier")
 
@@ -219,7 +219,7 @@ Defining signals
 
 .. class:: Signal([providing_args=list])
 
-All signals are :class:`django.dispatch.Signal` instances. The
+All signals are :class:`freedom.dispatch.Signal` instances. The
 ``providing_args`` is a list of the names of arguments the signal will provide
 to listeners. This is purely documentational, however, as there is nothing that
 checks that the signal actually provides these arguments to its listeners.
@@ -228,9 +228,9 @@ For example:
 
 .. code-block:: python
 
-    import django.dispatch
+    import freedom.dispatch
 
-    pizza_done = django.dispatch.Signal(providing_args=["toppings", "size"])
+    pizza_done = freedom.dispatch.Signal(providing_args=["toppings", "size"])
 
 This declares a ``pizza_done`` signal that will provide receivers with
 ``toppings`` and ``size`` arguments.
@@ -241,7 +241,7 @@ getting the API right on the first try isn't necessary.
 Sending signals
 ---------------
 
-There are two ways to send signals in Django.
+There are two ways to send signals in Freedom.
 
 .. method:: Signal.send(sender, **kwargs)
 .. method:: Signal.send_robust(sender, **kwargs)

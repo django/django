@@ -1,11 +1,11 @@
 .. _ref-gis-admin:
 
 ======================
-GeoDjango's admin site
+GeoFreedom's admin site
 ======================
 
-.. module:: django.contrib.gis.admin
-   :synopsis: GeoDjango's extensions to the admin site.
+.. module:: freedom.contrib.gis.admin
+   :synopsis: GeoFreedom's extensions to the admin site.
 
 
 ``GeoModelAdmin``
@@ -56,7 +56,7 @@ GeoDjango's admin site
    .. note::
 
        This is different from adding the geometry field to
-       :attr:`~django.contrib.admin.ModelAdmin.readonly_fields`,
+       :attr:`~freedom.contrib.admin.ModelAdmin.readonly_fields`,
        which will only display the WKT of the geometry. Setting
        ``modifiable=False``, actually displays the geometry in a map,
        but disables the ability to edit its vertices.

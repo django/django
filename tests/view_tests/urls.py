@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from os import path
 
-from django.conf.urls import url, include
-from django.utils._os import upath
-from django.views import defaults, i18n
+from freedom.conf.urls import url, include
+from freedom.utils._os import upath
+from freedom.views import defaults, i18n
 
 from . import views
 
@@ -13,32 +13,32 @@ media_dir = path.join(base_dir, 'media')
 locale_dir = path.join(base_dir, 'locale')
 
 js_info_dict = {
-    'domain': 'djangojs',
+    'domain': 'freedomjs',
     'packages': ('view_tests',),
 }
 
 js_info_dict_english_translation = {
-    'domain': 'djangojs',
+    'domain': 'freedomjs',
     'packages': ('view_tests.app0',),
 }
 
 js_info_dict_multi_packages1 = {
-    'domain': 'djangojs',
+    'domain': 'freedomjs',
     'packages': ('view_tests.app1', 'view_tests.app2'),
 }
 
 js_info_dict_multi_packages2 = {
-    'domain': 'djangojs',
+    'domain': 'freedomjs',
     'packages': ('view_tests.app3', 'view_tests.app4'),
 }
 
 js_info_dict_admin = {
-    'domain': 'djangojs',
-    'packages': ('django.contrib.admin', 'view_tests'),
+    'domain': 'freedomjs',
+    'packages': ('freedom.contrib.admin', 'view_tests'),
 }
 
 js_info_dict_app5 = {
-    'domain': 'djangojs',
+    'domain': 'freedomjs',
     'packages': ('view_tests.app5',),
 }
 
@@ -58,7 +58,7 @@ urlpatterns = [
     url(r'raises500/$', views.raises500),
 
     # i18n views
-    url(r'^i18n/', include('django.conf.urls.i18n')),
+    url(r'^i18n/', include('freedom.conf.urls.i18n')),
     url(r'^jsi18n/$', i18n.javascript_catalog, js_info_dict),
     url(r'^jsi18n/app5/$', i18n.javascript_catalog, js_info_dict_app5),
     url(r'^jsi18n_english_translation/$', i18n.javascript_catalog, js_info_dict_english_translation),
@@ -68,7 +68,7 @@ urlpatterns = [
     url(r'^jsi18n_template/$', views.jsi18n),
 
     # Static views
-    url(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': media_dir}),
+    url(r'^site_media/(?P<path>.*)$', 'freedom.views.static.serve', {'document_root': media_dir}),
 ]
 
 urlpatterns += [

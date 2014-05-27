@@ -1,4 +1,4 @@
-from django import template
+from freedom import template
 
 from ..views import BrokenException
 

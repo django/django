@@ -4,10 +4,10 @@ from __future__ import unicode_literals
 import re
 from unittest import skipUnless
 
-from django.core.management import call_command
-from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature
-from django.utils.six import PY3, StringIO
+from freedom.core.management import call_command
+from freedom.db import connection
+from freedom.test import TestCase, skipUnlessDBFeature
+from freedom.utils.six import PY3, StringIO
 
 
 class InspectDBTestCase(TestCase):
@@ -21,9 +21,9 @@ class InspectDBTestCase(TestCase):
                      stdout=out)
         error_message = "inspectdb has examined a table that should have been filtered out."
         # contrib.contenttypes is one of the apps always installed when running
-        # the Django test suite, check that one of its tables hasn't been
+        # the Freedom test suite, check that one of its tables hasn't been
         # inspected
-        self.assertNotIn("class DjangoContentType(models.Model):", out.getvalue(), msg=error_message)
+        self.assertNotIn("class FreedomContentType(models.Model):", out.getvalue(), msg=error_message)
 
     def make_field_type_asserter(self):
         """Call inspectdb and return a function to validate a field type in its output"""
@@ -40,7 +40,7 @@ class InspectDBTestCase(TestCase):
         return assertFieldType
 
     def test_field_types(self):
-        """Test introspection of various Django field types"""
+        """Test introspection of various Freedom field types"""
         assertFieldType = self.make_field_type_asserter()
 
         # Inspecting Oracle DB doesn't produce correct results (#19884):
@@ -76,7 +76,7 @@ class InspectDBTestCase(TestCase):
             assertFieldType('url_field', "models.CharField(max_length=200)")
 
     def test_number_field_types(self):
-        """Test introspection of various Django field types"""
+        """Test introspection of various Freedom field types"""
         assertFieldType = self.make_field_type_asserter()
 
         if not connection.features.can_introspect_autofield:

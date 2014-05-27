@@ -2,19 +2,19 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from django.conf import settings
-from django.contrib import admin
-from django.contrib.admin import helpers
-from django.contrib.admin.utils import (display_for_field, flatten,
+from freedom.conf import settings
+from freedom.contrib import admin
+from freedom.contrib.admin import helpers
+from freedom.contrib.admin.utils import (display_for_field, flatten,
     flatten_fieldsets, label_for_field, lookup_field, NestedObjects)
-from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
-from django.contrib.sites.models import Site
-from django.db import models, DEFAULT_DB_ALIAS
-from django import forms
-from django.test import SimpleTestCase, TestCase
-from django.utils.formats import localize
-from django.utils.safestring import mark_safe
-from django.utils import six
+from freedom.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
+from freedom.contrib.sites.models import Site
+from freedom.db import models, DEFAULT_DB_ALIAS
+from freedom import forms
+from freedom.test import SimpleTestCase, TestCase
+from freedom.utils.formats import localize
+from freedom.utils.safestring import mark_safe
+from freedom.utils import six
 
 from .models import Article, Count, Event, Location, EventGuide, Vehicle, Car
 

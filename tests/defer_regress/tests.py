@@ -2,11 +2,11 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from django.apps import apps
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.sessions.backends.db import SessionStore
-from django.db.models import Count
-from django.test import TestCase, override_settings
+from freedom.apps import apps
+from freedom.contrib.contenttypes.models import ContentType
+from freedom.contrib.sessions.backends.db import SessionStore
+from freedom.db.models import Count
+from freedom.test import TestCase, override_settings
 
 from .models import (
     ResolveThis, Item, RelatedItem, Child, Leaf, Proxy, SimpleItem, Feature,
@@ -113,7 +113,7 @@ class DeferRegressionTest(TestCase):
         self.assertIn("Item_Deferred_name", klasses_with_deferred)
         self.assertTrue(any(k._deferred for k in app_config.get_models(include_deferred=True)))
 
-    @override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer')
+    @override_settings(SESSION_SERIALIZER='freedom.contrib.sessions.serializers.PickleSerializer')
     def test_ticket_12163(self):
         # Test for #12163 - Pickling error saving session with unsaved model
         # instances.
@@ -220,7 +220,7 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(len(qs), 1)
 
     def test_deferred_class_factory(self):
-        from django.db.models.query_utils import deferred_class_factory
+        from freedom.db.models.query_utils import deferred_class_factory
         new_class = deferred_class_factory(
             Item,
             ('this_is_some_very_long_attribute_name_so_modelname_truncation_is_triggered',))

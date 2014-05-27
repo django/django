@@ -3,12 +3,12 @@ Base views
 ==========
 
 The following three classes provide much of the functionality needed to create
-Django views. You may think of them as *parent* views, which can be used by
+Freedom views. You may think of them as *parent* views, which can be used by
 themselves or inherited from. They may not provide all the capabilities
 required for projects, in which case there are Mixins and Generic class-based
 views.
 
-Many of Django's built-in class-based views inherit from other class-based
+Many of Freedom's built-in class-based views inherit from other class-based
 views or various mixins. Because this inheritance chain is very important, the
 ancestor classes are  documented under the section title of **Ancestors (MRO)**.
 MRO is an acronym for Method Resolution Order.
@@ -16,7 +16,7 @@ MRO is an acronym for Method Resolution Order.
 View
 ----
 
-.. class:: django.views.generic.base.View
+.. class:: freedom.views.generic.base.View
 
     The master class-based base view. All other class-based views inherit from
     this base class.
@@ -29,8 +29,8 @@ View
 
     **Example views.py**::
 
-        from django.http import HttpResponse
-        from django.views.generic import View
+        from freedom.http import HttpResponse
+        from freedom.views.generic import View
 
         class MyView(View):
 
@@ -39,7 +39,7 @@ View
 
     **Example urls.py**::
 
-        from django.conf.urls import url
+        from freedom.conf.urls import url
 
         from myapp.views import MyView
 
@@ -95,7 +95,7 @@ View
 TemplateView
 ------------
 
-.. class:: django.views.generic.base.TemplateView
+.. class:: freedom.views.generic.base.TemplateView
 
     Renders a given template, with the context containing parameters captured
     in the URL.
@@ -104,19 +104,19 @@ TemplateView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * :class:`django.views.generic.base.ContextMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.base.TemplateResponseMixin`
+    * :class:`freedom.views.generic.base.ContextMixin`
+    * :class:`freedom.views.generic.base.View`
 
     **Method Flowchart**
 
-    1. :meth:`~django.views.generic.base.View.dispatch()`
-    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
-    3. :meth:`~django.views.generic.base.ContextMixin.get_context_data()`
+    1. :meth:`~freedom.views.generic.base.View.dispatch()`
+    2. :meth:`~freedom.views.generic.base.View.http_method_not_allowed()`
+    3. :meth:`~freedom.views.generic.base.ContextMixin.get_context_data()`
 
     **Example views.py**::
 
-        from django.views.generic.base import TemplateView
+        from freedom.views.generic.base import TemplateView
 
         from articles.models import Article
 
@@ -131,7 +131,7 @@ TemplateView
 
     **Example urls.py**::
 
-        from django.conf.urls import url
+        from freedom.conf.urls import url
 
         from myapp.views import HomePageView
 
@@ -141,13 +141,13 @@ TemplateView
 
     **Context**
 
-    * Populated (through :class:`~django.views.generic.base.ContextMixin`) with
+    * Populated (through :class:`~freedom.views.generic.base.ContextMixin`) with
       the keyword arguments captured from the URL pattern that served the view.
 
 RedirectView
 ------------
 
-.. class:: django.views.generic.base.RedirectView
+.. class:: freedom.views.generic.base.RedirectView
 
     Redirects to a given URL.
 
@@ -157,25 +157,25 @@ RedirectView
     ``"%"`` characters in the URL must be written as ``"%%"`` so that Python
     will convert them to a single percent sign on output.
 
-    If the given URL is ``None``, Django will return an ``HttpResponseGone``
+    If the given URL is ``None``, Freedom will return an ``HttpResponseGone``
     (410).
 
     **Ancestors (MRO)**
 
     This view inherits methods and attributes from the following view:
 
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.base.View`
 
     **Method Flowchart**
 
-    1. :meth:`~django.views.generic.base.View.dispatch()`
-    2. :meth:`~django.views.generic.base.View.http_method_not_allowed()`
+    1. :meth:`~freedom.views.generic.base.View.dispatch()`
+    2. :meth:`~freedom.views.generic.base.View.http_method_not_allowed()`
     3. :meth:`get_redirect_url()`
 
     **Example views.py**::
 
-        from django.shortcuts import get_object_or_404
-        from django.views.generic.base import RedirectView
+        from freedom.shortcuts import get_object_or_404
+        from freedom.views.generic.base import RedirectView
 
         from articles.models import Article
 
@@ -192,15 +192,15 @@ RedirectView
 
     **Example urls.py**::
 
-        from django.conf.urls import url
-        from django.views.generic.base import RedirectView
+        from freedom.conf.urls import url
+        from freedom.views.generic.base import RedirectView
 
         from article.views import ArticleCounterRedirectView, ArticleDetail
 
         urlpatterns = [
             url(r'^counter/(?P<pk>[0-9]+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
             url(r'^details/(?P<pk>[0-9]+)/$', ArticleDetail.as_view(), name='article-detail'),
-            url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
+            url(r'^go-to-freedom/$', RedirectView.as_view(url='http://freedomproject.com'), name='go-to-freedom'),
         ]
 
     **Attributes**

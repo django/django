@@ -1,5 +1,5 @@
-from django.apps import apps
-from django.test import TestCase
+from freedom.apps import apps
+from freedom.test import TestCase
 
 
 class NoModelTests(TestCase):

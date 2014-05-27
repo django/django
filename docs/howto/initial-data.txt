@@ -3,7 +3,7 @@ Providing initial data for models
 =================================
 
 It's sometimes useful to pre-populate your database with hard-coded data when
-you're first setting up an app. There's a couple of ways you can have Django
+you're first setting up an app. There's a couple of ways you can have Freedom
 automatically create this data: you can provide `initial data via fixtures`_, or
 you can provide `initial data as SQL`_.
 
@@ -18,7 +18,7 @@ but initial SQL is also quite a bit more flexible.
 Providing initial data with fixtures
 ====================================
 
-A fixture is a collection of data that Django knows how to import into a
+A fixture is a collection of data that Freedom knows how to import into a
 database. The most straightforward way of creating a fixture if you've already
 got some data is to use the :djadmin:`manage.py dumpdata <dumpdata>` command.
 Or, you can write fixtures by hand; fixtures can be written as XML, YAML, or
@@ -80,7 +80,7 @@ Automatically loading initial data fixtures
 .. deprecated:: 1.7
 
     If an application uses migrations, there is no automatic loading of
-    fixtures. Since migrations will be required for applications in Django 2.0,
+    fixtures. Since migrations will be required for applications in Freedom 2.0,
     this behavior is considered deprecated. If you want to load initial data
     for an app, consider doing it in a migration.
 
@@ -89,12 +89,12 @@ be loaded every time you run :djadmin:`migrate`. This is extremely convenient,
 but be careful: remember that the data will be refreshed *every time* you run
 :djadmin:`migrate`. So don't use ``initial_data`` for data you'll want to edit.
 
-Where Django finds fixture files
+Where Freedom finds fixture files
 --------------------------------
 
-By default, Django looks in the ``fixtures`` directory inside each app for
+By default, Freedom looks in the ``fixtures`` directory inside each app for
 fixtures. You can set the :setting:`FIXTURE_DIRS` setting to a list of
-additional directories where Django should look.
+additional directories where Freedom should look.
 
 When running :djadmin:`manage.py loaddata <loaddata>`, you can also
 specify a path to a fixture file, which overrides searching the usual
@@ -114,15 +114,15 @@ Providing initial SQL data
 
     If an application uses migrations, there is no loading of initial SQL data
     (including backend-specific SQL data). Since migrations will be required
-    for applications in Django 2.0, this behavior is considered deprecated.
+    for applications in Freedom 2.0, this behavior is considered deprecated.
     If you want to use initial SQL for an app, consider doing it in a migration.
 
-Django provides a hook for passing the database arbitrary SQL that's executed
+Freedom provides a hook for passing the database arbitrary SQL that's executed
 just after the CREATE TABLE statements when you run :djadmin:`migrate`. You can
 use this hook to populate default records, or you could also create SQL
 functions, views, triggers, etc.
 
-The hook is simple: Django just looks for a file called ``sql/<modelname>.sql``,
+The hook is simple: Freedom just looks for a file called ``sql/<modelname>.sql``,
 in your app directory, where ``<modelname>`` is the model's name in lowercase.
 
 So, if you had a ``Person`` model in an app called ``myapp``, you could add
@@ -139,8 +139,8 @@ which will insert the desired data (e.g., properly-formatted
 ``INSERT`` statements separated by semicolons).
 
 The SQL files are read by the :djadmin:`sqlcustom` and :djadmin:`sqlall`
-commands in :doc:`manage.py </ref/django-admin>`. Refer to the :doc:`manage.py
-documentation </ref/django-admin>` for more information.
+commands in :doc:`manage.py </ref/freedom-admin>`. Refer to the :doc:`manage.py
+documentation </ref/freedom-admin>` for more information.
 
 Note that if you have multiple SQL data files, there's no guarantee of
 the order in which they're executed. The only thing you can assume is
@@ -150,7 +150,7 @@ database tables already will have been created.
 .. admonition:: Initial SQL data and testing
 
     This technique *cannot* be used to provide initial data for
-    testing purposes. Django's test framework flushes the contents of
+    testing purposes. Freedom's test framework flushes the contents of
     the test database after each test; as a result, any data added
     using the custom SQL hook will be lost.
 
@@ -163,17 +163,17 @@ Database-backend-specific SQL data
 
 There's also a hook for backend-specific SQL data. For example, you
 can have separate initial-data files for PostgreSQL and SQLite. For
-each app, Django looks for a file called
+each app, Freedom looks for a file called
 ``<app_label>/sql/<modelname>.<backend>.sql``, where ``<app_label>`` is
 your app directory, ``<modelname>`` is the model's name in lowercase
 and ``<backend>`` is the last part of the module name provided for the
 :setting:`ENGINE <DATABASE-ENGINE>` in your settings file (e.g., if you have
 defined a database with an :setting:`ENGINE <DATABASE-ENGINE>` value of
-``django.db.backends.sqlite3``, Django will look for
+``freedom.db.backends.sqlite3``, Freedom will look for
 ``<app_label>/sql/<modelname>.sqlite3.sql``).
 
 Backend-specific SQL data is executed before non-backend-specific SQL
 data. For example, if your app contains the files ``sql/person.sql``
 and ``sql/person.sqlite3.sql`` and you're installing the app on
-SQLite, Django will execute the contents of
+SQLite, Freedom will execute the contents of
 ``sql/person.sqlite3.sql`` first, then ``sql/person.sql``.

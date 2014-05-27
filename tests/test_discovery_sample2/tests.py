@@ -1,4 +1,4 @@
-from django.test import TestCase
+from freedom.test import TestCase
 
 
 class Test(TestCase):

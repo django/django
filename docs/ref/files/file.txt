@@ -1,10 +1,10 @@
 The ``File`` object
 ===================
 
-The :mod:`django.core.files` module and its submodules contain built-in classes
-for basic file handling in Django.
+The :mod:`freedom.core.files` module and its submodules contain built-in classes
+for basic file handling in Freedom.
 
-.. currentmodule:: django.core.files
+.. currentmodule:: freedom.core.files
 
 The ``File`` Class
 ------------------
@@ -12,8 +12,8 @@ The ``File`` Class
 .. class:: File(file_object)
 
     The :class:`File` class is a thin wrapper around a Python
-    :py:term:`file object` with some Django-specific additions.
-    Internally, Django uses this class when it needs to represent a file.
+    :py:term:`file object` with some Freedom-specific additions.
+    Internally, Freedom uses this class when it needs to represent a file.
 
     :class:`File` objects have the following attributes and methods:
 
@@ -76,39 +76,39 @@ The ``File`` Class
 
         Close the file.
 
-    In addition to the listed methods, :class:`~django.core.files.File` exposes
+    In addition to the listed methods, :class:`~freedom.core.files.File` exposes
     the following attributes and methods of its ``file`` object:
     ``encoding``, ``fileno``, ``flush``, ``isatty``, ``newlines``,
     ``read``, ``readinto``, ``readlines``, ``seek``, ``softspace``, ``tell``,
     ``truncate``, ``writelines``, ``xreadlines``.
 
-.. currentmodule:: django.core.files.base
+.. currentmodule:: freedom.core.files.base
 
 The ``ContentFile`` Class
 -------------------------
 
 .. class:: ContentFile(File)
 
-    The ``ContentFile`` class inherits from :class:`~django.core.files.File`,
-    but unlike :class:`~django.core.files.File` it operates on string content
+    The ``ContentFile`` class inherits from :class:`~freedom.core.files.File`,
+    but unlike :class:`~freedom.core.files.File` it operates on string content
     (bytes also supported), rather than an actual file. For example::
 
         from __future__ import unicode_literals
-        from django.core.files.base import ContentFile
+        from freedom.core.files.base import ContentFile
 
         f1 = ContentFile("esta sentencia está en español")
         f2 = ContentFile(b"these are bytes")
 
-.. currentmodule:: django.core.files.images
+.. currentmodule:: freedom.core.files.images
 
 The ``ImageFile`` Class
 -----------------------
 
 .. class:: ImageFile(file_object)
 
-    Django provides a built-in class specifically for images.
-    :class:`django.core.files.images.ImageFile` inherits all the attributes
-    and methods of :class:`~django.core.files.File`, and additionally
+    Freedom provides a built-in class specifically for images.
+    :class:`freedom.core.files.images.ImageFile` inherits all the attributes
+    and methods of :class:`~freedom.core.files.File`, and additionally
     provides the following:
 
     .. attribute:: width
@@ -119,7 +119,7 @@ The ``ImageFile`` Class
 
         Height of the image in pixels.
 
-.. currentmodule:: django.core.files
+.. currentmodule:: freedom.core.files
 
 Additional methods on files attached to objects
 -----------------------------------------------
@@ -143,7 +143,7 @@ below) will also have a couple of extra methods:
 
     Note that the ``content`` argument must be an instance of either
     :class:`File` or of a subclass of :class:`File`, such as
-    :class:`~django.core.files.base.ContentFile`.
+    :class:`~freedom.core.files.base.ContentFile`.
 
 .. method:: File.delete([save=True])
 

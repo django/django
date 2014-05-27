@@ -2,9 +2,9 @@ PostgreSQL specific form fields and widgets
 ===========================================
 
 All of these fields and widgets are available from the
-``django.contrib.postgres.forms`` module.
+``freedom.contrib.postgres.forms`` module.
 
-.. currentmodule:: django.contrib.postgres.forms
+.. currentmodule:: freedom.contrib.postgres.forms
 
 SimpleArrayField
 ----------------
@@ -22,8 +22,8 @@ SimpleArrayField
         to render any HTML, but it is used to process the submitted data and
         validate it. For example::
 
-            >>> from django.contrib.postgres.forms import SimpleArrayField
-            >>> from django import forms
+            >>> from freedom.contrib.postgres.forms import SimpleArrayField
+            >>> from freedom import forms
 
             >>> class NumberListForm(forms.Form):
             ...     numbers = SimpleArrayField(forms.IntegerField())
@@ -44,8 +44,8 @@ SimpleArrayField
         value is used to split the submitted data. It allows you to chain
         ``SimpleArrayField`` for multidimensional data::
 
-            >>> from django.contrib.postgres.forms import SimpleArrayField
-            >>> from django import forms
+            >>> from freedom.contrib.postgres.forms import SimpleArrayField
+            >>> from freedom import forms
 
             >>> class GridForm(forms.Form):
             ...     places = SimpleArrayField(SimpleArrayField(IntegerField()), delimiter='|')

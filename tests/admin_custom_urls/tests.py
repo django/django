@@ -1,14 +1,14 @@
 from __future__ import unicode_literals
 
-from django.contrib.admin.utils import quote
-from django.core.urlresolvers import reverse
-from django.template.response import TemplateResponse
-from django.test import TestCase, override_settings
+from freedom.contrib.admin.utils import quote
+from freedom.core.urlresolvers import reverse
+from freedom.template.response import TemplateResponse
+from freedom.test import TestCase, override_settings
 
 from .models import Action, Person, Car
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF='admin_custom_urls.urls',)
 class AdminCustomUrlsTest(TestCase):
     """
@@ -83,7 +83,7 @@ class AdminCustomUrlsTest(TestCase):
         self.assertContains(response, 'value="path/to/html/document.html"')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF='admin_custom_urls.urls',)
 class CustomRedirects(TestCase):
     fixtures = ['users.json', 'actions.json']

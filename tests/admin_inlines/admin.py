@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django import forms
+from freedom.contrib import admin
+from freedom import forms
 
 from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, ChildModel1, ChildModel2,

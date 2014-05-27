@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.db import transaction, IntegrityError
-from django.test import TestCase
+from freedom.db import transaction, IntegrityError
+from freedom.test import TestCase
 
 from .models import (Place, Restaurant, Waiter, ManualPrimaryKey, RelatedModel,
     MultiModel)

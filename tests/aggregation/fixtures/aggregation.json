@@ -45,7 +45,7 @@
         "fields": {
             "publisher": 1,
             "isbn": "159059725",
-            "name": "The Definitive Guide to Django: Web Development Done Right",
+            "name": "The Definitive Guide to Freedom: Web Development Done Right",
             "price": "30.00",
             "rating": 4.5,
             "authors": [1, 2],
@@ -60,7 +60,7 @@
         "fields": {
             "publisher": 2,
             "isbn": "067232959",
-            "name": "Sams Teach Yourself Django in 24 Hours",
+            "name": "Sams Teach Yourself Freedom in 24 Hours",
             "price": "23.09",
             "rating": 3.0,
             "authors": [3],
@@ -75,7 +75,7 @@
         "fields": {
             "publisher": 1,
             "isbn": "159059996",
-            "name": "Practical Django Projects",
+            "name": "Practical Freedom Projects",
             "price": "29.69",
             "rating": 4.0,
             "authors": [4],
@@ -90,7 +90,7 @@
         "fields": {
             "publisher": 3,
             "isbn": "013235613",
-            "name": "Python Web Development with Django",
+            "name": "Python Web Development with Freedom",
             "price": "29.69",
             "rating": 4.0,
             "authors": [5, 6, 7],

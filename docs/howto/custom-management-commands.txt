@@ -1,17 +1,17 @@
 ====================================
-Writing custom django-admin commands
+Writing custom freedom-admin commands
 ====================================
 
-.. module:: django.core.management
+.. module:: freedom.core.management
 
 Applications can register their own actions with ``manage.py``. For example,
-you might want to add a ``manage.py`` action for a Django app that you're
+you might want to add a ``manage.py`` action for a Freedom app that you're
 distributing. In this document, we will be building a custom ``closepoll``
 command for the ``polls`` application from the
 :doc:`tutorial</intro/tutorial01>`.
 
 To do this, just add a ``management/commands`` directory to the application.
-Django will register a ``manage.py`` command for each Python module in that
+Freedom will register a ``manage.py`` command for each Python module in that
 directory whose name doesn't begin with an underscore. For example::
 
     polls/
@@ -46,7 +46,7 @@ look like this:
 
 .. code-block:: python
 
-    from django.core.management.base import BaseCommand, CommandError
+    from freedom.core.management.base import BaseCommand, CommandError
     from polls.models import Poll
 
     class Command(BaseCommand):
@@ -115,7 +115,7 @@ parameter of the handle method. See the :py:mod:`optparse` Python documentation
 for more about ``make_option`` usage.
 
 In addition to being able to add custom command line options, all
-:doc:`management commands</ref/django-admin>` can accept some
+:doc:`management commands</ref/freedom-admin>` can accept some
 default options such as :djadminopt:`--verbosity` and :djadminopt:`--traceback`.
 
 .. _management-commands-and-locales:
@@ -124,7 +124,7 @@ Management commands and locales
 ===============================
 
 By default, the :meth:`BaseCommand.execute` method sets the hardcoded 'en-us'
-locale because some commands shipped with Django perform several tasks
+locale because some commands shipped with Freedom perform several tasks
 (for example, user-facing content rendering and database population) that
 require a system-neutral string language (for which we use 'en-us').
 
@@ -135,8 +135,8 @@ the functions provided by the I18N support code:
 
 .. code-block:: python
 
-    from django.core.management.base import BaseCommand, CommandError
-    from django.utils import translation
+    from freedom.core.management.base import BaseCommand, CommandError
+    from freedom.utils import translation
 
     class Command(BaseCommand):
         ...
@@ -149,7 +149,7 @@ the functions provided by the I18N support code:
 
             # Or you can activate the LANGUAGE_CODE # chosen in the settings:
             #
-            #from django.conf import settings
+            #from freedom.conf import settings
             #translation.activate(settings.LANGUAGE_CODE)
 
             # Your command logic here
@@ -158,7 +158,7 @@ the functions provided by the I18N support code:
             translation.deactivate()
 
 Another need might be that your command simply should use the locale set in
-settings and Django should be kept from forcing it to 'en-us'. You can achieve
+settings and Freedom should be kept from forcing it to 'en-us'. You can achieve
 it by using the :data:`BaseCommand.leave_locale_alone` option.
 
 When working on the scenarios described above though, take into account that
@@ -167,7 +167,7 @@ non-uniform locales, so you might need to:
 
 * Make sure the :setting:`USE_I18N` setting is always ``True`` when running
   the command (this is a good example of the potential problems stemming
-  from a dynamic runtime environment that Django commands avoid offhand by
+  from a dynamic runtime environment that Freedom commands avoid offhand by
   always using a fixed locale).
 
 * Review the code of your command and the code it calls for behavioral
@@ -205,7 +205,7 @@ All attributes can be set in your derived class and can be used in
 .. attribute:: BaseCommand.can_import_settings
 
   A boolean indicating whether the command needs to be able to
-  import Django settings; if ``True``, ``execute()`` will verify
+  import Freedom settings; if ``True``, ``execute()`` will verify
   that this is possible before proceeding. Default value is
   ``True``.
 
@@ -231,7 +231,7 @@ All attributes can be set in your derived class and can be used in
 
 .. versionadded:: 1.7
 
-  A boolean; if ``True``, the entire Django project will be checked for
+  A boolean; if ``True``, the entire Freedom project will be checked for
   potential problems prior to executing the command. If
   ``requires_system_checks`` is missing, the value of
   ``requires_model_validation`` is used. If the latter flag is missing
@@ -260,7 +260,7 @@ All attributes can be set in your derived class and can be used in
   Make sure you know what you are doing if you decide to change the value of
   this option in your custom command if it creates database content that
   is locale-sensitive and such content shouldn't contain any translations (like
-  it happens e.g. with django.contrib.auth permissions) as making the locale
+  it happens e.g. with freedom.contrib.auth permissions) as making the locale
   differ from the de facto default 'en-us' might cause unintended effects. See
   the `Management commands and locales`_ section above for further details.
 
@@ -289,8 +289,8 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. method:: BaseCommand.get_version()
 
-    Return the Django version, which should be correct for all
-    built-in Django commands. User-supplied commands can
+    Return the Freedom version, which should be correct for all
+    built-in Freedom commands. User-supplied commands can
     override this method to return their own version.
 
 .. method:: BaseCommand.execute(*args, **options)
@@ -314,7 +314,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. versionadded:: 1.7
 
-    Uses the system check framework to inspect the entire Django project for
+    Uses the system check framework to inspect the entire Freedom project for
     potential problems. Serious problems are raised as a :class:`CommandError`;
     warnings are output to stderr; minor notifications are output to stdout.
 
@@ -345,7 +345,7 @@ each application.
 .. method:: AppCommand.handle_app_config(app_config, **options)
 
     Perform the command's actions for ``app_config``, which will be an
-    :class:`~django.apps.AppConfig` instance corresponding to an application
+    :class:`~freedom.apps.AppConfig` instance corresponding to an application
     label given on the command line.
 
 .. versionchanged:: 1.7

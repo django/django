@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 import io
 import gzip
 
-from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
-from django.http.utils import conditional_content_removal
-from django.test import TestCase
+from freedom.http import HttpRequest, HttpResponse, StreamingHttpResponse
+from freedom.http.utils import conditional_content_removal
+from freedom.test import TestCase
 
 
 # based on Python 3.3's gzip.compress

@@ -1,7 +1,7 @@
-from django.contrib.sites.managers import CurrentSiteManager
-from django.contrib.sites.models import Site
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.contrib.sites.managers import CurrentSiteManager
+from freedom.contrib.sites.models import Site
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

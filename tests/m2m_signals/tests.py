@@ -2,8 +2,8 @@
 Testing signals emitted on changing m2m relations.
 """
 
-from django.db import models
-from django.test import TestCase
+from freedom.db import models
+from freedom.test import TestCase
 
 from .models import Part, Car, SportsCar, Person
 

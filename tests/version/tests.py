@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from django import get_version
-from django.utils import six
+from freedom import get_version
+from freedom.utils import six
 
 
 class VersionTests(TestCase):

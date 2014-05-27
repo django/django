@@ -1,10 +1,10 @@
 ==========================
-Serializing Django objects
+Serializing Freedom objects
 ==========================
 
-Django's serialization framework provides a mechanism for "translating" Django
+Freedom's serialization framework provides a mechanism for "translating" Freedom
 models into other formats. Usually these other formats will be text-based and
-used for sending Django data over a wire, but it's possible for a
+used for sending Freedom data over a wire, but it's possible for a
 serializer to handle any format (text-based or not).
 
 .. seealso::
@@ -17,16 +17,16 @@ Serializing data
 
 At the highest level, serializing data is a very simple operation::
 
-    from django.core import serializers
+    from freedom.core import serializers
     data = serializers.serialize("xml", SomeModel.objects.all())
 
 The arguments to the ``serialize`` function are the format to serialize the data
 to (see `Serialization formats`_) and a
-:class:`~django.db.models.query.QuerySet` to serialize. (Actually, the second
-argument can be any iterator that yields Django model instances, but it'll
+:class:`~freedom.db.models.query.QuerySet` to serialize. (Actually, the second
+argument can be any iterator that yields Freedom model instances, but it'll
 almost always be a QuerySet).
 
-.. function:: django.core.serializers.get_serializer(format)
+.. function:: freedom.core.serializers.get_serializer(format)
 
 You can also use a serializer object directly::
 
@@ -36,16 +36,16 @@ You can also use a serializer object directly::
     data = xml_serializer.getvalue()
 
 This is useful if you want to serialize data directly to a file-like object
-(which includes an :class:`~django.http.HttpResponse`)::
+(which includes an :class:`~freedom.http.HttpResponse`)::
 
     with open("file.xml", "w") as out:
         xml_serializer.serialize(SomeModel.objects.all(), stream=out)
 
 .. note::
 
-    Calling :func:`~django.core.serializers.get_serializer` with an unknown
+    Calling :func:`~freedom.core.serializers.get_serializer` with an unknown
     :ref:`format <serialization-formats>` will raise a
-    ``django.core.serializers.SerializerDoesNotExist`` exception.
+    ``freedom.core.serializers.SerializerDoesNotExist`` exception.
 
 Subset of fields
 ~~~~~~~~~~~~~~~~
@@ -53,7 +53,7 @@ Subset of fields
 If you only want a subset of fields to be serialized, you can
 specify a ``fields`` argument to the serializer::
 
-    from django.core import serializers
+    from freedom.core import serializers
     data = serializers.serialize('xml', SomeModel.objects.all(), fields=('name','size'))
 
 In this example, only the ``name`` and ``size`` attributes of each model will
@@ -111,7 +111,7 @@ As you can see, the ``deserialize`` function takes the same format argument as
 ``serialize``, a string or stream of data, and returns an iterator.
 
 However, here it gets slightly complicated. The objects returned by the
-``deserialize`` iterator *aren't* simple Django objects. Instead, they are
+``deserialize`` iterator *aren't* simple Freedom objects. Instead, they are
 special ``DeserializedObject`` instances that wrap a created -- but unsaved --
 object and any associated relationship data.
 
@@ -135,7 +135,7 @@ In other words, the usual use is to examine the deserialized objects to make
 sure that they are "appropriate" for saving before doing so.  Of course, if you
 trust your data source you could just save the object and move on.
 
-The Django object itself can be inspected as ``deserialized_object.object``.
+The Freedom object itself can be inspected as ``deserialized_object.object``.
 If fields in the serialized data do not exist on a model, a
 ``DeserializationError`` will be raised unless the ``ignorenonexistent``
 argument is passed in as ``True``::
@@ -147,7 +147,7 @@ argument is passed in as ``True``::
 Serialization formats
 ---------------------
 
-Django supports a number of serialization formats, some of which require you
+Freedom supports a number of serialization formats, some of which require you
 to install third-party Python modules:
 
 ==========  ==============================================================
@@ -170,15 +170,15 @@ XML
 The basic XML serialization format is quite simple::
 
     <?xml version="1.0" encoding="utf-8"?>
-    <django-objects version="1.0">
+    <freedom-objects version="1.0">
         <object pk="123" model="sessions.session">
             <field type="DateTimeField" name="expire_date">2013-01-16T08:16:59.844560+00:00</field>
             <!-- ... -->
         </object>
-    </django-objects>
+    </freedom-objects>
 
 The whole collection of objects that is either serialized or de-serialized is
-represented by a ``<django-objects>``-tag which contains multiple
+represented by a ``<freedom-objects>``-tag which contains multiple
 ``<object>``-elements. Each such object has two attributes: "pk" and "model",
 the latter being represented by the name of the app ("sessions") and the
 lowercase name of the model ("session") separated by a dot.
@@ -243,16 +243,16 @@ represented as a list of PKs.
 Date and datetime related types are treated in a special way by the JSON
 serializer to make the format compatible with `ECMA-262`_.
 
-Be aware that not all Django output can be passed unmodified to :mod:`json`.
+Be aware that not all Freedom output can be passed unmodified to :mod:`json`.
 In particular, :ref:`lazy translation objects <lazy-translations>` need a
 `special encoder`_ written for them. Something like this will work::
 
     import json
-    from django.utils.functional import Promise
-    from django.utils.encoding import force_text
-    from django.core.serializers.json import DjangoJSONEncoder
+    from freedom.utils.functional import Promise
+    from freedom.utils.encoding import force_text
+    from freedom.core.serializers.json import FreedomJSONEncoder
 
-    class LazyEncoder(DjangoJSONEncoder):
+    class LazyEncoder(FreedomJSONEncoder):
         def default(self, obj):
             if isinstance(obj, Promise):
                 return force_text(obj)
@@ -285,16 +285,16 @@ This strategy works well for most objects, but it can cause difficulty in some
 circumstances.
 
 Consider the case of a list of objects that have a foreign key referencing
-:class:`~django.contrib.contenttypes.models.ContentType`. If you're going to
+:class:`~freedom.contrib.contenttypes.models.ContentType`. If you're going to
 serialize an object that refers to a content type, then you need to have a way
 to refer to that content type to begin with. Since ``ContentType`` objects are
-automatically created by Django during the database synchronization process,
+automatically created by Freedom during the database synchronization process,
 the primary key of a given content type isn't easy to predict; it will
 depend on how and when :djadmin:`migrate` was executed. This is true for all
 models which automatically generate objects, notably including
-:class:`~django.contrib.auth.models.Permission`,
-:class:`~django.contrib.auth.models.Group`, and
-:class:`~django.contrib.auth.models.User`.
+:class:`~freedom.contrib.auth.models.Permission`,
+:class:`~freedom.contrib.auth.models.Group`, and
+:class:`~freedom.contrib.auth.models.User`.
 
 .. warning::
 
@@ -302,13 +302,13 @@ models which automatically generate objects, notably including
     other serialized data. By chance, the primary keys in the fixture
     may match those in the database and loading the fixture will
     have no effect. In the more likely case that they don't match, the fixture
-    loading will fail with an :class:`~django.db.IntegrityError`.
+    loading will fail with an :class:`~freedom.db.IntegrityError`.
 
 There is also the matter of convenience. An integer id isn't always
 the most convenient way to refer to an object; sometimes, a
 more natural reference would be helpful.
 
-It is for these reasons that Django provides *natural keys*. A natural
+It is for these reasons that Freedom provides *natural keys*. A natural
 key is a tuple of values that can be used to uniquely identify an
 object instance without using the primary key value.
 
@@ -317,7 +317,7 @@ Deserialization of natural keys
 
 Consider the following two models::
 
-    from django.db import models
+    from freedom.db import models
 
     class Person(models.Model):
         first_name = models.CharField(max_length=100)
@@ -356,7 +356,7 @@ Manager for Person with a ``get_by_natural_key()`` method. In the case
 of a Person, a good natural key might be the pair of first and last
 name::
 
-    from django.db import models
+    from freedom.db import models
 
     class PersonManager(models.Manager):
         def get_by_natural_key(self, first_name, last_name):
@@ -386,7 +386,7 @@ Now books can use that natural key to refer to ``Person`` objects::
     }
     ...
 
-When you try to load this serialized data, Django will use the
+When you try to load this serialized data, Freedom will use the
 ``get_by_natural_key()`` method to resolve ``["Douglas", "Adams"]``
 into the primary key of an actual ``Person`` object.
 
@@ -410,7 +410,7 @@ populate the deserialized object's primary key.
 Serialization of natural keys
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-So how do you get Django to emit a natural key when serializing an object?
+So how do you get Freedom to emit a natural key when serializing an object?
 Firstly, you need to add another method -- this time to the model itself::
 
     class Person(models.Model):
@@ -435,11 +435,11 @@ or ``use_natural_primary_keys=True`` arguments::
     >>> serializers.serialize('json', [book1, book2], indent=2,
     ...      use_natural_foreign_keys=True, use_natural_primary_keys=True)
 
-When ``use_natural_foreign_keys=True`` is specified, Django will use the
+When ``use_natural_foreign_keys=True`` is specified, Freedom will use the
 ``natural_key()`` method to serialize any foreign key reference to objects
 of the type that defines the method.
 
-When ``use_natural_primary_keys=True`` is specified, Django will not provide the
+When ``use_natural_primary_keys=True`` is specified, Freedom will not provide the
 primary key in the serialized data of this object since it can be calculated
 during deserialization::
 
@@ -466,12 +466,12 @@ line flags to generate natural keys.
 .. note::
 
     You don't need to define both ``natural_key()`` and
-    ``get_by_natural_key()``. If you don't want Django to output
+    ``get_by_natural_key()``. If you don't want Freedom to output
     natural keys during serialization, but you want to retain the
     ability to load natural keys, then you can opt to not implement
     the ``natural_key()`` method.
 
-    Conversely, if (for some strange reason) you want Django to output
+    Conversely, if (for some strange reason) you want Freedom to output
     natural keys during serialization, but *not* be able to load those
     key values, just don't define the ``get_by_natural_key()`` method.
 
@@ -486,7 +486,7 @@ for :djadmin:`dumpdata`.
 
 The original argument and command line flags remain for backwards
 compatibility and map to the new ``use_natural_foreign_keys`` argument and
-`--natural-foreign` command line flag. They'll be removed in Django 1.9.
+`--natural-foreign` command line flag. They'll be removed in Freedom 1.9.
 
 Dependencies during serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

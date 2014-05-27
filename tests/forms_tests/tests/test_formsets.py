@@ -3,11 +3,11 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.forms import (CharField, DateField, FileField, Form, IntegerField,
+from freedom.forms import (CharField, DateField, FileField, Form, IntegerField,
     SplitDateTimeField, ValidationError, formsets)
-from django.forms.formsets import BaseFormSet, formset_factory
-from django.forms.utils import ErrorList
-from django.test import TestCase
+from freedom.forms.formsets import BaseFormSet, formset_factory
+from freedom.forms.utils import ErrorList
+from freedom.test import TestCase
 
 
 class Choice(Form):

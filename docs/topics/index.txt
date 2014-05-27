@@ -1,7 +1,7 @@
-Using Django
+Using Freedom
 ============
 
-Introductions to all the key parts of Django you'll need to know:
+Introductions to all the key parts of Freedom you'll need to know:
 
 .. toctree::
    :maxdepth: 1

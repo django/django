@@ -2,7 +2,7 @@
 Models for testing various aspects of the djang.contrib.admindocs app
 """
 
-from django.db import models
+from freedom.db import models
 
 
 class Company(models.Model):

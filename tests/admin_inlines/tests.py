@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-from django.contrib.admin import TabularInline, ModelAdmin
-from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
-from django.contrib.admin.helpers import InlineAdminForm
-from django.contrib.auth.models import User, Permission
-from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase, override_settings, RequestFactory
+from freedom.contrib.admin import TabularInline, ModelAdmin
+from freedom.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from freedom.contrib.admin.helpers import InlineAdminForm
+from freedom.contrib.auth.models import User, Permission
+from freedom.contrib.contenttypes.models import ContentType
+from freedom.test import TestCase, override_settings, RequestFactory
 
 # local test models
 from .admin import InnerInline, site as admin_site
@@ -16,7 +16,7 @@ from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     SomeChildModel)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF="admin_inlines.urls")
 class TestInline(TestCase):
     fixtures = ['admin-views-users.xml']
@@ -312,7 +312,7 @@ class TestInline(TestCase):
         )
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF="admin_inlines.urls")
 class TestInlineMedia(TestCase):
     fixtures = ['admin-views-users.xml']
@@ -370,7 +370,7 @@ class TestInlineAdminForm(TestCase):
         self.assertEqual(iaf.original.content_type, parent_ct)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF="admin_inlines.urls")
 class TestInlineProtectedOnDelete(TestCase):
     fixtures = ['admin-views-users.xml']
@@ -603,7 +603,7 @@ class TestInlinePermissions(TestCase):
         self.assertContains(response, 'id="id_inner2_set-0-DELETE"')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF="admin_inlines.urls")
 class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 

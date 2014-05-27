@@ -5,9 +5,9 @@ from datetime import datetime
 import os
 from unittest import TestCase
 
-from django.utils import html, safestring
-from django.utils._os import upath
-from django.utils.encoding import force_text
+from freedom.utils import html, safestring
+from freedom.utils._os import upath
+from freedom.utils.encoding import force_text
 
 
 class TestUtilsHtml(TestCase):

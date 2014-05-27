@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.test import TestCase
-from django.utils.encoding import iri_to_uri, force_text
-from django.utils.functional import lazy
-from django.utils.http import (cookie_date, http_date,
+from freedom.test import TestCase
+from freedom.utils.encoding import iri_to_uri, force_text
+from freedom.utils.functional import lazy
+from freedom.utils.http import (cookie_date, http_date,
     urlquote, urlquote_plus, urlunquote, urlunquote_plus)
-from django.utils import six
-from django.utils.text import get_text_list, smart_split
-from django.utils.translation import override
+from freedom.utils import six
+from freedom.utils.text import get_text_list, smart_split
+from freedom.utils.translation import override
 
 lazystr = lazy(force_text, six.text_type)
 
 
 class TextTests(TestCase):
     """
-    Tests for stuff in django.utils.text and other text munging util functions.
+    Tests for stuff in freedom.utils.text and other text munging util functions.
     """
 
     def test_get_text_list(self):

@@ -7,8 +7,8 @@ isn't always a good idea, so the ``depth`` argument control how many "levels"
 the select-related behavior will traverse.
 """
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 # Who remembers high school biology?
 

@@ -4,8 +4,8 @@
 GDAL API
 ========
 
-.. module:: django.contrib.gis.gdal
-   :synopsis: GeoDjango's high-level interface to the GDAL library.
+.. module:: freedom.contrib.gis.gdal
+   :synopsis: GeoFreedom's high-level interface to the GDAL library.
 
 `GDAL`__ stands for **Geospatial Data Abstraction Library**,
 and is a veritable "swiss army knife" of GIS data functionality.  A subset
@@ -13,13 +13,13 @@ of GDAL is the `OGR`__ Simple Features Library, which specializes
 in reading and writing vector geographic data in a variety of standard
 formats.
 
-GeoDjango provides a high-level Python interface for some of the
+GeoFreedom provides a high-level Python interface for some of the
 capabilities of OGR, including the reading and coordinate transformation
 of vector spatial data.
 
 .. note::
 
-     Although the module is named ``gdal``, GeoDjango only supports
+     Although the module is named ``gdal``, GeoFreedom only supports
      some of the capabilities of OGR.  Thus, none of GDAL's features
      with respect to raster (image) data are supported at this time.
 
@@ -35,13 +35,13 @@ Sample Data
 The GDAL/OGR tools described here are designed to help you read in
 your geospatial data, in order for most of them to be useful you have
 to have some data to work with.  If you're starting out and don't yet
-have any data of your own to use, GeoDjango comes with a number of
+have any data of your own to use, GeoFreedom comes with a number of
 simple data sets that you can use for testing.  This snippet will
 determine where these sample files are installed on your computer::
 
     >>> import os
-    >>> import django.contrib.gis
-    >>> GIS_PATH = os.path.dirname(django.contrib.gis.__file__)
+    >>> import freedom.contrib.gis
+    >>> GIS_PATH = os.path.dirname(freedom.contrib.gis.__file__)
     >>> CITIES_PATH = os.path.join(GIS_PATH, 'tests/data/cities/cities.shp')
 
 Vector Data Source Objects
@@ -77,10 +77,10 @@ each feature in that layer.
    or (equivalently) by using the ``len()`` function.  For information on
    accessing the layers of data themselves, see the next section::
 
-       >>> from django.contrib.gis.gdal import DataSource
+       >>> from freedom.contrib.gis.gdal import DataSource
        >>> ds = DataSource(CITIES_PATH)
        >>> ds.name                         # The exact filename may be different on your computer
-       '/usr/local/lib/python3.4/site-packages/django/contrib/gis/tests/data/cities/cities.shp'
+       '/usr/local/lib/python3.4/site-packages/freedom/contrib/gis/tests/data/cities/cities.shp'
        >>> ds.layer_count                  # This file only contains one layer
        1
 
@@ -246,7 +246,7 @@ __ http://www.gdal.org/ogr/ogr_formats.html
 
    A method that returns a list containing the geometry of each feature
    in the layer.  If the optional argument ``geos`` is set to ``True``
-   then the geometries are converted to :class:`~django.contrib.gis.geos.GEOSGeometry`
+   then the geometries are converted to :class:`~freedom.contrib.gis.geos.GEOSGeometry`
    objects. Otherwise, they are returned as :class:`OGRGeometry` objects::
 
        >>> [pt.tuple for pt in layer.get_geoms()]
@@ -434,13 +434,13 @@ OGR Geometries
 ---------------
 
 :class:`OGRGeometry` objects share similar functionality with
-:class:`~django.contrib.gis.geos.GEOSGeometry` objects, and are thin
+:class:`~freedom.contrib.gis.geos.GEOSGeometry` objects, and are thin
 wrappers around OGR's internal geometry representation.  Thus,
 they allow for more efficient access to data when using :class:`DataSource`.
 Unlike its GEOS counterpart, :class:`OGRGeometry` supports spatial reference
 systems and coordinate transformation::
 
-    >>> from django.contrib.gis.gdal import OGRGeometry
+    >>> from freedom.contrib.gis.gdal import OGRGeometry
     >>> polygon = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5))')
 
 .. class:: OGRGeometry(geom_input[, srs=None])
@@ -564,7 +564,7 @@ systems and coordinate transformation::
 
    .. attribute:: geos
 
-   Returns a :class:`~django.contrib.gis.geos.GEOSGeometry` object
+   Returns a :class:`~freedom.contrib.gis.geos.GEOSGeometry` object
    corresponding to this geometry.
 
    .. attribute:: gml
@@ -800,7 +800,7 @@ systems and coordinate transformation::
    This class allows for the representation of an OGR geometry type
    in any of several ways::
 
-       >>> from django.contrib.gis.gdal import OGRGeomType
+       >>> from freedom.contrib.gis.gdal import OGRGeomType
        >>> gt1 = OGRGeomType(3)             # Using an integer for the type
        >>> gt2 = OGRGeomType('Polygon')     # Using a string
        >>> gt3 = OGRGeomType('POLYGON')     # It's case-insensitive
@@ -821,13 +821,13 @@ systems and coordinate transformation::
        >>> gt1.num
        3
 
-   .. attribute:: django
+   .. attribute:: freedom
 
-   Returns the Django field type (a subclass of GeometryField) to use for
-   storing this OGR type, or ``None`` if there is no appropriate Django
+   Returns the Freedom field type (a subclass of GeometryField) to use for
+   storing this OGR type, or ``None`` if there is no appropriate Freedom
    type::
 
-       >>> gt1.django
+       >>> gt1.freedom
        'PolygonField'
 
 ``Envelope``

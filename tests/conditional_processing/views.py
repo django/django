@@ -1,5 +1,5 @@
-from django.views.decorators.http import condition, etag, last_modified
-from django.http import HttpResponse
+from freedom.views.decorators.http import condition, etag, last_modified
+from freedom.http import HttpResponse
 
 from .tests import FULL_RESPONSE, LAST_MODIFIED, ETAG
 

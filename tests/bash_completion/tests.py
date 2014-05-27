@@ -5,9 +5,9 @@ import os
 import sys
 import unittest
 
-from django.apps import apps
-from django.core.management import ManagementUtility
-from django.utils.six import StringIO
+from freedom.apps import apps
+from freedom.core.management import ManagementUtility
+from freedom.utils.six import StringIO
 
 
 class BashCompletionTests(unittest.TestCase):
@@ -44,9 +44,9 @@ class BashCompletionTests(unittest.TestCase):
             pass
         return self.output.getvalue().strip().split('\n')
 
-    def test_django_admin_py(self):
-        "django_admin.py will autocomplete option flags"
-        self._user_input('django-admin.py sqlall --v')
+    def test_freedom_admin_py(self):
+        "freedom_admin.py will autocomplete option flags"
+        self._user_input('freedom-admin.py sqlall --v')
         output = self._run_autocomplete()
         self.assertEqual(output, ['--verbosity='])
 
@@ -58,31 +58,31 @@ class BashCompletionTests(unittest.TestCase):
 
     def test_custom_command(self):
         "A custom command can autocomplete option flags"
-        self._user_input('django-admin.py test_command --l')
+        self._user_input('freedom-admin.py test_command --l')
         output = self._run_autocomplete()
         self.assertEqual(output, ['--list'])
 
     def test_subcommands(self):
         "Subcommands can be autocompleted"
-        self._user_input('django-admin.py sql')
+        self._user_input('freedom-admin.py sql')
         output = self._run_autocomplete()
         self.assertEqual(output, ['sql sqlall sqlclear sqlcustom sqldropindexes sqlflush sqlindexes sqlmigrate sqlsequencereset'])
 
     def test_help(self):
         "No errors, just an empty list if there are no autocomplete options"
-        self._user_input('django-admin.py help --')
+        self._user_input('freedom-admin.py help --')
         output = self._run_autocomplete()
         self.assertEqual(output, [''])
 
     def test_runfcgi(self):
         "Command arguments will be autocompleted"
-        self._user_input('django-admin.py runfcgi h')
+        self._user_input('freedom-admin.py runfcgi h')
         output = self._run_autocomplete()
         self.assertEqual(output, ['host='])
 
     def test_app_completion(self):
         "Application names will be autocompleted for an AppCommand"
-        self._user_input('django-admin.py sqlall a')
+        self._user_input('freedom-admin.py sqlall a')
         output = self._run_autocomplete()
         a_labels = sorted(app_config.label
             for app_config in apps.get_app_configs()

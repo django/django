@@ -2,8 +2,8 @@
 Formset Functions
 ====================
 
-.. module:: django.forms.formsets
-   :synopsis: Django's functions for building formsets.
+.. module:: freedom.forms.formsets
+   :synopsis: Freedom's functions for building formsets.
 
 .. function:: formset_factory(form, formset=BaseFormSet, extra=1, can_order=False, can_delete=False, max_num=None, validate_max=False, min_num=None, validate_min=False)
 

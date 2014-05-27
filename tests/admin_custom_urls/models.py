@@ -1,10 +1,10 @@
 from functools import update_wrapper
 
-from django.contrib import admin
-from django.core.urlresolvers import reverse
-from django.db import models
-from django.http import HttpResponseRedirect
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.contrib import admin
+from freedom.core.urlresolvers import reverse
+from freedom.db import models
+from freedom.http import HttpResponseRedirect
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
@@ -35,7 +35,7 @@ class ActionAdmin(admin.ModelAdmin):
     def get_urls(self):
         # Add the URL of our custom 'add_view' view to the front of the URLs
         # list.  Remove the existing one(s) first
-        from django.conf.urls import url
+        from freedom.conf.urls import url
 
         def wrap(view):
             def wrapper(*args, **kwargs):

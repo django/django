@@ -2,15 +2,15 @@
 Migration Operations
 ====================
 
-.. module:: django.db.migrations.operations
+.. module:: freedom.db.migrations.operations
 
 Migration files are composed of one or more ``Operation``\s, objects that
 declaratively record what the migration should do to your database.
 
-Django also uses these ``Operation`` objects to work out what your models
+Freedom also uses these ``Operation`` objects to work out what your models
 looked like historically, and to calculate what changes you've made to
 your models since the last migration so it can automatically write
-your migrations; that's why they're declarative, as it means Django can
+your migrations; that's why they're declarative, as it means Freedom can
 easily load them all into memory and run through them without touching
 the database to work out what your project should look like.
 
@@ -25,8 +25,8 @@ but be aware that manually adding schema-altering operations can confuse the
 migration autodetector and make resulting runs of :djadmin:`makemigrations`
 output incorrect code.
 
-All of the core Django operations are available from the
-``django.db.migrations.operations`` module.
+All of the core Freedom operations are available from the
+``freedom.db.migrations.operations`` module.
 
 Schema Operations
 =================
@@ -78,7 +78,7 @@ AlterModelTable
 
 .. class:: AlterModelTable(name, table)
 
-Changes the model's table name (the :attr:`~django.db.models.Options.db_table`
+Changes the model's table name (the :attr:`~freedom.db.models.Options.db_table`
 option on the ``Meta`` subclass).
 
 AlterUniqueTogether
@@ -87,7 +87,7 @@ AlterUniqueTogether
 .. class:: AlterUniqueTogether(name, unique_together)
 
 Changes the model's set of unique constraints (the
-:attr:`~django.db.models.Options.unique_together` option on the ``Meta``
+:attr:`~freedom.db.models.Options.unique_together` option on the ``Meta``
 subclass).
 
 AlterIndexTogether
@@ -96,7 +96,7 @@ AlterIndexTogether
 .. class:: AlterIndexTogether(name, index_together)
 
 Changes the model's set of custom indexes (the
-:attr:`~django.db.models.Options.index_together` option on the ``Meta``
+:attr:`~freedom.db.models.Options.index_together` option on the ``Meta``
 subclass).
 
 AddField
@@ -114,8 +114,8 @@ value is permanent and should be baked into the project state (``True``),
 or if it is temporary and just for this migration (``False``) - usually
 because the migration is adding a non-nullable field to a table and needs
 a default value to put into existing rows. It does not effect the behavior
-of setting defaults in the database directly - Django never sets database
-defaults, and always applies them in the Django ORM code.
+of setting defaults in the database directly - Freedom never sets database
+defaults, and always applies them in the Freedom ORM code.
 
 RemoveField
 -----------
@@ -134,8 +134,8 @@ AlterField
 .. class:: AlterField(model_name, name, field)
 
 Alters a field's definition, including changes to its type,
-:attr:`~django.db.models.Field.null`, :attr:`~django.db.models.Field.unique`,
-:attr:`~django.db.models.Field.db_column` and other field attributes.
+:attr:`~freedom.db.models.Field.null`, :attr:`~freedom.db.models.Field.unique`,
+:attr:`~freedom.db.models.Field.db_column` and other field attributes.
 
 Note that not all changes are possible on all databases - for example, you
 cannot change a text-type field like ``models.TextField()`` into a number-type
@@ -146,7 +146,7 @@ RenameField
 
 .. class:: RenameField(model_name, old_name, new_name)
 
-Changes a field's name (and, unless :attr:`~django.db.models.Field.db_column`
+Changes a field's name (and, unless :attr:`~freedom.db.models.Field.db_column`
 is set, its column name).
 
 Special Operations
@@ -158,11 +158,11 @@ RunSQL
 .. class:: RunSQL(sql, reverse_sql=None, state_operations=None)
 
 Allows running of arbitrary SQL on the database - useful for more advanced
-features of database backends that Django doesn't support directly, like
+features of database backends that Freedom doesn't support directly, like
 partial indexes.
 
 ``sql``, and ``reverse_sql`` if provided, should be strings of SQL to run on
-the database. On most database backends (all but PostgreSQL), Django will
+the database. On most database backends (all but PostgreSQL), Freedom will
 split the SQL into individual statements prior to executing them. This
 requires installing the sqlparse_ Python library.
 
@@ -182,10 +182,10 @@ RunPython
 
 Runs custom Python code in a historical context. ``code`` (and ``reverse_code``
 if supplied) should be callable objects that accept two arguments; the first is
-an instance of ``django.apps.registry.Apps`` containing historical models that
+an instance of ``freedom.apps.registry.Apps`` containing historical models that
 match the operation's place in the project history, and the second is an
 instance of :class:`SchemaEditor
-<django.db.backends.schema.BaseDatabaseSchemaEditor>`.
+<freedom.db.backends.schema.BaseDatabaseSchemaEditor>`.
 
 You are advised to write the code as a separate function above the ``Migration``
 class in the migration file, and just pass it to ``RunPython``. Here's an
@@ -193,7 +193,7 @@ example of using ``RunPython`` to create some initial objects on a ``Country``
 model::
 
     # -*- coding: utf-8 -*-
-    from django.db import models, migrations
+    from freedom.db import models, migrations
 
     def forwards_func(apps, schema_editor):
         # We get the model from the versioned app registry;
@@ -225,7 +225,7 @@ or ``orm["appname", "Model"]`` references from South directly into
 rest of the code unchanged for data migrations.
 
 Much like :class:`RunSQL`, ensure that if you change schema inside here you're
-either doing it outside the scope of the Django model system (e.g. triggers)
+either doing it outside the scope of the Freedom model system (e.g. triggers)
 or that you use :class:`SeparateDatabaseAndState` to add in operations that will
 reflect your changes to the model state - otherwise, the versioned ORM and
 the autodetector will stop working correctly.
@@ -252,10 +252,10 @@ Writing your own
 ================
 
 Operations have a relatively simple API, and they're designed so that you can
-easily write your own to supplement the built-in Django ones. The basic structure
+easily write your own to supplement the built-in Freedom ones. The basic structure
 of an ``Operation`` looks like this::
 
-    from django.db.migrations.operations.base import Operation
+    from freedom.db.migrations.operations.base import Operation
 
     class MyCustomOperation(Operation):
 
@@ -263,7 +263,7 @@ of an ``Operation`` looks like this::
         # sqlmigrate; if true, it will be run and the SQL collected for its output.
         reduces_to_sql = False
 
-        # If this is False, Django will refuse to reverse past this operation.
+        # If this is False, Freedom will refuse to reverse past this operation.
         reversible = False
 
         def __init__(self, arg1, arg2):
@@ -273,7 +273,7 @@ of an ``Operation`` looks like this::
 
         def state_forwards(self, app_label, state):
             # The Operation should take the 'state' parameter (an instance of
-            # django.db.migrations.state.ProjectState) and mutate it to match
+            # freedom.db.migrations.state.ProjectState) and mutate it to match
             # any schema changes that have occurred.
             pass
 
@@ -291,7 +291,7 @@ of an ``Operation`` looks like this::
             return "Custom Operation"
 
 You can take this template and work from it, though we suggest looking at the
-built-in Django operations in ``django.db.migrations.operations`` - they're
+built-in Freedom operations in ``freedom.db.migrations.operations`` - they're
 easy to read and cover a lot of the example usage of semi-internal aspects
 of the migration framework like ``ProjectState`` and the patterns used to get
 historical models.
@@ -317,7 +317,7 @@ As a simple example, let's make an operation that loads PostgreSQL extensions
 (which contain some of PostgreSQL's more exciting features). It's simple enough;
 there's no model state changes, and all it does is run one command::
 
-    from django.db.migrations.operations.base import Operation
+    from freedom.db.migrations.operations.base import Operation
 
     class LoadExtension(Operation):
 

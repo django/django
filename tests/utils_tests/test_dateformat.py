@@ -2,12 +2,12 @@ from __future__ import unicode_literals
 
 from datetime import datetime, date
 
-from django.test import TestCase, override_settings
-from django.test.utils import TZ_SUPPORT, requires_tz_support
-from django.utils.dateformat import format
-from django.utils import dateformat
-from django.utils.timezone import utc, get_fixed_timezone, get_default_timezone, make_aware
-from django.utils import translation
+from freedom.test import TestCase, override_settings
+from freedom.test.utils import TZ_SUPPORT, requires_tz_support
+from freedom.utils.dateformat import format
+from freedom.utils import dateformat
+from freedom.utils.timezone import utc, get_fixed_timezone, get_default_timezone, make_aware
+from freedom.utils import translation
 
 
 @override_settings(TIME_ZONE='Europe/Copenhagen')

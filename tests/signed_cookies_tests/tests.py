@@ -2,9 +2,9 @@ from __future__ import unicode_literals
 
 import time
 
-from django.core import signing
-from django.http import HttpRequest, HttpResponse
-from django.test import TestCase, override_settings
+from freedom.core import signing
+from freedom.http import HttpRequest, HttpResponse
+from freedom.test import TestCase, override_settings
 
 
 class SignedCookieTest(TestCase):

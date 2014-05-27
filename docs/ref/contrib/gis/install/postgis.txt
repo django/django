@@ -12,7 +12,7 @@ might also need additional libraries, see `PostGIS requirements`_.
 .. note::
 
     The `psycopg2`_ module is required for use as the database adapter
-    when using GeoDjango with PostGIS.
+    when using GeoFreedom with PostGIS.
 
 .. _psycopg2: http://initd.org/psycopg/
 .. _PostGIS requirements: http://www.postgis.org/documentation/manual-2.0/postgis_installation.html#id554707
@@ -44,7 +44,7 @@ Finally, make and install::
 
 .. note::
 
-    GeoDjango does not automatically create a spatial database.  Please consult
+    GeoFreedom does not automatically create a spatial database.  Please consult
     the section on :ref:`spatialdb_template91` or
     :ref:`spatialdb_template_earlier` for more information.
 
@@ -67,7 +67,7 @@ spatial functionality::
     > CREATE EXTENSION postgis;
     > CREATE EXTENSION postgis_topology;
 
-No PostGIS topology functionalities are yet available from GeoDjango, so the
+No PostGIS topology functionalities are yet available from GeoFreedom, so the
 creation of the ``postgis_topology`` extension is entirely optional.
 
 .. _spatialdb_template_earlier:
@@ -168,8 +168,8 @@ Managing the database
 To administer the database, you can either use the pgAdmin III program
 (:menuselection:`Start --> PostgreSQL 9.x --> pgAdmin III`) or the
 SQL Shell (:menuselection:`Start --> PostgreSQL 9.x --> SQL Shell`).
-For example, to create a ``geodjango`` spatial database and user, the following
+For example, to create a ``geofreedom`` spatial database and user, the following
 may be executed from the SQL Shell as the ``postgres`` user::
 
-    postgres# CREATE USER geodjango PASSWORD 'my_passwd';
-    postgres# CREATE DATABASE geodjango OWNER geodjango TEMPLATE template_postgis ENCODING 'utf8';
+    postgres# CREATE USER geofreedom PASSWORD 'my_passwd';
+    postgres# CREATE DATABASE geofreedom OWNER geofreedom TEMPLATE template_postgis ENCODING 'utf8';

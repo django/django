@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, override_settings
-from django.views.generic.base import View
-from django.utils.encoding import force_str
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.test import TestCase, override_settings
+from freedom.views.generic.base import View
+from freedom.utils.encoding import force_str
 
 from .models import Author, Artist
 

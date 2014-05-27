@@ -1,18 +1,18 @@
 """
-Tests for django test runner
+Tests for freedom test runner
 """
 from __future__ import unicode_literals
 
 from optparse import make_option
 import unittest
 
-from django.core.exceptions import ImproperlyConfigured
-from django.core.management import call_command
-from django import db
-from django.test import runner, TestCase, TransactionTestCase, skipUnlessDBFeature
-from django.test.testcases import connections_support_transactions
-from django.test.utils import override_system_checks
-from django.utils import six
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.core.management import call_command
+from freedom import db
+from freedom.test import runner, TestCase, TransactionTestCase, skipUnlessDBFeature
+from freedom.test.testcases import connections_support_transactions
+from freedom.test.utils import override_system_checks
+from freedom.utils import six
 
 from admin_scripts.tests import AdminScriptTestCase
 from .models import Person
@@ -182,26 +182,26 @@ class CustomTestRunnerOptionsTests(AdminScriptTestCase):
 
     def test_default_options(self):
         args = ['test', '--settings=test_project.settings']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, '1:2:3')
 
     def test_default_and_given_options(self):
         args = ['test', '--settings=test_project.settings', '--option_b=foo']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, '1:foo:3')
 
     def test_option_name_and_value_separated(self):
         args = ['test', '--settings=test_project.settings', '--option_b', 'foo']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, '1:foo:3')
 
     def test_all_options_given(self):
         args = ['test', '--settings=test_project.settings', '--option_a=bar',
                 '--option_b=foo', '--option_c=31337']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'bar:foo:31337')
 
@@ -237,11 +237,11 @@ class Sqlite3InMemoryTestDbs(TestCase):
             try:
                 db.connections = db.ConnectionHandler({
                     'default': {
-                        'ENGINE': 'django.db.backends.sqlite3',
+                        'ENGINE': 'freedom.db.backends.sqlite3',
                         option_key: option_value,
                     },
                     'other': {
-                        'ENGINE': 'django.db.backends.sqlite3',
+                        'ENGINE': 'freedom.db.backends.sqlite3',
                         option_key: option_value,
                     },
                 })
@@ -301,7 +301,7 @@ class AliasedDefaultTestSetupTest(unittest.TestCase):
 
 class AliasedDatabaseTeardownTest(unittest.TestCase):
     def test_setup_aliased_databases(self):
-        from django.db.backends.dummy.base import DatabaseCreation
+        from freedom.db.backends.dummy.base import DatabaseCreation
 
         runner_instance = runner.DiscoverRunner(verbosity=0)
         old_db_connections = db.connections
@@ -314,11 +314,11 @@ class AliasedDatabaseTeardownTest(unittest.TestCase):
 
             db.connections = db.ConnectionHandler({
                 'default': {
-                    'ENGINE': 'django.db.backends.dummy',
+                    'ENGINE': 'freedom.db.backends.dummy',
                     'NAME': 'dbname',
                 },
                 'other': {
-                    'ENGINE': 'django.db.backends.dummy',
+                    'ENGINE': 'freedom.db.backends.dummy',
                     'NAME': 'dbname',
                 }
             })
@@ -337,7 +337,7 @@ class DeprecationDisplayTest(AdminScriptTestCase):
     # tests for 19546
     def setUp(self):
         settings = {
-            'DATABASES': '{"default": {"ENGINE":"django.db.backends.sqlite3", "NAME":":memory:"}}'
+            'DATABASES': '{"default": {"ENGINE":"freedom.db.backends.sqlite3", "NAME":":memory:"}}'
         }
         self.write_settings('settings.py', sdict=settings)
 
@@ -346,14 +346,14 @@ class DeprecationDisplayTest(AdminScriptTestCase):
 
     def test_runner_deprecation_verbosity_default(self):
         args = ['test', '--settings=test_project.settings', 'test_runner_deprecation_app']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertIn("Ran 1 test", err)
-        six.assertRegex(self, err, r"RemovedInDjango\d\dWarning: warning from test")
-        six.assertRegex(self, err, r"RemovedInDjango\d\dWarning: module-level warning from deprecation_app")
+        six.assertRegex(self, err, r"RemovedInFreedom\d\dWarning: warning from test")
+        six.assertRegex(self, err, r"RemovedInFreedom\d\dWarning: module-level warning from deprecation_app")
 
     def test_runner_deprecation_verbosity_zero(self):
         args = ['test', '--settings=test_project.settings', '--verbosity=0', 'test_runner_deprecation_app']
-        out, err = self.run_django_admin(args)
+        out, err = self.run_freedom_admin(args)
         self.assertIn("Ran 1 test", err)
         self.assertFalse("warning from test" in err)
 

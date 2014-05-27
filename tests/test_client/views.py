@@ -1,15 +1,15 @@
 from xml.dom.minidom import parseString
 
-from django.contrib.auth.decorators import login_required, permission_required
-from django.core import mail
-from django.forms import fields
-from django.forms.forms import Form, ValidationError
-from django.forms.formsets import formset_factory, BaseFormSet
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
-from django.shortcuts import render_to_response
-from django.template import Context, Template
-from django.utils.decorators import method_decorator
-from django.utils.six.moves.urllib.parse import urlencode
+from freedom.contrib.auth.decorators import login_required, permission_required
+from freedom.core import mail
+from freedom.forms import fields
+from freedom.forms.forms import Form, ValidationError
+from freedom.forms.formsets import formset_factory, BaseFormSet
+from freedom.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
+from freedom.shortcuts import render_to_response
+from freedom.template import Context, Template
+from freedom.utils.decorators import method_decorator
+from freedom.utils.six.moves.urllib.parse import urlencode
 
 
 def get_view(request):
@@ -281,5 +281,5 @@ def mass_mail_sending_view(request):
     return HttpResponse("Mail sent")
 
 
-def django_project_redirect(request):
-    return HttpResponseRedirect('https://www.djangoproject.com/')
+def freedom_project_redirect(request):
+    return HttpResponseRedirect('https://www.freedomproject.com/')

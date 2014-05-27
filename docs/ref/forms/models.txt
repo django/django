@@ -2,12 +2,12 @@
 Model Form Functions
 ====================
 
-.. module:: django.forms.models
-   :synopsis: Django's functions for building model forms and formsets.
+.. module:: freedom.forms.models
+   :synopsis: Freedom's functions for building model forms and formsets.
 
 .. function:: modelform_factory(model, form=ModelForm, fields=None, exclude=None, formfield_callback=None, widgets=None, localized_fields=None, labels=None, help_texts=None, error_messages=None)
 
-    Returns a :class:`~django.forms.ModelForm` class for the given ``model``.
+    Returns a :class:`~freedom.forms.ModelForm` class for the given ``model``.
     You can optionally pass a ``form`` argument to use as a starting point for
     constructing the ``ModelForm``.
 
@@ -38,7 +38,7 @@ Model Form Functions
     ``fields`` or ``exclude``, or the corresponding attributes on the form's
     inner ``Meta`` class. See :ref:`modelforms-selecting-fields` for more
     information. Omitting any definition of the fields to use will result in
-    an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
+    an :exc:`~freedom.core.exceptions.ImproperlyConfigured` exception.
 
     .. versionchanged:: 1.8
 
@@ -52,11 +52,11 @@ Model Form Functions
     Arguments ``model``, ``form``, ``fields``, ``exclude``,
     ``formfield_callback``, ``widgets``, ``localized_fields``, ``labels``,
     ``help_texts``, and ``error_messages`` are all passed through to
-    :func:`~django.forms.models.modelform_factory`.
+    :func:`~freedom.forms.models.modelform_factory`.
 
     Arguments ``formset``, ``extra``, ``max_num``, ``can_order``,
     ``can_delete`` and ``validate_max`` are passed through to
-    :func:`~django.forms.formsets.formset_factory`. See :ref:`formsets` for
+    :func:`~freedom.forms.formsets.formset_factory`. See :ref:`formsets` for
     details.
 
     See :ref:`model-formsets` for example usage.
@@ -64,10 +64,10 @@ Model Form Functions
 .. function:: inlineformset_factory(parent_model, model, form=ModelForm, formset=BaseInlineFormSet, fk_name=None, fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, widgets=None, validate_max=False, localized_fields=None, labels=None, help_texts=None, error_messages=None, min_num=None, validate_min=False)
 
     Returns an ``InlineFormSet`` using :func:`modelformset_factory` with
-    defaults of ``formset=``:class:`~django.forms.models.BaseInlineFormSet`,
+    defaults of ``formset=``:class:`~freedom.forms.models.BaseInlineFormSet`,
     ``can_delete=True``, and ``extra=3``.
 
-    If your model has more than one :class:`~django.db.models.ForeignKey` to
+    If your model has more than one :class:`~freedom.db.models.ForeignKey` to
     the ``parent_model``, you must specify a ``fk_name``.
 
     See :ref:`inline-formsets` for example usage.

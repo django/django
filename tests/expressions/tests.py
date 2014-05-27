@@ -2,13 +2,13 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.core.exceptions import FieldError
-from django.db import connection
-from django.db.models import F
-from django.db import transaction
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test.utils import Approximate
-from django.utils import six
+from freedom.core.exceptions import FieldError
+from freedom.db import connection
+from freedom.db.models import F
+from freedom.db import transaction
+from freedom.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from freedom.test.utils import Approximate
+from freedom.utils import six
 
 from .models import Company, Employee, Number, Experiment
 

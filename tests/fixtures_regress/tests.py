@@ -7,20 +7,20 @@ import os
 import re
 import warnings
 
-from django.core import serializers
-from django.core.serializers.base import DeserializationError
-from django.core import management
-from django.core.management.base import CommandError
-from django.core.management.commands.dumpdata import sort_dependencies
-from django.db import transaction, IntegrityError
-from django.db.models import signals
-from django.test import (TestCase, TransactionTestCase, skipIfDBFeature,
+from freedom.core import serializers
+from freedom.core.serializers.base import DeserializationError
+from freedom.core import management
+from freedom.core.management.base import CommandError
+from freedom.core.management.commands.dumpdata import sort_dependencies
+from freedom.db import transaction, IntegrityError
+from freedom.db.models import signals
+from freedom.test import (TestCase, TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
-from django.test import override_settings
-from django.utils.encoding import force_text
-from django.utils._os import upath
-from django.utils import six
-from django.utils.six import PY3, StringIO
+from freedom.test import override_settings
+from freedom.utils.encoding import force_text
+from freedom.utils._os import upath
+from freedom.utils import six
+from freedom.utils.six import PY3, StringIO
 
 from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
     Store, Person, Book, NKChild, RefToNKChild, Circle1, Circle2, Circle3,
@@ -839,8 +839,8 @@ class TestTicket11101(TransactionTestCase):
 
     available_apps = [
         'fixtures_regress',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
+        'freedom.contrib.auth',
+        'freedom.contrib.contenttypes',
     ]
 
     @skipUnlessDBFeature('supports_transactions')

@@ -1,4 +1,4 @@
-from django import template
+from freedom import template
 
 register = template.Library()
 

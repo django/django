@@ -5,21 +5,21 @@ from decimal import Decimal
 import unittest
 import warnings
 
-from django import test
-from django import forms
-from django.core import validators
-from django.core.exceptions import ValidationError
-from django.db import connection, transaction, models, IntegrityError
-from django.db.models.fields import (
+from freedom import test
+from freedom import forms
+from freedom.core import validators
+from freedom.core.exceptions import ValidationError
+from freedom.db import connection, transaction, models, IntegrityError
+from freedom.db.models.fields import (
     AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
     CommaSeparatedIntegerField, DateField, DateTimeField, DecimalField,
     EmailField, FilePathField, FloatField, IntegerField, IPAddressField,
     GenericIPAddressField, NOT_PROVIDED, NullBooleanField, PositiveIntegerField,
     PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
     TimeField, URLField)
-from django.db.models.fields.files import FileField, ImageField
-from django.utils import six
-from django.utils.functional import lazy
+from freedom.db.models.fields.files import FileField, ImageField
+from freedom.utils import six
+from freedom.utils.functional import lazy
 
 from .models import (
     Foo, Bar, Whiz, BigD, BigS, BigIntegerModel, Post, NullBooleanModel,
@@ -59,9 +59,9 @@ class BasicFieldTests(test.TestCase):
         Regression test for #5931: __repr__ of a field also displays its name
         """
         f = Foo._meta.get_field('a')
-        self.assertEqual(repr(f), '<django.db.models.fields.CharField: a>')
+        self.assertEqual(repr(f), '<freedom.db.models.fields.CharField: a>')
         f = models.fields.CharField()
-        self.assertEqual(repr(f), '<django.db.models.fields.CharField>')
+        self.assertEqual(repr(f), '<freedom.db.models.fields.CharField>')
 
     def test_field_name(self):
         """
@@ -110,7 +110,7 @@ class BasicFieldTests(test.TestCase):
         self.assertIsInstance(field.formfield(choices_form_class=klass), klass)
 
     def test_field_str(self):
-        from django.utils.encoding import force_str
+        from freedom.utils.encoding import force_str
         f = Foo._meta.get_field('a')
         self.assertEqual(force_str(f), "model_fields.Foo.a")
 
@@ -293,7 +293,7 @@ class BooleanFieldTests(unittest.TestCase):
         self.assertIsInstance(b4.nbfield, bool)
         self.assertEqual(b4.nbfield, False)
 
-        # http://code.djangoproject.com/ticket/13293
+        # http://code.freedomproject.com/ticket/13293
         # Verify that when an extra clause exists, the boolean
         # conversions are applied with an offset
         b5 = BooleanModel.objects.all().extra(

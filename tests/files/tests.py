@@ -8,20 +8,20 @@ import tempfile
 import unittest
 import zlib
 
-from django.core.files import File
-from django.core.files.move import file_move_safe
-from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
-from django.core.files.temp import NamedTemporaryFile
-from django.utils._os import upath
-from django.utils import six
+from freedom.core.files import File
+from freedom.core.files.move import file_move_safe
+from freedom.core.files.base import ContentFile
+from freedom.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
+from freedom.core.files.temp import NamedTemporaryFile
+from freedom.utils._os import upath
+from freedom.utils import six
 
 try:
     from PIL import Image
 except ImportError:
     Image = None
 else:
-    from django.core.files import images
+    from freedom.core.files import images
 
 
 class FileTests(unittest.TestCase):
@@ -45,7 +45,7 @@ class FileTests(unittest.TestCase):
 
     def test_namedtemporaryfile_closes(self):
         """
-        The symbol django.core.files.NamedTemporaryFile is assigned as
+        The symbol freedom.core.files.NamedTemporaryFile is assigned as
         a different class on different operating systems. In
         any case, the result should minimally mock some of the API of
         tempfile.NamedTemporaryFile from the Python standard library.
@@ -211,11 +211,11 @@ class SpooledTempTests(unittest.TestCase):
     def test_in_memory_spooled_temp(self):
         with tempfile.SpooledTemporaryFile() as temp:
             temp.write(b"foo bar baz quux\n")
-            django_file = File(temp, name="something.txt")
-            self.assertEqual(django_file.size, 17)
+            freedom_file = File(temp, name="something.txt")
+            self.assertEqual(freedom_file.size, 17)
 
     def test_written_spooled_temp(self):
         with tempfile.SpooledTemporaryFile(max_size=4) as temp:
             temp.write(b"foo bar baz quux\n")
-            django_file = File(temp, name="something.txt")
-            self.assertEqual(django_file.size, 17)
+            freedom_file = File(temp, name="something.txt")
+            self.assertEqual(freedom_file.size, 17)

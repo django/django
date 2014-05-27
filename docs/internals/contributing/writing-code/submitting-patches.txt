@@ -2,7 +2,7 @@
 Submitting patches
 ==================
 
-We're always grateful for patches to Django's code. Indeed, bug reports
+We're always grateful for patches to Freedom's code. Indeed, bug reports
 with associated patches will get fixed *far* more quickly than those
 without patches.
 
@@ -26,7 +26,7 @@ Hence, our policy is for contributors to "claim" tickets in order to let other
 developers know that a particular bug or feature is being worked on.
 
 If you have identified a contribution you want to make and you're capable of
-fixing it (as measured by your coding ability, knowledge of Django internals
+fixing it (as measured by your coding ability, knowledge of Freedom internals
 and time availability), claim it by following these steps:
 
 * `Create an account`_ to use in our ticket system. If you have an account
@@ -53,14 +53,14 @@ and time availability), claim it by following these steps:
   2. then click "Submit changes."
 
 .. note::
-    The Django software foundation requests that anyone contributing more than
-    a trivial patch to Django sign and submit a `Contributor License
-    Agreement`_, this ensures that the Django Software Foundation has clear
+    The Freedom software foundation requests that anyone contributing more than
+    a trivial patch to Freedom sign and submit a `Contributor License
+    Agreement`_, this ensures that the Freedom Software Foundation has clear
     license to all contributions allowing for a clear license for all users.
 
-.. _Create an account: https://www.djangoproject.com/accounts/register/
-.. _password reset page: https://www.djangoproject.com/accounts/password/reset/
-.. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/
+.. _Create an account: https://www.freedomproject.com/accounts/register/
+.. _password reset page: https://www.freedomproject.com/accounts/password/reset/
+.. _Contributor License Agreement: https://www.freedomproject.com/foundation/cla/
 
 Ticket claimers' responsibility
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -150,10 +150,10 @@ Non-trivial patches
 -------------------
 
 A "non-trivial" patch is one that is more than a simple bug fix. It's a patch
-that introduces Django functionality and makes some sort of design decision.
+that introduces Freedom functionality and makes some sort of design decision.
 
 If you provide a non-trivial patch, include evidence that alternatives have
-been discussed on |django-developers|.
+been discussed on |freedom-developers|.
 
 If you're not sure whether your patch should be considered non-trivial, just
 ask.
@@ -161,27 +161,27 @@ ask.
 Deprecating a feature
 ---------------------
 
-There are a couple reasons that code in Django might be deprecated:
+There are a couple reasons that code in Freedom might be deprecated:
 
 * If a feature has been improved or modified in a backwards-incompatible way,
   the old feature or behavior will be deprecated.
 
-* Sometimes Django will include a backport of a Python library that's not
-  included in a version of Python that Django currently supports. When Django
+* Sometimes Freedom will include a backport of a Python library that's not
+  included in a version of Python that Freedom currently supports. When Freedom
   no longer needs to support the older version of Python that doesn't include
-  the library, the library will be deprecated in Django.
+  the library, the library will be deprecated in Freedom.
 
 As the :ref:`deprecation policy<internal-release-deprecation-policy>` describes,
-the first release of Django that deprecates a feature (``A.B``) should raise a
-``RemovedInDjangoXXWarning`` (where XX is the Django version where the feature
+the first release of Freedom that deprecates a feature (``A.B``) should raise a
+``RemovedInFreedomXXWarning`` (where XX is the Freedom version where the feature
 will be removed) when the deprecated feature is invoked. Assuming
 we have a good test coverage, these warnings will be shown by the test suite
 when :ref:`running it <running-unit-tests>` with warnings enabled:
 ``python -Wall runtests.py``. This is annoying and the output of the test suite
-should remain clean. Thus, when adding a ``RemovedInDjangoXXWarning`` you need
+should remain clean. Thus, when adding a ``RemovedInFreedomXXWarning`` you need
 to eliminate or silence any warnings generated when running the tests.
 
-The first step is to remove any use of the deprecated behavior by Django itself.
+The first step is to remove any use of the deprecated behavior by Freedom itself.
 Next you can silence warnings in tests that actually test the deprecated
 behavior in one of two ways:
 
@@ -195,17 +195,17 @@ behavior in one of two ways:
             # invoke deprecated behavior
         # go ahead with the rest of the test
 
-#) For an entire test case, ``django.test.utils`` contains three helpful
+#) For an entire test case, ``freedom.test.utils`` contains three helpful
    mixins to silence warnings: ``IgnorePendingDeprecationWarningsMixin``,
    ``IgnoreDeprecationWarningsMixin``, and
    ``IgnoreAllDeprecationWarningsMixin``. For example::
 
-    from django.test.utils import IgnorePendingDeprecationWarningsMixin
+    from freedom.test.utils import IgnorePendingDeprecationWarningsMixin
 
     class MyDeprecatedTests(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
         ...
 
-Finally, there are a couple of updates to Django's documentation to make:
+Finally, there are a couple of updates to Freedom's documentation to make:
 
 #) If the existing feature is documented, mark it deprecated in documentation
    using the ``.. deprecated:: A.B`` annotation. Include a short description
@@ -219,13 +219,13 @@ Finally, there are a couple of updates to Django's documentation to make:
    under the ``A.B+2`` version describing what code will be removed.
 
 Once you have completed these steps, you are finished with the deprecation.
-In each minor release, all ``RemovedInDjangoXXWarning``\s matching the new
+In each minor release, all ``RemovedInFreedomXXWarning``\s matching the new
 version are removed.
 
 Javascript patches
 ------------------
 
-Django's admin system leverages the jQuery framework to increase the
+Freedom's admin system leverages the jQuery framework to increase the
 capabilities of the admin interface. In conjunction, there is an emphasis on
 admin javascript performance and minimizing overall admin media file size.
 Serving compressed or "minified" versions of javascript files is considered
@@ -239,15 +239,15 @@ should point to the compressed version.
 Compressing JavaScript
 ~~~~~~~~~~~~~~~~~~~~~~
 
-To simplify the process of providing optimized javascript code, Django
+To simplify the process of providing optimized javascript code, Freedom
 includes a handy python script which should be used to create a "minified"
 version. To run it::
 
-    python django/contrib/admin/bin/compress.py
+    python freedom/contrib/admin/bin/compress.py
 
 Behind the scenes, ``compress.py`` is a front-end for Google's
 `Closure Compiler`_ which is written in Java. However, the Closure Compiler
-library is not bundled with Django directly, so those wishing to contribute
+library is not bundled with Freedom directly, so those wishing to contribute
 complete javascript patches will need to download and install the library
 independently.
 
@@ -259,8 +259,8 @@ the default ``/usr/bin/java`` command may remain linked to the previous Java
 binary, so relinking that command may be necessary as well.)
 
 Please don't forget to run ``compress.py`` and include the ``diff`` of the
-minified scripts when submitting patches for Django's javascript.
+minified scripts when submitting patches for Freedom's javascript.
 
 .. _Closure Compiler: https://developers.google.com/closure/compiler/
-.. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
-.. _ticket tracker: https://code.djangoproject.com/newticket
+.. _list of tickets with patches: https://code.freedomproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
+.. _ticket tracker: https://code.freedomproject.com/newticket

@@ -3,49 +3,49 @@ Troubleshooting
 ===============
 
 This page contains some advice about errors and problems commonly encountered
-during the development of Django applications.
+during the development of Freedom applications.
 
-.. _troubleshooting-django-admin-py:
+.. _troubleshooting-freedom-admin-py:
 
-Problems running django-admin.py
+Problems running freedom-admin.py
 ================================
 
-"command not found: django-admin.py"
+"command not found: freedom-admin.py"
 ------------------------------------
 
-:doc:`django-admin.py </ref/django-admin>` should be on your system path if you
-installed Django via ``python setup.py``. If it's not on your path, you can
-find it in ``site-packages/django/bin``, where ``site-packages`` is a directory
-within your Python installation. Consider symlinking to :doc:`django-admin.py
-</ref/django-admin>` from some place on your path, such as
+:doc:`freedom-admin.py </ref/freedom-admin>` should be on your system path if you
+installed Freedom via ``python setup.py``. If it's not on your path, you can
+find it in ``site-packages/freedom/bin``, where ``site-packages`` is a directory
+within your Python installation. Consider symlinking to :doc:`freedom-admin.py
+</ref/freedom-admin>` from some place on your path, such as
 :file:`/usr/local/bin`.
 
 Script name may differ in distribution packages
 -----------------------------------------------
 
-If you installed Django using a Linux distribution's package manager
-(e.g. ``apt-get`` or ``yum``) ``django-admin.py`` may have been renamed to
-``django-admin``; use that instead.
+If you installed Freedom using a Linux distribution's package manager
+(e.g. ``apt-get`` or ``yum``) ``freedom-admin.py`` may have been renamed to
+``freedom-admin``; use that instead.
 
 Mac OS X permissions
 --------------------
 
 If you're using Mac OS X, you may see the message "permission denied" when
-you try to run ``django-admin.py``. This is because, on Unix-based systems like
+you try to run ``freedom-admin.py``. This is because, on Unix-based systems like
 OS X, a file must be marked as "executable" before it can be run as a program.
 To do this, open Terminal.app and navigate (using the ``cd`` command) to the
-directory where :doc:`django-admin.py </ref/django-admin>` is installed, then
-run the command ``sudo chmod +x django-admin.py``.
+directory where :doc:`freedom-admin.py </ref/freedom-admin>` is installed, then
+run the command ``sudo chmod +x freedom-admin.py``.
 
 Running virtualenv on Windows
 -----------------------------
 
-If you used virtualenv_ to :ref:`install Django <installing-official-release>`
+If you used virtualenv_ to :ref:`install Freedom <installing-official-release>`
 on Windows, you may get an ``ImportError`` when you try to run
-``django-admin.py``. This is because Windows does not run the
+``freedom-admin.py``. This is because Windows does not run the
 Python interpreter from your virtual environment unless you invoke it
 directly. Instead, prefix all commands that use .py files with ``python`` and
 use the full path to the file, like so:
-``python C:\pythonXY\Scripts\django-admin.py``.
+``python C:\pythonXY\Scripts\freedom-admin.py``.
 
 .. _virtualenv: http://www.virtualenv.org/

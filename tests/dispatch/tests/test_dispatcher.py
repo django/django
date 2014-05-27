@@ -5,7 +5,7 @@ import unittest
 import weakref
 from types import TracebackType
 
-from django.dispatch import Signal, receiver
+from freedom.dispatch import Signal, receiver
 
 
 if sys.platform.startswith('java'):

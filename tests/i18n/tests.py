@@ -11,20 +11,20 @@ import pickle
 from threading import local
 from unittest import skipUnless
 
-from django.conf import settings
-from django.template import Template, Context
-from django.template.base import TemplateSyntaxError
-from django.test import TestCase, RequestFactory, override_settings
-from django.utils import translation
-from django.utils.formats import (get_format, date_format, time_format,
+from freedom.conf import settings
+from freedom.template import Template, Context
+from freedom.template.base import TemplateSyntaxError
+from freedom.test import TestCase, RequestFactory, override_settings
+from freedom.utils import translation
+from freedom.utils.formats import (get_format, date_format, time_format,
     localize, localize_input, iter_format_modules, get_format_modules,
     reset_format_cache, sanitize_separators)
-from django.utils.numberformat import format as nformat
-from django.utils._os import upath
-from django.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText
-from django.utils import six
-from django.utils.six import PY3
-from django.utils.translation import (activate, deactivate,
+from freedom.utils.numberformat import format as nformat
+from freedom.utils._os import upath
+from freedom.utils.safestring import mark_safe, SafeBytes, SafeString, SafeText
+from freedom.utils import six
+from freedom.utils.six import PY3
+from freedom.utils.translation import (activate, deactivate,
     get_language, get_language_from_request, get_language_info,
     to_locale, trans_real,
     gettext_lazy,
@@ -48,7 +48,7 @@ extended_locale_paths = settings.LOCALE_PATHS + (
 
 @contextmanager
 def patch_formats(lang, **settings):
-    from django.utils.formats import _format_cache
+    from freedom.utils.formats import _format_cache
 
     # Populate _format_cache with temporary values
     for key, value in settings.items():
@@ -294,7 +294,7 @@ class TranslationTests(TestCase):
         """
         six.text_type(string_concat(...)) should not raise a TypeError - #4796
         """
-        self.assertEqual('django', six.text_type(string_concat("dja", "ngo")))
+        self.assertEqual('freedom', six.text_type(string_concat("dja", "ngo")))
 
     def test_safe_status(self):
         """
@@ -718,7 +718,7 @@ class FormattingTests(TestCase):
 
     def test_sanitize_separators(self):
         """
-        Tests django.utils.formats.sanitize_separators.
+        Tests freedom.utils.formats.sanitize_separators.
         """
         # Non-strings are untouched
         self.assertEqual(sanitize_separators(123), 123)
@@ -740,7 +740,7 @@ class FormattingTests(TestCase):
         """
         # Importing some format modules so that we can compare the returned
         # modules with these expected modules
-        default_mod = import_module('django.conf.locale.de.formats')
+        default_mod = import_module('freedom.conf.locale.de.formats')
         test_mod = import_module('i18n.other.locale.de.formats')
         test_mod2 = import_module('i18n.other2.locale.de.formats')
 
@@ -765,8 +765,8 @@ class FormattingTests(TestCase):
         Tests the iter_format_modules function always yields format modules in
         a stable and correct order in presence of both base ll and ll_CC formats.
         """
-        en_format_mod = import_module('django.conf.locale.en.formats')
-        en_gb_format_mod = import_module('django.conf.locale.en_GB.formats')
+        en_format_mod = import_module('freedom.conf.locale.en.formats')
+        en_gb_format_mod = import_module('freedom.conf.locale.en_GB.formats')
         self.assertEqual(list(iter_format_modules('en-gb')), [en_gb_format_mod, en_format_mod])
 
     def test_get_format_modules_lang(self):
@@ -899,7 +899,7 @@ class MiscTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'es-ar,de'}
         self.assertEqual('es-ar', g(r))
 
-        # This test assumes there won't be a Django translation to a US
+        # This test assumes there won't be a Freedom translation to a US
         # variation of the Spanish language, a safe assumption. When the
         # user sets it as the preferred language, the main 'es'
         # translation should be selected instead.
@@ -907,9 +907,9 @@ class MiscTests(TestCase):
         self.assertEqual(g(r), 'es')
 
         # This tests the following scenario: there isn't a main language (zh)
-        # translation of Django but there is a translation to variation (zh_CN)
+        # translation of Freedom but there is a translation to variation (zh_CN)
         # the user sets zh-cn as the preferred language, it should be selected
-        # by Django without falling back nor ignoring it.
+        # by Freedom without falling back nor ignoring it.
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,de'}
         self.assertEqual(g(r), 'zh-cn')
 
@@ -941,7 +941,7 @@ class MiscTests(TestCase):
     def test_support_for_deprecated_chinese_language_codes(self):
         """
         Some browsers (Firefox, IE etc) use deprecated language codes. As these
-        language codes will be removed in Django 1.9, these will be incorrectly
+        language codes will be removed in Freedom 1.9, these will be incorrectly
         matched. For example zh-tw (traditional) will be interpreted as zh-hans
         (simplified), which is wrong. So we should also accept these deprecated
         language codes.
@@ -972,7 +972,7 @@ class MiscTests(TestCase):
         still work as before the new language codes were introduced.
 
         refs #18419 -- this is explicitly for backwards compatibility and
-        should be removed in Django 1.9
+        should be removed in Freedom 1.9
         """
         g = get_language_from_request
         r = self.rf.get('/')
@@ -1001,7 +1001,7 @@ class MiscTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual('es', g(r))
 
-        # This test assumes there won't be a Django translation to a US
+        # This test assumes there won't be a Freedom translation to a US
         # variation of the Spanish language, a safe assumption. When the
         # user sets it as the preferred language, the main 'es'
         # translation should be selected instead.
@@ -1010,9 +1010,9 @@ class MiscTests(TestCase):
         self.assertEqual(g(r), 'es')
 
         # This tests the following scenario: there isn't a main language (zh)
-        # translation of Django but there is a translation to variation (zh_CN)
+        # translation of Freedom but there is a translation to variation (zh_CN)
         # the user sets zh-cn as the preferred language, it should be selected
-        # by Django without falling back nor ignoring it.
+        # by Freedom without falling back nor ignoring it.
         r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: 'zh-cn'}
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'de'}
         self.assertEqual(g(r), 'zh-cn')
@@ -1024,7 +1024,7 @@ class MiscTests(TestCase):
         self.assertEqual(g('/xyz/'), None)
 
     def test_get_language_from_path_null(self):
-        from django.utils.translation.trans_null import get_language_from_path as g
+        from freedom.utils.translation.trans_null import get_language_from_path as g
         self.assertEqual(g('/pl/'), None)
         self.assertEqual(g('/pl'), None)
         self.assertEqual(g('/xyz/'), None)
@@ -1097,7 +1097,7 @@ class AppResolutionOrderI18NTests(ResolutionOrderI18NTests):
             # Doesn't work because it's added later in the list.
             self.assertUgettext('Date/time', 'Datum/Zeit')
 
-            with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.admin.apps.SimpleAdminConfig'}):
+            with self.modify_settings(INSTALLED_APPS={'remove': 'freedom.contrib.admin.apps.SimpleAdminConfig'}):
                 # Force refreshing translations.
                 activate('de')
 
@@ -1116,9 +1116,9 @@ class LocalePathsResolutionOrderI18NTests(ResolutionOrderI18NTests):
             self.assertUgettext('Time', 'LOCALE_PATHS')
 
 
-class DjangoFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
+class FreedomFallbackResolutionOrderI18NTests(ResolutionOrderI18NTests):
 
-    def test_django_fallback(self):
+    def test_freedom_fallback(self):
         self.assertEqual(ugettext('Date/time'), 'Datum/Zeit')
 
 
@@ -1287,8 +1287,8 @@ class MultipleLocaleActivationTests(TestCase):
         ('fr', 'French'),
     ),
     MIDDLEWARE_CLASSES=(
-        'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.common.CommonMiddleware',
+        'freedom.middleware.locale.LocaleMiddleware',
+        'freedom.middleware.common.CommonMiddleware',
     ),
     ROOT_URLCONF='i18n.urls',
 )
@@ -1303,9 +1303,9 @@ class LocaleMiddlewareTests(TestCase):
 
     @override_settings(
         MIDDLEWARE_CLASSES=(
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.common.CommonMiddleware',
+            'freedom.contrib.sessions.middleware.SessionMiddleware',
+            'freedom.middleware.locale.LocaleMiddleware',
+            'freedom.middleware.common.CommonMiddleware',
         ),
     )
     def test_language_not_saved_to_session(self):
@@ -1324,8 +1324,8 @@ class LocaleMiddlewareTests(TestCase):
         ('pt-br', 'Portugese (Brazil)'),
     ),
     MIDDLEWARE_CLASSES=(
-        'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.common.CommonMiddleware',
+        'freedom.middleware.locale.LocaleMiddleware',
+        'freedom.middleware.common.CommonMiddleware',
     ),
     ROOT_URLCONF='i18n.urls'
 )

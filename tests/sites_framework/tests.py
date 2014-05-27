@@ -1,10 +1,10 @@
-from django.apps import apps
-from django.conf import settings
-from django.contrib.sites.managers import CurrentSiteManager
-from django.contrib.sites.models import Site
-from django.core import checks
-from django.db import models
-from django.test import TestCase
+from freedom.apps import apps
+from freedom.conf import settings
+from freedom.contrib.sites.managers import CurrentSiteManager
+from freedom.contrib.sites.models import Site
+from freedom.core import checks
+from freedom.db import models
+from freedom.test import TestCase
 
 from .models import (SyndicatedArticle, ExclusiveArticle, CustomArticle,
     AbstractArticle)

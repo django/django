@@ -1,15 +1,15 @@
 """
-Tests for stuff in django.utils.datastructures.
+Tests for stuff in freedom.utils.datastructures.
 """
 
 import copy
 import pickle
 
-from django.test import SimpleTestCase
-from django.test.utils import IgnoreDeprecationWarningsMixin
-from django.utils.datastructures import (DictWrapper, ImmutableList,
+from freedom.test import SimpleTestCase
+from freedom.test.utils import IgnoreDeprecationWarningsMixin
+from freedom.utils.datastructures import (DictWrapper, ImmutableList,
     MultiValueDict, MultiValueDictKeyError, MergeDict, SortedDict)
-from django.utils import six
+from freedom.utils import six
 
 
 class SortedDictTests(IgnoreDeprecationWarningsMixin, SimpleTestCase):

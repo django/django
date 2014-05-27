@@ -44,7 +44,7 @@ clean:
 	-rm -rf $(BUILDDIR)/*
 
 html:
-	$(SPHINXBUILD) -b djangohtml $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXBUILD) -b freedomhtml $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
@@ -79,17 +79,17 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/django.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/freedom.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/django.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/freedom.qhc"
 
 devhelp:
 	$(SPHINXBUILD) -b devhelp $(ALLSPHINXOPTS) $(BUILDDIR)/devhelp
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/django"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/django"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/freedom"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/freedom"
 	@echo "# devhelp"
 
 epub:

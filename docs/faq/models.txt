@@ -3,13 +3,13 @@ FAQ: Databases and models
 
 .. _faq-see-raw-sql-queries:
 
-How can I see the raw SQL queries Django is running?
+How can I see the raw SQL queries Freedom is running?
 ----------------------------------------------------
 
-Make sure your Django :setting:`DEBUG` setting is set to ``True``.
+Make sure your Freedom :setting:`DEBUG` setting is set to ``True``.
 Then, just do this::
 
-    >>> from django.db import connection
+    >>> from freedom.db import connection
     >>> connection.queries
     [{'sql': 'SELECT polls_polls.id, polls_polls.question, polls_polls.pub_date FROM polls_polls',
     'time': '0.002'}]
@@ -29,10 +29,10 @@ Note that the SQL recorded here may be :ref:`incorrectly quoted under SQLite
 If you are using :doc:`multiple databases</topics/db/multi-db>`, you can use the
 same interface on each member of the ``connections`` dictionary::
 
-    >>> from django.db import connections
+    >>> from freedom.db import connections
     >>> connections['my_db_alias'].queries
 
-Can I use Django with a pre-existing database?
+Can I use Freedom with a pre-existing database?
 ----------------------------------------------
 
 Yes. See :doc:`Integrating with a legacy database </howto/legacy-databases>`.
@@ -40,14 +40,14 @@ Yes. See :doc:`Integrating with a legacy database </howto/legacy-databases>`.
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
 
-Take a look at Django's support for :mod:`schema migrations
-<django.db.migrations>`.
+Take a look at Freedom's support for :mod:`schema migrations
+<freedom.db.migrations>`.
 
 If you don't mind clearing data, your project's ``manage.py`` utility has a
 :djadmin:`flush` option to reset the database to the state it was in
 immediately after :djadmin:`migrate` was executed.
 
-Do Django models support multiple-column primary keys?
+Do Freedom models support multiple-column primary keys?
 ------------------------------------------------------
 
 No. Only single-column primary keys are supported.
@@ -62,7 +62,7 @@ specify an object to edit or delete.
 How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
 ------------------------------------------------------------------------------------------------------------------
 
-We try to avoid adding special cases in the Django code to accommodate all the
+We try to avoid adding special cases in the Freedom code to accommodate all the
 database-specific options such as table type, etc. If you'd like to use any of
 these options, create an :ref:`SQL initial data file <initial-sql>` that
 contains ``ALTER TABLE`` statements that do what you want to do. The initial
@@ -77,15 +77,15 @@ As explained in the :ref:`SQL initial data file <initial-sql>` documentation,
 this SQL file can contain arbitrary SQL, so you can make any sorts of changes
 you need to make.
 
-Why is Django leaking memory?
+Why is Freedom leaking memory?
 -----------------------------
 
-Django isn't known to leak memory. If you find your Django processes are
+Freedom isn't known to leak memory. If you find your Freedom processes are
 allocating more and more memory, with no sign of releasing it, check to make
 sure your :setting:`DEBUG` setting is set to ``False``. If :setting:`DEBUG`
-is ``True``, then Django saves a copy of every SQL statement it has executed.
+is ``True``, then Freedom saves a copy of every SQL statement it has executed.
 
-(The queries are saved in ``django.db.connection.queries``. See
+(The queries are saved in ``freedom.db.connection.queries``. See
 :ref:`faq-see-raw-sql-queries`.)
 
 To fix the problem, set :setting:`DEBUG` to ``False``.
@@ -93,5 +93,5 @@ To fix the problem, set :setting:`DEBUG` to ``False``.
 If you need to clear the query list manually at any point in your functions,
 just call ``reset_queries()``, like this::
 
-    from django import db
+    from freedom import db
     db.reset_queries()

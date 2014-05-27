@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-from django import forms
-from django.forms.formsets import BaseFormSet, DELETION_FIELD_NAME
-from django.forms.utils import ErrorDict, ErrorList
-from django.forms.models import modelform_factory, inlineformset_factory, modelformset_factory, BaseModelFormSet
-from django.test import TestCase
-from django.utils import six
+from freedom import forms
+from freedom.forms.formsets import BaseFormSet, DELETION_FIELD_NAME
+from freedom.forms.utils import ErrorDict, ErrorList
+from freedom.forms.models import modelform_factory, inlineformset_factory, modelformset_factory, BaseModelFormSet
+from freedom.test import TestCase
+from freedom.utils import six
 
 from .models import User, UserSite, Restaurant, Manager, Network, Host
 

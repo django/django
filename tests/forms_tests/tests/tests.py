@@ -3,12 +3,12 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import models
-from django.forms import Form, ModelForm, FileField, ModelChoiceField, CharField
-from django.forms.models import ModelFormMetaclass
-from django.test import TestCase
-from django.utils import six
+from freedom.core.files.uploadedfile import SimpleUploadedFile
+from freedom.db import models
+from freedom.forms import Form, ModelForm, FileField, ModelChoiceField, CharField
+from freedom.forms.models import ModelFormMetaclass
+from freedom.test import TestCase
+from freedom.utils import six
 
 from ..models import (ChoiceModel, ChoiceOptionModel, ChoiceFieldModel,
     FileModel, Group, BoundaryModel, Defaults, OptionalMultiChoiceModel)
@@ -200,7 +200,7 @@ class FormsModelTestCase(TestCase):
         self.assertEqual(instance_form.initial['def_date'], datetime.date(1969, 4, 4))
         self.assertEqual(instance_form.initial['value'], 12)
 
-        from django.forms import CharField
+        from freedom.forms import CharField
 
         class ExcludingForm(ModelForm):
             name = CharField(max_length=255)

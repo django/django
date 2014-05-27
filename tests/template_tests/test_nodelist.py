@@ -1,8 +1,8 @@
 from unittest import TestCase
 
-from django.template import VariableNode, Context
-from django.template.loader import get_template_from_string
-from django.test import override_settings
+from freedom.template import VariableNode, Context
+from freedom.template.loader import get_template_from_string
+from freedom.test import override_settings
 
 
 class NodelistTest(TestCase):
@@ -55,6 +55,6 @@ class ErrorIndexTest(TestCase):
             try:
                 template.render(context)
             except (RuntimeError, TypeError) as e:
-                error_source_index = e.django_template_source[1]
+                error_source_index = e.freedom_template_source[1]
                 self.assertEqual(error_source_index,
                                  expected_error_source_index)

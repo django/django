@@ -1,7 +1,7 @@
-from django.db.models import Q, Sum
-from django.db.utils import IntegrityError
-from django.test import TestCase, skipIfDBFeature
-from django.forms.models import modelform_factory
+from freedom.db.models import Q, Sum
+from freedom.db.utils import IntegrityError
+from freedom.test import TestCase, skipIfDBFeature
+from freedom.forms.models import modelform_factory
 
 from .models import (
     Address, Place, Restaurant, Link, CharLink, TextLink,
@@ -53,7 +53,7 @@ class GenericRelationTests(TestCase):
         Tests that SQL query parameters for generic relations are properly
         grouped when OR is used.
 
-        Test for bug http://code.djangoproject.com/ticket/11535
+        Test for bug http://code.freedomproject.com/ticket/11535
 
         In this bug the first query (below) works while the second, with the
         query parameters the same but in reverse order, does not.

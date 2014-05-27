@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-from django import forms
-from django.contrib.contenttypes.forms import generic_inlineformset_factory
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import FieldError
-from django.test import TestCase
-from django.utils import six
+from freedom import forms
+from freedom.contrib.contenttypes.forms import generic_inlineformset_factory
+from freedom.contrib.contenttypes.models import ContentType
+from freedom.core.exceptions import FieldError
+from freedom.test import TestCase
+from freedom.utils import six
 
 from .models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
                      Vegetable, Mineral, Gecko, Rock, ManualPK,
@@ -49,7 +49,7 @@ class GenericRelationsTests(TestCase):
         )
         mpk = ManualPK.objects.create(id=1)
         mpk.tags.create(tag='mpk')
-        from django.db.models import Q
+        from freedom.db.models import Q
         qs = TaggedItem.objects.filter(Q(animal__isnull=False) | Q(manualpk__id=1)).order_by('tag')
         self.assertQuerysetEqual(
             qs, ["fatty", "hairy", "mpk", "yellow"], lambda x: x.tag)

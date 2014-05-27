@@ -1,5 +1,5 @@
-from django.conf.urls import include, url
-from django.contrib import admin
+from freedom.conf.urls import include, url
+from freedom.contrib import admin
 
 
 urlpatterns = [

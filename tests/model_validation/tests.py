@@ -1,8 +1,8 @@
-from django.core import management
-from django.core.checks import run_checks, Error
-from django.db.models.signals import post_init
-from django.test import TestCase
-from django.utils import six
+from freedom.core import management
+from freedom.core.checks import run_checks, Error
+from freedom.db.models.signals import post_init
+from freedom.test import TestCase
+from freedom.utils import six
 
 
 class OnPostInit(object):
@@ -19,9 +19,9 @@ class ModelValidationTest(TestCase):
         # All our models should validate properly
         # Validation Tests:
         #   * choices= Iterable of Iterables
-        #       See: https://code.djangoproject.com/ticket/20430
+        #       See: https://code.freedomproject.com/ticket/20430
         #   * related_name='+' doesn't clash with another '+'
-        #       See: https://code.djangoproject.com/ticket/21375
+        #       See: https://code.freedomproject.com/ticket/21375
         management.call_command("check", stdout=six.StringIO())
 
     def test_model_signal(self):

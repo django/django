@@ -2,47 +2,47 @@
 Translation
 ===========
 
-.. module:: django.utils.translation
+.. module:: freedom.utils.translation
 
 Overview
 ========
 
-In order to make a Django project translatable, you have to add a minimal
+In order to make a Freedom project translatable, you have to add a minimal
 number of hooks to your Python code and templates. These hooks are called
-:term:`translation strings <translation string>`. They tell Django: "This text
+:term:`translation strings <translation string>`. They tell Freedom: "This text
 should be translated into the end user's language, if a translation for this
 text is available in that language." It's your responsibility to mark
 translatable strings; the system can only translate strings it knows about.
 
-Django then provides utilities to extract the translation strings into a
+Freedom then provides utilities to extract the translation strings into a
 :term:`message file`. This file is a convenient way for translators to provide
 the equivalent of the translation strings in the target language. Once the
 translators have filled in the message file, it must be compiled. This process
 relies on the GNU gettext toolset.
 
-Once this is done, Django takes care of translating Web apps on the fly in each
+Once this is done, Freedom takes care of translating Web apps on the fly in each
 available language, according to users' language preferences.
 
-Django's internationalization hooks are on by default, and that means there's a
+Freedom's internationalization hooks are on by default, and that means there's a
 bit of i18n-related overhead in certain places of the framework. If you don't
 use internationalization, you should take the two seconds to set
-:setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Django will
+:setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Freedom will
 make some optimizations so as not to load the internationalization machinery.
-You'll probably also want to remove ``'django.core.context_processors.i18n'``
+You'll probably also want to remove ``'freedom.core.context_processors.i18n'``
 from your :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting.
 
 .. note::
 
     There is also an independent but related :setting:`USE_L10N` setting that
-    controls if Django should implement format localization. See
+    controls if Freedom should implement format localization. See
     :doc:`/topics/i18n/formatting` for more details.
 
 .. note::
 
     Make sure you've activated translation for your project (the fastest way is
     to check if :setting:`MIDDLEWARE_CLASSES` includes
-    :mod:`django.middleware.locale.LocaleMiddleware`). If you haven't yet,
-    see :ref:`how-django-discovers-language-preference`.
+    :mod:`freedom.middleware.locale.LocaleMiddleware`). If you haven't yet,
+    see :ref:`how-freedom-discovers-language-preference`.
 
 Internationalization: in Python code
 ====================================
@@ -51,18 +51,18 @@ Standard translation
 --------------------
 
 Specify a translation string by using the function
-:func:`~django.utils.translation.ugettext`. It's convention to import this
+:func:`~freedom.utils.translation.ugettext`. It's convention to import this
 as a shorter alias, ``_``, to save typing.
 
 .. note::
     Python's standard library ``gettext`` module installs ``_()`` into the
-    global namespace, as an alias for ``gettext()``. In Django, we have chosen
+    global namespace, as an alias for ``gettext()``. In Freedom, we have chosen
     not to follow this practice, for a couple of reasons:
 
     1. For international character set (Unicode) support,
-       :func:`~django.utils.translation.ugettext` is more useful than
+       :func:`~freedom.utils.translation.ugettext` is more useful than
        ``gettext()``. Sometimes, you should be using
-       :func:`~django.utils.translation.ugettext_lazy` as the default
+       :func:`~freedom.utils.translation.ugettext_lazy` as the default
        translation method for a particular file. Without ``_()`` in the
        global namespace, the developer has to think about which is the
        most appropriate translation function.
@@ -77,8 +77,8 @@ as a shorter alias, ``_``, to save typing.
 In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
 
-    from django.utils.translation import ugettext as _
-    from django.http import HttpResponse
+    from freedom.utils.translation import ugettext as _
+    from freedom.http import HttpResponse
 
     def my_view(request):
         output = _("Welcome to my site.")
@@ -87,8 +87,8 @@ string::
 Obviously, you could code this without using the alias. This example is
 identical to the previous one::
 
-    from django.utils.translation import ugettext
-    from django.http import HttpResponse
+    from freedom.utils.translation import ugettext
+    from freedom.http import HttpResponse
 
     def my_view(request):
         output = ugettext("Welcome to my site.")
@@ -110,8 +110,8 @@ Translation works on variables. Again, here's an identical example::
         return HttpResponse(output)
 
 (The caveat with using variables or computed values, as in the previous two
-examples, is that Django's translation-string-detecting utility,
-:djadmin:`django-admin.py makemessages <makemessages>`, won't be able to find
+examples, is that Freedom's translation-string-detecting utility,
+:djadmin:`freedom-admin.py makemessages <makemessages>`, won't be able to find
 these strings. More on :djadmin:`makemessages` later.)
 
 The strings you pass to ``_()`` or ``ugettext()`` can take placeholders,
@@ -164,7 +164,7 @@ more details.
 Marking strings as no-op
 ------------------------
 
-Use the function :func:`django.utils.translation.ugettext_noop()` to mark a
+Use the function :func:`freedom.utils.translation.ugettext_noop()` to mark a
 string as a translation string without translating it. The string is later
 translated from a variable.
 
@@ -176,13 +176,13 @@ such as when the string is presented to the user.
 Pluralization
 -------------
 
-Use the function :func:`django.utils.translation.ungettext()` to specify
+Use the function :func:`freedom.utils.translation.ungettext()` to specify
 pluralized messages.
 
 ``ungettext`` takes three arguments: the singular translation string, the plural
 translation string and the number of objects.
 
-This function is useful when you need your Django application to be localizable
+This function is useful when you need your Freedom application to be localizable
 to languages where the number and complexity of `plural forms
 <http://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_ is
 greater than the two forms used in English ('object' for the singular and
@@ -191,8 +191,8 @@ of its value.)
 
 For example::
 
-    from django.utils.translation import ungettext
-    from django.http import HttpResponse
+    from freedom.utils.translation import ungettext
+    from freedom.http import HttpResponse
 
     def hello_world(request, count):
         page = ungettext(
@@ -210,7 +210,7 @@ Note that pluralization is complicated and works differently in each language.
 Comparing ``count`` to 1 isn't always the correct rule. This code looks
 sophisticated, but will produce incorrect results for some languages::
 
-    from django.utils.translation import ungettext
+    from freedom.utils.translation import ungettext
     from myapp.models import Report
 
     count = Report.objects.count()
@@ -260,7 +260,7 @@ In a case like this, consider something like the following::
             'plural_name': Report._meta.verbose_name_plural
         }
 
-    You would get an error when running :djadmin:`django-admin.py
+    You would get an error when running :djadmin:`freedom-admin.py
     compilemessages <compilemessages>`::
 
         a format specification for argument 'name', as in 'msgstr[0]', doesn't exist in 'msgid'
@@ -273,8 +273,8 @@ Contextual markers
 Sometimes words have several meanings, such as ``"May"`` in English, which
 refers to a month name and to a verb. To enable translators to translate
 these words correctly in different contexts, you can use the
-:func:`django.utils.translation.pgettext()` function, or the
-:func:`django.utils.translation.npgettext()` function if the string needs
+:func:`freedom.utils.translation.pgettext()` function, or the
+:func:`freedom.utils.translation.npgettext()` function if the string needs
 pluralization. Both take a context string as the first variable.
 
 In the resulting ``.po`` file, the string will then appear as often as there are
@@ -284,14 +284,14 @@ each of them.
 
 For example::
 
-    from django.utils.translation import pgettext
+    from freedom.utils.translation import pgettext
 
     month = pgettext("month name", "May")
 
 or::
 
-    from django.db import models
-    from django.utils.translation import pgettext_lazy
+    from freedom.db import models
+    from freedom.utils.translation import pgettext_lazy
 
     class MyThing(models.Model):
         name = models.CharField(help_text=pgettext_lazy(
@@ -314,7 +314,7 @@ Lazy translation
 ----------------
 
 Use the lazy versions of translation functions in
-:mod:`django.utils.translation` (easily recognizable by the ``lazy`` suffix in
+:mod:`freedom.utils.translation` (easily recognizable by the ``lazy`` suffix in
 their names) to translate strings lazily -- when the value is accessed rather
 than when they're called.
 
@@ -326,7 +326,7 @@ This is essential when calls to these functions are located in code paths that
 are executed at module load time.
 
 This is something that can easily happen when defining models, forms and
-model forms, because Django implements these such that their fields are
+model forms, because Freedom implements these such that their fields are
 actually class-level attributes. For that reason, make sure to use lazy
 translations in the following cases:
 
@@ -336,36 +336,36 @@ Model fields and relationships ``verbose_name`` and ``help_text`` option values
 For example, to translate the help text of the *name* field in the following
 model, do the following::
 
-    from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from freedom.db import models
+    from freedom.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(help_text=_('This is the help text'))
 
-You can mark names of :class:`~django.db.models.ForeignKey`,
-:class:`~django.db.models.ManyToManyField` or
-:class:`~django.db.models.OneToOneField` relationship as translatable by using
-their :attr:`~django.db.models.Options.verbose_name` options::
+You can mark names of :class:`~freedom.db.models.ForeignKey`,
+:class:`~freedom.db.models.ManyToManyField` or
+:class:`~freedom.db.models.OneToOneField` relationship as translatable by using
+their :attr:`~freedom.db.models.Options.verbose_name` options::
 
     class MyThing(models.Model):
         kind = models.ForeignKey(ThingKind, related_name='kinds',
                                  verbose_name=_('kind'))
 
-Just like you would do in :attr:`~django.db.models.Options.verbose_name` you
-should provide a lowercase verbose name text for the relation as Django will
+Just like you would do in :attr:`~freedom.db.models.Options.verbose_name` you
+should provide a lowercase verbose name text for the relation as Freedom will
 automatically titlecase it when required.
 
 Model verbose names values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is recommended to always provide explicit
-:attr:`~django.db.models.Options.verbose_name` and
-:attr:`~django.db.models.Options.verbose_name_plural` options rather than
+:attr:`~freedom.db.models.Options.verbose_name` and
+:attr:`~freedom.db.models.Options.verbose_name_plural` options rather than
 relying on the fallback English-centric and somewhat naïve determination of
-verbose names Django performs by looking at the model's class name::
+verbose names Freedom performs by looking at the model's class name::
 
-    from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from freedom.db import models
+    from freedom.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(_('name'), help_text=_('This is the help text'))
@@ -377,11 +377,11 @@ verbose names Django performs by looking at the model's class name::
 Model methods ``short_description`` attribute values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For model methods, you can provide translations to Django and the admin site
+For model methods, you can provide translations to Freedom and the admin site
 with the ``short_description`` attribute::
 
-    from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from freedom.db import models
+    from freedom.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         kind = models.ForeignKey(ThingKind, related_name='kinds',
@@ -409,14 +409,14 @@ either, so this is consistent with normal Python behavior. For example::
     b"Hello %s" % ugettext_lazy("people")
 
 If you ever see output that looks like ``"hello
-<django.utils.functional...>"``, you have tried to insert the result of
+<freedom.utils.functional...>"``, you have tried to insert the result of
 ``ugettext_lazy()`` into a bytestring. That's a bug in your code.
 
 If you don't like the long ``ugettext_lazy`` name, you can just alias it as
 ``_`` (underscore), like so::
 
-    from django.db import models
-    from django.utils.translation import ugettext_lazy as _
+    from freedom.db import models
+    from freedom.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(help_text=_('This is the help text'))
@@ -439,8 +439,8 @@ definition. Therefore, you are authorized to pass a key name instead of an
 integer as the ``number`` argument. Then ``number`` will be looked up in the
 dictionary under that key during string interpolation. Here's example::
 
-    from django import forms
-    from django.utils.translation import ugettext_lazy
+    from freedom import forms
+    from freedom.utils.translation import ugettext_lazy
 
     class MyForm(forms.Form):
         error_message = ungettext_lazy("You only provided %(num)d argument",
@@ -469,12 +469,12 @@ Joining strings: string_concat()
 
 Standard Python string joins (``''.join([...])``) will not work on lists
 containing lazy translation objects. Instead, you can use
-:func:`django.utils.translation.string_concat()`, which creates a lazy object
+:func:`freedom.utils.translation.string_concat()`, which creates a lazy object
 that concatenates its contents *and* converts them to strings only when the
 result is included in a string. For example::
 
-    from django.utils.translation import string_concat
-    from django.utils.translation import ugettext_lazy
+    from freedom.utils.translation import string_concat
+    from freedom.utils.translation import ugettext_lazy
     ...
     name = ugettext_lazy('John Lennon')
     instrument = ugettext_lazy('guitar')
@@ -491,10 +491,10 @@ For any other case where you would like to delay the translation, but have to
 pass the translatable string as argument to another function, you can wrap
 this function inside a lazy call yourself. For example::
 
-    from django.utils import six  # Python 3 compatibility
-    from django.utils.functional import lazy
-    from django.utils.safestring import mark_safe
-    from django.utils.translation import ugettext_lazy as _
+    from freedom.utils import six  # Python 3 compatibility
+    from freedom.utils.functional import lazy
+    from freedom.utils.safestring import mark_safe
+    from freedom.utils.translation import ugettext_lazy as _
 
     mark_safe_lazy = lazy(mark_safe, six.text_type)
 
@@ -510,7 +510,7 @@ Localized names of languages
 The ``get_language_info()`` function provides detailed information about
 languages::
 
-    >>> from django.utils.translation import get_language_info
+    >>> from freedom.utils.translation import get_language_info
     >>> li = get_language_info('de')
     >>> print(li['name'], li['name_local'], li['bidi'])
     German Deutsch False
@@ -519,7 +519,7 @@ The ``name`` and ``name_local`` attributes of the dictionary contain the name of
 the language in English and in the language itself, respectively.  The ``bidi``
 attribute is True only for bi-directional languages.
 
-The source of the language information is the ``django.conf.locale`` module.
+The source of the language information is the ``freedom.conf.locale`` module.
 Similar access to this information is available for template code. See below.
 
 .. _specifying-translation-strings-in-template-code:
@@ -527,9 +527,9 @@ Similar access to this information is available for template code. See below.
 Internationalization: in template code
 ======================================
 
-.. highlightlang:: html+django
+.. highlightlang:: html+freedom
 
-Translations in :doc:`Django templates </topics/templates>` uses two template
+Translations in :doc:`Freedom templates </topics/templates>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
 access to these tags, put ``{% load i18n %}`` toward the top of your template.
 As with all template tags, this tag needs to be loaded in all templates which
@@ -554,7 +554,7 @@ require translation in the future::
     <title>{% trans "myvar" noop %}</title>
 
 Internally, inline translations use an
-:func:`~django.utils.translation.ugettext` call.
+:func:`~freedom.utils.translation.ugettext` call.
 
 In case a template var (``myvar`` above) is passed to the tag, the tag will
 first resolve such variable to a string at run-time and then look up that
@@ -592,7 +592,7 @@ or should be used as arguments for other template tags or filters::
 ``{% trans %}`` also supports :ref:`contextual markers<contextual-markers>`
 using the ``context`` keyword:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% trans "May" context "month name" %}
 
@@ -630,7 +630,7 @@ You can use multiple expressions inside a single ``blocktrans`` tag::
 
 If resolving one of the block arguments fails, blocktrans will fall back to
 the default language by deactivating the currently active language
-temporarily with the :func:`~django.utils.translation.deactivate_all`
+temporarily with the :func:`~freedom.utils.translation.deactivate_all`
 function.
 
 This tag also provides for pluralization. To use it:
@@ -675,7 +675,7 @@ be retrieved (and stored) beforehand::
 ``{% blocktrans %}`` also supports :ref:`contextual
 markers<contextual-markers>` using the ``context`` keyword:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% blocktrans with name=user.username context "greeting" %}Hi {{ name }}{% endblocktrans %}
 
@@ -731,7 +731,7 @@ Just like with :ref:`Python code <translator-comments>`, these notes for
 translators can be specified using comments, either with the :ttag:`comment`
 tag:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% comment %}Translators: View verb{% endcomment %}
     {% trans "View" %}
@@ -742,7 +742,7 @@ tag:
 
 or with the ``{#`` ... ``#}`` :ref:`one-line comment constructs <template-comments>`:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {# Translators: Label of a button that triggers search #}
     <button type="submit">{% trans "Go" %}</button>
@@ -787,7 +787,7 @@ Switching language in templates
 If you want to select a language within a template, you can use the
 ``language`` template tag:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% load i18n %}
 
@@ -816,7 +816,7 @@ Each ``RequestContext`` has access to three translation-specific variables:
   the currently active locale).
 
 * ``LANGUAGE_CODE`` is the current user's preferred language, as a string.
-  Example: ``en-us``. (See :ref:`how-django-discovers-language-preference`.)
+  Example: ``en-us``. (See :ref:`how-freedom-discovers-language-preference`.)
 
 * ``LANGUAGE_BIDI`` is the current locale's direction. If True, it's a
   right-to-left language, e.g.: Hebrew, Arabic. If False it's a
@@ -872,7 +872,7 @@ There are also simple filters available for convenience:
 * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
 * ``{{ LANGUAGE_CODE|bidi }}`` (False)
 
-.. _Django templates: ../templates_python/
+.. _Freedom templates: ../templates_python/
 
 Internationalization: in JavaScript code
 ========================================
@@ -889,7 +889,7 @@ Adding translations to JavaScript poses some problems:
 * The translation catalogs for JavaScript should be kept as small as
   possible.
 
-Django provides an integrated solution for these problems: It passes the
+Freedom provides an integrated solution for these problems: It passes the
 translations into JavaScript, so you can call ``gettext``, etc., from within
 JavaScript.
 
@@ -898,20 +898,20 @@ JavaScript.
 The ``javascript_catalog`` view
 -------------------------------
 
-.. module:: django.views.i18n
+.. module:: freedom.views.i18n
 
-.. function:: javascript_catalog(request, domain='djangojs', packages=None)
+.. function:: javascript_catalog(request, domain='freedomjs', packages=None)
 
 The main solution to these problems is the
-:meth:`django.views.i18n.javascript_catalog` view, which sends out a JavaScript
+:meth:`freedom.views.i18n.javascript_catalog` view, which sends out a JavaScript
 code library with functions that mimic the ``gettext`` interface, plus an array
 of translation strings. Those translation strings are taken from applications or
-Django core, according to what you specify in either the ``info_dict`` or the
+Freedom core, according to what you specify in either the ``info_dict`` or the
 URL. Paths listed in :setting:`LOCALE_PATHS` are also included.
 
 You hook it up like this::
 
-    from django.views.i18n import javascript_catalog
+    from freedom.views.i18n import javascript_catalog
 
     js_info_dict = {
         'packages': ('your.app.package',),
@@ -932,7 +932,7 @@ The precedence of translations is such that the packages appearing later in the
 beginning, this is important in the case of clashing translations for the same
 literal.
 
-By default, the view uses the ``djangojs`` gettext domain. This can be
+By default, the view uses the ``freedomjs`` gettext domain. This can be
 changed by altering the ``domain`` argument.
 
 You can make the view dynamic by putting the packages into the URL pattern::
@@ -945,7 +945,7 @@ With this, you specify the packages as a list of package names delimited by '+'
 signs in the URL. This is especially useful if your pages use code from
 different apps and this changes often and you don't want to pull in one big
 catalog file. As a security measure, these values can only be either
-``django.conf`` or any package from the :setting:`INSTALLED_APPS` setting.
+``freedom.conf`` or any package from the :setting:`INSTALLED_APPS` setting.
 
 The JavaScript translations found in the paths listed in the
 :setting:`LOCALE_PATHS` setting are also always included. To keep consistency
@@ -961,9 +961,9 @@ Using the JavaScript translation catalog
 
 To use the catalog, just pull in the dynamically generated script like this:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
-    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+    <script type="text/javascript" src="{% url 'freedom.views.i18n.javascript_catalog' %}"></script>
 
 This uses reverse URL lookup to find the URL of the JavaScript catalog view.
 When the catalog is loaded, your JavaScript code can use the standard
@@ -1016,24 +1016,24 @@ to produce proper pluralizations).
 Note on performance
 -------------------
 
-The :func:`~django.views.i18n.javascript_catalog` view generates the catalog
+The :func:`~freedom.views.i18n.javascript_catalog` view generates the catalog
 from ``.mo`` files on every request. Since its output is constant — at least
 for a given version of a site — it's a good candidate for caching.
 
 Server-side caching will reduce CPU load. It's easily implemented with the
-:func:`~django.views.decorators.cache.cache_page` decorator. To trigger cache
+:func:`~freedom.views.decorators.cache.cache_page` decorator. To trigger cache
 invalidation when your translations change, provide a version-dependent key
 prefix, as shown in the example below, or map the view at a version-dependent
 URL.
 
 .. code-block:: python
 
-    from django.views.decorators.cache import cache_page
-    from django.views.i18n import javascript_catalog
+    from freedom.views.decorators.cache import cache_page
+    from freedom.views.i18n import javascript_catalog
 
     # The value returned by get_version() must change when translations change.
     @cache_page(86400, key_prefix='js18n-%s' % get_version())
-    def cached_javascript_catalog(request, domain='djangojs', packages=None):
+    def cached_javascript_catalog(request, domain='freedomjs', packages=None):
         return javascript_catalog(request, domain, packages)
 
 Client-side caching will save bandwidth and make your site load faster. If
@@ -1044,42 +1044,42 @@ whenever your restart your application server.
 
 .. code-block:: python
 
-    from django.utils import timezone
-    from django.views.decorators.http import last_modified
-    from django.views.i18n import javascript_catalog
+    from freedom.utils import timezone
+    from freedom.views.decorators.http import last_modified
+    from freedom.views.i18n import javascript_catalog
 
     last_modified_date = timezone.now()
     @last_modified(lambda req, **kw: last_modified_date)
-    def cached_javascript_catalog(request, domain='djangojs', packages=None):
+    def cached_javascript_catalog(request, domain='freedomjs', packages=None):
         return javascript_catalog(request, domain, packages)
 
 You can even pre-generate the javascript catalog as part of your deployment
 procedure and serve it as a static file. This radical technique is implemented
-in django-statici18n_.
+in freedom-statici18n_.
 
-.. _django-statici18n: http://django-statici18n.readthedocs.org/en/latest/
+.. _freedom-statici18n: http://freedom-statici18n.readthedocs.org/en/latest/
 
 .. _url-internationalization:
 
 Internationalization: in URL patterns
 =====================================
 
-.. module:: django.conf.urls.i18n
+.. module:: freedom.conf.urls.i18n
 
-Django provides two mechanisms to internationalize URL patterns:
+Freedom provides two mechanisms to internationalize URL patterns:
 
 * Adding the language prefix to the root of the URL patterns to make it
-  possible for :class:`~django.middleware.locale.LocaleMiddleware` to detect
+  possible for :class:`~freedom.middleware.locale.LocaleMiddleware` to detect
   the language to activate from the requested URL.
 
 * Making URL patterns themselves translatable via the
-  :func:`django.utils.translation.ugettext_lazy()` function.
+  :func:`freedom.utils.translation.ugettext_lazy()` function.
 
 .. warning::
 
     Using either one of these features requires that an active language be set
     for each request; in other words, you need to have
-    :class:`django.middleware.locale.LocaleMiddleware` in your
+    :class:`freedom.middleware.locale.LocaleMiddleware` in your
     :setting:`MIDDLEWARE_CLASSES` setting.
 
 Language prefix in URL patterns
@@ -1090,15 +1090,15 @@ Language prefix in URL patterns
 .. deprecated:: 1.8
 
     The ``prefix`` argument to ``i18n_patterns()`` has been deprecated and will
-    not be supported in Django 2.0. Simply pass a list of
-    :func:`django.conf.urls.url` instances instead.
+    not be supported in Freedom 2.0. Simply pass a list of
+    :func:`freedom.conf.urls.url` instances instead.
 
-This function can be used in your root URLconf and Django will automatically
+This function can be used in your root URLconf and Freedom will automatically
 prepend the current active language code to all url patterns defined within
-:func:`~django.conf.urls.i18n.i18n_patterns`. Example URL patterns::
+:func:`~freedom.conf.urls.i18n.i18n_patterns`. Example URL patterns::
 
-    from django.conf.urls import include, url
-    from django.conf.urls.i18n import i18n_patterns
+    from freedom.conf.urls import include, url
+    from freedom.conf.urls.i18n import i18n_patterns
 
     urlpatterns = [
         url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml'),
@@ -1116,12 +1116,12 @@ prepend the current active language code to all url patterns defined within
     )
 
 
-After defining these URL patterns, Django will automatically add the
+After defining these URL patterns, Freedom will automatically add the
 language prefix to the URL patterns that were added by the ``i18n_patterns``
 function. Example::
 
-    from django.core.urlresolvers import reverse
-    from django.utils.translation import activate
+    from freedom.core.urlresolvers import reverse
+    from freedom.utils.translation import activate
 
     >>> activate('en')
     >>> reverse('sitemap_xml')
@@ -1135,9 +1135,9 @@ function. Example::
 
 .. warning::
 
-    :func:`~django.conf.urls.i18n.i18n_patterns` is only allowed in your root
+    :func:`~freedom.conf.urls.i18n.i18n_patterns` is only allowed in your root
     URLconf. Using it within an included URLconf will throw an
-    :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
+    :exc:`~freedom.core.exceptions.ImproperlyConfigured` exception.
 
 .. warning::
 
@@ -1149,11 +1149,11 @@ Translating URL patterns
 ------------------------
 
 URL patterns can also be marked translatable using the
-:func:`~django.utils.translation.ugettext_lazy` function. Example::
+:func:`~freedom.utils.translation.ugettext_lazy` function. Example::
 
-    from django.conf.urls import include, url
-    from django.conf.urls.i18n import i18n_patterns
-    from django.utils.translation import ugettext_lazy as _
+    from freedom.conf.urls import include, url
+    from freedom.conf.urls.i18n import i18n_patterns
+    from freedom.utils.translation import ugettext_lazy as _
 
     urlpatterns = [
         url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml'),
@@ -1172,11 +1172,11 @@ URL patterns can also be marked translatable using the
 
 
 After you've created the translations, the
-:func:`~django.core.urlresolvers.reverse` function will return the URL in the
+:func:`~freedom.core.urlresolvers.reverse` function will return the URL in the
 active language. Example::
 
-    from django.core.urlresolvers import reverse
-    from django.utils.translation import activate
+    from freedom.core.urlresolvers import reverse
+    from freedom.utils.translation import activate
 
     >>> activate('en')
     >>> reverse('news:category', kwargs={'slug': 'recent'})
@@ -1190,7 +1190,7 @@ active language. Example::
 
     In most cases, it's best to use translated URLs only within a
     language-code-prefixed block of patterns (using
-    :func:`~django.conf.urls.i18n.i18n_patterns`), to avoid the possibility
+    :func:`~freedom.conf.urls.i18n.i18n_patterns`), to avoid the possibility
     that a carelessly translated URL causes a collision with a non-translated
     URL pattern.
 
@@ -1203,7 +1203,7 @@ If localized URLs get reversed in templates they always use the current
 language. To link to a URL in another language use the :ttag:`language`
 template tag. It enables the given language in the enclosed template section:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% load i18n %}
 
@@ -1235,7 +1235,7 @@ file is a plain-text file, representing a single language, that contains all
 available translation strings and how they should be represented in the given
 language. Message files have a ``.po`` file extension.
 
-Django comes with a tool, :djadmin:`django-admin.py makemessages
+Freedom comes with a tool, :djadmin:`freedom-admin.py makemessages
 <makemessages>`, that automates the creation and upkeep of these files.
 
 .. admonition:: Gettext utilities
@@ -1248,7 +1248,7 @@ Django comes with a tool, :djadmin:`django-admin.py makemessages
 
 To create or update a message file, run this command::
 
-    django-admin.py makemessages -l de
+    freedom-admin.py makemessages -l de
 
 ...where ``de`` is the language code for the message file you want to create.
 The language code, in this case, is in :term:`locale format<locale name>`. For
@@ -1257,16 +1257,16 @@ German.
 
 The script should be run from one of two places:
 
-* The root directory of your Django project (the one that contains
+* The root directory of your Freedom project (the one that contains
   ``manage.py``).
-* The root directory of one of your Django apps.
+* The root directory of one of your Freedom apps.
 
 The script runs over your project source tree or your application source tree
 and pulls out all strings marked for translation (see
-:ref:`how-django-discovers-translations` and be sure :setting:`LOCALE_PATHS`
+:ref:`how-freedom-discovers-translations` and be sure :setting:`LOCALE_PATHS`
 is configured correctly). It creates (or updates) a message file in the
 directory ``locale/LANG/LC_MESSAGES``. In the ``de`` example, the file will be
-``locale/de/LC_MESSAGES/django.po``.
+``locale/de/LC_MESSAGES/freedom.po``.
 
 .. versionchanged:: 1.7
 
@@ -1279,30 +1279,30 @@ directory ``locale/LANG/LC_MESSAGES``. In the ``de`` example, the file will be
     :setting:`LOCALE_PATHS` or will generate an error if :setting:`LOCALE_PATHS`
     is empty.
 
-By default :djadmin:`django-admin.py makemessages <makemessages>` examines every
+By default :djadmin:`freedom-admin.py makemessages <makemessages>` examines every
 file that has the ``.html`` or ``.txt`` file extension. In case you want to
 override that default, use the ``--extension`` or ``-e`` option to specify the
 file extensions to examine::
 
-    django-admin.py makemessages -l de -e txt
+    freedom-admin.py makemessages -l de -e txt
 
 Separate multiple extensions with commas and/or use ``-e`` or ``--extension``
 multiple times::
 
-    django-admin.py makemessages -l de -e html,txt -e xml
+    freedom-admin.py makemessages -l de -e html,txt -e xml
 
 .. warning::
 
     When :ref:`creating message files from JavaScript source code
     <creating-message-files-from-js-code>` you need to use the special
-    'djangojs' domain, **not** ``-e js``.
+    'freedomjs' domain, **not** ``-e js``.
 
 .. admonition:: No gettext?
 
     If you don't have the ``gettext`` utilities installed,
     :djadmin:`makemessages` will create empty files. If that's the case, either
     install the ``gettext`` utilities or just copy the English message file
-    (``locale/en/LC_MESSAGES/django.po``) if available and use it as a starting
+    (``locale/en/LC_MESSAGES/freedom.po``) if available and use it as a starting
     point; it's just an empty translation file.
 
 .. admonition:: Working on Windows?
@@ -1317,12 +1317,12 @@ information, but the bulk of the file is a list of **messages** -- simple
 mappings between translation strings and the actual translated text for the
 particular language.
 
-For example, if your Django app contained a translation string for the text
+For example, if your Freedom app contained a translation string for the text
 ``"Welcome to my site."``, like so::
 
     _("Welcome to my site.")
 
-...then :djadmin:`django-admin.py makemessages <makemessages>` will have created
+...then :djadmin:`freedom-admin.py makemessages <makemessages>` will have created
 a ``.po`` file containing the following snippet -- a message::
 
     #: path/to/python/module.py:23
@@ -1352,40 +1352,40 @@ otherwise, they'll be tacked together without whitespace!
     the charset line (search for ``"CHARSET"``) and set it to the charset
     you'll be using to edit the content. Due to the way the ``gettext`` tools
     work internally and because we want to allow non-ASCII source strings in
-    Django's core and your applications, you **must** use UTF-8 as the encoding
+    Freedom's core and your applications, you **must** use UTF-8 as the encoding
     for your PO file. This means that everybody will be using the same
-    encoding, which is important when Django processes the PO files.
+    encoding, which is important when Freedom processes the PO files.
 
 To reexamine all source code and templates for new translation strings and
 update all message files for **all** languages, run this::
 
-    django-admin.py makemessages -a
+    freedom-admin.py makemessages -a
 
 Compiling message files
 -----------------------
 
 After you create your message file -- and each time you make changes to it --
 you'll need to compile it into a more efficient form, for use by ``gettext``. Do
-this with the :djadmin:`django-admin.py compilemessages <compilemessages>`
+this with the :djadmin:`freedom-admin.py compilemessages <compilemessages>`
 utility.
 
 This tool runs over all available ``.po`` files and creates ``.mo`` files, which
 are binary files optimized for use by ``gettext``. In the same directory from
-which you ran :djadmin:`django-admin.py makemessages <makemessages>`, run :djadmin:`django-admin.py compilemessages <compilemessages>` like this::
+which you ran :djadmin:`freedom-admin.py makemessages <makemessages>`, run :djadmin:`freedom-admin.py compilemessages <compilemessages>` like this::
 
-   django-admin.py compilemessages
+   freedom-admin.py compilemessages
 
 That's it. Your translations are ready for use.
 
 .. admonition:: Working on Windows?
 
    If you're using Windows and need to install the GNU gettext utilities so
-   :djadmin:`django-admin.py compilemessages <compilemessages>` works see
+   :djadmin:`freedom-admin.py compilemessages <compilemessages>` works see
    :ref:`gettext_on_windows` for more information.
 
 .. admonition:: .po files: Encoding and BOM usage.
 
-   Django only supports ``.po`` files encoded in UTF-8 and without any BOM
+   Freedom only supports ``.po`` files encoded in UTF-8 and without any BOM
    (Byte Order Mark) so if your text editor adds such marks to the beginning of
    files by default then you will need to reconfigure it.
 
@@ -1394,17 +1394,17 @@ That's it. Your translations are ready for use.
 Creating message files from JavaScript source code
 --------------------------------------------------
 
-You create and update the message files the same way as the other Django message
-files -- with the :djadmin:`django-admin.py makemessages <makemessages>` tool.
+You create and update the message files the same way as the other Freedom message
+files -- with the :djadmin:`freedom-admin.py makemessages <makemessages>` tool.
 The only difference is you need to explicitly specify what in gettext parlance
-is known as a domain in this case the ``djangojs`` domain, by providing a ``-d
-djangojs`` parameter, like this::
+is known as a domain in this case the ``freedomjs`` domain, by providing a ``-d
+freedomjs`` parameter, like this::
 
-    django-admin.py makemessages -d djangojs -l de
+    freedom-admin.py makemessages -d freedomjs -l de
 
 This would create or update the message file for JavaScript for German. After
-updating message files, just run :djadmin:`django-admin.py compilemessages
-<compilemessages>` the same way as you do with normal Django message files.
+updating message files, just run :djadmin:`freedom-admin.py compilemessages
+<compilemessages>` the same way as you do with normal Freedom message files.
 
 .. _gettext_on_windows:
 
@@ -1438,7 +1438,7 @@ test or compile a changed message file, you will need the ``gettext`` utilities:
 .. _mirrors: http://ftp.gnome.org/pub/GNOME/MIRRORS
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
-the ``xgettext --version`` command works properly. Do not attempt to use Django
+the ``xgettext --version`` command works properly. Do not attempt to use Freedom
 translation utilities with a ``gettext`` package if the command ``xgettext
 --version`` entered at a Windows command prompt causes a popup window saying
 "xgettext.exe has generated errors and will be closed by Windows".
@@ -1454,49 +1454,49 @@ The ``set_language`` redirect view
 
 .. highlightlang:: python
 
-.. currentmodule:: django.views.i18n
+.. currentmodule:: freedom.views.i18n
 
 .. function:: set_language(request)
 
-As a convenience, Django comes with a view, :func:`django.views.i18n.set_language`,
+As a convenience, Freedom comes with a view, :func:`freedom.views.i18n.set_language`,
 that sets a user's language preference and redirects to a given URL or, by default,
 back to the previous page.
 
 Make sure that the following item is in your
 :setting:`TEMPLATE_CONTEXT_PROCESSORS` list in your settings file::
 
-    'django.core.context_processors.i18n'
+    'freedom.core.context_processors.i18n'
 
 Activate this view by adding the following line to your URLconf::
 
-    (r'^i18n/', include('django.conf.urls.i18n')),
+    (r'^i18n/', include('freedom.conf.urls.i18n')),
 
 (Note that this example makes the view available at ``/i18n/setlang/``.)
 
 .. warning::
 
     Make sure that you don't include the above URL within
-    :func:`~django.conf.urls.i18n.i18n_patterns` - it needs to be
+    :func:`~freedom.conf.urls.i18n.i18n_patterns` - it needs to be
     language-independent itself to work correctly.
 
 The view expects to be called via the ``POST`` method, with a ``language``
 parameter set in request. If session support is enabled, the view
 saves the language choice in the user's session. Otherwise, it saves the
-language choice in a cookie that is by default named ``django_language``.
+language choice in a cookie that is by default named ``freedom_language``.
 (The name can be changed through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
 
-After setting the language choice, Django redirects the user, following this
+After setting the language choice, Freedom redirects the user, following this
 algorithm:
 
-* Django looks for a ``next`` parameter in the ``POST`` data.
-* If that doesn't exist, or is empty, Django tries the URL in the
+* Freedom looks for a ``next`` parameter in the ``POST`` data.
+* If that doesn't exist, or is empty, Freedom tries the URL in the
   ``Referrer`` header.
 * If that's empty -- say, if a user's browser suppresses that header --
   then the user will be redirected to ``/`` (the site root) as a fallback.
 
 Here's example HTML template code:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     <form action="{% url 'set_language' %}" method="post">
     {% csrf_token %}
@@ -1512,7 +1512,7 @@ Here's example HTML template code:
     <input type="submit" value="Go" />
     </form>
 
-In this example, Django looks up the URL of the page to which the user will be
+In this example, Freedom looks up the URL of the page to which the user will be
 redirected in the ``redirect_to`` context variable.
 
 Explicitly setting the active language
@@ -1522,26 +1522,26 @@ Explicitly setting the active language
 
 You may want to set the active language for the current session explicitly. Perhaps
 a user's language preference is retrieved from another system, for example.
-You've already been introduced to :func:`django.utils.translation.activate()`. That
+You've already been introduced to :func:`freedom.utils.translation.activate()`. That
 applies to the current thread only. To persist the language for the entire
-session, also modify :data:`~django.utils.translation.LANGUAGE_SESSION_KEY`
+session, also modify :data:`~freedom.utils.translation.LANGUAGE_SESSION_KEY`
 in the session::
 
-    from django.utils import translation
+    from freedom.utils import translation
     user_language = 'fr'
     translation.activate(user_language)
     request.session[translation.LANGUAGE_SESSION_KEY] = user_language
 
-You would typically want to use both: :func:`django.utils.translation.activate()`
+You would typically want to use both: :func:`freedom.utils.translation.activate()`
 will change the language for this thread, and modifying the session makes this
 preference persist in future requests.
 
 If you are not using sessions, the language will persist in a cookie, whose name
 is configured in :setting:`LANGUAGE_COOKIE_NAME`. For example::
 
-    from django.utils import translation
-    from django import http
-    from django.conf import settings
+    from freedom.utils import translation
+    from freedom import http
+    from freedom.conf import settings
     user_language = 'fr'
     translation.activate(user_language)
     response = http.HttpResponse(...)
@@ -1550,10 +1550,10 @@ is configured in :setting:`LANGUAGE_COOKIE_NAME`. For example::
 Using translations outside views and templates
 ----------------------------------------------
 
-While Django provides a rich set of i18n tools for use in views and templates,
-it does not restrict the usage to Django-specific code. The Django translation
+While Freedom provides a rich set of i18n tools for use in views and templates,
+it does not restrict the usage to Freedom-specific code. The Freedom translation
 mechanisms can be used to translate arbitrary texts to any language that is
-supported by Django (as long as an appropriate translation catalog exists, of
+supported by Freedom (as long as an appropriate translation catalog exists, of
 course). You can load a translation catalog, activate it and translate text to
 language of your choice, but remember to switch back to original language, as
 activating a translation catalog is done on per-thread basis and such change
@@ -1561,7 +1561,7 @@ will affect code running in the same thread.
 
 For example::
 
-    from django.utils import translation
+    from freedom.utils import translation
     def welcome_translated(language):
         cur_language = translation.get_language()
         try:
@@ -1574,11 +1574,11 @@ For example::
 Calling this function with the value 'de' will give you ``"Willkommen"``,
 regardless of :setting:`LANGUAGE_CODE` and language set by middleware.
 
-Functions of particular interest are ``django.utils.translation.get_language()``
+Functions of particular interest are ``freedom.utils.translation.get_language()``
 which returns the language used in the current thread,
-``django.utils.translation.activate()`` which activates a translation catalog
-for the current thread, and ``django.utils.translation.check_for_language()``
-which checks if the given language is supported by Django.
+``freedom.utils.translation.activate()`` which activates a translation catalog
+for the current thread, and ``freedom.utils.translation.check_for_language()``
+which checks if the given language is supported by Freedom.
 
 Language cookie
 ---------------
@@ -1597,43 +1597,43 @@ A number of settings can be used to adjust language cookie options:
 Implementation notes
 ====================
 
-.. _specialties-of-django-i18n:
+.. _specialties-of-freedom-i18n:
 
-Specialties of Django translation
+Specialties of Freedom translation
 ---------------------------------
 
-Django's translation machinery uses the standard ``gettext`` module that comes
+Freedom's translation machinery uses the standard ``gettext`` module that comes
 with Python. If you know ``gettext``, you might note these specialties in the
-way Django does translation:
+way Freedom does translation:
 
-* The string domain is ``django`` or ``djangojs``. This string domain is
+* The string domain is ``freedom`` or ``freedomjs``. This string domain is
   used to differentiate between different programs that store their data
   in a common message-file library (usually ``/usr/share/locale/``). The
-  ``django`` domain is used for python and template translation strings
-  and is loaded into the global translation catalogs. The ``djangojs``
+  ``freedom`` domain is used for python and template translation strings
+  and is loaded into the global translation catalogs. The ``freedomjs``
   domain is only used for JavaScript translation catalogs to make sure
   that those are as small as possible.
-* Django doesn't use ``xgettext`` alone. It uses Python wrappers around
+* Freedom doesn't use ``xgettext`` alone. It uses Python wrappers around
   ``xgettext`` and ``msgfmt``. This is mostly for convenience.
 
-.. _how-django-discovers-language-preference:
+.. _how-freedom-discovers-language-preference:
 
-How Django discovers language preference
+How Freedom discovers language preference
 ----------------------------------------
 
 Once you've prepared your translations -- or, if you just want to use the
-translations that come with Django -- you'll just need to activate translation
+translations that come with Freedom -- you'll just need to activate translation
 for your app.
 
-Behind the scenes, Django has a very flexible model of deciding which language
+Behind the scenes, Freedom has a very flexible model of deciding which language
 should be used -- installation-wide, for a particular user, or both.
 
 To set an installation-wide language preference, set :setting:`LANGUAGE_CODE`.
-Django uses this language as the default translation -- the final attempt if no
+Freedom uses this language as the default translation -- the final attempt if no
 better matching translation is found through one of the methods employed by the
 locale middleware (see below).
 
-If all you want is to run Django with your native language all you need to do
+If all you want is to run Freedom with your native language all you need to do
 is set :setting:`LANGUAGE_CODE` and make sure the corresponding :term:`message
 files <message file>` and their compiled versions (``.mo``) exist.
 
@@ -1642,7 +1642,7 @@ prefer, then you also need to use the ``LocaleMiddleware``.
 ``LocaleMiddleware`` enables language selection based on data from the request.
 It customizes content for each user.
 
-To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
+To use ``LocaleMiddleware``, add ``'freedom.middleware.locale.LocaleMiddleware'``
 to your :setting:`MIDDLEWARE_CLASSES` setting. Because middleware order
 matters, you should follow these guidelines:
 
@@ -1656,9 +1656,9 @@ matters, you should follow these guidelines:
 For example, your :setting:`MIDDLEWARE_CLASSES` might look like this::
 
     MIDDLEWARE_CLASSES = (
-       'django.contrib.sessions.middleware.SessionMiddleware',
-       'django.middleware.locale.LocaleMiddleware',
-       'django.middleware.common.CommonMiddleware',
+       'freedom.contrib.sessions.middleware.SessionMiddleware',
+       'freedom.middleware.locale.LocaleMiddleware',
+       'freedom.middleware.common.CommonMiddleware',
     )
 
 (For more on middleware, see the :doc:`middleware documentation
@@ -1672,22 +1672,22 @@ following this algorithm:
   root URLconf. See :ref:`url-internationalization` for more information
   about the language prefix and how to internationalize URL patterns.
 
-* Failing that, it looks for the :data:`~django.utils.translation.LANGUAGE_SESSION_KEY`
+* Failing that, it looks for the :data:`~freedom.utils.translation.LANGUAGE_SESSION_KEY`
   key in the current user's session.
 
   .. versionchanged:: 1.7
 
-      In previous versions, the key was named ``django_language``, and the
+      In previous versions, the key was named ``freedom_language``, and the
       ``LANGUAGE_SESSION_KEY`` constant did not exist.
 
 * Failing that, it looks for a cookie.
 
   The name of the cookie used is set by the :setting:`LANGUAGE_COOKIE_NAME`
-  setting. (The default name is ``django_language``.)
+  setting. (The default name is ``freedom_language``.)
 
 * Failing that, it looks at the ``Accept-Language`` HTTP header. This
   header is sent by your browser and tells the server which language(s) you
-  prefer, in order by priority. Django tries each language in the header
+  prefer, in order by priority. Freedom tries each language in the header
   until it finds one with available translations.
 
 * Failing that, it uses the global :setting:`LANGUAGE_CODE` setting.
@@ -1701,8 +1701,8 @@ Notes:
   Brazilian Portuguese is ``pt-br``.
 
 * If a base language is available but the sublanguage specified is not,
-  Django uses the base language. For example, if a user specifies ``de-at``
-  (Austrian German) but Django only has ``de`` available, Django uses
+  Freedom uses the base language. For example, if a user specifies ``de-at``
+  (Austrian German) but Freedom only has ``de`` available, Freedom uses
   ``de``.
 
 * Only languages listed in the :setting:`LANGUAGES` setting can be selected.
@@ -1721,12 +1721,12 @@ Notes:
 
 * If you define a custom :setting:`LANGUAGES` setting, as explained in the
   previous bullet, you can mark the language names as translation strings
-  -- but use :func:`~django.utils.translation.ugettext_lazy` instead of
-  :func:`~django.utils.translation.ugettext` to avoid a circular import.
+  -- but use :func:`~freedom.utils.translation.ugettext_lazy` instead of
+  :func:`~freedom.utils.translation.ugettext` to avoid a circular import.
 
   Here's a sample settings file::
 
-      from django.utils.translation import ugettext_lazy as _
+      from freedom.utils.translation import ugettext_lazy as _
 
       LANGUAGES = (
           ('de', _('German')),
@@ -1735,10 +1735,10 @@ Notes:
 
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each
-:class:`~django.http.HttpRequest`. Feel free to read this value in your view
+:class:`~freedom.http.HttpRequest`. Feel free to read this value in your view
 code. Here's a simple example::
 
-    from django.http import HttpResponse
+    from freedom.http import HttpResponse
 
     def hello_world(request, count):
         if request.LANGUAGE_CODE == 'de-at':
@@ -1755,12 +1755,12 @@ in ``request.LANGUAGE_CODE``.
 .. _session: ../sessions/
 .. _request object: ../request_response/#httprequest-objects
 
-.. _how-django-discovers-translations:
+.. _how-freedom-discovers-translations:
 
-How Django discovers translations
+How Freedom discovers translations
 ---------------------------------
 
-At runtime, Django builds an in-memory unified catalog of literals-translations.
+At runtime, Freedom builds an in-memory unified catalog of literals-translations.
 To achieve this it looks for translations by following this algorithm regarding
 the order in which it examines the different file paths to load the compiled
 :term:`message files <message file>` (``.mo``) and the precedence of multiple
@@ -1772,7 +1772,7 @@ translations for the same literal:
 2. Then, it looks for and uses if it exists a ``locale`` directory in each
    of the installed apps listed in :setting:`INSTALLED_APPS`.  The ones
    appearing first have higher precedence than the ones appearing later.
-3. Finally, the Django-provided base translation in ``django/conf/locale``
+3. Finally, the Freedom-provided base translation in ``freedom/conf/locale``
    is used as a fallback.
 
 .. seealso::
@@ -1794,14 +1794,14 @@ message file specific to the project you are composing. The choice is yours.
 All message file repositories are structured the same way. They are:
 
 * All paths listed in :setting:`LOCALE_PATHS` in your settings file are
-  searched for ``<language>/LC_MESSAGES/django.(po|mo)``
-* ``$APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
-* ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
+  searched for ``<language>/LC_MESSAGES/freedom.(po|mo)``
+* ``$APPPATH/locale/<language>/LC_MESSAGES/freedom.(po|mo)``
+* ``$PYTHONPATH/freedom/conf/locale/<language>/LC_MESSAGES/freedom.(po|mo)``
 
-To create message files, you use the :djadmin:`django-admin.py makemessages <makemessages>`
-tool. And you use :djadmin:`django-admin.py compilemessages <compilemessages>`
+To create message files, you use the :djadmin:`freedom-admin.py makemessages <makemessages>`
+tool. And you use :djadmin:`freedom-admin.py compilemessages <compilemessages>`
 to produce the binary ``.mo`` files that are used by ``gettext``.
 
-You can also run :djadmin:`django-admin.py compilemessages
+You can also run :djadmin:`freedom-admin.py compilemessages
 --settings=path.to.settings <compilemessages>` to make the compiler process all
 the directories in your :setting:`LOCALE_PATHS` setting.

@@ -2,12 +2,12 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django import forms
-from django.contrib import admin
-from django.contrib.contenttypes.admin import GenericStackedInline
-from django.core import checks
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from freedom import forms
+from freedom.contrib import admin
+from freedom.contrib.contenttypes.admin import GenericStackedInline
+from freedom.core import checks
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.test import TestCase
 
 from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State, Influence
 
@@ -575,7 +575,7 @@ class SystemChecksTestCase(TestCase):
             validator_class = MyValidator
 
         with warnings.catch_warnings(record=True):
-            warnings.filterwarnings('ignore', module='django.contrib.admin.options')
+            warnings.filterwarnings('ignore', module='freedom.contrib.admin.options')
             errors = MyModelAdmin.check(model=Song)
 
             expected = [

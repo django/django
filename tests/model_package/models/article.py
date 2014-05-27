@@ -1,5 +1,5 @@
-from django.contrib.sites.models import Site
-from django.db import models
+from freedom.contrib.sites.models import Site
+from freedom.db import models
 
 
 class Article(models.Model):

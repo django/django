@@ -5,21 +5,21 @@ import os
 from os import path
 import unittest
 
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.test import (
+from freedom.conf import settings
+from freedom.core.urlresolvers import reverse
+from freedom.test import (
     LiveServerTestCase, TestCase, modify_settings, override_settings)
-from django.utils import six
-from django.utils._os import upath
-from django.utils.module_loading import import_string
-from django.utils.translation import override, LANGUAGE_SESSION_KEY
+from freedom.utils import six
+from freedom.utils._os import upath
+from freedom.utils.module_loading import import_string
+from freedom.utils.translation import override, LANGUAGE_SESSION_KEY
 
 from ..urls import locale_dir
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class I18NTests(TestCase):
-    """ Tests django views in django/views/i18n.py """
+    """ Tests freedom views in freedom/views/i18n.py """
 
     def test_setlang(self):
         """
@@ -51,7 +51,7 @@ class I18NTests(TestCase):
         # we force saving language to a cookie rather than a session
         # by excluding session middleware and those which do require it
         test_settings = dict(
-            MIDDLEWARE_CLASSES=('django.middleware.common.CommonMiddleware',),
+            MIDDLEWARE_CLASSES=('freedom.middleware.common.CommonMiddleware',),
             LANGUAGE_COOKIE_NAME='mylanguage',
             LANGUAGE_COOKIE_AGE=3600 * 7 * 2,
             LANGUAGE_COOKIE_DOMAIN='.example.com',
@@ -70,7 +70,7 @@ class I18NTests(TestCase):
         """The javascript_catalog can be deployed with language settings"""
         for lang_code in ['es', 'fr', 'ru']:
             with override(lang_code):
-                catalog = gettext.translation('djangojs', locale_dir, [lang_code])
+                catalog = gettext.translation('freedomjs', locale_dir, [lang_code])
                 if six.PY3:
                     trans_txt = catalog.gettext('this is to be translated')
                 else:
@@ -88,7 +88,7 @@ class I18NTests(TestCase):
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class JsI18NTests(TestCase):
     """
-    Tests django views in django/views/i18n.py that need to change
+    Tests freedom views in freedom/views/i18n.py that need to change
     settings.LANGUAGE_CODE.
     """
 
@@ -166,7 +166,7 @@ class JsI18NTests(TestCase):
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class JsI18NTestsMultiPackage(TestCase):
     """
-    Tests for django views in django/views/i18n.py that need to change
+    Tests for freedom views in freedom/views/i18n.py that need to change
     settings.LANGUAGE_CODE and merge JS translation from several packages.
     """
     @modify_settings(INSTALLED_APPS={'append': ['view_tests.app1', 'view_tests.app2']})
@@ -174,7 +174,7 @@ class JsI18NTestsMultiPackage(TestCase):
         """
         Check if the JavaScript i18n view returns a complete language catalog
         if the default language is en-us, the selected language has a
-        translation available and a catalog composed by djangojs domain
+        translation available and a catalog composed by freedomjs domain
         translations of multiple Python packages is requested. See #13388,
         #3594 and #13514 for more details.
         """
@@ -211,7 +211,7 @@ skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
 class JavascriptI18nTests(LiveServerTestCase):
 
     # The test cases use translations from these apps.
-    available_apps = ['django.contrib.admin', 'view_tests']
+    available_apps = ['freedom.contrib.admin', 'view_tests']
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     @classmethod

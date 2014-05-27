@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 import re
 from unittest import TestCase
 
-from django import forms
-from django.core import validators
-from django.core.exceptions import ValidationError
+from freedom import forms
+from freedom.core import validators
+from freedom.core.exceptions import ValidationError
 
 
 class UserForm(forms.Form):

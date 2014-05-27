@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.db import connection
-from django.test import TestCase
+from freedom.db import connection
+from freedom.test import TestCase
 
 from .models import (Bar, Favorites, HiddenPointer, Place, Restaurant, Target,
     UndergroundBar)

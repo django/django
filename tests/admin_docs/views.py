@@ -1,7 +1,7 @@
-from django.http import HttpResponse
-from django.utils.decorators import decorator_from_middleware
-from django.views.generic import View
-from django.contrib.admindocs.middleware import XViewMiddleware
+from freedom.http import HttpResponse
+from freedom.utils.decorators import decorator_from_middleware
+from freedom.views.generic import View
+from freedom.contrib.admindocs.middleware import XViewMiddleware
 
 xview_dec = decorator_from_middleware(XViewMiddleware)
 

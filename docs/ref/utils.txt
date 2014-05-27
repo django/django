@@ -1,19 +1,19 @@
 ============
-Django Utils
+Freedom Utils
 ============
 
-.. module:: django.utils
-   :synopsis: Django's built-in utilities.
+.. module:: freedom.utils
+   :synopsis: Freedom's built-in utilities.
 
-This document covers all stable modules in ``django.utils``. Most of the
-modules in ``django.utils`` are designed for internal use and only the
+This document covers all stable modules in ``freedom.utils``. Most of the
+modules in ``freedom.utils`` are designed for internal use and only the
 following parts can be considered stable and thus backwards compatible as per
 the :ref:`internal release deprecation policy <internal-release-deprecation-policy>`.
 
-``django.utils.cache``
+``freedom.utils.cache``
 ======================
 
-.. module:: django.utils.cache
+.. module:: freedom.utils.cache
    :synopsis: Helper functions for controlling caching.
 
 This module contains helper functions for controlling caching. It does so by
@@ -97,19 +97,19 @@ need to distinguish caches by the ``Accept-language`` header.
     cache, this just means that we have to build the response once to get at
     the Vary header and so at the list of headers to use for the cache key.
 
-``django.utils.datastructures``
+``freedom.utils.datastructures``
 ===============================
 
-.. module:: django.utils.datastructures
+.. module:: freedom.utils.datastructures
    :synopsis: Data structures that aren't in Python's standard library.
 
 .. class:: SortedDict
 
 .. deprecated:: 1.7
-    ``SortedDict`` is deprecated and will be removed in Django 1.9. Use
+    ``SortedDict`` is deprecated and will be removed in Freedom 1.9. Use
     :class:`collections.OrderedDict` instead.
 
-    The :class:`django.utils.datastructures.SortedDict` class is a dictionary
+    The :class:`freedom.utils.datastructures.SortedDict` class is a dictionary
     that keeps its keys in the order in which they're inserted.
 
 Creating a new SortedDict
@@ -125,10 +125,10 @@ results. Instead do::
 
     SortedDict([('b', 1), ('a', 2), ('c', 3)])
 
-``django.utils.dateparse``
+``freedom.utils.dateparse``
 ==========================
 
-.. module:: django.utils.dateparse
+.. module:: freedom.utils.dateparse
    :synopsis: Functions to parse datetime objects.
 
 The functions defined in this module share the following properties:
@@ -155,13 +155,13 @@ The functions defined in this module share the following properties:
     Parses a string and returns a :class:`datetime.datetime`.
 
     UTC offsets are supported; if ``value`` describes one, the result's
-    ``tzinfo`` attribute is a :class:`~django.utils.tzinfo.FixedOffset`
+    ``tzinfo`` attribute is a :class:`~freedom.utils.tzinfo.FixedOffset`
     instance.
 
-``django.utils.decorators``
+``freedom.utils.decorators``
 ===========================
 
-.. module:: django.utils.decorators
+.. module:: freedom.utils.decorators
     :synopsis: Functions that help with creating decorators for views.
 
 .. function:: method_decorator(decorator)
@@ -179,7 +179,7 @@ The functions defined in this module share the following properties:
 
     Like ``decorator_from_middleware``, but returns a function
     that accepts the arguments to be passed to the middleware_class.
-    For example, the :func:`~django.views.decorators.cache.cache_page`
+    For example, the :func:`~freedom.views.decorators.cache.cache_page`
     decorator is created from the ``CacheMiddleware`` like this::
 
          cache_page = decorator_from_middleware_with_args(CacheMiddleware)
@@ -188,10 +188,10 @@ The functions defined in this module share the following properties:
          def my_view(request):
              pass
 
-``django.utils.encoding``
+``freedom.utils.encoding``
 =========================
 
-.. module:: django.utils.encoding
+.. module:: freedom.utils.encoding
    :synopsis: A series of helper functions to manage character encoding.
 
 .. function:: python_2_unicode_compatible
@@ -285,15 +285,15 @@ The functions defined in this module share the following properties:
 
     Returns an ASCII string containing the encoded result.
 
-``django.utils.feedgenerator``
+``freedom.utils.feedgenerator``
 ==============================
 
-.. module:: django.utils.feedgenerator
+.. module:: freedom.utils.feedgenerator
    :synopsis: Syndication feed generation library -- used for generating RSS, etc.
 
 Sample usage::
 
-    >>> from django.utils import feedgenerator
+    >>> from freedom.utils import feedgenerator
     >>> feed = feedgenerator.Rss201rev2Feed(
     ...     title="Poynter E-Media Tidbits",
     ...     link="http://www.poynter.org/column.asp?id=31",
@@ -417,10 +417,10 @@ Atom1Feed
 
     Spec: http://tools.ietf.org/html/rfc4287
 
-``django.utils.functional``
+``freedom.utils.functional``
 ===========================
 
-.. module:: django.utils.functional
+.. module:: freedom.utils.functional
     :synopsis: Functional programming tools.
 
 .. class:: cached_property(object)
@@ -454,7 +454,7 @@ Atom1Feed
     the view and the template are the same, ``@cached_property`` can avoid
     that::
 
-        from django.utils.functional import cached_property
+        from freedom.utils.functional import cached_property
 
         @cached_property
         def friends(self):
@@ -485,7 +485,7 @@ Atom1Feed
 
 .. function:: allow_lazy(func, *resultclasses)
 
-    Django offers many utility functions (particularly in ``django.utils``)
+    Freedom offers many utility functions (particularly in ``freedom.utils``)
     that take a string as their first argument and do something to that string.
     These functions are used by template filters as well as directly in other
     code.
@@ -496,14 +496,14 @@ Atom1Feed
     because you might be using this function outside of a view (and hence the
     current thread's locale setting will not be correct).
 
-    For cases like this, use the ``django.utils.functional.allow_lazy()``
+    For cases like this, use the ``freedom.utils.functional.allow_lazy()``
     decorator. It modifies the function so that *if* it's called with a lazy
     translation as one of its arguments, the function evaluation is delayed
     until it needs to be converted to a string.
 
     For example::
 
-        from django.utils.functional import allow_lazy
+        from freedom.utils.functional import allow_lazy
 
         def fancy_utility_function(s, ...):
             # Do some conversion on string 's'
@@ -521,14 +521,14 @@ Atom1Feed
     input is a proper string, then add support for lazy translation objects at
     the end.
 
-``django.utils.html``
+``freedom.utils.html``
 =====================
 
-.. module:: django.utils.html
+.. module:: freedom.utils.html
    :synopsis: HTML helper functions
 
-Usually you should build up HTML using Django's templates to make use of its
-autoescape mechanism, using the utilities in :mod:`django.utils.safestring`
+Usually you should build up HTML using Freedom's templates to make use of its
+autoescape mechanism, using the utilities in :mod:`freedom.utils.safestring`
 where appropriate. This module provides some additional low level utilities for
 escaping HTML.
 
@@ -536,8 +536,8 @@ escaping HTML.
 
     Returns the given text with ampersands, quotes and angle brackets encoded
     for use in HTML. The input is first passed through
-    :func:`~django.utils.encoding.force_text` and the output has
-    :func:`~django.utils.safestring.mark_safe` applied.
+    :func:`~freedom.utils.encoding.force_text` and the output has
+    :func:`~freedom.utils.safestring.mark_safe` applied.
 
 .. function:: conditional_escape(text)
 
@@ -578,7 +578,7 @@ escaping HTML.
     interpolation, some of the formatting options provided by `str.format`_
     (e.g. number formatting) will not work, since all arguments are passed
     through :func:`conditional_escape` which (ultimately) calls
-    :func:`~django.utils.encoding.force_text` on the values.
+    :func:`~freedom.utils.encoding.force_text` on the values.
 
 .. function:: format_html_join(sep, format_string, args_generator)
 
@@ -599,7 +599,7 @@ escaping HTML.
     is anything contained within ``<>``.
     Absolutely NO guaranty is provided about the resulting string being entirely
     HTML safe. So NEVER mark safe the result of a ``strip_tag`` call without
-    escaping it first, for example with :func:`~django.utils.html.escape`.
+    escaping it first, for example with :func:`~freedom.utils.html.escape`.
 
     For example::
 
@@ -631,10 +631,10 @@ escaping HTML.
 
 .. _str.format: http://docs.python.org/library/stdtypes.html#str.format
 
-``django.utils.http``
+``freedom.utils.http``
 =====================
 
-.. module:: django.utils.http
+.. module:: freedom.utils.http
    :synopsis: HTTP helper functions. (URL encoding, cookie handling, ...)
 
 .. function:: urlquote(url, safe='/')
@@ -702,10 +702,10 @@ escaping HTML.
     Decodes a base64 encoded string, adding back any trailing equal signs that
     might have been stripped.
 
-``django.utils.module_loading``
+``freedom.utils.module_loading``
 ===============================
 
-.. module:: django.utils.module_loading
+.. module:: freedom.utils.module_loading
    :synopsis: Functions for working with Python modules.
 
 Functions for working with Python modules.
@@ -718,26 +718,26 @@ Functions for working with Python modules.
     the last name in the path. Raises ``ImportError`` if the import failed. For
     example::
 
-        from django.utils.module_loading import import_string
-        ValidationError = import_string('django.core.exceptions.ValidationError')
+        from freedom.utils.module_loading import import_string
+        ValidationError = import_string('freedom.core.exceptions.ValidationError')
 
     is equivalent to::
 
-        from django.core.exceptions import ValidationError
+        from freedom.core.exceptions import ValidationError
 
 .. function:: import_by_path(dotted_path, error_prefix='')
 
     .. deprecated:: 1.7
-       Use :meth:`~django.utils.module_loading.import_string` instead.
+       Use :meth:`~freedom.utils.module_loading.import_string` instead.
 
     Imports a dotted module path and returns the attribute/class designated by
-    the last name in the path. Raises :exc:`~django.core.exceptions.ImproperlyConfigured`
+    the last name in the path. Raises :exc:`~freedom.core.exceptions.ImproperlyConfigured`
     if something goes wrong.
 
-``django.utils.safestring``
+``freedom.utils.safestring``
 ===========================
 
-.. module:: django.utils.safestring
+.. module:: freedom.utils.safestring
    :synopsis: Functions and classes for working with strings that can be displayed safely without further escaping in HTML.
 
 Functions and classes for working with "safe strings": strings that can be
@@ -778,7 +778,7 @@ appropriate entities.
         >>> mystr = '<b>Hello World</b>   '
         >>> mystr = mark_safe(mystr)
         >>> type(mystr)
-        <class 'django.utils.safestring.SafeBytes'>
+        <class 'freedom.utils.safestring.SafeBytes'>
 
         >>> mystr = mystr.strip()  # removing whitespace
         >>> type(mystr)
@@ -792,10 +792,10 @@ appropriate entities.
     Can be called multiple times on a single string (the resulting escaping is
     only applied once).
 
-``django.utils.text``
+``freedom.utils.text``
 =====================
 
-.. module:: django.utils.text
+.. module:: freedom.utils.text
     :synopsis: Text manipulation.
 
 .. function:: slugify
@@ -811,10 +811,10 @@ appropriate entities.
     If ``value`` is ``"Joel is a slug"``, the output will be
     ``"joel-is-a-slug"``.
 
-``django.utils.translation``
+``freedom.utils.translation``
 ============================
 
-.. module:: django.utils.translation
+.. module:: freedom.utils.translation
    :synopsis: Internationalization support.
 
 For a complete discussion on the usage of the following see the
@@ -898,11 +898,11 @@ For a complete discussion on the usage of the following see the
 .. function:: override(language, deactivate=False)
 
     A Python context manager that uses
-    :func:`django.utils.translation.activate` to fetch the translation object
+    :func:`freedom.utils.translation.activate` to fetch the translation object
     for a given language, activates it as the translation object for the
     current thread and reactivates the previous active language on exit.
     Optionally, it can simply deactivate the temporary translation on exit with
-    :func:`django.utils.translation.deactivate` if the ``deactivate`` argument
+    :func:`freedom.utils.translation.deactivate` if the ``deactivate`` argument
     is ``True``. If you pass ``None`` as the language argument, a
     ``NullTranslations()`` instance is activated within the context.
 
@@ -934,8 +934,8 @@ For a complete discussion on the usage of the following see the
 
 .. function:: templatize(src)
 
-    Turns a Django template into something that is understood by ``xgettext``.
-    It does so by translating the Django translation tags into standard
+    Turns a Freedom template into something that is understood by ``xgettext``.
+    It does so by translating the Freedom translation tags into standard
     ``gettext`` function invocations.
 
 .. data:: LANGUAGE_SESSION_KEY
@@ -945,10 +945,10 @@ For a complete discussion on the usage of the following see the
 
 .. _time-zone-selection-functions:
 
-``django.utils.timezone``
+``freedom.utils.timezone``
 =========================
 
-.. module:: django.utils.timezone
+.. module:: freedom.utils.timezone
     :synopsis: Timezone support.
 
 .. data:: utc
@@ -1057,13 +1057,13 @@ For a complete discussion on the usage of the following see the
 
 .. _pytz: http://pytz.sourceforge.net/
 
-``django.utils.tzinfo``
+``freedom.utils.tzinfo``
 =======================
 
 .. deprecated:: 1.7
-    Use :mod:`~django.utils.timezone` instead.
+    Use :mod:`~freedom.utils.timezone` instead.
 
-.. module:: django.utils.tzinfo
+.. module:: freedom.utils.tzinfo
    :synopsis: Implementation of ``tzinfo`` classes for use with ``datetime.datetime``.
 
 .. class:: FixedOffset
@@ -1071,11 +1071,11 @@ For a complete discussion on the usage of the following see the
     Fixed offset in minutes east from UTC.
 
     .. deprecated:: 1.7
-        Use :func:`~django.utils.timezone.get_fixed_timezone` instead.
+        Use :func:`~freedom.utils.timezone.get_fixed_timezone` instead.
 
 .. class:: LocalTimezone
 
     Proxy timezone information from time module.
 
     .. deprecated:: 1.7
-        Use :func:`~django.utils.timezone.get_default_timezone` instead.
+        Use :func:`~freedom.utils.timezone.get_default_timezone` instead.

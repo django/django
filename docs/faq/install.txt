@@ -5,44 +5,44 @@ How do I get started?
 ---------------------
 
 #. `Download the code`_.
-#. Install Django (read the :doc:`installation guide </intro/install>`).
+#. Install Freedom (read the :doc:`installation guide </intro/install>`).
 #. Walk through the :doc:`tutorial </intro/tutorial01>`.
 #. Check out the rest of the :doc:`documentation </index>`, and `ask questions`_ if you
    run into trouble.
 
-.. _`Download the code`: https://www.djangoproject.com/download/
-.. _ask questions: https://www.djangoproject.com/community/
+.. _`Download the code`: https://www.freedomproject.com/download/
+.. _ask questions: https://www.freedomproject.com/community/
 
-What are Django's prerequisites?
+What are Freedom's prerequisites?
 --------------------------------
 
-Django requires Python, specifically Python 2.7 or 3.2 and above. No other
-Python libraries are required for basic Django usage.
+Freedom requires Python, specifically Python 2.7 or 3.2 and above. No other
+Python libraries are required for basic Freedom usage.
 
-For a development environment -- if you just want to experiment with Django --
-you don't need to have a separate Web server installed; Django comes with its
-own lightweight development server. For a production environment, Django follows
+For a development environment -- if you just want to experiment with Freedom --
+you don't need to have a separate Web server installed; Freedom comes with its
+own lightweight development server. For a production environment, Freedom follows
 the WSGI spec, :pep:`3333`, which means it can run on a variety of server
-platforms. See :doc:`Deploying Django </howto/deployment/index>` for some
+platforms. See :doc:`Deploying Freedom </howto/deployment/index>` for some
 popular alternatives. Also, the `server arrangements wiki page`_ contains
 details for several deployment strategies.
 
-If you want to use Django with a database, which is probably the case, you'll
+If you want to use Freedom with a database, which is probably the case, you'll
 also need a database engine. PostgreSQL_ is recommended, because we're
 PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 
 .. _Python: http://www.python.org/
-.. _server arrangements wiki page: https://code.djangoproject.com/wiki/ServerArrangements
+.. _server arrangements wiki page: https://code.freedomproject.com/wiki/ServerArrangements
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/
 .. _Oracle: http://www.oracle.com/
 
-What Python version can I use with Django?
+What Python version can I use with Freedom?
 ------------------------------------------
 
 ============== ===============
-Django version Python versions
+Freedom version Python versions
 ============== ===============
 1.4            2.5, 2.6, 2.7
 1.5            2.6, 2.7 and 3.2, 3.3 (experimental)
@@ -54,10 +54,10 @@ For a given series of Python versions, only the latest release is officially
 supported. For instance, at the time of writing (April 1st, 2014), the latest
 release in the 2.7 series is 2.7.6.
 
-What Python version should I use with Django?
+What Python version should I use with Freedom?
 ---------------------------------------------
 
-As of Django 1.6, Python 3 support is considered stable and you can safely use
+As of Freedom 1.6, Python 3 support is considered stable and you can safely use
 it in production. See also :doc:`/topics/python3`. However, the community is
 still in the process of migrating third-party packages and applications to
 Python 3.
@@ -70,23 +70,23 @@ Since newer versions of Python are often faster, have more features, and are
 better supported, all else being equal, we recommend that you use the latest
 2.x.y or 3.x.y release.
 
-You don't lose anything in Django by using an older release, but you don't take
+You don't lose anything in Freedom by using an older release, but you don't take
 advantage of the improvements and optimizations in newer Python releases.
-Third-party applications for use with Django are, of course, free to set their
+Third-party applications for use with Freedom are, of course, free to set their
 own version requirements.
 
-Will Django run under shared hosting (like TextDrive or Dreamhost)?
+Will Freedom run under shared hosting (like TextDrive or Dreamhost)?
 -------------------------------------------------------------------
 
-See our `Django-friendly Web hosts`_ page.
+See our `Freedom-friendly Web hosts`_ page.
 
-.. _`Django-friendly Web hosts`: https://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
+.. _`Freedom-friendly Web hosts`: https://code.freedomproject.com/wiki/FreedomFriendlyWebHosts
 
 Should I use the stable version or development version?
 -------------------------------------------------------
 
 Generally, if you're using code in production, you should be using a
-stable release. The Django project publishes a full stable release
+stable release. The Freedom project publishes a full stable release
 every nine months or so, with bugfix updates in between. These stable
 releases contain the API that is covered by our backwards
 compatibility guarantees; if you write code against stable releases,

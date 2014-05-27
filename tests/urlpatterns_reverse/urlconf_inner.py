@@ -1,6 +1,6 @@
-from django.conf.urls import url
-from django.template import Template, Context
-from django.http import HttpResponse
+from freedom.conf.urls import url
+from freedom.template import Template, Context
+from freedom.http import HttpResponse
 
 
 def inner_view(request):

@@ -2,15 +2,15 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.contrib.admin import (site, ModelAdmin, SimpleListFilter,
+from freedom.contrib.admin import (site, ModelAdmin, SimpleListFilter,
     BooleanFieldListFilter, AllValuesFieldListFilter)
-from django.contrib.admin.views.main import ChangeList
-from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, RequestFactory, override_settings
-from django.utils.encoding import force_text
-from django.utils import six
+from freedom.contrib.admin.views.main import ChangeList
+from freedom.contrib.auth.admin import UserAdmin
+from freedom.contrib.auth.models import User
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.test import TestCase, RequestFactory, override_settings
+from freedom.utils.encoding import force_text
+from freedom.utils import six
 
 from .models import Book, Department, Employee
 
@@ -204,9 +204,9 @@ class ListFiltersTests(TestCase):
         self.lisa = User.objects.create_user('lisa', 'lisa@example.com')
 
         # Books
-        self.djangonaut_book = Book.objects.create(title='Djangonaut: an art of living', year=2009, author=self.alfred, is_best_seller=True, date_registered=self.today)
-        self.bio_book = Book.objects.create(title='Django: a biography', year=1999, author=self.alfred, is_best_seller=False, no=207)
-        self.django_book = Book.objects.create(title='The Django Book', year=None, author=self.bob, is_best_seller=None, date_registered=self.today, no=103)
+        self.freedomnaut_book = Book.objects.create(title='Freedomnaut: an art of living', year=2009, author=self.alfred, is_best_seller=True, date_registered=self.today)
+        self.bio_book = Book.objects.create(title='Freedom: a biography', year=1999, author=self.alfred, is_best_seller=False, no=207)
+        self.freedom_book = Book.objects.create(title='The Freedom Book', year=None, author=self.bob, is_best_seller=None, date_registered=self.today, no=103)
         self.gipsy_book = Book.objects.create(title='Gipsy guitar for dummies', year=2002, is_best_seller=True, date_registered=self.one_week_ago)
         self.gipsy_book.contributors = [self.bob, self.lisa]
         self.gipsy_book.save()
@@ -236,7 +236,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.django_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.freedom_book, self.freedomnaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
@@ -259,9 +259,9 @@ class ListFiltersTests(TestCase):
         queryset = changelist.get_queryset(request)
         if (self.today.year, self.today.month) == (self.one_week_ago.year, self.one_week_ago.month):
             # In case one week ago is in the same month.
-            self.assertEqual(list(queryset), [self.gipsy_book, self.django_book, self.djangonaut_book])
+            self.assertEqual(list(queryset), [self.gipsy_book, self.freedom_book, self.freedomnaut_book])
         else:
-            self.assertEqual(list(queryset), [self.django_book, self.djangonaut_book])
+            self.assertEqual(list(queryset), [self.freedom_book, self.freedomnaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
@@ -284,9 +284,9 @@ class ListFiltersTests(TestCase):
         queryset = changelist.get_queryset(request)
         if self.today.year == self.one_week_ago.year:
             # In case one week ago is in the same year.
-            self.assertEqual(list(queryset), [self.gipsy_book, self.django_book, self.djangonaut_book])
+            self.assertEqual(list(queryset), [self.gipsy_book, self.freedom_book, self.freedomnaut_book])
         else:
-            self.assertEqual(list(queryset), [self.django_book, self.djangonaut_book])
+            self.assertEqual(list(queryset), [self.freedom_book, self.freedomnaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
@@ -309,7 +309,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.gipsy_book, self.django_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.gipsy_book, self.freedom_book, self.freedomnaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][4]
@@ -337,7 +337,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.django_book])
+        self.assertEqual(list(queryset), [self.freedom_book])
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][0]
@@ -392,7 +392,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.django_book, self.bio_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.freedom_book, self.bio_book, self.freedomnaut_book])
 
         # Make sure the last choice is None and is selected
         filterspec = changelist.get_filters(request)[0][2]
@@ -454,15 +454,15 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[-1]['selected'], True)
         self.assertEqual(choices[-1]['query_string'], '?books_contributed__isnull=True')
 
-        request = self.request_factory.get('/', {'books_contributed__id__exact': self.django_book.pk})
+        request = self.request_factory.get('/', {'books_contributed__id__exact': self.freedom_book.pk})
         changelist = self.get_changelist(request, User, modeladmin)
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
         self.assertEqual(force_text(filterspec.title), 'book')
-        choice = select_by(filterspec.choices(changelist), "display", self.django_book.title)
+        choice = select_by(filterspec.choices(changelist), "display", self.freedom_book.title)
         self.assertEqual(choice['selected'], True)
-        self.assertEqual(choice['query_string'], '?books_contributed__id__exact=%d' % self.django_book.pk)
+        self.assertEqual(choice['query_string'], '?books_contributed__id__exact=%d' % self.freedom_book.pk)
 
     def test_booleanfieldlistfilter(self):
         modeladmin = BookAdmin(Book, site)
@@ -495,7 +495,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.gipsy_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.gipsy_book, self.freedomnaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][3]
@@ -509,7 +509,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.django_book])
+        self.assertEqual(list(queryset), [self.freedom_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][3]
@@ -533,7 +533,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.bio_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.bio_book, self.freedomnaut_book])
 
     def test_simplelistfilter(self):
         modeladmin = DecadeFilterBookAdmin(Book, site)
@@ -596,7 +596,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.gipsy_book, self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.gipsy_book, self.freedomnaut_book])
 
         # Make sure the correct choice is selected
         filterspec = changelist.get_filters(request)[0][1]
@@ -613,7 +613,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
-        self.assertEqual(list(queryset), [self.djangonaut_book])
+        self.assertEqual(list(queryset), [self.freedomnaut_book])
 
         # Make sure the correct choices are selected
         filterspec = changelist.get_filters(request)[0][1]

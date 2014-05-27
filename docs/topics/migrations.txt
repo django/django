@@ -2,12 +2,12 @@
 Migrations
 ==========
 
-.. module:: django.db.migrations
-   :synopsis: Schema migration support for Django models
+.. module:: freedom.db.migrations
+   :synopsis: Schema migration support for Freedom models
 
 .. versionadded:: 1.7
 
-Migrations are Django's way of propagating changes you make to your models
+Migrations are Freedom's way of propagating changes you make to your models
 (adding a field, deleting a model, etc.) into your database schema. They're
 designed to be mostly automatic, but you'll need to know when to make
 migrations, when to run them, and the common problems you might run into.
@@ -15,19 +15,19 @@ migrations, when to run them, and the common problems you might run into.
 A Brief History
 ---------------
 
-Prior to version 1.7, Django only supported adding new models to the
+Prior to version 1.7, Freedom only supported adding new models to the
 database; it was not possible to alter or remove existing models via the
 ``syncdb`` command (the predecessor to :djadmin:`migrate`).
 
 Third-party tools, most notably `South <http://south.aeracode.org>`_,
 provided support for these additional types of change, but it was considered
-important enough that support was brought into core Django.
+important enough that support was brought into core Freedom.
 
 Two Commands
 ------------
 
 There are two commands which you will use to interact with migrations
-and Django's handling of database schema:
+and Freedom's handling of database schema:
 
 * :djadmin:`migrate`, which is responsible for applying migrations, as well as
   unapplying and listing their status.
@@ -63,7 +63,7 @@ same circumstances, exactly what will happen in production.
 Backend Support
 ---------------
 
-Migrations are supported on all backends that Django ships with, as well
+Migrations are supported on all backends that Freedom ships with, as well
 as any third-party backends if they have programmed in support for schema
 alteration (done via the :doc:`SchemaEditor </ref/schema-editor>` class).
 
@@ -102,7 +102,7 @@ fail to be created under MySQL.
 SQLite
 ~~~~~~
 
-SQLite has very little built-in schema alteration support, and so Django
+SQLite has very little built-in schema alteration support, and so Freedom
 attempts to emulate it by:
 
 * Creating a new table with the new schema
@@ -113,9 +113,9 @@ attempts to emulate it by:
 This process generally works well, but it can be slow and occasionally
 buggy. It is not recommended that you run and migrate SQLite in a
 production environment unless you are very aware of the risks and
-its limitations; the support Django ships with is designed to allow
+its limitations; the support Freedom ships with is designed to allow
 developers to use SQLite on their local machines to develop less complex
-Django projects without the need for a full database.
+Freedom projects without the need for a full database.
 
 Workflow
 --------
@@ -167,13 +167,13 @@ come across situations where you and another developer have both committed
 a migration to the same app at the same time, resulting in two migrations
 with the same number.
 
-Don't worry - the numbers are just there for developers' reference, Django
+Don't worry - the numbers are just there for developers' reference, Freedom
 just cares that each migration has a different name. Migrations specify which
 other migrations they depend on - including earlier migrations in the same
 app - in the file, so it's possible to detect when there's two new migrations
 for the same app that aren't ordered.
 
-When this happens, Django will prompt you and give you some options. If it
+When this happens, Freedom will prompt you and give you some options. If it
 thinks it's safe enough, it will offer to automatically linearize the two
 migrations for you. If not, you'll have to go in and modify the migrations
 yourself - don't worry, this isn't difficult, and is explained more in
@@ -212,7 +212,7 @@ an agreed-upon object layout, written in a declarative style.
 
 A basic migration file looks like this::
 
-    from django.db import migrations, models
+    from freedom.db import migrations, models
 
     class Migration(migrations.Migration):
 
@@ -223,8 +223,8 @@ A basic migration file looks like this::
             migrations.AddField("Author", "rating", models.IntegerField(default=0)),
         ]
 
-What Django looks for when it loads a migration file (as a Python module) is
-a subclass of ``django.db.migrations.Migration`` called ``Migration``. It then
+What Freedom looks for when it loads a migration file (as a Python module) is
+a subclass of ``freedom.db.migrations.Migration`` called ``Migration``. It then
 inspects this object for four attributes, only two of which are used
 most of the time:
 
@@ -233,12 +233,12 @@ most of the time:
   migration does.
 
 The operations are the key; they are a set of declarative instructions which
-tell Django what schema changes need to be made. Django scans them and
+tell Freedom what schema changes need to be made. Freedom scans them and
 builds an in-memory representation of all of the schema changes to all apps,
 and uses this to generate the SQL which makes the schema changes.
 
 That in-memory structure is also used to work out what the differences are
-between your models and the current state of your migrations; Django runs
+between your models and the current state of your migrations; Freedom runs
 through all the changes, in order, on an in-memory set of models to come
 up with the state of your models last time you ran ``makemigrations``. It
 then uses these models to compare against the ones in your ``models.py`` files
@@ -266,13 +266,13 @@ accept migrations, and so just run :djadmin:`makemigrations` once you've made
 some changes.
 
 If your app already has models and database tables, and doesn't have migrations
-yet (for example, you created it against a previous Django version), you'll
+yet (for example, you created it against a previous Freedom version), you'll
 need to convert it to use migrations; this is a simple process::
 
     $ python manage.py makemigrations your_app_label
 
 This will make a new initial migration for your app. Now, when you run
-:djadmin:`migrate`, Django will detect that you have an initial migration
+:djadmin:`migrate`, Freedom will detect that you have an initial migration
 *and* that the tables it wants to create already exist, and will mark the
 migration as already applied.
 
@@ -280,9 +280,9 @@ Note that this only works given two things:
 
 * You have not changed your models since you made their tables. For migrations
   to work, you must make the initial migration *first* and then make changes,
-  as Django compares changes against migration files, not the database.
+  as Freedom compares changes against migration files, not the database.
 
-* You have not manually edited your database - Django won't be able to detect
+* You have not manually edited your database - Freedom won't be able to detect
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
 
@@ -291,9 +291,9 @@ Note that this only works given two things:
 Historical models
 -----------------
 
-When you run migrations, Django is working from historical versions of
+When you run migrations, Freedom is working from historical versions of
 your models stored in the migration files. If you write Python code
-using the :class:`~django.db.migrations.operations.RunPython` operation, or if
+using the :class:`~freedom.db.migrations.operations.RunPython` operation, or if
 you have ``allow_migrate`` methods on your database routers, you will be
 exposed to these versions of your models.
 
@@ -325,13 +325,13 @@ the data in the database itself, in conjunction with the schema if you want.
 Migrations that alter data are usually called "data migrations"; they're best
 written as separate migrations, sitting alongside your schema migrations.
 
-Django can't automatically generate data migrations for you, as it does with
+Freedom can't automatically generate data migrations for you, as it does with
 schema migrations, but it's not very hard to write them. Migration files in
-Django are made up of :doc:`Operations </ref/migration-operations>`, and
+Freedom are made up of :doc:`Operations </ref/migration-operations>`, and
 the main operation you use for data migrations is
-:class:`~django.db.migrations.operations.RunPython`.
+:class:`~freedom.db.migrations.operations.RunPython`.
 
-To start, make an empty migration file you can work from (Django will put
+To start, make an empty migration file you can work from (Freedom will put
 the file in the right place, suggest a name, and add dependencies for you)::
 
     python manage.py makemigrations --empty yourappname
@@ -339,7 +339,7 @@ the file in the right place, suggest a name, and add dependencies for you)::
 Then, open up the file; it should look something like this::
 
     # -*- coding: utf-8 -*-
-    from django.db import models, migrations
+    from freedom.db import models, migrations
 
     class Migration(migrations.Migration):
 
@@ -351,8 +351,8 @@ Then, open up the file; it should look something like this::
         ]
 
 Now, all you need to do is create a new function and have
-:class:`~django.db.migrations.operations.RunPython` use it.
-:class:`~django.db.migrations.operations.RunPython` expects a callable as its argument
+:class:`~freedom.db.migrations.operations.RunPython` use it.
+:class:`~freedom.db.migrations.operations.RunPython` expects a callable as its argument
 which takes two arguments - the first is an :doc:`app registry
 </ref/applications/>` that has the historical versions of all your models
 loaded into it to match where in your history the migration sits, and the
@@ -366,7 +366,7 @@ and realized that not everyone has first and last names). All we
 need to do is use the historical model and iterate over the rows::
 
     # -*- coding: utf-8 -*-
-    from django.db import models, migrations
+    from freedom.db import models, migrations
 
     def combine_names(apps, schema_editor):
         # We can't import the Person model directly as it may be a newer
@@ -390,7 +390,7 @@ Once that's done, we can just run ``python manage.py migrate`` as normal and
 the data migration will run in place alongside other migrations.
 
 You can pass a second callable to
-:class:`~django.db.migrations.operations.RunPython` to run whatever logic you
+:class:`~freedom.db.migrations.operations.RunPython` to run whatever logic you
 want executed when migrating backwards. If this callable is omitted, migrating
 backwards will raise an exception.
 
@@ -411,23 +411,23 @@ several hundred migrations to just a few, and that's where squashing comes in.
 Squashing is the act of reducing an existing set of many migrations down to
 one (or sometimes a few) migrations which still represent the same changes.
 
-Django does this by taking all of your existing migrations, extracting their
+Freedom does this by taking all of your existing migrations, extracting their
 ``Operation``\s and putting them all in sequence, and then running an optimizer
 over them to try and reduce the length of the list - for example, it knows
-that :class:`~django.db.migrations.operations.CreateModel` and
-:class:`~django.db.migrations.operations.DeleteModel` cancel each other out,
-and it knows that :class:`~django.db.migrations.operations.AddField` can be
-rolled into :class:`~django.db.migrations.operations.CreateModel`.
+that :class:`~freedom.db.migrations.operations.CreateModel` and
+:class:`~freedom.db.migrations.operations.DeleteModel` cancel each other out,
+and it knows that :class:`~freedom.db.migrations.operations.AddField` can be
+rolled into :class:`~freedom.db.migrations.operations.CreateModel`.
 
 Once the operation sequence has been reduced as much as possible - the amount
 possible depends on how closely intertwined your models are and if you have
-any :class:`~django.db.migrations.operations.RunSQL`
-or :class:`~django.db.migrations.operations.RunPython` operations (which can't
-be optimized through) - Django will them write it back out into a new set of
+any :class:`~freedom.db.migrations.operations.RunSQL`
+or :class:`~freedom.db.migrations.operations.RunPython` operations (which can't
+be optimized through) - Freedom will them write it back out into a new set of
 initial migration files.
 
 These files are marked to say they replace the previously-squashed migrations,
-so they can coexist with the old migration files, and Django will intelligently
+so they can coexist with the old migration files, and Freedom will intelligently
 switch between them depending where you are in the history. If you're still
 part-way through the set of migrations that you squashed, it will keep using
 them until it hits the end and then switch to the squashed history, while new
@@ -453,16 +453,16 @@ work::
   Do you wish to proceed? [yN] y
   Optimizing...
     Optimized from 12 operations to 7 operations.
-  Created new squashed migration /home/andrew/Programs/DjangoTest/test/migrations/0001_squashed_0004_undo_somthing.py
+  Created new squashed migration /home/andrew/Programs/FreedomTest/test/migrations/0001_squashed_0004_undo_somthing.py
     You should commit this migration but leave the old ones in place;
     the new migration will be used for new installs. Once you are sure
     all instances of the codebase have applied the migrations you squashed,
     you can delete them.
 
-Note that model interdependencies in Django can get very complex, and squashing
+Note that model interdependencies in Freedom can get very complex, and squashing
 may occasionally result in an optimized migration that doesn't work or is
 impossible to run. When this occurs, you can re-try with ``--no-optimize``, but
-please `file a bug report <https://code.djangoproject.com/newticket>`_ either
+please `file a bug report <https://code.freedomproject.com/newticket>`_ either
 way detailing the models and their relationships so we can improve the
 optimizer to handle your case.
 
@@ -472,26 +472,26 @@ Serializing values
 ------------------
 
 Migrations are just Python files containing the old definitions of your models
-- thus, to write them, Django must take the current state of your models and
+- thus, to write them, Freedom must take the current state of your models and
 serialize them out into a file.
 
-While Django can serialize most things, there are some things that we just
+While Freedom can serialize most things, there are some things that we just
 can't serialize out into a valid Python representation - there's no Python
 standard for how a value can be turned back into code (``repr()`` only works
 for basic values, and doesn't specify import paths).
 
-Django can serialize the following:
+Freedom can serialize the following:
 
 - ``int``, ``long``, ``float``, ``bool``, ``str``, ``unicode``, ``bytes``, ``None``
 - ``list``, ``set``, ``tuple``, ``dict``
 - ``datetime.date`` and ``datetime.datetime`` instances
 - ``decimal.Decimal`` instances
-- Any Django field
+- Any Freedom field
 - Any function or method reference (e.g. ``datetime.datetime.today``)
 - Any class reference
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
-Django cannot serialize:
+Freedom cannot serialize:
 
 - Arbitrary class instances (e.g. ``MyClass(4.3, 5.7)``)
 - Lambdas
@@ -501,7 +501,7 @@ Django cannot serialize:
 Adding a deconstruct() method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can let Django serialize your own custom class instances by giving the class
+You can let Freedom serialize your own custom class instances by giving the class
 a ``deconstruct()`` method. It takes no arguments, and should return a tuple
 of three things: ``(path, args, kwargs)``. Note this return value is different
 from the ``deconstruct()`` method :ref:`for custom fields
@@ -517,14 +517,14 @@ available at the top level of a module it is not serializable.
 ``kwargs`` should be a dict of keyword arguments to pass to your class'
 ``__init__`` method. Every value should itself be serializable.
 
-Django will write out the value as an instantiation of your class with the
-given arguments, similar to the way it writes out references to Django fields.
+Freedom will write out the value as an instantiation of your class with the
+given arguments, similar to the way it writes out references to Freedom fields.
 
 As long as all of the arguments to your class' constructor are themselves
 serializable, you can just use the ``@deconstructible`` class decorator
-from ``django.utils.deconstruct`` to add the method::
+from ``freedom.utils.deconstruct`` to add the method::
 
-    from django.utils.deconstruct import deconstructible
+    from freedom.utils.deconstruct import deconstructible
 
     @deconstructible
     class MyCustomClass(object):
@@ -541,14 +541,14 @@ Upgrading from South
 
 If you already have pre-existing migrations created with
 `South 0.x <http://south.aeracode.org>`_, then the upgrade process to use
-``django.db.migrations`` is quite simple:
+``freedom.db.migrations`` is quite simple:
 
 * Ensure all installs are fully up-to-date with their migrations
 * Delete all your (numbered) migration files, but not the directory or
   ``__init__.py`` - make sure you remove the ``.pyc`` files too.
-* Run ``python manage.py makemigrations``. Django should see the empty
+* Run ``python manage.py makemigrations``. Freedom should see the empty
   migration directories and make new initial migrations in the new format.
-* Run ``python manage.py migrate``. Django will see that the tables for the
+* Run ``python manage.py migrate``. Freedom will see that the tables for the
   initial migrations already exist and mark them as applied without running
   them.
 
