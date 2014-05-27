@@ -1391,7 +1391,7 @@ like::
     When Django searches for a certain format, it will go through all given
     Python paths until it finds a module that actually defines the given
     format. This means that formats defined in packages farther up in the list
-    will take precendence over the same formats in packages farther down.
+    will take precedence over the same formats in packages farther down.
 
 Available formats are :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`,
 :setting:`DATETIME_FORMAT`, :setting:`YEAR_MONTH_FORMAT`,

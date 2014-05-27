@@ -9,12 +9,12 @@ a number of PostgreSQL specific data types.
     Django is, and will continue to be, a database-agnostic web framework. We
     would encourage those writing reusable applications for the Django
     community to write database-agnostic code where practical. However, we
-    recognise that real world projects written using Django need not be
+    recognize that real world projects written using Django need not be
     database-agnostic. In fact, once a project reaches a given size changing
     the underlying data store is already a significant challenge and is likely
     to require changing the code base in some ways to handle differences
     between the data stores.
-    
+
     Django provides support for a number of data types which will
     only work with PostgreSQL. There is no fundamental reason why (for example)
     a ``contrib.mysql`` module does not exist, except that PostgreSQL has the

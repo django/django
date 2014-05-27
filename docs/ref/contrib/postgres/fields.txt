@@ -21,7 +21,7 @@ ArrayField
 
         This is a required argument.
 
-        Specifies the underlying data type and behaviour for the array. It
+        Specifies the underlying data type and behavior for the array. It
         should be an instance of a subclass of
         :class:`~django.db.models.Field`. For example, it could be an
         :class:`~django.db.models.IntegerField` or a
@@ -227,7 +227,7 @@ lookups available after the transform do not change. For example::
 
 .. admonition:: Multidimensional arrays with indexes and slices
 
-    PostgreSQL has some rather esoteric behaviour when using indexes and slices
+    PostgreSQL has some rather esoteric behavior when using indexes and slices
     on multidimensional arrays. It will always work to use indexes to reach
     down to the final underlying data, but most other slices behave strangely
     at the database level and cannot be supported in a logical, consistent
