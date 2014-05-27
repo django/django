@@ -13,9 +13,6 @@ from django.core.management.color import color_style
 from django.utils import lru_cache
 from django.utils import six
 
-# For backwards compatibility: get_version() used to be in this module.
-from django import get_version
-
 
 def find_commands(management_dir):
     """
