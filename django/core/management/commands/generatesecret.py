@@ -6,7 +6,7 @@ from django.utils.crypto import generate_secret_key
 
 
 class Command(BaseCommand):
-    help = "Generates and outputs a random secret ket to stdout."
+    help = "Generates and outputs a random secret key to stdout."
 
     requires_system_checks = False
 
