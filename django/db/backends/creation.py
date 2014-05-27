@@ -332,7 +332,7 @@ class BaseDatabaseCreation(object):
             ";",
         ]
 
-    def create_test_db(self, verbosity=1, autoclobber=False):
+    def create_test_db(self, verbosity=1, autoclobber=False, keepdb=False):
         """
         Creates a test database, prompting the user for confirmation if the
         database already exists. Returns the name of the test database created.
@@ -344,12 +344,21 @@ class BaseDatabaseCreation(object):
 
         if verbosity >= 1:
             test_db_repr = ''
+            action = 'Creating'
             if verbosity >= 2:
                 test_db_repr = " ('%s')" % test_database_name
-            print("Creating test database for alias '%s'%s..." % (
-                self.connection.alias, test_db_repr))
+            if keepdb:
+                action = "Using existing"
 
-        self._create_test_db(verbosity, autoclobber)
+            print("%s test database for alias '%s'%s..." % (
+                action, self.connection.alias, test_db_repr))
+
+        # We could skip this call if keepdb is True, but we instead
+        # give it the keepdb param. This is to handle the case
+        # where the test DB doesn't exist, in which case we need to
+        # create it, then just not destroy it. If we instead skip
+        # this, we will get an exception.
+        self._create_test_db(verbosity, autoclobber, keepdb)
 
         self.connection.close()
         settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
@@ -393,7 +402,7 @@ class BaseDatabaseCreation(object):
             return self.connection.settings_dict['TEST']['NAME']
         return TEST_DATABASE_PREFIX + self.connection.settings_dict['NAME']
 
-    def _create_test_db(self, verbosity, autoclobber):
+    def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         """
         Internal implementation - creates the test db tables.
         """
@@ -409,6 +418,11 @@ class BaseDatabaseCreation(object):
                 cursor.execute(
                     "CREATE DATABASE %s %s" % (qn(test_database_name), suffix))
             except Exception as e:
+                # if we want to keep the db, then no need to do any of the below,
+                # just return and skip it all.
+                if keepdb:
+                    return test_database_name
+
                 sys.stderr.write(
                     "Got an error creating the test database: %s\n" % e)
                 if not autoclobber:
