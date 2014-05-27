@@ -839,11 +839,14 @@ Model inheritance
 =================
 
 Model inheritance in Django works almost identically to the way normal
-class inheritance works in Python. The only decision you have to make
-is whether you want the parent models to be models in their own right
-(with their own database tables), or if the parents are just holders
-of common information that will only be visible through the child
-models.
+class inheritance works in Python, but the basics at the beginning of the page
+should still be followed. That means the base class should subclass
+:class:`django.db.models.Model`.
+
+The only decision you have to make is whether you want the parent models to be
+models in their own right (with their own database tables), or if the parents
+are just holders of common information that will only be visible through the
+child models.
 
 There are three styles of inheritance that are possible in Django.
 
