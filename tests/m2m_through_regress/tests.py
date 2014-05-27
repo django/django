@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from django.core import management
-from django.contrib.auth.models import User
-from django.test import TestCase
-from django.utils.six import StringIO
+from freedom.core import management
+from freedom.contrib.auth.models import User
+from freedom.test import TestCase
+from freedom.utils.six import StringIO
 
 from .models import (Person, Group, Membership, UserMembership, Car, Driver,
     CarDriver)
@@ -81,7 +81,7 @@ class M2MThroughTestCase(TestCase):
             indent=2, stdout=out)
         self.assertXMLEqual(out.getvalue().strip(), """
 <?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
+<freedom-objects version="1.0">
   <object pk="%(m_pk)s" model="m2m_through_regress.membership">
     <field to="m2m_through_regress.person" name="person" rel="ManyToOneRel">%(p_pk)s</field>
     <field to="m2m_through_regress.group" name="group" rel="ManyToOneRel">%(g_pk)s</field>
@@ -93,7 +93,7 @@ class M2MThroughTestCase(TestCase):
   <object pk="%(g_pk)s" model="m2m_through_regress.group">
     <field type="CharField" name="name">Roll</field>
   </object>
-</django-objects>
+</freedom-objects>
         """.strip() % pks)
 
     def test_join_trimming(self):

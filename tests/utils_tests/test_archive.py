@@ -3,8 +3,8 @@ import shutil
 import tempfile
 import unittest
 
-from django.utils.archive import Archive, extract
-from django.utils._os import upath
+from freedom.utils.archive import Archive, extract
+from freedom.utils._os import upath
 
 
 TEST_DIR = os.path.join(os.path.dirname(upath(__file__)), 'archives')

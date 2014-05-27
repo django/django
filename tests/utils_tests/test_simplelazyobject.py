@@ -2,13 +2,13 @@ from __future__ import unicode_literals
 
 import pickle
 
-from django.contrib.auth.models import User
-from django.test import TestCase
-from django.utils import six
-from django.utils.functional import SimpleLazyObject
+from freedom.contrib.auth.models import User
+from freedom.test import TestCase
+from freedom.utils import six
+from freedom.utils.functional import SimpleLazyObject
 
 
-class TestUtilsSimpleLazyObjectDjangoTestCase(TestCase):
+class TestUtilsSimpleLazyObjectFreedomTestCase(TestCase):
 
     def test_pickle_py2_regression(self):
         # See ticket #20212

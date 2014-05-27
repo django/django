@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 import datetime
 
-from django.contrib.auth.models import User
-from django.test import TestCase
+from freedom.contrib.auth.models import User
+from freedom.test import TestCase
 
 from .models import TestObject, Order, RevisionableModel
 

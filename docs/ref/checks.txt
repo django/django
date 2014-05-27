@@ -4,17 +4,17 @@ System check framework
 
 .. versionadded:: 1.7
 
-The system check framework is a set of static checks for validating Django
+The system check framework is a set of static checks for validating Freedom
 projects. It detects common problems and provides hints for how to fix them.
 The framework is extensible so you can easily add your own checks.
 
-For details on how to add your own checks and integrate them with Django`s
+For details on how to add your own checks and integrate them with Freedom`s
 system checks, see the :doc:`System check topic guide </topics/checks>`.
 
 Builtin tags
 ------------
 
-Django's system checks are organized using the following tags:
+Freedom's system checks are organized using the following tags:
 
 * ``models``: Checks governing model, field and manager definitions.
 * ``signals``: Checks on signal declarations and handler registrations.
@@ -94,9 +94,9 @@ Related Fields
 * **fields.E330**: ManyToManyFields cannot be unique.
 * **fields.E331**: Field specifies a many-to-many relation through model ``%s``, which has not been installed.
 * **fields.E332**: Many-to-many fields with intermediate tables must not be symmetrical.
-* **fields.E333**: The model is used as an intermediate model by ``<model>``, but it has more than two foreign keys to ``<model>``, which is ambiguous. You must specify which two foreign keys Django should use via the through_fields keyword argument.
-* **fields.E334**: The model is used as an intermediate model by ``<model>``, but it has more than one foreign key from ``<model>``, which is ambiguous. You must specify which foreign key Django should use via the through_fields keyword argument.
-* **fields.E335**: The model is used as an intermediate model by ``<model>``, but it has more than one foreign key to ``<model>``, which is ambiguous. You must specify which foreign key Django should use via the through_fields keyword argument.
+* **fields.E333**: The model is used as an intermediate model by ``<model>``, but it has more than two foreign keys to ``<model>``, which is ambiguous. You must specify which two foreign keys Freedom should use via the through_fields keyword argument.
+* **fields.E334**: The model is used as an intermediate model by ``<model>``, but it has more than one foreign key from ``<model>``, which is ambiguous. You must specify which foreign key Freedom should use via the through_fields keyword argument.
+* **fields.E335**: The model is used as an intermediate model by ``<model>``, but it has more than one foreign key to ``<model>``, which is ambiguous. You must specify which foreign key Freedom should use via the through_fields keyword argument.
 * **fields.E336**: The model is used as an intermediary model by ``<model>``, but it does not have foreign key to ``<model>`` or ``<model>``.
 * **fields.E337**: Field specifies ``through_fields`` but does not provide the names of the two link fields that should be used for the relation through ``<model>``.
 * **fields.E338**: The intermediary model ``<through model>`` has no field ``<field name>``.
@@ -122,7 +122,7 @@ Admin
 Admin checks are all performed as part of the ``admin`` tag.
 
 The following checks are performed on any
-:class:`~django.contrib.admin.ModelAdmin` (or subclass) that is registered
+:class:`~freedom.contrib.admin.ModelAdmin` (or subclass) that is registered
 with the admin site:
 
 * **admin.E001**: The value of ``raw_id_fields`` must be a list or tuple.
@@ -165,7 +165,7 @@ ModelAdmin
 ~~~~~~~~~~
 
 The following checks are performed on any
-:class:`~django.contrib.admin.ModelAdmin` that is registered
+:class:`~freedom.contrib.admin.ModelAdmin` that is registered
 with the admin site:
 
 * **admin.E101**: The value of ``save_as`` must be a boolean.
@@ -201,8 +201,8 @@ InlineModelAdmin
 ~~~~~~~~~~~~~~~~
 
 The following checks are performed on any
-:class:`~django.contrib.admin.InlineModelAdmin` that is registered as an
-inline on a :class:`~django.contrib.admin.ModelAdmin`.
+:class:`~freedom.contrib.admin.InlineModelAdmin` that is registered as an
+inline on a :class:`~freedom.contrib.admin.ModelAdmin`.
 
 * **admin.E201**: Cannot exclude the field ``<field name>``, because it is the foreign key to the parent model ``%s.%s``.
 * **admin.E202**: ``<model>`` has no ForeignKey to ``<parent model>``./``<model>`` has more than one ForeignKey to ``<parent model>``.
@@ -215,8 +215,8 @@ GenericInlineModelAdmin
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 The following checks are performed on any
-:class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin` that is
-registered as an inline on a :class:`~django.contrib.admin.ModelAdmin`.
+:class:`~freedom.contrib.contenttypes.admin.GenericInlineModelAdmin` that is
+registered as an inline on a :class:`~freedom.contrib.admin.ModelAdmin`.
 
 * **admin.E301**: 'ct_field' references ``<label>``, which is not a field on ``<model>``.
 * **admin.E302**: 'ct_fk_field' references ``<label>``, which is not a field on ``<model>``.
@@ -237,8 +237,8 @@ Content Types
 -------------
 
 The following checks are performed when a model contains a
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey` or
-:class:`~django.contrib.contenttypes.fields.GenericRelation`:
+:class:`~freedom.contrib.contenttypes.fields.GenericForeignKey` or
+:class:`~freedom.contrib.contenttypes.fields.GenericRelation`:
 
 * **contenttypes.E001**: The GenericForeignKey object ID references the non-existent field ``<field>``
 * **contenttypes.E002**: The GenericForeignKey content type references the non-existent field ``<field>``
@@ -249,7 +249,7 @@ Sites
 -----
 
 The following checks are performed on any model using a
-:class:`~django.contrib.sites.managers.CurrentSiteManager`:
+:class:`~freedom.contrib.sites.managers.CurrentSiteManager`:
 
 * **sites.E001**: CurrentSiteManager could not find a field named ``<field name>``.
 * **sites.E002**: CurrentSiteManager cannot use ``<field>`` as it is not a ForeignKey or ManyToManyField.

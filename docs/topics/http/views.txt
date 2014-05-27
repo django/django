@@ -19,7 +19,7 @@ Here's a view that returns the current date and time, as an HTML document:
 
 .. code-block:: python
 
-    from django.http import HttpResponse
+    from freedom.http import HttpResponse
     import datetime
 
     def current_datetime(request):
@@ -29,26 +29,26 @@ Here's a view that returns the current date and time, as an HTML document:
 
 Let's step through this code one line at a time:
 
-* First, we import the class :class:`~django.http.HttpResponse` from the
-  :mod:`django.http` module, along with Python's ``datetime`` library.
+* First, we import the class :class:`~freedom.http.HttpResponse` from the
+  :mod:`freedom.http` module, along with Python's ``datetime`` library.
 
 * Next, we define a function called ``current_datetime``. This is the view
-  function. Each view function takes an :class:`~django.http.HttpRequest`
+  function. Each view function takes an :class:`~freedom.http.HttpRequest`
   object as its first parameter, which is typically named ``request``.
 
   Note that the name of the view function doesn't matter; it doesn't have to
-  be named in a certain way in order for Django to recognize it. We're
+  be named in a certain way in order for Freedom to recognize it. We're
   calling it ``current_datetime`` here, because that name clearly indicates
   what it does.
 
-* The view returns an :class:`~django.http.HttpResponse` object that
+* The view returns an :class:`~freedom.http.HttpResponse` object that
   contains the generated response. Each view function is responsible for
-  returning an :class:`~django.http.HttpResponse` object. (There are
+  returning an :class:`~freedom.http.HttpResponse` object. (There are
   exceptions, but we'll get to those later.)
 
-.. admonition:: Django's Time Zone
+.. admonition:: Freedom's Time Zone
 
-    Django includes a :setting:`TIME_ZONE` setting that defaults to
+    Freedom includes a :setting:`TIME_ZONE` setting that defaults to
     ``America/Chicago``. This probably isn't where you live, so you might want
     to change it in your settings file.
 
@@ -62,15 +62,15 @@ date and time. To display this view at a particular URL, you'll need to create a
 Returning errors
 ================
 
-Returning HTTP error codes in Django is easy. There are subclasses of
-:class:`~django.http.HttpResponse` for a number of common HTTP status codes
+Returning HTTP error codes in Freedom is easy. There are subclasses of
+:class:`~freedom.http.HttpResponse` for a number of common HTTP status codes
 other than 200 (which means *"OK"*). You can find the full list of available
 subclasses in the :ref:`request/response <ref-httpresponse-subclasses>`
 documentation.  Just return an instance of one of those subclasses instead of
-a normal :class:`~django.http.HttpResponse` in order to signify an error. For
+a normal :class:`~freedom.http.HttpResponse` in order to signify an error. For
 example::
 
-    from django.http import HttpResponse, HttpResponseNotFound
+    from freedom.http import HttpResponse, HttpResponseNotFound
 
     def my_view(request):
         # ...
@@ -81,11 +81,11 @@ example::
 
 There isn't a specialized subclass for every possible HTTP response code,
 since many of them aren't going to be that common. However, as documented in
-the :class:`~django.http.HttpResponse` documentation, you can also pass the
-HTTP status code into the constructor for :class:`~django.http.HttpResponse`
+the :class:`~freedom.http.HttpResponse` documentation, you can also pass the
+HTTP status code into the constructor for :class:`~freedom.http.HttpResponse`
 to create a return class for any status code you like. For example::
 
-    from django.http import HttpResponse
+    from freedom.http import HttpResponse
 
     def my_view(request):
         # ...
@@ -99,22 +99,22 @@ to handle those errors.
 The Http404 exception
 ---------------------
 
-.. class:: django.http.Http404()
+.. class:: freedom.http.Http404()
 
-When you return an error such as :class:`~django.http.HttpResponseNotFound`,
+When you return an error such as :class:`~freedom.http.HttpResponseNotFound`,
 you're responsible for defining the HTML of the resulting error page::
 
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 For convenience, and because it's a good idea to have a consistent 404 error page
-across your site, Django provides an ``Http404`` exception. If you raise
-``Http404`` at any point in a view function, Django will catch it and return the
+across your site, Freedom provides an ``Http404`` exception. If you raise
+``Http404`` at any point in a view function, Freedom will catch it and return the
 standard error page for your application, along with an HTTP error code 404.
 
 Example usage::
 
-    from django.http import Http404
-    from django.shortcuts import render_to_response
+    from freedom.http import Http404
+    from freedom.shortcuts import render_to_response
     from polls.models import Poll
 
     def detail(request, poll_id):
@@ -138,11 +138,11 @@ Customizing error views
 The 404 (page not found) view
 -----------------------------
 
-.. function:: django.views.defaults.page_not_found(request, template_name='404.html')
+.. function:: freedom.views.defaults.page_not_found(request, template_name='404.html')
 
-When you raise :exc:`~django.http.Http404` from within a view, Django loads a
+When you raise :exc:`~freedom.http.Http404` from within a view, Freedom loads a
 special view devoted to handling 404 errors. By default, it's the view
-:func:`django.views.defaults.page_not_found`, which either produces a very
+:func:`freedom.views.defaults.page_not_found`, which either produces a very
 simple "Not Found" message or loads and renders the template ``404.html`` if
 you created it in your root template directory.
 
@@ -150,22 +150,22 @@ The default 404 view will pass one variable to the template: ``request_path``,
 which is the URL that resulted in the error.
 
 The ``page_not_found`` view should suffice for 99% of Web applications, but if
-you want to override it, you can specify :data:`~django.conf.urls.handler404`
+you want to override it, you can specify :data:`~freedom.conf.urls.handler404`
 in your root URLconf (setting ``handler404`` anywhere else will have no
 effect), like so::
 
     handler404 = 'mysite.views.my_custom_404_view'
 
-Behind the scenes, Django determines the 404 view by looking for
+Behind the scenes, Freedom determines the 404 view by looking for
 ``handler404`` in your root URLconf, and falling back to
-``django.views.defaults.page_not_found`` if you did not define one.
+``freedom.views.defaults.page_not_found`` if you did not define one.
 
 Three things to note about 404 views:
 
-* The 404 view is also called if Django doesn't find a match after
+* The 404 view is also called if Freedom doesn't find a match after
   checking every regular expression in the URLconf.
 
-* The 404 view is passed a :class:`~django.template.RequestContext` and
+* The 404 view is passed a :class:`~freedom.template.RequestContext` and
   will have access to variables supplied by your
   :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting (e.g., ``MEDIA_URL``).
 
@@ -178,11 +178,11 @@ Three things to note about 404 views:
 The 500 (server error) view
 ----------------------------
 
-.. function:: django.views.defaults.server_error(request, template_name='500.html')
+.. function:: freedom.views.defaults.server_error(request, template_name='500.html')
 
-Similarly, Django executes special-case behavior in the case of runtime errors
-in view code. If a view results in an exception, Django will, by default, call
-the view ``django.views.defaults.server_error``, which either produces a very
+Similarly, Freedom executes special-case behavior in the case of runtime errors
+in view code. If a view results in an exception, Freedom will, by default, call
+the view ``freedom.views.defaults.server_error``, which either produces a very
 simple "Server Error" message or loads and renders the template ``500.html`` if
 you created it in your root template directory.
 
@@ -191,13 +191,13 @@ rendered with an empty ``Context`` to lessen the chance of additional errors.
 
 This ``server_error`` view should suffice for 99% of Web applications, but if
 you want to override the view, you can specify
-:data:`~django.conf.urls.handler500` in your root URLconf, like so::
+:data:`~freedom.conf.urls.handler500` in your root URLconf, like so::
 
     handler500 = 'mysite.views.my_custom_error_view'
 
-Behind the scenes, Django determines the 500 view by looking for
+Behind the scenes, Freedom determines the 500 view by looking for
 ``handler500`` in your root URLconf, and falling back to
-``django.views.defaults.server_error`` if you did not define one.
+``freedom.views.defaults.server_error`` if you did not define one.
 
 If :setting:`DEBUG` is set to ``True`` (in your settings module), then
 your 500 view will never be used, and the traceback will be displayed
@@ -208,30 +208,30 @@ instead, with some debug information.
 The 403 (HTTP Forbidden) view
 -----------------------------
 
-.. function:: django.views.defaults.permission_denied(request, template_name='403.html')
+.. function:: freedom.views.defaults.permission_denied(request, template_name='403.html')
 
-In the same vein as the 404 and 500 views, Django has a view to handle 403
-Forbidden errors. If a view results in a 403 exception then Django will, by
-default, call the view ``django.views.defaults.permission_denied``.
+In the same vein as the 404 and 500 views, Freedom has a view to handle 403
+Forbidden errors. If a view results in a 403 exception then Freedom will, by
+default, call the view ``freedom.views.defaults.permission_denied``.
 
 This view loads and renders the template ``403.html`` in your root template
 directory, or if this file does not exist, instead serves the text
 "403 Forbidden", as per :rfc:`2616` (the HTTP 1.1 Specification).
 
-``django.views.defaults.permission_denied`` is triggered by a
-:exc:`~django.core.exceptions.PermissionDenied` exception. To deny access in a
+``freedom.views.defaults.permission_denied`` is triggered by a
+:exc:`~freedom.core.exceptions.PermissionDenied` exception. To deny access in a
 view you can use code like this::
 
-    from django.core.exceptions import PermissionDenied
+    from freedom.core.exceptions import PermissionDenied
 
     def edit(request, pk):
         if not request.user.is_staff:
             raise PermissionDenied
         # ...
 
-It is possible to override ``django.views.defaults.permission_denied`` in the
+It is possible to override ``freedom.views.defaults.permission_denied`` in the
 same way you can for the 404 and 500 views by specifying a
-:data:`~django.conf.urls.handler403` in your root URLconf::
+:data:`~freedom.conf.urls.handler403` in your root URLconf::
 
     handler403 = 'mysite.views.my_custom_permission_denied_view'
 
@@ -240,20 +240,20 @@ same way you can for the 404 and 500 views by specifying a
 The 400 (bad request) view
 --------------------------
 
-.. function:: django.views.defaults.bad_request(request, template_name='400.html')
+.. function:: freedom.views.defaults.bad_request(request, template_name='400.html')
 
-When a :exc:`~django.core.exceptions.SuspiciousOperation` is raised in Django,
-it may be handled by a component of Django (for example resetting the session
-data). If not specifically handled, Django will consider the current request a
+When a :exc:`~freedom.core.exceptions.SuspiciousOperation` is raised in Freedom,
+it may be handled by a component of Freedom (for example resetting the session
+data). If not specifically handled, Freedom will consider the current request a
 'bad request' instead of a server error.
 
-``django.views.defaults.bad_request``, is otherwise very similar to the
+``freedom.views.defaults.bad_request``, is otherwise very similar to the
 ``server_error`` view, but returns with the status code 400 indicating that
 the error condition was the result of a client operation.
 
 Like ``server_error``, the default ``bad_request`` should suffice for
 99% of Web applications, but if you want to override the view, you can specify
-:data:`~django.conf.urls.handler400` in your root URLconf, like so::
+:data:`~freedom.conf.urls.handler400` in your root URLconf, like so::
 
     handler400 = 'mysite.views.my_custom_bad_request_view'
 

@@ -1,12 +1,12 @@
 import unittest
 
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.contrib.admindocs import utils
-from django.contrib.admindocs.views import get_return_data_type
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-from django.test import TestCase, modify_settings, override_settings
+from freedom.conf import settings
+from freedom.contrib.sites.models import Site
+from freedom.contrib.admindocs import utils
+from freedom.contrib.admindocs.views import get_return_data_type
+from freedom.contrib.auth.models import User
+from freedom.core.urlresolvers import reverse
+from freedom.test import TestCase, modify_settings, override_settings
 
 from .models import Person, Company
 
@@ -18,7 +18,7 @@ class MiscTests(TestCase):
         User.objects.create_superuser('super', None, 'secret')
         self.client.login(username='super', password='secret')
 
-    @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
+    @modify_settings(INSTALLED_APPS={'remove': 'freedom.contrib.sites'})
     @override_settings(SITE_ID=None)    # will restore SITE_ID after the test
     def test_no_sites_framework(self):
         """
@@ -30,7 +30,7 @@ class MiscTests(TestCase):
         self.client.get('/admindocs/views/')  # should not raise
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF='admin_docs.urls')
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
 class AdminDocViewTests(TestCase):
@@ -41,54 +41,54 @@ class AdminDocViewTests(TestCase):
 
     def test_index(self):
         self.client.logout()
-        response = self.client.get(reverse('django-admindocs-docroot'), follow=True)
+        response = self.client.get(reverse('freedom-admindocs-docroot'), follow=True)
         # Should display the login screen
         self.assertContains(response,
             '<input type="hidden" name="next" value="/admindocs/" />', html=True)
         self.client.login(username='super', password='secret')
-        response = self.client.get(reverse('django-admindocs-docroot'))
+        response = self.client.get(reverse('freedom-admindocs-docroot'))
         self.assertContains(response, '<h1>Documentation</h1>', html=True)
         self.assertContains(response,
-                            '<h1 id="site-name"><a href="/admin/">Django '
+                            '<h1 id="site-name"><a href="/admin/">Freedom '
                             'administration</a></h1>')
 
     def test_bookmarklets(self):
-        response = self.client.get(reverse('django-admindocs-bookmarklets'))
+        response = self.client.get(reverse('freedom-admindocs-bookmarklets'))
         self.assertContains(response, 'http://testserver/admin/doc/views/')
 
     def test_templatetag_index(self):
-        response = self.client.get(reverse('django-admindocs-tags'))
+        response = self.client.get(reverse('freedom-admindocs-tags'))
         self.assertContains(response, '<h3 id="built_in-extends">extends</h3>', html=True)
 
     def test_templatefilter_index(self):
-        response = self.client.get(reverse('django-admindocs-filters'))
+        response = self.client.get(reverse('freedom-admindocs-filters'))
         self.assertContains(response, '<h3 id="built_in-first">first</h3>', html=True)
 
     def test_view_index(self):
-        response = self.client.get(reverse('django-admindocs-views-index'))
+        response = self.client.get(reverse('freedom-admindocs-views-index'))
         self.assertContains(response,
-            '<h3><a href="/admindocs/views/django.contrib.admindocs.views.BaseAdminDocsView/">/admindocs/</a></h3>',
+            '<h3><a href="/admindocs/views/freedom.contrib.admindocs.views.BaseAdminDocsView/">/admindocs/</a></h3>',
             html=True)
         self.assertContains(response, 'Views by namespace test')
         self.assertContains(response, 'Name: <code>test:func</code>.')
 
     def test_view_detail(self):
         response = self.client.get(
-            reverse('django-admindocs-views-detail',
-                    args=['django.contrib.admindocs.views.BaseAdminDocsView']))
+            reverse('freedom-admindocs-views-detail',
+                    args=['freedom.contrib.admindocs.views.BaseAdminDocsView']))
         # View docstring
         self.assertContains(response, 'Base view for admindocs views.')
 
     def test_model_index(self):
-        response = self.client.get(reverse('django-admindocs-models-index'))
+        response = self.client.get(reverse('freedom-admindocs-models-index'))
         self.assertContains(
             response,
-            '<h2 id="app-auth">Authentication and Authorization (django.contrib.auth)</h2>',
+            '<h2 id="app-auth">Authentication and Authorization (freedom.contrib.auth)</h2>',
             html=True
         )
 
     def test_template_detail(self):
-        response = self.client.get(reverse('django-admindocs-templates',
+        response = self.client.get(reverse('freedom-admindocs-templates',
             args=['admin_doc/template_detail.html']))
         self.assertContains(response,
             '<h1>Template: "admin_doc/template_detail.html"</h1>', html=True)
@@ -96,19 +96,19 @@ class AdminDocViewTests(TestCase):
     def test_missing_docutils(self):
         utils.docutils_is_available = False
         try:
-            response = self.client.get(reverse('django-admindocs-docroot'))
+            response = self.client.get(reverse('freedom-admindocs-docroot'))
             self.assertContains(response,
                 '<h3>The admin documentation system requires Python\'s '
                 '<a href="http://docutils.sf.net/">docutils</a> library.</h3>',
                 html=True)
             self.assertContains(response,
-                                '<h1 id="site-name"><a href="/admin/">Django '
+                                '<h1 id="site-name"><a href="/admin/">Freedom '
                                 'administration</a></h1>')
         finally:
             utils.docutils_is_available = True
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='admin_docs.urls')
 class XViewMiddlewareTest(TestCase):
     fixtures = ['data.xml']
@@ -156,7 +156,7 @@ class DefaultRoleTest(TestCase):
 
     def test_parse_rst(self):
         """
-        Tests that ``django.contrib.admindocs.utils.parse_rst`` uses
+        Tests that ``freedom.contrib.admindocs.utils.parse_rst`` uses
         ``cmsreference`` as the default role.
         """
         markup = ('<p><a class="reference external" href="/admindocs/%s">'
@@ -174,7 +174,7 @@ class DefaultRoleTest(TestCase):
 
     def test_publish_parts(self):
         """
-        Tests that Django hasn't broken the default role for interpreted text
+        Tests that Freedom hasn't broken the default role for interpreted text
         when ``publish_parts`` is used directly, by setting it to
         ``cmsreference``. See #6681.
         """
@@ -187,7 +187,7 @@ class DefaultRoleTest(TestCase):
         self.assertEqual(parts['fragment'], markup)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='admin_docs.urls')
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
 class TestModelDetailView(TestCase):
@@ -200,13 +200,13 @@ class TestModelDetailView(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
         self.response = self.client.get(
-            reverse('django-admindocs-models-detail',
+            reverse('freedom-admindocs-models-detail',
                     args=['admin_docs', 'person']))
 
     def test_method_excludes(self):
         """
         Test that methods that begin with strings defined in
-        ``django.contrib.admindocs.views.MODEL_METHODS_EXCLUDE``
+        ``freedom.contrib.admindocs.views.MODEL_METHODS_EXCLUDE``
         do not get displayed in the admin docs
         """
         self.assertContains(self.response, "<td>get_full_name</td>")
@@ -221,7 +221,7 @@ class TestModelDetailView(TestCase):
         We should be able to get a basic idea of the type returned
         by a method
         """
-        company = Company.objects.create(name="Django")
+        company = Company.objects.create(name="Freedom")
         person = Person.objects.create(
             first_name="Human",
             last_name="User",
@@ -275,7 +275,7 @@ class TestModelDetailView(TestCase):
         links in admin docs
         """
         response = self.client.get(
-            reverse('django-admindocs-models-detail',
+            reverse('freedom-admindocs-models-detail',
                     args=['admin_docs', 'family']))
 
         fields = response.context_data.get('fields')

@@ -2,7 +2,7 @@
 Coding style
 ============
 
-Please follow these coding standards when writing code for inclusion in Django.
+Please follow these coding standards when writing code for inclusion in Freedom.
 
 Python style
 ------------
@@ -11,7 +11,7 @@ Python style
 
   Use `flake8`_ to check for problems in this area. Note that our ``setup.cfg``
   file contains some excluded files (deprecated modules we don't care about
-  cleaning up and some third-party code that Django vendors) as well as some
+  cleaning up and some third-party code that Freedom vendors) as well as some
   excluded errors that we don't consider as gross violations. Remember that
   :pep:`8` is only a guide, so respect the style of the surrounding code as a
   primary goal.
@@ -32,11 +32,11 @@ Python style
 
 * Use convenience imports whenever available. For example, do this::
 
-      from django.views.generic import View
+      from freedom.views.generic import View
 
   Don't do this::
 
-      from django.views.generic.base import View
+      from freedom.views.generic.base import View
 
 * In docstrings, use "action words" such as::
 
@@ -57,25 +57,25 @@ Python style
 Template style
 --------------
 
-* In Django template code, put one (and only one) space between the curly
+* In Freedom template code, put one (and only one) space between the curly
   brackets and the tag contents.
 
   Do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+freedom
 
       {{ foo }}
 
   Don't do this:
 
-  .. code-block:: html+django
+  .. code-block:: html+freedom
 
       {{foo}}
 
 View style
 ----------
 
-* In Django views, the first parameter in a view function should be called
+* In Freedom views, the first parameter in a view function should be called
   ``request``.
 
   Do this::
@@ -137,7 +137,7 @@ Model style
 
 * If you define a ``__str__`` method (previously ``__unicode__`` before Python 3
   was supported), decorate the model class with
-  :func:`~django.utils.encoding.python_2_unicode_compatible`.
+  :func:`~freedom.utils.encoding.python_2_unicode_compatible`.
 
 * The order of model inner classes and standard methods should be as
   follows (noting that these are not all required):
@@ -162,10 +162,10 @@ Model style
             (DIRECTION_DOWN, 'Down'),
         )
 
-Use of ``django.conf.settings``
+Use of ``freedom.conf.settings``
 -------------------------------
 
-Modules should not in general use settings stored in ``django.conf.settings``
+Modules should not in general use settings stored in ``freedom.conf.settings``
 at the top level (i.e. evaluated when the module is imported). The explanation
 for this is as follows:
 
@@ -173,7 +173,7 @@ Manual configuration of settings (i.e. not relying on the
 ``DJANGO_SETTINGS_MODULE`` environment variable) is allowed and possible as
 follows::
 
-    from django.conf import settings
+    from freedom.conf import settings
 
     settings.configure({}, SOME_SETTING='foo')
 
@@ -184,8 +184,8 @@ already been configured).
 
 So, if there is a module containing some code as follows::
 
-    from django.conf import settings
-    from django.core.urlresolvers import get_callable
+    from freedom.conf import settings
+    from freedom.core.urlresolvers import get_callable
 
     default_foo_view = get_callable(settings.FOO_VIEW)
 
@@ -195,8 +195,8 @@ level is incompatible with the ability to configure the settings object
 manually, or makes it very difficult in some circumstances.
 
 Instead of the above code, a level of laziness or indirection must be used,
-such as ``django.utils.functional.LazyObject``,
-``django.utils.functional.lazy()`` or ``lambda``.
+such as ``freedom.utils.functional.LazyObject``,
+``freedom.utils.functional.lazy()`` or ``lambda``.
 
 Miscellaneous
 -------------
@@ -216,7 +216,7 @@ Miscellaneous
   highlight them in diff outputs.
 
 * Please don't put your name in the code you contribute. Our policy is to
-  keep contributors' names in the ``AUTHORS`` file distributed with Django
+  keep contributors' names in the ``AUTHORS`` file distributed with Freedom
   -- not scattered throughout the codebase itself. Feel free to include a
   change to the ``AUTHORS`` file in your patch if you make more than a
   single trivial change.

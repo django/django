@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.test import TestCase
+from freedom.test import TestCase
 from .models import Foo, Whiz, Bar, Article, Base, Child
 
 

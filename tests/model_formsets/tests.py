@@ -5,13 +5,13 @@ import re
 from datetime import date
 from decimal import Decimal
 
-from django import forms
-from django.core.exceptions import ImproperlyConfigured
-from django.db import models
-from django.forms.models import (_get_foreign_key, inlineformset_factory,
+from freedom import forms
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.db import models
+from freedom.forms.models import (_get_foreign_key, inlineformset_factory,
     modelformset_factory, BaseModelFormSet)
-from django.test import TestCase, skipUnlessDBFeature
-from django.utils import six
+from freedom.test import TestCase, skipUnlessDBFeature
+from freedom.utils import six
 
 from .models import (Author, BetterAuthor, Book, BookWithCustomPK,
     BookWithOptionalAltEditor, AlternateBook, AuthorMeeting, CustomPrimaryKey,
@@ -458,7 +458,7 @@ class ModelFormsetTest(TestCase):
     def test_custom_queryset_init(self):
         """
         Test that a queryset can be overridden in the __init__ method.
-        https://docs.djangoproject.com/en/dev/topics/forms/modelforms/#changing-the-queryset
+        https://docs.freedomproject.com/en/dev/topics/forms/modelforms/#changing-the-queryset
         """
         Author.objects.create(name='Charles Baudelaire')
         Author.objects.create(name='Paul Verlaine')
@@ -1096,7 +1096,7 @@ class ModelFormsetTest(TestCase):
         FormSet = inlineformset_factory(Person, Membership, can_delete=False, extra=1, fields="__all__")
         formset = FormSet(instance=person)
 
-        # Django will render a hidden field for model fields that have a callable
+        # Freedom will render a hidden field for model fields that have a callable
         # default. This is required to ensure the value is tested for change correctly
         # when determine what extra forms have changed to save.
 

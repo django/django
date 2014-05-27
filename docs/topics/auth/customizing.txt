@@ -1,8 +1,8 @@
 ====================================
-Customizing authentication in Django
+Customizing authentication in Freedom
 ====================================
 
-The authentication that comes with Django is good enough for most common cases,
+The authentication that comes with Freedom is good enough for most common cases,
 but you may have needs not met by the out-of-the-box defaults. To customize
 authentication to your projects needs involves understanding what points of the
 provided system are extensible or replaceable. This document provides details
@@ -10,10 +10,10 @@ about how the auth system can be customized.
 
 :ref:`Authentication backends <authentication-backends>` provide an extensible
 system for when a username and password stored with the User model need
-to be authenticated against a different service than Django's default.
+to be authenticated against a different service than Freedom's default.
 
 You can give your models :ref:`custom permissions <custom-permissions>` that can be
-checked through Django's authorization system.
+checked through Freedom's authorization system.
 
 You can :ref:`extend <extending-user>` the default User model, or :ref:`substitute
 <auth-custom-user>` a completely customized model.
@@ -30,26 +30,26 @@ methods.
 For example, your company may already have an LDAP setup that stores a username
 and password for every employee. It'd be a hassle for both the network
 administrator and the users themselves if users had separate accounts in LDAP
-and the Django-based applications.
+and the Freedom-based applications.
 
-So, to handle situations like this, the Django authentication system lets you
-plug in other authentication sources. You can override Django's default
+So, to handle situations like this, the Freedom authentication system lets you
+plug in other authentication sources. You can override Freedom's default
 database-based scheme, or you can use the default system in tandem with other
 systems.
 
 See the :ref:`authentication backend reference
 <authentication-backends-reference>` for information on the authentication
-backends included with Django.
+backends included with Freedom.
 
 Specifying authentication backends
 ----------------------------------
 
-Behind the scenes, Django maintains a list of "authentication backends" that it
+Behind the scenes, Freedom maintains a list of "authentication backends" that it
 checks for authentication. When somebody calls
-:func:`django.contrib.auth.authenticate()` -- as described in :ref:`How to log
-a user in <how-to-log-a-user-in>` -- Django tries authenticating across
+:func:`freedom.contrib.auth.authenticate()` -- as described in :ref:`How to log
+a user in <how-to-log-a-user-in>` -- Freedom tries authenticating across
 all of its authentication backends. If the first authentication method fails,
-Django tries the second one, and so on, until all backends have been attempted.
+Freedom tries the second one, and so on, until all backends have been attempted.
 
 The list of authentication backends to use is specified in the
 :setting:`AUTHENTICATION_BACKENDS` setting. This should be a tuple of Python
@@ -58,25 +58,25 @@ classes can be anywhere on your Python path.
 
 By default, :setting:`AUTHENTICATION_BACKENDS` is set to::
 
-    ('django.contrib.auth.backends.ModelBackend',)
+    ('freedom.contrib.auth.backends.ModelBackend',)
 
-That's the basic authentication backend that checks the Django users database
+That's the basic authentication backend that checks the Freedom users database
 and queries the built-in permissions. It does not provide protection against
 brute force attacks via any rate limiting mechanism. You may either implement
 your own rate limiting mechanism in a custom auth backend, or use the
 mechanisms provided by most Web servers.
 
 The order of :setting:`AUTHENTICATION_BACKENDS` matters, so if the same
-username and password is valid in multiple backends, Django will stop
+username and password is valid in multiple backends, Freedom will stop
 processing at the first positive match.
 
-If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
-exception, authentication will immediately fail. Django won't check the
+If a backend raises a :class:`~freedom.core.exceptions.PermissionDenied`
+exception, authentication will immediately fail. Freedom won't check the
 backends that follow.
 
 .. note::
 
-    Once a user has authenticated, Django stores which backend was used to
+    Once a user has authenticated, Freedom stores which backend was used to
     authenticate the user in the user's session, and re-uses the same backend
     for the duration of that session whenever access to the currently
     authenticated user is needed. This effectively means that authentication
@@ -115,19 +115,19 @@ Either way, ``authenticate`` should check the credentials it gets, and it
 should return a ``User`` object that matches those credentials, if the
 credentials are valid. If they're not valid, it should return ``None``.
 
-The Django admin system is tightly coupled to the Django ``User`` object
+The Freedom admin system is tightly coupled to the Freedom ``User`` object
 described at the beginning of this document. For now, the best way to deal with
-this is to create a Django ``User`` object for each user that exists for your
+this is to create a Freedom ``User`` object for each user that exists for your
 backend (e.g., in your LDAP directory, your external SQL database, etc.) You
 can either write a script to do this in advance, or your ``authenticate``
 method can do it the first time a user logs in.
 
 Here's an example backend that authenticates against a username and password
-variable defined in your ``settings.py`` file and creates a Django ``User``
+variable defined in your ``settings.py`` file and creates a Freedom ``User``
 object the first time a user authenticates::
 
-    from django.conf import settings
-    from django.contrib.auth.models import User, check_password
+    from freedom.conf import settings
+    from freedom.contrib.auth.models import User, check_password
 
     class SettingsBackend(object):
         """
@@ -170,22 +170,22 @@ Handling authorization in custom backends
 Custom auth backends can provide their own permissions.
 
 The user model will delegate permission lookup functions
-(:meth:`~django.contrib.auth.models.User.get_group_permissions()`,
-:meth:`~django.contrib.auth.models.User.get_all_permissions()`,
-:meth:`~django.contrib.auth.models.User.has_perm()`, and
-:meth:`~django.contrib.auth.models.User.has_module_perms()`) to any
+(:meth:`~freedom.contrib.auth.models.User.get_group_permissions()`,
+:meth:`~freedom.contrib.auth.models.User.get_all_permissions()`,
+:meth:`~freedom.contrib.auth.models.User.has_perm()`, and
+:meth:`~freedom.contrib.auth.models.User.has_module_perms()`) to any
 authentication backend that implements these functions.
 
 The permissions given to the user will be the superset of all permissions
-returned by all backends. That is, Django grants a permission to a user that
+returned by all backends. That is, Freedom grants a permission to a user that
 any one backend grants.
 
 .. versionadded:: 1.8
 
-    If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
-    exception in :meth:`~django.contrib.auth.models.User.has_perm()` or
-    :meth:`~django.contrib.auth.models.User.has_module_perms()`,
-    the authorization will immediately fail and Django
+    If a backend raises a :class:`~freedom.core.exceptions.PermissionDenied`
+    exception in :meth:`~freedom.contrib.auth.models.User.has_perm()` or
+    :meth:`~freedom.contrib.auth.models.User.has_module_perms()`,
+    the authorization will immediately fail and Freedom
     won't check the backends that follow.
 
 The simple backend above could implement permissions for the magic admin
@@ -201,17 +201,17 @@ fairly simply::
 
 This gives full permissions to the user granted access in the above example.
 Notice that in addition to the same arguments given to the associated
-:class:`django.contrib.auth.models.User` functions, the backend auth functions
+:class:`freedom.contrib.auth.models.User` functions, the backend auth functions
 all take the user object, which may be an anonymous user, as an argument.
 
 A full authorization implementation can be found in the ``ModelBackend`` class
-in `django/contrib/auth/backends.py`_, which is the default backend and queries
+in `freedom/contrib/auth/backends.py`_, which is the default backend and queries
 the ``auth_permission`` table most of the time. If you wish to provide
 custom behavior for only part of the backend API, you can take advantage of
 Python inheritance and subclass ``ModelBackend`` instead of implementing the
 complete API in a custom backend.
 
-.. _django/contrib/auth/backends.py: https://github.com/django/django/blob/master/django/contrib/auth/backends.py
+.. _freedom/contrib/auth/backends.py: https://github.com/freedom/freedom/blob/master/freedom/contrib/auth/backends.py
 
 .. _anonymous_auth:
 
@@ -224,9 +224,9 @@ not authorized to do anything. At the most basic level, most Web sites
 authorize anonymous users to browse most of the site, and many allow anonymous
 posting of comments etc.
 
-Django's permission framework does not have a place to store permissions for
+Freedom's permission framework does not have a place to store permissions for
 anonymous users. However, the user object passed to an authentication backend
-may be an :class:`django.contrib.auth.models.AnonymousUser` object, allowing
+may be an :class:`freedom.contrib.auth.models.AnonymousUser` object, allowing
 the backend to specify custom authorization behavior for anonymous users. This
 is especially useful for the authors of re-usable apps, who can delegate all
 questions of authorization to the auth backend, rather than needing settings,
@@ -253,7 +253,7 @@ backend permission methods.
 Handling object permissions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django's permission framework has a foundation for object permissions, though
+Freedom's permission framework has a foundation for object permissions, though
 there is no implementation for it in the core. That means that checking for
 object permissions will always return ``False`` or an empty list (depending on
 the check performed). An authentication backend will receive the keyword
@@ -295,10 +295,10 @@ Extending the existing User model
 =================================
 
 There are two ways to extend the default
-:class:`~django.contrib.auth.models.User` model without substituting your own
+:class:`~freedom.contrib.auth.models.User` model without substituting your own
 model. If the changes you need are purely behavioral, and don't require any
 change to what is stored in the database, you can create a :ref:`proxy model
-<proxy-models>` based on :class:`~django.contrib.auth.models.User`. This
+<proxy-models>` based on :class:`~freedom.contrib.auth.models.User`. This
 allows for any of the features offered by proxy models including default
 ordering, custom managers, or custom model methods.
 
@@ -308,28 +308,28 @@ additional information. This one-to-one model is often called a profile model,
 as it might store non-auth related information about a site user. For example
 you might create an Employee model::
 
-    from django.contrib.auth.models import User
+    from freedom.contrib.auth.models import User
 
     class Employee(models.Model):
         user = models.OneToOneField(User)
         department = models.CharField(max_length=100)
 
 Assuming an existing Employee Fred Smith who has both a User and Employee
-model, you can access the related information using Django's standard related
+model, you can access the related information using Freedom's standard related
 model conventions::
 
     >>> u = User.objects.get(username='fsmith')
     >>> freds_department = u.employee.department
 
 To add a profile model's fields to the user page in the admin, define an
-:class:`~django.contrib.admin.InlineModelAdmin` (for this example, we'll use a
-:class:`~django.contrib.admin.StackedInline`) in your app's ``admin.py`` and
+:class:`~freedom.contrib.admin.InlineModelAdmin` (for this example, we'll use a
+:class:`~freedom.contrib.admin.StackedInline`) in your app's ``admin.py`` and
 add it to a ``UserAdmin`` class which is registered with the
-:class:`~django.contrib.auth.models.User` class::
+:class:`~freedom.contrib.auth.models.User` class::
 
-    from django.contrib import admin
-    from django.contrib.auth.admin import UserAdmin
-    from django.contrib.auth.models import User
+    from freedom.contrib import admin
+    from freedom.contrib.auth.admin import UserAdmin
+    from freedom.contrib.auth.models import User
 
     from my_user_profile_app.models import Employee
 
@@ -348,10 +348,10 @@ add it to a ``UserAdmin`` class which is registered with the
     admin.site.unregister(User)
     admin.site.register(User, UserAdmin)
 
-These profile models are not special in any way - they are just Django models that
+These profile models are not special in any way - they are just Freedom models that
 happen to have a one-to-one link with a User model. As such, they do not get
 auto created when a user is created, but
-a :attr:`django.db.models.signals.post_save` could be used to create or update
+a :attr:`freedom.db.models.signals.post_save` could be used to create or update
 related models as appropriate.
 
 Note that using related models results in additional queries or joins to
@@ -365,18 +365,18 @@ the extra database load.
 Substituting a custom User model
 ================================
 
-Some kinds of projects may have authentication requirements for which Django's
-built-in :class:`~django.contrib.auth.models.User` model is not always
+Some kinds of projects may have authentication requirements for which Freedom's
+built-in :class:`~freedom.contrib.auth.models.User` model is not always
 appropriate. For instance, on some sites it makes more sense to use an email
 address as your identification token instead of a username.
 
-Django allows you to override the default User model by providing a value for
+Freedom allows you to override the default User model by providing a value for
 the :setting:`AUTH_USER_MODEL` setting that references a custom model::
 
      AUTH_USER_MODEL = 'myapp.MyUser'
 
-This dotted pair describes the name of the Django app (which must be in your
-:setting:`INSTALLED_APPS`), and the name of the Django model that you wish to
+This dotted pair describes the name of the Freedom app (which must be in your
+:setting:`INSTALLED_APPS`), and the name of the Freedom model that you wish to
 use as your User model.
 
 .. warning::
@@ -394,27 +394,27 @@ use as your User model.
 Referencing the User model
 --------------------------
 
-.. currentmodule:: django.contrib.auth
+.. currentmodule:: freedom.contrib.auth
 
-If you reference :class:`~django.contrib.auth.models.User` directly (for
+If you reference :class:`~freedom.contrib.auth.models.User` directly (for
 example, by referring to it in a foreign key), your code will not work in
 projects where the :setting:`AUTH_USER_MODEL` setting has been changed to a
 different User model.
 
 .. function:: get_user_model()
 
-    Instead of referring to :class:`~django.contrib.auth.models.User` directly,
+    Instead of referring to :class:`~freedom.contrib.auth.models.User` directly,
     you should reference the user model using
-    ``django.contrib.auth.get_user_model()``. This method will return the
+    ``freedom.contrib.auth.get_user_model()``. This method will return the
     currently active User model -- the custom User model if one is specified, or
-    :class:`~django.contrib.auth.models.User` otherwise.
+    :class:`~freedom.contrib.auth.models.User` otherwise.
 
     When you define a foreign key or many-to-many relations to the User model,
     you should specify the custom model using the :setting:`AUTH_USER_MODEL`
     setting. For example::
 
-        from django.conf import settings
-        from django.db import models
+        from freedom.conf import settings
+        from freedom.db import models
 
         class Article(models.Model):
             author = models.ForeignKey(settings.AUTH_USER_MODEL)
@@ -424,8 +424,8 @@ different User model.
         When connecting to signals sent by the User model, you should specify the
         custom model using the :setting:`AUTH_USER_MODEL` setting. For example::
 
-            from django.conf import settings
-            from django.db.models.signals import post_save
+            from freedom.conf import settings
+            from freedom.db.models.signals import post_save
 
             def post_save_receiver(signal, sender, instance, **kwargs):
                 pass
@@ -434,7 +434,7 @@ different User model.
 
     Generally speaking, you should reference the User model with the
     :setting:`AUTH_USER_MODEL` setting in code that is executed at import
-    time. ``get_user_model()`` only works once Django has imported all models.
+    time. ``get_user_model()`` only works once Freedom has imported all models.
 
 Specifying a custom User model
 ------------------------------
@@ -450,7 +450,7 @@ Specifying a custom User model
     apps. On the other hand, queries to retrieve this related information
     will involve a database join, which may have an effect on performance.
 
-Django expects your custom User model to meet some minimum requirements.
+Freedom expects your custom User model to meet some minimum requirements.
 
 1. Your model must have an integer primary key.
 
@@ -466,12 +466,12 @@ Django expects your custom User model to meet some minimum requirements.
    the same value.
 
 The easiest way to construct a compliant custom User model is to inherit from
-:class:`~django.contrib.auth.models.AbstractBaseUser`.
-:class:`~django.contrib.auth.models.AbstractBaseUser` provides the core
+:class:`~freedom.contrib.auth.models.AbstractBaseUser`.
+:class:`~freedom.contrib.auth.models.AbstractBaseUser` provides the core
 implementation of a ``User`` model, including hashed passwords and tokenized
 password resets. You must then provide some key implementation details:
 
-.. currentmodule:: django.contrib.auth
+.. currentmodule:: freedom.contrib.auth
 
 .. class:: models.CustomUser
 
@@ -496,11 +496,11 @@ password resets. You must then provide some key implementation details:
         A list of the field names that will be prompted for when creating a
         user via the :djadmin:`createsuperuser` management command. The user
         will be prompted to supply a value for each of these fields. It must
-        include any field for which :attr:`~django.db.models.Field.blank` is
+        include any field for which :attr:`~freedom.db.models.Field.blank` is
         ``False`` or undefined and may include additional fields you want
         prompted for when a user is created interactively. However, it will not
-        work for :class:`~django.db.models.ForeignKey` fields.
-        ``REQUIRED_FIELDS`` has no effect in other parts of Django, like
+        work for :class:`~freedom.db.models.ForeignKey` fields.
+        ``REQUIRED_FIELDS`` has no effect in other parts of Freedom, like
         creating a user in the admin.
 
         For example, here is the partial definition for a ``User`` model that
@@ -526,7 +526,7 @@ password resets. You must then provide some key implementation details:
         ``AbstractBaseUser`` defaulting to ``True``. How you choose to
         implement it will depend on the details of your chosen auth backends.
         See the documentation of the :attr:`is_active attribute on the built-in
-        user model <django.contrib.auth.models.User.is_active>` for details.
+        user model <freedom.contrib.auth.models.User.is_active>` for details.
 
     .. method:: get_full_name()
 
@@ -539,10 +539,10 @@ password resets. You must then provide some key implementation details:
         A short, informal identifier for the user. A common interpretation
         would be the first name of the user, but it can be any string that
         identifies the user in an informal way. It may also return the same
-        value as :meth:`django.contrib.auth.models.User.get_full_name()`.
+        value as :meth:`freedom.contrib.auth.models.User.get_full_name()`.
 
 The following methods are available on any subclass of
-:class:`~django.contrib.auth.models.AbstractBaseUser`:
+:class:`~freedom.contrib.auth.models.AbstractBaseUser`:
 
 .. class:: models.AbstractBaseUser
 
@@ -553,9 +553,9 @@ The following methods are available on any subclass of
     .. method:: models.AbstractBaseUser.is_anonymous()
 
         Always returns ``False``. This is a way of differentiating
-        from  :class:`~django.contrib.auth.models.AnonymousUser` objects.
+        from  :class:`~freedom.contrib.auth.models.AnonymousUser` objects.
         Generally, you should prefer using
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_authenticated()` to this
+        :meth:`~freedom.contrib.auth.models.AbstractBaseUser.is_authenticated()` to this
         method.
 
     .. method:: models.AbstractBaseUser.is_authenticated()
@@ -569,11 +569,11 @@ The following methods are available on any subclass of
 
         Sets the user's password to the given raw string, taking care of the
         password hashing. Doesn't save the
-        :class:`~django.contrib.auth.models.AbstractBaseUser` object.
+        :class:`~freedom.contrib.auth.models.AbstractBaseUser` object.
 
         When the raw_password is ``None``, the password will be set to an
         unusable password, as if
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password()`
+        :meth:`~freedom.contrib.auth.models.AbstractBaseUser.set_unusable_password()`
         were used.
 
     .. method:: models.AbstractBaseUser.check_password(raw_password)
@@ -586,9 +586,9 @@ The following methods are available on any subclass of
 
         Marks the user as having no password set.  This isn't the same as
         having a blank string for a password.
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.check_password()` for this user
+        :meth:`~freedom.contrib.auth.models.AbstractBaseUser.check_password()` for this user
         will never return ``True``. Doesn't save the
-        :class:`~django.contrib.auth.models.AbstractBaseUser` object.
+        :class:`~freedom.contrib.auth.models.AbstractBaseUser` object.
 
         You may need this if authentication for your application takes place
         against an existing external source such as an LDAP directory.
@@ -596,7 +596,7 @@ The following methods are available on any subclass of
     .. method:: models.AbstractBaseUser.has_usable_password()
 
         Returns ``False`` if
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.set_unusable_password()` has
+        :meth:`~freedom.contrib.auth.models.AbstractBaseUser.set_unusable_password()` has
         been called for this user.
 
     .. method:: models.AbstractBaseUser.get_session_auth_hash()
@@ -609,10 +609,10 @@ The following methods are available on any subclass of
 You should also define a custom manager for your ``User`` model. If your
 ``User`` model defines ``username``, ``email``, ``is_staff``, ``is_active``,
 ``is_superuser``, ``last_login``, and ``date_joined`` fields the same as
-Django's default ``User``, you can just install Django's
-:class:`~django.contrib.auth.models.UserManager`; however, if your ``User``
+Freedom's default ``User``, you can just install Freedom's
+:class:`~freedom.contrib.auth.models.UserManager`; however, if your ``User``
 model defines different fields, you will need to define a custom manager that
-extends :class:`~django.contrib.auth.models.BaseUserManager` providing two
+extends :class:`~freedom.contrib.auth.models.BaseUserManager` providing two
 additional methods:
 
 .. class:: models.CustomUserManager
@@ -642,7 +642,7 @@ additional methods:
         Unlike ``create_user()``, ``create_superuser()`` *must* require the
         caller to provide a password.
 
-:class:`~django.contrib.auth.models.BaseUserManager` provides the following
+:class:`~freedom.contrib.auth.models.BaseUserManager` provides the following
 utility methods:
 
 .. class:: models.BaseUserManager
@@ -668,14 +668,14 @@ utility methods:
         * ``o``, ``O``, and ``0`` (lowercase letter o, uppercase letter o,
           and zero)
 
-Extending Django's default User
+Extending Freedom's default User
 -------------------------------
 
-If you're entirely happy with Django's :class:`~django.contrib.auth.models.User`
+If you're entirely happy with Freedom's :class:`~freedom.contrib.auth.models.User`
 model and you just want to add some additional profile information, you can
-simply subclass ``django.contrib.auth.models.AbstractUser`` and add your
+simply subclass ``freedom.contrib.auth.models.AbstractUser`` and add your
 custom profile fields. This class provides the full implementation of the
-default :class:`~django.contrib.auth.models.User` as an :ref:`abstract model
+default :class:`~freedom.contrib.auth.models.User` as an :ref:`abstract model
 <abstract-base-classes>`.
 
 .. _custom-users-and-the-built-in-auth-forms:
@@ -683,7 +683,7 @@ default :class:`~django.contrib.auth.models.User` as an :ref:`abstract model
 Custom users and the built-in auth forms
 ----------------------------------------
 
-As you may expect, built-in Django's :ref:`forms <built-in-auth-forms>` and
+As you may expect, built-in Freedom's :ref:`forms <built-in-auth-forms>` and
 :ref:`views <built-in-auth-views>` make certain assumptions about the user
 model that they are working with.
 
@@ -691,41 +691,41 @@ If your user model doesn't follow the same assumptions, it may be necessary to d
 a replacement form, and pass that form in as part of the configuration of the
 auth views.
 
-* :class:`~django.contrib.auth.forms.UserCreationForm`
+* :class:`~freedom.contrib.auth.forms.UserCreationForm`
 
-  Depends on the :class:`~django.contrib.auth.models.User` model.
+  Depends on the :class:`~freedom.contrib.auth.models.User` model.
   Must be re-written for any custom user model.
 
-* :class:`~django.contrib.auth.forms.UserChangeForm`
+* :class:`~freedom.contrib.auth.forms.UserChangeForm`
 
-  Depends on the :class:`~django.contrib.auth.models.User` model.
+  Depends on the :class:`~freedom.contrib.auth.models.User` model.
   Must be re-written for any custom user model.
 
-* :class:`~django.contrib.auth.forms.AuthenticationForm`
+* :class:`~freedom.contrib.auth.forms.AuthenticationForm`
 
-  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`,
+  Works with any subclass of :class:`~freedom.contrib.auth.models.AbstractBaseUser`,
   and will adapt to use the field defined in ``USERNAME_FIELD``.
 
-* :class:`~django.contrib.auth.forms.PasswordResetForm`
+* :class:`~freedom.contrib.auth.forms.PasswordResetForm`
 
   Assumes that the user model has an integer primary key, has a field named
   ``email`` that can be used to identify the user, and a boolean field
   named ``is_active`` to prevent password resets for inactive users.
 
-* :class:`~django.contrib.auth.forms.SetPasswordForm`
+* :class:`~freedom.contrib.auth.forms.SetPasswordForm`
 
-  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
+  Works with any subclass of :class:`~freedom.contrib.auth.models.AbstractBaseUser`
 
-* :class:`~django.contrib.auth.forms.PasswordChangeForm`
+* :class:`~freedom.contrib.auth.forms.PasswordChangeForm`
 
-  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
+  Works with any subclass of :class:`~freedom.contrib.auth.models.AbstractBaseUser`
 
-* :class:`~django.contrib.auth.forms.AdminPasswordChangeForm`
+* :class:`~freedom.contrib.auth.forms.AdminPasswordChangeForm`
 
-  Works with any subclass of :class:`~django.contrib.auth.models.AbstractBaseUser`
+  Works with any subclass of :class:`~freedom.contrib.auth.models.AbstractBaseUser`
 
 
-Custom users and :mod:`django.contrib.admin`
+Custom users and :mod:`freedom.contrib.admin`
 --------------------------------------------
 
 If you want your custom User model to also work with Admin, your User model must
@@ -754,26 +754,26 @@ control access of the User to admin content:
     the given app.
 
 You will also need to register your custom User model with the admin. If
-your custom User model extends ``django.contrib.auth.models.AbstractUser``,
-you can use Django's existing ``django.contrib.auth.admin.UserAdmin``
+your custom User model extends ``freedom.contrib.auth.models.AbstractUser``,
+you can use Freedom's existing ``freedom.contrib.auth.admin.UserAdmin``
 class. However, if your User model extends
-:class:`~django.contrib.auth.models.AbstractBaseUser`, you'll need to define
+:class:`~freedom.contrib.auth.models.AbstractBaseUser`, you'll need to define
 a custom ``ModelAdmin`` class. It may be possible to subclass the default
-``django.contrib.auth.admin.UserAdmin``; however, you'll need to
+``freedom.contrib.auth.admin.UserAdmin``; however, you'll need to
 override any of the definitions that refer to fields on
-``django.contrib.auth.models.AbstractUser`` that aren't on your
+``freedom.contrib.auth.models.AbstractUser`` that aren't on your
 custom User class.
 
 Custom users and permissions
 ----------------------------
 
-To make it easy to include Django's permission framework into your own User
-class, Django provides :class:`~django.contrib.auth.models.PermissionsMixin`.
+To make it easy to include Freedom's permission framework into your own User
+class, Freedom provides :class:`~freedom.contrib.auth.models.PermissionsMixin`.
 This is an abstract model you can include in the class hierarchy for your User
 model, giving you all the methods and database fields necessary to support
-Django's permission model.
+Freedom's permission model.
 
-:class:`~django.contrib.auth.models.PermissionsMixin` provides the following
+:class:`~freedom.contrib.auth.models.PermissionsMixin` provides the following
 methods and attributes:
 
 .. class:: models.PermissionsMixin
@@ -822,13 +822,13 @@ methods and attributes:
     .. method:: models.PermissionsMixin.has_module_perms(package_name)
 
         Returns ``True`` if the user has any permissions in the given package
-        (the Django app label). If the user is inactive, this method will
+        (the Freedom app label). If the user is inactive, this method will
         always return ``False``.
 
 .. admonition:: ModelBackend
 
     If you don't include the
-    :class:`~django.contrib.auth.models.PermissionsMixin`, you must ensure you
+    :class:`~freedom.contrib.auth.models.PermissionsMixin`, you must ensure you
     don't invoke the permissions methods on ``ModelBackend``. ``ModelBackend``
     assumes that certain fields are available on your user model. If your User
     model doesn't provide  those fields, you will receive database errors when
@@ -838,9 +838,9 @@ Custom users and Proxy models
 -----------------------------
 
 One limitation of custom User models is that installing a custom User model
-will break any proxy model extending :class:`~django.contrib.auth.models.User`.
+will break any proxy model extending :class:`~freedom.contrib.auth.models.User`.
 Proxy models must be based on a concrete base class; by defining a custom User
-model, you remove the ability of Django to reliably identify the base class.
+model, you remove the ability of Freedom to reliably identify the base class.
 
 If your project uses proxy models, you must either modify the proxy to extend
 the User model that is currently in use in your project, or merge your proxy's
@@ -850,7 +850,7 @@ Custom users and signals
 ------------------------
 
 Another limitation of custom User models is that you can't use
-:func:`django.contrib.auth.get_user_model()` as the sender or target of a signal
+:func:`freedom.contrib.auth.get_user_model()` as the sender or target of a signal
 handler. Instead, you must register the handler with the resulting User model.
 See :doc:`/topics/signals` for more information on registering and sending
 signals.
@@ -865,14 +865,14 @@ instance of User will fail if the User model has been swapped out. This
 includes any attempt to create an instance of User with a fixture.
 
 To ensure that your test suite will pass in any project configuration,
-``django.contrib.auth.tests.utils`` defines a ``@skipIfCustomUser`` decorator.
+``freedom.contrib.auth.tests.utils`` defines a ``@skipIfCustomUser`` decorator.
 This decorator will cause a test case to be skipped if any User model other
-than the default Django user is in use. This decorator can be applied to a
+than the default Freedom user is in use. This decorator can be applied to a
 single test, or to an entire test class.
 
 Depending on your application, tests may also be needed to be added to ensure
 that the application works with *any* user model, not just the default User
-model. To assist with this, Django provides two substitute user models that
+model. To assist with this, Freedom provides two substitute user models that
 can be used in test suites:
 
 .. class:: tests.custom_user.CustomUser
@@ -882,7 +882,7 @@ can be used in test suites:
 
 .. class:: tests.custom_user.ExtensionUser
 
-  A custom user model that extends ``django.contrib.auth.models.AbstractUser``,
+  A custom user model that extends ``freedom.contrib.auth.models.AbstractUser``,
   adding a ``date_of_birth`` field.
 
 You can then use the ``@override_settings`` decorator to make that test run
@@ -890,9 +890,9 @@ with the custom User model. For example, here is a skeleton for a test that
 would test three possible User models -- the default, plus the two User
 models provided by ``auth`` app::
 
-    from django.contrib.auth.tests.utils import skipIfCustomUser
-    from django.contrib.auth.tests.custom_user import CustomUser, ExtensionUser
-    from django.test import TestCase, override_settings
+    from freedom.contrib.auth.tests.utils import skipIfCustomUser
+    from freedom.contrib.auth.tests.custom_user import CustomUser, ExtensionUser
+    from freedom.test import TestCase, override_settings
 
 
     class ApplicationTestCase(TestCase):
@@ -925,8 +925,8 @@ projects for production use.
 This code would all live in a ``models.py`` file for a custom
 authentication app::
 
-    from django.db import models
-    from django.contrib.auth.models import (
+    from freedom.db import models
+    from freedom.contrib.auth.models import (
         BaseUserManager, AbstractBaseUser
     )
 
@@ -1005,14 +1005,14 @@ authentication app::
             # Simplest possible answer: All admins are staff
             return self.is_admin
 
-Then, to register this custom User model with Django's admin, the following
+Then, to register this custom User model with Freedom's admin, the following
 code would be required in the app's ``admin.py`` file::
 
-    from django import forms
-    from django.contrib import admin
-    from django.contrib.auth.models import Group
-    from django.contrib.auth.admin import UserAdmin
-    from django.contrib.auth.forms import ReadOnlyPasswordHashField
+    from freedom import forms
+    from freedom.contrib import admin
+    from freedom.contrib.auth.models import Group
+    from freedom.contrib.auth.admin import UserAdmin
+    from freedom.contrib.auth.forms import ReadOnlyPasswordHashField
 
     from customauth.models import MyUser
 
@@ -1091,7 +1091,7 @@ code would be required in the app's ``admin.py`` file::
 
     # Now register the new UserAdmin...
     admin.site.register(MyUser, MyUserAdmin)
-    # ... and, since we're not using Django's built-in permissions,
+    # ... and, since we're not using Freedom's built-in permissions,
     # unregister the Group model from admin.
     admin.site.unregister(Group)
 

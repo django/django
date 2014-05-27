@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.utils.six import StringIO
+from freedom.utils.six import StringIO
 import sys
 
-from django.apps import apps
-from django.conf import settings
-from django.core import checks
-from django.core.checks import Error, Warning
-from django.core.checks.registry import CheckRegistry
-from django.core.checks.compatibility.django_1_6_0 import check_1_6_compatibility
-from django.core.management.base import CommandError
-from django.core.management import call_command
-from django.db.models.fields import NOT_PROVIDED
-from django.test import TestCase
-from django.test.utils import override_settings, override_system_checks
-from django.utils.encoding import force_text
+from freedom.apps import apps
+from freedom.conf import settings
+from freedom.core import checks
+from freedom.core.checks import Error, Warning
+from freedom.core.checks.registry import CheckRegistry
+from freedom.core.checks.compatibility.freedom_1_6_0 import check_1_6_compatibility
+from freedom.core.management.base import CommandError
+from freedom.core.management import call_command
+from freedom.db.models.fields import NOT_PROVIDED
+from freedom.test import TestCase
+from freedom.test.utils import override_settings, override_system_checks
+from freedom.utils.encoding import force_text
 
 from .models import SimpleModel, Book
 
@@ -81,9 +81,9 @@ class MessageTests(TestCase):
         self.assertEqual(force_text(e), expected)
 
 
-class Django_1_6_0_CompatibilityChecks(TestCase):
+class Freedom_1_6_0_CompatibilityChecks(TestCase):
 
-    @override_settings(TEST_RUNNER='django.test.runner.DiscoverRunner')
+    @override_settings(TEST_RUNNER='freedom.test.runner.DiscoverRunner')
     def test_test_runner_new_default(self):
         errors = check_1_6_compatibility()
         self.assertEqual(errors, [])
@@ -99,7 +99,7 @@ class Django_1_6_0_CompatibilityChecks(TestCase):
         if 'TEST_RUNNER' in settings._wrapped._explicit_settings:
             test_runner_overridden = True
             settings._wrapped._explicit_settings.remove('TEST_RUNNER')
-        # We remove some settings to make this look like a project generated under Django 1.5.
+        # We remove some settings to make this look like a project generated under Freedom 1.5.
         settings._wrapped._explicit_settings.add('MANAGERS')
         settings._wrapped._explicit_settings.add('ADMINS')
         try:
@@ -107,10 +107,10 @@ class Django_1_6_0_CompatibilityChecks(TestCase):
             expected = [
                 checks.Warning(
                     "Some project unittests may not execute as expected.",
-                    hint=("Django 1.6 introduced a new default test runner. It looks like "
-                          "this project was generated using Django 1.5 or earlier. You should "
+                    hint=("Freedom 1.6 introduced a new default test runner. It looks like "
+                          "this project was generated using Freedom 1.5 or earlier. You should "
                           "ensure your tests are all running & behaving as expected. See "
-                          "https://docs.djangoproject.com/en/dev/releases/1.6/#new-test-runner "
+                          "https://docs.freedomproject.com/en/dev/releases/1.6/#new-test-runner "
                           "for more information."),
                     obj=None,
                     id='1_6.W001',
@@ -135,8 +135,8 @@ class Django_1_6_0_CompatibilityChecks(TestCase):
                 expected = [
                     checks.Warning(
                         'BooleanField does not have a default value.',
-                        hint=('Django 1.6 changed the default value of BooleanField from False to None. '
-                              'See https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield '
+                        hint=('Freedom 1.6 changed the default value of BooleanField from False to None. '
+                              'See https://docs.freedomproject.com/en/1.6/ref/models/fields/#booleanfield '
                               'for more information.'),
                         obj=boolean_field,
                         id='1_6.W002',

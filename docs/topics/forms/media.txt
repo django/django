@@ -7,36 +7,36 @@ HTML - it also requires CSS stylesheets, and if you want to use fancy
 page. The exact combination of CSS and JavaScript that is required for
 any given page will depend upon the widgets that are in use on that page.
 
-This is where asset definitions come in. Django allows you to
+This is where asset definitions come in. Freedom allows you to
 associate different files -- like stylesheets and scripts -- with the
 forms and widgets that require those assets. For example, if you want
 to use a calendar to render DateFields, you can define a custom
 Calendar widget. This widget can then be associated with the CSS and
 JavaScript that is required to render the calendar. When the Calendar
-widget is used on a form, Django is able to identify the CSS and
+widget is used on a form, Freedom is able to identify the CSS and
 JavaScript files that are required, and provide the list of file names
 in a form suitable for easy inclusion on your Web page.
 
-.. admonition:: Assets and Django Admin
+.. admonition:: Assets and Freedom Admin
 
-    The Django Admin application defines a number of customized
+    The Freedom Admin application defines a number of customized
     widgets for calendars, filtered selections, and so on. These
-    widgets define asset requirements, and the Django Admin uses the
-    custom widgets in place of the Django defaults. The Admin
+    widgets define asset requirements, and the Freedom Admin uses the
+    custom widgets in place of the Freedom defaults. The Admin
     templates will only include those files that are required to
     render the widgets on any given page.
 
-    If you like the widgets that the Django Admin application uses,
+    If you like the widgets that the Freedom Admin application uses,
     feel free to use them in your own application! They're all stored
-    in ``django.contrib.admin.widgets``.
+    in ``freedom.contrib.admin.widgets``.
 
 .. admonition:: Which JavaScript toolkit?
 
     Many JavaScript toolkits exist, and many of them include widgets (such
     as calendar widgets) that can be used to enhance your application.
-    Django has deliberately avoided blessing any one JavaScript toolkit.
+    Freedom has deliberately avoided blessing any one JavaScript toolkit.
     Each toolkit has its own relative strengths and weaknesses - use
-    whichever toolkit suits your requirements. Django is able to integrate
+    whichever toolkit suits your requirements. Freedom is able to integrate
     with any JavaScript toolkit.
 
 .. _assets-as-a-static-definition:
@@ -50,7 +50,7 @@ inner class define the requirements.
 
 Here's a simple example::
 
-    from django import forms
+    from freedom import forms
 
     class CalendarWidget(forms.TextInput):
         class Media:
@@ -210,13 +210,13 @@ As part of the introduction of the
 to refer to "static files" (images, CSS, Javascript, etc.) that are needed
 to render a complete web page: :setting:`STATIC_URL` and :setting:`STATIC_ROOT`.
 
-To find the appropriate prefix to use, Django will check if the
+To find the appropriate prefix to use, Freedom will check if the
 :setting:`STATIC_URL` setting is not ``None`` and automatically fall back
 to using :setting:`MEDIA_URL`. For example, if the :setting:`MEDIA_URL` for
 your site was ``'http://uploads.example.com/'`` and :setting:`STATIC_URL`
 was ``None``::
 
-    >>> from django import forms
+    >>> from freedom import forms
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         css = {
@@ -275,7 +275,7 @@ Combining ``Media`` objects
 added, the resulting ``Media`` object contains the union of the assets
 specified by both::
 
-    >>> from django import forms
+    >>> from freedom import forms
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         css = {
@@ -309,7 +309,7 @@ objects have a ``media`` property. The default value for this property
 is the result of adding the ``media`` definitions for all widgets that
 are part of the form::
 
-    >>> from django import forms
+    >>> from freedom import forms
     >>> class ContactForm(forms.Form):
     ...     date = DateField(widget=CalendarWidget)
     ...     name = CharField(max_length=40, widget=OtherWidget)

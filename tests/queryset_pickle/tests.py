@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import pickle
 import datetime
 
-from django.test import TestCase
+from freedom.test import TestCase
 
 from .models import Group, Event, Happening, Container, M2MModel
 

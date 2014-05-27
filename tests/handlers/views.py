@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import SuspiciousOperation
-from django.db import connection, transaction
-from django.http import HttpResponse, StreamingHttpResponse
+from freedom.core.exceptions import SuspiciousOperation
+from freedom.db import connection, transaction
+from freedom.http import HttpResponse, StreamingHttpResponse
 
 
 def regular(request):

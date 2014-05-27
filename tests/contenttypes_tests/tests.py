@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from django.apps.registry import Apps, apps
-from django.contrib.contenttypes.fields import (
+from freedom.apps.registry import Apps, apps
+from freedom.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
-from django.contrib.contenttypes.models import ContentType
-from django.core import checks
-from django.db import models
-from django.test import TestCase
-from django.test.utils import override_settings
-from django.utils.encoding import force_str
+from freedom.contrib.contenttypes.models import ContentType
+from freedom.core import checks
+from freedom.db import models
+from freedom.test import TestCase
+from freedom.test.utils import override_settings
+from freedom.utils.encoding import force_str
 
 from .models import Author, Article, SchemeIncludedURL
 

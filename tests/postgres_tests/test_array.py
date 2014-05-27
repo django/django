@@ -1,14 +1,14 @@
 import json
 import unittest
 
-from django.contrib.postgres.fields import ArrayField
-from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
-from django.core import exceptions, serializers
-from django.db import models, IntegrityError, connection
-from django.db.migrations.writer import MigrationWriter
-from django import forms
-from django.test import TestCase
-from django.utils import timezone
+from freedom.contrib.postgres.fields import ArrayField
+from freedom.contrib.postgres.forms import SimpleArrayField, SplitArrayField
+from freedom.core import exceptions, serializers
+from freedom.db import models, IntegrityError, connection
+from freedom.db.migrations.writer import MigrationWriter
+from freedom import forms
+from freedom.test import TestCase
+from freedom.utils import timezone
 
 from .models import IntegerArrayModel, NullableIntegerArrayModel, CharArrayModel, DateTimeArrayModel, NestedIntegerArrayModel
 
@@ -217,7 +217,7 @@ class TestMigrations(TestCase):
     def test_makemigrations(self):
         field = ArrayField(models.CharField(max_length=20))
         statement, imports = MigrationWriter.serialize(field)
-        self.assertEqual(statement, 'django.contrib.postgres.fields.ArrayField(models.CharField(max_length=20), size=None)')
+        self.assertEqual(statement, 'freedom.contrib.postgres.fields.ArrayField(models.CharField(max_length=20), size=None)')
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL required')

@@ -10,13 +10,13 @@ import shutil
 import tempfile as sys_tempfile
 import unittest
 
-from django.core.files import temp as tempfile
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http.multipartparser import MultiPartParser
-from django.test import TestCase, client
-from django.test import override_settings
-from django.utils.encoding import force_bytes
-from django.utils.six import StringIO
+from freedom.core.files import temp as tempfile
+from freedom.core.files.uploadedfile import SimpleUploadedFile
+from freedom.http.multipartparser import MultiPartParser
+from freedom.test import TestCase, client
+from freedom.test import override_settings
+from freedom.utils.encoding import force_bytes
+from freedom.utils.six import StringIO
 
 from . import uploadhandler
 from .models import FileModel
@@ -342,7 +342,7 @@ class FileUploadTests(TestCase):
                 return ret
 
         # Maybe this is a little more complicated that it needs to be; but if
-        # the django.test.client.FakePayload.read() implementation changes then
+        # the freedom.test.client.FakePayload.read() implementation changes then
         # this test would fail.  So we need to know exactly what kind of error
         # it raises when there is an attempt to read more than the available bytes:
         try:
@@ -375,7 +375,7 @@ class FileUploadTests(TestCase):
         uploaded.
         """
         # Synthesize the contents of a file upload with a mixed case filename
-        # so we don't have to carry such a file in the Django tests source code
+        # so we don't have to carry such a file in the Freedom tests source code
         # tree.
         vars = {'boundary': 'oUrBoUnDaRyStRiNg'}
         post_data = [

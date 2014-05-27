@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import FieldError
-from django.test import TestCase
-from django.utils import six
+from freedom.core.exceptions import FieldError
+from freedom.test import TestCase
+from freedom.utils import six
 
 from .models import Author, Article
 
@@ -12,7 +12,7 @@ class CustomColumnsTests(TestCase):
         a1 = Author.objects.create(first_name="John", last_name="Smith")
         a2 = Author.objects.create(first_name="Peter", last_name="Jones")
 
-        art = Article.objects.create(headline="Django lets you build Web apps easily")
+        art = Article.objects.create(headline="Freedom lets you build Web apps easily")
         art.authors = [a1, a2]
 
         self.a1 = a1
@@ -66,7 +66,7 @@ class CustomColumnsTests(TestCase):
     def test_get_all_articles_for_an_author(self):
         self.assertQuerysetEqual(
             self.a1.article_set.all(), [
-                "Django lets you build Web apps easily",
+                "Freedom lets you build Web apps easily",
             ],
             lambda a: a.headline
         )

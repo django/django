@@ -2,9 +2,9 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from django.db import connection
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test import override_settings
+from freedom.db import connection
+from freedom.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from freedom.test import override_settings
 
 from .models import Country, Restaurant, Pizzeria, State, TwoFields
 

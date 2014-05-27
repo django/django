@@ -7,9 +7,9 @@ try:
 except ImportError:
     Image = None
 
-from django.core.files.storage import FileSystemStorage
-from django.db import models
-from django.db.models.fields.files import ImageFieldFile, ImageField
+from freedom.core.files.storage import FileSystemStorage
+from freedom.db import models
+from freedom.db.models.fields.files import ImageFieldFile, ImageField
 
 
 class Foo(models.Model):

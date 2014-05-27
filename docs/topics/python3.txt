@@ -2,7 +2,7 @@
 Porting to Python 3
 ===================
 
-Django 1.5 is the first version of Django to support Python 3. The same code
+Freedom 1.5 is the first version of Freedom to support Python 3. The same code
 runs both on Python 2 (≥ 2.6.5) and Python 3 (≥ 3.2), thanks to the six_
 compatibility layer.
 
@@ -10,7 +10,7 @@ compatibility layer.
 
 This document is primarily targeted at authors of pluggable application
 who want to support both Python 2 and 3. It also describes guidelines that
-apply to Django's code.
+apply to Freedom's code.
 
 Philosophy
 ==========
@@ -20,26 +20,26 @@ and Python 3. If you aren't, read `Python's official porting guide`_ first.
 Refreshing your knowledge of unicode handling on Python 2 and 3 will help; the
 `Pragmatic Unicode`_ presentation is a good resource.
 
-Django uses the *Python 2/3 Compatible Source* strategy. Of course, you're
+Freedom uses the *Python 2/3 Compatible Source* strategy. Of course, you're
 free to chose another strategy for your own code, especially if you don't need
 to stay compatible with Python 2. But authors of pluggable applications are
-encouraged to use the same porting strategy as Django itself.
+encouraged to use the same porting strategy as Freedom itself.
 
-Writing compatible code is much easier if you target Python ≥ 2.6. Django 1.5
-introduces compatibility tools such as :mod:`django.utils.six`, which is a
+Writing compatible code is much easier if you target Python ≥ 2.6. Freedom 1.5
+introduces compatibility tools such as :mod:`freedom.utils.six`, which is a
 customized version of the :mod:`six module <six>`. For convenience,
-forwards-compatible aliases were introduced in Django 1.4.2. If your
-application takes advantage of these tools, it will require Django ≥ 1.4.2.
+forwards-compatible aliases were introduced in Freedom 1.4.2. If your
+application takes advantage of these tools, it will require Freedom ≥ 1.4.2.
 
 Obviously, writing compatible source code adds some overhead, and that can
-cause frustration. Django's developers have found that attempting to write
+cause frustration. Freedom's developers have found that attempting to write
 Python 3 code that's compatible with Python 2 is much more rewarding than the
 opposite. Not only does that make your code more future-proof, but Python 3's
 advantages (like the saner string handling) start shining quickly. Dealing
 with Python 2 becomes a backwards compatibility requirement, and we as
 developers are used to dealing with such constraints.
 
-Porting tools provided by Django are inspired by this philosophy, and it's
+Porting tools provided by Freedom are inspired by this philosophy, and it's
 reflected throughout this guide.
 
 .. _Python's official porting guide: http://docs.python.org/3/howto/pyporting.html
@@ -61,7 +61,7 @@ This step consists in:
 
 Performing these changes systematically guarantees backwards compatibility.
 
-However, Django applications generally don't need bytestrings, since Django
+However, Freedom applications generally don't need bytestrings, since Freedom
 only exposes unicode interfaces to the programmer. Python 3 discourages using
 bytestrings, except for binary data or byte-oriented interfaces. Python 2
 makes bytestrings and unicode strings effectively interchangeable, as long as
@@ -83,14 +83,14 @@ Python 2's `unicode`_ type was renamed :class:`str` in Python 3,
 six_ provides :ref:`tools <string-handling-with-six>` to deal with these
 changes.
 
-Django also contains several string related classes and functions in the
-:mod:`django.utils.encoding` and :mod:`django.utils.safestring` modules. Their
+Freedom also contains several string related classes and functions in the
+:mod:`freedom.utils.encoding` and :mod:`freedom.utils.safestring` modules. Their
 names used the words ``str``, which doesn't mean the same thing in Python 2
 and Python 3, and ``unicode``, which doesn't exist in Python 3. In order to
 avoid ambiguity and confusion these concepts were renamed ``bytes`` and
 ``text``.
 
-Here are the name changes in :mod:`django.utils.encoding`:
+Here are the name changes in :mod:`freedom.utils.encoding`:
 
 ==================  ==================
 Old name            New name
@@ -103,17 +103,17 @@ Old name            New name
 For backwards compatibility, the old names still work on Python 2. Under
 Python 3, ``smart_str`` is an alias for ``smart_text``.
 
-For forwards compatibility, the new names work as of Django 1.4.2.
+For forwards compatibility, the new names work as of Freedom 1.4.2.
 
 .. note::
 
-    :mod:`django.utils.encoding` was deeply refactored in Django 1.5 to
+    :mod:`freedom.utils.encoding` was deeply refactored in Freedom 1.5 to
     provide a more consistent API. Check its documentation for more
     information.
 
-:mod:`django.utils.safestring` is mostly used via the
-:func:`~django.utils.safestring.mark_safe` and
-:func:`~django.utils.safestring.mark_for_escaping` functions, which didn't
+:mod:`freedom.utils.safestring` is mostly used via the
+:func:`~freedom.utils.safestring.mark_safe` and
+:func:`~freedom.utils.safestring.mark_for_escaping` functions, which didn't
 change. In case you're using the internals, here are the name changes:
 
 ==================  ==================
@@ -129,7 +129,7 @@ For backwards compatibility, the old names still work on Python 2. Under
 Python 3, ``EscapeString`` and ``SafeString`` are aliases for ``EscapeText``
 and ``SafeText`` respectively.
 
-For forwards compatibility, the new names work as of Django 1.4.2.
+For forwards compatibility, the new names work as of Freedom 1.4.2.
 
 :meth:`~object.__str__` and ` __unicode__()`_ methods
 -----------------------------------------------------
@@ -143,35 +143,35 @@ The ``print`` statement and the :class:`str` built-in call
 object. The ``unicode`` built-in calls ` __unicode__()`_ if it
 exists, and otherwise falls back to :meth:`~object.__str__` and decodes the
 result with the system encoding. Conversely, the
-:class:`~django.db.models.Model` base class automatically derives
+:class:`~freedom.db.models.Model` base class automatically derives
 :meth:`~object.__str__` from ` __unicode__()`_ by encoding to UTF-8.
 
 In Python 3, there's simply :meth:`~object.__str__`, which must return ``str``
 (text).
 
-(It is also possible to define :meth:`~object.__bytes__`, but Django application
+(It is also possible to define :meth:`~object.__bytes__`, but Freedom application
 have little use for that method, because they hardly ever deal with ``bytes``.)
 
-Django provides a simple way to define :meth:`~object.__str__` and
+Freedom provides a simple way to define :meth:`~object.__str__` and
 ` __unicode__()`_ methods that work on Python 2 and 3: you must
 define a :meth:`~object.__str__` method returning text and to apply the
-:func:`~django.utils.encoding.python_2_unicode_compatible` decorator.
+:func:`~freedom.utils.encoding.python_2_unicode_compatible` decorator.
 
 On Python 3, the decorator is a no-op. On Python 2, it defines appropriate
 ` __unicode__()`_ and :meth:`~object.__str__` methods (replacing the
 original :meth:`~object.__str__` method in the process). Here's an example::
 
     from __future__ import unicode_literals
-    from django.utils.encoding import python_2_unicode_compatible
+    from freedom.utils.encoding import python_2_unicode_compatible
 
     @python_2_unicode_compatible
     class MyClass(object):
         def __str__(self):
             return "Instance of my class"
 
-This technique is the best match for Django's porting philosophy.
+This technique is the best match for Freedom's porting philosophy.
 
-For forwards compatibility, this decorator is available as of Django 1.4.2.
+For forwards compatibility, this decorator is available as of Freedom 1.4.2.
 
 Finally, note that :meth:`~object.__repr__` must return a ``str`` on all
 versions of Python.
@@ -180,16 +180,16 @@ versions of Python.
 --------------------------------------------
 
 :meth:`dict.keys`, :meth:`dict.items` and :meth:`dict.values` return lists in
-Python 2 and iterators in Python 3. :class:`~django.http.QueryDict` and the
-:class:`dict`-like classes defined in :mod:`django.utils.datastructures`
+Python 2 and iterators in Python 3. :class:`~freedom.http.QueryDict` and the
+:class:`dict`-like classes defined in :mod:`freedom.utils.datastructures`
 behave likewise in Python 3.
 
 six_ provides compatibility functions to work around this change:
 :func:`~six.iterkeys`, :func:`~six.iteritems`, and :func:`~six.itervalues`.
 It also contains an undocumented ``iterlists`` function that works well for
-``django.utils.datastructures.MultiValueDict`` and its subclasses.
+``freedom.utils.datastructures.MultiValueDict`` and its subclasses.
 
-:class:`~django.http.HttpRequest` and :class:`~django.http.HttpResponse` objects
+:class:`~freedom.http.HttpRequest` and :class:`~freedom.http.HttpResponse` objects
 --------------------------------------------------------------------------------
 
 According to :pep:`3333`:
@@ -197,17 +197,17 @@ According to :pep:`3333`:
 - headers are always ``str`` objects,
 - input and output streams are always ``bytes`` objects.
 
-Specifically, :attr:`HttpResponse.content <django.http.HttpResponse.content>`
+Specifically, :attr:`HttpResponse.content <freedom.http.HttpResponse.content>`
 contains ``bytes``, which may become an issue if you compare it with a
 ``str`` in your tests. The preferred solution is to rely on
-:meth:`~django.test.SimpleTestCase.assertContains` and
-:meth:`~django.test.SimpleTestCase.assertNotContains`. These methods accept a
+:meth:`~freedom.test.SimpleTestCase.assertContains` and
+:meth:`~freedom.test.SimpleTestCase.assertNotContains`. These methods accept a
 response and a unicode string as arguments.
 
 Coding guidelines
 =================
 
-The following guidelines are enforced in Django's source code. They're also
+The following guidelines are enforced in Freedom's source code. They're also
 recommended for third-party application who follow the same porting strategy.
 
 Syntax requirements
@@ -319,7 +319,7 @@ Division
 Special methods are looked up on the class and not on the instance to reflect
 the behavior of the Python interpreter.
 
-.. module: django.utils.six
+.. module: freedom.utils.six
 
 Writing compatible code with six
 --------------------------------
@@ -327,8 +327,8 @@ Writing compatible code with six
 six_ is the canonical compatibility library for supporting Python 2 and 3 in
 a single codebase. Read its documentation!
 
-A :mod:`customized version of six <django.utils.six>` is bundled with Django
-as of version 1.4.2. You can import it as ``django.utils.six``.
+A :mod:`customized version of six <freedom.utils.six>` is bundled with Freedom
+as of version 1.4.2. You can import it as ``freedom.utils.six``.
 
 Here are the most common changes required to write compatible code.
 
@@ -363,7 +363,7 @@ Import ``six.moves.xrange`` wherever you use ``xrange``.
 Moved modules
 ~~~~~~~~~~~~~
 
-Some modules were renamed in Python 3. The ``django.utils.six.moves``
+Some modules were renamed in Python 3. The ``freedom.utils.six.moves``
 module (based on the :mod:`six.moves module <six.moves>`) provides a
 compatible location to import them.
 
@@ -378,12 +378,12 @@ If you need different code in Python 2 and Python 3, check :data:`six.PY2`::
 This is a last resort solution when :mod:`six` doesn't provide an appropriate
 function.
 
-.. module:: django.utils.six
+.. module:: freedom.utils.six
 
-Django customized version of six
+Freedom customized version of six
 --------------------------------
 
-The version of six bundled with Django (``django.utils.six``) includes a few
+The version of six bundled with Freedom (``freedom.utils.six``) includes a few
 extras.
 
 .. function:: assertRaisesRegex(testcase, *args, **kwargs)
@@ -399,7 +399,7 @@ extras.
     exists in current Python 3 versions, but issues a warning.
 
 
-In addition to six' defaults moves, Django's version provides ``thread`` as
+In addition to six' defaults moves, Freedom's version provides ``thread`` as
 ``_thread`` and ``dummy_thread`` as ``_dummy_thread``.
 
 .. _unicode: http://docs.python.org/2/library/functions.html#unicode

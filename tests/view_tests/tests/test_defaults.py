@@ -1,14 +1,14 @@
 from __future__ import unicode_literals
 
-from django.test import TestCase
-from django.test.utils import override_settings, override_with_test_loader
+from freedom.test import TestCase
+from freedom.test.utils import override_settings, override_with_test_loader
 
 from ..models import UrlArticle
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class DefaultsTests(TestCase):
-    """Test django views in django/views/defaults.py"""
+    """Test freedom views in freedom/views/defaults.py"""
     fixtures = ['testdata.json']
     non_existing_urls = ['/non_existing_url/',  # this is in urls.py
                          '/other_non_existing_url/']  # this NOT in urls.py

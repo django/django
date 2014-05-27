@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from django.contrib import admin
-from django.contrib.admin.options import ModelAdmin
-from django.contrib.auth.models import User
-from django.test import TestCase, RequestFactory
+from freedom.contrib import admin
+from freedom.contrib.admin.options import ModelAdmin
+from freedom.contrib.auth.models import User
+from freedom.test import TestCase, RequestFactory
 
 from .models import (Band, Song, SongInlineDefaultOrdering,
     SongInlineNewOrdering, DynOrderingBandAdmin)

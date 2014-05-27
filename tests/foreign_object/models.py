@@ -1,9 +1,9 @@
 import datetime
 
-from django.db import models
-from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import get_language
+from freedom.db import models
+from freedom.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
+from freedom.utils.encoding import python_2_unicode_compatible
+from freedom.utils.translation import get_language
 
 
 @python_2_unicode_compatible

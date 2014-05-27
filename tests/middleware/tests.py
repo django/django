@@ -7,17 +7,17 @@ import random
 import re
 from unittest import skipIf
 
-from django.conf import settings
-from django.core import mail
-from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
-from django.middleware.clickjacking import XFrameOptionsMiddleware
-from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddleware
-from django.middleware.http import ConditionalGetMiddleware
-from django.middleware.gzip import GZipMiddleware
-from django.test import TestCase, RequestFactory, override_settings
-from django.utils import six
-from django.utils.encoding import force_str
-from django.utils.six.moves import xrange
+from freedom.conf import settings
+from freedom.core import mail
+from freedom.http import HttpRequest, HttpResponse, StreamingHttpResponse
+from freedom.middleware.clickjacking import XFrameOptionsMiddleware
+from freedom.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddleware
+from freedom.middleware.http import ConditionalGetMiddleware
+from freedom.middleware.gzip import GZipMiddleware
+from freedom.test import TestCase, RequestFactory, override_settings
+from freedom.utils import six
+from freedom.utils.encoding import force_str
+from freedom.utils.six.moves import xrange
 
 
 @override_settings(ROOT_URLCONF='middleware.urls')

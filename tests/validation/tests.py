@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
-from django import forms
-from django.core.exceptions import NON_FIELD_ERRORS
-from django.test import TestCase
+from freedom import forms
+from freedom.core.exceptions import NON_FIELD_ERRORS
+from freedom.test import TestCase
 
 from . import ValidationTestCase
 from .models import (Author, Article, ModelToValidate,

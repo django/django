@@ -7,15 +7,15 @@ import pickle
 import unittest
 import warnings
 
-from django.core.exceptions import FieldError
-from django.db import connection, DEFAULT_DB_ALIAS
-from django.db.models import Count, F, Q
-from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
-from django.db.models.sql.datastructures import EmptyResultSet
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import str_prefix, CaptureQueriesContext
-from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils import six
+from freedom.core.exceptions import FieldError
+from freedom.db import connection, DEFAULT_DB_ALIAS
+from freedom.db.models import Count, F, Q
+from freedom.db.models.sql.where import WhereNode, EverythingNode, NothingNode
+from freedom.db.models.sql.datastructures import EmptyResultSet
+from freedom.test import TestCase, skipUnlessDBFeature
+from freedom.test.utils import str_prefix, CaptureQueriesContext
+from freedom.utils.deprecation import RemovedInFreedom19Warning
+from freedom.utils import six
 
 from .models import (
     Annotation, Article, Author, Celebrity, Child, Cover, Detail, DumbCategory,
@@ -448,13 +448,13 @@ class Queries1Tests(BaseQuerysetTest):
 
         # Ordering by a many-valued attribute (e.g. a many-to-many or reverse
         # ForeignKey) is legal, but the results might not make sense. That
-        # isn't Django's problem. Garbage in, garbage out.
+        # isn't Freedom's problem. Garbage in, garbage out.
         self.assertQuerysetEqual(
             Item.objects.filter(tags__isnull=False).order_by('tags', 'id'),
             ['<Item: one>', '<Item: two>', '<Item: one>', '<Item: two>', '<Item: four>']
         )
 
-        # If we replace the default ordering, Django adjusts the required
+        # If we replace the default ordering, Freedom adjusts the required
         # tables automatically. Item normally requires a join with Note to do
         # the default ordering, but that isn't needed here.
         qs = Item.objects.order_by('name')
@@ -1131,7 +1131,7 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
     def test_ticket_20250(self):
-        # A negated Q along with an annotated queryset failed in Django 1.4
+        # A negated Q along with an annotated queryset failed in Freedom 1.4
         qs = Author.objects.annotate(Count('item'))
         qs = qs.filter(~Q(extra__value=0))
 
@@ -1150,7 +1150,7 @@ class Queries1Tests(BaseQuerysetTest):
                 ['<Tag: t1>', '<Tag: t2>', '<Tag: t3>', '<Tag: t4>', '<Tag: t5>']
             )
             self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[0].category, RemovedInDjango19Warning))
+            self.assertTrue(issubclass(w[0].category, RemovedInFreedom19Warning))
 
 
 class Queries2Tests(TestCase):
@@ -1571,7 +1571,7 @@ class Queries5Tests(TestCase):
         # Ordering of extra() pieces is possible, too and you can mix extra
         # fields and model fields in the ordering.
         self.assertQuerysetEqual(
-            Ranking.objects.extra(tables=['django_site'], order_by=['-django_site.id', 'rank']),
+            Ranking.objects.extra(tables=['freedom_site'], order_by=['-freedom_site.id', 'rank']),
             ['<Ranking: 1: a3>', '<Ranking: 2: a2>', '<Ranking: 3: a1>']
         )
 
@@ -1608,7 +1608,7 @@ class Queries5Tests(TestCase):
 
     def test_ticket7045(self):
         # Extra tables used to crash SQL construction on the second use.
-        qs = Ranking.objects.extra(tables=['django_site'])
+        qs = Ranking.objects.extra(tables=['freedom_site'])
         qs.query.get_compiler(qs.db).as_sql()
         # test passes if this doesn't raise an exception.
         qs.query.get_compiler(qs.db).as_sql()
@@ -3242,7 +3242,7 @@ class RelatedLookupTypeTests(TestCase):
         oa = ObjectA.objects.create(name="oa")
         wrong_type = Order.objects.create(id=oa.pk)
         ob = ObjectB.objects.create(name="ob", objecta=oa, num=1)
-        # Currently Django doesn't care if the object is of correct
+        # Currently Freedom doesn't care if the object is of correct
         # type, it will just use the objecta's related fields attribute
         # (id) for model lookup. Making things more restrictive could
         # be a good idea...

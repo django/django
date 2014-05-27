@@ -1,8 +1,8 @@
 ===========================
-Outputting PDFs with Django
+Outputting PDFs with Freedom
 ===========================
 
-This document explains how to output PDF files dynamically using Django views.
+This document explains how to output PDF files dynamically using Freedom views.
 This is made possible by the excellent, open-source ReportLab_ Python PDF
 library.
 
@@ -10,7 +10,7 @@ The advantage of generating PDF files dynamically is that you can create
 customized PDFs for different purposes -- say, for different users or different
 pieces of content.
 
-For example, Django was used at kusports.com_ to generate customized,
+For example, Freedom was used at kusports.com_ to generate customized,
 printer-friendly NCAA tournament brackets, as PDF files, for people
 participating in a March Madness contest.
 
@@ -40,14 +40,14 @@ If that command doesn't raise any errors, the installation worked.
 Write your view
 ===============
 
-The key to generating PDFs dynamically with Django is that the ReportLab API
-acts on file-like objects, and Django's :class:`~django.http.HttpResponse`
+The key to generating PDFs dynamically with Freedom is that the ReportLab API
+acts on file-like objects, and Freedom's :class:`~freedom.http.HttpResponse`
 objects are file-like objects.
 
 Here's a "Hello World" example::
 
     from reportlab.pdfgen import canvas
-    from django.http import HttpResponse
+    from freedom.http import HttpResponse
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate PDF headers.
@@ -91,7 +91,7 @@ mention:
 
 * Hooking into the ReportLab API is easy: Just pass ``response`` as the
   first argument to ``canvas.Canvas``. The ``Canvas`` class expects a
-  file-like object, and :class:`~django.http.HttpResponse` objects fit the
+  file-like object, and :class:`~freedom.http.HttpResponse` objects fit the
   bill.
 
 * Note that all subsequent PDF-generation methods are called on the PDF
@@ -103,7 +103,7 @@ mention:
 .. note::
 
     ReportLab is not thread-safe. Some of our users have reported odd issues
-    with building PDF-generating Django views that are accessed by many people
+    with building PDF-generating Freedom views that are accessed by many people
     at the same time.
 
 Complex PDFs
@@ -116,7 +116,7 @@ Here's the above "Hello World" example rewritten to use :mod:`io`::
 
     from io import BytesIO
     from reportlab.pdfgen import canvas
-    from django.http import HttpResponse
+    from freedom.http import HttpResponse
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate PDF headers.
@@ -146,9 +146,9 @@ Further resources
 =================
 
 * PDFlib_ is another PDF-generation library that has Python bindings. To
-  use it with Django, just use the same concepts explained in this article.
+  use it with Freedom, just use the same concepts explained in this article.
 * `Pisa XHTML2PDF`_ is yet another PDF-generation library. Pisa ships with
-  an example of how to integrate Pisa with Django.
+  an example of how to integrate Pisa with Freedom.
 * HTMLdoc_ is a command-line script that can convert HTML to PDF. It
   doesn't have a Python interface, but you can escape out to the shell
   using ``system`` or ``popen`` and retrieve the output in Python.

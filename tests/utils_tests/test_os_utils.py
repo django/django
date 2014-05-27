@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from django.utils._os import safe_join
+from freedom.utils._os import safe_join
 
 
 class SafeJoinTests(unittest.TestCase):

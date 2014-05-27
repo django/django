@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from freedom.http import HttpResponse
 import unittest
 
 

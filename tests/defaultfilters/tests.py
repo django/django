@@ -5,7 +5,7 @@ import datetime
 import decimal
 import unittest
 
-from django.template.defaultfilters import (
+from freedom.template.defaultfilters import (
     add, addslashes, capfirst, center, cut, date, default, default_if_none,
     dictsort, dictsortreversed, divisibleby, escape, escapejs_filter,
     filesizeformat, first, floatformat, force_escape,
@@ -16,11 +16,11 @@ from django.template.defaultfilters import (
     truncatechars_html, truncatewords, truncatewords_html, unordered_list,
     upper, urlencode, urlize, urlizetrunc, wordcount, wordwrap, yesno,
 )
-from django.test import TestCase
-from django.utils import six
-from django.utils import translation
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.safestring import mark_safe, SafeData
+from freedom.test import TestCase
+from freedom.utils import six
+from freedom.utils import translation
+from freedom.utils.encoding import python_2_unicode_compatible
+from freedom.utils.safestring import mark_safe, SafeData
 
 
 class DefaultFiltersTests(TestCase):
@@ -262,10 +262,10 @@ class DefaultFiltersTests(TestCase):
             '<a href="http://google.com/" rel="nofollow">http://google.com/</a>')
         self.assertEqual(urlize('www.google.com'),
             '<a href="http://www.google.com" rel="nofollow">www.google.com</a>')
-        self.assertEqual(urlize('djangoproject.org'),
-            '<a href="http://djangoproject.org" rel="nofollow">djangoproject.org</a>')
-        self.assertEqual(urlize('info@djangoproject.org'),
-            '<a href="mailto:info@djangoproject.org">info@djangoproject.org</a>')
+        self.assertEqual(urlize('freedomproject.org'),
+            '<a href="http://freedomproject.org" rel="nofollow">freedomproject.org</a>')
+        self.assertEqual(urlize('info@freedomproject.org'),
+            '<a href="mailto:info@freedomproject.org">info@freedomproject.org</a>')
 
         # Check urlize with https addresses
         self.assertEqual(urlize('https://google.com'),
@@ -287,12 +287,12 @@ class DefaultFiltersTests(TestCase):
             'http://en.wikipedia.org/wiki/Café</a>')
 
         # Check urlize keeps balanced parentheses - see #11911
-        self.assertEqual(urlize('http://en.wikipedia.org/wiki/Django_(web_framework)'),
-            '<a href="http://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
-            'http://en.wikipedia.org/wiki/Django_(web_framework)</a>')
-        self.assertEqual(urlize('(see http://en.wikipedia.org/wiki/Django_(web_framework))'),
-            '(see <a href="http://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
-            'http://en.wikipedia.org/wiki/Django_(web_framework)</a>)')
+        self.assertEqual(urlize('http://en.wikipedia.org/wiki/Freedom_(web_framework)'),
+            '<a href="http://en.wikipedia.org/wiki/Freedom_(web_framework)" rel="nofollow">'
+            'http://en.wikipedia.org/wiki/Freedom_(web_framework)</a>')
+        self.assertEqual(urlize('(see http://en.wikipedia.org/wiki/Freedom_(web_framework))'),
+            '(see <a href="http://en.wikipedia.org/wiki/Freedom_(web_framework)" rel="nofollow">'
+            'http://en.wikipedia.org/wiki/Freedom_(web_framework)</a>)')
 
         # Check urlize adds nofollow properly - see #12183
         self.assertEqual(urlize('foo@bar.com or www.bar.com'),

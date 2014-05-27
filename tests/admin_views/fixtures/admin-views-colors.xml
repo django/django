@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
+<freedom-objects version="1.0">
     <object pk="1" model="admin_views.color">
         <field type="CharField" name="value">Red</field>
         <field type="BooleanField" name="warm">1</field>
@@ -16,4 +16,4 @@
         <field type="CharField" name="value">Green</field>
         <field type="BooleanField" name="warm">0</field>
     </object>
-</django-objects>
+</freedom-objects>

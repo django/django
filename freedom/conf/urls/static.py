@@ -1,0 +1,27 @@
+import re
+
+from freedom.conf import settings
+from freedom.conf.urls import url
+from freedom.core.exceptions import ImproperlyConfigured
+
+
+def static(prefix, view='freedom.views.static.serve', **kwargs):
+    """
+    Helper function to return a URL pattern for serving files in debug mode.
+
+    from freedom.conf import settings
+    from freedom.conf.urls.static import static
+
+    urlpatterns = [
+        # ... the rest of your URLconf goes here ...
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    """
+    # No-op if not in debug mode or an non-local prefix
+    if not settings.DEBUG or (prefix and '://' in prefix):
+        return []
+    elif not prefix:
+        raise ImproperlyConfigured("Empty static prefix not permitted")
+    return [
+        url(r'^%s(?P<path>.*)$' % re.escape(prefix.lstrip('/')), view, kwargs=kwargs),
+    ]

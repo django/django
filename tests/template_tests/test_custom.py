@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 from unittest import TestCase
 
-from django import template
-from django.utils import six
+from freedom import template
+from freedom.utils import six
 
 from .templatetags import custom
 

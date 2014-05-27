@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.core import checks
-from django.db import models
+from freedom.core import checks
+from freedom.db import models
 
 
 class ModelRaisingMessages(models.Model):

@@ -5,15 +5,15 @@ import datetime
 import os
 import tokenize
 
-from django.core.validators import RegexValidator, EmailValidator
-from django.db import models, migrations
-from django.db.migrations.writer import MigrationWriter, SettingsReference
-from django.test import TestCase
-from django.conf import settings
-from django.utils import datetime_safe, six
-from django.utils.deconstruct import deconstructible
-from django.utils.translation import ugettext_lazy as _
-from django.utils.timezone import get_default_timezone
+from freedom.core.validators import RegexValidator, EmailValidator
+from freedom.db import models, migrations
+from freedom.db.migrations.writer import MigrationWriter, SettingsReference
+from freedom.test import TestCase
+from freedom.conf import settings
+from freedom.utils import datetime_safe, six
+from freedom.utils.deconstruct import deconstructible
+from freedom.utils.translation import ugettext_lazy as _
+from freedom.utils.timezone import get_default_timezone
 
 
 class WriterTests(TestCase):
@@ -96,16 +96,16 @@ class WriterTests(TestCase):
         # Classes
         validator = RegexValidator(message="hello")
         string, imports = MigrationWriter.serialize(validator)
-        self.assertEqual(string, "django.core.validators.RegexValidator(message='hello')")
+        self.assertEqual(string, "freedom.core.validators.RegexValidator(message='hello')")
         self.serialize_round_trip(validator)
         validator = EmailValidator(message="hello")  # Test with a subclass.
         string, imports = MigrationWriter.serialize(validator)
-        self.assertEqual(string, "django.core.validators.EmailValidator(message='hello')")
+        self.assertEqual(string, "freedom.core.validators.EmailValidator(message='hello')")
         self.serialize_round_trip(validator)
         validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
         string, imports = MigrationWriter.serialize(validator)
         self.assertEqual(string, "custom.EmailValidator(message='hello')")
-        # Django fields
+        # Freedom fields
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
         self.assertSerializedFieldEqual(models.TextField(null=True, blank=True))
         # Setting references
@@ -114,7 +114,7 @@ class WriterTests(TestCase):
             SettingsReference("someapp.model", "AUTH_USER_MODEL"),
             (
                 "settings.AUTH_USER_MODEL",
-                set(["from django.conf import settings"]),
+                set(["from freedom.conf import settings"]),
             )
         )
         self.assertSerializedResultEqual(

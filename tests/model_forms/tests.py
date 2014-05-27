@@ -5,17 +5,17 @@ import os
 from decimal import Decimal
 from unittest import skipUnless
 
-from django import forms
-from django.core.exceptions import FieldError, ImproperlyConfigured, NON_FIELD_ERRORS
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.validators import ValidationError
-from django.db import connection
-from django.db.models.query import EmptyQuerySet
-from django.forms.models import (construct_instance, fields_for_model,
+from freedom import forms
+from freedom.core.exceptions import FieldError, ImproperlyConfigured, NON_FIELD_ERRORS
+from freedom.core.files.uploadedfile import SimpleUploadedFile
+from freedom.core.validators import ValidationError
+from freedom.db import connection
+from freedom.db.models.query import EmptyQuerySet
+from freedom.forms.models import (construct_instance, fields_for_model,
     model_to_dict, modelform_factory, ModelFormMetaclass)
-from django.test import TestCase, skipUnlessDBFeature
-from django.utils._os import upath
-from django.utils import six
+from freedom.test import TestCase, skipUnlessDBFeature
+from freedom.utils._os import upath
+from freedom.utils import six
 
 from .models import (Article, ArticleStatus, Author, Author1, BetterWriter, BigInt, Book,
     Category, CommaSeparatedInteger, CustomFF, CustomFieldForExclusionModel,
@@ -727,27 +727,27 @@ class UniqueTest(TestCase):
         self.assertEqual(form.errors['key'], ['Explicit pk with this Key already exists.'])
 
     def test_unique_for_date(self):
-        p = Post.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
-        form = PostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        p = Post.objects.create(title="Freedom 1.0 is released",
+            slug="Freedom 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
+        form = PostForm({'title': "Freedom 1.0 is released", 'posted': '2008-09-03'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['title'], ['Title must be unique for Posted date.'])
-        form = PostForm({'title': "Work on Django 1.1 begins", 'posted': '2008-09-03'})
+        form = PostForm({'title': "Work on Freedom 1.1 begins", 'posted': '2008-09-03'})
         self.assertTrue(form.is_valid())
-        form = PostForm({'title': "Django 1.0 is released", 'posted': '2008-09-04'})
+        form = PostForm({'title': "Freedom 1.0 is released", 'posted': '2008-09-04'})
         self.assertTrue(form.is_valid())
-        form = PostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
+        form = PostForm({'slug': "Freedom 1.0", 'posted': '2008-01-01'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['slug'], ['Slug must be unique for Posted year.'])
         form = PostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['subtitle'], ['Subtitle must be unique for Posted month.'])
-        form = PostForm({'subtitle': "Finally", "title": "Django 1.0 is released",
-            "slug": "Django 1.0", 'posted': '2008-09-03'}, instance=p)
+        form = PostForm({'subtitle': "Finally", "title": "Freedom 1.0 is released",
+            "slug": "Freedom 1.0", 'posted': '2008-09-03'}, instance=p)
         self.assertTrue(form.is_valid())
-        form = PostForm({'title': "Django 1.0 is released"})
+        form = PostForm({'title': "Freedom 1.0 is released"})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['posted'], ['This field is required.'])
@@ -763,39 +763,39 @@ class UniqueTest(TestCase):
                 model = DateTimePost
                 fields = '__all__'
 
-        DateTimePost.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally",
+        DateTimePost.objects.create(title="Freedom 1.0 is released",
+            slug="Freedom 1.0", subtitle="Finally",
             posted=datetime.datetime(2008, 9, 3, 10, 10, 1))
         # 'title' has unique_for_date='posted'
-        form = DateTimePostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        form = DateTimePostForm({'title': "Freedom 1.0 is released", 'posted': '2008-09-03'})
         self.assertTrue(form.is_valid())
         # 'slug' has unique_for_year='posted'
-        form = DateTimePostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
+        form = DateTimePostForm({'slug': "Freedom 1.0", 'posted': '2008-01-01'})
         self.assertTrue(form.is_valid())
         # 'subtitle' has unique_for_month='posted'
         form = DateTimePostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
         self.assertTrue(form.is_valid())
 
     def test_inherited_unique_for_date(self):
-        p = Post.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
-        form = DerivedPostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        p = Post.objects.create(title="Freedom 1.0 is released",
+            slug="Freedom 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
+        form = DerivedPostForm({'title': "Freedom 1.0 is released", 'posted': '2008-09-03'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['title'], ['Title must be unique for Posted date.'])
-        form = DerivedPostForm({'title': "Work on Django 1.1 begins", 'posted': '2008-09-03'})
+        form = DerivedPostForm({'title': "Work on Freedom 1.1 begins", 'posted': '2008-09-03'})
         self.assertTrue(form.is_valid())
-        form = DerivedPostForm({'title': "Django 1.0 is released", 'posted': '2008-09-04'})
+        form = DerivedPostForm({'title': "Freedom 1.0 is released", 'posted': '2008-09-04'})
         self.assertTrue(form.is_valid())
-        form = DerivedPostForm({'slug': "Django 1.0", 'posted': '2008-01-01'})
+        form = DerivedPostForm({'slug': "Freedom 1.0", 'posted': '2008-01-01'})
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['slug'], ['Slug must be unique for Posted year.'])
         form = DerivedPostForm({'subtitle': "Finally", 'posted': '2008-09-30'})
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors['subtitle'], ['Subtitle must be unique for Posted month.'])
-        form = DerivedPostForm({'subtitle': "Finally", "title": "Django 1.0 is released",
-            "slug": "Django 1.0", 'posted': '2008-09-03'}, instance=p)
+        form = DerivedPostForm({'subtitle': "Finally", "title": "Freedom 1.0 is released",
+            "slug": "Freedom 1.0", 'posted': '2008-09-03'}, instance=p)
         self.assertTrue(form.is_valid())
 
     def test_unique_for_date_with_nullable_date(self):
@@ -804,17 +804,17 @@ class UniqueTest(TestCase):
                 model = FlexibleDatePost
                 fields = '__all__'
 
-        p = FlexibleDatePost.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
+        p = FlexibleDatePost.objects.create(title="Freedom 1.0 is released",
+            slug="Freedom 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
 
-        form = FlexDatePostForm({'title': "Django 1.0 is released"})
+        form = FlexDatePostForm({'title': "Freedom 1.0 is released"})
         self.assertTrue(form.is_valid())
-        form = FlexDatePostForm({'slug': "Django 1.0"})
+        form = FlexDatePostForm({'slug': "Freedom 1.0"})
         self.assertTrue(form.is_valid())
         form = FlexDatePostForm({'subtitle': "Finally"})
         self.assertTrue(form.is_valid())
-        form = FlexDatePostForm({'subtitle': "Finally", "title": "Django 1.0 is released",
-            "slug": "Django 1.0"}, instance=p)
+        form = FlexDatePostForm({'subtitle': "Finally", "title": "Freedom 1.0 is released",
+            "slug": "Freedom 1.0"}, instance=p)
         self.assertTrue(form.is_valid())
 
     def test_override_unique_message(self):
@@ -854,9 +854,9 @@ class UniqueTest(TestCase):
                     }
                 }
 
-        Post.objects.create(title="Django 1.0 is released",
-            slug="Django 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
-        form = CustomPostForm({'title': "Django 1.0 is released", 'posted': '2008-09-03'})
+        Post.objects.create(title="Freedom 1.0 is released",
+            slug="Freedom 1.0", subtitle="Finally", posted=datetime.date(2008, 9, 3))
+        form = CustomPostForm({'title': "Freedom 1.0 is released", 'posted': '2008-09-03'})
         self.assertEqual(len(form.errors), 1)
         self.assertEqual(form.errors['title'], ["Post's Title not unique for Posted date."])
 
@@ -1770,7 +1770,7 @@ class FileAndImageFieldTests(TestCase):
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test1.txt')
 
-        # Delete the current file since this is not done by Django.
+        # Delete the current file since this is not done by Freedom.
         instance.file.delete()
 
         # Override the file by uploading a new one.
@@ -1781,7 +1781,7 @@ class FileAndImageFieldTests(TestCase):
         instance = f.save()
         self.assertEqual(instance.file.name, 'tests/test2.txt')
 
-        # Delete the current file since this is not done by Django.
+        # Delete the current file since this is not done by Freedom.
         instance.file.delete()
         instance.delete()
 
@@ -1810,7 +1810,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.description, 'New Description')
         self.assertEqual(instance.file.name, 'tests/test3.txt')
 
-        # Delete the current file since this is not done by Django.
+        # Delete the current file since this is not done by Freedom.
         instance.file.delete()
         instance.delete()
 
@@ -1863,7 +1863,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.width, 16)
         self.assertEqual(instance.height, 16)
 
-        # Delete the current file since this is not done by Django, but don't save
+        # Delete the current file since this is not done by Freedom, but don't save
         # because the dimension fields are not null=True.
         instance.image.delete(save=False)
         f = ImageFileForm(
@@ -1887,7 +1887,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.height, 16)
         self.assertEqual(instance.width, 16)
 
-        # Delete the current file since this is not done by Django, but don't save
+        # Delete the current file since this is not done by Freedom, but don't save
         # because the dimension fields are not null=True.
         instance.image.delete(save=False)
         # Override the file by uploading a new one.
@@ -1901,7 +1901,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.height, 32)
         self.assertEqual(instance.width, 48)
 
-        # Delete the current file since this is not done by Django, but don't save
+        # Delete the current file since this is not done by Freedom, but don't save
         # because the dimension fields are not null=True.
         instance.image.delete(save=False)
         instance.delete()
@@ -1915,7 +1915,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.height, 32)
         self.assertEqual(instance.width, 48)
 
-        # Delete the current file since this is not done by Django, but don't save
+        # Delete the current file since this is not done by Freedom, but don't save
         # because the dimension fields are not null=True.
         instance.image.delete(save=False)
         instance.delete()
@@ -1955,7 +1955,7 @@ class FileAndImageFieldTests(TestCase):
         self.assertEqual(instance.width, 16)
         self.assertEqual(instance.height, 16)
 
-        # Delete the current file since this is not done by Django.
+        # Delete the current file since this is not done by Freedom.
         instance.image.delete()
         instance.delete()
 
@@ -2251,7 +2251,7 @@ class ModelFormInheritanceTests(TestCase):
         self.assertEqual(list(type(str('NewForm'), (ModelForm, Form), {'age': None})().fields.keys()), ['name'])
 
     def test_field_removal_name_clashes(self):
-        """Regression test for https://code.djangoproject.com/ticket/22510."""
+        """Regression test for https://code.freedomproject.com/ticket/22510."""
 
         class MyForm(forms.ModelForm):
             media = forms.CharField()

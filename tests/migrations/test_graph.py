@@ -1,5 +1,5 @@
-from django.test import TestCase
-from django.db.migrations.graph import MigrationGraph, CircularDependencyError
+from freedom.test import TestCase
+from freedom.db.migrations.graph import MigrationGraph, CircularDependencyError
 
 
 class GraphTests(TestCase):

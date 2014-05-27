@@ -1,7 +1,7 @@
 .. _ref-gis-db-api:
 
 ======================
-GeoDjango Database API
+GeoFreedom Database API
 ======================
 
 .. _spatial-backends:
@@ -9,18 +9,18 @@ GeoDjango Database API
 Spatial Backends
 ================
 
-.. module:: django.contrib.gis.db.backends
-   :synopsis: GeoDjango's spatial database backends.
+.. module:: freedom.contrib.gis.db.backends
+   :synopsis: GeoFreedom's spatial database backends.
 
-GeoDjango currently provides the following spatial database backends:
+GeoFreedom currently provides the following spatial database backends:
 
-* ``django.contrib.gis.db.backends.postgis``
-* ``django.contrib.gis.db.backends.mysql``
-* ``django.contrib.gis.db.backends.oracle``
-* ``django.contrib.gis.db.backends.spatialite``
+* ``freedom.contrib.gis.db.backends.postgis``
+* ``freedom.contrib.gis.db.backends.mysql``
+* ``freedom.contrib.gis.db.backends.oracle``
+* ``freedom.contrib.gis.db.backends.spatialite``
 
-.. module:: django.contrib.gis.db.models
-   :synopsis: GeoDjango's database API.
+.. module:: freedom.contrib.gis.db.models
+   :synopsis: GeoFreedom's database API.
 
 .. _mysql-spatial-limitations:
 
@@ -38,7 +38,7 @@ MySQL's spatial extensions only support bounding box operations
     the same result as the corresponding MBR-based functions.
 
 In other words, while spatial lookups such as :lookup:`contains <gis-contains>`
-are available in GeoDjango when using MySQL, the results returned are really
+are available in GeoFreedom when using MySQL, the results returned are really
 equivalent to what would be returned when using :lookup:`bbcontains`
 on a different spatial backend.
 
@@ -59,9 +59,9 @@ model)::
     >>> z = Zipcode(code=77096, poly='POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))')
     >>> z.save()
 
-:class:`~django.contrib.gis.geos.GEOSGeometry` objects may also be used to save geometric models::
+:class:`~freedom.contrib.gis.geos.GEOSGeometry` objects may also be used to save geometric models::
 
-    >>> from django.contrib.gis.geos import GEOSGeometry
+    >>> from freedom.contrib.gis.geos import GEOSGeometry
     >>> poly = GEOSGeometry('POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))')
     >>> z = Zipcode(code=77096, poly=poly)
     >>> z.save()
@@ -74,7 +74,7 @@ transform procedure::
     >>> poly_3084 = GEOSGeometry('POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))', srid=3084)  # SRID 3084 is 'NAD83(HARN) / Texas Centric Lambert Conformal'
     >>> z = Zipcode(code=78212, poly=poly_3084)
     >>> z.save()
-    >>> from django.db import connection
+    >>> from freedom.db import connection
     >>> print(connection.queries[-1]['sql']) # printing the last SQL statement executed (requires DEBUG=True)
     INSERT INTO "geoapp_zipcode" ("code", "poly") VALUES (78212, ST_Transform(ST_GeomFromWKB('\\001 ... ', 3084), 4326))
 
@@ -84,7 +84,7 @@ hexadecimal [#fnewkb]_), and GeoJSON [#fngeojson]_ (requires GDAL). Essentially,
 if the input is not a ``GEOSGeometry`` object, the geometry field will attempt to
 create a ``GEOSGeometry`` instance from the input.
 
-For more information creating :class:`~django.contrib.gis.geos.GEOSGeometry`
+For more information creating :class:`~freedom.contrib.gis.geos.GEOSGeometry`
 objects, refer to the :ref:`GEOS tutorial <geos-tutorial>`.
 
 .. _spatial-lookups-intro:
@@ -92,10 +92,10 @@ objects, refer to the :ref:`GEOS tutorial <geos-tutorial>`.
 Spatial Lookups
 ===============
 
-GeoDjango's lookup types may be used with any manager method like
+GeoFreedom's lookup types may be used with any manager method like
 ``filter()``, ``exclude()``, etc.  However, the lookup types unique to
-GeoDjango are only available on geometry fields.
-Filters on 'normal' fields (e.g. :class:`~django.db.models.CharField`)
+GeoFreedom are only available on geometry fields.
+Filters on 'normal' fields (e.g. :class:`~freedom.db.models.CharField`)
 may be chained with those on geographic fields.  Thus, geographic queries
 take the following general form (assuming  the ``Zipcode`` model used in the
 :ref:`ref-gis-model-api`)::
@@ -109,7 +109,7 @@ For example::
 
 In this case, ``poly`` is the geographic field, :lookup:`contains <gis-contains>`
 is the spatial lookup type, and ``pnt`` is the parameter (which may be a
-:class:`~django.contrib.gis.geos.GEOSGeometry` object or a string of
+:class:`~freedom.contrib.gis.geos.GEOSGeometry` object or a string of
 GeoJSON , WKT, or HEXEWKB).
 
 A complete reference can be found in the :ref:`spatial lookup reference
@@ -117,8 +117,8 @@ A complete reference can be found in the :ref:`spatial lookup reference
 
 .. note::
 
-    GeoDjango constructs spatial SQL with the :class:`GeoQuerySet`, a
-    subclass of :class:`~django.db.models.query.QuerySet`.  The
+    GeoFreedom constructs spatial SQL with the :class:`GeoQuerySet`, a
+    subclass of :class:`~freedom.db.models.query.QuerySet`.  The
     :class:`GeoManager` instance attached to your model is what
     enables use of :class:`GeoQuerySet`.
 
@@ -157,9 +157,9 @@ The following distance lookups are available:
 Distance lookups take a tuple parameter comprising:
 
 #. A geometry to base calculations from; and
-#. A number or :class:`~django.contrib.gis.measure.Distance` object containing the distance.
+#. A number or :class:`~freedom.contrib.gis.measure.Distance` object containing the distance.
 
-If a :class:`~django.contrib.gis.measure.Distance` object is used,
+If a :class:`~freedom.contrib.gis.measure.Distance` object is used,
 it may be expressed in any units (the SQL generated will use units
 converted to those of the field); otherwise, numeric parameters are assumed
 to be in the units of the field.
@@ -184,14 +184,14 @@ to be in the units of the field.
     For much better performance on WGS84 distance queries, consider using
     :ref:`geography columns <geography-type>` in your database instead because
     they are able to use their spatial index in distance queries.
-    You can tell GeoDjango to use a geography column by setting ``geography=True``
+    You can tell GeoFreedom to use a geography column by setting ``geography=True``
     in your field definition.
 
 For example, let's say we have a ``SouthTexasCity`` model (from the
-`GeoDjango distance tests`__ ) on a *projected* coordinate system valid for cities
+`GeoFreedom distance tests`__ ) on a *projected* coordinate system valid for cities
 in southern Texas::
 
-    from django.contrib.gis.db import models
+    from freedom.contrib.gis.db import models
 
     class SouthTexasCity(models.Model):
         name = models.CharField(max_length=30)
@@ -202,8 +202,8 @@ in southern Texas::
 
 Then distance queries may be performed as follows::
 
-    >>> from django.contrib.gis.geos import *
-    >>> from django.contrib.gis.measure import D # ``D`` is a shortcut for ``Distance``
+    >>> from freedom.contrib.gis.geos import *
+    >>> from freedom.contrib.gis.measure import D # ``D`` is a shortcut for ``Distance``
     >>> from geoapp import SouthTexasCity
     # Distances will be calculated from this point, which does not have to be projected.
     >>> pnt = fromstr('POINT(-96.876369 29.905320)', srid=4326)
@@ -214,7 +214,7 @@ Then distance queries may be performed as follows::
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(mi=20)))
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(chain=100)))
 
-__ https://github.com/django/django/blob/master/django/contrib/gis/tests/distapp/models.py
+__ https://github.com/freedom/freedom/blob/master/freedom/contrib/gis/tests/distapp/models.py
 
 .. _compatibility-table:
 

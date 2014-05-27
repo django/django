@@ -2,23 +2,23 @@
 Sending email
 =============
 
-.. module:: django.core.mail
+.. module:: freedom.core.mail
    :synopsis: Helpers to easily send email.
 
 Although Python makes sending email relatively easy via the :mod:`smtplib`
-module, Django provides a couple of light wrappers over it. These wrappers are
+module, Freedom provides a couple of light wrappers over it. These wrappers are
 provided to make sending email extra quick, to make it easy to test email
 sending during development, and to provide support for platforms that can't use
 SMTP.
 
-The code lives in the ``django.core.mail`` module.
+The code lives in the ``freedom.core.mail`` module.
 
 Quick example
 =============
 
 In two lines::
 
-    from django.core.mail import send_mail
+    from freedom.core.mail import send_mail
 
     send_mail('Subject here', 'Here is the message.', 'from@example.com',
         ['to@example.com'], fail_silently=False)
@@ -32,7 +32,7 @@ a secure connection is used.
 
 .. note::
 
-    The character set of email sent with ``django.core.mail`` will be set to
+    The character set of email sent with ``freedom.core.mail`` will be set to
     the value of your :setting:`DEFAULT_CHARSET` setting.
 
 send_mail()
@@ -41,7 +41,7 @@ send_mail()
 .. function:: send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None, connection=None, html_message=None)
 
 The simplest way to send email is using
-``django.core.mail.send_mail()``.
+``freedom.core.mail.send_mail()``.
 
 The ``subject``, ``message``, ``from_email`` and ``recipient_list`` parameters
 are required.
@@ -57,10 +57,10 @@ are required.
   possible exceptions, all of which are subclasses of
   :exc:`~smtplib.SMTPException`.
 * ``auth_user``: The optional username to use to authenticate to the SMTP
-  server. If this isn't provided, Django will use the value of the
+  server. If this isn't provided, Freedom will use the value of the
   :setting:`EMAIL_HOST_USER` setting.
 * ``auth_password``: The optional password to use to authenticate to the
-  SMTP server. If this isn't provided, Django will use the value of the
+  SMTP server. If this isn't provided, Freedom will use the value of the
   :setting:`EMAIL_HOST_PASSWORD` setting.
 * ``connection``: The optional email backend to use to send the mail.
   If unspecified, an instance of the default backend will be used.
@@ -83,17 +83,17 @@ send_mass_mail()
 
 .. function:: send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None)
 
-``django.core.mail.send_mass_mail()`` is intended to handle mass emailing.
+``freedom.core.mail.send_mass_mail()`` is intended to handle mass emailing.
 
 ``datatuple`` is a tuple in which each element is in this format::
 
     (subject, message, from_email, recipient_list)
 
 ``fail_silently``, ``auth_user`` and ``auth_password`` have the same functions
-as in :meth:`~django.core.mail.send_mail()`.
+as in :meth:`~freedom.core.mail.send_mail()`.
 
 Each separate element of ``datatuple`` results in a separate email message.
-As in :meth:`~django.core.mail.send_mail()`, recipients in the same
+As in :meth:`~freedom.core.mail.send_mail()`, recipients in the same
 ``recipient_list`` will all see the other addresses in the email messages'
 "To:" field.
 
@@ -110,23 +110,23 @@ The return value will be the number of successfully delivered messages.
 send_mass_mail() vs. send_mail()
 --------------------------------
 
-The main difference between :meth:`~django.core.mail.send_mass_mail()` and
-:meth:`~django.core.mail.send_mail()` is that
-:meth:`~django.core.mail.send_mail()` opens a connection to the mail server
-each time it's executed, while :meth:`~django.core.mail.send_mass_mail()` uses
+The main difference between :meth:`~freedom.core.mail.send_mass_mail()` and
+:meth:`~freedom.core.mail.send_mail()` is that
+:meth:`~freedom.core.mail.send_mail()` opens a connection to the mail server
+each time it's executed, while :meth:`~freedom.core.mail.send_mass_mail()` uses
 a single connection for all of its messages. This makes
-:meth:`~django.core.mail.send_mass_mail()` slightly more efficient.
+:meth:`~freedom.core.mail.send_mass_mail()` slightly more efficient.
 
 mail_admins()
 =============
 
 .. function:: mail_admins(subject, message, fail_silently=False, connection=None, html_message=None)
 
-``django.core.mail.mail_admins()`` is a shortcut for sending an email to the
+``freedom.core.mail.mail_admins()`` is a shortcut for sending an email to the
 site admins, as defined in the :setting:`ADMINS` setting.
 
 ``mail_admins()`` prefixes the subject with the value of the
-:setting:`EMAIL_SUBJECT_PREFIX` setting, which is ``"[Django] "`` by default.
+:setting:`EMAIL_SUBJECT_PREFIX` setting, which is ``"[Freedom] "`` by default.
 
 The "From:" header of the email will be the value of the
 :setting:`SERVER_EMAIL` setting.
@@ -143,7 +143,7 @@ mail_managers()
 
 .. function:: mail_managers(subject, message, fail_silently=False, connection=None, html_message=None)
 
-``django.core.mail.mail_managers()`` is just like ``mail_admins()``, except it
+``freedom.core.mail.mail_managers()`` is just like ``mail_admins()``, except it
 sends an email to the site managers, as defined in the :setting:`MANAGERS`
 setting.
 
@@ -172,11 +172,11 @@ Preventing header injection
 email headers to control the "To:" and "From:" in email messages that your
 scripts generate.
 
-The Django email functions outlined above all protect against header injection
+The Freedom email functions outlined above all protect against header injection
 by forbidding newlines in header values. If any ``subject``, ``from_email`` or
 ``recipient_list`` contains a newline (in either Unix, Windows or Mac style),
-the email function (e.g. :meth:`~django.core.mail.send_mail()`) will raise
-``django.core.mail.BadHeaderError`` (a subclass of ``ValueError``) and, hence,
+the email function (e.g. :meth:`~freedom.core.mail.send_mail()`) will raise
+``freedom.core.mail.BadHeaderError`` (a subclass of ``ValueError``) and, hence,
 will not send the email. It's your responsibility to validate all data before
 passing it to the email functions.
 
@@ -187,7 +187,7 @@ Here's an example view that takes a ``subject``, ``message`` and ``from_email``
 from the request's POST data, sends that to admin@example.com and redirects to
 "/contact/thanks/" when it's done::
 
-    from django.core.mail import send_mail, BadHeaderError
+    from freedom.core.mail import send_mail, BadHeaderError
 
     def send_email(request):
         subject = request.POST.get('subject', '')
@@ -211,29 +211,29 @@ from the request's POST data, sends that to admin@example.com and redirects to
 The EmailMessage class
 ======================
 
-Django's :meth:`~django.core.mail.send_mail()` and
-:meth:`~django.core.mail.send_mass_mail()` functions are actually thin
-wrappers that make use of the :class:`~django.core.mail.EmailMessage` class.
+Freedom's :meth:`~freedom.core.mail.send_mail()` and
+:meth:`~freedom.core.mail.send_mass_mail()` functions are actually thin
+wrappers that make use of the :class:`~freedom.core.mail.EmailMessage` class.
 
-Not all features of the :class:`~django.core.mail.EmailMessage` class are
-available through the :meth:`~django.core.mail.send_mail()` and related
+Not all features of the :class:`~freedom.core.mail.EmailMessage` class are
+available through the :meth:`~freedom.core.mail.send_mail()` and related
 wrapper functions. If you wish to use advanced features, such as BCC'ed
 recipients, file attachments, or multi-part email, you'll need to create
-:class:`~django.core.mail.EmailMessage` instances directly.
+:class:`~freedom.core.mail.EmailMessage` instances directly.
 
 .. note::
-    This is a design feature. :meth:`~django.core.mail.send_mail()` and
-    related functions were originally the only interface Django provided.
+    This is a design feature. :meth:`~freedom.core.mail.send_mail()` and
+    related functions were originally the only interface Freedom provided.
     However, the list of parameters they accepted was slowly growing over
     time. It made sense to move to a more object-oriented design for email
     messages and retain the original functions only for backwards
     compatibility.
 
-:class:`~django.core.mail.EmailMessage` is responsible for creating the email
+:class:`~freedom.core.mail.EmailMessage` is responsible for creating the email
 message itself. The :ref:`email backend <topic-email-backends>` is then
 responsible for sending the email.
 
-For convenience, :class:`~django.core.mail.EmailMessage` provides a simple
+For convenience, :class:`~freedom.core.mail.EmailMessage` provides a simple
 ``send()`` method for sending a single email. If you need to send multiple
 messages, the email backend API :ref:`provides an alternative
 <topics-sending-multiple-emails>`.
@@ -243,7 +243,7 @@ EmailMessage Objects
 
 .. class:: EmailMessage
 
-The :class:`~django.core.mail.EmailMessage` class is initialized with the
+The :class:`~freedom.core.mail.EmailMessage` class is initialized with the
 following parameters (in the given order, if positional arguments are used).
 All parameters are optional and can be set at any time prior to calling the
 ``send()`` method.
@@ -291,11 +291,11 @@ The class has the following methods:
   used. If the keyword argument ``fail_silently`` is ``True``, exceptions
   raised while sending the message will be quashed.
 
-* ``message()`` constructs a ``django.core.mail.SafeMIMEText`` object (a
+* ``message()`` constructs a ``freedom.core.mail.SafeMIMEText`` object (a
   subclass of Python's ``email.MIMEText.MIMEText`` class) or a
-  ``django.core.mail.SafeMIMEMultipart`` object holding the message to be
+  ``freedom.core.mail.SafeMIMEMultipart`` object holding the message to be
   sent. If you ever need to extend the
-  :class:`~django.core.mail.EmailMessage` class, you'll probably want to
+  :class:`~freedom.core.mail.EmailMessage` class, you'll probably want to
   override this method to put the content you want into the MIME object.
 
 * ``recipients()`` returns a list of all the recipients of the message,
@@ -327,7 +327,7 @@ The class has the following methods:
     .. versionchanged:: 1.7
 
       If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
-      :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
+      :class:`freedom.core.mail.EmailMessage` and :py:class:`email.message.Message`.
 
       In addition, ``message/rfc822`` attachments will no longer be
       base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
@@ -348,15 +348,15 @@ Sending alternative content types
 
 It can be useful to include multiple versions of the content in an email; the
 classic example is to send both text and HTML versions of a message. With
-Django's email library, you can do this using the ``EmailMultiAlternatives``
-class. This subclass of :class:`~django.core.mail.EmailMessage` has an
+Freedom's email library, you can do this using the ``EmailMultiAlternatives``
+class. This subclass of :class:`~freedom.core.mail.EmailMessage` has an
 ``attach_alternative()`` method for including extra versions of the message
 body in the email. All the other methods (including the class initialization)
-are inherited directly from :class:`~django.core.mail.EmailMessage`.
+are inherited directly from :class:`~freedom.core.mail.EmailMessage`.
 
 To send a text and HTML combination, you could write::
 
-    from django.core.mail import EmailMultiAlternatives
+    from freedom.core.mail import EmailMultiAlternatives
 
     subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
     text_content = 'This is an important message.'
@@ -366,12 +366,12 @@ To send a text and HTML combination, you could write::
     msg.send()
 
 By default, the MIME type of the ``body`` parameter in an
-:class:`~django.core.mail.EmailMessage` is ``"text/plain"``. It is good
+:class:`~freedom.core.mail.EmailMessage` is ``"text/plain"``. It is good
 practice to leave this alone, because it guarantees that any recipient will be
 able to read the email, regardless of their mail client. However, if you are
 confident that your recipients can handle an alternative content type, you can
 use the ``content_subtype`` attribute on the
-:class:`~django.core.mail.EmailMessage` class to change the main content type.
+:class:`~freedom.core.mail.EmailMessage` class to change the main content type.
 The major type will always be ``"text"``, but you can change the
 subtype. For example::
 
@@ -393,7 +393,7 @@ The email backend class has the following methods:
 * ``close()`` closes the current email-sending connection.
 
 * ``send_messages(email_messages)`` sends a list of
-  :class:`~django.core.mail.EmailMessage` objects. If the connection is
+  :class:`~freedom.core.mail.EmailMessage` objects. If the connection is
   not open, this call will implicitly open the connection, and close the
   connection afterwards. If the connection is already open, it will be
   left open after mail has been sent.
@@ -401,7 +401,7 @@ The email backend class has the following methods:
 It can also be used as a context manager, which will automatically call
 ``open()`` and ``close()`` as needed::
 
-    from django.core import mail
+    from freedom.core import mail
 
     with mail.get_connection() as connection:
         mail.EmailMessage(subject1, body1, from1, [to1],
@@ -416,10 +416,10 @@ It can also be used as a context manager, which will automatically call
 Obtaining an instance of an email backend
 -----------------------------------------
 
-The :meth:`get_connection` function in ``django.core.mail`` returns an
+The :meth:`get_connection` function in ``freedom.core.mail`` returns an
 instance of the email backend that you can use.
 
-.. currentmodule:: django.core.mail
+.. currentmodule:: freedom.core.mail
 
 .. function:: get_connection(backend=None, fail_silently=False, *args, **kwargs)
 
@@ -434,7 +434,7 @@ will be silently ignored.
 All other arguments are passed directly to the constructor of the
 email backend.
 
-Django ships with several email sending backends. With the exception of the
+Freedom ships with several email sending backends. With the exception of the
 SMTP backend (which is the default), these backends are only useful during
 testing and development. If you have special email sending requirements, you
 can :ref:`write your own email backend <topic-custom-email-backend>`.
@@ -452,10 +452,10 @@ SMTP backend
     :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS` and
     :setting:`EMAIL_USE_SSL` settings in your settings file.
 
-    The SMTP backend is the default configuration inherited by Django. If you
+    The SMTP backend is the default configuration inherited by Freedom. If you
     want to specify it explicitly, put the following in your settings::
 
-        EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+        EMAIL_BACKEND = 'freedom.core.mail.backends.smtp.EmailBackend'
 
     Here is an attribute which doesn't have a corresponding setting like the
     others described above:
@@ -467,7 +467,7 @@ SMTP backend
         This backend contains a ``timeout`` parameter, which can be set with
         the following sample code::
 
-            from django.core.mail.backends import smtp
+            from freedom.core.mail.backends import smtp
 
             class MyEmailBackend(smtp.EmailBackend):
               def __init__(self, *args, **kwargs):
@@ -492,7 +492,7 @@ providing the ``stream`` keyword argument when constructing the connection.
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    EMAIL_BACKEND = 'freedom.core.mail.backends.console.EmailBackend'
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -506,11 +506,11 @@ The file backend writes emails to a file. A new file is created for each new
 session that is opened on this backend. The directory to which the files are
 written is either taken from the :setting:`EMAIL_FILE_PATH` setting or from
 the ``file_path`` keyword when creating a connection with
-:meth:`~django.core.mail.get_connection`.
+:meth:`~freedom.core.mail.get_connection`.
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_BACKEND = 'freedom.core.mail.backends.filebased.EmailBackend'
     EMAIL_FILE_PATH = '/tmp/app-messages' # change this to a proper location
 
 This backend is not intended for use in production -- it is provided as a
@@ -522,14 +522,14 @@ In-memory backend
 ~~~~~~~~~~~~~~~~~
 
 The ``'locmem'`` backend stores messages in a special attribute of the
-``django.core.mail`` module. The ``outbox`` attribute is created when the
+``freedom.core.mail`` module. The ``outbox`` attribute is created when the
 first message is sent. It's a list with an
-:class:`~django.core.mail.EmailMessage` instance for each message that would
+:class:`~freedom.core.mail.EmailMessage` instance for each message that would
 be sent.
 
 To specify this backend, put the following in your settings::
 
-  EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+  EMAIL_BACKEND = 'freedom.core.mail.backends.locmem.EmailBackend'
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development and testing.
@@ -542,7 +542,7 @@ Dummy backend
 As the name suggests the dummy backend does nothing with your messages. To
 specify this backend, put the following in your settings::
 
-   EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+   EMAIL_BACKEND = 'freedom.core.mail.backends.dummy.EmailBackend'
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -557,9 +557,9 @@ backend. The :setting:`EMAIL_BACKEND` setting in your settings file is then
 the Python import path for your backend class.
 
 Custom email backends should subclass ``BaseEmailBackend`` that is located in
-the ``django.core.mail.backends.base`` module. A custom email backend must
+the ``freedom.core.mail.backends.base`` module. A custom email backend must
 implement the ``send_messages(email_messages)`` method. This method receives a
-list of :class:`~django.core.mail.EmailMessage` instances and returns the
+list of :class:`~freedom.core.mail.EmailMessage` instances and returns the
 number of successfully delivered messages. If your backend has any concept of
 a persistent session or connection, you should also implement the ``open()``
 and ``close()`` methods. Refer to ``smtp.EmailBackend`` for a reference
@@ -578,15 +578,15 @@ destroying a connection every time you want to send an email.
 There are two ways you tell an email backend to reuse a connection.
 
 Firstly, you can use the ``send_messages()`` method. ``send_messages()`` takes
-a list of :class:`~django.core.mail.EmailMessage` instances (or subclasses),
+a list of :class:`~freedom.core.mail.EmailMessage` instances (or subclasses),
 and sends them all using a single connection.
 
 For example, if you have a function called ``get_notification_email()`` that
-returns a list of :class:`~django.core.mail.EmailMessage` objects representing
+returns a list of :class:`~freedom.core.mail.EmailMessage` objects representing
 some periodic email you wish to send out, you could send these emails using
 a single call to send_messages::
 
-    from django.core import mail
+    from freedom.core import mail
     connection = mail.get_connection()   # Use default email connection
     messages = get_notification_email()
     connection.send_messages(messages)
@@ -599,7 +599,7 @@ email backend to manually control the connection. ``send_messages()`` will not
 manually open or close the connection if it is already open, so if you
 manually open the connection, you can control when it is closed. For example::
 
-    from django.core import mail
+    from freedom.core import mail
     connection = mail.get_connection()
 
     # Manually open the connection
@@ -626,7 +626,7 @@ manually open the connection, you can control when it is closed. For example::
 Configuring email for development
 =================================
 
-There are times when you do not want Django to send emails at
+There are times when you do not want Freedom to send emails at
 all. For example, while developing a Web site, you probably don't want
 to send out thousands of emails -- but you may want to validate that
 emails will be sent to the right people under the right conditions,

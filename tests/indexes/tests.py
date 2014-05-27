@@ -1,8 +1,8 @@
 from unittest import skipUnless
 
-from django.core.management.color import no_style
-from django.db import connection
-from django.test import TestCase
+from freedom.core.management.color import no_style
+from freedom.db import connection
+from freedom.test import TestCase
 
 from .models import Article, IndexTogetherSingleList
 

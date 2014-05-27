@@ -10,17 +10,17 @@ import time
 from unittest import SkipTest, skipUnless
 import warnings
 
-from django.conf import settings
-from django.core import management
-from django.core.management import execute_from_command_line
-from django.core.management.utils import find_command
-from django.test import SimpleTestCase
-from django.test import override_settings
-from django.utils.encoding import force_text
-from django.utils._os import upath
-from django.utils import six
-from django.utils.six import StringIO
-from django.utils.translation import TranslatorCommentWarning
+from freedom.conf import settings
+from freedom.core import management
+from freedom.core.management import execute_from_command_line
+from freedom.core.management.utils import find_command
+from freedom.test import SimpleTestCase
+from freedom.test import override_settings
+from freedom.utils.encoding import force_text
+from freedom.utils._os import upath
+from freedom.utils import six
+from freedom.utils.six import StringIO
+from freedom.utils.translation import TranslatorCommentWarning
 
 
 LOCALE = 'de'
@@ -32,7 +32,7 @@ class ExtractorTests(SimpleTestCase):
 
     test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'commands'))
 
-    PO_FILE = 'locale/%s/LC_MESSAGES/django.po' % LOCALE
+    PO_FILE = 'locale/%s/LC_MESSAGES/freedom.po' % LOCALE
 
     def setUp(self):
         self._cwd = os.getcwd()
@@ -90,9 +90,9 @@ class ExtractorTests(SimpleTestCase):
 
     def assertLocationCommentPresent(self, po_filename, line_number, *comment_parts):
         """
-        self.assertLocationCommentPresent('django.po', 42, 'dirA', 'dirB', 'foo.py')
+        self.assertLocationCommentPresent('freedom.po', 42, 'dirA', 'dirB', 'foo.py')
 
-        verifies that the django.po file has a gettext-style location comment of the form
+        verifies that the freedom.po file has a gettext-style location comment of the form
 
         `#: dirA/dirB/foo.py:42`
 
@@ -132,8 +132,8 @@ class BasicExtractorTests(ExtractorTests):
             self.assertTrue('#. Translators: This comment should be extracted' in po_contents)
             self.assertTrue('This comment should not be extracted' not in po_contents)
             # Comments in templates
-            self.assertTrue('#. Translators: Django template comment for translators' in po_contents)
-            self.assertTrue("#. Translators: Django comment block for translators\n#. string's meaning unveiled" in po_contents)
+            self.assertTrue('#. Translators: Freedom template comment for translators' in po_contents)
+            self.assertTrue("#. Translators: Freedom comment block for translators\n#. string's meaning unveiled" in po_contents)
 
             self.assertTrue('#. Translators: One-line translator comment #1' in po_contents)
             self.assertTrue('#. Translators: Two-line translator comment #1\n#. continued here.' in po_contents)
@@ -193,7 +193,7 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_force_en_us_locale(self):
         """Value of locale-munging option used by the command is the right one"""
-        from django.core.management.commands.makemessages import Command
+        from freedom.core.management.commands.makemessages import Command
         self.assertTrue(Command.leave_locale_alone)
 
     def test_extraction_error(self):
@@ -334,11 +334,11 @@ class BasicExtractorTests(ExtractorTests):
 
 class JavascriptExtractorTests(ExtractorTests):
 
-    PO_FILE = 'locale/%s/LC_MESSAGES/djangojs.po' % LOCALE
+    PO_FILE = 'locale/%s/LC_MESSAGES/freedomjs.po' % LOCALE
 
     def test_javascript_literals(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', domain='djangojs', locale=[LOCALE], verbosity=0)
+        management.call_command('makemessages', domain='freedomjs', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
@@ -420,7 +420,7 @@ class SymlinkExtractorTests(ExtractorTests):
 
 class CopyPluralFormsExtractorTests(ExtractorTests):
 
-    PO_FILE_ES = 'locale/es/LC_MESSAGES/django.po'
+    PO_FILE_ES = 'locale/es/LC_MESSAGES/freedom.po'
 
     def tearDown(self):
         super(CopyPluralFormsExtractorTests, self).tearDown()
@@ -492,7 +492,7 @@ class LocationCommentsTests(ExtractorTests):
 
 class KeepPotFileExtractorTests(ExtractorTests):
 
-    POT_FILE = 'locale/django.pot'
+    POT_FILE = 'locale/freedom.pot'
 
     def setUp(self):
         super(KeepPotFileExtractorTests, self).setUp()
@@ -525,8 +525,8 @@ class KeepPotFileExtractorTests(ExtractorTests):
 
 
 class MultipleLocaleExtractionTests(ExtractorTests):
-    PO_FILE_PT = 'locale/pt/LC_MESSAGES/django.po'
-    PO_FILE_DE = 'locale/de/LC_MESSAGES/django.po'
+    PO_FILE_PT = 'locale/pt/LC_MESSAGES/freedom.po'
+    PO_FILE_DE = 'locale/de/LC_MESSAGES/freedom.po'
     LOCALES = ['pt', 'de', 'ch']
 
     def tearDown(self):
@@ -548,7 +548,7 @@ class MultipleLocaleExtractionTests(ExtractorTests):
 class ExcludedLocaleExtractionTests(ExtractorTests):
 
     LOCALES = ['en', 'fr', 'it']
-    PO_FILE = 'locale/%s/LC_MESSAGES/django.po'
+    PO_FILE = 'locale/%s/LC_MESSAGES/freedom.po'
 
     test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'exclude'))
 
@@ -574,7 +574,7 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
             # `call_command` bypasses the parser; by calling
             # `execute_from_command_line` with the help subcommand we
             # ensure that there are no issues with the parser itself.
-            execute_from_command_line(['django-admin', 'help', 'makemessages'])
+            execute_from_command_line(['freedom-admin', 'help', 'makemessages'])
         finally:
             sys.stdout, sys.stderr = old_stdout, old_stderr
 
@@ -634,9 +634,9 @@ class CustomLayoutExtractionTests(ExtractorTests):
 
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         project_de_locale = os.path.join(
-            self.test_dir, 'project_locale', 'de', 'LC_MESSAGES', 'django.po')
+            self.test_dir, 'project_locale', 'de', 'LC_MESSAGES', 'freedom.po')
         app_de_locale = os.path.join(
-            self.test_dir, 'app_with_locale', 'locale', 'de', 'LC_MESSAGES', 'django.po')
+            self.test_dir, 'app_with_locale', 'locale', 'de', 'LC_MESSAGES', 'freedom.po')
         self.assertTrue(os.path.exists(project_de_locale))
         self.assertTrue(os.path.exists(app_de_locale))
 

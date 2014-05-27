@@ -3,9 +3,9 @@ from __future__ import unicode_literals
 
 from unittest import TestCase
 
-from django.template import Template, TemplateEncodingError, Context
-from django.utils.safestring import SafeData
-from django.utils import six
+from freedom.template import Template, TemplateEncodingError, Context
+from freedom.utils.safestring import SafeData
+from freedom.utils import six
 
 
 class UnicodeTests(TestCase):

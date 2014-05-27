@@ -1,5 +1,5 @@
 
-from django.db import models
+from freedom.db import models
 
 
 class ConcreteModel(models.Model):

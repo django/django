@@ -2,10 +2,10 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 
-from django.core.management import call_command
-from django.test import TestCase, TransactionTestCase
-from django.test.utils import override_system_checks, extend_sys_path
-from django.utils._os import upath
+from freedom.core.management import call_command
+from freedom.test import TestCase, TransactionTestCase
+from freedom.test.utils import override_system_checks, extend_sys_path
+from freedom.utils._os import upath
 
 from .models import (ConcreteModel, ConcreteModelSubclass,
     ConcreteModelSubclassProxy)

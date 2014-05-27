@@ -2,9 +2,9 @@ from datetime import datetime
 import sys
 import unittest
 
-from django.utils.datastructures import MultiValueDict
-from django.utils import http
-from django.utils import six
+from freedom.utils.datastructures import MultiValueDict
+from freedom.utils import http
+from freedom.utils import six
 
 
 class TestUtilsHttp(unittest.TestCase):
@@ -85,7 +85,7 @@ class TestUtilsHttp(unittest.TestCase):
             self.assertRaises(TypeError, http.base36_to_int, n)
 
         # more explicit output testing
-        for n, b36 in [(0, '0'), (1, '1'), (42, '16'), (818469960, 'django')]:
+        for n, b36 in [(0, '0'), (1, '1'), (42, '16'), (818469960, 'freedom')]:
             self.assertEqual(http.int_to_base36(n), b36)
             self.assertEqual(http.base36_to_int(b36), n)
 

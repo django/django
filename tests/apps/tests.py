@@ -4,15 +4,15 @@ import os
 import sys
 from unittest import skipUnless
 
-from django.apps import apps, AppConfig
-from django.apps.registry import Apps
-from django.contrib.admin.models import LogEntry
-from django.core.exceptions import ImproperlyConfigured
-from django.db import models
-from django.test import TestCase, override_settings
-from django.test.utils import extend_sys_path
-from django.utils._os import upath
-from django.utils import six
+from freedom.apps import apps, AppConfig
+from freedom.apps.registry import Apps
+from freedom.contrib.admin.models import LogEntry
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.db import models
+from freedom.test import TestCase, override_settings
+from freedom.test.utils import extend_sys_path
+from freedom.utils._os import upath
+from freedom.utils import six
 
 from .default_config_app.apps import CustomConfig
 from .models import TotallyNormal, SoAlternative, new_apps
@@ -24,15 +24,15 @@ from .models import TotallyNormal, SoAlternative, new_apps
 SOME_INSTALLED_APPS = [
     'apps.apps.MyAdmin',
     'apps.apps.MyAuth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'freedom.contrib.contenttypes',
+    'freedom.contrib.sessions',
+    'freedom.contrib.messages',
+    'freedom.contrib.staticfiles',
 ]
 
 SOME_INSTALLED_APPS_NAMES = [
-    'django.contrib.admin',
-    'django.contrib.auth',
+    'freedom.contrib.admin',
+    'freedom.contrib.auth',
 ] + SOME_INSTALLED_APPS[2:]
 
 HERE = os.path.dirname(__file__)
@@ -113,10 +113,10 @@ class AppsTests(TestCase):
         Tests apps.get_app_config().
         """
         app_config = apps.get_app_config('admin')
-        self.assertEqual(app_config.name, 'django.contrib.admin')
+        self.assertEqual(app_config.name, 'freedom.contrib.admin')
 
         app_config = apps.get_app_config('staticfiles')
-        self.assertEqual(app_config.name, 'django.contrib.staticfiles')
+        self.assertEqual(app_config.name, 'freedom.contrib.staticfiles')
 
         with self.assertRaises(LookupError):
             apps.get_app_config('webdesign')
@@ -126,10 +126,10 @@ class AppsTests(TestCase):
         """
         Tests apps.is_installed().
         """
-        self.assertTrue(apps.is_installed('django.contrib.admin'))
-        self.assertTrue(apps.is_installed('django.contrib.auth'))
-        self.assertTrue(apps.is_installed('django.contrib.staticfiles'))
-        self.assertFalse(apps.is_installed('django.contrib.webdesign'))
+        self.assertTrue(apps.is_installed('freedom.contrib.admin'))
+        self.assertTrue(apps.is_installed('freedom.contrib.auth'))
+        self.assertTrue(apps.is_installed('freedom.contrib.staticfiles'))
+        self.assertFalse(apps.is_installed('freedom.contrib.webdesign'))
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_model(self):

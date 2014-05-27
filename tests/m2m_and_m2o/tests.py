@@ -1,5 +1,5 @@
-from django.db.models import Q
-from django.test import TestCase
+from freedom.db.models import Q
+from freedom.test import TestCase
 
 from .models import Issue, User, UnicodeReferenceModel
 

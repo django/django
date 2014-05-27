@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<django-objects version="1.0">
+<freedom-objects version="1.0">
     <object pk="100" model="auth.user">
         <field type="CharField" name="username">super</field>
         <field type="CharField" name="first_name">Super</field>
@@ -14,4 +14,4 @@
         <field to="auth.group" name="groups" rel="ManyToManyRel"></field>
         <field to="auth.permission" name="user_permissions" rel="ManyToManyRel"></field>
     </object>
-</django-objects>
+</freedom-objects>

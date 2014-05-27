@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 import datetime
 import unittest
 
-from django.utils import feedgenerator
-from django.utils.timezone import get_fixed_timezone
+from freedom.utils import feedgenerator
+from freedom.utils.timezone import get_fixed_timezone
 
 
 class FeedgeneratorTest(unittest.TestCase):
@@ -26,8 +26,8 @@ class FeedgeneratorTest(unittest.TestCase):
         numbers.
         """
         self.assertEqual(
-            feedgenerator.get_tag_uri('http://www.example.org:8000/2008/11/14/django#headline', datetime.datetime(2008, 11, 14, 13, 37, 0)),
-            'tag:www.example.org,2008-11-14:/2008/11/14/django/headline')
+            feedgenerator.get_tag_uri('http://www.example.org:8000/2008/11/14/freedom#headline', datetime.datetime(2008, 11, 14, 13, 37, 0)),
+            'tag:www.example.org,2008-11-14:/2008/11/14/freedom/headline')
 
     def test_rfc2822_date(self):
         """

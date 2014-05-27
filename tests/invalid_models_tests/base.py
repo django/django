@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.apps import apps
-from django.test import TestCase
+from freedom.apps import apps
+from freedom.test import TestCase
 
 
 class IsolatedModelsTestCase(TestCase):

@@ -7,19 +7,19 @@ from __future__ import unicode_literals
 import os
 import itertools
 
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.template import (TemplateSyntaxError,
+from freedom.core.urlresolvers import reverse, NoReverseMatch
+from freedom.template import (TemplateSyntaxError,
     Context, Template, loader)
-import django.template.context
-from django.test import Client, TestCase, override_settings
-from django.test.client import encode_file, RequestFactory
-from django.test.utils import ContextList, str_prefix
-from django.template.response import SimpleTemplateResponse
-from django.utils._os import upath
-from django.utils.translation import ugettext_lazy
-from django.http import HttpResponse
-from django.contrib.auth.signals import user_logged_out, user_logged_in
-from django.contrib.auth.models import User
+import freedom.template.context
+from freedom.test import Client, TestCase, override_settings
+from freedom.test.client import encode_file, RequestFactory
+from freedom.test.utils import ContextList, str_prefix
+from freedom.template.response import SimpleTemplateResponse
+from freedom.utils._os import upath
+from freedom.utils.translation import ugettext_lazy
+from freedom.http import HttpResponse
+from freedom.contrib.auth.signals import user_logged_out, user_logged_in
+from freedom.contrib.auth.models import User
 
 from .models import CustomUser
 from .views import CustomTestException
@@ -190,7 +190,7 @@ class AssertContainsTests(TestCase):
         self.assertNotContains(response, 'Bye')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF='test_client_regress.urls',)
 class AssertTemplateUsedTests(TestCase):
     fixtures = ['testdata.json']
@@ -803,7 +803,7 @@ class AssertFormsetErrorTests(TestCase):
                                     **kwargs)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF='test_client_regress.urls',)
 class LoginTests(TestCase):
     fixtures = ['testdata']
@@ -826,7 +826,7 @@ class LoginTests(TestCase):
 
 
 @override_settings(
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
     SESSION_ENGINE='test_client_regress.session',
     ROOT_URLCONF='test_client_regress.urls',
 )
@@ -872,7 +872,7 @@ class URLEscapingTests(TestCase):
         self.assertEqual(response.content, b'Hi, Arthur')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF='test_client_regress.urls',)
 class ExceptionTests(TestCase):
     fixtures = ['testdata.json']
@@ -946,7 +946,7 @@ class zzUrlconfSubstitutionTests(TestCase):
             reverse('arg_view', args=['somename'])
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF='test_client_regress.urls',)
 class ContextTests(TestCase):
     fixtures = ['testdata']
@@ -1002,11 +1002,11 @@ class ContextTests(TestCase):
         # the request instance. This triggers a bug caused by some ways of
         # copying RequestContext.
         try:
-            django.template.context._standard_context_processors = (lambda request: {'path': request.special_path},)
+            freedom.template.context._standard_context_processors = (lambda request: {'path': request.special_path},)
             response = self.client.get("/request_context_view/")
             self.assertContains(response, 'Path: /request_context_view/')
         finally:
-            django.template.context._standard_context_processors = None
+            freedom.template.context._standard_context_processors = None
 
     def test_nested_requests(self):
         """
@@ -1017,7 +1017,7 @@ class ContextTests(TestCase):
         self.assertEqual(response.context['nested'], 'yes')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF='test_client_regress.urls',)
 class SessionTests(TestCase):
     fixtures = ['testdata.json']
@@ -1214,7 +1214,7 @@ class RequestMethodStringDataTests(TestCase):
 class QueryStringTests(TestCase):
 
     def test_get_like_requests(self):
-        # See: https://code.djangoproject.com/ticket/10571.
+        # See: https://code.freedomproject.com/ticket/10571.
         for method_name in ('get', 'head'):
             # A GET-like request can pass a query string as data
             method = getattr(self.client, method_name)

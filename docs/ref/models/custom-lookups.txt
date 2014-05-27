@@ -4,12 +4,12 @@ Custom lookups
 
 .. versionadded:: 1.7
 
-.. module:: django.db.models.lookups
+.. module:: freedom.db.models.lookups
    :synopsis: Custom lookups
 
-.. currentmodule:: django.db.models
+.. currentmodule:: freedom.db.models
 
-By default Django offers a wide variety of :ref:`built-in lookups
+By default Freedom offers a wide variety of :ref:`built-in lookups
 <field-lookups>` for filtering (for example, ``exact`` and ``icontains``). This
 documentation explains how to write custom lookups and how to alter the working
 of existing lookups.
@@ -27,10 +27,10 @@ This SQL is backend independent, so we don't need to worry about different
 databases.
 
 There are two steps to making this work. Firstly we need to implement the
-lookup, then we need to tell Django about it. The implementation is quite
+lookup, then we need to tell Freedom about it. The implementation is quite
 straightforward::
 
-  from django.db.models import Lookup
+  from freedom.db.models import Lookup
 
   class NotEqual(Lookup):
       lookup_name = 'ne'
@@ -46,7 +46,7 @@ To register the ``NotEqual`` lookup we will just need to call
 this case, the lookup makes sense on all ``Field`` subclasses, so we register
 it with ``Field`` directly::
 
-  from django.db.models.fields import Field
+  from freedom.db.models.fields import Field
   Field.register_lookup(NotEqual)
 
 We can now use ``foo__ne`` for any field ``foo``. You will need to ensure that
@@ -104,12 +104,12 @@ or where it did not exceed a certain amount
 .. note::
     This example is somewhat contrived, but it demonstrates nicely the range of
     functionality which is possible in a database backend independent manner,
-    and without duplicating functionality already in Django.
+    and without duplicating functionality already in Freedom.
 
 We will start by writing a ``AbsoluteValue`` transformer. This will use the SQL
 function ``ABS()`` to transform the value before comparison::
 
-  from django.db.models import Transform
+  from freedom.db.models import Transform
 
   class AbsoluteValue(Transform):
       lookup_name = 'abs'
@@ -120,7 +120,7 @@ function ``ABS()`` to transform the value before comparison::
 
 Next, lets register it for ``IntegerField``::
 
-  from django.db.models import IntegerField
+  from freedom.db.models import IntegerField
   IntegerField.register_lookup(AbsoluteValue)
 
 We can now run the queries we had before.
@@ -137,11 +137,11 @@ SQL::
 
 Subclasses of ``Transform`` usually only operate on the left-hand side of the
 expression. Further lookups will work on the transformed value. Note that in
-this case where there is no other lookup specified, Django interprets
+this case where there is no other lookup specified, Freedom interprets
 ``change__abs=27`` as ``change__abs__exact=27``.
 
 When looking for which lookups are allowable after the ``Transform`` has been
-applied, Django uses the ``output_type`` attribute. We didn't need to specify
+applied, Freedom uses the ``output_type`` attribute. We didn't need to specify
 this here as it didn't change, but supposing we were applying ``AbsoluteValue``
 to some field which represents a more complex type (for example a point
 relative to an origin, or a complex number) then we may have wanted to specify
@@ -163,7 +163,7 @@ the following SQL::
 
 The implementation is::
 
-  from django.db.models import Lookup
+  from freedom.db.models import Lookup
 
   class AbsoluteValueLessThan(Lookup):
       lookup_name = 'lt'
@@ -206,7 +206,7 @@ Sometimes different database vendors require different SQL for the same
 operation. For this example we will rewrite a custom implementation for
 MySQL for the NotEqual operator. Instead of ``<>`` we will be using ``!=``
 operator. (Note that in reality almost all databases support both, including
-all the official databases supported by Django).
+all the official databases supported by Freedom).
 
 We can change the behavior on a specific backend by creating a subclass of
 ``NotEqual`` with a ``as_mysql`` method::
@@ -222,11 +222,11 @@ We can change the behavior on a specific backend by creating a subclass of
 We can then register it with ``Field``. It takes the place of the original
 ``NotEqual`` class as it has the same ``lookup_name``.
 
-When compiling a query, Django first looks for ``as_%s % connection.vendor``
+When compiling a query, Freedom first looks for ``as_%s % connection.vendor``
 methods, and then falls back to ``as_sql``. The vendor names for the in-built
 backends are ``sqlite``, ``postgresql``, ``oracle`` and ``mysql``.
 
-How Django determines the lookups and transforms which are used
+How Freedom determines the lookups and transforms which are used
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In some cases you may which to dynamically change which ``Transform`` or
@@ -295,10 +295,10 @@ to this API.
 .. method:: as_vendorname(qn, connection)
 
     Works like ``as_sql()`` method. When an expression is compiled by
-    ``qn.compile()``, Django will first try to call ``as_vendorname()``, where
+    ``qn.compile()``, Freedom will first try to call ``as_vendorname()``, where
     vendorname is the vendor name of the backend used for executing the query.
     The vendorname is one of ``postgresql``, ``oracle``, ``sqlite`` or
-    ``mysql`` for Django's built-in backends.
+    ``mysql`` for Freedom's built-in backends.
 
 .. method:: get_lookup(lookup_name)
 
@@ -394,13 +394,13 @@ The lookup registration API is explained below.
 
 .. method:: get_lookup(lookup_name)
 
-    Django uses ``get_lookup(lookup_name)`` to fetch lookups. The
+    Freedom uses ``get_lookup(lookup_name)`` to fetch lookups. The
     implementation of ``get_lookup()`` looks for a subclass which is registered
     for the current class with the correct ``lookup_name``.
 
 .. method:: get_transform(lookup_name)
 
-    Django uses ``get_transform(lookup_name)`` to fetch transforms. The
+    Freedom uses ``get_transform(lookup_name)`` to fetch transforms. The
     implementation of ``get_transform()`` looks for a subclass which is registered
     for the current class with the correct ``transform_name``.
 

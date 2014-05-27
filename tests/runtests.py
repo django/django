@@ -8,29 +8,29 @@ import sys
 import tempfile
 import warnings
 
-import django
-from django import contrib
-from django.apps import apps
-from django.conf import settings
-from django.db import connection
-from django.test import TransactionTestCase, TestCase
-from django.test.utils import get_runner
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
-from django.utils._os import upath
-from django.utils import six
+import freedom
+from freedom import contrib
+from freedom.apps import apps
+from freedom.conf import settings
+from freedom.db import connection
+from freedom.test import TransactionTestCase, TestCase
+from freedom.test.utils import get_runner
+from freedom.utils.deprecation import RemovedInFreedom19Warning, RemovedInFreedom20Warning
+from freedom.utils._os import upath
+from freedom.utils import six
 
 
-warnings.simplefilter("default", RemovedInDjango19Warning)
-warnings.simplefilter("default", RemovedInDjango20Warning)
+warnings.simplefilter("default", RemovedInFreedom19Warning)
+warnings.simplefilter("default", RemovedInFreedom20Warning)
 
-CONTRIB_MODULE_PATH = 'django.contrib'
+CONTRIB_MODULE_PATH = 'freedom.contrib'
 
 TEST_TEMPLATE_DIR = 'templates'
 
 CONTRIB_DIR = os.path.dirname(upath(contrib.__file__))
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 
-TEMP_DIR = tempfile.mkdtemp(prefix='django_')
+TEMP_DIR = tempfile.mkdtemp(prefix='freedom_')
 os.environ['DJANGO_TEST_TEMP_DIR'] = TEMP_DIR
 
 SUBDIRS_TO_SKIP = [
@@ -41,17 +41,17 @@ SUBDIRS_TO_SKIP = [
 ]
 
 ALWAYS_INSTALLED_APPS = [
-    'django.contrib.contenttypes',
-    'django.contrib.auth',
-    'django.contrib.sites',
-    'django.contrib.flatpages',
-    'django.contrib.redirects',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.admin.apps.SimpleAdminConfig',
-    'django.contrib.admindocs',
-    'django.contrib.staticfiles',
-    'django.contrib.humanize',
+    'freedom.contrib.contenttypes',
+    'freedom.contrib.auth',
+    'freedom.contrib.sites',
+    'freedom.contrib.flatpages',
+    'freedom.contrib.redirects',
+    'freedom.contrib.sessions',
+    'freedom.contrib.messages',
+    'freedom.contrib.admin.apps.SimpleAdminConfig',
+    'freedom.contrib.admindocs',
+    'freedom.contrib.staticfiles',
+    'freedom.contrib.humanize',
     'staticfiles_tests',
     'staticfiles_tests.apps.test',
     'staticfiles_tests.apps.no_label',
@@ -60,7 +60,7 @@ ALWAYS_INSTALLED_APPS = [
 
 
 def get_test_modules():
-    from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
+    from freedom.contrib.gis.tests.utils import HAS_SPATIAL_DB
     modules = []
     discovery_paths = [
         (None, RUNTESTS_DIR),
@@ -68,7 +68,7 @@ def get_test_modules():
     ]
     if HAS_SPATIAL_DB:
         discovery_paths.append(
-            ('django.contrib.gis.tests', os.path.join(CONTRIB_DIR, 'gis', 'tests'))
+            ('freedom.contrib.gis.tests', os.path.join(CONTRIB_DIR, 'gis', 'tests'))
         )
 
     for modpath, dirpath in discovery_paths:
@@ -90,7 +90,7 @@ def get_installed():
 
 
 def setup(verbosity, test_labels):
-    print("Testing against Django installed in '%s'" % os.path.dirname(django.__file__))
+    print("Testing against Freedom installed in '%s'" % os.path.dirname(freedom.__file__))
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
     def no_available_apps(self):
@@ -126,7 +126,7 @@ def setup(verbosity, test_labels):
         logger.addHandler(handler)
 
     # Load all the ALWAYS_INSTALLED_APPS.
-    django.setup()
+    freedom.setup()
 
     # Load all the test model apps.
     test_modules = get_test_modules()
@@ -135,7 +135,7 @@ def setup(verbosity, test_labels):
     test_labels_set = set()
     for label in test_labels:
         bits = label.split('.')
-        if bits[:2] == ['django', 'contrib']:
+        if bits[:2] == ['freedom', 'contrib']:
             bits = bits[:3]
         else:
             bits = bits[:1]
@@ -183,13 +183,13 @@ def teardown(state):
         setattr(settings, key, value)
 
 
-def django_tests(verbosity, interactive, failfast, test_labels):
+def freedom_tests(verbosity, interactive, failfast, test_labels):
     state = setup(verbosity, test_labels)
     extra_tests = []
 
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
-        settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+        settings.TEST_RUNNER = 'freedom.test.runner.DiscoverRunner'
     TestRunner = get_runner(settings)
 
     test_runner = TestRunner(
@@ -197,13 +197,13 @@ def django_tests(verbosity, interactive, failfast, test_labels):
         interactive=interactive,
         failfast=failfast,
     )
-    # Catch warnings thrown in test DB setup -- remove in Django 1.9
+    # Catch warnings thrown in test DB setup -- remove in Freedom 1.9
     with warnings.catch_warnings():
         warnings.filterwarnings(
             'ignore',
             "Custom SQL location '<app_label>/models/sql' is deprecated, "
             "use '<app_label>/sql' instead.",
-            RemovedInDjango19Warning
+            RemovedInFreedom19Warning
         )
         failures = test_runner.run_tests(
             test_labels or get_installed(), extra_tests=extra_tests)
@@ -316,10 +316,10 @@ if __name__ == "__main__":
              'output')
     parser.add_option(
         '--noinput', action='store_false', dest='interactive', default=True,
-        help='Tells Django to NOT prompt the user for input of any kind.')
+        help='Tells Freedom to NOT prompt the user for input of any kind.')
     parser.add_option(
         '--failfast', action='store_true', dest='failfast', default=False,
-        help='Tells Django to stop running the test suite after first failed '
+        help='Tells Freedom to stop running the test suite after first failed '
              'test.')
     parser.add_option(
         '--settings',
@@ -362,7 +362,7 @@ if __name__ == "__main__":
     elif options.pair:
         paired_tests(options.pair, options, args)
     else:
-        failures = django_tests(int(options.verbosity), options.interactive,
+        failures = freedom_tests(int(options.verbosity), options.interactive,
                                 options.failfast, args)
         if failures:
             sys.exit(bool(failures))

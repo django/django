@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # This script aims to help developers locate forms and view code that needs to
-# use the new CSRF protection in Django 1.2.  It tries to find all the code that
+# use the new CSRF protection in Freedom 1.2.  It tries to find all the code that
 # may need the steps described in the CSRF documentation.  It does not modify
 # any code directly, it merely attempts to locate it.  Developers should be
 # aware of its limitations, described below.
@@ -24,7 +24,7 @@
 #
 # The format used allows this script to be used in Emacs grep mode:
 #   M-x grep
-#   Run grep (like this): /path/to/my/virtualenv/python /path/to/django/src/extras/csrf_migration_helper.py --settings=mysettings /path/to/my/srcs
+#   Run grep (like this): /path/to/my/virtualenv/python /path/to/freedom/src/extras/csrf_migration_helper.py --settings=mysettings /path/to/my/srcs
 
 
 # Limitations
@@ -61,7 +61,7 @@
 #     include the template in another template.
 #
 # - All templates belonging to apps referenced in INSTALLED_APPS will be
-#   searched, which may include third party apps or Django contrib.  In some
+#   searched, which may include third party apps or Freedom contrib.  In some
 #   cases, this will be a good thing, because even if the templates of these
 #   apps have been fixed by someone else, your own view code may reference the
 #   same template and may need to be updated.
@@ -142,15 +142,15 @@ def get_template_dirs():
     """
     Returns a set of all directories that contain project templates.
     """
-    from django.conf import settings
+    from freedom.conf import settings
     dirs = set()
-    if ('django.template.loaders.filesystem.load_template_source' in settings.TEMPLATE_LOADERS
-            or 'django.template.loaders.filesystem.Loader' in settings.TEMPLATE_LOADERS):
+    if ('freedom.template.loaders.filesystem.load_template_source' in settings.TEMPLATE_LOADERS
+            or 'freedom.template.loaders.filesystem.Loader' in settings.TEMPLATE_LOADERS):
         dirs.update(map(unicode, settings.TEMPLATE_DIRS))
 
-    if ('django.template.loaders.app_directories.load_template_source' in settings.TEMPLATE_LOADERS
-            or 'django.template.loaders.app_directories.Loader' in settings.TEMPLATE_LOADERS):
-        from django.template.loaders.app_directories import app_template_dirs
+    if ('freedom.template.loaders.app_directories.load_template_source' in settings.TEMPLATE_LOADERS
+            or 'freedom.template.loaders.app_directories.Loader' in settings.TEMPLATE_LOADERS):
+        from freedom.template.loaders.app_directories import app_template_dirs
         dirs.update(app_template_dirs)
     return dirs
 

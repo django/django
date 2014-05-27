@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.test import TestCase
+from freedom.test import TestCase
 
 from .models import Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species, HybridSpecies
 

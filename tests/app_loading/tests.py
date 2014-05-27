@@ -2,11 +2,11 @@ from __future__ import unicode_literals
 
 import os
 
-from django.apps import apps
-from django.test import TestCase
-from django.test.utils import extend_sys_path
-from django.utils._os import upath
-from django.utils import six
+from freedom.apps import apps
+from freedom.test import TestCase
+from freedom.test.utils import extend_sys_path
+from freedom.utils._os import upath
+from freedom.utils import six
 
 
 class EggLoadingTest(TestCase):

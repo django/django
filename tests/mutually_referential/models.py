@@ -4,7 +4,7 @@
 Strings can be used instead of model literals to set up "lazy" relations.
 """
 
-from django.db import models
+from freedom.db import models
 
 
 class Parent(models.Model):

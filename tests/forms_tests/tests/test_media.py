@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from django.forms import Media, TextInput, CharField, Form, MultiWidget
-from django.template import Template, Context
-from django.test import TestCase, override_settings
+from freedom.forms import Media, TextInput, CharField, Form, MultiWidget
+from freedom.template import Template, Context
+from freedom.test import TestCase, override_settings
 
 
 @override_settings(

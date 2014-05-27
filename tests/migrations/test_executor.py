@@ -1,6 +1,6 @@
-from django.db import connection
-from django.db.migrations.executor import MigrationExecutor
-from django.test import override_settings
+from freedom.db import connection
+from freedom.db.migrations.executor import MigrationExecutor
+from freedom.test import override_settings
 
 from .test_base import MigrationTestBase
 
@@ -13,7 +13,7 @@ class ExecutorTests(MigrationTestBase):
     test failures first, as they may be propagating into here.
     """
 
-    available_apps = ["migrations", "django.contrib.sessions"]
+    available_apps = ["migrations", "freedom.contrib.sessions"]
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_run(self):

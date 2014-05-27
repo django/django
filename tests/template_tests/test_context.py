@@ -2,8 +2,8 @@
 
 from unittest import TestCase
 
-from django.template import Context, Variable, VariableDoesNotExist
-from django.template.context import RenderContext
+from freedom.template import Context, Variable, VariableDoesNotExist
+from freedom.template.context import RenderContext
 
 
 class ContextTests(TestCase):

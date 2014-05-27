@@ -1,10 +1,10 @@
 PostgreSQL specific model fields
 ================================
 
-All of these fields are available from the ``django.contrib.postgres.fields``
+All of these fields are available from the ``freedom.contrib.postgres.fields``
 module.
 
-.. currentmodule:: django.contrib.postgres.fields
+.. currentmodule:: freedom.contrib.postgres.fields
 
 ArrayField
 ----------
@@ -23,19 +23,19 @@ ArrayField
 
         Specifies the underlying data type and behaviour for the array. It
         should be an instance of a subclass of
-        :class:`~django.db.models.Field`. For example, it could be an
-        :class:`~django.db.models.IntegerField` or a
-        :class:`~django.db.models.CharField`. Most field types are permitted,
+        :class:`~freedom.db.models.Field`. For example, it could be an
+        :class:`~freedom.db.models.IntegerField` or a
+        :class:`~freedom.db.models.CharField`. Most field types are permitted,
         with the exception of those handling relational data
-        (:class:`~django.db.models.ForeignKey`,
-        :class:`~django.db.models.OneToOneField` and
-        :class:`~django.db.models.ManyToManyField`).
+        (:class:`~freedom.db.models.ForeignKey`,
+        :class:`~freedom.db.models.OneToOneField` and
+        :class:`~freedom.db.models.ManyToManyField`).
 
         It is possible to nest array fields - you can specify an instance of
         ``ArrayField`` as the ``base_field``. For example::
 
-            from django.db import models
-            from django.contrib.postgres.fields import ArrayField
+            from freedom.db import models
+            from freedom.contrib.postgres.fields import ArrayField
 
             class ChessBoard(models.Model):
                 board = ArrayField(
@@ -61,8 +61,8 @@ ArrayField
     When nesting ``ArrayField``, whether you use the `size` parameter or not,
     PostgreSQL requires that the arrays are rectangular::
 
-        from django.db import models
-        from django.contrib.postgres.fields import ArrayField
+        from freedom.db import models
+        from freedom.contrib.postgres.fields import ArrayField
 
         class Board(models.Model):
             pieces = ArrayField(ArrayField(models.IntegerField()))
@@ -88,8 +88,8 @@ Querying ArrayField
 There are a number of custom lookups and transforms for :class:`ArrayField`.
 We will use the following example model::
 
-    from django.db import models
-    from django.contrib.postgres.fields import ArrayField
+    from freedom.db import models
+    from freedom.contrib.postgres.fields import ArrayField
 
     class Post(models.Model):
         name = models.CharField(max_length=200)
@@ -107,17 +107,17 @@ The :lookup:`contains` lookup is overridden on :class:`ArrayField`. The
 returned objects will be those where the values passed are a subset of the
 data. It uses the SQL operator ``@>``. For example::
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'freedom'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
+    >>> Post.objects.create(name='Third post', tags=['tutorial', 'freedom'])
 
     >>> Post.objects.filter(tags__contains=['thoughts'])
     [<Post: First post>, <Post: Second post>]
 
-    >>> Post.objects.filter(tags__contains=['django'])
+    >>> Post.objects.filter(tags__contains=['freedom'])
     [<Post: First post>, <Post: Third post>]
 
-    >>> Post.objects.filter(tags__contains=['django', 'thoughts'])
+    >>> Post.objects.filter(tags__contains=['freedom', 'thoughts'])
     [<Post: First post>]
 
 .. fieldlookup:: arrayfield.contained_by
@@ -129,14 +129,14 @@ This is the inverse of the :lookup:`contains <arrayfield.contains>` lookup -
 the objects returned will be those where the data is a subset of the values
 passed. It uses the SQL operator ``<@``. For example::
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'freedom'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
+    >>> Post.objects.create(name='Third post', tags=['tutorial', 'freedom'])
 
-    >>> Post.objects.filter(tags__contained_by=['thoughts', 'django'])
+    >>> Post.objects.filter(tags__contained_by=['thoughts', 'freedom'])
     [<Post: First post>, <Post: Second post>]
 
-    >>> Post.objects.filter(tags__contained_by=['thoughts', 'django', 'tutorial'])
+    >>> Post.objects.filter(tags__contained_by=['thoughts', 'freedom', 'tutorial'])
     [<Post: First post>, <Post: Second post>, <Post: Third post>]
 
 .. fieldlookup:: arrayfield.overlap
@@ -147,9 +147,9 @@ overlap
 Returns objects where the data shares any results with the values passed. Uses
 the SQL operator ``&&``. For example::
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'freedom'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
+    >>> Post.objects.create(name='Third post', tags=['tutorial', 'freedom'])
 
     >>> Post.objects.filter(tags__overlap=['thoughts'])
     [<Post: First post>, <Post: Second post>]
@@ -163,9 +163,9 @@ len
 ~~~
 
 Returns the length of the array. The lookups available afterwards are those
-available for :class:`~django.db.models.IntegerField`. For example::
+available for :class:`~freedom.db.models.IntegerField`. For example::
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'freedom'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
 
     >>> Post.objects.filter(tags__len=1)
@@ -182,13 +182,13 @@ non-negative integer can be used. There are no errors if it exceeds the
 transform are those from the :attr:`base_field <ArrayField.base_field>`. For
 example::
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'freedom'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
 
     >>> Post.objects.filter(tags__0='thoughts')
     [<Post: First post>, <Post: Second post>]
 
-    >>> Post.objects.filter(tags__1__iexact='Django')
+    >>> Post.objects.filter(tags__1__iexact='Freedom')
     [<Post: First post>]
 
     >>> Post.objects.filter(tags__276='javascript')
@@ -209,9 +209,9 @@ This class of transforms allow you to take a slice of the array. Any two
 non-negative integers can be used, separated by a single underscore. The
 lookups available after the transform do not change. For example::
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
+    >>> Post.objects.create(name='First post', tags=['thoughts', 'freedom'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['django', 'python', 'thoughts'])
+    >>> Post.objects.create(name='Third post', tags=['freedom', 'python', 'thoughts'])
 
     >>> Post.objects.filter(tags__0_1=['thoughts'])
     [<Post: First post>]
@@ -231,12 +231,12 @@ lookups available after the transform do not change. For example::
     on multidimensional arrays. It will always work to use indexes to reach
     down to the final underlying data, but most other slices behave strangely
     at the database level and cannot be supported in a logical, consistent
-    fashion by Django.
+    fashion by Freedom.
 
 Indexing ArrayField
 ^^^^^^^^^^^^^^^^^^^
 
-At present using :attr:`~django.db.models.Field.db_index` will create a
+At present using :attr:`~freedom.db.models.Field.db_index` will create a
 ``btree`` index. This does not offer particularly significant help to querying.
 A more useful index is a ``GIN`` index, which you should create using a
-:class:`~django.db.migrations.operations.RunSQL` operation.
+:class:`~freedom.db.migrations.operations.RunSQL` operation.

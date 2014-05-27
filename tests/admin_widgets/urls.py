@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from freedom.conf.urls import include, url
 
 from . import widgetadmin
 

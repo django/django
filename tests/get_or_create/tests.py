@@ -4,9 +4,9 @@ from datetime import date
 import traceback
 import warnings
 
-from django.db import IntegrityError, DatabaseError
-from django.utils.encoding import DjangoUnicodeDecodeError
-from django.test import TestCase, TransactionTestCase
+from freedom.db import IntegrityError, DatabaseError
+from freedom.utils.encoding import FreedomUnicodeDecodeError
+from freedom.test import TestCase, TransactionTestCase
 
 from .models import (DefaultPerson, Person, ManualPrimaryKeyTest, Profile,
     Tag, Thing, Publisher, Author)
@@ -108,7 +108,7 @@ class GetOrCreateTestsWithManualPKs(TestCase):
                 Person.objects.get_or_create(
                     birthday=date(1970, 1, 1),
                     defaults={'first_name': b"\xff", 'last_name': b"\xff"})
-        except (DatabaseError, DjangoUnicodeDecodeError):
+        except (DatabaseError, FreedomUnicodeDecodeError):
             Person.objects.create(
                 first_name="Bob", last_name="Ross", birthday=date(1950, 1, 1))
         else:

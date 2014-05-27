@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import unittest
 
-from django.test import TestCase
+from freedom.test import TestCase
 
 from .models import (User, UserProfile, UserStat, UserStatResult, StatDetails,
     AdvancedUserStat, Image, Product, Parent1, Parent2, Child1, Child2, Child3,
@@ -86,12 +86,12 @@ class ReverseSelectRelatedTestCase(TestCase):
 
     def test_nullable_relation(self):
         im = Image.objects.create(name="imag1")
-        p1 = Product.objects.create(name="Django Plushie", image=im)
-        p2 = Product.objects.create(name="Talking Django Plushie")
+        p1 = Product.objects.create(name="Freedom Plushie", image=im)
+        p2 = Product.objects.create(name="Talking Freedom Plushie")
 
         with self.assertNumQueries(1):
             result = sorted(Product.objects.select_related("image"), key=lambda x: x.name)
-            self.assertEqual([p.name for p in result], ["Django Plushie", "Talking Django Plushie"])
+            self.assertEqual([p.name for p in result], ["Freedom Plushie", "Talking Freedom Plushie"])
 
             self.assertEqual(p1.image, im)
             # Check for ticket #13839

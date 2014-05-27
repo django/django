@@ -2,7 +2,7 @@
 Signals
 =======
 
-A list of all the signals that Django sends.
+A list of all the signals that Freedom sends.
 
 .. seealso::
 
@@ -15,24 +15,24 @@ A list of all the signals that Django sends.
 Model signals
 =============
 
-.. module:: django.db.models.signals
+.. module:: freedom.db.models.signals
    :synopsis: Signals sent by the model system.
 
-The :mod:`django.db.models.signals` module defines a set of signals sent by the
+The :mod:`freedom.db.models.signals` module defines a set of signals sent by the
 model system.
 
 .. warning::
 
     Many of these signals are sent by various model methods like
-    ``__init__()`` or :meth:`~django.db.models.Model.save` that you can
+    ``__init__()`` or :meth:`~freedom.db.models.Model.save` that you can
     override in your own code.
 
     If you override these methods on your model, you must call the parent class'
     methods for this signals to be sent.
 
-    Note also that Django stores signal handlers as weak references by default,
+    Note also that Freedom stores signal handlers as weak references by default,
     so if your handler is a local function, it may be garbage collected.  To
-    prevent this, pass ``weak=False`` when you call the signal's :meth:`~django.dispatch.Signal.connect`.
+    prevent this, pass ``weak=False`` when you call the signal's :meth:`~freedom.dispatch.Signal.connect`.
 
 .. versionadded:: 1.7
 
@@ -45,12 +45,12 @@ model system.
 pre_init
 --------
 
-.. attribute:: django.db.models.signals.pre_init
+.. attribute:: freedom.db.models.signals.pre_init
    :module:
 
 .. ^^^^^^^ this :module: hack keeps Sphinx from prepending the module.
 
-Whenever you instantiate a Django model, this signal is sent at the beginning
+Whenever you instantiate a Freedom model, this signal is sent at the beginning
 of the model's ``__init__()`` method.
 
 Arguments sent with this signal:
@@ -84,7 +84,7 @@ Argument    Value
 post_init
 ---------
 
-.. data:: django.db.models.signals.post_init
+.. data:: freedom.db.models.signals.post_init
    :module:
 
 Like pre_init, but this one is sent when the ``__init__()`` method finishes.
@@ -100,10 +100,10 @@ Arguments sent with this signal:
 pre_save
 --------
 
-.. data:: django.db.models.signals.pre_save
+.. data:: freedom.db.models.signals.pre_save
    :module:
 
-This is sent at the beginning of a model's :meth:`~django.db.models.Model.save`
+This is sent at the beginning of a model's :meth:`~freedom.db.models.Model.save`
 method.
 
 Arguments sent with this signal:
@@ -130,11 +130,11 @@ Arguments sent with this signal:
 post_save
 ---------
 
-.. data:: django.db.models.signals.post_save
+.. data:: freedom.db.models.signals.post_save
    :module:
 
 Like :data:`pre_save`, but sent at the end of the
-:meth:`~django.db.models.Model.save` method.
+:meth:`~freedom.db.models.Model.save` method.
 
 Arguments sent with this signal:
 
@@ -163,11 +163,11 @@ Arguments sent with this signal:
 pre_delete
 ----------
 
-.. data:: django.db.models.signals.pre_delete
+.. data:: freedom.db.models.signals.pre_delete
    :module:
 
-Sent at the beginning of a model's :meth:`~django.db.models.Model.delete`
-method and a queryset's :meth:`~django.db.models.query.QuerySet.delete` method.
+Sent at the beginning of a model's :meth:`~freedom.db.models.Model.delete`
+method and a queryset's :meth:`~freedom.db.models.query.QuerySet.delete` method.
 
 Arguments sent with this signal:
 
@@ -183,12 +183,12 @@ Arguments sent with this signal:
 post_delete
 -----------
 
-.. data:: django.db.models.signals.post_delete
+.. data:: freedom.db.models.signals.post_delete
    :module:
 
 Like :data:`pre_delete`, but sent at the end of a model's
-:meth:`~django.db.models.Model.delete` method and a queryset's
-:meth:`~django.db.models.query.QuerySet.delete` method.
+:meth:`~freedom.db.models.Model.delete` method and a queryset's
+:meth:`~freedom.db.models.query.QuerySet.delete` method.
 
 Arguments sent with this signal:
 
@@ -207,12 +207,12 @@ Arguments sent with this signal:
 m2m_changed
 -----------
 
-.. data:: django.db.models.signals.m2m_changed
+.. data:: freedom.db.models.signals.m2m_changed
    :module:
 
-Sent when a :class:`~django.db.models.ManyToManyField` is changed on a model
+Sent when a :class:`~freedom.db.models.ManyToManyField` is changed on a model
 instance. Strictly speaking, this is not a model signal since it is sent by the
-:class:`~django.db.models.ManyToManyField`, but since it complements the
+:class:`~freedom.db.models.ManyToManyField`, but since it complements the
 :data:`pre_save`/:data:`post_save` and :data:`pre_delete`/:data:`post_delete`
 when it comes to tracking changes to models, it is included here.
 
@@ -220,14 +220,14 @@ Arguments sent with this signal:
 
 ``sender``
     The intermediate model class describing the
-    :class:`~django.db.models.ManyToManyField`. This class is automatically
+    :class:`~freedom.db.models.ManyToManyField`. This class is automatically
     created when a many-to-many field is defined; you can access it using the
     ``through`` attribute on the many-to-many field.
 
 ``instance``
     The instance whose many-to-many relation is updated. This can be an
     instance of the ``sender``, or of the class the
-    :class:`~django.db.models.ManyToManyField` is related to.
+    :class:`~freedom.db.models.ManyToManyField` is related to.
 
 ``action``
     A string indicating the type of update that is done on the relation.
@@ -302,7 +302,7 @@ Argument        Value
 ``action``      ``"pre_add"`` (followed by a separate signal with ``"post_add"``)
 
 ``reverse``     ``False`` (``Pizza`` contains the
-                :class:`~django.db.models.ManyToManyField`, so this call
+                :class:`~freedom.db.models.ManyToManyField`, so this call
                 modifies the forward relation)
 
 ``model``       ``Topping`` (the class of the objects added to the
@@ -329,7 +329,7 @@ Argument        Value
 ``action``      ``"pre_remove"`` (followed by a separate signal with ``"post_remove"``)
 
 ``reverse``     ``True`` (``Pizza`` contains the
-                :class:`~django.db.models.ManyToManyField`, so this call
+                :class:`~freedom.db.models.ManyToManyField`, so this call
                 modifies the reverse relation)
 
 ``model``       ``Pizza`` (the class of the objects removed from the
@@ -344,15 +344,15 @@ Argument        Value
 class_prepared
 --------------
 
-.. data:: django.db.models.signals.class_prepared
+.. data:: freedom.db.models.signals.class_prepared
    :module:
 
 Sent whenever a model class has been "prepared" -- that is, once model has
-been defined and registered with Django's model system. Django uses this
+been defined and registered with Freedom's model system. Freedom uses this
 signal internally; it's not generally used in third-party applications.
 
 Since this signal is sent during the app registry population process, and
-:meth:`AppConfig.ready() <django.apps.AppConfig.ready>` runs after the app
+:meth:`AppConfig.ready() <freedom.apps.AppConfig.ready>` runs after the app
 registry is fully populated, receivers cannot be connected in that method.
 One possibility is to connect them ``AppConfig.__init__()`` instead, taking
 care not to import models or trigger calls to the app registry.
@@ -365,12 +365,12 @@ Arguments that are sent with this signal:
 Management signals
 ==================
 
-Signals sent by :doc:`django-admin </ref/django-admin>`.
+Signals sent by :doc:`freedom-admin </ref/freedom-admin>`.
 
 pre_migrate
 -----------
 
-.. data:: django.db.models.signals.pre_migrate
+.. data:: freedom.db.models.signals.pre_migrate
    :module:
 
 Sent by the :djadmin:`migrate` command before it starts to install an
@@ -379,7 +379,7 @@ application. It's not emitted for applications that lack a ``models`` module.
 Arguments sent with this signal:
 
 ``sender``
-    An :class:`~django.apps.AppConfig` instance for the application about to
+    An :class:`~freedom.apps.AppConfig` instance for the application about to
     be migrated/synced.
 
 ``app_config``
@@ -397,7 +397,7 @@ Arguments sent with this signal:
     things on the command line. If ``interactive`` is ``False``, functions
     which listen for this signal should not try to prompt for anything.
 
-    For example, the :mod:`django.contrib.auth` app only prompts to create a
+    For example, the :mod:`freedom.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
 ``using``
@@ -406,12 +406,12 @@ Arguments sent with this signal:
 pre_syncdb
 ----------
 
-.. data:: django.db.models.signals.pre_syncdb
+.. data:: freedom.db.models.signals.pre_syncdb
    :module:
 
 .. deprecated:: 1.7
 
-    This signal has been replaced by :data:`~django.db.models.signals.pre_migrate`.
+    This signal has been replaced by :data:`~freedom.db.models.signals.pre_migrate`.
 
 Sent by the :djadmin:`syncdb` command before it starts to install an
 application.
@@ -443,7 +443,7 @@ Arguments sent with this signal:
     things on the command line. If ``interactive`` is ``False``, functions
     which listen for this signal should not try to prompt for anything.
 
-    For example, the :mod:`django.contrib.auth` app only prompts to create a
+    For example, the :mod:`freedom.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
 ``using``
@@ -452,7 +452,7 @@ Arguments sent with this signal:
 post_migrate
 ------------
 
-.. data:: django.db.models.signals.post_migrate
+.. data:: freedom.db.models.signals.post_migrate
    :module:
 
 Sent by the :djadmin:`migrate` command after it installs an application, and the
@@ -466,7 +466,7 @@ command to fail if it also ran during the :djadmin:`migrate` command.
 Arguments sent with this signal:
 
 ``sender``
-    An :class:`~django.apps.AppConfig` instance for the application that was
+    An :class:`~freedom.apps.AppConfig` instance for the application that was
     just installed.
 
 ``app_config``
@@ -484,7 +484,7 @@ Arguments sent with this signal:
     things on the command line. If ``interactive`` is ``False``, functions
     which listen for this signal should not try to prompt for anything.
 
-    For example, the :mod:`django.contrib.auth` app only prompts to create a
+    For example, the :mod:`freedom.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
 ``db``
@@ -493,7 +493,7 @@ Arguments sent with this signal:
 
 For example, ``yourapp/management/__init__.py`` could be written like::
 
-    from django.db.models.signals import post_migrate
+    from freedom.db.models.signals import post_migrate
     import yourapp.models
 
     def my_callback(sender, **kwargs):
@@ -505,12 +505,12 @@ For example, ``yourapp/management/__init__.py`` could be written like::
 post_syncdb
 -----------
 
-.. data:: django.db.models.signals.post_syncdb
+.. data:: freedom.db.models.signals.post_syncdb
    :module:
 
 .. deprecated:: 1.7
 
-    This signal has been replaced by :data:`~django.db.models.signals.post_migrate`.
+    This signal has been replaced by :data:`~freedom.db.models.signals.post_migrate`.
 
 Sent by the :djadmin:`syncdb` command after it installs an application, and the
 :djadmin:`flush` command.
@@ -545,7 +545,7 @@ Arguments sent with this signal:
     things on the command line. If ``interactive`` is ``False``, functions
     which listen for this signal should not try to prompt for anything.
 
-    For example, the :mod:`django.contrib.auth` app only prompts to create a
+    For example, the :mod:`freedom.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
 
 ``db``
@@ -554,7 +554,7 @@ Arguments sent with this signal:
 
 For example, ``yourapp/management/__init__.py`` could be written like::
 
-    from django.db.models.signals import post_syncdb
+    from freedom.db.models.signals import post_syncdb
     import yourapp.models
 
     def my_callback(sender, **kwargs):
@@ -566,7 +566,7 @@ For example, ``yourapp/management/__init__.py`` could be written like::
 Request/response signals
 ========================
 
-.. module:: django.core.signals
+.. module:: freedom.core.signals
    :synopsis: Core signals sent by the request/response system.
 
 Signals sent by the core framework when processing a request.
@@ -574,24 +574,24 @@ Signals sent by the core framework when processing a request.
 request_started
 ---------------
 
-.. data:: django.core.signals.request_started
+.. data:: freedom.core.signals.request_started
    :module:
 
-Sent when Django begins processing an HTTP request.
+Sent when Freedom begins processing an HTTP request.
 
 Arguments sent with this signal:
 
 ``sender``
-    The handler class -- e.g. ``django.core.handlers.wsgi.WsgiHandler`` -- that
+    The handler class -- e.g. ``freedom.core.handlers.wsgi.WsgiHandler`` -- that
     handled the request.
 
 request_finished
 ----------------
 
-.. data:: django.core.signals.request_finished
+.. data:: freedom.core.signals.request_finished
    :module:
 
-Sent when Django finishes delivering an HTTP response to the client.
+Sent when Freedom finishes delivering an HTTP response to the client.
 
 .. note::
 
@@ -609,10 +609,10 @@ Arguments sent with this signal:
 got_request_exception
 ---------------------
 
-.. data:: django.core.signals.got_request_exception
+.. data:: freedom.core.signals.got_request_exception
    :module:
 
-This signal is sent whenever Django encounters an exception while processing an incoming HTTP request.
+This signal is sent whenever Freedom encounters an exception while processing an incoming HTTP request.
 
 Arguments sent with this signal:
 
@@ -620,12 +620,12 @@ Arguments sent with this signal:
     The handler class, as above.
 
 ``request``
-    The :class:`~django.http.HttpRequest` object.
+    The :class:`~freedom.http.HttpRequest` object.
 
 Test signals
 ============
 
-.. module:: django.test.signals
+.. module:: freedom.test.signals
    :synopsis: Signals sent during testing.
 
 Signals only sent when :ref:`running tests <running-tests>`.
@@ -633,12 +633,12 @@ Signals only sent when :ref:`running tests <running-tests>`.
 setting_changed
 ---------------
 
-.. data:: django.test.signals.setting_changed
+.. data:: freedom.test.signals.setting_changed
    :module:
 
 This signal is sent when the value of a setting is changed through the
-``django.test.TestCase.settings()`` context manager or the
-:func:`django.test.override_settings` decorator/context manager.
+``freedom.test.TestCase.settings()`` context manager or the
+:func:`freedom.test.override_settings` decorator/context manager.
 
 It's actually sent twice: when the new value is applied ("setup") and when the
 original value is restored ("teardown"). Use the ``enter`` argument to
@@ -664,28 +664,28 @@ Arguments sent with this signal:
 template_rendered
 -----------------
 
-.. data:: django.test.signals.template_rendered
+.. data:: freedom.test.signals.template_rendered
    :module:
 
 Sent when the test system renders a template. This signal is not emitted during
-normal operation of a Django server -- it is only available during testing.
+normal operation of a Freedom server -- it is only available during testing.
 
 Arguments sent with this signal:
 
 ``sender``
-    The :class:`~django.template.Template` object which was rendered.
+    The :class:`~freedom.template.Template` object which was rendered.
 
 ``template``
     Same as sender
 
 ``context``
-    The :class:`~django.template.Context` with which the template was
+    The :class:`~freedom.template.Context` with which the template was
     rendered.
 
 Database Wrappers
 =================
 
-.. module:: django.db.backends
+.. module:: freedom.db.backends
    :synopsis: Core signals sent by the database wrapper.
 
 Signals sent by the database wrapper when a database connection is
@@ -694,7 +694,7 @@ initiated.
 connection_created
 ------------------
 
-.. data:: django.db.backends.signals.connection_created
+.. data:: freedom.db.backends.signals.connection_created
    :module:
 
 Sent when the database wrapper makes the initial connection to the
@@ -705,8 +705,8 @@ Arguments sent with this signal:
 
 ``sender``
     The database wrapper class -- i.e.
-    ``django.db.backends.postgresql_psycopg2.DatabaseWrapper`` or
-    ``django.db.backends.mysql.DatabaseWrapper``, etc.
+    ``freedom.db.backends.postgresql_psycopg2.DatabaseWrapper`` or
+    ``freedom.db.backends.mysql.DatabaseWrapper``, etc.
 
 ``connection``
     The database connection that was opened. This can be used in a

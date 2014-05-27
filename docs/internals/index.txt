@@ -1,13 +1,13 @@
-Django internals
+Freedom internals
 ================
 
-Documentation for people hacking on Django itself. This is the place to go if
-you'd like to help improve Django, learn or learn about how Django works "under
+Documentation for people hacking on Freedom itself. This is the place to go if
+you'd like to help improve Freedom, learn or learn about how Freedom works "under
 the hood".
 
 .. warning::
 
-    Elsewhere in the Django documentation, coverage of a feature is a sort of a
+    Elsewhere in the Freedom documentation, coverage of a feature is a sort of a
     contract: once an API is in the official documentation, we consider it
     "stable" and don't change it without a good reason. APIs covered here,
     however, are considered "internal-only": we reserve the right to change
@@ -23,4 +23,4 @@ the hood".
    release-process
    deprecation
    git
-   howto-release-django
+   howto-release-freedom

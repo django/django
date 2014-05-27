@@ -6,11 +6,11 @@ This class sets up a model for each model field type
 """
 import warnings
 
-from django.db import models
-from django.contrib.contenttypes.fields import (
+from freedom.db import models
+from freedom.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
-from django.contrib.contenttypes.models import ContentType
+from freedom.contrib.contenttypes.models import ContentType
 
 # The following classes are for testing basic data
 # marshalling, including NULL values, where allowed.

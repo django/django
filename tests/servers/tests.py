@@ -1,19 +1,19 @@
 # -*- encoding: utf-8 -*-
 """
-Tests for django.core.servers.
+Tests for freedom.core.servers.
 """
 from __future__ import unicode_literals
 
 import os
 import socket
 
-from django.core.exceptions import ImproperlyConfigured
-from django.test import LiveServerTestCase
-from django.test import override_settings
-from django.utils.http import urlencode
-from django.utils.six.moves.urllib.error import HTTPError
-from django.utils.six.moves.urllib.request import urlopen
-from django.utils._os import upath
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.test import LiveServerTestCase
+from freedom.test import override_settings
+from freedom.utils.http import urlencode
+from freedom.utils.six.moves.urllib.error import HTTPError
+from freedom.utils.six.moves.urllib.request import urlopen
+from freedom.utils._os import upath
 
 from .models import Person
 
@@ -32,9 +32,9 @@ class LiveServerBase(LiveServerTestCase):
 
     available_apps = [
         'servers',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
+        'freedom.contrib.auth',
+        'freedom.contrib.contenttypes',
+        'freedom.contrib.sessions',
     ]
     fixtures = ['testdata.json']
 

@@ -2,14 +2,14 @@
 Aggregation
 ===========
 
-.. currentmodule:: django.db.models
+.. currentmodule:: freedom.db.models
 
-The topic guide on :doc:`Django's database-abstraction API </topics/db/queries>`
-described the way that you can use Django queries that create,
+The topic guide on :doc:`Freedom's database-abstraction API </topics/db/queries>`
+described the way that you can use Freedom queries that create,
 retrieve, update and delete individual objects. However, sometimes you will
 need to retrieve values that are derived by summarizing or *aggregating* a
 collection of objects. This topic guide describes the ways that aggregate values
-can be generated and returned using Django queries.
+can be generated and returned using Freedom queries.
 
 Throughout this guide, we'll refer to the following models. These models are
 used to track the inventory for a series of online bookstores:
@@ -18,7 +18,7 @@ used to track the inventory for a series of online bookstores:
 
 .. code-block:: python
 
-    from django.db import models
+    from freedom.db import models
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
@@ -58,12 +58,12 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     73
 
     # Average price across all books.
-    >>> from django.db.models import Avg
+    >>> from freedom.db.models import Avg
     >>> Book.objects.all().aggregate(Avg('price'))
     {'price__avg': 34.35}
 
     # Max price across all books.
-    >>> from django.db.models import Max
+    >>> from freedom.db.models import Max
     >>> Book.objects.all().aggregate(Max('price'))
     {'price__max': Decimal('81.20')}
 
@@ -71,7 +71,7 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     # many-to-many relationship backward
 
     # Each publisher, each with a count of books as a "num_books" attribute.
-    >>> from django.db.models import Count
+    >>> from freedom.db.models import Count
     >>> pubs = Publisher.objects.annotate(num_books=Count('book'))
     >>> pubs
     [<Publisher BaloneyPress>, <Publisher SalamiPress>, ...]
@@ -86,9 +86,9 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
 Generating aggregates over a QuerySet
 =====================================
 
-Django provides two ways to generate aggregates. The first way is to generate
+Freedom provides two ways to generate aggregates. The first way is to generate
 summary values over an entire ``QuerySet``. For example, say you wanted to
-calculate the average price of all books available for sale. Django's query
+calculate the average price of all books available for sale. Freedom's query
 syntax provides a means for describing the set of all books::
 
     >>> Book.objects.all()
@@ -97,7 +97,7 @@ What we need is a way to calculate summary values over the objects that
 belong to this ``QuerySet``. This is done by appending an ``aggregate()``
 clause onto the ``QuerySet``::
 
-    >>> from django.db.models import Avg
+    >>> from freedom.db.models import Avg
     >>> Book.objects.all().aggregate(Avg('price'))
     {'price__avg': 34.35}
 
@@ -125,7 +125,7 @@ If you want to generate more than one aggregate, you just add another
 argument to the ``aggregate()`` clause. So, if we also wanted to know
 the maximum and minimum price of all books, we would issue the query::
 
-    >>> from django.db.models import Avg, Max, Min
+    >>> from freedom.db.models import Avg, Max, Min
     >>> Book.objects.aggregate(Avg('price'), Max('price'), Min('price'))
     {'price__avg': 34.35, 'price__max': Decimal('81.20'), 'price__min': Decimal('12.99')}
 
@@ -150,16 +150,16 @@ the number of authors:
 .. code-block:: python
 
     # Build an annotated queryset
-    >>> from django.db.models import Count
+    >>> from freedom.db.models import Count
     >>> q = Book.objects.annotate(Count('authors'))
     # Interrogate the first object in the queryset
     >>> q[0]
-    <Book: The Definitive Guide to Django>
+    <Book: The Definitive Guide to Freedom>
     >>> q[0].authors__count
     2
     # Interrogate the second object in the queryset
     >>> q[1]
-    <Book: Practical Django Projects>
+    <Book: Practical Freedom Projects>
     >>> q[1].authors__count
     1
 
@@ -186,19 +186,19 @@ So far, we have dealt with aggregates over fields that belong to the
 model being queried. However, sometimes the value you want to aggregate
 will belong to a model that is related to the model you are querying.
 
-When specifying the field to be aggregated in an aggregate function, Django
+When specifying the field to be aggregated in an aggregate function, Freedom
 will allow you to use the same :ref:`double underscore notation
 <field-lookups-intro>` that is used when referring to related fields in
-filters. Django will then handle any table joins that are required to retrieve
+filters. Freedom will then handle any table joins that are required to retrieve
 and aggregate the related value.
 
 For example, to find the price range of books offered in each store,
 you could use the annotation::
 
-    >>> from django.db.models import Max, Min
+    >>> from freedom.db.models import Max, Min
     >>> Store.objects.annotate(min_price=Min('books__price'), max_price=Max('books__price'))
 
-This tells Django to retrieve the ``Store`` model, join (through the
+This tells Freedom to retrieve the ``Store`` model, join (through the
 many-to-many relationship) with the ``Book`` model, and aggregate on the
 price field of the book model to produce a minimum and maximum value.
 
@@ -226,7 +226,7 @@ For example, we can ask for all publishers, annotated with their respective
 total book stock counters (note how we use ``'book'`` to specify the
 ``Publisher`` -> ``Book`` reverse foreign key hop)::
 
-    >>> from django.db.models import Count, Min, Sum, Avg
+    >>> from freedom.db.models import Count, Min, Sum, Avg
     >>> Publisher.objects.annotate(Count('book'))
 
 (Every ``Publisher`` in the resulting ``QuerySet`` will have an extra attribute
@@ -271,17 +271,17 @@ constraining the objects that are considered for aggregation.
 When used with an ``annotate()`` clause, a filter has the effect of
 constraining the objects for which an annotation is calculated. For example,
 you can generate an annotated list of all books that have a title starting
-with "Django" using the query::
+with "Freedom" using the query::
 
-    >>> from django.db.models import Count, Avg
-    >>> Book.objects.filter(name__startswith="Django").annotate(num_authors=Count('authors'))
+    >>> from freedom.db.models import Count, Avg
+    >>> Book.objects.filter(name__startswith="Freedom").annotate(num_authors=Count('authors'))
 
 When used with an ``aggregate()`` clause, a filter has the effect of
 constraining the objects over which the aggregate is calculated.
 For example, you can generate the average price of all books with a
-title that starts with "Django" using the query::
+title that starts with "Freedom" using the query::
 
-    >>> Book.objects.filter(name__startswith="Django").aggregate(Avg('price'))
+    >>> Book.objects.filter(name__startswith="Freedom").aggregate(Avg('price'))
 
 Filtering on annotations
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -412,7 +412,7 @@ particularly, when counting things.
 
 By way of example, suppose you have a model like this::
 
-    from django.db import models
+    from freedom.db import models
 
     class Item(models.Model):
         name = models.CharField(max_length=10)
@@ -441,15 +441,15 @@ without any harmful effects, since that is already playing a role in the
 query.
 
 This behavior is the same as that noted in the queryset documentation for
-:meth:`~django.db.models.query.QuerySet.distinct` and the general rule is the
+:meth:`~freedom.db.models.query.QuerySet.distinct` and the general rule is the
 same: normally you won't want extra columns playing a part in the result, so
 clear out the ordering, or at least make sure it's restricted only to those
 fields you also select in a ``values()`` call.
 
 .. note::
-    You might reasonably ask why Django doesn't remove the extraneous columns
+    You might reasonably ask why Freedom doesn't remove the extraneous columns
     for you. The main reason is consistency with ``distinct()`` and other
-    places: Django **never** removes ordering constraints that you have
+    places: Freedom **never** removes ordering constraints that you have
     specified (and we can't change those other methods' behavior, as that
     would violate our :doc:`/misc/api-stability` policy).
 
@@ -464,6 +464,6 @@ For example, if you wanted to calculate the average number of authors per
 book you first annotate the set of books with the author count, then
 aggregate that author count, referencing the annotation field::
 
-    >>> from django.db.models import Count, Avg
+    >>> from freedom.db.models import Count, Avg
     >>> Book.objects.annotate(num_authors=Count('authors')).aggregate(Avg('num_authors'))
     {'num_authors__avg': 1.66}

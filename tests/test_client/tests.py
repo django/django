@@ -22,14 +22,14 @@ rather than the HTML rendered to the end-user.
 """
 from __future__ import unicode_literals
 
-from django.core import mail
-from django.test import Client, TestCase, RequestFactory
-from django.test import override_settings
+from freedom.core import mail
+from freedom.test import Client, TestCase, RequestFactory
+from freedom.test import override_settings
 
 from .views import get_view
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF='test_client.urls',)
 class ClientTest(TestCase):
     fixtures = ['testdata.json']
@@ -128,7 +128,7 @@ class ClientTest(TestCase):
         # front of non-absolute URLs.
         self.assertRedirects(response, '/get_view/')
 
-        host = 'django.testserver'
+        host = 'freedom.testserver'
         client_providing_host = Client(HTTP_HOST=host)
         response = client_providing_host.get('/redirect_view/')
         # Check that the response was a 302 (redirect) with absolute URI
@@ -147,10 +147,10 @@ class ClientTest(TestCase):
         # Check that the response was a 301 (permanent redirect)
         self.assertRedirects(response, 'http://testserver/get_view/', status_code=301)
 
-        client_providing_host = Client(HTTP_HOST='django.testserver')
+        client_providing_host = Client(HTTP_HOST='freedom.testserver')
         response = client_providing_host.get('/permanent_redirect_view/')
         # Check that the response was a 301 (permanent redirect) with absolute URI
-        self.assertRedirects(response, 'http://django.testserver/get_view/', status_code=301)
+        self.assertRedirects(response, 'http://freedom.testserver/get_view/', status_code=301)
 
     def test_temporary_redirect(self):
         "GET a URL that does a non-permanent redirect"
@@ -383,7 +383,7 @@ class ClientTest(TestCase):
         response = self.client.get('/login_protected_view/')
         self.assertRedirects(response, 'http://testserver/accounts/login/?next=/login_protected_view/')
 
-    @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies")
+    @override_settings(SESSION_ENGINE="freedom.contrib.sessions.backends.signed_cookies")
     def test_logout_cookie_sessions(self):
         self.test_logout()
 
@@ -437,8 +437,8 @@ class ClientTest(TestCase):
         # TODO: Log in with right permissions and request the page again
 
     def test_external_redirect(self):
-        response = self.client.get('/django_project_redirect/')
-        self.assertRedirects(response, 'https://www.djangoproject.com/', fetch_redirect_response=False)
+        response = self.client.get('/freedom_project_redirect/')
+        self.assertRedirects(response, 'https://www.freedomproject.com/', fetch_redirect_response=False)
 
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
@@ -499,7 +499,7 @@ class ClientTest(TestCase):
 
 
 @override_settings(
-    MIDDLEWARE_CLASSES=('django.middleware.csrf.CsrfViewMiddleware',),
+    MIDDLEWARE_CLASSES=('freedom.middleware.csrf.CsrfViewMiddleware',),
     ROOT_URLCONF='test_client.urls',
 )
 class CSRFEnabledClientTests(TestCase):

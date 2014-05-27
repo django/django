@@ -2,17 +2,17 @@
 Unit tests
 ==========
 
-Django comes with a test suite of its own, in the ``tests`` directory of the
+Freedom comes with a test suite of its own, in the ``tests`` directory of the
 code base. It's our policy to make sure all tests pass at all times.
 
 The tests cover:
 
-* Models, the database API and everything else in core Django core (``tests/``),
-* :ref:`contrib-apps` (``django/contrib/<app>/tests`` or ``tests/<app>_...``).
+* Models, the database API and everything else in core Freedom core (``tests/``),
+* :ref:`contrib-apps` (``freedom/contrib/<app>/tests`` or ``tests/<app>_...``).
 
 We appreciate any and all contributions to the test suite!
 
-The Django tests all use the testing infrastructure that ships with Django for
+The Freedom tests all use the testing infrastructure that ships with Freedom for
 testing applications. See :doc:`/topics/testing/overview` for an explanation of
 how to write new tests.
 
@@ -24,19 +24,19 @@ Running the unit tests
 Quickstart
 ~~~~~~~~~~
 
-Running the tests requires a Django settings module that defines the
-databases to use. To make it easy to get started, Django provides and uses a
+Running the tests requires a Freedom settings module that defines the
+databases to use. To make it easy to get started, Freedom provides and uses a
 sample settings module that uses the SQLite database. To run the tests:
 
 .. code-block:: bash
 
-   $ git clone https://github.com:django/django.git django-repo
-   $ cd django-repo/tests
+   $ git clone https://github.com:freedom/freedom.git freedom-repo
+   $ cd freedom-repo/tests
    $ PYTHONPATH=..:$PYTHONPATH ./runtests.py
 
 .. versionchanged:: 1.7
 
-Older versions of Django required specifying a settings file:
+Older versions of Freedom required specifying a settings file:
 
 .. code-block:: bash
 
@@ -45,7 +45,7 @@ Older versions of Django required specifying a settings file:
 ``runtests.py`` now uses ``test_sqlite`` by default if settings aren't provided
 through either ``--settings`` or :envvar:`DJANGO_SETTINGS_MODULE`.
 
-You can avoid typing the ``PYTHONPATH`` bit each time by adding your Django
+You can avoid typing the ``PYTHONPATH`` bit each time by adding your Freedom
 checkout to your ``PYTHONPATH`` or by installing the source checkout using pip.
 See :ref:`installing-development-version`.
 
@@ -58,7 +58,7 @@ Using another ``settings`` module
 
 The included settings module allows you to run the test suite using
 SQLite. If you want to test behavior using a different database (and
-if you're proposing patches for Django, it's a good idea to test
+if you're proposing patches for Freedom, it's a good idea to test
 across databases), you may need to define your own settings file.
 
 To run the tests with different settings, ensure that the module is on your
@@ -92,7 +92,7 @@ These test databases are deleted when the tests are finished.
 
 .. versionchanged:: 1.7
 
-    Before Django 1.7, the :setting:`NAME` setting was mandatory and had to
+    Before Freedom 1.7, the :setting:`NAME` setting was mandatory and had to
     be the name of an existing database to which the given user had permission
     to connect.
 
@@ -104,8 +104,8 @@ dictionary for the applicable database.
 Running only some of the tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django's entire test suite takes a while to run, and running every single test
-could be redundant if, say, you just added a test to Django that you want to
+Freedom's entire test suite takes a while to run, and running every single test
+could be redundant if, say, you just added a test to Freedom that you want to
 run quickly without running everything else. You can run a subset of the unit
 tests by appending the names of the test modules to ``runtests.py`` on the
 command line.
@@ -169,7 +169,7 @@ dependencies:
 *  sqlparse_
 
 You can find these dependencies in `pip requirements files`_ inside the
-``tests/requirements`` directory of the Django source tree and install them
+``tests/requirements`` directory of the Freedom source tree and install them
 like so:
 
 .. code-block:: bash
@@ -182,7 +182,7 @@ You can also install the database adapter(s) of your choice using
 If you want to test the memcached cache backend, you'll also need to define
 a :setting:`CACHES` setting that points at your memcached instance.
 
-To run the GeoDjango tests, you will need to :doc:`setup a spatial database
+To run the GeoFreedom tests, you will need to :doc:`setup a spatial database
 and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 
 Each of these dependencies is optional. If you're missing any of them, the
@@ -208,7 +208,7 @@ Contributors are encouraged to run coverage on the test suite to identify areas
 that need additional tests. The coverage tool installation and use is described
 in :ref:`testing code coverage<topics-testing-code-coverage>`.
 
-To run coverage on the Django test suite using the standard test settings:
+To run coverage on the Freedom test suite using the standard test settings:
 
 .. code-block:: bash
 
@@ -220,10 +220,10 @@ After running coverage, generate the html report by running:
 
    $ coverage html
 
-When running coverage for the Django tests, the included ``.coveragerc``
+When running coverage for the Freedom tests, the included ``.coveragerc``
 settings file  defines ``coverage_html`` as the output directory for the report
 and also excludes several directories not relevant to the results
-(test code or external code included in Django).
+(test code or external code included in Freedom).
 
 .. _contrib-apps:
 
@@ -231,7 +231,7 @@ Contrib apps
 ------------
 
 Tests for contrib apps go in their respective directories under
-``django/contrib``, in a ``tests.py`` file. You can split the tests over
+``freedom/contrib``, in a ``tests.py`` file. You can split the tests over
 multiple modules by using a ``tests`` directory in the normal Python way.
 
 If you have URLs that need to be mapped, put them in ``tests/urls.py``.
@@ -241,7 +241,7 @@ method as above:
 
 .. code-block:: bash
 
-   $ ./runtests.py --settings=settings django.contrib.auth
+   $ ./runtests.py --settings=settings freedom.contrib.auth
 
 .. _troubleshooting-unit-tests:
 

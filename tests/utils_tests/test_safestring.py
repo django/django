@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-from django.template import Template, Context
-from django.test import TestCase
-from django.utils.encoding import force_text, force_bytes
-from django.utils.functional import lazy
-from django.utils.safestring import mark_safe, mark_for_escaping, SafeData, EscapeData
-from django.utils import six
+from freedom.template import Template, Context
+from freedom.test import TestCase
+from freedom.utils.encoding import force_text, force_bytes
+from freedom.utils.functional import lazy
+from freedom.utils.safestring import mark_safe, mark_for_escaping, SafeData, EscapeData
+from freedom.utils import six
 
 lazystr = lazy(force_text, six.text_type)
 lazybytes = lazy(force_bytes, bytes)

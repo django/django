@@ -7,8 +7,8 @@ and many "secondary" ``Category`` objects.
 Set ``related_name`` to designate what the reverse relationship is called.
 """
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

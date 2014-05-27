@@ -2,10 +2,10 @@
 Form fields
 ===========
 
-.. module:: django.forms.fields
-   :synopsis: Django's built-in form fields.
+.. module:: freedom.forms.fields
+   :synopsis: Freedom's built-in form fields.
 
-.. currentmodule:: django.forms
+.. currentmodule:: freedom.forms
 
 .. class:: Field(**kwargs)
 
@@ -18,10 +18,10 @@ other hooks.
 Although the primary way you'll use ``Field`` classes is in ``Form`` classes,
 you can also instantiate them and use them directly to get a better idea of
 how they work. Each ``Field`` instance has a ``clean()`` method, which takes
-a single argument and either raises a ``django.forms.ValidationError``
+a single argument and either raises a ``freedom.forms.ValidationError``
 exception or returns the clean value::
 
-    >>> from django import forms
+    >>> from freedom import forms
     >>> f = forms.EmailField()
     >>> f.clean('foo@example.com')
     'foo@example.com'
@@ -48,7 +48,7 @@ By default, each ``Field`` class assumes the value is required, so if you pass
 an empty value -- either ``None`` or the empty string (``""``) -- then
 ``clean()`` will raise a ``ValidationError`` exception::
 
-    >>> from django import forms
+    >>> from freedom import forms
     >>> f = forms.CharField()
     >>> f.clean('foo')
     'foo'
@@ -108,7 +108,7 @@ behavior doesn't result in an adequate label.
 Here's a full example ``Form`` that implements ``label`` for two of its fields.
 We've specified ``auto_id=False`` to simplify the output::
 
-    >>> from django import forms
+    >>> from freedom import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(label='Your name')
     ...     url = forms.URLField(label='Your Web site', required=False)
@@ -127,7 +127,7 @@ We've specified ``auto_id=False`` to simplify the output::
 .. versionadded:: 1.8
 
 The ``label_suffix`` argument lets you override the form's
-:attr:`~django.forms.Form.label_suffix` on a per-field basis::
+:attr:`~freedom.forms.Form.label_suffix` on a per-field basis::
 
     >>> class ContactForm(forms.Form):
     ...     age = forms.IntegerField()
@@ -152,7 +152,7 @@ To specify dynamic initial data, see the :attr:`Form.initial` parameter.
 The use-case for this is when you want to display an "empty" form in which a
 field is initialized to a particular value. For example::
 
-    >>> from django import forms
+    >>> from freedom import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial='Your name')
     ...     url = forms.URLField(initial='http://')
@@ -228,7 +228,7 @@ methods (e.g., ``as_ul()``).
 Here's a full example ``Form`` that implements ``help_text`` for two of its
 fields. We've specified ``auto_id=False`` to simplify the output::
 
-    >>> from django import forms
+    >>> from freedom import forms
     >>> class HelpTextContactForm(forms.Form):
     ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
     ...     message = forms.CharField()
@@ -260,7 +260,7 @@ The ``error_messages`` argument lets you override the default messages that the
 field will raise. Pass in a dictionary with keys matching the error messages you
 want to override. For example, here is the default error message::
 
-    >>> from django import forms
+    >>> from freedom import forms
     >>> generic = forms.CharField()
     >>> generic.clean('')
     Traceback (most recent call last):
@@ -481,7 +481,7 @@ For each field, we describe the default widget used if you don't specify
     .. deprecated:: 1.7
 
         The ability to use :class:`SplitDateTimeWidget` with ``DateTimeField``
-        has been deprecated and will be removed in Django 1.9. Use
+        has been deprecated and will be removed in Freedom 1.9. Use
         :class:`SplitDateTimeField` instead.
 
 ``DecimalField``
@@ -682,7 +682,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. deprecated:: 1.7
         This field has been deprecated in favor of
-        :class:`~django.forms.GenericIPAddressField`.
+        :class:`~freedom.forms.GenericIPAddressField`.
 
     * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
@@ -814,7 +814,7 @@ For each field, we describe the default widget used if you don't specify
    * Error messages: ``required``, ``invalid``
 
    This field is intended for use in representing a model
-   :class:`~django.db.models.SlugField` in forms.
+   :class:`~freedom.db.models.SlugField` in forms.
 
 ``TimeField``
 ~~~~~~~~~~~~~
@@ -881,7 +881,7 @@ Slightly complex built-in ``Field`` classes
         The list of fields that should be used to validate the field's value (in
         the order in which they are provided).
 
-            >>> from django.forms import ComboField
+            >>> from freedom.forms import ComboField
             >>> f = ComboField(fields=[CharField(max_length=20), EmailField()])
             >>> f.clean('test@example.com')
             'test@example.com'
@@ -907,7 +907,7 @@ Slightly complex built-in ``Field`` classes
 
     This field is abstract and must be subclassed. In contrast with the
     single-value fields, subclasses of :class:`MultiValueField` must not
-    implement :meth:`~django.forms.Field.clean` but instead - implement
+    implement :meth:`~freedom.forms.Field.clean` but instead - implement
     :meth:`~MultiValueField.compress`.
 
     Takes one extra required argument:
@@ -939,7 +939,7 @@ Slightly complex built-in ``Field`` classes
         :class:`MultiValueField` subclass, or different messages can be defined
         on each individual field. For example::
 
-            from django.core.validators import RegexValidator
+            from freedom.core.validators import RegexValidator
 
             class PhoneField(MultiValueField):
                 def __init__(self, *args, **kwargs):
@@ -962,8 +962,8 @@ Slightly complex built-in ``Field`` classes
 
     .. attribute:: MultiValueField.widget
 
-        Must be a subclass of :class:`django.forms.MultiWidget`.
-        Default value is :class:`~django.forms.TextInput`, which
+        Must be a subclass of :class:`freedom.forms.MultiWidget`.
+        Default value is :class:`~freedom.forms.TextInput`, which
         probably is not very useful in this case.
 
     .. method:: compress(data_list)
@@ -1103,7 +1103,7 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
     receive a model object, and should return a string suitable for representing
     it. For example::
 
-        from django.forms import ModelChoiceField
+        from freedom.forms import ModelChoiceField
 
         class MyModelChoiceField(ModelChoiceField):
             def label_from_instance(self, obj):
@@ -1142,7 +1142,7 @@ Creating custom fields
 
 If the built-in ``Field`` classes don't meet your needs, you can easily create
 custom ``Field`` classes. To do this, just create a subclass of
-``django.forms.Field``. Its only requirements are that it implement a
+``freedom.forms.Field``. Its only requirements are that it implement a
 ``clean()`` method and that its ``__init__()`` method accept the core arguments
 mentioned above (``required``, ``label``, ``initial``, ``widget``,
 ``help_text``).

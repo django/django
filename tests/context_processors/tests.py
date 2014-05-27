@@ -1,13 +1,13 @@
 """
-Tests for Django's bundled context processors.
+Tests for Freedom's bundled context processors.
 """
-from django.test import TestCase, override_settings
+from freedom.test import TestCase, override_settings
 
 
 @override_settings(ROOT_URLCONF='context_processors.urls')
 class RequestContextProcessorTests(TestCase):
     """
-    Tests for the ``django.core.context_processors.request`` processor.
+    Tests for the ``freedom.core.context_processors.request`` processor.
     """
 
     def test_request_attributes(self):

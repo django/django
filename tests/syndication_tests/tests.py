@@ -8,12 +8,12 @@ try:
 except ImportError:
     pytz = None
 
-from django.contrib.syndication import views
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, override_settings
-from django.test.utils import requires_tz_support
-from django.utils.feedgenerator import rfc2822_date, rfc3339_date
-from django.utils import timezone
+from freedom.contrib.syndication import views
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.test import TestCase, override_settings
+from freedom.test.utils import requires_tz_support
+from freedom.utils.feedgenerator import rfc2822_date, rfc3339_date
+from freedom.utils import timezone
 
 from .models import Entry
 
@@ -25,7 +25,7 @@ class FeedTestCase(TestCase):
     fixtures = ['feeddata.json']
 
     def setUp(self):
-        # Django cannot deal with very old dates when pytz isn't installed.
+        # Freedom cannot deal with very old dates when pytz isn't installed.
         if pytz is None:
             old_entry = Entry.objects.get(pk=1)
             old_entry.updated = datetime.datetime(1980, 1, 1, 12, 30)
@@ -91,7 +91,7 @@ class SyndicationFeedTest(FeedTestCase):
             'ttl': '600',
             'copyright': 'Copyright (c) 2007, Sally Smith',
         })
-        self.assertCategories(chan, ['python', 'django'])
+        self.assertCategories(chan, ['python', 'freedom'])
 
         # Ensure the content of the channel is correct
         self.assertChildNodeContent(chan, {
@@ -184,7 +184,7 @@ class SyndicationFeedTest(FeedTestCase):
             'title': 'My blog',
             'link': 'http://example.com/blog/',
         })
-        self.assertCategories(chan, ['python', 'django'])
+        self.assertCategories(chan, ['python', 'freedom'])
 
         # Check feed_url is passed
         self.assertEqual(
@@ -278,7 +278,7 @@ class SyndicationFeedTest(FeedTestCase):
         feed = minidom.parseString(response.content).firstChild
 
         self.assertEqual(feed.nodeName, 'feed')
-        self.assertEqual(feed.getAttribute('django'), 'rocks')
+        self.assertEqual(feed.getAttribute('freedom'), 'rocks')
         self.assertChildNodes(feed, ['title', 'subtitle', 'link', 'id', 'updated', 'entry', 'spam', 'rights', 'category', 'author'])
 
         entries = feed.getElementsByTagName('entry')
@@ -439,16 +439,16 @@ class SyndicationFeedTest(FeedTestCase):
             'https://example.com/foo/?arg=value'
         )
         self.assertEqual(
-            views.add_domain('example.com', 'http://djangoproject.com/doc/'),
-            'http://djangoproject.com/doc/'
+            views.add_domain('example.com', 'http://freedomproject.com/doc/'),
+            'http://freedomproject.com/doc/'
         )
         self.assertEqual(
-            views.add_domain('example.com', 'https://djangoproject.com/doc/'),
-            'https://djangoproject.com/doc/'
+            views.add_domain('example.com', 'https://freedomproject.com/doc/'),
+            'https://freedomproject.com/doc/'
         )
         self.assertEqual(
-            views.add_domain('example.com', 'mailto:uhoh@djangoproject.com'),
-            'mailto:uhoh@djangoproject.com'
+            views.add_domain('example.com', 'mailto:uhoh@freedomproject.com'),
+            'mailto:uhoh@freedomproject.com'
         )
         self.assertEqual(
             views.add_domain('example.com', '//example.com/foo/?arg=value'),

@@ -1,16 +1,16 @@
 .. _ref-gis-install:
 
 ======================
-GeoDjango Installation
+GeoFreedom Installation
 ======================
 
 .. highlight:: console
 
 Overview
 ========
-In general, GeoDjango installation requires:
+In general, GeoFreedom installation requires:
 
-1. :ref:`Python and Django <django>`
+1. :ref:`Python and Freedom <freedom>`
 2. :ref:`spatial_database`
 3. :ref:`geospatial_libs`
 
@@ -23,7 +23,7 @@ instructions are available for:
 
 .. admonition:: Use the Source
 
-    Because GeoDjango takes advantage of the latest in the open source geospatial
+    Because GeoFreedom takes advantage of the latest in the open source geospatial
     software technology, recent versions of the libraries are necessary.
     If binary packages aren't available for your platform, installation from
     source may be required. When compiling the libraries from source, please
@@ -32,12 +32,12 @@ instructions are available for:
 Requirements
 ============
 
-.. _django:
+.. _freedom:
 
-Python and Django
+Python and Freedom
 -----------------
 
-Because GeoDjango is included with Django, please refer to Django's
+Because GeoFreedom is included with Freedom, please refer to Freedom's
 :ref:`installation instructions <installing-official-release>` for details on
 how to install.
 
@@ -54,7 +54,7 @@ PostgreSQL (with PostGIS), MySQL (mostly with MyISAM engine), Oracle, and SQLite
     PostGIS is recommended, because it is the most mature and feature-rich
     open source spatial database.
 
-The geospatial libraries required for a GeoDjango installation depends
+The geospatial libraries required for a GeoFreedom installation depends
 on the spatial database used.  The following lists the library requirements,
 supported versions, and any notes for each of the supported database backends:
 
@@ -92,11 +92,11 @@ Database installation
    postgis
    spatialite
 
-Add ``django.contrib.gis`` to :setting:`INSTALLED_APPS`
+Add ``freedom.contrib.gis`` to :setting:`INSTALLED_APPS`
 -------------------------------------------------------
 
-Like other Django contrib applications, you will *only* need to add
-:mod:`django.contrib.gis` to :setting:`INSTALLED_APPS` in your settings.
+Like other Freedom contrib applications, you will *only* need to add
+:mod:`freedom.contrib.gis` to :setting:`INSTALLED_APPS` in your settings.
 This is the so that ``gis`` templates can be located -- if not done, then
 features such as the geographic admin or KML sitemaps will not function properly.
 
@@ -113,13 +113,13 @@ Add Google projection to ``spatial_ref_sys`` table
 In order to conduct database transformations to the so-called "Google"
 projection (a spherical mercator projection used by Google Maps),
 an entry must be added to your spatial database's ``spatial_ref_sys`` table.
-Invoke the Django shell from your project and execute the
+Invoke the Freedom shell from your project and execute the
 ``add_srs_entry`` function:
 
 .. code-block:: pycon
 
     $ python manage.py shell
-    >>> from django.contrib.gis.utils import add_srs_entry
+    >>> from freedom.contrib.gis.utils import add_srs_entry
     >>> add_srs_entry(900913)
 
 This adds an entry for the 900913 SRID to the ``spatial_ref_sys`` (or equivalent)
@@ -132,23 +132,23 @@ Troubleshooting
 If you can't find the solution to your problem here then participate in the
 community!  You can:
 
-* Join the ``#geodjango`` IRC channel on Freenode. Please be patient and polite
+* Join the ``#geofreedom`` IRC channel on Freenode. Please be patient and polite
   -- while you may not get an immediate response, someone will attempt to answer
   your question as soon as they see it.
-* Ask your question on the `GeoDjango`__ mailing list.
-* File a ticket on the `Django trac`__ if you think there's a bug.  Make
+* Ask your question on the `GeoFreedom`__ mailing list.
+* File a ticket on the `Freedom trac`__ if you think there's a bug.  Make
   sure to provide a complete description of the problem, versions used,
   and specify the component as "GIS".
 
-__ https://groups.google.com/d/forum/geodjango
-__ https://code.djangoproject.com/newticket
+__ https://groups.google.com/d/forum/geofreedom
+__ https://code.freedomproject.com/newticket
 
 .. _libsettings:
 
 Library environment settings
 ----------------------------
 
-By far, the most common problem when installing GeoDjango is that the
+By far, the most common problem when installing GeoFreedom is that the
 external shared libraries (e.g., for GEOS and GDAL) cannot be located. [#]_
 Typically, the cause of this problem is that the operating system isn't aware
 of the directory where the libraries built from source were installed.
@@ -191,7 +191,7 @@ modifying the system library path::
 Install ``binutils``
 ^^^^^^^^^^^^^^^^^^^^
 
-GeoDjango uses the ``find_library`` function (from the ``ctypes.util`` Python
+GeoFreedom uses the ``find_library`` function (from the ``ctypes.util`` Python
 module) to discover libraries.  The ``find_library`` routine uses a program
 called ``objdump`` (part of the ``binutils`` package) to verify a shared
 library on GNU/Linux systems.  Thus, if ``binutils`` is not installed on your
@@ -216,7 +216,7 @@ Mac OS X
 --------
 
 Because of the variety of packaging systems available for OS X, users have
-several different options for installing GeoDjango. These options are:
+several different options for installing GeoFreedom. These options are:
 
 * :ref:`homebrew`
 * :ref:`kyngchaos`
@@ -226,7 +226,7 @@ several different options for installing GeoDjango. These options are:
 
 .. note::
 
-    Currently, the easiest and recommended approach for installing GeoDjango
+    Currently, the easiest and recommended approach for installing GeoFreedom
     on OS X is to use the KyngChaos packages.
 
 This section also includes instructions for installing an upgraded version
@@ -262,7 +262,7 @@ Homebrew
 ^^^^^^^^
 
 `Homebrew`__ provides "recipes" for building binaries and packages from source.
-It provides recipes for the GeoDjango prerequisites on Macintosh computers
+It provides recipes for the GeoFreedom prerequisites on Macintosh computers
 running OS X. Because Homebrew still builds the software from source, the
 `Apple Developer Tools`_ are required.
 
@@ -282,7 +282,7 @@ KyngChaos packages
 ^^^^^^^^^^^^^^^^^^
 
 William Kyngesburye provides a number of `geospatial library binary packages`__
-that make it simple to get GeoDjango installed on OS X without compiling
+that make it simple to get GeoFreedom installed on OS X without compiling
 them from source.  However, the `Apple Developer Tools`_ are still necessary
 for compiling the Python database adapters :ref:`psycopg2_kyngchaos` (for PostGIS)
 and :ref:`pysqlite2` (for SpatiaLite).
@@ -339,13 +339,13 @@ described above, ``psycopg2`` may be installed using the following command::
 Fink
 ^^^^
 
-`Kurt Schwehr`__ has been gracious enough to create GeoDjango packages for users
+`Kurt Schwehr`__ has been gracious enough to create GeoFreedom packages for users
 of the `Fink`__ package system.  The following packages are available, depending
 on which version of Python you want to use:
 
-* ``django-gis-py26``
-* ``django-gis-py25``
-* ``django-gis-py24``
+* ``freedom-gis-py26``
+* ``freedom-gis-py25``
+* ``freedom-gis-py24``
 
 __ http://schwehr.org/blog/
 __ http://www.finkproject.org/
@@ -355,7 +355,7 @@ __ http://www.finkproject.org/
 MacPorts
 ^^^^^^^^
 
-`MacPorts`__ may be used to install GeoDjango prerequisites on Macintosh
+`MacPorts`__ may be used to install GeoFreedom prerequisites on Macintosh
 computers running OS X.  Because MacPorts still builds the software from source,
 the `Apple Developer Tools`_ are required.
 
@@ -388,7 +388,7 @@ Windows
 -------
 
 Proceed through the following sections sequentially in order to install
-GeoDjango on Windows.
+GeoFreedom on Windows.
 
 .. note::
 
@@ -479,10 +479,10 @@ OSGeo4W
 ^^^^^^^
 
 The `OSGeo4W installer`_ makes it simple to install the PROJ.4, GDAL, and GEOS
-libraries required by GeoDjango.  First, download the `OSGeo4W installer`_,
+libraries required by GeoFreedom.  First, download the `OSGeo4W installer`_,
 and run it.  Select :menuselection:`Express Web-GIS Install` and click next.
 In the 'Select Packages' list, ensure that GDAL is selected; MapServer and
-Apache are also enabled by default, but are not required by GeoDjango and
+Apache are also enabled by default, but are not required by GeoFreedom and
 may be unchecked safely.  After clicking next, the packages will be
 automatically downloaded and installed, after which you may exit the
 installer.
@@ -492,7 +492,7 @@ installer.
 Modify Windows environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In order to use GeoDjango, you will need to add your Python and OSGeo4W
+In order to use GeoFreedom, you will need to add your Python and OSGeo4W
 directories to your Windows system ``Path``, as well as create ``GDAL_DATA``
 and ``PROJ_LIB`` environment variables.  The following set of commands,
 executable with ``cmd.exe``, will set this up:
@@ -509,12 +509,12 @@ executable with ``cmd.exe``, will set this up:
      reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v PROJ_LIB /t REG_EXPAND_SZ /f /d "%PROJ_LIB%"
 
 For your convenience, these commands are available in the executable batch
-script, :download:`geodjango_setup.bat`.
+script, :download:`geofreedom_setup.bat`.
 
 .. note::
 
     Administrator privileges are required to execute these commands.
-    To do this, right-click on :download:`geodjango_setup.bat` and select
+    To do this, right-click on :download:`geofreedom_setup.bat` and select
     :menuselection:`Run as administrator`. You need to log out and log back in again
     for the settings to take effect.
 
@@ -524,13 +524,13 @@ script, :download:`geodjango_setup.bat`.
     then you will need to modify the ``OSGEO4W_ROOT`` and/or ``PYTHON_ROOT``
     variables accordingly.
 
-Install Django and set up database
+Install Freedom and set up database
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Finally, :ref:`install Django <installing-official-release>` on your system.
+Finally, :ref:`install Freedom <installing-official-release>` on your system.
 
 .. rubric:: Footnotes
-.. [#] GeoDjango uses the :func:`~ctypes.util.find_library` routine from
+.. [#] GeoFreedom uses the :func:`~ctypes.util.find_library` routine from
        ``ctypes.util`` to locate shared libraries.
 .. [#] The ``psycopg2`` Windows installers are packaged and maintained by
        `Jason Erickson <http://www.stickpeople.com/projects/python/win-psycopg/>`_.

@@ -3,14 +3,14 @@ from __future__ import unicode_literals
 import logging
 import warnings
 
-from django.core import mail
-from django.test import TestCase, RequestFactory, override_settings
-from django.test.utils import patch_logger
-from django.utils.encoding import force_text
-from django.utils.deprecation import RemovedInNextVersionWarning
-from django.utils.log import (CallbackFilter, RequireDebugFalse,
+from freedom.core import mail
+from freedom.test import TestCase, RequestFactory, override_settings
+from freedom.test.utils import patch_logger
+from freedom.utils.encoding import force_text
+from freedom.utils.deprecation import RemovedInNextVersionWarning
+from freedom.utils.log import (CallbackFilter, RequireDebugFalse,
     RequireDebugTrue)
-from django.utils.six import StringIO
+from freedom.utils.six import StringIO
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -24,11 +24,11 @@ OLD_LOGGING = {
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler'
+            'class': 'freedom.utils.log.AdminEmailHandler'
         }
     },
     'loggers': {
-        'django.request': {
+        'freedom.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
@@ -65,15 +65,15 @@ class LoggingFiltersTest(TestCase):
 
 class DefaultLoggingTest(TestCase):
     def setUp(self):
-        self.logger = logging.getLogger('django')
+        self.logger = logging.getLogger('freedom')
         self.old_stream = self.logger.handlers[0].stream
 
     def tearDown(self):
         self.logger.handlers[0].stream = self.old_stream
 
-    def test_django_logger(self):
+    def test_freedom_logger(self):
         """
-        The 'django' base logger only output anything when DEBUG=True.
+        The 'freedom' base logger only output anything when DEBUG=True.
         """
         output = StringIO()
         self.logger.handlers[0].stream = output
@@ -87,12 +87,12 @@ class DefaultLoggingTest(TestCase):
 
 class WarningLoggerTests(TestCase):
     """
-    Tests that warnings output for RemovedInDjangoXXWarning (XX being the next
-    Django version) is enabled and captured to the logging system
+    Tests that warnings output for RemovedInFreedomXXWarning (XX being the next
+    Freedom version) is enabled and captured to the logging system
     """
     def setUp(self):
         # If tests are invoke with "-Wall" (or any -W flag actually) then
-        # warning logging gets disabled (see configure_logging in django/utils/log.py).
+        # warning logging gets disabled (see configure_logging in freedom/utils/log.py).
         # However, these tests expect warnings to be logged, so manually force warnings
         # to the logs. Use getattr() here because the logging capture state is
         # undocumented and (I assume) brittle.
@@ -161,7 +161,7 @@ class CallbackFilterTest(TestCase):
 
 
 class AdminEmailHandlerTest(TestCase):
-    logger = logging.getLogger('django.request')
+    logger = logging.getLogger('freedom.request')
 
     def get_admin_email_handler(self, logger):
         # Inspired from views/views.py: send_log()
@@ -354,11 +354,11 @@ dictConfig.called = False
 
 class SetupConfigureLogging(TestCase):
     """
-    Test that calling django.setup() initializes the logging configuration.
+    Test that calling freedom.setup() initializes the logging configuration.
     """
     @override_settings(LOGGING_CONFIG='logging_tests.tests.dictConfig')
     def test_configure_initializes_logging(self):
-        from django import setup
+        from freedom import setup
         setup()
         self.assertTrue(dictConfig.called)
 
@@ -367,13 +367,13 @@ class SetupConfigureLogging(TestCase):
 class SecurityLoggerTest(TestCase):
 
     def test_suspicious_operation_creates_log_message(self):
-        with patch_logger('django.security.SuspiciousOperation', 'error') as calls:
+        with patch_logger('freedom.security.SuspiciousOperation', 'error') as calls:
             self.client.get('/suspicious/')
             self.assertEqual(len(calls), 1)
             self.assertEqual(calls[0], 'dubious')
 
     def test_suspicious_operation_uses_sublogger(self):
-        with patch_logger('django.security.DisallowedHost', 'error') as calls:
+        with patch_logger('freedom.security.DisallowedHost', 'error') as calls:
             self.client.get('/suspicious_spec/')
             self.assertEqual(len(calls), 1)
             self.assertEqual(calls[0], 'dubious')

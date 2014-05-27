@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 import time
 import unittest
 
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse
-from django.test import TestCase, RequestFactory, override_settings
-from django.views.generic import View, TemplateView, RedirectView
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.http import HttpResponse
+from freedom.test import TestCase, RequestFactory, override_settings
+from freedom.views.generic import View, TemplateView, RedirectView
 
 from . import views
 

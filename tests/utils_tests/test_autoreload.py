@@ -1,21 +1,21 @@
 import os
 
-from django import conf
-from django.contrib import admin
-from django.test import TestCase, override_settings
-from django.utils.autoreload import gen_filenames
+from freedom import conf
+from freedom.contrib import admin
+from freedom.test import TestCase, override_settings
+from freedom.utils.autoreload import gen_filenames
 
 LOCALE_PATH = os.path.join(os.path.dirname(__file__), 'locale')
 
 
 class TestFilenameGenerator(TestCase):
-    def test_django_locales(self):
+    def test_freedom_locales(self):
         """
-        Test that gen_filenames() also yields the built-in django locale files.
+        Test that gen_filenames() also yields the built-in freedom locale files.
         """
         filenames = list(gen_filenames())
         self.assertIn(os.path.join(os.path.dirname(conf.__file__), 'locale',
-                                   'nl', 'LC_MESSAGES', 'django.mo'),
+                                   'nl', 'LC_MESSAGES', 'freedom.mo'),
                       filenames)
 
     @override_settings(LOCALE_PATHS=(LOCALE_PATH,))
@@ -24,7 +24,7 @@ class TestFilenameGenerator(TestCase):
         Test that gen_filenames also yields from LOCALE_PATHS locales.
         """
         filenames = list(gen_filenames())
-        self.assertIn(os.path.join(LOCALE_PATH, 'nl', 'LC_MESSAGES', 'django.mo'),
+        self.assertIn(os.path.join(LOCALE_PATH, 'nl', 'LC_MESSAGES', 'freedom.mo'),
                       filenames)
 
     @override_settings(INSTALLED_APPS=[])
@@ -38,19 +38,19 @@ class TestFilenameGenerator(TestCase):
         try:
             filenames = list(gen_filenames())
             self.assertIn(
-                os.path.join(LOCALE_PATH, 'nl', 'LC_MESSAGES', 'django.mo'),
+                os.path.join(LOCALE_PATH, 'nl', 'LC_MESSAGES', 'freedom.mo'),
                 filenames)
         finally:
             os.chdir(old_cwd)
 
-    @override_settings(INSTALLED_APPS=['django.contrib.admin'])
+    @override_settings(INSTALLED_APPS=['freedom.contrib.admin'])
     def test_app_locales(self):
         """
         Test that gen_filenames also yields from locale dirs in installed apps.
         """
         filenames = list(gen_filenames())
         self.assertIn(os.path.join(os.path.dirname(admin.__file__), 'locale',
-                                   'nl', 'LC_MESSAGES', 'django.mo'),
+                                   'nl', 'LC_MESSAGES', 'freedom.mo'),
                       filenames)
 
     @override_settings(USE_I18N=False)
@@ -62,5 +62,5 @@ class TestFilenameGenerator(TestCase):
         filenames = list(gen_filenames())
         self.assertNotIn(
             os.path.join(os.path.dirname(conf.__file__), 'locale', 'nl',
-                         'LC_MESSAGES', 'django.mo'),
+                         'LC_MESSAGES', 'freedom.mo'),
             filenames)

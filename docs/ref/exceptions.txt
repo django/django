@@ -1,25 +1,25 @@
 =================
-Django Exceptions
+Freedom Exceptions
 =================
 
 
-Django raises some Django specific exceptions as well as many standard
+Freedom raises some Freedom specific exceptions as well as many standard
 Python exceptions.
 
-Django Core Exceptions
+Freedom Core Exceptions
 ======================
 
-.. module:: django.core.exceptions
-    :synopsis: Django core exceptions
+.. module:: freedom.core.exceptions
+    :synopsis: Freedom core exceptions
 
-Django core exception classes are defined in :mod:`django.core.exceptions`.
+Freedom core exception classes are defined in :mod:`freedom.core.exceptions`.
 
 ObjectDoesNotExist and DoesNotExist
 -----------------------------------
 .. exception:: DoesNotExist
 
     The ``DoesNotExist`` exception is raised when an object is not found for
-    the given parameters of a query. Django provides a ``DoesNotExist``
+    the given parameters of a query. Freedom provides a ``DoesNotExist``
     exception as an attribute of each model class to identify the class of
     object that could not be found and to allow you to catch a particular model
     class with ``try/except``.
@@ -30,7 +30,7 @@ ObjectDoesNotExist and DoesNotExist
     ``ObjectDoesNotExist`` will catch ``DoesNotExist`` exceptions for all
     models.
 
-    See :meth:`~django.db.models.query.QuerySet.get()` for further information
+    See :meth:`~freedom.db.models.query.QuerySet.get()` for further information
     on :exc:`ObjectDoesNotExist` and :exc:`DoesNotExist`.
 
 MultipleObjectsReturned
@@ -39,11 +39,11 @@ MultipleObjectsReturned
 
     The :exc:`MultipleObjectsReturned` exception is raised by a query if only
     one object is expected, but multiple objects are returned. A base version
-    of this exception is provided in :mod:`django.core.exceptions`; each model
+    of this exception is provided in :mod:`freedom.core.exceptions`; each model
     class contains a subclassed version that can be used to identify the
     specific object type that has returned multiple objects.
 
-    See :meth:`~django.db.models.query.QuerySet.get()` for further information.
+    See :meth:`~freedom.db.models.query.QuerySet.get()` for further information.
 
 SuspiciousOperation
 -------------------
@@ -65,7 +65,7 @@ SuspiciousOperation
 
     If a ``SuspiciousOperation`` exception reaches the WSGI handler level it is
     logged at the ``Error`` level and results in
-    a :class:`~django.http.HttpResponseBadRequest`. See the :doc:`logging
+    a :class:`~freedom.http.HttpResponseBadRequest`. See the :doc:`logging
     documentation </topics/logging/>` for more information.
 
 PermissionDenied
@@ -80,7 +80,7 @@ ViewDoesNotExist
 .. exception:: ViewDoesNotExist
 
     The :exc:`ViewDoesNotExist` exception is raised by
-    :mod:`django.core.urlresolvers` when a requested view does not exist.
+    :mod:`freedom.core.urlresolvers` when a requested view does not exist.
 
 MiddlewareNotUsed
 -----------------
@@ -93,7 +93,7 @@ ImproperlyConfigured
 --------------------
 .. exception:: ImproperlyConfigured
 
-    The :exc:`ImproperlyConfigured` exception is raised when Django is
+    The :exc:`ImproperlyConfigured` exception is raised when Freedom is
     somehow improperly configured -- for example, if a value in ``settings.py``
     is incorrect or unparseable.
 
@@ -133,38 +133,38 @@ or model are classified as ``NON_FIELD_ERRORS``. This constant is used
 as a key in dictionaries that otherwise map fields to their respective
 list of errors.
 
-.. currentmodule:: django.core.urlresolvers
+.. currentmodule:: freedom.core.urlresolvers
 
 URL Resolver exceptions
 =======================
 
-URL Resolver exceptions are defined in :mod:`django.core.urlresolvers`.
+URL Resolver exceptions are defined in :mod:`freedom.core.urlresolvers`.
 
 Resolver404
 --------------
 .. exception:: Resolver404
 
     The :exc:`Resolver404` exception is raised by
-    :func:`django.core.urlresolvers.resolve()` if the path passed to
+    :func:`freedom.core.urlresolvers.resolve()` if the path passed to
     ``resolve()`` doesn't map to a view. It's a subclass of
-    :class:`django.http.Http404`
+    :class:`freedom.http.Http404`
 
 NoReverseMatch
 --------------
 .. exception:: NoReverseMatch
 
     The :exc:`NoReverseMatch` exception is raised by
-    :mod:`django.core.urlresolvers` when a matching URL in your URLconf
+    :mod:`freedom.core.urlresolvers` when a matching URL in your URLconf
     cannot be identified based on the parameters supplied.
 
-.. currentmodule:: django.db
+.. currentmodule:: freedom.db
 
 Database Exceptions
 ===================
 
-Database exceptions are provided in :mod:`django.db`.
+Database exceptions are provided in :mod:`freedom.db`.
 
-Django wraps the standard database exceptions so that your Django code has a
+Freedom wraps the standard database exceptions so that your Freedom code has a
 guaranteed common implementation of these classes.
 
 .. exception:: Error
@@ -177,7 +177,7 @@ guaranteed common implementation of these classes.
 .. exception:: ProgrammingError
 .. exception:: NotSupportedError
 
-The Django wrappers for database exceptions behave exactly the same as
+The Freedom wrappers for database exceptions behave exactly the same as
 the underlying database exceptions. See :pep:`249`, the Python Database API
 Specification v2.0, for further information.
 
@@ -190,26 +190,26 @@ to Python 3.)
 .. exception:: models.ProtectedError
 
 Raised to prevent deletion of referenced objects when using
-:attr:`django.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
+:attr:`freedom.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
 of :exc:`IntegrityError`.
 
-.. currentmodule:: django.http
+.. currentmodule:: freedom.http
 
 Http Exceptions
 ===============
 
-Http exceptions are provided in :mod:`django.http`.
+Http exceptions are provided in :mod:`freedom.http`.
 
 .. exception:: UnreadablePostError
 
     The :exc:`UnreadablePostError` is raised when a user cancels an upload.
 
-.. currentmodule:: django.db.transaction
+.. currentmodule:: freedom.db.transaction
 
 Transaction Exceptions
 ======================
 
-Transaction exceptions are defined in :mod:`django.db.transaction`.
+Transaction exceptions are defined in :mod:`freedom.db.transaction`.
 
 .. exception:: TransactionManagementError
 
@@ -219,5 +219,5 @@ Transaction exceptions are defined in :mod:`django.db.transaction`.
 Python Exceptions
 =================
 
-Django raises built-in Python exceptions when appropriate as well. See the
+Freedom raises built-in Python exceptions when appropriate as well. See the
 Python documentation for further information on the :ref:`bltin-exceptions`.

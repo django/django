@@ -4,19 +4,19 @@ from __future__ import unicode_literals
 import tempfile
 import os
 
-from django import forms
-from django.contrib import admin
-from django.contrib.admin.views.main import ChangeList
-from django.core.exceptions import ValidationError
-from django.core.files.storage import FileSystemStorage
-from django.core.mail import EmailMessage
-from django.core.servers.basehttp import FileWrapper
-from django.conf.urls import url
-from django.forms.models import BaseModelFormSet
-from django.http import HttpResponse, StreamingHttpResponse
-from django.contrib.admin import BooleanFieldListFilter
-from django.utils.safestring import mark_safe
-from django.utils.six import StringIO
+from freedom import forms
+from freedom.contrib import admin
+from freedom.contrib.admin.views.main import ChangeList
+from freedom.core.exceptions import ValidationError
+from freedom.core.files.storage import FileSystemStorage
+from freedom.core.mail import EmailMessage
+from freedom.core.servers.basehttp import FileWrapper
+from freedom.conf.urls import url
+from freedom.forms.models import BaseModelFormSet
+from freedom.http import HttpResponse, StreamingHttpResponse
+from freedom.contrib.admin import BooleanFieldListFilter
+from freedom.utils.safestring import mark_safe
+from freedom.utils.six import StringIO
 
 from .models import (Article, Chapter, Child, Parent, Picture, Widget,
     DooHickey, Grommet, Whatsit, FancyDoodad, Category, Link,
@@ -233,7 +233,7 @@ external_mail.short_description = 'External mail (Another awesome action)'
 
 
 def redirect_to(modeladmin, request, selected):
-    from django.http import HttpResponseRedirect
+    from freedom.http import HttpResponseRedirect
     return HttpResponseRedirect('/some-where-else/')
 redirect_to.short_description = 'Redirect to (Awesome action)'
 
@@ -914,8 +914,8 @@ site.register(EmptyModelMixin, EmptyModelMixinAdmin)
 site.register(StumpJoke)
 
 # Register core models we need in our tests
-from django.contrib.auth.models import User, Group
-from django.contrib.auth.admin import UserAdmin, GroupAdmin
+from freedom.contrib.auth.models import User, Group
+from freedom.contrib.auth.admin import UserAdmin, GroupAdmin
 site.register(User, UserAdmin)
 site.register(Group, GroupAdmin)
 

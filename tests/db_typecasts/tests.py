@@ -1,10 +1,10 @@
-# Unit tests for typecast functions in django.db.backends.util
+# Unit tests for typecast functions in freedom.db.backends.util
 
 import datetime
 import unittest
 
-from django.db.backends import utils as typecasts
-from django.utils import six
+from freedom.db.backends import utils as typecasts
+from freedom.utils import six
 
 
 TEST_CASES = {

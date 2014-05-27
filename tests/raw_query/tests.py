@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 from datetime import date
 
-from django.db.models.query_utils import InvalidQuery
-from django.test import TestCase, skipUnlessDBFeature
+from freedom.db.models.query_utils import InvalidQuery
+from freedom.test import TestCase, skipUnlessDBFeature
 
 from .models import Author, Book, Coffee, Reviewer, FriendlyAuthor
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from django.test import TestCase
-from django.db.migrations.optimizer import MigrationOptimizer
-from django.db import migrations
-from django.db import models
+from freedom.test import TestCase
+from freedom.db.migrations.optimizer import MigrationOptimizer
+from freedom.db import migrations
+from freedom.db import models
 
 
 class OptimizerTests(TestCase):

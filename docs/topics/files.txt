@@ -2,17 +2,17 @@
 Managing files
 ==============
 
-This document describes Django's file access APIs for files such as those
+This document describes Freedom's file access APIs for files such as those
 uploaded by a user. The lower level APIs are general enough that you could use
 them for other purposes. If you want to handle "static files" (JS, CSS, etc),
 see :doc:`/howto/static-files/index`.
 
-By default, Django stores files locally, using the :setting:`MEDIA_ROOT` and
+By default, Freedom stores files locally, using the :setting:`MEDIA_ROOT` and
 :setting:`MEDIA_URL` settings. The examples below assume that you're using these
 defaults.
 
-However, Django provides ways to write custom `file storage systems`_ that
-allow you to completely customize where and how Django stores files. The
+However, Freedom provides ways to write custom `file storage systems`_ that
+allow you to completely customize where and how Freedom stores files. The
 second half of this document describes how these storage systems work.
 
 .. _file storage systems: `File storage`_
@@ -20,14 +20,14 @@ second half of this document describes how these storage systems work.
 Using files in models
 =====================
 
-When you use a :class:`~django.db.models.FileField` or
-:class:`~django.db.models.ImageField`, Django provides a set of APIs you can use
+When you use a :class:`~freedom.db.models.FileField` or
+:class:`~freedom.db.models.ImageField`, Freedom provides a set of APIs you can use
 to deal with that file.
 
-Consider the following model, using an :class:`~django.db.models.ImageField` to
+Consider the following model, using an :class:`~freedom.db.models.ImageField` to
 store a photo::
 
-    from django.db import models
+    from freedom.db import models
 
     class Car(models.Model):
         name = models.CharField(max_length=255)
@@ -59,31 +59,31 @@ it has all the methods and attributes described below.
 The ``File`` object
 ===================
 
-Internally, Django uses a :class:`django.core.files.File` instance any time it
+Internally, Freedom uses a :class:`freedom.core.files.File` instance any time it
 needs to represent a file. This object is a thin wrapper around Python's
-`built-in file object`_ with some Django-specific additions.
+`built-in file object`_ with some Freedom-specific additions.
 
 .. _built-in file object: http://docs.python.org/library/stdtypes.html#bltin-file-objects
 
-Most of the time you'll simply use a ``File`` that Django's given you (i.e. a
+Most of the time you'll simply use a ``File`` that Freedom's given you (i.e. a
 file attached to a model as above, or perhaps an uploaded file).
 
 If you need to construct a ``File`` yourself, the easiest way is to create one
 using a Python built-in ``file`` object::
 
-    >>> from django.core.files import File
+    >>> from freedom.core.files import File
 
     # Create a Python file object using open()
     >>> f = open('/tmp/hello.world', 'w')
     >>> myfile = File(f)
 
 Now you can use any of the documented attributes and methods
-of the :class:`~django.core.files.File` class.
+of the :class:`~freedom.core.files.File` class.
 
 Be aware that files created in this way are not automatically closed.
 The following approach may be used to close files automatically::
 
-    >>> from django.core.files import File
+    >>> from freedom.core.files import File
 
     # Create a Python file object using open() and the with statement
     >>> with open('/tmp/hello.world', 'w') as f:
@@ -106,11 +106,11 @@ may lead to the following error::
 File storage
 ============
 
-Behind the scenes, Django delegates decisions about how and where to store files
+Behind the scenes, Freedom delegates decisions about how and where to store files
 to a file storage system. This is the object that actually understands things
 like file systems, opening and reading files, etc.
 
-Django's default file storage is given by the :setting:`DEFAULT_FILE_STORAGE`
+Freedom's default file storage is given by the :setting:`DEFAULT_FILE_STORAGE`
 setting; if you don't explicitly provide a storage system, this is the one that
 will be used.
 
@@ -126,8 +126,8 @@ the proper storage for that file), you can use file storage systems directly.
 You can create an instance of some custom file storage class, or -- often more
 useful -- you can use the global default storage system::
 
-    >>> from django.core.files.storage import default_storage
-    >>> from django.core.files.base import ContentFile
+    >>> from freedom.core.files.storage import default_storage
+    >>> from freedom.core.files.base import ContentFile
 
     >>> path = default_storage.save('/path/to/file', ContentFile('new content'))
     >>> path
@@ -149,14 +149,14 @@ See :doc:`/ref/files/storage` for the file storage API.
 The built-in filesystem storage class
 -------------------------------------
 
-Django ships with a :class:`django.core.files.storage.FileSystemStorage` class
+Freedom ships with a :class:`freedom.core.files.storage.FileSystemStorage` class
 which implements basic local filesystem file storage.
 
 For example, the following code will store uploaded files under
 ``/media/photos`` regardless of what your :setting:`MEDIA_ROOT` setting is::
 
-    from django.db import models
-    from django.core.files.storage import FileSystemStorage
+    from freedom.db import models
+    from freedom.core.files.storage import FileSystemStorage
 
     fs = FileSystemStorage(location='/media/photos')
 
@@ -166,4 +166,4 @@ For example, the following code will store uploaded files under
 
 :doc:`Custom storage systems </howto/custom-file-storage>` work the same way:
 you can pass them in as the ``storage`` argument to a
-:class:`~django.db.models.FileField`.
+:class:`~freedom.db.models.FileField`.

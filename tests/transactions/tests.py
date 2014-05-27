@@ -8,10 +8,10 @@ except ImportError:
 import time
 from unittest import skipIf, skipUnless
 
-from django.db import (connection, transaction,
+from freedom.db import (connection, transaction,
     DatabaseError, Error, IntegrityError, OperationalError)
-from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.utils import six
+from freedom.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
+from freedom.utils import six
 
 from .models import Reporter
 

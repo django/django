@@ -2,11 +2,11 @@
 ``contrib`` packages
 ====================
 
-Django aims to follow Python's `"batteries included" philosophy`_. It ships
+Freedom aims to follow Python's `"batteries included" philosophy`_. It ships
 with a variety of extra, optional tools that solve common Web-development
 problems.
 
-This code lives in ``django/contrib`` in the Django distribution. This document
+This code lives in ``freedom/contrib`` in the Freedom distribution. This document
 gives a rundown of the packages in ``contrib``, along with any dependencies
 those packages have.
 
@@ -14,7 +14,7 @@ those packages have.
 
     For most of these add-ons -- specifically, the add-ons that include either
     models or template tags -- you'll need to add the package name (e.g.,
-    ``'django.contrib.redirects'``) to your :setting:`INSTALLED_APPS` setting
+    ``'freedom.contrib.redirects'``) to your :setting:`INSTALLED_APPS` setting
     and re-run ``manage.py migrate``.
 
 .. _"batteries included" philosophy: http://docs.python.org/tutorial/stdlib.html#batteries-included
@@ -42,7 +42,7 @@ those packages have.
 admin
 =====
 
-The automatic Django administrative interface. For more information, see
+The automatic Freedom administrative interface. For more information, see
 :doc:`Tutorial 2 </intro/tutorial02>` and the
 :doc:`admin documentation </ref/contrib/admin/index>`.
 
@@ -51,7 +51,7 @@ Requires the auth_ and contenttypes_ contrib packages to be installed.
 auth
 ====
 
-Django's authentication framework.
+Freedom's authentication framework.
 
 See :doc:`/topics/auth/index`.
 
@@ -59,7 +59,7 @@ contenttypes
 ============
 
 A light framework for hooking into "types" of content, where each installed
-Django model is a separate content type.
+Freedom model is a separate content type.
 
 See the :doc:`contenttypes documentation </ref/contrib/contenttypes>`.
 
@@ -82,9 +82,9 @@ Requires the sites_ contrib package to be installed as well.
 formtools
 =========
 
-A set of high-level abstractions for Django forms (django.forms).
+A set of high-level abstractions for Freedom forms (freedom.forms).
 
-django.contrib.formtools.preview
+freedom.contrib.formtools.preview
 --------------------------------
 
 An abstraction of the following workflow:
@@ -93,7 +93,7 @@ An abstraction of the following workflow:
 
 See the :doc:`form preview documentation </ref/contrib/formtools/form-preview>`.
 
-django.contrib.formtools.wizard
+freedom.contrib.formtools.wizard
 -------------------------------
 
 Splits forms across multiple Web pages.
@@ -103,7 +103,7 @@ See the :doc:`form wizard documentation </ref/contrib/formtools/form-wizard>`.
 gis
 ====
 
-A world-class geospatial framework built on top of Django, that enables
+A world-class geospatial framework built on top of Freedom, that enables
 storage, manipulation and display of spatial data.
 
 See the :doc:`/ref/contrib/gis/index` documentation for more.
@@ -111,7 +111,7 @@ See the :doc:`/ref/contrib/gis/index` documentation for more.
 humanize
 ========
 
-A set of Django template filters useful for adding a "human touch" to data.
+A set of Freedom template filters useful for adding a "human touch" to data.
 
 See the :doc:`humanize documentation </ref/contrib/humanize>`.
 
@@ -148,7 +148,7 @@ sites
 =====
 
 A light framework that lets you operate multiple Web sites off of the same
-database and Django installation. It gives you hooks for associating objects to
+database and Freedom installation. It gives you hooks for associating objects to
 one or more sites.
 
 See the :doc:`sites documentation </ref/contrib/sites>`.
@@ -179,4 +179,4 @@ Other add-ons
 =============
 
 If you have an idea for functionality to include in ``contrib``, let us know!
-Code it up, and post it to the |django-users| mailing list.
+Code it up, and post it to the |freedom-users| mailing list.

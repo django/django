@@ -4,11 +4,11 @@ Many-to-one relationships
 
 .. highlight:: pycon
 
-To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
+To define a many-to-one relationship, use :class:`~freedom.db.models.ForeignKey`.
 
 .. code-block:: python
 
-    from django.db import models
+    from freedom.db import models
 
     class Reporter(models.Model):
         first_name = models.CharField(max_length=30)
@@ -186,7 +186,7 @@ Queries can go round in circles::
     [<Reporter: John Smith>]
 
 If you delete a reporter, his articles will be deleted (assuming that the
-ForeignKey was defined with :attr:`django.db.models.ForeignKey.on_delete` set to
+ForeignKey was defined with :attr:`freedom.db.models.ForeignKey.on_delete` set to
 ``CASCADE``, which is the default)::
 
     >>> Article.objects.all()

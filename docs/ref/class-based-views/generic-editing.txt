@@ -5,18 +5,18 @@ Generic editing views
 The following views are described on this page and provide a foundation for
 editing content:
 
-* :class:`django.views.generic.edit.FormView`
-* :class:`django.views.generic.edit.CreateView`
-* :class:`django.views.generic.edit.UpdateView`
-* :class:`django.views.generic.edit.DeleteView`
+* :class:`freedom.views.generic.edit.FormView`
+* :class:`freedom.views.generic.edit.CreateView`
+* :class:`freedom.views.generic.edit.UpdateView`
+* :class:`freedom.views.generic.edit.DeleteView`
 
 .. note::
 
     Some of the examples on this page assume that an ``Author`` model has been
     defined as follows in ``myapp/models.py``::
 
-        from django.core.urlresolvers import reverse
-        from django.db import models
+        from freedom.core.urlresolvers import reverse
+        from freedom.db import models
 
         class Author(models.Model):
             name = models.CharField(max_length=200)
@@ -27,7 +27,7 @@ editing content:
 FormView
 --------
 
-.. class:: django.views.generic.edit.FormView
+.. class:: freedom.views.generic.edit.FormView
 
     A view that displays a form. On error, redisplays the form with validation
     errors; on success, redirects to a new URL.
@@ -36,15 +36,15 @@ FormView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * ``django.views.generic.edit.BaseFormView``
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.base.TemplateResponseMixin`
+    * ``freedom.views.generic.edit.BaseFormView``
+    * :class:`freedom.views.generic.edit.FormMixin`
+    * :class:`freedom.views.generic.edit.ProcessFormView`
+    * :class:`freedom.views.generic.base.View`
 
     **Example myapp/forms.py**::
 
-        from django import forms
+        from freedom import forms
 
         class ContactForm(forms.Form):
             name = forms.CharField()
@@ -57,7 +57,7 @@ FormView
     **Example myapp/views.py**::
 
         from myapp.forms import ContactForm
-        from django.views.generic.edit import FormView
+        from freedom.views.generic.edit import FormView
 
         class ContactView(FormView):
             template_name = 'contact.html'
@@ -72,7 +72,7 @@ FormView
 
     **Example myapp/contact.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+freedom
 
         <form action="" method="post">{% csrf_token %}
             {{ form.as_p }}
@@ -83,7 +83,7 @@ FormView
 CreateView
 ----------
 
-.. class:: django.views.generic.edit.CreateView
+.. class:: freedom.views.generic.edit.CreateView
 
     A view that displays a form for creating an object, redisplaying the form
     with validation errors (if there are any) and saving the object.
@@ -92,14 +92,14 @@ CreateView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * ``django.views.generic.edit.BaseCreateView``
-    * :class:`django.views.generic.edit.ModelFormMixin`
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.detail.SingleObjectMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`freedom.views.generic.base.TemplateResponseMixin`
+    * ``freedom.views.generic.edit.BaseCreateView``
+    * :class:`freedom.views.generic.edit.ModelFormMixin`
+    * :class:`freedom.views.generic.edit.FormMixin`
+    * :class:`freedom.views.generic.detail.SingleObjectMixin`
+    * :class:`freedom.views.generic.edit.ProcessFormView`
+    * :class:`freedom.views.generic.base.View`
 
     **Attributes**
 
@@ -119,7 +119,7 @@ CreateView
 
     **Example myapp/views.py**::
 
-        from django.views.generic.edit import CreateView
+        from freedom.views.generic.edit import CreateView
         from myapp.models import Author
 
         class AuthorCreate(CreateView):
@@ -128,7 +128,7 @@ CreateView
 
     **Example myapp/author_form.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+freedom
 
         <form action="" method="post">{% csrf_token %}
             {{ form.as_p }}
@@ -138,7 +138,7 @@ CreateView
 UpdateView
 ----------
 
-.. class:: django.views.generic.edit.UpdateView
+.. class:: freedom.views.generic.edit.UpdateView
 
     A view that displays a form for editing an existing object, redisplaying
     the form with validation errors (if there are any) and saving changes to
@@ -149,14 +149,14 @@ UpdateView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * ``django.views.generic.edit.BaseUpdateView``
-    * :class:`django.views.generic.edit.ModelFormMixin`
-    * :class:`django.views.generic.edit.FormMixin`
-    * :class:`django.views.generic.detail.SingleObjectMixin`
-    * :class:`django.views.generic.edit.ProcessFormView`
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`freedom.views.generic.base.TemplateResponseMixin`
+    * ``freedom.views.generic.edit.BaseUpdateView``
+    * :class:`freedom.views.generic.edit.ModelFormMixin`
+    * :class:`freedom.views.generic.edit.FormMixin`
+    * :class:`freedom.views.generic.detail.SingleObjectMixin`
+    * :class:`freedom.views.generic.edit.ProcessFormView`
+    * :class:`freedom.views.generic.base.View`
 
     **Attributes**
 
@@ -175,7 +175,7 @@ UpdateView
 
     **Example myapp/views.py**::
 
-        from django.views.generic.edit import UpdateView
+        from freedom.views.generic.edit import UpdateView
         from myapp.models import Author
 
         class AuthorUpdate(UpdateView):
@@ -185,7 +185,7 @@ UpdateView
 
     **Example myapp/author_update_form.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+freedom
 
         <form action="" method="post">{% csrf_token %}
             {{ form.as_p }}
@@ -195,7 +195,7 @@ UpdateView
 DeleteView
 ----------
 
-.. class:: django.views.generic.edit.DeleteView
+.. class:: freedom.views.generic.edit.DeleteView
 
     A view that displays a confirmation page and deletes an existing object.
     The given object will only be deleted if the request method is ``POST``. If
@@ -206,13 +206,13 @@ DeleteView
 
     This view inherits methods and attributes from the following views:
 
-    * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
-    * :class:`django.views.generic.base.TemplateResponseMixin`
-    * ``django.views.generic.edit.BaseDeleteView``
-    * :class:`django.views.generic.edit.DeletionMixin`
-    * ``django.views.generic.detail.BaseDetailView``
-    * :class:`django.views.generic.detail.SingleObjectMixin`
-    * :class:`django.views.generic.base.View`
+    * :class:`freedom.views.generic.detail.SingleObjectTemplateResponseMixin`
+    * :class:`freedom.views.generic.base.TemplateResponseMixin`
+    * ``freedom.views.generic.edit.BaseDeleteView``
+    * :class:`freedom.views.generic.edit.DeletionMixin`
+    * ``freedom.views.generic.detail.BaseDetailView``
+    * :class:`freedom.views.generic.detail.SingleObjectMixin`
+    * :class:`freedom.views.generic.base.View`
 
     **Attributes**
 
@@ -226,8 +226,8 @@ DeleteView
 
     **Example myapp/views.py**::
 
-        from django.views.generic.edit import DeleteView
-        from django.core.urlresolvers import reverse_lazy
+        from freedom.views.generic.edit import DeleteView
+        from freedom.core.urlresolvers import reverse_lazy
         from myapp.models import Author
 
         class AuthorDelete(DeleteView):
@@ -236,7 +236,7 @@ DeleteView
 
     **Example myapp/author_confirm_delete.html**:
 
-    .. code-block:: html+django
+    .. code-block:: html+freedom
 
         <form action="" method="post">{% csrf_token %}
             <p>Are you sure you want to delete "{{ object }}"?</p>

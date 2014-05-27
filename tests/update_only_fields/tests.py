@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.db.models.signals import pre_save, post_save
-from django.test import TestCase
+from freedom.db.models.signals import pre_save, post_save
+from freedom.test import TestCase
 
 from .models import Person, Employee, ProxyEmployee, Profile, Account
 

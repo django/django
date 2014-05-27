@@ -11,7 +11,7 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
 
 .. code-block:: python
 
-    from django.db import models
+    from freedom.db import models
 
     class Publication(models.Model):
         title = models.CharField(max_length=30)
@@ -49,7 +49,7 @@ Create a couple of ``Publications``::
 
 Create an ``Article``::
 
-    >>> a1 = Article(headline='Django lets you build Web apps easily')
+    >>> a1 = Article(headline='Freedom lets you build Web apps easily')
 
 You can't associate it with a ``Publication`` until it's been saved::
 
@@ -86,7 +86,7 @@ Adding an object of the wrong type raises :exc:`TypeError`::
     TypeError: 'Publication' instance expected
 
 Create and add a ``Publication`` to an ``Article`` in one step using
-:meth:`~django.db.models.fields.related.RelatedManager.create`::
+:meth:`~freedom.db.models.fields.related.RelatedManager.create`::
 
     >>> new_publication = a2.publications.create(title='Highlights for Children')
 
@@ -102,7 +102,7 @@ Create and add a ``Publication`` to an ``Article`` in one step using
     >>> p2.article_set.all()
     [<Article: NASA uses Python>]
     >>> p1.article_set.all()
-    [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
+    [<Article: Freedom lets you build Web apps easily>, <Article: NASA uses Python>]
     >>> Publication.objects.get(id=4).article_set.all()
     [<Article: NASA uses Python>]
 
@@ -110,13 +110,13 @@ Many-to-many relationships can be queried using :ref:`lookups across
 relationships <lookups-that-span-relationships>`::
 
     >>> Article.objects.filter(publications__id=1)
-    [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
+    [<Article: Freedom lets you build Web apps easily>, <Article: NASA uses Python>]
     >>> Article.objects.filter(publications__pk=1)
-    [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
+    [<Article: Freedom lets you build Web apps easily>, <Article: NASA uses Python>]
     >>> Article.objects.filter(publications=1)
-    [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
+    [<Article: Freedom lets you build Web apps easily>, <Article: NASA uses Python>]
     >>> Article.objects.filter(publications=p1)
-    [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
+    [<Article: Freedom lets you build Web apps easily>, <Article: NASA uses Python>]
 
     >>> Article.objects.filter(publications__title__startswith="Science")
     [<Article: NASA uses Python>, <Article: NASA uses Python>]
@@ -124,8 +124,8 @@ relationships <lookups-that-span-relationships>`::
     >>> Article.objects.filter(publications__title__startswith="Science").distinct()
     [<Article: NASA uses Python>]
 
-The :meth:`~django.db.models.query.QuerySet.count` function respects
-:meth:`~django.db.models.query.QuerySet.distinct` as well::
+The :meth:`~freedom.db.models.query.QuerySet.count` function respects
+:meth:`~freedom.db.models.query.QuerySet.distinct` as well::
 
     >>> Article.objects.filter(publications__title__startswith="Science").count()
     2
@@ -134,12 +134,12 @@ The :meth:`~django.db.models.query.QuerySet.count` function respects
     1
 
     >>> Article.objects.filter(publications__in=[1,2]).distinct()
-    [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
+    [<Article: Freedom lets you build Web apps easily>, <Article: NASA uses Python>]
     >>> Article.objects.filter(publications__in=[p1,p2]).distinct()
-    [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]
+    [<Article: Freedom lets you build Web apps easily>, <Article: NASA uses Python>]
 
 Reverse m2m queries are supported (i.e., starting at the table that doesn't have
-a :class:`~django.db.models.ManyToManyField`)::
+a :class:`~freedom.db.models.ManyToManyField`)::
 
     >>> Publication.objects.filter(id=1)
     [<Publication: The Python Journal>]
@@ -167,7 +167,7 @@ Excluding a related item works as you would expect, too (although the SQL
 involved is a little complex)::
 
     >>> Article.objects.exclude(publications=p2)
-    [<Article: Django lets you build Web apps easily>]
+    [<Article: Freedom lets you build Web apps easily>]
 
 If we delete a ``Publication``, its ``Articles`` won't be able to access it::
 
@@ -182,7 +182,7 @@ If we delete an ``Article``, its ``Publications`` won't be able to access it::
 
     >>> a2.delete()
     >>> Article.objects.all()
-    [<Article: Django lets you build Web apps easily>]
+    [<Article: Freedom lets you build Web apps easily>]
     >>> p2.article_set.all()
     []
 
@@ -263,19 +263,19 @@ go::
     >>> Publication.objects.all()
     [<Publication: Highlights for Children>, <Publication: The Python Journal>]
     >>> Article.objects.all()
-    [<Article: Django lets you build Web apps easily>, <Article: NASA finds intelligent life on Earth>, <Article: NASA uses Python>, <Article: Oxygen-free diet works wonders>]
+    [<Article: Freedom lets you build Web apps easily>, <Article: NASA finds intelligent life on Earth>, <Article: NASA uses Python>, <Article: Oxygen-free diet works wonders>]
     >>> a2.publications.all()
     [<Publication: The Python Journal>]
 
 Bulk delete some articles - references to deleted objects should go::
 
-    >>> q = Article.objects.filter(headline__startswith='Django')
+    >>> q = Article.objects.filter(headline__startswith='Freedom')
     >>> print(q)
-    [<Article: Django lets you build Web apps easily>]
+    [<Article: Freedom lets you build Web apps easily>]
     >>> q.delete()
 
-After the :meth:`~django.db.models.query.QuerySet.delete`, the
-:class:`~django.db.models.query.QuerySet` cache needs to be cleared, and the
+After the :meth:`~freedom.db.models.query.QuerySet.delete`, the
+:class:`~freedom.db.models.query.QuerySet` cache needs to be cleared, and the
 referenced objects should be gone::
 
     >>> print(q)
@@ -284,7 +284,7 @@ referenced objects should be gone::
     [<Article: NASA uses Python>]
 
 An alternate to calling
-:meth:`~django.db.models.fields.related.RelatedManager.clear` is to assign the
+:meth:`~freedom.db.models.fields.related.RelatedManager.clear` is to assign the
 empty set::
 
     >>> p1.article_set = []

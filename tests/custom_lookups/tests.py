@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 from datetime import date
 import unittest
 
-from django.core.exceptions import FieldError
-from django.db import models
-from django.db import connection
-from django.test import TestCase
+from freedom.core.exceptions import FieldError
+from freedom.db import models
+from freedom.db import connection
+from freedom.test import TestCase
 from .models import Author
 
 

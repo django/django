@@ -5,16 +5,16 @@ import decimal
 import os
 import sys
 
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
-from django.core.urlresolvers import get_resolver
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render_to_response, render
-from django.template import Context, RequestContext, TemplateDoesNotExist
-from django.views.debug import technical_500_response, SafeExceptionReporterFilter
-from django.views.decorators.debug import (sensitive_post_parameters,
+from freedom.core.exceptions import PermissionDenied, SuspiciousOperation
+from freedom.core.urlresolvers import get_resolver
+from freedom.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from freedom.shortcuts import render_to_response, render
+from freedom.template import Context, RequestContext, TemplateDoesNotExist
+from freedom.views.debug import technical_500_response, SafeExceptionReporterFilter
+from freedom.views.decorators.debug import (sensitive_post_parameters,
                                            sensitive_variables)
-from django.utils._os import upath
-from django.utils.log import getLogger
+from freedom.utils._os import upath
+from freedom.utils.log import getLogger
 
 from . import BrokenException, except_args
 
@@ -29,7 +29,7 @@ def index_page(request):
 def raises(request):
     # Make sure that a callable that raises an exception in the stack frame's
     # local vars won't hijack the technical 500 response. See:
-    # http://code.djangoproject.com/ticket/15025
+    # http://code.freedomproject.com/ticket/15025
     def callable():
         raise Exception
     try:
@@ -171,7 +171,7 @@ def render_no_template(request):
 
 
 def send_log(request, exc_info):
-    logger = getLogger('django.request')
+    logger = getLogger('freedom.request')
     # The default logging config has a logging filter to ensure admin emails are
     # only sent with DEBUG=False, but since someone might choose to remove that
     # filter, we still want to be able to test the behavior of error emails

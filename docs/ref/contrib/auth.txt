@@ -1,12 +1,12 @@
-``django.contrib.auth``
+``freedom.contrib.auth``
 =======================
 
-This document provides API reference material for the components of Django's
+This document provides API reference material for the components of Freedom's
 authentication system. For more details on the usage of these components or
 how to customize authentication and authorization see the :doc:`authentication
 topic guide </topics/auth/index>`.
 
-.. currentmodule:: django.contrib.auth
+.. currentmodule:: freedom.contrib.auth
 
 User
 ====
@@ -16,7 +16,7 @@ Fields
 
 .. class:: models.User
 
-    :class:`~django.contrib.auth.models.User` objects have the following
+    :class:`~freedom.contrib.auth.models.User` objects have the following
     fields:
 
     .. attribute:: username
@@ -38,18 +38,18 @@ Fields
 
     .. attribute:: password
 
-        Required. A hash of, and metadata about, the password. (Django doesn't
+        Required. A hash of, and metadata about, the password. (Freedom doesn't
         store the raw password.) Raw passwords can be arbitrarily long and can
         contain any character. See the :doc:`password documentation
         </topics/auth/passwords>`.
 
     .. attribute:: groups
 
-        Many-to-many relationship to :class:`~django.contrib.auth.models.Group`
+        Many-to-many relationship to :class:`~freedom.contrib.auth.models.Group`
 
     .. attribute:: user_permissions
 
-         Many-to-many relationship to :class:`~django.contrib.auth.models.Permission`
+         Many-to-many relationship to :class:`~freedom.contrib.auth.models.Permission`
 
     .. attribute:: is_staff
 
@@ -67,11 +67,11 @@ Fields
         flag, and the default backends do not. If you want to reject a login
         based on ``is_active`` being ``False``, it's up to you to check that in
         your own login view or a custom authentication backend. However, the
-        :class:`~django.contrib.auth.forms.AuthenticationForm` used by the
-        :func:`~django.contrib.auth.views.login` view (which is the default)
+        :class:`~freedom.contrib.auth.forms.AuthenticationForm` used by the
+        :func:`~freedom.contrib.auth.views.login` view (which is the default)
         *does* perform this check, as do the permission-checking methods such
-        as :meth:`~django.contrib.auth.models.User.has_perm` and the
-        authentication in the Django admin. All of those functions/methods will
+        as :meth:`~freedom.contrib.auth.models.User.has_perm` and the
+        authentication in the Freedom admin. All of those functions/methods will
         return ``False`` for inactive users.
 
     .. attribute:: is_superuser
@@ -103,10 +103,10 @@ Methods
     .. method:: is_anonymous()
 
         Always returns ``False``. This is a way of differentiating
-        :class:`~django.contrib.auth.models.User` and
-        :class:`~django.contrib.auth.models.AnonymousUser` objects.
+        :class:`~freedom.contrib.auth.models.User` and
+        :class:`~freedom.contrib.auth.models.AnonymousUser` objects.
         Generally, you should prefer using
-        :meth:`~django.contrib.auth.models.User.is_authenticated()` to this
+        :meth:`~freedom.contrib.auth.models.User.is_authenticated()` to this
         method.
 
     .. method:: is_authenticated()
@@ -117,30 +117,30 @@ Methods
         imply any permissions, and doesn't check if the user is active or has
         a valid session. Even though normally you will call this method on
         ``request.user`` to find out whether it has been populated by the
-        :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
+        :class:`~freedom.contrib.auth.middleware.AuthenticationMiddleware`
         (representing the currently logged-in user), you should know this method
-        returns ``True`` for any :class:`~django.contrib.auth.models.User`
+        returns ``True`` for any :class:`~freedom.contrib.auth.models.User`
         instance.
 
     .. method:: get_full_name()
 
-        Returns the :attr:`~django.contrib.auth.models.User.first_name` plus
-        the :attr:`~django.contrib.auth.models.User.last_name`, with a space in
+        Returns the :attr:`~freedom.contrib.auth.models.User.first_name` plus
+        the :attr:`~freedom.contrib.auth.models.User.last_name`, with a space in
         between.
 
     .. method:: get_short_name()
 
-        Returns the :attr:`~django.contrib.auth.models.User.first_name`.
+        Returns the :attr:`~freedom.contrib.auth.models.User.first_name`.
 
     .. method:: set_password(raw_password)
 
         Sets the user's password to the given raw string, taking care of the
         password hashing. Doesn't save the
-        :class:`~django.contrib.auth.models.User` object.
+        :class:`~freedom.contrib.auth.models.User` object.
 
         When the ``raw_password`` is ``None``, the password will be set to an
         unusable password, as if
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()`
+        :meth:`~freedom.contrib.auth.models.User.set_unusable_password()`
         were used.
 
     .. method:: check_password(raw_password)
@@ -153,9 +153,9 @@ Methods
 
         Marks the user as having no password set.  This isn't the same as
         having a blank string for a password.
-        :meth:`~django.contrib.auth.models.User.check_password()` for this user
+        :meth:`~freedom.contrib.auth.models.User.check_password()` for this user
         will never return ``True``. Doesn't save the
-        :class:`~django.contrib.auth.models.User` object.
+        :class:`~freedom.contrib.auth.models.User` object.
 
         You may need this if authentication for your application takes place
         against an existing external source such as an LDAP directory.
@@ -163,7 +163,7 @@ Methods
     .. method:: has_usable_password()
 
         Returns ``False`` if
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()` has
+        :meth:`~freedom.contrib.auth.models.User.set_unusable_password()` has
         been called for this user.
 
     .. method:: get_group_permissions(obj=None)
@@ -205,45 +205,45 @@ Methods
     .. method:: has_module_perms(package_name)
 
         Returns ``True`` if the user has any permissions in the given package
-        (the Django app label). If the user is inactive, this method will
+        (the Freedom app label). If the user is inactive, this method will
         always return ``False``.
 
     .. method:: email_user(subject, message, from_email=None, **kwargs)
 
-        Sends an email to the user. If ``from_email`` is ``None``, Django uses
+        Sends an email to the user. If ``from_email`` is ``None``, Freedom uses
         the :setting:`DEFAULT_FROM_EMAIL`.
 
         .. versionchanged:: 1.7
 
             Any ``**kwargs`` are passed to the underlying
-            :meth:`~django.core.mail.send_mail()` call.
+            :meth:`~freedom.core.mail.send_mail()` call.
 
 Manager methods
 ---------------
 
 .. class:: models.UserManager
 
-    The :class:`~django.contrib.auth.models.User` model has a custom manager
+    The :class:`~freedom.contrib.auth.models.User` model has a custom manager
     that has the following helper methods (in addition to the methods provided
-    by :class:`~django.contrib.auth.models.BaseUserManager`):
+    by :class:`~freedom.contrib.auth.models.BaseUserManager`):
 
     .. method:: create_user(username, email=None, password=None, **extra_fields)
 
-        Creates, saves and returns a :class:`~django.contrib.auth.models.User`.
+        Creates, saves and returns a :class:`~freedom.contrib.auth.models.User`.
 
-        The :attr:`~django.contrib.auth.models.User.username` and
-        :attr:`~django.contrib.auth.models.User.password` are set as given. The
-        domain portion of :attr:`~django.contrib.auth.models.User.email` is
+        The :attr:`~freedom.contrib.auth.models.User.username` and
+        :attr:`~freedom.contrib.auth.models.User.password` are set as given. The
+        domain portion of :attr:`~freedom.contrib.auth.models.User.email` is
         automatically converted to lowercase, and the returned
-        :class:`~django.contrib.auth.models.User` object will have
-        :attr:`~django.contrib.auth.models.User.is_active` set to ``True``.
+        :class:`~freedom.contrib.auth.models.User` object will have
+        :attr:`~freedom.contrib.auth.models.User.is_active` set to ``True``.
 
         If no password is provided,
-        :meth:`~django.contrib.auth.models.User.set_unusable_password()` will
+        :meth:`~freedom.contrib.auth.models.User.set_unusable_password()` will
         be called.
 
         The ``extra_fields`` keyword arguments are passed through to the
-        :class:`~django.contrib.auth.models.User`’s ``__init__`` method to
+        :class:`~freedom.contrib.auth.models.User`’s ``__init__`` method to
         allow setting arbitrary fields on a :ref:`custom User model
         <auth-custom-user>`.
 
@@ -260,29 +260,29 @@ Anonymous users
 
 .. class:: models.AnonymousUser
 
-    :class:`django.contrib.auth.models.AnonymousUser` is a class that
-    implements the :class:`django.contrib.auth.models.User` interface, with
+    :class:`freedom.contrib.auth.models.AnonymousUser` is a class that
+    implements the :class:`freedom.contrib.auth.models.User` interface, with
     these differences:
 
     * :ref:`id <automatic-primary-key-fields>` is always ``None``.
-    * :attr:`~django.contrib.auth.models.User.is_staff` and
-      :attr:`~django.contrib.auth.models.User.is_superuser` are always
+    * :attr:`~freedom.contrib.auth.models.User.is_staff` and
+      :attr:`~freedom.contrib.auth.models.User.is_superuser` are always
       ``False``.
-    * :attr:`~django.contrib.auth.models.User.is_active` is always ``False``.
-    * :attr:`~django.contrib.auth.models.User.groups` and
-      :attr:`~django.contrib.auth.models.User.user_permissions` are always
+    * :attr:`~freedom.contrib.auth.models.User.is_active` is always ``False``.
+    * :attr:`~freedom.contrib.auth.models.User.groups` and
+      :attr:`~freedom.contrib.auth.models.User.user_permissions` are always
       empty.
-    * :meth:`~django.contrib.auth.models.User.is_anonymous()` returns ``True``
+    * :meth:`~freedom.contrib.auth.models.User.is_anonymous()` returns ``True``
       instead of ``False``.
-    * :meth:`~django.contrib.auth.models.User.is_authenticated()` returns
+    * :meth:`~freedom.contrib.auth.models.User.is_authenticated()` returns
       ``False`` instead of ``True``.
-    * :meth:`~django.contrib.auth.models.User.set_password()`,
-      :meth:`~django.contrib.auth.models.User.check_password()`,
-      :meth:`~django.db.models.Model.save` and
-      :meth:`~django.db.models.Model.delete()` raise :exc:`NotImplementedError`.
+    * :meth:`~freedom.contrib.auth.models.User.set_password()`,
+      :meth:`~freedom.contrib.auth.models.User.check_password()`,
+      :meth:`~freedom.db.models.Model.save` and
+      :meth:`~freedom.db.models.Model.delete()` raise :exc:`NotImplementedError`.
 
 In practice, you probably won't need to use
-:class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
+:class:`~freedom.contrib.auth.models.AnonymousUser` objects on your own, but
 they're used by Web requests, as explained in the next section.
 
 Permission
@@ -293,7 +293,7 @@ Permission
 Fields
 ------
 
-:class:`~django.contrib.auth.models.Permission` objects have the following
+:class:`~freedom.contrib.auth.models.Permission` objects have the following
 fields:
 
 .. attribute:: name
@@ -302,8 +302,8 @@ fields:
 
 .. attribute:: content_type
 
-    Required. A reference to the ``django_content_type`` database table, which
-    contains a record for each installed Django model.
+    Required. A reference to the ``freedom_content_type`` database table, which
+    contains a record for each installed Freedom model.
 
 .. attribute:: codename
 
@@ -312,8 +312,8 @@ fields:
 Methods
 -------
 
-:class:`~django.contrib.auth.models.Permission` objects have the standard
-data-access methods like any other :doc:`Django model </ref/models/instances>`.
+:class:`~freedom.contrib.auth.models.Permission` objects have the standard
+data-access methods like any other :doc:`Freedom model </ref/models/instances>`.
 
 Group
 =====
@@ -323,7 +323,7 @@ Group
 Fields
 ------
 
-:class:`~django.contrib.auth.models.Group` objects have the following fields:
+:class:`~freedom.contrib.auth.models.Group` objects have the following fields:
 
 .. attribute:: name
 
@@ -332,7 +332,7 @@ Fields
 
 .. attribute:: permissions
 
-    Many-to-many field to :class:`~django.contrib.auth.models.Permission`::
+    Many-to-many field to :class:`~freedom.contrib.auth.models.Permission`::
 
         group.permissions = [permission_list]
         group.permissions.add(permission, permission, ...)
@@ -344,7 +344,7 @@ Fields
 Login and logout signals
 ========================
 
-.. module:: django.contrib.auth.signals
+.. module:: freedom.contrib.auth.signals
 
 The auth framework uses the following :doc:`signals </topics/signals>` that
 can be used for notification when a user logs in or out.
@@ -359,7 +359,7 @@ can be used for notification when a user logs in or out.
         The class of the user that just logged in.
 
     ``request``
-        The current :class:`~django.http.HttpRequest` instance.
+        The current :class:`~freedom.http.HttpRequest` instance.
 
     ``user``
         The user instance that just logged in.
@@ -373,7 +373,7 @@ can be used for notification when a user logs in or out.
         if the user was not authenticated.
 
     ``request``
-        The current :class:`~django.http.HttpRequest` instance.
+        The current :class:`~freedom.http.HttpRequest` instance.
 
     ``user``
         The user instance that just logged out or ``None`` if the
@@ -388,7 +388,7 @@ can be used for notification when a user logs in or out.
 
     ``credentials``
         A dictionary of keyword arguments containing the user credentials that were
-        passed to :func:`~django.contrib.auth.authenticate()` or your own custom
+        passed to :func:`~freedom.contrib.auth.authenticate()` or your own custom
         authentication backend. Credentials matching a set of 'sensitive' patterns,
         (including password) will not be sent in the clear as part of the signal.
 
@@ -397,10 +397,10 @@ can be used for notification when a user logs in or out.
 Authentication backends
 =======================
 
-.. module:: django.contrib.auth.backends
-   :synopsis: Django's built-in authentication backend classes.
+.. module:: freedom.contrib.auth.backends
+   :synopsis: Freedom's built-in authentication backend classes.
 
-This section details the authentication backends that come with Django. For
+This section details the authentication backends that come with Freedom. For
 information on how to use them and how to write your own authentication
 backends, see the :ref:`Other authentication sources section
 <authentication-backends>` of the :doc:`User authentication guide
@@ -410,26 +410,26 @@ backends, see the :ref:`Other authentication sources section
 Available authentication backends
 ---------------------------------
 
-The following backends are available in :mod:`django.contrib.auth.backends`:
+The following backends are available in :mod:`freedom.contrib.auth.backends`:
 
 .. class:: ModelBackend
 
-    This is the default authentication backend used by Django.  It
+    This is the default authentication backend used by Freedom.  It
     authenticates using credentials consisting of a user identifier and
-    password.  For Django's default user model, the user identifier is the
+    password.  For Freedom's default user model, the user identifier is the
     username, for custom user models it is the field specified by
     USERNAME_FIELD (see :doc:`Customizing Users and authentication
     </topics/auth/customizing>`).
 
     It also handles the default permissions model as defined for
-    :class:`~django.contrib.auth.models.User` and
-    :class:`~django.contrib.auth.models.PermissionsMixin`.
+    :class:`~freedom.contrib.auth.models.User` and
+    :class:`~freedom.contrib.auth.models.PermissionsMixin`.
 
 .. class:: RemoteUserBackend
 
-    Use this backend to take advantage of external-to-Django-handled
+    Use this backend to take advantage of external-to-Freedom-handled
     authentication.  It authenticates using usernames passed in
-    :attr:`request.META['REMOTE_USER'] <django.http.HttpRequest.META>`.  See
+    :attr:`request.META['REMOTE_USER'] <freedom.http.HttpRequest.META>`.  See
     the :doc:`Authenticating against REMOTE_USER </howto/auth-remote-user>`
     documentation.
 
@@ -439,7 +439,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 .. attribute:: RemoteUserBackend.create_unknown_user
 
     ``True`` or ``False``.  Determines whether or not a
-    :class:`~django.contrib.auth.models.User` object is created if not already
+    :class:`~freedom.contrib.auth.models.User` object is created if not already
     in the database.  Defaults to ``True``.
 
 .. method:: RemoteUserBackend.authenticate(remote_user)
@@ -457,7 +457,7 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
    Performs any cleaning on the ``username`` (e.g. stripping LDAP DN
    information) prior to using it to get or create a
-   :class:`~django.contrib.auth.models.User` object.  Returns the cleaned
+   :class:`~freedom.contrib.auth.models.User` object.  Returns the cleaned
    username.
 
 .. method:: RemoteUserBackend.configure_user(user)

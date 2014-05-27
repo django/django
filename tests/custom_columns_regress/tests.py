@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import FieldError
-from django.test import TestCase
+from freedom.core.exceptions import FieldError
+from freedom.test import TestCase
 
 from .models import Author, Article
 
@@ -19,7 +19,7 @@ class CustomColumnRegression(TestCase):
         self.authors = [self.a1, self.a2]
 
     def test_basic_creation(self):
-        art = Article(headline='Django lets you build Web apps easily', primary_author=self.a1)
+        art = Article(headline='Freedom lets you build Web apps easily', primary_author=self.a1)
         art.save()
         art.authors = [self.a1, self.a2]
 
@@ -65,7 +65,7 @@ class CustomColumnRegression(TestCase):
         )
 
     def test_m2m_table(self):
-        art = Article.objects.create(headline='Django lets you build Web apps easily', primary_author=self.a1)
+        art = Article.objects.create(headline='Freedom lets you build Web apps easily', primary_author=self.a1)
         art.authors = self.authors
         self.assertQuerysetEqual(
             art.authors.all().order_by('last_name'),
@@ -73,7 +73,7 @@ class CustomColumnRegression(TestCase):
         )
         self.assertQuerysetEqual(
             self.a1.article_set.all(),
-            ['<Article: Django lets you build Web apps easily>']
+            ['<Article: Freedom lets you build Web apps easily>']
         )
         self.assertQuerysetEqual(
             art.authors.filter(last_name='Jones'),

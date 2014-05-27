@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand
-from django.utils import translation
+from freedom.core.management.base import BaseCommand
+from freedom.utils import translation
 
 
 class Command(BaseCommand):

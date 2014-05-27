@@ -6,16 +6,16 @@ Although it's not a strict requirement, each model should have a
 ``_str__()`` or ``__unicode__()`` method to return a "human-readable"
 representation of the object. Do this not only for your own sanity when dealing
 with the interactive prompt, but also because objects' representations are used
-throughout Django's automatically-generated admin.
+throughout Freedom's automatically-generated admin.
 
 Normally,  you should write ``__unicode__()`` method, since this will work for
-all field types (and Django will automatically provide an appropriate
+all field types (and Freedom will automatically provide an appropriate
 ``__str__()`` method). However, you can write a ``__str__()`` method directly,
 if you prefer. You must be careful to encode the results correctly, though.
 """
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 class Article(models.Model):

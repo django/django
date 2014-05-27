@@ -1,7 +1,7 @@
 Getting started
 ===============
 
-New to Django? Or to Web development in general? Well, you came to the right
+New to Freedom? Or to Web development in general? Well, you came to the right
 place: read this material to quickly get up and running.
 
 .. toctree::
@@ -22,8 +22,8 @@ place: read this material to quickly get up and running.
 .. seealso::
 
     If you're new to Python_, you might want to start by getting an idea of what
-    the language is like. Django is 100% Python, so if you've got minimal
-    comfort with Python you'll probably get a lot more out of Django.
+    the language is like. Freedom is 100% Python, so if you've got minimal
+    comfort with Python you'll probably get a lot more out of Freedom.
 
     If you're new to programming entirely, you might want to start with this
     `list of Python resources for non-programmers`_

@@ -1,11 +1,11 @@
 import sys
 
-from django.conf import settings
-from django.core.signals import got_request_exception
-from django.http import HttpResponse
-from django.template.response import TemplateResponse
-from django.template import Template
-from django.test import TestCase, override_settings
+from freedom.conf import settings
+from freedom.core.signals import got_request_exception
+from freedom.http import HttpResponse
+from freedom.template.response import TemplateResponse
+from freedom.template import Template
+from freedom.test import TestCase, override_settings
 
 
 class TestException(Exception):

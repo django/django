@@ -4,7 +4,7 @@
 Use properties on models just like on any other Python object.
 """
 
-from django.db import models
+from freedom.db import models
 
 
 class Person(models.Model):

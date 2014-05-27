@@ -1,6 +1,6 @@
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.template import loader, Context
+from freedom.http import HttpResponse
+from freedom.shortcuts import get_object_or_404
+from freedom.template import loader, Context
 
 from .models import Person
 

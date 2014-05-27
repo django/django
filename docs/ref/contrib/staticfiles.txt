@@ -2,10 +2,10 @@
 The staticfiles app
 ===================
 
-.. module:: django.contrib.staticfiles
+.. module:: freedom.contrib.staticfiles
    :synopsis: An app for handling static files.
 
-``django.contrib.staticfiles`` collects static files from each of your
+``freedom.contrib.staticfiles`` collects static files from each of your
 applications (and any other places you specify) into a single location that
 can easily be served in production.
 
@@ -32,12 +32,12 @@ following settings:
 Management Commands
 ===================
 
-``django.contrib.staticfiles`` exposes three management commands.
+``freedom.contrib.staticfiles`` exposes three management commands.
 
 collectstatic
 -------------
 
-.. django-admin:: collectstatic
+.. freedom-admin:: collectstatic
 
 Collects the static files into :setting:`STATIC_ROOT`.
 
@@ -52,11 +52,11 @@ Files are searched by using the :setting:`enabled finders
 specified by the :setting:`INSTALLED_APPS` setting.
 
 The :djadmin:`collectstatic` management command calls the
-:meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
+:meth:`~freedom.contrib.staticfiles.storage.StaticFilesStorage.post_process`
 method of the :setting:`STATICFILES_STORAGE` after each run and passes
 a list of paths that have been found by the management command. It also
 receives all command line options of :djadmin:`collectstatic`. This is used
-by the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+by the :class:`~freedom.contrib.staticfiles.storage.CachedStaticFilesStorage`
 by default.
 
 By default, collected files receive permissions from
@@ -67,7 +67,7 @@ permissions for these files and/or directories, you can subclass either of the
 ``file_permissions_mode`` and/or ``directory_permissions_mode`` parameters,
 respectively. For example::
 
-    from django.contrib.staticfiles import storage
+    from freedom.contrib.staticfiles import storage
 
     class MyStaticFilesStorage(storage.StaticFilesStorage):
         def __init__(self, *args, **kwargs):
@@ -81,7 +81,7 @@ Then set the :setting:`STATICFILES_STORAGE` setting to
 .. versionadded:: 1.7
 
     The ability to override ``file_permissions_mode`` and
-    ``directory_permissions_mode`` is new in Django 1.7.  Previously the file
+    ``directory_permissions_mode`` is new in Freedom 1.7.  Previously the file
     permissions always used :setting:`FILE_UPLOAD_PERMISSIONS` and the directory
     permissions always used :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`.
 
@@ -89,38 +89,38 @@ Then set the :setting:`STATICFILES_STORAGE` setting to
 
 Some commonly used options are:
 
-.. django-admin-option:: --noinput
+.. freedom-admin-option:: --noinput
 
     Do NOT prompt the user for input of any kind.
 
-.. django-admin-option:: -i <pattern>
-.. django-admin-option:: --ignore <pattern>
+.. freedom-admin-option:: -i <pattern>
+.. freedom-admin-option:: --ignore <pattern>
 
     Ignore files or directories matching this glob-style pattern. Use multiple
     times to ignore more.
 
-.. django-admin-option:: -n
-.. django-admin-option:: --dry-run
+.. freedom-admin-option:: -n
+.. freedom-admin-option:: --dry-run
 
     Do everything except modify the filesystem.
 
-.. django-admin-option:: -c
-.. django-admin-option:: --clear
+.. freedom-admin-option:: -c
+.. freedom-admin-option:: --clear
 
     Clear the existing files before trying to copy or link the original file.
 
-.. django-admin-option:: -l
-.. django-admin-option:: --link
+.. freedom-admin-option:: -l
+.. freedom-admin-option:: --link
 
     Create a symbolic link to each file instead of copying.
 
-.. django-admin-option:: --no-post-process
+.. freedom-admin-option:: --no-post-process
 
     Don't call the
-    :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
+    :meth:`~freedom.contrib.staticfiles.storage.StaticFilesStorage.post_process`
     method of the configured :setting:`STATICFILES_STORAGE` storage backend.
 
-.. django-admin-option:: --no-default-ignore
+.. freedom-admin-option:: --no-default-ignore
 
     Don't ignore the common private glob-style patterns ``'CVS'``, ``'.*'``
     and ``'*~'``.
@@ -132,7 +132,7 @@ For a full list of options, refer to the commands own help by running::
 findstatic
 ----------
 
-.. django-admin:: findstatic
+.. freedom-admin:: findstatic
 
 Searches for one or more relative paths with the enabled finders.
 
@@ -143,7 +143,7 @@ For example::
      /home/special.polls.com/core/static/css/base.css
      /home/polls.com/core/static/css/base.css
    Found 'admin/js/core.js' here:
-     /home/polls.com/src/django/contrib/admin/media/js/core.js
+     /home/polls.com/src/freedom/contrib/admin/media/js/core.js
 
 By default, all matching locations are found. To only return the first match
 for each relative path, use the ``--first`` option::
@@ -183,13 +183,13 @@ get all the directories which were searched::
 runserver
 ---------
 
-.. django-admin:: runserver
+.. freedom-admin:: runserver
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static
 files and the following new options.
 
-.. django-admin-option:: --nostatic
+.. freedom-admin-option:: --nostatic
 
 Use the ``--nostatic`` option to disable serving of static files with the
 :doc:`staticfiles </ref/contrib/staticfiles>` app entirely. This option is
@@ -198,9 +198,9 @@ in your project's :setting:`INSTALLED_APPS` setting.
 
 Example usage::
 
-    django-admin.py runserver --nostatic
+    freedom-admin.py runserver --nostatic
 
-.. django-admin-option:: --insecure
+.. freedom-admin-option:: --insecure
 
 Use the ``--insecure`` option to force serving of static files with the
 :doc:`staticfiles </ref/contrib/staticfiles>` app even if the :setting:`DEBUG`
@@ -210,11 +210,11 @@ local development, should **never be used in production** and is only
 available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
 in your project's :setting:`INSTALLED_APPS` setting. :djadmin:`runserver`
 ``--insecure`` doesn't work with
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`.
+:class:`~freedom.contrib.staticfiles.storage.CachedStaticFilesStorage`.
 
 Example usage::
 
-    django-admin.py runserver --insecure
+    freedom-admin.py runserver --insecure
 
 .. _staticfiles-storages:
 
@@ -226,7 +226,7 @@ StaticFilesStorage
 
 .. class:: storage.StaticFilesStorage
 
-A subclass of the :class:`~django.core.files.storage.FileSystemStorage`
+A subclass of the :class:`~freedom.core.files.storage.FileSystemStorage`
 storage backend that uses the :setting:`STATIC_ROOT` setting as the base
 file system location and the :setting:`STATIC_URL` setting respectively
 as the base URL.
@@ -237,7 +237,7 @@ This method is called by the :djadmin:`collectstatic` management command
 after each run and gets passed the local storages and paths of found
 files as a dictionary, as well as the command line options.
 
-The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+The :class:`~freedom.contrib.staticfiles.storage.CachedStaticFilesStorage`
 uses this behind the scenes to replace the paths with their hashed
 counterparts and update the cache appropriately.
 
@@ -248,7 +248,7 @@ ManifestStaticFilesStorage
 
 .. class:: storage.ManifestStaticFilesStorage
 
-A subclass of the :class:`~django.contrib.staticfiles.storage.StaticFilesStorage`
+A subclass of the :class:`~freedom.contrib.staticfiles.storage.StaticFilesStorage`
 storage backend which stores the file names it handles by appending the MD5
 hash of the file's content to the filename. For example, the file
 ``css/styles.css`` would also be saved as ``css/styles.55e7cbb9ba48.css``.
@@ -261,23 +261,23 @@ load time for subsequent page visits.
 
 The storage backend automatically replaces the paths found in the saved
 files matching other saved files with the path of the cached copy (using
-the :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
+the :meth:`~freedom.contrib.staticfiles.storage.StaticFilesStorage.post_process`
 method). The regular expressions used to find those paths
-(``django.contrib.staticfiles.storage.HashedFilesMixin.patterns``)
+(``freedom.contrib.staticfiles.storage.HashedFilesMixin.patterns``)
 by default covers the `@import`_ rule and `url()`_ statement of `Cascading
 Style Sheets`_. For example, the ``'css/styles.css'`` file with the
 content
 
-.. code-block:: css+django
+.. code-block:: css+freedom
 
     @import url("../admin/css/base.css");
 
-would be replaced by calling the :meth:`~django.core.files.storage.Storage.url`
+would be replaced by calling the :meth:`~freedom.core.files.storage.Storage.url`
 method of the ``ManifestStaticFilesStorage`` storage backend, ultimately
 saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
 content:
 
-.. code-block:: css+django
+.. code-block:: css+freedom
 
     @import url("../admin/css/base.27e20196a850.css");
 
@@ -285,7 +285,7 @@ To enable the ``ManifestStaticFilesStorage`` you have to make sure the
 following requirements are met:
 
 * the :setting:`STATICFILES_STORAGE` setting is set to
-  ``'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'``
+  ``'freedom.contrib.staticfiles.storage.ManifestStaticFilesStorage'``
 * the :setting:`DEBUG` setting is set to ``False``
 * you use the ``staticfiles`` :ttag:`static<staticfiles-static>` template
   tag to refer to your static files in your templates
@@ -317,8 +317,8 @@ CachedStaticFilesStorage
 .. class:: storage.CachedStaticFilesStorage
 
 ``CachedStaticFilesStorage`` is a similar class like the
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` class
-but uses Django's :doc:`caching framework</topics/cache>` for storing the
+:class:`~freedom.contrib.staticfiles.storage.ManifestStaticFilesStorage` class
+but uses Freedom's :doc:`caching framework</topics/cache>` for storing the
 hashed names of processed files instead of a static manifest file called
 ``staticfiles.json``. This is mostly useful for situations in which you don't
 have access to the file system.
@@ -327,7 +327,7 @@ If you want to override certain options of the cache backend the storage uses,
 simply specify a custom entry in the :setting:`CACHES` setting named
 ``'staticfiles'``. It falls back to using the ``'default'`` cache backend.
 
-.. currentmodule:: django.contrib.staticfiles.templatetags.staticfiles
+.. currentmodule:: freedom.contrib.staticfiles.templatetags.staticfiles
 
 Template tags
 =============
@@ -340,7 +340,7 @@ static
 Uses the configured :setting:`STATICFILES_STORAGE` storage to create the
 full URL for the given relative path, e.g.:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% load static from staticfiles %}
     <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
@@ -353,7 +353,7 @@ in :ref:`staticfiles-from-cdn`.
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% load static from staticfiles %}
     {% static "images/hi.jpg" as myphoto %}
@@ -365,7 +365,7 @@ Finders Module
 ``staticfiles`` finders has a ``searched_locations`` attribute which is a list
 of directory paths in which the finders searched. Example usage::
 
-    from django.contrib.staticfiles import finders
+    from freedom.contrib.staticfiles import finders
 
     result = finders.find('css/base.css')
     searched_locations = finders.searched_locations
@@ -378,12 +378,12 @@ Other Helpers
 =============
 
 There are a few other helpers outside of the
-:mod:`staticfiles <django.contrib.staticfiles>` app to work with static
+:mod:`staticfiles <freedom.contrib.staticfiles>` app to work with static
 files:
 
-- The :func:`django.core.context_processors.static` context processor
+- The :func:`freedom.core.context_processors.static` context processor
   which adds :setting:`STATIC_URL` to every template context rendered
-  with :class:`~django.template.RequestContext` contexts.
+  with :class:`~freedom.template.RequestContext` contexts.
 
 - The builtin template tag :ttag:`static` which takes a path and
   urljoins it with the static prefix :setting:`STATIC_URL`.
@@ -400,7 +400,7 @@ files:
 Static file development view
 ----------------------------
 
-.. currentmodule:: django.contrib.staticfiles
+.. currentmodule:: freedom.contrib.staticfiles
 
 The static files tools are mostly designed to help with getting static files
 successfully deployed into production. This usually means a separate,
@@ -425,8 +425,8 @@ This view function serves static files in development.
 
 .. versionchanged:: 1.7
 
-    This view will now raise an :exc:`~django.http.Http404` exception instead
-    of :exc:`~django.core.exceptions.ImproperlyConfigured` when
+    This view will now raise an :exc:`~freedom.http.Http404` exception instead
+    of :exc:`~freedom.core.exceptions.ImproperlyConfigured` when
     :setting:`DEBUG` is ``False``.
 
 .. note::
@@ -444,8 +444,8 @@ This view is automatically enabled by :djadmin:`runserver` (with a
 local development server, add the following snippet to the end of your
 primary URL configuration::
 
-   from django.conf import settings
-   from django.contrib.staticfiles import views
+   from freedom.conf import settings
+   from freedom.contrib.staticfiles import views
 
    if settings.DEBUG:
        urlpatterns += [
@@ -463,7 +463,7 @@ you:
 This will return the proper URL pattern for serving static files to your
 already defined pattern list. Use it like this::
 
-   from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+   from freedom.contrib.staticfiles.urls import staticfiles_urlpatterns
 
    # ... the rest of your URLconf here ...
 
@@ -472,7 +472,7 @@ already defined pattern list. Use it like this::
 This will inspect your :setting:`STATIC_URL` setting and wire up the view
 to serve static files accordingly. Don't forget to set the
 :setting:`STATICFILES_DIRS` setting appropriately to let
-``django.contrib.staticfiles`` know where to look for files in addition to
+``freedom.contrib.staticfiles`` know where to look for files in addition to
 files in app directories.
 
 .. warning::
@@ -490,7 +490,7 @@ Specialized test case to support 'live testing'
 
 .. class:: testing.StaticLiveServerCase
 
-This unittest TestCase subclass extends :class:`django.test.LiveServerTestCase`.
+This unittest TestCase subclass extends :class:`freedom.test.LiveServerTestCase`.
 
 Just like its parent, you can use it to write tests that involve running the
 code under test and consuming it with testing tools through HTTP (e.g. Selenium,
@@ -498,12 +498,12 @@ PhantomJS, etc.), because of which it's needed that the static assets are also
 published.
 
 But given the fact that it makes use of the
-:func:`django.contrib.staticfiles.views.serve` view described above, it can
+:func:`freedom.contrib.staticfiles.views.serve` view described above, it can
 transparently overlay at test execution-time the assets provided by the
 ``staticfiles`` finders. This means you don't need to run
 :djadmin:`collectstatic` before or as a part of your tests setup.
 
 .. versionadded:: 1.7
 
-    ``StaticLiveServerCase`` is new in Django 1.7. Previously its functionality
-    was provided by :class:`django.test.LiveServerTestCase`.
+    ``StaticLiveServerCase`` is new in Freedom 1.7. Previously its functionality
+    was provided by :class:`freedom.test.LiveServerTestCase`.

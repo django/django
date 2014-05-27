@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from django.contrib import admin
-from django.db import models
+from freedom.contrib import admin
+from freedom.db import models
 
 
 class Band(models.Model):

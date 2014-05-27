@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
-from django.forms.models import inlineformset_factory
-from django.test import TestCase, skipUnlessDBFeature
-from django.utils import six
+from freedom.forms.models import inlineformset_factory
+from freedom.test import TestCase, skipUnlessDBFeature
+from freedom.utils import six
 
 from .models import Poet, Poem, School, Parent, Child
 

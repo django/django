@@ -9,18 +9,18 @@ try:
 except ImportError:
     pytz = None
 
-from django import forms
-from django.conf import settings
-from django.contrib import admin
-from django.contrib.admin import widgets
-from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
-from django.core.files.storage import default_storage
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db.models import CharField, DateField
-from django.test import TestCase as DjangoTestCase
-from django.test import override_settings
-from django.utils import six
-from django.utils import translation
+from freedom import forms
+from freedom.conf import settings
+from freedom.contrib import admin
+from freedom.contrib.admin import widgets
+from freedom.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from freedom.core.files.storage import default_storage
+from freedom.core.files.uploadedfile import SimpleUploadedFile
+from freedom.db.models import CharField, DateField
+from freedom.test import TestCase as FreedomTestCase
+from freedom.test import override_settings
+from freedom.utils import six
+from freedom.utils import translation
 
 from . import models
 from .widgetadmin import site as widget_admin_site
@@ -181,9 +181,9 @@ class AdminFormfieldForDBFieldTests(TestCase):
         self.assertEqual(six.text_type(f.help_text), 'Hold down "Control", or "Command" on a Mac, to select more than one.')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='admin_widgets.urls')
-class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
+class AdminFormfieldForDBFieldWithRequestTests(FreedomTestCase):
     fixtures = ["admin-widgets-users.xml"]
 
     def testFilterChoicesByRequestUser(self):
@@ -196,9 +196,9 @@ class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
         self.assertContains(response, "Volkswagon Passat")
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='admin_widgets.urls')
-class AdminForeignKeyWidgetChangeList(DjangoTestCase):
+class AdminForeignKeyWidgetChangeList(FreedomTestCase):
     fixtures = ["admin-widgets-users.xml"]
 
     def setUp(self):
@@ -212,9 +212,9 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
         self.assertContains(response, '/auth/user/add/')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='admin_widgets.urls')
-class AdminForeignKeyRawIdWidget(DjangoTestCase):
+class AdminForeignKeyRawIdWidget(FreedomTestCase):
     fixtures = ["admin-widgets-users.xml"]
 
     def setUp(self):
@@ -260,7 +260,7 @@ class AdminForeignKeyRawIdWidget(DjangoTestCase):
         self.assertEqual(lookup1, lookup2)
 
 
-class FilteredSelectMultipleWidgetTest(DjangoTestCase):
+class FilteredSelectMultipleWidgetTest(FreedomTestCase):
     def test_render(self):
         w = widgets.FilteredSelectMultiple('test', False)
         self.assertHTMLEqual(
@@ -276,7 +276,7 @@ class FilteredSelectMultipleWidgetTest(DjangoTestCase):
         )
 
 
-class AdminDateWidgetTest(DjangoTestCase):
+class AdminDateWidgetTest(FreedomTestCase):
     def test_attrs(self):
         """
         Ensure that user-supplied attrs are used.
@@ -295,7 +295,7 @@ class AdminDateWidgetTest(DjangoTestCase):
         )
 
 
-class AdminTimeWidgetTest(DjangoTestCase):
+class AdminTimeWidgetTest(FreedomTestCase):
     def test_attrs(self):
         """
         Ensure that user-supplied attrs are used.
@@ -314,7 +314,7 @@ class AdminTimeWidgetTest(DjangoTestCase):
         )
 
 
-class AdminSplitDateTimeWidgetTest(DjangoTestCase):
+class AdminSplitDateTimeWidgetTest(FreedomTestCase):
     def test_render(self):
         w = widgets.AdminSplitDateTime()
         self.assertHTMLEqual(
@@ -333,7 +333,7 @@ class AdminSplitDateTimeWidgetTest(DjangoTestCase):
             )
 
 
-class AdminURLWidgetTest(DjangoTestCase):
+class AdminURLWidgetTest(FreedomTestCase):
     def test_render(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
@@ -370,7 +370,7 @@ class AdminURLWidgetTest(DjangoTestCase):
         )
 
 
-class AdminFileWidgetTest(DjangoTestCase):
+class AdminFileWidgetTest(FreedomTestCase):
     def test_render(self):
         band = models.Band.objects.create(name='Linkin Park')
         album = band.album_set.create(
@@ -392,7 +392,7 @@ class AdminFileWidgetTest(DjangoTestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_widgets.urls')
-class ForeignKeyRawIdWidgetTest(DjangoTestCase):
+class ForeignKeyRawIdWidgetTest(FreedomTestCase):
 
     def test_render(self):
         band = models.Band.objects.create(name='Linkin Park')
@@ -466,7 +466,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_widgets.urls')
-class ManyToManyRawIdWidgetTest(DjangoTestCase):
+class ManyToManyRawIdWidgetTest(FreedomTestCase):
 
     def test_render(self):
         band = models.Band.objects.create(name='Linkin Park')
@@ -509,7 +509,7 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
         )
 
 
-class RelatedFieldWidgetWrapperTests(DjangoTestCase):
+class RelatedFieldWidgetWrapperTests(FreedomTestCase):
     def test_no_can_add_related(self):
         rel = models.Individual._meta.get_field('parent').rel
         w = widgets.AdminRadioSelect()
@@ -518,7 +518,7 @@ class RelatedFieldWidgetWrapperTests(DjangoTestCase):
         self.assertFalse(w.can_add_related)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='admin_widgets.urls')
 class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
@@ -652,7 +652,7 @@ class DateTimePickerSeleniumIETests(DateTimePickerSeleniumFirefoxTests):
 
 @skipIf(pytz is None, "this test requires pytz")
 @override_settings(TIME_ZONE='Asia/Singapore')
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='admin_widgets.urls')
 class DateTimePickerShortcutsSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
@@ -720,7 +720,7 @@ class DateTimePickerShortcutsSeleniumIETests(DateTimePickerShortcutsSeleniumFire
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='admin_widgets.urls')
 class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
@@ -964,7 +964,7 @@ class HorizontalVerticalFilterSeleniumIETests(HorizontalVerticalFilterSeleniumFi
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF='admin_widgets.urls')
 class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps
@@ -1055,7 +1055,7 @@ class AdminRawIdWidgetSeleniumIETests(AdminRawIdWidgetSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF='admin_widgets.urls')
 class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     available_apps = ['admin_widgets'] + AdminSeleniumWebDriverTestCase.available_apps

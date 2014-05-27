@@ -1,6 +1,6 @@
 import unittest
 
-from django.utils import checksums
+from freedom.utils import checksums
 
 
 class TestUtilsChecksums(unittest.TestCase):

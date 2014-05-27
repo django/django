@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.test import TestCase, override_settings
-from django.db.migrations.autodetector import MigrationAutodetector
-from django.db.migrations.questioner import MigrationQuestioner
-from django.db.migrations.state import ProjectState, ModelState
-from django.db.migrations.graph import MigrationGraph
-from django.db import models
+from freedom.test import TestCase, override_settings
+from freedom.db.migrations.autodetector import MigrationAutodetector
+from freedom.db.migrations.questioner import MigrationQuestioner
+from freedom.db.migrations.state import ProjectState, ModelState
+from freedom.db.migrations.graph import MigrationGraph
+from freedom.db import models
 
 
 class DeconstructableObject(object):

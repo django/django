@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.db import models
-from django.test import TestCase
+from freedom.db import models
+from freedom.test import TestCase
 
 from .models import (
     First, Third, Parent, Child, Category, Record, Relation, Car, Driver)

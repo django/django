@@ -4,12 +4,12 @@ from types import ModuleType
 import unittest
 import warnings
 
-from django.conf import LazySettings, Settings, settings
-from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest
-from django.test import (SimpleTestCase, TransactionTestCase, TestCase,
+from freedom.conf import LazySettings, Settings, settings
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.http import HttpRequest
+from freedom.test import (SimpleTestCase, TransactionTestCase, TestCase,
     modify_settings, override_settings, signals)
-from django.utils import six
+from freedom.utils import six
 
 
 @modify_settings(ITEMS={
@@ -201,7 +201,7 @@ class SettingsTests(TestCase):
         self.assertTrue(issubclass(decorated, SimpleTestCase))
 
         with six.assertRaisesRegex(self, Exception,
-                "Only subclasses of Django SimpleTestCase*"):
+                "Only subclasses of Freedom SimpleTestCase*"):
             decorated = override_settings(TEST='override')(UnittestTestCaseSubclass)
 
     def test_signal_callback_context_manager(self):

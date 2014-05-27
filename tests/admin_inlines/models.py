@@ -5,10 +5,10 @@ Testing of admin inline formsets.
 from __future__ import unicode_literals
 import random
 
-from django.db import models
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.contrib.contenttypes.fields import GenericForeignKey
+from freedom.contrib.contenttypes.models import ContentType
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

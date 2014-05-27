@@ -1,5 +1,5 @@
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse, StreamingHttpResponse
+from freedom.core.urlresolvers import reverse
+from freedom.http import HttpResponse, StreamingHttpResponse
 
 from . import urlconf_inner
 

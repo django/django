@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from django.core.urlresolvers import NoReverseMatch
-from django.contrib.auth.views import logout
-from django.shortcuts import resolve_url
-from django.test import TestCase, override_settings
+from freedom.core.urlresolvers import NoReverseMatch
+from freedom.contrib.auth.views import logout
+from freedom.shortcuts import resolve_url
+from freedom.test import TestCase, override_settings
 
 from .models import UnimportantThing
 
@@ -60,7 +60,7 @@ class ResolveUrlTests(TestCase):
         Tests that passing a view function to ``resolve_url`` will result in
         the URL path mapping to that view.
         """
-        resolved_url = resolve_url('django.contrib.auth.views.logout')
+        resolved_url = resolve_url('freedom.contrib.auth.views.logout')
         self.assertEqual('/accounts/logout/', resolved_url)
 
     def test_domain(self):

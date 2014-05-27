@@ -2,10 +2,10 @@
 The sitemap framework
 =====================
 
-.. module:: django.contrib.sitemaps
+.. module:: freedom.contrib.sitemaps
    :synopsis: A framework for generating Google sitemap XML files.
 
-Django comes with a high-level sitemap-generating framework that makes
+Freedom comes with a high-level sitemap-generating framework that makes
 creating sitemap_ XML files easy.
 
 .. _sitemap: http://www.sitemaps.org/
@@ -18,12 +18,12 @@ frequently your pages change and how "important" certain pages are in relation
 to other pages on your site. This information helps search engines index your
 site.
 
-The Django sitemap framework automates the creation of this XML file by letting
+The Freedom sitemap framework automates the creation of this XML file by letting
 you express this information in Python code.
 
-It works much like Django's :doc:`syndication framework
+It works much like Freedom's :doc:`syndication framework
 </ref/contrib/syndication>`. To create a sitemap, just write a
-:class:`~django.contrib.sitemaps.Sitemap` class and point to it in your
+:class:`~freedom.contrib.sitemaps.Sitemap` class and point to it in your
 :doc:`URLconf </topics/http/urls>`.
 
 Installation
@@ -31,19 +31,19 @@ Installation
 
 To install the sitemap app, follow these steps:
 
-1. Add ``'django.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS`
+1. Add ``'freedom.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS`
    setting.
 
-2. Make sure ``'django.template.loaders.app_directories.Loader'``
+2. Make sure ``'freedom.template.loaders.app_directories.Loader'``
    is in your :setting:`TEMPLATE_LOADERS` setting. It's in there by default,
    so you'll only need to change this if you've changed that setting.
 
 3. Make sure you've installed the
-   :mod:`sites framework <django.contrib.sites>`.
+   :mod:`sites framework <freedom.contrib.sites>`.
 
 (Note: The sitemap application doesn't install any database tables. The only
 reason it needs to go into :setting:`INSTALLED_APPS` is so that the
-:func:`~django.template.loaders.app_directories.Loader` template
+:func:`~freedom.template.loaders.app_directories.Loader` template
 loader can find the default templates.)
 
 Initialization
@@ -51,12 +51,12 @@ Initialization
 
 .. function:: views.sitemap(request, sitemaps, section=None, template_name='sitemap.xml', mimetype='application/xml')
 
-To activate sitemap generation on your Django site, add this line to your
+To activate sitemap generation on your Freedom site, add this line to your
 :doc:`URLconf </topics/http/urls>`::
 
-   (r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+   (r'^sitemap\.xml$', 'freedom.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
 
-This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
+This tells Freedom to build a sitemap when a client accesses :file:`/sitemap.xml`.
 
 The name of the sitemap file is not important, but the location is. Search
 engines will only index links in your sitemap for the current URL level and
@@ -67,17 +67,17 @@ reference any URL in your site. However, if your sitemap lives at
 
 The sitemap view takes an extra, required argument: ``{'sitemaps': sitemaps}``.
 ``sitemaps`` should be a dictionary that maps a short section label (e.g.,
-``blog`` or ``news``) to its :class:`~django.contrib.sitemaps.Sitemap` class
+``blog`` or ``news``) to its :class:`~freedom.contrib.sitemaps.Sitemap` class
 (e.g., ``BlogSitemap`` or ``NewsSitemap``). It may also map to an *instance* of
-a :class:`~django.contrib.sitemaps.Sitemap` class (e.g.,
+a :class:`~freedom.contrib.sitemaps.Sitemap` class (e.g.,
 ``BlogSitemap(some_var)``).
 
 Sitemap classes
 ===============
 
-A :class:`~django.contrib.sitemaps.Sitemap` class is a simple Python
+A :class:`~freedom.contrib.sitemaps.Sitemap` class is a simple Python
 class that represents a "section" of entries in your sitemap. For example,
-one :class:`~django.contrib.sitemaps.Sitemap` class could represent
+one :class:`~freedom.contrib.sitemaps.Sitemap` class could represent
 all the entries of your Weblog, while another could represent all of the
 events in your events calendar.
 
@@ -86,8 +86,8 @@ In the simplest case, all these sections get lumped together into one
 sitemap index that references individual sitemap files, one per section. (See
 `Creating a sitemap index`_ below.)
 
-:class:`~django.contrib.sitemaps.Sitemap` classes must subclass
-``django.contrib.sitemaps.Sitemap``. They can live anywhere in your codebase.
+:class:`~freedom.contrib.sitemaps.Sitemap` classes must subclass
+``freedom.contrib.sitemaps.Sitemap``. They can live anywhere in your codebase.
 
 A simple example
 ================
@@ -96,7 +96,7 @@ Let's assume you have a blog system, with an ``Entry`` model, and you want your
 sitemap to include all the links to your individual blog entries. Here's how
 your sitemap class might look::
 
-    from django.contrib.sitemaps import Sitemap
+    from freedom.contrib.sitemaps import Sitemap
     from blog.models import Entry
 
     class BlogSitemap(Sitemap):
@@ -183,8 +183,8 @@ Sitemap class reference
         If all items in a sitemap have a :attr:`~Sitemap.lastmod`, the sitemap
         generated by :func:`views.sitemap` will have a ``Last-Modified``
         header equal to the latest ``lastmod``. You can activate the
-        :class:`~django.middleware.http.ConditionalGetMiddleware` to make
-        Django respond appropriately to requests with an ``If-Modified-Since``
+        :class:`~freedom.middleware.http.ConditionalGetMiddleware` to make
+        Freedom respond appropriately to requests with an ``If-Modified-Since``
         header which will prevent sending the sitemap if it hasn't changed.
 
     .. attribute:: Sitemap.changefreq
@@ -239,17 +239,17 @@ The sitemap framework provides a couple convenience classes for common cases:
 
 .. class:: FlatPageSitemap
 
-    The :class:`django.contrib.sitemaps.FlatPageSitemap` class looks at all
-    publicly visible :mod:`flatpages <django.contrib.flatpages>`
+    The :class:`freedom.contrib.sitemaps.FlatPageSitemap` class looks at all
+    publicly visible :mod:`flatpages <freedom.contrib.flatpages>`
     defined for the current :setting:`SITE_ID` (see the
-    :mod:`sites documentation <django.contrib.sites>`) and
+    :mod:`sites documentation <freedom.contrib.sites>`) and
     creates an entry in the sitemap. These entries include only the
     :attr:`~Sitemap.location` attribute -- not :attr:`~Sitemap.lastmod`,
     :attr:`~Sitemap.changefreq` or :attr:`~Sitemap.priority`.
 
 .. class:: GenericSitemap
 
-    The :class:`django.contrib.sitemaps.GenericSitemap` class allows you to
+    The :class:`freedom.contrib.sitemaps.GenericSitemap` class allows you to
     create a sitemap by passing it a dictionary which has to contain at least
     a ``queryset`` entry. This queryset will be used to generate the items
     of the sitemap. It may also have a ``date_field`` entry that
@@ -257,7 +257,7 @@ The sitemap framework provides a couple convenience classes for common cases:
     This will be used for the :attr:`~Sitemap.lastmod` attribute in the
     generated sitemap. You may also pass :attr:`~Sitemap.priority` and
     :attr:`~Sitemap.changefreq` keyword arguments to the
-    :class:`~django.contrib.sitemaps.GenericSitemap`  constructor to specify
+    :class:`~freedom.contrib.sitemaps.GenericSitemap`  constructor to specify
     these attributes for all URLs.
 
 Example
@@ -265,8 +265,8 @@ Example
 
 Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
 
-    from django.conf.urls import url
-    from django.contrib.sitemaps import FlatPageSitemap, GenericSitemap
+    from freedom.conf.urls import url
+    from freedom.contrib.sitemaps import FlatPageSitemap, GenericSitemap
     from blog.models import Entry
 
     info_dict = {
@@ -284,7 +284,7 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
         # ...
 
         # the sitemap
-        url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
+        url(r'^sitemap\.xml$', 'freedom.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
     ]
 
 .. _URLconf: ../url_dispatch/
@@ -295,12 +295,12 @@ Sitemap for static views
 Often you want the search engine crawlers to index views which are neither
 object detail pages nor flatpages. The solution is to explicitly list URL
 names for these views in ``items`` and call
-:func:`~django.core.urlresolvers.reverse` in the ``location`` method of
+:func:`~freedom.core.urlresolvers.reverse` in the ``location`` method of
 the sitemap. For example::
 
     # sitemaps.py
-    from django.contrib import sitemaps
-    from django.core.urlresolvers import reverse
+    from freedom.contrib import sitemaps
+    from freedom.core.urlresolvers import reverse
 
     class StaticViewSitemap(sitemaps.Sitemap):
         priority = 0.5
@@ -313,7 +313,7 @@ the sitemap. For example::
             return reverse(item)
 
     # urls.py
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from .sitemaps import StaticViewSitemap
 
     sitemaps = {
@@ -325,27 +325,27 @@ the sitemap. For example::
         url(r'^about/$', 'views.about', name='about'),
         url(r'^license/$', 'views.license', name='license'),
         # ...
-        url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+        url(r'^sitemap\.xml$', 'freedom.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
     ]
 
 
 Creating a sitemap index
 ========================
 
-.. function:: views.index(request, sitemaps, template_name='sitemap_index.xml', mimetype='application/xml', sitemap_url_name='django.contrib.sitemaps.views.sitemap')
+.. function:: views.index(request, sitemaps, template_name='sitemap_index.xml', mimetype='application/xml', sitemap_url_name='freedom.contrib.sitemaps.views.sitemap')
 
 The sitemap framework also has the ability to create a sitemap index that
 references individual sitemap files, one per each section defined in your
 ``sitemaps`` dictionary. The only differences in usage are:
 
-* You use two views in your URLconf: :func:`django.contrib.sitemaps.views.index`
-  and :func:`django.contrib.sitemaps.views.sitemap`.
-* The :func:`django.contrib.sitemaps.views.sitemap` view should take a
+* You use two views in your URLconf: :func:`freedom.contrib.sitemaps.views.index`
+  and :func:`freedom.contrib.sitemaps.views.sitemap`.
+* The :func:`freedom.contrib.sitemaps.views.sitemap` view should take a
   ``section`` keyword argument.
 
 Here's what the relevant URLconf lines would look like for the example above::
 
-    from django.contrib.sitemaps import views
+    from freedom.contrib.sitemaps import views
 
     urlpatterns = [
         url(r'^sitemap\.xml$', views.index, {'sitemaps': sitemaps}),
@@ -354,19 +354,19 @@ Here's what the relevant URLconf lines would look like for the example above::
 
 This will automatically generate a :file:`sitemap.xml` file that references
 both :file:`sitemap-flatpages.xml` and :file:`sitemap-blog.xml`. The
-:class:`~django.contrib.sitemaps.Sitemap` classes and the ``sitemaps``
+:class:`~freedom.contrib.sitemaps.Sitemap` classes and the ``sitemaps``
 dict don't change at all.
 
 You should create an index file if one of your sitemaps has more than 50,000
-URLs. In this case, Django will automatically paginate the sitemap, and the
+URLs. In this case, Freedom will automatically paginate the sitemap, and the
 index will reflect that.
 
 If you're not using the vanilla sitemap view -- for example, if it's wrapped
 with a caching decorator -- you must name your sitemap view and pass
 ``sitemap_url_name`` to the index view::
 
-    from django.contrib.sitemaps import views as sitemaps_views
-    from django.views.decorators.cache import cache_page
+    from freedom.contrib.sitemaps import views as sitemaps_views
+    from freedom.views.decorators.cache import cache_page
 
     urlpatterns = [
         url(r'^sitemap\.xml$',
@@ -385,7 +385,7 @@ If you wish to use a different template for each sitemap or sitemap index
 available on your site, you may specify it by passing a ``template_name``
 parameter to the ``sitemap`` and ``index`` views via the URLconf::
 
-    from django.contrib.sitemaps import views
+    from freedom.contrib.sitemaps import views
 
     urlpatterns = [
         url(r'^custom-sitemap\.xml$', views.index, {
@@ -399,7 +399,7 @@ parameter to the ``sitemap`` and ``index`` views via the URLconf::
     ]
 
 
-These views return :class:`~django.template.response.TemplateResponse`
+These views return :class:`~freedom.template.response.TemplateResponse`
 instances which allow you to easily customize the response data before
 rendering. For more details, see the :doc:`TemplateResponse documentation
 </ref/template-response>`.
@@ -408,8 +408,8 @@ Context variables
 ------------------
 
 When customizing the templates for the
-:func:`~django.contrib.sitemaps.views.index` and
-:func:`~django.contrib.sitemaps.views.sitemap` views, you can rely on the
+:func:`~freedom.contrib.sitemaps.views.index` and
+:func:`~freedom.contrib.sitemaps.views.sitemap` views, you can rely on the
 following context variables.
 
 Index
@@ -422,7 +422,7 @@ Sitemap
 
 The variable ``urlset`` is a list of URLs that should appear in the
 sitemap. Each URL exposes attributes as defined in the
-:class:`~django.contrib.sitemaps.Sitemap` class:
+:class:`~freedom.contrib.sitemaps.Sitemap` class:
 
 - ``changefreq``
 - ``item``
@@ -436,7 +436,7 @@ Sitemap's :attr:`~Sitemap.items()` would return a list of items with
 ``publication_data`` and a ``tags`` field something like this would
 generate a Google News compatible sitemap:
 
-.. code-block:: xml+django
+.. code-block:: xml+freedom
 
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset
@@ -465,7 +465,7 @@ Pinging Google
 
 You may want to "ping" Google when your sitemap changes, to let it know to
 reindex your site. The sitemaps framework provides a function to do just
-that: :func:`django.contrib.sitemaps.ping_google()`.
+that: :func:`freedom.contrib.sitemaps.ping_google()`.
 
 .. function:: ping_google
 
@@ -476,7 +476,7 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
     sitemap by performing a reverse looking in your URLconf.
 
     :func:`ping_google` raises the exception
-    ``django.contrib.sitemaps.SitemapNotFound`` if it cannot determine your
+    ``freedom.contrib.sitemaps.SitemapNotFound`` if it cannot determine your
     sitemap URL.
 
 .. admonition:: Register with Google first!
@@ -489,7 +489,7 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
 One useful way to call :func:`ping_google` is from a model's ``save()``
 method::
 
-   from django.contrib.sitemaps import ping_google
+   from freedom.contrib.sitemaps import ping_google
 
     class Entry(models.Model):
         # ...
@@ -510,7 +510,7 @@ each time you call ``save()``.
 Pinging Google via ``manage.py``
 --------------------------------
 
-.. django-admin:: ping_google
+.. freedom-admin:: ping_google
 
 Once the sitemaps application is added to your project, you may also
 ping Google using the ``ping_google`` management command::

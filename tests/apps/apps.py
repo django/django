@@ -1,15 +1,15 @@
 from __future__ import unicode_literals
 
-from django.apps import AppConfig
+from freedom.apps import AppConfig
 
 
 class MyAdmin(AppConfig):
-    name = 'django.contrib.admin'
+    name = 'freedom.contrib.admin'
     verbose_name = "Admin sweet admin."
 
 
 class MyAuth(AppConfig):
-    name = 'django.contrib.auth'
+    name = 'freedom.contrib.auth'
     label = 'myauth'
     verbose_name = "All your password are belong to us."
 

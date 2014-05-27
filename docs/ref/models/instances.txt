@@ -2,7 +2,7 @@
 Model instance reference
 ========================
 
-.. currentmodule:: django.db.models
+.. currentmodule:: freedom.db.models
 
 This document describes the details of the ``Model`` API. It builds on the
 material presented in the :doc:`model </topics/db/models>` and :doc:`database
@@ -34,7 +34,7 @@ that, you need to :meth:`~Model.save()`.
 
     1. Add a classmethod on the model class::
 
-        from django.db import models
+        from freedom.db import models
 
         class Book(models.Model):
             title = models.CharField(max_length=100)
@@ -76,24 +76,24 @@ There are three steps involved in validating a model:
 All three steps are performed when you call a model's
 :meth:`~Model.full_clean()` method.
 
-When you use a :class:`~django.forms.ModelForm`, the call to
-:meth:`~django.forms.Form.is_valid()` will perform these validation steps for
+When you use a :class:`~freedom.forms.ModelForm`, the call to
+:meth:`~freedom.forms.Form.is_valid()` will perform these validation steps for
 all the fields that are included on the form. See the :doc:`ModelForm
 documentation </topics/forms/modelforms>` for more information. You should only
 need to call a model's :meth:`~Model.full_clean()` method if you plan to handle
 validation errors yourself, or if you have excluded fields from the
-:class:`~django.forms.ModelForm` that require validation.
+:class:`~freedom.forms.ModelForm` that require validation.
 
 .. method:: Model.full_clean(exclude=None, validate_unique=True)
 
 This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`, and
 :meth:`Model.validate_unique()` (if ``validate_unique`` is ``True``), in that
-order and raises a :exc:`~django.core.exceptions.ValidationError` that has a
+order and raises a :exc:`~freedom.core.exceptions.ValidationError` that has a
 ``message_dict`` attribute containing errors from all three stages.
 
 The optional ``exclude`` argument can be used to provide a list of field names
 that can be excluded from validation and cleaning.
-:class:`~django.forms.ModelForm` uses this argument to exclude fields that
+:class:`~freedom.forms.ModelForm` uses this argument to exclude fields that
 aren't present on your form from being validated since any errors raised could
 not be corrected by the user.
 
@@ -102,7 +102,7 @@ your model's :meth:`~Model.save()` method. You'll need to call it manually
 when you want to run one-step model validation for your own manually created
 models. For example::
 
-    from django.core.exceptions import ValidationError
+    from freedom.core.exceptions import ValidationError
     try:
         article.full_clean()
     except ValidationError as e:
@@ -116,7 +116,7 @@ The first step ``full_clean()`` performs is to clean each individual field.
 
 This method will validate all fields on your model. The optional ``exclude``
 argument lets you provide a list of field names to exclude from validation. It
-will raise a :exc:`~django.core.exceptions.ValidationError` if any fields fail
+will raise a :exc:`~freedom.core.exceptions.ValidationError` if any fields fail
 validation.
 
 The second step ``full_clean()`` performs is to call :meth:`Model.clean()`.
@@ -130,8 +130,8 @@ automatically provide a value for a field, or to do validation that requires
 access to more than a single field::
 
     import datetime
-    from django.core.exceptions import ValidationError
-    from django.db import models
+    from freedom.core.exceptions import ValidationError
+    from freedom.db import models
 
     class Article(models.Model):
         ...
@@ -146,12 +146,12 @@ access to more than a single field::
 Note, however, that like :meth:`Model.full_clean()`, a model's ``clean()``
 method is not invoked when you call your model's :meth:`~Model.save()` method.
 
-Any :exc:`~django.core.exceptions.ValidationError` exceptions raised by
+Any :exc:`~freedom.core.exceptions.ValidationError` exceptions raised by
 ``Model.clean()`` will be stored in a special key error dictionary key,
-:data:`~django.core.exceptions.NON_FIELD_ERRORS`, that is used for errors
+:data:`~freedom.core.exceptions.NON_FIELD_ERRORS`, that is used for errors
 that are tied to the entire model instead of to a specific field::
 
-    from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+    from freedom.core.exceptions import ValidationError, NON_FIELD_ERRORS
     try:
         article.full_clean()
     except ValidationError as e:
@@ -165,10 +165,10 @@ This method is similar to :meth:`~Model.clean_fields`, but validates all
 uniqueness constraints on your model instead of individual field values. The
 optional ``exclude`` argument allows you to provide a list of field names to
 exclude from validation. It will raise a
-:exc:`~django.core.exceptions.ValidationError` if any fields fail validation.
+:exc:`~freedom.core.exceptions.ValidationError` if any fields fail validation.
 
 Note that if you provide an ``exclude`` argument to ``validate_unique()``, any
-:attr:`~django.db.models.Options.unique_together` constraint involving one of
+:attr:`~freedom.db.models.Options.unique_together` constraint involving one of
 the fields you provided will not be checked.
 
 
@@ -187,7 +187,7 @@ The model save process also has some subtleties; see the sections below.
 Auto-incrementing primary keys
 ------------------------------
 
-If a model has an :class:`~django.db.models.AutoField` — an auto-incrementing
+If a model has an :class:`~freedom.db.models.AutoField` — an auto-incrementing
 primary key — then that auto-incremented value will be calculated and saved as
 an attribute on your object the first time you call ``save()``::
 
@@ -197,11 +197,11 @@ an attribute on your object the first time you call ``save()``::
     >>> b2.id     # Returns the ID of your new object.
 
 There's no way to tell what the value of an ID will be before you call
-``save()``, because that value is calculated by your database, not by Django.
+``save()``, because that value is calculated by your database, not by Freedom.
 
-For convenience, each model has an :class:`~django.db.models.AutoField` named
+For convenience, each model has an :class:`~freedom.db.models.AutoField` named
 ``id`` by default unless you explicitly specify ``primary_key=True`` on a field
-in your model. See the documentation for :class:`~django.db.models.AutoField`
+in your model. See the documentation for :class:`~freedom.db.models.AutoField`
 for more details.
 
 The ``pk`` property
@@ -209,7 +209,7 @@ The ``pk`` property
 
 .. attribute:: Model.pk
 
-Regardless of whether you define a primary key field yourself, or let Django
+Regardless of whether you define a primary key field yourself, or let Freedom
 supply one for you, each model will have a property called ``pk``. It behaves
 like a normal attribute on the model, but is actually an alias for whichever
 attribute is the primary key field for the model. You can read and set this
@@ -219,7 +219,7 @@ correct field in the model.
 Explicitly specifying auto-primary-key values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If a model has an :class:`~django.db.models.AutoField` but you want to define a
+If a model has an :class:`~freedom.db.models.AutoField` but you want to define a
 new object's ID explicitly when saving, just define it explicitly before
 saving, rather than relying on the auto-assignment of the ID::
 
@@ -230,7 +230,7 @@ saving, rather than relying on the auto-assignment of the ID::
 
 If you assign auto-primary-key values manually, make sure not to use an
 already-existing primary-key value! If you create a new object with an explicit
-primary-key value that already exists in the database, Django will assume you're
+primary-key value that already exists in the database, Freedom will assume you're
 changing the existing record rather than creating a new one.
 
 Given the above ``'Cheddar Talk'`` blog example, this example would override the
@@ -239,7 +239,7 @@ previous record in the database::
     b4 = Blog(id=3, name='Not Cheddar', tagline='Anything but cheese.')
     b4.save()  # Overrides the previous blog with ID=3!
 
-See `How Django knows to UPDATE vs. INSERT`_, below, for the reason this
+See `How Freedom knows to UPDATE vs. INSERT`_, below, for the reason this
 happens.
 
 Explicitly specifying auto-primary-key values is mostly useful for bulk-saving
@@ -248,10 +248,10 @@ objects, when you're confident you won't have primary-key collision.
 What happens when you save?
 ---------------------------
 
-When you save an object, Django performs the following steps:
+When you save an object, Freedom performs the following steps:
 
 1. **Emit a pre-save signal.** The :doc:`signal </ref/signals>`
-   :attr:`django.db.models.signals.pre_save` is sent, allowing any
+   :attr:`freedom.db.models.signals.pre_save` is sent, allowing any
    functions listening for that signal to take some customized
    action.
 
@@ -261,7 +261,7 @@ When you save an object, Django performs the following steps:
 
    Most fields do *no* pre-processing — the field data is kept as-is.
    Pre-processing is only used on fields that have special behavior.  For
-   example, if your model has a :class:`~django.db.models.DateField` with
+   example, if your model has a :class:`~freedom.db.models.DateField` with
    ``auto_now=True``, the pre-save phase will alter the data in the object
    to ensure that the date field contains the current date stamp. (Our
    documentation doesn't yet include a list of all the fields with this
@@ -274,7 +274,7 @@ When you save an object, Django performs the following steps:
    integers and strings, are 'ready to write' as a Python object. However,
    more complex data types often require some modification.
 
-   For example, :class:`~django.db.models.DateField` fields use a Python
+   For example, :class:`~freedom.db.models.DateField` fields use a Python
    ``datetime`` object to store data. Databases don't store ``datetime``
    objects, so the field value must be converted into an ISO-compliant date
    string for insertion into the database.
@@ -284,37 +284,37 @@ When you save an object, Django performs the following steps:
    database.
 
 5. **Emit a post-save signal.** The signal
-   :attr:`django.db.models.signals.post_save` is sent, allowing
+   :attr:`freedom.db.models.signals.post_save` is sent, allowing
    any functions listening for that signal to take some customized
    action.
 
-How Django knows to UPDATE vs. INSERT
+How Freedom knows to UPDATE vs. INSERT
 -------------------------------------
 
-You may have noticed Django database objects use the same ``save()`` method
-for creating and changing objects. Django abstracts the need to use ``INSERT``
-or ``UPDATE`` SQL statements. Specifically, when you call ``save()``, Django
+You may have noticed Freedom database objects use the same ``save()`` method
+for creating and changing objects. Freedom abstracts the need to use ``INSERT``
+or ``UPDATE`` SQL statements. Specifically, when you call ``save()``, Freedom
 follows this algorithm:
 
 * If the object's primary key attribute is set to a value that evaluates to
-  ``True`` (i.e., a value other than ``None`` or the empty string), Django
+  ``True`` (i.e., a value other than ``None`` or the empty string), Freedom
   executes an ``UPDATE``.
 * If the object's primary key attribute is *not* set or if the ``UPDATE``
-  didn't update anything, Django executes an ``INSERT``.
+  didn't update anything, Freedom executes an ``INSERT``.
 
 The one gotcha here is that you should be careful not to specify a primary-key
 value explicitly when saving new objects, if you cannot guarantee the
 primary-key value is unused. For more on this nuance, see `Explicitly specifying
 auto-primary-key values`_ above and `Forcing an INSERT or UPDATE`_ below.
 
-In Django 1.5 and earlier, Django did a ``SELECT`` when the primary key
-attribute was set. If the ``SELECT`` found a row, then Django did an ``UPDATE``,
+In Freedom 1.5 and earlier, Freedom did a ``SELECT`` when the primary key
+attribute was set. If the ``SELECT`` found a row, then Freedom did an ``UPDATE``,
 otherwise it did an ``INSERT``. The old algorithm results in one more query in
 the ``UPDATE`` case. There are some rare cases where the database doesn't
 report that a row was updated even if the database contains a row for the
 object's primary key value. An example is the PostgreSQL ``ON UPDATE`` trigger
 which returns ``NULL``. In such cases it is possible to revert to the old
-algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
+algorithm by setting the :attr:`~freedom.db.models.Options.select_on_save`
 option to ``True``.
 
 .. _ref-models-force-insert:
@@ -330,7 +330,7 @@ row. In these cases you can pass the ``force_insert=True`` or
 Obviously, passing both parameters is an error: you cannot both insert *and*
 update at the same time!
 
-It should be very rare that you'll need to use these parameters. Django will
+It should be very rare that you'll need to use these parameters. Freedom will
 almost always do the right thing and trying to override that will lead to
 errors that are difficult to track down. This feature is for advanced use
 only.
@@ -356,18 +356,18 @@ the value of 11 will be written back to the database.
 The process can be made robust, :ref:`avoiding a race condition
 <avoiding-race-conditions-using-f>`, as well as slightly faster by expressing
 the update relative to the original field value, rather than as an explicit
-assignment of a new value. Django provides :class:`F expressions
-<django.db.models.F>` for performing this kind of relative update. Using
-:class:`F expressions <django.db.models.F>`, the previous example is expressed
+assignment of a new value. Freedom provides :class:`F expressions
+<freedom.db.models.F>` for performing this kind of relative update. Using
+:class:`F expressions <freedom.db.models.F>`, the previous example is expressed
 as::
 
-    >>> from django.db.models import F
+    >>> from freedom.db.models import F
     >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
     >>> product.number_sold = F('number_sold') + 1
     >>> product.save()
 
 For more details, see the documentation on :class:`F expressions
-<django.db.models.F>` and their :ref:`use in update queries
+<freedom.db.models.F>` and their :ref:`use in update queries
 <topics-db-queries-update>`.
 
 Specifying which fields to save
@@ -389,8 +389,8 @@ perform an update on all fields.
 Specifying ``update_fields`` will force an update.
 
 When saving a model fetched through deferred model loading
-(:meth:`~django.db.models.query.QuerySet.only()` or
-:meth:`~django.db.models.query.QuerySet.defer()`) only the fields loaded
+(:meth:`~freedom.db.models.query.QuerySet.only()` or
+:meth:`~freedom.db.models.query.QuerySet.defer()`) only the fields loaded
 from the DB will get updated. In effect there is an automatic
 ``update_fields`` in this case. If you assign or change any deferred field
 value, the field will be added to the updated fields.
@@ -421,7 +421,7 @@ A few object methods have special purposes.
     On Python 3, as all strings are natively considered Unicode, only use the
     ``__str__()`` method (the ``__unicode__()`` method is obsolete).
     If you'd like compatibility with Python 2, you can decorate your model class
-    with :func:`~django.utils.encoding.python_2_unicode_compatible`.
+    with :func:`~freedom.utils.encoding.python_2_unicode_compatible`.
 
 ``__unicode__``
 ---------------
@@ -429,15 +429,15 @@ A few object methods have special purposes.
 .. method:: Model.__unicode__()
 
 The ``__unicode__()`` method is called whenever you call ``unicode()`` on an
-object. Django uses ``unicode(obj)`` (or the related function, :meth:`str(obj)
+object. Freedom uses ``unicode(obj)`` (or the related function, :meth:`str(obj)
 <Model.__str__>`) in a number of places. Most notably, to display an object in
-the Django admin site and as the value inserted into a template when it
+the Freedom admin site and as the value inserted into a template when it
 displays an object. Thus, you should always return a nice, human-readable
 representation of the model from the ``__unicode__()`` method.
 
 For example::
 
-    from django.db import models
+    from freedom.db import models
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -447,10 +447,10 @@ For example::
             return '%s %s' % (self.first_name, self.last_name)
 
 If you define a ``__unicode__()`` method on your model and not a
-:meth:`~Model.__str__()` method, Django will automatically provide you with a
+:meth:`~Model.__str__()` method, Freedom will automatically provide you with a
 :meth:`~Model.__str__()` that calls ``__unicode__()`` and then converts the
 result correctly to a UTF-8 encoded string object. This is recommended
-development practice: define only ``__unicode__()`` and let Django take care of
+development practice: define only ``__unicode__()`` and let Freedom take care of
 the conversion to string objects when required.
 
 ``__str__``
@@ -459,15 +459,15 @@ the conversion to string objects when required.
 .. method:: Model.__str__()
 
 The ``__str__()`` method is called whenever you call ``str()`` on an
-object. In Python 3, Django uses ``str(obj)`` in a number of
-places. Most notably, to display an object in the Django admin site
+object. In Python 3, Freedom uses ``str(obj)`` in a number of
+places. Most notably, to display an object in the Freedom admin site
 and as the value inserted into a template when it displays an
 object. Thus, you should always return a nice, human-readable
 representation of the model from the ``__str__()`` method.
 
 For example::
 
-    from django.db import models
+    from freedom.db import models
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -476,7 +476,7 @@ For example::
         def __str__(self):
             return '%s %s' % (self.first_name, self.last_name)
 
-In Python 2, the main use of ``__str__`` directly inside Django is
+In Python 2, the main use of ``__str__`` directly inside Freedom is
 when the ``repr()`` output of a model is displayed anywhere (for
 example, in debugging output). It isn't required to put ``__str__()``
 methods everywhere if you have sensible :meth:`~Model.__unicode__()`
@@ -485,15 +485,15 @@ methods.
 The previous :meth:`~Model.__unicode__()` example could be similarly written
 using ``__str__()`` like this::
 
-    from django.db import models
-    from django.utils.encoding import force_bytes
+    from freedom.db import models
+    from freedom.utils.encoding import force_bytes
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
 
         def __str__(self):
-            # Note use of django.utils.encoding.force_bytes() here because
+            # Note use of freedom.utils.encoding.force_bytes() here because
             # first_name and last_name will be unicode strings.
             return force_bytes('%s %s' % (self.first_name, self.last_name))
 
@@ -509,7 +509,7 @@ for all other models it is simply the model's class.
 
 For example::
 
-    from django.db import models
+    from freedom.db import models
 
     class MyModel(models.Model):
         id = models.AutoField(primary_key=True)
@@ -555,7 +555,7 @@ in Python`_).
 
 .. method:: Model.get_absolute_url()
 
-Define a ``get_absolute_url()`` method to tell Django how to calculate the
+Define a ``get_absolute_url()`` method to tell Freedom how to calculate the
 canonical URL for an object. To callers, this method should appear to return a
 string that can be used to refer to the object over HTTP.
 
@@ -565,21 +565,21 @@ For example::
         return "/people/%i/" % self.id
 
 (Whilst this code is correct and simple, it may not be the most portable way to
-write this kind of method. The :func:`~django.core.urlresolvers.reverse`
+write this kind of method. The :func:`~freedom.core.urlresolvers.reverse`
 function is usually the best approach.)
 
 For example::
 
     def get_absolute_url(self):
-        from django.core.urlresolvers import reverse
+        from freedom.core.urlresolvers import reverse
         return reverse('people.views.details', args=[str(self.id)])
 
-One place Django uses ``get_absolute_url()`` is in the admin app. If an object
+One place Freedom uses ``get_absolute_url()`` is in the admin app. If an object
 defines this method, the object-editing page will have a "View on site" link
 that will jump you directly to the object's public view, as given by
 ``get_absolute_url()``.
 
-Similarly, a couple of other bits of Django, such as the :doc:`syndication feed
+Similarly, a couple of other bits of Freedom, such as the :doc:`syndication feed
 framework </ref/contrib/syndication>`, use ``get_absolute_url()`` when it is
 defined. If it makes sense for your model's instances to each have a unique
 URL, you should define ``get_absolute_url()``.
@@ -587,14 +587,14 @@ URL, you should define ``get_absolute_url()``.
 It's good practice to use ``get_absolute_url()`` in templates, instead of
 hard-coding your objects' URLs. For example, this template code is bad:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     <!-- BAD template code. Avoid! -->
     <a href="/people/{{ object.id }}/">{{ object.name }}</a>
 
 This template code is much better:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
@@ -610,7 +610,7 @@ in ``get_absolute_url()`` and have all your other code call that one place.
 
     Code and templates calling ``get_absolute_url()`` should be able to use the
     result directly without any further processing. You may wish to use the
-    ``django.utils.encoding.iri_to_uri()`` function to help with this if you
+    ``freedom.utils.encoding.iri_to_uri()`` function to help with this if you
     are using unicode strings containing characters outside the ASCII range at
     all.
 
@@ -620,15 +620,15 @@ The ``permalink`` decorator
 .. warning::
 
     The ``permalink`` decorator is no longer recommended. You should use
-    :func:`~django.core.urlresolvers.reverse` in the body of your
+    :func:`~freedom.core.urlresolvers.reverse` in the body of your
     ``get_absolute_url`` method instead.
 
-In early versions of Django, there wasn't an easy way to use URLs defined in
-URLconf file inside :meth:`~django.db.models.Model.get_absolute_url`. That
+In early versions of Freedom, there wasn't an easy way to use URLs defined in
+URLconf file inside :meth:`~freedom.db.models.Model.get_absolute_url`. That
 meant you would need to define the URL both in URLConf and
-:meth:`~django.db.models.Model.get_absolute_url`. The ``permalink`` decorator
+:meth:`~freedom.db.models.Model.get_absolute_url`. The ``permalink`` decorator
 was added to overcome this DRY principle violation. However, since the
-introduction of :func:`~django.core.urlresolvers.reverse` there is no
+introduction of :func:`~freedom.core.urlresolvers.reverse` there is no
 reason to use ``permalink`` any more.
 
 .. function:: permalink()
@@ -640,17 +640,17 @@ correct URL, with all parameters substituted in the correct positions.
 
 The ``permalink`` decorator is a Python-level equivalent to the :ttag:`url`
 template tag and a high-level wrapper for the
-:func:`~django.core.urlresolvers.reverse` function.
+:func:`~freedom.core.urlresolvers.reverse` function.
 
 An example should make it clear how to use ``permalink()``. Suppose your URLconf
 contains a line such as::
 
     (r'^people/([0-9]+)/$', 'people.views.details'),
 
-...your model could have a :meth:`~django.db.models.Model.get_absolute_url`
+...your model could have a :meth:`~freedom.db.models.Model.get_absolute_url`
 method that looked like this::
 
-    from django.db import models
+    from freedom.db import models
 
     @models.permalink
     def get_absolute_url(self):
@@ -674,25 +674,25 @@ because we only want to pass keyword parameters, not positional ones.
 
 In this way, you're associating the model's absolute path with the view that is
 used to display it, without repeating the view's URL information anywhere. You
-can still use the :meth:`~django.db.models.Model.get_absolute_url()` method in
+can still use the :meth:`~freedom.db.models.Model.get_absolute_url()` method in
 templates, as before.
 
 In some cases, such as the use of generic views or the re-use of custom views
 for multiple models, specifying the view function may confuse the reverse URL
 matcher (because multiple patterns point to the same view). For that case,
-Django has :ref:`named URL patterns <naming-url-patterns>`. Using a named URL
+Freedom has :ref:`named URL patterns <naming-url-patterns>`. Using a named URL
 pattern, it's possible to give a name to a pattern, and then reference the name
 rather than the view function. A named URL pattern is defined by replacing the
 pattern tuple by a call to the ``url`` function)::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     url(r'^people/([0-9]+)/$', 'blog_views.generic_detail', name='people_view'),
 
 ...and then using that name to perform the reverse URL resolution instead
 of the view name::
 
-    from django.db import models
+    from freedom.db import models
 
     @models.permalink
     def get_absolute_url(self):
@@ -709,13 +709,13 @@ might have some of the following methods:
 
 .. method:: Model.get_FOO_display()
 
-For every field that has :attr:`~django.db.models.Field.choices` set, the
+For every field that has :attr:`~freedom.db.models.Field.choices` set, the
 object will have a ``get_FOO_display()`` method, where ``FOO`` is the name of
 the field. This method returns the "human-readable" value of the field.
 
 For example::
 
-    from django.db import models
+    from freedom.db import models
 
     class Person(models.Model):
         SHIRT_SIZES = (
@@ -738,12 +738,12 @@ For example::
 .. method:: Model.get_next_by_FOO(\**kwargs)
 .. method:: Model.get_previous_by_FOO(\**kwargs)
 
-For every :class:`~django.db.models.DateField` and
-:class:`~django.db.models.DateTimeField` that does not have :attr:`null=True
-<django.db.models.Field.null>`, the object will have ``get_next_by_FOO()`` and
+For every :class:`~freedom.db.models.DateField` and
+:class:`~freedom.db.models.DateTimeField` that does not have :attr:`null=True
+<freedom.db.models.Field.null>`, the object will have ``get_next_by_FOO()`` and
 ``get_previous_by_FOO()`` methods, where ``FOO`` is the name of the field. This
 returns the next and previous object with respect to the date field, raising
-a :exc:`~django.core.exceptions.DoesNotExist` exception when appropriate.
+a :exc:`~freedom.core.exceptions.DoesNotExist` exception when appropriate.
 
 Both of these methods will perform their queries using the default
 manager for the model. If you need to emulate filtering used by a

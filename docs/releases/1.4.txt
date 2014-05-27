@@ -1,43 +1,43 @@
 ========================
-Django 1.4 release notes
+Freedom 1.4 release notes
 ========================
 
 *March 23, 2012*
 
-Welcome to Django 1.4!
+Welcome to Freedom 1.4!
 
 These release notes cover the `new features`_, as well
 as some `backwards incompatible changes`_ you'll want to be aware of
-when upgrading from Django 1.3 or older versions. We've also dropped some
+when upgrading from Freedom 1.3 or older versions. We've also dropped some
 features, which are detailed in :ref:`our deprecation plan
 <deprecation-removed-in-1.4>`, and we've `begun the deprecation process for
 some features`_.
 
-.. _`new features`: `What's new in Django 1.4`_
+.. _`new features`: `What's new in Freedom 1.4`_
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.4`_
 .. _`begun the deprecation process for some features`: `Features deprecated in 1.4`_
 
 Overview
 ========
 
-The biggest new feature in Django 1.4 is `support for time zones`_ when
-handling date/times. When enabled, this Django will store date/times in UTC,
+The biggest new feature in Freedom 1.4 is `support for time zones`_ when
+handling date/times. When enabled, this Freedom will store date/times in UTC,
 use timezone-aware objects internally, and translate them to users' local
 timezones for display.
 
-If you're upgrading an existing project to Django 1.4, switching to the time-
+If you're upgrading an existing project to Freedom 1.4, switching to the time-
 zone aware mode may take some care: the new mode disallows some rather sloppy
 behavior that used to be accepted. We encourage anyone who's upgrading to check
 out the :ref:`timezone migration guide <time-zones-migration-guide>` and the
 :ref:`timezone FAQ <time-zones-faq>` for useful pointers.
 
-Other notable new features in Django 1.4 include:
+Other notable new features in Freedom 1.4 include:
 
 * A number of ORM improvements, including `SELECT FOR UPDATE support`_,
   the ability to `bulk insert <#model-objects-bulk-create-in-the-orm>`_
   large datasets for improved performance, and
   `QuerySet.prefetch_related`_, a method to batch-load related objects
-  in areas where :meth:`~django.db.models.query.QuerySet.select_related`
+  in areas where :meth:`~freedom.db.models.query.QuerySet.select_related`
   doesn't work.
 
 * Some nice security additions, including `improved password hashing`_
@@ -51,45 +51,45 @@ Other notable new features in Django 1.4 include:
 
 * `Support for in-browser testing frameworks`_ (like Selenium_).
 
-* ... and a whole lot more; `see below <#what-s-new-in-django-1-4>`_!
+* ... and a whole lot more; `see below <#what-s-new-in-freedom-1-4>`_!
 
 Wherever possible we try to introduce new features in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>` policy.
-However, as with previous releases, Django 1.4 ships with some minor
+However, as with previous releases, Freedom 1.4 ships with some minor
 `backwards incompatible changes`_; people upgrading from previous versions
-of Django should read that list carefully.
+of Freedom should read that list carefully.
 
 Python compatibility
 ====================
 
-Django 1.4 has dropped support for Python 2.4. Python 2.5 is now the minimum
-required Python version. Django is tested and supported on Python 2.5, 2.6 and
+Freedom 1.4 has dropped support for Python 2.4. Python 2.5 is now the minimum
+required Python version. Freedom is tested and supported on Python 2.5, 2.6 and
 2.7.
 
-This change should affect only a small number of Django users, as most
+This change should affect only a small number of Freedom users, as most
 operating-system vendors today are shipping Python 2.5 or newer as their default
 version. If you're still using Python 2.4, however, you'll need to stick to
-Django 1.3 until you can upgrade. Per :doc:`our support policy
-</internals/release-process>`, Django 1.3 will continue to receive security
-support until the release of Django 1.5.
+Freedom 1.3 until you can upgrade. Per :doc:`our support policy
+</internals/release-process>`, Freedom 1.3 will continue to receive security
+support until the release of Freedom 1.5.
 
-Django does not support Python 3.x at this time. At some point before the
-release of Django 1.4, we plan to publish a document outlining our full
+Freedom does not support Python 3.x at this time. At some point before the
+release of Freedom 1.4, we plan to publish a document outlining our full
 timeline for deprecating Python 2.x and moving to Python 3.x.
 
-What's new in Django 1.4
+What's new in Freedom 1.4
 ========================
 
 Support for time zones
 ~~~~~~~~~~~~~~~~~~~~~~
 
-In previous versions, Django used "naive" date/times (that is, date/times
+In previous versions, Freedom used "naive" date/times (that is, date/times
 without an associated time zone), leaving it up to each developer to interpret
 what a given date/time "really means". This can cause all sorts of subtle
 timezone-related bugs.
 
-In Django 1.4, you can now switch Django into a more correct, time-zone aware
-mode. In this mode, Django stores date and  time information in UTC in the
+In Freedom 1.4, you can now switch Freedom into a more correct, time-zone aware
+mode. In this mode, Freedom stores date and  time information in UTC in the
 database, uses time-zone-aware datetime objects internally and translates them
 to the end user's time zone in templates and forms. Reasons for using this
 feature include:
@@ -98,7 +98,7 @@ feature include:
 
 - Storing datetimes in UTC for database portability and interoperability.
   (This argument doesn't apply to PostgreSQL, because it already stores
-  timestamps with time zone information in Django 1.3.)
+  timestamps with time zone information in Freedom 1.3.)
 
 - Avoiding data corruption problems around DST transitions.
 
@@ -110,11 +110,11 @@ encounter problems, there's a helpful :ref:`FAQ <time-zones-faq>`.
 Support for in-browser testing frameworks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.4 supports integration with in-browser testing frameworks like
-Selenium_. The new :class:`django.test.LiveServerTestCase` base class lets you
+Freedom 1.4 supports integration with in-browser testing frameworks like
+Selenium_. The new :class:`freedom.test.LiveServerTestCase` base class lets you
 test the interactions between your site's front and back ends more
 comprehensively. See the
-:class:`documentation<django.test.LiveServerTestCase>` for more details and
+:class:`documentation<freedom.test.LiveServerTestCase>` for more details and
 concrete examples.
 
 .. _Selenium: http://seleniumhq.org/
@@ -122,15 +122,15 @@ concrete examples.
 Updated default project layout and ``manage.py``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.4 ships with an updated default project layout and ``manage.py`` file
+Freedom 1.4 ships with an updated default project layout and ``manage.py`` file
 for the :djadmin:`startproject` management command. These fix some issues with
 the previous ``manage.py`` handling of Python import paths that caused double
 imports, trouble moving from development to deployment, and other
 difficult-to-debug path issues.
 
 The previous ``manage.py`` called functions that are now deprecated, and thus
-projects upgrading to Django 1.4 should update their ``manage.py``. (The
-old-style ``manage.py`` will continue to work as before until Django 1.6. In
+projects upgrading to Freedom 1.4 should update their ``manage.py``. (The
+old-style ``manage.py`` will continue to work as before until Freedom 1.6. In
 1.5 it will raise ``DeprecationWarning``).
 
 The new recommended ``manage.py`` file should look like this::
@@ -141,7 +141,7 @@ The new recommended ``manage.py`` file should look like this::
     if __name__ == "__main__":
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{{ project_name }}.settings")
 
-        from django.core.management import execute_from_command_line
+        from freedom.core.management import execute_from_command_line
 
         execute_from_command_line(sys.argv)
 
@@ -192,16 +192,16 @@ The :djadmin:`startapp` and :djadmin:`startproject` management commands
 now have a ``--template`` option for specifying a path or URL to a custom app
 or project template.
 
-For example, Django will use the ``/path/to/my_project_template`` directory
+For example, Freedom will use the ``/path/to/my_project_template`` directory
 when you run the following command::
 
-    django-admin.py startproject --template=/path/to/my_project_template myproject
+    freedom-admin.py startproject --template=/path/to/my_project_template myproject
 
 You can also now provide a destination directory as the second
 argument to both :djadmin:`startapp` and :djadmin:`startproject`::
 
-    django-admin.py startapp myapp /path/to/new/app
-    django-admin.py startproject myproject /path/to/new/project
+    freedom-admin.py startapp myapp /path/to/new/app
+    freedom-admin.py startproject myproject /path/to/new/project
 
 For more information, see the :djadmin:`startapp` and :djadmin:`startproject`
 documentation.
@@ -226,14 +226,14 @@ callable configured via :setting:`WSGI_APPLICATION`.)
 ``SELECT FOR UPDATE`` support
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.4 includes a :meth:`QuerySet.select_for_update()
-<django.db.models.query.QuerySet.select_for_update>` method, which generates a
+Freedom 1.4 includes a :meth:`QuerySet.select_for_update()
+<freedom.db.models.query.QuerySet.select_for_update>` method, which generates a
 ``SELECT ... FOR UPDATE`` SQL query. This will lock rows until the end of the
 transaction, meaning other transactions cannot modify or delete rows matched by
 a ``FOR UPDATE`` query.
 
 For more details, see the documentation for
-:meth:`~django.db.models.query.QuerySet.select_for_update`.
+:meth:`~freedom.db.models.query.QuerySet.select_for_update`.
 
 ``Model.objects.bulk_create`` in the ORM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -241,19 +241,19 @@ For more details, see the documentation for
 This method lets you create multiple objects more efficiently. It can result in
 significant performance increases if you have many objects.
 
-Django makes use of this internally, meaning some operations (such as database
+Freedom makes use of this internally, meaning some operations (such as database
 setup for test suites) have seen a performance benefit as a result.
 
-See the :meth:`~django.db.models.query.QuerySet.bulk_create` docs for more
+See the :meth:`~freedom.db.models.query.QuerySet.bulk_create` docs for more
 information.
 
 ``QuerySet.prefetch_related``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Similar to :meth:`~django.db.models.query.QuerySet.select_related` but with a
+Similar to :meth:`~freedom.db.models.query.QuerySet.select_related` but with a
 different strategy and broader scope,
-:meth:`~django.db.models.query.QuerySet.prefetch_related` has been added to
-:class:`~django.db.models.query.QuerySet`. This method returns a new
+:meth:`~freedom.db.models.query.QuerySet.prefetch_related` has been added to
+:class:`~freedom.db.models.query.QuerySet`. This method returns a new
 ``QuerySet`` that will prefetch each of the specified related lookups in a
 single batch as soon as the query begins to be evaluated. Unlike
 ``select_related``, it does the joins in Python, not in the database, and
@@ -265,10 +265,10 @@ each have many related objects that you also need to fetch.
 Improved password hashing
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django's auth system (``django.contrib.auth``) stores passwords using a one-way
-algorithm. Django 1.3 uses the SHA1_ algorithm, but increasing processor speeds
+Freedom's auth system (``freedom.contrib.auth``) stores passwords using a one-way
+algorithm. Freedom 1.3 uses the SHA1_ algorithm, but increasing processor speeds
 and theoretical attacks have revealed that SHA1 isn't as secure as we'd like.
-Thus, Django 1.4 introduces a new password storage system: by default Django now
+Thus, Freedom 1.4 introduces a new password storage system: by default Freedom now
 uses the PBKDF2_ algorithm (as recommended by NIST_). You can also easily choose
 a different algorithm (including the popular bcrypt_ algorithm). For more
 details, see :ref:`auth_password_storage`.
@@ -282,7 +282,7 @@ HTML5 doctype
 ~~~~~~~~~~~~~
 
 We've switched the admin and other bundled templates to use the HTML5
-doctype. While Django will be careful to maintain compatibility with older
+doctype. While Freedom will be careful to maintain compatibility with older
 browsers, this change means that you can use any HTML5 features you need in
 admin pages without having to lose HTML validity or override the provided
 templates to change the doctype.
@@ -290,32 +290,32 @@ templates to change the doctype.
 List filters in admin interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Prior to Django 1.4, the :mod:`~django.contrib.admin` app let you specify
+Prior to Freedom 1.4, the :mod:`~freedom.contrib.admin` app let you specify
 change list filters by specifying a field lookup, but it didn't allow you to
 create custom filters. This has been rectified with a simple API (previously
 used internally and known as "FilterSpec"). For more details, see the
-documentation for :attr:`~django.contrib.admin.ModelAdmin.list_filter`.
+documentation for :attr:`~freedom.contrib.admin.ModelAdmin.list_filter`.
 
 Multiple sort in admin interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The admin change list now supports sorting on multiple columns. It respects all
-elements of the :attr:`~django.contrib.admin.ModelAdmin.ordering` attribute, and
+elements of the :attr:`~freedom.contrib.admin.ModelAdmin.ordering` attribute, and
 sorting on multiple columns by clicking on headers is designed to mimic the
 behavior of desktop GUIs. We also added a
-:meth:`~django.contrib.admin.ModelAdmin.get_ordering` method for specifying the
+:meth:`~freedom.contrib.admin.ModelAdmin.get_ordering` method for specifying the
 ordering dynamically (i.e., depending on the request).
 
 New ``ModelAdmin`` methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We added a :meth:`~django.contrib.admin.ModelAdmin.save_related` method to
-:mod:`~django.contrib.admin.ModelAdmin` to ease customization of how
+We added a :meth:`~freedom.contrib.admin.ModelAdmin.save_related` method to
+:mod:`~freedom.contrib.admin.ModelAdmin` to ease customization of how
 related objects are saved in the admin.
 
-Two other new :class:`~django.contrib.admin.ModelAdmin` methods,
-:meth:`~django.contrib.admin.ModelAdmin.get_list_display` and
-:meth:`~django.contrib.admin.ModelAdmin.get_list_display_links`
+Two other new :class:`~freedom.contrib.admin.ModelAdmin` methods,
+:meth:`~freedom.contrib.admin.ModelAdmin.get_list_display` and
+:meth:`~freedom.contrib.admin.ModelAdmin.get_list_display_links`
 enable dynamic customization of fields and links displayed on the admin
 change list.
 
@@ -331,7 +331,7 @@ delete relationships.
 Tools for cryptographic signing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.4 adds both a low-level API for signing values and a high-level API
+Freedom 1.4 adds both a low-level API for signing values and a high-level API
 for setting and reading signed cookies, one of the most common uses of
 signing in Web applications.
 
@@ -341,7 +341,7 @@ information.
 Cookie-based session backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.4 introduces a cookie-based session backend that uses the tools for
+Freedom 1.4 introduces a cookie-based session backend that uses the tools for
 :doc:`cryptographic signing </topics/signing>` to store the session data in
 the client's browser.
 
@@ -358,15 +358,15 @@ more information.
 New form wizard
 ~~~~~~~~~~~~~~~
 
-The previous ``FormWizard`` from :mod:`django.contrib.formtools` has been
+The previous ``FormWizard`` from :mod:`freedom.contrib.formtools` has been
 replaced with a new implementation based on the class-based views
-introduced in Django 1.3. It features a pluggable storage API and doesn't
+introduced in Freedom 1.3. It features a pluggable storage API and doesn't
 require the wizard to pass around hidden fields for every previous step.
 
-Django 1.4 ships with a session-based storage backend and a cookie-based
+Freedom 1.4 ships with a session-based storage backend and a cookie-based
 storage backend. The latter uses the tools for
 :doc:`cryptographic signing </topics/signing>` also introduced in
-Django 1.4 to store the wizard's state in the user's cookies.
+Freedom 1.4 to store the wizard's state in the user's cookies.
 
 See the :doc:`form wizard </ref/contrib/formtools/form-wizard>` docs for
 more information.
@@ -374,16 +374,16 @@ more information.
 ``reverse_lazy``
 ~~~~~~~~~~~~~~~~
 
-A lazily evaluated version of :func:`django.core.urlresolvers.reverse` was
+A lazily evaluated version of :func:`freedom.core.urlresolvers.reverse` was
 added to allow using URL reversals before the project's URLconf gets loaded.
 
 Translating URL patterns
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django can now look for a language prefix in the URLpattern when using the new
-:func:`~django.conf.urls.i18n.i18n_patterns` helper function.
+Freedom can now look for a language prefix in the URLpattern when using the new
+:func:`~freedom.conf.urls.i18n.i18n_patterns` helper function.
 It's also now possible to define translatable URL patterns using
-:func:`~django.utils.translation.ugettext_lazy`. See
+:func:`~freedom.utils.translation.ugettext_lazy`. See
 :ref:`url-internationalization` for more information about the language prefix
 and how to internationalize URL patterns.
 
@@ -391,7 +391,7 @@ Contextual translation support for ``{% trans %}`` and ``{% blocktrans %}``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :ref:`contextual translation<contextual-markers>` support introduced in
-Django 1.3 via the ``pgettext`` function has been extended to the
+Freedom 1.3 via the ``pgettext`` function has been extended to the
 :ttag:`trans` and :ttag:`blocktrans` template tags using the new ``context``
 keyword.
 
@@ -399,10 +399,10 @@ Customizable ``SingleObjectMixin`` URLConf kwargs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Two new attributes,
-:attr:`pk_url_kwarg<django.views.generic.detail.SingleObjectMixin.pk_url_kwarg>`
+:attr:`pk_url_kwarg<freedom.views.generic.detail.SingleObjectMixin.pk_url_kwarg>`
 and
-:attr:`slug_url_kwarg<django.views.generic.detail.SingleObjectMixin.slug_url_kwarg>`,
-have been added to :class:`~django.views.generic.detail.SingleObjectMixin` to
+:attr:`slug_url_kwarg<freedom.views.generic.detail.SingleObjectMixin.slug_url_kwarg>`,
+have been added to :class:`~freedom.views.generic.detail.SingleObjectMixin` to
 enable the customization of URLconf keyword arguments used for single
 object generic views.
 
@@ -435,20 +435,20 @@ For example:
 Then, in the template, any number of arguments may be passed to the template tag.
 For example:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
 
 No wrapping of exceptions in ``TEMPLATE_DEBUG`` mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In previous versions of Django, whenever the :setting:`TEMPLATE_DEBUG` setting
+In previous versions of Freedom, whenever the :setting:`TEMPLATE_DEBUG` setting
 was ``True``, any exception raised during template rendering (even exceptions
 unrelated to template syntax) were wrapped in ``TemplateSyntaxError`` and
 re-raised. This was done in order to provide detailed template source location
 information in the debug 500 page.
 
-In Django 1.4, exceptions are no longer wrapped. Instead, the original
+In Freedom 1.4, exceptions are no longer wrapped. Instead, the original
 exception is annotated with the source information. This means that catching
 exceptions from template rendering is now consistent regardless of the value of
 :setting:`TEMPLATE_DEBUG`, and there's no need to catch and unwrap
@@ -465,7 +465,7 @@ more details.
 ``static`` template tag
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The :mod:`staticfiles<django.contrib.staticfiles>` contrib app has a new
+The :mod:`staticfiles<freedom.contrib.staticfiles>` contrib app has a new
 :ttag:`static<staticfiles-static>` template tag to refer to files saved with
 the :setting:`STATICFILES_STORAGE` storage backend. It uses the storage
 backend's ``url`` method and therefore supports advanced features such as
@@ -474,14 +474,14 @@ backend's ``url`` method and therefore supports advanced features such as
 ``CachedStaticFilesStorage`` storage backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :mod:`staticfiles<django.contrib.staticfiles>` contrib app now has a
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage` backend
+The :mod:`staticfiles<freedom.contrib.staticfiles>` contrib app now has a
+:class:`~freedom.contrib.staticfiles.storage.CachedStaticFilesStorage` backend
 that caches the files it saves (when running the :djadmin:`collectstatic`
 management command) by appending the MD5 hash of the file's content to the
 filename. For example, the file ``css/styles.css`` would also be saved as
 ``css/styles.55e7cbb9ba48.css``
 
-See the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+See the :class:`~freedom.contrib.staticfiles.storage.CachedStaticFilesStorage`
 docs for more information.
 
 Simple clickjacking protection
@@ -497,7 +497,7 @@ CSRF improvements
 ~~~~~~~~~~~~~~~~~
 
 We've made various improvements to our CSRF features, including the
-:func:`~django.views.decorators.csrf.ensure_csrf_cookie` decorator, which can
+:func:`~freedom.views.decorators.csrf.ensure_csrf_cookie` decorator, which can
 help with AJAX-heavy sites; protection for PUT and DELETE requests; and the
 :setting:`CSRF_COOKIE_SECURE` and :setting:`CSRF_COOKIE_PATH` settings, which can
 improve the security and usefulness of CSRF protection. See the :doc:`CSRF
@@ -507,14 +507,14 @@ Error report filtering
 ~~~~~~~~~~~~~~~~~~~~~~
 
 We added two function decorators,
-:func:`~django.views.decorators.debug.sensitive_variables` and
-:func:`~django.views.decorators.debug.sensitive_post_parameters`, to allow
+:func:`~freedom.views.decorators.debug.sensitive_variables` and
+:func:`~freedom.views.decorators.debug.sensitive_post_parameters`, to allow
 designating the local variables and POST parameters that may contain sensitive
 information and should be filtered out of error reports.
 
 All POST parameters are now systematically filtered out of error reports for
 certain views (``login``, ``password_reset_confirm``, ``password_change`` and
-``add_view`` in :mod:`django.contrib.auth.views`, as well as
+``add_view`` in :mod:`freedom.contrib.auth.views`, as well as
 ``user_change_password`` in the admin app) to prevent the leaking of sensitive
 information such as user passwords.
 
@@ -525,24 +525,24 @@ filter<custom-error-reports>`. For more information see the docs on
 Extended IPv6 support
 ~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.4 can now better handle IPv6 addresses with the new
-:class:`~django.db.models.GenericIPAddressField` model field,
-:class:`~django.forms.GenericIPAddressField` form field and
-the validators :data:`~django.core.validators.validate_ipv46_address` and
-:data:`~django.core.validators.validate_ipv6_address`.
+Freedom 1.4 can now better handle IPv6 addresses with the new
+:class:`~freedom.db.models.GenericIPAddressField` model field,
+:class:`~freedom.forms.GenericIPAddressField` form field and
+the validators :data:`~freedom.core.validators.validate_ipv46_address` and
+:data:`~freedom.core.validators.validate_ipv6_address`.
 
 HTML comparisons in tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The base classes in :mod:`django.test` now have some helpers to
+The base classes in :mod:`freedom.test` now have some helpers to
 compare HTML without tripping over irrelevant differences in whitespace,
 argument quoting/ordering and closing of self-closing tags. You can either
 compare HTML directly with the new
-:meth:`~django.test.SimpleTestCase.assertHTMLEqual` and
-:meth:`~django.test.SimpleTestCase.assertHTMLNotEqual` assertions, or use
+:meth:`~freedom.test.SimpleTestCase.assertHTMLEqual` and
+:meth:`~freedom.test.SimpleTestCase.assertHTMLNotEqual` assertions, or use
 the ``html=True`` flag with
-:meth:`~django.test.SimpleTestCase.assertContains` and
-:meth:`~django.test.SimpleTestCase.assertNotContains` to test whether the
+:meth:`~freedom.test.SimpleTestCase.assertContains` and
+:meth:`~freedom.test.SimpleTestCase.assertNotContains` to test whether the
 client's response contains a given HTML fragment. See the :ref:`assertions
 documentation <assertions>` for more.
 
@@ -571,22 +571,22 @@ For more information, see the :tfilter:`date` documentation.
 Minor features
 ~~~~~~~~~~~~~~
 
-Django 1.4 also includes several smaller improvements worth noting:
+Freedom 1.4 also includes several smaller improvements worth noting:
 
 * A more usable stacktrace in the technical 500 page. Frames in the
-  stack trace that reference Django's framework code are dimmed out,
+  stack trace that reference Freedom's framework code are dimmed out,
   while frames in application code are slightly emphasized. This change
   makes it easier to scan a stacktrace for issues in application code.
 
 * :doc:`Tablespace support </topics/db/tablespaces>` in PostgreSQL.
 
-* Customizable names for :meth:`~django.template.Library.simple_tag`.
+* Customizable names for :meth:`~freedom.template.Library.simple_tag`.
 
 * In the documentation, a helpful :doc:`security overview </topics/security>`
   page.
 
-* The ``django.contrib.auth.models.check_password`` function has been moved
-  to the :mod:`django.contrib.auth.hashers` module. Importing it from the old
+* The ``freedom.contrib.auth.models.check_password`` function has been moved
+  to the :mod:`freedom.contrib.auth.hashers` module. Importing it from the old
   location will still work, but you should update your imports.
 
 * The :djadmin:`collectstatic` management command now has a ``--clear`` option
@@ -597,8 +597,8 @@ Django 1.4 also includes several smaller improvements worth noting:
   MySQL with the InnoDB database engine.
 
 * A new 403 response handler has been added as
-  ``'django.views.defaults.permission_denied'``. You can set your own handler by
-  setting the value of :data:`django.conf.urls.handler403`. See the
+  ``'freedom.views.defaults.permission_denied'``. You can set your own handler by
+  setting the value of :data:`freedom.conf.urls.handler403`. See the
   documentation about :ref:`the 403 (HTTP Forbidden) view<http_forbidden_view>`
   for more information.
 
@@ -613,15 +613,15 @@ Django 1.4 also includes several smaller improvements worth noting:
 
 * The :ttag:`if` template tag now supports ``{% elif %}`` clauses.
 
-* If your Django app is behind a proxy, you might find the new
+* If your Freedom app is behind a proxy, you might find the new
   :setting:`SECURE_PROXY_SSL_HEADER` setting useful. It solves the problem of your
   proxy "eating" the fact that a request came in via HTTPS. But only use this
   setting if you know what you're doing.
 
 * A new, plain-text, version of the HTTP 500 status code internal error page
   served when :setting:`DEBUG` is ``True`` is now sent to the client when
-  Django detects that the request has originated in JavaScript code.
-  (:meth:`~django.http.HttpRequest.is_ajax` is used for this.)
+  Freedom detects that the request has originated in JavaScript code.
+  (:meth:`~freedom.http.HttpRequest.is_ajax` is used for this.)
 
   Like its HTML counterpart, it contains a collection of different
   pieces of information about the state of the application.
@@ -644,7 +644,7 @@ Django 1.4 also includes several smaller improvements worth noting:
   fields. This is only supported in PostgreSQL.
 
   For more details, see the documentation for
-  :meth:`~django.db.models.query.QuerySet.distinct`.
+  :meth:`~freedom.db.models.query.QuerySet.distinct`.
 
 * The admin login page will add a password reset link if you include a URL with
   the name `'admin_password_reset'` in your urls.py, so plugging in the built-in
@@ -661,12 +661,12 @@ Django 1.4 also includes several smaller improvements worth noting:
   forms, i.e. those which are not bound to an existing model instance.
 
 * The sitemaps framework can now handle HTTPS links using the new
-  :attr:`Sitemap.protocol <django.contrib.sitemaps.Sitemap.protocol>` class
+  :attr:`Sitemap.protocol <freedom.contrib.sitemaps.Sitemap.protocol>` class
   attribute.
 
-* A new :class:`django.test.SimpleTestCase` subclass of
+* A new :class:`freedom.test.SimpleTestCase` subclass of
   :class:`unittest.TestCase`
-  that's lighter than :class:`django.test.TestCase` and company. It can be
+  that's lighter than :class:`freedom.test.TestCase` and company. It can be
   useful in tests that don't need to hit a database. See
   :ref:`testcase_hierarchy_diagram`.
 
@@ -676,32 +676,32 @@ Backwards incompatible changes in 1.4
 SECRET_KEY setting is required
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Running Django with an empty or known :setting:`SECRET_KEY` disables many of
-Django's security protections and can lead to remote-code-execution
-vulnerabilities. No Django site should ever be run without a
+Running Freedom with an empty or known :setting:`SECRET_KEY` disables many of
+Freedom's security protections and can lead to remote-code-execution
+vulnerabilities. No Freedom site should ever be run without a
 :setting:`SECRET_KEY`.
 
-In Django 1.4, starting Django with an empty :setting:`SECRET_KEY` will raise a
-`DeprecationWarning`. In Django 1.5, it will raise an exception and Django will
+In Freedom 1.4, starting Freedom with an empty :setting:`SECRET_KEY` will raise a
+`DeprecationWarning`. In Freedom 1.5, it will raise an exception and Freedom will
 refuse to start. This is slightly accelerated from the usual deprecation path
-due to the severity of the consequences of running Django with no
+due to the severity of the consequences of running Freedom with no
 :setting:`SECRET_KEY`.
 
-django.contrib.admin
+freedom.contrib.admin
 ~~~~~~~~~~~~~~~~~~~~
 
-The included administration app ``django.contrib.admin`` has for a long time
+The included administration app ``freedom.contrib.admin`` has for a long time
 shipped with a default set of static files such as JavaScript, images and
-stylesheets. Django 1.3 added a new contrib app ``django.contrib.staticfiles``
+stylesheets. Freedom 1.3 added a new contrib app ``freedom.contrib.staticfiles``
 to handle such files in a generic way and defined conventions for static
 files included in apps.
 
-Starting in Django 1.4, the admin's static files also follow this
-convention, to make the files easier to deploy. In previous versions of Django,
+Starting in Freedom 1.4, the admin's static files also follow this
+convention, to make the files easier to deploy. In previous versions of Freedom,
 it was also common to define an ``ADMIN_MEDIA_PREFIX`` setting to point to the
 URL where the admin's static files live on a Web server. This setting has now
 been deprecated and replaced by the more general setting :setting:`STATIC_URL`.
-Django will now expect to find the admin static files under the URL
+Freedom will now expect to find the admin static files under the URL
 ``<STATIC_URL>/admin/``.
 
 If you've previously used a URL path for ``ADMIN_MEDIA_PREFIX`` (e.g.
@@ -718,14 +718,14 @@ If your ``ADMIN_MEDIA_PREFIX`` is set to an specific domain (e.g.
 .. warning::
 
     If you're implicitly relying on the path of the admin static files within
-    Django's source code, you'll need to update that path. The files were moved
-    from :file:`django/contrib/admin/media/` to
-    :file:`django/contrib/admin/static/admin/`.
+    Freedom's source code, you'll need to update that path. The files were moved
+    from :file:`freedom/contrib/admin/media/` to
+    :file:`freedom/contrib/admin/static/admin/`.
 
 Supported browsers for the admin
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django hasn't had a clear policy on which browsers are supported by the
+Freedom hasn't had a clear policy on which browsers are supported by the
 admin app. Our new policy formalizes existing practices: `YUI's A-grade`_
 browsers should provide a fully-functional admin experience, with the notable
 exception of Internet Explorer 6, which is no longer supported.
@@ -734,8 +734,8 @@ Released over 10 years ago, IE6 imposes many limitations on modern Web
 development. The practical implications of this policy are that contributors
 are free to improve the admin without consideration for these limitations.
 
-Obviously, this new policy **has no impact** on sites you develop using Django.
-It only applies to the Django admin. Feel free to develop apps compatible with
+Obviously, this new policy **has no impact** on sites you develop using Freedom.
+It only applies to the Freedom admin. Feel free to develop apps compatible with
 any range of browsers.
 
 .. _YUI's A-grade: http://yuilibrary.com/yui/docs/tutorials/gbs/
@@ -745,8 +745,8 @@ Removed admin icons
 
 As part of an effort to improve the performance and usability of the admin's
 change-list sorting interface and :attr:`horizontal
-<django.contrib.admin.ModelAdmin.filter_horizontal>` and :attr:`vertical
-<django.contrib.admin.ModelAdmin.filter_vertical>` "filter" widgets, some icon
+<freedom.contrib.admin.ModelAdmin.filter_horizontal>` and :attr:`vertical
+<freedom.contrib.admin.ModelAdmin.filter_vertical>` "filter" widgets, some icon
 files were removed and grouped into two sprite files.
 
 Specifically: ``selector-add.gif``, ``selector-addall.gif``,
@@ -771,16 +771,16 @@ selectors for custom styles or JavaScript transformations.
 Compatibility with old signed data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.3 changed the cryptographic signing mechanisms used in a number of
-places in Django. While Django 1.3 kept fallbacks that would accept hashes
-produced by the previous methods, these fallbacks are removed in Django 1.4.
+Freedom 1.3 changed the cryptographic signing mechanisms used in a number of
+places in Freedom. While Freedom 1.3 kept fallbacks that would accept hashes
+produced by the previous methods, these fallbacks are removed in Freedom 1.4.
 
-So, if you upgrade to Django 1.4 directly from 1.2 or earlier, you may
+So, if you upgrade to Freedom 1.4 directly from 1.2 or earlier, you may
 lose/invalidate certain pieces of data that have been cryptographically signed
-using an old method. To avoid this, use Django 1.3 first for a period of time
+using an old method. To avoid this, use Freedom 1.3 first for a period of time
 to allow the signed data to expire naturally. The affected parts are detailed
 below, with 1) the consequences of ignoring this advice and 2) the amount of
-time you need to run Django 1.3 for the data to expire or become irrelevant.
+time you need to run Freedom 1.3 for the data to expire or become irrelevant.
 
 * ``contrib.sessions`` data integrity check
 
@@ -796,7 +796,7 @@ time you need to run Django 1.3 for the data to expire or become irrelevant.
 
 Form-related hashes: these have a are much shorter lifetime and are relevant
 only for the short window where a user might fill in a form generated by the
-pre-upgrade Django instance and try to submit it to the upgraded Django
+pre-upgrade Freedom instance and try to submit it to the upgraded Freedom
 instance:
 
 * ``contrib.comments`` form security hash
@@ -817,7 +817,7 @@ instance:
 
 * CSRF check
 
-  * Note: This is actually a Django 1.1 fallback, not Django 1.2,
+  * Note: This is actually a Freedom 1.1 fallback, not Freedom 1.2,
     and it applies only if you're upgrading from 1.1.
 
   * Consequences: The user will see a 403 error with any CSRF-protected POST
@@ -835,14 +835,14 @@ instance:
 
   * Remedy: Set :setting:`PASSWORD_HASHERS` to use your original password
     hashing when you initially upgrade to 1.4. After you confirm your app works
-    well with Django 1.4 and you won't have to roll back to 1.3, enable the new
+    well with Freedom 1.4 and you won't have to roll back to 1.3, enable the new
     password hashes.
 
-django.contrib.flatpages
+freedom.contrib.flatpages
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Starting in 1.4, the
-:class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` only
+:class:`~freedom.contrib.flatpages.middleware.FlatpageFallbackMiddleware` only
 adds a trailing slash and redirects if the resulting URL refers to an existing
 flatpage. For example, requesting ``/notaflatpageoravalidurl`` in a previous
 version would redirect to ``/notaflatpageoravalidurl/``, which would
@@ -850,7 +850,7 @@ subsequently raise a 404. Requesting ``/notaflatpageoravalidurl`` now will
 immediately raise a 404.
 
 Also, redirects returned by flatpages are now permanent (with 301 status code),
-to match the behavior of :class:`~django.middleware.common.CommonMiddleware`.
+to match the behavior of :class:`~freedom.middleware.common.CommonMiddleware`.
 
 Serialization of :class:`~datetime.datetime` and :class:`~datetime.time`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -883,14 +883,14 @@ back from the database, which could corrupt the data.
 In the context of time-zone support, this flag was changed to ``False``, and
 datetimes are now stored without time-zone information in SQLite. When
 :setting:`USE_TZ` is ``False``, if you attempt to save an aware datetime
-object, Django raises an exception.
+object, Freedom raises an exception.
 
 ``MySQLdb``-specific exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The MySQL backend historically has raised ``MySQLdb.OperationalError``
 when a query triggered an exception. We've fixed this bug, and we now raise
-:exc:`django.db.DatabaseError` instead. If you were testing for
+:exc:`freedom.db.DatabaseError` instead. If you were testing for
 ``MySQLdb.OperationalError``, you'll need to update your ``except``
 clauses.
 
@@ -898,16 +898,16 @@ Database connection's thread-locality
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``DatabaseWrapper`` objects (i.e. the connection objects referenced by
-``django.db.connection`` and ``django.db.connections["some_alias"]``) used to
+``freedom.db.connection`` and ``freedom.db.connections["some_alias"]``) used to
 be thread-local. They are now global objects in order to be potentially shared
 between multiple threads. While the individual connection objects are now
-global, the ``django.db.connections`` dictionary referencing those objects is
+global, the ``freedom.db.connections`` dictionary referencing those objects is
 still thread-local. Therefore if you just use the ORM or
 ``DatabaseWrapper.cursor()`` then the behavior is still the same as before.
-Note, however, that ``django.db.connection`` does not directly reference the
+Note, however, that ``freedom.db.connection`` does not directly reference the
 default ``DatabaseWrapper`` object anymore and is now a proxy to access that
 object's attributes. If you need to access the actual ``DatabaseWrapper``
-object, use ``django.db.connections[DEFAULT_DB_ALIAS]`` instead.
+object, use ``freedom.db.connections[DEFAULT_DB_ALIAS]`` instead.
 
 As part of this change, all underlying SQLite connections are now enabled for
 potential thread-sharing (by passing the ``check_same_thread=False`` attribute
@@ -915,7 +915,7 @@ to pysqlite). ``DatabaseWrapper`` however preserves the previous behavior by
 disabling thread-sharing by default, so this does not affect any existing
 code that purely relies on the ORM or on ``DatabaseWrapper.cursor()``.
 
-Finally, while it's now possible to pass connections between threads, Django
+Finally, while it's now possible to pass connections between threads, Freedom
 doesn't make any effort to synchronize access to the underlying backend.
 Concurrency behavior is defined by the underlying backend implementation.
 Check their documentation for details.
@@ -923,7 +923,7 @@ Check their documentation for details.
 `COMMENTS_BANNED_USERS_GROUP` setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django's comments has historically
+Freedom's comments has historically
 supported excluding the comments of a special user group, but we've never
 documented the feature properly and didn't enforce the exclusion in other parts
 of the app such as the template tags. To fix this problem, we removed the code
@@ -932,8 +932,8 @@ from the feed class.
 If you rely on the feature and want to restore the old behavior, use a custom
 comment model manager to exclude the user group, like this::
 
-    from django.conf import settings
-    from django.contrib.comments.managers import CommentManager
+    from freedom.conf import settings
+    from freedom.contrib.comments.managers import CommentManager
 
     class BanningCommentManager(CommentManager):
         def get_query_set(self):
@@ -947,8 +947,8 @@ comment model manager to exclude the user group, like this::
 Save this model manager in your custom comment app (e.g., in
 ``my_comments_app/managers.py``) and add it your custom comment app model::
 
-    from django.db import models
-    from django.contrib.comments.models import Comment
+    from freedom.db import models
+    from freedom.contrib.comments.models import Comment
 
     from my_comments_app.managers import BanningCommentManager
 
@@ -960,13 +960,13 @@ Save this model manager in your custom comment app (e.g., in
 `IGNORABLE_404_STARTS` and `IGNORABLE_404_ENDS` settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Until Django 1.3, it was possible to exclude some URLs from Django's
+Until Freedom 1.3, it was possible to exclude some URLs from Freedom's
 :doc:`404 error reporting</howto/error-reporting>` by adding prefixes to
 ``IGNORABLE_404_STARTS`` and suffixes to ``IGNORABLE_404_ENDS``.
 
-In Django 1.4, these two settings are superseded by
+In Freedom 1.4, these two settings are superseded by
 :setting:`IGNORABLE_404_URLS`, which is a list of compiled regular
-expressions. Django won't send an email for 404 errors on URLs that match any
+expressions. Freedom won't send an email for 404 errors on URLs that match any
 of them.
 
 Furthermore, the previous settings had some rather arbitrary default values::
@@ -975,7 +975,7 @@ Furthermore, the previous settings had some rather arbitrary default values::
     IGNORABLE_404_ENDS = ('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi',
                           'favicon.ico', '.php')
 
-It's not Django's role to decide if your website has a legacy ``/cgi-bin/``
+It's not Freedom's role to decide if your website has a legacy ``/cgi-bin/``
 section or a ``favicon.ico``. As a consequence, the default values of
 :setting:`IGNORABLE_404_URLS`, ``IGNORABLE_404_STARTS``, and
 ``IGNORABLE_404_ENDS`` are all now empty.
@@ -998,7 +998,7 @@ expression, such as periods.
 CSRF protection extended to PUT and DELETE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Previously, Django's :doc:`CSRF protection </ref/contrib/csrf/>` provided
+Previously, Freedom's :doc:`CSRF protection </ref/contrib/csrf/>` provided
 protection only against POST requests. Since use of PUT and DELETE methods in
 AJAX applications is becoming more common, we now protect all methods not
 defined as safe by :rfc:`2616` -- i.e., we exempt GET, HEAD, OPTIONS and TRACE,
@@ -1010,27 +1010,27 @@ If you're using PUT or DELETE methods in AJAX applications, please see the
 Password reset view now accepts ``subject_template_name``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``password_reset`` view in ``django.contrib.auth`` now accepts a
+The ``password_reset`` view in ``freedom.contrib.auth`` now accepts a
 ``subject_template_name`` parameter, which is passed to the password save form
 as a keyword argument. If you are using this view with a custom password reset
 form, then you will need to ensure your form's ``save()`` method accepts this
 keyword argument.
 
-``django.core.template_loaders``
+``freedom.core.template_loaders``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This was an alias to ``django.template.loader`` since 2005, and we've removed it
+This was an alias to ``freedom.template.loader`` since 2005, and we've removed it
 without emitting a warning due to the length of the deprecation. If your code
-still referenced this, please use ``django.template.loader`` instead.
+still referenced this, please use ``freedom.template.loader`` instead.
 
-``django.db.models.fields.URLField.verify_exists``
+``freedom.db.models.fields.URLField.verify_exists``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This functionality has been removed due to intractable performance and
 security issues. Any existing usage of ``verify_exists`` should be
 removed.
 
-``django.core.files.storage.Storage.open``
+``freedom.core.files.storage.Storage.open``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``open`` method of the base Storage class used to take an obscure parameter
@@ -1039,8 +1039,8 @@ returned file object. This has been removed. In the rare case you relied on the
 ``mixin`` parameter, you can easily achieve the same by overriding the ``open``
 method, like this::
 
-    from django.core.files import File
-    from django.core.files.storage import FileSystemStorage
+    from freedom.core.files import File
+    from freedom.core.files.storage import FileSystemStorage
 
     class Spam(File):
         """
@@ -1061,7 +1061,7 @@ YAML deserializer now uses ``yaml.safe_load``
 
 ``yaml.load`` is able to construct any Python object, which may trigger
 arbitrary code execution if you process a YAML document that comes from an
-untrusted source. This feature isn't necessary for Django's YAML deserializer,
+untrusted source. This feature isn't necessary for Freedom's YAML deserializer,
 whose primary use is to load fixtures consisting of simple objects. Even though
 fixtures are trusted data, the YAML deserializer now uses ``yaml.safe_load``
 for additional security.
@@ -1089,8 +1089,8 @@ wild, because they would confuse browsers too.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It's now possible to check whether a template was used within a block of
-code with :meth:`~django.test.SimpleTestCase.assertTemplateUsed` and
-:meth:`~django.test.SimpleTestCase.assertTemplateNotUsed`. And they
+code with :meth:`~freedom.test.SimpleTestCase.assertTemplateUsed` and
+:meth:`~freedom.test.SimpleTestCase.assertTemplateNotUsed`. And they
 can be used as a context manager::
 
     with self.assertTemplateUsed('index.html'):
@@ -1110,7 +1110,7 @@ connections.
 
 If your code relied on connections to the production database being created
 after tests' execution, then you can restore the previous behavior by
-subclassing ``DjangoTestRunner`` and overriding its ``teardown_databases()``
+subclassing ``FreedomTestRunner`` and overriding its ``teardown_databases()``
 method.
 
 Output of :djadmin:`manage.py help <help>`
@@ -1149,12 +1149,12 @@ The development server is now is multithreaded by default. Use the
 :djadminopt:`--nothreading` option to disable the use of threading in the
 development server::
 
-    django-admin.py runserver --nothreading
+    freedom-admin.py runserver --nothreading
 
 Attributes disabled in markdown when safe mode set
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Prior to Django 1.4, attributes were included in any markdown output regardless
+Prior to Freedom 1.4, attributes were included in any markdown output regardless
 of safe mode setting of the filter. With version > 2.1 of the Python-Markdown
 library, an enable_attributes option was added. When the safe argument is
 passed to the markdown filter, both the ``safe_mode=True`` and
@@ -1165,8 +1165,8 @@ insecure.
 FormMixin get_initial returns an instance-specific dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In Django 1.3, the ``get_initial`` method of the
-:class:`django.views.generic.edit.FormMixin` class was returning the
+In Freedom 1.3, the ``get_initial`` method of the
+:class:`freedom.views.generic.edit.FormMixin` class was returning the
 class ``initial`` dictionary. This has been fixed to return a copy of this
 dictionary, so form instances can modify their initial data without messing
 with the class variable.
@@ -1179,87 +1179,87 @@ Features deprecated in 1.4
 Old styles of calling ``cache_page`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some legacy ways of calling :func:`~django.views.decorators.cache.cache_page`
+Some legacy ways of calling :func:`~freedom.views.decorators.cache.cache_page`
 have been deprecated. Please see the documentation for the correct way to use
 this decorator.
 
 Support for PostgreSQL versions older than 8.2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django 1.3 dropped support for PostgreSQL versions older than 8.0, and we
+Freedom 1.3 dropped support for PostgreSQL versions older than 8.0, and we
 suggested using a more recent version because of performance improvements
 and, more importantly, the end of upstream support periods for 8.0 and 8.1
 was near (November 2010).
 
-Django 1.4 takes that policy further and sets 8.2 as the minimum PostgreSQL
+Freedom 1.4 takes that policy further and sets 8.2 as the minimum PostgreSQL
 version it officially supports.
 
 Request exceptions are now always logged
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When we added :doc:`logging support </topics/logging/>` in Django in 1.3, the
+When we added :doc:`logging support </topics/logging/>` in Freedom in 1.3, the
 admin error email support was moved into the
-:class:`django.utils.log.AdminEmailHandler`, attached to the
-``'django.request'`` logger. In order to maintain the established behavior of
-error emails, the ``'django.request'`` logger was called only when
+:class:`freedom.utils.log.AdminEmailHandler`, attached to the
+``'freedom.request'`` logger. In order to maintain the established behavior of
+error emails, the ``'freedom.request'`` logger was called only when
 :setting:`DEBUG` was ``False``.
 
 To increase the flexibility of error logging for requests, the
-``'django.request'`` logger is now called regardless of the value of
+``'freedom.request'`` logger is now called regardless of the value of
 :setting:`DEBUG`, and the default settings file for new projects now includes a
-separate filter attached to :class:`django.utils.log.AdminEmailHandler` to
+separate filter attached to :class:`freedom.utils.log.AdminEmailHandler` to
 prevent admin error emails in ``DEBUG`` mode::
 
    'filters': {
         'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
+            '()': 'freedom.utils.log.RequireDebugFalse'
         }
     },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
+            'class': 'freedom.utils.log.AdminEmailHandler'
         }
     },
 
 If your project was created prior to this change, your :setting:`LOGGING`
 setting will not include this new filter. In order to maintain
-backwards-compatibility, Django will detect that your ``'mail_admins'`` handler
+backwards-compatibility, Freedom will detect that your ``'mail_admins'`` handler
 configuration includes no ``'filters'`` section and will automatically add
 this filter for you and issue a pending-deprecation warning. This will become a
-deprecation warning in Django 1.5, and in Django 1.6 the
+deprecation warning in Freedom 1.5, and in Freedom 1.6 the
 backwards-compatibility shim will be removed entirely.
 
 The existence of any ``'filters'`` key under the ``'mail_admins'`` handler will
 disable this backward-compatibility shim and deprecation warning.
 
-``django.conf.urls.defaults``
+``freedom.conf.urls.defaults``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Until Django 1.3, the functions :func:`~django.conf.urls.include`,
-:func:`~django.conf.urls.patterns` and :func:`~django.conf.urls.url` plus
-:data:`~django.conf.urls.handler404`, :data:`~django.conf.urls.handler500`
-were located in a ``django.conf.urls.defaults`` module.
+Until Freedom 1.3, the functions :func:`~freedom.conf.urls.include`,
+:func:`~freedom.conf.urls.patterns` and :func:`~freedom.conf.urls.url` plus
+:data:`~freedom.conf.urls.handler404`, :data:`~freedom.conf.urls.handler500`
+were located in a ``freedom.conf.urls.defaults`` module.
 
-In Django 1.4, they live in :mod:`django.conf.urls`.
+In Freedom 1.4, they live in :mod:`freedom.conf.urls`.
 
-``django.contrib.databrowse``
+``freedom.contrib.databrowse``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Databrowse has not seen active development for some time, and this does not show
 any sign of changing. There had been a suggestion for a `GSOC project`_ to
 integrate the functionality of databrowse into the admin, but no progress was
 made. While Databrowse has been deprecated, an enhancement of
-``django.contrib.admin`` providing a similar feature set is still possible.
+``freedom.contrib.admin`` providing a similar feature set is still possible.
 
-.. _GSOC project: https://code.djangoproject.com/wiki/SummerOfCode2011#Integratedatabrowseintotheadmin
+.. _GSOC project: https://code.freedomproject.com/wiki/SummerOfCode2011#Integratedatabrowseintotheadmin
 
-The code that powers Databrowse is licensed under the same terms as Django
+The code that powers Databrowse is licensed under the same terms as Freedom
 itself, so it's available to be adopted by an individual or group as
 a third-party project.
 
-``django.core.management.setup_environ``
+``freedom.core.management.setup_environ``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This function temporarily modified ``sys.path`` in order to make the parent
@@ -1268,16 +1268,16 @@ layout. This function is now deprecated, as its path workarounds are no longer
 needed with the new ``manage.py`` and default project layout.
 
 This function was never documented or part of the public API, but it was widely
-recommended for use in setting up a "Django environment" for a user script.
+recommended for use in setting up a "Freedom environment" for a user script.
 These uses should be replaced by setting the ``DJANGO_SETTINGS_MODULE``
-environment variable or using :func:`django.conf.settings.configure`.
+environment variable or using :func:`freedom.conf.settings.configure`.
 
-``django.core.management.execute_manager``
+``freedom.core.management.execute_manager``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This function was previously used by ``manage.py`` to execute a management
 command. It is identical to
-``django.core.management.execute_from_command_line``, except that it first
+``freedom.core.management.execute_from_command_line``, except that it first
 calls ``setup_environ``, which is now deprecated. As such, ``execute_manager``
 is also deprecated; ``execute_from_command_line`` can be used instead. Neither
 of these functions is documented as part of the public API, but a deprecation
@@ -1287,7 +1287,7 @@ path is needed due to use in existing ``manage.py`` files.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Two flags, ``is_safe`` and ``needs_autoescape``, define how each template filter
-interacts with Django's auto-escaping behavior. They used to be attributes of
+interacts with Freedom's auto-escaping behavior. They used to be attributes of
 the filter function::
 
     @register.filter
@@ -1296,9 +1296,9 @@ the filter function::
     noop.is_safe = True
 
 However, this technique caused some problems in combination with decorators,
-especially :func:`@stringfilter <django.template.defaultfilters.stringfilter>`.
+especially :func:`@stringfilter <freedom.template.defaultfilters.stringfilter>`.
 Now, the flags are keyword arguments of :meth:`@register.filter
-<django.template.Library.filter>`::
+<freedom.template.Library.filter>`::
 
     @register.filter(is_safe=True)
     def noop(value):
@@ -1309,13 +1309,13 @@ See :ref:`filters and auto-escaping <filters-auto-escaping>` for more informatio
 Wildcard expansion of application names in `INSTALLED_APPS`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Until Django 1.3, :setting:`INSTALLED_APPS` accepted wildcards in application
-names, like ``django.contrib.*``. The expansion was performed by a
+Until Freedom 1.3, :setting:`INSTALLED_APPS` accepted wildcards in application
+names, like ``freedom.contrib.*``. The expansion was performed by a
 filesystem-based implementation of ``from <package> import *``. Unfortunately,
 `this can't be done reliably`_.
 
 This behavior was never documented. Since it is unpythonic and not obviously
-useful, it was removed in Django 1.4. If you relied on it, you must edit your
+useful, it was removed in Freedom 1.4. If you relied on it, you must edit your
 settings file to list all your applications explicitly.
 
 .. _this can't be done reliably: http://docs.python.org/tutorial/modules.html#importing-from-a-package
@@ -1327,14 +1327,14 @@ This attribute was confusingly named ``HttpRequest.raw_post_data``, but it
 actually provided the body of the HTTP request. It's been renamed to
 ``HttpRequest.body``, and ``HttpRequest.raw_post_data`` has been deprecated.
 
-``django.contrib.sitemaps`` bug fix with potential performance implications
+``freedom.contrib.sitemaps`` bug fix with potential performance implications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In previous versions, ``Paginator`` objects used in sitemap classes were
 cached, which could result in stale site maps. We've removed the caching, so
 each request to a site map now creates a new Paginator object and calls the
-:attr:`~django.contrib.sitemaps.Sitemap.items()` method of the
-:class:`~django.contrib.sitemaps.Sitemap` subclass. Depending on what your
+:attr:`~freedom.contrib.sitemaps.Sitemap.items()` method of the
+:class:`~freedom.contrib.sitemaps.Sitemap` subclass. Depending on what your
 ``items()`` method is doing, this may have a negative performance impact.
 To mitigate the performance impact, consider using the :doc:`caching
 framework </topics/cache>` within your ``Sitemap`` subclass.

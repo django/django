@@ -1,12 +1,12 @@
 import os
 import sys
 
-from django.core import management
-from django.core.management import CommandError
-from django.core.management.utils import find_command, popen_wrapper
-from django.test import SimpleTestCase
-from django.utils import translation
-from django.utils.six import StringIO
+from freedom.core import management
+from freedom.core.management import CommandError
+from freedom.core.management.utils import find_command, popen_wrapper
+from freedom.test import SimpleTestCase
+from freedom.utils import translation
+from freedom.utils.six import StringIO
 
 
 class CommandTests(SimpleTestCase):

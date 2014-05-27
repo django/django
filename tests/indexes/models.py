@@ -1,5 +1,5 @@
-from django.db import connection
-from django.db import models
+from freedom.db import connection
+from freedom.db import models
 
 
 class Article(models.Model):

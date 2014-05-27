@@ -4,7 +4,7 @@ Authentication using ``REMOTE_USER``
 
 This document describes how to make use of external authentication sources
 (where the Web server sets the ``REMOTE_USER`` environment variable) in your
-Django applications.  This type of authentication solution is typically seen on
+Freedom applications.  This type of authentication solution is typically seen on
 intranet sites, with single sign-on solutions such as IIS and Integrated
 Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
 `WebAuth`_, `mod_auth_sspi`_, etc.
@@ -17,38 +17,38 @@ Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
 
 When the Web server takes care of authentication it typically sets the
 ``REMOTE_USER`` environment variable for use in the underlying application.  In
-Django, ``REMOTE_USER`` is made available in the :attr:`request.META
-<django.http.HttpRequest.META>` attribute.  Django can be configured to make
+Freedom, ``REMOTE_USER`` is made available in the :attr:`request.META
+<freedom.http.HttpRequest.META>` attribute.  Freedom can be configured to make
 use of the ``REMOTE_USER`` value using the ``RemoteUserMiddleware`` and
-:class:`~django.contrib.auth.backends.RemoteUserBackend` classes found in
-:mod:`django.contrib.auth`.
+:class:`~freedom.contrib.auth.backends.RemoteUserBackend` classes found in
+:mod:`freedom.contrib.auth`.
 
 Configuration
 =============
 
 First, you must add the
-:class:`django.contrib.auth.middleware.RemoteUserMiddleware` to the
+:class:`freedom.contrib.auth.middleware.RemoteUserMiddleware` to the
 :setting:`MIDDLEWARE_CLASSES` setting **after** the
-:class:`django.contrib.auth.middleware.AuthenticationMiddleware`::
+:class:`freedom.contrib.auth.middleware.AuthenticationMiddleware`::
 
     MIDDLEWARE_CLASSES = (
         '...',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.auth.middleware.RemoteUserMiddleware',
+        'freedom.contrib.auth.middleware.AuthenticationMiddleware',
+        'freedom.contrib.auth.middleware.RemoteUserMiddleware',
         '...',
     )
 
-Next, you must replace the :class:`~django.contrib.auth.backends.ModelBackend`
-with :class:`~django.contrib.auth.backends.RemoteUserBackend` in the
+Next, you must replace the :class:`~freedom.contrib.auth.backends.ModelBackend`
+with :class:`~freedom.contrib.auth.backends.RemoteUserBackend` in the
 :setting:`AUTHENTICATION_BACKENDS` setting::
 
     AUTHENTICATION_BACKENDS = (
-        'django.contrib.auth.backends.RemoteUserBackend',
+        'freedom.contrib.auth.backends.RemoteUserBackend',
     )
 
 With this setup, ``RemoteUserMiddleware`` will detect the username in
 ``request.META['REMOTE_USER']`` and will authenticate and auto-login that user
-using the :class:`~django.contrib.auth.backends.RemoteUserBackend`.
+using the :class:`~freedom.contrib.auth.backends.RemoteUserBackend`.
 
 .. note::
    Since the ``RemoteUserBackend`` inherits from ``ModelBackend``, you will
@@ -59,11 +59,11 @@ If your authentication mechanism uses a custom HTTP header and not
 ``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the
 ``header`` attribute to the desired ``request.META`` key.  For example::
 
-    from django.contrib.auth.middleware import RemoteUserMiddleware
+    from freedom.contrib.auth.middleware import RemoteUserMiddleware
 
     class CustomHeaderMiddleware(RemoteUserMiddleware):
         header = 'HTTP_AUTHUSER'
 
 If you need more control, you can create your own authentication backend
-that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and
+that inherits from :class:`~freedom.contrib.auth.backends.RemoteUserBackend` and
 override one or more of its attributes and methods.

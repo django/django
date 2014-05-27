@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext as _, ungettext
+from freedom.utils.translation import ugettext as _, ungettext
 
 # Translators: This comment should be extracted
 dummy1 = _("This is a translatable string.")

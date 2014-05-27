@@ -4,13 +4,13 @@ import stat
 import sys
 import unittest
 
-from django.core.management import call_command, CommandError, execute_from_command_line
-from django.core.management.utils import find_command
-from django.test import SimpleTestCase
-from django.test import override_settings
-from django.utils import translation
-from django.utils._os import upath
-from django.utils.six import StringIO
+from freedom.core.management import call_command, CommandError, execute_from_command_line
+from freedom.core.management.utils import find_command
+from freedom.test import SimpleTestCase
+from freedom.test import override_settings
+from freedom.utils import translation
+from freedom.utils._os import upath
+from freedom.utils.six import StringIO
 
 has_msgfmt = find_command('msgfmt')
 
@@ -38,7 +38,7 @@ class MessageCompilationTests(SimpleTestCase):
 class PoFileTests(MessageCompilationTests):
 
     LOCALE = 'es_AR'
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    MO_FILE = 'locale/%s/LC_MESSAGES/freedom.mo' % LOCALE
 
     def test_bom_rejection(self):
         with self.assertRaises(CommandError) as cm:
@@ -47,7 +47,7 @@ class PoFileTests(MessageCompilationTests):
         self.assertFalse(os.path.exists(self.MO_FILE))
 
     def test_no_write_access(self):
-        mo_file_en = 'locale/en/LC_MESSAGES/django.mo'
+        mo_file_en = 'locale/en/LC_MESSAGES/freedom.mo'
         err_buffer = StringIO()
         # put file in read-only mode
         old_mode = os.stat(mo_file_en).st_mode
@@ -64,7 +64,7 @@ class PoFileContentsTests(MessageCompilationTests):
     # Ticket #11240
 
     LOCALE = 'fr'
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    MO_FILE = 'locale/%s/LC_MESSAGES/freedom.mo' % LOCALE
 
     def setUp(self):
         super(PoFileContentsTests, self).setUp()
@@ -80,7 +80,7 @@ class PercentRenderingTests(MessageCompilationTests):
     # to keep tests for all the stack together
 
     LOCALE = 'it'
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    MO_FILE = 'locale/%s/LC_MESSAGES/freedom.mo' % LOCALE
 
     def setUp(self):
         super(PercentRenderingTests, self).setUp()
@@ -88,7 +88,7 @@ class PercentRenderingTests(MessageCompilationTests):
 
     def test_percent_symbol_escaping(self):
         with override_settings(LOCALE_PATHS=(os.path.join(self.test_dir, 'locale'),)):
-            from django.template import Template, Context
+            from freedom.template import Template, Context
             call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
             with translation.override(self.LOCALE):
                 t = Template('{% load i18n %}{% trans "Looks like a str fmt spec %% o but shouldn\'t be interpreted as such" %}')
@@ -108,8 +108,8 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
     def setUp(self):
         super(MultipleLocaleCompilationTests, self).setUp()
         localedir = os.path.join(self.test_dir, 'locale')
-        self.MO_FILE_HR = os.path.join(localedir, 'hr/LC_MESSAGES/django.mo')
-        self.MO_FILE_FR = os.path.join(localedir, 'fr/LC_MESSAGES/django.mo')
+        self.MO_FILE_HR = os.path.join(localedir, 'hr/LC_MESSAGES/freedom.mo')
+        self.MO_FILE_FR = os.path.join(localedir, 'fr/LC_MESSAGES/freedom.mo')
         self.addCleanup(self.rmfile, os.path.join(localedir, self.MO_FILE_HR))
         self.addCleanup(self.rmfile, os.path.join(localedir, self.MO_FILE_FR))
 
@@ -131,7 +131,7 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
 
     test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'exclude'))
 
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo'
+    MO_FILE = 'locale/%s/LC_MESSAGES/freedom.mo'
 
     def setUp(self):
         super(ExcludedLocaleCompilationTests, self).setUp()
@@ -146,7 +146,7 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
             # `call_command` bypasses the parser; by calling
             # `execute_from_command_line` with the help subcommand we
             # ensure that there are no issues with the parser itself.
-            execute_from_command_line(['django-admin', 'help', 'compilemessages'])
+            execute_from_command_line(['freedom-admin', 'help', 'compilemessages'])
         finally:
             sys.stdout, sys.stderr = old_stdout, old_stderr
 
@@ -179,7 +179,7 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
 class CompilationErrorHandling(MessageCompilationTests):
 
     LOCALE = 'ja'
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    MO_FILE = 'locale/%s/LC_MESSAGES/freedom.mo' % LOCALE
 
     def setUp(self):
         super(CompilationErrorHandling, self).setUp()

@@ -1,13 +1,13 @@
 .. _ref-gis-utils:
 
 ===================
-GeoDjango Utilities
+GeoFreedom Utilities
 ===================
 
-.. module:: django.contrib.gis.utils
-   :synopsis: GeoDjango's collection of utilities.
+.. module:: freedom.contrib.gis.utils
+   :synopsis: GeoFreedom's collection of utilities.
 
-The :mod:`django.contrib.gis.utils` module contains various utilities that are
+The :mod:`freedom.contrib.gis.utils` module contains various utilities that are
 useful in creating geospatial Web applications.
 
 .. toctree::

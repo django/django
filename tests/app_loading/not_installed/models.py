@@ -1,4 +1,4 @@
-from django.db import models
+from freedom.db import models
 
 
 class NotInstalledModel(models.Model):

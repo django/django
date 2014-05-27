@@ -2,9 +2,9 @@
 Writing code
 ============
 
-So you'd like to write some code to improve Django. Awesome! Browse the
+So you'd like to write some code to improve Freedom. Awesome! Browse the
 following sections to find out how to give your code patches the best
-chances to be included in Django core:
+chances to be included in Freedom core:
 
 .. toctree::
    :maxdepth: 1

@@ -11,11 +11,11 @@ returns.
 
 from __future__ import unicode_literals
 
-from django.contrib.contenttypes.fields import (
+from freedom.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 # An example of a custom manager called "objects".
 

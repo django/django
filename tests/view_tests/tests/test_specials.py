@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.test import TestCase, override_settings
+from freedom.test import TestCase, override_settings
 
 
 @override_settings(ROOT_URLCONF='view_tests.generic_urls')

@@ -5,7 +5,7 @@
 ##########
 
 Each Field class does some sort of validation. Each Field has a clean() method,
-which either raises django.forms.ValidationError or returns the "clean"
+which either raises freedom.forms.ValidationError or returns the "clean"
 data -- usually a Unicode object, but, in some rare cases, a list.
 
 Each Field's __init__() takes at least these parameters:
@@ -16,7 +16,7 @@ Each Field's __init__() takes at least these parameters:
               Widget that it'll use if you don't specify this. In most cases,
               the default widget is TextInput.
     label -- A verbose name for this field, for use in displaying this field in
-             a form. By default, Django will use a "pretty" version of the form
+             a form. By default, Freedom will use a "pretty" version of the form
              field name, if the Field is part of a Form.
     initial -- A value to use in this Field's initial display. This value is
                *not* used as a fallback if data isn't given.
@@ -32,8 +32,8 @@ import re
 import os
 from decimal import Decimal
 
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import (
+from freedom.core.files.uploadedfile import SimpleUploadedFile
+from freedom.forms import (
     BooleanField, CharField, ChoiceField, ComboField, DateField, DateTimeField,
     DecimalField, EmailField, Field, FileField, FilePathField, FloatField,
     Form, forms, HiddenInput, IntegerField, MultipleChoiceField,
@@ -41,11 +41,11 @@ from django.forms import (
     SplitDateTimeField, TextInput, Textarea, TimeField, TypedChoiceField,
     TypedMultipleChoiceField, URLField, ValidationError, Widget,
 )
-from django.test import SimpleTestCase
-from django.utils import formats
-from django.utils import six
-from django.utils import translation
-from django.utils._os import upath
+from freedom.test import SimpleTestCase
+from freedom.utils import formats
+from freedom.utils import six
+from freedom.utils import translation
+from freedom.utils._os import upath
 
 
 def fix_os_paths(x):
@@ -770,7 +770,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://inv-.-alid.com')
         self.assertEqual('http://valid-----hyphens.com', f.clean('http://valid-----hyphens.com'))
         self.assertEqual('http://some.idn.xyz\xe4\xf6\xfc\xdfabc.domain.com:123/blah', f.clean('http://some.idn.xyzäöüßabc.domain.com:123/blah'))
-        self.assertEqual('http://www.example.com/s/http://code.djangoproject.com/ticket/13804', f.clean('www.example.com/s/http://code.djangoproject.com/ticket/13804'))
+        self.assertEqual('http://www.example.com/s/http://code.freedomproject.com/ticket/13804', f.clean('www.example.com/s/http://code.freedomproject.com/ticket/13804'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, '[a')
         self.assertRaisesMessage(ValidationError, "'Enter a valid URL.'", f.clean, 'http://[a')
 
@@ -861,7 +861,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, False)
         self.assertEqual(True, f.clean(1))
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, 0)
-        self.assertEqual(True, f.clean('Django rocks'))
+        self.assertEqual(True, f.clean('Freedom rocks'))
         self.assertEqual(True, f.clean('True'))
         self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, 'False')
 
@@ -875,7 +875,7 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(False, f.clean(0))
         self.assertEqual(True, f.clean('1'))
         self.assertEqual(False, f.clean('0'))
-        self.assertEqual(True, f.clean('Django rocks'))
+        self.assertEqual(True, f.clean('Freedom rocks'))
         self.assertEqual(False, f.clean('False'))
         self.assertEqual(False, f.clean('false'))
         self.assertEqual(False, f.clean('FaLsE'))
@@ -1181,7 +1181,7 @@ class FieldsTests(SimpleTestCase):
     def test_filepathfield_1(self):
         path = os.path.abspath(upath(forms.__file__))
         path = os.path.dirname(path) + '/'
-        self.assertTrue(fix_os_paths(path).endswith('/django/forms/'))
+        self.assertTrue(fix_os_paths(path).endswith('/freedom/forms/'))
 
     def test_filepathfield_2(self):
         path = upath(forms.__file__)
@@ -1190,20 +1190,20 @@ class FieldsTests(SimpleTestCase):
         f.choices = [p for p in f.choices if p[0].endswith('.py')]
         f.choices.sort()
         expected = [
-            ('/django/forms/__init__.py', '__init__.py'),
-            ('/django/forms/fields.py', 'fields.py'),
-            ('/django/forms/forms.py', 'forms.py'),
-            ('/django/forms/formsets.py', 'formsets.py'),
-            ('/django/forms/models.py', 'models.py'),
-            ('/django/forms/util.py', 'util.py'),
-            ('/django/forms/utils.py', 'utils.py'),
-            ('/django/forms/widgets.py', 'widgets.py')
+            ('/freedom/forms/__init__.py', '__init__.py'),
+            ('/freedom/forms/fields.py', 'fields.py'),
+            ('/freedom/forms/forms.py', 'forms.py'),
+            ('/freedom/forms/formsets.py', 'formsets.py'),
+            ('/freedom/forms/models.py', 'models.py'),
+            ('/freedom/forms/util.py', 'util.py'),
+            ('/freedom/forms/utils.py', 'utils.py'),
+            ('/freedom/forms/widgets.py', 'widgets.py')
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
             self.assertTrue(got[0].endswith(exp[0]))
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. fields.py is not one of the available choices.'", f.clean, 'fields.py')
-        assert fix_os_paths(f.clean(path + 'fields.py')).endswith('/django/forms/fields.py')
+        assert fix_os_paths(f.clean(path + 'fields.py')).endswith('/freedom/forms/fields.py')
 
     def test_filepathfield_3(self):
         path = upath(forms.__file__)
@@ -1211,14 +1211,14 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, match='^.*?\.py$')
         f.choices.sort()
         expected = [
-            ('/django/forms/__init__.py', '__init__.py'),
-            ('/django/forms/fields.py', 'fields.py'),
-            ('/django/forms/forms.py', 'forms.py'),
-            ('/django/forms/formsets.py', 'formsets.py'),
-            ('/django/forms/models.py', 'models.py'),
-            ('/django/forms/util.py', 'util.py'),
-            ('/django/forms/utils.py', 'utils.py'),
-            ('/django/forms/widgets.py', 'widgets.py')
+            ('/freedom/forms/__init__.py', '__init__.py'),
+            ('/freedom/forms/fields.py', 'fields.py'),
+            ('/freedom/forms/forms.py', 'forms.py'),
+            ('/freedom/forms/formsets.py', 'formsets.py'),
+            ('/freedom/forms/models.py', 'models.py'),
+            ('/freedom/forms/util.py', 'util.py'),
+            ('/freedom/forms/utils.py', 'utils.py'),
+            ('/freedom/forms/widgets.py', 'widgets.py')
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
@@ -1230,16 +1230,16 @@ class FieldsTests(SimpleTestCase):
         f = FilePathField(path=path, recursive=True, match='^.*?\.py$')
         f.choices.sort()
         expected = [
-            ('/django/forms/__init__.py', '__init__.py'),
-            ('/django/forms/extras/__init__.py', 'extras/__init__.py'),
-            ('/django/forms/extras/widgets.py', 'extras/widgets.py'),
-            ('/django/forms/fields.py', 'fields.py'),
-            ('/django/forms/forms.py', 'forms.py'),
-            ('/django/forms/formsets.py', 'formsets.py'),
-            ('/django/forms/models.py', 'models.py'),
-            ('/django/forms/util.py', 'util.py'),
-            ('/django/forms/utils.py', 'utils.py'),
-            ('/django/forms/widgets.py', 'widgets.py')
+            ('/freedom/forms/__init__.py', '__init__.py'),
+            ('/freedom/forms/extras/__init__.py', 'extras/__init__.py'),
+            ('/freedom/forms/extras/widgets.py', 'extras/widgets.py'),
+            ('/freedom/forms/fields.py', 'fields.py'),
+            ('/freedom/forms/forms.py', 'forms.py'),
+            ('/freedom/forms/formsets.py', 'formsets.py'),
+            ('/freedom/forms/models.py', 'models.py'),
+            ('/freedom/forms/util.py', 'util.py'),
+            ('/freedom/forms/utils.py', 'utils.py'),
+            ('/freedom/forms/widgets.py', 'widgets.py')
         ]
         for exp, got in zip(expected, fix_os_paths(f.choices)):
             self.assertEqual(exp[1], got[1])
@@ -1274,7 +1274,7 @@ class FieldsTests(SimpleTestCase):
     # SplitDateTimeField ##########################################################
 
     def test_splitdatetimefield_1(self):
-        from django.forms.widgets import SplitDateTimeWidget
+        from freedom.forms.widgets import SplitDateTimeWidget
         f = SplitDateTimeField()
         assert isinstance(f.widget, SplitDateTimeWidget)
         self.assertEqual(datetime.datetime(2006, 1, 10, 7, 30), f.clean([datetime.date(2006, 1, 10), datetime.time(7, 30)]))

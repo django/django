@@ -1,6 +1,6 @@
 import warnings
 
-from django.conf.urls import patterns, url, include
+from freedom.conf.urls import patterns, url, include
 
 from .views import empty_view, empty_view_partial, empty_view_wrapped, absolute_kwargs_view
 
@@ -10,9 +10,9 @@ other_patterns = [
     url(r'nested_path/$', 'urlpatterns_reverse.views.nested_view'),
 ]
 
-# test deprecated patterns() function. convert to list of urls() in Django 2.0
+# test deprecated patterns() function. convert to list of urls() in Freedom 2.0
 with warnings.catch_warnings(record=True):
-    warnings.filterwarnings('ignore', module='django.conf.urls')
+    warnings.filterwarnings('ignore', module='freedom.conf.urls')
 
     urlpatterns = patterns('',
         url(r'^places/([0-9]+)/$', empty_view, name='places'),

@@ -1,5 +1,5 @@
 =====================================
-Writing your first Django app, part 4
+Writing your first Freedom app, part 4
 =====================================
 
 This tutorial begins where :doc:`Tutorial 3 </intro/tutorial03>` left off. We're
@@ -12,7 +12,7 @@ Write a simple form
 Let's update our poll detail template ("polls/detail.html") from the last
 tutorial, so that the template contains an HTML ``<form>`` element:
 
-.. snippet:: html+django
+.. snippet:: html+freedom
     :filename: polls/templates/polls/detail.html
 
     <h1>{{ question.question_text }}</h1>
@@ -42,19 +42,19 @@ A quick rundown:
   ``method="get"``) is very important, because the act of submitting this
   form will alter data server-side. Whenever you create a form that alters
   data server-side, use ``method="post"``. This tip isn't specific to
-  Django; it's just good Web development practice.
+  Freedom; it's just good Web development practice.
 
 * ``forloop.counter`` indicates how many times the :ttag:`for` tag has gone
   through its loop
 
 * Since we're creating a POST form (which can have the effect of modifying
   data), we need to worry about Cross Site Request Forgeries.
-  Thankfully, you don't have to worry too hard, because Django comes with
+  Thankfully, you don't have to worry too hard, because Freedom comes with
   a very easy-to-use system for protecting against it. In short, all POST
   forms that are targeted at internal URLs should use the
   :ttag:`{% csrf_token %}<csrf_token>` template tag.
 
-Now, let's create a Django view that handles the submitted data and does
+Now, let's create a Freedom view that handles the submitted data and does
 something with it. Remember, in :doc:`Tutorial 3 </intro/tutorial03>`, we
 created a URLconf for the polls application that includes this line:
 
@@ -69,9 +69,9 @@ create a real version. Add the following to ``polls/views.py``:
 .. snippet::
     :filename: polls/views.py
 
-    from django.shortcuts import get_object_or_404, render
-    from django.http import HttpResponseRedirect, HttpResponse
-    from django.core.urlresolvers import reverse
+    from freedom.shortcuts import get_object_or_404, render
+    from freedom.http import HttpResponseRedirect, HttpResponse
+    from freedom.core.urlresolvers import reverse
     from polls.models import Choice, Question
     # ...
     def vote(request, question_id):
@@ -94,16 +94,16 @@ create a real version. Add the following to ``polls/views.py``:
 
 This code includes a few things we haven't covered yet in this tutorial:
 
-* :attr:`request.POST <django.http.HttpRequest.POST>` is a dictionary-like
+* :attr:`request.POST <freedom.http.HttpRequest.POST>` is a dictionary-like
   object that lets you access submitted data by key name. In this case,
   ``request.POST['choice']`` returns the ID of the selected choice, as a
-  string. :attr:`request.POST <django.http.HttpRequest.POST>` values are
+  string. :attr:`request.POST <freedom.http.HttpRequest.POST>` values are
   always strings.
 
-  Note that Django also provides :attr:`request.GET
-  <django.http.HttpRequest.GET>` for accessing GET data in the same way --
+  Note that Freedom also provides :attr:`request.GET
+  <freedom.http.HttpRequest.GET>` for accessing GET data in the same way --
   but we're explicitly using :attr:`request.POST
-  <django.http.HttpRequest.POST>` in our code, to ensure that data is only
+  <freedom.http.HttpRequest.POST>` in our code, to ensure that data is only
   altered via a POST call.
 
 * ``request.POST['choice']`` will raise :exc:`KeyError` if
@@ -112,24 +112,24 @@ This code includes a few things we haven't covered yet in this tutorial:
   message if ``choice`` isn't given.
 
 * After incrementing the choice count, the code returns an
-  :class:`~django.http.HttpResponseRedirect` rather than a normal
-  :class:`~django.http.HttpResponse`.
-  :class:`~django.http.HttpResponseRedirect` takes a single argument: the
+  :class:`~freedom.http.HttpResponseRedirect` rather than a normal
+  :class:`~freedom.http.HttpResponse`.
+  :class:`~freedom.http.HttpResponseRedirect` takes a single argument: the
   URL to which the user will be redirected (see the following point for how
   we construct the URL in this case).
 
   As the Python comment above points out, you should always return an
-  :class:`~django.http.HttpResponseRedirect` after successfully dealing with
-  POST data. This tip isn't specific to Django; it's just good Web
+  :class:`~freedom.http.HttpResponseRedirect` after successfully dealing with
+  POST data. This tip isn't specific to Freedom; it's just good Web
   development practice.
 
-* We are using the :func:`~django.core.urlresolvers.reverse` function in the
-  :class:`~django.http.HttpResponseRedirect` constructor in this example.
+* We are using the :func:`~freedom.core.urlresolvers.reverse` function in the
+  :class:`~freedom.http.HttpResponseRedirect` constructor in this example.
   This function helps avoid having to hardcode a URL in the view function.
   It is given the name of the view that we want to pass control to and the
   variable portion of the URL pattern that points to that view. In this
   case, using the URLconf we set up in Tutorial 3, this
-  :func:`~django.core.urlresolvers.reverse` call will return a string like
+  :func:`~freedom.core.urlresolvers.reverse` call will return a string like
   ::
 
     '/polls/3/results/'
@@ -137,8 +137,8 @@ This code includes a few things we haven't covered yet in this tutorial:
   ... where the ``3`` is the value of ``p.id``. This redirected URL will
   then call the ``'results'`` view to display the final page.
 
-As mentioned in Tutorial 3, ``request`` is a :class:`~django.http.HttpRequest`
-object. For more on :class:`~django.http.HttpRequest` objects, see the
+As mentioned in Tutorial 3, ``request`` is a :class:`~freedom.http.HttpRequest`
+object. For more on :class:`~freedom.http.HttpRequest` objects, see the
 :doc:`request and response documentation </ref/request-response>`.
 
 After somebody votes in a question, the ``vote()`` view redirects to the results
@@ -147,7 +147,7 @@ page for the question. Let's write that view:
 .. snippet::
     :filename: polls/views.py
 
-    from django.shortcuts import get_object_or_404, render
+    from freedom.shortcuts import get_object_or_404, render
 
 
     def results(request, question_id):
@@ -160,7 +160,7 @@ redundancy later.
 
 Now, create a ``polls/results.html`` template:
 
-.. snippet:: html+django
+.. snippet:: html+freedom
     :filename: polls/templates/polls/results.html
 
     <h1>{{ question.question_text }}</h1>
@@ -186,7 +186,7 @@ view (also from Tutorial 3), which displays a list of polls, is similar.
 
 These views represent a common case of basic Web development: getting data from
 the database according to a parameter passed in the URL, loading a template and
-returning the rendered template. Because this is so common, Django provides a
+returning the rendered template. Because this is so common, Freedom provides a
 shortcut, called the "generic views" system.
 
 Generic views abstract common patterns to the point where you don't even need
@@ -200,13 +200,13 @@ conversion. We will:
 
 2. Delete some of the old, unneeded views.
 
-3. Introduce new views based on Django's generic views.
+3. Introduce new views based on Freedom's generic views.
 
 Read on for details.
 
 .. admonition:: Why the code-shuffle?
 
-    Generally, when writing a Django app, you'll evaluate whether generic views
+    Generally, when writing a Freedom app, you'll evaluate whether generic views
     are a good fit for your problem, and you'll use them from the beginning,
     rather than refactoring your code halfway through. But this tutorial
     intentionally has focused on writing the views "the hard way" until now, to
@@ -222,7 +222,7 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 .. snippet::
     :filename: polls/urls.py
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     from polls import views
 
@@ -237,16 +237,16 @@ Amend views
 -----------
 
 Next, we're going to remove our old ``index``, ``detail``, and ``results``
-views and use Django's generic views instead. To do so, open the
+views and use Freedom's generic views instead. To do so, open the
 ``polls/views.py`` file and change it like so:
 
 .. snippet::
     :filename: polls/views.py
 
-    from django.shortcuts import get_object_or_404, render
-    from django.http import HttpResponseRedirect
-    from django.core.urlresolvers import reverse
-    from django.views import generic
+    from freedom.shortcuts import get_object_or_404, render
+    from freedom.http import HttpResponseRedirect
+    from freedom.core.urlresolvers import reverse
+    from freedom.views import generic
 
     from polls.models import Choice, Question
 
@@ -274,46 +274,46 @@ views and use Django's generic views instead. To do so, open the
         ... # same as above
 
 We're using two generic views here:
-:class:`~django.views.generic.list.ListView` and
-:class:`~django.views.generic.detail.DetailView`. Respectively, those
+:class:`~freedom.views.generic.list.ListView` and
+:class:`~freedom.views.generic.detail.DetailView`. Respectively, those
 two views abstract the concepts of "display a list of objects" and
 "display a detail page for a particular type of object."
 
 * Each generic view needs to know what model it will be acting
   upon. This is provided using the ``model`` attribute.
 
-* The :class:`~django.views.generic.detail.DetailView` generic view
+* The :class:`~freedom.views.generic.detail.DetailView` generic view
   expects the primary key value captured from the URL to be called
   ``"pk"``, so we've changed ``question_id`` to ``pk`` for the generic
   views.
 
-By default, the :class:`~django.views.generic.detail.DetailView` generic
+By default, the :class:`~freedom.views.generic.detail.DetailView` generic
 view uses a template called ``<app name>/<model name>_detail.html``.
 In our case, it would use the template ``"polls/question_detail.html"``. The
-``template_name`` attribute is used to tell Django to use a specific
+``template_name`` attribute is used to tell Freedom to use a specific
 template name instead of the autogenerated default template name. We
 also specify the ``template_name`` for the ``results`` list view --
 this ensures that the results view and the detail view have a
 different appearance when rendered, even though they're both a
-:class:`~django.views.generic.detail.DetailView` behind the scenes.
+:class:`~freedom.views.generic.detail.DetailView` behind the scenes.
 
-Similarly, the :class:`~django.views.generic.list.ListView` generic
+Similarly, the :class:`~freedom.views.generic.list.ListView` generic
 view uses a default template called ``<app name>/<model
 name>_list.html``; we use ``template_name`` to tell
-:class:`~django.views.generic.list.ListView` to use our existing
+:class:`~freedom.views.generic.list.ListView` to use our existing
 ``"polls/index.html"`` template.
 
 In previous parts of the tutorial, the templates have been provided
 with a context that contains the ``question`` and ``latest_question_list``
 context variables. For ``DetailView`` the ``question`` variable is provided
-automatically -- since we're using a Django model (``Question``), Django
+automatically -- since we're using a Freedom model (``Question``), Freedom
 is able to determine an appropriate name for the context variable.
 However, for ListView, the automatically generated context variable is
 ``question_list``. To override this we provide the ``context_object_name``
 attribute, specifying that we want to use ``latest_question_list`` instead.
 As an alternative approach, you could change your templates to match
 the new default context variables -- but it's a lot easier to just
-tell Django to use the variable you want.
+tell Freedom to use the variable you want.
 
 Run the server, and use your new polling app based on generic views.
 

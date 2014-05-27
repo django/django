@@ -1,5 +1,5 @@
-from django.contrib import admin
-from django.contrib.contenttypes.admin import GenericTabularInline
+from freedom.contrib import admin
+from freedom.contrib.contenttypes.admin import GenericTabularInline
 
 from .models import (Media, PhoneNumber, Episode, Contact,
     Category, EpisodePermanent)

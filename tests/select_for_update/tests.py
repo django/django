@@ -3,12 +3,12 @@ from __future__ import unicode_literals
 import time
 import unittest
 
-from django.conf import settings
-from django.db import transaction, connection, router
-from django.db.utils import ConnectionHandler, DEFAULT_DB_ALIAS, DatabaseError
-from django.test import (TransactionTestCase, skipIfDBFeature,
+from freedom.conf import settings
+from freedom.db import transaction, connection, router
+from freedom.db.utils import ConnectionHandler, DEFAULT_DB_ALIAS, DatabaseError
+from freedom.test import (TransactionTestCase, skipIfDBFeature,
     skipUnlessDBFeature)
-from django.test import override_settings
+from freedom.test import override_settings
 
 from multiple_database.routers import TestRouter
 

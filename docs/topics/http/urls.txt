@@ -3,7 +3,7 @@ URL dispatcher
 ==============
 
 A clean, elegant URL scheme is an important detail in a high-quality Web
-application. Django lets you design URLs however you want, with no framework
+application. Freedom lets you design URLs however you want, with no framework
 limitations.
 
 There's no ``.php`` or ``.cgi`` required, and certainly none of that
@@ -26,45 +26,45 @@ This mapping can be as short or as long as needed. It can reference other
 mappings. And, because it's pure Python code, it can be constructed
 dynamically.
 
-Django also provides a way to translate URLs according to the active
+Freedom also provides a way to translate URLs according to the active
 language. See the :ref:`internationalization documentation
 <url-internationalization>` for more information.
 
-.. _how-django-processes-a-request:
+.. _how-freedom-processes-a-request:
 
-How Django processes a request
+How Freedom processes a request
 ==============================
 
-When a user requests a page from your Django-powered site, this is the
+When a user requests a page from your Freedom-powered site, this is the
 algorithm the system follows to determine which Python code to execute:
 
-1. Django determines the root URLconf module to use. Ordinarily,
+1. Freedom determines the root URLconf module to use. Ordinarily,
    this is the value of the :setting:`ROOT_URLCONF` setting, but if the incoming
    ``HttpRequest`` object has an attribute called ``urlconf`` (set by
    middleware :ref:`request processing <request-middleware>`), its value
    will be used in place of the :setting:`ROOT_URLCONF` setting.
 
-2. Django loads that Python module and looks for the variable
-   ``urlpatterns``. This should be a Python list of :func:`django.conf.urls.url`
+2. Freedom loads that Python module and looks for the variable
+   ``urlpatterns``. This should be a Python list of :func:`freedom.conf.urls.url`
    instances.
 
-3. Django runs through each URL pattern, in order, and stops at the first
+3. Freedom runs through each URL pattern, in order, and stops at the first
    one that matches the requested URL.
 
-4. Once one of the regexes matches, Django imports and calls the given view,
+4. Once one of the regexes matches, Freedom imports and calls the given view,
    which is a simple Python function (or a :doc:`class based view
    </topics/class-based-views/index>`). The view gets passed the following
    arguments:
 
-   * An instance of :class:`~django.http.HttpRequest`.
+   * An instance of :class:`~freedom.http.HttpRequest`.
    * If the matched regular expression returned no named groups, then the
      matches from the regular expression are provided as positional arguments.
    * The keyword arguments are made up of any named groups matched by the
      regular expression, overridden by any arguments specified in the optional
-     ``kwargs`` argument to :func:`django.conf.urls.url`.
+     ``kwargs`` argument to :func:`freedom.conf.urls.url`.
 
 5. If no regex matches, or if an exception is raised during any
-   point in this process, Django invokes an appropriate
+   point in this process, Freedom invokes an appropriate
    error-handling view. See `Error handling`_ below.
 
 Example
@@ -72,7 +72,7 @@ Example
 
 Here's a sample URLconf::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     urlpatterns = [
         url(r'^articles/2003/$', 'news.views.special_case_2003'),
@@ -95,7 +95,7 @@ Notes:
 Example requests:
 
 * A request to ``/articles/2005/03/`` would match the third entry in the
-  list. Django would call the function
+  list. Freedom would call the function
   ``news.views.month_archive(request, '2005', '03')``.
 
 * ``/articles/2005/3/`` would not match any URL patterns, because the
@@ -109,7 +109,7 @@ Example requests:
 * ``/articles/2003`` would not match any of these patterns, because each
   pattern requires that the URL end with a slash.
 
-* ``/articles/2003/03/03/`` would match the final pattern. Django would call
+* ``/articles/2003/03/03/`` would match the final pattern. Freedom would call
   the function ``news.views.article_detail(request, '2003', '03', '03')``.
 
 .. _Dive Into Python's explanation: http://diveintopython.net/regular_expressions/street_addresses.html#re.matching.2.3
@@ -129,7 +129,7 @@ is ``(?P<name>pattern)``, where ``name`` is the name of the group and
 
 Here's the above example URLconf, rewritten to use named groups::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     urlpatterns = [
         url(r'^articles/2003/$', 'news.views.special_case_2003'),
@@ -203,7 +203,7 @@ A convenient trick is to specify default parameters for your views' arguments.
 Here's an example URLconf and view::
 
     # URLconf
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     urlpatterns = [
         url(r'^blog/$', 'blog.views.page'),
@@ -230,14 +230,14 @@ accessed. This makes the system blazingly fast.
 Syntax of the urlpatterns variable
 ==================================
 
-``urlpatterns`` should be a Python list of :func:`~django.conf.urls.url`
+``urlpatterns`` should be a Python list of :func:`~freedom.conf.urls.url`
 instances.
 
 Error handling
 ==============
 
-When Django can't find a regex matching the requested URL, or when an
-exception is raised, Django will invoke an error-handling view.
+When Freedom can't find a regex matching the requested URL, or when an
+exception is raised, Freedom will invoke an error-handling view.
 
 The views to use for these cases are specified by four variables. Their
 default values should suffice for most projects, but further customization is
@@ -254,10 +254,10 @@ to the view that should be called to handle the error condition at hand.
 
 The variables are:
 
-* ``handler404`` -- See :data:`django.conf.urls.handler404`.
-* ``handler500`` -- See :data:`django.conf.urls.handler500`.
-* ``handler403`` -- See :data:`django.conf.urls.handler403`.
-* ``handler400`` -- See :data:`django.conf.urls.handler400`.
+* ``handler404`` -- See :data:`freedom.conf.urls.handler404`.
+* ``handler500`` -- See :data:`freedom.conf.urls.handler500`.
+* ``handler403`` -- See :data:`freedom.conf.urls.handler403`.
+* ``handler400`` -- See :data:`freedom.conf.urls.handler400`.
 
 .. _including-other-urlconfs:
 
@@ -267,28 +267,28 @@ Including other URLconfs
 At any point, your ``urlpatterns`` can "include" other URLconf modules. This
 essentially "roots" a set of URLs below other ones.
 
-For example, here's an excerpt of the URLconf for the `Django Web site`_
+For example, here's an excerpt of the URLconf for the `Freedom Web site`_
 itself. It includes a number of other URLconfs::
 
-    from django.conf.urls import include, url
+    from freedom.conf.urls import include, url
 
     urlpatterns = [
         # ... snip ...
-        url(r'^community/', include('django_website.aggregator.urls')),
-        url(r'^contact/', include('django_website.contact.urls')),
+        url(r'^community/', include('freedom_website.aggregator.urls')),
+        url(r'^contact/', include('freedom_website.contact.urls')),
         # ... snip ...
     ]
 
 Note that the regular expressions in this example don't have a ``$``
 (end-of-string match character) but do include a trailing slash. Whenever
-Django encounters ``include()`` (:func:`django.conf.urls.include()`), it chops
+Freedom encounters ``include()`` (:func:`freedom.conf.urls.include()`), it chops
 off whatever part of the URL matched up to that point and sends the remaining
 string to the included URLconf for further processing.
 
 Another possibility is to include additional URL patterns by using a list of
-:func:`~django.conf.urls.url` instances. For example, consider this URLconf::
+:func:`~freedom.conf.urls.url` instances. For example, consider this URLconf::
 
-    from django.conf.urls import include, url
+    from freedom.conf.urls import include, url
 
     extra_patterns = [
         url(r'^reports/(?P<id>[0-9]+)/$', 'credit.views.report'),
@@ -302,12 +302,12 @@ Another possibility is to include additional URL patterns by using a list of
     ]
 
 In this example, the ``/credit/reports/`` URL will be handled by the
-``credit.views.report()`` Django view.
+``credit.views.report()`` Freedom view.
 
 This can be used to remove redundancy from URLconfs where a single pattern
 prefix is used repeatedly. For example, consider this URLconf::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from . import views
 
     urlpatterns = [
@@ -320,7 +320,7 @@ prefix is used repeatedly. For example, consider this URLconf::
 We can improve this by stating the common path prefix only once and grouping
 the suffixes that differ::
 
-    from django.conf.urls import include, url
+    from freedom.conf.urls import include, url
     from . import views
 
     urlpatterns = [
@@ -332,7 +332,7 @@ the suffixes that differ::
         ])),
     ]
 
-.. _`Django Web site`: https://www.djangoproject.com/
+.. _`Freedom Web site`: https://www.freedomproject.com/
 
 Captured parameters
 -------------------
@@ -341,14 +341,14 @@ An included URLconf receives any captured parameters from parent URLconfs, so
 the following example is valid::
 
     # In settings/urls/main.py
-    from django.conf.urls import include, url
+    from freedom.conf.urls import include, url
 
     urlpatterns = [
         url(r'^(?P<username>\w+)/blog/', include('foo.urls.blog')),
     ]
 
     # In foo/urls/blog.py
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from . import views
 
     urlpatterns = [
@@ -367,20 +367,20 @@ Passing extra options to view functions
 URLconfs have a hook that lets you pass extra arguments to your view functions,
 as a Python dictionary.
 
-The :func:`django.conf.urls.url` function can take an optional third argument
+The :func:`freedom.conf.urls.url` function can take an optional third argument
 which should be a dictionary of extra keyword arguments to pass to the view
 function.
 
 For example::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from . import views
 
     urlpatterns = [
         url(r'^blog/(?P<year>[0-9]{4})/$', views.year_archive, {'foo': 'bar'}),
     ]
 
-In this example, for a request to ``/blog/2005/``, Django will call
+In this example, for a request to ``/blog/2005/``, Freedom will call
 ``blog.views.year_archive(request, year='2005', foo='bar')``.
 
 This technique is used in the
@@ -397,7 +397,7 @@ options to views.
 Passing extra options to ``include()``
 --------------------------------------
 
-Similarly, you can pass extra options to :func:`~django.conf.urls.include`.
+Similarly, you can pass extra options to :func:`~freedom.conf.urls.include`.
 When you pass extra options to ``include()``, *each* line in the included
 URLconf will be passed the extra options.
 
@@ -406,14 +406,14 @@ For example, these two URLconf sets are functionally identical:
 Set one::
 
     # main.py
-    from django.conf.urls import include, url
+    from freedom.conf.urls import include, url
 
     urlpatterns = [
         url(r'^blog/', include('inner'), {'blogid': 3}),
     ]
 
     # inner.py
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from mysite import views
 
     urlpatterns = [
@@ -424,7 +424,7 @@ Set one::
 Set two::
 
     # main.py
-    from django.conf.urls import include, url
+    from freedom.conf.urls import include, url
     from mysite import views
 
     urlpatterns = [
@@ -432,7 +432,7 @@ Set two::
     ]
 
     # inner.py
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     urlpatterns = [
         url(r'^archive/$', views.archive, {'blogid': 3}),
@@ -453,7 +453,7 @@ supported -- you can pass any callable object as the view.
 
 For example, given this URLconf in "string" notation::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     urlpatterns = [
         url(r'^archive/$', 'mysite.views.archive'),
@@ -464,7 +464,7 @@ For example, given this URLconf in "string" notation::
 You can accomplish the same thing by passing objects rather than strings. Just
 be sure to import the objects::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from mysite.views import archive, about, contact
 
     urlpatterns = [
@@ -477,7 +477,7 @@ The following example is functionally identical. It's just a bit more compact
 because it imports the module that contains the views, rather than importing
 each view individually::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from mysite import views
 
     urlpatterns = [
@@ -491,7 +491,7 @@ The style you use is up to you.
 Note that :doc:`class based views</topics/class-based-views/index>` must be
 imported::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from mysite.views import ClassBasedView
 
     urlpatterns = [
@@ -501,7 +501,7 @@ imported::
 Reverse resolution of URLs
 ==========================
 
-A common need when working on a Django project is the possibility to obtain URLs
+A common need when working on a Freedom project is the possibility to obtain URLs
 in their final forms either for embedding in generated content (views and assets
 URLs, URLs shown to the user, etc.) or for handling of the navigation flow on
 the server side (redirections, etc.)
@@ -520,38 +520,38 @@ an identification (e.g. the name) of the view in charge of handling it, other
 pieces of information that necessarily must participate in the lookup of the
 right URL are the types (positional, keyword) and values of the view arguments.
 
-Django provides a solution such that the URL mapper is the only repository of
+Freedom provides a solution such that the URL mapper is the only repository of
 the URL design. You feed it with your URLconf and then it can be used in both
 directions:
 
-* Starting with a URL requested by the user/browser, it calls the right Django
+* Starting with a URL requested by the user/browser, it calls the right Freedom
   view providing any arguments it might need with their values as extracted from
   the URL.
 
-* Starting with the identification of the corresponding Django view plus the
+* Starting with the identification of the corresponding Freedom view plus the
   values of arguments that would be passed to it, obtain the associated URL.
 
 The first one is the usage we've been discussing in the previous sections. The
 second one is what is known as *reverse resolution of URLs*, *reverse URL
 matching*, *reverse URL lookup*, or simply *URL reversing*.
 
-Django provides tools for performing URL reversing that match the different
+Freedom provides tools for performing URL reversing that match the different
 layers where URLs are needed:
 
 * In templates: Using the :ttag:`url` template tag.
 
-* In Python code: Using the :func:`django.core.urlresolvers.reverse`
+* In Python code: Using the :func:`freedom.core.urlresolvers.reverse`
   function.
 
-* In higher level code related to handling of URLs of Django model instances:
-  The :meth:`~django.db.models.Model.get_absolute_url` method.
+* In higher level code related to handling of URLs of Freedom model instances:
+  The :meth:`~freedom.db.models.Model.get_absolute_url` method.
 
 Examples
 --------
 
 Consider again this URLconf entry::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
 
     urlpatterns = [
         #...
@@ -564,7 +564,7 @@ is ``/articles/nnnn/``.
 
 You can obtain these in template code by using:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     <a href="{% url 'news.views.year_archive' 2012 %}">2012 Archive</a>
     {# Or with the year in a template context variable: #}
@@ -576,8 +576,8 @@ You can obtain these in template code by using:
 
 Or in Python code::
 
-    from django.core.urlresolvers import reverse
-    from django.http import HttpResponseRedirect
+    from freedom.core.urlresolvers import reverse
+    from freedom.http import HttpResponseRedirect
 
     def redirect_to_year(request):
         # ...
@@ -592,7 +592,7 @@ change the entry in the URLconf.
 In some scenarios where views are of a generic nature, a many-to-one
 relationship might exist between URLs and views. For these cases the view name
 isn't a good enough identifier for it when comes the time of reversing
-URLs. Read the next section to know about the solution Django provides for this.
+URLs. Read the next section to know about the solution Freedom provides for this.
 
 .. _naming-url-patterns:
 
@@ -603,7 +603,7 @@ It's fairly common to use the same view function in multiple URL patterns in
 your URLconf. For example, these two URL patterns both point to the ``archive``
 view::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from mysite.views import archive
 
     urlpatterns = [
@@ -612,19 +612,19 @@ view::
     ]
 
 This is completely valid, but it leads to problems when you try to do reverse
-URL matching (through the :func:`~django.core.urlresolvers.reverse` function
+URL matching (through the :func:`~freedom.core.urlresolvers.reverse` function
 or the :ttag:`url` template tag). Continuing this example, if you wanted to
-retrieve the URL for the ``archive`` view, Django's reverse URL matcher would
+retrieve the URL for the ``archive`` view, Freedom's reverse URL matcher would
 get confused, because *two* URL patterns point at that view.
 
-To solve this problem, Django supports **named URL patterns**. That is, you can
+To solve this problem, Freedom supports **named URL patterns**. That is, you can
 give a name to a URL pattern in order to distinguish it from other patterns
 using the same view and parameters. Then, you can use this name in reverse URL
 matching.
 
 Here's the above example, rewritten to use named URL patterns::
 
-    from django.conf.urls import url
+    from freedom.conf.urls import url
     from mysite.views import archive
 
     urlpatterns = [
@@ -635,13 +635,13 @@ Here's the above example, rewritten to use named URL patterns::
 With these names in place (``full-archive`` and ``arch-summary``), you can
 target each pattern individually by using its name:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% url 'arch-summary' 1945 %}
     {% url 'full-archive' 2007 %}
 
 Even though both URL patterns refer to the ``archive`` view here, using the
-``name`` parameter to :func:`django.conf.urls.url` allows you to tell them
+``name`` parameter to :func:`freedom.conf.urls.url` allows you to tell them
 apart in templates.
 
 The string used for the URL name can contain any characters you like. You are
@@ -680,14 +680,14 @@ A URL namespace comes in two parts, both of which are strings:
   application namespace
     This describes the name of the application that is being deployed. Every
     instance of a single application will have the same application namespace.
-    For example, Django's admin application has the somewhat predictable
+    For example, Freedom's admin application has the somewhat predictable
     application namespace of ``'admin'``.
 
   instance namespace
     This identifies a specific instance of an application. Instance namespaces
     should be unique across your entire project. However, an instance namespace
     can be the same as the application namespace. This is used to specify a
-    default instance of an application. For example, the default Django Admin
+    default instance of an application. For example, the default Freedom Admin
     instance has an instance namespace of ``'admin'``.
 
 Namespaced URLs are specified using the ``':'`` operator. For example, the main
@@ -703,14 +703,14 @@ within the top-level namespace ``'foo'``.
 Reversing namespaced URLs
 -------------------------
 
-When given a namespaced URL (e.g. ``'myapp:index'``) to resolve, Django splits
+When given a namespaced URL (e.g. ``'myapp:index'``) to resolve, Freedom splits
 the fully qualified name into parts, and then tries the following lookup:
 
-1. First, Django looks for a matching :term:`application namespace` (in this
+1. First, Freedom looks for a matching :term:`application namespace` (in this
    example, ``'myapp'``). This will yield a list of instances of that
    application.
 
-2. If there is a *current* application defined, Django finds and returns
+2. If there is a *current* application defined, Freedom finds and returns
    the URL resolver for that instance. The *current* application can be
    specified as an attribute on the template context - applications that
    expect to have multiple deployments should set the ``current_app``
@@ -718,19 +718,19 @@ the fully qualified name into parts, and then tries the following lookup:
    render a template.
 
    The current application can also be specified manually as an argument
-   to the :func:`django.core.urlresolvers.reverse` function.
+   to the :func:`freedom.core.urlresolvers.reverse` function.
 
-3. If there is no current application. Django looks for a default
+3. If there is no current application. Freedom looks for a default
    application instance. The default application instance is the instance
    that has an :term:`instance namespace` matching the :term:`application
    namespace` (in this example, an instance of the ``myapp`` called
    ``'myapp'``).
 
-4. If there is no default application instance, Django will pick the last
+4. If there is no default application instance, Freedom will pick the last
    deployed instance of the application, whatever its instance name may be.
 
 5. If the provided namespace doesn't match an :term:`application namespace` in
-   step 1, Django will attempt a direct lookup of the namespace as an
+   step 1, Freedom will attempt a direct lookup of the namespace as an
    :term:`instance namespace`.
 
 If there are nested namespaces, these steps are repeated for each part of the
@@ -782,7 +782,7 @@ URL namespaces of included URLconfs can be specified in two ways.
 
 Firstly, you can provide the :term:`application <application namespace>` and
 :term:`instance <instance namespace>` namespaces as arguments to
-:func:`django.conf.urls.include()` when you construct your URL patterns. For
+:func:`freedom.conf.urls.include()` when you construct your URL patterns. For
 example,::
 
     url(r'^help/', include('apps.help.urls', namespace='foo', app_name='bar')),
@@ -792,7 +792,7 @@ This will include the URLs defined in ``apps.help.urls`` into the
 ``'foo'``.
 
 Secondly, you can include an object that contains embedded namespace data. If
-you ``include()`` a list of :func:`django.conf.urls.url` instances,
+you ``include()`` a list of :func:`freedom.conf.urls.url` instances,
 the URLs contained in that object will be added to the global namespace.
 However, you can also ``include()`` a 3-tuple containing::
 
@@ -800,7 +800,7 @@ However, you can also ``include()`` a 3-tuple containing::
 
 For example::
 
-    from django.conf.urls import include, url
+    from freedom.conf.urls import include, url
 
     help_patterns = [
         url(r'^basic/$', 'apps.help.views.views.basic'),
@@ -812,14 +812,14 @@ For example::
 This will include the nominated URL patterns into the given application and
 instance namespace.
 
-For example, the Django Admin is deployed as instances of
-:class:`~django.contrib.admin.AdminSite`.  ``AdminSite`` objects have a ``urls``
+For example, the Freedom Admin is deployed as instances of
+:class:`~freedom.contrib.admin.AdminSite`.  ``AdminSite`` objects have a ``urls``
 attribute: A 3-tuple that contains all the patterns in the corresponding admin
 site, plus the application namespace ``'admin'``, and the name of the admin
 instance. It is this ``urls`` attribute that you ``include()`` into your
 projects ``urlpatterns`` when you deploy an Admin instance.
 
 Be sure to pass a tuple to ``include()``. If you simply pass three arguments:
-``include(help_patterns, 'bar', 'foo')``, Django won't throw an error but due
+``include(help_patterns, 'bar', 'foo')``, Freedom won't throw an error but due
 to the signature of ``include()``, ``'bar'`` will be the instance namespace and
 ``'foo'`` will be the application namespace instead of vice versa.

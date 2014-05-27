@@ -2,8 +2,8 @@
 Writing and running tests
 =========================
 
-.. module:: django.test
-   :synopsis: Testing tools for Django applications.
+.. module:: freedom.test
+   :synopsis: Testing tools for Freedom applications.
 
 .. seealso::
 
@@ -12,12 +12,12 @@ Writing and running tests
     </topics/testing/advanced>`.
 
 This document is split into two primary sections. First, we explain how to write
-tests with Django. Then, we explain how to run them.
+tests with Freedom. Then, we explain how to run them.
 
 Writing tests
 =============
 
-Django's unit tests use a Python standard library module: :mod:`unittest`. This
+Freedom's unit tests use a Python standard library module: :mod:`unittest`. This
 module defines tests using a class-based approach.
 
 .. admonition:: unittest2
@@ -25,20 +25,20 @@ module defines tests using a class-based approach.
     .. deprecated:: 1.7
 
     Python 2.7 introduced some major changes to the ``unittest`` library,
-    adding some extremely useful features. To ensure that every Django project
-    could benefit from these new features, Django used to ship with a copy of
+    adding some extremely useful features. To ensure that every Freedom project
+    could benefit from these new features, Freedom used to ship with a copy of
     Python 2.7's ``unittest`` backported for Python 2.6 compatibility.
 
-    Since Django no longer supports Python versions older than 2.7,
-    ``django.utils.unittest`` is deprecated. Simply use ``unittest``.
+    Since Freedom no longer supports Python versions older than 2.7,
+    ``freedom.utils.unittest`` is deprecated. Simply use ``unittest``.
 
 .. _unittest2: https://pypi.python.org/pypi/unittest2
 
-Here is an example which subclasses from :class:`django.test.TestCase`,
+Here is an example which subclasses from :class:`freedom.test.TestCase`,
 which is a subclass of :class:`unittest.TestCase` that runs each test inside a
 transaction to provide isolation::
 
-    from django.test import TestCase
+    from freedom.test import TestCase
     from myapp.models import Animal
 
     class AnimalTestCase(TestCase):
@@ -64,7 +64,7 @@ For more details about :mod:`unittest`, see the Python documentation.
 
     If your tests rely on database access such as creating or querying models,
     be sure to create your test classes as subclasses of
-    :class:`django.test.TestCase` rather than :class:`unittest.TestCase`.
+    :class:`freedom.test.TestCase` rather than :class:`unittest.TestCase`.
 
     Using :class:`unittest.TestCase` avoids the cost of running each test in a
     transaction and flushing the database, but if your tests interact with
@@ -132,7 +132,7 @@ be reported, and any test databases created by the run will not be destroyed.
 
     It's a good idea to run your tests with Python warnings enabled:
     ``python -Wall manage.py test``. The ``-Wall`` flag tells Python to
-    display deprecation warnings. Django, like many other Python libraries,
+    display deprecation warnings. Freedom, like many other Python libraries,
     uses these warnings to flag when features are going away. It also might
     flag areas in your code that aren't strictly wrong but could benefit
     from a better implementation.
@@ -195,7 +195,7 @@ and other advanced settings.
     .. versionadded:: 1.7
 
         This also applies to customized implementations of
-        :meth:`~django.apps.AppConfig.ready()`.
+        :meth:`~freedom.apps.AppConfig.ready()`.
 
 .. seealso::
 
@@ -207,13 +207,13 @@ Order in which tests are executed
 ---------------------------------
 
 In order to guarantee that all ``TestCase`` code starts with a clean database,
-the Django test runner reorders tests in the following way:
+the Freedom test runner reorders tests in the following way:
 
-* All :class:`~django.test.TestCase` subclasses are run first.
+* All :class:`~freedom.test.TestCase` subclasses are run first.
 
-* Then, all other Django-based tests (test cases based on
-  :class:`~django.test.SimpleTestCase`, including
-  :class:`~django.test.TransactionTestCase`) are run with no particular
+* Then, all other Freedom-based tests (test cases based on
+  :class:`~freedom.test.SimpleTestCase`, including
+  :class:`~freedom.test.TransactionTestCase`) are run with no particular
   ordering guaranteed nor enforced among them.
 
 * Then any other :class:`unittest.TestCase` tests (including doctests) that may
@@ -223,14 +223,14 @@ the Django test runner reorders tests in the following way:
 
     The new ordering of tests may reveal unexpected dependencies on test case
     ordering. This is the case with doctests that relied on state left in the
-    database by a given :class:`~django.test.TransactionTestCase` test, they
+    database by a given :class:`~freedom.test.TransactionTestCase` test, they
     must be updated to be able to run independently.
 
 Other test conditions
 ---------------------
 
 Regardless of the value of the :setting:`DEBUG` setting in your configuration
-file, all Django tests run with :setting:`DEBUG`\=False. This is to ensure that
+file, all Freedom tests run with :setting:`DEBUG`\=False. This is to ensure that
 the observed output of your code matches what will be seen in a production
 setting.
 
@@ -239,7 +239,7 @@ insert data from the tests into the cache of a live system if you run your
 tests in production because, unlike databases, a separate "test cache" is not
 used. This behavior `may change`_ in the future.
 
-.. _may change: https://code.djangoproject.com/ticket/11505
+.. _may change: https://code.freedomproject.com/ticket/11505
 
 Understanding the test output
 -----------------------------
@@ -257,7 +257,7 @@ prepares itself. You can control the level of detail of these messages with the
 This tells you that the test runner is creating a test database, as described
 in the previous section.
 
-Once the test database has been created, Django will run your tests.
+Once the test database has been created, Freedom will run your tests.
 If everything goes well, you'll see something like this::
 
     ----------------------------------------------------------------------
@@ -293,13 +293,13 @@ need to test for success or failure at that level.
 Speeding up the tests
 ---------------------
 
-In recent versions of Django, the default password hasher is rather slow by
+In recent versions of Freedom, the default password hasher is rather slow by
 design. If during your tests you are authenticating many users, you may want
 to use a custom settings file and set the :setting:`PASSWORD_HASHERS` setting
 to a faster hashing algorithm::
 
     PASSWORD_HASHERS = (
-        'django.contrib.auth.hashers.MD5PasswordHasher',
+        'freedom.contrib.auth.hashers.MD5PasswordHasher',
     )
 
 Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing

@@ -3,8 +3,8 @@ This is a basic model to test saving and loading boolean and date-related
 types, which in the past were problematic for some database backends.
 """
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

@@ -3,8 +3,8 @@ Regression tests for a few ForeignKey bugs.
 """
 from __future__ import unicode_literals
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 # If ticket #1578 ever slips back in, these models will not be able to be
 # created (the field names being lower-cased versions of their opposite

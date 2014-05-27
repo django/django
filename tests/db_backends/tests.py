@@ -1,5 +1,5 @@
-from django.test import TestCase
-from django.db.backends import BaseDatabaseWrapper
+from freedom.test import TestCase
+from freedom.db.backends import BaseDatabaseWrapper
 
 
 class DummyDatabaseWrapper(BaseDatabaseWrapper):

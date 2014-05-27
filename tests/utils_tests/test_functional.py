@@ -1,6 +1,6 @@
 import unittest
 
-from django.utils.functional import lazy, lazy_property, cached_property
+from freedom.utils.functional import lazy, lazy_property, cached_property
 
 
 class FunctionalTestCase(unittest.TestCase):

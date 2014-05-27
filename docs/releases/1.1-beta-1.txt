@@ -1,43 +1,43 @@
 ===============================
-Django 1.1 beta 1 release notes
+Freedom 1.1 beta 1 release notes
 ===============================
 
 March 23, 2009
 
-Welcome to Django 1.1 beta 1!
+Welcome to Freedom 1.1 beta 1!
 
 This is the second in a series of preview/development releases leading up to
-the eventual release of Django 1.1, currently scheduled to take place in April
+the eventual release of Freedom 1.1, currently scheduled to take place in April
 2009. This release is primarily targeted at developers who are interested in
-trying out new features and testing the Django codebase to help identify and
+trying out new features and testing the Freedom codebase to help identify and
 resolve bugs prior to the final 1.1 release.
 
 As such, this release is *not* intended for production use, and any such use
 is discouraged.
 
-What's new in Django 1.1 beta 1
+What's new in Freedom 1.1 beta 1
 ===============================
 
 .. seealso::
 
     The :doc:`1.1 alpha release notes </releases/1.1-alpha-1>`, which has a
-    list of everything new between Django 1.0 and Django 1.1 alpha.
+    list of everything new between Freedom 1.0 and Freedom 1.1 alpha.
 
 Model improvements
 ------------------
 
-.. currentmodule:: django.db.models
+.. currentmodule:: freedom.db.models
 
-A number of features have been added to Django's model layer:
+A number of features have been added to Freedom's model layer:
 
 "Unmanaged" models
 ~~~~~~~~~~~~~~~~~~
 
-You can now control whether or not Django creates database tables for a model
+You can now control whether or not Freedom creates database tables for a model
 using the :attr:`~Options.managed` model option. This defaults to ``True``,
-meaning that Django will create the appropriate database tables in
+meaning that Freedom will create the appropriate database tables in
 :djadmin:`syncdb` and remove them as part of ``reset`` command. That
-is, Django *manages* the database table's lifecycle.
+is, Freedom *manages* the database table's lifecycle.
 
 If you set this to ``False``, however, no database table creating or deletion
 will be automatically performed for this model. This is useful if the model
@@ -66,17 +66,17 @@ Deferred fields
 In some complex situations, your models might contain fields which could
 contain a lot of data (for example, large text fields), or require expensive
 processing to convert them to Python objects. If you know you don't need those
-particular fields, you can now tell Django not to retrieve them from the
+particular fields, you can now tell Freedom not to retrieve them from the
 database.
 
 You'll do this with the new queryset methods
-:meth:`~django.db.models.query.QuerySet.defer` and
-:meth:`~django.db.models.query.QuerySet.only`.
+:meth:`~freedom.db.models.query.QuerySet.defer` and
+:meth:`~freedom.db.models.query.QuerySet.only`.
 
 New admin features
 ------------------
 
-Since 1.1 alpha, a couple of new features have been added to Django's admin
+Since 1.1 alpha, a couple of new features have been added to Freedom's admin
 application:
 
 Editable fields on the change list
@@ -93,13 +93,13 @@ You can now define :doc:`admin actions </ref/contrib/admin/actions>` that can pe
 some action to a group of models in bulk. Users will be able to select objects on
 the change list page and then apply these bulk actions to all selected objects.
 
-Django ships with one pre-defined admin action to delete a group of objects in
+Freedom ships with one pre-defined admin action to delete a group of objects in
 one fell swoop.
 
 Testing improvements
 --------------------
 
-.. currentmodule:: django.test
+.. currentmodule:: freedom.test
 
 A couple of small but very useful improvements have been made to the
 :doc:`testing framework </topics/testing/index>`:
@@ -117,7 +117,7 @@ A couple of small but very useful improvements have been made to the
 Conditional view processing
 ---------------------------
 
-Django now has much better support for :doc:`conditional view processing
+Freedom now has much better support for :doc:`conditional view processing
 </topics/conditional-view-processing>` using the standard ``ETag`` and
 ``Last-Modified`` HTTP headers. This means you can now easily short-circuit
 view processing by testing less-expensive conditions. For many views this can
@@ -142,11 +142,11 @@ release, including:
   notably, the memcached backend -- these operations will be atomic, and
   quite fast.
 
-* Django now can :doc:`easily delegate authentication to the Web server
+* Freedom now can :doc:`easily delegate authentication to the Web server
   </howto/auth-remote-user>` via a new authentication backend that supports
   the standard ``REMOTE_USER`` environment variable used for this purpose.
 
-* There's a new :func:`django.shortcuts.redirect` function that makes it
+* There's a new :func:`freedom.shortcuts.redirect` function that makes it
   easier to issue redirects given an object, a view name, or a URL.
 
 * The ``postgresql_psycopg2`` backend now supports :ref:`native PostgreSQL
@@ -154,18 +154,18 @@ release, including:
   feature, that can make certain read-heavy applications a good deal
   faster.
 
-The Django 1.1 roadmap
+The Freedom 1.1 roadmap
 ======================
 
-Before Django 1.1 goes final, at least one other preview/development release
+Before Freedom 1.1 goes final, at least one other preview/development release
 will be made available. The current schedule consists of at least the
 following:
 
-* Week of *April 2, 2009:* Django 1.1 release candidate. At this point all
+* Week of *April 2, 2009:* Freedom 1.1 release candidate. At this point all
   strings marked for translation must freeze to allow translations to
   be submitted in advance of the final release.
 
-* Week of *April 13, 2009:* Django 1.1 final.
+* Week of *April 13, 2009:* Freedom 1.1 final.
 
 If deemed necessary, additional beta or release candidate packages will be
 issued prior to the final 1.1 release.
@@ -175,34 +175,34 @@ What you can do to help
 
 In order to provide a high-quality 1.1 release, we need your help. Although this
 beta release is, again, *not* intended for production use, you can help the
-Django team by trying out the beta codebase in a safe test environment and
-reporting any bugs or issues you encounter. The Django ticket tracker is the
+Freedom team by trying out the beta codebase in a safe test environment and
+reporting any bugs or issues you encounter. The Freedom ticket tracker is the
 central place to search for open issues:
 
-* https://code.djangoproject.com/timeline
+* https://code.freedomproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem you're
 running into.
 
-Additionally, discussion of Django development, including progress toward the
-1.1 release, takes place daily on the django-developers mailing list:
+Additionally, discussion of Freedom development, including progress toward the
+1.1 release, takes place daily on the freedom-developers mailing list:
 
-* http://groups.google.com/group/django-developers
+* http://groups.google.com/group/freedom-developers
 
-... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
-interested in helping out with Django's development, feel free to join the
+... and in the ``#freedom-dev`` IRC channel on ``irc.freenode.net``. If you're
+interested in helping out with Freedom's development, feel free to join the
 discussions there.
 
-Django's online documentation also includes pointers on how to contribute to
-Django:
+Freedom's online documentation also includes pointers on how to contribute to
+Freedom:
 
-* :doc:`How to contribute to Django </internals/contributing/index>`
+* :doc:`How to contribute to Freedom </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing documentation or simply
 triaging tickets and helping to test proposed bugfixes -- are always welcome and
 appreciated.
 
-Development sprints for Django 1.1 will also be taking place at PyCon US 2009,
+Development sprints for Freedom 1.1 will also be taking place at PyCon US 2009,
 on the dedicated sprint days (March 30 through April 2), and anyone who wants to
 help out is welcome to join in, either in person at PyCon or virtually in the
 IRC channel or on the mailing list.

@@ -2,18 +2,18 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.contrib import admin
-from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.templatetags.admin_list import pagination
-from django.contrib.admin.views.main import ChangeList, SEARCH_VAR, ALL_VAR
-from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-from django.template import Context, Template
-from django.test import TestCase, override_settings
-from django.test.client import RequestFactory
-from django.utils import formats
-from django.utils import six
+from freedom.contrib import admin
+from freedom.contrib.admin.options import IncorrectLookupParameters
+from freedom.contrib.admin.templatetags.admin_list import pagination
+from freedom.contrib.admin.views.main import ChangeList, SEARCH_VAR, ALL_VAR
+from freedom.contrib.admin.tests import AdminSeleniumWebDriverTestCase
+from freedom.contrib.auth.models import User
+from freedom.core.urlresolvers import reverse
+from freedom.template import Context, Template
+from freedom.test import TestCase, override_settings
+from freedom.test.client import RequestFactory
+from freedom.utils import formats
+from freedom.utils import six
 
 from .admin import (ChildAdmin, QuartetAdmin, BandAdmin, ChordsBandAdmin,
     GroupAdmin, ParentAdmin, DynamicListDisplayChildAdmin,
@@ -664,7 +664,7 @@ class AdminLogNodeTestCase(TestCase):
         self.assertEqual(template.render(context), '')
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=('freedom.contrib.auth.hashers.SHA1PasswordHasher',),
                    ROOT_URLCONF="admin_changelist.urls")
 class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 

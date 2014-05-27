@@ -2,15 +2,15 @@
 The "sites" framework
 =====================
 
-.. module:: django.contrib.sites
+.. module:: freedom.contrib.sites
    :synopsis: Lets you operate multiple Web sites from the same database and
-              Django project
+              Freedom project
 
-Django comes with an optional "sites" framework. It's a hook for associating
+Freedom comes with an optional "sites" framework. It's a hook for associating
 objects and functionality to particular Web sites, and it's a holding place for
-the domain names and "verbose" names of your Django-powered sites.
+the domain names and "verbose" names of your Freedom-powered sites.
 
-Use it if your single Django installation powers more than one site and you
+Use it if your single Freedom installation powers more than one site and you
 need to differentiate between those sites in some way.
 
 The sites framework is mainly based on a simple model:
@@ -19,7 +19,7 @@ The sites framework is mainly based on a simple model:
 
     A model for storing the ``domain`` and ``name`` attributes of a Web site.
     The :setting:`SITE_ID` setting specifies the database ID of the
-    :class:`~django.contrib.sites.models.Site` object associated with that
+    :class:`~freedom.contrib.sites.models.Site` object associated with that
     particular settings file.
 
     .. attribute:: domain
@@ -30,7 +30,7 @@ The sites framework is mainly based on a simple model:
 
         A human-readable "verbose" name for the Web site.
 
-How you use this is up to you, but Django uses it in a couple of ways
+How you use this is up to you, but Freedom uses it in a couple of ways
 automatically via simple conventions.
 
 Example usage
@@ -41,7 +41,7 @@ Why would you use sites? It's best explained through examples.
 Associating content with multiple sites
 ---------------------------------------
 
-The Django-powered sites LJWorld.com_ and Lawrence.com_ are operated by the
+The Freedom-powered sites LJWorld.com_ and Lawrence.com_ are operated by the
 same news organization -- the Lawrence Journal-World newspaper in Lawrence,
 Kansas. LJWorld.com focuses on news, while Lawrence.com focuses on local
 entertainment. But sometimes editors want to publish an article on *both*
@@ -53,12 +53,12 @@ But that's inefficient for site producers, and it's redundant to store
 multiple copies of the same story in the database.
 
 The better solution is simple: Both sites use the same article database, and an
-article is associated with one or more sites. In Django model terminology,
-that's represented by a :class:`~django.db.models.ManyToManyField` in the
+article is associated with one or more sites. In Freedom model terminology,
+that's represented by a :class:`~freedom.db.models.ManyToManyField` in the
 ``Article`` model::
 
-    from django.db import models
-    from django.contrib.sites.models import Site
+    from freedom.db import models
+    from freedom.contrib.sites.models import Site
 
     class Article(models.Model):
         headline = models.CharField(max_length=200)
@@ -68,16 +68,16 @@ that's represented by a :class:`~django.db.models.ManyToManyField` in the
 This accomplishes several things quite nicely:
 
 * It lets the site producers edit all content -- on both sites -- in a
-  single interface (the Django admin).
+  single interface (the Freedom admin).
 
 * It means the same story doesn't have to be published twice in the
   database; it only has a single record in the database.
 
-* It lets the site developers use the same Django view code for both sites.
+* It lets the site developers use the same Freedom view code for both sites.
   The view code that displays a given story just checks to make sure the
   requested story is on the current site. It looks something like this::
 
-      from django.contrib.sites.shortcuts import get_current_site
+      from freedom.contrib.sites.shortcuts import get_current_site
 
       def article_detail(request, article_id):
           try:
@@ -93,15 +93,15 @@ Associating content with a single site
 --------------------------------------
 
 Similarly, you can associate a model to the
-:class:`~django.contrib.sites.models.Site`
+:class:`~freedom.contrib.sites.models.Site`
 model in a many-to-one relationship, using
-:class:`~django.db.models.ForeignKey`.
+:class:`~freedom.db.models.ForeignKey`.
 
 For example, if an article is only allowed on a single site, you'd use a model
 like this::
 
-    from django.db import models
-    from django.contrib.sites.models import Site
+    from freedom.db import models
+    from freedom.contrib.sites.models import Site
 
     class Article(models.Model):
         headline = models.CharField(max_length=200)
@@ -115,11 +115,11 @@ This has the same benefits as described in the last section.
 Hooking into the current site from views
 ----------------------------------------
 
-You can use the sites framework in your Django views to do
+You can use the sites framework in your Freedom views to do
 particular things based on the site in which the view is being called.
 For example::
 
-    from django.conf import settings
+    from freedom.conf import settings
 
     def my_view(request):
         if settings.SITE_ID == 3:
@@ -134,7 +134,7 @@ hard-coding is best for hackish fixes that you need done quickly. The
 cleaner way of accomplishing the same thing is to check the current site's
 domain::
 
-    from django.contrib.sites.shortcuts import get_current_site
+    from freedom.contrib.sites.shortcuts import get_current_site
 
     def my_view(request):
         current_site = get_current_site(request)
@@ -146,15 +146,15 @@ domain::
             pass
 
 This has also the advantage of checking if the sites framework is installed,
-and return a :class:`~django.contrib.sites.requests.RequestSite` instance if
+and return a :class:`~freedom.contrib.sites.requests.RequestSite` instance if
 it is not.
 
 If you don't have access to the request object, you can use the
-``get_current()`` method of the :class:`~django.contrib.sites.models.Site`
+``get_current()`` method of the :class:`~freedom.contrib.sites.models.Site`
 model's manager. You should then ensure that your settings file does contain
 the :setting:`SITE_ID` setting. This example is equivalent to the previous one::
 
-    from django.contrib.sites.models import Site
+    from freedom.contrib.sites.models import Site
 
     def my_function_without_request():
         current_site = Site.objects.get_current()
@@ -176,15 +176,15 @@ reader signs up on a Web form and immediately gets an email saying,
 It'd be inefficient and redundant to implement this sign up processing code
 twice, so the sites use the same code behind the scenes. But the "thank you for
 signing up" notice needs to be different for each site. By using
-:class:`~django.contrib.sites.models.Site`
+:class:`~freedom.contrib.sites.models.Site`
 objects, we can abstract the "thank you" notice to use the values of the
-current site's :attr:`~django.contrib.sites.models.Site.name` and
-:attr:`~django.contrib.sites.models.Site.domain`.
+current site's :attr:`~freedom.contrib.sites.models.Site.name` and
+:attr:`~freedom.contrib.sites.models.Site.domain`.
 
 Here's an example of what the form-handling view looks like::
 
-    from django.contrib.sites.shortcuts import get_current_site
-    from django.core.mail import send_mail
+    from freedom.contrib.sites.shortcuts import get_current_site
+    from freedom.core.mail import send_mail
 
     def register_for_newsletter(request):
         # Check form values, etc., and subscribe the user.
@@ -203,12 +203,12 @@ lawrence.com alerts." On LJWorld.com, the email has the subject "Thanks for
 subscribing to LJWorld.com alerts." Same goes for the email's message body.
 
 Note that an even more flexible (but more heavyweight) way of doing this would
-be to use Django's template system. Assuming Lawrence.com and LJWorld.com have
+be to use Freedom's template system. Assuming Lawrence.com and LJWorld.com have
 different template directories (:setting:`TEMPLATE_DIRS`), you could simply
 farm out to the template system like so::
 
-    from django.core.mail import send_mail
-    from django.template import loader, Context
+    from freedom.core.mail import send_mail
+    from freedom.template import loader, Context
 
     def register_for_newsletter(request):
         # Check form values, etc., and subscribe the user.
@@ -224,18 +224,18 @@ In this case, you'd have to create :file:`subject.txt` and :file:`message.txt`
 template files for both the LJWorld.com and Lawrence.com template directories.
 That gives you more flexibility, but it's also more complex.
 
-It's a good idea to exploit the :class:`~django.contrib.sites.models.Site`
+It's a good idea to exploit the :class:`~freedom.contrib.sites.models.Site`
 objects as much as possible, to remove unneeded complexity and redundancy.
 
 Getting the current domain for full URLs
 ----------------------------------------
 
-Django's ``get_absolute_url()`` convention is nice for getting your objects'
+Freedom's ``get_absolute_url()`` convention is nice for getting your objects'
 URL without the domain name, but in some cases you might want to display the
 full URL -- with ``http://`` and the domain and everything -- for an object.
 To do this, you can use the sites framework. A simple example::
 
-    >>> from django.contrib.sites.models import Site
+    >>> from freedom.contrib.sites.models import Site
     >>> obj = MyModel.objects.get(id=3)
     >>> obj.get_absolute_url()
     '/mymodel/objects/3/'
@@ -251,7 +251,7 @@ Enabling the sites framework
 
 To enable the sites framework, follow these steps:
 
-1. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS`
+1. Add ``'freedom.contrib.sites'`` to your :setting:`INSTALLED_APPS`
    setting.
 
 2. Define a :setting:`SITE_ID` setting::
@@ -260,10 +260,10 @@ To enable the sites framework, follow these steps:
 
 3. Run :djadmin:`migrate`.
 
-``django.contrib.sites`` registers a
-:data:`~django.db.models.signals.post_migrate` signal handler which creates a
+``freedom.contrib.sites`` registers a
+:data:`~freedom.db.models.signals.post_migrate` signal handler which creates a
 default site named ``example.com`` with the domain ``example.com``. This site
-will also be created after Django creates the test database. To set the
+will also be created after Freedom creates the test database. To set the
 correct name and domain for your project, you can use an :doc:`initial data
 fixture </howto/initial-data>`.
 
@@ -271,11 +271,11 @@ Caching the current ``Site`` object
 ===================================
 
 As the current site is stored in the database, each call to
-``Site.objects.get_current()`` could result in a database query. But Django is a
+``Site.objects.get_current()`` could result in a database query. But Freedom is a
 little cleverer than that: on the first request, the current site is cached, and
 any subsequent call returns the cached data instead of hitting the database.
 
-If for any reason you want to force a database query, you can tell Django to
+If for any reason you want to force a database query, you can tell Freedom to
 clear the cache using ``Site.objects.clear_cache()``::
 
     # First call; current site fetched from database.
@@ -295,19 +295,19 @@ The ``CurrentSiteManager``
 
 .. class:: managers.CurrentSiteManager
 
-If :class:`~django.contrib.sites.models.Site` plays a key role in your
+If :class:`~freedom.contrib.sites.models.Site` plays a key role in your
 application, consider using the helpful
-:class:`~django.contrib.sites.managers.CurrentSiteManager` in your
+:class:`~freedom.contrib.sites.managers.CurrentSiteManager` in your
 model(s). It's a model :doc:`manager </topics/db/managers>` that
 automatically filters its queries to include only objects associated
-with the current :class:`~django.contrib.sites.models.Site`.
+with the current :class:`~freedom.contrib.sites.models.Site`.
 
-Use :class:`~django.contrib.sites.managers.CurrentSiteManager` by adding it to
+Use :class:`~freedom.contrib.sites.managers.CurrentSiteManager` by adding it to
 your model explicitly. For example::
 
-    from django.db import models
-    from django.contrib.sites.models import Site
-    from django.contrib.sites.managers import CurrentSiteManager
+    from freedom.db import models
+    from freedom.contrib.sites.models import Site
+    from freedom.contrib.sites.managers import CurrentSiteManager
 
     class Photo(models.Model):
         photo = models.FileField(upload_to='/home/photos')
@@ -326,25 +326,25 @@ Put another way, these two statements are equivalent::
     Photo.objects.filter(site=settings.SITE_ID)
     Photo.on_site.all()
 
-How did :class:`~django.contrib.sites.managers.CurrentSiteManager`
+How did :class:`~freedom.contrib.sites.managers.CurrentSiteManager`
 know which field of ``Photo`` was the
-:class:`~django.contrib.sites.models.Site`? By default,
-:class:`~django.contrib.sites.managers.CurrentSiteManager` looks for a
-either a :class:`~django.db.models.ForeignKey` called
+:class:`~freedom.contrib.sites.models.Site`? By default,
+:class:`~freedom.contrib.sites.managers.CurrentSiteManager` looks for a
+either a :class:`~freedom.db.models.ForeignKey` called
 ``site`` or a
-:class:`~django.db.models.ManyToManyField` called
+:class:`~freedom.db.models.ManyToManyField` called
 ``sites`` to filter on. If you use a field named something other than
 ``site`` or ``sites`` to identify which
-:class:`~django.contrib.sites.models.Site` objects your object is
+:class:`~freedom.contrib.sites.models.Site` objects your object is
 related to, then you need to explicitly pass the custom field name as
 a parameter to
-:class:`~django.contrib.sites.managers.CurrentSiteManager` on your
+:class:`~freedom.contrib.sites.managers.CurrentSiteManager` on your
 model. The following model, which has a field called ``publish_on``,
 demonstrates this::
 
-    from django.db import models
-    from django.contrib.sites.models import Site
-    from django.contrib.sites.managers import CurrentSiteManager
+    from freedom.db import models
+    from freedom.contrib.sites.models import Site
+    from freedom.contrib.sites.managers import CurrentSiteManager
 
     class Photo(models.Model):
         photo = models.FileField(upload_to='/home/photos')
@@ -354,20 +354,20 @@ demonstrates this::
         objects = models.Manager()
         on_site = CurrentSiteManager('publish_on')
 
-If you attempt to use :class:`~django.contrib.sites.managers.CurrentSiteManager`
-and pass a field name that doesn't exist, Django will raise a ``ValueError``.
+If you attempt to use :class:`~freedom.contrib.sites.managers.CurrentSiteManager`
+and pass a field name that doesn't exist, Freedom will raise a ``ValueError``.
 
 Finally, note that you'll probably want to keep a normal
 (non-site-specific) ``Manager`` on your model, even if you use
-:class:`~django.contrib.sites.managers.CurrentSiteManager`. As
+:class:`~freedom.contrib.sites.managers.CurrentSiteManager`. As
 explained in the :doc:`manager documentation </topics/db/managers>`, if
-you define a manager manually, then Django won't create the automatic
+you define a manager manually, then Freedom won't create the automatic
 ``objects = models.Manager()`` manager for you. Also note that certain
-parts of Django -- namely, the Django admin site and generic views --
+parts of Freedom -- namely, the Freedom admin site and generic views --
 use whichever manager is defined *first* in the model, so if you want
 your admin site to have access to all objects (not just site-specific
 ones), put ``objects = models.Manager()`` in your model, before you
-define :class:`~django.contrib.sites.managers.CurrentSiteManager`.
+define :class:`~freedom.contrib.sites.managers.CurrentSiteManager`.
 
 .. _site-middleware:
 
@@ -378,58 +378,58 @@ Site middleware
 
 If you often use this pattern::
 
-    from django.contrib.sites.models import Site
+    from freedom.contrib.sites.models import Site
 
     def my_view(request):
         site = Site.objects.get_current()
         ...
 
 there is simple way to avoid repetitions. Add
-:class:`django.contrib.sites.middleware.CurrentSiteMiddleware` to
+:class:`freedom.contrib.sites.middleware.CurrentSiteMiddleware` to
 :setting:`MIDDLEWARE_CLASSES`. The middleware sets the ``site`` attribute on
 every request object, so you can use ``request.site`` to get the current site.
 
-How Django uses the sites framework
+How Freedom uses the sites framework
 ===================================
 
 Although it's not required that you use the sites framework, it's strongly
-encouraged, because Django takes advantage of it in a few places. Even if your
-Django installation is powering only a single site, you should take the two
+encouraged, because Freedom takes advantage of it in a few places. Even if your
+Freedom installation is powering only a single site, you should take the two
 seconds to create the site object with your ``domain`` and ``name``, and point
 to its ID in your :setting:`SITE_ID` setting.
 
-Here's how Django uses the sites framework:
+Here's how Freedom uses the sites framework:
 
-* In the :mod:`redirects framework <django.contrib.redirects>`, each
-  redirect object is associated with a particular site. When Django searches
+* In the :mod:`redirects framework <freedom.contrib.redirects>`, each
+  redirect object is associated with a particular site. When Freedom searches
   for a redirect, it takes into account the current site.
 
-* In the :mod:`flatpages framework <django.contrib.flatpages>`, each
+* In the :mod:`flatpages framework <freedom.contrib.flatpages>`, each
   flatpage is associated with a particular site. When a flatpage is created,
-  you specify its :class:`~django.contrib.sites.models.Site`, and the
-  :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
+  you specify its :class:`~freedom.contrib.sites.models.Site`, and the
+  :class:`~freedom.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
   checks the current site in retrieving flatpages to display.
 
-* In the :mod:`syndication framework <django.contrib.syndication>`, the
+* In the :mod:`syndication framework <freedom.contrib.syndication>`, the
   templates for ``title`` and ``description`` automatically have access to a
   variable ``{{ site }}``, which is the
-  :class:`~django.contrib.sites.models.Site` object representing the current
+  :class:`~freedom.contrib.sites.models.Site` object representing the current
   site. Also, the hook for providing item URLs will use the ``domain`` from
-  the current :class:`~django.contrib.sites.models.Site` object if you don't
+  the current :class:`~freedom.contrib.sites.models.Site` object if you don't
   specify a fully-qualified domain.
 
-* In the :mod:`authentication framework <django.contrib.auth>`, the
-  :func:`django.contrib.auth.views.login` view passes the current
-  :class:`~django.contrib.sites.models.Site` name to the template as
+* In the :mod:`authentication framework <freedom.contrib.auth>`, the
+  :func:`freedom.contrib.auth.views.login` view passes the current
+  :class:`~freedom.contrib.sites.models.Site` name to the template as
   ``{{ site_name }}``.
 
-* The shortcut view (``django.contrib.contenttypes.views.shortcut``)
+* The shortcut view (``freedom.contrib.contenttypes.views.shortcut``)
   uses the domain of the current
-  :class:`~django.contrib.sites.models.Site` object when calculating
+  :class:`~freedom.contrib.sites.models.Site` object when calculating
   an object's URL.
 
 * In the admin framework, the "view on site" link uses the current
-  :class:`~django.contrib.sites.models.Site` to work out the domain for the
+  :class:`~freedom.contrib.sites.models.Site` to work out the domain for the
   site that it will redirect to.
 
 ``RequestSite`` objects
@@ -437,52 +437,52 @@ Here's how Django uses the sites framework:
 
 .. _requestsite-objects:
 
-Some :doc:`django.contrib </ref/contrib/index>` applications take advantage of
+Some :doc:`freedom.contrib </ref/contrib/index>` applications take advantage of
 the sites framework but are architected in a way that doesn't *require* the
 sites framework to be installed in your database. (Some people don't want to,
 or just aren't *able* to install the extra database table that the sites
 framework requires.) For those cases, the framework provides a
-:class:`django.contrib.sites.requests.RequestSite` class, which can be used as
+:class:`freedom.contrib.sites.requests.RequestSite` class, which can be used as
 a fallback when the database-backed sites framework is not available.
 
 .. class:: requests.RequestSite
 
     A class that shares the primary interface of
-    :class:`~django.contrib.sites.models.Site` (i.e., it has
-    ``domain`` and ``name`` attributes) but gets its data from a Django
-    :class:`~django.http.HttpRequest` object rather than from a database.
+    :class:`~freedom.contrib.sites.models.Site` (i.e., it has
+    ``domain`` and ``name`` attributes) but gets its data from a Freedom
+    :class:`~freedom.http.HttpRequest` object rather than from a database.
 
     .. method:: __init__(request)
 
         Sets the ``name`` and ``domain`` attributes to the value of
-        :meth:`~django.http.HttpRequest.get_host`.
+        :meth:`~freedom.http.HttpRequest.get_host`.
 
     .. versionchanged:: 1.7
 
-      This class used to be defined in ``django.contrib.sites.models``.
+      This class used to be defined in ``freedom.contrib.sites.models``.
 
-A :class:`~django.contrib.sites.requests.RequestSite` object has a similar
-interface to a normal :class:`~django.contrib.sites.models.Site` object,
-except its :meth:`~django.contrib.sites.requests.RequestSite.__init__()`
-method takes an :class:`~django.http.HttpRequest` object. It's able to deduce
+A :class:`~freedom.contrib.sites.requests.RequestSite` object has a similar
+interface to a normal :class:`~freedom.contrib.sites.models.Site` object,
+except its :meth:`~freedom.contrib.sites.requests.RequestSite.__init__()`
+method takes an :class:`~freedom.http.HttpRequest` object. It's able to deduce
 the ``domain`` and ``name`` by looking at the request's domain. It has
 ``save()`` and ``delete()`` methods to match the interface of
-:class:`~django.contrib.sites.models.Site`, but the methods raise
+:class:`~freedom.contrib.sites.models.Site`, but the methods raise
 :exc:`NotImplementedError`.
 
 ``get_current_site`` shortcut
 =============================
 
 Finally, to avoid repetitive fallback code, the framework provides a
-:func:`django.contrib.sites.shortcuts.get_current_site` function.
+:func:`freedom.contrib.sites.shortcuts.get_current_site` function.
 
 .. function:: shortcuts.get_current_site(request)
 
-    A function that checks if ``django.contrib.sites`` is installed and
-    returns either the current :class:`~django.contrib.sites.models.Site`
-    object or a :class:`~django.contrib.sites.requests.RequestSite` object
+    A function that checks if ``freedom.contrib.sites`` is installed and
+    returns either the current :class:`~freedom.contrib.sites.models.Site`
+    object or a :class:`~freedom.contrib.sites.requests.RequestSite` object
     based on the request.
 
     .. versionchanged:: 1.7
 
-      This function used to be defined in ``django.contrib.sites.models``.
+      This function used to be defined in ``freedom.contrib.sites.models``.

@@ -3,16 +3,16 @@ from __future__ import unicode_literals
 
 import unittest
 
-from django.conf.urls import url
-from django.core.urlresolvers import NoReverseMatch, reverse
-from django.db import connection
-from django.forms import EmailField, IntegerField
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test.html import HTMLParseError, parse_html
-from django.test.utils import CaptureQueriesContext, override_settings
-from django.utils import six
+from freedom.conf.urls import url
+from freedom.core.urlresolvers import NoReverseMatch, reverse
+from freedom.db import connection
+from freedom.forms import EmailField, IntegerField
+from freedom.http import HttpResponse
+from freedom.template.loader import render_to_string
+from freedom.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
+from freedom.test.html import HTMLParseError, parse_html
+from freedom.test.utils import CaptureQueriesContext, override_settings
+from freedom.utils import six
 
 from .models import Person
 from .views import empty_response

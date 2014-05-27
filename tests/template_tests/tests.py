@@ -8,23 +8,23 @@ import traceback
 import unittest
 import warnings
 
-from django import template
-from django.conf import settings
-from django.core import urlresolvers
-from django.template import (base as template_base, loader, Context,
+from freedom import template
+from freedom.conf import settings
+from freedom.core import urlresolvers
+from freedom.template import (base as template_base, loader, Context,
     RequestContext, Template, TemplateSyntaxError)
-from django.template.loaders import app_directories, filesystem, cached
-from django.test import RequestFactory, TestCase
-from django.test.utils import (override_settings, override_template_loaders,
+from freedom.template.loaders import app_directories, filesystem, cached
+from freedom.test import RequestFactory, TestCase
+from freedom.test.utils import (override_settings, override_template_loaders,
                                override_with_test_loader, extend_sys_path)
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.formats import date_format
-from django.utils._os import upath
-from django.utils.safestring import mark_safe
-from django.utils import six
-from django.utils.six.moves.urllib.parse import urljoin
-from django.utils import translation
+from freedom.utils.deprecation import RemovedInFreedom19Warning, RemovedInFreedom20Warning
+from freedom.utils.encoding import python_2_unicode_compatible
+from freedom.utils.formats import date_format
+from freedom.utils._os import upath
+from freedom.utils.safestring import mark_safe
+from freedom.utils import six
+from freedom.utils.six.moves.urllib.parse import urljoin
+from freedom.utils import translation
 
 # NumPy installed?
 try:
@@ -412,7 +412,7 @@ class TemplateRegressionTests(TestCase):
         with self.assertRaises(ZeroDivisionError) as cm:
             t.render(c)
 
-        self.assertEqual(cm.exception.django_template_source[1], (0, 14))
+        self.assertEqual(cm.exception.freedom_template_source[1], (0, 14))
 
     def test_invalid_block_suggestion(self):
         # See #7876
@@ -449,11 +449,11 @@ class TemplateRegressionTests(TestCase):
 
     @override_settings(CACHES={
         'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'default',
         },
         'template_fragments': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'BACKEND': 'freedom.core.cache.backends.locmem.LocMemCache',
             'LOCATION': 'fragments',
         },
     })
@@ -565,9 +565,9 @@ class TemplateTests(TestCase):
                                     try:
                                         with warnings.catch_warnings():
                                             # Ignore pending deprecations of loading 'ssi' and 'url' tags from future.
-                                            warnings.filterwarnings("ignore", category=RemovedInDjango19Warning, module='django.templatetags.future')
+                                            warnings.filterwarnings("ignore", category=RemovedInFreedom19Warning, module='freedom.templatetags.future')
                                             # Ignore deprecations of loading 'cycle' and 'firstof' tags from future.
-                                            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.templatetags.future")
+                                            warnings.filterwarnings("ignore", category=RemovedInFreedom20Warning, module="freedom.templatetags.future")
                                             test_template = loader.get_template(name)
                                     except ShouldNotExecuteException:
                                         failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template loading invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
@@ -575,7 +575,7 @@ class TemplateTests(TestCase):
                                     try:
                                         with warnings.catch_warnings():
                                             # Ignore deprecations of using the wrong number of variables with the 'for' tag.
-                                            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaulttags")
+                                            warnings.filterwarnings("ignore", category=RemovedInFreedom20Warning, module="freedom.template.defaulttags")
                                             output = self.render(test_template, vals)
                                     except ShouldNotExecuteException:
                                         failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
@@ -736,16 +736,16 @@ class TemplateTests(TestCase):
             'list-index07': ("{{ var.1 }}", {"var": {'1': "hello", 1: "world"}}, "hello"),
 
             # Basic filter usage
-            'filter-syntax01': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
+            'filter-syntax01': ("{{ var|upper }}", {"var": "Freedom is the greatest!"}, "DJANGO IS THE GREATEST!"),
 
             # Chained filters
-            'filter-syntax02': ("{{ var|upper|lower }}", {"var": "Django is the greatest!"}, "django is the greatest!"),
+            'filter-syntax02': ("{{ var|upper|lower }}", {"var": "Freedom is the greatest!"}, "freedom is the greatest!"),
 
             # Allow spaces before the filter pipe
-            'filter-syntax03': ("{{ var |upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
+            'filter-syntax03': ("{{ var |upper }}", {"var": "Freedom is the greatest!"}, "DJANGO IS THE GREATEST!"),
 
             # Allow spaces after the filter pipe
-            'filter-syntax04': ("{{ var| upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
+            'filter-syntax04': ("{{ var| upper }}", {"var": "Freedom is the greatest!"}, "DJANGO IS THE GREATEST!"),
 
             # Raise TemplateSyntaxError for a nonexistent filter
             'filter-syntax05': ("{{ var|does_not_exist }}", {}, template.TemplateSyntaxError),
@@ -883,9 +883,9 @@ class TemplateTests(TestCase):
 
             ### FILTER TAG ############################################################
             'filter01': ('{% filter upper %}{% endfilter %}', {}, ''),
-            'filter02': ('{% filter upper %}django{% endfilter %}', {}, 'DJANGO'),
-            'filter03': ('{% filter upper|lower %}django{% endfilter %}', {}, 'django'),
-            'filter04': ('{% filter cut:remove %}djangospam{% endfilter %}', {'remove': 'spam'}, 'django'),
+            'filter02': ('{% filter upper %}freedom{% endfilter %}', {}, 'DJANGO'),
+            'filter03': ('{% filter upper|lower %}freedom{% endfilter %}', {}, 'freedom'),
+            'filter04': ('{% filter cut:remove %}freedomspam{% endfilter %}', {'remove': 'spam'}, 'freedom'),
             'filter05': ('{% filter safe %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
             'filter05bis': ('{% filter upper|safe %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
             'filter06': ('{% filter escape %}fail{% endfilter %}', {}, template.TemplateSyntaxError),
@@ -934,7 +934,7 @@ class TemplateTests(TestCase):
             'for-tag-filter-ws': ("{% load custom %}{% for x in s|noop:'x y' %}{{ x }}{% endfor %}", {'s': 'abc'}, 'abc'),
 
             # These tests raise deprecation warnings and will raise an exception
-            # in Django 2.0. The existing behavior is silent truncation if the
+            # in Freedom 2.0. The existing behavior is silent truncation if the
             # length of loopvars differs to the length of each set of items.
             'for-tag-unpack10': ("{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": (('one', 1, 'carrot'), ('two', 2, 'orange'))}, "one:1/two:2/"),
             'for-tag-unpack11': ("{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, ("one:1,/two:2,/", "one:1,INVALID/two:2,INVALID/")),

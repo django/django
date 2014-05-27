@@ -1,1 +1,1 @@
-from django.db import modelz  # NOQA
+from freedom.db import modelz  # NOQA

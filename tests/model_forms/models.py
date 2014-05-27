@@ -12,13 +12,13 @@ import datetime
 import os
 import tempfile
 
-from django.core import validators
-from django.core.exceptions import ValidationError
-from django.core.files.storage import FileSystemStorage
-from django.db import models
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils._os import upath
+from freedom.core import validators
+from freedom.core.exceptions import ValidationError
+from freedom.core.files.storage import FileSystemStorage
+from freedom.db import models
+from freedom.utils import six
+from freedom.utils.encoding import python_2_unicode_compatible
+from freedom.utils._os import upath
 
 
 temp_storage_dir = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])

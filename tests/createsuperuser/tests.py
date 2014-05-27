@@ -1,8 +1,8 @@
-from django.contrib.auth import models
-from django.contrib.auth.management.commands import changepassword
-from django.core.management import call_command
-from django.test import TestCase
-from django.utils.six import StringIO
+from freedom.contrib.auth import models
+from freedom.contrib.auth.management.commands import changepassword
+from freedom.core.management import call_command
+from freedom.test import TestCase
+from freedom.utils.six import StringIO
 
 
 class MultiDBChangepasswordManagementCommandTestCase(TestCase):

@@ -1,8 +1,8 @@
-from django.test import TestCase, override_settings
+from freedom.test import TestCase, override_settings
 
 
 @override_settings(
-    TEMPLATE_CONTEXT_PROCESSORS=('django.core.context_processors.static',),
+    TEMPLATE_CONTEXT_PROCESSORS=('freedom.core.context_processors.static',),
     STATIC_URL='/path/to/static/media/',
     ROOT_URLCONF='view_tests.generic_urls',
 )

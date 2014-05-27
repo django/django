@@ -1,15 +1,15 @@
 ================================
-Django 1.2 alpha 1 release notes
+Freedom 1.2 alpha 1 release notes
 ================================
 
 January 5, 2010
 
-Welcome to Django 1.2 alpha 1!
+Welcome to Freedom 1.2 alpha 1!
 
 This is the first in a series of preview/development releases leading up to the
-eventual release of Django 1.2, currently scheduled to take place in March 2010.
+eventual release of Freedom 1.2, currently scheduled to take place in March 2010.
 This release is primarily targeted at developers who are interested in trying
-out new features and testing the Django codebase to help identify and resolve
+out new features and testing the Freedom codebase to help identify and resolve
 bugs prior to the final 1.2 release.
 
 As such, this release is *not* intended for production use, and any such use is
@@ -27,7 +27,7 @@ There have been large changes to the way that CSRF protection works, detailed in
 changes that developers must be aware of:
 
 * ``CsrfResponseMiddleware`` and ``CsrfMiddleware`` have been deprecated, and
-  **will be removed completely in Django 1.4**, in favor of a template tag that
+  **will be removed completely in Freedom 1.4**, in favor of a template tag that
   should be inserted into forms.
 
 * All contrib apps use a ``csrf_protect`` decorator to protect the view. This
@@ -37,8 +37,8 @@ changes that developers must be aware of:
 
   .. admonition:: Documentation removed
 
-     The upgrade notes have been removed in current Django docs. Please refer
-     to the docs for Django 1.3 or older to find these instructions.
+     The upgrade notes have been removed in current Freedom docs. Please refer
+     to the docs for Freedom 1.3 or older to find these instructions.
 
 * ``CsrfViewMiddleware`` is included in :setting:`MIDDLEWARE_CLASSES` by
   default. This turns on CSRF protection by default, so that views that accept
@@ -62,7 +62,7 @@ keyword status is always enforced, and template code like ``{% if not %}`` or
 --------------
 
 ``LazyObject`` is an undocumented utility class used for lazily wrapping other
-objects of unknown type.  In Django 1.1 and earlier, it handled introspection in
+objects of unknown type.  In Freedom 1.1 and earlier, it handled introspection in
 a non-standard way, depending on wrapped objects implementing a public method
 ``get_all_members()``. Since this could easily lead to name clashes, it has been
 changed to use the standard method, involving ``__members__`` and ``__dir__()``.
@@ -89,7 +89,7 @@ changes:
 Historically, the ``__dict__`` attribute of a model instance has only contained
 attributes corresponding to the fields on a model.
 
-In order to support multiple database configurations, Django 1.2 has
+In order to support multiple database configurations, Freedom 1.2 has
 added a ``_state`` attribute to object instances. This attribute will
 appear in ``__dict__`` for a model instance. If your code relies on
 iterating over __dict__ to obtain a list of fields, you must now
@@ -152,7 +152,7 @@ an unprepared (i.e., ``prepared=False``) value is provided to the
 Conversion functions has been provided which will transparently
 convert functions adhering to the old prototype into functions
 compatible with the new prototype. However, this conversion function
-will be removed in Django 1.4, so you should upgrade your Field
+will be removed in Freedom 1.4, so you should upgrade your Field
 definitions to use the new prototype.
 
 If your ``get_db_prep_*()`` methods made no use of the database
@@ -170,7 +170,7 @@ Template tags that store rendering state on the node itself may experience
 problems if they are used with the new :ref:`cached
 template loader<template-loaders>`.
 
-All of the built-in Django template tags are safe to use with the cached
+All of the built-in Freedom template tags are safe to use with the cached
 loader, but if you're using custom template tags that come from third
 party packages, or that you wrote yourself, you should ensure that the
 ``Node`` implementation for each tag is thread-safe. For more
@@ -195,7 +195,7 @@ CSRF response rewriting middleware
 
 ``CsrfResponseMiddleware``, the middleware that automatically inserted CSRF
 tokens into POST forms in outgoing pages, has been deprecated in favor of a
-template tag method (see above), and will be removed completely in Django
+template tag method (see above), and will be removed completely in Freedom
 1.4. ``CsrfMiddleware``, which includes the functionality of
 ``CsrfResponseMiddleware`` and ``CsrfViewMiddleware`` has likewise been
 deprecated.
@@ -205,8 +205,8 @@ imports are deprecated, as described in the upgrading notes.
 
 .. admonition:: Documentation removed
 
-   The upgrade notes have been removed in current Django docs. Please refer
-   to the docs for Django 1.3 or older to find these instructions.
+   The upgrade notes have been removed in current Freedom docs. Please refer
+   to the docs for Freedom 1.3 or older to find these instructions.
 
 ``SMTPConnection``
 ------------------
@@ -215,15 +215,15 @@ The ``SMTPConnection`` class has been deprecated in favor of a generic
 Email backend API. Old code that explicitly instantiated an instance
 of an SMTPConnection::
 
-    from django.core.mail import SMTPConnection
+    from freedom.core.mail import SMTPConnection
     connection = SMTPConnection()
     messages = get_notification_email()
     connection.send_messages(messages)
 
-should now call :meth:`~django.core.mail.get_connection()` to
+should now call :meth:`~freedom.core.mail.get_connection()` to
 instantiate a generic email connection::
 
-    from django.core.mail import get_connection
+    from freedom.core.mail import get_connection
     connection = get_connection()
     messages = get_notification_email()
     connection.send_messages(messages)
@@ -233,26 +233,26 @@ may not return an SMTP connection. If you explicitly require an SMTP
 connection with which to send email, you can explicitly request an
 SMTP connection::
 
-    from django.core.mail import get_connection
-    connection = get_connection('django.core.mail.backends.smtp.EmailBackend')
+    from freedom.core.mail import get_connection
+    connection = get_connection('freedom.core.mail.backends.smtp.EmailBackend')
     messages = get_notification_email()
     connection.send_messages(messages)
 
 If your call to construct an instance of ``SMTPConnection`` required
 additional arguments, those arguments can be passed to the
-:meth:`~django.core.mail.get_connection()` call::
+:meth:`~freedom.core.mail.get_connection()` call::
 
-    connection = get_connection('django.core.mail.backends.smtp.EmailBackend', hostname='localhost', port=1234)
+    connection = get_connection('freedom.core.mail.backends.smtp.EmailBackend', hostname='localhost', port=1234)
 
 Specifying databases
 --------------------
 
-Prior to Django 1.1, Django used a number of settings to control access to a
-single database. Django 1.2 introduces support for multiple databases, and as
+Prior to Freedom 1.1, Freedom used a number of settings to control access to a
+single database. Freedom 1.2 introduces support for multiple databases, and as
 a result, the way you define database settings has changed.
 
-**Any existing Django settings file will continue to work as expected
-until Django 1.4.** Old-style database settings will be automatically
+**Any existing Freedom settings file will continue to work as expected
+until Freedom 1.4.** Old-style database settings will be automatically
 translated to the new-style format.
 
 In the old-style (pre 1.2) format, there were a number of
@@ -274,7 +274,7 @@ The sample settings given previously would now be stored using::
     DATABASES = {
         'default': {
             'NAME': 'test_db',
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'freedom.db.backends.postgresql_psycopg2',
             'USER': 'myusername',
             'PASSWORD': 's3krit',
         }
@@ -300,17 +300,17 @@ This affects the following settings:
 These changes are also required if you have manually created a database
 connection using ``DatabaseWrapper()`` from your database backend of choice.
 
-In addition to the change in structure, Django 1.2 removes the special
+In addition to the change in structure, Freedom 1.2 removes the special
 handling for the built-in database backends. All database backends
 must now be specified by a fully qualified module name (i.e.,
-``django.db.backends.postgresql_psycopg2``, rather than just
+``freedom.db.backends.postgresql_psycopg2``, rather than just
 ``postgresql_psycopg2``).
 
 User Messages API
 -----------------
 
 The API for storing messages in the user ``Message`` model (via
-``user.message_set.create``) is now deprecated and will be removed in Django
+``user.message_set.create``) is now deprecated and will be removed in Freedom
 1.4 according to the standard :doc:`release process </internals/release-process>`.
 
 To upgrade your code, you need to replace any instances of::
@@ -319,7 +319,7 @@ To upgrade your code, you need to replace any instances of::
 
 with the following::
 
-    from django.contrib import messages
+    from freedom.contrib import messages
     messages.add_message(request, messages.INFO, 'a message')
 
 Additionally, if you make use of the method, you need to replace the
@@ -330,7 +330,7 @@ following::
 
 with::
 
-    from django.contrib import messages
+    from freedom.contrib import messages
     for message in messages.get_messages(request):
         ...
 
@@ -341,20 +341,20 @@ update your code to use the new API immediately.
 Date format helper functions
 ----------------------------
 
-``django.utils.translation.get_date_formats()`` and
-``django.utils.translation.get_partial_date_formats()`` have been deprecated
-in favor of the appropriate calls to ``django.utils.formats.get_format()``
+``freedom.utils.translation.get_date_formats()`` and
+``freedom.utils.translation.get_partial_date_formats()`` have been deprecated
+in favor of the appropriate calls to ``freedom.utils.formats.get_format()``
 which is locale aware when :setting:`USE_L10N` is set to ``True``, and falls
 back to default settings if set to ``False``.
 
 To get the different date formats, instead of writing::
 
-    from django.utils.translation import get_date_formats
+    from freedom.utils.translation import get_date_formats
     date_format, datetime_format, time_format = get_date_formats()
 
 use::
 
-    from django.utils import formats
+    from freedom.utils import formats
 
     date_format = formats.get_format('DATE_FORMAT')
     datetime_format = formats.get_format('DATETIME_FORMAT')
@@ -362,19 +362,19 @@ use::
 
 or, when directly formatting a date value::
 
-    from django.utils import formats
+    from freedom.utils import formats
     value_formatted = formats.date_format(value, 'DATETIME_FORMAT')
 
-The same applies to the globals found in ``django.forms.fields``:
+The same applies to the globals found in ``freedom.forms.fields``:
 
 * ``DEFAULT_DATE_INPUT_FORMATS``
 * ``DEFAULT_TIME_INPUT_FORMATS``
 * ``DEFAULT_DATETIME_INPUT_FORMATS``
 
-Use ``django.utils.formats.get_format()`` to get the appropriate formats.
+Use ``freedom.utils.formats.get_format()`` to get the appropriate formats.
 
 
-What's new in Django 1.2 alpha 1
+What's new in Freedom 1.2 alpha 1
 ================================
 
 The following new features are present as of this alpha release; this
@@ -386,7 +386,7 @@ release cycle. Some minor features will continue development until the
 CSRF support
 ------------
 
-Django now has much improved protection against :doc:`Cross-Site
+Freedom now has much improved protection against :doc:`Cross-Site
 Request Forgery (CSRF) attacks</ref/contrib/csrf>`. This type of attack
 occurs when a malicious Web site contains a link, a form button or
 some javascript that is intended to perform some action on your Web
@@ -398,15 +398,15 @@ into a site with someone else's credentials, is also covered.
 Email Backends
 --------------
 
-You can now :ref:`configure the way that Django sends email
+You can now :ref:`configure the way that Freedom sends email
 <topic-email-backends>`. Instead of using SMTP to send all email, you
 can now choose a configurable email backend to send messages. If your
 hosting provider uses a sandbox or some other non-SMTP technique for
 sending mail, you can now construct an email backend that will allow
-Django's standard :doc:`mail sending methods</topics/email>` to use
+Freedom's standard :doc:`mail sending methods</topics/email>` to use
 those facilities.
 
-This also makes it easier to debug mail sending - Django ships with
+This also makes it easier to debug mail sending - Freedom ships with
 backend implementations that allow you to send email to a
 :ref:`file<topic-email-file-backend>`, to the
 :ref:`console<topic-email-console-backend>`, or to
@@ -416,7 +416,7 @@ email to be :ref:`thrown away<topic-email-dummy-backend>`.
 Messages Framework
 ------------------
 
-Django now includes a robust and configurable :doc:`messages framework
+Freedom now includes a robust and configurable :doc:`messages framework
 </ref/contrib/messages>` with built-in support for cookie- and session-based
 messaging, for both anonymous and authenticated clients. The messages framework
 replaces the deprecated user message API and allows you to temporarily store
@@ -426,8 +426,8 @@ messages in one request and retrieve them for display in a subsequent request
 Support for multiple databases
 ------------------------------
 
-Django 1.2 adds the ability to use :doc:`more than one database
-</topics/db/multi-db>` in your Django project. Queries can be
+Freedom 1.2 adds the ability to use :doc:`more than one database
+</topics/db/multi-db>` in your Freedom project. Queries can be
 issued at a specific database with the ``using()`` method on
 querysets; individual objects can be saved to a specific database
 by providing a ``using`` argument when you save the instance.
@@ -438,7 +438,7 @@ by providing a ``using`` argument when you save the instance.
 The :ttag:`if` tag has been upgraded to be much more powerful.  First, support
 for comparison operators has been added. No longer will you have to type:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% ifnotequal a b %}
      ...
@@ -446,7 +446,7 @@ for comparison operators has been added. No longer will you have to type:
 
 ...as you can now do:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     {% if a != b %}
      ...
@@ -458,7 +458,7 @@ The operators supported are ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=`` and
 
 Also, filters may now be used in the ``if`` expression. For example:
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
       <div
         {% if user.email|lower == message.recipient|lower %}
@@ -469,17 +469,17 @@ Also, filters may now be used in the ``if`` expression. For example:
 Template caching
 ----------------
 
-In previous versions of Django, every time you rendered a template it
-would be reloaded from disk. In Django 1.2, you can use a :ref:`cached
+In previous versions of Freedom, every time you rendered a template it
+would be reloaded from disk. In Freedom 1.2, you can use a :ref:`cached
 template loader <template-loaders>` to load templates once, then use
 the cached result for every subsequent render. This can lead to a
 significant performance improvement if your templates are broken into
 lots of smaller subtemplates (using the ``{% extends %}`` or ``{%
 include %}`` tags).
 
-As a side effect, it is now much easier to support non-Django template
+As a side effect, it is now much easier to support non-Freedom template
 languages. For more details, see the :ref:`notes on supporting
-non-Django template languages<topic-template-alternate-language>`.
+non-Freedom template languages<topic-template-alternate-language>`.
 
 Natural keys in fixtures
 ------------------------
@@ -493,13 +493,13 @@ objects whose primary key value may not be predictable or known.
 ``BigIntegerField``
 -------------------
 
-Models can now use a 64 bit :class:`~django.db.models.BigIntegerField` type.
+Models can now use a 64 bit :class:`~freedom.db.models.BigIntegerField` type.
 
 Fast Failure for Tests
 ----------------------
 
-The :djadmin:`test` subcommand of ``django-admin.py``, and the ``runtests.py``
-script used to run Django's own test suite, support a new ``--failfast`` option.
+The :djadmin:`test` subcommand of ``freedom-admin.py``, and the ``runtests.py``
+script used to run Freedom's own test suite, support a new ``--failfast`` option.
 When specified, this option causes the test runner to exit after encountering
 a failure instead of continuing with the test run.  In addition, the handling
 of ``Ctrl-C`` during a test run has been improved to trigger a graceful exit
@@ -508,17 +508,17 @@ from the test run that reports details of the tests run before the interruption.
 Improved localization
 ---------------------
 
-Django's :doc:`internationalization framework </topics/i18n/index>` has been
+Freedom's :doc:`internationalization framework </topics/i18n/index>` has been
 expanded by locale aware formatting and form processing. That means, if
 enabled, dates and numbers on templates will be displayed using the format
-specified for the current locale. Django will also use localized formats
+specified for the current locale. Freedom will also use localized formats
 when parsing data in forms.
 See :ref:`Format localization <format-localization>` for more details.
 
 Added ``readonly_fields`` to ``ModelAdmin``
 -------------------------------------------
 
-:attr:`django.contrib.admin.ModelAdmin.readonly_fields` has been added to
+:attr:`freedom.contrib.admin.ModelAdmin.readonly_fields` has been added to
 enable non-editable fields in add/change pages for models and inlines. Field
 and calculated values can be displayed alongside editable fields.
 
@@ -526,27 +526,27 @@ Customizable syntax highlighting
 --------------------------------
 
 You can now use the ``DJANGO_COLORS`` environment variable to modify
-or disable the colors used by ``django-admin.py`` to provide
+or disable the colors used by ``freedom-admin.py`` to provide
 :ref:`syntax highlighting <syntax-coloring>`.
 
 
-The Django 1.2 roadmap
+The Freedom 1.2 roadmap
 ======================
 
-Before the final Django 1.2 release, several other preview/development
+Before the final Freedom 1.2 release, several other preview/development
 releases will be made available. The current schedule consists of at
 least the following:
 
-* Week of **January 26, 2010**: First Django 1.2 beta release. Final
-  feature freeze for Django 1.2.
+* Week of **January 26, 2010**: First Freedom 1.2 beta release. Final
+  feature freeze for Freedom 1.2.
 
-* Week of **March 2, 2010**: First Django 1.2 release
+* Week of **March 2, 2010**: First Freedom 1.2 release
   candidate. String freeze for translations.
 
-* Week of **March 9, 2010**: Django 1.2 final release.
+* Week of **March 9, 2010**: Freedom 1.2 final release.
 
 If necessary, additional alpha, beta or release-candidate packages
-will be issued prior to the final 1.2 release. Django 1.2 will be
+will be issued prior to the final 1.2 release. Freedom 1.2 will be
 released approximately one week after the final release candidate.
 
 
@@ -555,34 +555,34 @@ What you can do to help
 
 In order to provide a high-quality 1.2 release, we need your help. Although this
 alpha release is, again, *not* intended for production use, you can help the
-Django team by trying out the alpha codebase in a safe test environment and
-reporting any bugs or issues you encounter. The Django ticket tracker is the
+Freedom team by trying out the alpha codebase in a safe test environment and
+reporting any bugs or issues you encounter. The Freedom ticket tracker is the
 central place to search for open issues:
 
-* https://code.djangoproject.com/timeline
+* https://code.freedomproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem you're
 running into.
 
-Additionally, discussion of Django development, including progress toward the
-1.2 release, takes place daily on the django-developers mailing list:
+Additionally, discussion of Freedom development, including progress toward the
+1.2 release, takes place daily on the freedom-developers mailing list:
 
-* http://groups.google.com/group/django-developers
+* http://groups.google.com/group/freedom-developers
 
-... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
-interested in helping out with Django's development, feel free to join the
+... and in the ``#freedom-dev`` IRC channel on ``irc.freenode.net``. If you're
+interested in helping out with Freedom's development, feel free to join the
 discussions there.
 
-Django's online documentation also includes pointers on how to contribute to
-Django:
+Freedom's online documentation also includes pointers on how to contribute to
+Freedom:
 
-* :doc:`How to contribute to Django </internals/contributing/index>`
+* :doc:`How to contribute to Freedom </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing documentation or simply
 triaging tickets and helping to test proposed bugfixes -- are always welcome and
 appreciated.
 
-Development sprints for Django 1.2 will also be taking place at PyCon
+Development sprints for Freedom 1.2 will also be taking place at PyCon
 US 2010, on the dedicated sprint days (February 22 through 25), and
 anyone who wants to help out is welcome to join in, either in person
 at PyCon or virtually in the IRC channel or on the mailing list.

@@ -8,8 +8,8 @@ and where files should be stored.
 import random
 import tempfile
 
-from django.db import models
-from django.core.files.storage import FileSystemStorage
+from freedom.db import models
+from freedom.core.files.storage import FileSystemStorage
 
 
 temp_storage_location = tempfile.mkdtemp()

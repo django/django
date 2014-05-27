@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from django.contrib import admin
+from freedom.contrib import admin
 
 
 class Bug8245Test(TestCase):

@@ -2,13 +2,13 @@
 18. Using SQL reserved names
 
 Need to use a reserved SQL name as a column name or table name? Need to include
-a hyphen in a column or table name? No problem. Django quotes names
+a hyphen in a column or table name? No problem. Freedom quotes names
 appropriately behind the scenes, so your database won't complain about
 reserved-name usage.
 """
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

@@ -11,7 +11,7 @@ API Reference
    clickjacking
    contrib/index
    databases
-   django-admin
+   freedom-admin
    exceptions
    files/index
    forms/index

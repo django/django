@@ -2,10 +2,10 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.conf import settings
-from django.db import transaction, DEFAULT_DB_ALIAS, models
-from django.db.utils import ConnectionHandler
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from freedom.conf import settings
+from freedom.db import transaction, DEFAULT_DB_ALIAS, models
+from freedom.db.utils import ConnectionHandler
+from freedom.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
     PlayedWithNote, Email, Researcher, Food, Eaten, Policy, Version, Location,
@@ -59,7 +59,7 @@ class DeleteLockingTest(TransactionTestCase):
 class DeleteCascadeTests(TestCase):
     def test_generic_relation_cascade(self):
         """
-        Django cascades deletes through generic-related objects to their
+        Freedom cascades deletes through generic-related objects to their
         reverse relations.
 
         """

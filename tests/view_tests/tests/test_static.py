@@ -4,11 +4,11 @@ import mimetypes
 from os import path
 import unittest
 
-from django.conf.urls.static import static
-from django.http import HttpResponseNotModified
-from django.test import SimpleTestCase, override_settings
-from django.utils.http import http_date
-from django.views.static import was_modified_since
+from freedom.conf.urls.static import static
+from freedom.http import HttpResponseNotModified
+from freedom.test import SimpleTestCase, override_settings
+from freedom.utils.http import http_date
+from freedom.views.static import was_modified_since
 
 from .. import urls
 from ..urls import media_dir
@@ -16,7 +16,7 @@ from ..urls import media_dir
 
 @override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
 class StaticTests(SimpleTestCase):
-    """Tests django views in django/views/static.py"""
+    """Tests freedom views in freedom/views/static.py"""
 
     prefix = 'site_media'
 
@@ -57,7 +57,7 @@ class StaticTests(SimpleTestCase):
         response = self.client.get(
             '/%s/%s' % (self.prefix, file_name),
             HTTP_IF_MODIFIED_SINCE='Mon, 18 Jan 2038 05:14:07 GMT'
-            # This is 24h before max Unix time. Remember to fix Django and
+            # This is 24h before max Unix time. Remember to fix Freedom and
             # update this test well before 2038 :)
         )
         self.assertIsInstance(response, HttpResponseNotModified)

@@ -1,7 +1,7 @@
 Handling HTTP requests
 ======================
 
-Information on handling HTTP requests in Django:
+Information on handling HTTP requests in Freedom:
 
 .. toctree::
    :maxdepth: 1

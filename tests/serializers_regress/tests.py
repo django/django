@@ -18,15 +18,15 @@ try:
 except ImportError:
     yaml = None
 
-from django.core import serializers
-from django.core.serializers import SerializerDoesNotExist
-from django.core.serializers.base import DeserializationError
-from django.core.serializers.xml_serializer import DTDForbidden
-from django.db import connection, models
-from django.http import HttpResponse
-from django.test import skipUnlessDBFeature, TestCase
-from django.utils import six
-from django.utils.functional import curry
+from freedom.core import serializers
+from freedom.core.serializers import SerializerDoesNotExist
+from freedom.core.serializers.base import DeserializationError
+from freedom.core.serializers.xml_serializer import DTDForbidden
+from freedom.db import connection, models
+from freedom.http import HttpResponse
+from freedom.test import skipUnlessDBFeature, TestCase
+from freedom.utils import six
+from freedom.utils.functional import curry
 
 from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, EmailData,
     FileData, FilePathData, DecimalData, FloatData, IntegerData, IPAddressData,
@@ -495,7 +495,7 @@ def naturalKeySerializerTest(format, self):
     for klass in instance_count:
         instance_count[klass] = klass.objects.count()
 
-    # use_natural_keys is deprecated and to be removed in Django 1.9
+    # use_natural_keys is deprecated and to be removed in Freedom 1.9
     with warnings.catch_warnings(record=True):
         warnings.simplefilter("always")
         # Serialize the test database
@@ -550,8 +550,8 @@ def streamTest(format, self):
 
 def naturalKeyTest(format, self):
     book1 = {'data': '978-1590597255', 'title': 'The Definitive Guide to '
-             'Django: Web Development Done Right'}
-    book2 = {'data': '978-1590599969', 'title': 'Practical Django Projects'}
+             'Freedom: Web Development Done Right'}
+    book2 = {'data': '978-1590599969', 'title': 'Practical Freedom Projects'}
 
     # Create the books.
     adrian = NaturalKeyAnchor.objects.create(**book1)

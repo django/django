@@ -1,13 +1,13 @@
 .. _ref-contrib-gis:
 
 =========
-GeoDjango
+GeoFreedom
 =========
 
-.. module:: django.contrib.gis
-   :synopsis: Geographic Information System (GIS) extensions for Django
+.. module:: freedom.contrib.gis
+   :synopsis: Geographic Information System (GIS) extensions for Freedom
 
-GeoDjango intends to be a world-class geographic Web framework. Its goal is to
+GeoFreedom intends to be a world-class geographic Web framework. Its goal is to
 make it as easy as possible to build GIS Web applications and harness the power
 of spatially enabled data.
 

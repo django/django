@@ -1,5 +1,5 @@
 ========================
-Django's release process
+Freedom's release process
 ========================
 
 .. _official-releases:
@@ -7,18 +7,18 @@ Django's release process
 Official releases
 =================
 
-Since version 1.0, Django's release numbering works as follows:
+Since version 1.0, Freedom's release numbering works as follows:
 
 * Versions are numbered in the form ``A.B`` or ``A.B.C``.
 
 * ``A`` is the *major version* number, which is only incremented for major
-  changes to Django, and these changes are not necessarily
-  backwards-compatible. That is, code you wrote for Django 1.6 may break
-  when we release Django 2.0.
+  changes to Freedom, and these changes are not necessarily
+  backwards-compatible. That is, code you wrote for Freedom 1.6 may break
+  when we release Freedom 2.0.
 
 * ``B`` is the *minor version* number, which is incremented for large yet
-  backwards compatible changes.  Code written for Django 1.6 will continue
-  to work under Django 1.7. Exceptions to this rule will be listed in the
+  backwards compatible changes.  Code written for Freedom 1.6 will continue
+  to work under Freedom 1.7. Exceptions to this rule will be listed in the
   release notes.
 
 * ``C`` is the *micro version* number, which is incremented for bug and
@@ -31,19 +31,19 @@ Since version 1.0, Django's release numbering works as follows:
   releases. These are of the form ``A.B alpha/beta/rc N``, which means the
   ``Nth`` alpha/beta/release candidate of version ``A.B``.
 
-In git, each Django release will have a tag indicating its version number,
-signed with the Django release key. Additionally, each release series has its
+In git, each Freedom release will have a tag indicating its version number,
+signed with the Freedom release key. Additionally, each release series has its
 own branch, called ``stable/A.B.x``, and bugfix/security releases will be
 issued from those branches.
 
-For more information about how the Django project issues new releases for
+For more information about how the Freedom project issues new releases for
 security purposes, please see :doc:`our security policies <security>`.
 
 .. glossary::
 
   Major release
     Major releases (1.0, 2.0, etc.) will happen very infrequently (think "years",
-    not "months"), and may represent major, sweeping changes to Django.
+    not "months"), and may represent major, sweeping changes to Freedom.
 
   Minor release
     Minor release (1.5, 1.6, etc.) will happen roughly every nine months -- see
@@ -58,17 +58,17 @@ security purposes, please see :doc:`our security policies <security>`.
     ``A.B+2``.
 
     So, for example, if we decided to start the deprecation of a function in
-    Django 1.7:
+    Freedom 1.7:
 
-    * Django 1.7 will contain a backwards-compatible replica of the function which
-      will raise a ``RemovedInDjango19Warning``. This warning is silent by
+    * Freedom 1.7 will contain a backwards-compatible replica of the function which
+      will raise a ``RemovedInFreedom19Warning``. This warning is silent by
       default; you can turn on display of these warnings with the ``-Wd`` option
       of Python.
 
-    * Django 1.8 will still contain the backwards-compatible replica. This
+    * Freedom 1.8 will still contain the backwards-compatible replica. This
       warning becomes *loud* by default, and will likely be quite annoying.
 
-    * Django 1.9 will remove the feature outright.
+    * Freedom 1.9 will remove the feature outright.
 
   Micro release
     Micro releases (1.5.1, 1.6.2, 1.6.1, etc.) will be issued as needed, often to
@@ -83,7 +83,7 @@ security purposes, please see :doc:`our security policies <security>`.
 Supported versions
 ==================
 
-At any moment in time, Django's developer team will support a set of releases to
+At any moment in time, Freedom's developer team will support a set of releases to
 varying levels:
 
 * The current development master will get new features and bug fixes
@@ -117,9 +117,9 @@ varying levels:
   regressions is much less of a concern.
 
 As a concrete example, consider a moment in time halfway between the release of
-Django 1.6 and 1.7. At this point in time:
+Freedom 1.6 and 1.7. At this point in time:
 
-* Features will be added to development master, to be released as Django 1.7.
+* Features will be added to development master, to be released as Freedom 1.7.
 
 * Critical bug fixes will be applied to the ``stable/1.6.x`` branch, and
   released as 1.6.1, 1.6.2, etc.
@@ -136,21 +136,21 @@ Django 1.6 and 1.7. At this point in time:
 Long-term support (LTS) releases
 ================================
 
-Additionally, the Django team will occasionally designate certain releases
+Additionally, the Freedom team will occasionally designate certain releases
 to be "Long-term support" (LTS) releases. LTS releases will get security fixes
 applied for a guaranteed period of time, typically 3+ years, regardless of
 the pace of releases afterwards.
 
 The follow releases have been designated for long-term support:
 
-* Django 1.4, supported until at least March 2015.
+* Freedom 1.4, supported until at least March 2015.
 
 .. _release-process:
 
 Release process
 ===============
 
-Django uses a time-based release schedule, with minor (i.e. 1.6, 1.7, etc.)
+Freedom uses a time-based release schedule, with minor (i.e. 1.6, 1.7, etc.)
 releases every nine months, or more, depending on features.
 
 After each release, and after a suitable cooling-off period of a few weeks, the

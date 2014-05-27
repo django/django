@@ -2,7 +2,7 @@
 Regression tests for initial SQL insertion.
 """
 
-from django.db import models
+from freedom.db import models
 
 
 class Simple(models.Model):

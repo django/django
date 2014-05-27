@@ -1,6 +1,6 @@
 from optparse import make_option
 
-from django.core.management.base import BaseCommand, CommandError
+from freedom.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):

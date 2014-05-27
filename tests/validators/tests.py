@@ -6,15 +6,15 @@ import re
 import types
 from unittest import TestCase
 
-from django.core.exceptions import ValidationError
-from django.core.validators import (
+from freedom.core.exceptions import ValidationError
+from freedom.core.validators import (
     BaseValidator, EmailValidator, MaxLengthValidator, MaxValueValidator,
     MinLengthValidator, MinValueValidator, RegexValidator, URLValidator,
     validate_comma_separated_integer_list, validate_email, validate_integer,
     validate_ipv46_address, validate_ipv4_address, validate_ipv6_address,
     validate_slug,
 )
-from django.test.utils import str_prefix
+from freedom.test.utils import str_prefix
 
 
 NOW = datetime.now()
@@ -88,7 +88,7 @@ TEST_DATA = (
     (validate_ipv4_address, '25,1,1,1', ValidationError),
     (validate_ipv4_address, '25.1 .1.1', ValidationError),
 
-    # validate_ipv6_address uses django.utils.ipv6, which
+    # validate_ipv6_address uses freedom.utils.ipv6, which
     # is tested in much greater detail in its own testcase
     (validate_ipv6_address, 'fe80::1', None),
     (validate_ipv6_address, '::1', None),
@@ -149,7 +149,7 @@ TEST_DATA = (
 
     (MinLengthValidator(10), '', ValidationError),
 
-    (URLValidator(), 'http://www.djangoproject.com/', None),
+    (URLValidator(), 'http://www.freedomproject.com/', None),
     (URLValidator(), 'HTTP://WWW.DJANGOPROJECT.COM/', None),
     (URLValidator(), 'http://localhost/', None),
     (URLValidator(), 'http://example.com/', None),

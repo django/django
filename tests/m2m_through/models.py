@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 # M2M described on one of the models

@@ -1,17 +1,17 @@
 """
 A subset of the tests in tests/servers/tests exercicing
-django.contrib.staticfiles.testing.StaticLiveServerCase instead of
-django.test.LiveServerTestCase.
+freedom.contrib.staticfiles.testing.StaticLiveServerCase instead of
+freedom.test.LiveServerTestCase.
 """
 
 import os
 
-from django.core.exceptions import ImproperlyConfigured
-from django.test import override_settings
-from django.utils.six.moves.urllib.request import urlopen
-from django.utils._os import upath
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.test import override_settings
+from freedom.utils.six.moves.urllib.request import urlopen
+from freedom.utils._os import upath
 
-from django.contrib.staticfiles.testing import StaticLiveServerCase
+from freedom.contrib.staticfiles.testing import StaticLiveServerCase
 
 
 TEST_ROOT = os.path.dirname(upath(__file__))

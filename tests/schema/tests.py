@@ -2,11 +2,11 @@ from __future__ import absolute_import
 import datetime
 import unittest
 
-from django.test import TransactionTestCase
-from django.db import connection, DatabaseError, IntegrityError, OperationalError
-from django.db.models.fields import IntegerField, TextField, CharField, SlugField, BooleanField
-from django.db.models.fields.related import ManyToManyField, ForeignKey
-from django.db.transaction import atomic
+from freedom.test import TransactionTestCase
+from freedom.db import connection, DatabaseError, IntegrityError, OperationalError
+from freedom.db.models.fields import IntegerField, TextField, CharField, SlugField, BooleanField
+from freedom.db.models.fields.related import ManyToManyField, ForeignKey
+from freedom.db.transaction import atomic
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
     UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough)

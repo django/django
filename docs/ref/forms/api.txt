@@ -2,11 +2,11 @@
 The Forms API
 =============
 
-.. module:: django.forms
+.. module:: freedom.forms
 
 .. admonition:: About this document
 
-    This document covers the gritty details of Django's forms API. You should
+    This document covers the gritty details of Freedom's forms API. You should
     read the :doc:`introduction to working with forms </topics/forms/index>`
     first.
 
@@ -174,7 +174,7 @@ from a view.
 The ``field`` argument is the name of the field to which the errors
 should be added. If its value is ``None`` the error will be treated as
 a non-field error as returned by :meth:`Form.non_field_errors()
-<django.forms.Form.non_field_errors>`.
+<freedom.forms.Form.non_field_errors>`.
 
 The ``error`` argument can be a simple string, or preferably an instance of
 ``ValidationError``. See :ref:`raising-validation-error` for best practices
@@ -192,15 +192,15 @@ a specific error ``code``. If ``code`` is ``None``, it will return ``True``
 if the field contains any errors at all.
 
 To check for non-field errors use
-:data:`~django.core.exceptions.NON_FIELD_ERRORS` as the ``field`` parameter.
+:data:`~freedom.core.exceptions.NON_FIELD_ERRORS` as the ``field`` parameter.
 
 .. method:: Form.non_field_errors()
 
 This method returns the list of errors from :attr:`Form.errors
-<django.forms.Form.errors>`  that aren't associated with a particular field.
+<freedom.forms.Form.errors>`  that aren't associated with a particular field.
 This includes ``ValidationError``\s that are raised in :meth:`Form.clean()
-<django.forms.Form.clean>` and errors added using :meth:`Form.add_error(None,
-"...") <django.forms.Form.add_error>`.
+<freedom.forms.Form.clean>` and errors added using :meth:`Form.add_error(None,
+"...") <freedom.forms.Form.add_error>`.
 
 Behavior of unbound forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -233,13 +233,13 @@ it's not necessary to include every field in your form. For example::
 These values are only displayed for unbound forms, and they're not used as
 fallback values if a particular value isn't provided.
 
-Note that if a :class:`~django.forms.Field` defines :attr:`~Form.initial` *and*
+Note that if a :class:`~freedom.forms.Field` defines :attr:`~Form.initial` *and*
 you include ``initial`` when instantiating the ``Form``, then the latter
 ``initial`` will have precedence. In this example, ``initial`` is provided both
 at the field level and at the form instance level, and the latter gets
 precedence::
 
-    >>> from django import forms
+    >>> from freedom import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial='class')
     ...     url = forms.URLField()
@@ -260,11 +260,11 @@ attribute::
 
     >>> for row in f.fields.values(): print(row)
     ...
-    <django.forms.fields.CharField object at 0x7ffaac632510>
-    <django.forms.fields.URLField object at 0x7ffaac632f90>
-    <django.forms.fields.CharField object at 0x7ffaac3aa050>
+    <freedom.forms.fields.CharField object at 0x7ffaac632510>
+    <freedom.forms.fields.URLField object at 0x7ffaac632f90>
+    <freedom.forms.fields.CharField object at 0x7ffaac3aa050>
     >>> f.fields['name']
-    <django.forms.fields.CharField object at 0x7ffaac6324d0>
+    <freedom.forms.fields.CharField object at 0x7ffaac6324d0>
 
 You can alter the field of :class:`Form` instance to change the way it is
 presented in the form::
@@ -294,7 +294,7 @@ data, but also for "cleaning" it -- normalizing it to a consistent format. This
 is a nice feature, because it allows data for a particular field to be input in
 a variety of ways, always resulting in consistent output.
 
-For example, :class:`~django.forms.DateField` normalizes input into a
+For example, :class:`~freedom.forms.DateField` normalizes input into a
 Python ``datetime.date`` object. Regardless of whether you pass it a string in
 the format ``'1994-07-15'``, a ``datetime.date`` object, or a number of other
 formats, ``DateField`` will always normalize it to a ``datetime.date`` object
@@ -353,7 +353,7 @@ When the ``Form`` is valid, ``cleaned_data`` will include a key and value for
 fields. In this example, the data dictionary doesn't include a value for the
 ``nick_name`` field, but ``cleaned_data`` includes it, with an empty value::
 
-    >>> from django.forms import Form
+    >>> from freedom.forms import Form
     >>> class OptionalPersonForm(Form):
     ...     first_name = CharField()
     ...     last_name = CharField()
@@ -507,7 +507,7 @@ attributes to required rows or to rows with errors: simply set the
 :attr:`Form.error_css_class` and/or :attr:`Form.required_css_class`
 attributes::
 
-    from django.forms import Form
+    from freedom.forms import Form
 
     class ContactForm(Form):
         error_css_class = 'error'
@@ -654,11 +654,11 @@ or ``:``).
 
 .. versionadded:: 1.8
 
-Fields can also define their own :attr:`~django.forms.Field.label_suffix`.
+Fields can also define their own :attr:`~freedom.forms.Field.label_suffix`.
 This will take precedence over :attr:`Form.label_suffix
-<django.forms.Form.label_suffix>`. The suffix can also be overridden at runtime
+<freedom.forms.Form.label_suffix>`. The suffix can also be overridden at runtime
 using the ``label_suffix`` parameter to
-:meth:`~django.forms.BoundField.label_tag`.
+:meth:`~freedom.forms.BoundField.label_tag`.
 
 Notes on field ordering
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -704,12 +704,12 @@ method you're using::
 Customizing the error list format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, forms use ``django.forms.utils.ErrorList`` to format validation
+By default, forms use ``freedom.forms.utils.ErrorList`` to format validation
 errors. If you'd like to use an alternate class for displaying errors, you can
 pass that in at construction time (replace ``__str__`` by ``__unicode__`` on
 Python 2)::
 
-    >>> from django.forms.utils import ErrorList
+    >>> from freedom.forms.utils import ErrorList
     >>> class DivErrorList(ErrorList):
     ...     def __str__(self):              # __unicode__ on Python 2
     ...         return self.as_divs()
@@ -727,7 +727,7 @@ Python 2)::
 
 .. versionchanged:: 1.7
 
-    ``django.forms.util`` was renamed to ``django.forms.utils``.
+    ``freedom.forms.util`` was renamed to ``freedom.forms.utils``.
 
 More granular output
 ~~~~~~~~~~~~~~~~~~~~
@@ -804,8 +804,8 @@ auto-generated label tag. An optional ``attrs`` dictionary may contain
 additional attributes for the ``<label>`` tag.
 
 The HTML that's generated includes the form's
-:attr:`~django.forms.Form.label_suffix` (a colon, by default) or, if set, the
-current field's :attr:`~django.forms.Field.label_suffix`. The optional
+:attr:`~freedom.forms.Form.label_suffix` (a colon, by default) or, if set, the
+current field's :attr:`~freedom.forms.Field.label_suffix`. The optional
 ``label_suffix`` parameter allows you to override any previously set
 suffix. For example, you can use an empty string to hide the label on selected
 fields. If you need to do this in a template, you could write a custom
@@ -817,7 +817,7 @@ filter to allow passing parameters to ``label_tag``.
 
 .. method:: BoundField.css_classes()
 
-When you use Django's rendering shortcuts, CSS classes are used to
+When you use Freedom's rendering shortcuts, CSS classes are used to
 indicate required form fields or fields that contain errors. If you're
 manually rendering a form, you can access these CSS classes using the
 ``css_classes`` method::
@@ -853,13 +853,13 @@ Use this property to render the ID of this field. For example, if you are
 manually constructing a ``<label>`` in your template (despite the fact that
 :meth:`~BoundField.label_tag` will do this for you):
 
-.. code-block:: html+django
+.. code-block:: html+freedom
 
     <label for="{{ form.my_field.id_for_label }}">...</label>{{ my_field }}
 
 By default, this will be the field's name prefixed by ``id_``
 ("``id_my_field``" for the example above). You may modify the ID by setting
-:attr:`~django.forms.Widget.attrs` on the field's widget. For example,
+:attr:`~freedom.forms.Widget.attrs` on the field's widget. For example,
 declaring a field like this::
 
     my_field = forms.CharField(widget=forms.TextInput(attrs={'id': 'myFIELD'}))
@@ -892,7 +892,7 @@ ContactForm to include an ``ImageField`` called ``mugshot``, we
 need to bind the file data containing the mugshot image::
 
     # Bound form with an image field
-    >>> from django.core.files.uploadedfile import SimpleUploadedFile
+    >>> from freedom.core.files.uploadedfile import SimpleUploadedFile
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
     ...         'sender': 'foo@example.com',
@@ -965,7 +965,7 @@ example, ``BeatleForm`` subclasses both ``PersonForm`` and ``InstrumentForm``
 (in that order), and its field list includes the fields from the parent
 classes::
 
-    >>> from django.forms import Form
+    >>> from freedom.forms import Form
     >>> class PersonForm(Form):
     ...     first_name = CharField()
     ...     last_name = CharField()
@@ -985,7 +985,7 @@ classes::
 * It's possible to declaratively remove a ``Field`` inherited from a parent
   class by setting the name to be ``None`` on the subclass. For example::
 
-    >>> from django import forms
+    >>> from freedom import forms
 
     >>> class ParentForm(forms.Form):
     ...     name = forms.CharField()
@@ -1004,7 +1004,7 @@ Prefixes for forms
 
 .. attribute:: Form.prefix
 
-You can put several Django forms inside one ``<form>`` tag. To give each
+You can put several Freedom forms inside one ``<form>`` tag. To give each
 ``Form`` its own namespace, use the ``prefix`` keyword argument::
 
     >>> mother = PersonForm(prefix="mother")

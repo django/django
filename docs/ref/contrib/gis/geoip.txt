@@ -4,7 +4,7 @@
 Geolocation with GeoIP
 ======================
 
-.. module:: django.contrib.gis.geoip
+.. module:: freedom.contrib.gis.geoip
    :synopsis: High-level Python interface for MaxMind's GeoIP C library.
 
 The :class:`GeoIP` object is a ctypes wrapper for the
@@ -29,7 +29,7 @@ Example
 Assuming you have the GeoIP C library installed, here is an example of its
 usage::
 
-     >>> from django.contrib.gis.geoip import GeoIP
+     >>> from freedom.contrib.gis.geoip import GeoIP
      >>> g = GeoIP()
      >>> g.country('google.com')
      {'country_code': 'US', 'country_name': 'United States'}
@@ -132,7 +132,7 @@ Querying
 
 All the following querying routines may take either a string IP address
 or a fully qualified domain name (FQDN).  For example, both
-``'205.186.163.125'`` and ``'djangoproject.com'`` would be valid query
+``'205.186.163.125'`` and ``'freedomproject.com'`` would be valid query
 parameters.
 
 .. method:: GeoIP.city(query)
@@ -170,7 +170,7 @@ Returns a coordinate tuple of (latitude, longitude),
 
 .. method:: GeoIP.geos(query)
 
-Returns a :class:`django.contrib.gis.geos.Point` object corresponding to the query.
+Returns a :class:`freedom.contrib.gis.geos.Point` object corresponding to the query.
 
 Database Information
 --------------------

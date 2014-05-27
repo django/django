@@ -1,9 +1,9 @@
 from datetime import time, date, datetime
 
-from django import forms
-from django.test import override_settings
-from django.utils.translation import activate, deactivate
-from django.test import SimpleTestCase
+from freedom import forms
+from freedom.test import override_settings
+from freedom.utils.translation import activate, deactivate
+from freedom.test import SimpleTestCase
 
 
 @override_settings(TIME_INPUT_FORMATS=["%I:%M:%S %p", "%I:%M %p"], USE_L10N=True)

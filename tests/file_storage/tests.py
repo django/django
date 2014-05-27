@@ -15,16 +15,16 @@ try:
 except ImportError:
     import dummy_threading as threading
 
-from django.core.cache import cache
-from django.core.exceptions import SuspiciousOperation
-from django.core.files.base import File, ContentFile
-from django.core.files.storage import FileSystemStorage, get_storage_class
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import LiveServerTestCase, SimpleTestCase
-from django.test import override_settings
-from django.utils import six
-from django.utils.six.moves.urllib.request import urlopen
-from django.utils._os import upath
+from freedom.core.cache import cache
+from freedom.core.exceptions import SuspiciousOperation
+from freedom.core.files.base import File, ContentFile
+from freedom.core.files.storage import FileSystemStorage, get_storage_class
+from freedom.core.files.uploadedfile import SimpleUploadedFile
+from freedom.test import LiveServerTestCase, SimpleTestCase
+from freedom.test import override_settings
+from freedom.utils import six
+from freedom.utils.six.moves.urllib.request import urlopen
+from freedom.utils._os import upath
 
 from .models import Storage, temp_storage, temp_storage_location
 
@@ -36,7 +36,7 @@ class GetStorageClassTests(SimpleTestCase):
         get_storage_class returns the class for a storage backend name/path.
         """
         self.assertEqual(
-            get_storage_class('django.core.files.storage.FileSystemStorage'),
+            get_storage_class('freedom.core.files.storage.FileSystemStorage'),
             FileSystemStorage)
 
     def test_get_invalid_storage_module(self):
@@ -51,7 +51,7 @@ class GetStorageClassTests(SimpleTestCase):
         get_storage_class raises an error if the requested class don't exist.
         """
         self.assertRaises(ImportError, get_storage_class,
-                          'django.core.files.storage.NonExistingStorage')
+                          'freedom.core.files.storage.NonExistingStorage')
 
     def test_get_nonexisting_storage_module(self):
         """
@@ -59,16 +59,16 @@ class GetStorageClassTests(SimpleTestCase):
         """
         # Error message may or may not be the fully qualified path.
         with six.assertRaisesRegex(self, ImportError,
-                "No module named '?(django.core.files.)?non_existing_storage'?"):
+                "No module named '?(freedom.core.files.)?non_existing_storage'?"):
             get_storage_class(
-                'django.core.files.non_existing_storage.NonExistingStorage')
+                'freedom.core.files.non_existing_storage.NonExistingStorage')
 
 
 class FileStorageDeconstructionTests(unittest.TestCase):
 
     def test_deconstruction(self):
         path, args, kwargs = temp_storage.deconstruct()
-        self.assertEqual(path, "django.core.files.storage.FileSystemStorage")
+        self.assertEqual(path, "freedom.core.files.storage.FileSystemStorage")
         self.assertEqual(args, tuple())
         self.assertEqual(kwargs, {'location': temp_storage_location})
 
@@ -419,8 +419,8 @@ class FileFieldStorageTests(unittest.TestCase):
         self.assertRaises(ValueError, lambda: obj1.normal.size)
 
         # Saving a file enables full functionality.
-        obj1.normal.save("django_test.txt", ContentFile("content"))
-        self.assertEqual(obj1.normal.name, "tests/django_test.txt")
+        obj1.normal.save("freedom_test.txt", ContentFile("content"))
+        self.assertEqual(obj1.normal.name, "tests/freedom_test.txt")
         self.assertEqual(obj1.normal.size, 7)
         self.assertEqual(obj1.normal.read(), b"content")
         obj1.normal.close()
@@ -434,19 +434,19 @@ class FileFieldStorageTests(unittest.TestCase):
 
         obj1.save()
         dirs, files = temp_storage.listdir("tests")
-        self.assertEqual(sorted(files), ["assignment.txt", "django_test.txt"])
+        self.assertEqual(sorted(files), ["assignment.txt", "freedom_test.txt"])
 
         # Save another file with the same name.
         obj2 = Storage()
-        obj2.normal.save("django_test.txt", ContentFile("more content"))
-        self.assertEqual(obj2.normal.name, "tests/django_test_1.txt")
+        obj2.normal.save("freedom_test.txt", ContentFile("more content"))
+        self.assertEqual(obj2.normal.name, "tests/freedom_test_1.txt")
         self.assertEqual(obj2.normal.size, 12)
         obj2.normal.close()
 
         # Deleting an object does not delete the file it uses.
         obj2.delete()
-        obj2.normal.save("django_test.txt", ContentFile("more content"))
-        self.assertEqual(obj2.normal.name, "tests/django_test_2.txt")
+        obj2.normal.save("freedom_test.txt", ContentFile("more content"))
+        self.assertEqual(obj2.normal.name, "tests/freedom_test_2.txt")
         obj2.normal.close()
 
     def test_filefield_read(self):
@@ -489,8 +489,8 @@ class FileFieldStorageTests(unittest.TestCase):
     def test_empty_upload_to(self):
         # upload_to can be empty, meaning it does not use subdirectory.
         obj = Storage()
-        obj.empty.save('django_test.txt', ContentFile('more content'))
-        self.assertEqual(obj.empty.name, "./django_test.txt")
+        obj.empty.save('freedom_test.txt', ContentFile('more content'))
+        self.assertEqual(obj.empty.name, "./freedom_test.txt")
         self.assertEqual(obj.empty.read(), b"more content")
         obj.empty.close()
 
@@ -505,10 +505,10 @@ class FileFieldStorageTests(unittest.TestCase):
     def test_filefield_pickling(self):
         # Push an object into the cache to make sure it pickles properly
         obj = Storage()
-        obj.normal.save("django_test.txt", ContentFile("more content"))
+        obj.normal.save("freedom_test.txt", ContentFile("more content"))
         obj.normal.close()
         cache.set("obj", obj)
-        self.assertEqual(cache.get("obj").normal.name, "tests/django_test.txt")
+        self.assertEqual(cache.get("obj").normal.name, "tests/freedom_test.txt")
 
     def test_file_object(self):
         # Create sample file

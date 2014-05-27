@@ -1,5 +1,5 @@
 [run]
-omit = */django/contrib/*/tests*,*/django/utils/unittest*,*/django/utils/importlib.py,*/django/test/_doctest.py,*/django/core/servers/fastcgi.py,*/django/utils/autoreload.py,*/django/utils/dictconfig.py
+omit = */freedom/contrib/*/tests*,*/freedom/utils/unittest*,*/freedom/utils/importlib.py,*/freedom/test/_doctest.py,*/freedom/core/servers/fastcgi.py,*/freedom/utils/autoreload.py,*/freedom/utils/dictconfig.py
 
 [report]
 ignore_errors = True

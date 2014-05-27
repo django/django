@@ -3,7 +3,7 @@ Writing documentation
 =====================
 
 We place a high importance on consistency and readability of documentation.
-After all, Django was created in a journalism environment! So we treat our
+After all, Freedom was created in a journalism environment! So we treat our
 documentation like we treat our code: we aim to improve it as often as
 possible.
 
@@ -21,13 +21,13 @@ in the most useful and least error-prone ways.
 Getting the raw documentation
 -----------------------------
 
-Though Django's documentation is intended to be read as HTML at
-https://docs.djangoproject.com/, we edit it as a collection of text files for
+Though Freedom's documentation is intended to be read as HTML at
+https://docs.freedomproject.com/, we edit it as a collection of text files for
 maximum flexibility. These files live in the top-level ``docs/`` directory of a
-Django release.
+Freedom release.
 
 If you'd like to start contributing to our docs, get the development version of
-Django from the source code repository
+Freedom from the source code repository
 (see :ref:`installing-development-version`). The development version has the
 latest-and-greatest documentation, just as it has latest-and-greatest code.
 We also backport documentation fixes and improvements, at the discretion of the
@@ -38,7 +38,7 @@ to have the docs for the last release be up-to-date and correct (see
 Getting started with Sphinx
 ---------------------------
 
-Django's documentation uses the Sphinx__ documentation system, which in turn
+Freedom's documentation uses the Sphinx__ documentation system, which in turn
 is based on docutils__. The basic idea is that lightly-formatted plain-text
 documentation is transformed into HTML, PDF, and any other output format.
 
@@ -50,9 +50,9 @@ Sphinx -- ``sudo pip install Sphinx`` should do the trick.
 
 .. note::
 
-    Building the Django documentation requires Sphinx 1.0.2 or newer. Sphinx
+    Building the Freedom documentation requires Sphinx 1.0.2 or newer. Sphinx
     also requires the Pygments__ library for syntax highlighting; building the
-    Django documentation requires Pygments 1.1 or newer (a new-enough version
+    Freedom documentation requires Pygments 1.1 or newer (a new-enough version
     should automatically be installed along with Sphinx).
 
 __ http://pygments.org
@@ -84,8 +84,8 @@ Commonly used terms
 Here are some style guidelines on commonly used terms throughout the
 documentation:
 
-* **Django** -- when referring to the framework, capitalize Django. It is
-  lowercase only in Python code and in the djangoproject.com logo.
+* **Freedom** -- when referring to the framework, capitalize Freedom. It is
+  lowercase only in Python code and in the freedomproject.com logo.
 
 * **email** -- no hyphen.
 
@@ -108,7 +108,7 @@ documentation:
 
 * **Web site** -- use two words, with Web capitalized.
 
-Django-specific terminology
+Freedom-specific terminology
 ---------------------------
 
 * **model** -- it's not capitalized.
@@ -135,11 +135,11 @@ documentation:
 * The main thing to keep in mind as you write and edit docs is that the
   more semantic markup you can add the better. So::
 
-      Add ``django.contrib.auth`` to your ``INSTALLED_APPS``...
+      Add ``freedom.contrib.auth`` to your ``INSTALLED_APPS``...
 
   Isn't nearly as helpful as::
 
-      Add :mod:`django.contrib.auth` to your :setting:`INSTALLED_APPS`...
+      Add :mod:`freedom.contrib.auth` to your :setting:`INSTALLED_APPS`...
 
   This is because Sphinx will generate proper links for the latter, which
   greatly helps readers. There's basically no limit to the amount of
@@ -148,10 +148,10 @@ documentation:
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
   documentation.
 
-Django-specific markup
+Freedom-specific markup
 ----------------------
 
-Besides the `Sphinx built-in markup`__, Django's docs defines some extra
+Besides the `Sphinx built-in markup`__, Freedom's docs defines some extra
 description units:
 
 __ http://sphinx-doc.org/markup/desc.html
@@ -180,15 +180,15 @@ __ http://sphinx-doc.org/markup/desc.html
 
   To link, use ``:lookup:`exact```.
 
-* ``django-admin`` commands::
+* ``freedom-admin`` commands::
 
-        .. django-admin:: migrate
+        .. freedom-admin:: migrate
 
   To link, use ``:djadmin:`migrate```.
 
-* ``django-admin`` command-line options::
+* ``freedom-admin`` command-line options::
 
-        .. django-admin-option:: --traceback
+        .. freedom-admin-option:: --traceback
 
   To link, use ``:djadminopt:`--traceback```.
 
@@ -200,7 +200,7 @@ Documenting new features
 Our policy for new features is:
 
     All documentation of new features should be written in a way that
-    clearly designates the features are only available in the Django
+    clearly designates the features are only available in the Freedom
     development version. Assume documentation readers are using the latest
     release, not the development version.
 
@@ -271,13 +271,13 @@ example:
     Default: ``()`` (Empty tuple)
 
     A tuple that lists people who get code error notifications. When
-    ``DEBUG=False`` and a view raises an exception, Django will email these people
+    ``DEBUG=False`` and a view raises an exception, Freedom will email these people
     with the full exception information. Each member of the tuple should be a tuple
     of (Full name, email address). Example::
 
         (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
 
-    Note that Django will email *all* of these people whenever an error happens.
+    Note that Freedom will email *all* of these people whenever an error happens.
     See :doc:`/howto/error-reporting` for more information.
 
   This marks up the following header as the "canonical" target for the
@@ -334,19 +334,19 @@ look better:
   "description units".
 
   You can tell which are which by looking at in
-  :file:`_ext/djangodocs.py`; it registers roles as one of the other.
+  :file:`_ext/freedomdocs.py`; it registers roles as one of the other.
 
 * Add ``.. code-block:: <lang>`` to literal blocks so that they get
   highlighted.
 
 * When referring to classes/functions/modules, etc., you'll want to use
   the fully-qualified name of the target
-  (``:class:`django.contrib.contenttypes.models.ContentType```).
+  (``:class:`freedom.contrib.contenttypes.models.ContentType```).
 
   Since this doesn't look all that awesome in the output -- it shows the
   entire path to the object -- you can prefix the target with a ``~``
   (that's a tilde) to get just the "last bit" of that path. So
-  ``:class:`~django.contrib.contenttypes.models.ContentType``` will just
+  ``:class:`~freedom.contrib.contenttypes.models.ContentType``` will just
   display a link with the title "ContentType".
 
 Spelling check

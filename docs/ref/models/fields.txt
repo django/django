@@ -2,13 +2,13 @@
 Model field reference
 =====================
 
-.. module:: django.db.models.fields
+.. module:: freedom.db.models.fields
    :synopsis: Built-in field types.
 
-.. currentmodule:: django.db.models
+.. currentmodule:: freedom.db.models
 
 This document contains all the gory details about all the `field options`_ and
-`field types`_ Django's got to offer.
+`field types`_ Freedom's got to offer.
 
 .. seealso::
 
@@ -19,9 +19,9 @@ This document contains all the gory details about all the `field options`_ and
 
 .. note::
 
-    Technically, these models are defined in :mod:`django.db.models.fields`, but
-    for convenience they're imported into :mod:`django.db.models`; the standard
-    convention is to use ``from django.db import models`` and refer to fields as
+    Technically, these models are defined in :mod:`freedom.db.models.fields`, but
+    for convenience they're imported into :mod:`freedom.db.models`; the standard
+    convention is to use ``from freedom.db import models`` and refer to fields as
     ``models.<Foo>Field``.
 
 .. _common-model-field-options:
@@ -36,7 +36,7 @@ The following arguments are available to all field types. All are optional.
 
 .. attribute:: Field.null
 
-If ``True``, Django will store empty values as ``NULL`` in the database. Default
+If ``True``, Freedom will store empty values as ``NULL`` in the database. Default
 is ``False``.
 
 Avoid using :attr:`~Field.null` on string-based fields such as
@@ -44,7 +44,7 @@ Avoid using :attr:`~Field.null` on string-based fields such as
 always be stored as empty strings, not as ``NULL``. If a string-based field has
 ``null=True``, that means it has two possible values for "no data": ``NULL``,
 and the empty string. In most cases, it's redundant to have two possible values
-for "no data;" the Django convention is to use the empty string, not ``NULL``.
+for "no data;" the Freedom convention is to use the empty string, not ``NULL``.
 
 For both string-based and non-string-based fields, you will also need to
 set ``blank=True`` if you wish to permit empty values in forms, as the
@@ -96,7 +96,7 @@ and the second element is the human-readable name. For example::
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
 
-    from django.db import models
+    from freedom.db import models
 
     class Student(models.Model):
         FRESHMAN = 'FR'
@@ -145,9 +145,9 @@ a value and a human-readable name for an option. Grouped options may be
 combined with ungrouped options within a single list (such as the
 `unknown` option in this example).
 
-For each model field that has :attr:`~Field.choices` set, Django will add a
+For each model field that has :attr:`~Field.choices` set, Freedom will add a
 method to retrieve the human-readable name for the field's current value. See
-:meth:`~django.db.models.Model.get_FOO_display` in the database API
+:meth:`~freedom.db.models.Model.get_FOO_display` in the database API
 documentation.
 
 Note that choices can be any iterable object -- not necessarily a list or tuple.
@@ -163,7 +163,7 @@ Unless :attr:`blank=False<Field.blank>` is set on the field along with a
 with the select box. To override this behavior, add a tuple to ``choices``
 containing ``None``; e.g. ``(None, 'Your String For Display')``.
 Alternatively, you can use an empty string instead of ``None`` where this makes
-sense - such as on a :class:`~django.db.models.CharField`.
+sense - such as on a :class:`~freedom.db.models.CharField`.
 
 ``db_column``
 -------------
@@ -171,11 +171,11 @@ sense - such as on a :class:`~django.db.models.CharField`.
 .. attribute:: Field.db_column
 
 The name of the database column to use for this field. If this isn't given,
-Django will use the field's name.
+Freedom will use the field's name.
 
 If your database column name is an SQL reserved word, or contains
 characters that aren't allowed in Python variable names -- notably, the
-hyphen -- that's OK. Django quotes column and table names behind the
+hyphen -- that's OK. Freedom quotes column and table names behind the
 scenes.
 
 ``db_index``
@@ -183,7 +183,7 @@ scenes.
 
 .. attribute:: Field.db_index
 
-If ``True``, :djadmin:`django-admin.py sqlindexes <sqlindexes>` will output a
+If ``True``, :djadmin:`freedom-admin.py sqlindexes <sqlindexes>` will output a
 ``CREATE INDEX`` statement for this field.
 
 ``db_tablespace``
@@ -219,7 +219,7 @@ a dictionary as the default, use a ``lambda`` as follows::
 .. attribute:: Field.editable
 
 If ``False``, the field will not be displayed in the admin or any other
-:class:`~django.forms.ModelForm`. Default is ``True``.
+:class:`~freedom.forms.ModelForm`. Default is ``True``.
 
 ``error_messages``
 ------------------
@@ -253,7 +253,7 @@ desire. For example::
     help_text="Please use the following format: <em>YYYY-MM-DD</em>."
 
 Alternatively you can use plain text and
-``django.utils.html.escape()`` to escape any HTML special characters.
+``freedom.utils.html.escape()`` to escape any HTML special characters.
 
 ``primary_key``
 ---------------
@@ -262,7 +262,7 @@ Alternatively you can use plain text and
 
 If ``True``, this field is the primary key for the model.
 
-If you don't specify ``primary_key=True`` for any field in your model, Django
+If you don't specify ``primary_key=True`` for any field in your model, Freedom
 will automatically add an :class:`AutoField` to hold the primary key, so you
 don't need to set ``primary_key=True`` on any of your fields unless you want to
 override the default primary-key behavior. For more, see
@@ -280,8 +280,8 @@ If ``True``, this field must be unique throughout the table.
 
 This is enforced at the database level and by model validation. If
 you try to save a model with a duplicate value in a :attr:`~Field.unique`
-field, a :exc:`django.db.IntegrityError` will be raised by the model's
-:meth:`~django.db.models.Model.save` method.
+field, a :exc:`freedom.db.IntegrityError` will be raised by the model's
+:meth:`~freedom.db.models.Model.save` method.
 
 This option is valid on all field types except :class:`ManyToManyField`,
 :class:`OneToOneField`, and :class:`FileField`.
@@ -298,7 +298,7 @@ Set this to the name of a :class:`DateField` or :class:`DateTimeField` to
 require that this field be unique for the value of the date field.
 
 For example, if you have a field ``title`` that has
-``unique_for_date="pub_date"``, then Django wouldn't allow the entry of two
+``unique_for_date="pub_date"``, then Freedom wouldn't allow the entry of two
 records with the same ``title`` and ``pub_date``.
 
 Note that if you set this to point to a :class:`DateTimeField`, only the date
@@ -308,7 +308,7 @@ portion of the field will be considered. Besides, when :setting:`USE_TZ` is
 
 This is enforced by :meth:`Model.validate_unique()` during model validation
 but not at the database level. If any :attr:`~Field.unique_for_date` constraint
-involves fields that are not part of a :class:`~django.forms.ModelForm` (for
+involves fields that are not part of a :class:`~freedom.forms.ModelForm` (for
 example, if one of the fields is listed in ``exclude`` or has
 :attr:`editable=False<Field.editable>`), :meth:`Model.validate_unique()` will
 skip validation for that particular constraint.
@@ -333,7 +333,7 @@ Like :attr:`~Field.unique_for_date` and :attr:`~Field.unique_for_month`.
 
 .. attribute:: Field.verbose_name
 
-A human-readable name for the field. If the verbose name isn't given, Django
+A human-readable name for the field. If the verbose name isn't given, Freedom
 will automatically create it using the field's attribute name, converting
 underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 
@@ -357,7 +357,7 @@ how lookups are fetched from a field.
 Field types
 ===========
 
-.. currentmodule:: django.db.models
+.. currentmodule:: freedom.db.models
 
 ``AutoField``
 -------------
@@ -377,7 +377,7 @@ otherwise. See :ref:`automatic-primary-key-fields`.
 A 64 bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from ``-9223372036854775808`` to
 ``9223372036854775807``. The default form widget for this field is a
-:class:`~django.forms.TextInput`.
+:class:`~freedom.forms.TextInput`.
 
 ``BinaryField``
 -------------------
@@ -402,7 +402,7 @@ to filter a queryset on a ``BinaryField`` value.
 A true/false field.
 
 The default form widget for this field is a
-:class:`~django.forms.CheckboxInput`.
+:class:`~freedom.forms.CheckboxInput`.
 
 If you need to accept :attr:`~Field.null` values then use
 :class:`NullBooleanField` instead.
@@ -417,16 +417,16 @@ isn't defined.
 
 A string field, for small- to large-sized strings.
 
-For large amounts of text, use :class:`~django.db.models.TextField`.
+For large amounts of text, use :class:`~freedom.db.models.TextField`.
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~freedom.forms.TextInput`.
 
 :class:`CharField` has one extra required argument:
 
 .. attribute:: CharField.max_length
 
     The maximum length (in characters) of the field. The max_length is enforced
-    at the database level and in Django's validation.
+    at the database level and in Freedom's validation.
 
 .. note::
 
@@ -473,7 +473,7 @@ optional arguments:
     it's not just a default value that you can override.
 
 The default form widget for this field is a
-:class:`~django.forms.TextInput`. The admin adds a JavaScript calendar,
+:class:`~freedom.forms.TextInput`. The admin adds a JavaScript calendar,
 and a shortcut for "Today". Includes an additional ``invalid_date`` error
 message key.
 
@@ -494,8 +494,8 @@ A date and time, represented in Python by a ``datetime.datetime`` instance.
 Takes the same extra arguments as :class:`DateField`.
 
 The default form widget for this field is a single
-:class:`~django.forms.TextInput`. The admin uses two separate
-:class:`~django.forms.TextInput` widgets with JavaScript shortcuts.
+:class:`~freedom.forms.TextInput`. The admin uses two separate
+:class:`~freedom.forms.TextInput` widgets with JavaScript shortcuts.
 
 ``DecimalField``
 ----------------
@@ -524,7 +524,7 @@ decimal places::
 
     models.DecimalField(..., max_digits=19, decimal_places=10)
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~freedom.forms.TextInput`.
 
 .. note::
 
@@ -565,11 +565,11 @@ Has two optional arguments:
 
     .. versionchanged:: 1.7
 
-        ``upload_to`` was required in older versions of Django.
+        ``upload_to`` was required in older versions of Freedom.
 
     A local filesystem path that will be appended to your :setting:`MEDIA_ROOT`
     setting to determine the value of the
-    :attr:`~django.db.models.fields.files.FieldFile.url` attribute.
+    :attr:`~freedom.db.models.fields.files.FieldFile.url` attribute.
 
     This path may contain :func:`~time.strftime` formatting, which will be
     replaced by the date/time of the file upload (so that uploaded files don't
@@ -605,13 +605,13 @@ Has two optional arguments:
     files. See :doc:`/topics/files` for details on how to provide this object.
 
 The default form widget for this field is a
-:class:`~django.forms.ClearableFileInput`.
+:class:`~freedom.forms.ClearableFileInput`.
 
 Using a :class:`FileField` or an :class:`ImageField` (see below) in a model
 takes a few steps:
 
 1. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as the
-   full path to a directory where you'd like Django to store uploaded files.
+   full path to a directory where you'd like Freedom to store uploaded files.
    (For performance, these files are not stored in the database.) Define
    :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
    that this directory is writable by the Web server's user account.
@@ -622,8 +622,8 @@ takes a few steps:
 
 3. All that will be stored in your database is a path to the file
    (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
-   convenience :attr:`~django.db.models.fields.files.FieldFile.url` attribute
-   provided by Django. For example, if your :class:`ImageField` is called
+   convenience :attr:`~freedom.db.models.fields.files.FieldFile.url` attribute
+   provided by Freedom. For example, if your :class:`ImageField` is called
    ``mug_shot``, you can get the absolute path to your image in a template with
    ``{{ object.mug_shot.url }}``.
 
@@ -635,10 +635,10 @@ the two-digit day. If you upload a file on Jan. 15, 2007, it will be saved in
 the directory ``/home/media/photos/2007/01/15``.
 
 If you wanted to retrieve the uploaded file's on-disk filename, or the file's
-size, you could use the :attr:`~django.core.files.File.name` and
-:attr:`~django.core.files.File.size` attributes respectively; for more
+size, you could use the :attr:`~freedom.core.files.File.name` and
+:attr:`~freedom.core.files.File.size` attributes respectively; for more
 information on the available attributes and methods, see the
-:class:`~django.core.files.File` class reference and the :doc:`/topics/files`
+:class:`~freedom.core.files.File` class reference and the :doc:`/topics/files`
 topic guide.
 
 .. note::
@@ -647,9 +647,9 @@ topic guide.
     saved.
 
 The uploaded file's relative URL can be obtained using the
-:attr:`~django.db.models.fields.files.FieldFile.url` attribute. Internally,
-this calls the :meth:`~django.core.files.storage.Storage.url` method of the
-underlying :class:`~django.core.files.storage.Storage` class.
+:attr:`~freedom.db.models.fields.files.FieldFile.url` attribute. Internally,
+this calls the :meth:`~freedom.core.files.storage.Storage.url` method of the
+underlying :class:`~freedom.core.files.storage.Storage` class.
 
 .. _file-upload-security:
 
@@ -672,11 +672,11 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 FileField and FieldFile
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. currentmodule:: django.db.models.fields.files
+.. currentmodule:: freedom.db.models.fields.files
 
 .. class:: FieldFile
 
-When you access a :class:`~django.db.models.FileField` on a model, you are
+When you access a :class:`~freedom.db.models.FileField` on a model, you are
 given an instance of :class:`FieldFile` as a proxy for accessing the underlying
 file. This class has several attributes and methods that can be used to
 interact with file data:
@@ -684,8 +684,8 @@ interact with file data:
 .. attribute:: FieldFile.url
 
 A read-only property to access the file's relative URL by calling the
-:meth:`~django.core.files.storage.Storage.url` method of the underlying
-:class:`~django.core.files.storage.Storage` class.
+:meth:`~freedom.core.files.storage.Storage.url` method of the underlying
+:class:`~freedom.core.files.storage.Storage` class.
 
 .. method:: FieldFile.open(mode='rb')
 
@@ -702,7 +702,7 @@ associated with this instance.
 This method takes a filename and file contents and passes them to the storage
 class for the field, then associates the stored file with the model field.
 If you want to manually associate file data with
-:class:`~django.db.models.FileField` instances on your model, the ``save()``
+:class:`~freedom.db.models.FileField` instances on your model, the ``save()``
 method is used to persist that file data.
 
 Takes two required arguments: ``name`` which is the name of the file, and
@@ -711,18 +711,18 @@ optional ``save`` argument controls whether or not the instance is
 saved after the file has been altered. Defaults to ``True``.
 
 Note that the ``content`` argument should be an instance of
-:class:`django.core.files.File`, not Python's built-in file object.
-You can construct a :class:`~django.core.files.File` from an existing
+:class:`freedom.core.files.File`, not Python's built-in file object.
+You can construct a :class:`~freedom.core.files.File` from an existing
 Python file object like this::
 
-    from django.core.files import File
+    from freedom.core.files import File
     # Open an existing file using Python's built-in open()
     f = open('/tmp/hello.world')
     myfile = File(f)
 
 Or you can construct one from a Python string like this::
 
-    from django.core.files.base import ContentFile
+    from freedom.core.files.base import ContentFile
     myfile = ContentFile("hello world")
 
 For more information, see :doc:`/topics/files`.
@@ -741,7 +741,7 @@ to cleanup orphaned files, you'll need to handle it yourself (for instance,
 with a custom management command that can be run manually or scheduled to run
 periodically via e.g. cron).
 
-.. currentmodule:: django.db.models
+.. currentmodule:: freedom.db.models
 
 ``FilePathField``
 -----------------
@@ -803,7 +803,7 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 
 A floating-point number represented in Python by a ``float`` instance.
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~freedom.forms.TextInput`.
 
 .. _floatfield_vs_decimalfield:
 
@@ -849,7 +849,7 @@ columns in your database. As with other fields, you can change the maximum
 length using the :attr:`~CharField.max_length` argument.
 
 The default form widget for this field is a
-:class:`~django.forms.ClearableFileInput`.
+:class:`~freedom.forms.ClearableFileInput`.
 
 ``IntegerField``
 ----------------
@@ -857,8 +857,8 @@ The default form widget for this field is a
 .. class:: IntegerField([**options])
 
 An integer. Values from ``-2147483648`` to ``2147483647`` are safe in all
-databases supported by Django. The default form widget for this field is a
-:class:`~django.forms.TextInput`.
+databases supported by Freedom. The default form widget for this field is a
+:class:`~freedom.forms.TextInput`.
 
 ``IPAddressField``
 ------------------
@@ -867,10 +867,10 @@ databases supported by Django. The default form widget for this field is a
 
 .. deprecated:: 1.7
     This field has been deprecated in favor of
-    :class:`~django.db.models.GenericIPAddressField`.
+    :class:`~freedom.db.models.GenericIPAddressField`.
 
 An IP address, in string format (e.g. "192.0.2.30"). The default form widget
-for this field is a :class:`~django.forms.TextInput`.
+for this field is a :class:`~freedom.forms.TextInput`.
 
 ``GenericIPAddressField``
 -------------------------
@@ -879,7 +879,7 @@ for this field is a :class:`~django.forms.TextInput`.
 
 An IPv4 or IPv6 address, in string format (e.g. ``192.0.2.30`` or
 ``2a02:42fe::4``). The default form widget for this field is a
-:class:`~django.forms.TextInput`.
+:class:`~freedom.forms.TextInput`.
 
 The IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,
 including using the IPv4 format suggested in paragraph 3 of that section, like
@@ -910,7 +910,7 @@ values are stored as null.
 
 Like a :class:`BooleanField`, but allows ``NULL`` as one of the options. Use
 this instead of a :class:`BooleanField` with ``null=True``. The default form
-widget for this field is a :class:`~django.forms.NullBooleanSelect`.
+widget for this field is a :class:`~freedom.forms.NullBooleanSelect`.
 
 ``PositiveIntegerField``
 ------------------------
@@ -919,7 +919,7 @@ widget for this field is a :class:`~django.forms.NullBooleanSelect`.
 
 Like an :class:`IntegerField`, but must be either positive or zero (``0``).
 Values from ``0`` to ``2147483647`` are safe in all databases supported by
-Django. The value ``0`` is accepted for backward compatibility reasons.
+Freedom. The value ``0`` is accepted for backward compatibility reasons.
 
 ``PositiveSmallIntegerField``
 -----------------------------
@@ -928,7 +928,7 @@ Django. The value ``0`` is accepted for backward compatibility reasons.
 
 Like a :class:`PositiveIntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``0`` to ``32767`` are safe in all
-databases supported by Django.
+databases supported by Freedom.
 
 ``SlugField``
 -------------
@@ -941,14 +941,14 @@ in URLs.
 
 Like a CharField, you can specify :attr:`~CharField.max_length` (read the note
 about database portability and :attr:`~CharField.max_length` in that section,
-too). If :attr:`~CharField.max_length` is not specified, Django will use a
+too). If :attr:`~CharField.max_length` is not specified, Freedom will use a
 default length of 50.
 
 Implies setting :attr:`Field.db_index` to ``True``.
 
 It is often useful to automatically prepopulate a SlugField based on the value
 of some other value.  You can do this automatically in the admin using
-:attr:`~django.contrib.admin.ModelAdmin.prepopulated_fields`.
+:attr:`~freedom.contrib.admin.ModelAdmin.prepopulated_fields`.
 
 ``SmallIntegerField``
 ---------------------
@@ -957,7 +957,7 @@ of some other value.  You can do this automatically in the admin using
 
 Like an :class:`IntegerField`, but only allows values under a certain
 (database-dependent) point. Values from ``-32768`` to ``32767`` are safe in all
-databases supported by Django.
+databases supported by Freedom.
 
 ``TextField``
 -------------
@@ -965,12 +965,12 @@ databases supported by Django.
 .. class:: TextField([**options])
 
 A large text field. The default form widget for this field is a
-:class:`~django.forms.Textarea`.
+:class:`~freedom.forms.Textarea`.
 
 .. versionchanged:: 1.7
 
     If you specify a ``max_length`` attribute, it will be reflected in the
-    :class:`~django.forms.Textarea` widget of the auto-generated form field.
+    :class:`~freedom.forms.Textarea` widget of the auto-generated form field.
     However it is not enforced at the model or database level. Use a
     :class:`CharField` for that.
 
@@ -989,7 +989,7 @@ A large text field. The default form widget for this field is a
 A time, represented in Python by a ``datetime.time`` instance. Accepts the same
 auto-population options as :class:`DateField`.
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~freedom.forms.TextInput`.
 The admin adds some JavaScript shortcuts.
 
 ``URLField``
@@ -999,7 +999,7 @@ The admin adds some JavaScript shortcuts.
 
 A :class:`CharField` for a URL.
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~freedom.forms.TextInput`.
 
 Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length` argument. If you don't specify
@@ -1008,12 +1008,12 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 Relationship fields
 ===================
 
-.. module:: django.db.models.fields.related
+.. module:: freedom.db.models.fields.related
    :synopsis: Related field types
 
-.. currentmodule:: django.db.models
+.. currentmodule:: freedom.db.models
 
-Django also defines a set of fields that represent relations.
+Freedom also defines a set of fields that represent relations.
 
 .. _ref-foreignkey:
 
@@ -1035,7 +1035,7 @@ relationship with itself -- use ``models.ForeignKey('self')``.
 If you need to create a relationship on a model that has not yet been defined,
 you can use the name of the model, rather than the model object itself::
 
-    from django.db import models
+    from freedom.db import models
 
     class Car(models.Model):
         manufacturer = models.ForeignKey('Manufacturer')
@@ -1065,7 +1065,7 @@ like a partial or multiple column index.
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Behind the scenes, Django appends ``"_id"`` to the field name to create its
+Behind the scenes, Freedom appends ``"_id"`` to the field name to create its
 database column name. In the above example, the database table for the ``Car``
 model will have a ``manufacturer_id`` column. (You can change this explicitly by
 specifying :attr:`~Field.db_column`) However, your code should never have to
@@ -1085,15 +1085,15 @@ define the details of how the relation works.
     Sets a limit to the available choices for this field when this field is
     rendered using a ``ModelForm`` or the admin (by default, all objects
     in the queryset are available to choose). Either a dictionary, a
-    :class:`~django.db.models.Q` object, or a callable returning a
-    dictionary or :class:`~django.db.models.Q` object can be used.
+    :class:`~freedom.db.models.Q` object, or a callable returning a
+    dictionary or :class:`~freedom.db.models.Q` object can be used.
 
     For example::
 
         staff_member = models.ForeignKey(User, limit_choices_to={'is_staff': True})
 
     causes the corresponding field on the ``ModelForm`` to list only ``Users``
-    that have ``is_staff=True``. This may be helpful in the Django admin.
+    that have ``is_staff=True``. This may be helpful in the Freedom admin.
 
     The callable form can be helpful, for instance, when used in conjunction
     with the Python ``datetime`` module to limit selections by date range. For
@@ -1102,15 +1102,15 @@ define the details of how the relation works.
         limit_choices_to = lambda: {'pub_date__lte': datetime.date.utcnow()}
 
     If ``limit_choices_to`` is or returns a :class:`Q object
-    <django.db.models.Q>`, which is useful for :ref:`complex queries
+    <freedom.db.models.Q>`, which is useful for :ref:`complex queries
     <complex-lookups-with-q>`, then it will only have an effect on the choices
     available in the admin when the field is not listed in
-    :attr:`~django.contrib.admin.ModelAdmin.raw_id_fields` in the
+    :attr:`~freedom.contrib.admin.ModelAdmin.raw_id_fields` in the
     ``ModelAdmin`` for the model.
 
     .. versionchanged:: 1.7
 
-        Previous versions of Django do not allow passing a callable as a value
+        Previous versions of Freedom do not allow passing a callable as a value
         for ``limit_choices_to``.
 
     .. note::
@@ -1132,7 +1132,7 @@ define the details of how the relation works.
     :ref:`abstract models <abstract-base-classes>`; and when you do so
     :ref:`some special syntax <abstract-related-name>` is available.
 
-    If you'd prefer Django not to create a backwards relation, set
+    If you'd prefer Freedom not to create a backwards relation, set
     ``related_name`` to ``'+'`` or end it with ``'+'``. For example, this will
     ensure that the ``User`` model won't have a backwards relation to this
     model::
@@ -1155,7 +1155,7 @@ define the details of how the relation works.
 
 .. attribute:: ForeignKey.to_field
 
-    The field on the related object that the relation is to. By default, Django
+    The field on the related object that the relation is to. By default, Freedom
     uses the primary key of the related object.
 
 .. attribute:: ForeignKey.db_constraint
@@ -1173,7 +1173,7 @@ define the details of how the relation works.
 
 .. attribute:: ForeignKey.on_delete
 
-    When an object referenced by a :class:`ForeignKey` is deleted, Django by
+    When an object referenced by a :class:`ForeignKey` is deleted, Freedom by
     default emulates the behavior of the SQL constraint ``ON DELETE CASCADE``
     and also deletes the object containing the ``ForeignKey``. This behavior
     can be overridden by specifying the :attr:`on_delete` argument. For
@@ -1183,7 +1183,7 @@ define the details of how the relation works.
         user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
 The possible values for :attr:`~ForeignKey.on_delete` are found in
-:mod:`django.db.models`:
+:mod:`freedom.db.models`:
 
 * .. attribute:: CASCADE
 
@@ -1192,8 +1192,8 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 * .. attribute:: PROTECT
 
     Prevent deletion of the referenced object by raising
-    :exc:`~django.db.models.ProtectedError`, a subclass of
-    :exc:`django.db.IntegrityError`.
+    :exc:`~freedom.db.models.ProtectedError`, a subclass of
+    :exc:`freedom.db.IntegrityError`.
 
 * .. attribute:: SET_NULL
 
@@ -1208,13 +1208,13 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 * .. function:: SET()
 
     Set the :class:`ForeignKey` to the value passed to
-    :func:`~django.db.models.SET()`, or if a callable is passed in,
+    :func:`~freedom.db.models.SET()`, or if a callable is passed in,
     the result of calling it. In most cases, passing a callable will be
     necessary to avoid executing queries at the time your models.py is
     imported::
 
-        from django.db import models
-        from django.contrib.auth.models import User
+        from freedom.db import models
+        from freedom.contrib.auth.models import User
 
         def get_sentinel_user():
             return User.objects.get_or_create(username='deleted')[0]
@@ -1225,7 +1225,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 * .. attribute:: DO_NOTHING
 
     Take no action. If your database backend enforces referential
-    integrity, this will cause an :exc:`~django.db.IntegrityError` unless
+    integrity, this will cause an :exc:`~freedom.db.IntegrityError` unless
     you manually add an SQL ``ON DELETE`` constraint to the database field
     (perhaps using :ref:`initial sql<initial-sql>`).
 
@@ -1259,12 +1259,12 @@ which the model is related, which works exactly the same as it does for
 :ref:`lazy <lazy-relationships>` relationships.
 
 Related objects can be added, removed, or created with the field's
-:class:`~django.db.models.fields.related.RelatedManager`.
+:class:`~freedom.db.models.fields.related.RelatedManager`.
 
 Database Representation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Behind the scenes, Django creates an intermediary join table to represent the
+Behind the scenes, Freedom creates an intermediary join table to represent the
 many-to-many relationship. By default, this table name is generated using the
 name of the many-to-many field and the name of the table for the model that
 contains it. Since some databases don't support table names above a certain
@@ -1302,28 +1302,28 @@ that control how the relationship functions.
     Only used in the definition of ManyToManyFields on self. Consider the
     following model::
 
-        from django.db import models
+        from freedom.db import models
 
         class Person(models.Model):
             friends = models.ManyToManyField("self")
 
-    When Django processes this model, it identifies that it has a
+    When Freedom processes this model, it identifies that it has a
     :class:`ManyToManyField` on itself, and as a result, it doesn't add a
     ``person_set`` attribute to the ``Person`` class. Instead, the
     :class:`ManyToManyField` is assumed to be symmetrical -- that is, if I am
     your friend, then you are my friend.
 
     If you do not want symmetry in many-to-many relationships with ``self``, set
-    :attr:`~ManyToManyField.symmetrical` to ``False``. This will force Django to
+    :attr:`~ManyToManyField.symmetrical` to ``False``. This will force Freedom to
     add the descriptor for the reverse relationship, allowing
     :class:`ManyToManyField` relationships to be non-symmetrical.
 
 .. attribute:: ManyToManyField.through
 
-    Django will automatically generate a table to manage many-to-many
+    Freedom will automatically generate a table to manage many-to-many
     relationships. However, if you want to manually specify the intermediary
     table, you can use the :attr:`~ManyToManyField.through` option to specify
-    the Django model that represents the intermediate table that you want to
+    the Freedom model that represents the intermediate table that you want to
     use.
 
     The most common use for this option is when you want to associate
@@ -1334,12 +1334,12 @@ that control how the relationship functions.
 
     .. versionadded:: 1.7
 
-    Only used when a custom intermediary model is specified. Django will
+    Only used when a custom intermediary model is specified. Freedom will
     normally determine which fields of the intermediary model to use in order
     to establish a many-to-many relationship automatically. However,
     consider the following models::
 
-        from django.db import models
+        from freedom.db import models
 
         class Person(models.Model):
             name = models.CharField(max_length=50)
@@ -1355,9 +1355,9 @@ that control how the relationship functions.
             invite_reason = models.CharField(max_length=64)
 
     ``Membership`` has *two* foreign keys to ``Person`` (``person`` and
-    ``inviter``), which makes the relationship ambiguous and Django can't know
+    ``inviter``), which makes the relationship ambiguous and Freedom can't know
     which one to use. In this case, you must explicitly specify which
-    foreign keys Django should use using ``through_fields``, as in the example
+    foreign keys Freedom should use using ``through_fields``, as in the example
     above.
 
     ``through_fields`` accepts a 2-tuple ``('field1', 'field2')``, where
@@ -1372,7 +1372,7 @@ that control how the relationship functions.
     :ref:`recursive relationships <recursive-relationships>`
     when an intermediary model is used and there are more than two
     foreign keys to the model, or you want to explicitly specify which two
-    Django should use.
+    Freedom should use.
 
     Recursive relationships using an intermediary model are always defined as
     non-symmetrical -- that is, with :attr:`symmetrical=False <ManyToManyField.symmetrical>`
@@ -1383,7 +1383,7 @@ that control how the relationship functions.
 .. attribute:: ManyToManyField.db_table
 
     The name of the table to create for storing the many-to-many data. If this
-    is not provided, Django will assume a default name based upon the names of:
+    is not provided, Freedom will assume a default name based upon the names of:
     the table for the model defining the relationship and the name of the field
     itself.
 
@@ -1440,13 +1440,13 @@ including all the options regarding :ref:`recursive <recursive-relationships>`
 and :ref:`lazy <lazy-relationships>` relationships.
 
 If you do not specify the :attr:`~ForeignKey.related_name` argument for
-the ``OneToOneField``, Django will use the lower-case name of the current model
+the ``OneToOneField``, Freedom will use the lower-case name of the current model
 as default value.
 
 With the following example::
 
-    from django.db import models
-    from django.contrib.auth.models import User
+    from freedom.db import models
+    from freedom.contrib.auth.models import User
 
     class MySpecialUser(models.Model):
         user = models.OneToOneField(User)

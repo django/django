@@ -2,11 +2,11 @@
 Tests for field subclassing.
 """
 
-from django.db import models
-from django.utils.encoding import force_text
+from freedom.db import models
+from freedom.utils.encoding import force_text
 
 from .fields import Small, SmallField, SmallerField, JSONField
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

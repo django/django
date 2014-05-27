@@ -6,9 +6,9 @@ This demonstrates features of the database API.
 
 from __future__ import unicode_literals
 
-from django.db import models
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.db import models
+from freedom.utils import six
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 class Author(models.Model):

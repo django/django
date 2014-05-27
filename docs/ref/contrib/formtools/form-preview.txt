@@ -2,11 +2,11 @@
 Form preview
 ============
 
-.. module:: django.contrib.formtools.preview
+.. module:: freedom.contrib.formtools.preview
     :synopsis: Displays an HTML form, forces a preview, then does something
                with the submission.
 
-Django comes with an optional "form preview" application that helps automate
+Freedom comes with an optional "form preview" application that helps automate
 the following workflow:
 
 "Display an HTML form, force a preview, then do something with the submission."
@@ -17,7 +17,7 @@ Python class.
 Overview
 =========
 
-Given a :class:`django.forms.Form` subclass that you define, this
+Given a :class:`freedom.forms.Form` subclass that you define, this
 application takes care of the following workflow:
 
 1. Displays the form as HTML on a Web page.
@@ -35,10 +35,10 @@ on the preview page, the form submission will fail the hash-comparison test.
 How to use ``FormPreview``
 ==========================
 
-1. Point Django at the default FormPreview templates. There are two ways to
+1. Point Freedom at the default FormPreview templates. There are two ways to
    do this:
 
-   * Add ``'django.contrib.formtools'`` to your
+   * Add ``'freedom.contrib.formtools'`` to your
      :setting:`INSTALLED_APPS` setting. This will work if your
      :setting:`TEMPLATE_LOADERS` setting includes the
      ``app_directories`` template loader (which is the case by
@@ -46,14 +46,14 @@ How to use ``FormPreview``
      for more.
 
    * Otherwise, determine the full filesystem path to the
-     :file:`django/contrib/formtools/templates` directory, and add that
+     :file:`freedom/contrib/formtools/templates` directory, and add that
      directory to your :setting:`TEMPLATE_DIRS` setting.
 
-2. Create a :class:`~django.contrib.formtools.preview.FormPreview` subclass that
+2. Create a :class:`~freedom.contrib.formtools.preview.FormPreview` subclass that
    overrides the ``done()`` method::
 
-       from django.contrib.formtools.preview import FormPreview
-       from django.http import HttpResponseRedirect
+       from freedom.contrib.formtools.preview import FormPreview
+       from freedom.http import HttpResponseRedirect
        from myapp.models import SomeModel
 
        class SomeModelFormPreview(FormPreview):
@@ -63,17 +63,17 @@ How to use ``FormPreview``
                # to a "success" page.
                return HttpResponseRedirect('/form/success')
 
-   This method takes an :class:`~django.http.HttpRequest` object and a
+   This method takes an :class:`~freedom.http.HttpRequest` object and a
    dictionary of the form data after it has been validated and cleaned.
-   It should return an :class:`~django.http.HttpResponseRedirect` that
+   It should return an :class:`~freedom.http.HttpResponseRedirect` that
    is the end result of the form being submitted.
 
 3. Change your URLconf to point to an instance of your
-   :class:`~django.contrib.formtools.preview.FormPreview` subclass::
+   :class:`~freedom.contrib.formtools.preview.FormPreview` subclass::
 
        from myapp.preview import SomeModelFormPreview
        from myapp.forms import SomeModelForm
-       from django import forms
+       from freedom import forms
 
    ...and add the following line to the appropriate model in your URLconf::
 
@@ -81,17 +81,17 @@ How to use ``FormPreview``
 
    where ``SomeModelForm`` is a Form or ModelForm class for the model.
 
-4. Run the Django server and visit :file:`/post/` in your browser.
+4. Run the Freedom server and visit :file:`/post/` in your browser.
 
 ``FormPreview`` classes
 =======================
 
 .. class:: FormPreview
 
-A :class:`~django.contrib.formtools.preview.FormPreview` class is a simple Python class
+A :class:`~freedom.contrib.formtools.preview.FormPreview` class is a simple Python class
 that represents the preview workflow.
-:class:`~django.contrib.formtools.preview.FormPreview` classes must subclass
-``django.contrib.formtools.preview.FormPreview`` and override the ``done()``
+:class:`~freedom.contrib.formtools.preview.FormPreview` classes must subclass
+``freedom.contrib.formtools.preview.FormPreview`` and override the ``done()``
 method. They can live anywhere in your codebase.
 
 ``FormPreview`` templates
@@ -103,9 +103,9 @@ method. They can live anywhere in your codebase.
 By default, the form is rendered via the template :file:`formtools/form.html`,
 and the preview page is rendered via the template :file:`formtools/preview.html`.
 These values can be overridden for a particular form preview by setting
-:attr:`~django.contrib.formtools.preview.FormPreview.preview_template` and
-:attr:`~django.contrib.formtools.preview.FormPreview.form_template` attributes on the
-FormPreview subclass. See :file:`django/contrib/formtools/templates` for the
+:attr:`~freedom.contrib.formtools.preview.FormPreview.preview_template` and
+:attr:`~freedom.contrib.formtools.preview.FormPreview.form_template` attributes on the
+FormPreview subclass. See :file:`freedom/contrib/formtools/templates` for the
 default templates.
 
 Advanced ``FormPreview`` methods

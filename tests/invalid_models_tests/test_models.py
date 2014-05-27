@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.core.checks import Error
-from django.db import models
-from django.test.utils import override_settings
+from freedom.core.checks import Error
+from freedom.db import models
+from freedom.test.utils import override_settings
 
 from .base import IsolatedModelsTestCase
 

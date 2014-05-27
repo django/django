@@ -1,1 +1,1 @@
-from django import Xtemplate  # NOQA
+from freedom import Xtemplate  # NOQA

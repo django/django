@@ -1,5 +1,5 @@
 from unittest import TestCase
-from django.utils.numberformat import format as nformat
+from freedom.utils.numberformat import format as nformat
 from sys import float_info
 
 

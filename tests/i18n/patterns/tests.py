@@ -2,14 +2,14 @@ from __future__ import unicode_literals
 
 import os
 
-from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse, clear_url_caches
-from django.http import HttpResponsePermanentRedirect
-from django.middleware.locale import LocaleMiddleware
-from django.test import TestCase, override_settings
-from django.template import Template, Context
-from django.utils._os import upath
-from django.utils import translation
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.core.urlresolvers import reverse, clear_url_caches
+from freedom.http import HttpResponsePermanentRedirect
+from freedom.middleware.locale import LocaleMiddleware
+from freedom.test import TestCase, override_settings
+from freedom.template import Template, Context
+from freedom.utils._os import upath
+from freedom.utils import translation
 
 
 class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
@@ -31,8 +31,8 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
         ('pt-br', 'Brazilian Portuguese'),
     ),
     MIDDLEWARE_CLASSES=(
-        'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.common.CommonMiddleware',
+        'freedom.middleware.locale.LocaleMiddleware',
+        'freedom.middleware.common.CommonMiddleware',
     ),
     ROOT_URLCONF='i18n.patterns.urls.default',
 )
@@ -189,7 +189,7 @@ class URLRedirectTests(URLTestCaseBase):
     @override_settings(
         MIDDLEWARE_CLASSES=(
             'i18n.patterns.tests.PermanentRedirectLocaleMiddleWare',
-            'django.middleware.common.CommonMiddleware',
+            'freedom.middleware.common.CommonMiddleware',
         ),
     )
     def test_custom_redirect_class(self):

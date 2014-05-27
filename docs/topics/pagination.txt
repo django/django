@@ -2,12 +2,12 @@
 Pagination
 ==========
 
-.. module:: django.core.paginator
+.. module:: freedom.core.paginator
    :synopsis: Classes to help you easily manage paginated data.
 
-Django provides a few classes that help you manage paginated data -- that is,
+Freedom provides a few classes that help you manage paginated data -- that is,
 data that's split across several pages, with "Previous/Next" links. These
-classes live in :file:`django/core/paginator.py`.
+classes live in :file:`freedom/core/paginator.py`.
 
 Example
 =======
@@ -16,7 +16,7 @@ Give :class:`Paginator` a list of objects, plus the number of items you'd like t
 have on each page, and it gives you methods for accessing the items for each
 page::
 
-    >>> from django.core.paginator import Paginator
+    >>> from freedom.core.paginator import Paginator
     >>> objects = ['john', 'paul', 'george', 'ringo']
     >>> p = Paginator(objects, 2)
 
@@ -64,12 +64,12 @@ page::
 
 .. note::
 
-    Note that you can give ``Paginator`` a list/tuple, a Django ``QuerySet``,
+    Note that you can give ``Paginator`` a list/tuple, a Freedom ``QuerySet``,
     or any other object with a ``count()`` or ``__len__()`` method. When
     determining the number of objects contained in the passed object,
     ``Paginator`` will first try calling ``count()``, then fallback to using
     ``len()`` if the passed object has no ``count()`` method. This allows
-    objects such as Django's ``QuerySet`` to use a more efficient ``count()``
+    objects such as Freedom's ``QuerySet`` to use a more efficient ``count()``
     method when available.
 
 
@@ -83,7 +83,7 @@ show how you can display the results. This example assumes you have a
 
 The view function looks like this::
 
-    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    from freedom.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
     def listing(request):
         contact_list = Contacts.objects.all()
@@ -137,7 +137,7 @@ Required arguments
 ------------------
 
 ``object_list``
-    A list, tuple, Django ``QuerySet``, or other sliceable object with a
+    A list, tuple, Freedom ``QuerySet``, or other sliceable object with a
     ``count()`` or ``__len__()`` method.
 
 ``per_page``
@@ -182,7 +182,7 @@ Attributes
         ``Paginator`` will first try calling ``object_list.count()``. If
         ``object_list`` has no ``count()`` method, then ``Paginator`` will
         fallback to using ``len(object_list)``. This allows objects, such as
-        Django's ``QuerySet``, to use a more efficient ``count()`` method when
+        Freedom's ``QuerySet``, to use a more efficient ``count()`` method when
         available.
 
 .. attribute:: Paginator.num_pages

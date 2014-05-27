@@ -7,20 +7,20 @@ import os
 import pickle
 import unittest
 
-from django.core.exceptions import SuspiciousOperation
-from django.core.serializers.json import DjangoJSONEncoder
-from django.core.signals import request_finished
-from django.db import close_old_connections
-from django.http import (QueryDict, HttpResponse, HttpResponseRedirect,
+from freedom.core.exceptions import SuspiciousOperation
+from freedom.core.serializers.json import FreedomJSONEncoder
+from freedom.core.signals import request_finished
+from freedom.db import close_old_connections
+from freedom.http import (QueryDict, HttpResponse, HttpResponseRedirect,
                          HttpResponsePermanentRedirect, HttpResponseNotAllowed,
                          HttpResponseNotModified, StreamingHttpResponse,
                          SimpleCookie, BadHeaderError, JsonResponse,
                          parse_cookie)
-from django.test import TestCase
-from django.utils.encoding import smart_str, force_text
-from django.utils.functional import lazy
-from django.utils._os import upath
-from django.utils import six
+from freedom.test import TestCase
+from freedom.utils.encoding import smart_str, force_text
+from freedom.utils.functional import lazy
+from freedom.utils._os import upath
+from freedom.utils import six
 
 lazystr = lazy(force_text, six.text_type)
 
@@ -473,11 +473,11 @@ class JsonResponseTests(TestCase):
         self.assertEqual(json.loads(response.content.decode()), ['foo', 'bar'])
 
     def test_json_response_custom_encoder(self):
-        class CustomDjangoJSONEncoder(DjangoJSONEncoder):
+        class CustomFreedomJSONEncoder(FreedomJSONEncoder):
             def encode(self, o):
                 return json.dumps({'foo': 'bar'})
 
-        response = JsonResponse({}, encoder=CustomDjangoJSONEncoder)
+        response = JsonResponse({}, encoder=CustomFreedomJSONEncoder)
         self.assertEqual(json.loads(response.content.decode()), {'foo': 'bar'})
 
 

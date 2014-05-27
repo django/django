@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
-from django.contrib.sites.models import Site
-from django.db import models
-from django.test import TestCase
+from freedom.contrib.sites.models import Site
+from freedom.db import models
+from freedom.test import TestCase
 
 from .models.publication import Publication
 from .models.article import Article

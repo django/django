@@ -6,14 +6,14 @@ import unittest
 import warnings
 from zipimport import zipimporter
 
-from django.core.exceptions import ImproperlyConfigured
-from django.test import SimpleTestCase, modify_settings
-from django.test.utils import IgnoreDeprecationWarningsMixin, extend_sys_path
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.module_loading import (autodiscover_modules, import_by_path, import_string,
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.test import SimpleTestCase, modify_settings
+from freedom.test.utils import IgnoreDeprecationWarningsMixin, extend_sys_path
+from freedom.utils import six
+from freedom.utils.deprecation import RemovedInFreedom19Warning
+from freedom.utils.module_loading import (autodiscover_modules, import_by_path, import_string,
                                          module_has_submodule)
-from django.utils._os import upath
+from freedom.utils._os import upath
 
 
 class DefaultLoader(unittest.TestCase):
@@ -43,8 +43,8 @@ class DefaultLoader(unittest.TestCase):
         self.assertRaises(ImportError, import_module, 'utils_tests.test_module.no_such_module')
 
         # A child that doesn't exist, but is the name of a package on the path
-        self.assertFalse(module_has_submodule(test_module, 'django'))
-        self.assertRaises(ImportError, import_module, 'utils_tests.test_module.django')
+        self.assertFalse(module_has_submodule(test_module, 'freedom'))
+        self.assertRaises(ImportError, import_module, 'utils_tests.test_module.freedom')
 
         # Don't be confused by caching of import misses
         import types  # NOQA: causes attempted import of utils_tests.types
@@ -112,7 +112,7 @@ class EggLoader(unittest.TestCase):
 
 class ModuleImportTestCase(IgnoreDeprecationWarningsMixin, unittest.TestCase):
     def test_import_by_path(self):
-        cls = import_by_path('django.utils.module_loading.import_by_path')
+        cls = import_by_path('freedom.utils.module_loading.import_by_path')
         self.assertEqual(cls, import_by_path)
 
         # Test exceptions raised
@@ -135,15 +135,15 @@ class ModuleImportTestCase(IgnoreDeprecationWarningsMixin, unittest.TestCase):
 
     def test_import_by_path_pending_deprecation_warning(self):
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always', category=RemovedInDjango19Warning)
-            cls = import_by_path('django.utils.module_loading.import_by_path')
+            warnings.simplefilter('always', category=RemovedInFreedom19Warning)
+            cls = import_by_path('freedom.utils.module_loading.import_by_path')
             self.assertEqual(cls, import_by_path)
             self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[-1].category, RemovedInDjango19Warning))
+            self.assertTrue(issubclass(w[-1].category, RemovedInFreedom19Warning))
             self.assertIn('deprecated', str(w[-1].message))
 
     def test_import_string(self):
-        cls = import_string('django.utils.module_loading.import_string')
+        cls = import_string('freedom.utils.module_loading.import_string')
         self.assertEqual(cls, import_string)
 
         # Test exceptions raised

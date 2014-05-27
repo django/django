@@ -8,19 +8,19 @@ import shutil
 import sys
 import unittest
 
-from django.template import loader, Context
-from django.conf import settings
-from django.core.cache.backends.base import BaseCache
-from django.core.exceptions import ImproperlyConfigured
-from django.core.management import call_command
-from django.test import TestCase, override_settings
-from django.utils.encoding import force_text
-from django.utils.functional import empty
-from django.utils._os import rmtree_errorhandler, upath, symlinks_supported
-from django.utils import six
+from freedom.template import loader, Context
+from freedom.conf import settings
+from freedom.core.cache.backends.base import BaseCache
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.core.management import call_command
+from freedom.test import TestCase, override_settings
+from freedom.utils.encoding import force_text
+from freedom.utils.functional import empty
+from freedom.utils._os import rmtree_errorhandler, upath, symlinks_supported
+from freedom.utils import six
 
-from django.contrib.staticfiles import finders, storage
-from django.contrib.staticfiles.management.commands import collectstatic
+from freedom.contrib.staticfiles import finders, storage
+from freedom.contrib.staticfiles.management.commands import collectstatic
 
 from .storage import DummyStorage
 
@@ -37,12 +37,12 @@ TEST_SETTINGS = {
         ('prefix', os.path.join(TEST_ROOT, 'project', 'prefixed')),
     ),
     'STATICFILES_FINDERS': (
-        'django.contrib.staticfiles.finders.FileSystemFinder',
-        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-        'django.contrib.staticfiles.finders.DefaultStorageFinder',
+        'freedom.contrib.staticfiles.finders.FileSystemFinder',
+        'freedom.contrib.staticfiles.finders.AppDirectoriesFinder',
+        'freedom.contrib.staticfiles.finders.DefaultStorageFinder',
     ),
 }
-from django.contrib.staticfiles.management.commands.collectstatic import Command as CollectstaticCommand
+from freedom.contrib.staticfiles.management.commands.collectstatic import Command as CollectstaticCommand
 
 
 class BaseStaticFilesTestCase(object):
@@ -239,7 +239,7 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
                       searched_locations)
         self.assertIn(os.path.join('staticfiles_tests', 'apps', 'no_label', 'static'),
                       searched_locations)
-        self.assertIn(os.path.join('django', 'contrib', 'admin', 'static'),
+        self.assertIn(os.path.join('freedom', 'contrib', 'admin', 'static'),
                       searched_locations)
         self.assertIn(os.path.join('tests', 'servers', 'another_app', 'static'),
                       searched_locations)
@@ -265,7 +265,7 @@ class TestConfiguration(StaticFilesTestCase):
         staticfiles_storage = storage.staticfiles_storage
         try:
             storage.staticfiles_storage._wrapped = empty
-            with override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.StaticFilesStorage'):
+            with override_settings(STATICFILES_STORAGE='freedom.contrib.staticfiles.storage.StaticFilesStorage'):
                 command = collectstatic.Command()
                 self.assertTrue(command.is_local_storage())
 
@@ -585,7 +585,7 @@ class TestHashedFiles(object):
 
     @override_settings(
         STATICFILES_DIRS=(os.path.join(TEST_ROOT, 'project', 'faulty'),),
-        STATICFILES_FINDERS=('django.contrib.staticfiles.finders.FileSystemFinder',),
+        STATICFILES_FINDERS=('freedom.contrib.staticfiles.finders.FileSystemFinder',),
     )
     def test_post_processing_failure(self):
         """
@@ -602,7 +602,7 @@ class TestHashedFiles(object):
 # we set DEBUG to False here since the template tag wouldn't work otherwise
 @override_settings(**dict(
     TEST_SETTINGS,
-    STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
+    STATICFILES_STORAGE='freedom.contrib.staticfiles.storage.CachedStaticFilesStorage',
     DEBUG=False,
 ))
 class TestCollectionCachedStorage(TestHashedFiles, BaseCollectionTestCase,
@@ -639,7 +639,7 @@ class TestCollectionCachedStorage(TestHashedFiles, BaseCollectionTestCase,
 # we set DEBUG to False here since the template tag wouldn't work otherwise
 @override_settings(**dict(
     TEST_SETTINGS,
-    STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
+    STATICFILES_STORAGE='freedom.contrib.staticfiles.storage.ManifestStaticFilesStorage',
     DEBUG=False,
 ))
 class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
@@ -812,7 +812,7 @@ class TestServeStaticWithURLHelper(TestServeStatic, TestDefaults):
 
 class TestServeAdminMedia(TestServeStatic):
     """
-    Test serving media from django.contrib.admin.
+    Test serving media from freedom.contrib.admin.
     """
     def _response(self, filepath):
         return self.client.get(
@@ -881,7 +881,7 @@ class TestDefaultStorageFinder(StaticFilesTestCase, FinderTestCase):
 
 
 @override_settings(
-    STATICFILES_FINDERS=('django.contrib.staticfiles.finders.FileSystemFinder',),
+    STATICFILES_FINDERS=('freedom.contrib.staticfiles.finders.FileSystemFinder',),
     STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'documents')],
 )
 class TestMiscFinder(TestCase):
@@ -890,12 +890,12 @@ class TestMiscFinder(TestCase):
     """
     def test_get_finder(self):
         self.assertIsInstance(finders.get_finder(
-            'django.contrib.staticfiles.finders.FileSystemFinder'),
+            'freedom.contrib.staticfiles.finders.FileSystemFinder'),
             finders.FileSystemFinder)
 
     def test_get_finder_bad_classname(self):
         self.assertRaises(ImportError, finders.get_finder,
-                          'django.contrib.staticfiles.finders.FooBarFinder')
+                          'freedom.contrib.staticfiles.finders.FooBarFinder')
 
     def test_get_finder_bad_module(self):
         self.assertRaises(ImportError,
@@ -905,7 +905,7 @@ class TestMiscFinder(TestCase):
         finders.get_finder.cache_clear()
         for n in range(10):
             finders.get_finder(
-                'django.contrib.staticfiles.finders.FileSystemFinder')
+                'freedom.contrib.staticfiles.finders.FileSystemFinder')
         cache_info = finders.get_finder.cache_info()
         self.assertEqual(cache_info.hits, 9)
         self.assertEqual(cache_info.currsize, 1)

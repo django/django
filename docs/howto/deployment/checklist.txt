@@ -2,11 +2,11 @@
 Deployment checklist
 ====================
 
-The Internet is a hostile environment. Before deploying your Django project,
+The Internet is a hostile environment. Before deploying your Freedom project,
 you should take some time to review your settings, with security, performance,
 and operations in mind.
 
-Django includes many :doc:`security features </topics/security>`. Some are
+Freedom includes many :doc:`security features </topics/security>`. Some are
 built-in and always enabled. Others are optional because they aren't always
 appropriate, or because they're inconvenient for development. For example,
 forcing HTTPS may not be suitable for all websites, and it's impractical for
@@ -18,7 +18,7 @@ Error reporting needs are also widely different.
 
 The following checklist includes settings that:
 
-- must be set properly for Django to provide the expected level of security;
+- must be set properly for Freedom to provide the expected level of security;
 - are expected to be different in each environment;
 - enable optional security features;
 - enable performance optimizations;
@@ -70,7 +70,7 @@ Environment-specific settings
 :setting:`ALLOWED_HOSTS`
 ------------------------
 
-When :setting:`DEBUG = False <DEBUG>`, Django doesn't work at all without a
+When :setting:`DEBUG = False <DEBUG>`, Freedom doesn't work at all without a
 suitable value for :setting:`ALLOWED_HOSTS`.
 
 This setting is required to protect your site against some CSRF attacks. If
@@ -131,14 +131,14 @@ HTTPS
 =====
 
 Any website which allows users to log in should enforce site-wide HTTPS to
-avoid transmitting access tokens in clear. In Django, access tokens include
+avoid transmitting access tokens in clear. In Freedom, access tokens include
 the login/password, the session cookie, and password reset tokens. (You can't
 do much to protect password reset tokens if you're sending them by email.)
 
 Protecting sensitive areas such as the user account or the admin isn't
 sufficient, because the same session cookie is used for HTTP and HTTPS. Your
 web server must redirect all HTTP traffic to HTTPS, and only transmit HTTPS
-requests to Django.
+requests to Freedom.
 
 Once you've set up HTTPS, enable the following settings.
 
@@ -181,7 +181,7 @@ Error reporting
 ===============
 
 By the time you push your code to production, it's hopefully robust, but you
-can't rule out unexpected errors. Thankfully, Django can capture errors and
+can't rule out unexpected errors. Thankfully, Freedom can capture errors and
 notify you accordingly.
 
 :setting:`LOGGING`
@@ -212,7 +212,7 @@ See :doc:`/howto/error-reporting` for details on error reporting by email.
 Customize the default error views
 ---------------------------------
 
-Django includes default views and templates for several HTTP error codes. You
+Freedom includes default views and templates for several HTTP error codes. You
 may want to override the default templates by creating the following templates
 in your root template directory: ``404.html``, ``500.html``, ``403.html``, and
 ``400.html``. The default views should suffice for 99% of Web applications, but
@@ -236,7 +236,7 @@ Python Options
 ==============
 
 It's strongly recommended that you invoke the Python process running your
-Django application using the `-R`_ option or with the
+Freedom application using the `-R`_ option or with the
 :envvar:`PYTHONHASHSEED` environment variable set to ``random``.
 
 These options help protect your site from denial-of-service (DoS)

@@ -1,4 +1,4 @@
-from django.views.generic.edit import UpdateView
+from freedom.views.generic.edit import UpdateView
 
 from .models import Article
 

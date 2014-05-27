@@ -5,12 +5,12 @@ import pickle
 from decimal import Decimal
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
-from django.contrib.contenttypes.models import ContentType
-from django.db.models import Count, Max, Avg, Sum, StdDev, Variance, F, Q
-from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import Approximate
-from django.utils import six
+from freedom.core.exceptions import FieldError
+from freedom.contrib.contenttypes.models import ContentType
+from freedom.db.models import Count, Max, Avg, Sum, StdDev, Variance, F, Q
+from freedom.test import TestCase, skipUnlessDBFeature
+from freedom.test.utils import Approximate
+from freedom.utils import six
 
 from .models import (Author, Book, Publisher, Clues, Entries, HardbackBook,
         ItemTag, WithManualPK, Alfa, Bravo, Charlie)
@@ -125,7 +125,7 @@ class AggregationTests(TestCase):
             id=2,
             isbn='067232959',
             mean_auth_age=45.0,
-            name='Sams Teach Yourself Django in 24 Hours',
+            name='Sams Teach Yourself Freedom in 24 Hours',
             pages=528,
             price=Decimal("23.09"),
             pubdate=datetime.date(2008, 3, 3),
@@ -142,7 +142,7 @@ class AggregationTests(TestCase):
             id=2,
             isbn='067232959',
             mean_auth_age=45.0,
-            name='Sams Teach Yourself Django in 24 Hours',
+            name='Sams Teach Yourself Freedom in 24 Hours',
             pages=528,
             price=Decimal("23.09"),
             pubdate=datetime.date(2008, 3, 3),
@@ -162,7 +162,7 @@ class AggregationTests(TestCase):
             "id": 2,
             "isbn": "067232959",
             "mean_auth_age": 45.0,
-            "name": "Sams Teach Yourself Django in 24 Hours",
+            "name": "Sams Teach Yourself Freedom in 24 Hours",
             "pages": 528,
             "price": Decimal("23.09"),
             "pubdate": datetime.date(2008, 3, 3),
@@ -181,7 +181,7 @@ class AggregationTests(TestCase):
             'id': 2,
             'isbn': '067232959',
             'mean_auth_age': 45.0,
-            'name': 'Sams Teach Yourself Django in 24 Hours',
+            'name': 'Sams Teach Yourself Freedom in 24 Hours',
             'pages': 528,
             'price': Decimal("23.09"),
             'pubdate': datetime.date(2008, 3, 3),
@@ -193,13 +193,13 @@ class AggregationTests(TestCase):
         # unless it is explicitly named
         obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page': 'price / pages'}).values('name').get(pk=1)
         self.assertEqual(obj, {
-            "name": 'The Definitive Guide to Django: Web Development Done Right',
+            "name": 'The Definitive Guide to Freedom: Web Development Done Right',
         })
 
         obj = Book.objects.annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page': 'price / pages'}).values('name', 'mean_auth_age').get(pk=1)
         self.assertEqual(obj, {
             'mean_auth_age': 34.5,
-            'name': 'The Definitive Guide to Django: Web Development Done Right',
+            'name': 'The Definitive Guide to Freedom: Web Development Done Right',
         })
 
         # If an annotation isn't included in the values, it can still be used
@@ -207,7 +207,7 @@ class AggregationTests(TestCase):
         qs = Book.objects.annotate(n_authors=Count('authors')).values('name').filter(n_authors__gt=2)
         self.assertQuerysetEqual(
             qs, [
-                {"name": 'Python Web Development with Django'}
+                {"name": 'Python Web Development with Freedom'}
             ],
             lambda b: b,
         )
@@ -217,7 +217,7 @@ class AggregationTests(TestCase):
         obj = Book.objects.values('name').annotate(mean_auth_age=Avg('authors__age')).extra(select={'price_per_page': 'price / pages'}).get(pk=1)
         self.assertEqual(obj, {
             'mean_auth_age': 34.5,
-            'name': 'The Definitive Guide to Django: Web Development Done Right',
+            'name': 'The Definitive Guide to Freedom: Web Development Done Right',
         })
 
         # Check that all of the objects are getting counted (allow_nulls) and
@@ -432,12 +432,12 @@ class AggregationTests(TestCase):
         # order_by introduces a new join.
         self.assertQuerysetEqual(
             Book.objects.annotate(num_authors=Count('authors')).order_by('publisher__name', 'name'), [
-                "Practical Django Projects",
-                "The Definitive Guide to Django: Web Development Done Right",
+                "Practical Freedom Projects",
+                "The Definitive Guide to Freedom: Web Development Done Right",
                 "Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp",
                 "Artificial Intelligence: A Modern Approach",
-                "Python Web Development with Django",
-                "Sams Teach Yourself Django in 24 Hours",
+                "Python Web Development with Freedom",
+                "Sams Teach Yourself Freedom in 24 Hours",
             ],
             lambda b: b.name
         )
@@ -447,9 +447,9 @@ class AggregationTests(TestCase):
         self.assertQuerysetEqual(
             qs, [
                 ('Artificial Intelligence: A Modern Approach', 51.5, 'Prentice Hall', 'Peter Norvig'),
-                ('Practical Django Projects', 29.0, 'Apress', 'James Bennett'),
-                ('Python Web Development with Django', Approximate(30.333, places=2), 'Prentice Hall', 'Jeffrey Forcier'),
-                ('Sams Teach Yourself Django in 24 Hours', 45.0, 'Sams', 'Brad Dayley')
+                ('Practical Freedom Projects', 29.0, 'Apress', 'James Bennett'),
+                ('Python Web Development with Freedom', Approximate(30.333, places=2), 'Prentice Hall', 'Jeffrey Forcier'),
+                ('Sams Teach Yourself Freedom in 24 Hours', 45.0, 'Sams', 'Brad Dayley')
             ],
             lambda b: (b.name, b.authors__age__avg, b.publisher.name, b.contact.name)
         )
@@ -483,7 +483,7 @@ class AggregationTests(TestCase):
         ids = Book.objects.filter(pages__gt=100).annotate(n_authors=Count('authors')).filter(n_authors__gt=2).order_by('n_authors')
         self.assertQuerysetEqual(
             Book.objects.filter(id__in=ids), [
-                "Python Web Development with Django",
+                "Python Web Development with Freedom",
             ],
             lambda b: b.name
         )
@@ -555,10 +555,10 @@ class AggregationTests(TestCase):
             books.all(), [
                 'Artificial Intelligence: A Modern Approach',
                 'Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp',
-                'Practical Django Projects',
-                'Python Web Development with Django',
-                'Sams Teach Yourself Django in 24 Hours',
-                'The Definitive Guide to Django: Web Development Done Right'
+                'Practical Freedom Projects',
+                'Python Web Development with Freedom',
+                'Sams Teach Yourself Freedom in 24 Hours',
+                'The Definitive Guide to Freedom: Web Development Done Right'
             ],
             lambda b: b.name
         )
@@ -631,9 +631,9 @@ class AggregationTests(TestCase):
         books = Book.objects.filter(publisher__in=publishers)
         self.assertQuerysetEqual(
             books, [
-                "Practical Django Projects",
-                "Sams Teach Yourself Django in 24 Hours",
-                "The Definitive Guide to Django: Web Development Done Right",
+                "Practical Freedom Projects",
+                "Sams Teach Yourself Freedom in 24 Hours",
+                "The Definitive Guide to Freedom: Web Development Done Right",
             ],
             lambda b: b.name
         )
@@ -716,7 +716,7 @@ class AggregationTests(TestCase):
         ).values_list("pk")
         self.assertQuerysetEqual(
             Book.objects.filter(pk__in=qs), [
-                "Python Web Development with Django"
+                "Python Web Development with Freedom"
             ],
             attrgetter("name")
         )
@@ -742,23 +742,23 @@ class AggregationTests(TestCase):
 
     def test_annotation_disjunction(self):
         qs = Book.objects.annotate(n_authors=Count("authors")).filter(
-            Q(n_authors=2) | Q(name="Python Web Development with Django")
+            Q(n_authors=2) | Q(name="Python Web Development with Freedom")
         )
         self.assertQuerysetEqual(
             qs, [
                 "Artificial Intelligence: A Modern Approach",
-                "Python Web Development with Django",
-                "The Definitive Guide to Django: Web Development Done Right",
+                "Python Web Development with Freedom",
+                "The Definitive Guide to Freedom: Web Development Done Right",
             ],
             attrgetter("name")
         )
 
         qs = Book.objects.annotate(n_authors=Count("authors")).filter(
-            Q(name="The Definitive Guide to Django: Web Development Done Right") | (Q(name="Artificial Intelligence: A Modern Approach") & Q(n_authors=3))
+            Q(name="The Definitive Guide to Freedom: Web Development Done Right") | (Q(name="Artificial Intelligence: A Modern Approach") & Q(n_authors=3))
         )
         self.assertQuerysetEqual(
             qs, [
-                "The Definitive Guide to Django: Web Development Done Right",
+                "The Definitive Guide to Freedom: Web Development Done Right",
             ],
             attrgetter("name")
         )
@@ -794,13 +794,13 @@ class AggregationTests(TestCase):
 
     def test_quoting_aggregate_order_by(self):
         qs = Book.objects.filter(
-            name="Python Web Development with Django"
+            name="Python Web Development with Freedom"
         ).annotate(
             authorCount=Count("authors")
         ).order_by("authorCount")
         self.assertQuerysetEqual(
             qs, [
-                ("Python Web Development with Django", 3),
+                ("Python Web Development with Freedom", 3),
             ],
             lambda b: (b.name, b.authorCount)
         )
@@ -897,8 +897,8 @@ class AggregationTests(TestCase):
     def test_type_conversion(self):
         # The database backend convert_values function should not try to covert
         # CharFields to float. Refs #13844.
-        from django.db.models import CharField
-        from django.db import connection
+        from freedom.db.models import CharField
+        from freedom.db import connection
         testData = 'not_a_float_value'
         testField = CharField()
         self.assertEqual(
@@ -999,10 +999,10 @@ class AggregationTests(TestCase):
             [
                 ('Artificial Intelligence: A Modern Approach', 2),
                 ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1),
-                ('Practical Django Projects', 1),
-                ('Python Web Development with Django', 3),
-                ('Sams Teach Yourself Django in 24 Hours', 1),
-                ('The Definitive Guide to Django: Web Development Done Right', 2)
+                ('Practical Freedom Projects', 1),
+                ('Python Web Development with Freedom', 3),
+                ('Sams Teach Yourself Freedom in 24 Hours', 1),
+                ('The Definitive Guide to Freedom: Web Development Done Right', 2)
             ]
         )
 
@@ -1017,15 +1017,15 @@ class AggregationTests(TestCase):
 
         tests aggregations with generic reverse relations
         """
-        django_book = Book.objects.get(name='Practical Django Projects')
-        ItemTag.objects.create(object_id=django_book.id, tag='intermediate',
-                content_type=ContentType.objects.get_for_model(django_book))
-        ItemTag.objects.create(object_id=django_book.id, tag='django',
-                content_type=ContentType.objects.get_for_model(django_book))
+        freedom_book = Book.objects.get(name='Practical Freedom Projects')
+        ItemTag.objects.create(object_id=freedom_book.id, tag='intermediate',
+                content_type=ContentType.objects.get_for_model(freedom_book))
+        ItemTag.objects.create(object_id=freedom_book.id, tag='freedom',
+                content_type=ContentType.objects.get_for_model(freedom_book))
         # Assign a tag to model with same PK as the book above. If the JOIN
         # used in aggregation doesn't have content type as part of the
         # condition the annotation will also count the 'hi mom' tag for b.
-        wmpk = WithManualPK.objects.create(id=django_book.pk)
+        wmpk = WithManualPK.objects.create(id=freedom_book.pk)
         ItemTag.objects.create(object_id=wmpk.id, tag='hi mom',
                 content_type=ContentType.objects.get_for_model(wmpk))
         ai_book = Book.objects.get(name__startswith='Paradigms of Artificial Intelligence')
@@ -1037,12 +1037,12 @@ class AggregationTests(TestCase):
         self.assertEqual(
             [(b.name, b.tags__count) for b in results],
             [
-                ('Practical Django Projects', 2),
+                ('Practical Freedom Projects', 2),
                 ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1),
                 ('Artificial Intelligence: A Modern Approach', 0),
-                ('Python Web Development with Django', 0),
-                ('Sams Teach Yourself Django in 24 Hours', 0),
-                ('The Definitive Guide to Django: Web Development Done Right', 0)
+                ('Python Web Development with Freedom', 0),
+                ('Sams Teach Yourself Freedom in 24 Hours', 0),
+                ('The Definitive Guide to Freedom: Web Development Done Right', 0)
             ]
         )
 
@@ -1123,7 +1123,7 @@ class AggregationTests(TestCase):
             acount=F('publisher__num_awards')
         )
         self.assertQuerysetEqual(
-            qs, ['Sams Teach Yourself Django in 24 Hours'],
+            qs, ['Sams Teach Yourself Freedom in 24 Hours'],
             lambda b: b.name)
 
     def test_annotate_reserved_word(self):

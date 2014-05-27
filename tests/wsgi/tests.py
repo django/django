@@ -2,14 +2,14 @@ from __future__ import unicode_literals
 
 import unittest
 
-from django.core.exceptions import ImproperlyConfigured
-from django.core.servers.basehttp import get_internal_wsgi_application
-from django.core.signals import request_started
-from django.core.wsgi import get_wsgi_application
-from django.db import close_old_connections
-from django.test import TestCase, override_settings
-from django.test.client import RequestFactory
-from django.utils import six
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.core.servers.basehttp import get_internal_wsgi_application
+from freedom.core.signals import request_started
+from freedom.core.wsgi import get_wsgi_application
+from freedom.db import close_old_connections
+from freedom.test import TestCase, override_settings
+from freedom.test.client import RequestFactory
+from freedom.utils import six
 
 
 @override_settings(ROOT_URLCONF="wsgi.urls")
@@ -78,7 +78,7 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
 
         def mock_get_wsgi_app():
             return fake_app
-        from django.core.servers import basehttp
+        from freedom.core.servers import basehttp
         _orig_get_wsgi_app = basehttp.get_wsgi_application
         basehttp.get_wsgi_application = mock_get_wsgi_app
 

@@ -2,10 +2,10 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import requires_tz_support
-from django.utils import timezone
+from freedom.core.exceptions import ImproperlyConfigured
+from freedom.test import TestCase, override_settings, skipUnlessDBFeature
+from freedom.test.utils import requires_tz_support
+from freedom.utils import timezone
 
 from .models import Book, BookSigning
 

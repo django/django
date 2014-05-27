@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 from datetime import datetime
 import unittest
 
-from django.core.paginator import (Paginator, EmptyPage, InvalidPage,
+from freedom.core.paginator import (Paginator, EmptyPage, InvalidPage,
     PageNotAnInteger)
-from django.test import TestCase
-from django.utils import six
+from freedom.test import TestCase
+from freedom.utils import six
 
 from .models import Article
 from .custom import ValidAdjacentNumsPaginator
@@ -235,7 +235,7 @@ class PaginationTests(unittest.TestCase):
 
 class ModelPaginationTests(TestCase):
     """
-    Test pagination with Django model instances
+    Test pagination with Freedom model instances
     """
     def setUp(self):
         # Prepare a list of objects for pagination.

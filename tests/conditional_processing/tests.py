@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from django.test import TestCase, override_settings
+from freedom.test import TestCase, override_settings
 
 
 FULL_RESPONSE = 'Test conditional get response'

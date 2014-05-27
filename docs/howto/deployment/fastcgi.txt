@@ -1,14 +1,14 @@
 ============================================
-How to use Django with FastCGI, SCGI, or AJP
+How to use Freedom with FastCGI, SCGI, or AJP
 ============================================
 
 .. deprecated:: 1.7
-    FastCGI support is deprecated and will be removed in Django 1.9.
+    FastCGI support is deprecated and will be removed in Freedom 1.9.
 
 .. highlight:: bash
 
 Although :doc:`WSGI</howto/deployment/wsgi/index>` is the preferred deployment
-platform for Django, many people use shared hosting, on which protocols such as
+platform for Freedom, many people use shared hosting, on which protocols such as
 FastCGI, SCGI or AJP are the only viable options.
 
 .. admonition:: Note
@@ -47,7 +47,7 @@ persistent process.
 Prerequisite: flup
 ==================
 
-Before you can start using FastCGI with Django, you'll need to install flup_, a
+Before you can start using FastCGI with Freedom, you'll need to install flup_, a
 Python library for dealing with FastCGI. Version 0.5 or newer should work fine.
 
 .. _flup: http://www.saddi.com/software/flup/
@@ -57,7 +57,7 @@ Starting your FastCGI server
 
 FastCGI operates on a client-server model, and in most cases you'll be starting
 the FastCGI process on your own. Your Web server (be it Apache, lighttpd, or
-otherwise) only contacts your Django-FastCGI process when the server needs a
+otherwise) only contacts your Freedom-FastCGI process when the server needs a
 dynamic page to be loaded. Because the daemon is already running with the code
 in memory, it's able to serve the response very quickly.
 
@@ -65,7 +65,7 @@ in memory, it's able to serve the response very quickly.
 
     If you're on a shared hosting system, you'll probably be forced to use
     Web server-managed FastCGI processes. See the section below on running
-    Django with Web server-managed processes for more information.
+    Freedom with Web server-managed processes for more information.
 
 A Web server can connect to a FastCGI server in one of two ways: It can use
 either a Unix domain socket (a "named pipe" on Win32 systems), or it can use a
@@ -73,7 +73,7 @@ TCP socket. What you choose is a manner of preference; a TCP socket is usually
 easier due to permissions issues.
 
 To start your server, first change into the directory of your project (wherever
-your :doc:`manage.py </ref/django-admin>` is), and then run the
+your :doc:`manage.py </ref/freedom-admin>` is), and then run the
 :djadmin:`runfcgi` command::
 
     ./manage.py runfcgi [options]
@@ -89,7 +89,7 @@ specified when starting the FastCGI server. See the examples_, below.
 Protocols
 ---------
 
-Django supports all the protocols that flup_ does, namely fastcgi_, `SCGI`_ and
+Freedom supports all the protocols that flup_ does, namely fastcgi_, `SCGI`_ and
 `AJP1.3`_ (the Apache JServ Protocol, version 1.3). Select your preferred
 protocol by using the :djadminopt:`protocol=\<protocol_name\> <protocol>` option
 with ``./manage.py runfcgi`` -- where ``<protocol_name>`` may be one of:
@@ -111,11 +111,11 @@ Running a threaded server on a TCP port::
 
 Running a preforked server on a Unix domain socket::
 
-    ./manage.py runfcgi method=prefork socket=/home/user/mysite.sock pidfile=django.pid
+    ./manage.py runfcgi method=prefork socket=/home/user/mysite.sock pidfile=freedom.pid
 
 .. admonition:: Socket security
 
-    Django's default umask requires that the web server and the Django fastcgi
+    Freedom's default umask requires that the web server and the Freedom fastcgi
     process be run with the same group **and** user. For increased security,
     you can run them under the same group but as different users. If you do
     this, you will need to set the umask to 0002 using the ``umask`` argument
@@ -162,11 +162,11 @@ To easily restart your FastCGI daemon on Unix, try this small shell script::
 Apache setup
 ============
 
-To use Django with Apache and FastCGI, you'll need Apache installed and
+To use Freedom with Apache and FastCGI, you'll need Apache installed and
 configured, with `mod_fastcgi`_ installed and enabled. Consult the Apache
 documentation for instructions.
 
-Once you've got that set up, point Apache at your Django FastCGI instance by
+Once you've got that set up, point Apache at your Freedom FastCGI instance by
 editing the ``httpd.conf`` (Apache configuration) file. You'll need to do two
 things:
 
@@ -208,14 +208,14 @@ directive, as explained in the previous section).
 
 In this example, we tell Apache to use FastCGI to handle any request that
 doesn't represent a file on the filesystem and doesn't start with ``/media/``.
-This is probably the most common case, if you're using Django's admin site:
+This is probably the most common case, if you're using Freedom's admin site:
 
 .. code-block:: apache
 
     <VirtualHost 12.34.56.78>
       ServerName example.com
       DocumentRoot /home/user/public_html
-      Alias /media /home/user/python/django/contrib/admin/media
+      Alias /media /home/user/python/freedom/contrib/admin/media
       RewriteEngine On
       RewriteRule ^/(media.*)$ /$1 [QSA,L,PT]
       RewriteCond %{REQUEST_FILENAME} !-f
@@ -224,7 +224,7 @@ This is probably the most common case, if you're using Django's admin site:
 
 .. _mod_rewrite: http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html
 
-Django will automatically use the pre-rewrite version of the URL when
+Freedom will automatically use the pre-rewrite version of the URL when
 constructing URLs with the :ttag:`{% url %}<url>` template tag (and similar
 methods).
 
@@ -238,7 +238,7 @@ by itself and doesn't offer something like ``FastCGIExternalServer``. This
 means that the configuration looks slightly different.
 
 In effect, you have to go the way of adding a script handler similar to what
-is described later on regarding running Django in a :ref:`shared-hosting
+is described later on regarding running Freedom in a :ref:`shared-hosting
 environment <apache_shared_hosting>`. For further details please refer to the
 `mod_fcgid reference`_
 
@@ -275,7 +275,7 @@ Add the following to your lighttpd config file:
         ),
     )
     alias.url = (
-        "/media" => "/home/user/django/contrib/admin/media/",
+        "/media" => "/home/user/freedom/contrib/admin/media/",
     )
 
     url.rewrite-once = (
@@ -284,7 +284,7 @@ Add the following to your lighttpd config file:
         "^(/.*)$" => "/mysite.fcgi$1",
     )
 
-Running multiple Django sites on one lighttpd
+Running multiple Freedom sites on one lighttpd
 ---------------------------------------------
 
 lighttpd lets you use "conditional configuration" to allow configuration to be
@@ -309,7 +309,7 @@ block around your FastCGI config for each site::
         ...
     }
 
-You can also run multiple Django installations on the same site simply by
+You can also run multiple Freedom installations on the same site simply by
 specifying multiple entries in the ``fastcgi.server`` directive. Add one
 FastCGI host for each.
 
@@ -322,17 +322,17 @@ TLS and SSL encrypted connections, Virtual hosts, Authentication, on the fly
 encoding, Load Balancing, Apache compatible log files, Data Base Balancer,
 Reverse HTTP Proxy and much more.
 
-The Cherokee project provides a documentation to `setting up Django`_ with Cherokee.
+The Cherokee project provides a documentation to `setting up Freedom`_ with Cherokee.
 
-.. _setting up Django: http://www.cherokee-project.com/doc/cookbook_django.html
+.. _setting up Freedom: http://www.cherokee-project.com/doc/cookbook_freedom.html
 
 .. _apache_shared_hosting:
 
-Running Django on a shared-hosting provider with Apache
+Running Freedom on a shared-hosting provider with Apache
 =======================================================
 
 Many shared-hosting providers don't allow you to run your own server daemons or
-edit the ``httpd.conf`` file. In these cases, it's still possible to run Django
+edit the ``httpd.conf`` file. In these cases, it's still possible to run Freedom
 using Web server-spawned processes.
 
 .. admonition:: Note
@@ -368,7 +368,7 @@ be sure to make it executable:
     # Set the DJANGO_SETTINGS_MODULE environment variable.
     os.environ['DJANGO_SETTINGS_MODULE'] = "myproject.settings"
 
-    from django.core.servers.fastcgi import runfastcgi
+    from freedom.core.servers.fastcgi import runfastcgi
     runfastcgi(method="threaded", daemonize="false")
 
 This works if your server uses mod_fastcgi. If, on the other hand, you are
@@ -390,7 +390,7 @@ If you change any Python code on your site, you'll need to tell FastCGI the
 code has changed. But there's no need to restart Apache in this case. Rather,
 just reupload ``mysite.fcgi``, or edit the file, so that the timestamp on the
 file will change. When Apache sees the file has been updated, it will restart
-your Django application for you.
+your Freedom application for you.
 
 If you have access to a command shell on a Unix system, you can accomplish this
 easily by using the ``touch`` command::
@@ -409,25 +409,25 @@ Forcing the URL prefix to a particular value
 ============================================
 
 Because many of these fastcgi-based solutions require rewriting the URL at
-some point inside the Web server, the path information that Django sees may not
-resemble the original URL that was passed in. This is a problem if the Django
+some point inside the Web server, the path information that Freedom sees may not
+resemble the original URL that was passed in. This is a problem if the Freedom
 application is being served from under a particular prefix and you want your
 URLs from the :ttag:`{% url %}<url>` tag to look like the prefix, rather than
 the rewritten version, which might contain, for example, ``mysite.fcgi``.
 
-Django makes a good attempt to work out what the real script name prefix
+Freedom makes a good attempt to work out what the real script name prefix
 should be. In particular, if the Web server sets the ``SCRIPT_URL`` (specific
 to Apache's mod_rewrite), or ``REDIRECT_URL`` (set by a few servers, including
-Apache + mod_rewrite in some situations), Django will work out the original
+Apache + mod_rewrite in some situations), Freedom will work out the original
 prefix automatically.
 
-In the cases where Django cannot work out the prefix correctly and where you
+In the cases where Freedom cannot work out the prefix correctly and where you
 want the original value to be used in URLs, you can set the
 :setting:`FORCE_SCRIPT_NAME` setting in your main ``settings`` file. This sets the
 script name uniformly for every URL served via that settings file. Thus you'll
 need to use different settings files if you want different sets of URLs to
 have different script names in this case, but that is a rare situation.
 
-As an example of how to use it, if your Django configuration is serving all of
+As an example of how to use it, if your Freedom configuration is serving all of
 the URLs under ``'/'`` and you wanted to use this setting, you would set
 ``FORCE_SCRIPT_NAME = ''`` in your settings file.

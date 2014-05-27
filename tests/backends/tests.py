@@ -9,23 +9,23 @@ import re
 import threading
 import unittest
 
-from django.conf import settings
-from django.core.management.color import no_style
-from django.db import (connection, connections, DEFAULT_DB_ALIAS,
+from freedom.conf import settings
+from freedom.core.management.color import no_style
+from freedom.db import (connection, connections, DEFAULT_DB_ALIAS,
     DatabaseError, IntegrityError, transaction)
-from django.db.backends.signals import connection_created
-from django.db.backends.postgresql_psycopg2 import version as pg_version
-from django.db.backends.utils import format_number, CursorWrapper
-from django.db.models import Sum, Avg, Variance, StdDev
-from django.db.models.fields import (AutoField, DateField, DateTimeField,
+from freedom.db.backends.signals import connection_created
+from freedom.db.backends.postgresql_psycopg2 import version as pg_version
+from freedom.db.backends.utils import format_number, CursorWrapper
+from freedom.db.models import Sum, Avg, Variance, StdDev
+from freedom.db.models.fields import (AutoField, DateField, DateTimeField,
     DecimalField, IntegerField, TimeField)
-from django.db.models.sql.constants import CURSOR
-from django.db.utils import ConnectionHandler
-from django.test import (TestCase, TransactionTestCase, override_settings,
+from freedom.db.models.sql.constants import CURSOR
+from freedom.db.utils import ConnectionHandler
+from freedom.test import (TestCase, TransactionTestCase, override_settings,
     skipUnlessDBFeature, skipIfDBFeature)
-from django.test.utils import str_prefix
-from django.utils import six
-from django.utils.six.moves import xrange
+from freedom.test.utils import str_prefix
+from freedom.utils import six
+from freedom.utils.six.moves import xrange
 
 from . import models
 
@@ -39,7 +39,7 @@ class DummyBackendTest(TestCase):
         DATABASES = {}
         conns = ConnectionHandler(DATABASES)
         self.assertEqual(conns[DEFAULT_DB_ALIAS].settings_dict['ENGINE'],
-            'django.db.backends.dummy')
+            'freedom.db.backends.dummy')
 
 
 @unittest.skipUnless(connection.vendor == 'oracle', "Test only for Oracle")
@@ -54,16 +54,16 @@ class OracleTests(unittest.TestCase):
     def test_dbms_session(self):
         # If the backend is Oracle, test that we can call a standard
         # stored procedure through our cursor wrapper.
-        from django.db.backends.oracle.base import convert_unicode
+        from freedom.db.backends.oracle.base import convert_unicode
 
         with connection.cursor() as cursor:
             cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
-                            [convert_unicode('_django_testing!')])
+                            [convert_unicode('_freedom_testing!')])
 
     def test_cursor_var(self):
         # If the backend is Oracle, test that we can pass cursor variables
         # as query parameters.
-        from django.db.backends.oracle.base import Database
+        from freedom.db.backends.oracle.base import Database
 
         with connection.cursor() as cursor:
             var = cursor.var(Database.STRING)
@@ -131,7 +131,7 @@ class SQLiteTests(TestCase):
                 models.Item.objects.all().aggregate, aggregate('last_modified'))
 
     def test_convert_values_to_handle_null_value(self):
-        from django.db.backends.sqlite3.base import DatabaseOperations
+        from freedom.db.backends.sqlite3.base import DatabaseOperations
         convert_values = DatabaseOperations(connection).convert_values
         self.assertIsNone(convert_values(None, AutoField(primary_key=True)))
         self.assertIsNone(convert_values(None, DateField()))
@@ -248,7 +248,7 @@ class PostgreSQLTests(TestCase):
         self.assertEqual(a[0], b[0])
 
     def test_lookup_cast(self):
-        from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations
+        from freedom.db.backends.postgresql_psycopg2.operations import DatabaseOperations
 
         do = DatabaseOperations(connection=None)
         for lookup in ('iexact', 'contains', 'icontains', 'startswith',
@@ -282,13 +282,13 @@ class MySQLTests(TestCase):
 
 class DateQuotingTest(TestCase):
 
-    def test_django_date_trunc(self):
+    def test_freedom_date_trunc(self):
         """
-        Test the custom ``django_date_trunc method``, in particular against
+        Test the custom ``freedom_date_trunc method``, in particular against
         fields which clash with strings passed to it (e.g. 'year') - see
         #12818__.
 
-        __: http://code.djangoproject.com/ticket/12818
+        __: http://code.freedomproject.com/ticket/12818
 
         """
         updated = datetime.datetime(2010, 2, 20)
@@ -296,12 +296,12 @@ class DateQuotingTest(TestCase):
         years = models.SchoolClass.objects.dates('last_updated', 'year')
         self.assertEqual(list(years), [datetime.date(2010, 1, 1)])
 
-    def test_django_date_extract(self):
+    def test_freedom_date_extract(self):
         """
-        Test the custom ``django_date_extract method``, in particular against fields
+        Test the custom ``freedom_date_extract method``, in particular against fields
         which clash with strings passed to it (e.g. 'day') - see #12818__.
 
-        __: http://code.djangoproject.com/ticket/12818
+        __: http://code.freedomproject.com/ticket/12818
 
         """
         updated = datetime.datetime(2010, 2, 20)
@@ -383,9 +383,9 @@ class LongNameTest(TestCase):
 
     @skipUnlessDBFeature('supports_long_model_names')
     def test_sequence_name_length_limits_m2m(self):
-        """Test an m2m save of a model with a long name and a long m2m field name doesn't error as on Django >=1.2 this now uses object saves. Ref #8901"""
+        """Test an m2m save of a model with a long name and a long m2m field name doesn't error as on Freedom >=1.2 this now uses object saves. Ref #8901"""
         obj = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
-        rel_obj = models.Person.objects.create(first_name='Django', last_name='Reinhardt')
+        rel_obj = models.Person.objects.create(first_name='Freedom', last_name='Reinhardt')
         obj.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.add(rel_obj)
 
     @skipUnlessDBFeature('supports_long_model_names')
@@ -673,7 +673,7 @@ class BackendTestCase(TestCase):
 # * if sqlite3 (if/once we get #14204 fixed) has referential integrity turned
 #   on or not, something that would be controlled by runtime support and user
 #   preference.
-# verify if its type is django.database.db.IntegrityError.
+# verify if its type is freedom.database.db.IntegrityError.
 class FkConstraintsTests(TransactionTestCase):
 
     available_apps = ['backends']
@@ -785,7 +785,7 @@ class ThreadTests(TestCase):
 
     def test_default_connection_thread_local(self):
         """
-        Ensure that the default connection (i.e. django.db.connection) is
+        Ensure that the default connection (i.e. freedom.db.connection) is
         different for each thread.
         Refs #17258.
         """
@@ -796,9 +796,9 @@ class ThreadTests(TestCase):
         connections_dict[id(connection)] = connection
 
         def runner():
-            # Passing django.db.connection between threads doesn't work while
+            # Passing freedom.db.connection between threads doesn't work while
             # connections[DEFAULT_DB_ALIAS] does.
-            from django.db import connections
+            from freedom.db import connections
             connection = connections[DEFAULT_DB_ALIAS]
             # Allow thread sharing so the connection can be closed by the
             # main thread.
@@ -832,7 +832,7 @@ class ThreadTests(TestCase):
             connections_dict[id(conn)] = conn
 
         def runner():
-            from django.db import connections
+            from freedom.db import connections
             for conn in connections.all():
                 # Allow thread sharing so the connection can be closed by the
                 # main thread.
@@ -859,7 +859,7 @@ class ThreadTests(TestCase):
 
         def do_thread():
             def runner(main_thread_connection):
-                from django.db import connections
+                from freedom.db import connections
                 connections['default'] = main_thread_connection
                 try:
                     models.Person.objects.get(first_name="John", last_name="Doe")

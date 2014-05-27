@@ -8,8 +8,8 @@ import os
 import shutil
 import unittest
 
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.utils._os import upath
+from freedom.core.files.uploadedfile import SimpleUploadedFile
+from freedom.utils._os import upath
 
 from .models import Photo, PhotoForm, temp_storage_dir
 

@@ -1,24 +1,24 @@
 ===============================
-Django 1.2 beta 1 release notes
+Freedom 1.2 beta 1 release notes
 ===============================
 
 February 5, 2010
 
-Welcome to Django 1.2 beta 1!
+Welcome to Freedom 1.2 beta 1!
 
 This is the second in a series of preview/development releases leading
-up to the eventual release of Django 1.2, currently scheduled to take
+up to the eventual release of Freedom 1.2, currently scheduled to take
 place in March 2010. This release is primarily targeted at developers
-who are interested in trying out new features and testing the Django
+who are interested in trying out new features and testing the Freedom
 codebase to help identify and resolve bugs prior to the final 1.2
 release.
 
 As such, this release is *not* intended for production use, and any
 such use is discouraged.
 
-This document covers changes since the Django 1.2 alpha release; the
+This document covers changes since the Freedom 1.2 alpha release; the
 :doc:`1.2 alpha release notes </releases/1.2-alpha-1>` cover new and
-updated features in Django between 1.1 and 1.2 alpha.
+updated features in Freedom between 1.1 and 1.2 alpha.
 
 
 Deprecations and other changes in 1.2 beta
@@ -31,14 +31,14 @@ deprecation proceeds over multiple release cycles: initially, the
 deprecated API will raise ``PendingDeprecationWarning``, followed by
 raising ``DeprecationWarning`` in the next release, and finally
 removal of the deprecated API in the release after that. APIs
-beginning the deprecation process in Django 1.2 will be removed in the
-Django 1.4 release.
+beginning the deprecation process in Freedom 1.2 will be removed in the
+Freedom 1.4 release.
 
 
 Unit test runners
 -----------------
 
-Django 1.2 changes the test runner tools to use a class-based
+Freedom 1.2 changes the test runner tools to use a class-based
 approach. Old style function-based test runners will still work, but
 should be updated to use the new :ref:`class-based runners
 <topics-testing-test_runner>`.
@@ -47,8 +47,8 @@ should be updated to use the new :ref:`class-based runners
 Syndication feeds
 -----------------
 
-The ``django.contrib.syndication.feeds.Feed`` class is being
-replaced by the :class:`django.contrib.syndication.views.Feed` class.
+The ``freedom.contrib.syndication.feeds.Feed`` class is being
+replaced by the :class:`freedom.contrib.syndication.views.Feed` class.
 The old ``feeds.Feed`` class is deprecated. The new class has an
 almost identical API, but allows instances to be used as views.
 
@@ -66,7 +66,7 @@ Cookie encoding
 ---------------
 
 Due to cookie-handling bugs in Internet Explorer, Safari, and possibly
-other browsers, Django's encoding of cookie values was changed so that
+other browsers, Freedom's encoding of cookie values was changed so that
 the characters comma (',') and semi-colon (';') are treated as
 non-safe characters, and are therefore encoded as ``\054`` and
 ``\073`` respectively. This could produce backwards incompatibilities
@@ -77,7 +77,7 @@ cookie values.
 What's new in 1.2 beta
 ======================
 
-This 1.2 beta release marks the final feature freeze for Django 1.2;
+This 1.2 beta release marks the final feature freeze for Freedom 1.2;
 while most feature development was completed for 1.2 alpha (which
 constituted a freeze on major features), a few other new features were
 added afterward and so are new as of 1.2 beta.
@@ -87,9 +87,9 @@ Object-level permissions
 ------------------------
 
 A foundation for specifying permissions at the per-object level was
-added in Django 1.2 alpha but not documented with the alpha release.
+added in Freedom 1.2 alpha but not documented with the alpha release.
 
-The default authentication backends shipped with Django do not
+The default authentication backends shipped with Freedom do not
 currently make use of this, but third-party authentication backends
 are free to do so. See the :doc:`authentication docs </topics/auth/index>`
 for more information.
@@ -116,20 +116,20 @@ fields to select. One-to-one relations will not, however, be traversed
 by a depth-based ``select_related()`` call.
 
 
-The Django 1.2 roadmap
+The Freedom 1.2 roadmap
 ======================
 
-Before the final Django 1.2 release, at least one additional
+Before the final Freedom 1.2 release, at least one additional
 preview/development releases will be made available. The current
 schedule consists of at least the following:
 
-* Week of **March 2, 2010**: First Django 1.2 release
+* Week of **March 2, 2010**: First Freedom 1.2 release
   candidate. String freeze for translations.
 
-* Week of **March 9, 2010**: Django 1.2 final release.
+* Week of **March 9, 2010**: Freedom 1.2 final release.
 
 If necessary, additional beta or release-candidate packages will be
-issued prior to the final 1.2 release. Django 1.2 will be released
+issued prior to the final 1.2 release. Freedom 1.2 will be released
 approximately one week after the final release candidate.
 
 
@@ -138,36 +138,36 @@ What you can do to help
 
 In order to provide a high-quality 1.2 release, we need your
 help. Although this beta release is, again, *not* intended for
-production use, you can help the Django team by trying out the beta
+production use, you can help the Freedom team by trying out the beta
 codebase in a safe test environment and reporting any bugs or issues
-you encounter. The Django ticket tracker is the central place to
+you encounter. The Freedom ticket tracker is the central place to
 search for open issues:
 
-* https://code.djangoproject.com/timeline
+* https://code.freedomproject.com/timeline
 
 Please open new tickets if no existing ticket corresponds to a problem
 you're running into.
 
-Additionally, discussion of Django development, including progress
-toward the 1.2 release, takes place daily on the django-developers
+Additionally, discussion of Freedom development, including progress
+toward the 1.2 release, takes place daily on the freedom-developers
 mailing list:
 
-* http://groups.google.com/group/django-developers
+* http://groups.google.com/group/freedom-developers
 
-... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. If you're
-interested in helping out with Django's development, feel free to join the
+... and in the ``#freedom-dev`` IRC channel on ``irc.freenode.net``. If you're
+interested in helping out with Freedom's development, feel free to join the
 discussions there.
 
-Django's online documentation also includes pointers on how to
-contribute to Django:
+Freedom's online documentation also includes pointers on how to
+contribute to Freedom:
 
-* :doc:`How to contribute to Django </internals/contributing/index>`
+* :doc:`How to contribute to Freedom </internals/contributing/index>`
 
 Contributions on any level -- developing code, writing documentation
 or simply triaging tickets and helping to test proposed bugfixes --
 are always welcome and appreciated.
 
-Development sprints for Django 1.2 will also be taking place at PyCon
+Development sprints for Freedom 1.2 will also be taking place at PyCon
 US 2010, on the dedicated sprint days (February 22 through 25), and
 anyone who wants to help out is welcome to join in, either in person
 at PyCon or virtually in the IRC channel or on the mailing list.

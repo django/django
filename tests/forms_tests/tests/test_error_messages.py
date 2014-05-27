@@ -3,17 +3,17 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import (
+from freedom.core.files.uploadedfile import SimpleUploadedFile
+from freedom.forms import (
     BooleanField, CharField, ChoiceField, DateField, DateTimeField,
     DecimalField, EmailField, FileField, FloatField, Form,
     GenericIPAddressField, IntegerField, IPAddressField, ModelChoiceField,
     ModelMultipleChoiceField, MultipleChoiceField, RegexField,
     SplitDateTimeField, TimeField, URLField, utils, ValidationError,
 )
-from django.test import TestCase
-from django.utils.safestring import mark_safe
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.test import TestCase
+from freedom.utils.safestring import mark_safe
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 class AssertFormErrorsMixin(object):

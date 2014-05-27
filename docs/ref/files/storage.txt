@@ -1,19 +1,19 @@
 File storage API
 ================
 
-.. module:: django.core.files.storage
+.. module:: freedom.core.files.storage
 
 Getting the current storage class
 ---------------------------------
 
-Django provides two convenient ways to access the current storage class:
+Freedom provides two convenient ways to access the current storage class:
 
 .. class:: DefaultStorage
 
-    :class:`~django.core.files.storage.DefaultStorage` provides
+    :class:`~freedom.core.files.storage.DefaultStorage` provides
     lazy access to the current default storage system as defined by
     :setting:`DEFAULT_FILE_STORAGE`. :class:`DefaultStorage` uses
-    :func:`~django.core.files.storage.get_storage_class` internally.
+    :func:`~freedom.core.files.storage.get_storage_class` internally.
 
 .. function:: get_storage_class([import_path=None])
 
@@ -31,9 +31,9 @@ The FileSystemStorage Class
 
 .. class:: FileSystemStorage([location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None])
 
-    The :class:`~django.core.files.storage.FileSystemStorage` class implements
+    The :class:`~freedom.core.files.storage.FileSystemStorage` class implements
     basic file storage on a local filesystem. It inherits from
-    :class:`~django.core.files.storage.Storage` and provides implementations
+    :class:`~freedom.core.files.storage.Storage` and provides implementations
     for all the public methods thereof.
 
     .. attribute:: location
@@ -77,7 +77,7 @@ The Storage Class
 
 .. class:: Storage
 
-    The :class:`~django.core.files.storage.Storage` class provides a
+    The :class:`~freedom.core.files.storage.Storage` class provides a
     standardized API for storing files, along with a set of default
     behaviors that all other storage systems can inherit or override
     as necessary.
@@ -151,8 +151,8 @@ The Storage Class
         name. The actual name of the stored file will be returned.
 
         The ``content`` argument must be an instance of
-        :class:`django.core.files.File` or of a subclass of
-        :class:`~django.core.files.File`.
+        :class:`freedom.core.files.File` or of a subclass of
+        :class:`~freedom.core.files.File`.
 
     .. method:: size(name)
 

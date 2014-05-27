@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 
 from types import MethodType
 
-from django.core.checks import Error
-from django.db import connection, models
+from freedom.core.checks import Error
+from freedom.db import connection, models
 
 from .base import IsolatedModelsTestCase
 

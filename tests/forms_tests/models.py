@@ -5,9 +5,9 @@ import os
 import datetime
 import tempfile
 
-from django.core.files.storage import FileSystemStorage
-from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from freedom.core.files.storage import FileSystemStorage
+from freedom.db import models
+from freedom.utils.encoding import python_2_unicode_compatible
 
 
 temp_storage_location = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])

@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.test import TestCase
-from django.utils import six
+from freedom.test import TestCase
+from freedom.utils import six
 
 from .models import Person, FunPerson, Book, Car, PersonManager, PublishedBookManager
 

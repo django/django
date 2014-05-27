@@ -1,10 +1,10 @@
 from functools import partial, update_wrapper
 
-from django.http import HttpResponse
-from django.views.generic import RedirectView
-from django.core.urlresolvers import reverse_lazy
+from freedom.http import HttpResponse
+from freedom.views.generic import RedirectView
+from freedom.core.urlresolvers import reverse_lazy
 
-from django.contrib.auth.decorators import user_passes_test
+from freedom.contrib.auth.decorators import user_passes_test
 
 
 def empty_view(request, *args, **kwargs):

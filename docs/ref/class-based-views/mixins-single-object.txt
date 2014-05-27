@@ -5,7 +5,7 @@ Single object mixins
 SingleObjectMixin
 -----------------
 
-.. class:: django.views.generic.detail.SingleObjectMixin
+.. class:: freedom.views.generic.detail.SingleObjectMixin
 
     Provides a mechanism for looking up an object associated with the
     current HTTP request.
@@ -27,7 +27,7 @@ SingleObjectMixin
 
             ``queryset`` is a class attribute with a *mutable* value so care
             must be taken when using it directly. Before using it, either call
-            its :meth:`~django.db.models.query.QuerySet.all` method or
+            its :meth:`~freedom.db.models.query.QuerySet.all` method or
             retrieve it with :meth:`get_queryset` which takes care of the
             cloning behind the scenes.
 
@@ -66,7 +66,7 @@ SingleObjectMixin
         Returns the queryset that will be used to retrieve the object that
         this view will display. By default, :meth:`get_queryset` returns the
         value of the :attr:`queryset` attribute if it is set, otherwise
-        it constructs a :class:`~django.db.models.query.QuerySet` by calling
+        it constructs a :class:`~freedom.db.models.query.QuerySet` by calling
         the ``all()`` method on the :attr:`model` attribute's default manager.
 
     .. method:: get_context_object_name(obj)
@@ -95,18 +95,18 @@ SingleObjectMixin
 SingleObjectTemplateResponseMixin
 ---------------------------------
 
-.. class:: django.views.generic.detail.SingleObjectTemplateResponseMixin
+.. class:: freedom.views.generic.detail.SingleObjectTemplateResponseMixin
 
     A mixin class that performs template-based response rendering for views
     that operate upon a single object instance. Requires that the view it is
     mixed with provides ``self.object``, the object instance that the view is
     operating on. ``self.object`` will usually be, but is not required to be,
-    an instance of a Django model. It may be ``None`` if the view is in the
+    an instance of a Freedom model. It may be ``None`` if the view is in the
     process of constructing a new instance.
 
     **Extends**
 
-    * :class:`~django.views.generic.base.TemplateResponseMixin`
+    * :class:`~freedom.views.generic.base.TemplateResponseMixin`
 
     **Methods and Attributes**
 

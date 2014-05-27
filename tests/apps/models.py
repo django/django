@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.apps.registry import Apps
-from django.db import models
+from freedom.apps.registry import Apps
+from freedom.db import models
 
 
 # We're testing app registry presence on load, so this is handy.
