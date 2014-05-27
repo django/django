@@ -225,17 +225,16 @@ An example
     introduce referential integrity problems that Django can't
     currently handle.
 
-    The primary/replica (referred to as master/slave by some databases)
-    configuration described is also flawed -- it
+    The master/slave configuration described is also flawed -- it
     doesn't provide any solution for handling replication lag (i.e.,
     query inconsistencies introduced because of the time taken for a
-    write to propagate to the replicas). It also doesn't consider the
+    write to propagate to the slaves). It also doesn't consider the
     interaction of transactions with the database utilization strategy.
 
 So - what does this mean in practice? Let's consider another sample
 configuration. This one will have several databases: one for the
-``auth`` application, and all other apps using a primary/replica setup
-with two read replicas. Here are the settings specifying these
+``auth`` application, and all other apps using a master/slave setup
+with two read slaves. Here are the settings specifying these
 databases::
 
     DATABASES = {
@@ -245,20 +244,20 @@ databases::
             'USER': 'mysql_user',
             'PASSWORD': 'swordfish',
         },
-        'primary': {
-            'NAME': 'primary',
+        'master': {
+            'NAME': 'master',
             'ENGINE': 'django.db.backends.mysql',
             'USER': 'mysql_user',
             'PASSWORD': 'spam',
         },
-        'replica1': {
-            'NAME': 'replica1',
+        'slave1': {
+            'NAME': 'slave1',
             'ENGINE': 'django.db.backends.mysql',
             'USER': 'mysql_user',
             'PASSWORD': 'eggs',
         },
-        'replica2': {
-            'NAME': 'replica2',
+        'slave2': {
+            'NAME': 'slave2',
             'ENGINE': 'django.db.backends.mysql',
             'USER': 'mysql_user',
             'PASSWORD': 'bacon',
@@ -310,30 +309,30 @@ send queries for the ``auth`` app to ``auth_db``::
             return None
 
 And we also want a router that sends all other apps to the
-primary/replica configuration, and randomly chooses a replica to read
+master/slave configuration, and randomly chooses a slave to read
 from::
 
     import random
 
-    class PrimaryReplicaRouter(object):
+    class MasterSlaveRouter(object):
         def db_for_read(self, model, **hints):
             """
-            Reads go to a randomly-chosen replica.
+            Reads go to a randomly-chosen slave.
             """
-            return random.choice(['replica1', 'replica2'])
+            return random.choice(['slave1', 'slave2'])
 
         def db_for_write(self, model, **hints):
             """
-            Writes always go to primary.
+            Writes always go to master.
             """
-            return 'primary'
+            return 'master'
 
         def allow_relation(self, obj1, obj2, **hints):
             """
             Relations between objects are allowed if both objects are
-            in the primary/replica pool.
+            in the master/slave pool.
             """
-            db_list = ('primary', 'replica1', 'replica2')
+            db_list = ('master', 'slave1', 'slave2')
             if obj1._state.db in db_list and obj2._state.db in db_list:
                 return True
             return None
@@ -348,17 +347,17 @@ Finally, in the settings file, we add the following (substituting
 ``path.to.`` with the actual python path to the module(s) where the
 routers are defined)::
 
-    DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.PrimaryReplicaRouter']
+    DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.MasterSlaveRouter']
 
 The order in which routers are processed is significant. Routers will
 be queried in the order the are listed in the
 :setting:`DATABASE_ROUTERS` setting . In this example, the
-``AuthRouter`` is processed before the ``PrimaryReplicaRouter``, and as a
+``AuthRouter`` is processed before the ``MasterSlaveRouter``, and as a
 result, decisions concerning the models in ``auth`` are processed
 before any other decision is made. If the :setting:`DATABASE_ROUTERS`
 setting listed the two routers in the other order,
-``PrimaryReplicaRouter.allow_migrate()`` would be processed first. The
-catch-all nature of the PrimaryReplicaRouter implementation would mean
+``MasterSlaveRouter.allow_migrate()`` would be processed first. The
+catch-all nature of the MasterSlaveRouter implementation would mean
 that all models would be available on all databases.
 
 With this setup installed, lets run some Django code::
@@ -370,7 +369,7 @@ With this setup installed, lets run some Django code::
     >>> # This save will also be directed to 'auth_db'
     >>> fred.save()
 
-    >>> # These retrieval will be randomly allocated to a replica database
+    >>> # These retrieval will be randomly allocated to a slave database
     >>> dna = Person.objects.get(name='Douglas Adams')
 
     >>> # A new object has no database allocation when created
@@ -380,10 +379,10 @@ With this setup installed, lets run some Django code::
     >>> # the same database as the author object
     >>> mh.author = dna
 
-    >>> # This save will force the 'mh' instance onto the primary database...
+    >>> # This save will force the 'mh' instance onto the master database...
     >>> mh.save()
 
-    >>> # ... but if we re-retrieve the object, it will come back on a replica
+    >>> # ... but if we re-retrieve the object, it will come back on a slave
     >>> mh = Book.objects.get(title='Mostly Harmless')
 
 
@@ -443,7 +442,7 @@ Consider the following example::
 
 In statement 1, a new ``Person`` object is saved to the ``first``
 database. At this time, ``p`` doesn't have a primary key, so Django
-issues an SQL ``INSERT`` statement. This creates a primary key, and
+issues an SQL ``INSERT`` statement. This creates a master key, and
 Django assigns that primary key to ``p``.
 
 When the save occurs in statement 2, ``p`` already has a primary key
@@ -691,7 +690,7 @@ In addition, some objects are automatically created just after
   database).
 
 For common setups with multiple databases, it isn't useful to have these
-objects in more than one database. Common setups include primary/replica and
+objects in more than one database. Common setups include master/slave and
 connecting to external databases. Therefore, it's recommended:
 
 - either to run :djadmin:`migrate` only for the default database;
