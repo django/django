@@ -415,6 +415,40 @@ class OtherModelTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_ordering_pointing_to_missing_foreignkey_field(self):
+        # refs #22711
+
+        class Model(models.Model):
+            missing_fk_field = models.IntegerField()
+
+            class Meta:
+                ordering = ("missing_fk_field_id",)
+
+        errors = Model.check()
+        expected = [
+            Error(
+                "'ordering' refers to the non-existent field 'missing_fk_field_id'.",
+                hint=None,
+                obj=Model,
+                id='models.E015',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_ordering_pointing_to_existing_foreignkey_field(self):
+        # refs #22711
+
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent)
+
+            class Meta:
+                ordering = ("parent_id",)
+
+        self.assertFalse(Child.check())
+
     @override_settings(TEST_SWAPPED_MODEL_BAD_VALUE='not-a-model')
     def test_swappable_missing_app_name(self):
         class Model(models.Model):
