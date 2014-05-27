@@ -54,7 +54,7 @@ from .models import (Article, BarAccount, CustomArticle, EmptyModel, FooAccount,
     Report, MainPrepopulated, RelatedPrepopulated, UnorderedObject,
     Simple, UndeletableObject, UnchangeableObject, Choice, ShortMessage,
     Telegram, Pizza, Topping, FilteredManager, City, Restaurant, Worker,
-    ParentWithDependentChildren, Character, FieldOverridePost, Color2)
+    ParentWithDependentChildren, Character, FieldOverridePost, Color2, SpecialProfile)
 from .admin import site, site2, CityAdmin
 
 
@@ -4981,3 +4981,54 @@ class AdminGenericRelationTests(TestCase):
             validator.validate_list_filter(GenericFKAdmin, Plot)
         except ImproperlyConfigured:
             self.fail("Couldn't validate a GenericRelation -> FK path in ModelAdmin.list_filter")
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF="admin_views.urls")
+class CustomAdminWithCustomPermissionTests(TestCase):
+
+    fixtures = ['admin-views-users.xml']
+
+    def setUp(self):
+        """
+        Gets a user who is not staff and gives him a special permission
+        """
+        joe = User.objects.get(username='joepublic')
+        specialjoe = SpecialProfile(special_user=joe)
+        specialjoe.save()
+        self.client.login(username='joepublic', password='secret')
+
+    def tearDown(self):
+        self.client.logout()
+        formats.reset_format_cache()
+
+    def test_user_tools_are_diplayed_on_custom_admin(self):
+        """
+        Tests that user-tools are displayed on custom admin
+        """
+        response = self.client.get('/test_admin/admin6/')
+        self.assertContains(response, "Welcome")
+
+    def test_user_tools_not_displayed_on_logout_page(self):
+        """
+        Tests that user-tools are not displayed on logout page
+        """
+        response = self.client.get('/test_admin/admin6/logout/')
+        self.assertNotContains(response, "Welcome")
+
+    def test_user_tools_not_displayed_on_login_page(self):
+        """
+        Tests that user-tools are not displayed on login page
+        """
+        self.client.get('/test_admin/admin6/logout/')
+        response = self.client.get('/test_admin/admin6/login/')
+        self.assertNotContains(response, "Welcome")
+
+    def test_user_tools_not_displayed_when_extending_base_site(self):
+        """
+        Tests that user-tools are not displayed on templates that extends
+        base_site.html (backwards compatibility)
+        """
+        response = self.client.get('/test_extends_base_site/')
+        self.assertContains(response, "Hello!")
+        self.assertNotContains(response, "Welcome")
