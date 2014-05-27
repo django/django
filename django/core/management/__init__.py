@@ -321,7 +321,7 @@ class ManagementUtility(object):
         # These options could affect the commands that are available, so they
         # must be processed early.
         parser = LaxOptionParser(usage="%prog subcommand [options] [args]",
-                                 version=get_version(),
+                                 version=django.get_version(),
                                  option_list=BaseCommand.option_list)
         try:
             options, args = parser.parse_args(self.argv)
