@@ -1,5 +1,4 @@
 import collections
-import imp
 from importlib import import_module
 from optparse import OptionParser, NO_DEFAULT
 import os
@@ -31,45 +30,6 @@ def find_commands(management_dir):
                 if not f.startswith('_') and f.endswith('.py')]
     except OSError:
         return []
-
-
-def find_management_module(app_name):
-    """
-    Determines the path to the management module for the given app_name,
-    without actually importing the application or the management module.
-
-    Raises ImportError if the management module cannot be found for any reason.
-    """
-    # TODO: this method is only called from get_commands() which has already
-    # imported the application module at that point.
-
-    parts = app_name.split('.')
-    parts.append('management')
-    parts.reverse()
-    part = parts.pop()
-    path = None
-
-    # When using manage.py, the project module is added to the path,
-    # loaded, then removed from the path. This means that
-    # testproject.testapp.models can be loaded in future, even if
-    # testproject isn't in the path. When looking for the management
-    # module, we need look for the case where the project name is part
-    # of the app_name but the project directory itself isn't on the path.
-    try:
-        f, path, descr = imp.find_module(part, path)
-    except ImportError:
-        if os.path.basename(os.getcwd()) != part:
-            raise
-    else:
-        if f:
-            f.close()
-
-    while parts:
-        part = parts.pop()
-        f, path, descr = imp.find_module(part, [path] if path else None)
-        if f:
-            f.close()
-    return path
 
 
 def load_command_class(app_name, name):
@@ -110,14 +70,9 @@ def get_commands():
     if not settings.configured:
         return commands
 
-    app_names = [app_config.name for app_config in apps.get_app_configs()]
-
-    for app_name in reversed(app_names):
-        try:
-            path = find_management_module(app_name)
-            commands.update({name: app_name for name in find_commands(path)})
-        except ImportError:
-            pass  # No management module - ignore this app
+    for app_config in reversed(apps.get_app_configs()):
+        path = os.path.join(app_config.path, 'management')
+        commands.update({name: app_config.name for name in find_commands(path)})
 
     return commands
 
