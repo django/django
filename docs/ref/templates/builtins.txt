@@ -407,7 +407,7 @@ variables or to negate a given variable::
     {% if not athlete_list or coach_list %}
         There are no athletes or there are some coaches (OK, so
         writing English translations of boolean logic sounds
-        stupid; it's not our fault).
+        silly; it's not our fault).
     {% endif %}
 
     {% if athlete_list and not coach_list %}
