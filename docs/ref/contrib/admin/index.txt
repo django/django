@@ -1631,6 +1631,11 @@ templates used by the :class:`ModelAdmin` views:
     be interpreted as meaning that the current user is not permitted to delete
     any object of this type).
 
+.. method:: ModelAdmin.has_module_permission(request)
+
+    Should return ``True`` if adding, editing or deleting an object is 
+    permitted, ``False`` otherwise.
+
 .. method:: ModelAdmin.get_queryset(request)
 
     The ``get_queryset`` method on a ``ModelAdmin`` returns a
@@ -1909,6 +1914,7 @@ adds some of its own (the shared features are actually defined in the
 - :meth:`~ModelAdmin.has_add_permission`
 - :meth:`~ModelAdmin.has_change_permission`
 - :meth:`~ModelAdmin.has_delete_permission`
+- :meth:`~ModelAdmin.has_module_permission`
 
 The ``InlineModelAdmin`` class adds:
 

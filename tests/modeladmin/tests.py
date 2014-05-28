@@ -1518,3 +1518,71 @@ class CustomModelAdminTests(CheckTestCase):
                 validator_class = CustomValidator
 
             self.assertIsInvalid(CustomModelAdmin, ValidationTestModel, 'error!')
+
+
+class ModelAdminPermissionTests(TestCase):
+
+    class MockUser(object):
+        def has_module_perms(self, app_label):
+            if app_label == "modeladmin":
+                return True
+            return False
+
+    class MockAddUser(MockUser):
+        def has_perm(self, perm):
+            if perm == "modeladmin.add_band":
+                return True
+            return False
+
+    class MockChangeUser(MockUser):
+        def has_perm(self, perm):
+            if perm == "modeladmin.change_band":
+                return True
+            return False
+
+    class MockDeleteUser(MockUser):
+        def has_perm(self, perm):
+            if perm == "modeladmin.delete_band":
+                return True
+            return False
+
+    def test_has_add_permission(self):
+        ma = ModelAdmin(Band, AdminSite())
+        request = MockRequest()
+        request.user = self.MockAddUser()
+        self.assertTrue(ma.has_add_permission(request))
+        self.assertFalse(ma.has_change_permission(request))
+        self.assertFalse(ma.has_delete_permission(request))
+
+    def test_has_change_permission(self):
+        ma = ModelAdmin(Band, AdminSite())
+        request = MockRequest()
+        request.user = self.MockChangeUser()
+        self.assertFalse(ma.has_add_permission(request))
+        self.assertTrue(ma.has_change_permission(request))
+        self.assertFalse(ma.has_delete_permission(request))
+
+    def test_has_delete_permission(self):
+        ma = ModelAdmin(Band, AdminSite())
+        request = MockRequest()
+        request.user = self.MockDeleteUser()
+        self.assertFalse(ma.has_add_permission(request))
+        self.assertFalse(ma.has_change_permission(request))
+        self.assertTrue(ma.has_delete_permission(request))
+
+    def test_has_module_permission(self):
+        ma = ModelAdmin(Band, AdminSite())
+        request = MockRequest()
+        request.user = self.MockAddUser()
+        self.assertTrue(ma.has_module_permission(request))
+        request.user = self.MockChangeUser()
+        self.assertTrue(ma.has_module_permission(request))
+        request.user = self.MockDeleteUser()
+        self.assertTrue(ma.has_module_permission(request))
+        ma.opts.app_label = "anotherapp"
+        request.user = self.MockAddUser()
+        self.assertFalse(ma.has_module_permission(request))
+        request.user = self.MockChangeUser()
+        self.assertFalse(ma.has_module_permission(request))
+        request.user = self.MockDeleteUser()
+        self.assertFalse(ma.has_module_permission(request))
