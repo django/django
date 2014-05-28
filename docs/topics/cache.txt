@@ -222,29 +222,29 @@ won't appear in the models cache, but the model details can be used
 for routing purposes.
 
 For example, the following router would direct all cache read
-operations to ``cache_replica``, and all write operations to
-``cache_primary``. The cache table will only be synchronized onto
-``cache_primary``::
+operations to ``cache_robin``, and all write operations to
+``cache_batman``. The cache table will only be synchronized onto
+``cache_batman``::
 
     class CacheRouter(object):
         """A router to control all database cache operations"""
 
         def db_for_read(self, model, **hints):
-            "All cache read operations go to the replica"
+            "All cache read operations go to the robin"
             if model._meta.app_label in ('django_cache',):
-                return 'cache_replica'
+                return 'cache_robin'
             return None
 
         def db_for_write(self, model, **hints):
-            "All cache write operations go to primary"
+            "All cache write operations go to batman"
             if model._meta.app_label in ('django_cache',):
-                return 'cache_primary'
+                return 'cache_batman'
             return None
 
         def allow_migrate(self, db, model):
-            "Only install the cache model on primary"
+            "Only install the cache model on batman"
             if model._meta.app_label in ('django_cache',):
-                return db == 'cache_primary'
+                return db == 'cache_batman'
             return None
 
 If you don't specify routing directions for the database cache model,

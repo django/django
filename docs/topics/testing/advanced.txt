@@ -66,10 +66,10 @@ Tests and multiple databases
 
 .. _topics-testing-primaryreplica:
 
-Testing primary/replica configurations
+Testing batman/robin configurations
 --------------------------------------
 
-If you're testing a multiple database configuration with primary/replica
+If you're testing a multiple database configuration with batman/robin
 (referred to as master/slave by some databases) replication, this strategy of
 creating test databases poses a problem.
 When the test databases are created, there won't be any replication,
