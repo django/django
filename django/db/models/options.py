@@ -147,7 +147,6 @@ class Options(object):
                 # NOTE: missing virtual fields and Proxy
                 for name, f in model._meta.get_new_fields(types=DATA,
                                                           opts=INCLUDE_HIDDEN):
-                    #if f.creation_counter < 0 or 
                     is_relation = (hasattr(f, 'rel')
                                    and f.rel
                                    and not isinstance(f.rel.to, six.string_types)
