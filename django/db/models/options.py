@@ -27,6 +27,7 @@ M2M = 0b10
 
 NONE = 0b00
 LOCAL_ONLY = 0b01
+CONCRETE = 0b10
 
 
 def normalize_together(option_together):
@@ -115,9 +116,15 @@ class Options(object):
         return self.app_config is not None
 
     def get_new_fields(self, types, opts=NONE, **kwargs):
+        fields = []
         if types & DATA:
-            if opts & LOCAL_ONLY:
-                return [(f.attname, f) for f in self.local_fields]
+            fields = [(f.attname, f) for f in self.local_fields]
+            if opts & CONCRETE:
+                fields = [(n, f) for n, f in fields
+                          if f.column is not None]
+        #if not (opts & LOCAL_ONLY):
+            #pass
+        return fields
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
@@ -306,6 +313,7 @@ class Options(object):
 
     @cached_property
     def fields(self):
+        # get_fields(local=RECURSIVE)
         """
         The getter for self.fields. This returns the list of field objects
         available to this model (including through parent models).
@@ -321,13 +329,16 @@ class Options(object):
 
     @cached_property
     def concrete_fields(self):
+        # get_fields(local=RECURSIVE | CONCRETE)
         return [f for f in self.fields if f.column is not None]
 
     @cached_property
     def local_concrete_fields(self):
+        # get_fields(local=CONCRETE)
         return [f for f in self.local_fields if f.column is not None]
 
     def get_fields_with_model(self):
+        # get_fields(local=RECURSIVE)
         """
         Returns a sequence of (field, model) pairs for all fields. The "model"
         element is None for fields on the current model. Mostly of use when
@@ -340,6 +351,7 @@ class Options(object):
         return self._field_cache
 
     def get_concrete_fields_with_model(self):
+        # get_fields(local=RECURSIVE | CONCRETE)
         return [(field, model) for field, model in self.get_fields_with_model() if
                 field.column is not None]
 
@@ -356,6 +368,7 @@ class Options(object):
         self._field_name_cache = [x for x, _ in cache]
 
     def _many_to_many(self):
+        #get_fields(m2m=RECURSIVE)
         try:
             self._m2m_cache
         except AttributeError:
@@ -364,6 +377,7 @@ class Options(object):
     many_to_many = property(_many_to_many)
 
     def get_m2m_with_model(self):
+        #get_fields(m2m=RECURSIVE)
         """
         The many-to-many version of get_fields_with_model().
         """
@@ -424,6 +438,7 @@ class Options(object):
         debugging output (a list of choices), so any internal-only field names
         are not included.
         """
+        #fields = filter(lambda val: not val.endswith('+'), get_fields(m2m=RECURSIVE))
         try:
             cache = self._name_map
         except AttributeError:
@@ -463,6 +478,14 @@ class Options(object):
     def get_all_related_objects_with_model(self, local_only=False,
                                            include_hidden=False,
                                            include_proxy_eq=False):
+        #bits = LOCAL
+        #if not local_only:
+            #bits |= RECURSIVE
+        #if include_hidden:
+            #bits |= HIDDEN
+        #if include_proxy_eq:
+            #bits |= PROXY
+        #get_fields(related=bits)
         """
         Returns a list of (related-object, model) pairs. Similar to
         get_fields_with_model().
