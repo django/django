@@ -3,6 +3,7 @@ import datetime
 import binascii
 
 from django.utils import six
+from django.utils.text import force_text
 from django.db.backends.schema import BaseDatabaseSchemaEditor
 from django.db.utils import DatabaseError
 
@@ -23,8 +24,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return "'%s'" % value
         elif isinstance(value, six.string_types):
             return "'%s'" % six.text_type(value).replace("\'", "\'\'")
-        elif isinstance(value, buffer):
-            return "'%s'" % binascii.hexlify(value)
+        elif (isinstance(value, six.memoryview) or
+              six.PY3 and isinstance(value, bytes)):
+            return "'%s'" % force_text(binascii.hexlify(value))
         elif isinstance(value, bool):
             return "1" if value else "0"
         else:

@@ -259,7 +259,10 @@ WHEN (new.%(col_name)s IS NULL)
         # string instead of null, but only if the field accepts the
         # empty string.
         if value is None and field and field.empty_strings_allowed:
-            value = ''
+            if field.get_internal_type() == 'BinaryField':
+                value = bytes()  # same as '' on PY2 but different on PY3
+            else:
+                value = ''
         # Convert 1 or 0 to True or False
         elif value in (1, 0) and field and field.get_internal_type() in ('BooleanField', 'NullBooleanField'):
             value = bool(value)
