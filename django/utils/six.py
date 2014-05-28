@@ -666,6 +666,7 @@ if PY3:
     _assertRaisesRegex = "assertRaisesRegex"
     _assertRegex = "assertRegex"
     memoryview = memoryview
+    buffer_types = (bytes, bytearray, memoryview)
 else:
     _assertRaisesRegex = "assertRaisesRegexp"
     _assertRegex = "assertRegexpMatches"
@@ -676,6 +677,7 @@ else:
         memoryview = memoryview
     else:
         memoryview = buffer
+    buffer_types = (bytearray, memoryview)
 
 
 def assertRaisesRegex(self, *args, **kwargs):
