@@ -159,6 +159,8 @@ class FileSystemStorage(Storage):
         self.location = abspathu(self.base_location)
         if base_url is None:
             base_url = settings.MEDIA_URL
+        elif not base_url.endswith('/'):
+            base_url += '/'
         self.base_url = base_url
         self.file_permissions_mode = (
             file_permissions_mode if file_permissions_mode is not None
