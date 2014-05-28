@@ -43,8 +43,6 @@ import sys
 from binascii import a2b_hex, b2a_hex
 from ctypes import byref, string_at, c_char_p, c_double, c_ubyte, c_void_p
 
-from django.contrib.gis import memoryview
-
 # Getting GDAL prerequisites
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
@@ -77,7 +75,7 @@ class OGRGeometry(GDALBase):
 
         # If HEX, unpack input to a binary buffer.
         if str_instance and hex_regex.match(geom_input):
-            geom_input = memoryview(a2b_hex(geom_input.upper().encode()))
+            geom_input = six.memoryview(a2b_hex(geom_input.upper().encode()))
             str_instance = False
 
         # Constructing the geometry,
@@ -102,7 +100,7 @@ class OGRGeometry(GDALBase):
                 # (e.g., 'Point', 'POLYGON').
                 OGRGeomType(geom_input)
                 g = capi.create_geom(OGRGeomType(geom_input).num)
-        elif isinstance(geom_input, memoryview):
+        elif isinstance(geom_input, six.memoryview):
             # WKB was passed in
             g = capi.from_wkb(bytes(geom_input), None, byref(c_void_p()), len(geom_input))
         elif isinstance(geom_input, OGRGeomType):
@@ -346,7 +344,7 @@ class OGRGeometry(GDALBase):
         buf = (c_ubyte * sz)()
         capi.to_wkb(self.ptr, byteorder, byref(buf))
         # Returning a buffer of the string at the pointer.
-        return memoryview(string_at(buf, sz))
+        return six.memoryview(string_at(buf, sz))
 
     @property
     def wkt(self):
