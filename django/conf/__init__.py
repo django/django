@@ -110,12 +110,7 @@ class Settings(BaseSettings):
                 self._explicit_settings.add(setting)
 
         if not self.SECRET_KEY:
-            # Generate a random SECRET_KEY for use when DEBUG=True.
-            from django.utils.crypto import generate_secret_key
-            self.SECRET_KEY = generate_secret_key()
-
-            if not self.DEBUG:
-                raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+            raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
         if ('django.contrib.auth.middleware.AuthenticationMiddleware' in self.MIDDLEWARE_CLASSES and
                 'django.contrib.auth.middleware.SessionAuthenticationMiddleware' not in self.MIDDLEWARE_CLASSES):

@@ -77,15 +77,6 @@ def get_random_string(length=12,
     return ''.join(random.choice(allowed_chars) for i in range(length))
 
 
-def generate_secret_key():
-    """
-    Returns a secure randomly generated secret key.
-
-    """
-    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-    return get_random_string(50, chars)
-
-
 if hasattr(hmac, "compare_digest"):
     # Prefer the stdlib implementation, when available.
     def constant_time_compare(val1, val2):
