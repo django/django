@@ -194,9 +194,6 @@ class ModelBase(type):
                     base = parent
             if base is None:
                 raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
-            if (new_class._meta.local_fields or
-                    new_class._meta.local_many_to_many):
-                raise FieldError("Proxy model '%s' contains model fields." % name)
             new_class._meta.setup_proxy(base)
             new_class._meta.concrete_model = base._meta.concrete_model
         else:
@@ -1047,6 +1044,7 @@ class Model(six.with_metaclass(ModelBase)):
     def check(cls, **kwargs):
         errors = []
         errors.extend(cls._check_swappable())
+        errors.extend(cls._check_model())
         errors.extend(cls._check_managers(**kwargs))
         if not cls._meta.swapped:
             errors.extend(cls._check_fields(**kwargs))
@@ -1090,6 +1088,21 @@ class Model(six.with_metaclass(ModelBase)):
                         hint=None,
                         obj=None,
                         id='models.E002',
+                    )
+                )
+        return errors
+
+    @classmethod
+    def _check_model(cls):
+        errors = []
+        if cls._meta.proxy:
+            if cls._meta.local_fields or cls._meta.local_many_to_many:
+                errors.append(
+                    checks.Error(
+                        "Proxy model '%s' contains model fields." % cls.__name__,
+                        hint=None,
+                        obj=None,
+                        id='models.E017',
                     )
                 )
         return errors
