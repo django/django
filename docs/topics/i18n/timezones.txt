@@ -512,7 +512,7 @@ Setup
    datetimes safely, their representation should include the UTC offset, or
    their values should be in UTC (or both!).
 
-   Finally, our calendar system contains interesting traps for computers::
+   Finally, our calendar system contains interesting catches for computers::
 
        >>> import datetime
        >>> def one_year_before(value):       # DON'T DO THAT!
