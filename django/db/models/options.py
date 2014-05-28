@@ -131,6 +131,10 @@ class Options(object):
                     continue
                 fields[field.attname] = field
 
+        if types & M2M:
+            for field in self.local_many_to_many:
+                fields[field.attname] = field
+
         return tuple(fields.iteritems())
 
     def contribute_to_class(self, cls, name):
