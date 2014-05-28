@@ -31,7 +31,9 @@ Minor features
 :mod:`django.contrib.admin`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* :class:`~django.contrib.admin.ModelAdmin` now has a
+  :meth:`~django.contrib.admin.ModelAdmin.has_module_permission`
+  method to allow limiting access to the module on the admin index page.
 
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
