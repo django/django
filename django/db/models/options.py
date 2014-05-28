@@ -119,14 +119,15 @@ class Options(object):
         fields = OrderedDict()
 
         # Recursively update parent dict
-        for parent in self.parents:
-            fields.update(parent._meta.get_new_fields(types,
-                          opts, **kwargs))
+        if not (opts & LOCAL_ONLY):
+            for parent in self.parents:
+                fields.update(parent._meta.get_new_fields(types,
+                              opts, **kwargs))
 
         # Now add my own dict
         if types & DATA:
             for field in self.local_fields:
-                if (opts & LOCAL_ONLY) and field.column is None:
+                if (opts & CONCRETE) and field.column is None:
                     continue
                 fields[field.attname] = field
 
