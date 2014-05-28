@@ -738,7 +738,7 @@ class BaseDatabaseFeatures(object):
     # Suffix for backends that don't support "SELECT xxx;" queries.
     bare_select_suffix = ''
 
-    uppercases_column_names = True
+    uppercases_column_names = False
 
     def __init__(self, connection):
         self.connection = connection
