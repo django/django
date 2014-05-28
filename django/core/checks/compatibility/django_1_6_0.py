@@ -43,8 +43,8 @@ def check_boolean_field_default_value():
             "%s." % fieldnames,
             "In Django 1.6 the default value of BooleanField was changed from",
             "False to Null when Field.default isn't defined. See",
-            "https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield"
-            "for more information."
+            "https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield",
+            "for more information.",
         ]
         return ' '.join(message)
 
