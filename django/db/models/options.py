@@ -116,15 +116,21 @@ class Options(object):
         return self.app_config is not None
 
     def get_new_fields(self, types, opts=NONE, **kwargs):
-        fields = []
+        fields = OrderedDict()
+
+        # Recursively update parent dict
+        for parent in self.parents:
+            fields.update(parent._meta.get_new_fields(types,
+                          opts, **kwargs))
+
+        # Now add my own dict
         if types & DATA:
-            fields = [(f.attname, f) for f in self.local_fields]
-            if opts & CONCRETE:
-                fields = [(n, f) for n, f in fields
-                          if f.column is not None]
-        #if not (opts & LOCAL_ONLY):
-            #pass
-        return fields
+            for field in self.local_fields:
+                if (opts & LOCAL_ONLY) and field.column is None:
+                    continue
+                fields[field.attname] = field
+
+        return tuple(fields.iteritems())
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
