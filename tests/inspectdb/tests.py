@@ -176,7 +176,7 @@ class InspectDBTestCase(TestCase):
         out = StringIO()
         call_command('inspectdb', stdout=out)
         output = out.getvalue()
-        base_name = 'field' if not connection.features.uppercases_column_names else 'Field'
+        base_name = 'Field' if not connection.features.uppercases_column_names else 'field'
         self.assertIn("field = models.IntegerField()", output)
         self.assertIn("field_field = models.IntegerField(db_column='%s_')" % base_name, output)
         self.assertIn("field_field_0 = models.IntegerField(db_column='%s__')" % base_name, output)
