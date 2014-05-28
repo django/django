@@ -22,12 +22,14 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save')
 
-DATA = 0b01
-M2M = 0b10
+DATA = 0b001
+M2M = 0b010
+RELATED_OBJECTS = 0b100
 
 NONE = 0b00
-LOCAL_ONLY = 0b01
-CONCRETE = 0b10
+LOCAL_ONLY = 0b001
+CONCRETE = 0b010
+INCLUDE_HIDDEN = 0b100
 
 
 def normalize_together(option_together):
@@ -115,6 +117,11 @@ class Options(object):
     def installed(self):
         return self.app_config is not None
 
+    def get_non_swapped_models(self, include_auto_created=True):
+        apps = self.apps.get_models(include_auto_created=
+                                    include_auto_created)
+        return filter(lambda a: not a._meta.swapped, apps)
+
     def get_new_fields(self, types, opts=NONE, **kwargs):
         fields = OrderedDict()
 
@@ -134,6 +141,20 @@ class Options(object):
         if types & M2M:
             for field in self.local_many_to_many:
                 fields[field.attname] = field
+
+        if types & RELATED_OBJECTS:
+            for model in self.get_non_swapped_models(True):
+                # NOTE: missing virtual fields and Proxy
+                for name, f in model._meta.get_new_fields(types=DATA,
+                                                          opts=INCLUDE_HIDDEN):
+                    #if f.creation_counter < 0 or 
+                    is_relation = (hasattr(f, 'rel')
+                                   and f.rel
+                                   and not isinstance(f.rel.to, six.string_types)
+                                   and f.generate_reverse_relation)
+
+                    if is_relation and f.rel.to._meta == self:
+                        fields[f.attname] = f.related
 
         return tuple(fields.iteritems())
 

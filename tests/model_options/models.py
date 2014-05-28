@@ -31,3 +31,12 @@ class Group(models.Model):
 
 class Quartet(Group):
     pass
+
+
+@python_2_unicode_compatible
+class OwnedVenue(models.Model):
+    name = models.CharField(max_length=30)
+    group = models.ForeignKey(Group)
+
+    def __str__(self):
+        return self.name
