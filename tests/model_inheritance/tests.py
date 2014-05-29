@@ -69,7 +69,7 @@ class ModelInheritanceTests(TestCase):
         # access to the fields of their ancestors.
         # Create a couple of Places.
         Place.objects.create(name="Master Shakes", address="666 W. Jersey")
-        Place.objects.create(name="Ace Harware", address="1013 N. Ashland")
+        Place.objects.create(name="Ace Hardware", address="1013 N. Ashland")
 
         # Test constructor for Restaurant.
         r = Restaurant.objects.create(

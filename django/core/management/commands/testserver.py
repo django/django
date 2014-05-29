@@ -11,7 +11,7 @@ class Command(BaseCommand):
             type='string', default='',
             help='port number or ipaddr:port to run the server on'),
         make_option('--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
-            help='Tells Django to use a IPv6 address.'),
+            help='Tells Django to use an IPv6 address.'),
     )
     help = 'Runs a development server with data from the given fixture(s).'
     args = '[fixture ...]'

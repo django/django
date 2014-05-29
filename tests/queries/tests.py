@@ -1710,7 +1710,7 @@ class NullableRelOrderingTests(TestCase):
         qs = qs.order_by('others__single__name')
         # The ordering by others__single__pk will add one new join (to single)
         # and that join must be LEFT join. The already existing join to related
-        # objects must be kept INNER. So, we have both a INNER and a LEFT join
+        # objects must be kept INNER. So, we have both an INNER and a LEFT join
         # in the query.
         self.assertEqual(str(qs.query).count('LEFT'), 1)
         self.assertEqual(str(qs.query).count('INNER'), 1)

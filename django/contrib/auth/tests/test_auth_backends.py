@@ -373,7 +373,7 @@ class NoBackendsTest(TestCase):
 @skipIfCustomUser
 class InActiveUserBackendTest(TestCase):
     """
-    Tests for a inactive user
+    Tests for an inactive user
     """
     backend = 'django.contrib.auth.tests.test_auth_backends.SimpleRowlevelBackend'
 

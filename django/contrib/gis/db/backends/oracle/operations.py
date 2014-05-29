@@ -233,7 +233,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
         "Returns the SQL WHERE clause for use in Oracle spatial SQL construction."
         geo_col, db_type = lvalue
 
-        # See if a Oracle Geometry function matches the lookup type next
+        # See if an Oracle Geometry function matches the lookup type next
         lookup_info = self.geometry_functions.get(lookup_type, False)
         if lookup_info:
             # Lookup types that are tuples take tuple arguments, e.g., 'relate' and

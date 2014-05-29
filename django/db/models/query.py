@@ -1780,7 +1780,7 @@ def prefetch_related_objects(result_cache, related_lookups):
                 # Last one, this *must* resolve to something that supports
                 # prefetching, otherwise there is no point adding it and the
                 # developer asking for it has made a mistake.
-                raise ValueError("'%s' does not resolve to a item that supports "
+                raise ValueError("'%s' does not resolve to an item that supports "
                                  "prefetching - this is an invalid parameter to "
                                  "prefetch_related()." % lookup.prefetch_through)
 

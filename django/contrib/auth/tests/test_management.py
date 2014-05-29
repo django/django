@@ -229,7 +229,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertEqual(command_output, 'Superuser created successfully.')
 
     def test_verbosity_zero(self):
-        # We can supress output on the management command
+        # We can suppress output on the management command
         new_io = six.StringIO()
         call_command(
             "createsuperuser",

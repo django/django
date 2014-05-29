@@ -373,7 +373,7 @@ class ReverseShortcutTests(TestCase):
 
     def test_reverse_by_path_nested(self):
         # Views that are added to urlpatterns using include() should be
-        # reversable by doted path.
+        # reversible by doted path.
         self.assertEqual(reverse('urlpatterns_reverse.views.nested_view'), '/includes/nested_path/')
 
     def test_redirect_view_object(self):
@@ -439,7 +439,7 @@ class NamespaceTests(TestCase):
         self.assertEqual('/ns-included1/+%5C$*/', reverse('inc-ns1:inc-special-view'))
 
     def test_namespace_pattern_with_variable_prefix(self):
-        "When using a include with namespaces when there is a regex variable in front of it"
+        "When using an include with namespaces when there is a regex variable in front of it"
         self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', kwargs={'outer': 42}))
         self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', args=[42]))
         self.assertEqual('/ns-outer/42/normal/37/4/', reverse('inc-outer:inc-normal-view', kwargs={'outer': 42, 'arg1': 37, 'arg2': 4}))
