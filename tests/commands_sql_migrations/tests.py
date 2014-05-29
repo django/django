@@ -20,7 +20,7 @@ class SQLCommandsMigrationsTestCase(TestCase):
     def test_sql_delete(self):
         app_config = apps.get_app_config('commands_sql_migrations')
         with self.assertRaises(CommandError):
-            sql_delete(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
+            sql_delete(app_config, no_style(), connections[DEFAULT_DB_ALIAS], close_connection=False)
 
     def test_sql_indexes(self):
         app_config = apps.get_app_config('commands_sql_migrations')
