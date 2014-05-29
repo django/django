@@ -12,29 +12,34 @@ class RecorderTests(TestCase):
     Tests recording migrations as applied or not.
     """
 
+    def _filter_contrib(self, applied_set):
+        """Filter out contrib app migrations from applied_set"""
+        return set(item for item in applied_set if item[0] not in (
+            'admin', 'auth', 'flatpages', 'redirects', 'sessions', 'sites'))
+
     def test_apply(self):
         """
         Tests marking migrations as applied/unapplied.
         """
         recorder = MigrationRecorder(connection)
         self.assertEqual(
-            recorder.applied_migrations(),
+            self._filter_contrib(recorder.applied_migrations()),
             set(),
         )
         recorder.record_applied("myapp", "0432_ponies")
         self.assertEqual(
-            recorder.applied_migrations(),
+            self._filter_contrib(recorder.applied_migrations()),
             set([("myapp", "0432_ponies")]),
         )
         # That should not affect records of another database
         recorder_other = MigrationRecorder(connections['other'])
         self.assertEqual(
-            recorder_other.applied_migrations(),
+            self._filter_contrib(recorder_other.applied_migrations()),
             set(),
         )
         recorder.record_unapplied("myapp", "0432_ponies")
         self.assertEqual(
-            recorder.applied_migrations(),
+            self._filter_contrib(recorder.applied_migrations()),
             set(),
         )
 
@@ -89,6 +94,7 @@ class LoaderTests(TestCase):
         self.assertEqual(
             migration_loader.graph.forwards_plan(("migrations", "0001_initial")),
             [
+                ("auth", "initial"),
                 ("migrations", "0001_initial"),
             ],
         )
@@ -136,14 +142,14 @@ class LoaderTests(TestCase):
         recorder = MigrationRecorder(connection)
         # Loading with nothing applied should just give us the one node
         self.assertEqual(
-            len(migration_loader.graph.nodes),
+            len([key for key in migration_loader.graph.nodes.keys() if key[0] == 'migrations']),
             1,
         )
         # However, fake-apply one migration and it should now use the old two
         recorder.record_applied("migrations", "0001_initial")
         migration_loader.build_graph()
         self.assertEqual(
-            len(migration_loader.graph.nodes),
+            len([key for key in migration_loader.graph.nodes.keys() if key[0] == 'migrations']),
             2,
         )
         recorder.flush()
