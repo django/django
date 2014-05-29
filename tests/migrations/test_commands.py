@@ -413,3 +413,38 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertIn("migrations.AddField(", stdout.getvalue())
         self.assertIn("model_name='sillymodel',", stdout.getvalue())
         self.assertIn("name='silly_char',", stdout.getvalue())
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_path_doesnt_exist.foo.bar"})
+    def test_makemigrations_migrations_modules_path_not_exist(self):
+        """
+        Ticket #22682 -- Makemigrations fails when specifying custom location
+        for migration files (using MIGRATION_MODULES) if the custom path
+        doesn't already exist.
+        """
+
+        class SillyModel(models.Model):
+            silly_field = models.BooleanField(default=False)
+
+            class Meta:
+                app_label = "migrations"
+
+        stdout = six.StringIO()
+        call_command("makemigrations", "migrations", stdout=stdout)
+
+        # Command output indicates the migration is created.
+        self.assertIn(" - Create model SillyModel", stdout.getvalue())
+
+        # Migrations file is actually created in the expected path.
+        self.assertTrue(os.path.isfile(os.path.join(self.test_dir,
+                       "test_migrations_path_doesnt_exist", "foo", "bar",
+                       "0001_initial.py")))
+
+        os.chdir(self.test_dir)
+        try:
+            self._rmrf(os.path.join(self.test_dir,
+                       "test_migrations_path_doesnt_exist"))
+            pass
+        except OSError:
+            pass
+        os.chdir(self._cwd)
