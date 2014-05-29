@@ -165,7 +165,7 @@ class ModelInheritanceTest(TestCase):
             serves_hot_dogs=True,
             serves_pizza=False)
 
-        # This should delete both Restuarants, plus the related places, plus
+        # This should delete both Restaurants, plus the related places, plus
         # the ItalianRestaurant.
         Restaurant.objects.all().delete()
 

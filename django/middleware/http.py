@@ -3,7 +3,7 @@ from django.utils.http import http_date, parse_http_date_safe
 
 class ConditionalGetMiddleware(object):
     """
-    Handles conditional GET operations. If the response has a ETag or
+    Handles conditional GET operations. If the response has an ETag or
     Last-Modified header, and the request has If-None-Match or
     If-Modified-Since, the response is replaced by an HttpNotModified.
 

@@ -647,7 +647,7 @@ class QueryTestCase(TestCase):
 
         new_bob_profile = UserProfile(flavor="spring surprise")
 
-        # assigning a profile requires a explicit pk as the object isn't saved
+        # assigning a profile requires an explicit pk as the object isn't saved
         charlie = User(pk=51, username='charlie', email='charlie@example.com')
         charlie.set_unusable_password()
 

@@ -79,7 +79,7 @@ class Field(object):
         #                   messages that the field will raise.
         # show_hidden_initial -- Boolean that specifies if it is needed to render a
         #                        hidden widget with initial value after widget.
-        # validators -- List of addtional validators to use
+        # validators -- List of additional validators to use
         # localize -- Boolean that specifies if the field should be localized.
         self.required, self.label, self.initial = required, label, initial
         self.show_hidden_initial = show_hidden_initial

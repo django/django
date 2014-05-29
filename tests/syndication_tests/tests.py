@@ -386,7 +386,7 @@ class SyndicationFeedTest(FeedTestCase):
 
     def test_item_link_error(self):
         """
-        Test that a ImproperlyConfigured is raised if no link could be found
+        Test that an ImproperlyConfigured is raised if no link could be found
         for the item(s).
         """
         self.assertRaises(ImproperlyConfigured,
