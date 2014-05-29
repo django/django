@@ -151,14 +151,15 @@ class Options(object):
                     fields[field.attname] = field
 
         if types & RELATED_OBJECTS:
-            fields = OrderedDict()
-            for parent in self.parents:
-                for obj, name in parent._meta.get_new_fields(
-                        types=RELATED_OBJECTS,
-                        opts=INCLUDE_HIDDEN,
-                        inversed_order=True):
-                    if self._validate_related_object(obj):
-                        fields[obj] = obj.field.attname
+            related_fields = OrderedDict()
+            if not (opts & LOCAL_ONLY):
+                for parent in self.parents:
+                    for obj, name in parent._meta.get_new_fields(
+                            types=RELATED_OBJECTS,
+                            opts=INCLUDE_HIDDEN,
+                            inversed_order=True):
+                        if self._validate_related_object(obj):
+                            related_fields[obj] = obj.field.attname
 
             for model in self.get_non_swapped_models(True):
                 # NOTE: missing virtual fields

@@ -91,9 +91,12 @@ class OptionsTests(test.TestCase):
 
         self.assertEquals(uniq_new_fields, uniq_old_fields)
 
-    #def test_related_objects_local_only(self):
-        #old_fields = Quartet._meta.get_all_related_objects_with_model(
-            #True, False, False)
-        #new_fields = Quartet._meta.get_new_fields(types=RELATED_OBJECTS,
-                                                  #opts=LOCAL_ONLY)
-        #self.assertEquals(old_fields, new_fields)
+    def test_related_objects_local_only(self):
+        old_fields = Quartet._meta.get_all_related_objects_with_model(
+            True, False, False)
+        new_fields = Quartet._meta.get_new_fields(types=RELATED_OBJECTS,
+                                                  opts=LOCAL_ONLY)
+        uniq_old_fields = [x for x, y in old_fields]
+        uniq_new_fields = [y for x, y in new_fields]
+
+        self.assertEquals(uniq_new_fields, uniq_old_fields)
