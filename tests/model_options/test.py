@@ -1,13 +1,16 @@
 from django import test
 
 from django.contrib.auth.models import (
-    User, Permission, Group
+    User, Permission
 )
 from django.db.models.options import (
-    DATA, LOCAL_ONLY, M2M, CONCRETE, RELATED_OBJECTS, INCLUDE_PROXY
+    DATA, LOCAL_ONLY, M2M, CONCRETE, RELATED_OBJECTS, INCLUDE_PROXY,
+    RELATED_M2M
 )
 
-from .models import Person, Quartet, Group, Reporter
+from .models import (
+    Person, Quartet, Group, Reporter, Musician
+)
 
 
 class OptionsTests(test.TestCase):
@@ -69,7 +72,7 @@ class OptionsTests(test.TestCase):
         self.assertEquals(uniq_new_fields, uniq_old_fields)
 
     def test_related_objects_contrib_auth(self):
-        models = [User, Permission, Group]
+        models = [User, Permission]
         for M in models:
             old_fields = M._meta.get_all_related_objects_with_model(
                 False, False, False)
@@ -100,3 +103,9 @@ class OptionsTests(test.TestCase):
         uniq_new_fields = [y for x, y in new_fields]
 
         self.assertEquals(uniq_new_fields, uniq_old_fields)
+
+    def test_related_m2m_objects(self):
+        old_fields = Musician._meta.get_all_related_many_to_many_objects()
+        new_fields = Musician._meta.get_new_fields(types=RELATED_M2M)
+        uniq_new_fields = [y for x, y in new_fields]
+        self.assertEquals(uniq_new_fields, old_fields)
