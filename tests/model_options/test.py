@@ -47,12 +47,14 @@ class OptionsTests(test.TestCase):
         self.assertEquals(old_fields, [x[1] for x in new_fields])
 
     def test_related_objects(self):
+        del Group._meta._related_objects_cache
+        del Group._meta._related_objects_proxy_cache
         old_fields = Group._meta.get_all_related_objects_with_model(
             False, False, False)
         new_fields = Group._meta.get_new_fields(types=RELATED_OBJECTS)
 
-        uniq_old_fields = set([x for x, y in old_fields])
-        uniq_new_fields = set([y for x, y in new_fields])
+        uniq_old_fields = [x for x, y in old_fields]
+        uniq_new_fields = [y for x, y in new_fields]
 
         self.assertEquals(uniq_new_fields, uniq_old_fields)
 
@@ -61,8 +63,8 @@ class OptionsTests(test.TestCase):
             False, False, False)
         new_fields = Quartet._meta.get_new_fields(types=RELATED_OBJECTS)
 
-        uniq_old_fields = set([x for x, y in old_fields])
-        uniq_new_fields = set([y for x, y in new_fields])
+        uniq_old_fields = [x for x, y in old_fields]
+        uniq_new_fields = [y for x, y in new_fields]
 
         self.assertEquals(uniq_new_fields, uniq_old_fields)
 
@@ -73,8 +75,8 @@ class OptionsTests(test.TestCase):
                 False, False, False)
             new_fields = M._meta.get_new_fields(types=RELATED_OBJECTS)
 
-            uniq_old_fields = set([x for x, y in old_fields])
-            uniq_new_fields = set([y for x, y in new_fields])
+            uniq_old_fields = [x for x, y in old_fields]
+            uniq_new_fields = [y for x, y in new_fields]
 
             self.assertEquals(uniq_new_fields, uniq_old_fields)
 
@@ -84,8 +86,8 @@ class OptionsTests(test.TestCase):
         new_fields = Reporter._meta.get_new_fields(
                         types=RELATED_OBJECTS, opts=INCLUDE_PROXY)
 
-        uniq_old_fields = set([x for x, y in old_fields])
-        uniq_new_fields = set([y for x, y in new_fields])
+        uniq_old_fields = [x for x, y in old_fields]
+        uniq_new_fields = [y for x, y in new_fields]
 
         self.assertEquals(uniq_new_fields, uniq_old_fields)
 

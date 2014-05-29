@@ -127,10 +127,11 @@ class Options(object):
         fields = OrderedDict()
 
         # Recursively update parent dict
-        if not (opts & LOCAL_ONLY):
-            for parent in self.parents:
-                fields.update(parent._meta.get_new_fields(types,
-                              opts, **kwargs))
+        if not (types & RELATED_OBJECTS):
+            if not (opts & LOCAL_ONLY):
+                for parent in self.parents:
+                    fields.update(parent._meta.get_new_fields(types,
+                                  opts, **kwargs))
 
         # Now add my own dict
         if types & DATA:
@@ -149,17 +150,19 @@ class Options(object):
             fields = OrderedDict()
 
             for parent in self.parents:
-                for name, obj in parent._meta.get_new_fields(
-                        types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN):
+                for obj, name in parent._meta.get_new_fields(
+                        types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN,
+                        inversed_order=True):
                     if not ((obj.field.creation_counter < 0
                             or obj.field.rel.parent_link)
                             and obj.model not in parent_list):
-                        fields[obj.field.attname] = obj
+                        fields[obj] = obj.field.attname
 
             for model in self.get_non_swapped_models(True):
-                # NOTE: missing virtual fields and Proxy
+                # NOTE: missing virtual fields
                 for name, f in model._meta.get_new_fields(types=DATA,
-                                                          opts=INCLUDE_HIDDEN):
+                                                          opts=INCLUDE_HIDDEN,
+                                                          inversed_order=True):
                     is_relation = (hasattr(f, 'rel')
                                    and f.rel
                                    and not isinstance(f.rel.to, six.string_types)
@@ -168,15 +171,15 @@ class Options(object):
                     if is_relation:
                         to_meta = f.rel.to._meta
                         if to_meta == self:
-                            print "adding %s NEW" % f.attname
                             fields[f.related] = f.attname
                         elif self.concrete_model == to_meta.concrete_model:
-                            print "adding %s NEW" % f.attname
                             fields[f.related] = f.attname
 
             if not opts & INCLUDE_HIDDEN:
                 fields = OrderedDict([(k, v) for k, v in fields.items() if not k.field.rel.is_hidden()])
-            fields = OrderedDict([(v, k) for k, v in fields.items()])
+
+            if not 'inversed_order' in kwargs:
+                fields = OrderedDict([(v, k) for k, v in fields.items()])
 
         return tuple(fields.iteritems())
 
