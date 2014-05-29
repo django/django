@@ -2631,6 +2631,12 @@ aggregate functions, see
     aggregation on date/time fields in SQLite will raise
     ``NotImplementedError``.
 
+.. admonition:: Note
+
+    Aggregation functions will return ``None`` when used with an empty
+    ``QuerySet``. For example, the ``Count`` aggregation function will return
+    ``None`` instead of ``0`` if the ``QuerySet`` contains no entries.
+
 Avg
 ~~~
 
