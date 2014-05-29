@@ -9,11 +9,12 @@ from django.apps import apps
 from django.conf import settings
 from django.core.management.base import CommandError
 from django.db import models, router
-from django.db.migrations.loader import MigrationLoader
 from django.utils.deprecation import RemovedInDjango19Warning
 
 
 def check_for_migrations(app_config, connection):
+    # Inner import to stop tests failing
+    from django.db.migrations.loader import MigrationLoader
     loader = MigrationLoader(connection)
     if app_config.label in loader.migrated_apps:
         raise CommandError("App '%s' has migrations. Only the sqlmigrate and sqlflush commands can be used when an app has migrations." % app_config.label)
