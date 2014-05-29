@@ -169,15 +169,18 @@ class Options(object):
                     if has_rel_attr and f.has_class_relation():
                         to_meta = f.rel.to._meta
                         if to_meta == self:
-                            fields[f.related] = f.attname
+                            related_fields[f.related] = f.attname
                         elif self.concrete_model == to_meta.concrete_model:
-                            fields[f.related] = f.attname
+                            related_fields[f.related] = f.attname
 
             if not opts & INCLUDE_HIDDEN:
-                fields = OrderedDict([(k, v) for k, v in fields.items() if not k.field.rel.is_hidden()])
+                related_fields = OrderedDict([(k, v) for k, v in related_fields.items()
+                                              if not k.field.rel.is_hidden()])
 
             if 'inversed_order' not in kwargs:
-                fields = OrderedDict([(v, k) for k, v in fields.items()])
+                related_fields = OrderedDict([(v, k) for k, v in related_fields.items()])
+
+            fields.update(related_fields)
 
         return tuple(fields.iteritems())
 
