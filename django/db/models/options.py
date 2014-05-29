@@ -163,12 +163,8 @@ class Options(object):
                 for name, f in model._meta.get_new_fields(types=DATA,
                                                           opts=INCLUDE_HIDDEN,
                                                           inversed_order=True):
-                    is_relation = (hasattr(f, 'rel')
-                                   and f.rel
-                                   and not isinstance(f.rel.to, six.string_types)
-                                   and f.generate_reverse_relation)
-
-                    if is_relation:
+                    has_rel_attr = hasattr(f, 'rel') and f.rel
+                    if has_rel_attr and f.has_class_relation():
                         to_meta = f.rel.to._meta
                         if to_meta == self:
                             fields[f.related] = f.attname
