@@ -787,9 +787,20 @@ Composite widgets
         .. versionadded:: 1.8
 
         If the :class:`~django.forms.DateField` is not required,
-        :class:`SelectDateWidget` will have an empty choice at the top of
-        the list. You can change the text of this label
-        (which is ``---`` by default) with the ``empty_label`` attribute::
+        :class:`SelectDateWidget` will have an empty choice at the top of the
+        list (which is ``---`` by default). You can change the text of this
+        label with the ``empty_label`` attribute. ``empty_label`` can be a
+        ``string``, ``list``, or ``tuple``. When a string is used, all select
+        boxes will each have an empty choice with this label. If ``empty_label``
+        is a ``list`` or ``tuple`` of 3 string elements, the select boxes will
+        have their own custom label. The labels should be in this order
+        ``('year_label', 'month_label', 'day_label')``.
 
-            # A custom empty label
+        .. code-block:: python
+
+            # A custom empty label with string
             field1 = forms.DateField(widget=SelectDateWidget(empty_label="Nothing"))
+
+            # A custom empty label with tuple
+            field1 = forms.DateField(widget=SelectDateWidget(
+                empty_label=("Choose Year", "Choose Month", "Choose Day"))

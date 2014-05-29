@@ -64,8 +64,21 @@ class SelectDateWidget(Widget):
         else:
             self.months = MONTHS
 
-        if empty_label is not None:
-            self.none_value = (0, empty_label)
+        # Optional string, list, or tuple to use as empty_label.
+        if isinstance(empty_label, (list, tuple)):
+            if not len(empty_label) == 3:
+                raise ValueError('empty_label list/tuple must have 3 elements.')
+
+            self.year_none_value = (0, empty_label[0])
+            self.month_none_value = (0, empty_label[1])
+            self.day_none_value = (0, empty_label[2])
+        else:
+            if empty_label is not None:
+                self.none_value = (0, empty_label)
+
+            self.year_none_value = self.none_value
+            self.month_none_value = self.none_value
+            self.day_none_value = self.none_value
 
     def render(self, name, value, attrs=None):
         try:
@@ -86,11 +99,11 @@ class SelectDateWidget(Widget):
                         year_val, month_val, day_val = [int(v) for v in match.groups()]
         html = {}
         choices = [(i, i) for i in self.years]
-        html['year'] = self.create_select(name, self.year_field, value, year_val, choices)
+        html['year'] = self.create_select(name, self.year_field, value, year_val, choices, self.year_none_value)
         choices = list(six.iteritems(self.months))
-        html['month'] = self.create_select(name, self.month_field, value, month_val, choices)
+        html['month'] = self.create_select(name, self.month_field, value, month_val, choices, self.month_none_value)
         choices = [(i, i) for i in range(1, 32)]
-        html['day'] = self.create_select(name, self.day_field, value, day_val, choices)
+        html['day'] = self.create_select(name, self.day_field, value, day_val, choices, self.day_none_value)
 
         output = []
         for field in _parse_date_fmt():
@@ -123,13 +136,13 @@ class SelectDateWidget(Widget):
                 return '%s-%s-%s' % (y, m, d)
         return data.get(name, None)
 
-    def create_select(self, name, field, value, val, choices):
+    def create_select(self, name, field, value, val, choices, none_value):
         if 'id' in self.attrs:
             id_ = self.attrs['id']
         else:
             id_ = 'id_%s' % name
         if not self.is_required:
-            choices.insert(0, self.none_value)
+            choices.insert(0, none_value)
         local_attrs = self.build_attrs(id=field % id_)
         s = Select(choices=choices)
         select_html = s.render(field % name, val, local_attrs)
