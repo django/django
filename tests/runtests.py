@@ -87,7 +87,7 @@ def get_installed():
 
 
 def setup(verbosity, test_labels):
-    from django.apps import apps, AppConfig
+    from django.apps import apps
     from django.conf import settings
     from django.test import TransactionTestCase, TestCase
 
