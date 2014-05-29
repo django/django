@@ -168,12 +168,15 @@ class Options(object):
                     if is_relation:
                         to_meta = f.rel.to._meta
                         if to_meta == self:
-                            fields[f.attname] = f.related
+                            print "adding %s NEW" % f.attname
+                            fields[f.related] = f.attname
                         elif self.concrete_model == to_meta.concrete_model:
-                            fields[f.attname] = f.related
+                            print "adding %s NEW" % f.attname
+                            fields[f.related] = f.attname
 
             if not opts & INCLUDE_HIDDEN:
-                fields = OrderedDict([(k, v) for k, v in fields.items() if not v.field.rel.is_hidden()])
+                fields = OrderedDict([(k, v) for k, v in fields.items() if not k.field.rel.is_hidden()])
+            fields = OrderedDict([(v, k) for k, v in fields.items()])
 
         return tuple(fields.iteritems())
 
