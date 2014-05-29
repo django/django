@@ -373,7 +373,7 @@ class ReverseShortcutTests(TestCase):
 
     def test_reverse_by_path_nested(self):
         # Views that are added to urlpatterns using include() should be
-        # reversible by doted path.
+        # reversible by dotted path.
         self.assertEqual(reverse('urlpatterns_reverse.views.nested_view'), '/includes/nested_path/')
 
     def test_redirect_view_object(self):
