@@ -142,7 +142,19 @@ class Options(object):
             for field in self.local_many_to_many:
                 fields[field.attname] = field
 
+        # RESET HERE!
         if types & RELATED_OBJECTS:
+            parent_list = self.get_parent_list()
+            fields = OrderedDict()
+
+            for parent in self.parents:
+                for name, obj in parent._meta.get_new_fields(
+                        types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN):
+                    if not ((obj.field.creation_counter < 0
+                            or obj.field.rel.parent_link)
+                            and obj.model not in parent_list):
+                        fields[obj.field.attname] = obj
+
             for model in self.get_non_swapped_models(True):
                 # NOTE: missing virtual fields and Proxy
                 for name, f in model._meta.get_new_fields(types=DATA,
@@ -154,6 +166,9 @@ class Options(object):
 
                     if is_relation and f.rel.to._meta == self:
                         fields[f.attname] = f.related
+
+            if not opts & INCLUDE_HIDDEN:
+                fields = OrderedDict([(k, v) for k, v in fields.items() if not v.field.rel.is_hidden()])
 
         return tuple(fields.iteritems())
 
