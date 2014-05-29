@@ -22,9 +22,10 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save')
 
-DATA = 0b001
-M2M = 0b010
-RELATED_OBJECTS = 0b100
+DATA = 0b0001
+M2M = 0b0010
+RELATED_OBJECTS = 0b0100
+RELATED_M2M = 0b1000
 
 # Aggregates
 NON_RELATED_FIELDS = DATA | M2M
@@ -150,8 +151,31 @@ class Options(object):
                 for field in self.local_many_to_many:
                     fields[field.attname] = field
 
+        if types & RELATED_M2M:
+            related_m2m_fields = OrderedDict()
+            for parent in self.parents:
+                for obj, name in parent._meta.get_new_fields(types=RELATED_M2M,
+                                                             inversed_order=True):
+                    is_valid = not (obj.field.creation_counter < 0
+                                and obj.model not in self.get_parent_list())
+                    if is_valid:
+                        related_m2m_fields[obj] = obj.field.attname
+
+            for model in self.get_non_swapped_models(False):
+                for name, f in model._meta.get_new_fields(types=M2M,
+                                                          inversed_order=True):
+                    has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
+                    if has_rel_attr and self == f.rel.to._meta:
+                        related_m2m_fields[f.related] = f.attname
+
+            if 'inversed_order' not in kwargs:
+                related_m2m_fields = OrderedDict([(v, k) for k, v in related_m2m_fields.items()])
+
+            fields.update(related_m2m_fields)
+
         if types & RELATED_OBJECTS:
             related_fields = OrderedDict()
+            # ERROR? check
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
                     for obj, name in parent._meta.get_new_fields(
