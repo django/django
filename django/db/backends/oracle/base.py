@@ -260,7 +260,7 @@ WHEN (new.%(col_name)s IS NULL)
         # empty string.
         if value is None and field and field.empty_strings_allowed:
             if field.get_internal_type() == 'BinaryField':
-                value = bytes()  # same as '' on PY2 but different on PY3
+                value = b''
             else:
                 value = ''
         # Convert 1 or 0 to True or False
