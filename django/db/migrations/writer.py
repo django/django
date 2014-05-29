@@ -6,6 +6,7 @@ import decimal
 import collections
 from importlib import import_module
 import os
+import sys
 import types
 
 from django.apps import apps
@@ -158,7 +159,18 @@ class MigrationWriter(object):
             if '%s.%s' % (app_config.name, migrations_package_basename) == migrations_package_name:
                 basedir = os.path.join(app_config.path, migrations_package_basename)
             else:
-                raise ImportError("Cannot open migrations module %s for app %s" % (migrations_package_name, self.migration.app_label))
+                # In case of using MIGRATION_MODULES setting and the custom
+                # package doesn't exist, create one.
+                package_dirs = migrations_package_name.split(".")
+                create_path = os.path.join(sys.path[0], *package_dirs)
+                if not os.path.isdir(create_path):
+                    os.makedirs(create_path)
+                for i in range(1, len(package_dirs) + 1):
+                    init_dir = os.path.join(sys.path[0], *package_dirs[:i])
+                    init_path = os.path.join(init_dir, "__init__.py")
+                    if not os.path.isfile(init_path):
+                        open(init_path, "w").close()
+                return os.path.join(create_path, self.filename)
         return os.path.join(basedir, self.filename)
 
     @classmethod
