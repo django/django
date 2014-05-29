@@ -128,14 +128,133 @@ class MigrationAutodetector(object):
         self.generate_altered_unique_together()
         self.generate_altered_index_together()
 
+        # Now, reordering to make things possible. The order we have already
+        # isn't bad, but we need to pull a few things around so FKs work nicely
+        # inside the same app
+        for app_label, ops in self.generated_operations.items():
+            while True:
+                found = False
+                for i, op in enumerate(ops):
+                    for dep in op._auto_deps:
+                        if dep[0] == app_label:
+                            # Alright, there's a dependency on the same app.
+                            for j, op2 in enumerate(ops):
+                                if self.check_dependency(op2, dep) and j > i:
+                                    ops = ops[:i] + ops[i+1:j+1] + [op] + ops[j+1:]
+                                    found = True
+                                    break
+                    if found:
+                        break
+                if not found:
+                    break
+            self.generated_operations[app_label] = ops
+
         for app_label, ops in sorted(self.generated_operations.items()):
             print app_label
             for op in ops:
                 print "   ", op
             print
-        raise NotImplementedError()
 
-    def add_operation(self, app_label, operation):
+        # Now, we need to chop the lists of operations up into migrations with
+        # dependencies on each other.
+        # We do this by stepping up an app's list of operations until we
+        # find one that has an outgoing dependency that isn't in another app's
+        # migration yet (hasn't been chopped off its list). We then chop off the
+        # operations before it into a migration and move onto the next app.
+        # If we loop back around without doing anything, there's a circular
+        # dependency (which _should_ be impossible as the operations are all
+        # split at this point so they can't depend and be depended on)
+
+        self.migrations = {}
+        num_ops = sum(len(x) for x in self.generated_operations.values())
+        while num_ops:
+            for app_label in self.generated_operations:
+                chopped = []
+                dependencies = set()
+                for operation in list(self.generated_operations[app_label]):
+                    deps_satisfied = True
+                    operation_dependencies = set()
+                    for dep in op._auto_deps:
+                        if dep[0] != app_label:
+                            # External app dependency. See if it's not yet
+                            # satisfied.
+                            for other_operation in self.generated_operations[dep[0]]:
+                                if self.check_dependency(other_operation, dep):
+                                    deps_satisfied = False
+                                    break
+                            if not deps_satisfied:
+                                break
+                            else:
+                                operation_dependencies.add(
+                                    (dep[0], self.migrations[dep[0]][-1].name)
+                                    if self.migrations.get(dep[0], None) else
+                                    (dep[0], "__latest__")
+                                )
+                    print deps_satisfied, operation, len(self.generated_operations[app_label])
+                    if deps_satisfied:
+                        chopped.append(operation)
+                        dependencies.update(operation_dependencies)
+                        self.generated_operations[app_label] = self.generated_operations[app_label][1:]
+                # Make a migration!
+                subclass = type(str("Migration"), (Migration,), {"operations": [], "dependencies": []})
+                instance = subclass("auto_%i" % (len(self.migrations.get(app_label, [])) + 1), app_label)
+                instance.dependencies = list(dependencies)
+                instance.operations = chopped
+                self.migrations.setdefault(app_label, []).append(instance)
+            new_num_ops = sum(len(x) for x in self.generated_operations.values())
+            if new_num_ops == num_ops:
+                raise ValueError("Cannot resolve operation dependencies")
+            num_ops = new_num_ops
+
+        # OK, add in internal dependencies among the migrations
+        for app_label, migrations in self.migrations.items():
+            for m1, m2 in zip(migrations, migrations[1:]):
+                m2.dependencies.append((app_label, m1.name))
+
+        # De-dupe dependencies
+        for app_label, migrations in self.migrations.items():
+            for migration in migrations:
+                migration.dependencies = list(set(migration.dependencies))
+
+        for app_label, migs in sorted(self.migrations.items()):
+            print app_label
+            for mig in migs:
+                print "   ", mig
+            print
+
+        return self.migrations
+
+    def check_dependency(self, operation, dependency):
+        """
+        Checks if an operation dependency matches an operation.
+        """
+        # Created model
+        if dependency[2] is None and dependency[3] is True:
+            return (
+                isinstance(operation, operations.CreateModel) and
+                operation.name.lower() == dependency[1].lower()
+            )
+        # Created field
+        elif dependency[2] is not None and dependency[3] is True:
+            return (
+                (
+                    isinstance(operation, operations.CreateModel) and
+                    operation.name.lower() == dependency[1].lower() and
+                    any(dependency[2] == x for x, y in operation.fields)
+                ) or
+                (
+                    isinstance(operation, operations.AddField) and
+                    operation.model_name.lower() == dependency[1].lower() and
+                    operation.name.lower() == dependency[2].lower()
+                )
+            )
+        # ???
+        else:
+            return False
+
+    def add_operation(self, app_label, operation, dependencies=None):
+        # Dependencies are (app_label, model_name, field_name, create/delete as True/False)
+        operation._auto_deps = dependencies or []
         self.generated_operations.setdefault(app_label, []).append(operation)
 
     def generate_renamed_models(self):
@@ -218,6 +337,9 @@ class MigrationAutodetector(object):
                         name=name,
                         field=field,
                     ),
+                    dependencies = [
+                        (field.rel.to._meta.app_label, field.rel.to._meta.object_name, None, True),
+                    ]
                 )
             # Generate other opns
             if unique_together:
@@ -226,7 +348,11 @@ class MigrationAutodetector(object):
                     operations.AlterUniqueTogether(
                         name=model_name,
                         unique_together=unique_together,
-                    )
+                    ),
+                    dependencies = [
+                        (app_label, model_name, name, True)
+                        for name, field in sorted(related_fields.items())
+                    ]
                 )
             if index_together:
                 self.add_operation(
@@ -234,7 +360,11 @@ class MigrationAutodetector(object):
                     operations.AlterIndexTogether(
                         name=model_name,
                         index_together=index_together,
-                    )
+                    ),
+                    dependencies = [
+                        (app_label, model_name, name, True)
+                        for name, field in sorted(related_fields.items())
+                    ]
                 )
 
     def generate_deleted_models(self):
