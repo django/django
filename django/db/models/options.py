@@ -165,8 +165,12 @@ class Options(object):
                                    and not isinstance(f.rel.to, six.string_types)
                                    and f.generate_reverse_relation)
 
-                    if is_relation and f.rel.to._meta == self:
-                        fields[f.attname] = f.related
+                    if is_relation:
+                        to_meta = f.rel.to._meta
+                        if to_meta == self:
+                            fields[f.attname] = f.related
+                        elif self.concrete_model == to_meta.concrete_model:
+                            fields[f.attname] = f.related
 
             if not opts & INCLUDE_HIDDEN:
                 fields = OrderedDict([(k, v) for k, v in fields.items() if not v.field.rel.is_hidden()])
@@ -573,11 +577,15 @@ class Options(object):
                 for f in klass._meta.local_fields + klass._meta.virtual_fields:
                     if (hasattr(f, 'rel') and f.rel and not isinstance(f.rel.to, six.string_types)
                             and f.generate_reverse_relation):
+                        # If its on the same model
                         if self == f.rel.to._meta:
                             cache[f.related] = None
                             proxy_cache[f.related] = None
+                        # If its on another model
                         elif self.concrete_model == f.rel.to._meta.concrete_model:
                             proxy_cache[f.related] = None
+
+        # Only return direct related links
         self._related_objects_cache = cache
         self._related_objects_proxy_cache = proxy_cache
 
