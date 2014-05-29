@@ -252,7 +252,7 @@ class ManagementUtility(object):
         Subcommand options are saved as pairs. A pair consists of
         the long option string (e.g. '--exclude') and a boolean
         value indicating if the option requires arguments. When printing to
-        stdout, a equal sign is appended to options which require arguments.
+        stdout, an equal sign is appended to options which require arguments.
 
         Note: If debugging this function, it is recommended to write the debug
         output in a separate file. Otherwise the debug output will be treated
