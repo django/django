@@ -26,10 +26,11 @@ DATA = 0b001
 M2M = 0b010
 RELATED_OBJECTS = 0b100
 
-NONE = 0b00
-LOCAL_ONLY = 0b001
-CONCRETE = 0b010
-INCLUDE_HIDDEN = 0b100
+NONE = 0b0000
+LOCAL_ONLY = 0b0001
+CONCRETE = 0b0010
+INCLUDE_HIDDEN = 0b0100
+INCLUDE_PROXY = 0b1000
 
 
 def normalize_together(option_together):
@@ -553,13 +554,18 @@ class Options(object):
         cache = OrderedDict()
         parent_list = self.get_parent_list()
         for parent in self.parents:
+            # For each parent, recursively call this fn
             for obj, model in parent._meta.get_all_related_objects_with_model(include_hidden=True):
+                # If model is invalid, continue
                 if (obj.field.creation_counter < 0 or obj.field.rel.parent_link) and obj.model not in parent_list:
                     continue
+
+                # Add model to cache
                 if not model:
                     cache[obj] = parent
                 else:
                     cache[obj] = model
+
         # Collect also objects which are in relation to some proxy child/parent of self.
         proxy_cache = cache.copy()
         for klass in self.apps.get_models(include_auto_created=True):

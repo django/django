@@ -4,10 +4,10 @@ from django.contrib.auth.models import (
     User, Permission, Group
 )
 from django.db.models.options import (
-    DATA, LOCAL_ONLY, M2M, CONCRETE, RELATED_OBJECTS
+    DATA, LOCAL_ONLY, M2M, CONCRETE, RELATED_OBJECTS, INCLUDE_PROXY
 )
 
-from .models import Person, Quartet, Group
+from .models import Person, Quartet, Group, Reporter
 
 
 class OptionsTests(test.TestCase):
@@ -77,6 +77,17 @@ class OptionsTests(test.TestCase):
             uniq_new_fields = set([y for x, y in new_fields])
 
             self.assertEquals(uniq_new_fields, uniq_old_fields)
+
+    def test_related_objects_proxy(self):
+        old_fields = Reporter._meta.get_all_related_objects_with_model(
+            include_proxy_eq=True)
+        new_fields = Reporter._meta.get_new_fields(
+                        types=RELATED_OBJECTS, opts=INCLUDE_PROXY)
+
+        uniq_old_fields = set([x for x, y in old_fields])
+        uniq_new_fields = set([y for x, y in new_fields])
+
+        self.assertEquals(uniq_new_fields, uniq_old_fields)
 
     #def test_related_objects_local_only(self):
         #old_fields = Quartet._meta.get_all_related_objects_with_model(
