@@ -26,6 +26,9 @@ DATA = 0b001
 M2M = 0b010
 RELATED_OBJECTS = 0b100
 
+# Aggregates
+NON_RELATED_FIELDS = DATA | M2M
+
 NONE = 0b0000
 LOCAL_ONLY = 0b0001
 CONCRETE = 0b0010
@@ -123,39 +126,38 @@ class Options(object):
                                     include_auto_created)
         return filter(lambda a: not a._meta.swapped, apps)
 
+    def _validate_related_object(self, obj):
+        parent_list = self.get_parent_list()
+        return not ((obj.field.creation_counter < 0
+                or obj.field.rel.parent_link)
+                and obj.model not in parent_list)
+
     def get_new_fields(self, types, opts=NONE, **kwargs):
         fields = OrderedDict()
 
-        # Recursively update parent dict
-        if not (types & RELATED_OBJECTS):
+        if types & NON_RELATED_FIELDS:
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
                     fields.update(parent._meta.get_new_fields(types,
                                   opts, **kwargs))
 
-        # Now add my own dict
-        if types & DATA:
-            for field in self.local_fields:
-                if (opts & CONCRETE) and field.column is None:
-                    continue
-                fields[field.attname] = field
+            if types & DATA:
+                for field in self.local_fields:
+                    if not ((opts & CONCRETE) and field.column is None):
+                        fields[field.attname] = field
 
-        if types & M2M:
-            for field in self.local_many_to_many:
-                fields[field.attname] = field
+            if types & M2M:
+                for field in self.local_many_to_many:
+                    fields[field.attname] = field
 
-        # RESET HERE!
         if types & RELATED_OBJECTS:
-            parent_list = self.get_parent_list()
             fields = OrderedDict()
-
             for parent in self.parents:
                 for obj, name in parent._meta.get_new_fields(
-                        types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN,
+                        types=RELATED_OBJECTS,
+                        opts=INCLUDE_HIDDEN,
                         inversed_order=True):
-                    if not ((obj.field.creation_counter < 0
-                            or obj.field.rel.parent_link)
-                            and obj.model not in parent_list):
+                    if self._validate_related_object(obj):
                         fields[obj] = obj.field.attname
 
             for model in self.get_non_swapped_models(True):
@@ -174,7 +176,7 @@ class Options(object):
             if not opts & INCLUDE_HIDDEN:
                 fields = OrderedDict([(k, v) for k, v in fields.items() if not k.field.rel.is_hidden()])
 
-            if not 'inversed_order' in kwargs:
+            if 'inversed_order' not in kwargs:
                 fields = OrderedDict([(v, k) for k, v in fields.items()])
 
         return tuple(fields.iteritems())
