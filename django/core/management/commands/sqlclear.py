@@ -22,5 +22,5 @@ class Command(AppCommand):
         if app_config.models_module is None:
             return
         connection = connections[options.get('database')]
-        statements = sql_delete(app_config, self.style, connection)
+        statements = sql_delete(app_config, connection)
         return '\n'.join(statements)
