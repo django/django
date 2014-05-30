@@ -1632,10 +1632,10 @@ use of its services to color output just like on Unix-based platforms.
 The colors used for syntax highlighting can be customized. Django
 ships with three color palettes:
 
-* ``dark``, suited to terminals that show white text on a black
+* ``dark``, suited to terminals that show white text on a dark
   background. This is the default palette.
 
-* ``light``, suited to terminals that show black text on a white
+* ``light``, suited to terminals that show dark text on a white
   background.
 
 * ``nocolor``, which disables syntax highlighting.

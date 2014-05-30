@@ -13,8 +13,8 @@ The :class:`~django.test.RequestFactory` shares the same API as
 the test client. However, instead of behaving like a browser, the
 RequestFactory provides a way to generate a request instance that can
 be used as the first argument to any view. This means you can test a
-view function the same way as you would test any other function -- as
-a black box, with exactly known inputs, testing for specific outputs.
+view function the same way as you would test any other function,
+with exactly known inputs, testing for specific outputs.
 
 The API for the :class:`~django.test.RequestFactory` is a slightly
 restricted subset of the test client API:

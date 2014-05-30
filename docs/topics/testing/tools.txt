@@ -87,9 +87,9 @@ Note a few important things about how the test client works:
   template-related functionality, is only available *while tests are
   running*.
 
-  The reason for this is that Django's test runner performs a bit of black
+  The reason for this is that Django's test runner performs a bit of dark
   magic in order to determine which template was loaded by a given view.
-  This black magic (essentially a patching of Django's template system in
+  This dark magic (essentially a patching of Django's template system in
   memory) only happens during test running.
 
 * By default, the test client will disable any CSRF checks
