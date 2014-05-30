@@ -7,6 +7,7 @@ from django.db import models
 from django.db.migrations import operations
 from django.db.migrations.migration import Migration
 from django.db.migrations.questioner import MigrationQuestioner
+from django.db.migrations.optimizer import MigrationOptimizer
 
 
 class MigrationAutodetector(object):
@@ -132,7 +133,7 @@ class MigrationAutodetector(object):
         # isn't bad, but we need to pull a few things around so FKs work nicely
         # inside the same app
         for app_label, ops in self.generated_operations.items():
-            while True:
+            for i in range(10000):
                 found = False
                 for i, op in enumerate(ops):
                     for dep in op._auto_deps:
@@ -143,17 +144,15 @@ class MigrationAutodetector(object):
                                     ops = ops[:i] + ops[i+1:j+1] + [op] + ops[j+1:]
                                     found = True
                                     break
+                        if found:
+                            break
                     if found:
                         break
                 if not found:
                     break
+            else:
+                ValueError("Infinite loop caught in operation dependency resolution")
             self.generated_operations[app_label] = ops
-
-        for app_label, ops in sorted(self.generated_operations.items()):
-            print app_label
-            for op in ops:
-                print "   ", op
-            print
 
         # Now, we need to chop the lists of operations up into migrations with
         # dependencies on each other.
@@ -190,17 +189,17 @@ class MigrationAutodetector(object):
                                     if self.migrations.get(dep[0], None) else
                                     (dep[0], "__latest__")
                                 )
-                    print deps_satisfied, operation, len(self.generated_operations[app_label])
                     if deps_satisfied:
                         chopped.append(operation)
                         dependencies.update(operation_dependencies)
                         self.generated_operations[app_label] = self.generated_operations[app_label][1:]
-                # Make a migration!
-                subclass = type(str("Migration"), (Migration,), {"operations": [], "dependencies": []})
-                instance = subclass("auto_%i" % (len(self.migrations.get(app_label, [])) + 1), app_label)
-                instance.dependencies = list(dependencies)
-                instance.operations = chopped
-                self.migrations.setdefault(app_label, []).append(instance)
+                # Make a migration! Well, only if there's stuff to put in it
+                if dependencies or chopped:
+                    subclass = type(str("Migration"), (Migration,), {"operations": [], "dependencies": []})
+                    instance = subclass("auto_%i" % (len(self.migrations.get(app_label, [])) + 1), app_label)
+                    instance.dependencies = list(dependencies)
+                    instance.operations = chopped
+                    self.migrations.setdefault(app_label, []).append(instance)
             new_num_ops = sum(len(x) for x in self.generated_operations.values())
             if new_num_ops == num_ops:
                 raise ValueError("Cannot resolve operation dependencies")
@@ -216,11 +215,10 @@ class MigrationAutodetector(object):
             for migration in migrations:
                 migration.dependencies = list(set(migration.dependencies))
 
-        for app_label, migs in sorted(self.migrations.items()):
-            print app_label
-            for mig in migs:
-                print "   ", mig
-            print
+        # Optimize migrations
+        for app_label, migrations in self.migrations.items():
+            for migration in migrations:
+                migration.operations = MigrationOptimizer().optimize(migration.operations, app_label=app_label)
 
         return self.migrations
 
@@ -247,6 +245,13 @@ class MigrationAutodetector(object):
                     operation.model_name.lower() == dependency[1].lower() and
                     operation.name.lower() == dependency[2].lower()
                 )
+            )
+        # Removed field
+        elif dependency[2] is not None and dependency[3] is False:
+            return (
+                isinstance(operation, operations.RemoveField) and
+                operation.model_name.lower() == dependency[1].lower() and
+                operation.name.lower() == dependency[2].lower()
             )
         # ???
         else:
@@ -378,16 +383,17 @@ class MigrationAutodetector(object):
         """
         deleted_models = set(self.old_model_keys) - set(self.new_model_keys)
         for app_label, model_name in deleted_models:
-            model_state = self.to_state.models[app_label, model_name]
+            model_state = self.from_state.models[app_label, model_name]
+            model = self.old_apps.get_model(app_label, model_name)
             # Gather related fields
             related_fields = {}
-            for field in self.new_apps.get_model(app_label, model_name)._meta.local_fields:
+            for field in model._meta.local_fields:
                 if field.rel:
                     if field.rel.to:
                         related_fields[field.name] = field
                     if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
                         related_fields[field.name] = field
-            for field in self.new_apps.get_model(app_label, model_name)._meta.local_many_to_many:
+            for field in model._meta.local_many_to_many:
                 if field.rel.to:
                     related_fields[field.name] = field
                 if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
@@ -418,14 +424,34 @@ class MigrationAutodetector(object):
                     operations.RemoveField(
                         model_name=model_name,
                         name=name,
-                    ),
+                    )
                 )
-            # Finally, remove the model
+            # Finally, remove the model.
+            # This depends on both the removal of all incoming fields
+            # and the removal of all its own related fields.
+            dependencies = []
+            for related_object in model._meta.get_all_related_objects():
+                dependencies.append((
+                    related_object.model._meta.app_label,
+                    related_object.model._meta.object_name,
+                    related_object.field.name,
+                    False,
+                ))
+            for related_object in model._meta.get_all_related_many_to_many_objects():
+                dependencies.append((
+                    related_object.model._meta.app_label,
+                    related_object.model._meta.object_name,
+                    related_object.field.name,
+                    False,
+                ))
+            for name, field in sorted(related_fields.items()):
+                dependencies.append((app_label, model_name, name, False))
             self.add_operation(
                 app_label,
                 operations.DeleteModel(
                     name=model_state.name,
-                )
+                ),
+                dependencies = list(set(dependencies)),
             )
 
     def generate_added_fields(self):
@@ -535,7 +561,7 @@ class MigrationAutodetector(object):
                     app_label,
                     operations.AlterUniqueTogether(
                         name=model_name,
-                        unique_together=new_model_state.options.unique_together
+                        unique_together=new_model_state.options['unique_together'],
                     )
                 )
 
@@ -549,19 +575,9 @@ class MigrationAutodetector(object):
                     app_label,
                     operations.AlterIndexTogether(
                         name=model_name,
-                        index_together=new_model_state.options.index_together
+                        index_together=new_model_state.options['index_together'],
                     )
                 )
-
-        # # Alright, now add internal dependencies
-        # for app_label, migrations in self.migrations.items():
-        #     for m1, m2 in zip(migrations, migrations[1:]):
-        #         m2.dependencies.append((app_label, m1.name))
-        # # Clean up dependencies
-        # for app_label, migrations in self.migrations.items():
-        #     for migration in migrations:
-        #         migration.dependencies = list(set(migration.dependencies))
-        # return self.migrations
 
     # def add_swappable_dependency(self, app_label, setting_name):
     #     """
