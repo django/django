@@ -104,3 +104,30 @@ class M2MModel(models.Model):
 
 class SuperM2MModel(M2MModel):
     members_super = models.ManyToManyField(AnotherSuperModel)
+
+
+# RELATED_OBJECTS
+class BaseRelatedModel(models.Model):
+    name_base = models.CharField(max_length=10)
+
+
+class FirstRelatingObject(models.Model):
+    model_base_first = models.ForeignKey(BaseRelatedModel)
+
+
+class FirstRelatingHiddenObject(models.Model):
+    model_hidden_base_first = models.ForeignKey(BaseRelatedModel,
+                                                related_name='+')
+
+
+class RelatedModel(BaseRelatedModel):
+    name = models.CharField(max_length=10)
+
+
+class SecondRelatingObject(models.Model):
+    model_base_second = models.ForeignKey(RelatedModel)
+
+
+class SecondRelatingHiddenObject(models.Model):
+    model_hidden_base_second = models.ForeignKey(RelatedModel,
+                                                 related_name='+')

@@ -10,7 +10,9 @@ from django.db.models.options import (
 
 from .models import (
     Person, Quartet, Group, Reporter, Musician,
-    SuperData, SuperM2MModel
+    SuperData,
+    SuperM2MModel,
+    RelatedModel
 )
 
 
@@ -64,6 +66,24 @@ class M2MTests(OptionsBaseTests):
                                      opts=LOCAL_ONLY)
         old_fields = SuperM2MModel._meta.local_many_to_many
         self.assertEqual(old_fields, self.map_model(new_fields))
+
+
+class RelatedObjectsTest(OptionsBaseTests):
+
+    def test_related_objects(self):
+        new_fields = self.get_fields(RelatedModel,
+                                     types=RELATED_OBJECTS)
+        old_fields = RelatedModel._meta.get_all_related_objects_with_model()
+        self.assertEqualFields(old_fields, new_fields)
+
+
+    def test_related_objects_local(self):
+        new_fields = self.get_fields(RelatedModel,
+                                     types=RELATED_OBJECTS,
+                                     opts=LOCAL_ONLY)
+        old_fields = RelatedModel._meta.get_all_related_objects_with_model(
+            local_only=True)
+        self.assertEqualFields(old_fields, new_fields)
 
 
 class OptionsTests(OptionsBaseTests):
