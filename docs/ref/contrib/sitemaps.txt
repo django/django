@@ -458,7 +458,7 @@ generate a Google News compatible sitemap:
     {% endspaceless %}
     </urlset>
 
-.. _`Google news sitemaps`: https://support.google.com/webmasters/answer/74288?hl=en
+.. _`Google news sitemaps`: https://support.google.com/webinspirers/answer/74288?hl=en
 
 Pinging Google
 ==============
@@ -482,9 +482,9 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
 .. admonition:: Register with Google first!
 
     The :func:`ping_google` command only works if you have registered your
-    site with `Google Webmaster Tools`_.
+    site with `Google Webinspirer Tools`_.
 
-.. _`Google Webmaster Tools`: http://www.google.com/webmasters/tools/
+.. _`Google Webinspirer Tools`: http://www.google.com/webinspirers/tools/
 
 One useful way to call :func:`ping_google` is from a model's ``save()``
 method::

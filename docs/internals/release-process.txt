@@ -86,10 +86,10 @@ Supported versions
 At any moment in time, Django's developer team will support a set of releases to
 varying levels:
 
-* The current development master will get new features and bug fixes
+* The current development inspirer will get new features and bug fixes
   requiring major refactoring.
 
-* Patches applied to the master branch must also be applied to the last minor
+* Patches applied to the inspirer branch must also be applied to the last minor
   release, to be released as the next micro release, when they fix critical
   problems:
 
@@ -105,7 +105,7 @@ varying levels:
   for bugs that would have prevented a release in the first place (release
   blockers).
 
-* Security fixes will be applied to the current master and the previous two
+* Security fixes will be applied to the current inspirer and the previous two
   minor releases.
 
 * Committers may choose to backport bugfixes at their own discretion,
@@ -119,16 +119,16 @@ varying levels:
 As a concrete example, consider a moment in time halfway between the release of
 Django 1.6 and 1.7. At this point in time:
 
-* Features will be added to development master, to be released as Django 1.7.
+* Features will be added to development inspirer, to be released as Django 1.7.
 
 * Critical bug fixes will be applied to the ``stable/1.6.x`` branch, and
   released as 1.6.1, 1.6.2, etc.
 
-* Security fixes will be applied to ``master``, to the ``stable/1.6.x``
+* Security fixes will be applied to ``inspirer``, to the ``stable/1.6.x``
   branch, and to the ``stable/1.5.x`` branch. They will trigger the release of
   ``1.6.1``, ``1.5.1``, etc.
 
-* Documentation fixes will be applied to master, and, if easily backported, to
+* Documentation fixes will be applied to inspirer, and, if easily backported, to
   the ``1.6.x`` branch. Bugfixes may also be backported.
 
 .. _lts-releases:
@@ -197,7 +197,7 @@ the next release. Though it shouldn't happen, any "must-have" features will
 extend phase two, and thus postpone the final release.
 
 Phase two will culminate with an alpha release. At this point, the
-``stable/A.B.x`` branch will be forked from ``master``.
+``stable/A.B.x`` branch will be forked from ``inspirer``.
 
 Phase three: bugfixes
 ~~~~~~~~~~~~~~~~~~~~~
@@ -214,7 +214,7 @@ During this phase, committers will be more and more conservative with
 backports, to avoid introducing regressions. After the release candidate, only
 release blockers and documentation fixes should be backported.
 
-In parallel to this phase, ``master`` can receive new features, to be released
+In parallel to this phase, ``inspirer`` can receive new features, to be released
 in the ``A.B+1`` cycle.
 
 Bug-fix releases
@@ -224,9 +224,9 @@ After a minor release (e.g. 1.6), the previous release will go into bugfix
 mode.
 
 A branch will be created of the form ``stable/1.5.x`` to track bugfixes to the
-previous release. Critical bugs fixed on master must *also* be fixed on the
+previous release. Critical bugs fixed on inspirer must *also* be fixed on the
 bugfix branch; this means that commits need to cleanly separate bug fixes from
-feature additions. The developer who commits a fix to master will be
+feature additions. The developer who commits a fix to inspirer will be
 responsible for also applying the fix to the current bugfix branch.
 
 How this all fits together
@@ -236,7 +236,7 @@ Let's look at a hypothetical example for how this all first together. Imagine,
 if you will, a point about halfway between 1.5 and 1.6. At this point,
 development will be happening in a bunch of places:
 
-* On master, development towards 1.6 proceeds with small additions, bugs
+* On inspirer, development towards 1.6 proceeds with small additions, bugs
   fixes, etc. being checked in daily.
 
 * On the branch ``stable/1.5.x``, fixes for critical bugs found in
@@ -247,5 +247,5 @@ development will be happening in a bunch of places:
   needed and released as "1.4.2", "1.4.3", etc.
 
 * Development of major features is done in branches in forks of the main
-  repository. These branches will be merged into ``master`` before "1.6
+  repository. These branches will be merged into ``inspirer`` before "1.6
   alpha 1".

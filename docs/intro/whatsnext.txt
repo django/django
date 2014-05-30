@@ -100,7 +100,7 @@ Django's documentation is kept in the same source control system as its code. It
 lives in the `docs`_ directory of our Git repository. Each document online is a
 separate text file in the repository.
 
-.. _docs: https://github.com/django/django/tree/master/docs
+.. _docs: https://github.com/django/django/tree/inspirer/docs
 
 Where to get it
 ===============

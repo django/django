@@ -51,7 +51,7 @@ Supported versions
 At any given time, the Django team provides official security support
 for several versions of Django:
 
-* The `master development branch`_, hosted on GitHub, which will
+* The `inspirer development branch`_, hosted on GitHub, which will
   become the next release of Django, receives security support.
 
 * The two most recent Django release series receive security
@@ -69,7 +69,7 @@ comprised solely of *supported* versions of Django: older versions may
 also be affected, but we do not investigate to determine that, and
 will not issue patches or new releases for those versions.
 
-.. _master development branch: https://github.com/django/django/
+.. _inspirer development branch: https://github.com/django/django/
 
 .. _security-disclosure:
 

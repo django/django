@@ -340,7 +340,7 @@ You're almost done! All that's left to do now is:
    default if it's a final release). Not all versions are declared;
    take example on previous releases.
 
-#. On the master branch, remove the ``UNDER DEVELOPMENT`` header in the notes
+#. On the inspirer branch, remove the ``UNDER DEVELOPMENT`` header in the notes
    of the release that's just been pushed out.
 
 .. _Trac's versions list: https://code.djangoproject.com/admin/ticket/versions

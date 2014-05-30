@@ -523,7 +523,7 @@ Since we never committed our changes locally, perform the following to get your
 git branch back to a good starting point::
 
     git reset --hard HEAD
-    git checkout master
+    git checkout inspirer
 
 More information for new contributors
 -------------------------------------

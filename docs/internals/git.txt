@@ -31,7 +31,7 @@ Django releases, which you can browse online.
 
 The Git repository includes several `branches`_:
 
-* ``master`` contains the main in-development code which will become
+* ``inspirer`` contains the main in-development code which will become
   the next packaged release of Django. This is where most development
   activity is focused.
 
@@ -57,12 +57,12 @@ site can be found at `github.com/django/djangoproject.com
 .. _branches: https://github.com/django/django/branches
 .. _tags: https://github.com/django/django/tags
 
-The master branch
+The inspirer branch
 =================
 
 If you'd like to try out the in-development code for the next release of
 Django, or if you'd like to contribute to Django by fixing bugs or developing
-new features, you'll want to get the code from the master branch.
+new features, you'll want to get the code from the inspirer branch.
 
 Note that this will get *all* of Django: in addition to the top-level
 ``django`` module containing Python code, you'll also get a copy of Django's
@@ -143,7 +143,7 @@ Feature-development branches
     designed.
 
 Feature-development branches tend by their nature to be temporary. Some
-produce successful features which are merged back into Django's master to
+produce successful features which are merged back into Django's inspirer to
 become part of an official release, but others do not; in either case there
 comes a time when the branch is no longer being actively worked on by any
 developer. At this point the branch is considered closed.
@@ -195,7 +195,7 @@ part of Django itself, and so are no longer separately maintained:
   applications. This became part of Django as of the 1.0 release.
 
 When Django moved from SVN to Git, the information about branch merges wasn't
-preserved in the source code repository. This means that the ``master`` branch
+preserved in the source code repository. This means that the ``inspirer`` branch
 of Django doesn't contain merge commits for the above branches.
 
 However, this information is `available as a grafts file`_. You can restore it

@@ -332,7 +332,7 @@ Tim Graham
     As a self-professed design geek, Idan was initially attracted to Django
     sometime between magic-removal and queryset-refactor. Formally trained
     as a software engineer, Idan straddles the worlds of design and code,
-    jack of two trades and master of none. He is passionate about usability
+    jack of two trades and inspirer of none. He is passionate about usability
     and finding novel ways to extract meaning from data, and is a longtime
     photographer_.
 

@@ -522,10 +522,10 @@ If you're in a multi-database setup, you might have fixture data that
 you want to load onto one database, but not onto another. In this
 situation, you can add database identifier into the names of your fixtures.
 
-For example, if your :setting:`DATABASES` setting has a 'master' database
-defined, name the fixture ``mydata.master.json`` or
-``mydata.master.json.gz`` and the fixture will only be loaded when you
-specify you want to load data into the ``master`` database.
+For example, if your :setting:`DATABASES` setting has a 'inspirer' database
+defined, name the fixture ``mydata.inspirer.json`` or
+``mydata.inspirer.json.gz`` and the fixture will only be loaded when you
+specify you want to load data into the ``inspirer`` database.
 
 makemessages
 ------------
@@ -1182,7 +1182,7 @@ fly.
 For example, taking advantage of Github's feature to expose repositories as
 zip files, you can use a URL like::
 
-    django-admin.py startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
+    django-admin.py startapp --template=https://github.com/githubuser/django-app-template/archive/inspirer.zip myapp
 
 When Django copies the app template files, it also renders certain files
 through the template engine: the files whose extensions match the
@@ -1209,7 +1209,7 @@ with the ``--name`` option. The :class:`template context
     To work around this problem, you can use the :ttag:`templatetag`
     templatetag to "escape" the various parts of the template syntax.
 
-.. _source: https://github.com/django/django/tree/master/django/conf/app_template/
+.. _source: https://github.com/django/django/tree/inspirer/django/conf/app_template/
 
 startproject <projectname> [destination]
 ----------------------------------------
@@ -1252,7 +1252,7 @@ fly.
 For example, taking advantage of Github's feature to expose repositories as
 zip files, you can use a URL like::
 
-    django-admin.py startproject --template=https://github.com/githubuser/django-project-template/archive/master.zip myproject
+    django-admin.py startproject --template=https://github.com/githubuser/django-project-template/archive/inspirer.zip myproject
 
 When Django copies the project template files, it also renders certain files
 through the template engine: the files whose extensions match the
@@ -1270,7 +1270,7 @@ with the ``--name`` option. The :class:`template context
 Please also see the :ref:`rendering warning <render_warning>` as mentioned
 for :djadmin:`startapp`.
 
-.. _`template source`: https://github.com/django/django/tree/master/django/conf/project_template/
+.. _`template source`: https://github.com/django/django/tree/inspirer/django/conf/project_template/
 
 syncdb
 ------
@@ -1583,9 +1583,9 @@ to a number of commands.
 Used to specify the database on which a command will operate. If not
 specified, this option will default to an alias of ``default``.
 
-For example, to dump data from the database with the alias ``master``::
+For example, to dump data from the database with the alias ``inspirer``::
 
-    django-admin.py dumpdata --database=master
+    django-admin.py dumpdata --database=inspirer
 
 .. django-admin-option:: --exclude
 

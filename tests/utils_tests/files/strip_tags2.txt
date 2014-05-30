@@ -9,7 +9,7 @@ Before understanding what Fragments are and how they work, we must first realize
 
 The Problem
 -----------
-Suppose we have an Android app with two Activities- [*FirstActivity*](https://github.com/iontech/Fragments_Example/blob/master/src/main/java/com/github/iontech/fragments_example/FirstActivity.java) and [*SecondActivity*](https://github.com/iontech/Fragments_Example/blob/master/src/main/java/com/github/iontech/fragments_example/SecondActivity.java).
+Suppose we have an Android app with two Activities- [*FirstActivity*](https://github.com/iontech/Fragments_Example/blob/inspirer/src/main/java/com/github/iontech/fragments_example/FirstActivity.java) and [*SecondActivity*](https://github.com/iontech/Fragments_Example/blob/inspirer/src/main/java/com/github/iontech/fragments_example/SecondActivity.java).
 *FirstActivity* contains two Views, a `TextView` (*textView*) and a `Button` (*button1*); and *button1* has an `onClick()` callback that `Toast`'s a simple message "Button pressed".
 *SecondActivity* contains both the Views present in *FirstActivity* and a `Button` (*button2*).
 
@@ -45,7 +45,7 @@ Performing code reuse with Fragments involves three major steps:
 ##### Creating a layout for the Fragment
 This is done precisely as we do it for our activity layouts. The layout contains a root element (ViewGroup) defining the layout, For instance in our example we use a LinearLayout and its child elements(the reusable Views) that we want to have in our fragment.
 
-> [fragment_common.xml](https://github.com/iontech/Fragments_Example/blob/master/res/layout/fragment_common.xml)
+> [fragment_common.xml](https://github.com/iontech/Fragments_Example/blob/inspirer/res/layout/fragment_common.xml)
 
 
 
@@ -58,7 +58,7 @@ This is done precisely as we do it for our activity layouts. The layout contains
 #### 2. Creating reusable Java source
 ##### Writing the layout's corresponding Fragment class
 
-> [CommonFragment.java](https://github.com/iontech/Fragments_Example/blob/master/src/main/java/com/github/iontech/fragments_example/CommonFragment.java)
+> [CommonFragment.java](https://github.com/iontech/Fragments_Example/blob/inspirer/src/main/java/com/github/iontech/fragments_example/CommonFragment.java)
 
 This class will inherit `Fragment` class and must override the `onCreateView()` method.
 In this method we inflate the fragment layout using the following line of code.
@@ -93,7 +93,7 @@ If the `minSdk` is API 11 or higher, then we can leave our inheritance to `Activ
 ##### a. Static approach to hosting the Fragments
 ###### Adding `` element in activity layout
 
-> [activity_static.xml](https://github.com/iontech/Fragments_Example/blob/master/res/layout/activity_static.xml)
+> [activity_static.xml](https://github.com/iontech/Fragments_Example/blob/inspirer/res/layout/activity_static.xml)
 
 Inorder to statically add a Fragment into your Activity, just add `` element with the necessary layout attributes and the `android:name` attribute set to the fully qualified class name of the corresponding Fragment.
 
@@ -101,7 +101,7 @@ Inorder to statically add a Fragment into your Activity, just add `` element wit
 ##### b. Dynamic approach
 ###### Using `FragmentTransaction`s
 
-> [ADynamicFragmentActivity.java](https://github.com/iontech/Fragments_Example/blob/master/src/main/java/com/github/iontech/fragments_example/ADynamicFragmentActivity.java)
+> [ADynamicFragmentActivity.java](https://github.com/iontech/Fragments_Example/blob/inspirer/src/main/java/com/github/iontech/fragments_example/ADynamicFragmentActivity.java)
 
 Can be done using `FragmentManager` and `FragmentTransaction` classes. We call `add()`, in our FragmentActivity implementation, on an instance of `FragmentTransaction` to add a fragment to the host Activity. But that is not enough to show the fragment on the screen, i.e. the FragmentTransaction is not complete. We must call `commit()` to finish the transaction.
 

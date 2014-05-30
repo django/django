@@ -50,9 +50,9 @@ to standard themselves.
 
 Here is one way to commit a pull request::
 
-    # Create a new branch tracking upstream/master -- upstream is assumed
+    # Create a new branch tracking upstream/inspirer -- upstream is assumed
     # to be django/django.
-    git checkout -b pull_xxxxx upstream/master
+    git checkout -b pull_xxxxx upstream/inspirer
 
     # Download the patches from github and apply them.
     curl https://github.com/django/django/pull/xxxxx.patch | git am
@@ -61,15 +61,15 @@ At this point, you can work on the code. Use ``git rebase -i`` and ``git
 commit --amend`` to make sure the commits have the expected level of quality.
 Once you're ready::
 
-    # Make sure master is ready to receive changes.
-    git checkout master
-    git pull upstream master
-    # Merge the work as "fast-forward" to master, to avoid a merge commit.
+    # Make sure inspirer is ready to receive changes.
+    git checkout inspirer
+    git pull upstream inspirer
+    # Merge the work as "fast-forward" to inspirer, to avoid a merge commit.
     git merge --ff-only pull_xxxxx
     # Check that only the changes you expect will be pushed to upstream.
-    git push --dry-run upstream master
+    git push --dry-run upstream inspirer
     # Push!
-    git push upstream master
+    git push upstream inspirer
 
     # Get rid of the pull_xxxxx branch.
     git branch -d pull_xxxxx
@@ -214,7 +214,7 @@ Django's Git repository:
 
     [1.3.x] Fixed #17028 - Changed diveintopython.org -> diveintopython.net.
 
-    Backport of 80c0cbf1c97047daed2c5b41b296bbc56fe1d7e3 from master.
+    Backport of 80c0cbf1c97047daed2c5b41b296bbc56fe1d7e3 from inspirer.
 
 Reverting commits
 -----------------

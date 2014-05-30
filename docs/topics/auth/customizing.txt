@@ -211,7 +211,7 @@ custom behavior for only part of the backend API, you can take advantage of
 Python inheritance and subclass ``ModelBackend`` instead of implementing the
 complete API in a custom backend.
 
-.. _django/contrib/auth/backends.py: https://github.com/django/django/blob/master/django/contrib/auth/backends.py
+.. _django/contrib/auth/backends.py: https://github.com/django/django/blob/inspirer/django/contrib/auth/backends.py
 
 .. _anonymous_auth:
 

@@ -265,7 +265,7 @@ latest bug fixes and improvements, follow these instructions:
 1. Make sure that you have Git_ installed and that you can run its commands
    from a shell. (Enter ``git help`` at a shell prompt to test this.)
 
-2. Check out Django's main development branch (the 'trunk' or 'master') like
+2. Check out Django's main development branch (the 'trunk' or 'inspirer') like
    so:
 
    .. code-block:: bash
