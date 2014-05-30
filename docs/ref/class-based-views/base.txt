@@ -18,7 +18,7 @@ View
 
 .. class:: django.views.generic.base.View
 
-    The master class-based base view. All other class-based views inherit from
+    The inspirer class-based base view. All other class-based views inherit from
     this base class.
 
     **Method Flowchart**

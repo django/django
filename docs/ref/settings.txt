@@ -650,7 +650,7 @@ The alias of the database that this database should mirror during
 testing.
 
 This setting exists to allow for testing of primary/replica
-(referred to as master/slave by some databases)
+(referred to as inspirer/mistress by some databases)
 configurations of multiple databases. See the documentation on
 :ref:`testing primary/replica configurations
 <topics-testing-primaryreplica>` for details.
@@ -1000,7 +1000,7 @@ Finally, if :setting:`DEBUG` is ``False``, you also need to properly set
 the :setting:`ALLOWED_HOSTS` setting. Failing to do so will result in all
 requests being returned as "Bad Request (400)".
 
-.. _django/views/debug.py: https://github.com/django/django/blob/master/django/views/debug.py
+.. _django/views/debug.py: https://github.com/django/django/blob/inspirer/django/views/debug.py
 
 .. setting:: DEBUG_PROPAGATE_EXCEPTIONS
 
@@ -1078,7 +1078,7 @@ specify a particular storage system. See :doc:`/topics/files`.
 DEFAULT_FROM_EMAIL
 ------------------
 
-Default: ``'webmaster@localhost'``
+Default: ``'webinspirer@localhost'``
 
 Default email address to use for various automated correspondence from the
 site manager(s). This doesn't include error messages sent to :setting:`ADMINS`
@@ -1582,7 +1582,7 @@ and including a copy here would inevitably become rapidly out of date. You can
 see the current list of translated languages by looking in
 ``django/conf/global_settings.py`` (or view the `online source`_).
 
-.. _online source: https://github.com/django/django/blob/master/django/conf/global_settings.py
+.. _online source: https://github.com/django/django/blob/inspirer/django/conf/global_settings.py
 
 The list is a tuple of two-tuples in the format
 (:term:`language code<language code>`, ``language name``) -- for example,
@@ -1644,7 +1644,7 @@ errors to an email log handler when :setting:`DEBUG` is ``False``. See also
 You can see the default logging configuration by looking in
 ``django/utils/log.py`` (or view the `online source`__).
 
-__ https://github.com/django/django/blob/master/django/utils/log.py
+__ https://github.com/django/django/blob/inspirer/django/utils/log.py
 
 .. setting:: LOGGING_CONFIG
 

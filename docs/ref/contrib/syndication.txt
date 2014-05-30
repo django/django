@@ -985,7 +985,7 @@ For example, to create an Atom 1.0 feed and print it to standard output::
     ...
     </feed>
 
-.. _django/utils/feedgenerator.py: https://github.com/django/django/blob/master/django/utils/feedgenerator.py
+.. _django/utils/feedgenerator.py: https://github.com/django/django/blob/inspirer/django/utils/feedgenerator.py
 
 .. currentmodule:: django.contrib.syndication
 
