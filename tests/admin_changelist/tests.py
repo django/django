@@ -283,6 +283,105 @@ class ChangeListTests(TestCase):
         # There's only one ChordsBand instance
         self.assertEqual(cl.result_count, 1)
 
+
+    def test_no_distinct_for_m2m_in_list_filter(self):
+        """
+        Regression test for #18729: When a ManyToMany list_filter exists but
+        but not used do not need distinct
+        base on test for #13902
+        """
+        blues = Genre.objects.create(name='Blues')
+        band = Band.objects.create(name='B.B. King Review', nr_of_members=11)
+
+        band.genres.add(blues)
+        band.genres.add(blues)
+
+        m = BandAdmin(Band, admin.site)
+        request = self.factory.get('/band/', data={})
+
+        cl = ChangeList(request, Band, m.list_display,
+                m.list_display_links, m.list_filter, m.date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_max_show_all, m.list_editable, m)
+
+        query_sql = "%s" % (cl.queryset.query)
+
+        # distinct is not used
+        self.assertFalse('distinct' in query_sql.lower())
+
+    def test_no_distinct_for_through_m2m_in_list_filter(self):
+        """
+        Regression test for #18729: When a ManyToMany list_filter exists but
+        but not used do not need distinct
+        base on test for #13902
+        """
+        lead = Musician.objects.create(name='Vox')
+        band = Group.objects.create(name='The Hype')
+        Membership.objects.create(group=band, music=lead, role='lead voice')
+        Membership.objects.create(group=band, music=lead, role='bass player')
+    
+        m = GroupAdmin(Group, admin.site)
+        request = self.factory.get('/group/', data={})
+    
+        cl = ChangeList(request, Group, m.list_display,
+                m.list_display_links, m.list_filter, m.date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_max_show_all, m.list_editable, m)
+    
+        query_sql = "%s" % (cl.queryset.query)
+    
+        # distinct is not used
+        self.assertFalse('distinct' in query_sql.lower())
+    
+    def test_no_distinct_for_inherited_m2m_in_list_filter(self):
+        """
+        Regression test for #18729: When a ManyToMany list_filter exists but
+        but not used do not ned distinct
+        base on test for #13902
+        """
+        lead = Musician.objects.create(name='John')
+        four = Quartet.objects.create(name='The Beatles')
+        Membership.objects.create(group=four, music=lead, role='lead voice')
+        Membership.objects.create(group=four, music=lead, role='guitar player')
+    
+        m = QuartetAdmin(Quartet, admin.site)
+        request = self.factory.get('/quartet/', data={})
+    
+        cl = ChangeList(request, Quartet, m.list_display,
+                m.list_display_links, m.list_filter, m.date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_max_show_all, m.list_editable, m)
+    
+        query_sql = "%s" % (cl.queryset.query)
+    
+        # distinct is not used
+        self.assertFalse('distinct' in query_sql.lower())
+    
+    def test_no_distinct_for_m2m_to_inherited_in_list_filter(self):
+        """
+        Regression test for #18729: When a ManyToMany list_filter exists but
+        but not used do not need distinct
+        base on test for #13902
+        """
+        lead = ChordsMusician.objects.create(name='Player A')
+        three = ChordsBand.objects.create(name='The Chords Trio')
+        Invitation.objects.create(band=three, player=lead, instrument='guitar')
+        Invitation.objects.create(band=three, player=lead, instrument='bass')
+    
+        m = ChordsBandAdmin(ChordsBand, admin.site)
+        request = self.factory.get('/chordsband/', data={})
+    
+        cl = ChangeList(request, ChordsBand, m.list_display,
+                m.list_display_links, m.list_filter, m.date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_max_show_all, m.list_editable, m)
+    
+        query_sql = "%s" % (cl.queryset.query)
+    
+        # distinct is not used
+        self.assertFalse('distinct' in query_sql.lower())
+
+
     def test_distinct_for_non_unique_related_object_in_list_filter(self):
         """
         Regressions tests for #15819: If a field listed in list_filters
