@@ -15,6 +15,9 @@ from .models import (
 
 class DataTests(test.TestCase):
 
+    def get_fields(self, Model, **kwargs):
+        return Model._meta.get_new_fields(**kwargs)
+
     def map_model(self, new_fields):
         return [f for n, f in new_fields]
 
@@ -24,28 +27,23 @@ class DataTests(test.TestCase):
         self.assertEquals(uniq_new_fields, uniq_old_fields)
 
     def test_data_local(self):
-        new_fields = Quartet._meta.get_new_fields(types=DATA,
-                                                  opts=LOCAL_ONLY)
+        new_fields = self.get_fields(Quartet, types=DATA, opts=LOCAL_ONLY)
         old_fields = Quartet._meta.local_fields
         self.assertEqual(old_fields, self.map_model(new_fields))
 
     def test_data(self):
-        new_fields = Quartet._meta.get_new_fields(types=DATA)
-
+        new_fields = self.get_fields(Quartet, types=DATA)
         old_fields = Quartet._meta.get_fields_with_model()
         self.assertEqualFields(old_fields, new_fields)
 
     def test_data_local_concrete(self):
-        new_fields = Quartet._meta.get_new_fields(types=DATA,
-                                                  opts=LOCAL_ONLY | CONCRETE)
-
+        new_fields = self.get_fields(Quartet, types=DATA,
+                                     opts=LOCAL_ONLY | CONCRETE)
         old_fields = Quartet._meta.local_concrete_fields
         self.assertEqual(old_fields, self.map_model(new_fields))
 
     def test_data_concrete(self):
-        new_fields = Quartet._meta.get_new_fields(types=DATA,
-                                                  opts=CONCRETE)
-
+        new_fields = self.get_fields(Quartet, types=DATA, opts=CONCRETE)
         old_fields = Quartet._meta.concrete_fields
         self.assertEqual(old_fields, self.map_model(new_fields))
 
