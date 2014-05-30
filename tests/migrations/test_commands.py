@@ -132,6 +132,13 @@ class MakeMigrationsTests(MigrationTestBase):
             self._rmrf(self.migration_dir)
         except OSError:
             pass
+
+        try:
+            self._rmrf(os.path.join(self.test_dir,
+                       "test_migrations_path_doesnt_exist"))
+        except OSError:
+            pass
+
         os.chdir(self._cwd)
 
     def _rmrf(self, dname):
@@ -439,12 +446,3 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertTrue(os.path.isfile(os.path.join(self.test_dir,
                        "test_migrations_path_doesnt_exist", "foo", "bar",
                        "0001_initial.py")))
-
-        os.chdir(self.test_dir)
-        try:
-            self._rmrf(os.path.join(self.test_dir,
-                       "test_migrations_path_doesnt_exist"))
-            pass
-        except OSError:
-            pass
-        os.chdir(self._cwd)
