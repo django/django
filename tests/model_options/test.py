@@ -13,6 +13,43 @@ from .models import (
 )
 
 
+class DataTests(test.TestCase):
+
+    def map_model(self, new_fields):
+        return [f for n, f in new_fields]
+
+    def assertEqualFields(self, old_fields, new_fields):
+        uniq_old_fields = [x for x, y in old_fields]
+        uniq_new_fields = [y for x, y in new_fields]
+        self.assertEquals(uniq_new_fields, uniq_old_fields)
+
+    def test_data_local(self):
+        new_fields = Quartet._meta.get_new_fields(types=DATA,
+                                                  opts=LOCAL_ONLY)
+        old_fields = Quartet._meta.local_fields
+        self.assertEqual(old_fields, self.map_model(new_fields))
+
+    def test_data(self):
+        new_fields = Quartet._meta.get_new_fields(types=DATA)
+
+        old_fields = Quartet._meta.get_fields_with_model()
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_data_local_concrete(self):
+        new_fields = Quartet._meta.get_new_fields(types=DATA,
+                                                  opts=LOCAL_ONLY | CONCRETE)
+
+        old_fields = Quartet._meta.local_concrete_fields
+        self.assertEqual(old_fields, self.map_model(new_fields))
+
+    def test_data_concrete(self):
+        new_fields = Quartet._meta.get_new_fields(types=DATA,
+                                                  opts=CONCRETE)
+
+        old_fields = Quartet._meta.concrete_fields
+        self.assertEqual(old_fields, self.map_model(new_fields))
+
+
 class OptionsTests(test.TestCase):
 
     def setUp(self):

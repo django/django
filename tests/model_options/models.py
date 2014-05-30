@@ -67,3 +67,20 @@ class Article(models.Model):
 
     def __str__(self):
         return self.headline
+class AbstractData(models.Model):
+    class Meta:
+        abstract = True
+    name = models.CharField(max_length=10)
+    origin = models.ForeignObject(Country,
+        from_fields=['person_country_id'], to_fields=['id'])
+
+
+class Data(AbstractData):
+    name_data = models.CharField(max_length=10)
+
+
+class SuperData(Data):
+    name_super_data = models.CharField(max_length=10)
+    surname_super_data = models.CharField(max_length=10)
+    origin_super_data = models.ForeignObject(Reporter,
+        from_fields=['person_country_id'], to_fields=['id'])
