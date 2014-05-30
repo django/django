@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
 )
 from django.db.models.options import (
     DATA, LOCAL_ONLY, M2M, CONCRETE, RELATED_OBJECTS, INCLUDE_PROXY,
-    RELATED_M2M
+    RELATED_M2M, INCLUDE_HIDDEN
 )
 
 from .models import (
@@ -76,13 +76,28 @@ class RelatedObjectsTest(OptionsBaseTests):
         old_fields = RelatedModel._meta.get_all_related_objects_with_model()
         self.assertEqualFields(old_fields, new_fields)
 
-
     def test_related_objects_local(self):
         new_fields = self.get_fields(RelatedModel,
                                      types=RELATED_OBJECTS,
                                      opts=LOCAL_ONLY)
         old_fields = RelatedModel._meta.get_all_related_objects_with_model(
             local_only=True)
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_related_objects_include_hidden(self):
+        new_fields = self.get_fields(RelatedModel,
+                                     types=RELATED_OBJECTS,
+                                     opts=INCLUDE_HIDDEN)
+        old_fields = RelatedModel._meta.get_all_related_objects_with_model(
+            include_hidden=True)
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_related_objects_include_hidden_local_only(self):
+        new_fields = self.get_fields(RelatedModel,
+                                     types=RELATED_OBJECTS,
+                                     opts=INCLUDE_HIDDEN | LOCAL_ONLY)
+        old_fields = RelatedModel._meta.get_all_related_objects_with_model(
+            include_hidden=True, local_only=True)
         self.assertEqualFields(old_fields, new_fields)
 
 
