@@ -572,7 +572,7 @@ TECHNICAL_500_TEMPLATE = """
     .user div.context ol li { color:#666; }
     div.commands { margin-left: 40px; }
     div.commands a { color:#555; text-decoration:none; }
-    .user div.commands a { color: black; }
+    .user div.commands a { color: #000; }
     #summary { background: #ffc; }
     #summary h2 { font-weight: normal; color: #666; }
     #explanation { background:#eee; }

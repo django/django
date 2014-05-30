@@ -35,7 +35,7 @@ release) are a result of merging the 'magic-removal' branch of development.
 This branch removed a number of constraints in the way Django code had to be
 written that were a consequence of decisions made in the early days of Django,
 prior to its open-source release. It's now possible to write more natural,
-Pythonic code that works as expected, and there's less "black magic" happening
+Pythonic code that works as expected, and there's less "dark magic" happening
 behind the scenes.
 
 Aside from that, another main theme of this release is a dramatic increase in

@@ -60,7 +60,7 @@ def main(argv=None):
 
     for fn in files:
         if fn in DONT_TOUCH:
-            print("Skipping blacklisted file %s." % fn)
+            print("Skipping embargoed file %s." % fn)
             continue
 
         target_found, lines = has_target(fn)

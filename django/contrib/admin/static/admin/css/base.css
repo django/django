@@ -434,7 +434,7 @@ textarea, select, .vTextField {
 .button, input[type=submit], input[type=button], .submit-row input {
     background: #fff url(../img/nav-bg.gif) bottom repeat-x;
     padding: 3px 5px;
-    color: black;
+    color: #000;
     border: 1px solid #bbb;
     border-color: #ddd #aaa #aaa #ddd;
 }
