@@ -195,7 +195,8 @@ class Options(object):
                         to_meta = f.rel.to._meta
                         if to_meta == self:
                             related_fields[f.related] = f.attname
-                        elif self.concrete_model == to_meta.concrete_model:
+                        elif ((opts & INCLUDE_PROXY)
+                              and self.concrete_model == to_meta.concrete_model):
                             related_fields[f.related] = f.attname
 
             if not opts & INCLUDE_HIDDEN:
