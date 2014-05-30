@@ -131,3 +131,17 @@ class SecondRelatingObject(models.Model):
 class SecondRelatingHiddenObject(models.Model):
     model_hidden_base_second = models.ForeignKey(RelatedModel,
                                                  related_name='+')
+
+
+class RelatedModelProxy(RelatedModel):
+    class Meta:
+        proxy = True
+
+
+class RelatingObjectToProxy(models.Model):
+    object_to_proxy = models.ForeignKey(RelatedModelProxy)
+
+
+class RelatingHiddenObjectToProxy(models.Model):
+    object_to_proxy_hidden = models.ForeignKey(RelatedModelProxy,
+                                               related_name='+')

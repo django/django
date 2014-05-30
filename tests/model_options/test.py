@@ -15,6 +15,8 @@ from .models import (
     RelatedModel
 )
 
+from collections import OrderedDict
+
 
 class OptionsBaseTests(test.TestCase):
 
@@ -98,6 +100,23 @@ class RelatedObjectsTest(OptionsBaseTests):
                                      opts=INCLUDE_HIDDEN | LOCAL_ONLY)
         old_fields = RelatedModel._meta.get_all_related_objects_with_model(
             include_hidden=True, local_only=True)
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_related_objects_proxy(self):
+        new_fields = self.get_fields(RelatedModel,
+                                     types=RELATED_OBJECTS,
+                                     opts=INCLUDE_PROXY)
+        old_fields = RelatedModel._meta.get_all_related_objects_with_model(
+            include_proxy_eq=True)
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_related_objects_proxy_hidden(self):
+        new_fields = self.get_fields(RelatedModel,
+                                     types=RELATED_OBJECTS,
+                                     opts=INCLUDE_PROXY | INCLUDE_HIDDEN)
+        old_fields = RelatedModel._meta.get_all_related_objects_with_model(
+            include_proxy_eq=True, include_hidden=True)
+        self.assertTrue(OrderedDict(new_fields)['object_to_proxy_hidden_id'])
         self.assertEqualFields(old_fields, new_fields)
 
 
