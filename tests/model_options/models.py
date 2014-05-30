@@ -67,6 +67,8 @@ class Article(models.Model):
 
     def __str__(self):
         return self.headline
+
+# DATA
 class AbstractData(models.Model):
     class Meta:
         abstract = True
@@ -84,3 +86,21 @@ class SuperData(Data):
     surname_super_data = models.CharField(max_length=10)
     origin_super_data = models.ForeignObject(Reporter,
         from_fields=['person_country_id'], to_fields=['id'])
+
+
+# M2M
+class AnotherSuperModel(models.Model):
+    name_super_m2m = models.CharField(max_length=10)
+
+
+class AnotherModel(models.Model):
+    name_m2m = models.CharField(max_length=10)
+
+
+class M2MModel(models.Model):
+    name_m2m = models.CharField(max_length=10)
+    members = models.ManyToManyField(AnotherModel)
+
+
+class SuperM2MModel(M2MModel):
+    members_super = models.ManyToManyField(AnotherSuperModel)

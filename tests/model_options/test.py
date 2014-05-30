@@ -9,11 +9,12 @@ from django.db.models.options import (
 )
 
 from .models import (
-    Person, Quartet, Group, Reporter, Musician
+    Person, Quartet, Group, Reporter, Musician,
+    SuperData, SuperM2MModel
 )
 
 
-class DataTests(test.TestCase):
+class OptionsBaseTests(test.TestCase):
 
     def get_fields(self, Model, **kwargs):
         return Model._meta.get_new_fields(**kwargs)
@@ -26,29 +27,46 @@ class DataTests(test.TestCase):
         uniq_new_fields = [y for x, y in new_fields]
         self.assertEquals(uniq_new_fields, uniq_old_fields)
 
+
+class DataTests(OptionsBaseTests):
+
     def test_data_local(self):
-        new_fields = self.get_fields(Quartet, types=DATA, opts=LOCAL_ONLY)
-        old_fields = Quartet._meta.local_fields
+        new_fields = self.get_fields(SuperData, types=DATA, opts=LOCAL_ONLY)
+        old_fields = SuperData._meta.local_fields
         self.assertEqual(old_fields, self.map_model(new_fields))
 
     def test_data(self):
-        new_fields = self.get_fields(Quartet, types=DATA)
-        old_fields = Quartet._meta.get_fields_with_model()
+        new_fields = self.get_fields(SuperData, types=DATA)
+        old_fields = SuperData._meta.get_fields_with_model()
         self.assertEqualFields(old_fields, new_fields)
 
     def test_data_local_concrete(self):
-        new_fields = self.get_fields(Quartet, types=DATA,
+        new_fields = self.get_fields(SuperData, types=DATA,
                                      opts=LOCAL_ONLY | CONCRETE)
-        old_fields = Quartet._meta.local_concrete_fields
+        old_fields = SuperData._meta.local_concrete_fields
         self.assertEqual(old_fields, self.map_model(new_fields))
 
     def test_data_concrete(self):
-        new_fields = self.get_fields(Quartet, types=DATA, opts=CONCRETE)
-        old_fields = Quartet._meta.concrete_fields
+        new_fields = self.get_fields(SuperData, types=DATA, opts=CONCRETE)
+        old_fields = SuperData._meta.concrete_fields
         self.assertEqual(old_fields, self.map_model(new_fields))
 
 
-class OptionsTests(test.TestCase):
+class M2MTests(OptionsBaseTests):
+
+    def test_m2m(self):
+        new_fields = self.get_fields(SuperM2MModel, types=M2M)
+        old_fields = SuperM2MModel._meta.get_m2m_with_model()
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_m2m_local(self):
+        new_fields = self.get_fields(SuperM2MModel, types=M2M,
+                                     opts=LOCAL_ONLY)
+        old_fields = SuperM2MModel._meta.local_many_to_many
+        self.assertEqual(old_fields, self.map_model(new_fields))
+
+
+class OptionsTests(OptionsBaseTests):
 
     def setUp(self):
         for c in['_related_objects_proxy_cache',
