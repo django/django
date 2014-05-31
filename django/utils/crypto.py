@@ -128,7 +128,7 @@ if hasattr(hashlib, "pbkdf2_hmac"):
         Implements PBKDF2 with the same API as Django's existing
         implementation, using the stdlib.
 
-        This is used in Python 3.4 and up.
+        This is used in Python 2.7.8+ and 3.4+.
         """
         if digest is None:
             digest = hashlib.sha256
