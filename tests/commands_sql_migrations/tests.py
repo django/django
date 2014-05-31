@@ -5,7 +5,7 @@ from django.core.management import CommandError
 from django.core.management.color import no_style
 from django.core.management.sql import (sql_create, sql_delete, sql_indexes,
                                         sql_destroy_indexes, sql_all)
-from django.db import connections, DEFAULT_DB_ALIAS, router
+from django.db import connections, DEFAULT_DB_ALIAS
 from django.test import TestCase
 
 
