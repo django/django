@@ -51,14 +51,15 @@ parameter will be transparently passed to the view.
 .. _error-views:
 
 Error views
-=======================
+===========
+
+Django comes with a few views by default for handling HTTP errors. To override
+these with your own custom views, see :ref:`customizing-error-views`.
 
 .. _http_not_found_view:
 
-Django comes with a few views by default for handling HTTP errors. To override these with your own custom views, see :ref:`customizing-error-views`.
-
 The 404 (page not found) view
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 .. function:: django.views.defaults.page_not_found(request, template_name='404.html')
 
@@ -87,7 +88,7 @@ Three things to note about 404 views:
 .. _http_internal_server_error_view:
 
 The 500 (server error) view
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 .. function:: django.views.defaults.server_error(request, template_name='500.html')
 
@@ -107,7 +108,7 @@ instead, with some debug information.
 .. _http_forbidden_view:
 
 The 403 (HTTP Forbidden) view
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 .. function:: django.views.defaults.permission_denied(request, template_name='403.html')
 
@@ -133,7 +134,7 @@ view you can use code like this::
 .. _http_bad_request_view:
 
 The 400 (bad request) view
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 .. function:: django.views.defaults.bad_request(request, template_name='400.html')
 
