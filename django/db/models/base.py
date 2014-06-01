@@ -1357,7 +1357,7 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_ordering(cls):
-        """ Check "ordering" option -- is it a list of lists and do all fields
+        """ Check "ordering" option -- is it a list of strings and do all fields
         exist? """
 
         from django.db.models import FieldDoesNotExist
@@ -1401,6 +1401,14 @@ class Model(six.with_metaclass(ModelBase)):
             try:
                 cls._meta.get_field(field_name, many_to_many=False)
             except FieldDoesNotExist:
+                if field_name.endswith('_id'):
+                    try:
+                        field = cls._meta.get_field(field_name[:-3], many_to_many=False)
+                    except FieldDoesNotExist:
+                        pass
+                    else:
+                        if field.attname == field_name:
+                            continue
                 errors.append(
                     checks.Error(
                         "'ordering' refers to the non-existent field '%s'." % field_name,
