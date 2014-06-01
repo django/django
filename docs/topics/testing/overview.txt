@@ -149,6 +149,14 @@ Tests that require a database (namely, model tests) will not use your "real"
 Regardless of whether the tests pass or fail, the test databases are destroyed
 when all the tests have been executed.
 
+.. versionadded:: 1.8
+
+   You can prevent the test databases from being destroyed by adding the
+   :djadminopt:`--keepdb` flag to the test command. This will preserve the test
+   database between runs. If the database does not exist, it will first
+   be created. Any migrations will also be applied in order to keep it
+   up to date.
+
 By default the test databases get their names by prepending ``test_``
 to the value of the :setting:`NAME` settings for the databases
 defined in :setting:`DATABASES`. When using the SQLite database engine

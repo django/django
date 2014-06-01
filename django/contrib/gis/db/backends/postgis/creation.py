@@ -82,8 +82,10 @@ class PostGISCreation(DatabaseCreation):
                 self.connection.ops.quote_name(self.template_postgis),)
         return ''
 
-    def _create_test_db(self, verbosity, autoclobber):
-        test_database_name = super(PostGISCreation, self)._create_test_db(verbosity, autoclobber)
+    def _create_test_db(self, verbosity, autoclobber, keepdb=False):
+        test_database_name = super(PostGISCreation, self)._create_test_db(verbosity, autoclobber, keepdb)
+        if keepdb:
+            return test_database_name
         if self.template_postgis is None:
             # Connect to the test database in order to create the postgis extension
             self.connection.close()

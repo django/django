@@ -310,7 +310,7 @@ class AliasedDatabaseTeardownTest(unittest.TestCase):
         try:
             destroyed_names = []
             DatabaseCreation.destroy_test_db = lambda self, old_database_name, verbosity=1: destroyed_names.append(old_database_name)
-            DatabaseCreation.create_test_db = lambda self, verbosity=1, autoclobber=False: self._get_test_db_name()
+            DatabaseCreation.create_test_db = lambda self, verbosity=1, autoclobber=False, keepdb=False: self._get_test_db_name()
 
             db.connections = db.ConnectionHandler({
                 'default': {

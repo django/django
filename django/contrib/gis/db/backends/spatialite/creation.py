@@ -7,7 +7,7 @@ from django.db.backends.sqlite3.creation import DatabaseCreation
 
 class SpatiaLiteCreation(DatabaseCreation):
 
-    def create_test_db(self, verbosity=1, autoclobber=False):
+    def create_test_db(self, verbosity=1, autoclobber=False, keepdb=False):
         """
         Creates a test database, prompting the user for confirmation if the
         database already exists. Returns the name of the test database created.
@@ -22,11 +22,15 @@ class SpatiaLiteCreation(DatabaseCreation):
 
         if verbosity >= 1:
             test_db_repr = ''
+            action = 'Creating'
             if verbosity >= 2:
                 test_db_repr = " ('%s')" % test_database_name
-            print("Creating test database for alias '%s'%s..." % (self.connection.alias, test_db_repr))
+            if keepdb:
+                action = 'Using existing'
+            print("%s test database for alias '%s'%s..." % (
+                action, self.connection.alias, test_db_repr))
 
-        self._create_test_db(verbosity, autoclobber)
+        self._create_test_db(verbosity, autoclobber, keepdb)
 
         self.connection.close()
         self.connection.settings_dict["NAME"] = test_database_name
