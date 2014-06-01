@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from optparse import make_option
 
 from django.core.management.base import AppCommand
-from django.core.management.sql import check_for_migrations
 from django.db import connections, DEFAULT_DB_ALIAS
 
 
@@ -23,7 +22,6 @@ class Command(AppCommand):
         if app_config.models_module is None:
             return
         connection = connections[options.get('database')]
-        check_for_migrations(app_config, connection)
         models = app_config.get_models(include_auto_created=True)
         statements = connection.ops.sequence_reset_sql(self.style, models)
         return '\n'.join(statements)
