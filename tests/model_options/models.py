@@ -145,3 +145,21 @@ class RelatingObjectToProxy(models.Model):
 class RelatingHiddenObjectToProxy(models.Model):
     object_to_proxy_hidden = models.ForeignKey(RelatedModelProxy,
                                                related_name='+')
+
+# RELATED_M2M
+
+
+class BaseRelatedM2MModel(models.Model):
+    name_base = models.CharField(max_length=10)
+
+
+class M2MRelationToBaseM2MModel(models.Model):
+    models.ManyToManyField(BaseRelatedM2MModel)
+
+
+class RelatedM2MModel(BaseRelatedM2MModel):
+    name = models.CharField(max_length=10)
+
+
+class M2MRelationToM2MModel(models.Model):
+    models.ManyToManyField(RelatedM2MModel)

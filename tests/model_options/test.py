@@ -58,9 +58,9 @@ class DataTests(OptionsBaseTests):
     def test_related_objects(self):
         objects = RelatedModel._meta.get_all_related_objects_with_model()
         self.eq_field_names_and_models(objects, [
-            'model_options:secondrelatingobject',
             'model_options:firstrelatingobject',
-        ], [None, BaseRelatedModel])
+            'model_options:secondrelatingobject',
+        ], [BaseRelatedModel, None])
 
     def test_related_objects_local(self):
         objects = RelatedModel._meta.get_all_related_objects_with_model(
@@ -73,11 +73,11 @@ class DataTests(OptionsBaseTests):
         objects = RelatedModel._meta.get_all_related_objects_with_model(
             include_hidden=True)
         self.eq_field_names_and_models(objects, [
-            'model_options:secondrelatingobject',
-            'model_options:secondrelatinghiddenobject',
             'model_options:firstrelatingobject',
-            'model_options:firstrelatinghiddenobject'
-        ], [None, None, BaseRelatedModel, BaseRelatedModel])
+            'model_options:secondrelatinghiddenobject',
+            'model_options:firstrelatinghiddenobject',
+            'model_options:secondrelatingobject'
+        ], [BaseRelatedModel, None, BaseRelatedModel, None])
 
     def test_related_objects_include_hidden_local_only(self):
         objects = RelatedModel._meta.get_all_related_objects_with_model(
@@ -91,21 +91,21 @@ class DataTests(OptionsBaseTests):
         objects = RelatedModel._meta.get_all_related_objects_with_model(
             include_proxy_eq=True)
         self.eq_field_names_and_models(objects, [
-            'model_options:secondrelatingobject',
             'model_options:firstrelatingobject',
-            'model_options:relatingobjecttoproxy'
-        ], [None, BaseRelatedModel, None])
+            'model_options:relatingobjecttoproxy',
+            'model_options:secondrelatingobject'
+        ], [BaseRelatedModel, None, None])
 
     def test_related_objects_proxy_hidden(self):
         objects = RelatedModel._meta.get_all_related_objects_with_model(
             include_proxy_eq=True, include_hidden=True)
         self.eq_field_names_and_models(objects, [
-            'model_options:relatingobjecttoproxy',
             'model_options:relatinghiddenobjecttoproxy',
-            'model_options:firstrelatinghiddenobject',
-            'model_options:firstrelatingobject',
             'model_options:secondrelatingobject',
-            'model_options:secondrelatinghiddenobject'
+            'model_options:firstrelatingobject',
+            'model_options:firstrelatinghiddenobject',
+            'model_options:secondrelatinghiddenobject',
+            'model_options:relatingobjecttoproxy'
         ], [None, None, BaseRelatedModel, BaseRelatedModel,
             None, None])
 
