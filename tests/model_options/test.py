@@ -11,7 +11,10 @@ from .models import (
 
 
 class OptionsBaseTests(test.TestCase):
-    pass
+    def eq_field_names_and_models(self, objects, names_eq, models_eq):
+        fields, models = dict(objects).keys(), dict(objects).values()
+        self.assertEquals([f.name for f in fields], names_eq)
+        self.assertEquals(models, models_eq)
 
 
 class DataTests(OptionsBaseTests):
@@ -54,69 +57,55 @@ class DataTests(OptionsBaseTests):
 
     def test_related_objects(self):
         objects = RelatedModel._meta.get_all_related_objects_with_model()
-        fields, models = dict(objects).keys(), dict(objects).values()
-        self.assertEquals([f.name for f in fields], [
+        self.eq_field_names_and_models(objects, [
             'model_options:secondrelatingobject',
             'model_options:firstrelatingobject',
-        ])
-        self.assertEquals(models, [
-            None, BaseRelatedModel
-        ])
+        ], [None, BaseRelatedModel])
 
     def test_related_objects_local(self):
         objects = RelatedModel._meta.get_all_related_objects_with_model(
             local_only=True)
-        fields, models = dict(objects).keys(), dict(objects).values()
-        self.assertEquals([f.name for f in fields], [
+        self.eq_field_names_and_models(objects, [
             'model_options:secondrelatingobject'
-        ])
-        self.assertEquals(models, [None])
+        ], [None])
 
     def test_related_objects_include_hidden(self):
         objects = RelatedModel._meta.get_all_related_objects_with_model(
             include_hidden=True)
-        fields, models = dict(objects).keys(), dict(objects).values()
-        self.assertEquals([f.name for f in fields], [
+        self.eq_field_names_and_models(objects, [
             'model_options:secondrelatingobject',
             'model_options:secondrelatinghiddenobject',
             'model_options:firstrelatingobject',
             'model_options:firstrelatinghiddenobject'
-        ])
-        self.assertEquals(models, [None, None, BaseRelatedModel,
-                                   BaseRelatedModel])
+        ], [None, None, BaseRelatedModel, BaseRelatedModel])
 
     def test_related_objects_include_hidden_local_only(self):
         objects = RelatedModel._meta.get_all_related_objects_with_model(
             include_hidden=True, local_only=True)
-        fields, models = dict(objects).keys(), dict(objects).values()
-        self.assertEquals([f.name for f in fields], [
+        self.eq_field_names_and_models(objects, [
             'model_options:secondrelatingobject',
             'model_options:secondrelatinghiddenobject'
-        ])
-        self.assertEquals(models, [None, None])
+        ], [None, None])
 
     def test_related_objects_proxy(self):
         objects = RelatedModel._meta.get_all_related_objects_with_model(
             include_proxy_eq=True)
-        fields, models = dict(objects).keys(), dict(objects).values()
-        self.assertEquals([f.name for f in fields], [
+        self.eq_field_names_and_models(objects, [
             'model_options:secondrelatingobject',
             'model_options:firstrelatingobject',
             'model_options:relatingobjecttoproxy'
-        ])
-        self.assertEquals(models, [None, BaseRelatedModel, None])
+        ], [None, BaseRelatedModel, None])
 
     def test_related_objects_proxy_hidden(self):
         objects = RelatedModel._meta.get_all_related_objects_with_model(
             include_proxy_eq=True, include_hidden=True)
-        fields, models = dict(objects).keys(), dict(objects).values()
-        self.assertEquals([f.name for f in fields], [
+        self.eq_field_names_and_models(objects, [
             'model_options:relatingobjecttoproxy',
             'model_options:relatinghiddenobjecttoproxy',
             'model_options:firstrelatinghiddenobject',
             'model_options:firstrelatingobject',
             'model_options:secondrelatingobject',
             'model_options:secondrelatinghiddenobject'
-        ])
-        self.assertEquals(models, [None, None, BaseRelatedModel,
-                                   BaseRelatedModel, None, None])
+        ], [None, None, BaseRelatedModel, BaseRelatedModel,
+            None, None])
+
