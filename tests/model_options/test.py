@@ -1,11 +1,12 @@
 from django import test
 
 from django.db.models import CharField, ManyToManyField
-from django.db.models.fields.related import ManyToManyRel
+from django.db.models.fields.related import ManyToManyRel, RelatedObject
 
 from django.contrib.auth.models import User
 
 from .models import (
+    Musician, Group,
     SuperData, M2MModel,
     SuperM2MModel,
     RelatedModel, BaseRelatedModel,
@@ -142,3 +143,18 @@ class DataTests(OptionsBaseTests):
 
         self.assertEquals(['my_new_field'], [f.attname for f in
                           BareModel._meta.many_to_many])
+
+    def test_get_data_field(self):
+        field_info = Musician._meta.get_field_by_name('name')
+        self.assertEquals(field_info[1:], (None, True, False))
+        self.assertTrue(isinstance(field_info[0], CharField))
+
+    def test_get_m2m_field(self):
+        field_info = Group._meta.get_field_by_name('members')
+        self.assertEquals(field_info[1:], (None, True, True))
+        self.assertTrue(isinstance(field_info[0], ManyToManyField))
+
+    def test_get_related_object(self):
+        field_info = Group._meta.get_field_by_name('ownedvenue')
+        self.assertEquals(field_info[1:], (None, False, False))
+        self.assertTrue(isinstance(field_info[0], RelatedObject))
