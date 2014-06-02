@@ -84,3 +84,24 @@ class DataTests(OptionsBaseTests):
         ])
         self.assertEquals(models, [None, None, BaseRelatedModel,
                                    BaseRelatedModel])
+
+    def test_related_objects_include_hidden_local_only(self):
+        objects = RelatedModel._meta.get_all_related_objects_with_model(
+            include_hidden=True, local_only=True)
+        fields, models = dict(objects).keys(), dict(objects).values()
+        self.assertEquals([f.name for f in fields], [
+            'model_options:secondrelatingobject',
+            'model_options:secondrelatinghiddenobject'
+        ])
+        self.assertEquals(models, [None, None])
+
+    def test_related_objects_proxy(self):
+        objects = RelatedModel._meta.get_all_related_objects_with_model(
+            include_proxy_eq=True)
+        fields, models = dict(objects).keys(), dict(objects).values()
+        self.assertEquals([f.name for f in fields], [
+            'model_options:secondrelatingobject',
+            'model_options:firstrelatingobject',
+            'model_options:relatingobjecttoproxy'
+        ])
+        self.assertEquals(models, [None, BaseRelatedModel, None])
