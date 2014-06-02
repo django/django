@@ -3,10 +3,10 @@ from django import test
 from django.db.models.fields.related import ManyToManyRel
 
 from .models import (
-    Person, Quartet, Group, Reporter, Musician,
     SuperData, M2MModel,
     SuperM2MModel,
-    RelatedModel, BaseRelatedModel
+    RelatedModel, BaseRelatedModel,
+    RelatedM2MModel, BaseRelatedM2MModel
 )
 
 
@@ -109,3 +109,16 @@ class DataTests(OptionsBaseTests):
         ], [None, None, BaseRelatedModel, BaseRelatedModel,
             None, None])
 
+    def test_related_m2m_with_model(self):
+        objects = RelatedM2MModel._meta.get_all_related_m2m_objects_with_model()
+        self.eq_field_names_and_models(objects, [
+            'model_options:m2mrelationtobasem2mmodel',
+            'model_options:m2mrelationtom2mmodel'
+        ], [BaseRelatedM2MModel, None])
+
+    def test_related_m2m_local_only(self):
+        fields = RelatedM2MModel._meta.get_all_related_many_to_many_objects(
+            local_only=True)
+        self.assertEquals([f.name for f in fields], [
+            'model_options:m2mrelationtom2mmodel'
+        ])
