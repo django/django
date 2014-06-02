@@ -105,3 +105,18 @@ class DataTests(OptionsBaseTests):
             'model_options:relatingobjecttoproxy'
         ])
         self.assertEquals(models, [None, BaseRelatedModel, None])
+
+    def test_related_objects_proxy_hidden(self):
+        objects = RelatedModel._meta.get_all_related_objects_with_model(
+            include_proxy_eq=True, include_hidden=True)
+        fields, models = dict(objects).keys(), dict(objects).values()
+        self.assertEquals([f.name for f in fields], [
+            'model_options:relatingobjecttoproxy',
+            'model_options:relatinghiddenobjecttoproxy',
+            'model_options:firstrelatinghiddenobject',
+            'model_options:firstrelatingobject',
+            'model_options:secondrelatingobject',
+            'model_options:secondrelatinghiddenobject'
+        ])
+        self.assertEquals(models, [None, None, BaseRelatedModel,
+                                   BaseRelatedModel, None, None])
