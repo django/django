@@ -166,3 +166,16 @@ class M2MRelationToM2MModel(models.Model):
 
 class BareModel(models.Model):
     pass
+
+
+# CHAIN
+class A(models.Model):
+    pass
+
+
+class B(A):
+    pass
+
+
+class C(B):
+    pass

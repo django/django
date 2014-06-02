@@ -1,7 +1,9 @@
 from django import test
 
 from django.db.models import CharField, ManyToManyField
-from django.db.models.fields.related import ManyToManyRel, RelatedObject
+from django.db.models.fields.related import (
+    ManyToManyRel, RelatedObject, OneToOneField
+)
 
 from django.contrib.auth.models import User
 
@@ -11,7 +13,8 @@ from .models import (
     SuperM2MModel,
     RelatedModel, BaseRelatedModel,
     RelatedM2MModel, BaseRelatedM2MModel,
-    BareModel
+    BareModel,
+    A, B, C
 )
 
 
@@ -168,3 +171,23 @@ class DataTests(OptionsBaseTests):
         field_info = SuperData._meta.get_field_by_name('name_data')
         self.assertEquals(field_info[1:], (Data, True, False))
         self.assertTrue(isinstance(field_info[0], CharField))
+
+    def test_get_ancestor_link(self):
+        field = SuperData._meta.get_ancestor_link(Data)
+        self.assertTrue(isinstance(field, OneToOneField))
+        self.assertEquals(field.related_query_name(), 'superdata')
+
+    def test_get_ancestor_link_multiple(self):
+        info = C._meta.get_ancestor_link(A)
+        self.assertEquals('b_ptr_id', info.attname)
+
+    def test_get_ancestor_link_invalid(self):
+        self.assertFalse(SuperData._meta.get_ancestor_link(Musician))
+
+    def test_get_base_chain(self):
+        chain = C._meta.get_base_chain(A)
+        self.assertEquals(chain, [B, A])
+
+    def test_get_base_chain_invalid(self):
+        self.assertFalse(C._meta.get_base_chain(Musician))
+
