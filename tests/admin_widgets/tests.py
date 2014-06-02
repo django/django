@@ -142,23 +142,6 @@ class AdminFormfieldForDBFieldTests(TestCase):
         self.assertEqual(f2.widget.attrs['maxlength'], '20')
         self.assertEqual(f2.widget.attrs['size'], '10')
 
-    def testFormfieldOverridesWidgetInstancesForFieldsWithChoices(self):
-        """
-        Test that widget is actually overridden for fields with choices.
-        (#194303)
-        """
-        class MemberAdmin(admin.ModelAdmin):
-            formfield_overrides = {
-                CharField: {'widget': forms.TextInput}
-            }
-        ma = MemberAdmin(models.Member, admin.site)
-        name_field = models.Member._meta.get_field('name')
-        gender_field = models.Member._meta.get_field('gender')
-        name = ma.formfield_for_dbfield(name_field, request=None)
-        gender = ma.formfield_for_dbfield(gender_field, request=None)
-        self.assertIsInstance(name.widget, forms.TextInput)
-        self.assertIsInstance(gender.widget, forms.TextInput)
-
     def testFieldWithChoices(self):
         self.assertFormfield(models.Member, 'gender', forms.Select)
 
