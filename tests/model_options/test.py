@@ -1,12 +1,16 @@
 from django import test
 
+from django.db.models import CharField, ManyToManyField
 from django.db.models.fields.related import ManyToManyRel
+
+from django.contrib.auth.models import User
 
 from .models import (
     SuperData, M2MModel,
     SuperM2MModel,
     RelatedModel, BaseRelatedModel,
-    RelatedM2MModel, BaseRelatedM2MModel
+    RelatedM2MModel, BaseRelatedM2MModel,
+    BareModel
 )
 
 
@@ -122,3 +126,19 @@ class DataTests(OptionsBaseTests):
         self.assertEquals([f.name for f in fields], [
             'model_options:m2mrelationtom2mmodel'
         ])
+
+    def test_add_data_field(self):
+        cf = CharField()
+        cf.set_attributes_from_name("my_new_field")
+        BareModel._meta.add_field(cf)
+
+        self.assertEquals([u'id', 'my_new_field'], [f.attname
+                          for f in BareModel._meta.fields])
+
+    def test_add_m2m_field(self):
+        cf = ManyToManyField(User)
+        cf.set_attributes_from_name("my_new_field")
+        BareModel._meta.add_field(cf)
+
+        self.assertEquals(['my_new_field'], [f.attname for f in
+                          BareModel._meta.many_to_many])

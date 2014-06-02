@@ -162,3 +162,7 @@ class RelatedM2MModel(BaseRelatedM2MModel):
 
 class M2MRelationToM2MModel(models.Model):
     relation = models.ManyToManyField(RelatedM2MModel)
+
+
+class BareModel(models.Model):
+    pass
