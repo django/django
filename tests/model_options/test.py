@@ -16,13 +16,23 @@ class OptionsBaseTests(test.TestCase):
 
 class DataTests(OptionsBaseTests):
 
-    def test_data_local(self):
-        old_fields = SuperData._meta.local_fields
-        self.assertEquals([f.attname for f in old_fields], [
+    def test_local_fields(self):
+        fields = SuperData._meta.local_fields
+        self.assertEquals([f.attname for f in fields], [
             'data_ptr_id',
             'name_super_data',
             'surname_super_data',
             'origin_super_data'
         ])
         self.assertTrue(all([f.rel is None or not isinstance(f.rel, ManyToManyRel)
-                             for f in old_fields]))
+                             for f in fields]))
+
+    def test_local_concrete_fields(self):
+        fields = SuperData._meta.local_concrete_fields
+        self.assertEquals([f.attname for f in fields], [
+            u'data_ptr_id',
+            'name_super_data',
+            'surname_super_data'
+        ])
+        self.assertTrue(all([f.column is not None
+                             for f in fields]))
