@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
 from .models import (
     Musician, Group,
-    SuperData, M2MModel,
+    Data, SuperData, M2MModel,
     SuperM2MModel,
     RelatedModel, BaseRelatedModel,
     RelatedM2MModel, BaseRelatedM2MModel,
@@ -158,3 +158,13 @@ class DataTests(OptionsBaseTests):
         field_info = Group._meta.get_field_by_name('ownedvenue')
         self.assertEquals(field_info[1:], (None, False, False))
         self.assertTrue(isinstance(field_info[0], RelatedObject))
+
+    def test_get_related_m2m(self):
+        field_info = Musician._meta.get_field_by_name('group')
+        self.assertEquals(field_info[1:], (None, False, True))
+        self.assertTrue(isinstance(field_info[0], RelatedObject))
+
+    def test_get_parent_field(self):
+        field_info = SuperData._meta.get_field_by_name('name_data')
+        self.assertEquals(field_info[1:], (Data, True, False))
+        self.assertTrue(isinstance(field_info[0], CharField))
