@@ -274,11 +274,10 @@ Django requires MySQLdb version 1.2.1p2 or later.
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
 
-MySQL Connector/Python is available through two `release branches`_: Generally
-Available (GA, currently 1.0.x) and Development (Dev, currently 1.1.x beta).
-The Django adapter is currently only available in the Dev branch.
+MySQL Connector/Python is available from `download page`_.
+The Django adapter is available from 1.2.x.
 
-.. _release branches: http://dev.mysql.com/downloads/connector/python/
+.. _download page: http://dev.mysql.com/downloads/connector/python/
 
 .. _mysql-time-zone-definitions:
 
