@@ -1,6 +1,5 @@
 from django.test import TestCase
 from django.core import signing
-from django.core.exceptions import SuspiciousOperation
 from django.http import HttpResponse
 
 from django.contrib.auth.tests.utils import skipIfCustomUser
@@ -25,7 +24,7 @@ class TestCookieStorage(TestStorage, TestCase):
         self.assertEqual(storage.load_data(), {'key1': 'value1'})
 
         storage.request.COOKIES[storage.prefix] = 'i_am_manipulated'
-        self.assertRaises(SuspiciousOperation, storage.load_data)
+        self.assertIsNone(storage.load_data())
 
     def test_reset_cookie(self):
         request = get_request()

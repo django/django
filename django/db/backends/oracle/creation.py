@@ -56,7 +56,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     def __init__(self, connection):
         super(DatabaseCreation, self).__init__(connection)
 
-    def _create_test_db(self, verbosity=1, autoclobber=False):
+    def _create_test_db(self, verbosity=1, autoclobber=False, keepdb=False):
         TEST_NAME = self._test_database_name()
         TEST_USER = self._test_database_user()
         TEST_PASSWD = self._test_database_passwd()
@@ -76,6 +76,10 @@ class DatabaseCreation(BaseDatabaseCreation):
             try:
                 self._execute_test_db_creation(cursor, parameters, verbosity)
             except Exception as e:
+                # if we want to keep the db, then no need to do any of the below,
+                # just return and skip it all.
+                if keepdb:
+                    return
                 sys.stderr.write("Got an error creating the test database: %s\n" % e)
                 if not autoclobber:
                     confirm = input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_NAME)

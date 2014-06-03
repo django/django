@@ -31,6 +31,7 @@ those packages have.
    gis/index
    humanize
    messages
+   postgres/index
    redirects
    sitemaps
    sites
@@ -121,6 +122,13 @@ A framework for storing and retrieving temporary cookie- or session-based
 messages
 
 See the :doc:`messages documentation </ref/contrib/messages>`.
+
+postgres
+========
+
+A collection of PostgreSQL specific features.
+
+See the :doc:`contrib.postgres documentation </ref/contrib/postgres/index>`.
 
 redirects
 =========

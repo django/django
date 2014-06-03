@@ -1120,31 +1120,3 @@ class AdminTests(TestCase):
         with timezone.override(ICT):
             response = self.client.get(reverse('admin:timezones_timestamp_change', args=(t.pk,)))
         self.assertContains(response, t.created.astimezone(ICT).isoformat())
-
-
-@override_settings(TIME_ZONE='Africa/Nairobi')
-class UtilitiesTests(TestCase):
-
-    def test_make_aware(self):
-        self.assertEqual(
-            timezone.make_aware(datetime.datetime(2011, 9, 1, 13, 20, 30), EAT),
-            datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
-        )
-        self.assertEqual(
-            timezone.make_aware(datetime.datetime(2011, 9, 1, 10, 20, 30), UTC),
-            datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC)
-        )
-
-    def test_make_naive(self):
-        self.assertEqual(
-            timezone.make_naive(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT), EAT),
-            datetime.datetime(2011, 9, 1, 13, 20, 30)
-        )
-        self.assertEqual(
-            timezone.make_naive(datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT), UTC),
-            datetime.datetime(2011, 9, 1, 10, 20, 30)
-        )
-        self.assertEqual(
-            timezone.make_naive(datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC), UTC),
-            datetime.datetime(2011, 9, 1, 10, 20, 30)
-        )

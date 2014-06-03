@@ -24,7 +24,7 @@ class Command(TemplateCommand):
                                "project name. Please try another name." %
                                project_name)
 
-        # Create a random SECRET_KEY hash to put it in the main settings.
+        # Create a random SECRET_KEY to put it in the main settings.
         chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
         options['secret_key'] = get_random_string(50, chars)
 

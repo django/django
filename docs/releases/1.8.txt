@@ -36,17 +36,28 @@ Minor features
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* Authorization backends can now raise
+  :class:`~django.core.exceptions.PermissionDenied` in
+  :meth:`~django.contrib.auth.models.User.has_perm`
+  and :meth:`~django.contrib.auth.models.User.has_module_perms`
+  to short-circuit permission checking.
 
 :mod:`django.contrib.formtools`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* A :doc:`form wizard </ref/contrib/formtools/form-wizard>` using the
+  :class:`~django.contrib.formtools.wizard.views.CookieWizardView` will now ignore
+  an invalid cookie, and the wizard will restart from the first step. An invalid
+  cookie can occur in cases of intentional manipulation, but also after a secret
+  key change. Previously, this would raise ``WizardViewCookieModified``, a
+  ``SuspiciousOperation``, causing an exception for any user with an invalid cookie
+  upon every request to the wizard, until the cookie is removed.
 
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
+  Django 1.2 have been removed.
 
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -125,10 +136,17 @@ Forms
   a form's :attr:`~django.forms.Form.label_suffix` while using  shortcuts such
   as ``{{ form.as_p }}`` in templates.
 
+* :class:`~django.forms.extras.widgets.SelectDateWidget` now accepts an
+  :attr:`~django.forms.extras.widgets.SelectDateWidget.empty_label` argument, which will
+  override the top list choice label when :class:`~django.forms.DateField` is not required.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* :setting:`FORMAT_MODULE_PATH` can now be a list of strings representing
+  module paths. This allows importing several format modules from different
+  reusable apps. It also allows overriding those custom formats in your main
+  Django project.
 
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
@@ -140,6 +158,9 @@ Management Commands
   :djadminopt:`--exclude` which allows exclusion of specific locales from
   processing.
 
+* The :djadminopt:`--ignorenonexistent` option of the :djadmin:`loaddata`
+  management command now ignores data for models that no longer exist.
+
 Models
 ^^^^^^
 
@@ -148,7 +169,9 @@ Models
 Signals
 ^^^^^^^
 
-* ...
+* Exceptions from the ``(receiver, exception)`` tuples returned by
+  :meth:`Signal.send_robust() <django.dispatch.Signal.send_robust>` now have
+  their traceback attached as a ``__traceback__`` attribute.
 
 Templates
 ^^^^^^^^^
@@ -170,6 +193,9 @@ Tests
 * The new :meth:`~django.test.SimpleTestCase.assertJSONNotEqual` assertion
   allows you to test that two JSON fragments are not equal.
 
+* Added the ability to preserve the test database by adding the :djadminopt:`--keepdb`
+  flag.
+
 Validators
 ^^^^^^^^^^
 
@@ -181,7 +207,7 @@ Backwards incompatible changes in 1.8
 .. warning::
 
     In addition to the changes outlined in this section, be sure to review the
-    :doc:`deprecation plan </internals/deprecation>` for any features that
+    :ref:`deprecation plan <deprecation-removed-in-1.8>` for any features that
     have been removed. If you haven't updated your code within the
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.

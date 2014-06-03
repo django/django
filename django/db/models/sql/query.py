@@ -1491,7 +1491,7 @@ class Query(object):
         query.remove_inherited_models()
 
         # Add extra check to make sure the selected field will not be null
-        # since we are adding a IN <subquery> clause. This prevents the
+        # since we are adding an IN <subquery> clause. This prevents the
         # database from tripping over IN (...,NULL,...) selects and returning
         # nothing
         alias, col = query.select[0].col
@@ -2091,7 +2091,7 @@ class JoinPromoter(object):
             # join.
             # Note that in this example we could just as well have the __gte
             # clause and the OR clause swapped. Or we could replace the __gte
-            # clause with a OR clause containing rel_a__col=1|rel_a__col=2,
+            # clause with an OR clause containing rel_a__col=1|rel_a__col=2,
             # and again we could safely demote to INNER.
         query.promote_joins(to_promote)
         query.demote_joins(to_demote)

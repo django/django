@@ -370,16 +370,15 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(wordcount('oneword'), 1)
         self.assertEqual(wordcount('lots of words'), 3)
 
+    def test_wordwrap(self):
         self.assertEqual(wordwrap('this is a long paragraph of text that '
-            'really needs to be wrapped I\'m afraid', 14),
-            "this is a long\nparagraph of\ntext that\nreally needs\nto be "
+            "really needs to be wrapped I'm afraid", 14),
+            'this is a long\nparagraph of\ntext that\nreally needs\nto be '
             "wrapped\nI'm afraid")
-
         self.assertEqual(wordwrap('this is a short paragraph of text.\n  '
             'But this line should be indented', 14),
             'this is a\nshort\nparagraph of\ntext.\n  But this\nline '
             'should be\nindented')
-
         self.assertEqual(wordwrap('this is a short paragraph of text.\n  '
             'But this line should be indented', 15), 'this is a short\n'
             'paragraph of\ntext.\n  But this line\nshould be\nindented')

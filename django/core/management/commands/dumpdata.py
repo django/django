@@ -155,10 +155,15 @@ class Command(BaseCommand):
 
         try:
             self.stdout.ending = None
-            serializers.serialize(format, get_objects(), indent=indent,
-                    use_natural_foreign_keys=use_natural_foreign_keys,
-                    use_natural_primary_keys=use_natural_primary_keys,
-                    stream=open(output, 'w') if output else self.stdout)
+            stream = open(output, 'w') if output else None
+            try:
+                serializers.serialize(format, get_objects(), indent=indent,
+                        use_natural_foreign_keys=use_natural_foreign_keys,
+                        use_natural_primary_keys=use_natural_primary_keys,
+                        stream=stream or self.stdout)
+            finally:
+                if stream:
+                    stream.close()
         except Exception as e:
             if show_traceback:
                 raise

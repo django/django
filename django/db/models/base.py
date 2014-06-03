@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import copy
+import inspect
 import sys
 from functools import update_wrapper
 import warnings
@@ -299,7 +300,8 @@ class ModelBase(type):
                 cls.add_to_class(mgr_name, new_manager)
 
     def add_to_class(cls, name, value):
-        if hasattr(value, 'contribute_to_class'):
+        # We should call the contribute_to_class method only if it's bound
+        if not inspect.isclass(value) and hasattr(value, 'contribute_to_class'):
             value.contribute_to_class(cls, name)
         else:
             setattr(cls, name, value)
@@ -1355,7 +1357,7 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_ordering(cls):
-        """ Check "ordering" option -- is it a list of lists and do all fields
+        """ Check "ordering" option -- is it a list of strings and do all fields
         exist? """
 
         from django.db.models import FieldDoesNotExist
@@ -1399,6 +1401,14 @@ class Model(six.with_metaclass(ModelBase)):
             try:
                 cls._meta.get_field(field_name, many_to_many=False)
             except FieldDoesNotExist:
+                if field_name.endswith('_id'):
+                    try:
+                        field = cls._meta.get_field(field_name[:-3], many_to_many=False)
+                    except FieldDoesNotExist:
+                        pass
+                    else:
+                        if field.attname == field_name:
+                            continue
                 errors.append(
                     checks.Error(
                         "'ordering' refers to the non-existent field '%s'." % field_name,

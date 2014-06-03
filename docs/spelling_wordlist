@@ -244,6 +244,7 @@ gunicorn
 Gunicorn
 gz
 GZip
+gzipped
 hackish
 handheld
 hardcode

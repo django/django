@@ -180,6 +180,14 @@ The permissions given to the user will be the superset of all permissions
 returned by all backends. That is, Django grants a permission to a user that
 any one backend grants.
 
+.. versionadded:: 1.8
+
+    If a backend raises a :class:`~django.core.exceptions.PermissionDenied`
+    exception in :meth:`~django.contrib.auth.models.User.has_perm()` or
+    :meth:`~django.contrib.auth.models.User.has_module_perms()`,
+    the authorization will immediately fail and Django
+    won't check the backends that follow.
+
 The simple backend above could implement permissions for the magic admin
 fairly simply::
 

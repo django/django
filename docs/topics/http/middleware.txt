@@ -45,7 +45,9 @@ The order in :setting:`MIDDLEWARE_CLASSES` matters because a middleware can
 depend on other middleware. For instance,
 :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` stores the
 authenticated user in the session; therefore, it must run after
-:class:`~django.contrib.sessions.middleware.SessionMiddleware`.
+:class:`~django.contrib.sessions.middleware.SessionMiddleware`. See
+:ref:`middleware-ordering` for some common hints about ordering of Django
+middleware classes.
 
 Hooks and application order
 ===========================

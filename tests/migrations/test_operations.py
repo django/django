@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import unittest
 
 try:
@@ -5,6 +7,7 @@ try:
 except ImportError:
     sqlparse = None
 
+from django import test
 from django.db import connection, migrations, models, router
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
@@ -34,18 +37,33 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             return migration.unapply(project_state, editor)
 
-    def set_up_test_model(self, app_label, second_model=False, related_model=False, mti_model=False):
+    def set_up_test_model(self, app_label, second_model=False, third_model=False, related_model=False, mti_model=False):
         """
         Creates a test model state and database table.
         """
         # Delete the tables if they already exist
         with connection.cursor() as cursor:
+            # Start with ManyToMany tables
+            try:
+                cursor.execute("DROP TABLE %s_pony_stables" % app_label)
+            except DatabaseError:
+                pass
+            try:
+                cursor.execute("DROP TABLE %s_pony_vans" % app_label)
+            except DatabaseError:
+                pass
+
+            # Then standard model tables
             try:
                 cursor.execute("DROP TABLE %s_pony" % app_label)
             except DatabaseError:
                 pass
             try:
                 cursor.execute("DROP TABLE %s_stable" % app_label)
+            except DatabaseError:
+                pass
+            try:
+                cursor.execute("DROP TABLE %s_van" % app_label)
             except DatabaseError:
                 pass
         # Make the "current" state
@@ -60,6 +78,13 @@ class OperationTests(MigrationTestBase):
         if second_model:
             operations.append(migrations.CreateModel(
                 "Stable",
+                [
+                    ("id", models.AutoField(primary_key=True)),
+                ]
+            ))
+        if third_model:
+            operations.append(migrations.CreateModel(
+                "Van",
                 [
                     ("id", models.AutoField(primary_key=True)),
                 ]
@@ -312,6 +337,137 @@ class OperationTests(MigrationTestBase):
             operation.database_backwards("test_adfl", editor, new_state, project_state)
         self.assertColumnNotExists("test_adfl_pony", "height")
 
+    def test_add_charfield(self):
+        """
+        Tests the AddField operation on TextField.
+        """
+        project_state = self.set_up_test_model("test_adchfl")
+
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_adchfl", "Pony")
+        pony = Pony.objects.create(weight=42)
+
+        new_state = self.apply_operations("test_adchfl", project_state, [
+            migrations.AddField(
+                "Pony",
+                "text",
+                models.CharField(max_length=10, default="some text"),
+            ),
+            migrations.AddField(
+                "Pony",
+                "empty",
+                models.CharField(max_length=10, default=""),
+            ),
+            # If not properly quoted digits would be interpreted as an int.
+            migrations.AddField(
+                "Pony",
+                "digits",
+                models.CharField(max_length=10, default="42"),
+            ),
+            # Manual quoting is fragile and could trip on quotes. Refs #xyz.
+            migrations.AddField(
+                "Pony",
+                "quotes",
+                models.CharField(max_length=10, default='"\'"'),
+            ),
+        ])
+
+        new_apps = new_state.render()
+        Pony = new_apps.get_model("test_adchfl", "Pony")
+        pony = Pony.objects.get(pk=pony.pk)
+        self.assertEqual(pony.text, "some text")
+        self.assertEqual(pony.empty, "")
+        self.assertEqual(pony.digits, "42")
+        self.assertEqual(pony.quotes, '"\'"')
+
+    def test_add_textfield(self):
+        """
+        Tests the AddField operation on TextField.
+        """
+        project_state = self.set_up_test_model("test_adtxtfl")
+
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_adtxtfl", "Pony")
+        pony = Pony.objects.create(weight=42)
+
+        new_state = self.apply_operations("test_adtxtfl", project_state, [
+            migrations.AddField(
+                "Pony",
+                "text",
+                models.TextField(default="some text"),
+            ),
+            migrations.AddField(
+                "Pony",
+                "empty",
+                models.TextField(default=""),
+            ),
+            # If not properly quoted digits would be interpreted as an int.
+            migrations.AddField(
+                "Pony",
+                "digits",
+                models.TextField(default="42"),
+            ),
+            # Manual quoting is fragile and could trip on quotes. Refs #xyz.
+            migrations.AddField(
+                "Pony",
+                "quotes",
+                models.TextField(default='"\'"'),
+            ),
+        ])
+
+        new_apps = new_state.render()
+        Pony = new_apps.get_model("test_adtxtfl", "Pony")
+        pony = Pony.objects.get(pk=pony.pk)
+        self.assertEqual(pony.text, "some text")
+        self.assertEqual(pony.empty, "")
+        self.assertEqual(pony.digits, "42")
+        self.assertEqual(pony.quotes, '"\'"')
+
+    @test.skipUnlessDBFeature('supports_binary_field')
+    def test_add_binaryfield(self):
+        """
+        Tests the AddField operation on TextField/BinaryField.
+        """
+        project_state = self.set_up_test_model("test_adbinfl")
+
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_adbinfl", "Pony")
+        pony = Pony.objects.create(weight=42)
+
+        new_state = self.apply_operations("test_adbinfl", project_state, [
+            migrations.AddField(
+                "Pony",
+                "blob",
+                models.BinaryField(default=b"some text"),
+            ),
+            migrations.AddField(
+                "Pony",
+                "empty",
+                models.BinaryField(default=b""),
+            ),
+            # If not properly quoted digits would be interpreted as an int.
+            migrations.AddField(
+                "Pony",
+                "digits",
+                models.BinaryField(default=b"42"),
+            ),
+            # Manual quoting is fragile and could trip on quotes. Refs #xyz.
+            migrations.AddField(
+                "Pony",
+                "quotes",
+                models.BinaryField(default=b'"\'"'),
+            ),
+        ])
+
+        new_apps = new_state.render()
+        Pony = new_apps.get_model("test_adbinfl", "Pony")
+        pony = Pony.objects.get(pk=pony.pk)
+        # SQLite returns buffer/memoryview, cast to bytes for checking.
+        self.assertEqual(bytes(pony.blob), b"some text")
+        self.assertEqual(bytes(pony.empty), b"")
+        self.assertEqual(bytes(pony.digits), b"42")
+        self.assertEqual(bytes(pony.quotes), b'"\'"')
+
     def test_column_name_quoting(self):
         """
         Column names that are SQL keywords shouldn't cause problems when used
@@ -404,6 +560,27 @@ class OperationTests(MigrationTestBase):
         new_apps = project_state.render()
         Pony = new_apps.get_model("test_alflmm", "Pony")
         self.assertTrue(Pony._meta.get_field('stables').blank)
+
+    def test_repoint_field_m2m(self):
+        project_state = self.set_up_test_model("test_alflmm", second_model=True, third_model=True)
+
+        project_state = self.apply_operations("test_alflmm", project_state, operations=[
+            migrations.AddField("Pony", "places", models.ManyToManyField("Stable", related_name="ponies"))
+        ])
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_alflmm", "Pony")
+
+        project_state = self.apply_operations("test_alflmm", project_state, operations=[
+            migrations.AlterField("Pony", "places", models.ManyToManyField(to="Van", related_name="ponies"))
+        ])
+
+        # Ensure the new field actually works
+        new_apps = project_state.render()
+        Pony = new_apps.get_model("test_alflmm", "Pony")
+        p = Pony.objects.create(pink=False, weight=4.55)
+        p.places.create()
+        self.assertEqual(p.places.count(), 1)
+        p.places.all().delete()
 
     def test_remove_field_m2m(self):
         project_state = self.set_up_test_model("test_rmflmm", second_model=True)
@@ -803,7 +980,7 @@ class MultiDBOperationTests(MigrationTestBase):
     multi_db = True
 
     def setUp(self):
-        # Make the 'other' database appear to be a slave of the 'default'
+        # Make the 'other' database appear to be a replica of the 'default'
         self.old_routers = router.routers
         router.routers = [MigrateNothingRouter()]
 

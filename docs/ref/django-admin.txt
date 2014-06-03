@@ -383,13 +383,16 @@ onto which the data will be loaded.
 
 .. django-admin-option:: --ignorenonexistent
 
-The :djadminopt:`--ignorenonexistent` option can be used to ignore fields that
-may have been removed from models since the fixture was originally generated.
-
+The :djadminopt:`--ignorenonexistent` option can be used to ignore fields and
+models that may have been removed since the fixture was originally generated.
 
 .. versionchanged:: 1.7
 
     ``--app`` was added.
+
+.. versionchanged:: 1.8
+
+    ``--ignorenonexistent`` also ignores non-existent models.
 
 .. django-admin-option:: --app
 
@@ -656,6 +659,17 @@ migration for the specified apps, for manual editing. This option is only
 for advanced users and should not be used unless you are familiar with
 the migration format, migration operations, and the dependencies between
 your migrations.
+
+.. django-admin-option:: --dry-run
+
+The ``--dry-run`` option shows what migrations would be made without
+actually writing any migrations files to disk. Using this option along with
+``--verbosity 3`` will also show the complete migrations files that would be
+written.
+
+.. django-admin-option:: --merge
+
+The ``--merge`` option enables fixing of migration conflicts.
 
 migrate [<app_label> [<migrationname>]]
 ---------------------------------------
@@ -1295,6 +1309,17 @@ provided by the :setting:`TEST_RUNNER` setting.
 The ``--liveserver`` option can be used to override the default address where
 the live server (used with :class:`~django.test.LiveServerTestCase`) is
 expected to run from. The default value is ``localhost:8081``.
+
+.. django-admin-option:: --keepdb
+
+.. versionadded:: 1.8
+
+The ``--keepdb`` option can be used to preserve the test database between test
+runs. This has the advantage of skipping both the create and destroy actions
+which greatly decreases the time to run tests, especially those in a large
+test suite. If the test database does not exist, it will be created on the first
+run and then preserved for each subsequent run. Any unapplied migrations will also
+be applied to the test database before running the test suite.
 
 testserver <fixture fixture ...>
 --------------------------------

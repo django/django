@@ -16,6 +16,7 @@ class BaseStorage(object):
         self.prefix = 'wizard_%s' % prefix
         self.request = request
         self.file_storage = file_storage
+        self._files = {}
 
     def init_data(self):
         self.data = {
@@ -82,8 +83,10 @@ class BaseStorage(object):
         for field, field_dict in six.iteritems(wizard_files):
             field_dict = field_dict.copy()
             tmp_name = field_dict.pop('tmp_name')
-            files[field] = UploadedFile(
-                file=self.file_storage.open(tmp_name), **field_dict)
+            if (step, field) not in self._files:
+                self._files[(step, field)] = UploadedFile(
+                    file=self.file_storage.open(tmp_name), **field_dict)
+            files[field] = self._files[(step, field)]
         return files or None
 
     def set_step_files(self, step, files):
@@ -111,4 +114,12 @@ class BaseStorage(object):
         return self.get_step_files(self.current_step)
 
     def update_response(self, response):
-        pass
+        def post_render_callback(response):
+            for file in self._files.values():
+                if not file.closed:
+                    file.close()
+
+        if hasattr(response, 'render'):
+            response.add_post_render_callback(post_render_callback)
+        else:
+            post_render_callback(response)

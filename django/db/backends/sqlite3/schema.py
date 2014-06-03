@@ -1,3 +1,5 @@
+import codecs
+import copy
 from decimal import Decimal
 from django.utils import six
 from django.apps.registry import Apps
@@ -25,9 +27,19 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         elif isinstance(value, six.integer_types):
             return str(value)
         elif isinstance(value, six.string_types):
-            return '"%s"' % six.text_type(value)
+            return "'%s'" % six.text_type(value).replace("\'", "\'\'")
         elif value is None:
             return "NULL"
+        elif isinstance(value, (bytes, bytearray, six.memoryview)):
+            # Bytes are only allowed for BLOB fields, encoded as string
+            # literals containing hexadecimal data and preceded by a single "X"
+            # character:
+            # value = b'\x01\x02' => value_hex = b'0102' => return X'0102'
+            value = bytes(value)
+            hex_encoder = codecs.getencoder('hex_codec')
+            value_hex, _length = hex_encoder(value)
+            # Use 'ascii' encoding for b'01' => '01', no need to use force_text here.
+            return "X'%s'" % value_hex.decode('ascii')
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
@@ -37,7 +49,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         # Work out the new fields dict / mapping
         body = dict((f.name, f) for f in model._meta.local_fields)
-        mapping = dict((f.column, f.column) for f in model._meta.local_fields)
+        # Since mapping might mix column names and default values,
+        # its values must be already quoted.
+        mapping = dict((f.column, self.quote_name(f.column)) for f in model._meta.local_fields)
         # If any of the new or altered fields is introducing a new PK,
         # remove the old one
         restore_pk_field = None
@@ -62,7 +76,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             del body[old_field.name]
             del mapping[old_field.column]
             body[new_field.name] = new_field
-            mapping[new_field.column] = old_field.column
+            mapping[new_field.column] = self.quote_name(old_field.column)
         # Remove any deleted fields
         for field in delete_fields:
             del body[field.name]
@@ -72,6 +86,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 return self.delete_model(field.rel.through)
         # Work inside a new app registry
         apps = Apps()
+
+        # Provide isolated instances of the fields to the new model body
+        # Instantiating the new model with an alternate db_table will alter
+        # the internal references of some of the provided fields.
+        body = copy.deepcopy(body)
+
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
@@ -82,6 +102,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         meta = type("Meta", tuple(), meta_contents)
         body['Meta'] = meta
         body['__module__'] = model.__module__
+
         temp_model = type(model._meta.object_name, model.__bases__, body)
         # Create a new table with that format
         self.create_model(temp_model)
@@ -90,7 +111,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
             self.quote_name(temp_model._meta.db_table),
             ', '.join(self.quote_name(x) for x, y in field_maps),
-            ', '.join(self.quote_name(y) for x, y in field_maps),
+            ', '.join(y for x, y in field_maps),
             self.quote_name(model._meta.db_table),
         ))
         # Delete the old table (not using self.delete_model to avoid deleting
@@ -134,28 +155,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             self._remake_table(model, delete_fields=[field])
 
-    def alter_field(self, model, old_field, new_field, strict=False):
-        """
-        Allows a field's type, uniqueness, nullability, default, column,
-        constraints etc. to be modified.
-        Requires a copy of the old field as well so we can only perform
-        changes that are required.
-        If strict is true, raises errors if the old column does not match old_field precisely.
-        """
-        old_db_params = old_field.db_parameters(connection=self.connection)
-        old_type = old_db_params['type']
-        new_db_params = new_field.db_parameters(connection=self.connection)
-        new_type = new_db_params['type']
-        if old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
-            return self._alter_many_to_many(model, old_field, new_field, strict)
-        elif old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and not old_field.rel.through._meta.auto_created and not new_field.rel.through._meta.auto_created):
-            # Both sides have through models; this is a no-op.
-            return
-        elif old_type is None or new_type is None:
-            raise ValueError("Cannot alter field %s into %s - they are not compatible types (you cannot alter to or from M2M fields, or add or remove through= on M2M fields)" % (
-                old_field,
-                new_field,
-            ))
+    def _alter_field(self, model, old_field, new_field, old_type, new_type, old_db_params, new_db_params, strict=False):
+        """Actually perform a "physical" (non-ManyToMany) field update."""
         # Alter by remaking table
         self._remake_table(model, alter_fields=[(old_field, new_field)])
 
@@ -172,6 +173,17 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         Alters M2Ms to repoint their to= endpoints.
         """
         if old_field.rel.through._meta.db_table == new_field.rel.through._meta.db_table:
+            # The field name didn't change, but some options did; we have to propagate this altering.
+            self._remake_table(
+                old_field.rel.through,
+                alter_fields=[(
+                    # We need the field that points to the target model, so we can tell alter_field to change it -
+                    # this is m2m_reverse_field_name() (as opposed to m2m_field_name, which points to our model)
+                    old_field.rel.through._meta.get_field_by_name(old_field.m2m_reverse_field_name())[0],
+                    new_field.rel.through._meta.get_field_by_name(new_field.m2m_reverse_field_name())[0],
+                )],
+                override_uniques=(new_field.m2m_field_name(), new_field.m2m_reverse_field_name()),
+            )
             return
 
         # Make a new through table

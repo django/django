@@ -28,6 +28,8 @@ class AutodetectorTests(TestCase):
     author_name_default = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default='Ada Lovelace'))])
     author_name_deconstructable_1 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=DeconstructableObject()))])
     author_name_deconstructable_2 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=DeconstructableObject()))])
+    author_name_deconstructable_3 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=models.IntegerField()))])
+    author_name_deconstructable_4 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=models.IntegerField()))])
     author_with_book = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
     author_renamed_with_book = ModelState("testapp", "Writer", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
     author_with_publisher_string = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("publisher_name", models.CharField(max_length=200))])
@@ -239,7 +241,7 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AlterField")
         self.assertEqual(action.name, "author")
-        self.assertEqual(action.field.rel.to.__name__, "Writer")
+        self.assertEqual(action.field.rel.to, "testapp.Writer")
 
     def test_rename_model_with_renamed_rel_field(self):
         """
@@ -276,7 +278,7 @@ class AutodetectorTests(TestCase):
         action = migration.operations[1]
         self.assertEqual(action.__class__.__name__, "AlterField")
         self.assertEqual(action.name, "writer")
-        self.assertEqual(action.field.rel.to.__name__, "Writer")
+        self.assertEqual(action.field.rel.to, "testapp.Writer")
 
     def test_fk_dependency(self):
         "Tests that having a ForeignKey automatically adds a dependency"
@@ -572,6 +574,16 @@ class AutodetectorTests(TestCase):
         """
         before = self.make_project_state([self.author_name_deconstructable_1])
         after = self.make_project_state([self.author_name_deconstructable_2])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertEqual(changes, {})
+
+    def test_deconstruct_field_kwarg(self):
+        """
+        Field instances are handled correctly by nested deconstruction.
+        """
+        before = self.make_project_state([self.author_name_deconstructable_3])
+        after = self.make_project_state([self.author_name_deconstructable_4])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         self.assertEqual(changes, {})

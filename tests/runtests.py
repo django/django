@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-from __future__ import division
-
 import logging
+from optparse import OptionParser
 import os
 import shutil
 import subprocess
@@ -11,6 +10,11 @@ import warnings
 
 import django
 from django import contrib
+from django.apps import apps
+from django.conf import settings
+from django.db import connection
+from django.test import TransactionTestCase, TestCase
+from django.test.utils import get_runner
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils._os import upath
 from django.utils import six
@@ -75,20 +79,17 @@ def get_test_modules():
                     os.path.isfile(f) or
                     not os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
                 continue
+            if not connection.vendor == 'postgresql' and f == 'postgres_tests':
+                continue
             modules.append((modpath, f))
     return modules
 
 
 def get_installed():
-    from django.apps import apps
     return [app_config.name for app_config in apps.get_app_configs()]
 
 
 def setup(verbosity, test_labels):
-    from django.apps import apps, AppConfig
-    from django.conf import settings
-    from django.test import TransactionTestCase, TestCase
-
     print("Testing against Django installed in '%s'" % os.path.dirname(django.__file__))
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
@@ -140,6 +141,7 @@ def setup(verbosity, test_labels):
             bits = bits[:1]
         test_labels_set.add('.'.join(bits))
 
+    installed_app_names = set(get_installed())
     for modpath, module_name in test_modules:
         if modpath:
             module_label = '.'.join([modpath, module_name])
@@ -156,23 +158,17 @@ def setup(verbosity, test_labels):
                 module_label == label or module_label.startswith(label + '.')
                 for label in test_labels_set)
 
-        installed_app_names = set(get_installed())
         if module_found_in_labels and module_label not in installed_app_names:
             if verbosity >= 2:
                 print("Importing application %s" % module_name)
-            # HACK.
             settings.INSTALLED_APPS.append(module_label)
-            app_config = AppConfig.create(module_label)
-            apps.app_configs[app_config.label] = app_config
-            app_config.import_models(apps.all_models[app_config.label])
-            apps.clear_cache()
+
+    apps.set_installed_apps(settings.INSTALLED_APPS)
 
     return state
 
 
 def teardown(state):
-    from django.conf import settings
-
     try:
         # Removing the temporary TEMP_DIR. Ensure we pass in unicode
         # so that it will successfully remove temp trees containing
@@ -188,12 +184,10 @@ def teardown(state):
 
 
 def django_tests(verbosity, interactive, failfast, test_labels):
-    from django.conf import settings
     state = setup(verbosity, test_labels)
     extra_tests = []
 
     # Run the test suite, including the extra validation tests.
-    from django.test.utils import get_runner
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
     TestRunner = get_runner(settings)
@@ -313,7 +307,6 @@ def paired_tests(paired_test, options, test_labels):
 
 
 if __name__ == "__main__":
-    from optparse import OptionParser
     usage = "%prog [options] [module module module ...]"
     parser = OptionParser(usage=usage)
     parser.add_option(

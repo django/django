@@ -681,8 +681,9 @@ Model attributes
     :class:`~django.db.models.Manager`. It's the interface through which
     database query operations are provided to Django models and is used to
     :ref:`retrieve the instances <retrieving-objects>` from the database. If no
-    custom ``Manager`` is defined, the default name is ``objects``. Managers
-    are only accessible via model classes, not the model instances.
+    custom ``Manager`` is defined, the default name is
+    :attr:`~django.db.models.Model.objects`. Managers are only accessible via
+    model classes, not the model instances.
 
 .. _model-methods:
 
@@ -838,11 +839,14 @@ Model inheritance
 =================
 
 Model inheritance in Django works almost identically to the way normal
-class inheritance works in Python. The only decision you have to make
-is whether you want the parent models to be models in their own right
-(with their own database tables), or if the parents are just holders
-of common information that will only be visible through the child
-models.
+class inheritance works in Python, but the basics at the beginning of the page
+should still be followed. That means the base class should subclass
+:class:`django.db.models.Model`.
+
+The only decision you have to make is whether you want the parent models to be
+models in their own right (with their own database tables), or if the parents
+are just holders of common information that will only be visible through the
+child models.
 
 There are three styles of inheritance that are possible in Django.
 

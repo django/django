@@ -9,7 +9,7 @@ from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils.encoding import force_text
 
-from .models import (Author, Book, Reader, Qualification, Teacher, Department,
+from .models import (Author, Bio, Book, Reader, Qualification, Teacher, Department,
     TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors, AuthorWithAge,
     BookWithYear, BookReview, Person, House, Room, Employee, Comment,
     LessonEntry, WordEntry, Author2)
@@ -191,6 +191,20 @@ class PrefetchRelatedTests(TestCase):
                                      ["Amy"],
                                      ["Amy"],
                                      ["Amy", "Belinda"]])
+
+    def test_reverse_one_to_one_then_m2m(self):
+        """
+        Test that we can follow a m2m relation after going through
+        the select_related reverse of an o2o.
+        """
+        qs = Author.objects.prefetch_related('bio__books').select_related('bio')
+
+        with self.assertNumQueries(1):
+            list(qs.all())
+
+        Bio.objects.create(author=self.author1)
+        with self.assertNumQueries(2):
+            list(qs.all())
 
     def test_attribute_error(self):
         qs = Reader.objects.all().prefetch_related('books_read__xyz')
@@ -452,6 +466,52 @@ class CustomPrefetchTests(TestCase):
             )
         self.assertEqual(lst1, lst2)
 
+    def test_traverse_single_item_property(self):
+        # Control lookups.
+        with self.assertNumQueries(5):
+            lst1 = self.traverse_qs(
+                Person.objects.prefetch_related(
+                    'houses__rooms',
+                    'primary_house__occupants__houses',
+                ),
+                [['primary_house', 'occupants', 'houses']]
+            )
+
+        # Test lookups.
+        with self.assertNumQueries(5):
+            lst2 = self.traverse_qs(
+                Person.objects.prefetch_related(
+                    'houses__rooms',
+                    Prefetch('primary_house__occupants', to_attr='occupants_lst'),
+                    'primary_house__occupants_lst__houses',
+                ),
+                [['primary_house', 'occupants_lst', 'houses']]
+            )
+        self.assertEqual(lst1, lst2)
+
+    def test_traverse_multiple_items_property(self):
+        # Control lookups.
+        with self.assertNumQueries(4):
+            lst1 = self.traverse_qs(
+                Person.objects.prefetch_related(
+                    'houses',
+                    'all_houses__occupants__houses',
+                ),
+                [['all_houses', 'occupants', 'houses']]
+            )
+
+        # Test lookups.
+        with self.assertNumQueries(4):
+            lst2 = self.traverse_qs(
+                Person.objects.prefetch_related(
+                    'houses',
+                    Prefetch('all_houses__occupants', to_attr='occupants_lst'),
+                    'all_houses__occupants_lst__houses',
+                ),
+                [['all_houses', 'occupants_lst', 'houses']]
+            )
+        self.assertEqual(lst1, lst2)
+
     def test_custom_qs(self):
         # Test basic.
         with self.assertNumQueries(2):
@@ -499,13 +559,16 @@ class CustomPrefetchTests(TestCase):
         inner_rooms_qs = Room.objects.filter(pk__in=[self.room1_1.pk, self.room1_2.pk])
         houses_qs_prf = House.objects.prefetch_related(
             Prefetch('rooms', queryset=inner_rooms_qs, to_attr='rooms_lst'))
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             lst2 = list(Person.objects.prefetch_related(
-                Prefetch('houses', queryset=houses_qs_prf.filter(pk=self.house1.pk), to_attr='houses_lst')))
+                Prefetch('houses', queryset=houses_qs_prf.filter(pk=self.house1.pk), to_attr='houses_lst'),
+                Prefetch('houses_lst__rooms_lst__main_room_of')
+            ))
 
         self.assertEqual(len(lst2[0].houses_lst[0].rooms_lst), 2)
         self.assertEqual(lst2[0].houses_lst[0].rooms_lst[0], self.room1_1)
         self.assertEqual(lst2[0].houses_lst[0].rooms_lst[1], self.room1_2)
+        self.assertEqual(lst2[0].houses_lst[0].rooms_lst[0].main_room_of, self.house1)
         self.assertEqual(len(lst2[1].houses_lst), 0)
 
         # Test ReverseSingleRelatedObjectDescriptor.

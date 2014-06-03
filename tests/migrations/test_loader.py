@@ -18,23 +18,23 @@ class RecorderTests(TestCase):
         """
         recorder = MigrationRecorder(connection)
         self.assertEqual(
-            recorder.applied_migrations(),
+            set((x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"),
             set(),
         )
         recorder.record_applied("myapp", "0432_ponies")
         self.assertEqual(
-            recorder.applied_migrations(),
+            set((x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"),
             set([("myapp", "0432_ponies")]),
         )
         # That should not affect records of another database
         recorder_other = MigrationRecorder(connections['other'])
         self.assertEqual(
-            recorder_other.applied_migrations(),
+            set((x, y) for (x, y) in recorder_other.applied_migrations() if x == "myapp"),
             set(),
         )
         recorder.record_unapplied("myapp", "0432_ponies")
         self.assertEqual(
-            recorder.applied_migrations(),
+            set((x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"),
             set(),
         )
 
@@ -136,14 +136,14 @@ class LoaderTests(TestCase):
         recorder = MigrationRecorder(connection)
         # Loading with nothing applied should just give us the one node
         self.assertEqual(
-            len(migration_loader.graph.nodes),
+            len([x for x in migration_loader.graph.nodes if x[0] == "migrations"]),
             1,
         )
         # However, fake-apply one migration and it should now use the old two
         recorder.record_applied("migrations", "0001_initial")
         migration_loader.build_graph()
         self.assertEqual(
-            len(migration_loader.graph.nodes),
+            len([x for x in migration_loader.graph.nodes if x[0] == "migrations"]),
             2,
         )
         recorder.flush()

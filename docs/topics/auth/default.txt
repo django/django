@@ -507,7 +507,7 @@ checks to make sure the user has an email in the desired domain::
             return HttpResponse("You can't vote in this poll.")
         # ...
 
-.. function:: user_passes_test(func, [login_url=None])
+.. function:: user_passes_test(func, [login_url=None, redirect_field_name=REDIRECT_FIELD_NAME])
 
     As a shortcut, you can use the convenient ``user_passes_test`` decorator::
 
@@ -528,9 +528,19 @@ checks to make sure the user has an email in the desired domain::
     automatically check that the :class:`~django.contrib.auth.models.User` is
     not anonymous.
 
-    :func:`~django.contrib.auth.decorators.user_passes_test()` takes an
-    optional ``login_url`` argument, which lets you specify the URL for your
-    login page (:setting:`settings.LOGIN_URL <LOGIN_URL>` by default).
+    :func:`~django.contrib.auth.decorators.user_passes_test` takes two
+    optional arguments:
+
+    ``login_url``
+       Lets you specify the URL that users who don't pass the test will be
+       redirected to. It may be a login page and defaults to
+       :setting:`settings.LOGIN_URL <LOGIN_URL>` if you don't specify one.
+
+    ``redirect_field_name``
+       Same as for :func:`~django.contrib.auth.decorators.login_required`.
+       Setting it to ``None`` removes it from the URL, which you may want to do
+       if you are redirecting users that don't pass the test to a non-login
+       page where there's no "next page".
 
     For example::
 

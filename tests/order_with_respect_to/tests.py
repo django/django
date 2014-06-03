@@ -4,6 +4,8 @@ from operator import attrgetter
 
 from django.test import TestCase
 
+from django.db import models
+
 from .models import Post, Question, Answer
 
 
@@ -71,3 +73,22 @@ class OrderWithRespectToTests(TestCase):
         Post.objects.create(title="2.1", parent=p2)
         p1_3 = Post.objects.create(title="1.3", parent=p1)
         self.assertEqual(p1.get_post_order(), [p1_1.pk, p1_2.pk, p1_3.pk])
+
+    def test_duplicate_order_field(self):
+
+        class Bar(models.Model):
+            pass
+
+        class Foo(models.Model):
+            bar = models.ForeignKey(Bar)
+            order = models.OrderWrt()
+
+            class Meta:
+                order_with_respect_to = 'bar'
+
+        count = 0
+        for field in Foo._meta.local_fields:
+            if isinstance(field, models.OrderWrt):
+                count += 1
+
+        self.assertEqual(count, 1)

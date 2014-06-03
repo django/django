@@ -2,8 +2,8 @@
 The main QuerySet implementation. This provides the public API for the ORM.
 """
 
+from collections import deque
 import copy
-import itertools
 import sys
 
 from django.conf import settings
@@ -1680,6 +1680,9 @@ class Prefetch(object):
             return self.prefetch_to == other.prefetch_to
         return False
 
+    def __hash__(self):
+        return hash(self.__class__) ^ hash(self.prefetch_to)
+
 
 def normalize_prefetch_lookups(lookups, prefix=None):
     """
@@ -1713,11 +1716,12 @@ def prefetch_related_objects(result_cache, related_lookups):
     # ensure we don't do duplicate work.
     done_queries = {}    # dictionary of things like 'foo__bar': [results]
 
-    auto_lookups = []  # we add to this as we go through.
+    auto_lookups = set()  # we add to this as we go through.
     followed_descriptors = set()  # recursion protection
 
-    all_lookups = itertools.chain(related_lookups, auto_lookups)
-    for lookup in all_lookups:
+    all_lookups = deque(related_lookups)
+    while all_lookups:
+        lookup = all_lookups.popleft()
         if lookup.prefetch_to in done_queries:
             if lookup.queryset:
                 raise ValueError("'%s' lookup was already seen with a different queryset. "
@@ -1776,7 +1780,7 @@ def prefetch_related_objects(result_cache, related_lookups):
                 # Last one, this *must* resolve to something that supports
                 # prefetching, otherwise there is no point adding it and the
                 # developer asking for it has made a mistake.
-                raise ValueError("'%s' does not resolve to a item that supports "
+                raise ValueError("'%s' does not resolve to an item that supports "
                                  "prefetching - this is an invalid parameter to "
                                  "prefetch_related()." % lookup.prefetch_through)
 
@@ -1788,17 +1792,10 @@ def prefetch_related_objects(result_cache, related_lookups):
                 # the new lookups from relationships we've seen already.
                 if not (lookup in auto_lookups and descriptor in followed_descriptors):
                     done_queries[prefetch_to] = obj_list
-                    auto_lookups.extend(normalize_prefetch_lookups(additional_lookups, prefetch_to))
+                    new_lookups = normalize_prefetch_lookups(additional_lookups, prefetch_to)
+                    auto_lookups.update(new_lookups)
+                    all_lookups.extendleft(new_lookups)
                 followed_descriptors.add(descriptor)
-            elif isinstance(getattr(first_obj, through_attr), list):
-                # The current part of the lookup relates to a custom Prefetch.
-                # This means that obj.attr is a list of related objects, and
-                # thus we must turn the obj.attr lists into a single related
-                # object list.
-                new_list = []
-                for obj in obj_list:
-                    new_list.extend(getattr(obj, through_attr))
-                obj_list = new_list
             else:
                 # Either a singly related object that has already been fetched
                 # (e.g. via select_related), or hopefully some other property
@@ -1815,7 +1812,13 @@ def prefetch_related_objects(result_cache, related_lookups):
                         continue
                     if new_obj is None:
                         continue
-                    new_obj_list.append(new_obj)
+                    # We special-case `list` rather than something more generic
+                    # like `Iterable` because we don't want to accidentally match
+                    # user models that define __iter__.
+                    if isinstance(new_obj, list):
+                        new_obj_list.extend(new_obj)
+                    else:
+                        new_obj_list.append(new_obj)
                 obj_list = new_obj_list
 
 
@@ -1830,7 +1833,6 @@ def get_prefetcher(instance, attr):
      a boolean that is True if the attribute has already been fetched)
     """
     prefetcher = None
-    attr_found = False
     is_fetched = False
 
     # For singly related objects, we have to avoid getting the attribute
@@ -1838,16 +1840,7 @@ def get_prefetcher(instance, attr):
     # on the class, in order to get the descriptor object.
     rel_obj_descriptor = getattr(instance.__class__, attr, None)
     if rel_obj_descriptor is None:
-        try:
-            rel_obj = getattr(instance, attr)
-            attr_found = True
-            # If we are following a lookup path which leads us through a previous
-            # fetch from a custom Prefetch then we might end up into a list
-            # instead of related qs. This means the objects are already fetched.
-            if isinstance(rel_obj, list):
-                is_fetched = True
-        except AttributeError:
-            pass
+        attr_found = hasattr(instance, attr)
     else:
         attr_found = True
         if rel_obj_descriptor:
@@ -1892,10 +1885,10 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
 
     rel_qs, rel_obj_attr, instance_attr, single, cache_name = (
         prefetcher.get_prefetch_queryset(instances, lookup.get_current_queryset(level)))
-    # We have to handle the possibility that the default manager itself added
-    # prefetch_related lookups to the QuerySet we just got back. We don't want to
-    # trigger the prefetch_related functionality by evaluating the query.
-    # Rather, we need to merge in the prefetch_related lookups.
+    # We have to handle the possibility that the QuerySet we just got back
+    # contains some prefetch_related lookups. We don't want to trigger the
+    # prefetch_related functionality by evaluating the query. Rather, we need
+    # to merge in the prefetch_related lookups.
     additional_lookups = getattr(rel_qs, '_prefetch_related_lookups', [])
     if additional_lookups:
         # Don't need to clone because the manager should have given us a fresh

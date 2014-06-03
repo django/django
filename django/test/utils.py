@@ -146,42 +146,107 @@ def get_runner(settings, test_runner_class=None):
     return test_runner
 
 
-def setup_test_template_loader(templates_dict, use_cached_loader=False):
+class override_template_loaders(object):
     """
-    Changes Django to only find templates from within a dictionary (where each
-    key is the template name and each value is the corresponding template
-    content to return).
+    Acts as a function decorator, context manager or start/end manager and
+    override the template loaders. It could be used in the following ways:
 
-    Use meth:`restore_template_loaders` to restore the original loaders.
+    @override_template_loaders(SomeLoader())
+    def test_function(self):
+        ...
+
+    with override_template_loaders(SomeLoader(), OtherLoader()) as loaders:
+        ...
+
+    loaders = override_template_loaders.override(SomeLoader())
+    ...
+    override_template_loaders.restore()
     """
-    if hasattr(loader, RESTORE_LOADERS_ATTR):
-        raise Exception("loader.%s already exists" % RESTORE_LOADERS_ATTR)
+    def __init__(self, *loaders):
+        self.loaders = loaders
+        self.old_loaders = []
 
-    def test_template_loader(template_name, template_dirs=None):
-        "A custom template loader that loads templates from a dictionary."
+    def __enter__(self):
+        self.old_loaders = loader.template_source_loaders
+        loader.template_source_loaders = self.loaders
+        return self.loaders
+
+    def __exit__(self, type, value, traceback):
+        loader.template_source_loaders = self.old_loaders
+
+    def __call__(self, test_func):
+        @wraps(test_func)
+        def inner(*args, **kwargs):
+            with self:
+                return test_func(*args, **kwargs)
+        return inner
+
+    @classmethod
+    def override(cls, *loaders):
+        if hasattr(loader, RESTORE_LOADERS_ATTR):
+            raise Exception("loader.%s already exists" % RESTORE_LOADERS_ATTR)
+        setattr(loader, RESTORE_LOADERS_ATTR, loader.template_source_loaders)
+        loader.template_source_loaders = loaders
+        return loaders
+
+    @classmethod
+    def restore(cls):
+        loader.template_source_loaders = getattr(loader, RESTORE_LOADERS_ATTR)
+        delattr(loader, RESTORE_LOADERS_ATTR)
+
+
+class TestTemplateLoader(loader.BaseLoader):
+    "A custom template loader that loads templates from a dictionary."
+    is_usable = True
+
+    def __init__(self, templates_dict):
+        self.templates_dict = templates_dict
+
+    def load_template_source(self, template_name, template_dirs=None,
+                             skip_template=None):
         try:
-            return (templates_dict[template_name], "test:%s" % template_name)
+            return (self.templates_dict[template_name],
+                    "test:%s" % template_name)
         except KeyError:
             raise TemplateDoesNotExist(template_name)
 
-    if use_cached_loader:
-        template_loader = cached.Loader(('test_template_loader',))
-        template_loader._cached_loaders = (test_template_loader,)
-    else:
-        template_loader = test_template_loader
 
-    setattr(loader, RESTORE_LOADERS_ATTR, loader.template_source_loaders)
-    loader.template_source_loaders = (template_loader,)
-    return template_loader
-
-
-def restore_template_loaders():
+class override_with_test_loader(override_template_loaders):
     """
-    Restores the original template loaders after
-    :meth:`setup_test_template_loader` has been run.
+    Acts as a function decorator, context manager or start/end manager and
+    override the template loaders with the test loader. It could be used in the
+    following ways:
+
+    @override_with_test_loader(templates_dict, use_cached_loader=True)
+    def test_function(self):
+        ...
+
+    with override_with_test_loader(templates_dict) as test_loader:
+        ...
+
+    test_loader = override_with_test_loader.override(templates_dict)
+    ...
+    override_with_test_loader.restore()
     """
-    loader.template_source_loaders = getattr(loader, RESTORE_LOADERS_ATTR)
-    delattr(loader, RESTORE_LOADERS_ATTR)
+
+    def __init__(self, templates_dict, use_cached_loader=False):
+        self.loader = self._get_loader(templates_dict, use_cached_loader)
+        super(override_with_test_loader, self).__init__(self.loader)
+
+    def __enter__(self):
+        return super(override_with_test_loader, self).__enter__()[0]
+
+    @classmethod
+    def override(cls, templates_dict, use_cached_loader=False):
+        loader = cls._get_loader(templates_dict, use_cached_loader)
+        return super(override_with_test_loader, cls).override(loader)[0]
+
+    @classmethod
+    def _get_loader(cls, templates_dict, use_cached_loader=False):
+        if use_cached_loader:
+            loader = cached.Loader(('TestTemplateLoader',))
+            loader._cached_loaders = TestTemplateLoader(templates_dict)
+        return TestTemplateLoader(templates_dict)
 
 
 class override_settings(object):

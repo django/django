@@ -544,8 +544,8 @@ Forms
   inheriting from both ``Form`` and ``ModelForm`` simultaneously have been
   removed as long as ``ModelForm`` appears first in the MRO.
 
-* It's now possible to opt-out from a ``Form`` field declared in a parent class
-  by shadowing it with a non-``Field`` value.
+* It's now possible to remove a field from a ``Form`` when subclassing by
+  setting the name to ``None``.
 
 * The new :meth:`~django.forms.Form.add_error()` method allows adding errors
   to specific form fields.
@@ -851,7 +851,7 @@ Backwards incompatible changes in 1.7
 .. warning::
 
     In addition to the changes outlined in this section, be sure to review the
-    :doc:`deprecation plan </internals/deprecation>` for any features that
+    :ref:`deprecation plan <deprecation-removed-in-1.7>` for any features that
     have been removed. If you haven't updated your code within the
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.

@@ -21,7 +21,7 @@ class Restaurant(Place):
 
 
 class Manager(models.Model):
-    retaurant = models.ForeignKey(Restaurant)
+    restaurant = models.ForeignKey(Restaurant)
     name = models.CharField(max_length=50)
 
 

@@ -79,7 +79,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
         # Schema for this table
         cursor.execute("SELECT sql FROM sqlite_master WHERE tbl_name = %s AND type = %s", [table_name, "table"])
-        results = cursor.fetchone()[0].strip()
+        try:
+            results = cursor.fetchone()[0].strip()
+        except TypeError:
+            # It might be a view, then no results will be returned
+            return relations
         results = results[results.index('(') + 1:results.rindex(')')]
 
         # Walk through and look for references to other tables. SQLite doesn't

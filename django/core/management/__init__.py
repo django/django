@@ -1,5 +1,4 @@
 import collections
-import imp
 from importlib import import_module
 from optparse import OptionParser, NO_DEFAULT
 import os
@@ -13,9 +12,6 @@ from django.core.management.base import BaseCommand, CommandError, handle_defaul
 from django.core.management.color import color_style
 from django.utils import lru_cache
 from django.utils import six
-
-# For backwards compatibility: get_version() used to be in this module.
-from django import get_version
 
 
 def find_commands(management_dir):
@@ -31,45 +27,6 @@ def find_commands(management_dir):
                 if not f.startswith('_') and f.endswith('.py')]
     except OSError:
         return []
-
-
-def find_management_module(app_name):
-    """
-    Determines the path to the management module for the given app_name,
-    without actually importing the application or the management module.
-
-    Raises ImportError if the management module cannot be found for any reason.
-    """
-    # TODO: this method is only called from get_commands() which has already
-    # imported the application module at that point.
-
-    parts = app_name.split('.')
-    parts.append('management')
-    parts.reverse()
-    part = parts.pop()
-    path = None
-
-    # When using manage.py, the project module is added to the path,
-    # loaded, then removed from the path. This means that
-    # testproject.testapp.models can be loaded in future, even if
-    # testproject isn't in the path. When looking for the management
-    # module, we need look for the case where the project name is part
-    # of the app_name but the project directory itself isn't on the path.
-    try:
-        f, path, descr = imp.find_module(part, path)
-    except ImportError as e:
-        if os.path.basename(os.getcwd()) != part:
-            raise e
-    else:
-        if f:
-            f.close()
-
-    while parts:
-        part = parts.pop()
-        f, path, descr = imp.find_module(part, [path] if path else None)
-        if f:
-            f.close()
-    return path
 
 
 def load_command_class(app_name, name):
@@ -107,24 +64,12 @@ def get_commands():
     """
     commands = {name: 'django.core' for name in find_commands(__path__[0])}
 
-    # Find the installed apps
-    try:
-        settings.INSTALLED_APPS
-    except ImproperlyConfigured:
-        # Still useful for commands that do not require functional
-        # settings, like startproject or help.
-        app_names = []
-    else:
-        app_configs = apps.get_app_configs()
-        app_names = [app_config.name for app_config in app_configs]
+    if not settings.configured:
+        return commands
 
-    # Find and load the management module for each installed app.
-    for app_name in reversed(app_names):
-        try:
-            path = find_management_module(app_name)
-            commands.update({name: app_name for name in find_commands(path)})
-        except ImportError:
-            pass  # No management module - ignore this app
+    for app_config in reversed(list(apps.get_app_configs())):
+        path = os.path.join(app_config.path, 'management')
+        commands.update({name: app_config.name for name in find_commands(path)})
 
     return commands
 
@@ -232,6 +177,7 @@ class ManagementUtility(object):
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
         self.prog_name = os.path.basename(self.argv[0])
+        self.settings_exception = None
 
     def main_help_text(self, commands_only=False):
         """
@@ -260,12 +206,11 @@ class ManagementUtility(object):
                 for name in sorted(commands_dict[app]):
                     usage.append("    %s" % name)
             # Output an extra note if settings are not properly configured
-            try:
-                settings.INSTALLED_APPS
-            except ImproperlyConfigured as e:
+            if self.settings_exception is not None:
                 usage.append(style.NOTICE(
-                    "Note that only Django core commands are listed as settings "
-                    "are not properly configured (error: %s)." % e))
+                    "Note that only Django core commands are listed "
+                    "as settings are not properly configured (error: %s)."
+                    % self.settings_exception))
 
         return '\n'.join(usage)
 
@@ -280,6 +225,8 @@ class ManagementUtility(object):
         try:
             app_name = commands[subcommand]
         except KeyError:
+            # This might trigger ImproperlyConfigured (masked in get_commands)
+            settings.INSTALLED_APPS
             sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" %
                 (subcommand, self.prog_name))
             sys.exit(1)
@@ -305,7 +252,7 @@ class ManagementUtility(object):
         Subcommand options are saved as pairs. A pair consists of
         the long option string (e.g. '--exclude') and a boolean
         value indicating if the option requires arguments. When printing to
-        stdout, a equal sign is appended to options which require arguments.
+        stdout, an equal sign is appended to options which require arguments.
 
         Note: If debugging this function, it is recommended to write the debug
         output in a separate file. Otherwise the debug output will be treated
@@ -374,7 +321,7 @@ class ManagementUtility(object):
         # These options could affect the commands that are available, so they
         # must be processed early.
         parser = LaxOptionParser(usage="%prog subcommand [options] [args]",
-                                 version=get_version(),
+                                 version=django.get_version(),
                                  option_list=BaseCommand.option_list)
         try:
             options, args = parser.parse_args(self.argv)
@@ -383,19 +330,29 @@ class ManagementUtility(object):
             pass  # Ignore any option errors at this point.
 
         try:
-            settings.INSTALLED_APPS
-        except ImproperlyConfigured:
-            # Some commands are supposed to work without configured settings
-            pass
-        else:
-            django.setup()
-
-        self.autocomplete()
-
-        try:
             subcommand = self.argv[1]
         except IndexError:
             subcommand = 'help'  # Display help if no arguments were given.
+
+        no_settings_commands = [
+            'help', 'version', '--help', '--version', '-h',
+            'compilemessages', 'makemessages',
+            'startapp', 'startproject',
+        ]
+
+        try:
+            settings.INSTALLED_APPS
+        except ImproperlyConfigured as exc:
+            self.settings_exception = exc
+            # A handful of built-in management commands work without settings.
+            # Load the default settings -- where INSTALLED_APPS is empty.
+            if subcommand in no_settings_commands:
+                settings.configure()
+
+        if settings.configured:
+            django.setup()
+
+        self.autocomplete()
 
         if subcommand == 'help':
             if len(args) <= 2:

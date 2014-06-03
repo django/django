@@ -72,10 +72,10 @@ def _check_diff(cat_name, base_path):
     """
     po_path = '%(path)s/en/LC_MESSAGES/django%(ext)s.po' % {
         'path': base_path, 'ext': 'js' if cat_name.endswith('-js') else ''}
-    p = Popen("git diff -U0 %s | egrep -v '^@@|^[-+]#|^..POT-Creation' | wc -l" % po_path,
+    p = Popen("git diff -U0 %s | egrep '^[-+]msgid' | wc -l" % po_path,
               stdout=PIPE, stderr=PIPE, shell=True)
     output, errors = p.communicate()
-    num_changes = int(output.strip()) - 4
+    num_changes = int(output.strip())
     print("%d changed/added messages in '%s' catalog." % (num_changes, cat_name))
 
 
@@ -84,21 +84,19 @@ def update_catalogs(resources=None, languages=None):
     Update the en/LC_MESSAGES/django.po (main and contrib) files with
     new/updated translatable strings.
     """
-    contrib_dirs = _get_locale_dirs(resources, include_core=False)
+    if resources is not None:
+        print("`update_catalogs` will always process all resources.")
+    contrib_dirs = _get_locale_dirs(None, include_core=False)
 
     os.chdir(os.path.join(os.getcwd(), 'django'))
-    print("Updating main en catalog")
+    print("Updating en catalogs for Django and contrib apps...")
     call_command('makemessages', locale=['en'])
-    _check_diff('core', os.path.join(os.getcwd(), 'conf', 'locale'))
+    print("Updating en JS catalogs for Django and contrib apps...")
+    call_command('makemessages', locale=['en'], domain='djangojs')
 
-    # Contrib catalogs
+    # Output changed stats
+    _check_diff('core', os.path.join(os.getcwd(), 'conf', 'locale'))
     for name, dir_ in contrib_dirs:
-        os.chdir(os.path.join(dir_, '..'))
-        print("Updating en catalog in %s" % dir_)
-        if name.endswith('-js'):
-            call_command('makemessages', locale=['en'], domain='djangojs')
-        else:
-            call_command('makemessages', locale=['en'])
         _check_diff(name, dir_)
 
 

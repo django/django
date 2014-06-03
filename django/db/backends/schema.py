@@ -118,6 +118,7 @@ class BaseDatabaseSchemaEditor(object):
         null = field.null
         # If we were told to include a default value, do so
         default_value = self.effective_default(field)
+        include_default = include_default and not self.skip_default(field)
         if include_default and default_value is not None:
             if self.connection.features.requires_literal_defaults:
                 # Some databases can't take defaults as a parameter (oracle)
@@ -132,9 +133,9 @@ class BaseDatabaseSchemaEditor(object):
         if (field.empty_strings_allowed and not field.primary_key and
                 self.connection.features.interprets_empty_strings_as_nulls):
             null = True
-        if null:
+        if null and not self.connection.features.implied_column_null:
             sql += " NULL"
-        else:
+        elif not null:
             sql += " NOT NULL"
         # Primary key/unique outputs
         if field.primary_key:
@@ -147,6 +148,13 @@ class BaseDatabaseSchemaEditor(object):
             sql += " %s" % self.connection.ops.tablespace_sql(tablespace, inline=True)
         # Return the sql
         return sql, params
+
+    def skip_default(self, field):
+        """
+        Some backends don't accept default values for certain columns types
+        (i.e. MySQL longtext and longblob).
+        """
+        return False
 
     def prepare_default(self, value):
         """
@@ -398,7 +406,7 @@ class BaseDatabaseSchemaEditor(object):
         self.execute(sql, params)
         # Drop the default if we need to
         # (Django usually does not use in-database defaults)
-        if field.default is not None:
+        if not self.skip_default(field) and field.default is not None:
             sql = self.sql_alter_column % {
                 "table": self.quote_name(model._meta.db_table),
                 "changes": self.sql_alter_column_no_default % {
@@ -491,6 +499,12 @@ class BaseDatabaseSchemaEditor(object):
                 old_field,
                 new_field,
             ))
+
+        self._alter_field(model, old_field, new_field, old_type, new_type, old_db_params, new_db_params, strict)
+
+    def _alter_field(self, model, old_field, new_field, old_type, new_type, old_db_params, new_db_params, strict=False):
+        """Actually perform a "physical" (non-ManyToMany) field update."""
+
         # Has unique been removed?
         if old_field.unique and (not new_field.unique or (not old_field.primary_key and new_field.primary_key)):
             # Find the unique constraint for this field

@@ -67,20 +67,21 @@ class MigrationAutodetector(object):
             if not model._meta.proxy and model._meta.managed and al not in self.to_state.real_apps:
                 new_model_keys.append((al, mn))
 
-        def _deep_deconstruct(obj, field=True):
+        def _deep_deconstruct(obj):
             """
             Recursive deconstruction for a field and its arguments.
             """
             if not hasattr(obj, 'deconstruct'):
                 return obj
             deconstructed = obj.deconstruct()
-            if field:
+            if isinstance(obj, models.Field):
+                # we have a field which also returns a name
                 deconstructed = deconstructed[1:]
             name, args, kwargs = deconstructed
             return (
                 name,
-                [_deep_deconstruct(value, field=False) for value in args],
-                dict([(key, _deep_deconstruct(value, field=False))
+                [_deep_deconstruct(value) for value in args],
+                dict([(key, _deep_deconstruct(value))
                       for key, value in kwargs.items()])
             )
 

@@ -92,8 +92,8 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
                 declared_fields.update(base.declared_fields)
 
             # Field shadowing.
-            for attr in base.__dict__.keys():
-                if attr in declared_fields:
+            for attr, value in base.__dict__.items():
+                if value is None and attr in declared_fields:
                     declared_fields.pop(attr)
 
         new_class.base_fields = declared_fields

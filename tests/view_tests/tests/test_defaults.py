@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
 
 from django.test import TestCase
-from django.test.utils import (setup_test_template_loader,
-    restore_template_loaders, override_settings)
+from django.test.utils import override_settings, override_with_test_loader
 
 from ..models import UrlArticle
 
@@ -41,17 +40,13 @@ class DefaultsTests(TestCase):
         Test that 404.html and 500.html templates are picked by their respective
         handler.
         """
-        setup_test_template_loader(
-            {'404.html': 'This is a test template for a 404 error.',
-             '500.html': 'This is a test template for a 500 error.'}
-        )
-        try:
+        with override_with_test_loader({
+                '404.html': 'This is a test template for a 404 error.',
+                '500.html': 'This is a test template for a 500 error.'}):
             for code, url in ((404, '/non_existing_url/'), (500, '/server_error/')):
                 response = self.client.get(url)
                 self.assertContains(response, "test template for a %d error" % code,
                     status_code=code)
-        finally:
-            restore_template_loaders()
 
     def test_get_absolute_url_attributes(self):
         "A model can set attributes on the get_absolute_url method"
