@@ -1081,7 +1081,10 @@ class LiveServerThread(threading.Thread):
                 connections[alias] = conn
         try:
             # Create the handler for serving static and media files
-            handler = StaticFilesHandler(_MediaFilesHandler(WSGIHandler()))
+            handler = WSGIHandler()
+            if settings.MEDIA_URL:
+                handler = _MediaFilesHandler(handler)
+            handler = StaticFilesHandler(handler)
 
             # Go through the list of possible ports, hoping that we can find
             # one that is free to use for the WSGI server.

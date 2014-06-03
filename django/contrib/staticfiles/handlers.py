@@ -60,6 +60,9 @@ class StaticFilesHandler(WSGIHandler):
                 if settings.DEBUG:
                     from django.views import debug
                     return debug.technical_404_response(request, e)
+                else:
+                    # don't swallow the 404
+                    raise
         return super(StaticFilesHandler, self).get_response(request)
 
     def __call__(self, environ, start_response):

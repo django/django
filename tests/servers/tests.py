@@ -178,3 +178,24 @@ class LiveServerDatabase(LiveServerBase):
             ['jane', 'robert', 'emily'],
             lambda b: b.name
         )
+
+
+@override_settings(DEBUG=True)
+class LiveServerWithoutMediaUrlInDebugMode(LiveServerBase):
+
+    @classmethod
+    def setUpClass(cls):
+        # initialize without MEDIA_URL
+        MEDIA_URL = TEST_SETTINGS.pop('MEDIA_URL')
+        super(LiveServerWithoutMediaUrlInDebugMode, cls).setUpClass()
+
+        # restore original MEDIA_URL value
+        TEST_SETTINGS['MEDIA_URL'] = MEDIA_URL
+
+    def test_existing_url(self):
+        """
+        Ensure that LiveServerTestCase serves views when MEDIA_URL is unset
+        and DEBUG is True. Refs #21451.
+        """
+        f = self.urlopen('/example_view/')
+        self.assertEqual(f.read(), b'example view')
