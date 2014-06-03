@@ -191,3 +191,6 @@ class DataTests(OptionsBaseTests):
     def test_get_base_chain_invalid(self):
         self.assertFalse(C._meta.get_base_chain(Musician))
 
+    def test_get_parent_list(self):
+        self.assertEquals(C._meta.get_parent_list(), set([
+                          B, A]))
