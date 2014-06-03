@@ -12,10 +12,12 @@ import functools
 from importlib import import_module
 import re
 from threading import local
+import warnings
 
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str, force_text, iri_to_uri
 from django.utils.functional import lazy
 from django.utils.http import urlquote
@@ -424,11 +426,18 @@ class RegexURLResolver(LocaleRegexProvider):
         if not self._populated:
             self._populate()
 
+        original_lookup = lookup_view
         try:
             if lookup_view in self._callback_strs:
                 lookup_view = get_callable(lookup_view, True)
         except (ImportError, AttributeError) as e:
             raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
+        else:
+            if not callable(original_lookup) and callable(lookup_view):
+                warnings.warn(
+                    'Reversing by dotted path is deprecated (%s).' % original_lookup,
+                    RemovedInDjango20Warning, stacklevel=3
+                )
         possibilities = self.reverse_dict.getlist(lookup_view)
 
         prefix_norm, prefix_args = normalize(urlquote(_prefix))[0]
