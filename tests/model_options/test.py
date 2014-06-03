@@ -25,20 +25,20 @@ from .models import (
 class OptionsBaseTests(test.TestCase):
     def eq_field_names_and_models(self, objects, names_eq, models_eq):
         fields, models = dict(objects).keys(), dict(objects).values()
-        self.assertEquals([f.name for f in fields], names_eq)
-        self.assertEquals(models, models_eq)
+        self.assertEquals(set([f.name for f in fields]), set(names_eq))
+        self.assertEquals(set(models), set(models_eq))
 
 
 class DataTests(OptionsBaseTests):
 
     def test_local_fields(self):
         fields = SuperData._meta.local_fields
-        self.assertEquals([f.attname for f in fields], [
+        self.assertEquals(set([f.attname for f in fields]), set([
             'data_ptr_id',
             'name_super_data',
             'surname_super_data',
             'origin_super_data'
-        ])
+        ]))
         self.assertTrue(all([f.rel is None or not isinstance(f.rel, ManyToManyRel)
                              for f in fields]))
 
