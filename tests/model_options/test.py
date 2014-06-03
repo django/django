@@ -5,7 +5,9 @@ from django.db.models.fields.related import (
     ManyToManyRel, RelatedObject, OneToOneField
 )
 
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.contrib.auth.models import User
 
 from .models import (
@@ -16,7 +18,7 @@ from .models import (
     RelatedM2MModel, BaseRelatedM2MModel,
     BareModel,
     A, B, C,
-    ModelWithGenericFK
+    ModelWithGenericFK, AGenericRelation
 )
 
 
@@ -202,3 +204,14 @@ class DataTests(OptionsBaseTests):
         self.assertEquals(len(virtual_fields), 1)
         self.assertTrue(isinstance(virtual_fields[0],
                         GenericForeignKey))
+
+    def test_virtual_field_generic_relation(self):
+        virtual_fields = AGenericRelation._meta.virtual_fields
+        self.assertEquals(len(virtual_fields), 1)
+        self.assertTrue(isinstance(virtual_fields[0],
+                        GenericRelation))
+
+        objects = ModelWithGenericFK._meta.get_all_related_objects(
+            include_hidden=True)
+        self.assertEquals([f.name for f in objects],
+                          ["model_options:agenericrelation"])
