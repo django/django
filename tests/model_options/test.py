@@ -2,8 +2,8 @@ from django import test
 
 from django.db.models import CharField, ManyToManyField
 from django.db.models.options import (
-    DATA,
-    LOCAL_ONLY
+    DATA, M2M, RELATED_OBJECTS,
+    LOCAL_ONLY, CONCRETE
 )
 from django.db.models.fields.related import (
     ManyToManyRel, RelatedObject, OneToOneField
@@ -33,6 +33,17 @@ class OptionsBaseTests(test.TestCase):
         self.assertEquals(set(models), set(models_eq))
 
 
+class NewAPISpecTests(OptionsBaseTests):
+
+    def test_get_data_with_model(self):
+        fields = SuperData._meta.get_new_fields(types=DATA,
+                                                opts=LOCAL_ONLY,
+                                                with_model=True)
+        field_model_couple = [fm for n, fm in fields]
+        self.assertTrue(all([len(fm) is 2 for fm in
+                             field_model_couple]))
+
+
 class NewAPITests(OptionsBaseTests):
 
     def test_local_fields(self):
@@ -46,6 +57,34 @@ class NewAPITests(OptionsBaseTests):
         ]))
         self.assertTrue(all([f.rel is None or not isinstance(f.rel, ManyToManyRel)
                              for n, f in fields]))
+
+    def test_local_concrete_fields(self):
+        fields = SuperData._meta.get_new_fields(types=DATA,
+                                                opts=LOCAL_ONLY | CONCRETE)
+        self.assertEquals([n for n, f in fields], [
+            u'data_ptr_id',
+            'name_super_data',
+            'surname_super_data'
+        ])
+        self.assertTrue(all([f.column is not None
+                             for n, f in fields]))
+
+    def test_many_to_many(self):
+        fields = SuperM2MModel._meta.get_new_fields(types=M2M)
+        self.assertEquals([f.attname for n, f in fields], [
+            'members',
+            'members_super'
+        ])
+        self.assertTrue(all([isinstance(f.rel, ManyToManyRel)
+                             for n, f in fields]))
+
+    def test_many_to_many_with_model(self):
+        fields = SuperM2MModel._meta.get_new_fields(types=M2M)
+        models = [SuperM2MModel._meta.get_field_details(n)[1]
+                  for n, f in fields]
+        self.assertEquals(len(models), 2)
+        self.assertEquals(models[0], M2MModel)
+        self.assertEquals(models[1], SuperM2MModel)
 
 
 class LegacyAPITests(OptionsBaseTests):

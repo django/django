@@ -133,6 +133,26 @@ class Options(object):
                 or obj.field.rel.parent_link)
                 and obj.model not in parent_list)
 
+    def get_field_details(self, field_name):
+        base = OrderedDict()
+        for name, data in self.get_new_fields(types=RELATED_M2M,
+                                              with_model=True):
+            base[name] = data + (False, True,)
+        for name, data in self.get_new_fields(types=RELATED_OBJECTS,
+                                              with_model=True):
+            base[name] = data + (False, False,)
+        for name, data in self.get_new_fields(types=M2M,
+                                              with_model=True):
+            base[name] = data + (True, True,)
+        for name, data in self.get_new_fields(types=DATA,
+                                              with_model=True):
+            base[name] = data + (True, False,)
+        try:
+            return base[field_name]
+        except KeyError:
+            raise FieldDoesNotExist('%s has no field named %r'
+                    % (self.object_name, field_name))
+
     def get_new_fields(self, types, opts=NONE, **kwargs):
         fields = OrderedDict()
 
@@ -145,11 +165,13 @@ class Options(object):
             if types & DATA:
                 for field in self.local_fields:
                     if not ((opts & CONCRETE) and field.column is None):
-                        fields[field.attname] = field
+                        data = (field, self.model) if 'with_model' in kwargs else field
+                        fields[field.attname] = data
 
             if types & M2M:
                 for field in self.local_many_to_many:
-                    fields[field.attname] = field
+                    data = (field, self.model) if 'with_model' in kwargs else field
+                    fields[field.attname] = data
 
         if types & RELATED_M2M:
             related_m2m_fields = OrderedDict()
