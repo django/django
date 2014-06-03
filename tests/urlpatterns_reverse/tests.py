@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import sys
 import unittest
+import warnings
 
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -17,6 +18,7 @@ from django.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanent
 from django.shortcuts import redirect
 from django.test import TestCase, override_settings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -173,13 +175,15 @@ class NoURLPatternsTests(TestCase):
 class URLPatternReverse(TestCase):
 
     def test_urlpattern_reverse(self):
-        for name, expected, args, kwargs in test_data:
-            try:
-                got = reverse(name, args=args, kwargs=kwargs)
-            except NoReverseMatch:
-                self.assertEqual(expected, NoReverseMatch)
-            else:
-                self.assertEqual(got, expected)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            for name, expected, args, kwargs in test_data:
+                try:
+                    got = reverse(name, args=args, kwargs=kwargs)
+                except NoReverseMatch:
+                    self.assertEqual(expected, NoReverseMatch)
+                else:
+                    self.assertEqual(got, expected)
 
     def test_reverse_none(self):
         # Reversing None should raise an error, not return the last un-named view.
@@ -373,8 +377,10 @@ class ReverseShortcutTests(TestCase):
 
     def test_reverse_by_path_nested(self):
         # Views that are added to urlpatterns using include() should be
-        # reversible by dotted path.
-        self.assertEqual(reverse('urlpatterns_reverse.views.nested_view'), '/includes/nested_path/')
+        # reversible by doted path.
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            self.assertEqual(reverse('urlpatterns_reverse.views.nested_view'), '/includes/nested_path/')
 
     def test_redirect_view_object(self):
         from .views import absolute_kwargs_view

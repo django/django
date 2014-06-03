@@ -982,7 +982,7 @@ resulting path will be encoded using :func:`~django.utils.encoding.iri_to_uri`.
 This is a way to output links without violating the DRY principle by having to
 hard-code URLs in your templates::
 
-    {% url 'path.to.some_view' v1 v2 %}
+    {% url 'some-url-name' v1 v2 %}
 
 The first argument is a path to a view function in the format
 ``package.package.module.function``. It can be a quoted literal or any other
@@ -991,7 +991,7 @@ should be space-separated values that will be used as arguments in the URL.
 The example above shows passing positional arguments. Alternatively you may
 use keyword syntax::
 
-    {% url 'path.to.some_view' arg1=v1 arg2=v2 %}
+    {% url 'some-url-name' arg1=v1 arg2=v2 %}
 
 Do not mix both positional and keyword syntax in a single call. All arguments
 required by the URLconf should be present.
@@ -1002,7 +1002,7 @@ takes a client ID (here, ``client()`` is a method inside the views file
 
 .. code-block:: python
 
-    ('^client/([0-9]+)/$', 'app_views.client')
+    ('^client/([0-9]+)/$', 'app_views.client', name='app-views-client')
 
 If this app's URLconf is included into the project's URLconf under a path
 such as this:
@@ -1013,7 +1013,7 @@ such as this:
 
 ...then, in a template, you can create a link to this view like this::
 
-    {% url 'app_views.client' client.id %}
+    {% url 'app-views-client' client.id %}
 
 The template tag will output the string ``/clients/client/123/``.
 
@@ -1028,7 +1028,7 @@ cause your site to display an error page.
 If you'd like to retrieve a URL without displaying it, you can use a slightly
 different call::
 
-    {% url 'path.to.view' arg arg2 as the_url %}
+    {% url 'some-url-name' arg arg2 as the_url %}
 
     <a href="{{ the_url }}">I'm linking to {{ the_url }}</a>
 
@@ -1038,7 +1038,7 @@ The scope of the variable created by the  ``as var`` syntax is the
 This ``{% url ... as var %}`` syntax will *not* cause an error if the view is
 missing. In practice you'll use this to link to views that are optional::
 
-    {% url 'path.to.view' as the_url %}
+    {% url 'some-url-name' as the_url %}
     {% if the_url %}
       <a href="{{ the_url }}">Link to optional stuff</a>
     {% endif %}
@@ -1050,6 +1050,13 @@ If you'd like to retrieve a namespaced URL, specify the fully qualified name::
 This will follow the normal :ref:`namespaced URL resolution strategy
 <topics-http-reversing-url-namespaces>`, including using any hints provided
 by the context as to the current application.
+
+.. deprecated:: 1.8
+
+    The dotted Python path syntax is deprecated and will be removed in
+    Django 2.0::
+
+        {% url 'path.to.some_view' v1 v2 %}
 
 .. warning::
 
