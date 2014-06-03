@@ -444,7 +444,7 @@ For example::
         last_name = models.CharField(max_length=50)
 
         def __unicode__(self):
-            return '%s %s' % (self.first_name, self.last_name)
+            return u'%s %s' % (self.first_name, self.last_name)
 
 If you define a ``__unicode__()`` method on your model and not a
 :meth:`~Model.__str__()` method, Django will automatically provide you with a
