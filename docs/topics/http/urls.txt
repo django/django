@@ -555,7 +555,7 @@ Consider again this URLconf entry::
 
     urlpatterns = [
         #...
-        url(r'^articles/([0-9]{4})/$', 'news.views.year_archive'),
+        url(r'^articles/([0-9]{4})/$', 'news.views.year_archive', name='news-year-archive'),
         #...
     ]
 
@@ -566,11 +566,11 @@ You can obtain these in template code by using:
 
 .. code-block:: html+django
 
-    <a href="{% url 'news.views.year_archive' 2012 %}">2012 Archive</a>
+    <a href="{% url 'news-year-archive' 2012 %}">2012 Archive</a>
     {# Or with the year in a template context variable: #}
     <ul>
     {% for yearvar in year_list %}
-    <li><a href="{% url 'news.views.year_archive' yearvar %}">{{ yearvar }} Archive</a></li>
+    <li><a href="{% url 'news-year-archive' yearvar %}">{{ yearvar }} Archive</a></li>
     {% endfor %}
     </ul>
 
@@ -583,7 +583,7 @@ Or in Python code::
         # ...
         year = 2006
         # ...
-        return HttpResponseRedirect(reverse('news.views.year_archive', args=(year,)))
+        return HttpResponseRedirect(reverse('news-year-archive', args=(year,)))
 
 If, for some reason, it was decided that the URLs where content for yearly
 article archives are published at should be changed then you would only need to
@@ -599,65 +599,19 @@ URLs. Read the next section to know about the solution Django provides for this.
 Naming URL patterns
 ===================
 
-It's fairly common to use the same view function in multiple URL patterns in
-your URLconf. For example, these two URL patterns both point to the ``archive``
-view::
+In order to perform URL reversing, you'll need to use **named URL patterns**
+as done in the examples above. The string used for the URL name can contain any
+characters you like. You are not restricted to valid Python names.
 
-    from django.conf.urls import url
-    from mysite.views import archive
+When you name your URL patterns, make sure you use names that are unlikely
+to clash with any other application's choice of names. If you call your URL
+pattern ``comment``, and another application does the same thing, there's
+no guarantee which URL will be inserted into your template when you use
+this name.
 
-    urlpatterns = [
-        url(r'^archive/([0-9]{4})/$', archive),
-        url(r'^archive-summary/([0-9]{4})/$', archive, {'summary': True}),
-    ]
-
-This is completely valid, but it leads to problems when you try to do reverse
-URL matching (through the :func:`~django.core.urlresolvers.reverse` function
-or the :ttag:`url` template tag). Continuing this example, if you wanted to
-retrieve the URL for the ``archive`` view, Django's reverse URL matcher would
-get confused, because *two* URL patterns point at that view.
-
-To solve this problem, Django supports **named URL patterns**. That is, you can
-give a name to a URL pattern in order to distinguish it from other patterns
-using the same view and parameters. Then, you can use this name in reverse URL
-matching.
-
-Here's the above example, rewritten to use named URL patterns::
-
-    from django.conf.urls import url
-    from mysite.views import archive
-
-    urlpatterns = [
-        url(r'^archive/([0-9]{4})/$', archive, name="full-archive"),
-        url(r'^archive-summary/([0-9]{4})/$', archive, {'summary': True}, name="arch-summary"),
-    ]
-
-With these names in place (``full-archive`` and ``arch-summary``), you can
-target each pattern individually by using its name:
-
-.. code-block:: html+django
-
-    {% url 'arch-summary' 1945 %}
-    {% url 'full-archive' 2007 %}
-
-Even though both URL patterns refer to the ``archive`` view here, using the
-``name`` parameter to :func:`django.conf.urls.url` allows you to tell them
-apart in templates.
-
-The string used for the URL name can contain any characters you like. You are
-not restricted to valid Python names.
-
-.. note::
-
-    When you name your URL patterns, make sure you use names that are unlikely
-    to clash with any other application's choice of names. If you call your URL
-    pattern ``comment``, and another application does the same thing, there's
-    no guarantee which URL will be inserted into your template when you use
-    this name.
-
-    Putting a prefix on your URL names, perhaps derived from the application
-    name, will decrease the chances of collision. We recommend something like
-    ``myapp-comment`` instead of ``comment``.
+Putting a prefix on your URL names, perhaps derived from the application
+name, will decrease the chances of collision. We recommend something like
+``myapp-comment`` instead of ``comment``.
 
 .. _topics-http-defining-url-namespaces:
 

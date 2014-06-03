@@ -72,7 +72,7 @@ urlpatterns = [
     url(r'^simple/custom-index\.xml$', views.index,
         {'sitemaps': simple_sitemaps, 'template_name': 'custom_sitemap_index.xml'}),
     url(r'^simple/sitemap-(?P<section>.+)\.xml$', views.sitemap,
-        {'sitemaps': simple_sitemaps}),
+        {'sitemaps': simple_sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     url(r'^simple/sitemap\.xml$', views.sitemap, {'sitemaps': simple_sitemaps}),
     url(r'^simple/custom-sitemap\.xml$', views.sitemap,
         {'sitemaps': simple_sitemaps, 'template_name': 'custom_sitemap.xml'}),

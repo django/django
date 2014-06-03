@@ -529,8 +529,7 @@ class TemplateTests(TestCase):
 
             # Warm the URL reversing cache. This ensures we don't pay the cost
             # warming the cache during one of the tests.
-            urlresolvers.reverse('template_tests.views.client_action',
-                                 kwargs={'id': 0, 'action': "update"})
+            urlresolvers.reverse('named.client', args=(0,))
 
             for name, vals in tests:
                 if isinstance(vals[2], tuple):
@@ -575,6 +574,7 @@ class TemplateTests(TestCase):
                                     try:
                                         with warnings.catch_warnings():
                                             # Ignore deprecations of using the wrong number of variables with the 'for' tag.
+                                            # and warnings for {% url %} reversing by dotted path
                                             warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaulttags")
                                             output = self.render(test_template, vals)
                                     except ShouldNotExecuteException:
