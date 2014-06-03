@@ -5,6 +5,7 @@ from django.db.models.fields.related import (
     ManyToManyRel, RelatedObject, OneToOneField
 )
 
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.auth.models import User
 
 from .models import (
@@ -14,7 +15,8 @@ from .models import (
     RelatedModel, BaseRelatedModel,
     RelatedM2MModel, BaseRelatedM2MModel,
     BareModel,
-    A, B, C
+    A, B, C,
+    ModelWithGenericFK
 )
 
 
@@ -194,3 +196,9 @@ class DataTests(OptionsBaseTests):
     def test_get_parent_list(self):
         self.assertEquals(C._meta.get_parent_list(), set([
                           B, A]))
+
+    def test_virtual_field(self):
+        virtual_fields = ModelWithGenericFK._meta.virtual_fields
+        self.assertEquals(len(virtual_fields), 1)
+        self.assertTrue(isinstance(virtual_fields[0],
+                        GenericForeignKey))
