@@ -33,7 +33,7 @@ class OptionsBaseTests(test.TestCase):
         self.assertEquals(set(models), set(models_eq))
 
 
-class DataTests(OptionsBaseTests):
+class NewAPITests(OptionsBaseTests):
 
     def test_local_fields(self):
         fields = SuperData._meta.get_new_fields(types=DATA,
@@ -46,6 +46,20 @@ class DataTests(OptionsBaseTests):
         ]))
         self.assertTrue(all([f.rel is None or not isinstance(f.rel, ManyToManyRel)
                              for n, f in fields]))
+
+
+class LegacyAPITests(OptionsBaseTests):
+
+    def test_local_fields(self):
+        fields = SuperData._meta.local_fields
+        self.assertEquals(set([f.attname for f in fields]), set([
+            'data_ptr_id',
+            'name_super_data',
+            'surname_super_data',
+            'origin_super_data'
+        ]))
+        self.assertTrue(all([f.rel is None or not isinstance(f.rel, ManyToManyRel)
+                             for f in fields]))
 
     def test_local_concrete_fields(self):
         fields = SuperData._meta.local_concrete_fields
