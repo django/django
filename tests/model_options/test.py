@@ -1,6 +1,10 @@
 from django import test
 
 from django.db.models import CharField, ManyToManyField
+from django.db.models.options import (
+    DATA,
+    LOCAL_ONLY
+)
 from django.db.models.fields.related import (
     ManyToManyRel, RelatedObject, OneToOneField
 )
@@ -32,15 +36,16 @@ class OptionsBaseTests(test.TestCase):
 class DataTests(OptionsBaseTests):
 
     def test_local_fields(self):
-        fields = SuperData._meta.local_fields
-        self.assertEquals(set([f.attname for f in fields]), set([
+        fields = SuperData._meta.get_new_fields(types=DATA,
+                                                opts=LOCAL_ONLY)
+        self.assertEquals(set([n for n, f in fields]), set([
             'data_ptr_id',
             'name_super_data',
             'surname_super_data',
             'origin_super_data'
         ]))
         self.assertTrue(all([f.rel is None or not isinstance(f.rel, ManyToManyRel)
-                             for f in fields]))
+                             for n, f in fields]))
 
     def test_local_concrete_fields(self):
         fields = SuperData._meta.local_concrete_fields
