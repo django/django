@@ -118,7 +118,7 @@ class MigrationAutodetector(object):
         self.through_users = {}
         self.old_field_keys = set()
         self.new_field_keys = set()
-        for app_label, model_name in self.kept_model_keys:
+        for app_label, model_name in sorted(self.kept_model_keys):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
@@ -190,7 +190,7 @@ class MigrationAutodetector(object):
             # try to chop it off from the rest and continue, but we only
             # do this if we've already been through the list once before
             # without any chopping and nothing has changed.
-            for app_label in self.generated_operations:
+            for app_label in sorted(self.generated_operations.keys()):
                 chopped = []
                 dependencies = set()
                 for operation in list(self.generated_operations[app_label]):
@@ -304,7 +304,7 @@ class MigrationAutodetector(object):
         self.renamed_models = {}
         self.renamed_models_rel = {}
         added_models = set(self.new_model_keys) - set(self.old_model_keys)
-        for app_label, model_name in added_models:
+        for app_label, model_name in sorted(added_models):
             model_state = self.to_state.models[app_label, model_name]
             model_fields_def = self.only_relation_agnostic_fields(model_state.fields)
 
@@ -338,7 +338,7 @@ class MigrationAutodetector(object):
         that might be deferred (e.g. unique_together, index_together)
         """
         added_models = set(self.new_model_keys) - set(self.old_model_keys)
-        for app_label, model_name in added_models:
+        for app_label, model_name in sorted(added_models):
             model_state = self.to_state.models[app_label, model_name]
             # Gather related fields
             related_fields = {}
@@ -424,7 +424,7 @@ class MigrationAutodetector(object):
         collections of fields - the inverse of generate_created_models.
         """
         deleted_models = set(self.old_model_keys) - set(self.new_model_keys)
-        for app_label, model_name in deleted_models:
+        for app_label, model_name in sorted(deleted_models):
             model_state = self.from_state.models[app_label, model_name]
             model = self.old_apps.get_model(app_label, model_name)
             # Gather related fields
@@ -505,7 +505,7 @@ class MigrationAutodetector(object):
     def generate_added_fields(self):
         # New fields
         self.renamed_fields = {}
-        for app_label, model_name, field_name in self.new_field_keys - self.old_field_keys:
+        for app_label, model_name, field_name in sorted(self.new_field_keys - self.old_field_keys):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
@@ -513,7 +513,7 @@ class MigrationAutodetector(object):
             # Scan to see if this is actually a rename!
             field_dec = self.deep_deconstruct(field)
             found_rename = False
-            for rem_app_label, rem_model_name, rem_field_name in (self.old_field_keys - self.new_field_keys):
+            for rem_app_label, rem_model_name, rem_field_name in sorted(self.old_field_keys - self.new_field_keys):
                 if rem_app_label == app_label and rem_model_name == model_name:
                     old_field_dec = self.deep_deconstruct(old_model_state.get_field_by_name(rem_field_name))
                     if field.rel and field.rel.to and 'to' in old_field_dec[2]:
@@ -564,7 +564,7 @@ class MigrationAutodetector(object):
         """
         Fields that have been removed.
         """
-        for app_label, model_name, field_name in self.old_field_keys - self.new_field_keys:
+        for app_label, model_name, field_name in sorted(self.old_field_keys - self.new_field_keys):
             self.add_operation(
                 app_label,
                 operations.RemoveField(
@@ -577,7 +577,7 @@ class MigrationAutodetector(object):
         """
         Fields that have been altered.
         """
-        for app_label, model_name, field_name in self.old_field_keys.intersection(self.new_field_keys):
+        for app_label, model_name, field_name in sorted(self.old_field_keys.intersection(self.new_field_keys)):
             # Did the field change?
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
@@ -596,7 +596,7 @@ class MigrationAutodetector(object):
                 )
 
     def generate_altered_unique_together(self):
-        for app_label, model_name in self.kept_model_keys:
+        for app_label, model_name in sorted(self.kept_model_keys):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
@@ -610,7 +610,7 @@ class MigrationAutodetector(object):
                 )
 
     def generate_altered_index_together(self):
-        for app_label, model_name in self.kept_model_keys:
+        for app_label, model_name in sorted(self.kept_model_keys):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
