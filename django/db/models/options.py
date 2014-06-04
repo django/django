@@ -225,13 +225,14 @@ class Options(object):
                                               if not k.field.rel.is_hidden()])
 
             if 'inversed_order' not in kwargs:
-                res = OrderedDict()
+                temp = OrderedDict()
                 for k, v in related_fields.items():
                     if len(v) == 2:
-                        res[v[0]] = (k, v[1])
+                        key, value = v[0], (k, v[1])
                     else:
-                        res[v] = k
-                related_fields = res
+                        key, value = v, k
+                    temp[key] = value
+                related_fields = temp
             fields.update(related_fields)
 
         return tuple(fields.iteritems())
