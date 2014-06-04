@@ -52,12 +52,14 @@ class MigrationAutodetector(object):
         if isinstance(obj, models.Field):
             # we have a field which also returns a name
             deconstructed = deconstructed[1:]
-        name, args, kwargs = deconstructed
+        path, args, kwargs = deconstructed
         return (
-            name,
+            path,
             [self.deep_deconstruct(value) for value in args],
-            dict([(key, self.deep_deconstruct(value))
-                  for key, value in kwargs.items()])
+            dict(
+                (key, self.deep_deconstruct(value))
+                for key, value in kwargs.items()
+            ),
         )
 
     def only_relation_agnostic_fields(self, fields):
@@ -284,9 +286,9 @@ class MigrationAutodetector(object):
                 operation.model_name.lower() == dependency[1].lower() and
                 operation.name.lower() == dependency[2].lower()
             )
-        # ???
+        # Unknown dependency. Raise an error.
         else:
-            return False
+            raise ValueError("Can't handle dependency %r" % dependency)
 
     def add_operation(self, app_label, operation, dependencies=None):
         # Dependencies are (app_label, model_name, field_name, create/delete as True/False)
