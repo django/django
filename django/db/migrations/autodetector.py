@@ -167,7 +167,7 @@ class MigrationAutodetector(object):
                 if not found:
                     break
             else:
-                ValueError("Infinite loop caught in operation dependency resolution")
+                raise ValueError("Infinite loop caught in operation dependency resolution")
             self.generated_operations[app_label] = ops
 
         # Now, we need to chop the lists of operations up into migrations with
