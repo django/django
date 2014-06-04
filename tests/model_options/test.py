@@ -27,6 +27,16 @@ from .models import (
 
 
 class OptionsBaseTests(test.TestCase):
+    def assertContainsOfType(self, model, objects, names_and_models):
+        self.assertEquals(len(objects), len(names_and_models))
+
+        field_names = dict([(f.name, n) for n, f in objects])
+        gfd = model._meta.get_field_details
+        for expected_name, expected_model in names_and_models:
+            self.assertTrue(expected_name in field_names.keys())
+            self.assertEquals(gfd(field_names[expected_name])[1],
+                              expected_model)
+
     def eq_field_names_and_models(self, objects, names_eq, models_eq):
         fields, models = dict(objects).keys(), dict(objects).values()
         self.assertEquals(set([f.name for f in fields]), set(names_eq))
@@ -85,6 +95,13 @@ class NewAPITests(OptionsBaseTests):
         self.assertEquals(len(models), 2)
         self.assertEquals(models[0], M2MModel)
         self.assertEquals(models[1], SuperM2MModel)
+
+    def test_related_objects(self):
+        objects = RelatedModel._meta.get_new_fields(types=RELATED_OBJECTS)
+        self.assertContainsOfType(RelatedModel, objects, (
+            ('model_options:firstrelatingobject', BaseRelatedModel),
+            ('model_options:secondrelatingobject', RelatedModel),
+        ))
 
 
 class LegacyAPITests(OptionsBaseTests):

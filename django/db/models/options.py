@@ -200,12 +200,12 @@ class Options(object):
             # ERROR? check
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
-                    for obj, name in parent._meta.get_new_fields(
+                    for obj, data in parent._meta.get_new_fields(
                             types=RELATED_OBJECTS,
                             opts=INCLUDE_HIDDEN,
-                            inversed_order=True):
+                            **dict(kwargs, inversed_order=True)):
                         if self._validate_related_object(obj):
-                            related_fields[obj] = obj.field.attname
+                            related_fields[obj] = data
 
             for model in self.get_non_swapped_models(True):
                 # NOTE: missing virtual fields
@@ -216,18 +216,25 @@ class Options(object):
                     if has_rel_attr and f.has_class_relation():
                         to_meta = f.rel.to._meta
                         if to_meta == self:
-                            related_fields[f.related] = f.attname
+                            data = (f.attname, self.model) if 'with_model' in kwargs else f.attname
+                            related_fields[f.related] = data
                         elif ((opts & INCLUDE_PROXY)
                               and self.concrete_model == to_meta.concrete_model):
-                            related_fields[f.related] = f.attname
+                            data = (f.attname, self.model) if 'with_model' in kwargs else f.attname
+                            related_fields[f.related] = data
 
             if not opts & INCLUDE_HIDDEN:
                 related_fields = OrderedDict([(k, v) for k, v in related_fields.items()
                                               if not k.field.rel.is_hidden()])
 
             if 'inversed_order' not in kwargs:
-                related_fields = OrderedDict([(v, k) for k, v in related_fields.items()])
-
+                res = OrderedDict()
+                for k, v in related_fields.items():
+                    if len(v) == 2:
+                        res[v[0]] = (k, v[1])
+                    else:
+                        res[v] = k
+                related_fields = res
             fields.update(related_fields)
 
         return tuple(fields.iteritems())
