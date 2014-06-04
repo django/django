@@ -215,11 +215,8 @@ class Options(object):
                     has_rel_attr = hasattr(f, 'rel') and f.rel
                     if has_rel_attr and f.has_class_relation():
                         to_meta = f.rel.to._meta
-                        if to_meta == self:
-                            data = (f.attname, self.model) if 'with_model' in kwargs else f.attname
-                            related_fields[f.related] = data
-                        elif ((opts & INCLUDE_PROXY)
-                              and self.concrete_model == to_meta.concrete_model):
+                        if (to_meta == self) or ((opts & INCLUDE_PROXY)
+                                and self.concrete_model == to_meta.concrete_model):
                             data = (f.attname, self.model) if 'with_model' in kwargs else f.attname
                             related_fields[f.related] = data
 
