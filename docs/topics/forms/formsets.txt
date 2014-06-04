@@ -509,6 +509,18 @@ model instances for deleted forms will be deleted when you call
         >>> for obj in formset.deleted_objects:
         ...     obj.delete()
 
+    If you want to maintain backwards compatibility with Django 1.6 and earlier,
+    you can do something like this::
+
+        >>> try:
+        >>>     # For Django 1.7+
+        >>>     for obj in formset.deleted_objects:
+        >>>         obj.delete()
+        >>> except AssertionError:
+        >>>     # Django 1.6 and earlier already deletes the objects, trying to
+        >>>     # delete them a second time raises an AssertionError.
+        >>>     pass
+
 On the other hand, if you are using a plain ``FormSet``, it's up to you to
 handle ``formset.deleted_forms``, perhaps in your formset's ``save()`` method,
 as there's no general notion of what it means to delete a form.
