@@ -401,10 +401,9 @@ class BaseModelForm(BaseForm):
 
     def _post_clean(self):
         opts = self._meta
-        # Update the model instance with self.cleaned_data.
-        self.instance = construct_instance(self, self.instance, opts.fields, opts.exclude)
 
         exclude = self._get_validation_exclusions()
+        construct_inline_exclude = list(exclude)
 
         # Foreign Keys being used to represent inline relationships
         # are excluded from basic field value validation. This is for two
@@ -415,7 +414,18 @@ class BaseModelForm(BaseForm):
         # so this can't be part of _get_validation_exclusions().
         for name, field in self.fields.items():
             if isinstance(field, InlineForeignKeyField):
+                # construct_inline_exclude contains those fields for which
+                # instances need to be created.
+                # this is needed because those fields will have their objects
+                # created in construct_instance and saved in save_new()
+                # If we do not exclude these then these will raise ValueError
+                # for unsaved object. Refs. 10811
+                if self.cleaned_data[name] is not None and self.cleaned_data[name]._state.adding:
+                    construct_inline_exclude.append(name)
                 exclude.append(name)
+
+        # Update the model instance with self.cleaned_data.
+        self.instance = construct_instance(self, self.instance, opts.fields, construct_inline_exclude)
 
         try:
             self.instance.full_clean(exclude=exclude, validate_unique=False)
