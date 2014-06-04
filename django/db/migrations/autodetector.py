@@ -96,23 +96,24 @@ class MigrationAutodetector(object):
         self.old_apps = self.from_state.render(ignore_swappable=True)
         self.new_apps = self.to_state.render()
         self.old_model_keys = []
-        for al, mn in self.from_state.models.keys():
+        for al, mn in sorted(self.from_state.models.keys()):
             model = self.old_apps.get_model(al, mn)
             if not model._meta.proxy and model._meta.managed and al not in self.from_state.real_apps:
                 self.old_model_keys.append((al, mn))
         self.new_model_keys = []
-        for al, mn in self.to_state.models.keys():
+        for al, mn in sorted(self.to_state.models.keys()):
             model = self.new_apps.get_model(al, mn)
             if not model._meta.proxy and model._meta.managed and al not in self.from_state.real_apps:
                 self.new_model_keys.append((al, mn))
 
-        # Generate model operations
+        # Renames have to come first
         self.generate_renamed_models()
-        self.generate_created_models()
-        self.generate_deleted_models()
 
-        # Prepare field lists
+        # Prepare field lists, and prepare a list of the fields that used
+        # through models in the old state so we can make dependencies
+        # from the through model deletion to the field that uses it.
         self.kept_model_keys = set(self.old_model_keys).intersection(self.new_model_keys)
+        self.through_users = {}
         self.old_field_keys = set()
         self.new_field_keys = set()
         for app_label, model_name in self.kept_model_keys:
@@ -121,6 +122,19 @@ class MigrationAutodetector(object):
             new_model_state = self.to_state.models[app_label, model_name]
             self.old_field_keys.update((app_label, model_name, x) for x, y in old_model_state.fields)
             self.new_field_keys.update((app_label, model_name, x) for x, y in new_model_state.fields)
+            # Through model stuff
+            for field_name, field in old_model_state.fields:
+                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field_by_name(field_name)[0]
+                if hasattr(old_field, "rel") and hasattr(old_field.rel, "through") and not old_field.rel.through._meta.auto_created:
+                    through_key = (
+                        old_field.rel.through._meta.app_label,
+                        old_field.rel.through._meta.object_name.lower(),
+                    )
+                    self.through_users[through_key] = (app_label, old_model_name, field_name)
+
+        # Generate non-rename model operations
+        self.generate_created_models()
+        self.generate_deleted_models()
 
         # Generate field operations
         self.generate_added_fields()
@@ -132,7 +146,7 @@ class MigrationAutodetector(object):
         # Now, reordering to make things possible. The order we have already
         # isn't bad, but we need to pull a few things around so FKs work nicely
         # inside the same app
-        for app_label, ops in self.generated_operations.items():
+        for app_label, ops in sorted(self.generated_operations.items()):
             for i in range(10000):
                 found = False
                 for i, op in enumerate(ops):
@@ -166,15 +180,24 @@ class MigrationAutodetector(object):
 
         self.migrations = {}
         num_ops = sum(len(x) for x in self.generated_operations.values())
+        chop_mode = False
         while num_ops:
+            # On every iteration, we step through all the apps and see if there
+            # is a completed set of operations.
+            # If we find that a subset of the operations are complete we can
+            # try to chop it off from the rest and continue, but we only
+            # do this if we've already been through the list once before
+            # without any chopping and nothing has changed.
             for app_label in self.generated_operations:
                 chopped = []
                 dependencies = set()
                 for operation in list(self.generated_operations[app_label]):
                     deps_satisfied = True
                     operation_dependencies = set()
-                    for dep in op._auto_deps:
-                        if dep[0] != app_label:
+                    for dep in operation._auto_deps:
+                        if dep[0] == "__setting__":
+                            operation_dependencies.add((dep[0], dep[1]))
+                        elif dep[0] != app_label:
                             # External app dependency. See if it's not yet
                             # satisfied.
                             for other_operation in self.generated_operations[dep[0]]:
@@ -184,25 +207,33 @@ class MigrationAutodetector(object):
                             if not deps_satisfied:
                                 break
                             else:
-                                operation_dependencies.add(
-                                    (dep[0], self.migrations[dep[0]][-1].name)
-                                    if self.migrations.get(dep[0], None) else
-                                    (dep[0], "__latest__")
-                                )
+                                if self.migrations.get(dep[0], None):
+                                    operation_dependencies.add((dep[0], self.migrations[dep[0]][-1].name))
+                                else:
+                                    operation_dependencies.add((dep[0], "__latest__"))
                     if deps_satisfied:
                         chopped.append(operation)
                         dependencies.update(operation_dependencies)
                         self.generated_operations[app_label] = self.generated_operations[app_label][1:]
+                    else:
+                        break
                 # Make a migration! Well, only if there's stuff to put in it
                 if dependencies or chopped:
-                    subclass = type(str("Migration"), (Migration,), {"operations": [], "dependencies": []})
-                    instance = subclass("auto_%i" % (len(self.migrations.get(app_label, [])) + 1), app_label)
-                    instance.dependencies = list(dependencies)
-                    instance.operations = chopped
-                    self.migrations.setdefault(app_label, []).append(instance)
+                    if not self.generated_operations[app_label] or chop_mode:
+                        subclass = type(str("Migration"), (Migration,), {"operations": [], "dependencies": []})
+                        instance = subclass("auto_%i" % (len(self.migrations.get(app_label, [])) + 1), app_label)
+                        instance.dependencies = list(dependencies)
+                        instance.operations = chopped
+                        self.migrations.setdefault(app_label, []).append(instance)
+                        chop_mode = False
+                    else:
+                        self.generated_operations[app_label] = chopped + self.generated_operations[app_label]
             new_num_ops = sum(len(x) for x in self.generated_operations.values())
             if new_num_ops == num_ops:
-                raise ValueError("Cannot resolve operation dependencies")
+                if not chop_mode:
+                    chop_mode = True
+                else:
+                    raise ValueError("Cannot resolve operation dependencies")
             num_ops = new_num_ops
 
         # OK, add in internal dependencies among the migrations
@@ -335,6 +366,15 @@ class MigrationAutodetector(object):
             )
             # Generate operations for each related field
             for name, field in sorted(related_fields.items()):
+                # Account for FKs to swappable models
+                swappable_setting = getattr(field, 'swappable_setting', None)
+                if swappable_setting is not None:
+                    dep_app_label = "__setting__"
+                    dep_object_name = swappable_setting
+                else:
+                    dep_app_label = field.rel.to._meta.app_label
+                    dep_object_name = field.rel.to._meta.object_name
+                # Make operation
                 self.add_operation(
                     app_label,
                     operations.AddField(
@@ -343,7 +383,7 @@ class MigrationAutodetector(object):
                         field=field,
                     ),
                     dependencies = [
-                        (field.rel.to._meta.app_label, field.rel.to._meta.object_name, None, True),
+                        (dep_app_label, dep_object_name, None, True),
                     ]
                 )
             # Generate other opns
@@ -428,7 +468,8 @@ class MigrationAutodetector(object):
                 )
             # Finally, remove the model.
             # This depends on both the removal of all incoming fields
-            # and the removal of all its own related fields.
+            # and the removal of all its own related fields, and if it's
+            # a through model the field that references it.
             dependencies = []
             for related_object in model._meta.get_all_related_objects():
                 dependencies.append((
@@ -446,6 +487,11 @@ class MigrationAutodetector(object):
                 ))
             for name, field in sorted(related_fields.items()):
                 dependencies.append((app_label, model_name, name, False))
+            # We're referenced in another field's through=
+            through_user = self.through_users.get((app_label, model_state.name.lower()), None)
+            if through_user:
+                dependencies.append((through_user[0], through_user[1], through_user[2], False))
+            # Finally, make the operation, deduping any dependencies
             self.add_operation(
                 app_label,
                 operations.DeleteModel(
@@ -511,10 +557,6 @@ class MigrationAutodetector(object):
                         field=field,
                     )
                 )
-            # new_field = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
-            # swappable_setting = getattr(new_field, 'swappable_setting', None)
-            # if swappable_setting is not None:
-            #     self.add_swappable_dependency(app_label, swappable_setting)
 
     def generate_removed_fields(self):
         """
@@ -578,13 +620,6 @@ class MigrationAutodetector(object):
                         index_together=new_model_state.options['index_together'],
                     )
                 )
-
-    # def add_swappable_dependency(self, app_label, setting_name):
-    #     """
-    #     Adds a dependency to the value of a swappable model setting.
-    #     """
-    #     dependency = ("__setting__", setting_name)
-    #     self.migrations[app_label][-1].dependencies.append(dependency)
 
     def arrange_for_graph(self, changes, graph):
         """
