@@ -125,8 +125,8 @@ class NewAPITests(OptionsBaseTests):
         self.assertContainsOfType(RelatedModel, objects, (
             ('model_options:secondrelatingobject', RelatedModel),
             ('model_options:secondrelatinghiddenobject', RelatedModel),
-            ('model_options:firstrelatingobject', RelatedModel),
-            ('model_options:firstrelatinghiddenobject', RelatedModel),
+            ('model_options:firstrelatingobject', BaseRelatedModel),
+            ('model_options:firstrelatinghiddenobject', BaseRelatedModel),
             ('model_options:relatingobjecttoproxy', RelatedModel),
             ('model_options:relatinghiddenobjecttoproxy', RelatedModel)
         ), opts=INCLUDE_HIDDEN | INCLUDE_PROXY)
