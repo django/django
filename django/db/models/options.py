@@ -175,13 +175,14 @@ class Options(object):
 
         if types & RELATED_M2M:
             related_m2m_fields = OrderedDict()
-            for parent in self.parents:
-                for obj, data in parent._meta.get_new_fields(types=RELATED_M2M,
-                                                             **dict(kwargs, inversed_order=True)):
-                    is_valid = not (obj.field.creation_counter < 0
-                                and obj.model not in self.get_parent_list())
-                    if is_valid:
-                        related_m2m_fields[obj] = data
+            if not (opts & LOCAL_ONLY):
+                for parent in self.parents:
+                    for obj, data in parent._meta.get_new_fields(types=RELATED_M2M,
+                                                                 **dict(kwargs, inversed_order=True)):
+                        is_valid = not (obj.field.creation_counter < 0
+                                    and obj.model not in self.get_parent_list())
+                        if is_valid:
+                            related_m2m_fields[obj] = data
 
             for model in self.get_non_swapped_models(False):
                 for name, f in model._meta.get_new_fields(types=M2M,

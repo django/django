@@ -138,6 +138,13 @@ class NewAPITests(OptionsBaseTests):
             ('model_options:m2mrelationtom2mmodel', RelatedM2MModel)
         ))
 
+    def test_related_m2m_local_only(self):
+        objects = RelatedM2MModel._meta.get_new_fields(types=RELATED_M2M,
+                                                       opts=LOCAL_ONLY)
+        self.assertContainsOfType(RelatedM2MModel, objects, (
+            ('model_options:m2mrelationtom2mmodel', RelatedM2MModel),
+        ), opts=LOCAL_ONLY)
+
 
 class LegacyAPITests(OptionsBaseTests):
 
