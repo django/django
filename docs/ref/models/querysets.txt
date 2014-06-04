@@ -2633,9 +2633,10 @@ aggregate functions, see
 
 .. admonition:: Note
 
-    Aggregation functions will return ``None`` when used with an empty
-    ``QuerySet``. For example, the ``Count`` aggregation function will return
-    ``None`` instead of ``0`` if the ``QuerySet`` contains no entries.
+    Aggregation functions return ``None`` when used with an empty
+    ``QuerySet``. For example, the ``Sum`` aggregation function returns ``None``
+    instead of ``0`` if the ``QuerySet`` contains no entries. An exception is
+    ``Count``, which does return ``0`` if the ``QuerySet`` is empty.
 
 Avg
 ~~~
