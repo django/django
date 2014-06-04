@@ -44,10 +44,7 @@ class SelectDateWidget(Widget):
     element and hence implements value_from_datadict.
     """
     none_value = (0, '---')
-    day_none_value = (0, '---')
-    month_none_value = (0, '---')
-    year_none_value = (0, '---')
-
+    
     month_field = '%s_month'
     day_field = '%s_day'
     year_field = '%s_year'
@@ -77,7 +74,7 @@ class SelectDateWidget(Widget):
             self.month_none_value = (0, empty_label[1])
             self.day_none_value = (0, empty_label[2])
         else:
-            if isinstance(empty_label, six.string_types):
+            if empty_label is not None:
                 self.none_value = (0, empty_label)
 
             self.year_none_value = self.none_value
