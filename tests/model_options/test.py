@@ -131,6 +131,13 @@ class NewAPITests(OptionsBaseTests):
             ('model_options:relatinghiddenobjecttoproxy', RelatedModel)
         ), opts=INCLUDE_HIDDEN | INCLUDE_PROXY)
 
+    def test_related_m2m_with_model(self):
+        objects = RelatedM2MModel._meta.get_new_fields(types=RELATED_M2M)
+        self.assertContainsOfType(RelatedM2MModel, objects, (
+            ('model_options:m2mrelationtobasem2mmodel', BaseRelatedM2MModel),
+            ('model_options:m2mrelationtom2mmodel', RelatedM2MModel)
+        ))
+
 
 class LegacyAPITests(OptionsBaseTests):
 

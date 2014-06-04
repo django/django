@@ -176,22 +176,30 @@ class Options(object):
         if types & RELATED_M2M:
             related_m2m_fields = OrderedDict()
             for parent in self.parents:
-                for obj, name in parent._meta.get_new_fields(types=RELATED_M2M,
-                                                             inversed_order=True):
+                for obj, data in parent._meta.get_new_fields(types=RELATED_M2M,
+                                                             **dict(kwargs, inversed_order=True)):
                     is_valid = not (obj.field.creation_counter < 0
                                 and obj.model not in self.get_parent_list())
                     if is_valid:
-                        related_m2m_fields[obj] = obj.field.attname
+                        related_m2m_fields[obj] = data
 
             for model in self.get_non_swapped_models(False):
                 for name, f in model._meta.get_new_fields(types=M2M,
                                                           inversed_order=True):
                     has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
                     if has_rel_attr and self == f.rel.to._meta:
-                        related_m2m_fields[f.related] = f.attname
+                        data = (f.attname, self.model) if 'with_model' in kwargs else f.attname
+                        related_m2m_fields[f.related] = data
 
             if 'inversed_order' not in kwargs:
-                related_m2m_fields = OrderedDict([(v, k) for k, v in related_m2m_fields.items()])
+                temp = OrderedDict()
+                for field, data in related_m2m_fields.items():
+                    if 'with_model' in kwargs:
+                        key, value = data[0], (field, data[1])
+                    else:
+                        key, value = data, field
+                    temp[key] = value
+                related_m2m_fields = temp
 
             fields.update(related_m2m_fields)
 
@@ -227,7 +235,7 @@ class Options(object):
             if 'inversed_order' not in kwargs:
                 temp = OrderedDict()
                 for field, data in related_fields.items():
-                    if len(data) == 2:
+                    if 'with_model' in kwargs:
                         key, value = data[0], (field, data[1])
                     else:
                         key, value = data, field
