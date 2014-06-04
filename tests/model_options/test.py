@@ -111,6 +111,26 @@ class NewAPITests(OptionsBaseTests):
             ('model_options:firstrelatinghiddenobject', BaseRelatedModel),
         ), opts=INCLUDE_HIDDEN)
 
+    def test_related_objects_include_hidden_local_only(self):
+        objects = RelatedModel._meta.get_new_fields(types=RELATED_OBJECTS,
+                                                    opts=INCLUDE_HIDDEN | LOCAL_ONLY)
+        self.assertContainsOfType(RelatedModel, objects, (
+            ('model_options:secondrelatingobject', RelatedModel),
+            ('model_options:secondrelatinghiddenobject', RelatedModel),
+        ), opts=INCLUDE_HIDDEN | LOCAL_ONLY)
+
+    def test_related_objects_proxy(self):
+        objects = RelatedModel._meta.get_new_fields(types=RELATED_OBJECTS,
+                                                    opts=INCLUDE_HIDDEN | INCLUDE_PROXY)
+        self.assertContainsOfType(RelatedModel, objects, (
+            ('model_options:secondrelatingobject', RelatedModel),
+            ('model_options:secondrelatinghiddenobject', RelatedModel),
+            ('model_options:firstrelatingobject', RelatedModel),
+            ('model_options:firstrelatinghiddenobject', RelatedModel),
+            ('model_options:relatingobjecttoproxy', RelatedModel),
+            ('model_options:relatinghiddenobjecttoproxy', RelatedModel)
+        ), opts=INCLUDE_HIDDEN | INCLUDE_PROXY)
+
 
 class LegacyAPITests(OptionsBaseTests):
 
@@ -298,3 +318,114 @@ class LegacyAPITests(OptionsBaseTests):
             include_hidden=True)
         self.assertEquals([f.name for f in objects],
                           ["model_options:agenericrelation"])
+
+
+class ComparisonBaseTests(test.TestCase):
+
+    def get_fields(self, Model, **kwargs):
+        return Model._meta.get_new_fields(**kwargs)
+
+    def map_model(self, new_fields):
+        return [f for n, f in new_fields]
+
+    def assertEqualFields(self, old_fields, new_fields):
+        uniq_old_fields = [x for x, y in old_fields]
+        uniq_new_fields = [y for x, y in new_fields]
+        self.assertEquals(uniq_new_fields, uniq_old_fields)
+
+
+class ComparisonDataTests(ComparisonBaseTests):
+
+    def test_data_local(self):
+        new_fields = self.get_fields(SuperData, types=DATA, opts=LOCAL_ONLY)
+        old_fields = SuperData._meta.local_fields
+        self.assertEqual(old_fields, self.map_model(new_fields))
+
+    def test_data(self):
+        new_fields = self.get_fields(SuperData, types=DATA)
+        old_fields = SuperData._meta.get_fields_with_model()
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_data_local_concrete(self):
+        new_fields = self.get_fields(SuperData, types=DATA,
+                                     opts=LOCAL_ONLY | CONCRETE)
+        old_fields = SuperData._meta.local_concrete_fields
+        self.assertEqual(old_fields, self.map_model(new_fields))
+
+    def test_data_concrete(self):
+        new_fields = self.get_fields(SuperData, types=DATA, opts=CONCRETE)
+        old_fields = SuperData._meta.concrete_fields
+        self.assertEqual(old_fields, self.map_model(new_fields))
+
+
+class ComparisonM2MTests(ComparisonBaseTests):
+
+    def test_m2m(self):
+        new_fields = self.get_fields(SuperM2MModel, types=M2M)
+        old_fields = SuperM2MModel._meta.get_m2m_with_model()
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_m2m_local(self):
+        new_fields = self.get_fields(SuperM2MModel, types=M2M,
+                                     opts=LOCAL_ONLY)
+        old_fields = SuperM2MModel._meta.local_many_to_many
+        self.assertEqual(old_fields, self.map_model(new_fields))
+
+
+class ComparisonRelatedObjectsTest(ComparisonBaseTests):
+
+    def test_related_objects(self):
+        new_fields = self.get_fields(RelatedModel,
+                                     types=RELATED_OBJECTS)
+        old_fields = RelatedModel._meta.get_all_related_objects_with_model()
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_related_objects_local(self):
+        new_fields = self.get_fields(RelatedModel,
+                                     types=RELATED_OBJECTS,
+                                     opts=LOCAL_ONLY)
+        old_fields = RelatedModel._meta.get_all_related_objects_with_model(
+            local_only=True)
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_related_objects_include_hidden(self):
+        new_fields = self.get_fields(RelatedModel,
+                                     types=RELATED_OBJECTS,
+                                     opts=INCLUDE_HIDDEN)
+        old_fields = RelatedModel._meta.get_all_related_objects_with_model(
+            include_hidden=True)
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_related_objects_include_hidden_local_only(self):
+        new_fields = self.get_fields(RelatedModel,
+                                     types=RELATED_OBJECTS,
+                                     opts=INCLUDE_HIDDEN | LOCAL_ONLY)
+        old_fields = RelatedModel._meta.get_all_related_objects_with_model(
+            include_hidden=True, local_only=True)
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_related_objects_proxy(self):
+        new_fields = self.get_fields(RelatedModel,
+                                     types=RELATED_OBJECTS,
+                                     opts=INCLUDE_PROXY)
+        old_fields = RelatedModel._meta.get_all_related_objects_with_model(
+            include_proxy_eq=True)
+        self.assertEqualFields(old_fields, new_fields)
+
+    def test_related_objects_proxy_hidden(self):
+        new_fields = self.get_fields(RelatedModel,
+                                     types=RELATED_OBJECTS,
+                                     opts=INCLUDE_PROXY | INCLUDE_HIDDEN)
+        old_fields = RelatedModel._meta.get_all_related_objects_with_model(
+            include_proxy_eq=True, include_hidden=True)
+        self.assertTrue(OrderedDict(new_fields)['object_to_proxy_hidden_id'])
+        self.assertEqualFields(old_fields, new_fields)
+
+
+class ComparisonRelatedM2MTest(ComparisonBaseTests):
+
+    def test_related_m2m_objects(self):
+        old_fields = Musician._meta.get_all_related_many_to_many_objects()
+        new_fields = Musician._meta.get_new_fields(types=RELATED_M2M)
+        uniq_new_fields = [y for x, y in new_fields]
+        self.assertEquals(uniq_new_fields, old_fields)
