@@ -2,8 +2,8 @@ from django import test
 
 from django.db.models import CharField, ManyToManyField
 from django.db.models.options import (
-    DATA, M2M, RELATED_OBJECTS,
-    LOCAL_ONLY, CONCRETE
+    DATA, M2M, RELATED_OBJECTS, RELATED_M2M,
+    LOCAL_ONLY, CONCRETE, INCLUDE_PROXY, INCLUDE_HIDDEN, NONE
 )
 from django.db.models.fields.related import (
     ManyToManyRel, RelatedObject, OneToOneField
@@ -25,33 +25,24 @@ from .models import (
     ModelWithGenericFK, AGenericRelation
 )
 
+from collections import OrderedDict
+
 
 class OptionsBaseTests(test.TestCase):
-    def assertContainsOfType(self, model, objects, names_and_models):
+    def assertContainsOfType(self, model, objects, names_and_models, opts=NONE):
         self.assertEquals(len(objects), len(names_and_models))
 
         field_names = dict([(f.name, n) for n, f in objects])
         gfd = model._meta.get_field_details
         for expected_name, expected_model in names_and_models:
             self.assertTrue(expected_name in field_names.keys())
-            self.assertEquals(gfd(field_names[expected_name])[1],
+            self.assertEquals(gfd(field_names[expected_name], opts=opts)[1],
                               expected_model)
 
     def eq_field_names_and_models(self, objects, names_eq, models_eq):
         fields, models = dict(objects).keys(), dict(objects).values()
         self.assertEquals(set([f.name for f in fields]), set(names_eq))
         self.assertEquals(set(models), set(models_eq))
-
-
-class NewAPISpecTests(OptionsBaseTests):
-
-    def test_get_data_with_model(self):
-        fields = SuperData._meta.get_new_fields(types=DATA,
-                                                opts=LOCAL_ONLY,
-                                                with_model=True)
-        field_model_couple = [fm for n, fm in fields]
-        self.assertTrue(all([len(fm) is 2 for fm in
-                             field_model_couple]))
 
 
 class NewAPITests(OptionsBaseTests):
@@ -102,6 +93,23 @@ class NewAPITests(OptionsBaseTests):
             ('model_options:firstrelatingobject', BaseRelatedModel),
             ('model_options:secondrelatingobject', RelatedModel),
         ))
+
+    def test_related_objects_local(self):
+        objects = RelatedModel._meta.get_new_fields(types=RELATED_OBJECTS,
+                                                    opts=LOCAL_ONLY)
+        self.assertContainsOfType(RelatedModel, objects, (
+            ('model_options:secondrelatingobject', RelatedModel),
+        ))
+
+    def test_related_objects_include_hidden(self):
+        objects = RelatedModel._meta.get_new_fields(types=RELATED_OBJECTS,
+                                                    opts=INCLUDE_HIDDEN)
+        self.assertContainsOfType(RelatedModel, objects, (
+            ('model_options:secondrelatingobject', RelatedModel),
+            ('model_options:secondrelatinghiddenobject', RelatedModel),
+            ('model_options:firstrelatingobject', BaseRelatedModel),
+            ('model_options:firstrelatinghiddenobject', BaseRelatedModel),
+        ), opts=INCLUDE_HIDDEN)
 
 
 class LegacyAPITests(OptionsBaseTests):

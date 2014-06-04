@@ -133,19 +133,19 @@ class Options(object):
                 or obj.field.rel.parent_link)
                 and obj.model not in parent_list)
 
-    def get_field_details(self, field_name):
+    def get_field_details(self, field_name, opts=NONE):
         base = OrderedDict()
         for name, data in self.get_new_fields(types=RELATED_M2M,
-                                              with_model=True):
+                                              opts=opts, with_model=True):
             base[name] = data + (False, True,)
         for name, data in self.get_new_fields(types=RELATED_OBJECTS,
-                                              with_model=True):
+                                              opts=opts, with_model=True):
             base[name] = data + (False, False,)
         for name, data in self.get_new_fields(types=M2M,
-                                              with_model=True):
+                                              opts=opts, with_model=True):
             base[name] = data + (True, True,)
         for name, data in self.get_new_fields(types=DATA,
-                                              with_model=True):
+                                              opts=opts, with_model=True):
             base[name] = data + (True, False,)
         try:
             return base[field_name]
@@ -226,11 +226,11 @@ class Options(object):
 
             if 'inversed_order' not in kwargs:
                 temp = OrderedDict()
-                for k, v in related_fields.items():
-                    if len(v) == 2:
-                        key, value = v[0], (k, v[1])
+                for field, data in related_fields.items():
+                    if len(data) == 2:
+                        key, value = data[0], (field, data[1])
                     else:
-                        key, value = v, k
+                        key, value = data, field
                     temp[key] = value
                 related_fields = temp
             fields.update(related_fields)
