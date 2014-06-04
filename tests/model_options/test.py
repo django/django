@@ -40,7 +40,7 @@ class OptionsBaseTests(test.TestCase):
                               expected_model)
 
     def eq_field_names_and_models(self, objects, names_eq, models_eq):
-        fields, models = dict(objects).keys(), dict(objects).values()
+        fields, models = zip(*objects)
         self.assertEquals(set([f.name for f in fields]), set(names_eq))
         self.assertEquals(set(models), set(models_eq))
 
@@ -179,7 +179,7 @@ class LegacyAPITests(OptionsBaseTests):
                              for f in fields]))
 
     def test_many_to_many_with_model(self):
-        models = dict(SuperM2MModel._meta.get_m2m_with_model()).values()
+        models = [m for n, m in SuperM2MModel._meta.get_m2m_with_model()]
         self.assertEquals(len(models), 2)
         self.assertEquals(models[0], M2MModel)
         self.assertEquals(models[1], None)
