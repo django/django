@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import connection
-from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
+from django.test import TestCase, skipUnlessDBFeature
 
 from .models import Reporter, Article
 
@@ -73,10 +73,9 @@ class IntrospectionTests(TestCase):
             [30, 30, 75]
         )
 
-    # Oracle forces null=True under the hood in some cases (see
-    # https://docs.djangoproject.com/en/dev/ref/databases/#null-and-empty-strings)
-    # so its idea about null_ok in cursor.description is different from ours.
-    @skipIfDBFeature('interprets_empty_strings_as_nulls')
+    # The following test fails on Oracle. Since it forces null=True under the
+    # hood in some cases, its idea about null_ok is different from ours.
+    @skipUnlessDBFeature('can_introspect_null')
     def test_get_table_description_nullable(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
