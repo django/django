@@ -124,8 +124,8 @@ class DiscoverRunner(object):
         """
         old_names, mirrors = old_config
         for connection, old_name, destroy in old_names:
-            if destroy and not self.keepdb:
-                connection.creation.destroy_test_db(old_name, self.verbosity)
+            if destroy:
+                connection.creation.destroy_test_db(old_name, self.verbosity, self.keepdb)
 
     def teardown_test_environment(self, **kwargs):
         unittest.removeHandler()

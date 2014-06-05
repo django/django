@@ -485,7 +485,7 @@ django.db.connection.creation
 The creation module of the database backend also provides some utilities that
 can be useful during testing.
 
-.. function:: create_test_db([verbosity=1, autoclobber=False])
+.. function:: create_test_db([verbosity=1, autoclobber=False, keepdb=False])
 
     Creates a new test database and runs ``migrate`` against it.
 
@@ -501,13 +501,19 @@ can be useful during testing.
     * If autoclobber is ``True``, the database will be destroyed
       without consulting the user.
 
+    ``keepdb`` determines if the test run should use an existing
+    database, or create a new one. If ``True``, the existing
+    database will be used, or created if not present. If ``False``,
+    a new database will be created, prompting the user to remove
+    the existing one, if present.
+
     Returns the name of the test database that it created.
 
     ``create_test_db()`` has the side effect of modifying the value of
     :setting:`NAME` in :setting:`DATABASES` to match the name of the test
     database.
 
-.. function:: destroy_test_db(old_database_name, [verbosity=1])
+.. function:: destroy_test_db(old_database_name, [verbosity=1, keepdb=False])
 
     Destroys the database whose name is the value of :setting:`NAME` in
     :setting:`DATABASES`, and sets :setting:`NAME` to the value of
@@ -515,6 +521,9 @@ can be useful during testing.
 
     The ``verbosity`` argument has the same behavior as for
     :class:`~django.test.runner.DiscoverRunner`.
+
+    If the ``keepdb`` argument is ``True``, then the connection to the
+    database will be closed, but the database will not be destroyed.
 
 .. _topics-testing-code-coverage:
 
