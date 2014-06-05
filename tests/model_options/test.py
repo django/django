@@ -253,18 +253,14 @@ class LegacyAPITests(OptionsBaseTests):
         ])
 
     def test_add_data_field(self):
-        cf = CharField()
-        cf.set_attributes_from_name("my_new_field")
-        BareModel._meta.add_field(cf)
-
+        cf = CharField(max_length=50)
+        BareModel.add_to_class("my_new_field", cf)
         self.assertEquals([u'id', 'my_new_field'], [f.attname
                           for f in BareModel._meta.fields])
 
     def test_add_m2m_field(self):
         cf = ManyToManyField(User)
-        cf.set_attributes_from_name("my_new_field")
-        BareModel._meta.add_field(cf)
-
+        BareModel.add_to_class("my_new_field", cf)
         self.assertEquals(['my_new_field'], [f.attname for f in
                           BareModel._meta.many_to_many])
 
