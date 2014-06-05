@@ -100,13 +100,12 @@ class InspectDBTestCase(TestCase):
             else:
                 assertFieldType('null_bool_field', "models.IntegerField()")
 
-        if connection.vendor == 'sqlite':
-            # Guessed arguments on SQLite, see #5014
+        if connection.features.can_introspect_decimal_field:
+            assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
+        else:       # Guessed arguments on SQLite, see #5014
             assertFieldType('decimal_field', "models.DecimalField(max_digits=10, decimal_places=5)  "
                                              "# max_digits and decimal_places have been guessed, "
                                              "as this database handles decimal fields as float")
-        else:
-            assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
 
         assertFieldType('float_field', "models.FloatField()")
 
