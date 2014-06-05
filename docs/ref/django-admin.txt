@@ -902,6 +902,13 @@ Example usage::
 The development server is multithreaded by default. Use the ``--nothreading``
 option to disable the use of threading in the development server.
 
+.. django-admin-option:: --nodaemon
+
+The development server uses daemon threads by default. Use the ``--nodaemon``
+option to use non-daemon threads in the development server. Using non-daemon
+threads will prevent the server from properly quitting or auto-reloading if
+one of the threads isn't terminating correctly.
+
 .. django-admin-option:: --ipv6, -6
 
 Use the ``--ipv6`` (or shorter ``-6``) option to tell Django to use IPv6 for
