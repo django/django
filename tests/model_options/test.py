@@ -30,14 +30,21 @@ from collections import OrderedDict
 
 class OptionsBaseTests(test.TestCase):
     def assertContainsOfType(self, model, objects, names_and_models, opts=NONE):
+        names_and_models = dict(names_and_models)
         self.assertEquals(len(objects), len(names_and_models))
 
-        field_names = dict([(f.name, n) for n, f in objects])
-        gfd = model._meta.get_field_details
-        for expected_name, expected_model in names_and_models:
-            self.assertTrue(expected_name in field_names.keys())
-            self.assertEquals(gfd(field_names[expected_name], opts=opts)[1],
-                              expected_model)
+        for _, o in objects:
+            legacy_name = o.field.related_query_name()
+
+            # NOTE: there is currently no way to fetch hidden
+            # or proxy models with get_field_by_name. The way the
+            # legacy implementation does so it through
+            # get_all_related_objects_with_model, our get_new_fields
+            # does not support this..
+            if legacy_name == '+' or o.field.rel.to._meta.proxy:
+                continue
+            relation_class = model._meta.get_field_details(legacy_name)[1]
+            self.assertEquals(relation_class, names_and_models[o.name])
 
     def eq_field_names_and_models(self, objects, names_eq, models_eq):
         fields, models = zip(*objects)
@@ -149,6 +156,17 @@ class NewAPITests(OptionsBaseTests):
         cf = CharField(max_length=50)
         BareModel.add_to_class("my_new_field_2", cf)
         self.assertEquals(BareModel._meta.get_new_field("my_new_field_2"), cf)
+
+    def test_add_m2m_field(self):
+        cf = ManyToManyField(User)
+        BareModel.add_to_class("my_new_field_m2m", cf)
+        self.assertEquals(BareModel._meta.get_new_field("my_new_field_m2m"), cf)
+
+    def test_get_related_object(self):
+        #import ipdb; ipdb.set_trace()
+        field_info = Group._meta.get_field_details('ownedvenue')
+        self.assertEquals(field_info[1:], (Group, False, False))
+        self.assertTrue(isinstance(field_info[0], RelatedObject))
 
 
 class LegacyAPITests(OptionsBaseTests):
