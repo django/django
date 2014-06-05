@@ -145,6 +145,11 @@ class NewAPITests(OptionsBaseTests):
             ('model_options:m2mrelationtom2mmodel', RelatedM2MModel),
         ), opts=LOCAL_ONLY)
 
+    def test_add_data_field(self):
+        cf = CharField(max_length=50)
+        BareModel.add_to_class("my_new_field_2", cf)
+        self.assertEquals(BareModel._meta.get_new_field("my_new_field_2"), cf)
+
 
 class LegacyAPITests(OptionsBaseTests):
 

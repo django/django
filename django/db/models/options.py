@@ -133,6 +133,11 @@ class Options(object):
                 or obj.field.rel.parent_link)
                 and obj.model not in parent_list)
 
+    def get_new_field(self, field_name, opts=NONE):
+        field, model, direct, m2m = self.get_field_details(field_name,
+                                                           opts)
+        return field
+
     def get_field_details(self, field_name, opts=NONE):
         base = OrderedDict()
         for name, data in self.get_new_fields(types=RELATED_M2M,
