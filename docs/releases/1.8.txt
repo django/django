@@ -333,7 +333,7 @@ path being reversed to be imported. This behavior has also resulted in a
 for reversing instead.
 
 If you are using :mod:`django.contrib.sitemaps`, add the ``name`` argument to
-the ``url`` that references :func:`django.contrib.sitemaps.views.sitemap`:
+the ``url`` that references :func:`django.contrib.sitemaps.views.sitemap`::
 
     url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
         {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
