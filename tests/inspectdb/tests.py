@@ -89,10 +89,16 @@ class InspectDBTestCase(TestCase):
 
         if connection.features.can_introspect_boolean_field:
             assertFieldType('bool_field', "models.BooleanField()")
-            assertFieldType('null_bool_field', "models.NullBooleanField()")
+            if connection.features.can_introspect_null:
+                assertFieldType('null_bool_field', "models.NullBooleanField()")
+            else:
+                assertFieldType('null_bool_field', "models.BooleanField()")
         else:
             assertFieldType('bool_field', "models.IntegerField()")
-            assertFieldType('null_bool_field', "models.IntegerField(blank=True, null=True)")
+            if connection.features.can_introspect_null:
+                assertFieldType('null_bool_field', "models.IntegerField(blank=True, null=True)")
+            else:
+                assertFieldType('null_bool_field', "models.IntegerField()")
 
         if connection.vendor == 'sqlite':
             # Guessed arguments on SQLite, see #5014
