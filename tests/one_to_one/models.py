@@ -30,6 +30,10 @@ class Restaurant(models.Model):
         return "%s the restaurant" % self.place.name
 
 
+class Bar(models.Model):
+    place = models.OneToOneField(Place, null=True)
+
+
 @python_2_unicode_compatible
 class Waiter(models.Model):
     restaurant = models.ForeignKey(Restaurant)
