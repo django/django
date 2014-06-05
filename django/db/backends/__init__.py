@@ -591,6 +591,9 @@ class BaseDatabaseFeatures(object):
     # Can the backend introspect an BooleanField, instead of an IntegerField?
     can_introspect_boolean_field = True
 
+    # Can the backend introspect an DecimalField, instead of an FloatField?
+    can_introspect_decimal_field = True
+
     # Can the backend introspect an IPAddressField, instead of an CharField?
     can_introspect_ip_address_field = False
 
