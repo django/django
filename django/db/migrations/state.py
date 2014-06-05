@@ -65,7 +65,8 @@ class ProjectState(object):
                     except InvalidBasesError:
                         new_unrendered_models.append(model)
                 if len(new_unrendered_models) == len(unrendered_models):
-                    raise InvalidBasesError("Cannot resolve bases for %r" % new_unrendered_models)
+                    raise InvalidBasesError("Cannot resolve bases for %r" % [
+                        s.name for s in new_unrendered_models])
                 unrendered_models = new_unrendered_models
             # make sure apps has no dangling references
             if self.apps._pending_lookups:

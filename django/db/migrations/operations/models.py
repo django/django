@@ -13,23 +13,29 @@ class CreateModel(Operation):
     """
 
     serialization_expand_args = ['fields', 'options']
+    orm_only = False
 
-    def __init__(self, name, fields, options=None, bases=None):
+    def __init__(self, name, fields, options=None, bases=None, orm_only=False):
         self.name = name
         self.fields = fields
         self.options = options or {}
         self.bases = bases or (models.Model,)
+        self.orm_only = orm_only
 
     def state_forwards(self, app_label, state):
         state.models[app_label, self.name.lower()] = ModelState(app_label, self.name, self.fields, self.options, self.bases)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        if self.orm_only:
+            return
         apps = to_state.render()
         model = apps.get_model(app_label, self.name)
         if router.allow_migrate(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        if self.orm_only:
+            return
         apps = from_state.render()
         model = apps.get_model(app_label, self.name)
         if router.allow_migrate(schema_editor.connection.alias, model):
@@ -64,25 +70,35 @@ class CreateModel(Operation):
             ([(k, f.deconstruct()[1:]) for k, f in self.fields] == [(k, f.deconstruct()[1:]) for k, f in other.fields])
         )
 
+    def __ne__(self, other):
+        return not (self == other)
+
 
 class DeleteModel(Operation):
     """
     Drops a model's table.
     """
 
-    def __init__(self, name):
+    orm_only = False
+
+    def __init__(self, name, orm_only=False):
         self.name = name
+        self.orm_only = orm_only
 
     def state_forwards(self, app_label, state):
         del state.models[app_label, self.name.lower()]
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        if self.orm_only:
+            return
         apps = from_state.render()
         model = apps.get_model(app_label, self.name)
         if router.allow_migrate(schema_editor.connection.alias, model):
             schema_editor.delete_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        if self.orm_only:
+            return
         apps = to_state.render()
         model = apps.get_model(app_label, self.name)
         if router.allow_migrate(schema_editor.connection.alias, model):
@@ -101,10 +117,12 @@ class RenameModel(Operation):
     """
 
     reversible = False
+    orm_only = False
 
-    def __init__(self, old_name, new_name):
+    def __init__(self, old_name, new_name, orm_only=False):
         self.old_name = old_name
         self.new_name = new_name
+        self.orm_only = orm_only
 
     def state_forwards(self, app_label, state):
         state.models[app_label, self.new_name.lower()] = state.models[app_label, self.old_name.lower()]
@@ -112,6 +130,8 @@ class RenameModel(Operation):
         del state.models[app_label, self.old_name.lower()]
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        if self.orm_only:
+            return
         old_apps = from_state.render()
         new_apps = to_state.render()
         old_model = old_apps.get_model(app_label, self.old_name)
@@ -124,6 +144,8 @@ class RenameModel(Operation):
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        if self.orm_only:
+            return
         old_apps = from_state.render()
         new_apps = to_state.render()
         old_model = old_apps.get_model(app_label, self.new_name)
