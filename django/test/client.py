@@ -10,6 +10,7 @@ from io import BytesIO
 
 from django.apps import apps
 from django.conf import settings
+from django.core import urlresolvers
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import (request_started, request_finished,
@@ -18,7 +19,7 @@ from django.db import close_old_connections
 from django.http import SimpleCookie, HttpRequest, QueryDict
 from django.template import TemplateDoesNotExist
 from django.test import signals
-from django.utils.functional import curry
+from django.utils.functional import curry, SimpleLazyObject
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
@@ -448,6 +449,10 @@ class Client(RequestFactory):
             # Add any rendered template detail to the response.
             response.templates = data.get("templates", [])
             response.context = data.get("context")
+
+            # Attach the ResolverMatch instance to the response
+            response.resolver_match = SimpleLazyObject(
+                lambda: urlresolvers.resolve(request['PATH_INFO']))
 
             # Flatten a single context. Not really necessary anymore thanks to
             # the __getattr__ flattening in ContextList, but has some edge-case
