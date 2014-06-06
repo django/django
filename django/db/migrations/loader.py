@@ -134,6 +134,25 @@ class MigrationLoader(object):
         else:
             return self.disk_migrations[results[0]]
 
+    def check_key(self, key, current_app):
+        if key[1] != "__first__" or key in self.graph:
+            return key
+        # Special-case __first__, which means "the first migration" for
+        # migrated apps, and is ignored for unmigrated apps. It allows
+        # makemigrations to declare dependencies on apps before they even have
+        # migrations.
+        if key[0] == current_app:
+            # Ignore __first__ references to the same app (#22325)
+            return
+        if key[0] in self.unmigrated_apps:
+            # This app isn't migrated, but something depends on it.
+            # The models will get auto-added into the state, though
+            # so we're fine.
+            return
+        if key[0] in self.migrated_apps:
+            return list(self.graph.root_nodes(key[0]))[0]
+        raise ValueError("Dependency on unknown app %s" % key[0])
+
     def build_graph(self):
         """
         Builds a migration dependency graph using both the disk and database.
@@ -196,25 +215,13 @@ class MigrationLoader(object):
             self.graph.add_node(key, migration)
         for key, migration in normal.items():
             for parent in migration.dependencies:
-                # Special-case __first__, which means "the first migration" for
-                # migrated apps, and is ignored for unmigrated apps. It allows
-                # makemigrations to declare dependencies on apps before they
-                # even have migrations.
-                if parent[1] == "__first__" and parent not in self.graph:
-                    if parent[0] == key[0]:
-                        # Ignore __first__ references to the same app (#22325)
-                        continue
-                    elif parent[0] in self.unmigrated_apps:
-                        # This app isn't migrated, but something depends on it.
-                        # The models will get auto-added into the state, though
-                        # so we're fine.
-                        continue
-                    elif parent[0] in self.migrated_apps:
-                        parent = list(self.graph.root_nodes(parent[0]))[0]
-                    else:
-                        raise ValueError("Dependency on unknown app %s" % parent[0])
+                parent = self.check_key(parent, key[0])
                 if parent is not None:
                     self.graph.add_dependency(key, parent)
+            for child in migration.run_before:
+                child = self.check_key(child, key[0])
+                if child is not None:
+                    self.graph.add_dependency(child, key)
 
     def detect_conflicts(self):
         """
