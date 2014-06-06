@@ -1494,6 +1494,27 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, 'http://example.com/dummy/foo/')
 
+    def test_overriding_has_module_permission(self):
+        """
+        The ModelAdmin on '/admin7/' has a custom has_module_permission() that
+        always returns False, so no user should be able to access any page of
+        that module.
+        """
+        login_url = reverse('admin7:login') + '?next=/test_admin/admin/'
+        self.client.post(login_url, self.super_login)
+        response = self.client.get('/test_admin/admin7/admin_views/')
+        self.assertEquals(response.status_code, 403)
+        response = self.client.get('/test_admin/admin7/admin_views/article/')
+        self.assertEquals(response.status_code, 403)
+        response = self.client.get('/test_admin/admin7/admin_views/article/add/')
+        self.assertEquals(response.status_code, 403)
+        response = self.client.get('/test_admin/admin7/admin_views/article/1/')
+        self.assertEquals(response.status_code, 403)
+        response = self.client.get('/test_admin/admin7/admin_views/article/1/history/')
+        self.assertEquals(response.status_code, 403)
+        response = self.client.get('/test_admin/admin7/admin_views/article/1/delete/')
+        self.assertEquals(response.status_code, 403)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF="admin_views.urls")

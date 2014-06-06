@@ -191,7 +191,8 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             if formfield and db_field.name not in self.raw_id_fields:
                 related_modeladmin = self.admin_site._registry.get(db_field.rel.to)
                 can_add_related = bool(related_modeladmin and
-                    related_modeladmin.has_add_permission(request))
+                    related_modeladmin.has_add_permission(request) and
+                    related_modeladmin.has_module_permission(request))
                 formfield.widget = widgets.RelatedFieldWidgetWrapper(
                     formfield.widget, db_field.rel, self.admin_site,
                     can_add_related=can_add_related)
@@ -482,8 +483,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         Returns True if the given request has any permission in the given
         app label
         """
-        opts = self.opts
-        return request.user.has_module_perms(opts.app_label)
+        return request.user.has_module_perms(self.opts.app_label)
 
 
 @python_2_unicode_compatible
@@ -544,7 +544,8 @@ class ModelAdmin(BaseModelAdmin):
                         inline.has_change_permission(request, obj) or
                         inline.has_delete_permission(request, obj)):
                     continue
-                if not inline.has_add_permission(request):
+                if not (inline.has_add_permission(request) and
+                        inline.has_module_permission(request)):
                     inline.max_num = 0
             inline_instances.append(inline)
 
@@ -1341,14 +1342,16 @@ class ModelAdmin(BaseModelAdmin):
         add = object_id is None
 
         if add:
-            if not self.has_add_permission(request):
+            if not (self.has_add_permission(request) and
+                    self.has_module_permission(request)):
                 raise PermissionDenied
             obj = None
 
         else:
             obj = self.get_object(request, unquote(object_id))
 
-            if not self.has_change_permission(request, obj):
+            if not (self.has_change_permission(request, obj) and
+                    self.has_module_permission(request)):
                 raise PermissionDenied
 
             if obj is None:
@@ -1434,7 +1437,8 @@ class ModelAdmin(BaseModelAdmin):
         from django.contrib.admin.views.main import ERROR_FLAG
         opts = self.model._meta
         app_label = opts.app_label
-        if not self.has_change_permission(request, None):
+        if not (self.has_change_permission(request, None) and
+                self.has_module_permission(request)):
             raise PermissionDenied
 
         list_display = self.get_list_display(request)
@@ -1592,7 +1596,8 @@ class ModelAdmin(BaseModelAdmin):
 
         obj = self.get_object(request, unquote(object_id))
 
-        if not self.has_delete_permission(request, obj):
+        if not (self.has_delete_permission(request, obj) and
+                self.has_module_permission(request)):
             raise PermissionDenied
 
         if obj is None:
@@ -1647,7 +1652,8 @@ class ModelAdmin(BaseModelAdmin):
         model = self.model
         obj = get_object_or_404(self.get_queryset(request), pk=unquote(object_id))
 
-        if not self.has_change_permission(request, obj):
+        if not (self.has_change_permission(request, obj) and
+                self.has_module_permission(request)):
             raise PermissionDenied
 
         # Then get the history for this object.
@@ -1838,7 +1844,8 @@ class InlineModelAdmin(BaseModelAdmin):
 
     def get_queryset(self, request):
         queryset = super(InlineModelAdmin, self).get_queryset(request)
-        if not self.has_change_permission(request):
+        if not (self.has_change_permission(request) and
+                self.has_module_permission(request)):
             queryset = queryset.none()
         return queryset
 
