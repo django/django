@@ -171,3 +171,14 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_empty_sitemap(self):
         response = self.client.get('/empty/sitemap.xml')
         self.assertEqual(response.status_code, 200)
+
+    @override_settings(LANGUAGES=(('en', 'English'), ('pt', 'Portuguese')))
+    def test_simple_i18nsitemap_index(self):
+        "A simple i18n sitemap index can be rendered"
+        response = self.client.get('/simple/i18n.xml')
+        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url><loc>{0}/en/i18n/testmodel/1/</loc><changefreq>never</changefreq><priority>0.5</priority></url><url><loc>{0}/pt/i18n/testmodel/1/</loc><changefreq>never</changefreq><priority>0.5</priority></url>
+</urlset>
+""".format(self.base_url)
+        self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
