@@ -83,7 +83,8 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The new :attr:`Sitemap.i18n <django.contrib.sitemaps.Sitemap.i18n>` attribute
+  allows you to generate a sitemap based on the :setting:`LANGUAGES` setting.
 
 :mod:`django.contrib.sites`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
