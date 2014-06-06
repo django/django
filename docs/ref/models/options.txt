@@ -95,6 +95,14 @@ Django quotes column and table names behind the scenes.
     setting, if set. If the backend doesn't support tablespaces, this option is
     ignored.
 
+``default_related_name``
+-----------------
+.. attribute:: Options.default_related_name
+
+    The name that will be used by default for the relation from a related object
+    back to this one. The default is <model name>_set.
+
+
 ``get_latest_by``
 -----------------
 
