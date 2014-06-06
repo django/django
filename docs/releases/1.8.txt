@@ -176,6 +176,13 @@ Models
 * Django now logs at most 9000 queries in ``connections.queries``, in order
   to prevent excessive memory usage in long-running processes in debug mode.
 
+* Pickling models and querysets across different versions of Django isn't
+  officially supported (it may work, but there's no guarantee). An extra
+  variable that specifies the current Django version is now added to the
+  pickled state of models and querysets, and Django raises a ``RuntimeWarning``
+  when these objects are unpickled in a different version than the one in
+  which they were pickled.
+
 Signals
 ^^^^^^^
 
