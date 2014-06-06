@@ -21,7 +21,13 @@ class CreateModel(Operation):
         self.bases = bases or (models.Model,)
 
     def state_forwards(self, app_label, state):
-        state.models[app_label, self.name.lower()] = ModelState(app_label, self.name, self.fields, self.options, self.bases)
+        state.models[app_label, self.name.lower()] = ModelState(
+            app_label,
+            self.name,
+            list(self.fields),
+            dict(self.options),
+            tuple(self.bases),
+        )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         apps = to_state.render()
