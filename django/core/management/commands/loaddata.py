@@ -5,7 +5,6 @@ import gzip
 import os
 import warnings
 import zipfile
-from optparse import make_option
 
 from django.apps import apps
 from django.conf import settings
@@ -29,18 +28,21 @@ except ImportError:
 
 class Command(BaseCommand):
     help = 'Installs the named fixture(s) in the database.'
-    args = "fixture [fixture ...]"
+    missing_args_message = ("No database fixture specified. Please provide the "
+                            "path of at least one fixture in the command line.")
 
-    option_list = BaseCommand.option_list + (
-        make_option('--database', action='store', dest='database',
+    def add_arguments(self, parser):
+        parser.add_argument('args', metavar='fixture', nargs='+',
+            help='Fixture labels.')
+        parser.add_argument('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Nominates a specific database to load '
-                'fixtures into. Defaults to the "default" database.'),
-        make_option('--app', action='store', dest='app_label',
-            default=None, help='Only look for fixtures in the specified app.'),
-        make_option('--ignorenonexistent', '-i', action='store_true', dest='ignore',
-            default=False, help='Ignores entries in the serialized data for fields'
-                                ' that do not currently exist on the model.'),
-    )
+            'fixtures into. Defaults to the "default" database.')
+        parser.add_argument('--app', action='store', dest='app_label',
+            default=None, help='Only look for fixtures in the specified app.')
+        parser.add_argument('--ignorenonexistent', '-i', action='store_true',
+            dest='ignore', default=False,
+            help='Ignores entries in the serialized data for fields that do not '
+            'currently exist on the model.')
 
     def handle(self, *fixture_labels, **options):
 
@@ -48,13 +50,7 @@ class Command(BaseCommand):
         self.using = options.get('database')
         self.app_label = options.get('app_label')
         self.hide_empty = options.get('hide_empty', False)
-
-        if not len(fixture_labels):
-            raise CommandError(
-                "No database fixture specified. Please provide the path "
-                "of at least one fixture in the command line.")
-
-        self.verbosity = int(options.get('verbosity'))
+        self.verbosity = options.get('verbosity')
 
         with transaction.atomic(using=self.using):
             self.loaddata(fixture_labels)

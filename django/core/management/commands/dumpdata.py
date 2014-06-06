@@ -1,7 +1,6 @@
 import warnings
 
 from collections import OrderedDict
-from optparse import make_option
 
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
@@ -11,38 +10,39 @@ from django.utils.deprecation import RemovedInDjango19Warning
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--format', default='json', dest='format',
-            help='Specifies the output serialization format for fixtures.'),
-        make_option('--indent', default=None, dest='indent', type='int',
-            help='Specifies the indent level to use when pretty-printing output'),
-        make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS,
-            help='Nominates a specific database to dump fixtures from. '
-                 'Defaults to the "default" database.'),
-        make_option('-e', '--exclude', dest='exclude', action='append', default=[],
-            help='An app_label or app_label.ModelName to exclude '
-                 '(use multiple --exclude to exclude multiple apps/models).'),
-        make_option('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
-            help='Use natural keys if they are available (deprecated: use --natural-foreign instead).'),
-        make_option('--natural-foreign', action='store_true', dest='use_natural_foreign_keys', default=False,
-            help='Use natural foreign keys if they are available.'),
-        make_option('--natural-primary', action='store_true', dest='use_natural_primary_keys', default=False,
-            help='Use natural primary keys if they are available.'),
-        make_option('-a', '--all', action='store_true', dest='use_base_manager', default=False,
-            help="Use Django's base manager to dump all models stored in the database, "
-                 "including those that would otherwise be filtered or modified by a custom manager."),
-        make_option('--pks', dest='primary_keys',
-            help="Only dump objects with given primary keys. "
-                 "Accepts a comma separated list of keys. "
-                 "This option will only work when you specify one model."),
-        make_option('-o', '--output', default=None, dest='output',
-            help='Specifies file to which the output is written.'),
-    )
     help = ("Output the contents of the database as a fixture of the given "
             "format (using each model's default manager unless --all is "
             "specified).")
-    args = '[app_label app_label.ModelName ...]'
+
+    def add_arguments(self, parser):
+        parser.add_argument('args', metavar='app_label[.ModelName]', nargs='*',
+            help='Restricts dumped data to the specified app_label or app_label.ModelName.')
+        parser.add_argument('--format', default='json', dest='format',
+            help='Specifies the output serialization format for fixtures.')
+        parser.add_argument('--indent', default=None, dest='indent', type=int,
+            help='Specifies the indent level to use when pretty-printing output.')
+        parser.add_argument('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS,
+            help='Nominates a specific database to dump fixtures from. '
+                 'Defaults to the "default" database.')
+        parser.add_argument('-e', '--exclude', dest='exclude', action='append', default=[],
+            help='An app_label or app_label.ModelName to exclude '
+                 '(use multiple --exclude to exclude multiple apps/models).')
+        parser.add_argument('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
+            help='Use natural keys if they are available (deprecated: use --natural-foreign instead).')
+        parser.add_argument('--natural-foreign', action='store_true', dest='use_natural_foreign_keys', default=False,
+            help='Use natural foreign keys if they are available.')
+        parser.add_argument('--natural-primary', action='store_true', dest='use_natural_primary_keys', default=False,
+            help='Use natural primary keys if they are available.')
+        parser.add_argument('-a', '--all', action='store_true', dest='use_base_manager', default=False,
+            help="Use Django's base manager to dump all models stored in the database, "
+                 "including those that would otherwise be filtered or modified by a custom manager.")
+        parser.add_argument('--pks', dest='primary_keys',
+            help="Only dump objects with given primary keys. "
+                 "Accepts a comma separated list of keys. "
+                 "This option will only work when you specify one model.")
+        parser.add_argument('-o', '--output', default=None, dest='output',
+            help='Specifies file to which the output is written.')
 
     def handle(self, *app_labels, **options):
         format = options.get('format')

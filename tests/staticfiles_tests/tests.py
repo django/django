@@ -128,7 +128,7 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
                         ignore_errors=True, onerror=rmtree_errorhandler)
 
     def run_collectstatic(self, **kwargs):
-        call_command('collectstatic', interactive=False, verbosity='0',
+        call_command('collectstatic', interactive=False, verbosity=0,
                      ignore_patterns=['*.ignoreme'], **kwargs)
 
     def _get_file(self, filepath):
@@ -559,7 +559,7 @@ class TestHashedFiles(object):
         """
         collectstatic_args = {
             'interactive': False,
-            'verbosity': '0',
+            'verbosity': 0,
             'link': False,
             'clear': False,
             'dry_run': False,
@@ -952,7 +952,7 @@ class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
 
     command_params = {'interactive': False,
                       'post_process': True,
-                      'verbosity': '0',
+                      'verbosity': 0,
                       'ignore_patterns': ['*.ignoreme'],
                       'use_default_ignore_patterns': True,
                       'clear': False,
