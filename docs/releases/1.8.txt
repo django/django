@@ -193,6 +193,10 @@ Models
   when these objects are unpickled in a different version than the one in
   which they were pickled.
 
+* Added :meth:`Model.from_db() <django.db.models.Model.from_db()>` which
+  Django uses whenever objects are loaded using the ORM. The method allows
+  customizing model loading behavior.
+
 Signals
 ^^^^^^^
 
