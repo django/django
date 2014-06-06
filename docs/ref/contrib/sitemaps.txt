@@ -231,6 +231,15 @@ Sitemap class reference
         sitemap was requested is used. If the sitemap is built outside the
         context of a request, the default is ``'http'``.
 
+    .. attribute:: Sitemap.i18n
+
+        **Optional.**
+
+        A boolean attribute that defines if the URLs of this class are using i18n.
+        If ``True`` it will generate your sitemap based on all of your :setting:`LANGUAGES`,
+        the default is ``False``.
+
+        .. versionadded:: 1.8
 
 Shortcuts
 =========
