@@ -458,6 +458,16 @@ class Model(six.with_metaclass(ModelBase)):
         super(Model, self).__init__()
         signals.post_init.send(sender=self.__class__, instance=self)
 
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        if cls._deferred:
+            new = cls(**dict(zip(field_names, values)))
+        else:
+            new = cls(*values)
+        new._state.adding = False
+        new._state.db = db
+        return new
+
     def __repr__(self):
         try:
             u = six.text_type(self)

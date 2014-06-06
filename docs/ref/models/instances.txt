@@ -62,6 +62,60 @@ that, you need to :meth:`~Model.save()`.
 
         book = Book.objects.create_book("Pride and Prejudice")
 
+Customizing model loading
+-------------------------
+
+.. classmethod:: Model.from_db(db, field_names, values)
+
+.. versionadded:: 1.8
+
+The ``from_db()`` method can be used to customize model instance creation
+when loading from the database.
+
+The ``db`` argument contains the database alias for the database the model
+is loaded from, ``field_names`` contains the names of all loaded fields, and
+``values`` contains the loaded values for each field in ``field_names``. The
+``field_names`` are in the same order as the ``values``, so it is possible to
+use ``cls(**(zip(field_names, values)))`` to instantiate the object. If all
+of the model's fields are present, then ``values`` are guaranteed to be in
+the order ``__init__()`` expects them. That is, the instance can be created
+by ``cls(*values)``. It is possible to check if all fields are present by
+consulting ``cls._deferred`` - if ``False``, then all fields have been loaded
+from the database.
+
+In addition to creating the new model, the ``from_db()`` method must set the
+``adding`` and ``db`` flags in the new instance's ``_state`` attribute.
+
+Below is an example showing how torecord the initial values of fields that
+are loaded from the database:: 
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        # default implementation of from_db() (could be replaced
+        # with super())
+        if cls._deferred:
+            instance = cls(**zip(field_names, values))
+        else:
+            instance = cls(*values)
+        instance._state.adding = False
+        instance._state.db = db
+        # customization to store the original field values on the instance
+        instance._loaded_values = zip(field_names, values)
+        return instance
+
+    def save(self, *args, **kwargs):
+        # Check how the current values differ from ._loaded_values. For example,
+        # prevent changing the creator_id of the model. (This example doesn't
+        # support cases where 'creator_id' is deferred).
+        if not self._state.adding and (
+                self.creator_id != self._loaded_values['creator_id']):
+            raise ValueError("Updating the value of creator isn't allowed")
+        super(...).save(*args, **kwargs)
+
+The example above shows a full ``from_db()`` implementation to clarify how that
+is done. In this case it would of course be possible to just use ``super()`` call
+in the ``from_db()`` method.
+
 .. _validating-objects:
 
 Validating objects
