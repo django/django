@@ -62,6 +62,38 @@ that, you need to :meth:`~Model.save()`.
 
         book = Book.objects.create_book("Pride and Prejudice")
 
+Customizing model loading
+-------------------------
+
+.. method:: Model.from_db(using, field_names, values)
+
+The ``from_db()`` method can be used to customize model instance creation
+when loading from the database.
+
+The ``using`` argument contains the database alias for the database the model is
+loaded from, ``field_names`` contain the names of all loaded fields and ``values``
+contain the loaded value for each field in ``field_names``. The field_names
+are in the same order as the values, so it is possible to use
+``cls(\*\*(zip(field_names, values)))`` to instantiate the object. If all of
+the model's fields are present, then values are guaranteed to be in the order
+``__init__()`` expects them. That is, the instance can be created by
+``cls(\*values)``. It is possible to check if all fields are present by
+consulting cls.deferred - if False, then all fields are loaded from the database.
+
+In addition of creating the new model, the ``from_db()`` method must create
+`django.db.models.ModelState` class into the new instance's ``._state``
+attribute. Thus a full from_db() method could look like this::
+
+    from django.db.models import ModelState
+    @classmethod
+    def from_db(cls, using, field_names, values):
+        if cls.deferred:
+            instance = cls(**zip(field_names, values))
+        else:
+            instance = cls(*values)
+        instance._state = ModelState(using, adding=False)
+        return instance
+
 .. _validating-objects:
 
 Validating objects

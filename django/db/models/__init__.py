@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured  # N
 from django.db.models.query import Q, QuerySet, Prefetch  # NOQA
 from django.db.models.expressions import F  # NOQA
 from django.db.models.manager import Manager  # NOQA
-from django.db.models.base import Model  # NOQA
+from django.db.models.base import Model, ModelState  # NOQA
 from django.db.models.aggregates import *  # NOQA
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields.subclassing import SubfieldBase        # NOQA

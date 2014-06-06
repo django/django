@@ -351,12 +351,12 @@ class ModelState(object):
     """
     A class for storing instance state
     """
-    def __init__(self, db=None):
+    def __init__(self, db=None, adding=True):
         self.db = db
         # If true, uniqueness validation checks will consider this a new, as-yet-unsaved object.
         # Necessary for correct validation of new instances of objects with explicit (non-auto) PKs.
         # This impacts validation only; it has no effect on the actual save.
-        self.adding = True
+        self.adding = adding
 
 
 class Model(six.with_metaclass(ModelBase)):
@@ -457,6 +457,15 @@ class Model(six.with_metaclass(ModelBase)):
                 raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
         super(Model, self).__init__()
         signals.post_init.send(sender=self.__class__, instance=self)
+
+    @classmethod
+    def from_db(cls, using, field_names, values):
+        if cls._deferred:
+            new = cls(**dict(zip(field_names, values)))
+        else:
+            new = cls(*values)
+        new._state = ModelState(using, False)
+        return new
 
     def __repr__(self):
         try:
