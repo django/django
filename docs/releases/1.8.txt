@@ -178,6 +178,10 @@ Models
 * Django now logs at most 9000 queries in ``connections.queries``, in order
   to prevent excessive memory usage in long-running processes in debug mode.
 
+* There is now a model ``Meta`` option to define a
+  :attr:`default related name <django.db.models.Options.default_related_name>`
+  for all relational fields of a model.
+
 * Pickling models and querysets across different versions of Django isn't
   officially supported (it may work, but there's no guarantee). An extra
   variable that specifies the current Django version is now added to the
