@@ -280,6 +280,20 @@ Now, an error will be raised to prevent data loss::
     ...
     ValueError: Cannot assign "<Author: John>": "Author" instance isn't saved in the database.
 
+Management commands that only accept positional arguments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you have written a custom management command that only accepts positional
+arguments and you didn't specify the
+:attr:`~django.core.management.BaseCommand.args` command variable, you might
+get an error like ``Error: unrecognized arguments: ...``, as variable parsing
+is now based on :py:mod:`argparse` which doesn't implicitly accept positional
+arguments. You can make your command backwards compatible by simply setting the
+:attr:`~django.core.management.BaseCommand.args` class variable. However, if
+you don't have to keep compatibility with older Django versions, it's better to
+implement the new :meth:`~django.core.management.BaseCommand.add_arguments`
+method as described in :doc:`/howto/custom-management-commands`.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -409,3 +423,14 @@ Similarly for GIS sitemaps, add ``name='django.contrib.gis.sitemaps.views.kml'``
 or ``name='django.contrib.gis.sitemaps.views.kmz'``.
 
 .. _security issue: https://www.djangoproject.com/weblog/2014/apr/21/security/#s-issue-unexpected-code-execution-using-reverse
+
+Extending management command arguments through ``Command.option_list``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Management commands now use :py:mod:`argparse` instead of :py:mod:`optparse` to
+parse command-line arguments passed to commands. This also means that the way
+to add custom arguments to commands has changed: instead of extending the
+``option_list`` class list, you should now override the
+:meth:`~django.core.management.BaseCommand.add_arguments` method and add
+arguments through ``argparse.add_argument()``. See
+:ref:`this example <custom-commands-options>` for more details.
