@@ -30,83 +30,125 @@ Models
 ~~~~~~
 
 * **models.E001**: ``<swappable>`` is not of the form ``app_label.app_name``.
-* **models.E002**: ``<SETTING>`` references ``<model>``, which has not been installed, or is abstract.
-* **models.E003**: The model has two many-to-many relations through the intermediate model ``%s.%s``.
-* **models.E004**: ``id`` can only be used as a field name if the field also sets ``primary_key=True``.
-* **models.E005**: The field ``<field name>`` from parent model <model> clashes with the field ``<field name>`` from parent model <model>.
-* **models.E006**: The field clashes with the field ``<field name>`` from model <model>.
-* **models.E007**: Field ``<field name>`` has column name ``<column name>`` that is used by another field.
+* **models.E002**: ``<SETTING>`` references ``<model>``, which has not been
+  installed, or is abstract.
+* **models.E003**: The model has two many-to-many relations through the
+  intermediate model ``<app_label>.<model>``.
+* **models.E004**: ``id`` can only be used as a field name if the field also
+  sets ``primary_key=True``.
+* **models.E005**: The field ``<field name>`` from parent model ``<model>``
+  clashes with the field ``<field name>`` from parent model ``<model>``.
+* **models.E006**: The field clashes with the field ``<field name>`` from model
+  ``<model>``.
+* **models.E007**: Field ``<field name>`` has column name ``<column name>``
+  that is used by another field.
 * **models.E008**: ``index_together`` must be a list or tuple.
 * **models.E009**: All ``index_together`` elements must be lists or tuples.
 * **models.E010**: ``unique_together`` must be a list or tuple.
 * **models.E011**: All ``unique_together`` elements must be lists or tuples.
-* **models.E012**: ``index_together/unique_together`` refers to the non-existent field ``<field name>``.
-* **models.E013**: ``index_together/unique_together`` refers to a ManyToManyField ``<field name>``, but ManyToManyFields are not supported for that option.
-* **models.E014**: ``ordering`` must be a tuple or list (even if you want to order by only one field).
-* **models.E015**: ``ordering`` refers to the non-existent field ``<field name>``.
-* **models.E016**: ``index_together/unique_together`` refers to field ``<field_name>`` which is not local to model ``<model>``.
+* **models.E012**: ``index_together/unique_together`` refers to the
+  non-existent field ``<field name>``.
+* **models.E013**: ``index_together/unique_together`` refers to a
+  ``ManyToManyField`` ``<field name>``, but ``ManyToManyField``\s are not
+  supported for that option.
+* **models.E014**: ``ordering`` must be a tuple or list (even if you want to
+  order by only one field).
+* **models.E015**: ``ordering`` refers to the non-existent field
+  ``<field name>``.
+* **models.E016**: ``index_together/unique_together`` refers to field
+  ``<field_name>`` which is not local to model ``<model>``.
 * **models.E017**: Proxy model ``<model>`` contains model fields.
 
 Fields
 ~~~~~~
 
 * **fields.E001**: Field names must not end with an underscore.
-* **fields.E002**: Field names must not contain "__".
-* **fields.E003**: ``pk`` is a reserved word that cannot be used as a field name.
+* **fields.E002**: Field names must not contain ``"__"``.
+* **fields.E003**: ``pk`` is a reserved word that cannot be used as a field
+  name.
 * **fields.E004**: ``choices`` must be an iterable (e.g., a list or tuple).
-* **fields.E005**: ``choices`` must be an iterable returning (actual value, human readable name) tuples.
-* **fields.E006**: ``db_index`` must be None, True or False.
-* **fields.E007**: Primary keys must not have null=True.
-* **fields.E100**: AutoFields must set primary_key=True.
-* **fields.E110**: BooleanFields do not accept null values.
-* **fields.E120**: CharFields must define a ``max_length`` attribute.
+* **fields.E005**: ``choices`` must be an iterable returning ``(actual value,
+  human readable name)`` tuples.
+* **fields.E006**: ``db_index`` must be ``None``, ``True`` or ``False``.
+* **fields.E007**: Primary keys must not have ``null=True``.
+* **fields.E100**: ``AutoField``\s must set primary_key=True.
+* **fields.E110**: ``BooleanField``\s do not accept null values.
+* **fields.E120**: ``CharField``\s must define a ``max_length`` attribute.
 * **fields.E121**: ``max_length`` must be a positive integer.
-* **fields.E130**: DecimalFields must define a ``decimal_places`` attribute.
+* **fields.E130**: ``DecimalField``\s must define a ``decimal_places`` attribute.
 * **fields.E131**: ``decimal_places`` must be a non-negative integer.
-* **fields.E132**: DecimalFields must define a ``max_digits`` attribute.
+* **fields.E132**: ``DecimalField``\s must define a ``max_digits`` attribute.
 * **fields.E133**: ``max_digits`` must be a non-negative integer.
 * **fields.E134**: ``max_digits`` must be greater or equal to ``decimal_places``.
-* **fields.E140**: FilePathFields must have either ``allow_files`` or ``allow_folders`` set to True.
-* **fields.E150**: GenericIPAddressFields cannot accept blank values if null values are not allowed, as blank values are stored as nulls.
-* **fields.E160**: The options ``auto_now``, ``auto_now_add``, and ``default`` are mutually exclusive. Only one of these options may be present.
+* **fields.E140**: ``FilePathField``\s must have either ``allow_files`` or
+  ``allow_folders`` set to True.
+* **fields.E150**: ``GenericIPAddressField``\s cannot accept blank values if
+  null values are not allowed, as blank values are stored as nulls.
+* **fields.E160**: The options ``auto_now``, ``auto_now_add``, and ``default``
+  are mutually exclusive. Only one of these options may be present.
 * **fields.W161**: Fixed default value provided.
 
 
 File Fields
 ~~~~~~~~~~~
 
-* **fields.E200**: ``unique`` is not a valid argument for a FileField.
-* **fields.E201**: ``primary_key`` is not a valid argument for a FileField.
-* **fields.E210**: Cannot use ImageField because Pillow is not installed.
+* **fields.E200**: ``unique`` is not a valid argument for a ``FileField``.
+* **fields.E201**: ``primary_key`` is not a valid argument for a ``FileField``.
+* **fields.E210**: Cannot use ``ImageField`` because Pillow is not installed.
 
 Related Fields
 ~~~~~~~~~~~~~~
 
-* **fields.E300**: Field defines a relation with model ``<model>``, which is either not installed, or is abstract.
-* **fields.E301**: Field defines a relation with the model ``<model>`` which has been swapped out.
-* **fields.E302**: Accessor for field ``<field name>`` clashes with field ``<field name>``.
-* **fields.E303**: Reverse query name for field ``<field name>`` clashes with field ``<field name>``.
-* **fields.E304**: Field name ``<field name>`` clashes with accessor for ``<field name>``.
-* **fields.E305**: Field name ``<field name>`` clashes with reverse query name for ``<field name>``.
-* **fields.E310**: None of the fields ``<field1>``, ``<field2>``, ... on model ``<model>`` have a unique=True constraint.
-* **fields.E311**: ``<model>`` must set unique=True because it is referenced by a ForeignKey.
-* **fields.E320**: Field specifies on_delete=SET_NULL, but cannot be null.
-* **fields.E321**: The field specifies on_delete=SET_DEFAULT, but has no default value.
-* **fields.E330**: ManyToManyFields cannot be unique.
-* **fields.E331**: Field specifies a many-to-many relation through model ``%s``, which has not been installed.
-* **fields.E332**: Many-to-many fields with intermediate tables must not be symmetrical.
-* **fields.E333**: The model is used as an intermediate model by ``<model>``, but it has more than two foreign keys to ``<model>``, which is ambiguous. You must specify which two foreign keys Django should use via the through_fields keyword argument.
-* **fields.E334**: The model is used as an intermediate model by ``<model>``, but it has more than one foreign key from ``<model>``, which is ambiguous. You must specify which foreign key Django should use via the through_fields keyword argument.
-* **fields.E335**: The model is used as an intermediate model by ``<model>``, but it has more than one foreign key to ``<model>``, which is ambiguous. You must specify which foreign key Django should use via the through_fields keyword argument.
-* **fields.E336**: The model is used as an intermediary model by ``<model>``, but it does not have foreign key to ``<model>`` or ``<model>``.
-* **fields.E337**: Field specifies ``through_fields`` but does not provide the names of the two link fields that should be used for the relation through ``<model>``.
-* **fields.E338**: The intermediary model ``<through model>`` has no field ``<field name>``.
+* **fields.E300**: Field defines a relation with model ``<model>``, which is
+  either not installed, or is abstract.
+* **fields.E301**: Field defines a relation with the model ``<model>`` which
+  has been swapped out.
+* **fields.E302**: Accessor for field ``<field name>`` clashes with field
+  ``<field name>``.
+* **fields.E303**: Reverse query name for field ``<field name>`` clashes with
+  field ``<field name>``.
+* **fields.E304**: Field name ``<field name>`` clashes with accessor for
+  ``<field name>``.
+* **fields.E305**: Field name ``<field name>`` clashes with reverse query name
+  for ``<field name>``.
+* **fields.E310**: None of the fields ``<field1>``, ``<field2>``, ... on model
+  ``<model>`` have a ``unique=True`` constraint.
+* **fields.E311**: ``<model>`` must set ``unique=True`` because it is
+  referenced by a ``ForeignKey``.
+* **fields.E320**: Field specifies ``on_delete=SET_NULL``, but cannot be null.
+* **fields.E321**: The field specifies ``on_delete=SET_DEFAULT``, but has no
+  default value.
+* **fields.E330**: ``ManyToManyField``\s cannot be unique.
+* **fields.E331**: Field specifies a many-to-many relation through model
+  ``<model>``, which has not been installed.
+* **fields.E332**: Many-to-many fields with intermediate tables must not be
+  symmetrical.
+* **fields.E333**: The model is used as an intermediate model by ``<model>``,
+  but it has more than two foreign keys to ``<model>``, which is ambiguous.
+  You must specify which two foreign keys Django should use via the
+  ``through_fields`` keyword argument.
+* **fields.E334**: The model is used as an intermediate model by ``<model>``,
+  but it has more than one foreign key from ``<model>``, which is ambiguous.
+  You must specify which foreign key Django should use via the
+  ``through_fields`` keyword argument.
+* **fields.E335**: The model is used as an intermediate model by ``<model>``,
+  but it has more than one foreign key to ``<model>``, which is ambiguous.
+  You must specify which foreign key Django should use via the
+  ``through_fields`` keyword argument.
+* **fields.E336**: The model is used as an intermediary model by ``<model>``,
+  but it does not have foreign key to ``<model>`` or ``<model>``.
+* **fields.E337**: Field specifies ``through_fields`` but does not provide the
+  names of the two link fields that should be used for the relation through
+  ``<model>``.
+* **fields.E338**: The intermediary model ``<through model>`` has no field
+  ``<field name>``.
 * **fields.E339**: ``<model>.<field name>`` is not a foreign key to ``<model>``.
 
 Signals
 ~~~~~~~
 
-* **signals.E001**: <handler> was connected to the ``<signal>`` signal with a lazy reference to the ``<moel>`` sender, which has not been installed.
+* **signals.E001**: ``<handler>`` was connected to the ``<signal>`` signal with
+  a lazy reference to the ``<model>`` sender, which has not been installed.
 
 Backwards Compatibility
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,8 +156,8 @@ Backwards Compatibility
 The following checks are performed to warn the user of any potential problems
 that might occur as a result of a version upgrade.
 
-* **1_6.W001**: Some project unittests may not execute as expected.
-* **1_6.W002**: BooleanField does not have a default value.
+* **1_6.W001**: Some project unit tests may not execute as expected.
+* **1_6.W002**: ``BooleanField`` does not have a default value.
 
 Admin
 -----
@@ -127,8 +169,10 @@ The following checks are performed on any
 with the admin site:
 
 * **admin.E001**: The value of ``raw_id_fields`` must be a list or tuple.
-* **admin.E002**: The value of ``raw_id_fields[n]`` refers to ``<field name>``, which is not an attribute of ``<model>``.
-* **admin.E003**: The value of ``raw_id_fields[n]`` must be a ForeignKey or ManyToManyField.
+* **admin.E002**: The value of ``raw_id_fields[n]`` refers to ``<field name>``,
+  which is not an attribute of ``<model>``.
+* **admin.E003**: The value of ``raw_id_fields[n]`` must be a ``ForeignKey`` or
+  ``ManyToManyField``.
 * **admin.E004**: The value of ``fields`` must be a list or tuple.
 * **admin.E005**: Both ``fieldsets`` and ``fields`` are specified.
 * **admin.E006**: The value of ``fields`` contains duplicate field(s).
@@ -136,31 +180,48 @@ with the admin site:
 * **admin.E008**: The value of ``fieldsets[n]`` must be a list or tuple.
 * **admin.E009**: The value of ``fieldsets[n]`` must be of length 2.
 * **admin.E010**: The value of ``fieldsets[n][1]`` must be a dictionary.
-* **admin.E011**: The value of ``fieldsets[n][1]`` must contain the key ``fields``.
-* **admin.E012**: There are duplicate field(s) in ``fieldsets[n][1]``
-* **admin.E013**: ``fields[n]/fieldsets[n][m]`` cannot include the ManyToManyField ``<field name>``, because that field manually specifies a relationship model.
+* **admin.E011**: The value of ``fieldsets[n][1]`` must contain the key
+  ``fields``.
+* **admin.E012**: There are duplicate field(s) in ``fieldsets[n][1]``.
+* **admin.E013**: ``fields[n]/fieldsets[n][m]`` cannot include the
+  ``ManyToManyField`` ``<field name>``, because that field manually specifies a
+  relationship model.
 * **admin.E014**: The value of ``exclude`` must be a list or tuple.
 * **admin.E015**: The value of ``exclude`` contains duplicate field(s).
 * **admin.E016**: The value of ``form`` must inherit from ``BaseModelForm``.
 * **admin.E017**: The value of ``filter_vertical`` must be a list or tuple.
 * **admin.E018**: The value of ``filter_horizontal`` must be a list or tuple.
-* **admin.E019**: The value of ``filter_vertical[n]/filter_vertical[n]`` refers to ``<field name>``, which is not an attribute of ``<model>``.
-* **admin.E020**: The value of ``filter_vertical[n]/filter_vertical[n]`` must be a ManyToManyField.
+* **admin.E019**: The value of ``filter_vertical[n]/filter_vertical[n]`` refers
+  to ``<field name>``, which is not an attribute of ``<model>``.
+* **admin.E020**: The value of ``filter_vertical[n]/filter_vertical[n]`` must
+  be a ``ManyToManyField``.
 * **admin.E021**: The value of ``radio_fields`` must be a dictionary.
-* **admin.E022**: The value of ``radio_fields`` refers to ``<field name>``, which is not an attribute of ``<model>``.
-* **admin.E023**: The value of ``radio_fields`` refers to ``<field name>``, which is not a ForeignKey, and does not have a ``choices`` definition.
-* **admin.E024**: The value of ``radio_fields[<field name>]`` must be either admin.HORIZONTAL nor admin.VERTICAL.
-* **admin.E025**: The value of ``view_on_site`` must be either a callable or a boolean value.
+* **admin.E022**: The value of ``radio_fields`` refers to ``<field name>``,
+  which is not an attribute of ``<model>``.
+* **admin.E023**: The value of ``radio_fields`` refers to ``<field name>``,
+  which is not a ``ForeignKey``, and does not have a ``choices`` definition.
+* **admin.E024**: The value of ``radio_fields[<field name>]`` must be either
+  ``admin.HORIZONTAL`` nor ``admin.VERTICAL``.
+* **admin.E025**: The value of ``view_on_site`` must be either a callable or a
+  boolean value.
 * **admin.E026**: The value of ``prepopulated_fields`` must be a dictionary.
-* **admin.E027**: The value of ``prepopulated_fields`` refers to ``<field name>``, which is not an attribute of ``<model>``.
-* **admin.E028**: The value of ``prepopulated_fields`` refers to ``<field name>``, which must not be a DateTimeField, ForeignKey or ManyToManyField.
-* **admin.E029**: The value of ``prepopulated_fields[<field name>]`` must be a list or tuple.
-* **admin.E030**: The value of ``prepopulated_fields`` refers to ``<field name>``, which is not an attribute of ``<model>``.
+* **admin.E027**: The value of ``prepopulated_fields`` refers to
+  ``<field name>``, which is not an attribute of ``<model>``.
+* **admin.E028**: The value of ``prepopulated_fields`` refers to
+  ``<field name>``, which must not be a ``DateTimeField``, ``ForeignKey`` or
+  ``ManyToManyField``.
+* **admin.E029**: The value of ``prepopulated_fields[<field name>]`` must be a
+  list or tuple.
+* **admin.E030**: The value of ``prepopulated_fields`` refers to
+  ``<field name>``, which is not an attribute of ``<model>``.
 * **admin.E031**: The value of ``ordering`` must be a list or tuple.
-* **admin.E032**: The value of ``ordering`` has the random ordering marker ``?``, but contains other fields as well.
-* **admin.E033**: The value of ``ordering`` refers to ``<field name>``, which is not an attribute of ``<model>``.
+* **admin.E032**: The value of ``ordering`` has the random ordering marker
+  ``?``, but contains other fields as well.
+* **admin.E033**: The value of ``ordering`` refers to ``<field name>``, which
+  is not an attribute of ``<model>``.
 * **admin.E034**: The value of ``readonly_fields`` must be a list or tuple.
-* **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
+* **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an
+  attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
 
 ModelAdmin
 ~~~~~~~~~~
@@ -172,31 +233,51 @@ with the admin site:
 * **admin.E101**: The value of ``save_as`` must be a boolean.
 * **admin.E102**: The value of ``save_on_top`` must be a boolean.
 * **admin.E103**: The value of ``inlines`` must be a list or tuple.
-* **admin.E104**: ``<InlineModelAdmin class>`` must inherit from ``BaseModelAdmin``.
+* **admin.E104**: ``<InlineModelAdmin class>`` must inherit from
+  ``BaseModelAdmin``.
 * **admin.E105**: ``<InlineModelAdmin class>`` must have a ``model`` attribute.
-* **admin.E106**: The value of ``<InlineModelAdmin class>.model`` must be a Model.
+* **admin.E106**: The value of ``<InlineModelAdmin class>.model`` must be a
+  ``Model``.
 * **admin.E107**: The value of ``list_display`` must be a list or tuple.
-* **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``, which is not a callable, an attribute of ``<ModelAdmin class``, or an attribute or method on ``<model>``.
-* **admin.E109**: The value of ``list_display[n]`` must not be a ManyToManyField.
-* **admin.E110**: The value of ``list_display_links`` must be a list, a tuple, or None.
-* **admin.E111**: The value of ``list_display_links[n]`` refers to ``<label>``, which is not defined in ``list_display``.
+* **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``,
+  which is not a callable, an attribute of ``<ModelAdmin class>``, or an
+  attribute or method on ``<model>``.
+* **admin.E109**: The value of ``list_display[n]`` must not be a
+  ``ManyToManyField``.
+* **admin.E110**: The value of ``list_display_links`` must be a list, a tuple,
+  or ``None``.
+* **admin.E111**: The value of ``list_display_links[n]`` refers to ``<label>``,
+  which is not defined in ``list_display``.
 * **admin.E112**: The value of ``list_filter`` must be a list or tuple.
-* **admin.E113**: The value of ``list_filter[n]`` must inherit from ``ListFilter``.
-* **admin.E114**: The value of ``list_filter[n]`` must not inherit from ``FieldListFilter``.
-* **admin.E115**: The value of ``list_filter[n][1]`` must inherit from ``FieldListFilter``.
-* **admin.E116**: The value of ``list_filter[n]`` refers to ``<label>``, which does not refer to a Field.
-* **admin.E117**: The value of ``list_select_related`` must be a boolean, tuple or list.
+* **admin.E113**: The value of ``list_filter[n]`` must inherit from
+  ``ListFilter``.
+* **admin.E114**: The value of ``list_filter[n]`` must not inherit from
+  ``FieldListFilter``.
+* **admin.E115**: The value of ``list_filter[n][1]`` must inherit from
+  ``FieldListFilter``.
+* **admin.E116**: The value of ``list_filter[n]`` refers to ``<label>``,
+  which does not refer to a Field.
+* **admin.E117**: The value of ``list_select_related`` must be a boolean,
+  tuple or list.
 * **admin.E118**: The value of ``list_per_page`` must be an integer.
 * **admin.E119**: The value of ``list_max_show_all`` must be an integer.
 * **admin.E120**: The value of ``list_editable`` must be a list or tuple.
-* **admin.E121**: The value of ``list_editable[n]`` refers to ``<label>``, which is not an attribute of ``<model>``.
-* **admin.E122**: The value of ``list_editable[n]`` refers to ``<label>``, which is not contained in ``list_display``.
-* **admin.E123**: The value of ``list_editable[n]`` cannot be in both ``list_editable`` and ``list_display_links``.
-* **admin.E124**: The value of ``list_editable[n]`` refers to the first field in ``list_display`` (``<label>``), which cannot be used unless ``list_display_links`` is set.
-* **admin.E125**: The value of ``list_editable[n]`` refers to ``<field name>``, which is not editable through the admin.
+* **admin.E121**: The value of ``list_editable[n]`` refers to ``<label>``,
+  which is not an attribute of ``<model>``.
+* **admin.E122**: The value of ``list_editable[n]`` refers to ``<label>``,
+  which is not contained in ``list_display``.
+* **admin.E123**: The value of ``list_editable[n]`` cannot be in both
+  ``list_editable`` and ``list_display_links``.
+* **admin.E124**: The value of ``list_editable[n]`` refers to the first field
+  in ``list_display`` (``<label>``), which cannot be used unless
+  ``list_display_links`` is set.
+* **admin.E125**: The value of ``list_editable[n]`` refers to ``<field name>``,
+  which is not editable through the admin.
 * **admin.E126**: The value of ``search_fields`` must be a list or tuple.
-* **admin.E127**: The value of ``date_hierarchy`` refers to ``<field name>``, which is not an attribute of ``<model>``.
-* **admin.E128**: The value of ``date_hierarchy`` must be a DateField or DateTimeField.
+* **admin.E127**: The value of ``date_hierarchy`` refers to ``<field name>``,
+  which is not an attribute of ``<model>``.
+* **admin.E128**: The value of ``date_hierarchy`` must be a ``DateField`` or
+  ``DateTimeField``.
 
 InlineModelAdmin
 ~~~~~~~~~~~~~~~~
@@ -205,12 +286,15 @@ The following checks are performed on any
 :class:`~django.contrib.admin.InlineModelAdmin` that is registered as an
 inline on a :class:`~django.contrib.admin.ModelAdmin`.
 
-* **admin.E201**: Cannot exclude the field ``<field name>``, because it is the foreign key to the parent model ``%s.%s``.
-* **admin.E202**: ``<model>`` has no ForeignKey to ``<parent model>``./``<model>`` has more than one ForeignKey to ``<parent model>``.
+* **admin.E201**: Cannot exclude the field ``<field name>``, because it is the
+  foreign key to the parent model ``<app_label>.<model>``.
+* **admin.E202**: ``<model>`` has no ``ForeignKey`` to ``<parent model>``./
+  ``<model>`` has more than one ``ForeignKey`` to ``<parent model>``.
 * **admin.E203**: The value of ``extra`` must be an integer.
 * **admin.E204**: The value of ``max_num`` must be an integer.
 * **admin.E205**: The value of ``min_num`` must be an integer.
-* **admin.E206**: The value of ``formset`` must inherit from ``BaseModelFormSet``.
+* **admin.E206**: The value of ``formset`` must inherit from
+  ``BaseModelFormSet``.
 
 GenericInlineModelAdmin
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -219,19 +303,25 @@ The following checks are performed on any
 :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin` that is
 registered as an inline on a :class:`~django.contrib.admin.ModelAdmin`.
 
-* **admin.E301**: 'ct_field' references ``<label>``, which is not a field on ``<model>``.
-* **admin.E302**: 'ct_fk_field' references ``<label>``, which is not a field on ``<model>``.
-* **admin.E303**: ``<model>`` has no GenericForeignKey.
-* **admin.E304**: ``<model>`` has no GenericForeignKey using content type field ``<field name>`` and object ID field ``<field name>``.
+* **admin.E301**: ``'ct_field'`` references ``<label>``, which is not a field
+  on ``<model>``.
+* **admin.E302**: ``'ct_fk_field'`` references ``<label>``, which is not a
+  field on ``<model>``.
+* **admin.E303**: ``<model>`` has no ``GenericForeignKey``.
+* **admin.E304**: ``<model>`` has no ``GenericForeignKey`` using content type
+  field ``<field name>`` and object ID field ``<field name>``.
 
 
 Auth
 ----
 
 * **auth.E001**: ``REQUIRED_FIELDS`` must be a list or tuple.
-* **auth.E002**: The field named as the ``USERNAME_FIELD`` for a custom user model must not be included in ``REQUIRED_FIELDS``.
-* **auth.E003**: ``<field>`` must be unique because it is named as the ``USERNAME_FIELD``.
-* **auth.W004**: ``<field>`` is named as the ``USERNAME_FIELD``, but it is not unique.
+* **auth.E002**: The field named as the ``USERNAME_FIELD`` for a custom user
+  model must not be included in ``REQUIRED_FIELDS``.
+* **auth.E003**: ``<field>`` must be unique because it is named as the
+  ``USERNAME_FIELD``.
+* **auth.W004**: ``<field>`` is named as the ``USERNAME_FIELD``, but it is not
+  unique.
 
 
 Content Types
@@ -241,10 +331,13 @@ The following checks are performed when a model contains a
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey` or
 :class:`~django.contrib.contenttypes.fields.GenericRelation`:
 
-* **contenttypes.E001**: The GenericForeignKey object ID references the non-existent field ``<field>``
-* **contenttypes.E002**: The GenericForeignKey content type references the non-existent field ``<field>``
-* **contenttypes.E003**: ``<field>`` is not a ForeignKey.
-* **contenttypes.E004**: ``<field>`` is not a ForeignKey to ``contenttypes.ContentType``
+* **contenttypes.E001**: The ``GenericForeignKey`` object ID references the
+  non-existent field ``<field>``
+* **contenttypes.E002**: The ``GenericForeignKey`` content type references the
+  non-existent field ``<field>``
+* **contenttypes.E003**: ``<field>`` is not a ``ForeignKey``.
+* **contenttypes.E004**: ``<field>`` is not a ``ForeignKey`` to
+  ``contenttypes.ContentType``
 
 Sites
 -----
@@ -252,8 +345,10 @@ Sites
 The following checks are performed on any model using a
 :class:`~django.contrib.sites.managers.CurrentSiteManager`:
 
-* **sites.E001**: CurrentSiteManager could not find a field named ``<field name>``.
-* **sites.E002**: CurrentSiteManager cannot use ``<field>`` as it is not a ForeignKey or ManyToManyField.
+* **sites.E001**: ``CurrentSiteManager`` could not find a field named
+  ``<field name>``.
+* **sites.E002**: ``CurrentSiteManager`` cannot use ``<field>`` as it is not a
+  ``ForeignKey`` or ``ManyToManyField``.
 
 Database
 --------
@@ -263,4 +358,5 @@ MySQL
 
 If you're using MySQL, the following checks will be performed:
 
-* **mysql.E001**: MySQL does not allow unique CharFields to have a max_length > 255.
+* **mysql.E001**: MySQL does not allow unique ``CharField``\s to have a
+  ``max_length`` > 255.
