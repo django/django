@@ -1,5 +1,4 @@
 import sys
-from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import six
@@ -11,25 +10,23 @@ from django.db.migrations.optimizer import MigrationOptimizer
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--no-optimize', action='store_true', dest='no_optimize', default=False,
-            help='Do not try to optimize the squashed operations.'),
-        make_option('--noinput', action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.'),
-    )
-
     help = "Squashes an existing set of migrations (from first until specified) into a single new one."
-    usage_str = "Usage: ./manage.py squashmigrations app migration_name"
-    args = "app_label migration_name"
 
-    def handle(self, app_label=None, migration_name=None, **options):
+    def add_arguments(self, parser):
+        parser.add_argument('app_label',
+            help='App label of the application to squash migrations for.')
+        parser.add_argument('migration_name',
+            help='Migrations will be squashed until and including this migration.')
+        parser.add_argument('--no-optimize', action='store_true', dest='no_optimize', default=False,
+            help='Do not try to optimize the squashed operations.')
+        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
+            help='Tells Django to NOT prompt the user for input of any kind.')
 
-        self.verbosity = int(options.get('verbosity'))
+    def handle(self, **options):
+
+        self.verbosity = options.get('verbosity')
         self.interactive = options.get('interactive')
-
-        if app_label is None or migration_name is None:
-            self.stderr.write(self.usage_str)
-            sys.exit(1)
+        app_label, migration_name = options['app_label'], options['migration_name']
 
         # Load the current graph state, check the app and migration they asked for exists
         executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
