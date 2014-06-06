@@ -35,6 +35,9 @@ about each item can often be found in the release notes of two versions prior.
 * The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
   Python path will be removed.
 
+* Support for :py:mod:`optparse` will be dropped for custom management commands
+  (replaced by :py:mod:`argparse`).
+
 .. _deprecation-removed-in-1.9:
 
 1.9
