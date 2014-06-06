@@ -1,5 +1,4 @@
 import warnings
-from optparse import make_option
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
@@ -11,16 +10,15 @@ from django.utils.six.moves import input
 
 
 class Command(NoArgsCommand):
-    option_list = NoArgsCommand.option_list + (
-        make_option('--noinput', action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.'),
-        make_option('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
-            help='Tells Django not to load any initial data after database synchronization.'),
-        make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
-                'Defaults to the "default" database.'),
-    )
     help = "Deprecated - use 'migrate' instead."
+
+    def add_arguments(self, parser):
+        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
+            help='Tells Django to NOT prompt the user for input of any kind.')
+        parser.add_argument('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
+            help='Tells Django not to load any initial data after database synchronization.')
+        parser.add_argument('--database', default=DEFAULT_DB_ALIAS,
+            help='Nominates a database to synchronize. Defaults to the "default" database.')
 
     def handle_noargs(self, **options):
         warnings.warn("The syncdb command will be removed in Django 1.9", RemovedInDjango19Warning)

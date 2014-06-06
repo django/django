@@ -28,7 +28,6 @@ from django.utils._os import npath, upath
 from django.utils.six import StringIO
 from django.test import LiveServerTestCase, TestCase, override_settings
 from django.test.runner import DiscoverRunner
-from django.test.utils import str_prefix
 
 
 test_dir = os.path.realpath(os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project'))
@@ -1378,7 +1377,8 @@ class CommandTypes(AdminScriptTestCase):
         args = ['sqlall', '--help']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "Prints the CREATE TABLE, custom SQL and CREATE INDEX SQL statements for the given model module name(s).")
+        self.assertOutput(out, "Prints the CREATE TABLE, custom SQL and CREATE INDEX SQL statements for the\ngiven model module name(s).")
+        self.assertEqual(out.count('optional arguments'), 1)
 
     def test_no_color(self):
         "--no-color prevent colorization of the output"
@@ -1420,12 +1420,11 @@ class CommandTypes(AdminScriptTestCase):
     def _test_base_command(self, args, labels, option_a="'1'", option_b="'2'"):
         out, err = self.run_manage(args)
 
-        expected_out = str_prefix(
-            ("EXECUTE:BaseCommand labels=%%s, "
-             "options=[('no_color', False), ('option_a', %%s), ('option_b', %%s), "
-             "('option_c', '3'), ('pythonpath', None), ('settings', None), "
-             "('traceback', None), ('verbosity', %(_)s'1')]")
-        ) % (labels, option_a, option_b)
+        expected_out = (
+            "EXECUTE:BaseCommand labels=%s, "
+            "options=[('no_color', False), ('option_a', %s), ('option_b', %s), "
+            "('option_c', '3'), ('pythonpath', None), ('settings', None), "
+            "('traceback', False), ('verbosity', 1)]") % (labels, option_a, option_b)
         self.assertNoOutput(err)
         self.assertOutput(out, expected_out)
 
@@ -1629,7 +1628,7 @@ class ArgumentOrder(AdminScriptTestCase):
     def _test(self, args, option_b="'2'"):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, str_prefix("EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option_b', %%s), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', None), ('verbosity', %(_)s'1')]") % option_b)
+        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option_b', %s), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', False), ('verbosity', 1)]" % option_b)
 
 
 @override_settings(ROOT_URLCONF='admin_scripts.urls')
@@ -1646,7 +1645,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         "Make sure passing the wrong kinds of arguments raises a CommandError"
         out, err = self.run_django_admin(['startproject'])
         self.assertNoOutput(out)
-        self.assertOutput(err, "you must provide a project name")
+        self.assertOutput(err, "You must provide a project name.")
 
     def test_simple_project(self):
         "Make sure the startproject management command creates a project"

@@ -7,7 +7,6 @@ import os
 import re
 import sys
 from itertools import dropwhile
-from optparse import make_option
 
 import django
 from django.core.management.base import CommandError, NoArgsCommand
@@ -164,34 +163,6 @@ def write_pot_file(potfile, msgs):
 
 
 class Command(NoArgsCommand):
-    option_list = NoArgsCommand.option_list + (
-        make_option('--locale', '-l', default=[], dest='locale', action='append',
-            help='Creates or updates the message files for the given locale(s) (e.g. pt_BR). '
-                 'Can be used multiple times.'),
-        make_option('--exclude', '-x', default=[], dest='exclude', action='append',
-                    help='Locales to exclude. Default is none. Can be used multiple times.'),
-        make_option('--domain', '-d', default='django', dest='domain',
-            help='The domain of the message files (default: "django").'),
-        make_option('--all', '-a', action='store_true', dest='all',
-            default=False, help='Updates the message files for all existing locales.'),
-        make_option('--extension', '-e', dest='extensions',
-            help='The file extension(s) to examine (default: "html,txt", or "js" if the domain is "djangojs"). Separate multiple extensions with commas, or use -e multiple times.',
-            action='append'),
-        make_option('--symlinks', '-s', action='store_true', dest='symlinks',
-            default=False, help='Follows symlinks to directories when examining source code and templates for translation strings.'),
-        make_option('--ignore', '-i', action='append', dest='ignore_patterns',
-            default=[], metavar='PATTERN', help='Ignore files or directories matching this glob-style pattern. Use multiple times to ignore more.'),
-        make_option('--no-default-ignore', action='store_false', dest='use_default_ignore_patterns',
-            default=True, help="Don't ignore the common glob-style patterns 'CVS', '.*', '*~' and '*.pyc'."),
-        make_option('--no-wrap', action='store_true', dest='no_wrap',
-            default=False, help="Don't break long message lines into several lines."),
-        make_option('--no-location', action='store_true', dest='no_location',
-            default=False, help="Don't write '#: filename:line' lines."),
-        make_option('--no-obsolete', action='store_true', dest='no_obsolete',
-            default=False, help="Remove obsolete message strings."),
-        make_option('--keep-pot', action='store_true', dest='keep_pot',
-            default=False, help="Keep .pot file after making messages. Useful when debugging."),
-    )
     help = ("Runs over the entire source tree of the current directory and "
 "pulls out all strings marked for translation. It creates (or updates) a message "
 "file in the conf/locale (in the django tree) or locale (for projects and "
@@ -206,11 +177,44 @@ class Command(NoArgsCommand):
     msgattrib_options = ['--no-obsolete']
     xgettext_options = ['--from-code=UTF-8', '--add-comments=Translators']
 
+    def add_arguments(self, parser):
+        parser.add_argument('--locale', '-l', default=[], dest='locale', action='append',
+            help='Creates or updates the message files for the given locale(s) (e.g. pt_BR). '
+                 'Can be used multiple times.')
+        parser.add_argument('--exclude', '-x', default=[], dest='exclude', action='append',
+                    help='Locales to exclude. Default is none. Can be used multiple times.')
+        parser.add_argument('--domain', '-d', default='django', dest='domain',
+            help='The domain of the message files (default: "django").')
+        parser.add_argument('--all', '-a', action='store_true', dest='all',
+            default=False, help='Updates the message files for all existing locales.')
+        parser.add_argument('--extension', '-e', dest='extensions',
+            help='The file extension(s) to examine (default: "html,txt", or "js" '
+                 'if the domain is "djangojs"). Separate multiple extensions with '
+                 'commas, or use -e multiple times.',
+            action='append')
+        parser.add_argument('--symlinks', '-s', action='store_true', dest='symlinks',
+            default=False, help='Follows symlinks to directories when examining '
+                                'source code and templates for translation strings.')
+        parser.add_argument('--ignore', '-i', action='append', dest='ignore_patterns',
+            default=[], metavar='PATTERN',
+            help='Ignore files or directories matching this glob-style pattern. '
+                 'Use multiple times to ignore more.')
+        parser.add_argument('--no-default-ignore', action='store_false', dest='use_default_ignore_patterns',
+            default=True, help="Don't ignore the common glob-style patterns 'CVS', '.*', '*~' and '*.pyc'.")
+        parser.add_argument('--no-wrap', action='store_true', dest='no_wrap',
+            default=False, help="Don't break long message lines into several lines.")
+        parser.add_argument('--no-location', action='store_true', dest='no_location',
+            default=False, help="Don't write '#: filename:line' lines.")
+        parser.add_argument('--no-obsolete', action='store_true', dest='no_obsolete',
+            default=False, help="Remove obsolete message strings.")
+        parser.add_argument('--keep-pot', action='store_true', dest='keep_pot',
+            default=False, help="Keep .pot file after making messages. Useful when debugging.")
+
     def handle_noargs(self, *args, **options):
         locale = options.get('locale')
         exclude = options.get('exclude')
         self.domain = options.get('domain')
-        self.verbosity = int(options.get('verbosity'))
+        self.verbosity = options.get('verbosity')
         process_all = options.get('all')
         extensions = options.get('extensions')
         self.symlinks = options.get('symlinks')
