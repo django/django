@@ -112,25 +112,15 @@ PYTHON_ENCODING = "UTF-8"
 #     and fail to find real instances.
 
 
+from argparse import ArgumentParser
 import os
 import sys
 import re
-from optparse import OptionParser
 
-USAGE = """
-This tool helps to locate forms that need CSRF tokens added and the
+DESCRIPTION = """This tool helps to locate forms that need CSRF tokens added and the
 corresponding view code.  This processing is NOT fool proof, and you should read
 the help contained in the script itself.  Also, this script may need configuring
-(by editing the script) before use.
-
-Usage:
-
-python csrf_migration_helper.py [--settings=path.to.your.settings] /path/to/python/code [more paths...]
-
-  Paths can be specified as relative paths.
-
-  With no arguments, this help is printed.
-"""
+(by editing the script) before use."""
 
 _POST_FORM_RE = \
     re.compile(r'(<form\W[^>]*\bmethod\s*=\s*(\'|"|)POST(\'|"|)\b[^>]*>)', re.IGNORECASE)
@@ -347,21 +337,20 @@ def main(pythonpaths):
         print("----")
 
 
-parser = OptionParser(usage=USAGE)
-parser.add_option("", "--settings", action="store", dest="settings", help="Dotted path to settings file")
-
 if __name__ == '__main__':
-    options, args = parser.parse_args()
-    if len(args) == 0:
+    parser = ArgumentParser(description=DESCRIPTION)
+    parser.add_argument('files', nargs='*', help='Paths can be specified as relative paths.')
+    parser.add_argument("--settings", help="Dotted path to settings file")
+    options = parser.parse_args()
+    if len(options.files) == 0:
         parser.print_help()
         sys.exit(1)
 
-    settings = getattr(options, 'settings', None)
-    if settings is None:
+    if options.settings is None:
         if os.environ.get("DJANGO_SETTINGS_MODULE", None) is None:
             print("You need to set DJANGO_SETTINGS_MODULE or use the '--settings' parameter")
             sys.exit(1)
     else:
         os.environ["DJANGO_SETTINGS_MODULE"] = settings
 
-    main(args)
+    main(options.files)
