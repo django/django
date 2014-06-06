@@ -99,6 +99,29 @@ class ClientTest(TestCase):
             self.assertIn(key, response.wsgi_request.environ)
             self.assertEqual(response.wsgi_request.environ[key], value)
 
+    def test_response_resolver_match(self):
+        """
+        The response contains a ResolverMatch instance.
+        """
+        response = self.client.get('/header_view/')
+        self.assertTrue(hasattr(response, 'resolver_match'))
+
+    def test_response_resolver_match_redirect_follow(self):
+        """
+        The response ResolverMatch instance contains the correct
+        information when following redirects.
+        """
+        response = self.client.get('/redirect_view/', follow=True)
+        self.assertEqual(response.resolver_match.url_name, 'get_view')
+
+    def test_response_resolver_match_regular_view(self):
+        """
+        The response ResolverMatch instance contains the correct
+        information when accessing a regular view.
+        """
+        response = self.client.get('/get_view/')
+        self.assertEqual(response.resolver_match.url_name, 'get_view')
+
     def test_raw_post(self):
         "POST raw data (with a content type) to a view"
         test_doc = """<?xml version="1.0" encoding="utf-8"?><library><book><title>Blink</title><author>Malcolm Gladwell</author></book></library>"""
