@@ -1,6 +1,6 @@
 #!/usr/bin/env python
+from argparse import ArgumentParser
 import logging
-from optparse import OptionParser
 import os
 import shutil
 import subprocess
@@ -213,7 +213,7 @@ def django_tests(verbosity, interactive, failfast, test_labels):
 
 
 def bisect_tests(bisection_label, options, test_labels):
-    state = setup(int(options.verbosity), test_labels)
+    state = setup(options.verbosity, test_labels)
 
     test_labels = test_labels or get_installed()
 
@@ -271,7 +271,7 @@ def bisect_tests(bisection_label, options, test_labels):
 
 
 def paired_tests(paired_test, options, test_labels):
-    state = setup(int(options.verbosity), test_labels)
+    state = setup(options.verbosity, test_labels)
 
     test_labels = test_labels or get_installed()
 
@@ -307,43 +307,39 @@ def paired_tests(paired_test, options, test_labels):
 
 
 if __name__ == "__main__":
-    usage = "%prog [options] [module module module ...]"
-    parser = OptionParser(usage=usage)
-    parser.add_option(
-        '-v', '--verbosity', action='store', dest='verbosity', default='1',
-        type='choice', choices=['0', '1', '2', '3'],
-        help='Verbosity level; 0=minimal output, 1=normal output, 2=all '
-             'output')
-    parser.add_option(
+    parser = ArgumentParser(description="Run the Django test suite.")
+    parser.add_argument('modules', nargs='*', metavar='module',
+        help='Optional path(s) to test modules; e.g. "i18n" or '
+             '"i18n.tests.TranslationTests.test_lazy_objects".')
+    parser.add_argument(
+        '-v', '--verbosity', default=1, type=int, choices=[0, 1, 2, 3],
+        help='Verbosity level; 0=minimal output, 1=normal output, 2=all output')
+    parser.add_argument(
         '--noinput', action='store_false', dest='interactive', default=True,
         help='Tells Django to NOT prompt the user for input of any kind.')
-    parser.add_option(
+    parser.add_argument(
         '--failfast', action='store_true', dest='failfast', default=False,
         help='Tells Django to stop running the test suite after first failed '
              'test.')
-    parser.add_option(
+    parser.add_argument(
         '--settings',
         help='Python path to settings module, e.g. "myproject.settings". If '
-             'this isn\'t provided, the DJANGO_SETTINGS_MODULE environment '
-             'variable will be used.')
-    parser.add_option(
-        '--bisect', action='store', dest='bisect', default=None,
+             'this isn\'t provided, either the DJANGO_SETTINGS_MODULE '
+             'environment variable or "test_sqlite" will be used.')
+    parser.add_argument('--bisect',
         help='Bisect the test suite to discover a test that causes a test '
              'failure when combined with the named test.')
-    parser.add_option(
-        '--pair', action='store', dest='pair', default=None,
+    parser.add_argument('--pair',
         help='Run the test suite in pairs with the named test to find problem '
              'pairs.')
-    parser.add_option(
-        '--liveserver', action='store', dest='liveserver', default=None,
+    parser.add_argument('--liveserver',
         help='Overrides the default address where the live server (used with '
              'LiveServerTestCase) is expected to run from. The default value '
              'is localhost:8081.')
-    parser.add_option(
-        '--selenium', action='store_true', dest='selenium',
-        default=False,
+    parser.add_argument(
+        '--selenium', action='store_true', dest='selenium', default=False,
         help='Run the Selenium tests as well (if Selenium is installed)')
-    options, args = parser.parse_args()
+    options = parser.parse_args()
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
     else:
@@ -358,11 +354,11 @@ if __name__ == "__main__":
         os.environ['DJANGO_SELENIUM_TESTS'] = '1'
 
     if options.bisect:
-        bisect_tests(options.bisect, options, args)
+        bisect_tests(options.bisect, options, options.modules)
     elif options.pair:
-        paired_tests(options.pair, options, args)
+        paired_tests(options.pair, options, options.modules)
     else:
-        failures = django_tests(int(options.verbosity), options.interactive,
-                                options.failfast, args)
+        failures = django_tests(options.verbosity, options.interactive,
+                                options.failfast, options.modules)
         if failures:
             sys.exit(bool(failures))
