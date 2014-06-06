@@ -449,7 +449,7 @@ class BaseDatabaseCreation(object):
 
         return test_database_name
 
-    def destroy_test_db(self, old_database_name, verbosity=1):
+    def destroy_test_db(self, old_database_name, verbosity=1, keepdb=False):
         """
         Destroy a test database, prompting the user for confirmation if the
         database already exists.
@@ -458,12 +458,18 @@ class BaseDatabaseCreation(object):
         test_database_name = self.connection.settings_dict['NAME']
         if verbosity >= 1:
             test_db_repr = ''
+            action = 'Destroying'
             if verbosity >= 2:
                 test_db_repr = " ('%s')" % test_database_name
-            print("Destroying test database for alias '%s'%s..." % (
-                self.connection.alias, test_db_repr))
+            if keepdb:
+                action = 'Preserving'
+            print("%s test database for alias '%s'%s..." % (
+                action, self.connection.alias, test_db_repr))
 
-        self._destroy_test_db(test_database_name, verbosity)
+        # if we want to preserve the database
+        # skip the actual destroying piece.
+        if not keepdb:
+            self._destroy_test_db(test_database_name, verbosity)
 
     def _destroy_test_db(self, test_database_name, verbosity):
         """
