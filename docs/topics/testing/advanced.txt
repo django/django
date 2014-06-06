@@ -333,9 +333,15 @@ execute and tear down the test suite.
     runner, ensure it accepts ``**kwargs``.
 
     Your test runner may also define additional command-line options.
-    If you add an ``option_list`` attribute to a subclassed test runner,
-    those options will be added to the list of command-line options that
-    the :djadmin:`test` command can use.
+    Create or override an ``add_arguments(cls, parser)`` class method and add
+    custom arguments by calling ``parser.add_argument()`` inside the method, so
+    that the :djadmin:`test` command will be able to use those arguments.
+
+    .. versionchanged:: 1.8
+
+        Previously, you had to provide an ``option_list`` attribute to a
+        subclassed test runner to add options to the list of command-line
+        options that the :djadmin:`test` command could use.
 
 Attributes
 ~~~~~~~~~~
@@ -372,6 +378,12 @@ Attributes
     management command's ``OptionParser`` for parsing arguments. See the
     documentation for Python's ``optparse`` module for more details.
 
+    .. deprecated:: 1.8
+
+        You should now override the :meth:`~DiscoverRunner.add_arguments` class
+        method to add custom arguments accepted by the :djadmin:`test`
+        management command.
+
 Methods
 ~~~~~~~
 
@@ -388,6 +400,15 @@ Methods
     in addition to those discovered in the modules listed in ``test_labels``.
 
     This method should return the number of tests that failed.
+
+.. classmethod:: DiscoverRunner.add_arguments(parser)
+
+    .. versionadded:: 1.8
+
+    Override this class method to add custom arguments accepted by the
+    :djadmin:`test` management command. See
+    :py:meth:`argparse.ArgumentParser.add_argument()` for details about adding
+    arguments to a parser.
 
 .. method:: DiscoverRunner.setup_test_environment(**kwargs)
 
