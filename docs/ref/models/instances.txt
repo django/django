@@ -410,6 +410,22 @@ For more details, including how to delete objects in bulk, see
 If you want customized deletion behavior, you can override the ``delete()``
 method. See :ref:`overriding-model-methods` for more details.
 
+Pickling objects
+================
+
+Django allows to :mod:`pickle` ``Models``. When ``Models`` are pickled,
+all the results prior to pickling are loaded into memory. This means that
+when you unpickle a ``Model``, it contains the ``Model`` at the moment it
+was pickled, rather than the results that are currently in the database::
+
+  >>> import pickle
+  >>> model = pickle.loads(s)     # Assuming 's' is the pickled string.
+
+.. versionadded:: 1.8
+
+Django raises a ``RuntimeWarning`` when you try to unpickle ``Models``
+in a version that is different than the one in which it was pickled.
+
 .. _model-instance-methods:
 
 Other model instance methods

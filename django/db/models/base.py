@@ -13,7 +13,7 @@ from django.core import checks
 from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
 from django.db import (router, transaction, DatabaseError,
-    DEFAULT_DB_ALIAS)
+    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY)
 from django.db.models.deletion import Collector
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
@@ -30,6 +30,7 @@ from django.utils.functional import curry
 from django.utils.six.moves import zip
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _
+from django.utils.version import get_version
 
 
 def subclass_exception(name, parents, module, attached_to=None):
@@ -495,6 +496,7 @@ class Model(six.with_metaclass(ModelBase)):
         only module-level classes can be pickled by the default path.
         """
         data = self.__dict__
+        data[DJANGO_VERSION_PICKLE_KEY] = get_version()
         if not self._deferred:
             class_id = self._meta.app_label, self._meta.object_name
             return model_unpickle, (class_id, [], simple_class_factory), data
@@ -506,6 +508,23 @@ class Model(six.with_metaclass(ModelBase)):
         model = self._meta.proxy_for_model
         class_id = model._meta.app_label, model._meta.object_name
         return (model_unpickle, (class_id, defers, deferred_class_factory), data)
+
+    def __setstate__(self, state):
+        msg = None
+        pickled_version = state.get(DJANGO_VERSION_PICKLE_KEY)
+        if pickled_version:
+            current_version = get_version()
+            if current_version != pickled_version:
+                msg = ("Pickled model instance's Django version %s does"
+                    " not match the current version %s."
+                    % (pickled_version, current_version))
+        else:
+            msg = "Pickled model instance's Django version is not specified."
+
+        if msg:
+            warnings.warn(msg, RuntimeWarning, stacklevel=2)
+
+        self.__dict__.update(state)
 
     def _get_pk_val(self, meta=None):
         if not meta:

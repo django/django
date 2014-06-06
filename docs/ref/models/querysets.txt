@@ -116,6 +116,11 @@ described here.
     Django version N+1. Pickles should not be used as part of a long-term
     archival strategy.
 
+    .. versionadded:: 1.8
+
+    Django raises a ``RuntimeWarning`` when you try to unpickle ``QuerySet``
+    in a version that is different than the one in which it was pickled.
+
 .. _queryset-api:
 
 QuerySet API
