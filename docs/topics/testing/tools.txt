@@ -432,6 +432,24 @@ Specifically, a ``Response`` object has the following attributes:
         loaded from a file. (The name is a string such as
         ``'admin/index.html'``.)
 
+    .. attribute:: resolver_match
+
+       .. versionadded:: 1.8
+
+    An instance of :class:`~django.core.urlresolvers.ResolverMatch` for the
+    response. You can use the
+    :attr:`~django.core.urlresolvers.ResolverMatch.func` attribute, for
+    example, to verify the view that served the response::
+
+        # get_view here is a method based view
+        self.assertEqual(response.resolver_match.func, get_view)
+
+        # class based views need to compare by name, as the functions are not equal
+        self.assertEqual(response.resolver_match.func.__name__, GetView.as_view().__name__)
+
+    If the given URL is not found, accessing this attribute will raise a
+    :exc:`~django.core.urlresolvers.Resolver404` exception.
+
 You can also use dictionary syntax on the response object to query the value
 of any settings in the HTTP headers. For example, you could determine the
 content type of a response using ``response['Content-Type']``.
