@@ -157,7 +157,7 @@ class MigrationAutodetector(object):
                             # Alright, there's a dependency on the same app.
                             for j, op2 in enumerate(ops):
                                 if self.check_dependency(op2, dep) and j > i:
-                                    ops = ops[:i] + ops[i+1:j+1] + [op] + ops[j+1:]
+                                    ops = ops[:i] + ops[i + 1:j + 1] + [op] + ops[j + 1:]
                                     found = True
                                     break
                         if found:
@@ -384,7 +384,7 @@ class MigrationAutodetector(object):
                         name=name,
                         field=field,
                     ),
-                    dependencies = [
+                    dependencies=[
                         (dep_app_label, dep_object_name, None, True),
                     ]
                 )
@@ -396,7 +396,7 @@ class MigrationAutodetector(object):
                         name=model_name,
                         unique_together=unique_together,
                     ),
-                    dependencies = [
+                    dependencies=[
                         (app_label, model_name, name, True)
                         for name, field in sorted(related_fields.items())
                     ]
@@ -408,7 +408,7 @@ class MigrationAutodetector(object):
                         name=model_name,
                         index_together=index_together,
                     ),
-                    dependencies = [
+                    dependencies=[
                         (app_label, model_name, name, True)
                         for name, field in sorted(related_fields.items())
                     ]
@@ -499,7 +499,7 @@ class MigrationAutodetector(object):
                 operations.DeleteModel(
                     name=model_state.name,
                 ),
-                dependencies = list(set(dependencies)),
+                dependencies=list(set(dependencies)),
             )
 
     def generate_added_fields(self):
