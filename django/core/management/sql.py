@@ -12,7 +12,7 @@ from django.db import models, router
 from django.utils.deprecation import RemovedInDjango19Warning
 
 
-def sql_create(app_config, style, connection):
+def sql_create(app_config, style, connection, specific_models=None):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
 
     if connection.settings_dict['ENGINE'] == 'django.db.backends.dummy':
@@ -33,15 +33,19 @@ def sql_create(app_config, style, connection):
     pending_references = {}
 
     for model in router.get_migratable_models(app_config, connection.alias, include_auto_created=True):
-        output, references = connection.creation.sql_create_model(model, style, known_models)
-        final_output.extend(output)
-        for refto, refs in references.items():
-            pending_references.setdefault(refto, []).extend(refs)
-            if refto in known_models:
-                final_output.extend(connection.creation.sql_for_pending_references(refto, style, pending_references))
-        final_output.extend(connection.creation.sql_for_pending_references(model, style, pending_references))
-        # Keep track of the fact that we've created the table for this model.
-        known_models.add(model)
+        # If the command is called with `specific_models`, the model has to be
+        # one of them to be used to generate SQL. Otherwise, use every model of
+        # the app.
+        if (specific_models and model.__name__ in specific_models) or specific_models is None:
+            output, references = connection.creation.sql_create_model(model, style, known_models)
+            final_output.extend(output)
+            for refto, refs in references.items():
+                pending_references.setdefault(refto, []).extend(refs)
+                if refto in known_models:
+                    final_output.extend(connection.creation.sql_for_pending_references(refto, style, pending_references))
+            final_output.extend(connection.creation.sql_for_pending_references(model, style, pending_references))
+            # Keep track of the fact that we've created the table for this model.
+            known_models.add(model)
 
     # Handle references to tables that are from other apps
     # but don't exist physically.
@@ -120,23 +124,25 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_
     return statements
 
 
-def sql_custom(app_config, style, connection):
+def sql_custom(app_config, style, connection, specific_models=None):
     "Returns a list of the custom table modifying SQL statements for the given app."
     output = []
 
     app_models = router.get_migratable_models(app_config, connection.alias)
 
     for model in app_models:
-        output.extend(custom_sql_for_model(model, style, connection))
+        if (specific_models and model.__name__ in specific_models) or specific_models is None:
+            output.extend(custom_sql_for_model(model, style, connection))
 
     return output
 
 
-def sql_indexes(app_config, style, connection):
+def sql_indexes(app_config, style, connection, specific_models=None):
     "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
     output = []
     for model in router.get_migratable_models(app_config, connection.alias, include_auto_created=True):
-        output.extend(connection.creation.sql_indexes_for_model(model, style))
+        if (specific_models and model.__name__ in specific_models) or specific_models is None:
+            output.extend(connection.creation.sql_indexes_for_model(model, style))
     return output
 
 
@@ -148,9 +154,9 @@ def sql_destroy_indexes(app_config, style, connection):
     return output
 
 
-def sql_all(app_config, style, connection):
+def sql_all(app_config, style, connection, specific_models=None):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
-    return sql_create(app_config, style, connection) + sql_custom(app_config, style, connection) + sql_indexes(app_config, style, connection)
+    return sql_create(app_config, style, connection, specific_models) + sql_custom(app_config, style, connection, specific_models) + sql_indexes(app_config, style, connection, specific_models)
 
 
 def _split_statements(content):

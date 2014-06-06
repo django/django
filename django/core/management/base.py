@@ -477,6 +477,76 @@ class AppCommand(BaseCommand):
             return handle_app(app_config.models_module, **options)
 
 
+class AppOrModelCommand(AppCommand):
+    """
+    The command takes one or more installed application labels
+    as arguments, those labels can be used with or without specifing models
+    names (e.g. either "App" or "App.Model"). If used with specific models,
+    only the relevent statements will be in the output.
+
+    This class implements ``handle()`` and leave the implementation of
+    ``handle_app_config()`` (which will be called once for each application)
+    to each subclass.
+    """
+    args = '<app_label app_label app_label.Model ...>'
+
+    def handle(self, *app_labels, **options):
+        from django.apps import apps
+        if not app_labels:
+            raise CommandError("Enter at least one application label.")
+        try:
+            app_configs = []
+            specific_models = {}
+
+            for app_label in app_labels:
+                app_label_split = app_label.split('.')
+                app_name = app_label_split[0]
+
+                app = apps.get_app_config(app_name)
+                if app not in app_configs:
+                    app_configs.append(app)
+
+                if len(app_label_split) == 2:
+                    model_name = app_label_split[1]
+                    if model_name.lower() in app.models:
+                        if app_name in specific_models:
+                            specific_models[app_name].append(model_name)
+                        else:
+                            specific_models[app_name] = [model_name]
+                    else:
+                        raise CommandError("%s isn't a model of %s app." % (model_name, app_name))
+
+        except (LookupError, ImportError) as e:
+            raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
+        output = []
+        for app_config in app_configs:
+            if app_config.name in specific_models:
+                app_output = self.handle_app_config(app_config,
+                                                    specific_models=specific_models[app_config.name],
+                                                    **options)
+            else:
+                app_output = self.handle_app_config(app_config, **options)
+            if app_output:
+                output.append(app_output)
+        return '\n'.join(output)
+
+
+class SQLAppOrModelCommand(AppOrModelCommand):
+    """
+    The base command used by `sqlall`, `sql`, `sqlcustom`, and `sqlindexes`
+    commands.
+    """
+
+    from django.db import DEFAULT_DB_ALIAS
+    option_list = AppCommand.option_list + (
+        make_option('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a database to print the '
+                'SQL for.  Defaults to the "default" database.'),
+    )
+
+    output_transaction = True
+
+
 class LabelCommand(BaseCommand):
     """
     A management command which takes one or more arbitrary arguments

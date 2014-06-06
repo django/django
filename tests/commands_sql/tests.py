@@ -54,6 +54,34 @@ class SQLCommandsTestCase(TestCase):
         # PostgreSQL creates one additional index for CharField
         self.assertIn(self.count_ddl(output, 'CREATE INDEX'), [3, 4])
 
+    def test_sql_all_specific_model(self):
+        app_config = apps.get_app_config('commands_sql')
+        specific_models = ["Comment"]
+        output = sql_all(app_config, no_style(), connections[DEFAULT_DB_ALIAS],
+                         specific_models)
+
+        self.assertEqual(self.count_ddl(output, 'CREATE TABLE'), 1)
+
+    def test_sql_create_specific_model(self):
+        app_config = apps.get_app_config('commands_sql')
+        specific_models = ["Comment"]
+        output = sql_create(app_config, no_style(),
+                            connections[DEFAULT_DB_ALIAS], specific_models)
+        create_tables = [o for o in output if o.startswith('CREATE TABLE')]
+        self.assertEqual(len(create_tables), 1)
+
+        # Lower so that Oracle's upper case tbl names wont break
+        sql = create_tables[-1].lower()
+        six.assertRegex(self, sql, r'^create table .commands_sql_comment.*')
+
+    def test_sql_indexes_specific_model(self):
+        app_config = apps.get_app_config('commands_sql')
+        specific_models = ["Book"]
+        output = sql_indexes(app_config, no_style(),
+                             connections[DEFAULT_DB_ALIAS], specific_models)
+        # PostgreSQL creates one additional index for CharField
+        self.assertIn(self.count_ddl(output, 'CREATE INDEX'), [1, 2])
+
 
 class TestRouter(object):
     def allow_migrate(self, db, model):
