@@ -1,14 +1,15 @@
 from django.core import signals
-from django.db.utils import (DEFAULT_DB_ALIAS, DataError, OperationalError,
-    IntegrityError, InternalError, ProgrammingError, NotSupportedError,
-    DatabaseError, InterfaceError, Error, ConnectionHandler, ConnectionRouter)
+from django.db.utils import (DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY,
+    DataError, OperationalError, IntegrityError, InternalError, ProgrammingError,
+    NotSupportedError, DatabaseError, InterfaceError, Error, ConnectionHandler,
+    ConnectionRouter)
 
 
 __all__ = [
     'backend', 'connection', 'connections', 'router', 'DatabaseError',
     'IntegrityError', 'InternalError', 'ProgrammingError', 'DataError',
     'NotSupportedError', 'Error', 'InterfaceError', 'OperationalError',
-    'DEFAULT_DB_ALIAS'
+    'DEFAULT_DB_ALIAS', 'DJANGO_VERSION_PICKLE_KEY'
 ]
 
 connections = ConnectionHandler()

@@ -410,6 +410,28 @@ For more details, including how to delete objects in bulk, see
 If you want customized deletion behavior, you can override the ``delete()``
 method. See :ref:`overriding-model-methods` for more details.
 
+Pickling objects
+================
+
+When you :mod:`pickle` a model, its current state is pickled. When you unpickle
+it, it'll contain the model instance at the moment it was pickled, rather than
+the data that's currently in the database.
+
+.. admonition:: You can't share pickles between versions
+
+    Pickles of models are only valid for the version of Django that
+    was used to generate them. If you generate a pickle using Django
+    version N, there is no guarantee that pickle will be readable with
+    Django version N+1. Pickles should not be used as part of a long-term
+    archival strategy.
+
+    .. versionadded:: 1.8
+
+    Since pickle compatibility errors can be difficult to diagnose, such as
+    silently corrupted objects, a ``RuntimeWarning`` is raised when you try to
+    unpickle a model in a Django version that is different than the one in
+    which it was pickled.
+
 .. _model-instance-methods:
 
 Other model instance methods

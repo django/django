@@ -14,6 +14,7 @@ from django.utils import six
 
 
 DEFAULT_DB_ALIAS = 'default'
+DJANGO_VERSION_PICKLE_KEY = '_django_version'
 
 
 class Error(Exception if six.PY3 else StandardError):
