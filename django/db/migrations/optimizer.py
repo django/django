@@ -51,7 +51,7 @@ class MigrationOptimizer(object):
         for i, operation in enumerate(operations):
             # Compare it to each operation after it
             for j, other in enumerate(operations[i + 1:]):
-                result = self.reduce(operation, other, operations[i+1:i+j+1])
+                result = self.reduce(operation, other, operations[i + 1:i + j + 1])
                 if result is not None:
                     # Optimize! Add result, then remaining others, then return
                     new_operations.extend(result)
