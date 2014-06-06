@@ -7,6 +7,7 @@ from django.db import models
 from django.db.migrations import operations
 from django.db.migrations.migration import Migration
 from django.db.migrations.questioner import MigrationQuestioner
+from django.db.migrations.optimizer import MigrationOptimizer
 
 
 class MigrationAutodetector(object):
@@ -39,6 +40,43 @@ class MigrationAutodetector(object):
             changes = self._trim_to_apps(changes, trim_to_apps)
         return changes
 
+    def deep_deconstruct(self, obj):
+        """
+        Recursive deconstruction for a field and its arguments.
+        Used for full comparison for rename/alter; sometimes a single-level
+        deconstruction will not compare correctly.
+        """
+        if not hasattr(obj, 'deconstruct'):
+            return obj
+        deconstructed = obj.deconstruct()
+        if isinstance(obj, models.Field):
+            # we have a field which also returns a name
+            deconstructed = deconstructed[1:]
+        path, args, kwargs = deconstructed
+        return (
+            path,
+            [self.deep_deconstruct(value) for value in args],
+            dict(
+                (key, self.deep_deconstruct(value))
+                for key, value in kwargs.items()
+            ),
+        )
+
+    def only_relation_agnostic_fields(self, fields):
+        """
+        Return a definition of the fields that ignores field names and
+        what related fields actually relate to.
+        Used for detecting renames (as, of course, the related fields
+        change during renames)
+        """
+        fields_def = []
+        for name, field in fields:
+            deconstruction = self.deep_deconstruct(field)
+            if field.rel and field.rel.to:
+                del deconstruction[2]['to']
+            fields_def.append(deconstruction)
+        return fields_def
+
     def _detect_changes(self):
         """
         Returns a dict of migration plans which will achieve the
@@ -48,246 +86,443 @@ class MigrationAutodetector(object):
         The resulting migrations aren't specially named, but the names
         do matter for dependencies inside the set.
         """
-        # We'll store migrations as lists by app names for now
-        self.migrations = {}
-        old_apps = self.from_state.render(ignore_swappable=True)
-        new_apps = self.to_state.render()
-        # Prepare lists of old/new model keys that we care about
-        # (i.e. ignoring proxy ones and unmigrated ones)
 
-        old_model_keys = []
-        for al, mn in self.from_state.models.keys():
-            model = old_apps.get_model(al, mn)
+        # The first phase is generating all the operations for each app
+        # and gathering them into a big per-app list.
+        # We'll then go through that list later and order it and split
+        # into migrations to resolve dependencies caused by M2Ms and FKs.
+        self.generated_operations = {}
+
+        # Prepare some old/new state and model lists, ignoring
+        # proxy models and unmigrated apps.
+        self.old_apps = self.from_state.render(ignore_swappable=True)
+        self.new_apps = self.to_state.render()
+        self.old_model_keys = []
+        for al, mn in sorted(self.from_state.models.keys()):
+            model = self.old_apps.get_model(al, mn)
             if not model._meta.proxy and model._meta.managed and al not in self.from_state.real_apps:
-                old_model_keys.append((al, mn))
+                self.old_model_keys.append((al, mn))
+        self.new_model_keys = []
+        for al, mn in sorted(self.to_state.models.keys()):
+            model = self.new_apps.get_model(al, mn)
+            if not model._meta.proxy and model._meta.managed and al not in self.from_state.real_apps:
+                self.new_model_keys.append((al, mn))
 
-        new_model_keys = []
-        for al, mn in self.to_state.models.keys():
-            model = new_apps.get_model(al, mn)
-            if not model._meta.proxy and model._meta.managed and al not in self.to_state.real_apps:
-                new_model_keys.append((al, mn))
+        # Renames have to come first
+        self.generate_renamed_models()
 
-        def _deep_deconstruct(obj):
-            """
-            Recursive deconstruction for a field and its arguments.
-            """
-            if not hasattr(obj, 'deconstruct'):
-                return obj
-            deconstructed = obj.deconstruct()
-            if isinstance(obj, models.Field):
-                # we have a field which also returns a name
-                deconstructed = deconstructed[1:]
-            name, args, kwargs = deconstructed
+        # Prepare field lists, and prepare a list of the fields that used
+        # through models in the old state so we can make dependencies
+        # from the through model deletion to the field that uses it.
+        self.kept_model_keys = set(self.old_model_keys).intersection(self.new_model_keys)
+        self.through_users = {}
+        self.old_field_keys = set()
+        self.new_field_keys = set()
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            self.old_field_keys.update((app_label, model_name, x) for x, y in old_model_state.fields)
+            self.new_field_keys.update((app_label, model_name, x) for x, y in new_model_state.fields)
+            # Through model stuff
+            for field_name, field in old_model_state.fields:
+                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field_by_name(field_name)[0]
+                if hasattr(old_field, "rel") and hasattr(old_field.rel, "through") and not old_field.rel.through._meta.auto_created:
+                    through_key = (
+                        old_field.rel.through._meta.app_label,
+                        old_field.rel.through._meta.object_name.lower(),
+                    )
+                    self.through_users[through_key] = (app_label, old_model_name, field_name)
+
+        # Generate non-rename model operations
+        self.generate_created_models()
+        self.generate_deleted_models()
+
+        # Generate field operations
+        self.generate_added_fields()
+        self.generate_removed_fields()
+        self.generate_altered_fields()
+        self.generate_altered_unique_together()
+        self.generate_altered_index_together()
+
+        # Now, reordering to make things possible. The order we have already
+        # isn't bad, but we need to pull a few things around so FKs work nicely
+        # inside the same app
+        for app_label, ops in sorted(self.generated_operations.items()):
+            for i in range(10000):
+                found = False
+                for i, op in enumerate(ops):
+                    for dep in op._auto_deps:
+                        if dep[0] == app_label:
+                            # Alright, there's a dependency on the same app.
+                            for j, op2 in enumerate(ops):
+                                if self.check_dependency(op2, dep) and j > i:
+                                    ops = ops[:i] + ops[i+1:j+1] + [op] + ops[j+1:]
+                                    found = True
+                                    break
+                        if found:
+                            break
+                    if found:
+                        break
+                if not found:
+                    break
+            else:
+                raise ValueError("Infinite loop caught in operation dependency resolution")
+            self.generated_operations[app_label] = ops
+
+        # Now, we need to chop the lists of operations up into migrations with
+        # dependencies on each other.
+        # We do this by stepping up an app's list of operations until we
+        # find one that has an outgoing dependency that isn't in another app's
+        # migration yet (hasn't been chopped off its list). We then chop off the
+        # operations before it into a migration and move onto the next app.
+        # If we loop back around without doing anything, there's a circular
+        # dependency (which _should_ be impossible as the operations are all
+        # split at this point so they can't depend and be depended on)
+
+        self.migrations = {}
+        num_ops = sum(len(x) for x in self.generated_operations.values())
+        chop_mode = False
+        while num_ops:
+            # On every iteration, we step through all the apps and see if there
+            # is a completed set of operations.
+            # If we find that a subset of the operations are complete we can
+            # try to chop it off from the rest and continue, but we only
+            # do this if we've already been through the list once before
+            # without any chopping and nothing has changed.
+            for app_label in sorted(self.generated_operations.keys()):
+                chopped = []
+                dependencies = set()
+                for operation in list(self.generated_operations[app_label]):
+                    deps_satisfied = True
+                    operation_dependencies = set()
+                    for dep in operation._auto_deps:
+                        if dep[0] == "__setting__":
+                            operation_dependencies.add((dep[0], dep[1]))
+                        elif dep[0] != app_label:
+                            # External app dependency. See if it's not yet
+                            # satisfied.
+                            for other_operation in self.generated_operations[dep[0]]:
+                                if self.check_dependency(other_operation, dep):
+                                    deps_satisfied = False
+                                    break
+                            if not deps_satisfied:
+                                break
+                            else:
+                                if self.migrations.get(dep[0], None):
+                                    operation_dependencies.add((dep[0], self.migrations[dep[0]][-1].name))
+                                else:
+                                    operation_dependencies.add((dep[0], "__latest__"))
+                    if deps_satisfied:
+                        chopped.append(operation)
+                        dependencies.update(operation_dependencies)
+                        self.generated_operations[app_label] = self.generated_operations[app_label][1:]
+                    else:
+                        break
+                # Make a migration! Well, only if there's stuff to put in it
+                if dependencies or chopped:
+                    if not self.generated_operations[app_label] or chop_mode:
+                        subclass = type(str("Migration"), (Migration,), {"operations": [], "dependencies": []})
+                        instance = subclass("auto_%i" % (len(self.migrations.get(app_label, [])) + 1), app_label)
+                        instance.dependencies = list(dependencies)
+                        instance.operations = chopped
+                        self.migrations.setdefault(app_label, []).append(instance)
+                        chop_mode = False
+                    else:
+                        self.generated_operations[app_label] = chopped + self.generated_operations[app_label]
+            new_num_ops = sum(len(x) for x in self.generated_operations.values())
+            if new_num_ops == num_ops:
+                if not chop_mode:
+                    chop_mode = True
+                else:
+                    raise ValueError("Cannot resolve operation dependencies")
+            num_ops = new_num_ops
+
+        # OK, add in internal dependencies among the migrations
+        for app_label, migrations in self.migrations.items():
+            for m1, m2 in zip(migrations, migrations[1:]):
+                m2.dependencies.append((app_label, m1.name))
+
+        # De-dupe dependencies
+        for app_label, migrations in self.migrations.items():
+            for migration in migrations:
+                migration.dependencies = list(set(migration.dependencies))
+
+        # Optimize migrations
+        for app_label, migrations in self.migrations.items():
+            for migration in migrations:
+                migration.operations = MigrationOptimizer().optimize(migration.operations, app_label=app_label)
+
+        return self.migrations
+
+    def check_dependency(self, operation, dependency):
+        """
+        Checks if an operation dependency matches an operation.
+        """
+        # Created model
+        if dependency[2] is None and dependency[3] is True:
             return (
-                name,
-                [_deep_deconstruct(value) for value in args],
-                dict([(key, _deep_deconstruct(value))
-                      for key, value in kwargs.items()])
+                isinstance(operation, operations.CreateModel) and
+                operation.name.lower() == dependency[1].lower()
             )
+        # Created field
+        elif dependency[2] is not None and dependency[3] is True:
+            return (
+                (
+                    isinstance(operation, operations.CreateModel) and
+                    operation.name.lower() == dependency[1].lower() and
+                    any(dependency[2] == x for x, y in operation.fields)
+                ) or
+                (
+                    isinstance(operation, operations.AddField) and
+                    operation.model_name.lower() == dependency[1].lower() and
+                    operation.name.lower() == dependency[2].lower()
+                )
+            )
+        # Removed field
+        elif dependency[2] is not None and dependency[3] is False:
+            return (
+                isinstance(operation, operations.RemoveField) and
+                operation.model_name.lower() == dependency[1].lower() and
+                operation.name.lower() == dependency[2].lower()
+            )
+        # Unknown dependency. Raise an error.
+        else:
+            raise ValueError("Can't handle dependency %r" % dependency)
 
-        def _rel_agnostic_fields_def(fields):
-            """
-            Return a definition of the fields that ignores field names and
-            what related fields actually relate to.
-            """
-            fields_def = []
-            for name, field in fields:
-                deconstruction = _deep_deconstruct(field)
-                if field.rel and field.rel.to:
-                    del deconstruction[2]['to']
-                fields_def.append(deconstruction)
-            return fields_def
+    def add_operation(self, app_label, operation, dependencies=None):
+        # Dependencies are (app_label, model_name, field_name, create/delete as True/False)
+        operation._auto_deps = dependencies or []
+        self.generated_operations.setdefault(app_label, []).append(operation)
 
-        # Find any renamed models.
-        renamed_models = {}
-        renamed_models_rel = {}
-        added_models = set(new_model_keys) - set(old_model_keys)
-        for app_label, model_name in added_models:
+    def generate_renamed_models(self):
+        """
+        Finds any renamed models, and generates the operations for them,
+        and removes the old entry from the model lists.
+        Must be run before other model-level generation.
+        """
+        self.renamed_models = {}
+        self.renamed_models_rel = {}
+        added_models = set(self.new_model_keys) - set(self.old_model_keys)
+        for app_label, model_name in sorted(added_models):
             model_state = self.to_state.models[app_label, model_name]
-            model_fields_def = _rel_agnostic_fields_def(model_state.fields)
+            model_fields_def = self.only_relation_agnostic_fields(model_state.fields)
 
-            removed_models = set(old_model_keys) - set(new_model_keys)
+            removed_models = set(self.old_model_keys) - set(self.new_model_keys)
             for rem_app_label, rem_model_name in removed_models:
                 if rem_app_label == app_label:
                     rem_model_state = self.from_state.models[rem_app_label, rem_model_name]
-                    rem_model_fields_def = _rel_agnostic_fields_def(rem_model_state.fields)
+                    rem_model_fields_def = self.only_relation_agnostic_fields(rem_model_state.fields)
                     if model_fields_def == rem_model_fields_def:
                         if self.questioner.ask_rename_model(rem_model_state, model_state):
-                            self.add_to_migration(
+                            self.add_operation(
                                 app_label,
                                 operations.RenameModel(
                                     old_name=rem_model_state.name,
                                     new_name=model_state.name,
                                 )
                             )
-                            renamed_models[app_label, model_name] = rem_model_name
-                            renamed_models_rel['%s.%s' % (rem_model_state.app_label, rem_model_state.name)] = '%s.%s' % (model_state.app_label, model_state.name)
-                            old_model_keys.remove((rem_app_label, rem_model_name))
-                            old_model_keys.append((app_label, model_name))
+                            self.renamed_models[app_label, model_name] = rem_model_name
+                            self.renamed_models_rel['%s.%s' % (rem_model_state.app_label, rem_model_state.name)] = '%s.%s' % (model_state.app_label, model_state.name)
+                            self.old_model_keys.remove((rem_app_label, rem_model_name))
+                            self.old_model_keys.append((app_label, model_name))
                             break
 
-        # Adding models. Phase 1 is adding models with no outward relationships.
-        added_models = set(new_model_keys) - set(old_model_keys)
-        pending_add = {}
-        for app_label, model_name in added_models:
+    def generate_created_models(self):
+        """
+        Find all new models and make creation operations for them,
+        and separate operations to create any foreign key or M2M relationships
+        (we'll optimise these back in later if we can)
+
+        We also defer any model options that refer to collections of fields
+        that might be deferred (e.g. unique_together, index_together)
+        """
+        added_models = set(self.new_model_keys) - set(self.old_model_keys)
+        for app_label, model_name in sorted(added_models):
             model_state = self.to_state.models[app_label, model_name]
-            # Are there any relationships out from this model? if so, punt it to the next phase.
-            related_fields = []
-            for field in new_apps.get_model(app_label, model_name)._meta.local_fields:
+            # Gather related fields
+            related_fields = {}
+            for field in self.new_apps.get_model(app_label, model_name)._meta.local_fields:
                 if field.rel:
                     if field.rel.to:
-                        related_fields.append((field.name, field.rel.to._meta.app_label, field.rel.to._meta.model_name))
+                        related_fields[field.name] = field
                     if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
-                        related_fields.append((field.name, field.rel.through._meta.app_label, field.rel.through._meta.model_name))
-            for field in new_apps.get_model(app_label, model_name)._meta.local_many_to_many:
+                        related_fields[field.name] = field
+            for field in self.new_apps.get_model(app_label, model_name)._meta.local_many_to_many:
                 if field.rel.to:
-                    related_fields.append((field.name, field.rel.to._meta.app_label, field.rel.to._meta.model_name))
+                    related_fields[field.name] = field
                 if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
-                    related_fields.append((field.name, field.rel.through._meta.app_label, field.rel.through._meta.model_name))
-            if related_fields:
-                pending_add[app_label, model_name] = related_fields
-            else:
-                self.add_to_migration(
-                    app_label,
-                    operations.CreateModel(
-                        name=model_state.name,
-                        fields=model_state.fields,
-                        options=model_state.options,
-                        bases=model_state.bases,
-                    )
+                    related_fields[field.name] = field
+            # Are there unique/index_together to defer?
+            unique_together = model_state.options.pop('unique_together', None)
+            index_together = model_state.options.pop('index_together', None)
+            # Generate creation operatoin
+            self.add_operation(
+                app_label,
+                operations.CreateModel(
+                    name=model_state.name,
+                    fields=[d for d in model_state.fields if d[0] not in related_fields],
+                    options=model_state.options,
+                    bases=model_state.bases,
                 )
-
-        # Phase 2 is progressively adding pending models, splitting up into two
-        # migrations if required.
-        pending_new_fks = []
-        pending_unique_together = []
-        added_phase_2 = set()
-        while pending_add:
-            # Is there one we can add that has all dependencies satisfied?
-            satisfied = [
-                (m, rf)
-                for m, rf in pending_add.items()
-                if all((al, mn) not in pending_add for f, al, mn in rf)
-            ]
-            if satisfied:
-                (app_label, model_name), related_fields = sorted(satisfied)[0]
-                model_state = self.to_state.models[app_label, model_name]
-                self.add_to_migration(
-                    app_label,
-                    operations.CreateModel(
-                        name=model_state.name,
-                        fields=model_state.fields,
-                        options=model_state.options,
-                        bases=model_state.bases,
-                    ),
-                    # If it's already been added in phase 2 put it in a new
-                    # migration for safety.
-                    new=any((al, mn) in added_phase_2 for f, al, mn in related_fields),
-                )
-                added_phase_2.add((app_label, model_name))
-            # Ah well, we'll need to split one. Pick deterministically.
-            else:
-                (app_label, model_name), related_fields = sorted(pending_add.items())[0]
-                model_state = self.to_state.models[app_label, model_name]
-                # Defer unique together constraints creation, see ticket #22275
-                unique_together_constraints = model_state.options.pop('unique_together', None)
-                if unique_together_constraints:
-                    pending_unique_together.append((app_label, model_name,
-                                                   unique_together_constraints))
-                # Work out the fields that need splitting out
-                bad_fields = dict((f, (al, mn)) for f, al, mn in related_fields if (al, mn) in pending_add)
-                # Create the model, without those
-                self.add_to_migration(
-                    app_label,
-                    operations.CreateModel(
-                        name=model_state.name,
-                        fields=[(n, f) for n, f in model_state.fields if n not in bad_fields],
-                        options=model_state.options,
-                        bases=model_state.bases,
-                    )
-                )
-                # Add the bad fields to be made in a phase 3
-                for field_name, (other_app_label, other_model_name) in bad_fields.items():
-                    pending_new_fks.append((app_label, model_name, field_name, other_app_label))
-            for field_name, other_app_label, other_model_name in related_fields:
-                # If it depends on a swappable something, add a dynamic depend'cy
-                swappable_setting = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0].swappable_setting
+            )
+            # Generate operations for each related field
+            for name, field in sorted(related_fields.items()):
+                # Account for FKs to swappable models
+                swappable_setting = getattr(field, 'swappable_setting', None)
                 if swappable_setting is not None:
-                    self.add_swappable_dependency(app_label, swappable_setting)
-                elif app_label != other_app_label:
-                    self.add_dependency(app_label, other_app_label)
-            del pending_add[app_label, model_name]
-
-        # Phase 3 is adding the final set of FKs as separate new migrations.
-        for app_label, model_name, field_name, other_app_label in pending_new_fks:
-            model_state = self.to_state.models[app_label, model_name]
-            self.add_to_migration(
-                app_label,
-                operations.AddField(
-                    model_name=model_name,
-                    name=field_name,
-                    field=model_state.get_field_by_name(field_name),
-                ),
-                new=True,
-            )
-            # If it depends on a swappable something, add a dynamic depend'cy
-            swappable_setting = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0].swappable_setting
-            if swappable_setting is not None:
-                self.add_swappable_dependency(app_label, swappable_setting)
-            elif app_label != other_app_label:
-                self.add_dependency(app_label, other_app_label)
-        # Phase 3.1 - unique together constraints
-        for app_label, model_name, unique_together in pending_unique_together:
-            self.add_to_migration(
-                app_label,
-                operations.AlterUniqueTogether(
-                    name=model_name,
-                    unique_together=unique_together
+                    dep_app_label = "__setting__"
+                    dep_object_name = swappable_setting
+                else:
+                    dep_app_label = field.rel.to._meta.app_label
+                    dep_object_name = field.rel.to._meta.object_name
+                # Make operation
+                self.add_operation(
+                    app_label,
+                    operations.AddField(
+                        model_name=model_name,
+                        name=name,
+                        field=field,
+                    ),
+                    dependencies = [
+                        (dep_app_label, dep_object_name, None, True),
+                    ]
                 )
-            )
-        # Changes within models
-        kept_models = set(old_model_keys).intersection(new_model_keys)
-        old_fields = set()
-        new_fields = set()
-        unique_together_operations = []
-        for app_label, model_name in kept_models:
-            old_model_name = renamed_models.get((app_label, model_name), model_name)
-            old_model_state = self.from_state.models[app_label, old_model_name]
-            new_model_state = self.to_state.models[app_label, model_name]
-            # Collect field changes for later global dealing with (so AddFields
-            # always come before AlterFields even on separate models)
-            old_fields.update((app_label, model_name, x) for x, y in old_model_state.fields)
-            new_fields.update((app_label, model_name, x) for x, y in new_model_state.fields)
-            # Unique_together changes. Operations will be added to migration a
-            # bit later, after fields creation. See ticket #22035.
-            if old_model_state.options.get("unique_together", set()) != new_model_state.options.get("unique_together", set()):
-                unique_together_operations.append((
+            # Generate other opns
+            if unique_together:
+                self.add_operation(
                     app_label,
                     operations.AlterUniqueTogether(
                         name=model_name,
-                        unique_together=new_model_state.options.get("unique_together", set()),
+                        unique_together=unique_together,
+                    ),
+                    dependencies = [
+                        (app_label, model_name, name, True)
+                        for name, field in sorted(related_fields.items())
+                    ]
+                )
+            if index_together:
+                self.add_operation(
+                    app_label,
+                    operations.AlterIndexTogether(
+                        name=model_name,
+                        index_together=index_together,
+                    ),
+                    dependencies = [
+                        (app_label, model_name, name, True)
+                        for name, field in sorted(related_fields.items())
+                    ]
+                )
+
+    def generate_deleted_models(self):
+        """
+        Find all deleted models and make creation operations for them,
+        and separate operations to delete any foreign key or M2M relationships
+        (we'll optimise these back in later if we can)
+
+        We also bring forward removal of any model options that refer to
+        collections of fields - the inverse of generate_created_models.
+        """
+        deleted_models = set(self.old_model_keys) - set(self.new_model_keys)
+        for app_label, model_name in sorted(deleted_models):
+            model_state = self.from_state.models[app_label, model_name]
+            model = self.old_apps.get_model(app_label, model_name)
+            # Gather related fields
+            related_fields = {}
+            for field in model._meta.local_fields:
+                if field.rel:
+                    if field.rel.to:
+                        related_fields[field.name] = field
+                    if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
+                        related_fields[field.name] = field
+            for field in model._meta.local_many_to_many:
+                if field.rel.to:
+                    related_fields[field.name] = field
+                if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
+                    related_fields[field.name] = field
+            # Generate option removal first
+            unique_together = model_state.options.pop('unique_together', None)
+            index_together = model_state.options.pop('index_together', None)
+            if unique_together:
+                self.add_operation(
+                    app_label,
+                    operations.AlterUniqueTogether(
+                        name=model_name,
+                        unique_together=None,
                     )
+                )
+            if index_together:
+                self.add_operation(
+                    app_label,
+                    operations.AlterIndexTogether(
+                        name=model_name,
+                        index_together=None,
+                    )
+                )
+            # Then remove each related field
+            for name, field in sorted(related_fields.items()):
+                self.add_operation(
+                    app_label,
+                    operations.RemoveField(
+                        model_name=model_name,
+                        name=name,
+                    )
+                )
+            # Finally, remove the model.
+            # This depends on both the removal of all incoming fields
+            # and the removal of all its own related fields, and if it's
+            # a through model the field that references it.
+            dependencies = []
+            for related_object in model._meta.get_all_related_objects():
+                dependencies.append((
+                    related_object.model._meta.app_label,
+                    related_object.model._meta.object_name,
+                    related_object.field.name,
+                    False,
                 ))
+            for related_object in model._meta.get_all_related_many_to_many_objects():
+                dependencies.append((
+                    related_object.model._meta.app_label,
+                    related_object.model._meta.object_name,
+                    related_object.field.name,
+                    False,
+                ))
+            for name, field in sorted(related_fields.items()):
+                dependencies.append((app_label, model_name, name, False))
+            # We're referenced in another field's through=
+            through_user = self.through_users.get((app_label, model_state.name.lower()), None)
+            if through_user:
+                dependencies.append((through_user[0], through_user[1], through_user[2], False))
+            # Finally, make the operation, deduping any dependencies
+            self.add_operation(
+                app_label,
+                operations.DeleteModel(
+                    name=model_state.name,
+                ),
+                dependencies = list(set(dependencies)),
+            )
+
+    def generate_added_fields(self):
         # New fields
-        renamed_fields = {}
-        for app_label, model_name, field_name in new_fields - old_fields:
-            old_model_name = renamed_models.get((app_label, model_name), model_name)
+        self.renamed_fields = {}
+        for app_label, model_name, field_name in sorted(self.new_field_keys - self.old_field_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
             field = new_model_state.get_field_by_name(field_name)
             # Scan to see if this is actually a rename!
-            field_dec = _deep_deconstruct(field)
+            field_dec = self.deep_deconstruct(field)
             found_rename = False
-            for rem_app_label, rem_model_name, rem_field_name in (old_fields - new_fields):
+            for rem_app_label, rem_model_name, rem_field_name in sorted(self.old_field_keys - self.new_field_keys):
                 if rem_app_label == app_label and rem_model_name == model_name:
-                    old_field_dec = _deep_deconstruct(old_model_state.get_field_by_name(rem_field_name))
+                    old_field_dec = self.deep_deconstruct(old_model_state.get_field_by_name(rem_field_name))
                     if field.rel and field.rel.to and 'to' in old_field_dec[2]:
                         old_rel_to = old_field_dec[2]['to']
-                        if old_rel_to in renamed_models_rel:
-                            old_field_dec[2]['to'] = renamed_models_rel[old_rel_to]
+                        if old_rel_to in self.renamed_models_rel:
+                            old_field_dec[2]['to'] = self.renamed_models_rel[old_rel_to]
                     if old_field_dec == field_dec:
                         if self.questioner.ask_rename(model_name, rem_field_name, field_name, field):
-                            self.add_to_migration(
+                            self.add_operation(
                                 app_label,
                                 operations.RenameField(
                                     model_name=model_name,
@@ -295,9 +530,9 @@ class MigrationAutodetector(object):
                                     new_name=field_name,
                                 )
                             )
-                            old_fields.remove((rem_app_label, rem_model_name, rem_field_name))
-                            old_fields.add((app_label, model_name, field_name))
-                            renamed_fields[app_label, model_name, field_name] = rem_field_name
+                            self.old_field_keys.remove((rem_app_label, rem_model_name, rem_field_name))
+                            self.old_field_keys.add((app_label, model_name, field_name))
+                            self.renamed_fields[app_label, model_name, field_name] = rem_field_name
                             found_rename = True
                             break
             if found_rename:
@@ -306,7 +541,7 @@ class MigrationAutodetector(object):
             if not field.null and not field.has_default() and not isinstance(field, models.ManyToManyField):
                 field = field.clone()
                 field.default = self.questioner.ask_not_null_addition(field_name, model_name)
-                self.add_to_migration(
+                self.add_operation(
                     app_label,
                     operations.AddField(
                         model_name=model_name,
@@ -316,7 +551,7 @@ class MigrationAutodetector(object):
                     )
                 )
             else:
-                self.add_to_migration(
+                self.add_operation(
                     app_label,
                     operations.AddField(
                         model_name=model_name,
@@ -324,33 +559,34 @@ class MigrationAutodetector(object):
                         field=field,
                     )
                 )
-                new_field = new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
-                swappable_setting = getattr(new_field, 'swappable_setting', None)
-                if swappable_setting is not None:
-                    self.add_swappable_dependency(app_label, swappable_setting)
-        # Old fields
-        for app_label, model_name, field_name in old_fields - new_fields:
-            old_model_name = renamed_models.get((app_label, model_name), model_name)
-            old_model_state = self.from_state.models[app_label, old_model_name]
-            new_model_state = self.to_state.models[app_label, model_name]
-            self.add_to_migration(
+
+    def generate_removed_fields(self):
+        """
+        Fields that have been removed.
+        """
+        for app_label, model_name, field_name in sorted(self.old_field_keys - self.new_field_keys):
+            self.add_operation(
                 app_label,
                 operations.RemoveField(
                     model_name=model_name,
                     name=field_name,
                 )
             )
-        # The same fields
-        for app_label, model_name, field_name in old_fields.intersection(new_fields):
+
+    def generate_altered_fields(self):
+        """
+        Fields that have been altered.
+        """
+        for app_label, model_name, field_name in sorted(self.old_field_keys.intersection(self.new_field_keys)):
             # Did the field change?
-            old_model_name = renamed_models.get((app_label, model_name), model_name)
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
-            old_field_name = renamed_fields.get((app_label, model_name, field_name), field_name)
-            old_field_dec = _deep_deconstruct(old_model_state.get_field_by_name(old_field_name))
-            new_field_dec = _deep_deconstruct(new_model_state.get_field_by_name(field_name))
+            old_field_name = self.renamed_fields.get((app_label, model_name, field_name), field_name)
+            old_field_dec = self.deep_deconstruct(old_model_state.get_field_by_name(old_field_name))
+            new_field_dec = self.deep_deconstruct(new_model_state.get_field_by_name(field_name))
             if old_field_dec != new_field_dec:
-                self.add_to_migration(
+                self.add_operation(
                     app_label,
                     operations.AlterField(
                         model_name=model_name,
@@ -358,53 +594,34 @@ class MigrationAutodetector(object):
                         field=new_model_state.get_field_by_name(field_name),
                     )
                 )
-        for app_label, operation in unique_together_operations:
-            self.add_to_migration(app_label, operation)
-        # Removing models
-        removed_models = set(old_model_keys) - set(new_model_keys)
-        for app_label, model_name in removed_models:
-            model_state = self.from_state.models[app_label, model_name]
-            self.add_to_migration(
-                app_label,
-                operations.DeleteModel(
-                    model_state.name,
+
+    def generate_altered_unique_together(self):
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            if old_model_state.options.get("unique_together", None) != new_model_state.options.get("unique_together", None):
+                self.add_operation(
+                    app_label,
+                    operations.AlterUniqueTogether(
+                        name=model_name,
+                        unique_together=new_model_state.options['unique_together'],
+                    )
                 )
-            )
-        # Alright, now add internal dependencies
-        for app_label, migrations in self.migrations.items():
-            for m1, m2 in zip(migrations, migrations[1:]):
-                m2.dependencies.append((app_label, m1.name))
-        # Clean up dependencies
-        for app_label, migrations in self.migrations.items():
-            for migration in migrations:
-                migration.dependencies = list(set(migration.dependencies))
-        return self.migrations
 
-    def add_to_migration(self, app_label, operation, new=False):
-        migrations = self.migrations.setdefault(app_label, [])
-        if not migrations or new:
-            subclass = type(str("Migration"), (Migration,), {"operations": [], "dependencies": []})
-            instance = subclass("auto_%i" % (len(migrations) + 1), app_label)
-            migrations.append(instance)
-        migrations[-1].operations.append(operation)
-
-    def add_dependency(self, app_label, other_app_label):
-        """
-        Adds a dependency to app_label's newest migration on
-        other_app_label's latest migration.
-        """
-        if self.migrations.get(other_app_label):
-            dependency = (other_app_label, self.migrations[other_app_label][-1].name)
-        else:
-            dependency = (other_app_label, "__first__")
-        self.migrations[app_label][-1].dependencies.append(dependency)
-
-    def add_swappable_dependency(self, app_label, setting_name):
-        """
-        Adds a dependency to the value of a swappable model setting.
-        """
-        dependency = ("__setting__", setting_name)
-        self.migrations[app_label][-1].dependencies.append(dependency)
+    def generate_altered_index_together(self):
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            if old_model_state.options.get("index_together", None) != new_model_state.options.get("index_together", None):
+                self.add_operation(
+                    app_label,
+                    operations.AlterIndexTogether(
+                        name=model_name,
+                        index_together=new_model_state.options['index_together'],
+                    )
+                )
 
     def arrange_for_graph(self, changes, graph):
         """
