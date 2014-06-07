@@ -999,22 +999,30 @@ behavior you can use the ``--no-startup`` option. e.g.::
 
     django-admin.py shell --plain --no-startup
 
-sql <app_label app_label ...>
+sql <app_label app_label app_label.Model ...>
 -----------------------------
 
 .. django-admin:: sql
 
 Prints the CREATE TABLE SQL statements for the given app name(s).
 
+.. versionchanged:: 1.8
+
+    `sql` can also be used for a specific model `<app_label.Model>`.
+
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlall <app_label app_label ...>
+sqlall <app_label app_label app_label.Model ...>
 --------------------------------
 
 .. django-admin:: sqlall
 
 Prints the CREATE TABLE and initial-data SQL statements for the given app name(s).
+
+.. versionchanged:: 1.8
+
+    `sqlall` can also be used for a specific model `<app_label.Model>`.
 
 Refer to the description of :djadmin:`sqlcustom` for an explanation of how to
 specify initial data.
@@ -1032,7 +1040,7 @@ Prints the DROP TABLE SQL statements for the given app name(s).
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlcustom <app_label app_label ...>
+sqlcustom <app_label app_label app_label.Model ...>
 -----------------------------------
 
 .. django-admin:: sqlcustom
@@ -1052,6 +1060,10 @@ table-creation statements have been executed. Use this SQL hook to make any
 table modifications, or insert any SQL functions into the database.
 
 Note that the order in which the SQL files are processed is undefined.
+
+.. versionchanged:: 1.8
+
+    `sqlcustom` can also be used for a specific model `<app_label.Model>`.
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
@@ -1077,12 +1089,16 @@ command.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlindexes <app_label app_label ...>
+sqlindexes <app_label app_label app_label.Model ...>
 ------------------------------------
 
 .. django-admin:: sqlindexes
 
 Prints the CREATE INDEX SQL statements for the given app name(s).
+
+.. versionchanged:: 1.8
+
+    `sqlindexes` can also be used for a specific model `<app_label.Model>`.
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.

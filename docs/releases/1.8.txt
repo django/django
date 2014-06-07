@@ -167,6 +167,9 @@ Management Commands
 
 * :djadmin:`runserver` now uses daemon threads for faster reloading.
 
+* :djadmin:`sqlall`, :djadmin:`sql`, :djadmin:`sqlcustom`, and
+  :djadmin:`sqlindexes` commands can now be used for a specific model.
+
 Models
 ^^^^^^
 
