@@ -27,6 +27,13 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(list(request.COOKIES.keys()), [])
         self.assertEqual(list(request.META.keys()), [])
 
+        # .GET and .POST should be QueryDicts
+        self.assertEqual(request.GET.urlencode(), '')
+        self.assertEqual(request.POST.urlencode(), '')
+
+        # and FILES should be MultiValueDict
+        self.assertEqual(request.FILES.getlist('foo'), [])
+
     def test_httprequest_repr(self):
         request = HttpRequest()
         request.path = '/somepath/'
