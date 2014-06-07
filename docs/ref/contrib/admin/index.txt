@@ -1635,9 +1635,14 @@ templates used by the :class:`ModelAdmin` views:
 
     .. versionadded:: 1.8
 
-    Should return ``True`` if adding, editing, or deleting an object is 
+    Should return ``True`` if adding, editing, or deleting an object is
     permitted, ``False`` otherwise. Uses :meth:`User.has_module_perms()
-    <django.contrib.auth.models.User.has_module_perms>` by default.
+    <django.contrib.auth.models.User.has_module_perms>` by default. It is
+    used for displaying the module on the admin index page and for accessing
+    the module's index page. Overriding it does not restrict access to the add,
+    change or delete views, :meth:`~ModelAdmin.has_add_permission`,
+    :meth:`~ModelAdmin.has_change_permission`, or
+    :meth:`~ModelAdmin.has_delete_permission` should be used for that.
 
 .. method:: ModelAdmin.get_queryset(request)
 

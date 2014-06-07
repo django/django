@@ -369,9 +369,9 @@ class AdminSite(object):
         app_dict = {}
         for model, model_admin in self._registry.items():
             app_label = model._meta.app_label
-            has_module_permission = model_admin.has_module_permission(request)
+            has_module_perms = model_admin.has_module_permission(request)
 
-            if has_module_permission:
+            if has_module_perms:
                 perms = model_admin.get_model_perms(request)
 
                 # Check whether user has any perm for this module.
@@ -400,7 +400,7 @@ class AdminSite(object):
                             'name': apps.get_app_config(app_label).verbose_name,
                             'app_label': app_label,
                             'app_url': reverse('admin:app_list', kwargs={'app_label': app_label}, current_app=self.name),
-                            'has_module_permission': has_module_permission,
+                            'has_module_perms': has_module_perms,
                             'models': [model_dict],
                         }
 
@@ -427,44 +427,44 @@ class AdminSite(object):
         app_dict = {}
         for model, model_admin in self._registry.items():
             if app_label == model._meta.app_label:
-                has_module_permission = model_admin.has_module_permission(request)
-                if not has_module_permission:
+                has_module_perms = model_admin.has_module_permission(request)
+                if not has_module_perms:
                     raise PermissionDenied
-                else:
-                    perms = model_admin.get_model_perms(request)
 
-                    # Check whether user has any perm for this module.
-                    # If so, add the module to the model_list.
-                    if True in perms.values():
-                        info = (app_label, model._meta.model_name)
-                        model_dict = {
-                            'name': capfirst(model._meta.verbose_name_plural),
-                            'object_name': model._meta.object_name,
-                            'perms': perms,
+                perms = model_admin.get_model_perms(request)
+
+                # Check whether user has any perm for this module.
+                # If so, add the module to the model_list.
+                if True in perms.values():
+                    info = (app_label, model._meta.model_name)
+                    model_dict = {
+                        'name': capfirst(model._meta.verbose_name_plural),
+                        'object_name': model._meta.object_name,
+                        'perms': perms,
+                    }
+                    if perms.get('change'):
+                        try:
+                            model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
+                        except NoReverseMatch:
+                            pass
+                    if perms.get('add'):
+                        try:
+                            model_dict['add_url'] = reverse('admin:%s_%s_add' % info, current_app=self.name)
+                        except NoReverseMatch:
+                            pass
+                    if app_dict:
+                        app_dict['models'].append(model_dict),
+                    else:
+                        # First time around, now that we know there's
+                        # something to display, add in the necessary meta
+                        # information.
+                        app_dict = {
+                            'name': app_name,
+                            'app_label': app_label,
+                            'app_url': '',
+                            'has_module_perms': has_module_perms,
+                            'models': [model_dict],
                         }
-                        if perms.get('change'):
-                            try:
-                                model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
-                            except NoReverseMatch:
-                                pass
-                        if perms.get('add'):
-                            try:
-                                model_dict['add_url'] = reverse('admin:%s_%s_add' % info, current_app=self.name)
-                            except NoReverseMatch:
-                                pass
-                        if app_dict:
-                            app_dict['models'].append(model_dict),
-                        else:
-                            # First time around, now that we know there's
-                            # something to display, add in the necessary meta
-                            # information.
-                            app_dict = {
-                                'name': app_name,
-                                'app_label': app_label,
-                                'app_url': '',
-                                'has_module_permission': has_module_permission,
-                                'models': [model_dict],
-                            }
         if not app_dict:
             raise Http404('The requested admin page does not exist.')
         # Sort the models alphabetically within each app.
