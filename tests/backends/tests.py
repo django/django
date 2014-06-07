@@ -701,6 +701,11 @@ class BackendTestCase(TestCase):
         new_connections = ConnectionHandler(settings.DATABASES)
         new_connection = new_connections[DEFAULT_DB_ALIAS]
 
+        # Initialize the connection and clear initialization statements.
+        with new_connection.cursor():
+            pass
+        new_connection.queries_log.clear()
+
         try:
             with new_connection.cursor() as cursor:
                 cursor.execute("SELECT 1" + new_connection.features.bare_select_suffix)
