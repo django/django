@@ -32,6 +32,12 @@ same interface on each member of the ``connections`` dictionary::
     >>> from django.db import connections
     >>> connections['my_db_alias'].queries
 
+If you need to clear the query list manually at any point in your functions,
+just call ``reset_queries()``, like this::
+
+    from django.db import reset_queries
+    reset_queries()
+
 Can I use Django with a pre-existing database?
 ----------------------------------------------
 
