@@ -383,4 +383,7 @@ the ``url`` that references :func:`django.contrib.sitemaps.views.sitemap`::
 
 to ensure compatibility when reversing by Python path is removed in Django 2.0.
 
+Similarly for GIS sitemaps, add ``name='django.contrib.gis.sitemaps.views.kml'``
+or ``name='django.contrib.gis.sitemaps.views.kmz'``.
+
 .. _security issue: https://www.djangoproject.com/weblog/2014/apr/21/security/#s-issue-unexpected-code-execution-using-reverse
