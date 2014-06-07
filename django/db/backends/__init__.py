@@ -73,17 +73,6 @@ class BaseDatabaseWrapper(object):
         self.allow_thread_sharing = allow_thread_sharing
         self._thread_ident = thread.get_ident()
 
-    def __eq__(self, other):
-        if isinstance(other, BaseDatabaseWrapper):
-            return self.alias == other.alias
-        return NotImplemented
-
-    def __ne__(self, other):
-        return not self == other
-
-    def __hash__(self):
-        return hash(self.alias)
-
     @property
     def queries(self):
         if len(self.queries_log) == self.queries_log.maxlen:

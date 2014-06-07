@@ -270,6 +270,9 @@ Miscellaneous
 
 * ``connections.queries`` is now a read-only attribute.
 
+* Database connections are considered equal only if they're the same object.
+  They aren't hashable any more.
+
 * ``URLField.to_python`` no longer adds a trailing slash to pathless URLs.
 
 * ``django.contrib.gis`` dropped support for GEOS 3.1 and GDAL 1.6.
