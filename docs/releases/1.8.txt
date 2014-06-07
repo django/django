@@ -220,6 +220,12 @@ Requests and Responses
   instantiated with ``QueryDict()`` instead of ``QueryDict(None)`` or
   ``QueryDict('')``.
 
+* The ``GET`` and ``POST`` attributes of an :class:`~django.http.HttpRequest`
+  object are now :class:`~django.http.QueryDict`\s rather than dictionaries,
+  and the ``FILES`` attribute is now a ``MultiValueDict``.
+  This brings this class into line with the documentation and with
+  ``WSGIRequest``.
+
 Tests
 ^^^^^
 

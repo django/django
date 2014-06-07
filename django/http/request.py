@@ -49,7 +49,12 @@ class HttpRequest(object):
         # Any variable assignment made here should also happen in
         # `WSGIRequest.__init__()`.
 
-        self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
+        self.GET = QueryDict(mutable=True)
+        self.POST = QueryDict(mutable=True)
+        self.COOKIES = {}
+        self.META = {}
+        self.FILES = MultiValueDict()
+
         self.path = ''
         self.path_info = ''
         self.method = None
