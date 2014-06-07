@@ -87,3 +87,13 @@ class UserProfile(models.Model):
 
     class Meta:
         ordering = ('flavor',)
+
+
+# Model for testing auto-truncation when using multiple databases
+# Ref. #13528
+class VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz(models.Model):
+    pass
+
+    class Meta:
+        verbose_name = 'VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzz'
+

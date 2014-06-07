@@ -109,7 +109,7 @@ class Options(object):
         return self.app_config is not None
 
     def contribute_to_class(self, cls, name):
-        from django.db import connection
+        from django.db import connections
         from django.db.backends.utils import truncate_name
 
         cls._meta = self
@@ -161,7 +161,17 @@ class Options(object):
         # If the db_table wasn't provided, use the app_label + model_name.
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.model_name)
-            self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
+            max_length = None
+            for db in settings.DATABASES.keys():
+                max_name_length = connections[db].ops.max_name_length()
+                if max_name_length is None:
+                    continue
+                else:
+                    if max_length is None:
+                        max_length = max_name_length
+                    elif max_name_length < max_length:
+                        max_length = max_name_length
+            self.db_table = truncate_name(self.db_table, max_length)
 
     def _prepare(self, model):
         if self.order_with_respect_to:
