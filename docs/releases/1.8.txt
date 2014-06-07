@@ -170,7 +170,8 @@ Management Commands
 Models
 ^^^^^^
 
-* ...
+* Django now logs at most 9000 queries in ``connections.queries``, in order
+  to prevent excessive memory usage in long-running processes in debug mode.
 
 Signals
 ^^^^^^^
@@ -262,6 +263,8 @@ Now, an error will be raised to prevent data loss::
 
 Miscellaneous
 ~~~~~~~~~~~~~
+
+* ``connections.queries`` is now a read-only attribute.
 
 * ``URLField.to_python`` no longer adds a trailing slash to pathless URLs.
 

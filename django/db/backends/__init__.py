@@ -1,3 +1,4 @@
+from collections import deque
 import datetime
 import time
 import warnings
@@ -30,17 +31,21 @@ class BaseDatabaseWrapper(object):
     ops = None
     vendor = 'unknown'
 
+    queries_limit = 9000
+
     def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS,
                  allow_thread_sharing=False):
         # Connection related attributes.
+        # The underlying database connection.
         self.connection = None
-        self.queries = []
         # `settings_dict` should be a dictionary containing keys such as
         # NAME, USER, etc. It's called `settings_dict` instead of `settings`
         # to disambiguate it from Django settings modules.
         self.settings_dict = settings_dict
         self.alias = alias
+        # Query logging in debug mode.
         self.use_debug_cursor = None
+        self.queries_log = deque(maxlen=self.queries_limit)
 
         # Transaction related attributes.
         # Tracks if the connection is in autocommit mode. Per PEP 249, by
@@ -78,6 +83,14 @@ class BaseDatabaseWrapper(object):
 
     def __hash__(self):
         return hash(self.alias)
+
+    @property
+    def queries(self):
+        if len(self.queries_log) == self.queries_log.maxlen:
+            warnings.warn(
+                "Limit for query logging exceeded, only the last {} queries "
+                "will be returned.".format(self.queries_log.maxlen))
+        return list(self.queries_log)
 
     ##### Backend-specific methods for creating connections and cursors #####
 
@@ -429,7 +442,7 @@ class BaseDatabaseWrapper(object):
 
     def make_debug_cursor(self, cursor):
         """
-        Creates a cursor that logs all queries in self.queries.
+        Creates a cursor that logs all queries in self.queries_log.
         """
         return utils.CursorDebugWrapper(cursor, self)
 
