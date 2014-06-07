@@ -31,7 +31,7 @@ needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ["djangodocs", "sphinx.ext.intersphinx"]
+extensions = ["djangodocs", "sphinx.ext.intersphinx", "sphinx.ext.viewcode"]
 
 # Spelling check needs an additional module that is not installed by default.
 # Add it only if spelling check is requested so docs can be generated without it.
