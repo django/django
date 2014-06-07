@@ -134,20 +134,21 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     # that work.
     #
     version_text = {
-        'deprecated':       'Deprecated in Django %s',
-        'versionchanged':   'Changed in Django %s',
-        'versionadded':     'New in Django %s',
+        'versionchanged': 'Changed in Django %s',
+        'versionadded': 'New in Django %s',
     }
 
     def visit_versionmodified(self, node):
         self.body.append(
             self.starttag(node, 'div', CLASS=node['type'])
         )
-        title = "%s%s" % (
-            self.version_text[node['type']] % node['version'],
-            ":" if len(node) else "."
-        )
-        self.body.append('<span class="title">%s</span> ' % title)
+        version_text = self.version_text.get(node['type'])
+        if version_text:
+            title = "%s%s" % (
+                version_text % node['version'],
+                ":" if len(node) else "."
+            )
+            self.body.append('<span class="title">%s</span> ' % title)
 
     def depart_versionmodified(self, node):
         self.body.append("</div>\n")
