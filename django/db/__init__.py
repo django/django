@@ -52,7 +52,7 @@ connection = DefaultConnectionProxy()
 # Register an event to reset saved queries when a Django request is started.
 def reset_queries(**kwargs):
     for conn in connections.all():
-        conn.queries = []
+        conn.queries_log.clear()
 signals.request_started.connect(reset_queries)
 
 

@@ -32,6 +32,12 @@ same interface on each member of the ``connections`` dictionary::
     >>> from django.db import connections
     >>> connections['my_db_alias'].queries
 
+If you need to clear the query list manually at any point in your functions,
+just call ``reset_queries()``, like this::
+
+    from django.db import reset_queries
+    reset_queries()
+
 Can I use Django with a pre-existing database?
 ----------------------------------------------
 
@@ -76,22 +82,3 @@ type, create an initial data file and put something like this in it::
 As explained in the :ref:`SQL initial data file <initial-sql>` documentation,
 this SQL file can contain arbitrary SQL, so you can make any sorts of changes
 you need to make.
-
-Why is Django leaking memory?
------------------------------
-
-Django isn't known to leak memory. If you find your Django processes are
-allocating more and more memory, with no sign of releasing it, check to make
-sure your :setting:`DEBUG` setting is set to ``False``. If :setting:`DEBUG`
-is ``True``, then Django saves a copy of every SQL statement it has executed.
-
-(The queries are saved in ``django.db.connection.queries``. See
-:ref:`faq-see-raw-sql-queries`.)
-
-To fix the problem, set :setting:`DEBUG` to ``False``.
-
-If you need to clear the query list manually at any point in your functions,
-just call ``reset_queries()``, like this::
-
-    from django import db
-    db.reset_queries()
