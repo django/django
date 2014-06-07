@@ -17,6 +17,7 @@ class BaseStorage(object):
         self.request = request
         self.file_storage = file_storage
         self._files = {}
+        self._tmp_files = []
 
     def init_data(self):
         self.data = {
@@ -27,11 +28,13 @@ class BaseStorage(object):
         }
 
     def reset(self):
-        # Delete temporary files before breaking reference to them.
+        # Store unused temporary file names in order to delete them
+        # at the end of the response cycle through a callback attached in
+        # `update_response`.
         wizard_files = self.data[self.step_files_key]
         for step_files in six.itervalues(wizard_files):
             for step_file in six.itervalues(step_files):
-                self.file_storage.delete(step_file['tmp_name'])
+                self._tmp_files.append(step_file['tmp_name'])
         self.init_data()
 
     def _get_current_step(self):
@@ -118,6 +121,8 @@ class BaseStorage(object):
             for file in self._files.values():
                 if not file.closed:
                     file.close()
+            for tmp_file in self._tmp_files:
+                self.file_storage.delete(tmp_file)
 
         if hasattr(response, 'render'):
             response.add_post_render_callback(post_render_callback)
