@@ -681,7 +681,7 @@ class BackendTestCase(TestCase):
 
         self.assertIsInstance(connection.queries, list)
         self.assertIsInstance(connection.queries[0], dict)
-        self.assertItemsEqual(connection.queries[0].keys(), ['sql', 'time'])
+        six.assertCountEqual(self, connection.queries[0].keys(), ['sql', 'time'])
 
         reset_queries()
         self.assertEqual(0, len(connection.queries))
