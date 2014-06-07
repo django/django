@@ -165,7 +165,14 @@ Management Commands
 * The :djadminopt:`--ignorenonexistent` option of the :djadmin:`loaddata`
   management command now ignores data for models that no longer exist.
 
-* :djadmin:`runserver` now uses daemon threads for faster reloading.
+* The :djadmin:`runserver` command received several improvements:
+
+  * It now uses daemon threads for faster reloading.
+
+  * It will reuse the same socket across automatic reloads which ensures that
+    requests will not fail if the browser is reloaded too quickly.
+    For Windows, this feature is only supported with Python 3.x.
+
 
 Models
 ^^^^^^
