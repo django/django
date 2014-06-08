@@ -3960,11 +3960,7 @@ class UserAdminTest(TestCase):
         # Don't depend on a warm cache, see #17377.
         ContentType.objects.clear_cache()
 
-        expected_queries = 10
-        if not connection.features.can_release_savepoints:
-            expected_queries -= 1
-
-        with self.assertNumQueries(expected_queries):
+        with self.assertNumQueries(10):
             response = self.client.get('/test_admin/admin/auth/user/%s/' % u.pk)
             self.assertEqual(response.status_code, 200)
 
@@ -4001,12 +3997,7 @@ class GroupAdminTest(TestCase):
 
     def test_group_permission_performance(self):
         g = Group.objects.create(name="test_group")
-
-        expected_queries = 8
-        if not connection.features.can_release_savepoints:
-            expected_queries -= 1
-
-        with self.assertNumQueries(expected_queries):
+        with self.assertNumQueries(8):
             response = self.client.get('/test_admin/admin/auth/group/%s/' % g.pk)
             self.assertEqual(response.status_code, 200)
 
