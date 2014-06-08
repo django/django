@@ -289,12 +289,12 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):
-        from django.contrib.gis.db.backends.oracle.models import GeometryColumns
-        return GeometryColumns
+        from django.contrib.gis.db.backends.oracle.models import OracleGeometryColumns
+        return OracleGeometryColumns
 
     def spatial_ref_sys(self):
-        from django.contrib.gis.db.backends.oracle.models import SpatialRefSys
-        return SpatialRefSys
+        from django.contrib.gis.db.backends.oracle.models import OracleSpatialRefSys
+        return OracleSpatialRefSys
 
     def modify_insert_params(self, placeholders, params):
         """Drop out insert parameters for NULL placeholder. Needed for Oracle Spatial
