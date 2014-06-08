@@ -39,7 +39,7 @@ class BaseDatabaseWrapper(object):
         self.queries = []
         self.settings_dict = settings_dict
         self.alias = alias
-        self.use_debug_cursor = None
+        self.use_debug_cursor = False
 
         # Savepoint management related attributes
         self.savepoint_state = 0
@@ -157,8 +157,7 @@ class BaseDatabaseWrapper(object):
         Creates a cursor, opening a connection if necessary.
         """
         self.validate_thread_sharing()
-        if (self.use_debug_cursor or
-                (self.use_debug_cursor is None and settings.DEBUG)):
+        if self.use_debug_cursor or settings.DEBUG:
             cursor = self.make_debug_cursor(self._cursor())
         else:
             cursor = utils.CursorWrapper(self._cursor(), self)
