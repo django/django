@@ -38,9 +38,9 @@ class ProjectState(object):
             real_apps=self.real_apps,
         )
 
-    def render(self, include_real=None, ignore_swappable=False):
+    def render(self, include_real=None, ignore_swappable=False, skip_cache=False):
         "Turns the project state into actual models in a new Apps"
-        if self.apps is None:
+        if self.apps is None or skip_cache:
             # Any apps in self.real_apps should have all their models included
             # in the render. We don't use the original model instances as there
             # are some variables that refer to the Apps object.
@@ -87,7 +87,11 @@ class ProjectState(object):
                         ))
                     else:
                         do_pending_lookups(model)
-        return self.apps
+        try:
+            return self.apps
+        finally:
+            if skip_cache:
+                self.apps = None
 
     @classmethod
     def from_apps(cls, apps):

@@ -77,9 +77,7 @@ class AutodetectorTests(TestCase):
         return output
 
     def assertNumberMigrations(self, changes, app_label, number):
-        if not changes.get(app_label, None):
-            self.fail("No migrations found for %s\n%s" % (app_label, self.repr_changes(changes)))
-        if len(changes[app_label]) != number:
+        if len(changes.get(app_label, [])) != number:
             self.fail("Incorrect number of migrations (%s) for %s (expected %s)\n%s" % (
                 len(changes[app_label]),
                 app_label,
@@ -285,7 +283,7 @@ class AutodetectorTests(TestCase):
         changes = autodetector._detect_changes()
 
         # Right number of migrations for model rename?
-        self.assertEqual(len(changes['testapp']), 1)
+        self.assertNumberMigrations(changes, 'testapp', 1)
         # Right number of actions?
         migration = changes['testapp'][0]
         self.assertEqual(len(migration.operations), 1)
@@ -294,17 +292,9 @@ class AutodetectorTests(TestCase):
         self.assertEqual(action.__class__.__name__, "RenameModel")
         self.assertEqual(action.old_name, "Author")
         self.assertEqual(action.new_name, "Writer")
-
-        # Right number of migrations for related field rename?
-        self.assertEqual(len(changes['otherapp']), 1)
-        # Right number of actions?
-        migration = changes['otherapp'][0]
-        self.assertEqual(len(migration.operations), 1)
-        # Right action?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "AlterField")
-        self.assertEqual(action.name, "author")
-        self.assertEqual(action.field.rel.to, "testapp.Writer")
+        # Now that RenameModel handles related fields too, there should be
+        # no AlterField for the related field.
+        self.assertNumberMigrations(changes, 'otherapp', 0)
 
     def test_rename_model_with_renamed_rel_field(self):
         """
@@ -316,9 +306,8 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.author_renamed_with_book, self.book_with_field_and_author_renamed])
         autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename_model": True, "ask_rename": True}))
         changes = autodetector._detect_changes()
-
         # Right number of migrations for model rename?
-        self.assertEqual(len(changes['testapp']), 1)
+        self.assertNumberMigrations(changes, 'testapp', 1)
         # Right number of actions?
         migration = changes['testapp'][0]
         self.assertEqual(len(migration.operations), 1)
@@ -327,21 +316,17 @@ class AutodetectorTests(TestCase):
         self.assertEqual(action.__class__.__name__, "RenameModel")
         self.assertEqual(action.old_name, "Author")
         self.assertEqual(action.new_name, "Writer")
-
         # Right number of migrations for related field rename?
-        self.assertEqual(len(changes['otherapp']), 1)
+        # Alter is already taken care of.
+        self.assertNumberMigrations(changes, 'otherapp', 1)
         # Right number of actions?
         migration = changes['otherapp'][0]
-        self.assertEqual(len(migration.operations), 2)
+        self.assertEqual(len(migration.operations), 1)
         # Right actions?
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "RenameField")
         self.assertEqual(action.old_name, "author")
         self.assertEqual(action.new_name, "writer")
-        action = migration.operations[1]
-        self.assertEqual(action.__class__.__name__, "AlterField")
-        self.assertEqual(action.name, "writer")
-        self.assertEqual(action.field.rel.to, "testapp.Writer")
 
     def test_fk_dependency(self):
         "Tests that having a ForeignKey automatically adds a dependency"
