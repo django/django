@@ -56,7 +56,7 @@ Using initial data with a formset
 Initial data is what drives the main usability of a formset. As shown above
 you can define the number of extra forms. What this means is that you are
 telling the formset how many additional forms to show in addition to the
-number of forms it generates from the initial data. Lets take a look at an
+number of forms it generates from the initial data. Let's take a look at an
 example::
 
     >>> import datetime
