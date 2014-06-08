@@ -12,7 +12,7 @@ import types
 from django.apps import apps
 from django.db import models
 from django.db.migrations.loader import MigrationLoader
-from django.utils import datetime_safe, six, importlib
+from django.utils import datetime_safe, six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 
@@ -296,7 +296,7 @@ class MigrationWriter(object):
             # Python 2/fallback version
             module_name = value.__module__
             # Make sure it's actually there and not an unbound method
-            module = importlib.import_module(module_name)
+            module = import_module(module_name)
             if not hasattr(module, value.__name__):
                 raise ValueError(
                     "Could not find function %s in %s.\nPlease note that "
