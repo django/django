@@ -96,7 +96,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     interprets_empty_strings_as_nulls = True
     uses_savepoints = True
-    can_release_savepoints = False
     has_select_for_update = True
     has_select_for_update_nowait = True
     can_return_id_from_insert = True
@@ -691,9 +690,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "Returns a new instance of this backend's SchemaEditor"
         return DatabaseSchemaEditor(self, *args, **kwargs)
 
-    # Oracle doesn't support savepoint commits.  Ignore them.
+    # Oracle doesn't support releasing savepoints. But we fake them when query
+    # logging is enabled to keep query counts consistent with other backends.
     def _savepoint_commit(self, sid):
-        pass
+        if self.queries_logged:
+            self.queries_log.append({
+                'sql': '-- RELEASE SAVEPOINT %s (faked)' % self.ops.quote_name(sid),
+                'time': '0.000',
+            })
 
     def _set_autocommit(self, autocommit):
         with self.wrap_database_errors:

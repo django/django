@@ -82,6 +82,10 @@ class BaseDatabaseWrapper(object):
     def __hash__(self):
         return hash(self.alias)
 
+    @property
+    def queries_logged(self):
+        return self.use_debug_cursor or settings.DEBUG
+
     ##### Backend-specific methods for creating connections and cursors #####
 
     def get_connection_params(self):
@@ -157,7 +161,7 @@ class BaseDatabaseWrapper(object):
         Creates a cursor, opening a connection if necessary.
         """
         self.validate_thread_sharing()
-        if self.use_debug_cursor or settings.DEBUG:
+        if self.queries_logged:
             cursor = self.make_debug_cursor(self._cursor())
         else:
             cursor = utils.CursorWrapper(self._cursor(), self)
@@ -579,7 +583,6 @@ class BaseDatabaseFeatures(object):
     can_return_id_from_insert = False
     has_bulk_insert = False
     uses_savepoints = False
-    can_release_savepoints = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
 
     # If True, don't use integer foreign keys referring to, e.g., positive
