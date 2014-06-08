@@ -580,11 +580,21 @@ class MigrationAutodetector(object):
         for app_label, model_name, field_name in sorted(self.old_field_keys.intersection(self.new_field_keys)):
             # Did the field change?
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
-            old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
             old_field_name = self.renamed_fields.get((app_label, model_name, field_name), field_name)
-            old_field_dec = self.deep_deconstruct(old_model_state.get_field_by_name(old_field_name))
-            new_field_dec = self.deep_deconstruct(new_model_state.get_field_by_name(field_name))
+            old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field_by_name(old_field_name)[0]
+            new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+            # Implement any model renames on relations; these are handled by RenameModel
+            # so we need to exclude them from the comparison
+            if hasattr(new_field, "rel") and getattr(new_field.rel, "to", None):
+                rename_key = (
+                    new_field.rel.to._meta.app_label,
+                    new_field.rel.to._meta.object_name.lower(),
+                )
+                if rename_key in self.renamed_models:
+                    new_field.rel.to = old_field.rel.to
+            old_field_dec = self.deep_deconstruct(old_field)
+            new_field_dec = self.deep_deconstruct(new_field)
             if old_field_dec != new_field_dec:
                 self.add_operation(
                     app_label,
