@@ -113,9 +113,28 @@ class RenameModel(Operation):
         self.new_name = new_name
 
     def state_forwards(self, app_label, state):
+        # Get all of the related objects we need to repoint
+        apps = state.render(skip_cache=True)
+        model = apps.get_model(app_label, self.old_name)
+        related_objects = model._meta.get_all_related_objects()
+        related_m2m_objects = model._meta.get_all_related_many_to_many_objects()
+        # Rename the model
         state.models[app_label, self.new_name.lower()] = state.models[app_label, self.old_name.lower()]
         state.models[app_label, self.new_name.lower()].name = self.new_name
         del state.models[app_label, self.old_name.lower()]
+        # Repoint the FKs and M2Ms pointing to us
+        for related_object in (related_objects + related_m2m_objects):
+            related_key = (
+                related_object.model._meta.app_label,
+                related_object.model._meta.object_name.lower(),
+            )
+            new_fields = []
+            for name, field in state.models[related_key].fields:
+                if name == related_object.field.name:
+                    field = field.clone()
+                    field.rel.to = "%s.%s" % (app_label, self.new_name)
+                new_fields.append((name, field))
+            state.models[related_key].fields = new_fields
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         old_apps = from_state.render()
@@ -123,23 +142,30 @@ class RenameModel(Operation):
         old_model = old_apps.get_model(app_label, self.old_name)
         new_model = new_apps.get_model(app_label, self.new_name)
         if router.allow_migrate(schema_editor.connection.alias, new_model):
+            # Move the main table
             schema_editor.alter_db_table(
                 new_model,
                 old_model._meta.db_table,
                 new_model._meta.db_table,
             )
+            # Alter the fields pointing to us
+            related_objects = old_model._meta.get_all_related_objects()
+            related_m2m_objects = old_model._meta.get_all_related_many_to_many_objects()
+            for related_object in (related_objects + related_m2m_objects):
+                to_field = new_apps.get_model(
+                    related_object.model._meta.app_label,
+                    related_object.model._meta.object_name.lower(),
+                )._meta.get_field_by_name(related_object.field.name)[0]
+                schema_editor.alter_field(
+                    related_object.model,
+                    related_object.field,
+                    to_field,
+                )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        old_apps = from_state.render()
-        new_apps = to_state.render()
-        old_model = old_apps.get_model(app_label, self.new_name)
-        new_model = new_apps.get_model(app_label, self.old_name)
-        if router.allow_migrate(schema_editor.connection.alias, new_model):
-            schema_editor.alter_db_table(
-                new_model,
-                old_model._meta.db_table,
-                new_model._meta.db_table,
-            )
+        self.new_name, self.old_name = self.old_name, self.new_name
+        self.database_forwards(app_label, schema_editor, from_state, to_state)
+        self.new_name, self.old_name = self.old_name, self.new_name
 
     def references_model(self, name, app_label=None):
         return (
