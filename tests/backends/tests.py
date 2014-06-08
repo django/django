@@ -686,7 +686,6 @@ class BackendTestCase(TestCase):
         reset_queries()
         self.assertEqual(0, len(connection.queries))
 
-
     # Unfortunately with sqlite3 the in-memory test database cannot be closed.
     @skipUnlessDBFeature('test_db_allows_multiple_connections')
     @override_settings(DEBUG=True)
