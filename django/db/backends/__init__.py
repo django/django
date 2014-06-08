@@ -43,9 +43,9 @@ class BaseDatabaseWrapper(object):
         # to disambiguate it from Django settings modules.
         self.settings_dict = settings_dict
         self.alias = alias
-        # Query logging in debug mode.
-        self.use_debug_cursor = None
+        # Query logging in debug mode or when explicitly enabled.
         self.queries_log = deque(maxlen=self.queries_limit)
+        self.use_debug_cursor = False
 
         # Transaction related attributes.
         # Tracks if the connection is in autocommit mode. Per PEP 249, by
@@ -156,8 +156,7 @@ class BaseDatabaseWrapper(object):
         Creates a cursor, opening a connection if necessary.
         """
         self.validate_thread_sharing()
-        if (self.use_debug_cursor or
-                (self.use_debug_cursor is None and settings.DEBUG)):
+        if self.use_debug_cursor or settings.DEBUG:
             cursor = self.make_debug_cursor(self._cursor())
         else:
             cursor = self.make_cursor(self._cursor())
