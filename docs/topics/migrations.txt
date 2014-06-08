@@ -491,10 +491,29 @@ Django can serialize the following:
 - Any class reference
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
+Django can serialize the following on Python 3 only:
+
+- Unbound methods used from within the class body (see below)
+
 Django cannot serialize:
 
 - Arbitrary class instances (e.g. ``MyClass(4.3, 5.7)``)
 - Lambdas
+
+Due to the fact ``__qualname__`` was only introduced in Python 3, Django can only
+serialize the following pattern (an unbound method used within the class body)
+on Python 3, and will fail to serialize a reference to it on Python 2::
+
+    class MyModel(models.Model):
+
+        def upload_to(self):
+            return "something dynamic"
+
+        my_file = models.FileField(upload_to=upload_to)
+
+If you are using Python 2, we recommend you move your methods for upload_to
+and similar arguments that accept callables (e.g. ``default``) to live in
+the main module body, rather than the class body.
 
 .. _custom-deconstruct-method:
 

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 import os
 import tokenize
+import unittest
 
 from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
@@ -14,6 +15,12 @@ from django.utils import datetime_safe, six
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import get_default_timezone
+
+
+class TestModel1(object):
+    def upload_to(self):
+        return "somewhere dynamic"
+    thing = models.FileField(upload_to=upload_to)
 
 
 class WriterTests(TestCase):
@@ -136,6 +143,26 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(empty_tuple)
         self.assertSerializedEqual(one_item_tuple)
         self.assertSerializedEqual(many_items_tuple)
+
+    @unittest.skipUnless(six.PY2, "Only applies on Python 2")
+    def test_serialize_direct_function_reference(self):
+        """
+        Ticket #22436: You cannot use a function straight from its body
+        (e.g. define the method and use it in the same body)
+        """
+        with self.assertRaises(ValueError):
+            self.serialize_round_trip(TestModel1.thing)
+
+    def test_serialize_local_function_reference(self):
+        """
+        Neither py2 or py3 can serialize a reference in a local scope.
+        """
+        class TestModel2(object):
+            def upload_to(self):
+                return "somewhere dynamic"
+            thing = models.FileField(upload_to=upload_to)
+        with self.assertRaises(ValueError):
+            self.serialize_round_trip(TestModel2.thing)
 
     def test_simple_migration(self):
         """
