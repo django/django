@@ -13,7 +13,7 @@ from django.db.utils import ProgrammingError
 from django.utils import six
 from django.utils.functional import cached_property
 
-from .models import GeometryColumns, SpatialRefSys
+from .models import PostGISGeometryColumns, PostGISSpatialRefSys
 
 
 #### Classes used in constructing PostGIS spatial SQL ####
@@ -571,7 +571,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
 
     # Routines for getting the OGC-compliant models.
     def geometry_columns(self):
-        return GeometryColumns
+        return PostGISGeometryColumns
 
     def spatial_ref_sys(self):
-        return SpatialRefSys
+        return PostGISSpatialRefSys
