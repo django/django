@@ -1544,3 +1544,9 @@ Reorganization of database test settings
 All database settings with a ``TEST_`` prefix have been deprecated in favor of
 entries in a :setting:`TEST <DATABASE-TEST>` dictionary in the database
 settings. The old settings will be supported until Django 1.9.
+
+FastCGI support
+~~~~~~~~~~~~~~~
+
+FastCGI support via the ``runfcgi`` management command will be removed in
+Django 1.9. Please deploy your project using WSGI.
