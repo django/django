@@ -22,10 +22,9 @@ class Command(NoArgsCommand):
         make_option('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
             help='Tells Django not to load any initial data after database synchronization.'),
     )
-    help = ('Returns the database to the state it was in immediately after '
-           'migrate was first executed. This means that all data will be removed '
-           'from the database, any post-migration handlers will be '
-           're-executed, and the initial_data fixture will be re-installed.')
+    help = ('Removes ALL DATA from the database, including data added during '
+           'migrations. Unmigrated apps will also have their initial_data '
+           'fixture reloaded. Does not achieve a "fresh install" state.')
 
     def handle_noargs(self, **options):
         database = options.get('database')
@@ -54,7 +53,7 @@ class Command(NoArgsCommand):
         if interactive:
             confirm = input("""You have requested a flush of the database.
 This will IRREVERSIBLY DESTROY all data currently in the %r database,
-and return each table to a fresh state.
+and return each table to an empty state.
 Are you sure you want to do this?
 
     Type 'yes' to continue, or 'no' to cancel: """ % connection.settings_dict['NAME'])
