@@ -1,195 +1,147 @@
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 
 
-class Country(models.Model):
-    name = models.CharField(max_length=50)
-
-
-class Person(models.Model):
-    name = models.CharField(max_length=10)
-    person_country = models.ForeignObject(Country,
-        from_fields=['person_country_id'], to_fields=['id'])
-
-
-@python_2_unicode_compatible
-class Musician(models.Model):
-    name = models.CharField(max_length=30)
-
-    def __str__(self):
-        return self.name
-
-
-@python_2_unicode_compatible
-class Group(models.Model):
-    name = models.CharField(max_length=30)
-    members = models.ManyToManyField(Musician)
-
-    def __str__(self):
-        return self.name
-
-
-class Quartet(Group):
+# DATA
+class RelatedConcreteData(models.Model):
     pass
 
 
-@python_2_unicode_compatible
-class OwnedVenue(models.Model):
-    name = models.CharField(max_length=30)
-    group = models.ForeignKey(Group)
-
-    def __str__(self):
-        return self.name
-
-
-@python_2_unicode_compatible
-class Reporter(models.Model):
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    raw_data = models.BinaryField()
-
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
-
-
-class ReporterProxy(Reporter):
-    class Meta:
-        proxy = True
-
-
-@python_2_unicode_compatible
-class Article(models.Model):
-    headline = models.CharField(max_length=100)
-    pub_date = models.DateField()
-    reporter = models.ForeignKey(Reporter)
-    reporter_proxy = models.ForeignKey(ReporterProxy, null=True,
-                                       related_name='reporter_proxy')
-
-    def __str__(self):
-        return self.headline
-
-# DATA
 class AbstractData(models.Model):
     class Meta:
         abstract = True
-    name = models.CharField(max_length=10)
-    origin = models.ForeignObject(Country,
-        from_fields=['person_country_id'], to_fields=['id'])
+    name_abstract = models.CharField(max_length=10)
 
 
-class Data(AbstractData):
-    name_data = models.CharField(max_length=10)
-
-
-class SuperData(Data):
-    name_super_data = models.CharField(max_length=10)
-    surname_super_data = models.CharField(max_length=10)
-    origin_super_data = models.ForeignObject(Reporter,
-        from_fields=['person_country_id'], to_fields=['id'])
-
-
-# M2M
-class AnotherSuperModel(models.Model):
-    name_super_m2m = models.CharField(max_length=10)
-
-
-class AnotherModel(models.Model):
-    name_m2m = models.CharField(max_length=10)
-
-
-class M2MModel(models.Model):
-    name_m2m = models.CharField(max_length=10)
-    members = models.ManyToManyField(AnotherModel)
-
-
-class SuperM2MModel(M2MModel):
-    members_super = models.ManyToManyField(AnotherSuperModel)
-
-
-# RELATED_OBJECTS
-class BaseRelatedModel(models.Model):
+class BaseData(AbstractData):
     name_base = models.CharField(max_length=10)
 
 
-class FirstRelatingObject(models.Model):
-    model_base_first = models.ForeignKey(BaseRelatedModel)
-
-
-class FirstRelatingHiddenObject(models.Model):
-    model_hidden_base_first = models.ForeignKey(BaseRelatedModel,
-                                                related_name='+')
-
-
-class RelatedModel(BaseRelatedModel):
+class Data(BaseData):
     name = models.CharField(max_length=10)
 
 
-class SecondRelatingObject(models.Model):
-    model_base_second = models.ForeignKey(RelatedModel)
+class ConcreteData(Data):
+    name_concrete = models.CharField(max_length=10)
+    non_concrete_relationship = models.ForeignObject(RelatedConcreteData,
+            from_fields=['non_concrete_id'], to_fields=['id'])
 
 
-class SecondRelatingHiddenObject(models.Model):
-    model_hidden_base_second = models.ForeignKey(RelatedModel,
-                                                 related_name='+')
+# M2M
+# M2M RELATIONS
+class RelAbstractM2M(models.Model):
+    pass
 
 
-class RelatedModelProxy(RelatedModel):
+class RelBaseM2M(models.Model):
+    pass
+
+
+class RelM2M(models.Model):
+    pass
+
+
+# M2M MODELS
+class AbstractM2M(models.Model):
+    m2m_abstract = models.ManyToManyField(RelAbstractM2M)
+
+    class Meta:
+        abstract = True
+
+
+class BaseM2M(AbstractM2M):
+    m2m_base = models.ManyToManyField(RelBaseM2M)
+
+
+class M2M(BaseM2M):
+    m2m = models.ManyToManyField(RelM2M)
+
+
+# RELATED_OBJECTS
+# RELATED_OBJECTS RELATIONS
+class RelBaseRelatedObjects(models.Model):
+    rel_base = models.ForeignKey('BaseRelatedObject')
+
+
+class RelRelatedObjects(models.Model):
+    rel = models.ForeignKey('RelatedObject')
+
+
+class RelHiddenRelatedObjects(models.Model):
+    rel_hidden = models.ForeignKey('HiddenRelatedObject',
+                                   related_name='+')
+
+
+class RelProxyRelatedObjects(models.Model):
+    rel_hidden = models.ForeignKey('ProxyRelatedObject')
+
+
+class RelProxyHiddenRelatedObjects(models.Model):
+    rel_hidden = models.ForeignKey('ProxyRelatedObject',
+                                   related_name='+')
+
+
+# RELATED_OBJECTS MODELS
+class BaseRelatedObject(models.Model):
+    pass
+
+
+class RelatedObject(BaseRelatedObject):
+    pass
+
+
+class HiddenRelatedObject(RelatedObject):
+    pass
+
+
+class ProxyRelatedObject(RelatedObject):
     class Meta:
         proxy = True
 
 
-class RelatingObjectToProxy(models.Model):
-    object_to_proxy = models.ForeignKey(RelatedModelProxy)
-
-
-class RelatingHiddenObjectToProxy(models.Model):
-    object_to_proxy_hidden = models.ForeignKey(RelatedModelProxy,
-                                               related_name='+')
-
-
 # RELATED_M2M
-class BaseRelatedM2MModel(models.Model):
-    name_base = models.CharField(max_length=10)
+# RELATED_M2M RELATIONS
+class RelBaseRelatedM2M(models.Model):
+    rel_base = models.ManyToManyField('BaseRelatedM2M')
 
 
-class M2MRelationToBaseM2MModel(models.Model):
-    relation_base = models.ManyToManyField(BaseRelatedM2MModel)
+class RelRelatedM2M(models.Model):
+    rel = models.ManyToManyField('RelatedM2M')
 
 
-class RelatedM2MModel(BaseRelatedM2MModel):
-    name = models.CharField(max_length=10)
-
-
-class M2MRelationToM2MModel(models.Model):
-    relation = models.ManyToManyField(RelatedM2MModel)
-
-
-class BareModel(models.Model):
+# RELATED_M2M MODELS
+class BaseRelatedM2M(models.Model):
     pass
 
 
-# CHAIN
-class A(models.Model):
+class RelatedM2M(BaseRelatedM2M):
     pass
 
 
-class B(A):
-    pass
+class RelatedM2MRecursiveAsymmetrical(models.Model):
+    name = models.CharField(max_length=50)
+    following = models.ManyToManyField(
+        'self', related_name='followers', symmetrical=False)
 
 
-class C(B):
-    pass
+class RelatedM2MRecursiveSymmetrical(models.Model):
+    name = models.CharField(max_length=50)
+    friends = models.ManyToManyField(
+        'self', related_name='friends', symmetrical=True)
 
 
-# VIRTUAL FIELDS
-class ModelWithGenericFK(models.Model):
+# VIRTUAL_FIELDS
+# VIRTUAL_FIELDS RELATIONS
+class RelVirtiual(models.Model):
+    generic_model = GenericRelation('ModelWithGenericFK')
+
+
+# VIRTUAL_FIELDS MODELS
+class Virtual(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
 
-class AGenericRelation(models.Model):
-    generic_model = GenericRelation(ModelWithGenericFK)
