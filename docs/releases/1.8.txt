@@ -273,6 +273,11 @@ Miscellaneous
 * Database connections are considered equal only if they're the same object.
   They aren't hashable any more.
 
+* :class:`~django.middleware.gzip.GZipMiddleware` used to disable compression
+  for some content types when the request is from Internet Explorer, in order
+  to work around a bug in IE6 and earlier. This behavior could affect
+  performance on IE7 and later. It was removed.
+
 * ``URLField.to_python`` no longer adds a trailing slash to pathless URLs.
 
 * ``django.contrib.gis`` dropped support for GEOS 3.1 and GDAL 1.6.
