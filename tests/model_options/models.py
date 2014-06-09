@@ -5,108 +5,57 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 
 
-class Country(models.Model):
-    name = models.CharField(max_length=50)
-
-
-class Person(models.Model):
-    name = models.CharField(max_length=10)
-    person_country = models.ForeignObject(Country,
-        from_fields=['person_country_id'], to_fields=['id'])
-
-
-@python_2_unicode_compatible
-class Musician(models.Model):
-    name = models.CharField(max_length=30)
-
-    def __str__(self):
-        return self.name
-
-
-@python_2_unicode_compatible
-class Group(models.Model):
-    name = models.CharField(max_length=30)
-    members = models.ManyToManyField(Musician)
-
-    def __str__(self):
-        return self.name
-
-
-class Quartet(Group):
+# DATA
+class RelatedConcreteData(models.Model):
     pass
 
 
-@python_2_unicode_compatible
-class OwnedVenue(models.Model):
-    name = models.CharField(max_length=30)
-    group = models.ForeignKey(Group)
-
-    def __str__(self):
-        return self.name
-
-
-@python_2_unicode_compatible
-class Reporter(models.Model):
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    raw_data = models.BinaryField()
-
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
-
-
-class ReporterProxy(Reporter):
-    class Meta:
-        proxy = True
-
-
-@python_2_unicode_compatible
-class Article(models.Model):
-    headline = models.CharField(max_length=100)
-    pub_date = models.DateField()
-    reporter = models.ForeignKey(Reporter)
-    reporter_proxy = models.ForeignKey(ReporterProxy, null=True,
-                                       related_name='reporter_proxy')
-
-    def __str__(self):
-        return self.headline
-
-# DATA
 class AbstractData(models.Model):
     class Meta:
         abstract = True
+    name_abstract = models.CharField(max_length=10)
+
+
+class BaseData(AbstractData):
+    name_base = models.CharField(max_length=10)
+
+
+class Data(BaseData):
     name = models.CharField(max_length=10)
-    origin = models.ForeignObject(Country,
-        from_fields=['person_country_id'], to_fields=['id'])
 
 
-class Data(AbstractData):
-    name_data = models.CharField(max_length=10)
-
-
-class SuperData(Data):
-    name_super_data = models.CharField(max_length=10)
-    surname_super_data = models.CharField(max_length=10)
-    origin_super_data = models.ForeignObject(Reporter,
-        from_fields=['person_country_id'], to_fields=['id'])
+class ConcreteData(Data):
+    name_concrete = models.CharField(max_length=10)
+    non_concrete_relationship = models.ForeignObject(RelatedConcreteData,
+            from_fields=['non_concrete_id'], to_fields=['id'])
 
 
 # M2M
-class AnotherSuperModel(models.Model):
-    name_super_m2m = models.CharField(max_length=10)
+
+# RELATIONS
+class RelatedAbstractM2M(models.Model):
+    pass
 
 
-class AnotherModel(models.Model):
-    name_m2m = models.CharField(max_length=10)
+class RelatedBaseM2M(models.Model):
+    pass
 
 
-class M2MModel(models.Model):
-    name_m2m = models.CharField(max_length=10)
-    members = models.ManyToManyField(AnotherModel)
+class RelatedM2M(models.Model):
+    pass
 
 
-class SuperM2MModel(M2MModel):
-    members_super = models.ManyToManyField(AnotherSuperModel)
+# MODELS
+class AbstractM2M(models.Model):
+    m2m_abstract = models.ManyToManyField(RelatedAbstractM2M)
+
+
+class BaseM2M(AbstractM2M):
+    m2m_base = models.ManyToManyField(RelatedBaseM2M)
+
+
+class M2M(BaseM2M):
+    m2m = models.ManyToManyField(RelatedM2M)
 
 
 # RELATED_OBJECTS
