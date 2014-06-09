@@ -93,22 +93,22 @@ class RelatedObjectsTests(OptionsBaseTests):
             'model_options:relhiddenrelatedobjects'
         ], (BaseRelatedObject, RelatedObject, None))
 
-    #def test_related_objects_include_hidden_local_only(self):
-        #objects = RelatedModel._meta.get_all_related_objects_with_model(
-            #include_hidden=True, local_only=True)
-        #self.eq_field_names_and_models(objects, [
-            #'model_options:secondrelatingobject',
-            #'model_options:secondrelatinghiddenobject'
-        #], [None, None])
+    def test_related_objects_include_hidden_local_only(self):
+        objects = HiddenRelatedObject._meta.get_all_related_objects_with_model(
+            include_hidden=True, local_only=True)
+        self.eq_field_names_and_models(objects, [
+            'model_options:relhiddenrelatedobjects'
+        ], (None,))
 
-    #def test_related_objects_proxy(self):
-        #objects = RelatedModel._meta.get_all_related_objects_with_model(
-            #include_proxy_eq=True)
-        #self.eq_field_names_and_models(objects, [
-            #'model_options:firstrelatingobject',
-            #'model_options:relatingobjecttoproxy',
-            #'model_options:secondrelatingobject'
-        #], [BaseRelatedModel, None, None])
+    def test_related_objects_proxy(self):
+        objects = RelatedObject._meta.get_all_related_objects_with_model(
+            include_proxy_eq=True)
+        self.eq_field_names_and_models(objects, [
+            'model_options:relbaserelatedobjects',
+            'model_options:relrelatedobjects',
+            'model_options:relproxyrelatedobjects',
+            'model_options:hiddenrelatedobject',
+        ], (BaseRelatedObject, None, None, None))
 
     #def test_related_objects_proxy_hidden(self):
         #objects = RelatedModel._meta.get_all_related_objects_with_model(
