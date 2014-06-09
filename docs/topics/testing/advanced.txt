@@ -485,7 +485,7 @@ django.db.connection.creation
 The creation module of the database backend also provides some utilities that
 can be useful during testing.
 
-.. function:: create_test_db([verbosity=1, autoclobber=False, keepdb=False, serialize=True])
+.. function:: create_test_db([verbosity=1, autoclobber=False, serialize=True, keepdb=False])
 
     Creates a new test database and runs ``migrate`` against it.
 
@@ -501,23 +501,31 @@ can be useful during testing.
     * If autoclobber is ``True``, the database will be destroyed
       without consulting the user.
 
-    ``keepdb`` determines if the test run should use an existing
-    database, or create a new one. If ``True``, the existing
-    database will be used, or created if not present. If ``False``,
-    a new database will be created, prompting the user to remove
-    the existing one, if present.
-
     ``serialize`` determines if Django serializes the database into an
     in-memory JSON string before running tests (used to restore the database
     state between tests if you don't have transactions). You can set this to
     False to significantly speed up creation time if you know you don't need
     data persistance outside of test fixtures.
 
+    ``keepdb`` determines if the test run should use an existing
+    database, or create a new one. If ``True``, the existing
+    database will be used, or created if not present. If ``False``,
+    a new database will be created, prompting the user to remove
+    the existing one, if present.
+
     Returns the name of the test database that it created.
 
     ``create_test_db()`` has the side effect of modifying the value of
     :setting:`NAME` in :setting:`DATABASES` to match the name of the test
     database.
+
+    .. versionchanged:: 1.7
+
+        The ``serialize`` argument was added.
+
+    .. versionchanged:: 1.8
+
+        The ``keepdb`` argument was added.
 
 .. function:: destroy_test_db(old_database_name, [verbosity=1, keepdb=False])
 
@@ -530,6 +538,10 @@ can be useful during testing.
 
     If the ``keepdb`` argument is ``True``, then the connection to the
     database will be closed, but the database will not be destroyed.
+
+    .. versionchanged:: 1.8
+
+        The ``keepdb`` argument was added.
 
 .. _topics-testing-code-coverage:
 
