@@ -1,27 +1,17 @@
 from django import test
+from collections import OrderedDict
 
-from django.db.models import CharField, ManyToManyField
+from django.db.models import fields
 from django.db.models.fields.related import (
-    ManyToManyRel, RelatedObject, OneToOneField
+    ManyToManyRel, ManyToManyField
 )
-
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
-)
-from django.contrib.auth.models import User
 
 from .models import (
-    AbstractData, BaseData, Data, ConcreteData,
-
-    AbstractM2M, BaseM2M, M2M,
-
-    BaseRelatedObject, RelatedObject,
-    ProxyRelatedObject, HiddenRelatedObject,
-
+    BaseData, Data, ConcreteData,
+    BaseM2M, M2M,
+    BaseRelatedObject, RelatedObject, HiddenRelatedObject,
     BaseRelatedM2M, RelatedM2M
 )
-
-from collections import OrderedDict
 
 
 class OptionsBaseTests(test.TestCase):
@@ -140,27 +130,22 @@ class RelatedM2MTests(OptionsBaseTests):
             'model_options:relrelatedm2m'
         ])
 
-    #def test_get_data_field(self):
-        #field_info = Musician._meta.get_field_by_name('name')
-        #self.assertEquals(field_info[1:], (None, True, False))
-        #self.assertTrue(isinstance(field_info[0], CharField))
+    def test_get_data_field(self):
+        field_info = Data._meta.get_field_by_name('name_abstract')
+        self.assertEquals(field_info[1:], (BaseData, True, False))
+        self.assertTrue(isinstance(field_info[0], fields.CharField))
 
-    #def test_get_m2m_field(self):
-        #field_info = Group._meta.get_field_by_name('members')
-        #self.assertEquals(field_info[1:], (None, True, True))
-        #self.assertTrue(isinstance(field_info[0], ManyToManyField))
+    def test_get_m2m_field(self):
+        field_info = M2M._meta.get_field_by_name('m2m_base')
+        self.assertEquals(field_info[1:], (BaseM2M, True, True))
+        self.assertTrue(isinstance(field_info[0], ManyToManyField))
 
-    #def test_get_related_object(self):
-        #field_info = Group._meta.get_field_by_name('ownedvenue')
-        #self.assertEquals(field_info[1:], (None, False, False))
+    def test_get_related_object(self):
+        field_info = RelatedObject._meta.get_field_by_name('relrelatedobjects')
+        self.assertEquals(field_info[1:], (None, False, False))
         #self.assertTrue(isinstance(field_info[0], RelatedObject))
 
-    #def test_get_related_m2m(self):
-        #field_info = Musician._meta.get_field_by_name('group')
-        #self.assertEquals(field_info[1:], (None, False, True))
+    def test_get_related_m2m(self):
+        field_info = RelatedM2M._meta.get_field_by_name('relrelatedm2m')
+        self.assertEquals(field_info[1:], (None, False, True))
         #self.assertTrue(isinstance(field_info[0], RelatedObject))
-
-    #def test_get_parent_field(self):
-        #field_info = SuperData._meta.get_field_by_name('name_data')
-        #self.assertEquals(field_info[1:], (Data, True, False))
-        #self.assertTrue(isinstance(field_info[0], CharField))
