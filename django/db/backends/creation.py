@@ -412,6 +412,7 @@ class BaseDatabaseCreation(object):
                 app_config.name not in settings.TEST_NON_SERIALIZED_APPS
             ):
                 app_list.append((app_config, None))
+
         # Make a function to iteratively return every object
         def get_objects():
             for model in sort_dependencies(app_list):
