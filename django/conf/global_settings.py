@@ -578,6 +578,10 @@ DEFAULT_EXCEPTION_REPORTER_FILTER = 'django.views.debug.SafeExceptionReporterFil
 # The name of the class to use to run the test suite
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
+# Apps that don't need to be serialized at test database creation time
+# (only apps with migrations are to start with)
+TEST_NON_SERIALIZED_APPS = []
+
 ############
 # FIXTURES #
 ############

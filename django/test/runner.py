@@ -298,7 +298,11 @@ def setup_databases(verbosity, interactive, keepdb=False, **kwargs):
             connection = connections[alias]
             if test_db_name is None:
                 test_db_name = connection.creation.create_test_db(
-                    verbosity, autoclobber=not interactive, keepdb=keepdb)
+                    verbosity,
+                    autoclobber=not interactive,
+                    keepdb=keepdb,
+                    serialize=connection.settings_dict.get("TEST_SERIALIZE", True),
+                )
                 destroy = True
             else:
                 connection.settings_dict['NAME'] = test_db_name

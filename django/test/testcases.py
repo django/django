@@ -756,8 +756,8 @@ class TransactionTestCase(SimpleTestCase):
     # If transactions aren't available, Django will serialize the database
     # contents into a fixture during setup and flush and reload them
     # during teardown (as flush does not restore data from migrations).
-    # This can be slow; this flag allows disabling on a per-case basis.
-    serialized_rollback = True
+    # This can be slow; this flag allows enabling on a per-case basis.
+    serialized_rollback = False
 
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
@@ -859,7 +859,7 @@ class TransactionTestCase(SimpleTestCase):
             # Restore the state of it from fixtures.
             # We need the apps to be correct for this one item, but other
             # teardown code may rely on it being limited still, so we reset it.
-            if self.serialized_rollback:
+            if self.serialized_rollback and hasattr(connections[db_name], "_test_serialized_contents"):
                 if self.available_apps is not None:
                     apps.unset_available_apps()
                 connections[db_name].creation.deserialize_db_from_string(

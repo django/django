@@ -337,7 +337,7 @@ class BaseDatabaseCreation(object):
             ";",
         ]
 
-    def create_test_db(self, verbosity=1, autoclobber=False, keepdb=False):
+    def create_test_db(self, verbosity=1, autoclobber=False, keepdb=False, serialize=True):
         """
         Creates a test database, prompting the user for confirmation if the
         database already exists. Returns the name of the test database created.
@@ -369,20 +369,46 @@ class BaseDatabaseCreation(object):
         settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
         self.connection.settings_dict["NAME"] = test_database_name
 
-        # Report migrate messages at one level lower than that requested.
+        # We report migrate messages at one level lower than that requested.
         # This ensures we don't get flooded with messages during testing
-        # (unless you really ask to be flooded)
-        call_command('migrate',
+        # (unless you really ask to be flooded).
+        # First off, only do the syncdb portion - we need to do this, then
+        # flush (to erase data inserted by custom SQL, as per #14661),
+        # then migrate with no syncdb, to load data in correctly.
+        call_command(
+            'migrate',
             verbosity=max(verbosity - 1, 0),
             interactive=False,
             database=self.connection.alias,
-            test_database=True)
+            test_database=True,
+            syncdb_only=True,
+        )
+
+        # We need to then do a flush to ensure that any data installed by
+        # custom SQL has been removed.
+        call_command(
+            'flush',
+            verbosity=max(verbosity - 1, 0),
+            interactive=False,
+            database=self.connection.alias
+        )
+
+        # We then call migrate again in migrate-only mode
+        call_command(
+            'migrate',
+            verbosity=max(verbosity - 1, 0),
+            interactive=False,
+            database=self.connection.alias,
+            test_database=True,
+            migrate_only=True,
+        )
 
         # We then serialize the current state of the database into a string
         # and store it on the connection. This slightly horrific process is so people
         # who are testing on databases without transactions or who are using
         # a TransactionTestCase still get a clean database on every test run.
-        self.connection._test_serialized_contents = self.serialize_db_to_string()
+        if serialize:
+            self.connection._test_serialized_contents = self.serialize_db_to_string()
 
         call_command('createcachetable', database=self.connection.alias)
 
@@ -398,12 +424,21 @@ class BaseDatabaseCreation(object):
         amounts of data.
         """
         # Build list of all apps to serialize
-        app_list = [(app_config, None) for app_config in apps.get_app_configs() if app_config.models_module is not None]
+        from django.db.migrations.loader import MigrationLoader
+        loader = MigrationLoader(self.connection)
+        app_list = []
+        for app_config in apps.get_app_configs():
+            if (
+                app_config.models_module is not None and
+                app_config.label in loader.migrated_apps and
+                app_config.name not in settings.TEST_NON_SERIALIZED_APPS
+            ):
+                app_list.append((app_config, None))
         # Make a function to iteratively return every object
         def get_objects():
             for model in sort_dependencies(app_list):
                 if not model._meta.proxy and router.allow_migrate(self.connection.alias, model):
-                    queryset = model.objects.using(self.connection.alias).order_by(model._meta.pk.name)
+                    queryset = model._default_manager.using(self.connection.alias).order_by(model._meta.pk.name)
                     for obj in queryset.iterator():
                         yield obj
         # Serialise to a string
