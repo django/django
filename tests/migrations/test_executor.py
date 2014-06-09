@@ -21,7 +21,6 @@ class ExecutorTests(MigrationTestBase):
         Tests running a simple set of migrations.
         """
         executor = MigrationExecutor(connection)
-        executor.recorder.flush()
         # Let's look at the plan first and make sure it's up to scratch
         plan = executor.migration_plan([("migrations", "0002_second")])
         self.assertEqual(
@@ -61,7 +60,6 @@ class ExecutorTests(MigrationTestBase):
         Tests running a squashed migration from zero (should ignore what it replaces)
         """
         executor = MigrationExecutor(connection)
-        executor.recorder.flush()
         # Check our leaf node is the squashed one
         leaves = [key for key in executor.loader.graph.leaf_nodes() if key[0] == "migrations"]
         self.assertEqual(leaves, [("migrations", "0001_squashed_0002")])
@@ -128,7 +126,9 @@ class ExecutorTests(MigrationTestBase):
         plan = executor.migration_plan([("migrations", "0002_second"), ("sessions", "0001_initial")])
         self.assertEqual(plan, [])
         # Erase all the fake records
-        executor.recorder.flush()
+        executor.recorder.record_unapplied("sessions", "0001_initial")
+        executor.recorder.record_unapplied("migrations", "0002_second")
+        executor.recorder.record_unapplied("migrations", "0001_initial")
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_soft_apply(self):
@@ -140,7 +140,6 @@ class ExecutorTests(MigrationTestBase):
         def fake_storer(phase, migration, fake):
             state["faked"] = fake
         executor = MigrationExecutor(connection, progress_callback=fake_storer)
-        executor.recorder.flush()
         # Were the tables there before?
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
