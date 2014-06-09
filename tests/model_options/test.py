@@ -24,7 +24,7 @@ from collections import OrderedDict
 
 class OptionsBaseTests(test.TestCase):
     def eq_field_names_and_models(self, objects, names_eq, models_eq):
-        fields, models = dict(objects).keys(), dict(objects).values()
+        fields, models = zip(*objects)
         self.assertEquals([f.name for f in fields], names_eq)
         self.assertEquals(models, models_eq)
 
@@ -71,27 +71,27 @@ class RelatedObjectsTests(OptionsBaseTests):
     def test_related_objects(self):
         objects = RelatedObject._meta.get_all_related_objects_with_model()
         self.eq_field_names_and_models(objects, [
-            'model_options:hiddenrelatedobject',
             'model_options:relbaserelatedobjects',
-            'model_options:relrelatedobjects'
-        ], [None, BaseRelatedObject, None])
+            'model_options:relrelatedobjects',
+            u'model_options:hiddenrelatedobject'
+        ], (BaseRelatedObject, None, None))
 
-    #def test_related_objects_local(self):
-        #objects = RelatedModel._meta.get_all_related_objects_with_model(
-            #local_only=True)
-        #self.eq_field_names_and_models(objects, [
-            #'model_options:secondrelatingobject'
-        #], [None])
+    def test_related_objects_local(self):
+        objects = RelatedObject._meta.get_all_related_objects_with_model(
+            local_only=True)
+        self.eq_field_names_and_models(objects, [
+            'model_options:relrelatedobjects',
+            'model_options:hiddenrelatedobject'
+        ], (None, None))
 
-    #def test_related_objects_include_hidden(self):
-        #objects = RelatedModel._meta.get_all_related_objects_with_model(
-            #include_hidden=True)
-        #self.eq_field_names_and_models(objects, [
-            #'model_options:firstrelatingobject',
-            #'model_options:secondrelatinghiddenobject',
-            #'model_options:firstrelatinghiddenobject',
-            #'model_options:secondrelatingobject'
-        #], [BaseRelatedModel, None, BaseRelatedModel, None])
+    def test_related_objects_include_hidden(self):
+        objects = HiddenRelatedObject._meta.get_all_related_objects_with_model(
+            include_hidden=True)
+        self.eq_field_names_and_models(objects, [
+            'model_options:relbaserelatedobjects',
+            'model_options:relrelatedobjects',
+            'model_options:relhiddenrelatedobjects'
+        ], (BaseRelatedObject, RelatedObject, None))
 
     #def test_related_objects_include_hidden_local_only(self):
         #objects = RelatedModel._meta.get_all_related_objects_with_model(
