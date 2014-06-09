@@ -247,6 +247,9 @@ details on these changes.
 * Support for the syntax of ``{% cycle %}`` that uses comma-separated arguments
   will be removed.
 
+* The warning that :class:`~django.core.signing.Signer` issues when given an
+  invalid separator will become an exception.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
