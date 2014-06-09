@@ -63,7 +63,7 @@ class M2MTests(OptionsBaseTests):
 
     def test_many_to_many_with_model(self):
         models = OrderedDict(M2M._meta.get_m2m_with_model()).values()
-        self.assertEquals(models, [AbstractM2M, BaseM2M, None])
+        self.assertEquals(models, [BaseM2M, BaseM2M, None])
 
 
 class RelatedObjectsTests(OptionsBaseTests):
