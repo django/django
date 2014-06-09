@@ -613,16 +613,6 @@ class GZipMiddlewareTest(TestCase):
         self.assertEqual(r.content, self.compressible_string)
         self.assertEqual(r.get('Content-Encoding'), 'deflate')
 
-    def test_no_compress_ie_js_requests(self):
-        """
-        Tests that compression isn't performed on JavaScript requests from Internet Explorer.
-        """
-        self.req.META['HTTP_USER_AGENT'] = 'Mozilla/4.0 (compatible; MSIE 5.00; Windows 98)'
-        self.resp['Content-Type'] = 'application/javascript; charset=UTF-8'
-        r = GZipMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(r.content, self.compressible_string)
-        self.assertEqual(r.get('Content-Encoding'), None)
-
     def test_no_compress_uncompressible_response(self):
         """
         Tests that compression isn't performed on responses with uncompressible content.

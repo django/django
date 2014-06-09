@@ -108,11 +108,6 @@ It will NOT compress content if any of the following are true:
 * The request (the browser) hasn't sent an ``Accept-Encoding`` header
   containing ``gzip``.
 
-* The request is from Internet Explorer and the ``Content-Type`` header
-  contains ``javascript`` or starts with anything other than ``text/``.
-  We do this to avoid a bug in early versions of IE that caused decompression
-  not to be performed on certain content types.
-
 You can apply GZip compression to individual views using the
 :func:`~django.views.decorators.gzip.gzip_page()` decorator.
 
