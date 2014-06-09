@@ -331,12 +331,9 @@ class AdminSite(object):
             'current_app': self.name,
             'extra_context': dict(
                 self.each_context(),
-                has_permission=self.has_permission(request),
                 **(extra_context or {})
             ),
         }
-        # We don't want user-tools on logout page
-        defaults['extra_context']['has_permission'] = False
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
         return logout(request, **defaults)
