@@ -31,8 +31,7 @@ class ConcreteData(Data):
 
 
 # M2M
-
-# RELATIONS
+# M2M RELATIONS
 class RelatedAbstractM2M(models.Model):
     pass
 
@@ -45,9 +44,12 @@ class RelatedM2M(models.Model):
     pass
 
 
-# MODELS
+# M2M MODELS
 class AbstractM2M(models.Model):
     m2m_abstract = models.ManyToManyField(RelatedAbstractM2M)
+
+    class Meta:
+        abstract = True
 
 
 class BaseM2M(AbstractM2M):
@@ -59,44 +61,40 @@ class M2M(BaseM2M):
 
 
 # RELATED_OBJECTS
-class BaseRelatedModel(models.Model):
-    name_base = models.CharField(max_length=10)
+# RELATED_OBJECTS RELATIONS
+class RelBaseRelatedObjects(models.Model):
+    rel_base = models.ForeignKey('BaseRelatedObject')
 
 
-class FirstRelatingObject(models.Model):
-    model_base_first = models.ForeignKey(BaseRelatedModel)
+class RelRelatedObjects(models.Model):
+    rel = models.ForeignKey('RelatedObject')
 
 
-class FirstRelatingHiddenObject(models.Model):
-    model_hidden_base_first = models.ForeignKey(BaseRelatedModel,
-                                                related_name='+')
+class RelHiddenRelatedObjects(models.Model):
+    rel_hidden = models.ForeignKey('HiddenRelatedObject',
+                                   related_name='+')
 
 
-class RelatedModel(BaseRelatedModel):
-    name = models.CharField(max_length=10)
+class RelProxyRelatedObjects(models.Model):
+    rel_hidden = models.ForeignKey('ProxyRelatedObject')
 
 
-class SecondRelatingObject(models.Model):
-    model_base_second = models.ForeignKey(RelatedModel)
+# RELATED_OBJECTS MODELS
+class BaseRelatedObject(models.Model):
+    pass
 
 
-class SecondRelatingHiddenObject(models.Model):
-    model_hidden_base_second = models.ForeignKey(RelatedModel,
-                                                 related_name='+')
+class RelatedObject(BaseRelatedObject):
+    pass
 
 
-class RelatedModelProxy(RelatedModel):
+class HiddenRelatedObject(RelatedObject):
+    pass
+
+
+class ProxyRelatedObject(RelatedObject):
     class Meta:
         proxy = True
-
-
-class RelatingObjectToProxy(models.Model):
-    object_to_proxy = models.ForeignKey(RelatedModelProxy)
-
-
-class RelatingHiddenObjectToProxy(models.Model):
-    object_to_proxy_hidden = models.ForeignKey(RelatedModelProxy,
-                                               related_name='+')
 
 
 # RELATED_M2M

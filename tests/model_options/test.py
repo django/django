@@ -12,7 +12,11 @@ from django.contrib.auth.models import User
 
 from .models import (
     AbstractData, BaseData, Data, ConcreteData,
-    AbstractM2M, BaseM2M, M2M
+
+    AbstractM2M, BaseM2M, M2M,
+
+    BaseRelatedObject, RelatedObject,
+    ProxyRelatedObject, HiddenRelatedObject
 )
 
 from collections import OrderedDict
@@ -47,6 +51,9 @@ class DataTests(OptionsBaseTests):
         self.assertTrue(all([f.column is not None
                              for f in fields]))
 
+
+class M2MTests(OptionsBaseTests):
+
     def test_many_to_many(self):
         fields = M2M._meta.many_to_many
         self.assertEquals([f.attname for f in fields], [
@@ -58,12 +65,16 @@ class DataTests(OptionsBaseTests):
         models = OrderedDict(M2M._meta.get_m2m_with_model()).values()
         self.assertEquals(models, [AbstractM2M, BaseM2M, None])
 
-    #def test_related_objects(self):
-        #objects = RelatedModel._meta.get_all_related_objects_with_model()
-        #self.eq_field_names_and_models(objects, [
-            #'model_options:firstrelatingobject',
-            #'model_options:secondrelatingobject',
-        #], [BaseRelatedModel, None])
+
+class RelatedObjectsTests(OptionsBaseTests):
+
+    def test_related_objects(self):
+        objects = RelatedObject._meta.get_all_related_objects_with_model()
+        self.eq_field_names_and_models(objects, [
+            'model_options:hiddenrelatedobject',
+            'model_options:relbaserelatedobjects',
+            'model_options:relrelatedobjects'
+        ], [None, BaseRelatedObject, None])
 
     #def test_related_objects_local(self):
         #objects = RelatedModel._meta.get_all_related_objects_with_model(
