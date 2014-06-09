@@ -504,18 +504,21 @@ can be useful during testing.
     * If autoclobber is ``True``, the database will be destroyed
       without consulting the user.
 
-
     ``serialize`` determines if Django serializes the database into an
     in-memory JSON string before running tests (used to restore the database
     state between tests if you don't have transactions). You can set this to
     False to significantly speed up creation time if you know you don't need
-    data persistance outside of test fixtures.
+    data persistence outside of test fixtures.
 
     Returns the name of the test database that it created.
 
     ``create_test_db()`` has the side effect of modifying the value of
     :setting:`NAME` in :setting:`DATABASES` to match the name of the test
     database.
+
+    .. versionchanged:: 1.7
+
+        The ``serialize`` argument was added.
 
 .. function:: destroy_test_db(old_database_name, [verbosity=1])
 
