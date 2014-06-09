@@ -1,10 +1,7 @@
 from django import test
 from collections import OrderedDict
 
-from django.db.models import fields
-from django.db.models.fields.related import (
-    ManyToManyRel, ManyToManyField
-)
+from django.db.models.fields import related, CharField
 
 from .models import (
     BaseData, Data, ConcreteData,
@@ -33,8 +30,8 @@ class DataTests(OptionsBaseTests):
         fields = Data._meta.local_fields
         self.assertEquals([f.attname for f in fields], [
                           u'basedata_ptr_id', 'name'])
-        self.assertTrue(all([f.rel is None or not isinstance(f.rel, ManyToManyRel)
-                             for f in fields]))
+        self.assertTrue(all([f.rel is None or not isinstance(f.rel,
+                        related.ManyToManyRel) for f in fields]))
 
     def test_local_concrete_fields(self):
         fields = ConcreteData._meta.local_concrete_fields
@@ -50,7 +47,7 @@ class M2MTests(OptionsBaseTests):
         fields = M2M._meta.many_to_many
         self.assertEquals([f.attname for f in fields], [
                           'm2m_abstract', 'm2m_base', 'm2m'])
-        self.assertTrue(all([isinstance(f.rel, ManyToManyRel)
+        self.assertTrue(all([isinstance(f.rel, related.ManyToManyRel)
                              for f in fields]))
 
     def test_many_to_many_with_model(self):
@@ -133,19 +130,19 @@ class RelatedM2MTests(OptionsBaseTests):
     def test_get_data_field(self):
         field_info = Data._meta.get_field_by_name('name_abstract')
         self.assertEquals(field_info[1:], (BaseData, True, False))
-        self.assertTrue(isinstance(field_info[0], fields.CharField))
+        self.assertTrue(isinstance(field_info[0], CharField))
 
     def test_get_m2m_field(self):
         field_info = M2M._meta.get_field_by_name('m2m_base')
         self.assertEquals(field_info[1:], (BaseM2M, True, True))
-        self.assertTrue(isinstance(field_info[0], ManyToManyField))
+        self.assertTrue(isinstance(field_info[0], related.ManyToManyField))
 
     def test_get_related_object(self):
         field_info = RelatedObject._meta.get_field_by_name('relrelatedobjects')
         self.assertEquals(field_info[1:], (None, False, False))
-        #self.assertTrue(isinstance(field_info[0], RelatedObject))
+        self.assertTrue(isinstance(field_info[0], related.RelatedObject))
 
     def test_get_related_m2m(self):
         field_info = RelatedM2M._meta.get_field_by_name('relrelatedm2m')
         self.assertEquals(field_info[1:], (None, False, True))
-        #self.assertTrue(isinstance(field_info[0], RelatedObject))
+        self.assertTrue(isinstance(field_info[0], related.RelatedObject))
