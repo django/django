@@ -199,8 +199,9 @@ model::
         # We get the model from the versioned app registry;
         # if we directly import it, it'll be the wrong version
         Country = apps.get_model("myapp", "Country")
-        Country.objects.create(name="USA", code="us")
-        Country.objects.create(name="France", code="fr")
+        db_alias = schema_editor.connection.alias
+        Country.objects.create(name="USA", code="us", using=db_alias)
+        Country.objects.create(name="France", code="fr", using=db_alias)
 
     class Migration(migrations.Migration):
 
@@ -235,6 +236,14 @@ on databases that do not support DDL transactions (for example, MySQL and
 Oracle). This should be safe, but may cause a crash if you attempt to use
 the ``schema_editor`` provided on these backends; in this case, please
 set ``atomic=False``.
+
+.. warning::
+
+    RunPython does not magically alter the connection of the models for you;
+    any model methods you call will go to the default database unless you
+    give them the current database alias (available from
+    ``schema_editor.connection.alias``, where ``schema_editor`` is the second
+    argument to your function).
 
 SeparateDatabaseAndState
 ------------------------

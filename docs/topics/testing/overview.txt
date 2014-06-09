@@ -234,6 +234,33 @@ the Django test runner reorders tests in the following way:
     database by a given :class:`~django.test.TransactionTestCase` test, they
     must be updated to be able to run independently.
 
+.. _test-case-serialized-rollback:
+
+Rollback emulation
+------------------
+
+Any initial data loaded in migrations will only be available in ``TestCase``
+tests and not in ``TransactionTestCase`` tests, and additionally only on
+backends where transactions are supported (the most important exception being
+MyISAM).
+
+Django can re-load that data for you on a per-testcase basis by
+setting the ``serialized_rollback`` option to ``True`` in the body of the
+``TestCase`` or ``TransactionTestCase``, but note that this will slow down
+that test suite by approximately 3x.
+
+Third-party apps or those developing against MyISAM will need to set this;
+in general, however, you should be developing your own projects against a
+transactional database and be using ``TestCase`` for most tests, and thus
+not need this setting.
+
+The initial serialization is usually very quick, but if you wish to exclude
+some apps from this process (and speed up test runs slightly), you may add
+those apps to :setting:`TEST_NON_SERIALIZED_APPS`.
+
+Apps without migrations are not affected; ``initial_data`` fixtures are
+reloaded as usual.
+
 Other test conditions
 ---------------------
 
@@ -248,6 +275,7 @@ tests in production because, unlike databases, a separate "test cache" is not
 used. This behavior `may change`_ in the future.
 
 .. _may change: https://code.djangoproject.com/ticket/11505
+
 
 Understanding the test output
 -----------------------------

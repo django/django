@@ -753,6 +753,12 @@ class TransactionTestCase(SimpleTestCase):
     # Subclasses can define fixtures which will be automatically installed.
     fixtures = None
 
+    # If transactions aren't available, Django will serialize the database
+    # contents into a fixture during setup and flush and reload them
+    # during teardown (as flush does not restore data from migrations).
+    # This can be slow; this flag allows enabling on a per-case basis.
+    serialized_rollback = False
+
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
 
@@ -808,6 +814,17 @@ class TransactionTestCase(SimpleTestCase):
             if self.reset_sequences:
                 self._reset_sequences(db_name)
 
+            # If we need to provide replica initial data from migrated apps,
+            # then do so.
+            if self.serialized_rollback and hasattr(connections[db_name], "_test_serialized_contents"):
+                if self.available_apps is not None:
+                    apps.unset_available_apps()
+                connections[db_name].creation.deserialize_db_from_string(
+                    connections[db_name]._test_serialized_contents
+                )
+                if self.available_apps is not None:
+                    apps.set_available_apps(self.available_apps)
+
             if self.fixtures:
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
@@ -844,11 +861,13 @@ class TransactionTestCase(SimpleTestCase):
         # Allow TRUNCATE ... CASCADE and don't emit the post_migrate signal
         # when flushing only a subset of the apps
         for db_name in self._databases_names(include_mirrors=False):
+            # Flush the database
             call_command('flush', verbosity=0, interactive=False,
                          database=db_name, skip_checks=True,
                          reset_sequences=False,
                          allow_cascade=self.available_apps is not None,
                          inhibit_post_migrate=self.available_apps is not None)
+
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
         items = six.moves.map(transform, qs)
