@@ -2083,17 +2083,19 @@ The name of the class to use for starting the test suite. See
 TEST_NON_SERIALIZED_APPS
 ------------------------
 
+.. versionadded:: 1.7
+
 Default: ``[]``
 
-In order to restore the database state between tests for TransactionTestCases
-and database backends without transactions, Django will :ref:`serialize the
-contents of all apps with migrations <test-case-serialized-rollback>` when it
-starts the test run so it can then reload from that copy before tests that
-need it.
+In order to restore the database state between tests for
+``TransactionTestCase``\s and database backends without transactions, Django
+will :ref:`serialize the contents of all apps with migrations
+<test-case-serialized-rollback>` when it starts the test run so it can then
+reload from that copy before tests that need it.
 
 This slows down the startup time of the test runner; if you have apps that
 you know don't need this feature, you can add their full names in here (e.g.
-``django.contrib.contenttypes``) to exclude them from this serialization
+``'django.contrib.contenttypes'``) to exclude them from this serialization
 process.
 
 .. setting:: THOUSAND_SEPARATOR
@@ -3001,6 +3003,7 @@ Templates
 Testing
 -------
 * Database: :setting:`TEST <DATABASE-TEST>`
+* :setting:`TEST_NON_SERIALIZED_APPS`
 * :setting:`TEST_RUNNER`
 
 URLs
