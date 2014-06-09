@@ -280,6 +280,8 @@ Miscellaneous
 * The :tfilter:`length` template filter now returns ``0`` for an undefined
   variable, rather than an empty string.
 
+* Support for SpatiaLite < 2.4 has been dropped.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
