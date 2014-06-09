@@ -15,6 +15,8 @@ from .models import (
     AbstractM2M, BaseM2M, M2M
 )
 
+from collections import OrderedDict
+
 
 class OptionsBaseTests(test.TestCase):
     def eq_field_names_and_models(self, objects, names_eq, models_eq):
@@ -45,20 +47,16 @@ class DataTests(OptionsBaseTests):
         self.assertTrue(all([f.column is not None
                              for f in fields]))
 
-    #def test_many_to_many(self):
-        #fields = SuperM2MModel._meta.many_to_many
-        #self.assertEquals([f.attname for f in fields], [
-            #'members',
-            #'members_super'
-        #])
-        #self.assertTrue(all([isinstance(f.rel, ManyToManyRel)
-                             #for f in fields]))
+    def test_many_to_many(self):
+        fields = M2M._meta.many_to_many
+        self.assertEquals([f.attname for f in fields], [
+                          'm2m_abstract', 'm2m_base', 'm2m'])
+        self.assertTrue(all([isinstance(f.rel, ManyToManyRel)
+                             for f in fields]))
 
-    #def test_many_to_many_with_model(self):
-        #models = dict(SuperM2MModel._meta.get_m2m_with_model()).values()
-        #self.assertEquals(len(models), 2)
-        #self.assertEquals(models[0], M2MModel)
-        #self.assertEquals(models[1], None)
+    def test_many_to_many_with_model(self):
+        models = OrderedDict(M2M._meta.get_m2m_with_model()).values()
+        self.assertEquals(models, [AbstractM2M, BaseM2M, None])
 
     #def test_related_objects(self):
         #objects = RelatedModel._meta.get_all_related_objects_with_model()
