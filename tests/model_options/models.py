@@ -79,6 +79,11 @@ class RelProxyRelatedObjects(models.Model):
     rel_hidden = models.ForeignKey('ProxyRelatedObject')
 
 
+class RelProxyHiddenRelatedObjects(models.Model):
+    rel_hidden = models.ForeignKey('ProxyRelatedObject',
+                                   related_name='+')
+
+
 # RELATED_OBJECTS MODELS
 class BaseRelatedObject(models.Model):
     pass

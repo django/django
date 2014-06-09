@@ -110,18 +110,16 @@ class RelatedObjectsTests(OptionsBaseTests):
             'model_options:hiddenrelatedobject',
         ], (BaseRelatedObject, None, None, None))
 
-    #def test_related_objects_proxy_hidden(self):
-        #objects = RelatedModel._meta.get_all_related_objects_with_model(
-            #include_proxy_eq=True, include_hidden=True)
-        #self.eq_field_names_and_models(objects, [
-            #'model_options:relatinghiddenobjecttoproxy',
-            #'model_options:secondrelatingobject',
-            #'model_options:firstrelatingobject',
-            #'model_options:firstrelatinghiddenobject',
-            #'model_options:secondrelatinghiddenobject',
-            #'model_options:relatingobjecttoproxy'
-        #], [None, None, BaseRelatedModel, BaseRelatedModel,
-            #None, None])
+    def test_related_objects_proxy_hidden(self):
+        objects = RelatedObject._meta.get_all_related_objects_with_model(
+            include_proxy_eq=True, include_hidden=True)
+        self.eq_field_names_and_models(objects, [
+            'model_options:relbaserelatedobjects',
+            'model_options:relrelatedobjects',
+            'model_options:relproxyrelatedobjects',
+            'model_options:relproxyhiddenrelatedobjects',
+            'model_options:hiddenrelatedobject',
+        ], (BaseRelatedObject, None, None, None, None))
 
     #def test_related_m2m_with_model(self):
         #objects = RelatedM2MModel._meta.get_all_related_m2m_objects_with_model()
