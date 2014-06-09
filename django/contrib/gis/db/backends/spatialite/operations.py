@@ -140,17 +140,15 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
                 'database (error was "%s").  Was the SpatiaLite initialization '
                 'SQL loaded on this database?') % (self.connection.settings_dict['NAME'], msg)
             six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
-        if version < (2, 3, 0):
+        if version < (2, 4, 0):
             raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions '
-                                       '2.3.0 and above')
+                                       '2.4.0 and above')
         return version
 
     @property
     def _version_greater_2_4_0_rc4(self):
         if self.spatial_version >= (2, 4, 1):
             return True
-        elif self.spatial_version < (2, 4, 0):
-            return False
         else:
             # Spatialite 2.4.0-RC4 added AsGML and AsKML, however both
             # RC2 (shipped in popular Debian/Ubuntu packages) and RC4
@@ -274,24 +272,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         Returns the SpatiaLite version as a tuple (version string, major,
         minor, subminor).
         """
-        # Getting the SpatiaLite version.
-        try:
-            version = self.spatialite_version()
-        except DatabaseError:
-            # The `spatialite_version` function first appeared in version 2.3.1
-            # of SpatiaLite, so doing a fallback test for 2.3.0 (which is
-            # used by popular Debian/Ubuntu packages).
-            version = None
-            try:
-                tmp = self._get_spatialite_func("X(GeomFromText('POINT(1 1)'))")
-                if tmp == 1.0:
-                    version = '2.3.0'
-            except DatabaseError:
-                pass
-            # If no version string defined, then just re-raise the original
-            # exception.
-            if version is None:
-                raise
+        version = self.spatialite_version()
 
         m = self.version_regex.match(version)
         if m:
