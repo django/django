@@ -1393,7 +1393,7 @@ class ModelAdmin(BaseModelAdmin):
         for inline_formset in inline_formsets:
             media = media + inline_formset.media
 
-        context = dict(self.admin_site.each_context(request),
+        context = dict(self.admin_site.each_context(),
             title=(_('Add %s') if add else _('Change %s')) % force_text(opts.verbose_name),
             adminform=adminForm,
             object_id=object_id,
@@ -1406,6 +1406,7 @@ class ModelAdmin(BaseModelAdmin):
             inline_admin_formsets=inline_formsets,
             errors=helpers.AdminErrorList(form, formsets),
             preserved_filters=self.get_preserved_filters(request),
+            has_permission=self.admin_site.has_permission(request),
         )
 
         context.update(extra_context or {})
@@ -1550,7 +1551,7 @@ class ModelAdmin(BaseModelAdmin):
             'All %(total_count)s selected', cl.result_count)
 
         context = dict(
-            self.admin_site.each_context(request),
+            self.admin_site.each_context(),
             module_name=force_text(opts.verbose_name_plural),
             selection_note=_('0 of %(cnt)s selected') % {'cnt': len(cl.result_list)},
             selection_note_all=selection_note_all % {'total_count': cl.result_count},
@@ -1566,6 +1567,7 @@ class ModelAdmin(BaseModelAdmin):
             actions_on_bottom=self.actions_on_bottom,
             actions_selection_counter=self.actions_selection_counter,
             preserved_filters=self.get_preserved_filters(request),
+            has_permission=self.admin_site.has_permission(request),
         )
         context.update(extra_context or {})
 
@@ -1617,7 +1619,7 @@ class ModelAdmin(BaseModelAdmin):
             title = _("Are you sure?")
 
         context = dict(
-            self.admin_site.each_context(request),
+            self.admin_site.each_context(),
             title=title,
             object_name=object_name,
             object=obj,
@@ -1627,6 +1629,7 @@ class ModelAdmin(BaseModelAdmin):
             opts=opts,
             app_label=app_label,
             preserved_filters=self.get_preserved_filters(request),
+            has_permission=self.admin_site.has_permission(request),
         )
         context.update(extra_context or {})
 
@@ -1650,13 +1653,14 @@ class ModelAdmin(BaseModelAdmin):
             content_type=get_content_type_for_model(model)
         ).select_related().order_by('action_time')
 
-        context = dict(self.admin_site.each_context(request),
+        context = dict(self.admin_site.each_context(),
             title=_('Change history: %s') % force_text(obj),
             action_list=action_list,
             module_name=capfirst(force_text(opts.verbose_name_plural)),
             object=obj,
             opts=opts,
             preserved_filters=self.get_preserved_filters(request),
+            has_permission=self.admin_site.has_permission(request),
         )
         context.update(extra_context or {})
         return TemplateResponse(request, self.object_history_template or [

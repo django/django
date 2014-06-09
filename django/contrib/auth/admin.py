@@ -156,8 +156,9 @@ class UserAdmin(admin.ModelAdmin):
             'original': user,
             'save_as': False,
             'show_save': True,
+            'has_permission': admin.site.has_permission(request),
         }
-        context.update(admin.site.each_context(request))
+        context.update(admin.site.each_context())
         return TemplateResponse(request,
             self.change_user_password_template or
             'admin/auth/user/change_password.html',
