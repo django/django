@@ -488,7 +488,7 @@ django.db.connection.creation
 The creation module of the database backend also provides some utilities that
 can be useful during testing.
 
-.. function:: create_test_db([verbosity=1, autoclobber=False])
+.. function:: create_test_db([verbosity=1, autoclobber=False, serialize=True])
 
     Creates a new test database and runs ``migrate`` against it.
 
@@ -503,6 +503,13 @@ can be useful during testing.
 
     * If autoclobber is ``True``, the database will be destroyed
       without consulting the user.
+
+
+    ``serialize`` determines if Django serializes the database into an
+    in-memory JSON string before running tests (used to restore the database
+    state between tests if you don't have transactions). You can set this to
+    False to significantly speed up creation time if you know you don't need
+    data persistance outside of test fixtures.
 
     Returns the name of the test database that it created.
 

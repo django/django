@@ -27,7 +27,7 @@ class Command(BaseCommand):
         addrport = options.get('addrport')
 
         # Create a test database.
-        db_name = connection.creation.create_test_db(verbosity=verbosity, autoclobber=not interactive)
+        db_name = connection.creation.create_test_db(verbosity=verbosity, autoclobber=not interactive, serialize=False)
 
         # Import the fixture data into the test database.
         call_command('loaddata', *fixture_labels, **{'verbosity': verbosity})
