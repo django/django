@@ -951,6 +951,9 @@ Miscellaneous
   ``django.utils.feedgenerator.RssFeed.mime_type`` attributes are deprecated in
   favor of ``content_type``.
 
+* :class:`~django.core.signing.Signer` now issues a warning if an invalid
+  separator is used. This will become an exception in Django 1.10.
+
 .. removed-features-1.9:
 
 Features removed in 1.9
