@@ -79,7 +79,7 @@ class AutodetectorTests(TestCase):
     def assertNumberMigrations(self, changes, app_label, number):
         if len(changes.get(app_label, [])) != number:
             self.fail("Incorrect number of migrations (%s) for %s (expected %s)\n%s" % (
-                len(changes[app_label]),
+                len(changes.get(app_label, [])),
                 app_label,
                 number,
                 self.repr_changes(changes),
@@ -705,6 +705,20 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AddField")
         self.assertEqual(action.name, "publishers")
+
+    def test_create_with_through_model(self):
+        """
+        Adding a m2m with a through model and the models that use it should
+        be ordered correctly.
+        """
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_with_m2m_through, self.publisher, self.contract])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        # Right actions in right order?
+        self.assertOperationTypes(changes, "testapp", 0, ["CreateModel", "CreateModel", "CreateModel", "AddField", "AddField"])
 
     def test_many_to_many_removed_before_through_model(self):
         """
