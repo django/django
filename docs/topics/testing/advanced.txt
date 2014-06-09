@@ -505,7 +505,7 @@ can be useful during testing.
     in-memory JSON string before running tests (used to restore the database
     state between tests if you don't have transactions). You can set this to
     False to significantly speed up creation time if you know you don't need
-    data persistance outside of test fixtures.
+    data persistence outside of test fixtures.
 
     ``keepdb`` determines if the test run should use an existing
     database, or create a new one. If ``True``, the existing

@@ -239,7 +239,7 @@ set ``atomic=False``.
 
 .. warning::
 
-    RunPython does not magically alter the connection of the models for you;
+    ``RunPython`` does not magically alter the connection of the models for you;
     any model methods you call will go to the default database unless you
     give them the current database alias (available from
     ``schema_editor.connection.alias``, where ``schema_editor`` is the second

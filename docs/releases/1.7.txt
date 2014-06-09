@@ -63,9 +63,10 @@ but a few of the key features are:
 * ``initial_data`` fixtures are no longer loaded for apps with migrations; if
   you want to load initial data for an app, we suggest you do it in a migration.
 
-* Test rollback behaviour is different for apps with migrations; in particular,
+* Test rollback behavior is different for apps with migrations; in particular,
   Django will no longer emulate rollbacks on non-transactional databases or
-  inside ``TransactionTestCase`` :ref:`unless specifically asked <test-case-serialized-rollback>`.
+  inside ``TransactionTestCase`` :ref:`unless specifically requested
+  <test-case-serialized-rollback>`.
 
 App-loading refactor
 ~~~~~~~~~~~~~~~~~~~~

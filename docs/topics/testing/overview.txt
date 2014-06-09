@@ -244,7 +244,7 @@ tests and not in ``TransactionTestCase`` tests, and additionally only on
 backends where transactions are supported (the most important exception being
 MyISAM).
 
-Django can re-load that data for you on a per-testcase basis by
+Django can reload that data for you on a per-testcase basis by
 setting the ``serialized_rollback`` option to ``True`` in the body of the
 ``TestCase`` or ``TransactionTestCase``, but note that this will slow down
 that test suite by approximately 3x.
@@ -275,7 +275,6 @@ tests in production because, unlike databases, a separate "test cache" is not
 used. This behavior `may change`_ in the future.
 
 .. _may change: https://code.djangoproject.com/ticket/11505
-
 
 Understanding the test output
 -----------------------------
