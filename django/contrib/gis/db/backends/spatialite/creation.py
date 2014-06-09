@@ -7,7 +7,7 @@ from django.db.backends.sqlite3.creation import DatabaseCreation
 
 class SpatiaLiteCreation(DatabaseCreation):
 
-    def create_test_db(self, verbosity=1, autoclobber=False, keepdb=False):
+    def create_test_db(self, verbosity=1, autoclobber=False, serialize=True, keepdb=False):
         """
         Creates a test database, prompting the user for confirmation if the
         database already exists. Returns the name of the test database created.
@@ -46,6 +46,13 @@ class SpatiaLiteCreation(DatabaseCreation):
             interactive=False,
             database=self.connection.alias,
             load_initial_data=False)
+
+        # We then serialize the current state of the database into a string
+        # and store it on the connection. This slightly horrific process is so people
+        # who are testing on databases without transactions or who are using
+        # a TransactionTestCase still get a clean database on every test run.
+        if serialize:
+            self.connection._test_serialized_contents = self.serialize_db_to_string()
 
         # We need to then do a flush to ensure that any data installed by
         # custom SQL has been removed. The only test data should come from
