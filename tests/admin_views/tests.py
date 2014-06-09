@@ -26,7 +26,6 @@ from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Group, User, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.db import connection
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase
