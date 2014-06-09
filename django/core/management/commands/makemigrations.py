@@ -94,7 +94,11 @@ class Command(BaseCommand):
             return
 
         # Detect changes
-        changes = autodetector.changes(graph=loader.graph, trim_to_apps=app_labels or None)
+        changes = autodetector.changes(
+            graph=loader.graph,
+            trim_to_apps=app_labels or None,
+            convert_apps=app_labels or None,
+        )
 
         # No changes? Tell them.
         if not changes and self.verbosity >= 1:

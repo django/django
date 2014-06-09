@@ -28,13 +28,13 @@ class MigrationAutodetector(object):
         self.to_state = to_state
         self.questioner = questioner or MigrationQuestioner()
 
-    def changes(self, graph, trim_to_apps=None):
+    def changes(self, graph, trim_to_apps=None, convert_apps=None):
         """
         Main entry point to produce a list of appliable changes.
         Takes a graph to base names on and an optional set of apps
         to try and restrict to (restriction is not guaranteed)
         """
-        changes = self._detect_changes()
+        changes = self._detect_changes(convert_apps)
         changes = self.arrange_for_graph(changes, graph)
         if trim_to_apps:
             changes = self._trim_to_apps(changes, trim_to_apps)
@@ -77,7 +77,7 @@ class MigrationAutodetector(object):
             fields_def.append(deconstruction)
         return fields_def
 
-    def _detect_changes(self):
+    def _detect_changes(self, convert_apps=None):
         """
         Returns a dict of migration plans which will achieve the
         change from from_state to to_state. The dict has app labels
@@ -105,7 +105,10 @@ class MigrationAutodetector(object):
         self.new_model_keys = []
         for al, mn in sorted(self.to_state.models.keys()):
             model = self.new_apps.get_model(al, mn)
-            if not model._meta.proxy and model._meta.managed and al not in self.from_state.real_apps:
+            if not model._meta.proxy and model._meta.managed and (
+                al not in self.from_state.real_apps or
+                (convert_apps and al in convert_apps)
+            ):
                 self.new_model_keys.append((al, mn))
 
         # Renames have to come first
@@ -376,6 +379,14 @@ class MigrationAutodetector(object):
                 else:
                     dep_app_label = field.rel.to._meta.app_label
                     dep_object_name = field.rel.to._meta.object_name
+                dependencies = [(dep_app_label, dep_object_name, None, True)]
+                if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                    dependencies.append((
+                        field.rel.through._meta.app_label,
+                        field.rel.through._meta.object_name,
+                        None,
+                        True
+                    ))
                 # Make operation
                 self.add_operation(
                     app_label,
@@ -384,9 +395,7 @@ class MigrationAutodetector(object):
                         name=name,
                         field=field,
                     ),
-                    dependencies=[
-                        (dep_app_label, dep_object_name, None, True),
-                    ]
+                    dependencies=list(set(dependencies)),
                 )
             # Generate other opns
             if unique_together:
