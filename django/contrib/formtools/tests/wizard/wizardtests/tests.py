@@ -16,6 +16,8 @@ from django.contrib.formtools.tests.models import Poet, Poem
 from .forms import temp_storage
 
 
+# On Python 2, __file__ may end with .pyc
+THIS_FILE = upath(__file__.rstrip("c"))
 UPLOADED_FILE_NAME = 'tests.py'
 
 
@@ -115,14 +117,14 @@ class WizardTests(object):
         self.assertEqual(response.context['wizard']['steps'].current, 'form2')
 
         post_data = self.wizard_step_data[1]
-        with open(upath(__file__), 'rb') as post_file:
+        with open(upath(THIS_FILE), 'rb') as post_file:
             post_data['form2-file1'] = post_file
             response = self.client.post(self.wizard_url, post_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['wizard']['steps'].current, 'form3')
 
         # Check that the file got uploaded properly.
-        with open(upath(__file__), 'rb') as f, temp_storage.open(UPLOADED_FILE_NAME) as f2:
+        with open(THIS_FILE, 'rb') as f, temp_storage.open(UPLOADED_FILE_NAME) as f2:
             self.assertEqual(f.read(), f2.read())
 
         response = self.client.post(self.wizard_url, self.wizard_step_data[2])
@@ -152,7 +154,7 @@ class WizardTests(object):
         self.assertEqual(response.status_code, 200)
 
         post_data = self.wizard_step_data[1]
-        with open(upath(__file__), 'rb') as post_file:
+        with open(THIS_FILE, 'rb') as post_file:
             post_data['form2-file1'] = post_file
             response = self.client.post(self.wizard_url, post_data)
         self.assertEqual(response.status_code, 200)
@@ -184,7 +186,7 @@ class WizardTests(object):
         self.assertEqual(response.status_code, 200)
 
         post_data = self.wizard_step_data[1]
-        with open(upath(__file__), 'rb') as post_file:
+        with open(THIS_FILE, 'rb') as post_file:
             post_data['form2-file1'] = post_file
             response = self.client.post(self.wizard_url, post_data)
         self.assertEqual(response.status_code, 200)
@@ -212,7 +214,7 @@ class WizardTests(object):
         self.assertEqual(response.context['wizard']['steps'].current, 'form2')
 
         post_data = self.wizard_step_data[1]
-        with open(upath(__file__), 'rb') as post_file:
+        with open(THIS_FILE, 'rb') as post_file:
             post_data['form2-file1'] = post_file
             response = self.client.post(self.wizard_url, post_data)
         self.assertEqual(response.status_code, 200)
@@ -333,7 +335,7 @@ class WizardTestKwargs(TestCase):
         self.wizard_step_data[0]['form1-user'] = self.testuser.pk
 
     def test_template(self):
-        templates = os.path.join(os.path.dirname(upath(__file__)), 'templates')
+        templates = os.path.join(os.path.dirname(THIS_FILE), 'templates')
         with self.settings(
                 TEMPLATE_DIRS=list(settings.TEMPLATE_DIRS) + [templates]):
             response = self.client.get(self.wizard_url)
