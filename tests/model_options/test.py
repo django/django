@@ -16,7 +16,9 @@ from .models import (
     AbstractM2M, BaseM2M, M2M,
 
     BaseRelatedObject, RelatedObject,
-    ProxyRelatedObject, HiddenRelatedObject
+    ProxyRelatedObject, HiddenRelatedObject,
+
+    BaseRelatedM2M, RelatedM2M
 )
 
 from collections import OrderedDict
@@ -121,35 +123,22 @@ class RelatedObjectsTests(OptionsBaseTests):
             'model_options:hiddenrelatedobject',
         ], (BaseRelatedObject, None, None, None, None))
 
-    #def test_related_m2m_with_model(self):
-        #objects = RelatedM2MModel._meta.get_all_related_m2m_objects_with_model()
-        #self.eq_field_names_and_models(objects, [
-            #'model_options:m2mrelationtobasem2mmodel',
-            #'model_options:m2mrelationtom2mmodel'
-        #], [BaseRelatedM2MModel, None])
 
-    #def test_related_m2m_local_only(self):
-        #fields = RelatedM2MModel._meta.get_all_related_many_to_many_objects(
-            #local_only=True)
-        #self.assertEquals([f.name for f in fields], [
-            #'model_options:m2mrelationtom2mmodel'
-        #])
+class RelatedM2MTests(OptionsBaseTests):
 
-    #def test_add_data_field(self):
-        #cf = CharField()
-        #cf.set_attributes_from_name("my_new_field")
-        #BareModel._meta.add_field(cf)
+    def test_related_m2m_with_model(self):
+        objects = RelatedM2M._meta.get_all_related_m2m_objects_with_model()
+        self.eq_field_names_and_models(objects, [
+            'model_options:relbaserelatedm2m',
+            'model_options:relrelatedm2m'
+        ], (BaseRelatedM2M, None))
 
-        #self.assertEquals([u'id', 'my_new_field'], [f.attname
-                          #for f in BareModel._meta.fields])
-
-    #def test_add_m2m_field(self):
-        #cf = ManyToManyField(User)
-        #cf.set_attributes_from_name("my_new_field")
-        #BareModel._meta.add_field(cf)
-
-        #self.assertEquals(['my_new_field'], [f.attname for f in
-                          #BareModel._meta.many_to_many])
+    def test_related_m2m_local_only(self):
+        objects = RelatedM2M._meta.get_all_related_many_to_many_objects(
+            local_only=True)
+        self.assertEquals([o.name for o in objects], [
+            'model_options:relrelatedm2m'
+        ])
 
     #def test_get_data_field(self):
         #field_info = Musician._meta.get_field_by_name('name')
@@ -175,43 +164,3 @@ class RelatedObjectsTests(OptionsBaseTests):
         #field_info = SuperData._meta.get_field_by_name('name_data')
         #self.assertEquals(field_info[1:], (Data, True, False))
         #self.assertTrue(isinstance(field_info[0], CharField))
-
-    #def test_get_ancestor_link(self):
-        #field = SuperData._meta.get_ancestor_link(Data)
-        #self.assertTrue(isinstance(field, OneToOneField))
-        #self.assertEquals(field.related_query_name(), 'superdata')
-
-    #def test_get_ancestor_link_multiple(self):
-        #info = C._meta.get_ancestor_link(A)
-        #self.assertEquals('b_ptr_id', info.attname)
-
-    #def test_get_ancestor_link_invalid(self):
-        #self.assertFalse(SuperData._meta.get_ancestor_link(Musician))
-
-    #def test_get_base_chain(self):
-        #chain = C._meta.get_base_chain(A)
-        #self.assertEquals(chain, [B, A])
-
-    #def test_get_base_chain_invalid(self):
-        #self.assertFalse(C._meta.get_base_chain(Musician))
-
-    #def test_get_parent_list(self):
-        #self.assertEquals(C._meta.get_parent_list(), set([
-                          #B, A]))
-
-    #def test_virtual_field(self):
-        #virtual_fields = ModelWithGenericFK._meta.virtual_fields
-        #self.assertEquals(len(virtual_fields), 1)
-        #self.assertTrue(isinstance(virtual_fields[0],
-                        #GenericForeignKey))
-
-    #def test_virtual_field_generic_relation(self):
-        #virtual_fields = AGenericRelation._meta.virtual_fields
-        #self.assertEquals(len(virtual_fields), 1)
-        #self.assertTrue(isinstance(virtual_fields[0],
-                        #GenericRelation))
-
-        #objects = ModelWithGenericFK._meta.get_all_related_objects(
-            #include_hidden=True)
-        #self.assertEquals([f.name for f in objects],
-                          #["model_options:agenericrelation"])
