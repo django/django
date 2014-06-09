@@ -337,7 +337,7 @@ class BaseDatabaseCreation(object):
             ";",
         ]
 
-    def create_test_db(self, verbosity=1, autoclobber=False, keepdb=False, serialize=True):
+    def create_test_db(self, verbosity=1, autoclobber=False, serialize=True, keepdb=False):
         """
         Creates a test database, prompting the user for confirmation if the
         database already exists. Returns the name of the test database created.
@@ -419,6 +419,7 @@ class BaseDatabaseCreation(object):
                 app_config.name not in settings.TEST_NON_SERIALIZED_APPS
             ):
                 app_list.append((app_config, None))
+
         # Make a function to iteratively return every object
         def get_objects():
             for model in sort_dependencies(app_list):
