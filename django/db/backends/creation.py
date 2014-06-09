@@ -372,35 +372,12 @@ class BaseDatabaseCreation(object):
         # We report migrate messages at one level lower than that requested.
         # This ensures we don't get flooded with messages during testing
         # (unless you really ask to be flooded).
-        # First off, only do the syncdb portion - we need to do this, then
-        # flush (to erase data inserted by custom SQL, as per #14661),
-        # then migrate with no syncdb, to load data in correctly.
         call_command(
             'migrate',
             verbosity=max(verbosity - 1, 0),
             interactive=False,
             database=self.connection.alias,
             test_database=True,
-            syncdb_only=True,
-        )
-
-        # We need to then do a flush to ensure that any data installed by
-        # custom SQL has been removed.
-        call_command(
-            'flush',
-            verbosity=max(verbosity - 1, 0),
-            interactive=False,
-            database=self.connection.alias
-        )
-
-        # We then call migrate again in migrate-only mode
-        call_command(
-            'migrate',
-            verbosity=max(verbosity - 1, 0),
-            interactive=False,
-            database=self.connection.alias,
-            test_database=True,
-            migrate_only=True,
         )
 
         # We then serialize the current state of the database into a string
@@ -409,6 +386,14 @@ class BaseDatabaseCreation(object):
         # a TransactionTestCase still get a clean database on every test run.
         if serialize:
             self.connection._test_serialized_contents = self.serialize_db_to_string()
+
+        # Finally, we flush the database to clean
+        call_command(
+            'flush',
+            verbosity=max(verbosity - 1, 0),
+            interactive=False,
+            database=self.connection.alias
+        )
 
         call_command('createcachetable', database=self.connection.alias)
 

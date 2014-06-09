@@ -97,15 +97,6 @@ class Command(BaseCommand):
             if app_label not in executor.loader.migrated_apps:
                 raise CommandError("App '%s' does not have migrations (you cannot selectively sync unmigrated apps)" % app_label)
             targets = [key for key in executor.loader.graph.leaf_nodes() if key[0] == app_label]
-        # Special internal options the test runner uses while we have both
-        # migrated and unmigrated apps around.
-        elif options.get("force_syncdb", None) is True:
-            targets = []
-            run_syncdb = True
-        elif options.get("force_syncdb", None) is False:
-            targets = executor.loader.graph.leaf_nodes()
-            run_syncdb = False
-        # Default behaviour
         else:
             targets = executor.loader.graph.leaf_nodes()
             run_syncdb = True

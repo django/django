@@ -814,6 +814,17 @@ class TransactionTestCase(SimpleTestCase):
             if self.reset_sequences:
                 self._reset_sequences(db_name)
 
+            # If we need to provide replica initial data from migrated apps,
+            # then do so.
+            if self.serialized_rollback and hasattr(connections[db_name], "_test_serialized_contents"):
+                if self.available_apps is not None:
+                    apps.unset_available_apps()
+                connections[db_name].creation.deserialize_db_from_string(
+                    connections[db_name]._test_serialized_contents
+                )
+                if self.available_apps is not None:
+                    apps.set_available_apps(self.available_apps)
+
             if self.fixtures:
                 # We have to use this slightly awkward syntax due to the fact
                 # that we're using *args and **kwargs together.
@@ -856,17 +867,6 @@ class TransactionTestCase(SimpleTestCase):
                          reset_sequences=False,
                          allow_cascade=self.available_apps is not None,
                          inhibit_post_migrate=self.available_apps is not None)
-            # Restore the state of it from fixtures.
-            # We need the apps to be correct for this one item, but other
-            # teardown code may rely on it being limited still, so we reset it.
-            if self.serialized_rollback and hasattr(connections[db_name], "_test_serialized_contents"):
-                if self.available_apps is not None:
-                    apps.unset_available_apps()
-                connections[db_name].creation.deserialize_db_from_string(
-                    connections[db_name]._test_serialized_contents
-                )
-                if self.available_apps is not None:
-                    apps.set_available_apps(self.available_apps)
 
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
