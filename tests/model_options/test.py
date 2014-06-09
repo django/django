@@ -2,12 +2,15 @@ from django import test
 from collections import OrderedDict
 
 from django.db.models.fields import related, CharField
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 from .models import (
     BaseData, Data, ConcreteData,
     BaseM2M, M2M,
     BaseRelatedObject, RelatedObject, HiddenRelatedObject,
-    BaseRelatedM2M, RelatedM2M
+    BaseRelatedM2M, RelatedM2M,
+    RelatedM2MRecursiveSymmetrical, RelatedM2MRecursiveAsymmetrical,
+    Virtual
 )
 
 
@@ -127,6 +130,32 @@ class RelatedM2MTests(OptionsBaseTests):
             'model_options:relrelatedm2m'
         ])
 
+    def test_related_m2m_asymmetrical(self):
+        m2m = RelatedM2MRecursiveAsymmetrical._meta.many_to_many
+        self.assertEquals([f.name for f in m2m],
+                          ['following'])
+        related_m2m = RelatedM2MRecursiveAsymmetrical._meta.get_all_related_many_to_many_objects()
+        self.assertEquals([o.field.related_query_name() for o in related_m2m],
+                          ['followers'])
+
+    def test_related_m2m_symmetrical(self):
+        m2m = RelatedM2MRecursiveSymmetrical._meta.many_to_many
+        self.assertEquals([f.name for f in m2m],
+                          ['friends'])
+        related_m2m = RelatedM2MRecursiveSymmetrical._meta.get_all_related_many_to_many_objects()
+        self.assertEquals([o.field.related_query_name() for o in related_m2m],
+                          ['friends_rel_+'])
+
+
+class VirtualFieldsTests(OptionsBaseTests):
+
+    def test_virtual_fields(self):
+        self.assertEquals([f.name for f in Virtual._meta.virtual_fields], [
+                          'content_object'])
+
+
+class GetFieldByNameTests(OptionsBaseTests):
+
     def test_get_data_field(self):
         field_info = Data._meta.get_field_by_name('name_abstract')
         self.assertEquals(field_info[1:], (BaseData, True, False))
@@ -146,3 +175,8 @@ class RelatedM2MTests(OptionsBaseTests):
         field_info = RelatedM2M._meta.get_field_by_name('relrelatedm2m')
         self.assertEquals(field_info[1:], (None, False, True))
         self.assertTrue(isinstance(field_info[0], related.RelatedObject))
+
+    def test_get_virtual_field(self):
+        field_info = Virtual._meta.get_field_by_name('content_object')
+        self.assertEquals(field_info[1:], (None, True, False))
+        self.assertTrue(isinstance(field_info[0], GenericForeignKey))

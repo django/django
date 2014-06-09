@@ -121,12 +121,28 @@ class RelatedM2M(BaseRelatedM2M):
     pass
 
 
-# VIRTUAL FIELDS
-class ModelWithGenericFK(models.Model):
+class RelatedM2MRecursiveAsymmetrical(models.Model):
+    name = models.CharField(max_length=50)
+    following = models.ManyToManyField(
+        'self', related_name='followers', symmetrical=False)
+
+
+class RelatedM2MRecursiveSymmetrical(models.Model):
+    name = models.CharField(max_length=50)
+    friends = models.ManyToManyField(
+        'self', related_name='friends', symmetrical=True)
+
+
+# VIRTUAL_FIELDS
+# VIRTUAL_FIELDS RELATIONS
+class RelVirtiual(models.Model):
+    generic_model = GenericRelation('ModelWithGenericFK')
+
+
+# VIRTUAL_FIELDS MODELS
+class Virtual(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
 
-class AGenericRelation(models.Model):
-    generic_model = GenericRelation(ModelWithGenericFK)
