@@ -36,6 +36,7 @@ FASTCGI_OPTIONS = {
     'outlog': None,
     'errlog': None,
     'umask': None,
+    'proctitle': None,
 }
 
 FASTCGI_HELP = r"""
@@ -63,6 +64,8 @@ Optional Fcgi settings: (setting=value)
   outlog=FILE          write stdout to this file.
   errlog=FILE          write stderr to this file.
   umask=UMASK          umask to use when daemonizing, in octal notation (default 022).
+  proctitle=PROCTITLE  overide title of the python process
+                       (visible in output of ps, pstree, top, and other commands).
 
 Examples:
   Run a "standard" fastcgi process on a file-descriptor
@@ -180,6 +183,10 @@ def runfastcgi(argset=[], **kwargs):
     if options["pidfile"]:
         with open(options["pidfile"], "w") as fp:
             fp.write("%d\n" % os.getpid())
+
+    if options["proctitle"]:
+        from setproctitle import setproctitle
+        setproctitle(options["proctitle"])
 
     WSGIServer(get_internal_wsgi_application(), **wsgi_opts).run()
 
