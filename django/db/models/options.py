@@ -140,13 +140,11 @@ class Options(object):
 
     def get_field_details(self, field_name, opts=NONE):
         base = OrderedDict()
-        for _, data in self.get_new_fields(types=RELATED_M2M,
+        for name, data in self.get_new_fields(types=RELATED_M2M,
                                            opts=opts, with_model=True):
-            name = data[0].field.related_query_name()
             base[name] = data + (False, True,)
-        for _, data in self.get_new_fields(types=RELATED_OBJECTS,
+        for name, data in self.get_new_fields(types=RELATED_OBJECTS,
                                            opts=opts, with_model=True):
-            name = data[0].field.related_query_name()
             base[name] = data + (False, False,)
         for name, data in self.get_new_fields(types=M2M,
                                               opts=opts, with_model=True):
