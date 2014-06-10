@@ -28,8 +28,8 @@ class OptionsBaseTests(test.TestCase):
     def fields(self, res):
         return [f for fn, f in res]
 
-    def fields_models(self, m, res):
-        models = [m._meta.get_field_details(fn)[1] for fn, f in res]
+    def fields_models(self, m, res, opts=NONE):
+        models = [m._meta.get_field_details(fn, opts=opts)[1] for fn, f in res]
         fields = [f for fn, f in res]
         return zip(fields, map(lambda model: None if m == model else model, models))
 
@@ -84,16 +84,16 @@ class RelatedObjectsTests(OptionsBaseTests):
         ], (BaseRelatedObject, None, None))
 
     def test_related_objects_local(self):
-        objects = RelatedObject._meta.get_all_related_objects_with_model(
-            local_only=True)
+        objects = self.fields_models(RelatedObject, RelatedObject._meta.get_new_fields(
+                                     types=RELATED_OBJECTS, opts=LOCAL_ONLY), LOCAL_ONLY)
         self.eq_field_names_and_models(objects, [
             'model_options:relrelatedobjects',
             'model_options:hiddenrelatedobject'
         ], (None, None))
 
     def test_related_objects_include_hidden(self):
-        objects = HiddenRelatedObject._meta.get_all_related_objects_with_model(
-            include_hidden=True)
+        objects = self.fields_models(HiddenRelatedObject, HiddenRelatedObject._meta.get_new_fields(
+                                     types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN), INCLUDE_HIDDEN)
         self.eq_field_names_and_models(objects, [
             'model_options:relbaserelatedobjects',
             'model_options:relrelatedobjects',
@@ -101,15 +101,16 @@ class RelatedObjectsTests(OptionsBaseTests):
         ], (BaseRelatedObject, RelatedObject, None))
 
     def test_related_objects_include_hidden_local_only(self):
-        objects = HiddenRelatedObject._meta.get_all_related_objects_with_model(
-            include_hidden=True, local_only=True)
+        opts = INCLUDE_HIDDEN | LOCAL_ONLY
+        objects = self.fields_models(HiddenRelatedObject, HiddenRelatedObject._meta.get_new_fields(
+                                     types=RELATED_OBJECTS, opts=opts), opts)
         self.eq_field_names_and_models(objects, [
             'model_options:relhiddenrelatedobjects'
         ], (None,))
 
     def test_related_objects_proxy(self):
-        objects = RelatedObject._meta.get_all_related_objects_with_model(
-            include_proxy_eq=True)
+        objects = self.fields_models(RelatedObject, RelatedObject._meta.get_new_fields(
+                                     types=RELATED_OBJECTS, opts=INCLUDE_PROXY), INCLUDE_PROXY)
         self.eq_field_names_and_models(objects, [
             'model_options:relbaserelatedobjects',
             'model_options:relrelatedobjects',
@@ -118,8 +119,9 @@ class RelatedObjectsTests(OptionsBaseTests):
         ], (BaseRelatedObject, None, None, None))
 
     def test_related_objects_proxy_hidden(self):
-        objects = RelatedObject._meta.get_all_related_objects_with_model(
-            include_proxy_eq=True, include_hidden=True)
+        opts = INCLUDE_HIDDEN | INCLUDE_PROXY
+        objects = self.fields_models(RelatedObject, RelatedObject._meta.get_new_fields(
+                                     types=RELATED_OBJECTS, opts=opts), opts)
         self.eq_field_names_and_models(objects, [
             'model_options:relbaserelatedobjects',
             'model_options:relrelatedobjects',
