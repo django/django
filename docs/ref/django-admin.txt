@@ -1435,9 +1435,8 @@ This command is only available if Django's :doc:`authentication system
 </topics/auth/index>` (``django.contrib.auth``) is installed.
 
 Creates a superuser account (a user who has all permissions). This is
-useful if you need to create an initial superuser account but did not
-do so during the first :djadmin:`migrate`, or if you need to programmatically
-generate superuser accounts for your site(s).
+useful if you need to create an initial superuser account or if you need to
+programmatically generate superuser accounts for your site(s).
 
 When run interactively, this command will prompt for a password for
 the new superuser account. When run non-interactively, no password
