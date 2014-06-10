@@ -305,6 +305,28 @@ Now to implement the same behavior, you have to create an
 ``parser.add_argument`` to add any custom arguments, as parser is now an
 :py:class:`argparse.ArgumentParser` instance.
 
+Model check ensures auto-generated column names are within limits specified by database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A field name that's longer than the column name length supported by a database
+can create problems. For example, with MySQL you'll get an exception trying to
+create the column, and with PostgreSQL the column name is truncated by the
+database (you may see a warning in the PostgreSQL logs).
+
+A model check has been introduced to better alert users to this scenario before
+the actual creation of database tables.
+
+If you have an existing model where this check seems to be a false positive,
+for example on PostgreSQL where the name was already being truncated, simply
+use :attr:`~django.db.models.Field.db_column` to specify the name that's being
+used.
+
+The check also applies to the columns generated in an implicit
+``ManyToManyField.through`` model. If you run into an issue there, use
+:attr:`~django.db.models.ManyToManyField.through` to create an explicit model
+and then specify :attr:`~django.db.models.Field.db_column` on its column(s)
+as needed.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
