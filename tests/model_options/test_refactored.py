@@ -28,6 +28,11 @@ class OptionsBaseTests(test.TestCase):
     def fields(self, res):
         return [f for fn, f in res]
 
+    def fields_models(self, m, res):
+        models = [m._meta.get_field_details(fn)[1] for fn, f in res]
+        fields = [f for fn, f in res]
+        return zip(fields, map(lambda model: None if m == model else model, models))
+
 
 class DataTests(OptionsBaseTests):
 
@@ -56,21 +61,22 @@ class DataTests(OptionsBaseTests):
 class M2MTests(OptionsBaseTests):
 
     def test_many_to_many(self):
-        fields = M2M._meta.many_to_many
+        fields = self.fields(M2M._meta.get_new_fields(types=_M2M))
         self.assertEquals([f.attname for f in fields], [
                           'm2m_abstract', 'm2m_base', 'm2m'])
         self.assertTrue(all([isinstance(f.rel, related.ManyToManyRel)
                              for f in fields]))
 
     def test_many_to_many_with_model(self):
-        models = OrderedDict(M2M._meta.get_m2m_with_model()).values()
-        self.assertEquals(models, [BaseM2M, BaseM2M, None])
+        objects = self.fields_models(M2M, M2M._meta.get_new_fields(types=_M2M))
+        self.assertEquals([m for f, m in objects], [BaseM2M, BaseM2M, None])
 
 
 class RelatedObjectsTests(OptionsBaseTests):
 
     def test_related_objects(self):
-        objects = RelatedObject._meta.get_all_related_objects_with_model()
+        objects = self.fields_models(RelatedObject, RelatedObject._meta.get_new_fields(
+                                     types=RELATED_OBJECTS))
         self.eq_field_names_and_models(objects, [
             'model_options:relbaserelatedobjects',
             'model_options:relrelatedobjects',
