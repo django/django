@@ -473,6 +473,13 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         codename = get_permission_codename('delete', opts)
         return request.user.has_perm("%s.%s" % (opts.app_label, codename))
 
+    def has_module_permission(self, request):
+        """
+        Returns True if the given request has any permission in the given
+        app label
+        """
+        return request.user.has_module_perms(self.opts.app_label)
+
 
 @python_2_unicode_compatible
 class ModelAdmin(BaseModelAdmin):

@@ -1493,6 +1493,70 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, 'http://example.com/dummy/foo/')
 
+    def test_has_module_permission(self):
+        """
+        Ensure that has_module_permission() returns True for all users who
+        have any permission for that module (add, change, or delete), so that
+        the module is displayed on the admin index page.
+        """
+        login_url = reverse('admin:login') + '?next=/test_admin/admin/'
+
+        self.client.post(login_url, self.super_login)
+        response = self.client.get('/test_admin/admin/')
+        self.assertContains(response, 'admin_views')
+        self.assertContains(response, 'Articles')
+        self.client.get('/test_admin/admin/logout/')
+
+        self.client.post(login_url, self.adduser_login)
+        response = self.client.get('/test_admin/admin/')
+        self.assertContains(response, 'admin_views')
+        self.assertContains(response, 'Articles')
+        self.client.get('/test_admin/admin/logout/')
+
+        self.client.post(login_url, self.changeuser_login)
+        response = self.client.get('/test_admin/admin/')
+        self.assertContains(response, 'admin_views')
+        self.assertContains(response, 'Articles')
+        self.client.get('/test_admin/admin/logout/')
+
+        self.client.post(login_url, self.deleteuser_login)
+        response = self.client.get('/test_admin/admin/')
+        self.assertContains(response, 'admin_views')
+        self.assertContains(response, 'Articles')
+        self.client.get('/test_admin/admin/logout/')
+
+    def test_overriding_has_module_permission(self):
+        """
+        Ensure that overriding has_module_permission() has the desired effect.
+        In this case, it always returns False, so the module should not be
+        displayed on the admin index page for any users.
+        """
+        login_url = reverse('admin:login') + '?next=/test_admin/admin7/'
+
+        self.client.post(login_url, self.super_login)
+        response = self.client.get('/test_admin/admin7/')
+        self.assertNotContains(response, 'admin_views')
+        self.assertNotContains(response, 'Articles')
+        self.client.get('/test_admin/admin7/logout/')
+
+        self.client.post(login_url, self.adduser_login)
+        response = self.client.get('/test_admin/admin7/')
+        self.assertNotContains(response, 'admin_views')
+        self.assertNotContains(response, 'Articles')
+        self.client.get('/test_admin/admin7/logout/')
+
+        self.client.post(login_url, self.changeuser_login)
+        response = self.client.get('/test_admin/admin7/')
+        self.assertNotContains(response, 'admin_views')
+        self.assertNotContains(response, 'Articles')
+        self.client.get('/test_admin/admin7/logout/')
+
+        self.client.post(login_url, self.deleteuser_login)
+        response = self.client.get('/test_admin/admin7/')
+        self.assertNotContains(response, 'admin_views')
+        self.assertNotContains(response, 'Articles')
+        self.client.get('/test_admin/admin7/logout/')
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF="admin_views.urls")
