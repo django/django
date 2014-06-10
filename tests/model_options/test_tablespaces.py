@@ -6,27 +6,29 @@ from django.db import connection
 from django.core.management.color import no_style
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from .models import Article, ArticleRef, Authors, Reviewers, Scientist, ScientistRef
+from .models.tablespaces import (Article, ArticleRef, Authors, Reviewers,
+    Scientist, ScientistRef)
+
+
+def sql_for_table(model):
+    return '\n'.join(connection.creation.sql_create_model(model,
+                                                          no_style())[0])
+
+
+def sql_for_index(model):
+    return '\n'.join(connection.creation.sql_indexes_for_model(model,
+                                                               no_style()))
+
 
 # We can't test the DEFAULT_TABLESPACE and DEFAULT_INDEX_TABLESPACE settings
 # because they're evaluated when the model class is defined. As a consequence,
 # @override_settings doesn't work, and the tests depend
-
-
-def sql_for_table(model):
-    return '\n'.join(connection.creation.sql_create_model(model, no_style())[0])
-
-
-def sql_for_index(model):
-    return '\n'.join(connection.creation.sql_indexes_for_model(model, no_style()))
-
-
 class TablespacesTests(TestCase):
 
     def setUp(self):
         # The unmanaged models need to be removed after the test in order to
         # prevent bad interactions with the flush operation in other tests.
-        self._old_models = apps.app_configs['tablespaces'].models.copy()
+        self._old_models = apps.app_configs['model_options'].models.copy()
 
         for model in Article, Authors, Reviewers, Scientist:
             model._meta.managed = True
@@ -35,8 +37,8 @@ class TablespacesTests(TestCase):
         for model in Article, Authors, Reviewers, Scientist:
             model._meta.managed = False
 
-        apps.app_configs['tablespaces'].models = self._old_models
-        apps.all_models['tablespaces'] = self._old_models
+        apps.app_configs['model_options'].models = self._old_models
+        apps.all_models['model_options'] = self._old_models
         apps.clear_cache()
 
     def assertNumContains(self, haystack, needle, count):
