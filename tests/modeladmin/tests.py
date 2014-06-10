@@ -1518,3 +1518,27 @@ class CustomModelAdminTests(CheckTestCase):
                 validator_class = CustomValidator
 
             self.assertIsInvalid(CustomModelAdmin, ValidationTestModel, 'error!')
+
+
+class ListDisplayEditableTests(CheckTestCase):
+    def test_list_display_links_is_none(self):
+        """
+        list_display and list_editable can contain the same values
+        when list_display_links is None
+        """
+        class ProductAdmin(ModelAdmin):
+            list_display = ['name', 'slug', 'pub_date']
+            list_editable = list_display
+            list_display_links = None
+        self.assertIsValid(ProductAdmin, ValidationTestModel)
+
+    def test_list_display_same_as_list_editable(self):
+        """
+        The first item in list_display can be the same as the first
+        in list_editable
+        """
+        class ProductAdmin(ModelAdmin):
+            list_display = ['name', 'slug', 'pub_date']
+            list_editable = ['name', 'slug']
+            list_display_links = ['pub_date']
+        self.assertIsValid(ProductAdmin, ValidationTestModel)
