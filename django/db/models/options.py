@@ -101,7 +101,6 @@ class Options(object):
 
         self.default_related_name = None
 
-
     @property
     def app_config(self):
         # Don't go through get_app_config to avoid triggering imports.
