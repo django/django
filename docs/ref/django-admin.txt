@@ -1528,7 +1528,7 @@ variable.
 Note that this option is unnecessary in ``manage.py``, because it takes care of
 setting the Python path for you.
 
-.. _import search path: http://diveintopython.net/getting_to_know_python/everything_is_an_object.html
+.. _import search path: http://www.diveintopython.net/getting_to_know_python/everything_is_an_object.html
 
 .. django-admin-option:: --settings
 
