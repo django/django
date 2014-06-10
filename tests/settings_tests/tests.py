@@ -436,3 +436,24 @@ class IsOverriddenTest(TestCase):
         self.assertFalse(settings.is_overridden('TEMPLATE_LOADERS'))
         with override_settings(TEMPLATE_LOADERS=[]):
             self.assertTrue(settings.is_overridden('TEMPLATE_LOADERS'))
+
+
+class TestTupleSettings(unittest.TestCase):
+    """
+    Make sure settings that should be tuples throw ImproperlyConfigured if they
+    are set to a string instead of a tuple.
+    """
+    tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS", "LOCALE_PATHS")
+
+    def test_tuple_settings(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.SECRET_KEY = 'foo'
+        for setting in self.tuple_settings:
+            setattr(settings_module, setting, ('non_tuple_value'))
+            sys.modules['fake_settings_module'] = settings_module
+            try:
+                with self.assertRaises(ImproperlyConfigured):
+                    s = Settings('fake_settings_module')
+            finally:
+                del sys.modules['fake_settings_module']
+                delattr(settings_module, setting)
