@@ -45,7 +45,8 @@ class DataTests(OptionsBaseTests):
                         related.ManyToManyRel) for f in fields]))
 
     def test_local_concrete_fields(self):
-        fields = ConcreteData._meta.local_concrete_fields
+        fields = self.fields(ConcreteData._meta.get_new_fields(types=DATA,
+                                                       opts=LOCAL_ONLY | CONCRETE))
         self.assertEquals([f.attname for f in fields], [
                           u'data_ptr_id', 'name_concrete'])
         self.assertTrue(all([f.column is not None
