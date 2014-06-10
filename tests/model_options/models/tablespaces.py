@@ -23,7 +23,7 @@ class Scientist(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
-        db_table = 'tablespaces_scientistref'
+        db_table = 'model_options_scientistref'
         db_tablespace = 'tbl_tbsp'
         managed = False
 
@@ -35,14 +35,14 @@ class Article(models.Model):
     reviewers = models.ManyToManyField(Scientist, related_name='articles_reviewed_set', db_tablespace='idx_tbsp')
 
     class Meta:
-        db_table = 'tablespaces_articleref'
+        db_table = 'model_options_articleref'
         db_tablespace = 'tbl_tbsp'
         managed = False
 
 # Also set the tables for automatically created models
 
 Authors = Article._meta.get_field('authors').rel.through
-Authors._meta.db_table = 'tablespaces_articleref_authors'
+Authors._meta.db_table = 'model_options_articleref_authors'
 
 Reviewers = Article._meta.get_field('reviewers').rel.through
-Reviewers._meta.db_table = 'tablespaces_articleref_reviewers'
+Reviewers._meta.db_table = 'model_options_articleref_reviewers'
