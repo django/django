@@ -934,7 +934,7 @@ def pluralize(value, arg='s'):
     singular_suffix, plural_suffix = bits[:2]
 
     try:
-        if int(value) != 1:
+        if float(value) != 1:
             return plural_suffix
     except ValueError:  # Invalid string that's not a number.
         pass
