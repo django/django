@@ -233,7 +233,8 @@ class Options(object):
                         to_meta = f.rel.to._meta
                         if (to_meta == self) or ((opts & INCLUDE_PROXY)
                                 and self.concrete_model == to_meta.concrete_model):
-                            data = (f.attname, self.model) if 'with_model' in kwargs else f.attname
+                            name = f.related_query_name()
+                            data = (name, self.model) if 'with_model' in kwargs else name
                             related_fields[f.related] = data
 
             if not opts & INCLUDE_HIDDEN:
@@ -241,14 +242,14 @@ class Options(object):
                                               if not k.field.rel.is_hidden()])
 
             if 'inversed_order' not in kwargs:
-                temp = OrderedDict()
+                temp = []
                 for field, data in related_fields.items():
                     if 'with_model' in kwargs:
                         key, value = data[0], (field, data[1])
                     else:
                         key, value = data, field
-                    temp[key] = value
-                related_fields = temp
+                    temp.append((key, value))
+                related_fields = tuple(temp)
             fields.update(related_fields)
 
         return tuple(fields.iteritems())
