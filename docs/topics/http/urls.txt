@@ -112,7 +112,7 @@ Example requests:
 * ``/articles/2003/03/03/`` would match the final pattern. Django would call
   the function ``news.views.article_detail(request, '2003', '03', '03')``.
 
-.. _Dive Into Python's explanation: http://diveintopython.net/regular_expressions/street_addresses.html#re.matching.2.3
+.. _Dive Into Python's explanation: http://www.diveintopython.net/regular_expressions/street_addresses.html#re.matching.2.3
 
 Named groups
 ============
