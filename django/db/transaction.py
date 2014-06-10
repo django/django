@@ -149,7 +149,7 @@ class Atomic(object):
             # Reset state when entering an outermost atomic block.
             connection.commit_on_exit = True
             connection.needs_rollback = False
-            if not connection.get_autocommit():
+            if not get_autocommit(self.using):
                 # Some database adapters (namely sqlite3) don't handle
                 # transactions and savepoints properly when autocommit is off.
                 # Turning autocommit back on isn't an option; it would trigger
@@ -177,7 +177,7 @@ class Atomic(object):
             # second condition avoids creating useless savepoints and prevents
             # overwriting needs_rollback until the rollback is performed.
             if self.savepoint and not connection.needs_rollback:
-                sid = connection.savepoint()
+                sid = savepoint(self.using)
                 connection.savepoint_ids.append(sid)
             else:
                 connection.savepoint_ids.append(None)
@@ -192,7 +192,7 @@ class Atomic(object):
                 connection._start_transaction_under_autocommit()
                 connection.autocommit = False
             else:
-                connection.set_autocommit(False)
+                set_autocommit(False, self.using)
             connection.in_atomic_block = True
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -215,10 +215,10 @@ class Atomic(object):
                     # Release savepoint if there is one
                     if sid is not None:
                         try:
-                            connection.savepoint_commit(sid)
+                            savepoint_commit(sid, self.using)
                         except DatabaseError:
                             try:
-                                connection.savepoint_rollback(sid)
+                                savepoint_rollback(sid, self.using)
                             except Error:
                                 # If rolling back to a savepoint fails, mark for
                                 # rollback at a higher level and avoid shadowing
@@ -228,10 +228,10 @@ class Atomic(object):
                 else:
                     # Commit transaction
                     try:
-                        connection.commit()
+                        commit(self.using)
                     except DatabaseError:
                         try:
-                            connection.rollback()
+                            rollback(self.using)
                         except Error:
                             # An error during rollback means that something
                             # went wrong with the connection. Drop it.
@@ -248,7 +248,7 @@ class Atomic(object):
                         connection.needs_rollback = True
                     else:
                         try:
-                            connection.savepoint_rollback(sid)
+                            savepoint_rollback(sid, self.using)
                         except Error:
                             # If rolling back to a savepoint fails, mark for
                             # rollback at a higher level and avoid shadowing
@@ -257,7 +257,7 @@ class Atomic(object):
                 else:
                     # Roll back transaction
                     try:
-                        connection.rollback()
+                        rollback(self.using)
                     except Error:
                         # An error during rollback means that something
                         # went wrong with the connection. Drop it.
@@ -271,7 +271,7 @@ class Atomic(object):
                 elif connection.features.autocommits_when_autocommit_is_off:
                     connection.autocommit = True
                 else:
-                    connection.set_autocommit(True)
+                    set_autocommit(True, self.using)
             # Outermost block exit when autocommit was disabled.
             elif not connection.savepoint_ids and not connection.commit_on_exit:
                 if connection.closed_in_transaction:
