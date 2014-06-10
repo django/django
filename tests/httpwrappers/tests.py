@@ -26,12 +26,15 @@ lazystr = lazy(force_text, six.text_type)
 
 
 class QueryDictTests(unittest.TestCase):
+    def test_create_with_no_args(self):
+        self.assertEqual(QueryDict(), QueryDict(str('')))
+
     def test_missing_key(self):
-        q = QueryDict(str(''))
+        q = QueryDict()
         self.assertRaises(KeyError, q.__getitem__, 'foo')
 
     def test_immutability(self):
-        q = QueryDict(str(''))
+        q = QueryDict()
         self.assertRaises(AttributeError, q.__setitem__, 'something', 'bar')
         self.assertRaises(AttributeError, q.setlist, 'foo', ['bar'])
         self.assertRaises(AttributeError, q.appendlist, 'foo', ['bar'])
@@ -41,11 +44,11 @@ class QueryDictTests(unittest.TestCase):
         self.assertRaises(AttributeError, q.clear)
 
     def test_immutable_get_with_default(self):
-        q = QueryDict(str(''))
+        q = QueryDict()
         self.assertEqual(q.get('foo', 'default'), 'default')
 
     def test_immutable_basic_operations(self):
-        q = QueryDict(str(''))
+        q = QueryDict()
         self.assertEqual(q.getlist('foo'), [])
         if six.PY2:
             self.assertEqual(q.has_key('foo'), False)
@@ -95,30 +98,30 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(q.urlencode(), 'foo=bar')
 
     def test_urlencode(self):
-        q = QueryDict(str(''), mutable=True)
+        q = QueryDict(mutable=True)
         q['next'] = '/a&b/'
         self.assertEqual(q.urlencode(), 'next=%2Fa%26b%2F')
         self.assertEqual(q.urlencode(safe='/'), 'next=/a%26b/')
-        q = QueryDict(str(''), mutable=True)
+        q = QueryDict(mutable=True)
         q['next'] = '/t\xebst&key/'
         self.assertEqual(q.urlencode(), 'next=%2Ft%C3%ABst%26key%2F')
         self.assertEqual(q.urlencode(safe='/'), 'next=/t%C3%ABst%26key/')
 
     def test_mutable_copy(self):
         """A copy of a QueryDict is mutable."""
-        q = QueryDict(str('')).copy()
+        q = QueryDict().copy()
         self.assertRaises(KeyError, q.__getitem__, "foo")
         q['name'] = 'john'
         self.assertEqual(q['name'], 'john')
 
     def test_mutable_delete(self):
-        q = QueryDict(str('')).copy()
+        q = QueryDict(mutable=True)
         q['name'] = 'john'
         del q['name']
         self.assertFalse('name' in q)
 
     def test_basic_mutable_operations(self):
-        q = QueryDict(str('')).copy()
+        q = QueryDict(mutable=True)
         q['name'] = 'john'
         self.assertEqual(q.get('foo', 'default'), 'default')
         self.assertEqual(q.get('name', 'default'), 'john')
@@ -210,7 +213,7 @@ class QueryDictTests(unittest.TestCase):
             self.assertEqual(q.getlist('foo'), ['bar', '\ufffd'])
 
     def test_pickle(self):
-        q = QueryDict(str(''))
+        q = QueryDict()
         q1 = pickle.loads(pickle.dumps(q, 2))
         self.assertEqual(q == q1, True)
         q = QueryDict(str('a=b&c=d'))
