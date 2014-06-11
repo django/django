@@ -187,6 +187,7 @@ class ConnectionHandler(object):
         'USER_CREATE': 'CREATE_USER',
         'PASSWD': 'PASSWORD',
     }
+    TEST_SETTING_RENAMES_REVERSE = {v: k for k, v in TEST_SETTING_RENAMES.items()}
 
     def prepare_test_settings(self, alias):
         """
@@ -197,18 +198,29 @@ class ConnectionHandler(object):
         except KeyError:
             raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
 
+        test_dict_set = 'TEST' in conn
         test_settings = conn.setdefault('TEST', {})
+        old_test_settings = {}
         for key, value in six.iteritems(conn):
             if key.startswith('TEST_'):
                 new_key = key[5:]
                 new_key = self.TEST_SETTING_RENAMES.get(new_key, new_key)
-                if new_key in test_settings:
-                    raise ImproperlyConfigured("Connection %s has both %s and TEST[%s] specified." %
-                                               (alias, key, new_key))
-                warnings.warn("In Django 1.9 the %s connection setting will be moved "
-                              "to a %s entry in the TEST setting" % (key, new_key),
-                              RemovedInDjango19Warning, stacklevel=2)
-                test_settings[new_key] = value
+                old_test_settings[new_key] = value
+
+        if old_test_settings:
+            if test_dict_set:
+                if test_settings != old_test_settings:
+                    raise ImproperlyConfigured(
+                        "Connection '%s' has mismatched TEST and TEST_* "
+                        "database settings." % alias)
+            else:
+                test_settings.update(old_test_settings)
+                for key, _ in six.iteritems(old_test_settings):
+                    warnings.warn("In Django 1.9 the %s connection setting will be moved "
+                                  "to a %s entry in the TEST setting" %
+                                  (self.TEST_SETTING_RENAMES_REVERSE.get(key, key), key),
+                                  RemovedInDjango19Warning, stacklevel=2)
+
         for key in list(conn.keys()):
             if key.startswith('TEST_'):
                 del conn[key]
