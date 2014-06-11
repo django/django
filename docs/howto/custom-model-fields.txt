@@ -679,7 +679,7 @@ Django filter lookups: ``exact``, ``iexact``, ``contains``, ``icontains``,
 
 .. versionadded:: 1.7
 
-    If you are using :doc:`Custom lookups </ref/models/custom-lookups>` the
+    If you are using :doc:`Custom lookups </howto/custom-lookups>` the
     ``lookup_type`` can be any ``lookup_name`` used by the project's custom
     lookups.
 
