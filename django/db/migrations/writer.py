@@ -10,7 +10,7 @@ import sys
 import types
 
 from django.apps import apps
-from django.db import models
+from django.db import models, migrations
 from django.db.migrations.loader import MigrationLoader
 from django.utils import datetime_safe, six
 from django.utils.encoding import force_text
@@ -44,7 +44,17 @@ class OperationWriter(object):
         argspec = inspect.getargspec(self.operation.__init__)
         normalized_kwargs = inspect.getcallargs(self.operation.__init__, *args, **kwargs)
 
-        self.feed('migrations.%s(' % name)
+        # See if this operation is in django.db.migrations. If it is,
+        # We can just use the fact we already have that imported,
+        # otherwise, we need to add an import for the operation class.
+        if getattr(migrations, name, None) == self.operation.__class__:
+            self.feed('migrations.%s(' % name)
+        else:
+            imports.add('from %s import %s' % (
+                self.operation.__class__.__module__, name
+            ))
+            self.feed('%s(' % (name))
+
         self.indent()
         for arg_name in argspec.args[1:]:
             arg_value = normalized_kwargs[arg_name]

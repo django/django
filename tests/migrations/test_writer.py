@@ -8,6 +8,7 @@ import unittest
 
 from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
+from django.db.migrations.operations.base import Operation
 from django.db.migrations.writer import MigrationWriter, SettingsReference
 from django.test import TestCase
 from django.conf import settings
@@ -22,6 +23,25 @@ class TestModel1(object):
         return "somewhere dynamic"
     thing = models.FileField(upload_to=upload_to)
 
+class TestOperation(Operation):
+    def __init__(self):
+        pass
+
+    @property
+    def reversible(self):
+        return True
+
+    def state_forwards(self, app_label, state):
+        pass
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def state_backwards(self, app_label, state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
 
 class WriterTests(TestCase):
     """
@@ -222,3 +242,16 @@ class WriterTests(TestCase):
                 expected_path = os.path.join(base_dir, *(app.split('.') + ['migrations', '0001_initial.py']))
                 writer = MigrationWriter(migration)
                 self.assertEqual(writer.path, expected_path)
+
+    def test_custom_operation(self):
+        migration = type(str("Migration"), (migrations.Migration,), {
+            "operations": [
+                TestOperation()
+            ],
+            "dependencies": []
+        })
+        writer = MigrationWriter(migration)
+        output = writer.as_string()
+        self.assertIn("TestOperation", output)
+        result = self.safe_exec(output)
+        self.assertIn("TestOperation", result)
