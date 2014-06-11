@@ -28,7 +28,7 @@ from django.contrib.auth.models import Group, User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import patch_logger
 from django.test import override_settings
 from django.utils import formats
@@ -1527,6 +1527,7 @@ class AdminViewsNoUrlTest(TestCase):
         self.client.get('/test_admin/admin/logout/')
 
 
+@skipUnlessDBFeature('can_defer_constraint_checks')
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class AdminViewDeletedObjectsTest(TestCase):
     urls = "admin_views.urls"

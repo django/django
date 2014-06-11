@@ -402,6 +402,7 @@ if connection.features.allows_auto_pk_0:
 # registered serializers are automatically tested.
 
 
+@skipUnlessDBFeature('can_defer_constraint_checks')
 class SerializerTests(TestCase):
     def test_get_unknown_serializer(self):
         """
