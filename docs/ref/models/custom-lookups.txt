@@ -272,136 +272,182 @@ is not found, we look for a ``Transform`` and then the ``exact`` lookup on that
 
 Lookups and transforms are registered using the same API - ``register_lookup``.
 
+.. _lookup-registration-api:
+
+Registering and fetching lookups
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django uses :class:`~RegisterLookupMixin` to give a class the interface to
+register lookups on itself. The most prominent example is
+:class:`~django.db.models.Field`, subclass of :class:`RegisterLookupMixin`
+and base class of all fields.
+
+.. class:: RegisterLookupMixin
+
+    A mixin that implements the lookup API on its subclasses.
+    It uses the class attribute ``class_lookups`` to store
+    the registered lookups on the class.
+
+    .. classmethod:: register_lookup(lookup)
+
+        Registers a new lookup in the class. For example
+        ``DateField.register_lookup(YearExact)`` will register ``YearExact`` lookup on
+        ``DateField``.
+
+        It overrides any lookup that already exists with the same name.
+
+    .. method:: get_lookup(lookup_name)
+
+        Returns the ``Lookup`` named ``lookup_name`` registered in the class.
+        The default implementation looks recursively on all parent classes
+        and checks if any has a registered lookup named ``lookup_name``,
+        returning the first match.
+
+    .. method:: get_transform(transform_name)
+
+        Returns a ``Transform`` named ``transform_name``. The
+        default implementation looks recursively on all parent classes
+        to check if any has the registered transform named ``transform_name``,
+        returning the first match.
+
+All lookups must follow the `Query Expression API <query-expression>`_ below.
+In particular :class:`~Lookup` and :class:`~Transform` are currently the two base
+lookups that you can subclass.
+
+
 .. _query-expression:
 
 The Query Expression API
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-A lookup can assume that the lhs responds to the query expression API.
-Currently direct field references, aggregates and ``Transform`` instances respond
-to this API.
+The query expression API is a common set of methods that
+classes define to be usable in Query Expressions to translate themselves
+into SQL expressions. Direct field references, aggregates and
+``Transform`` are examples that follow this API.
+A class is said to follow the Query Expression API when it implements
+the following methods:
 
-.. method:: as_sql(qn, connection)
+.. method:: as_sql(self, qn, connection)
 
     Responsible for producing the query string and parameters for the
     expression. The ``qn`` is a ``SQLCompiler`` object, which has a
     ``compile()`` method that can be used to compile other expressions. The
     ``connection`` is the connection used to execute the query.
 
-    Calling expression.as_sql() directly is usually incorrect - instead
+    Calling ``expression.as_sql()`` is usually incorrect - instead
     ``qn.compile(expression)`` should be used. The ``qn.compile()`` method will
     take care of calling vendor-specific methods of the expression.
 
-.. method:: as_vendorname(qn, connection)
+.. method:: as_vendorname(self, qn, connection)
 
     Works like ``as_sql()`` method. When an expression is compiled by
     ``qn.compile()``, Django will first try to call ``as_vendorname()``, where
-    vendorname is the vendor name of the backend used for executing the query.
-    The vendorname is one of ``postgresql``, ``oracle``, ``sqlite`` or
+    ``vendorname`` is the vendor name of the backend used for executing the query.
+    The ``vendorname`` is one of ``postgresql``, ``oracle``, ``sqlite`` or
     ``mysql`` for Django's built-in backends.
 
 .. method:: get_lookup(lookup_name)
 
-    The ``get_lookup()`` method is used to fetch lookups. By default the
-    lookup is fetched from the expression's output type in the same way
-    described in registering and fetching lookup documentation below.
-    It is possible to override this method to alter that behavior.
+    Same as :meth:`~RegisterLookupMixin.get_lookup()`
 
-.. method:: get_transform(lookup_name)
+.. method:: get_transform(transform_name)
 
-    The ``get_transform()`` method is used when a transform is needed rather
-    than a lookup, or if a lookup is not found. This is a more complex
-    situation which is useful when there arbitrary possible lookups for a
-    field. Generally speaking, you will not need to override ``get_lookup()``
-    or ``get_transform()``, and can use ``register_lookup()`` instead.
+    Same as :meth:`~RegisterLookupMixin.get_transform()`
 
 .. attribute:: output_field
 
     The ``output_field`` attribute is used by the ``get_lookup()`` method to
     check for lookups. The ``output_field`` should be a field.
 
-Note that this documentation lists only the public methods of the API.
+Transform reference
+~~~~~~~~~~~~~~~~~~~
+
+.. class:: Transform
+
+    A ``Transform`` is a generic class to implement field transformations.
+    A prominent example is ``__year`` that transforms a ``DateField`` into a
+    ``IntegerField``.
+
+    The notation to use a ``Transform`` in an lookup expression is
+    ``<lhs>__<lookup_name>``.
+
+    This class follows the `Query Expression API <query-expression>`_,
+    which implies that the expression ``<lhs>__<lookup_name1>__<lookup_name2>``
+    where `lookup_name1` and `lookup_name2` are two transformations
+    is valid.
+
+    .. attribute:: lhs
+
+        The left-hand side - what is being transformed.
+        It must follow the `Query Expression API <query-expression>`_.
+
+    .. attribute:: lookup_name
+
+        The name of the lookup, used for identifying it on parsing
+        query expressions. It cannot contain the string ``"__"``.
+
+    .. attribute:: output_type
+
+        Defines the class this transformation outputs.
+        It must be a :class:`~django.db.models.Field` instance.
+        By default is the same as its ``lhs.output_type``.
+
+    .. method:: as_sql
+
+        To be overridden; raises :class:`NotImplemented`.
+
+    .. method:: get_lookup(lookup_name)
+
+        Same as :meth:`~RegisterLookupMixin.get_lookup()`
+
+    .. method:: get_transform(transform_name)
+
+        Same as :meth:`~RegisterLookupMixin.get_transform()`
+
 
 Lookup reference
 ~~~~~~~~~~~~~~~~
 
 .. class:: Lookup
 
-    In addition to the attributes and methods below, lookups also support
-    ``as_sql`` and ``as_vendorname`` from the query expression API.
+    A ``Lookup`` is a generic class to implement lookups.
+    A lookup is a query expression with a left-hand side, :attr:`lhs`,
+    a right-hand side, :attr:`rhs`, and a ``lookup_name``.
 
-.. attribute:: lhs
+    The notation to use a lookup in an expression is
+    ``<lhs>__<lookup_name>=<rhs>``.
 
-    The ``lhs`` (left-hand side) of a lookup tells us what we are comparing the
-    rhs to. It is an object which implements the query expression API. This is
-    likely to be a field, an aggregate or a subclass of ``Transform``.
+    This class doesn't follow the `Query Expression API <query-expression>`_
+    since it has ``=<rhs>`` on its construction: lookups are always
+    ends of a query expression.
 
-.. attribute:: rhs
+    .. attribute:: lhs
 
-    The ``rhs`` (right-hand side) of a lookup is the value we are comparing the
-    left hand side to. It may be a plain value, or something which compiles
-    into SQL, for example an ``F()`` object or a ``Queryset``.
+        The left-hand side - what is being looked up.
+        The object must follow the `Query Expression API <query-expression>`_.
 
-.. attribute:: lookup_name
+    .. attribute:: rhs
 
-    This class level attribute is used when registering lookups. It determines
-    the name used in queries to trigger this lookup. For example, ``contains``
-    or ``exact``. This should not contain the string ``__``.
+        The right-hand side - what ``lhs`` is being looked against.
+        It can be a plain value, or something that compiles
+        into SQL, typically a ``F()`` object or a ``Queryset``.
 
-.. method:: process_lhs(qn, connection)
+    .. attribute:: lookup_name
 
-    This returns a tuple of ``(lhs_string, lhs_params)``. In some cases you may
-    wish to compile ``lhs`` directly in your ``as_sql`` methods using
-    ``qn.compile(self.lhs)``.
+        The name of this lookup, used to identify it on parsing
+        query expressions. It cannot contain the string ``"__"``.
 
-.. method:: process_rhs(qn, connection)
+    .. method:: process_lhs(qn, connection[, lhs=None])
 
-    Behaves the same as ``process_lhs`` but acts on the right-hand side.
+        :param qn: a ``SQLCompiler``, to be used as ``qn.compile(lhs)``
+            for compiling ``lhs``.
+        :param connection: the connection (for compiling vendor specific SQL)
+        :param lhs: if not ``None``, the processed ``lhs`` is this and not ``self.lhs``.
 
-Transform reference
-~~~~~~~~~~~~~~~~~~~
+        Returns a tuple ``(lhs_string, lhs_params)``, as returned
+        by ``qn.compile(lhs)``.
+        This method can be overridden to tune how the ``lhs`` is processed.
 
-.. class:: Transform
+    .. method:: process_rhs(qn, connection)
 
-    In addition to implementing the query expression API Transforms have the
-    following methods and attributes.
-
-.. attribute:: lhs
-
-    The ``lhs`` (left-hand-side) of a transform contains the value to be
-    transformed. The ``lhs`` implements the query expression API.
-
-.. attribute:: lookup_name
-
-    This class level attribute is used when registering lookups. It determines
-    the name used in queries to trigger this lookup. For example, ``year``
-    or ``dayofweek``. This should not contain the string ``__``.
-
-.. _lookup-registration-api:
-
-Registering and fetching lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The lookup registration API is explained below.
-
-.. classmethod:: register_lookup(lookup)
-
-    Registers the Lookup or Transform for the class. For example
-    ``DateField.register_lookup(YearExact)`` will register ``YearExact`` for
-    all ``DateFields`` in the project, but also for fields that are instances
-    of a subclass of ``DateField`` (for example ``DateTimeField``). You can
-    register a Lookup or a Transform using the same class method.
-
-.. method:: get_lookup(lookup_name)
-
-    Django uses ``get_lookup(lookup_name)`` to fetch lookups. The
-    implementation of ``get_lookup()`` looks for a subclass which is registered
-    for the current class with the correct ``lookup_name``.
-
-.. method:: get_transform(lookup_name)
-
-    Django uses ``get_transform(lookup_name)`` to fetch transforms. The
-    implementation of ``get_transform()`` looks for a subclass which is registered
-    for the current class with the correct ``transform_name``.
-
-The lookup registration API is available for ``Transform`` and ``Field`` classes.
+        Behaves the same way as :meth:`process_lhs`, for the right-hand side.
