@@ -11,6 +11,7 @@ import unittest
 import warnings
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
     DatabaseError, IntegrityError, reset_queries, transaction)
@@ -1077,3 +1078,118 @@ class BackendUtilTests(TestCase):
               '0.1')
         equal('0.1234567890', 12, 0,
               '0')
+
+
+class DBTestSettingsRenamedTests(TestCase):
+
+    mismatch_msg = ("Connection 'test-deprecation' has mismatched TEST "
+                    "and TEST_* database settings.")
+
+    def setUp(self):
+        self.handler = ConnectionHandler()
+        self.db_settings = {'default': {}}
+
+    def test_mismatched_database_test_settings_1(self):
+        # if the TEST setting is used, all TEST_* keys must appear in it.
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {},
+                'TEST_NAME': 'foo',
+            }
+        })
+        with override_settings(DATABASES=self.db_settings):
+            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
+                self.handler.prepare_test_settings('test-deprecation')
+
+    def test_mismatched_database_test_settings_2(self):
+        # if the TEST setting is used, all TEST_* keys must match.
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {'NAME': 'foo'},
+                'TEST_NAME': 'bar',
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
+                self.handler.prepare_test_settings('test-deprecation')
+
+    def test_mismatched_database_test_settings_3(self):
+        # Verifies the mapping of an aliased key.
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {'CREATE_DB': 'foo'},
+                'TEST_CREATE': 'bar',
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
+                self.handler.prepare_test_settings('test-deprecation')
+
+    def test_mismatched_database_test_settings_4(self):
+        # Verifies the mapping of an aliased key when the aliased key is missing.
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {},
+                'TEST_CREATE': 'bar',
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
+                self.handler.prepare_test_settings('test-deprecation')
+
+    def test_mismatched_settings_old_none(self):
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {'CREATE_DB': None},
+                'TEST_CREATE': '',
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
+                self.handler.prepare_test_settings('test-deprecation')
+
+    def test_mismatched_settings_new_none(self):
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {},
+                'TEST_CREATE': None,
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
+                self.handler.prepare_test_settings('test-deprecation')
+
+    def test_matched_test_settings(self):
+        # should be able to define new settings and the old, if they match
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {'NAME': 'foo'},
+                'TEST_NAME': 'foo',
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            self.handler.prepare_test_settings('test-deprecation')
+
+    def test_new_settings_only(self):
+        # should be able to define new settings without the old
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {'NAME': 'foo'},
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            self.handler.prepare_test_settings('test-deprecation')
+
+    def test_old_settings_only(self):
+        # should be able to define old settings without the new
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST_NAME': 'foo',
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            self.handler.prepare_test_settings('test-deprecation')
+
+    def test_empty_settings(self):
+        with override_settings(DATABASES=self.db_settings):
+            self.handler.prepare_test_settings('default')

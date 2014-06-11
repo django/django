@@ -1546,9 +1546,12 @@ will be removed in Django 1.8.
 
 Reorganization of database test settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 All database settings with a ``TEST_`` prefix have been deprecated in favor of
 entries in a :setting:`TEST <DATABASE-TEST>` dictionary in the database
-settings. The old settings will be supported until Django 1.9.
+settings. The old settings will be supported until Django 1.9. For backwards
+compatibility with older versions of Django, you can define both versions of
+the settings as long as they match.
 
 FastCGI support
 ~~~~~~~~~~~~~~~
