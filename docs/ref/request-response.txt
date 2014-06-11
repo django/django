@@ -339,21 +339,36 @@ QueryDict objects
 
 .. class:: QueryDict
 
-In an :class:`HttpRequest` object, the ``GET`` and ``POST`` attributes are instances
-of ``django.http.QueryDict``. :class:`QueryDict` is a dictionary-like
-class customized to deal with multiple values for the same key. This is
-necessary because some HTML form elements, notably
-``<select multiple="multiple">``, pass multiple values for the same key.
+In an :class:`HttpRequest` object, the ``GET`` and ``POST`` attributes are
+instances of ``django.http.QueryDict``, a dictionary-like class customized to
+deal with multiple values for the same key. This is necessary because some HTML
+form elements, notably ``<select multiple>``, pass multiple values for the same
+key.
 
-``QueryDict`` instances are immutable, unless you create a ``copy()`` of them.
-That means you can't change attributes of ``request.POST`` and ``request.GET``
-directly.
+The ``QueryDict``\ s at ``request.POST`` and ``request.GET`` will be immutable
+when accessed in a normal request/response cycle. To get a mutable version you
+need to use ``.copy()``.
 
 Methods
 -------
 
-:class:`QueryDict` implements all the standard dictionary methods, because it's
+:class:`QueryDict` implements all the standard dictionary methods because it's
 a subclass of dictionary. Exceptions are outlined here:
+
+.. method:: QueryDict.__init__(query_string, mutable=False, encoding=None)
+
+   Instantiates a ``QueryDict`` object based on ``query_string``.
+
+          >>> QueryDict('a=1&a=2&c=3')
+          <QueryDict: {u'a': [u'1', u'2'], u'b': [u'1']}>
+
+   Most ``QueryDict``\ s you encounter, and in particular those at
+   ``request.POST`` and ``request.GET``, will be immutable. If you are
+   instantiating one yourself, you can make it mutable by passing
+   ``mutable=True`` to its ``__init__()``.
+
+   Strings for setting both keys and values will be converted from ``encoding``
+   to unicode. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
 
 .. method:: QueryDict.__getitem__(key)
 
@@ -367,8 +382,8 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Sets the given key to ``[value]`` (a Python list whose single element is
     ``value``). Note that this, as other dictionary functions that have side
-    effects, can only be called on a mutable ``QueryDict`` (one that was created
-    via ``copy()``).
+    effects, can only be called on a mutable ``QueryDict`` (such as one that
+    was created via ``copy()``).
 
 .. method:: QueryDict.__contains__(key)
 
@@ -391,8 +406,7 @@ a subclass of dictionary. Exceptions are outlined here:
     dictionary ``update()`` method, except it *appends* to the current
     dictionary items rather than replacing them. For example::
 
-          >>> q = QueryDict('a=1')
-          >>> q = q.copy() # to make it mutable
+          >>> q = QueryDict('a=1', mutable=True)
           >>> q.update({'a': '2'})
           >>> q.getlist('a')
           ['1', '2']
@@ -437,8 +451,7 @@ In addition, ``QueryDict`` has the following methods:
 .. method:: QueryDict.copy()
 
     Returns a copy of the object, using ``copy.deepcopy()`` from the Python
-    standard library. The copy will be mutable -- that is, you can change its
-    values.
+    standard library. This copy will be mutable even if the original was not.
 
 .. method:: QueryDict.getlist(key, default)
 
