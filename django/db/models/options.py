@@ -22,13 +22,14 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save')
 
-DATA = 0b0001
-M2M = 0b0010
-RELATED_OBJECTS = 0b0100
-RELATED_M2M = 0b1000
+DATA = 0b00001
+M2M = 0b00010
+RELATED_OBJECTS = 0b00100
+RELATED_M2M = 0b01000
+VIRTUAL = 0b10000
 
 # Aggregates
-NON_RELATED_FIELDS = DATA | M2M
+NON_RELATED_FIELDS = DATA | M2M | VIRTUAL
 
 NONE = 0b0000
 LOCAL_ONLY = 0b0001
@@ -152,6 +153,9 @@ class Options(object):
         for name, data in self.get_new_fields(types=DATA,
                                               opts=opts, with_model=True):
             base[name] = data + (True, False,)
+        for name, data in self.get_new_fields(types=VIRTUAL,
+                                              opts=opts, with_model=True):
+            base[name] = data + (True, False,)
         try:
             return base[field_name]
         except KeyError:
@@ -166,6 +170,11 @@ class Options(object):
                 for parent in self.parents:
                     fields.update(parent._meta.get_new_fields(types,
                                   opts, **kwargs))
+
+            if types & VIRTUAL:
+                for field in self.virtual_fields:
+                    data = (field, self.model) if 'with_model' in kwargs else field
+                    fields[field.name] = data
 
             if types & DATA:
                 for field in self.local_fields:
