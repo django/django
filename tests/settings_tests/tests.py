@@ -453,7 +453,7 @@ class TestTupleSettings(unittest.TestCase):
             sys.modules['fake_settings_module'] = settings_module
             try:
                 with self.assertRaises(ImproperlyConfigured):
-                    s = Settings('fake_settings_module')
+                    Settings('fake_settings_module')
             finally:
                 del sys.modules['fake_settings_module']
                 delattr(settings_module, setting)
