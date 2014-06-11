@@ -139,7 +139,8 @@ very different kinds of data, and have to do different things with them.
 
 A form field is represented to a user in the browser as a HTML "widget" - a
 piece of interface machinery. Each field type has an appropriate default
-``Widget`` class, but these can be overridden as required.
+:doc:`Widget class </ref/forms/widgets/>`, but these can be overridden as
+required.
 
 Instantiating, processing, and rendering forms
 ----------------------------------------------
@@ -180,7 +181,9 @@ The work that needs to done
 ---------------------------
 
 Suppose you want to create a simple form on your website, to obtain the user's
-name. You'd need something like this in your template::
+name. You'd need something like this in your template:
+
+.. code-block:: html+django
 
     <form action="/yourname/" method="post">
         <label for="your_name">Your name: </label>
@@ -247,7 +250,9 @@ valid data, it will:
 * return ``True``
 * place the form's data in its ``cleaned_data`` attribute.
 
-The whole form, when rendered for the first time, will look like::
+The whole form, when rendered for the first time, will look like:
+
+.. code-block:: html+django
 
     <label for="your_name">Your name: </label>
     <input id="your_name" type="text" name="your_name" maxlength="100">
@@ -315,7 +320,9 @@ The template
 ^^^^^^^^^^^^
 
 We don't need to do much in our ``name.html`` template. The simplest example
-is::
+is:
+
+.. code-block:: html+django
 
     <form action="/yourname/" method="post">
         {% csrf_token %}
@@ -397,8 +404,9 @@ three of the available field types; a full list can be found in
 Widgets
 ^^^^^^^
 
-Each form field has a corresponding Widget class, which in turn corresponds to
-an HTML form widget such as ``<input type="text">``.
+Each form field has a corresponding :doc:`Widget class </ref/forms/widgets/>`,
+which in turn corresponds to an HTML form widget such as ``<input
+type="text">``.
 
 In most cases, the field will have a sensible default widget. For example, by
 default, a ``CharField`` will have a ``TextInput`` widget, that produces an
@@ -479,7 +487,9 @@ There are other output options though for the ``<label>``/``<input>`` pairs:
 Note that you'll have to provide the surrounding ``<table>`` or ``<ul>``
 elements yourself.
 
-Here's the output of ``{{ form.as_p }}`` for our ``ContactForm`` instance::
+Here's the output of ``{{ form.as_p }}`` for our ``ContactForm`` instance:
+
+.. code-block:: html+django
 
    <p><label for="id_subject">Subject:</label>
        <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
@@ -504,7 +514,9 @@ Rendering fields manually
 We don't have to let Django unpack the form's fields; we can do it manually if
 we like (allowing us to reorder the fields, for example). Each field is
 available as an attribute of the form using ``{{ form.name_of_field }}``, and
-in a Django template, will be rendered appropriately. For example::
+in a Django template, will be rendered appropriately. For example:
+
+.. code-block:: html+django
 
     {{ form.non_field_errors }}
     <div class="fieldWrapper">
@@ -538,7 +550,9 @@ field and any errors for the form as a whole. Note ``{{ form.non_field_errors
 }}`` at the top of the form and the template tag for errors on each field.
 
 Using ``{{ form.name_of_field.errors }}`` displays a list of form
-errors, rendered as an unordered list. This might look like::
+errors, rendered as an unordered list. This might look like:
+
+.. code-block:: html+django
 
    <ul class="errorlist">
        <li>Sender is required.</li>
@@ -561,7 +575,9 @@ over them::
 Non-field errors (and/or hidden field errors that are rendered at the top of
 the form when using helpers like ``form.as_p()``) will be rendered with an
 additional class of ``nonfield`` to help distinguish them from field-specific
-errors. For example, ``{{ form.non_field_errors }}`` would look like::
+errors. For example, ``{{ form.non_field_errors }}`` would look like:
+
+.. code-block:: html+django
 
     <ul class="errorlist nonfield">
         <li>Generic validation error</li>
@@ -575,7 +591,9 @@ Looping over the form's fields
 
 If you're using the same HTML for each of your form fields, you can reduce
 duplicate code by looping through each field in turn using a ``{% for %}``
-loop::
+loop:
+
+.. code-block:: html+django
 
     {% for field in form %}
         <div class="fieldWrapper">
@@ -622,7 +640,9 @@ Useful attributes on ``{{ field }}`` include:
 ``{{ field.is_hidden }}``
     This attribute is ``True`` if the form field is a hidden field and
     ``False`` otherwise. It's not particularly useful as a template
-    variable, but could be useful in conditional tests such as::
+    variable, but could be useful in conditional tests such as:
+
+.. code-block:: html+django
 
         {% if field.is_hidden %}
            {# Do something special #}
@@ -647,7 +667,9 @@ differently.
 Django provides two methods on a form that allow you to loop over the hidden
 and visible fields independently: ``hidden_fields()`` and
 ``visible_fields()``. Here's a modification of an earlier example that uses
-these two methods::
+these two methods:
+
+.. code-block:: html+django
 
     {# Include the hidden fields #}
     {% for hidden in form.hidden_fields %}
@@ -671,7 +693,9 @@ Reusable form templates
 
 If your site uses the same rendering logic for forms in multiple places, you
 can reduce duplication by saving the form's loop in a standalone template and
-using the :ttag:`include` tag to reuse it in other templates::
+using the :ttag:`include` tag to reuse it in other templates:
+
+.. code-block:: html+django
 
     # In your form template:
     {% include "form_snippet.html" %}
@@ -686,7 +710,9 @@ using the :ttag:`include` tag to reuse it in other templates::
 
 If the form object passed to a template has a different name within the
 context, you can alias it using the ``with`` argument of the :ttag:`include`
-tag::
+tag:
+
+.. code-block:: html+django
 
     {% include "form_snippet.html" with form=comment_form %}
 
