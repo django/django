@@ -340,6 +340,10 @@ if __name__ == "__main__":
         '--selenium', action='store_true', dest='selenium', default=False,
         help='Run the Selenium tests as well (if Selenium is installed)')
     options = parser.parse_args()
+
+    # Allow including a trailing slash on app_labels for tab completion convenience
+    options.modules = [os.path.normpath(labels) for labels in options.modules]
+
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
     else:
