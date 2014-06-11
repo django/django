@@ -43,6 +43,9 @@ class TestOperation(Operation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         pass
 
+class CreateModel(TestOperation):
+    pass
+
 class WriterTests(TestCase):
     """
     Tests the migration writer (makes migration files from Migration instances)
@@ -246,12 +249,14 @@ class WriterTests(TestCase):
     def test_custom_operation(self):
         migration = type(str("Migration"), (migrations.Migration,), {
             "operations": [
-                TestOperation()
+                TestOperation(),
+                CreateModel(),
+                migrations.CreateModel("MyModel", (), {}, (models.Model,)),
             ],
             "dependencies": []
         })
         writer = MigrationWriter(migration)
         output = writer.as_string()
-        self.assertIn("TestOperation", output)
         result = self.safe_exec(output)
         self.assertIn("TestOperation", result)
+        self.assertIn("CreateModel", result)
