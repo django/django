@@ -16,6 +16,9 @@ from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import get_default_timezone
 
+import custom_migration_operations.operations
+import custom_migration_operations.more_operations
+
 
 class TestModel1(object):
     def upload_to(self):
@@ -222,3 +225,22 @@ class WriterTests(TestCase):
                 expected_path = os.path.join(base_dir, *(app.split('.') + ['migrations', '0001_initial.py']))
                 writer = MigrationWriter(migration)
                 self.assertEqual(writer.path, expected_path)
+
+    def test_custom_operation(self):
+        migration = type(str("Migration"), (migrations.Migration,), {
+            "operations": [
+                custom_migration_operations.operations.TestOperation(),
+                custom_migration_operations.operations.CreateModel(),
+                migrations.CreateModel("MyModel", (), {}, (models.Model,)),
+                custom_migration_operations.more_operations.TestOperation()
+            ],
+            "dependencies": []
+        })
+        writer = MigrationWriter(migration)
+        output = writer.as_string()
+        result = self.safe_exec(output)
+        self.assertIn("custom_migration_operations", result)
+        self.assertNotEqual(
+            result['custom_migration_operations'].operations.TestOperation,
+            result['custom_migration_operations'].more_operations.TestOperation
+        )
