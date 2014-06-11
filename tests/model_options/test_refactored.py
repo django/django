@@ -5,7 +5,7 @@ from django.db.models.fields import related, CharField
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 from django.db.models.options import (
-    DATA, M2M as _M2M, RELATED_OBJECTS, RELATED_M2M,
+    DATA, M2M as _M2M, RELATED_OBJECTS, RELATED_M2M, VIRTUAL,
     LOCAL_ONLY, CONCRETE, INCLUDE_PROXY, INCLUDE_HIDDEN, NONE
 )
 
@@ -32,6 +32,12 @@ class OptionsBaseTests(test.TestCase):
         models = [m._meta.get_field_details(fn, opts=opts)[1] for fn, f in res]
         fields = [f for fn, f in res]
         return zip(fields, map(lambda model: None if m == model else model, models))
+
+    def _map_none(self, m, res):
+        res = list(res)
+        if res[1] == m:
+            res[1] = None
+        return tuple(res)
 
 
 class DataTests(OptionsBaseTests):
@@ -171,33 +177,33 @@ class RelatedM2MTests(OptionsBaseTests):
 class VirtualFieldsTests(OptionsBaseTests):
 
     def test_virtual_fields(self):
-        self.assertEquals([f.name for f in Virtual._meta.virtual_fields], [
+        self.assertEquals([fn for fn, f in Virtual._meta.get_new_fields(types=VIRTUAL)], [
                           'content_object'])
 
 
 class GetFieldByNameTests(OptionsBaseTests):
 
     def test_get_data_field(self):
-        field_info = Data._meta.get_field_by_name('name_abstract')
+        field_info = self._map_none(Data, Data._meta.get_field_details('name_abstract'))
         self.assertEquals(field_info[1:], (BaseData, True, False))
         self.assertTrue(isinstance(field_info[0], CharField))
 
     def test_get_m2m_field(self):
-        field_info = M2M._meta.get_field_by_name('m2m_base')
+        field_info = self._map_none(M2M, M2M._meta.get_field_details('m2m_base'))
         self.assertEquals(field_info[1:], (BaseM2M, True, True))
         self.assertTrue(isinstance(field_info[0], related.ManyToManyField))
 
     def test_get_related_object(self):
-        field_info = RelatedObject._meta.get_field_by_name('relrelatedobjects')
+        field_info = self._map_none(RelatedObject, RelatedObject._meta.get_field_details('relrelatedobjects'))
         self.assertEquals(field_info[1:], (None, False, False))
         self.assertTrue(isinstance(field_info[0], related.RelatedObject))
 
     def test_get_related_m2m(self):
-        field_info = RelatedM2M._meta.get_field_by_name('relrelatedm2m')
+        field_info = self._map_none(RelatedM2M, RelatedM2M._meta.get_field_details('relrelatedm2m'))
         self.assertEquals(field_info[1:], (None, False, True))
         self.assertTrue(isinstance(field_info[0], related.RelatedObject))
 
     def test_get_virtual_field(self):
-        field_info = Virtual._meta.get_field_by_name('content_object')
+        field_info = self._map_none(Virtual, Virtual._meta.get_field_details('content_object'))
         self.assertEquals(field_info[1:], (None, True, False))
         self.assertTrue(isinstance(field_info[0], GenericForeignKey))

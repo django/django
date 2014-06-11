@@ -203,18 +203,19 @@ class Options(object):
                                                           inversed_order=True):
                     has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
                     if has_rel_attr and self == f.rel.to._meta:
-                        data = (f.attname, self.model) if 'with_model' in kwargs else f.attname
+                        name = f.related_query_name()
+                        data = (name, self.model) if 'with_model' in kwargs else name
                         related_m2m_fields[f.related] = data
 
             if 'inversed_order' not in kwargs:
-                temp = OrderedDict()
+                temp = []
                 for field, data in related_m2m_fields.items():
                     if 'with_model' in kwargs:
                         key, value = data[0], (field, data[1])
                     else:
                         key, value = data, field
-                    temp[key] = value
-                related_m2m_fields = temp
+                    temp.append((key, value))
+                related_m2m_fields = tuple(temp)
 
             fields.update(related_m2m_fields)
 
