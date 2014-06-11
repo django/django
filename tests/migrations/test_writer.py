@@ -17,6 +17,7 @@ from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import get_default_timezone
 
+import operations
 
 class TestModel1(object):
     def upload_to(self):
@@ -252,11 +253,14 @@ class WriterTests(TestCase):
                 TestOperation(),
                 CreateModel(),
                 migrations.CreateModel("MyModel", (), {}, (models.Model,)),
+                operations.TestOperation()
             ],
             "dependencies": []
         })
         writer = MigrationWriter(migration)
         output = writer.as_string()
         result = self.safe_exec(output)
+        # Need a way to ensure we have two different
+        # TestOperation classes.
         self.assertIn("TestOperation", result)
         self.assertIn("CreateModel", result)
