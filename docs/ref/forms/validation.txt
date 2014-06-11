@@ -412,5 +412,5 @@ sample) looks like this::
 
 The second argument of ``add_error()`` can be a simple string, or preferably
 an instance of ``ValidationError``. See :ref:`raising-validation-error` for
-more details. Note that ``add_error()` automatically removes the field
+more details. Note that ``add_error()`` automatically removes the field
 from ``cleaned_data``.
