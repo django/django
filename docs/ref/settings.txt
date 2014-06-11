@@ -586,6 +586,8 @@ TEST
 
     All :setting:`TEST <DATABASE-TEST>` sub-entries used to be independent
     entries in the database settings dictionary, with a ``TEST_`` prefix.
+    For backwards compatibility with older versions of Django, you can define
+    both versions of the settings as long as they match.
     Further, ``TEST_CREATE``, ``TEST_USER_CREATE`` and ``TEST_PASSWD``
     were changed to ``CREATE_DB``, ``CREATE_USER`` and ``PASSWORD``
     respectively.
