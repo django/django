@@ -210,7 +210,7 @@ class ConnectionHandler(object):
                         "Connection '%s' has mismatched TEST and TEST_* "
                         "database settings." % alias)
             else:
-                test_settings = old_test_settings
+                test_settings.update(old_test_settings)
                 for key, _ in six.iteritems(old_test_settings):
                     warnings.warn("In Django 1.9 the %s connection setting will be moved "
                                   "to a %s entry in the TEST setting" %
