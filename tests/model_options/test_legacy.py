@@ -4,7 +4,9 @@ from collections import OrderedDict
 from django.db.models.fields import related, CharField
 from django.contrib.contenttypes.fields import GenericForeignKey
 
-from .models import Person
+from .models import (
+    AbstractPerson, BasePerson, Person
+)
 
 
 class OptionsBaseTests(test.TestCase):
@@ -45,15 +47,16 @@ class DataTests(OptionsBaseTests):
 class M2MTests(OptionsBaseTests):
 
     def test_many_to_many(self):
-        fields = M2M._meta.many_to_many
+        fields = Person._meta.many_to_many
         self.assertEquals([f.attname for f in fields], [
-                          'm2m_abstract', 'm2m_base', 'm2m'])
+                          'm2m_abstract', 'm2m_base', 'friends',
+                          'following', 'm2m_inherited'])
         self.assertTrue(all([isinstance(f.rel, related.ManyToManyRel)
                              for f in fields]))
 
     def test_many_to_many_with_model(self):
-        models = OrderedDict(M2M._meta.get_m2m_with_model()).values()
-        self.assertEquals(models, [BaseM2M, BaseM2M, None])
+        models = OrderedDict(Person._meta.get_m2m_with_model()).values()
+        self.assertEquals(models, [BasePerson, BasePerson, BasePerson, BasePerson, None])
 
 
 class RelatedObjectsTests(OptionsBaseTests):
