@@ -39,6 +39,10 @@ class DateParseTests(unittest.TestCase):
             datetime(2012, 4, 9, 4, 8, 16, 0, get_fixed_timezone(-200)))
         self.assertEqual(parse_datetime('2012-04-23T10:20:30.400+02:30'),
             datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(150)))
+        self.assertEqual(parse_datetime('2012-04-23T10:20:30.400+02'),
+            datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(120)))
+        self.assertEqual(parse_datetime('2012-04-23T10:20:30.400-02'),
+            datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(-120)))
         # Invalid inputs
         self.assertEqual(parse_datetime('20120423091500'), None)
         self.assertRaises(ValueError, parse_datetime, '2012-04-56T09:15:90')
