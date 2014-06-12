@@ -842,7 +842,7 @@ optional arguments:
 
 Requires the `Pillow`_ library.
 
-.. _Pillow: http://python-imaging.github.io/Pillow/
+.. _Pillow: http://pillow.readthedocs.org/en/latest/
 
 By default, :class:`ImageField` instances are created as ``varchar(100)``
 columns in your database. As with other fields, you can change the maximum
