@@ -4,14 +4,7 @@ from collections import OrderedDict
 from django.db.models.fields import related, CharField
 from django.contrib.contenttypes.fields import GenericForeignKey
 
-from .models import (
-    BaseData, Data, ConcreteData,
-    BaseM2M, M2M,
-    BaseRelatedObject, RelatedObject, HiddenRelatedObject,
-    BaseRelatedM2M, RelatedM2M,
-    RelatedM2MRecursiveSymmetrical, RelatedM2MRecursiveAsymmetrical,
-    Virtual
-)
+from .models import Person
 
 
 class OptionsBaseTests(test.TestCase):
@@ -24,22 +17,27 @@ class OptionsBaseTests(test.TestCase):
 class DataTests(OptionsBaseTests):
 
     def test_fields(self):
-        fields = Data._meta.fields
+        fields = Person._meta.fields
         self.assertEquals([f.attname for f in fields], [
-                          u'id', 'name_abstract', 'name_base',
-                          u'basedata_ptr_id', 'name'])
+                          'id', 'data_abstract', 'fk_abstract_id',
+                          'data_not_concrete_abstract', 'data_base',
+                          'fk_base_id', 'data_not_concrete_base',
+                          'baseperson_ptr_id', 'data_inherited',
+                          'fk_inherited_id', 'data_not_concrete_inherited'])
 
     def test_local_fields(self):
-        fields = Data._meta.local_fields
+        fields = Person._meta.local_fields
         self.assertEquals([f.attname for f in fields], [
-                          u'basedata_ptr_id', 'name'])
+                          'baseperson_ptr_id', 'data_inherited',
+                          'fk_inherited_id', 'data_not_concrete_inherited'])
         self.assertTrue(all([f.rel is None or not isinstance(f.rel,
                         related.ManyToManyRel) for f in fields]))
 
     def test_local_concrete_fields(self):
-        fields = ConcreteData._meta.local_concrete_fields
+        fields = Person._meta.local_concrete_fields
         self.assertEquals([f.attname for f in fields], [
-                          u'data_ptr_id', 'name_concrete'])
+                          'baseperson_ptr_id', 'data_inherited',
+                          'fk_inherited_id'])
         self.assertTrue(all([f.column is not None
                              for f in fields]))
 
