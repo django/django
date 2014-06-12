@@ -629,7 +629,7 @@ For each field, we describe the default widget used if you don't specify
     When you use an ``ImageField`` on a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
 
-.. _Pillow: http://python-imaging.github.io/Pillow/
+.. _Pillow: http://pillow.readthedocs.org/en/latest/
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 
 ``IntegerField``
