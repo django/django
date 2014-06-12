@@ -204,6 +204,12 @@ class ModelState(object):
                     options[name] = set(normalize_together(it))
                 else:
                     options[name] = model._meta.original_attrs[name]
+        # If we're ignoring relationships, remove all field-listing model
+        # options (that option basically just means "make a stub model")
+        if exclude_rels:
+            for key in ["unique_together", "index_together", "order_with_respect_to"]:
+                if key in options:
+                    del options[key]
 
         def flatten_bases(model):
             bases = []
