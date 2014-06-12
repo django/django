@@ -4,144 +4,87 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 
 
-# DATA
-class RelatedConcreteData(models.Model):
+# VIRTUAL field models
+class AbstractVirtualRelation(models.Model):
     pass
 
 
-class AbstractData(models.Model):
-    class Meta:
-        abstract = True
-    name_abstract = models.CharField(max_length=10)
-
-
-class BaseData(AbstractData):
-    name_base = models.CharField(max_length=10)
-
-
-class Data(BaseData):
-    name = models.CharField(max_length=10)
-
-
-class ConcreteData(Data):
-    name_concrete = models.CharField(max_length=10)
-    non_concrete_relationship = models.ForeignObject(RelatedConcreteData,
-            from_fields=['non_concrete_id'], to_fields=['id'])
-
-
-# M2M
-# M2M RELATIONS
-class RelAbstractM2M(models.Model):
+class BaseVirtualRelation(models.Model):
     pass
 
 
-class RelBaseM2M(models.Model):
+class ConcreteVirtualRelation(models.Model):
     pass
 
 
-class RelM2M(models.Model):
+# FOREIGN KEY models
+class AbstractRelatedObject(models.Model):
     pass
 
 
-# M2M MODELS
-class AbstractM2M(models.Model):
-    m2m_abstract = models.ManyToManyField(RelAbstractM2M)
-
-    class Meta:
-        abstract = True
-
-
-class BaseM2M(AbstractM2M):
-    m2m_base = models.ManyToManyField(RelBaseM2M)
-
-
-class M2M(BaseM2M):
-    m2m = models.ManyToManyField(RelM2M)
-
-
-# RELATED_OBJECTS
-# RELATED_OBJECTS RELATIONS
-class RelBaseRelatedObjects(models.Model):
-    rel_base = models.ForeignKey('BaseRelatedObject')
-
-
-class RelRelatedObjects(models.Model):
-    rel = models.ForeignKey('RelatedObject')
-
-
-class RelHiddenRelatedObjects(models.Model):
-    rel_hidden = models.ForeignKey('HiddenRelatedObject',
-                                   related_name='+')
-
-
-class RelProxyRelatedObjects(models.Model):
-    rel_hidden = models.ForeignKey('ProxyRelatedObject')
-
-
-class RelProxyHiddenRelatedObjects(models.Model):
-    rel_hidden = models.ForeignKey('ProxyRelatedObject',
-                                   related_name='+')
-
-
-# RELATED_OBJECTS MODELS
 class BaseRelatedObject(models.Model):
     pass
 
 
-class RelatedObject(BaseRelatedObject):
+class ConcreteRelatedObject(models.Model):
     pass
 
 
-class HiddenRelatedObject(RelatedObject):
+# M2M models
+class AbstractRelatedM2M(models.Model):
     pass
 
 
-class ProxyRelatedObject(RelatedObject):
-    class Meta:
-        proxy = True
-
-
-# RELATED_M2M
-# RELATED_M2M RELATIONS
-class RelBaseRelatedM2M(models.Model):
-    rel_base = models.ManyToManyField('BaseRelatedM2M')
-
-
-class RelRelatedM2M(models.Model):
-    rel = models.ManyToManyField('RelatedM2M')
-
-
-# RELATED_M2M MODELS
 class BaseRelatedM2M(models.Model):
     pass
 
 
-class RelatedM2M(BaseRelatedM2M):
+class ConcreteRelatedM2M(models.Model):
     pass
 
 
-class RelatedM2MRecursiveAsymmetrical(models.Model):
-    name = models.CharField(max_length=50)
+# Models
+class AbstractPerson(models.Model):
+    class Meta:
+        abstract = True
+    data_abstract = models.CharField(max_length=10)
+    fk_abstract = models.ForeignKey(AbstractRelatedObject)
+    m2m_abstract = models.ManyToManyField(AbstractRelatedM2M)
+    data_not_concrete_abstract = models.ForeignObject(AbstractVirtualRelation,
+            from_fields=['abstract_non_concrete_id'], to_fields=['id'])
+
+
+class BasePerson(AbstractPerson):
+    data_base = models.CharField(max_length=10)
+    fk_base = models.ForeignKey(BaseRelatedObject)
+    m2m_base = models.ManyToManyField(BaseRelatedM2M)
+    data_not_concrete_base = models.ForeignObject(BaseVirtualRelation,
+            from_fields=['base_non_concrete_id'], to_fields=['id'])
+    friends = models.ManyToManyField(
+        'self', related_name='friends', symmetrical=True)
     following = models.ManyToManyField(
         'self', related_name='followers', symmetrical=False)
 
 
-class RelatedM2MRecursiveSymmetrical(models.Model):
-    name = models.CharField(max_length=50)
-    friends = models.ManyToManyField(
-        'self', related_name='friends', symmetrical=True)
+class Person(BasePerson):
+    data_inherited = models.CharField(max_length=10)
+    fk_inherited = models.ForeignKey(ConcreteRelatedObject)
+    m2m_inherited = models.ManyToManyField(ConcreteRelatedM2M)
+    data_not_concrete_inherited = models.ForeignObject(ConcreteVirtualRelation,
+            from_fields=['model_non_concrete_id'], to_fields=['id'])
 
 
-# VIRTUAL_FIELDS
-# VIRTUAL_FIELDS RELATIONS
-class RelVirtiual(models.Model):
-    generic_model = GenericRelation('ModelWithGenericFK')
+class Computer(models.Model):
+    person = models.ForeignKey(BasePerson)
 
 
-# VIRTUAL_FIELDS MODELS
-class Virtual(models.Model):
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+class Watch(models.Model):
+    person = models.ForeignKey(Person)
 
 
+class Car(models.Model):
+    people = models.ManyToManyField(BasePerson)
+
+
+class Photo(models.Model):
+    people = models.ManyToManyField(Person)
