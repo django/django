@@ -26,7 +26,7 @@ from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
 from django.test import (TestCase, TransactionTestCase, override_settings,
     skipUnlessDBFeature, skipIfDBFeature)
-from django.test.utils import str_prefix
+from django.test.utils import str_prefix, IgnoreAllDeprecationWarningsMixin
 from django.utils import six
 from django.utils.six.moves import xrange
 
@@ -1080,12 +1080,19 @@ class BackendUtilTests(TestCase):
               '0')
 
 
-class DBTestSettingsRenamedTests(TestCase):
+class DBTestSettingsRenamedTests(IgnoreAllDeprecationWarningsMixin, TestCase):
 
     mismatch_msg = ("Connection 'test-deprecation' has mismatched TEST "
                     "and TEST_* database settings.")
 
+    @classmethod
+    def setUpClass(cls):
+        # Silence "UserWarning: Overriding setting DATABASES can lead to
+        # unexpected behavior."
+        cls.warning_classes.append(UserWarning)
+
     def setUp(self):
+        super(DBTestSettingsRenamedTests, self).setUp()
         self.handler = ConnectionHandler()
         self.db_settings = {'default': {}}
 
