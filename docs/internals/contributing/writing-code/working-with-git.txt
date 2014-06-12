@@ -46,7 +46,10 @@ forked Django's repository, create a local copy of your fork::
     git clone git@github.com:github_nick/django.git
 
 This will create a new directory "django", containing a clone of your GitHub
-repository.
+repository. The rest of the git commands on this page need to be run within the
+cloned directory so switch to it now::
+
+    cd django
 
 Your GitHub repository will be called "origin" in Git.
 
