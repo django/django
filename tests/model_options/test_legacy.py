@@ -108,25 +108,36 @@ class RelatedObjectsTests(OptionsBaseTests):
         ], (None, None, None, None, None))
 
     def test_related_objects_proxy(self):
-        objects = RelatedObject._meta.get_all_related_objects_with_model(
+        objects = Person._meta.get_all_related_objects_with_model(
             include_proxy_eq=True)
         self.eq_field_names_and_models(objects, [
-            'model_options:relbaserelatedobjects',
-            'model_options:relrelatedobjects',
-            'model_options:relproxyrelatedobjects',
-            'model_options:hiddenrelatedobject',
-        ], (BaseRelatedObject, None, None, None))
+            'model_options:computer',
+            'model_options:watch',
+            'model_options:hometown',
+        ], (BasePerson, None, None))
 
     def test_related_objects_proxy_hidden(self):
-        objects = RelatedObject._meta.get_all_related_objects_with_model(
+        objects = Person._meta.get_all_related_objects_with_model(
             include_proxy_eq=True, include_hidden=True)
         self.eq_field_names_and_models(objects, [
-            'model_options:relbaserelatedobjects',
-            'model_options:relrelatedobjects',
-            'model_options:relproxyrelatedobjects',
-            'model_options:relproxyhiddenrelatedobjects',
-            'model_options:hiddenrelatedobject',
-        ], (BaseRelatedObject, None, None, None, None))
+            u'model_options:baseperson_m2m_base',
+            u'model_options:baseperson_following',
+            u'model_options:baseperson_following',
+            u'model_options:baseperson_friends',
+            u'model_options:baseperson_friends',
+            u'model_options:baseperson_m2m_abstract',
+            u'model_options:computer',
+            u'model_options:computerhidden',
+            u'model_options:car_people',
+            u'model_options:carhidden_people',
+            u'model_options:person_m2m_inherited',
+            u'model_options:watch', u'model_options:watchhidden',
+            u'model_options:hometown', u'model_options:hometownhidden',
+            u'model_options:photo_people',
+            u'model_options:photohidden_people'
+        ], (BasePerson, BasePerson, BasePerson, BasePerson,
+            BasePerson, BasePerson, BasePerson, BasePerson,
+            BasePerson, BasePerson, None, None, None, None, None, None, None))
 
 
 class RelatedM2MTests(OptionsBaseTests):

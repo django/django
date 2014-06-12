@@ -74,6 +74,11 @@ class Person(BasePerson):
             from_fields=['model_non_concrete_id'], to_fields=['id'])
 
 
+class ProxyPerson(Person):
+    class Meta:
+        proxy = True
+
+
 class Computer(models.Model):
     person = models.ForeignKey(BasePerson)
 
@@ -89,6 +94,15 @@ class Watch(models.Model):
 
 class WatchHidden(models.Model):
     person = models.ForeignKey(Person,
+                               related_name='+')
+
+
+class Hometown(models.Model):
+    person = models.ForeignKey(ProxyPerson)
+
+
+class HometownHidden(models.Model):
+    person = models.ForeignKey(ProxyPerson,
                                related_name='+')
 
 
