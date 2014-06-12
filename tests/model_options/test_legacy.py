@@ -76,20 +76,36 @@ class RelatedObjectsTests(OptionsBaseTests):
         ], (None,))
 
     def test_related_objects_include_hidden(self):
-        objects = HiddenRelatedObject._meta.get_all_related_objects_with_model(
+        objects = Person._meta.get_all_related_objects_with_model(
             include_hidden=True)
         self.eq_field_names_and_models(objects, [
-            'model_options:relbaserelatedobjects',
-            'model_options:relrelatedobjects',
-            'model_options:relhiddenrelatedobjects'
-        ], (BaseRelatedObject, RelatedObject, None))
+            u'model_options:baseperson_m2m_base',
+            u'model_options:baseperson_following',
+            u'model_options:baseperson_following',
+            u'model_options:baseperson_friends',
+            u'model_options:baseperson_friends',
+            u'model_options:baseperson_m2m_abstract',
+            u'model_options:computer',
+            u'model_options:computerhidden',
+            u'model_options:car_people',
+            u'model_options:carhidden_people',
+            u'model_options:person_m2m_inherited',
+            u'model_options:watch', u'model_options:watchhidden',
+            u'model_options:photo_people',
+            u'model_options:photohidden_people'
+        ], (BasePerson, BasePerson, BasePerson, BasePerson,
+            BasePerson, BasePerson, BasePerson, BasePerson,
+            BasePerson, BasePerson, None, None, None, None, None))
 
     def test_related_objects_include_hidden_local_only(self):
-        objects = HiddenRelatedObject._meta.get_all_related_objects_with_model(
+        objects = Person._meta.get_all_related_objects_with_model(
             include_hidden=True, local_only=True)
         self.eq_field_names_and_models(objects, [
-            'model_options:relhiddenrelatedobjects'
-        ], (None,))
+            u'model_options:person_m2m_inherited',
+            u'model_options:watch', u'model_options:watchhidden',
+            u'model_options:photo_people',
+            u'model_options:photohidden_people'
+        ], (None, None, None, None, None))
 
     def test_related_objects_proxy(self):
         objects = RelatedObject._meta.get_all_related_objects_with_model(

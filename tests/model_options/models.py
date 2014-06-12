@@ -78,13 +78,33 @@ class Computer(models.Model):
     person = models.ForeignKey(BasePerson)
 
 
+class ComputerHidden(models.Model):
+    person = models.ForeignKey(BasePerson,
+                               related_name='+')
+
+
 class Watch(models.Model):
     person = models.ForeignKey(Person)
+
+
+class WatchHidden(models.Model):
+    person = models.ForeignKey(Person,
+                               related_name='+')
 
 
 class Car(models.Model):
     people = models.ManyToManyField(BasePerson)
 
 
+class CarHidden(models.Model):
+    people = models.ManyToManyField(BasePerson,
+                               related_name='+')
+
+
 class Photo(models.Model):
     people = models.ManyToManyField(Person)
+
+
+class PhotoHidden(models.Model):
+    people = models.ManyToManyField(Person,
+                                    related_name='+')
