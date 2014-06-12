@@ -5,7 +5,7 @@ from django.db.models.fields import related, CharField
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 from .models import (
-    AbstractPerson, BasePerson, Person
+    BasePerson, Person
 )
 
 
@@ -62,20 +62,18 @@ class M2MTests(OptionsBaseTests):
 class RelatedObjectsTests(OptionsBaseTests):
 
     def test_related_objects(self):
-        objects = RelatedObject._meta.get_all_related_objects_with_model()
+        objects = Person._meta.get_all_related_objects_with_model()
         self.eq_field_names_and_models(objects, [
-            'model_options:relbaserelatedobjects',
-            'model_options:relrelatedobjects',
-            u'model_options:hiddenrelatedobject'
-        ], (BaseRelatedObject, None, None))
+            'model_options:computer',
+            'model_options:watch'
+        ], (BasePerson, None))
 
     def test_related_objects_local(self):
-        objects = RelatedObject._meta.get_all_related_objects_with_model(
+        objects = Person._meta.get_all_related_objects_with_model(
             local_only=True)
         self.eq_field_names_and_models(objects, [
-            'model_options:relrelatedobjects',
-            'model_options:hiddenrelatedobject'
-        ], (None, None))
+            'model_options:watch'
+        ], (None,))
 
     def test_related_objects_include_hidden(self):
         objects = HiddenRelatedObject._meta.get_all_related_objects_with_model(
