@@ -24,6 +24,7 @@ class DataTests(OptionsBaseTests):
                           'id', 'data_abstract', 'fk_abstract_id',
                           'data_not_concrete_abstract', 'data_base',
                           'fk_base_id', 'data_not_concrete_base',
+                          'content_type_id', 'object_id',
                           'baseperson_ptr_id', 'data_inherited',
                           'fk_inherited_id', 'data_not_concrete_inherited'])
 
@@ -143,66 +144,67 @@ class RelatedObjectsTests(OptionsBaseTests):
 class RelatedM2MTests(OptionsBaseTests):
 
     def test_related_m2m_with_model(self):
-        objects = RelatedM2M._meta.get_all_related_m2m_objects_with_model()
+        objects = Person._meta.get_all_related_m2m_objects_with_model()
         self.eq_field_names_and_models(objects, [
-            'model_options:relbaserelatedm2m',
-            'model_options:relrelatedm2m'
-        ], (BaseRelatedM2M, None))
+            u'model_options:baseperson',
+            u'model_options:baseperson',
+            u'model_options:car',
+            u'model_options:carhidden',
+            u'model_options:photo',
+            u'model_options:photohidden'
+        ], (BasePerson, BasePerson, BasePerson, BasePerson, None, None))
 
     def test_related_m2m_local_only(self):
-        objects = RelatedM2M._meta.get_all_related_many_to_many_objects(
+        objects = Person._meta.get_all_related_many_to_many_objects(
             local_only=True)
         self.assertEquals([o.name for o in objects], [
-            'model_options:relrelatedm2m'
+            u'model_options:photo',
+            u'model_options:photohidden'
         ])
 
     def test_related_m2m_asymmetrical(self):
-        m2m = RelatedM2MRecursiveAsymmetrical._meta.many_to_many
-        self.assertEquals([f.name for f in m2m],
-                          ['following'])
-        related_m2m = RelatedM2MRecursiveAsymmetrical._meta.get_all_related_many_to_many_objects()
-        self.assertEquals([o.field.related_query_name() for o in related_m2m],
-                          ['followers'])
+        m2m = Person._meta.many_to_many
+        self.assertTrue('following' in [f.attname for f in m2m])
+        related_m2m = Person._meta.get_all_related_many_to_many_objects()
+        self.assertTrue('followers' in [o.field.related_query_name() for o in related_m2m])
 
     def test_related_m2m_symmetrical(self):
-        m2m = RelatedM2MRecursiveSymmetrical._meta.many_to_many
-        self.assertEquals([f.name for f in m2m],
-                          ['friends'])
-        related_m2m = RelatedM2MRecursiveSymmetrical._meta.get_all_related_many_to_many_objects()
-        self.assertEquals([o.field.related_query_name() for o in related_m2m],
-                          ['friends_rel_+'])
+        m2m = Person._meta.many_to_many
+        self.assertTrue('friends' in [f.attname for f in m2m])
+        related_m2m = Person._meta.get_all_related_many_to_many_objects()
+        self.assertTrue('friends_rel_+' in [o.field.related_query_name() for o in related_m2m])
 
 
 class VirtualFieldsTests(OptionsBaseTests):
 
     def test_virtual_fields(self):
-        self.assertEquals([f.name for f in Virtual._meta.virtual_fields], [
+        self.assertEquals([f.name for f in Person._meta.virtual_fields], [
                           'content_object'])
 
 
 class GetFieldByNameTests(OptionsBaseTests):
 
     def test_get_data_field(self):
-        field_info = Data._meta.get_field_by_name('name_abstract')
-        self.assertEquals(field_info[1:], (BaseData, True, False))
+        field_info = Person._meta.get_field_by_name('data_abstract')
+        self.assertEquals(field_info[1:], (BasePerson, True, False))
         self.assertTrue(isinstance(field_info[0], CharField))
 
     def test_get_m2m_field(self):
-        field_info = M2M._meta.get_field_by_name('m2m_base')
-        self.assertEquals(field_info[1:], (BaseM2M, True, True))
+        field_info = Person._meta.get_field_by_name('m2m_base')
+        self.assertEquals(field_info[1:], (BasePerson, True, True))
         self.assertTrue(isinstance(field_info[0], related.ManyToManyField))
 
     def test_get_related_object(self):
-        field_info = RelatedObject._meta.get_field_by_name('relrelatedobjects')
+        field_info = Person._meta.get_field_by_name('watch')
         self.assertEquals(field_info[1:], (None, False, False))
         self.assertTrue(isinstance(field_info[0], related.RelatedObject))
 
     def test_get_related_m2m(self):
-        field_info = RelatedM2M._meta.get_field_by_name('relrelatedm2m')
+        field_info = Person._meta.get_field_by_name('photo')
         self.assertEquals(field_info[1:], (None, False, True))
         self.assertTrue(isinstance(field_info[0], related.RelatedObject))
 
     def test_get_virtual_field(self):
-        field_info = Virtual._meta.get_field_by_name('content_object')
+        field_info = Person._meta.get_field_by_name('content_object')
         self.assertEquals(field_info[1:], (None, True, False))
         self.assertTrue(isinstance(field_info[0], GenericForeignKey))

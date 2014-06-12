@@ -65,6 +65,11 @@ class BasePerson(AbstractPerson):
     following = models.ManyToManyField(
         'self', related_name='followers', symmetrical=False)
 
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type',
+                                       'object_id')
+
 
 class Person(BasePerson):
     data_inherited = models.CharField(max_length=10)
@@ -79,6 +84,7 @@ class ProxyPerson(Person):
         proxy = True
 
 
+# Models with FK pointing to Person
 class Computer(models.Model):
     person = models.ForeignKey(BasePerson)
 
@@ -106,6 +112,7 @@ class HometownHidden(models.Model):
                                related_name='+')
 
 
+# Models with M2M pointing to Person
 class Car(models.Model):
     people = models.ManyToManyField(BasePerson)
 
