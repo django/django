@@ -20,13 +20,26 @@ class OptionsBaseTests(test.TestCase):
         self.assertEquals([f.name for f in fields], names_eq)
         self.assertEquals(models, models_eq)
 
+    def eq_field_query_names_and_models(self, objects, names_eq, models_eq):
+        fields, models = zip(*objects)
+        self.assertEquals([o.field.related_query_name()
+                          for o in fields], names_eq)
+        self.assertEquals(models, models_eq)
+
     def fields(self, res):
         return [f for fn, f in res]
 
-    def fields_models(self, m, res, opts=NONE):
-        models = [m._meta.get_field_details(fn, opts=opts)[1] for fn, f in res]
-        fields = [f for fn, f in res]
-        return zip(fields, map(lambda model: None if m == model else model, models))
+    def fields_models(self, res):
+
+        def get_model(field):
+            from django.db.models import Field
+            from django.contrib.contenttypes.fields import GenericForeignKey
+            direct = isinstance(field, Field) or isinstance(field, GenericForeignKey)
+
+            model = field.model if direct else field.parent_model
+            return (field, model)
+
+        return map(get_model, res)
 
     def _map_none(self, m, res):
         res = list(res)
@@ -38,7 +51,7 @@ class OptionsBaseTests(test.TestCase):
 class DataTests(OptionsBaseTests):
 
     def test_fields(self):
-        fields = self.fields(Person._meta.get_new_fields(types=DATA))
+        fields = Person._meta.get_new_fields(types=DATA)
         self.assertEquals([f.attname for f in fields], [
                           u'id', 'data_abstract', u'fk_abstract_id',
                           'data_not_concrete_abstract', u'content_type_abstract_id',
@@ -49,7 +62,7 @@ class DataTests(OptionsBaseTests):
                           u'content_type_concrete_id', 'object_id_concrete'])
 
     def test_local_fields(self):
-        fields = self.fields(Person._meta.get_new_fields(types=DATA, opts=LOCAL_ONLY))
+        fields = Person._meta.get_new_fields(types=DATA, opts=LOCAL_ONLY)
         self.assertEquals([f.attname for f in fields], [
                           'baseperson_ptr_id', 'data_inherited',
                           'fk_inherited_id', 'data_not_concrete_inherited',
@@ -58,8 +71,8 @@ class DataTests(OptionsBaseTests):
                         related.ManyToManyRel) for f in fields]))
 
     def test_local_concrete_fields(self):
-        fields = self.fields(Person._meta.get_new_fields(types=DATA,
-                                                         opts=LOCAL_ONLY | CONCRETE))
+        fields = Person._meta.get_new_fields(types=DATA,
+                                             opts=LOCAL_ONLY | CONCRETE)
         self.assertEquals([f.attname for f in fields], [
                           'baseperson_ptr_id', 'data_inherited',
                           'fk_inherited_id', 'content_type_concrete_id',
@@ -86,30 +99,42 @@ class M2MTests(OptionsBaseTests):
 class RelatedObjectsTests(OptionsBaseTests):
 
     def test_related_objects(self):
-        objects = self.fields_models(RelatedObject, RelatedObject._meta.get_new_fields(
+        objects = self.fields_models(Person, Person._meta.get_new_fields(
                                      types=RELATED_OBJECTS))
-        self.eq_field_names_and_models(objects, [
-            'model_options:relbaserelatedobjects',
-            'model_options:relrelatedobjects',
-            u'model_options:hiddenrelatedobject'
-        ], (BaseRelatedObject, None, None))
+        self.eq_field_query_names_and_models(objects, [
+            'relating_baseperson',
+            'relating_person'
+        ], (BasePerson, None))
 
     def test_related_objects_local(self):
-        objects = self.fields_models(RelatedObject, RelatedObject._meta.get_new_fields(
+        objects = self.fields_models(Person, Person._meta.get_new_fields(
                                      types=RELATED_OBJECTS, opts=LOCAL_ONLY), LOCAL_ONLY)
-        self.eq_field_names_and_models(objects, [
-            'model_options:relrelatedobjects',
-            'model_options:hiddenrelatedobject'
-        ], (None, None))
+        self.eq_field_query_names_and_models(objects, [
+            'relating_person'
+        ], (None,))
 
     def test_related_objects_include_hidden(self):
-        objects = self.fields_models(HiddenRelatedObject, HiddenRelatedObject._meta.get_new_fields(
-                                     types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN), INCLUDE_HIDDEN)
+        objects = self.fields_models(Person._meta.get_new_fields(
+                                     types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN))
         self.eq_field_names_and_models(objects, [
-            'model_options:relbaserelatedobjects',
-            'model_options:relrelatedobjects',
-            'model_options:relhiddenrelatedobjects'
-        ], (BaseRelatedObject, RelatedObject, None))
+            'model_options:baseperson_m2m_base',
+            'model_options:baseperson_following',
+            'model_options:baseperson_following',
+            'model_options:baseperson_friends',
+            'model_options:baseperson_friends',
+            'model_options:baseperson_m2m_abstract',
+            'model_options:relating_basepeople',
+            'model_options:relating_basepeople_hidden',
+            'model_options:relating',
+            'model_options:relating',
+            'model_options:person_m2m_inherited',
+            'model_options:relating_people',
+            'model_options:relating_people_hidden',
+            'model_options:relating',
+            'model_options:relating'
+        ], (BasePerson, BasePerson, BasePerson, BasePerson,
+            BasePerson, BasePerson, BasePerson, BasePerson,
+            BasePerson, BasePerson, None, None, None, None, None))
 
     def test_related_objects_include_hidden_local_only(self):
         opts = INCLUDE_HIDDEN | LOCAL_ONLY

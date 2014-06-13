@@ -169,53 +169,36 @@ class Options(object):
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
                     fields.update(parent._meta.get_new_fields(types,
-                                  opts, **kwargs))
+                                  opts, **dict(kwargs, recursive=True)))
 
             if types & VIRTUAL:
                 for field in self.virtual_fields:
-                    data = (field, self.model) if 'with_model' in kwargs else field
-                    fields[field.name] = data
+                    fields[field] = True
 
             if types & DATA:
                 for field in self.local_fields:
                     if not ((opts & CONCRETE) and field.column is None):
-                        data = (field, self.model) if 'with_model' in kwargs else field
-                        fields[field.attname] = data
+                        fields[field] = True
 
             if types & M2M:
                 for field in self.local_many_to_many:
-                    data = (field, self.model) if 'with_model' in kwargs else field
-                    fields[field.attname] = data
+                    fields[field] = True
 
         if types & RELATED_M2M:
             related_m2m_fields = OrderedDict()
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
-                    for obj, data in parent._meta.get_new_fields(types=RELATED_M2M,
-                                                                 **dict(kwargs, inversed_order=True)):
+                    for obj in parent._meta.get_new_fields(types=RELATED_M2M, **kwargs):
                         is_valid = not (obj.field.creation_counter < 0
                                     and obj.model not in self.get_parent_list())
                         if is_valid:
-                            related_m2m_fields[obj] = data
+                            related_m2m_fields[obj] = True
 
             for model in self.get_non_swapped_models(False):
-                for name, f in model._meta.get_new_fields(types=M2M,
-                                                          inversed_order=True):
+                for f in model._meta.get_new_fields(types=M2M):
                     has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
                     if has_rel_attr and self == f.rel.to._meta:
-                        name = f.related_query_name()
-                        data = (name, self.model) if 'with_model' in kwargs else name
-                        related_m2m_fields[f.related] = data
-
-            if 'inversed_order' not in kwargs:
-                temp = []
-                for field, data in related_m2m_fields.items():
-                    if 'with_model' in kwargs:
-                        key, value = data[0], (field, data[1])
-                    else:
-                        key, value = data, field
-                    temp.append((key, value))
-                related_m2m_fields = tuple(temp)
+                        related_m2m_fields[f.related] = True
 
             fields.update(related_m2m_fields)
 
@@ -224,43 +207,32 @@ class Options(object):
             # ERROR? check
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
-                    for obj, data in parent._meta.get_new_fields(
-                            types=RELATED_OBJECTS,
-                            opts=INCLUDE_HIDDEN,
-                            **dict(kwargs, inversed_order=True)):
+                    for obj, _ in parent._meta.get_new_fields(types=RELATED_OBJECTS,
+                                                              opts=INCLUDE_HIDDEN,
+                                                              **dict(kwargs, recursive=True)):
                         if self._validate_related_object(obj):
-                            related_fields[obj] = data
+                            related_fields[obj] = True
 
             for model in self.get_non_swapped_models(True):
                 # NOTE: missing virtual fields
-                for name, f in model._meta.get_new_fields(types=DATA,
-                                                          opts=INCLUDE_HIDDEN,
-                                                          inversed_order=True):
+                for f in model._meta.get_new_fields(types=DATA,
+                                                    opts=INCLUDE_HIDDEN):
                     has_rel_attr = hasattr(f, 'rel') and f.rel
                     if has_rel_attr and f.has_class_relation():
                         to_meta = f.rel.to._meta
                         if (to_meta == self) or ((opts & INCLUDE_PROXY)
                                 and self.concrete_model == to_meta.concrete_model):
-                            name = f.related_query_name()
-                            data = (name, self.model) if 'with_model' in kwargs else name
-                            related_fields[f.related] = data
+                            related_fields[f.related] = True
 
             if not opts & INCLUDE_HIDDEN:
                 related_fields = OrderedDict([(k, v) for k, v in related_fields.items()
                                               if not k.field.rel.is_hidden()])
-
-            if 'inversed_order' not in kwargs:
-                temp = []
-                for field, data in related_fields.items():
-                    if 'with_model' in kwargs:
-                        key, value = data[0], (field, data[1])
-                    else:
-                        key, value = data, field
-                    temp.append((key, value))
-                related_fields = tuple(temp)
             fields.update(related_fields)
 
-        return tuple(fields.iteritems())
+        if not 'recursive' in kwargs:
+            fields = tuple(fields.keys())
+
+        return fields
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
