@@ -73,15 +73,14 @@ class IntrospectionTests(TestCase):
             [30, 30, 75]
         )
 
-    # The following test fails on Oracle. Since it forces null=True under the
-    # hood in some cases, its idea about null_ok is different from ours.
     @skipUnlessDBFeature('can_introspect_null')
     def test_get_table_description_nullable(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
+        nullable_by_backend = connection.features.interprets_empty_strings_as_nulls
         self.assertEqual(
             [r[6] for r in desc],
-            [False, False, False, False, True, True]
+            [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True]
         )
 
     # Regression test for #9991 - 'real' types in postgres

@@ -576,6 +576,10 @@ class BaseDatabaseFeatures(object):
     can_introspect_max_length = True
 
     # Can the backend determine reliably if a field is nullable?
+    # Note that this is separate from interprets_empty_strings_as_nulls,
+    # although the latter feature, when true, interferes with correct
+    # setting (and introspection) of CharFields' nullability.
+    # This is True for all core backends.
     can_introspect_null = True
 
     # Confirm support for introspected foreign keys
