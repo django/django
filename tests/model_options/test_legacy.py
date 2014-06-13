@@ -10,9 +10,16 @@ from .models import (
 
 
 class OptionsBaseTests(test.TestCase):
+
+    def eq_field_query_names_and_models(self, objects, names_eq, models_eq):
+        fields, models = zip(*objects)
+        self.assertEquals([o.field.related_query_name()
+                          for o in fields], names_eq)
+        self.assertEquals(models, models_eq)
+
     def eq_field_names_and_models(self, objects, names_eq, models_eq):
         fields, models = zip(*objects)
-        self.assertEquals([f.name for f in fields], names_eq)
+        self.assertEquals([o.name for o in fields], names_eq)
         self.assertEquals(models, models_eq)
 
 
@@ -64,36 +71,37 @@ class RelatedObjectsTests(OptionsBaseTests):
 
     def test_related_objects(self):
         objects = Person._meta.get_all_related_objects_with_model()
-        self.eq_field_names_and_models(objects, [
-            'model_options:computer',
-            'model_options:watch'
+        self.eq_field_query_names_and_models(objects, [
+            'relating_baseperson',
+            'relating_person'
         ], (BasePerson, None))
 
     def test_related_objects_local(self):
         objects = Person._meta.get_all_related_objects_with_model(
             local_only=True)
-        self.eq_field_names_and_models(objects, [
-            'model_options:watch'
+        self.eq_field_query_names_and_models(objects, [
+            'relating_person'
         ], (None,))
 
     def test_related_objects_include_hidden(self):
         objects = Person._meta.get_all_related_objects_with_model(
             include_hidden=True)
         self.eq_field_names_and_models(objects, [
-            u'model_options:baseperson_m2m_base',
-            u'model_options:baseperson_following',
-            u'model_options:baseperson_following',
-            u'model_options:baseperson_friends',
-            u'model_options:baseperson_friends',
-            u'model_options:baseperson_m2m_abstract',
-            u'model_options:computer',
-            u'model_options:computerhidden',
-            u'model_options:car_people',
-            u'model_options:carhidden_people',
-            u'model_options:person_m2m_inherited',
-            u'model_options:watch', u'model_options:watchhidden',
-            u'model_options:photo_people',
-            u'model_options:photohidden_people'
+            'model_options:baseperson_m2m_base',
+            'model_options:baseperson_following',
+            'model_options:baseperson_following',
+            'model_options:baseperson_friends',
+            'model_options:baseperson_friends',
+            'model_options:baseperson_m2m_abstract',
+            'model_options:relating_basepeople',
+            'model_options:relating_basepeople_hidden',
+            'model_options:relating',
+            'model_options:relating',
+            'model_options:person_m2m_inherited',
+            'model_options:relating_people',
+            'model_options:relating_people_hidden',
+            'model_options:relating',
+            'model_options:relating'
         ], (BasePerson, BasePerson, BasePerson, BasePerson,
             BasePerson, BasePerson, BasePerson, BasePerson,
             BasePerson, BasePerson, None, None, None, None, None))
@@ -102,40 +110,43 @@ class RelatedObjectsTests(OptionsBaseTests):
         objects = Person._meta.get_all_related_objects_with_model(
             include_hidden=True, local_only=True)
         self.eq_field_names_and_models(objects, [
-            u'model_options:person_m2m_inherited',
-            u'model_options:watch', u'model_options:watchhidden',
-            u'model_options:photo_people',
-            u'model_options:photohidden_people'
+            'model_options:person_m2m_inherited',
+            'model_options:relating_people',
+            'model_options:relating_people_hidden',
+            'model_options:relating',
+            'model_options:relating'
         ], (None, None, None, None, None))
 
     def test_related_objects_proxy(self):
         objects = Person._meta.get_all_related_objects_with_model(
             include_proxy_eq=True)
-        self.eq_field_names_and_models(objects, [
-            'model_options:computer',
-            'model_options:watch',
-            'model_options:hometown',
+        self.eq_field_query_names_and_models(objects, [
+            'relating_baseperson',
+            'relating_person',
+            'relating_proxyperson'
         ], (BasePerson, None, None))
 
     def test_related_objects_proxy_hidden(self):
         objects = Person._meta.get_all_related_objects_with_model(
             include_proxy_eq=True, include_hidden=True)
         self.eq_field_names_and_models(objects, [
-            u'model_options:baseperson_m2m_base',
-            u'model_options:baseperson_following',
-            u'model_options:baseperson_following',
-            u'model_options:baseperson_friends',
-            u'model_options:baseperson_friends',
-            u'model_options:baseperson_m2m_abstract',
-            u'model_options:computer',
-            u'model_options:computerhidden',
-            u'model_options:car_people',
-            u'model_options:carhidden_people',
-            u'model_options:person_m2m_inherited',
-            u'model_options:watch', u'model_options:watchhidden',
-            u'model_options:hometown', u'model_options:hometownhidden',
-            u'model_options:photo_people',
-            u'model_options:photohidden_people'
+            'model_options:baseperson_m2m_base',
+            'model_options:baseperson_following',
+            'model_options:baseperson_following',
+            'model_options:baseperson_friends',
+            'model_options:baseperson_friends',
+            'model_options:baseperson_m2m_abstract',
+            'model_options:relating_basepeople',
+            'model_options:relating_basepeople_hidden',
+            'model_options:relating',
+            'model_options:relating',
+            'model_options:person_m2m_inherited',
+            'model_options:relating_people',
+            'model_options:relating_people_hidden',
+            'model_options:relating',
+            'model_options:relating',
+            'model_options:relating',
+            'model_options:relating'
         ], (BasePerson, BasePerson, BasePerson, BasePerson,
             BasePerson, BasePerson, BasePerson, BasePerson,
             BasePerson, BasePerson, None, None, None, None, None, None, None))
@@ -148,18 +159,17 @@ class RelatedM2MTests(OptionsBaseTests):
         self.eq_field_names_and_models(objects, [
             u'model_options:baseperson',
             u'model_options:baseperson',
-            u'model_options:car',
-            u'model_options:carhidden',
-            u'model_options:photo',
-            u'model_options:photohidden'
+            u'model_options:relating',
+            u'model_options:relating',
+            u'model_options:relating',
+            u'model_options:relating'
         ], (BasePerson, BasePerson, BasePerson, BasePerson, None, None))
 
     def test_related_m2m_local_only(self):
         objects = Person._meta.get_all_related_many_to_many_objects(
             local_only=True)
-        self.assertEquals([o.name for o in objects], [
-            u'model_options:photo',
-            u'model_options:photohidden'
+        self.assertEquals([o.field.related_query_name() for o in objects], [
+            'relating_people', '+'
         ])
 
     def test_related_m2m_asymmetrical(self):

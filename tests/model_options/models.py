@@ -5,41 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 
 
 # VIRTUAL field models
-class AbstractVirtualRelation(models.Model):
-    pass
-
-
-class BaseVirtualRelation(models.Model):
-    pass
-
-
-class ConcreteVirtualRelation(models.Model):
-    pass
-
-
-# FOREIGN KEY models
-class AbstractRelatedObject(models.Model):
-    pass
-
-
-class BaseRelatedObject(models.Model):
-    pass
-
-
-class ConcreteRelatedObject(models.Model):
-    pass
-
-
-# M2M models
-class AbstractRelatedM2M(models.Model):
-    pass
-
-
-class BaseRelatedM2M(models.Model):
-    pass
-
-
-class ConcreteRelatedM2M(models.Model):
+class Relation(models.Model):
     pass
 
 
@@ -47,19 +13,34 @@ class ConcreteRelatedM2M(models.Model):
 class AbstractPerson(models.Model):
     class Meta:
         abstract = True
+
     data_abstract = models.CharField(max_length=10)
-    fk_abstract = models.ForeignKey(AbstractRelatedObject)
-    m2m_abstract = models.ManyToManyField(AbstractRelatedM2M)
-    data_not_concrete_abstract = models.ForeignObject(AbstractVirtualRelation,
-            from_fields=['abstract_non_concrete_id'], to_fields=['id'])
+    fk_abstract = models.ForeignKey(Relation,
+                                    related_name='fk_abstract_rel')
+    m2m_abstract = models.ManyToManyField(Relation,
+                                    related_name='m2m_abstract_rel')
+
+    data_not_concrete_abstract = models.ForeignObject(
+        Relation,
+        from_fields=['abstract_non_concrete_id'],
+        to_fields=['id'],
+        related_name='fo_abstract_rel'
+    )
 
 
 class BasePerson(AbstractPerson):
     data_base = models.CharField(max_length=10)
-    fk_base = models.ForeignKey(BaseRelatedObject)
-    m2m_base = models.ManyToManyField(BaseRelatedM2M)
-    data_not_concrete_base = models.ForeignObject(BaseVirtualRelation,
-            from_fields=['base_non_concrete_id'], to_fields=['id'])
+    fk_base = models.ForeignKey(Relation,
+                                related_name='fk_base_rel')
+    m2m_base = models.ManyToManyField(Relation,
+                                      related_name='m2m_base_rel')
+
+    data_not_concrete_base = models.ForeignObject(
+        Relation,
+        from_fields=['base_non_concrete_id'], to_fields=['id'],
+        related_name='fo_base_rel'
+    )
+
     friends = models.ManyToManyField(
         'self', related_name='friends', symmetrical=True)
     following = models.ManyToManyField(
@@ -73,10 +54,16 @@ class BasePerson(AbstractPerson):
 
 class Person(BasePerson):
     data_inherited = models.CharField(max_length=10)
-    fk_inherited = models.ForeignKey(ConcreteRelatedObject)
-    m2m_inherited = models.ManyToManyField(ConcreteRelatedM2M)
-    data_not_concrete_inherited = models.ForeignObject(ConcreteVirtualRelation,
-            from_fields=['model_non_concrete_id'], to_fields=['id'])
+    fk_inherited = models.ForeignKey(Relation,
+                                     related_name='fk_concrete_rel')
+    m2m_inherited = models.ManyToManyField(Relation,
+                                     related_name='m2m_concrete_rel')
+
+    data_not_concrete_inherited = models.ForeignObject(
+        Relation,
+        from_fields=['model_non_concrete_id'], to_fields=['id'],
+        related_name='fo_concrete_rel'
+    )
 
 
 class ProxyPerson(Person):
@@ -85,47 +72,33 @@ class ProxyPerson(Person):
 
 
 # Models with FK pointing to Person
-class Computer(models.Model):
-    person = models.ForeignKey(BasePerson)
-
-
-class ComputerHidden(models.Model):
-    person = models.ForeignKey(BasePerson,
+class Relating(models.Model):
+    # ForeignKey to BasePerson
+    baseperson = models.ForeignKey(BasePerson,
+                               related_name='relating_baseperson')
+    baseperson_hidden = models.ForeignKey(BasePerson,
                                related_name='+')
 
-
-class Watch(models.Model):
-    person = models.ForeignKey(Person)
-
-
-class WatchHidden(models.Model):
+    # ForeignKey to Person
     person = models.ForeignKey(Person,
-                               related_name='+')
+                               related_name='relating_person')
+    person_hidden = models.ForeignKey(Person,
+                                      related_name='+')
 
+    # ForeignKey to ProxyPerson
+    proxyperson = models.ForeignKey(ProxyPerson,
+                                    related_name='relating_proxyperson')
+    proxyperson_hidden = models.ForeignKey(ProxyPerson,
+                                      related_name='+')
 
-class Hometown(models.Model):
-    person = models.ForeignKey(ProxyPerson)
+    # ManyToManyField to BasePerson
+    basepeople = models.ManyToManyField(BasePerson,
+                                        related_name='relating_basepeople')
+    basepeople_hidden = models.ManyToManyField(BasePerson,
+                                               related_name='+')
 
-
-class HometownHidden(models.Model):
-    person = models.ForeignKey(ProxyPerson,
-                               related_name='+')
-
-
-# Models with M2M pointing to Person
-class Car(models.Model):
-    people = models.ManyToManyField(BasePerson)
-
-
-class CarHidden(models.Model):
-    people = models.ManyToManyField(BasePerson,
-                               related_name='+')
-
-
-class Photo(models.Model):
-    people = models.ManyToManyField(Person)
-
-
-class PhotoHidden(models.Model):
+    # ManyToManyField to Person
     people = models.ManyToManyField(Person,
-                                    related_name='+')
+                                    related_name='relating_people')
+    people_hidden = models.ManyToManyField(Person,
+                                           related_name='+')
