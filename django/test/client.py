@@ -597,16 +597,13 @@ class Client(RequestFactory):
 
         Causes the authenticated user to be logged out.
         """
-        from django.contrib.auth import get_user_model, logout
+        from django.contrib.auth import get_user, logout
 
         request = HttpRequest()
         engine = import_module(settings.SESSION_ENGINE)
-        UserModel = get_user_model()
         if self.session:
             request.session = self.session
-            uid = self.session.get("_auth_user_id")
-            if uid:
-                request.user = UserModel._default_manager.get(pk=uid)
+            request.user = get_user(request)
         else:
             request.session = engine.SessionStore()
         logout(request)
