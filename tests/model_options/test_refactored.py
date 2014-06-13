@@ -29,7 +29,7 @@ class OptionsBaseTests(test.TestCase):
     def fields(self, res):
         return [f for fn, f in res]
 
-    def fields_models(self, res):
+    def fields_models(self, m, res):
 
         def get_model(field):
             from django.db.models import Field
@@ -37,6 +37,7 @@ class OptionsBaseTests(test.TestCase):
             direct = isinstance(field, Field) or isinstance(field, GenericForeignKey)
 
             model = field.model if direct else field.parent_model
+            model = None if model == m else model
             return (field, model)
 
         return map(get_model, res)
@@ -84,7 +85,7 @@ class DataTests(OptionsBaseTests):
 class M2MTests(OptionsBaseTests):
 
     def test_many_to_many(self):
-        fields = self.fields(Person._meta.get_new_fields(types=_M2M))
+        fields = Person._meta.get_new_fields(types=_M2M)
         self.assertEquals([f.attname for f in fields], [
                           'm2m_abstract', 'm2m_base', 'friends',
                           'following', 'm2m_inherited'])
