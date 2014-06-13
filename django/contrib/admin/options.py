@@ -1402,6 +1402,7 @@ class ModelAdmin(BaseModelAdmin):
             inline_admin_formsets=inline_formsets,
             errors=helpers.AdminErrorList(form, formsets),
             preserved_filters=self.get_preserved_filters(request),
+            has_permission=self.admin_site.has_permission(request),
         )
 
         context.update(extra_context or {})
@@ -1562,6 +1563,7 @@ class ModelAdmin(BaseModelAdmin):
             actions_on_bottom=self.actions_on_bottom,
             actions_selection_counter=self.actions_selection_counter,
             preserved_filters=self.get_preserved_filters(request),
+            has_permission=self.admin_site.has_permission(request),
         )
         context.update(extra_context or {})
 
@@ -1623,6 +1625,7 @@ class ModelAdmin(BaseModelAdmin):
             opts=opts,
             app_label=app_label,
             preserved_filters=self.get_preserved_filters(request),
+            has_permission=self.admin_site.has_permission(request),
         )
         context.update(extra_context or {})
 
@@ -1653,6 +1656,7 @@ class ModelAdmin(BaseModelAdmin):
             object=obj,
             opts=opts,
             preserved_filters=self.get_preserved_filters(request),
+            has_permission=self.admin_site.has_permission(request),
         )
         context.update(extra_context or {})
         return TemplateResponse(request, self.object_history_template or [

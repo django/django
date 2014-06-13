@@ -822,3 +822,8 @@ class Worker(models.Model):
     work_at = models.ForeignKey(Restaurant)
     name = models.CharField(max_length=50)
     surname = models.CharField(max_length=50)
+
+
+class SpecialProfile(models.Model):
+    special_user = models.OneToOneField(User)
+    special = models.BooleanField(default=True)

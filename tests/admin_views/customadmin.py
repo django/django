@@ -45,6 +45,14 @@ class CustomPwdTemplateUserAdmin(UserAdmin):
     change_user_password_template = ['admin/auth/user/change_password.html']  # a list, to test fix for #18697
 
 
+class Admin6(admin.AdminSite):
+
+    login_form = forms.CustomAdminAuthenticationForm2
+
+    def has_permission(self, request):
+        return request.user.is_active and request.user.specialprofile.special
+
+
 site = Admin2(name="admin2")
 
 site.register(models.Article, base_admin.ArticleAdmin)
@@ -58,3 +66,5 @@ site.register(models.Simple, base_admin.AttributeErrorRaisingAdmin)
 
 simple_site = Admin2(name='admin4')
 simple_site.register(User, CustomPwdTemplateUserAdmin)
+
+special_site = Admin6(name='admin6')

@@ -280,7 +280,10 @@ class AdminSite(object):
             'current_app': self.name,
             'password_change_form': AdminPasswordChangeForm,
             'post_change_redirect': url,
-            'extra_context': self.each_context(),
+            'extra_context': dict(
+                self.each_context(),
+                has_permission=self.has_permission(request),
+            ),
         }
         if self.password_change_template is not None:
             defaults['template_name'] = self.password_change_template
@@ -293,7 +296,11 @@ class AdminSite(object):
         from django.contrib.auth.views import password_change_done
         defaults = {
             'current_app': self.name,
-            'extra_context': dict(self.each_context(), **(extra_context or {})),
+            'extra_context': dict(
+                self.each_context(),
+                has_permission=self.has_permission(request),
+                **(extra_context or {})
+            ),
         }
         if self.password_change_done_template is not None:
             defaults['template_name'] = self.password_change_done_template
@@ -322,7 +329,10 @@ class AdminSite(object):
         from django.contrib.auth.views import logout
         defaults = {
             'current_app': self.name,
-            'extra_context': dict(self.each_context(), **(extra_context or {})),
+            'extra_context': dict(
+                self.each_context(),
+                **(extra_context or {})
+            ),
         }
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
@@ -346,6 +356,7 @@ class AdminSite(object):
         context = dict(self.each_context(),
             title=_('Log in'),
             app_path=request.get_full_path(),
+            has_permission=self.has_permission(request),
         )
         if (REDIRECT_FIELD_NAME not in request.GET and
                 REDIRECT_FIELD_NAME not in request.POST):
@@ -417,6 +428,7 @@ class AdminSite(object):
             self.each_context(),
             title=self.index_title,
             app_list=app_list,
+            has_permission=self.has_permission(request),
         )
         context.update(extra_context or {})
         return TemplateResponse(request, self.index_template or
@@ -474,6 +486,7 @@ class AdminSite(object):
             title=_('%(app)s administration') % {'app': app_name},
             app_list=[app_dict],
             app_label=app_label,
+            has_permission=self.has_permission(request),
         )
         context.update(extra_context or {})
 
