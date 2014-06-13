@@ -217,6 +217,8 @@ Tests
 * Added the ability to preserve the test database by adding the :djadminopt:`--keepdb`
   flag.
 
+* Added the :attr:`~django.test.Response.resolver_match` attribute to test client responses.
+
 Validators
 ^^^^^^^^^^
 
