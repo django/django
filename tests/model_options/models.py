@@ -27,6 +27,12 @@ class AbstractPerson(models.Model):
         related_name='fo_abstract_rel'
     )
 
+    content_type_abstract = models.ForeignKey(ContentType,
+                                              related_name='+')
+    object_id_abstract = models.PositiveIntegerField()
+    content_object_abstract = GenericForeignKey('content_type_abstract',
+                                       'object_id_abstract')
+
 
 class BasePerson(AbstractPerson):
     data_base = models.CharField(max_length=10)
@@ -46,7 +52,8 @@ class BasePerson(AbstractPerson):
     following = models.ManyToManyField(
         'self', related_name='followers', symmetrical=False)
 
-    content_type_base = models.ForeignKey(ContentType)
+    content_type_base = models.ForeignKey(ContentType,
+                                          related_name='+')
     object_id_base = models.PositiveIntegerField()
     content_object_base = GenericForeignKey('content_type_base',
                                        'object_id_base')
@@ -64,6 +71,12 @@ class Person(BasePerson):
         from_fields=['model_non_concrete_id'], to_fields=['id'],
         related_name='fo_concrete_rel'
     )
+
+    content_type_concrete = models.ForeignKey(ContentType,
+                                          related_name='+')
+    object_id_concrete = models.PositiveIntegerField()
+    content_object_concrete = GenericForeignKey('content_type_concrete',
+                                       'object_id_concrete')
 
 
 class ProxyPerson(Person):
