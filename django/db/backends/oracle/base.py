@@ -111,7 +111,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_tablespaces = True
     supports_sequence_reset = False
     can_introspect_max_length = False
-    can_introspect_null = False
     can_introspect_time_field = False
     atomic_transactions = False
     supports_combined_alters = False
