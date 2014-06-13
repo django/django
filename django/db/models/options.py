@@ -166,7 +166,7 @@ class Options(object):
         fields = OrderedDict()
 
         if types & NON_RELATED_FIELDS:
-            if not (opts & LOCAL_ONLY):
+            if not (opts & LOCAL_ONLY) and not (types & VIRTUAL):
                 for parent in self.parents:
                     fields.update(parent._meta.get_new_fields(types,
                                   opts, **dict(kwargs, recursive=True)))

@@ -222,8 +222,10 @@ class RelatedM2MTests(OptionsBaseTests):
 class VirtualFieldsTests(OptionsBaseTests):
 
     def test_virtual_fields(self):
-        self.assertEquals([fn for fn, f in Virtual._meta.get_new_fields(types=VIRTUAL)], [
-                          'content_object'])
+        self.assertEquals([f.name for f in Person._meta.get_new_fields(types=VIRTUAL)], [
+                          'content_object_concrete', 'generic_relation_concrete',
+                          'generic_relation_base', 'content_object_base',
+                          'generic_relation_abstract', 'content_object_abstract'])
 
 
 class GetFieldByNameTests(OptionsBaseTests):
