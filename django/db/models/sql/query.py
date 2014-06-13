@@ -1008,7 +1008,7 @@ class Query(object):
 
             # Join promotion note - we must not remove any rows here, so use
             # outer join if there isn't any existing join.
-            field, sources, opts, join_list, path = self.setup_joins(
+            _, sources, opts, join_list, path = self.setup_joins(
                 field_list, opts, self.get_initial_alias())
 
             # Process the join chain to see if it can be trimmed
@@ -1158,7 +1158,7 @@ class Query(object):
 
         try:
             field, sources, opts, join_list, path = self.setup_joins(
-                parts, opts, alias, can_reuse, allow_many)
+                parts, opts, alias, can_reuse=can_reuse, allow_many=allow_many)
             # split_exclude() needs to know which joins were generated for the
             # lookup parts
             self._lookup_joins = join_list
@@ -1605,9 +1605,8 @@ class Query(object):
             for name in field_names:
                 # Join promotion note - we must not remove any rows here, so
                 # if there is no existing joins, use outer join.
-                field, targets, u2, joins, path = self.setup_joins(
-                    name.split(LOOKUP_SEP), opts, alias, can_reuse=None,
-                    allow_many=allow_m2m)
+                _, targets, _, joins, path = self.setup_joins(
+                    name.split(LOOKUP_SEP), opts, alias, allow_many=allow_m2m)
                 targets, final_alias, joins = self.trim_joins(targets, joins, path)
                 for target in targets:
                     self.select.append(SelectInfo((final_alias, target.column), target))
