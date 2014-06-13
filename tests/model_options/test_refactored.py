@@ -10,7 +10,7 @@ from django.db.models.options import (
 )
 
 from .models import (
-    BasePerson, Person
+    BasePerson, Person, ProxyPerson
 )
 
 
@@ -36,7 +36,7 @@ class OptionsBaseTests(test.TestCase):
             from django.contrib.contenttypes.fields import GenericForeignKey
             direct = isinstance(field, Field) or isinstance(field, GenericForeignKey)
 
-            model = field.model if direct else field.parent_model
+            model = field.model if direct else field.parent_model._meta.concrete_model
             model = None if model == m else model
             return (field, model)
 
@@ -109,13 +109,13 @@ class RelatedObjectsTests(OptionsBaseTests):
 
     def test_related_objects_local(self):
         objects = self.fields_models(Person, Person._meta.get_new_fields(
-                                     types=RELATED_OBJECTS, opts=LOCAL_ONLY), LOCAL_ONLY)
+                                     types=RELATED_OBJECTS, opts=LOCAL_ONLY))
         self.eq_field_query_names_and_models(objects, [
             'relating_person'
         ], (None,))
 
     def test_related_objects_include_hidden(self):
-        objects = self.fields_models(Person._meta.get_new_fields(
+        objects = self.fields_models(Person, Person._meta.get_new_fields(
                                      types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN))
         self.eq_field_names_and_models(objects, [
             'model_options:baseperson_m2m_base',
@@ -139,33 +139,50 @@ class RelatedObjectsTests(OptionsBaseTests):
 
     def test_related_objects_include_hidden_local_only(self):
         opts = INCLUDE_HIDDEN | LOCAL_ONLY
-        objects = self.fields_models(HiddenRelatedObject, HiddenRelatedObject._meta.get_new_fields(
-                                     types=RELATED_OBJECTS, opts=opts), opts)
+        objects = self.fields_models(Person, Person._meta.get_new_fields(
+                                     types=RELATED_OBJECTS, opts=opts))
         self.eq_field_names_and_models(objects, [
-            'model_options:relhiddenrelatedobjects'
-        ], (None,))
+            'model_options:person_m2m_inherited',
+            'model_options:relating_people',
+            'model_options:relating_people_hidden',
+            'model_options:relating',
+            'model_options:relating'
+        ], (None, None, None, None, None))
 
     def test_related_objects_proxy(self):
-        objects = self.fields_models(RelatedObject, RelatedObject._meta.get_new_fields(
-                                     types=RELATED_OBJECTS, opts=INCLUDE_PROXY), INCLUDE_PROXY)
-        self.eq_field_names_and_models(objects, [
-            'model_options:relbaserelatedobjects',
-            'model_options:relrelatedobjects',
-            'model_options:relproxyrelatedobjects',
-            'model_options:hiddenrelatedobject',
-        ], (BaseRelatedObject, None, None, None))
+        objects = self.fields_models(Person, Person._meta.get_new_fields(
+                                     types=RELATED_OBJECTS, opts=INCLUDE_PROXY))
+        self.eq_field_query_names_and_models(objects, [
+            'relating_baseperson',
+            'relating_person',
+            'relating_proxyperson'
+        ], (BasePerson, None, None))
 
     def test_related_objects_proxy_hidden(self):
         opts = INCLUDE_HIDDEN | INCLUDE_PROXY
-        objects = self.fields_models(RelatedObject, RelatedObject._meta.get_new_fields(
-                                     types=RELATED_OBJECTS, opts=opts), opts)
+        objects = self.fields_models(Person, Person._meta.get_new_fields(
+                                     types=RELATED_OBJECTS, opts=opts))
         self.eq_field_names_and_models(objects, [
-            'model_options:relbaserelatedobjects',
-            'model_options:relrelatedobjects',
-            'model_options:relproxyrelatedobjects',
-            'model_options:relproxyhiddenrelatedobjects',
-            'model_options:hiddenrelatedobject',
-        ], (BaseRelatedObject, None, None, None, None))
+            'model_options:baseperson_m2m_base',
+            'model_options:baseperson_following',
+            'model_options:baseperson_following',
+            'model_options:baseperson_friends',
+            'model_options:baseperson_friends',
+            'model_options:baseperson_m2m_abstract',
+            'model_options:relating_basepeople',
+            'model_options:relating_basepeople_hidden',
+            'model_options:relating',
+            'model_options:relating',
+            'model_options:person_m2m_inherited',
+            'model_options:relating_people',
+            'model_options:relating_people_hidden',
+            'model_options:relating',
+            'model_options:relating',
+            'model_options:relating',
+            'model_options:relating'
+        ], (BasePerson, BasePerson, BasePerson, BasePerson,
+            BasePerson, BasePerson, BasePerson, BasePerson,
+            BasePerson, BasePerson, None, None, None, None, None, None, None))
 
 
 class RelatedM2MTests(OptionsBaseTests):

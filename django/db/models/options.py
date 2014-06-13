@@ -209,7 +209,7 @@ class Options(object):
                 for parent in self.parents:
                     for obj, _ in parent._meta.get_new_fields(types=RELATED_OBJECTS,
                                                               opts=INCLUDE_HIDDEN,
-                                                              **dict(kwargs, recursive=True)):
+                                                              **dict(kwargs, recursive=True)).iteritems():
                         if self._validate_related_object(obj):
                             related_fields[obj] = True
 
