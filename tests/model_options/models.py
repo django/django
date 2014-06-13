@@ -46,10 +46,10 @@ class BasePerson(AbstractPerson):
     following = models.ManyToManyField(
         'self', related_name='followers', symmetrical=False)
 
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type',
-                                       'object_id')
+    content_type_base = models.ForeignKey(ContentType)
+    object_id_base = models.PositiveIntegerField()
+    content_object_base = GenericForeignKey('content_type_base',
+                                       'object_id_base')
 
 
 class Person(BasePerson):

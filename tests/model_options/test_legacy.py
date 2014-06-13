@@ -31,7 +31,7 @@ class DataTests(OptionsBaseTests):
                           'id', 'data_abstract', 'fk_abstract_id',
                           'data_not_concrete_abstract', 'data_base',
                           'fk_base_id', 'data_not_concrete_base',
-                          'content_type_id', 'object_id',
+                          'content_type_base_id', 'object_id_base',
                           'baseperson_ptr_id', 'data_inherited',
                           'fk_inherited_id', 'data_not_concrete_inherited'])
 
@@ -189,7 +189,7 @@ class VirtualFieldsTests(OptionsBaseTests):
 
     def test_virtual_fields(self):
         self.assertEquals([f.name for f in Person._meta.virtual_fields], [
-                          'content_object'])
+                          'content_object_base'])
 
 
 class GetFieldByNameTests(OptionsBaseTests):
@@ -215,6 +215,6 @@ class GetFieldByNameTests(OptionsBaseTests):
         self.assertTrue(isinstance(field_info[0], related.RelatedObject))
 
     def test_get_virtual_field(self):
-        field_info = Person._meta.get_field_by_name('content_object')
+        field_info = Person._meta.get_field_by_name('content_object_base')
         self.assertEquals(field_info[1:], (None, True, False))
         self.assertTrue(isinstance(field_info[0], GenericForeignKey))
