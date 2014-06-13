@@ -10,12 +10,7 @@ from django.db.models.options import (
 )
 
 from .models import (
-    BaseData, Data, ConcreteData,
-    BaseM2M, M2M,
-    BaseRelatedObject, RelatedObject, HiddenRelatedObject,
-    BaseRelatedM2M, RelatedM2M,
-    RelatedM2MRecursiveSymmetrical, RelatedM2MRecursiveAsymmetrical,
-    Virtual
+    BasePerson, Person
 )
 
 
@@ -43,23 +38,32 @@ class OptionsBaseTests(test.TestCase):
 class DataTests(OptionsBaseTests):
 
     def test_fields(self):
-        fields = self.fields(Data._meta.get_new_fields(types=DATA))
+        fields = self.fields(Person._meta.get_new_fields(types=DATA))
         self.assertEquals([f.attname for f in fields], [
-                          u'id', 'name_abstract', 'name_base',
-                          u'basedata_ptr_id', 'name'])
+                          u'id', 'data_abstract', u'fk_abstract_id',
+                          'data_not_concrete_abstract', u'content_type_abstract_id',
+                          'object_id_abstract', 'data_base', u'fk_base_id',
+                          'data_not_concrete_base', u'content_type_base_id',
+                          'object_id_base', u'baseperson_ptr_id', 'data_inherited',
+                          u'fk_inherited_id', 'data_not_concrete_inherited',
+                          u'content_type_concrete_id', 'object_id_concrete'])
 
     def test_local_fields(self):
-        fields = self.fields(Data._meta.get_new_fields(types=DATA, opts=LOCAL_ONLY))
+        fields = self.fields(Person._meta.get_new_fields(types=DATA, opts=LOCAL_ONLY))
         self.assertEquals([f.attname for f in fields], [
-                          u'basedata_ptr_id', 'name'])
+                          'baseperson_ptr_id', 'data_inherited',
+                          'fk_inherited_id', 'data_not_concrete_inherited',
+                          'content_type_concrete_id', 'object_id_concrete'])
         self.assertTrue(all([f.rel is None or not isinstance(f.rel,
                         related.ManyToManyRel) for f in fields]))
 
     def test_local_concrete_fields(self):
-        fields = self.fields(ConcreteData._meta.get_new_fields(types=DATA,
-                                                       opts=LOCAL_ONLY | CONCRETE))
+        fields = self.fields(Person._meta.get_new_fields(types=DATA,
+                                                         opts=LOCAL_ONLY | CONCRETE))
         self.assertEquals([f.attname for f in fields], [
-                          u'data_ptr_id', 'name_concrete'])
+                          'baseperson_ptr_id', 'data_inherited',
+                          'fk_inherited_id', 'content_type_concrete_id',
+                          'object_id_concrete'])
         self.assertTrue(all([f.column is not None
                              for f in fields]))
 
