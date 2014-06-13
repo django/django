@@ -205,12 +205,12 @@ class GetFieldByNameTests(OptionsBaseTests):
         self.assertTrue(isinstance(field_info[0], related.ManyToManyField))
 
     def test_get_related_object(self):
-        field_info = Person._meta.get_field_by_name('watch')
-        self.assertEquals(field_info[1:], (None, False, False))
+        field_info = Person._meta.get_field_by_name('relating_baseperson')
+        self.assertEquals(field_info[1:], (BasePerson, False, False))
         self.assertTrue(isinstance(field_info[0], related.RelatedObject))
 
     def test_get_related_m2m(self):
-        field_info = Person._meta.get_field_by_name('photo')
+        field_info = Person._meta.get_field_by_name('relating_people')
         self.assertEquals(field_info[1:], (None, False, True))
         self.assertTrue(isinstance(field_info[0], related.RelatedObject))
 
