@@ -188,38 +188,35 @@ class RelatedObjectsTests(OptionsBaseTests):
 class RelatedM2MTests(OptionsBaseTests):
 
     def test_related_m2m_with_model(self):
-        objects = self.fields_models(RelatedM2M, RelatedM2M._meta.get_new_fields(
+        objects = self.fields_models(Person, Person._meta.get_new_fields(
                                      types=RELATED_M2M))
         self.eq_field_names_and_models(objects, [
-            'model_options:relbaserelatedm2m',
-            'model_options:relrelatedm2m'
-        ], (BaseRelatedM2M, None))
+            u'model_options:baseperson',
+            u'model_options:baseperson',
+            u'model_options:relating',
+            u'model_options:relating',
+            u'model_options:relating',
+            u'model_options:relating'
+        ], (BasePerson, BasePerson, BasePerson, BasePerson, None, None))
 
     def test_related_m2m_local_only(self):
-        opts = LOCAL_ONLY
-        objects = [f for fn, f in RelatedM2M._meta.get_new_fields(
-                   types=RELATED_M2M, opts=opts)]
-        self.assertEquals([o.name for o in objects], [
-            'model_options:relrelatedm2m'
+        objects = Person._meta.get_new_fields(types=RELATED_M2M,
+                                              opts=LOCAL_ONLY)
+        self.assertEquals([o.field.related_query_name() for o in objects], [
+            'relating_people', '+'
         ])
 
     def test_related_m2m_asymmetrical(self):
-        m2m = RelatedM2MRecursiveAsymmetrical._meta.get_new_fields(types=_M2M)
-        self.assertEquals([fn for fn, f in m2m],
-                          ['following'])
-        related_m2m = RelatedM2MRecursiveAsymmetrical._meta.get_new_fields(
-            types=RELATED_M2M)
-        self.assertEquals([fn for fn, f in related_m2m],
-                          ['followers'])
+        m2m = Person._meta.get_new_fields(types=_M2M)
+        self.assertTrue('following' in [f.attname for f in m2m])
+        related_m2m = Person._meta.get_all_related_many_to_many_objects()
+        self.assertTrue('followers' in [o.field.related_query_name() for o in related_m2m])
 
     def test_related_m2m_symmetrical(self):
-        m2m = RelatedM2MRecursiveSymmetrical._meta.get_new_fields(types=_M2M)
-        self.assertEquals([fn for fn, f in m2m],
-                          ['friends'])
-        related_m2m = RelatedM2MRecursiveSymmetrical._meta.get_new_fields(
-            types=RELATED_M2M)
-        self.assertEquals([fn for fn, f in related_m2m],
-                          ['friends_rel_+'])
+        m2m = Person._meta.get_new_fields(types=_M2M)
+        self.assertTrue('friends' in [f.attname for f in m2m])
+        related_m2m = Person._meta.get_all_related_many_to_many_objects()
+        self.assertTrue('friends_rel_+' in [o.field.related_query_name() for o in related_m2m])
 
 
 class VirtualFieldsTests(OptionsBaseTests):
