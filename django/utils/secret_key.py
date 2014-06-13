@@ -16,32 +16,25 @@ def generate_secret_key():
     return get_random_string(50, chars)
 
 
-def create_secret_key_file(path=None):
+def create_secret_key_file(path):
     """
     Writes a secret key out to a file.
     """
-    key = generate_secret_key()
-    if path is None:
-        path = '.secret_key'
+    # Open file for write only
+    # Fail if file already exists
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
 
-    with open(path, "w") as file:
-        file.write(key)
-    os.chmod(path, 0600)
+    # Do not follow symlinks to prevent someone from making a
+    # symlink that we follow and insecurely open a file.
+    if hasattr(os, "O_NOFOLLOW"):
+        flags |= os.O_NOFOLLOW
 
-    return key
-
-
-def read_or_create_secret_key_file(path=None):
-    """
-    Attempts to read the secret key from a file.
-
-    If it fails to open the file None will be returned.
-    """
-    if path is None:
-        path = '.secret_key'
+    fd = os.open(path, flags, 0600)
 
     try:
-        with open(path, "r") as file:
-            return file.read()
-    except IOError:
-        return create_secret_key_file(path)
+        with os.fdopen(fd, 'w') as file:
+            file.write(generate_secret_key())
+    except:
+        # An error occurred wrapping our FD in a file object
+        os.close(fd)
+        raise
