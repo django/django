@@ -71,15 +71,16 @@ class DataTests(OptionsBaseTests):
 class M2MTests(OptionsBaseTests):
 
     def test_many_to_many(self):
-        fields = self.fields(M2M._meta.get_new_fields(types=_M2M))
+        fields = self.fields(Person._meta.get_new_fields(types=_M2M))
         self.assertEquals([f.attname for f in fields], [
-                          'm2m_abstract', 'm2m_base', 'm2m'])
+                          'm2m_abstract', 'm2m_base', 'friends',
+                          'following', 'm2m_inherited'])
         self.assertTrue(all([isinstance(f.rel, related.ManyToManyRel)
                              for f in fields]))
 
     def test_many_to_many_with_model(self):
-        objects = self.fields_models(M2M, M2M._meta.get_new_fields(types=_M2M))
-        self.assertEquals([m for f, m in objects], [BaseM2M, BaseM2M, None])
+        models = self.fields_models(Person, Person._meta.get_new_fields(types=_M2M))
+        self.assertEquals([m for f, m in models], [BasePerson, BasePerson, BasePerson, BasePerson, None])
 
 
 class RelatedObjectsTests(OptionsBaseTests):
