@@ -192,8 +192,9 @@ class VirtualFieldsTests(OptionsBaseTests):
 
     def test_virtual_fields(self):
         self.assertEquals([f.name for f in Person._meta.virtual_fields], [
-                          'content_object_concrete', 'content_object_base',
-                          'content_object_abstract'])
+                          'content_object_concrete', 'generic_relation_concrete',
+                          'generic_relation_base', 'content_object_base',
+                          'generic_relation_abstract', 'content_object_abstract'])
 
 
 class GetFieldByNameTests(OptionsBaseTests):

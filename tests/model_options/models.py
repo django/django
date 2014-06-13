@@ -33,6 +33,8 @@ class AbstractPerson(models.Model):
     content_object_abstract = GenericForeignKey('content_type_abstract',
                                        'object_id_abstract')
 
+    generic_relation_abstract = GenericRelation(Relation)
+
 
 class BasePerson(AbstractPerson):
     data_base = models.CharField(max_length=10)
@@ -57,6 +59,7 @@ class BasePerson(AbstractPerson):
     object_id_base = models.PositiveIntegerField()
     content_object_base = GenericForeignKey('content_type_base',
                                        'object_id_base')
+    generic_relation_base = GenericRelation(Relation)
 
 
 class Person(BasePerson):
@@ -77,6 +80,7 @@ class Person(BasePerson):
     object_id_concrete = models.PositiveIntegerField()
     content_object_concrete = GenericForeignKey('content_type_concrete',
                                        'object_id_concrete')
+    generic_relation_concrete = GenericRelation(Relation)
 
 
 class ProxyPerson(Person):
