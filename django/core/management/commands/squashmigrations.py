@@ -1,5 +1,3 @@
-import sys
-
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import six
 from django.db import connections, DEFAULT_DB_ALIAS, migrations

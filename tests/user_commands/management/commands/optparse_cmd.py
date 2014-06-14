@@ -1,6 +1,6 @@
 from optparse import make_option
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -13,7 +13,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        example = options["example"]
+        options["example"]
         # BaseCommand default option is available
         options['verbosity']
         self.stdout.write("All right, let's dance %s." % options["style"])
