@@ -664,16 +664,16 @@ class Query(object):
         If 'create' is true, a new alias is always created. Otherwise, the
         most recently created alias for the table (if one exists) is reused.
         """
-        current = self.table_map.get(table_name)
-        if not create and current:
-            alias = current[0]
+        alias_list = self.table_map.get(table_name)
+        if not create and alias_list:
+            alias = alias_list[0]
             self.alias_refcount[alias] += 1
             return alias, False
 
         # Create a new alias for this table.
-        if current:
+        if alias_list:
             alias = '%s%d' % (self.alias_prefix, len(self.alias_map) + 1)
-            current.append(alias)
+            alias_list.append(alias)
         else:
             # The first occurrence of a table uses the table name directly.
             alias = table_name
@@ -900,7 +900,7 @@ class Query(object):
             return alias
 
         # No reuse is possible, so we need a new alias.
-        alias, _ = self.table_alias(table, True)
+        alias, _ = self.table_alias(table, create=True)
         if not lhs:
             # Not all tables need to be joined to anything. No join type
             # means the later columns are ignored.
