@@ -277,7 +277,7 @@ to ``DateField`` it is possible to filter on the transformed value, for
 example ``qs.filter(author__birthdate__year__lte=1981)``.
 
 For more information about both custom lookups and transforms refer to
-:doc:`custom lookups </ref/models/custom-lookups>` documentation.
+:doc:`custom lookups </howto/custom-lookups>` documentation.
 
 Improvements to ``Form`` error handling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
