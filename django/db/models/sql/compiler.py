@@ -96,7 +96,7 @@ class SQLCompiler(object):
         # However we do not want to get rid of stuff done in pre_sql_setup(),
         # as the pre_sql_setup will modify query state in a way that forbids
         # another run of it.
-        self.refcounts_before = self.query.alias_refcount.copy()
+        refcounts_before = self.query.alias_refcount.copy()
         out_cols, s_params = self.get_columns(with_col_aliases)
         ordering, o_params, ordering_group_by = self.get_ordering()
 
@@ -169,7 +169,7 @@ class SQLCompiler(object):
             result.append(self.connection.ops.for_update_sql(nowait=nowait))
 
         # Finally do cleanup - get rid of the joins we created above.
-        self.query.reset_refcounts(self.refcounts_before)
+        self.query.reset_refcounts(refcounts_before)
 
         return ' '.join(result), tuple(params)
 
