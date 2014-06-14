@@ -52,11 +52,14 @@ class CommandParser(ArgumentParser):
         # Catch missing argument for a better error message
         if (hasattr(self.cmd, 'missing_args_message') and
                 not (args or any([not arg.startswith('-') for arg in args]))):
-            raise CommandError("Error: %s" % self.cmd.missing_args_message)
+            self.error(self.cmd.missing_args_message)
         return super(CommandParser, self).parse_args(args, namespace)
 
     def error(self, message):
-        raise CommandError("Error: %s" % message)
+        if self.cmd._called_from_command_line:
+            super(CommandParser, self).error(message)
+        else:
+            raise CommandError("Error: %s" % message)
 
 
 def handle_default_options(options):
@@ -208,6 +211,7 @@ class BaseCommand(object):
     args = ''
 
     # Configuration shortcuts that alter various logic.
+    _called_from_command_line = False
     can_import_settings = True
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     leave_locale_alone = False
@@ -338,6 +342,7 @@ class BaseCommand(object):
         to stderr. If the ``--traceback`` option is present or the raised
         ``Exception`` is not ``CommandError``, raise it.
         """
+        self._called_from_command_line = True
         parser = self.create_parser(argv[0], argv[1])
 
         if self.use_argparse:

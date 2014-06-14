@@ -1494,7 +1494,7 @@ class CommandTypes(AdminScriptTestCase):
         "NoArg Commands raise an error if an argument is provided"
         args = ['noargs_command', 'argument']
         out, err = self.run_manage(args)
-        self.assertOutput(err, "Error: unrecognized arguments: argument")
+        self.assertOutput(err, "error: unrecognized arguments: argument")
 
     def test_app_command(self):
         "User AppCommands can execute when a single app name is provided"
@@ -1508,7 +1508,7 @@ class CommandTypes(AdminScriptTestCase):
         "User AppCommands raise an error when no app name is provided"
         args = ['app_command']
         out, err = self.run_manage(args)
-        self.assertOutput(err, 'Error: Enter at least one application label.')
+        self.assertOutput(err, 'error: Enter at least one application label.')
 
     def test_app_command_multiple_apps(self):
         "User AppCommands raise an error when multiple app names are provided"
@@ -1642,9 +1642,10 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
     ]
 
     def test_wrong_args(self):
-        "Make sure passing the wrong kinds of arguments raises a CommandError"
+        "Make sure passing the wrong kinds of arguments outputs an error and prints usage"
         out, err = self.run_django_admin(['startproject'])
         self.assertNoOutput(out)
+        self.assertOutput(err, "usage:")
         self.assertOutput(err, "You must provide a project name.")
 
     def test_simple_project(self):
