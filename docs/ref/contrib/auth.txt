@@ -446,21 +446,20 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         .. versionadded:: 1.8
 
         Returns the set of permission strings the ``user_obj`` has from their
-        own user permissions. Returns an empty set if the user
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous`.
+        own user permissions. Returns an empty set if the user is not
+        :meth:`active <django.contrib.auth.models.CustomUser.is_active>`.
 
     .. method:: get_group_permissions(user_obj, obj=None)
 
         Returns the set of permission strings the ``user_obj`` has from the
         permissions of the groups they belong. Returns an empty set if the user
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous`.
+        is not :meth:`active <django.contrib.auth.models.CustomUser.is_active>`.
 
     .. method:: get_all_permissions(user_obj, obj=None)
 
-        Returns the set of permission strings the ``user_obj`` has, including
-        both user permissions and groups permissions. Returns an empty set if
-        the user
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous`.
+        Returns the set of permission strings the ``user_obj`` has, including both
+        user permissions and group permissions. Returns an empty set if the
+        user is not :meth:`active <django.contrib.auth.models.CustomUser.is_active>`.
 
     .. method:: has_perm(user_obj, perm, obj=None)
 
