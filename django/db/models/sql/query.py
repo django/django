@@ -1084,6 +1084,32 @@ class Query(object):
                     (lookup, self.get_meta().model.__name__))
         return lookup_parts, field_parts, False
 
+    def check_query_object_type(self, value, opts):
+        """
+        Checks whether the object passed while querying is of the correct type.
+        If not, it raises a ValueError specifying the wrong object.
+        """
+        if hasattr(value, '_meta'):
+            if not (value._meta.concrete_model == opts.concrete_model
+                    or opts.concrete_model in value._meta.get_parent_list()
+                    or value._meta.concrete_model in opts.get_parent_list()):
+                raise ValueError(
+                    'Cannot query "%s": Must be "%s" instance.' %
+                    (value, opts.object_name))
+
+    def check_related_objects(self, field, value, opts):
+        """
+        Checks the type of object passed to query relations.
+        """
+        if field.rel:
+            # testing for iterable of models
+            if hasattr(value, '__iter__'):
+                for v in value:
+                    self.check_query_object_type(v, opts)
+            else:
+                # expecting single model instance here
+                self.check_query_object_type(value, opts)
+
     def build_lookup(self, lookups, lhs, rhs):
         lookups = lookups[:]
         while lookups:
@@ -1159,6 +1185,9 @@ class Query(object):
         try:
             field, sources, opts, join_list, path = self.setup_joins(
                 parts, opts, alias, can_reuse=can_reuse, allow_many=allow_many)
+
+            self.check_related_objects(field, value, opts)
+
             # split_exclude() needs to know which joins were generated for the
             # lookup parts
             self._lookup_joins = join_list

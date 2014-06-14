@@ -409,6 +409,15 @@ class ObjectA(models.Model):
         return self.name
 
 
+class ProxyObjectA(ObjectA):
+    class Meta:
+        proxy = True
+
+
+class ChildObjectA(ObjectA):
+    pass
+
+
 @python_2_unicode_compatible
 class ObjectB(models.Model):
     name = models.CharField(max_length=50)
@@ -419,11 +428,17 @@ class ObjectB(models.Model):
         return self.name
 
 
+class ProxyObjectB(ObjectB):
+    class Meta:
+        proxy = True
+
+
 @python_2_unicode_compatible
 class ObjectC(models.Model):
     name = models.CharField(max_length=50)
     objecta = models.ForeignKey(ObjectA, null=True)
     objectb = models.ForeignKey(ObjectB, null=True)
+    childobjecta = models.ForeignKey(ChildObjectA, null=True, related_name='ca_pk')
 
     def __str__(self):
         return self.name

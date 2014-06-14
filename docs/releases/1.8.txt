@@ -350,6 +350,21 @@ The check also applies to the columns generated in an implicit
 and then specify :attr:`~django.db.models.Field.db_column` on its column(s)
 as needed.
 
+Query relation lookups now check object types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Querying for model lookups now checks if the object passed is of correct type
+and raises a :exc:`ValueError` if not. Previously, Django didn't care if the
+object was of correct type; it just used the object's related field attribute
+(e.g. ``id``) for the lookup. Now, an error is raised to prevent incorrect
+lookups::
+
+    >>> book = Book.objects.create(name="Django")
+    >>> book = Book.objects.filter(author=book)
+    Traceback (most recent call last):
+    ...
+    ValueError: Cannot query "<Book: Django>": Must be "Author" instance.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

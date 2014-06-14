@@ -22,12 +22,12 @@ from .models import (
     ExtraInfo, Fan, Item, LeafA, Join, LeafB, LoopX, LoopZ, ManagedModel,
     Member, NamedCategory, Note, Number, Plaything, PointerA, Ranking, Related,
     Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten, Node, ObjectA,
-    ObjectB, ObjectC, CategoryItem, SimpleCategory, SpecialCategory,
-    OneToOneCategory, NullableName, ProxyCategory, SingleObject, RelatedObject,
-    ModelA, ModelB, ModelC, ModelD, Responsibility, Job, JobResponsibilities,
-    BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
-    MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser,
-    CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
+    ProxyObjectA, ChildObjectA, ObjectB, ProxyObjectB, ObjectC, CategoryItem,
+    SimpleCategory, SpecialCategory, OneToOneCategory, NullableName, ProxyCategory,
+    SingleObject, RelatedObject, ModelA, ModelB, ModelC, ModelD, Responsibility, Job,
+    JobResponsibilities, BaseA, FK1, Identifier, Program, Channel, Page, Paragraph,
+    Chapter, Book, MyObject, Order, OrderItem, SharedConnection, Task, Staff,
+    StaffUser, CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
     Company, Employment, CustomPk, CustomPkTag, Classroom, School, Student)
 
 
@@ -3361,20 +3361,85 @@ class Ticket12807Tests(TestCase):
 
 
 class RelatedLookupTypeTests(TestCase):
+    error = 'Cannot query "%s": Must be "%s" instance.'
+
+    def setUp(self):
+        self.oa = ObjectA.objects.create(name="oa")
+        self.poa = ProxyObjectA.objects.get(name="oa")
+        self.coa = ChildObjectA.objects.create(name="coa")
+        self.wrong_type = Order.objects.create(id=self.oa.pk)
+        self.ob = ObjectB.objects.create(name="ob", objecta=self.oa, num=1)
+        ProxyObjectB.objects.create(name="pob", objecta=self.oa, num=2)
+        self.pob = ProxyObjectB.objects.all()
+        ObjectC.objects.create(childobjecta=self.coa)
+
     def test_wrong_type_lookup(self):
-        oa = ObjectA.objects.create(name="oa")
-        wrong_type = Order.objects.create(id=oa.pk)
-        ob = ObjectB.objects.create(name="ob", objecta=oa, num=1)
-        # Currently Django doesn't care if the object is of correct
-        # type, it will just use the objecta's related fields attribute
-        # (id) for model lookup. Making things more restrictive could
-        # be a good idea...
-        self.assertQuerysetEqual(
-            ObjectB.objects.filter(objecta=wrong_type),
-            [ob], lambda x: x)
-        self.assertQuerysetEqual(
-            ObjectB.objects.filter(objecta__in=[wrong_type]),
-            [ob], lambda x: x)
+        """
+        A ValueError is raised when the incorrect object type is passed to a
+        query lookup.
+        """
+        # Passing incorrect object type
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.wrong_type, ObjectA._meta.object_name)):
+            ObjectB.objects.get(objecta=self.wrong_type)
+
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.wrong_type, ObjectA._meta.object_name)):
+            ObjectB.objects.filter(objecta__in=[self.wrong_type])
+
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.wrong_type, ObjectA._meta.object_name)):
+            ObjectB.objects.filter(objecta=self.wrong_type)
+
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.wrong_type, ObjectB._meta.object_name)):
+            ObjectA.objects.filter(objectb__in=[self.wrong_type, self.ob])
+
+        # Passing an object of the class on which query is done.
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.ob, ObjectA._meta.object_name)):
+            ObjectB.objects.filter(objecta__in=[self.poa, self.ob])
+
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.ob, ChildObjectA._meta.object_name)):
+            ObjectC.objects.exclude(childobjecta__in=[self.coa, self.ob])
+
+    def test_wrong_backward_lookup(self):
+        """
+        A ValueError is raised when the incorrect object type is passed to a
+        query lookup for backward relations.
+        """
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.oa, ObjectB._meta.object_name)):
+            ObjectA.objects.filter(objectb__in=[self.oa, self.ob])
+
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.oa, ObjectB._meta.object_name)):
+            ObjectA.objects.exclude(objectb=self.oa)
+
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.wrong_type, ObjectB._meta.object_name)):
+            ObjectA.objects.get(objectb=self.wrong_type)
+
+    def test_correct_lookup(self):
+        """
+        When passing proxy model objects, child objects, or parent objects,
+        lookups work fine.
+        """
+        out_a = ['<ObjectA: oa>', ]
+        out_b = ['<ObjectB: ob>', '<ObjectB: pob>']
+        out_c = ['<ObjectC: >']
+
+        # proxy model objects
+        self.assertQuerysetEqual(ObjectB.objects.filter(objecta=self.poa).order_by('name'), out_b)
+        self.assertQuerysetEqual(ObjectA.objects.filter(objectb__in=self.pob).order_by('pk'), out_a * 2)
+
+        # child objects
+        self.assertQuerysetEqual(ObjectB.objects.filter(objecta__in=[self.coa]), [])
+        self.assertQuerysetEqual(ObjectB.objects.filter(objecta__in=[self.poa, self.coa]).order_by('name'), out_b)
+
+        # parent objects
+        self.assertQuerysetEqual(ObjectC.objects.exclude(childobjecta=self.oa), out_c)
 
 
 class Ticket14056Tests(TestCase):
