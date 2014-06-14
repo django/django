@@ -569,7 +569,7 @@ class SQLCompiler(object):
             if (len(self.query.get_meta().concrete_fields) == len(self.query.select)
                     and self.connection.features.allows_group_by_pk):
                 self.query.group_by = [
-                    (self.query.get_meta().db_table, self.query.get_meta().pk.column)
+                    (self.query.get_initial_alias(), self.query.get_meta().pk.column)
                 ]
                 select_cols = []
             seen = set()
