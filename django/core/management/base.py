@@ -300,7 +300,8 @@ class BaseCommand(object):
             for opt in self.option_list:
                 parser.add_option(opt)
         else:
-            parser = CommandParser(self, prog="%s %s" % (prog_name, subcommand), description=self.help or None)
+            parser = CommandParser(self, prog="%s %s" % (os.path.basename(prog_name), subcommand),
+                description=self.help or None)
             parser.add_argument('--version', action='version', version=self.get_version())
             parser.add_argument('-v', '--verbosity', action='store', dest='verbosity', default='1',
                 type=int, choices=[0, 1, 2, 3],
