@@ -1,55 +1,83 @@
-Registering and fetching lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+====================
+Lookup API reference
+====================
+
+.. module:: django.db.models.lookups
+   :synopsis: Lookups API
+
+.. currentmodule:: django.db.models
+
+This document has the API references of lookups, the Django API for building the ``WHERE``
+clause of a database query. To learn how to *use* lookups, see
+:doc:`topics/db/queries`; to learn how to *create* new lookups, see
+:doc:`howto/custom-lookups`.
+
+Django Lookup API has two components, a ``Register`` that registers lookups, and the
+`Query Expression API <query-expression>`_, a set of methods that a class has to
+implement to be registable as lookup.
+
+Django has two base classes that follow the Query Expression API and from where
+all Django Builtin lookups are derived from:
+
+* :class:`Lookup`: to lookup a field (e.g. the ``exact`` of ``field_name__exact``)
+* :class:`Transform`: to transform a field
+
+In a query expression, the first element is always the name of the class
+that registered the lookup, followed by an optional arbitrary number of ``Transform``s,
+and ends with a ``Lookup``::
+
+    F("field_name__transformPlus10__exact")
+
+When the last lookup is not provided, Django uses ``"exact"``.
+
+Registration API
+~~~~~~~~~~~~~~~~
 
 Django uses :class:`~RegisterLookupMixin` to give a class the interface to
-register lookups on itself. The most prominent example is
-:class:`~django.db.models.Field`, subclass of :class:`RegisterLookupMixin`
-and base class of all fields.
+register lookups on itself. The two prominent examples are
+:class:`~django.db.models.Field`, the base class of all model fields, and
+:class:`~django.db.models.Aggregate`, the base class of all Django aggregates.
 
 .. class:: RegisterLookupMixin
 
-    A mixin that implements the lookup API on its subclasses.
-    It uses the class attribute ``class_lookups`` to store
-    the registered lookups on the class.
+    A mixin that implements the lookup API on a class. It uses the class
+    attribute ``class_lookups`` to store the registered lookups.
 
     .. classmethod:: register_lookup(lookup)
 
         Registers a new lookup in the class. For example
-        ``DateField.register_lookup(YearExact)`` will register ``YearExact`` lookup on
-        ``DateField``.
+        ``DateField.register_lookup(YearExact)`` will register ``YearExact``
+        lookup on ``DateField``.
 
         It overrides any lookup that already exists with the same name.
 
     .. method:: get_lookup(lookup_name)
 
-        Returns the ``Lookup`` named ``lookup_name`` registered in the class.
+        Returns the :class:`Lookup` named ``lookup_name`` registered in the class.
         The default implementation looks recursively on all parent classes
-        and checks if any has a registered lookup named ``lookup_name``,
-        returning the first match.
+        and checks if any has a registered lookup named ``lookup_name``, returning
+        the first match.
 
     .. method:: get_transform(transform_name)
 
-        Returns a ``Transform`` named ``transform_name``. The
-        default implementation looks recursively on all parent classes
-        to check if any has the registered transform named ``transform_name``,
-        returning the first match.
+        Returns a :class:`Transform` named ``transform_name``. The default
+        implementation looks recursively on all parent classes to check if any
+        has the registered transform named ``transform_name``, returning the first
+        match.
 
-All lookups must follow the `Query Expression API <query-expression>`_ below.
-In particular :class:`~Lookup` and :class:`~Transform` are currently the two base
-lookups that you can subclass.
-
+For a class to be a lookup, it must follow the `Query Expression API <query-expression>`_.
+:class:`~Lookup` and :class:`~Transform` naturally follow this API.
 
 .. _query-expression:
 
 The Query Expression API
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The query expression API is a common set of methods that
-classes define to be usable in Query Expressions to translate themselves
-into SQL expressions. Direct field references, aggregates and
-``Transform`` are examples that follow this API.
-A class is said to follow the Query Expression API when it implements
-the following methods:
+The query expression API is a common set of methods that classes define to be
+usable in Query Expressions to translate themselves into SQL expressions. Direct
+field references, aggregates and ``Transform`` are examples that follow this API.
+A class is said to follow the Query Expression API when it implements the following
+methods:
 
 .. method:: as_sql(self, qn, connection)
 
@@ -72,11 +100,13 @@ the following methods:
 
 .. method:: get_lookup(lookup_name)
 
-    Same as :meth:`~RegisterLookupMixin.get_lookup()`
+    Must return the lookup ``lookup_name``. For instance, by returning
+    ``self.output_type.get_lookup(lookup_name)``.
 
 .. method:: get_transform(transform_name)
 
-    Same as :meth:`~RegisterLookupMixin.get_transform()`
+    Must return the lookup ``transform_name``. For instance, by returning
+    ``self.output_type.get_transform(transform_name)``.
 
 .. attribute:: output_type
 
