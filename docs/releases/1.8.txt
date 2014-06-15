@@ -479,3 +479,12 @@ arguments through ``argparse.add_argument()``. See
 The class :class:`~django.core.management.NoArgsCommand` is now deprecated and
 will be removed in Django 2.0. Use :class:`~django.core.management.BaseCommand`
 instead, which takes no arguments by default.
+
+``cache_choices`` option of ``ModelChoiceField`` and ``MultipleModelChoiceField``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`~django.forms.ModelChoiceField` and
+:class:`~django.forms.MultipleModelChoiceField` took an undocumented, untested
+option ``cache_choices``. This cached querysets between multiple renderings of
+the same ``Form`` object. This option is subject to an accelerated deprecation
+and will be removed in Django 1.9.
