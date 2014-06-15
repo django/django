@@ -44,6 +44,7 @@ class AutodetectorTests(TestCase):
         ("publishers", models.ManyToManyField("testapp.Publisher")),
     ])
     author_with_m2m_through = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("publishers", models.ManyToManyField("testapp.Publisher", through="testapp.Contract"))])
+    author_with_options = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))], {"verbose_name": "Authi", "permissions": [('can_hire', 'Can hire')]})
     contract = ModelState("testapp", "Contract", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("publisher", models.ForeignKey("testapp.Publisher"))])
     publisher = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=100))])
     publisher_with_author = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("name", models.CharField(max_length=100))])
@@ -799,3 +800,17 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, "testapp", 1)
         # Right actions in right order?
         self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "RemoveField", "DeleteModel", "DeleteModel"])
+
+    def test_alter_model_options(self):
+        """
+        If two models with a ForeignKey from one to the other are removed at the same time,
+        the autodetector should remove them in the correct order.
+        """
+        before = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.author_with_options])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        # Right actions in right order?
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelOptions"])

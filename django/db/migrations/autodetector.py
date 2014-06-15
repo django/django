@@ -23,6 +23,17 @@ class MigrationAutodetector(object):
     if it wishes, with the caveat that it may not always be possible.
     """
 
+    # Model options we want to compare and preserve in an AlterModelOptions op
+    ALTER_OPTION_KEYS = [
+        "get_latest_by",
+        "ordering",
+        "permissions",
+        "default_permissions",
+        "select_on_save",
+        "verbose_name",
+        "verbose_name_plural",
+    ]
+
     def __init__(self, from_state, to_state, questioner=None):
         self.from_state = from_state
         self.to_state = to_state
@@ -144,6 +155,7 @@ class MigrationAutodetector(object):
         # Generate non-rename model operations
         self.generate_created_models()
         self.generate_deleted_models()
+        self.generate_altered_options()
 
         # Generate field operations
         self.generate_added_fields()
@@ -643,6 +655,28 @@ class MigrationAutodetector(object):
                     operations.AlterIndexTogether(
                         name=model_name,
                         index_together=new_model_state.options['index_together'],
+                    )
+                )
+
+    def generate_altered_options(self):
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            old_options = dict(
+                option for option in old_model_state.options.items()
+                if option[0] in self.ALTER_OPTION_KEYS
+            )
+            new_options = dict(
+                option for option in new_model_state.options.items()
+                if option[0] in self.ALTER_OPTION_KEYS
+            )
+            if old_options != new_options:
+                self.add_operation(
+                    app_label,
+                    operations.AlterModelOptions(
+                        name=model_name,
+                        options=new_options,
                     )
                 )
 
