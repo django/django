@@ -205,7 +205,7 @@ class MigrationAutodetector(object):
                         elif dep[0] != app_label:
                             # External app dependency. See if it's not yet
                             # satisfied.
-                            for other_operation in self.generated_operations[dep[0]]:
+                            for other_operation in self.generated_operations.get(dep[0], []):
                                 if self.check_dependency(other_operation, dep):
                                     deps_satisfied = False
                                     break

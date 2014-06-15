@@ -135,7 +135,7 @@ class MigrationLoader(object):
             return self.disk_migrations[results[0]]
 
     def check_key(self, key, current_app):
-        if key[1] != "__first__" or key in self.graph:
+        if (key[1] != "__first__" and key[1] != "__latest__") or key in self.graph:
             return key
         # Special-case __first__, which means "the first migration" for
         # migrated apps, and is ignored for unmigrated apps. It allows
@@ -151,7 +151,10 @@ class MigrationLoader(object):
             return
         if key[0] in self.migrated_apps:
             try:
-                return list(self.graph.root_nodes(key[0]))[0]
+                if key[1] == "__first__":
+                    return list(self.graph.root_nodes(key[0]))[0]
+                else:
+                    return list(self.graph.root_nodes(key[0]))[-1]
             except IndexError:
                 raise ValueError("Dependency on app with no migrations: %s" % key[0])
         raise ValueError("Dependency on unknown app: %s" % key[0])
