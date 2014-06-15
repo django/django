@@ -803,6 +803,28 @@ class OperationTests(MigrationTestBase):
         self.assertEqual(len(new_state.models["test_almoop", "pony"].options.get("permissions", [])), 1)
         self.assertEqual(new_state.models["test_almoop", "pony"].options["permissions"][0][0], "can_groom")
 
+    def test_alter_order_with_respect_to(self):
+        """
+        Tests the AlterOrderWithRespectTo operation.
+        """
+        project_state = self.set_up_test_model("test_alorwrtto", related_model=True)
+        # Test the state alteration
+        operation = migrations.AlterOrderWithRespectTo("Rider", "pony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_alorwrtto", new_state)
+        self.assertEqual(project_state.models["test_alorwrtto", "rider"].options.get("order_with_respect_to", None), None)
+        self.assertEqual(new_state.models["test_alorwrtto", "rider"].options.get("order_with_respect_to", None), "pony")
+        # Make sure there's no matching index
+        self.assertColumnNotExists("test_alorwrtto_rider", "_order")
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alorwrtto", editor, project_state, new_state)
+        self.assertColumnExists("test_alorwrtto_rider", "_order")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alorwrtto", editor, new_state, project_state)
+        self.assertColumnNotExists("test_alorwrtto_rider", "_order")
+
     @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql(self):
         """
