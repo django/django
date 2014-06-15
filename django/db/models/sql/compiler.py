@@ -213,7 +213,7 @@ class SQLCompiler(object):
         else:
             col_aliases = set()
         if self.query.select:
-            only_load = self.deferred_to_columns()
+            only_load = self.query.get_loaded_columns()
             for col, _ in self.query.select:
                 if isinstance(col, (list, tuple)):
                     alias, column = col
@@ -293,7 +293,7 @@ class SQLCompiler(object):
         qn = self
         qn2 = self.connection.ops.quote_name
         aliases = set()
-        only_load = self.deferred_to_columns()
+        only_load = self.query.get_loaded_columns()
         if not start_alias:
             start_alias = self.query.get_initial_alias()
         # The 'seen_models' is used to optimize checking the needed parent
@@ -683,16 +683,6 @@ class SQLCompiler(object):
                 self.fill_related_selections(model._meta, alias, cur_depth + 1,
                                              next, restricted)
 
-    def deferred_to_columns(self):
-        """
-        Converts the self.deferred_loading data structure to mapping of table
-        names to sets of column names which are to be loaded. Returns the
-        dictionary.
-        """
-        columns = {}
-        self.query.deferred_to_data(columns, self.query.deferred_to_columns_cb)
-        return columns
-
     def results_iter(self):
         """
         Returns an iterator over the results from executing this query.
@@ -729,7 +719,7 @@ class SQLCompiler(object):
 
                         # If the field was deferred, exclude it from being passed
                         # into `resolve_columns` because it wasn't selected.
-                        only_load = self.deferred_to_columns()
+                        only_load = self.query.get_loaded_columns()
                         if only_load:
                             fields = [f for f in fields if f.model._meta.db_table not in only_load or
                                       f.column in only_load[f.model._meta.db_table]]

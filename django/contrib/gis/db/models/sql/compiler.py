@@ -37,7 +37,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         else:
             col_aliases = set()
         if self.query.select:
-            only_load = self.deferred_to_columns()
+            only_load = self.query.get_loaded_columns()
             # This loop customized for GeoQuery.
             for col, field in self.query.select:
                 if isinstance(col, (list, tuple)):
@@ -120,7 +120,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         if opts is None:
             opts = self.query.get_meta()
         aliases = set()
-        only_load = self.deferred_to_columns()
+        only_load = self.query.get_loaded_columns()
         seen = self.query.included_inherited_models.copy()
         if start_alias:
             seen[None] = start_alias
