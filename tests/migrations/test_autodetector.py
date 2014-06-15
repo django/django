@@ -750,6 +750,21 @@ class AutodetectorTests(TestCase):
         self.assertEqual(action.__class__.__name__, "DeleteModel")
         self.assertEqual(action.name, "Attribution")
 
+    def test_many_to_many_removed_before_through_model_2(self):
+        """
+        Removing a model that contains a ManyToManyField and the
+        "through" model in the same change must remove
+        the field before the model to maintain consistency.
+        """
+        before = self.make_project_state([self.book_with_multiple_authors_through_attribution, self.author_name, self.attribution])
+        after = self.make_project_state([self.author_name])  # removes both the through model and ManyToMany
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        # Right number of actions?
+        self.assertOperationTypes(changes, 'otherapp', 0, ["RemoveField", "RemoveField", "RemoveField", "DeleteModel", "DeleteModel"])
+
     def test_m2m_w_through_multistep_remove(self):
         """
         A model with a m2m field that specifies a "through" model cannot be removed in the same

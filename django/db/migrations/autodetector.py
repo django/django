@@ -127,7 +127,11 @@ class MigrationAutodetector(object):
             new_model_state = self.to_state.models[app_label, model_name]
             self.old_field_keys.update((app_label, model_name, x) for x, y in old_model_state.fields)
             self.new_field_keys.update((app_label, model_name, x) for x, y in new_model_state.fields)
-            # Through model stuff
+
+        # Through model map generation
+        for app_label, model_name in sorted(self.old_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
             for field_name, field in old_model_state.fields:
                 old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field_by_name(field_name)[0]
                 if hasattr(old_field, "rel") and hasattr(old_field.rel, "through") and not old_field.rel.through._meta.auto_created:
