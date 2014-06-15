@@ -150,8 +150,11 @@ class MigrationLoader(object):
             # so we're fine.
             return
         if key[0] in self.migrated_apps:
-            return list(self.graph.root_nodes(key[0]))[0]
-        raise ValueError("Dependency on unknown app %s" % key[0])
+            try:
+                return list(self.graph.root_nodes(key[0]))[0]
+            except IndexError:
+                raise ValueError("Dependency on app with no migrations: %s" % key[0])
+        raise ValueError("Dependency on unknown app: %s" % key[0])
 
     def build_graph(self):
         """
