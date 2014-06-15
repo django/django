@@ -163,7 +163,8 @@ class MigrationOptimizer(object):
         """
         Folds a CreateModel and a DeleteModel into nothing.
         """
-        if operation.name.lower() == other.name.lower():
+        if operation.name.lower() == other.name.lower() and \
+            not operation.options.get("proxy", False):
             return []
 
     def reduce_model_alter_delete(self, operation, other, in_between):
