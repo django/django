@@ -99,6 +99,24 @@ Changes the model's set of custom indexes (the
 :attr:`~django.db.models.Options.index_together` option on the ``Meta``
 subclass).
 
+AlterOrderWithRespectTo
+-----------------------
+
+.. class:: AlterIndexTogether(name, order_with_respect_to)
+
+Makes or deletes the ``_order`` column needed for the
+:attr:`~django.db.models.Options.order_with_respect_to` option on the ``Meta``
+subclass.
+
+AlterModelOptions
+-----------------
+
+.. class:: AlterIndexTogether(name, options)
+
+Stores changes to miscellaneous model options (settings on a model's ``Meta``)
+like ``permissions`` and ``verbose_name``. Does not affect the database, but
+persists these changes for :class:`RunPython` instances to use.
+
 AddField
 --------
 

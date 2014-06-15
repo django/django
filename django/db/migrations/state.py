@@ -5,6 +5,7 @@ from django.apps.registry import Apps, apps as global_apps
 from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.fields.related import do_pending_lookups
+from django.db.models.fields.proxy import OrderWrt
 from django.conf import settings
 from django.utils import six
 from django.utils.encoding import force_text
@@ -165,6 +166,8 @@ class ModelState(object):
         fields = []
         for field in model._meta.local_fields:
             if getattr(field, "rel", None) and exclude_rels:
+                continue
+            if isinstance(field, OrderWrt):
                 continue
             name, path, args, kwargs = field.deconstruct()
             field_class = import_string(path)

@@ -285,6 +285,45 @@ class AlterIndexTogether(Operation):
         return "Alter index_together for %s (%s constraints)" % (self.name, len(self.index_together))
 
 
+class AlterOrderWithRespectTo(Operation):
+    """
+    Represents a change with the order_with_respect_to option.
+    """
+
+    def __init__(self, name, order_with_respect_to):
+        self.name = name
+        self.order_with_respect_to = order_with_respect_to
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.name.lower()]
+        model_state.options['order_with_respect_to'] = self.order_with_respect_to
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        from_model = from_state.render().get_model(app_label, self.name)
+        to_model = to_state.render().get_model(app_label, self.name)
+        if router.allow_migrate(schema_editor.connection.alias, to_model):
+            # Remove a field if we need to
+            if from_model._meta.order_with_respect_to and not to_model._meta.order_with_respect_to:
+                schema_editor.remove_field(from_model, from_model._meta.get_field_by_name("_order")[0])
+            # Add a field if we need to (altering the column is untouched as
+            # it's likely a rename)
+            elif to_model._meta.order_with_respect_to and not from_model._meta.order_with_respect_to:
+                field = to_model._meta.get_field_by_name("_order")[0]
+                schema_editor.add_field(
+                    from_model,
+                    field,
+                )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.name.lower()
+
+    def describe(self):
+        return "Set order_with_respect_to on %s to %s" % (self.name, self.order_with_respect_to)
+
+
 class AlterModelOptions(Operation):
     """
     Sets new model options that don't directly affect the database schema

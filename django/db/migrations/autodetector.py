@@ -163,6 +163,7 @@ class MigrationAutodetector(object):
         self.generate_altered_fields()
         self.generate_altered_unique_together()
         self.generate_altered_index_together()
+        self.generate_altered_order_with_respect_to()
 
         # Now, reordering to make things possible. The order we have already
         # isn't bad, but we need to pull a few things around so FKs work nicely
@@ -305,9 +306,16 @@ class MigrationAutodetector(object):
                 operation.model_name.lower() == dependency[1].lower() and
                 operation.name.lower() == dependency[2].lower()
             )
+        # order_with_respect_to being unset for a field
+        elif dependency[2] is not None and dependency[3] == "order_wrt_unset":
+            return (
+                isinstance(operation, operations.AlterOrderWithRespectTo) and
+                operation.name.lower() == dependency[1].lower() and
+                (operation.order_with_respect_to or "").lower() != dependency[2].lower()
+            )
         # Unknown dependency. Raise an error.
         else:
-            raise ValueError("Can't handle dependency %r" % dependency)
+            raise ValueError("Can't handle dependency %r" % (dependency, ))
 
     def add_operation(self, app_label, operation, dependencies=None):
         # Dependencies are (app_label, model_name, field_name, create/delete as True/False)
@@ -375,6 +383,7 @@ class MigrationAutodetector(object):
             # Are there unique/index_together to defer?
             unique_together = model_state.options.pop('unique_together', None)
             index_together = model_state.options.pop('index_together', None)
+            order_with_respect_to = model_state.options.pop('order_with_respect_to', None)
             # Generate creation operatoin
             self.add_operation(
                 app_label,
@@ -436,6 +445,17 @@ class MigrationAutodetector(object):
                     dependencies=[
                         (app_label, model_name, name, True)
                         for name, field in sorted(related_fields.items())
+                    ]
+                )
+            if order_with_respect_to:
+                self.add_operation(
+                    app_label,
+                    operations.AlterOrderWithRespectTo(
+                        name=model_name,
+                        order_with_respect_to=order_with_respect_to,
+                    ),
+                    dependencies=[
+                        (app_label, model_name, order_with_respect_to, True),
                     ]
                 )
 
@@ -595,7 +615,10 @@ class MigrationAutodetector(object):
                 operations.RemoveField(
                     model_name=model_name,
                     name=field_name,
-                )
+                ),
+                # We might need to depend on the removal of an order_with_respect_to;
+                # this is safely ignored if there isn't one
+                dependencies=[(app_label, model_name, field_name, "order_wrt_unset")],
             )
 
     def generate_altered_fields(self):
@@ -659,6 +682,11 @@ class MigrationAutodetector(object):
                 )
 
     def generate_altered_options(self):
+        """
+        Works out if any non-schema-affecting options have changed and
+        makes an operation to represent them in state changes (in case Python
+        code in migrations needs them)
+        """
         for app_label, model_name in sorted(self.kept_model_keys):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
@@ -678,6 +706,32 @@ class MigrationAutodetector(object):
                         name=model_name,
                         options=new_options,
                     )
+                )
+
+    def generate_altered_order_with_respect_to(self):
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            if old_model_state.options.get("order_with_respect_to", None) != new_model_state.options.get("order_with_respect_to", None):
+                # Make sure it comes second if we're adding
+                # (removal dependency is part of RemoveField)
+                dependencies = []
+                if new_model_state.options.get("order_with_respect_to", None):
+                    dependencies.append((
+                        app_label,
+                        model_name,
+                        new_model_state.options["order_with_respect_to"],
+                        True,
+                    ))
+                # Actually generate the operation
+                self.add_operation(
+                    app_label,
+                    operations.AlterOrderWithRespectTo(
+                        name=model_name,
+                        order_with_respect_to=new_model_state.options.get('order_with_respect_to', None),
+                    ),
+                    dependencies = dependencies,
                 )
 
     def arrange_for_graph(self, changes, graph):
