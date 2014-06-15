@@ -283,3 +283,32 @@ class AlterIndexTogether(Operation):
 
     def describe(self):
         return "Alter index_together for %s (%s constraints)" % (self.name, len(self.index_together))
+
+
+class AlterModelOptions(Operation):
+    """
+    Sets new model options that don't directly affect the database schema
+    (like verbose_name, permissions, ordering). Python code in migrations
+    may still need them.
+    """
+
+    def __init__(self, name, options):
+        self.name = name
+        self.options = options
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.name.lower()]
+        model_state.options = dict(model_state.options)
+        model_state.options.update(self.options)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.name.lower()
+
+    def describe(self):
+        return "Change Meta options on %s" % (self.name, )
