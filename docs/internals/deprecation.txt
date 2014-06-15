@@ -154,6 +154,9 @@ details on these changes.
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, will no longer be supported.
 
+* The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
+  :class:`~django.forms.MultipleModelChoiceField` will be removed.
+
 .. _deprecation-removed-in-1.8:
 
 1.8
