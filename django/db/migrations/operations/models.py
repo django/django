@@ -32,17 +32,17 @@ class CreateModel(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         apps = to_state.render()
         model = apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, model):
+        if router.allow_migrate(schema_editor.connection.alias, model) and not model._meta.proxy:
             schema_editor.create_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         apps = from_state.render()
         model = apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, model):
+        if router.allow_migrate(schema_editor.connection.alias, model) and not model._meta.proxy:
             schema_editor.delete_model(model)
 
     def describe(self):
-        return "Create model %s" % (self.name, )
+        return "Create %smodel %s" % ("proxy " if self.options.get("proxy", False) else "", self.name)
 
     def references_model(self, name, app_label=None):
         strings_to_check = [self.name]
@@ -85,13 +85,13 @@ class DeleteModel(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         apps = from_state.render()
         model = apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, model):
+        if router.allow_migrate(schema_editor.connection.alias, model) and not model._meta.proxy:
             schema_editor.delete_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         apps = to_state.render()
         model = apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, model):
+        if router.allow_migrate(schema_editor.connection.alias, model) and not model._meta.proxy:
             schema_editor.create_model(model)
 
     def references_model(self, name, app_label=None):
