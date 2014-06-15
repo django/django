@@ -790,6 +790,19 @@ class OperationTests(MigrationTestBase):
             operation.database_backwards("test_alinto", editor, new_state, project_state)
         self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])
 
+    def test_alter_model_options(self):
+        """
+        Tests the AlterModelOptions operation.
+        """
+        project_state = self.set_up_test_model("test_almoop")
+        # Test the state alteration (no DB alteration to test)
+        operation = migrations.AlterModelOptions("Pony", {"permissions": [("can_groom", "Can groom")]})
+        new_state = project_state.clone()
+        operation.state_forwards("test_almoop", new_state)
+        self.assertEqual(len(project_state.models["test_almoop", "pony"].options.get("permissions", [])), 0)
+        self.assertEqual(len(new_state.models["test_almoop", "pony"].options.get("permissions", [])), 1)
+        self.assertEqual(new_state.models["test_almoop", "pony"].options["permissions"][0][0], "can_groom")
+
     @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql(self):
         """
