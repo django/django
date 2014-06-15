@@ -31,6 +31,7 @@ class AutodetectorTests(TestCase):
     author_name_deconstructable_3 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=models.IntegerField()))])
     author_name_deconstructable_4 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=models.IntegerField()))])
     author_with_book = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
+    author_with_book_order_wrt = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))], options={"order_with_respect_to": "book"})
     author_renamed_with_book = ModelState("testapp", "Writer", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
     author_with_publisher_string = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("publisher_name", models.CharField(max_length=200))])
     author_with_publisher = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("publisher", models.ForeignKey("testapp.Publisher"))])
@@ -814,3 +815,64 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, "testapp", 1)
         # Right actions in right order?
         self.assertOperationTypes(changes, "testapp", 0, ["AlterModelOptions"])
+
+    def test_set_alter_order_with_respect_to(self):
+        "Tests that setting order_with_respect_to adds a field"
+        # Make state
+        before = self.make_project_state([self.book, self.author_with_book])
+        after = self.make_project_state([self.book, self.author_with_book_order_wrt])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AlterOrderWithRespectTo"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="author", order_with_respect_to="book")
+
+    def test_add_alter_order_with_respect_to(self):
+        """
+        Tests that setting order_with_respect_to when adding the FK too
+        does things in the right order.
+        """
+        # Make state
+        before = self.make_project_state([self.author_name])
+        after = self.make_project_state([self.book, self.author_with_book_order_wrt])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AlterOrderWithRespectTo"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, model_name="author", name="book")
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="author", order_with_respect_to="book")
+
+    def test_remove_alter_order_with_respect_to(self):
+        """
+        Tests that removing order_with_respect_to when removing the FK too
+        does things in the right order.
+        """
+        # Make state
+        before = self.make_project_state([self.book, self.author_with_book_order_wrt])
+        after = self.make_project_state([self.author_name])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AlterOrderWithRespectTo", "RemoveField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="author", order_with_respect_to=None)
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, model_name="author", name="book")
+
+    def test_add_model_order_with_respect_to(self):
+        """
+        Tests that setting order_with_respect_to when adding the whole model
+        does things in the right order.
+        """
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([self.book, self.author_with_book_order_wrt])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "AlterOrderWithRespectTo"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="author", order_with_respect_to="book")
+        # Make sure the _order field is not in the CreateModel fields
+        self.assertNotIn("_order", [name for name, field in changes['testapp'][0].operations[0].fields])
