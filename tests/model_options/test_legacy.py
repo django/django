@@ -8,36 +8,6 @@ from .models import (
     AbstractPerson, BasePerson, Person
 )
 
-
-class OptionsBaseTests(test.TestCase):
-
-    def _debug(self, f, m):
-        print "Attname"
-        print [x.name for x in f]
-        try:
-            print "Related Query Name"
-            print [x.field.related_query_name() for x in f]
-        except:
-            pass
-        print "Models"
-
-        def asd(m2):
-            if m2 is not None:
-                m2 = m2.__name__
-            return m2
-        print map(asd, m)
-
-    def eq_field_query_names_and_models(self, objects, names_eq, models_eq):
-        fields, models = zip(*objects)
-        self.assertEquals([o.field.related_query_name()
-                          for o in fields], names_eq)
-        self.assertEquals(models, models_eq)
-
-    def eq_field_names_and_models(self, objects, names_eq, models_eq):
-        fields, models = zip(*objects)
-        self.assertEquals([o.name for o in fields], names_eq)
-        self.assertEquals(models, models_eq)
-
 TEST_RESULTS = {
     'fields': {
         Person: [
@@ -296,8 +266,22 @@ TEST_RESULTS = {
             'content_object_concrete', 'generic_relation_concrete',
             'generic_relation_base', 'content_object_base',
             'generic_relation_abstract', 'content_object_abstract']
-        },
+    },
 }
+
+
+class OptionsBaseTests(test.TestCase):
+
+    def eq_field_query_names_and_models(self, objects, names_eq, models_eq):
+        fields, models = zip(*objects)
+        self.assertEquals([o.field.related_query_name()
+                          for o in fields], names_eq)
+        self.assertEquals(models, models_eq)
+
+    def eq_field_names_and_models(self, objects, names_eq, models_eq):
+        fields, models = zip(*objects)
+        self.assertEquals([o.name for o in fields], names_eq)
+        self.assertEquals(models, models_eq)
 
 
 class DataTests(OptionsBaseTests):
