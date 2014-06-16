@@ -258,7 +258,34 @@ TEST_RESULTS = {
              BasePerson, BasePerson, BasePerson, BasePerson,
              BasePerson, BasePerson, None, None, None, None,
              None, None, None, None, None, None, None))
-    }
+    },
+    'get_all_related_many_to_many_with_model': {
+        BasePerson: (
+            [u'friends_abstract_rel_+', 'followers_abstract',
+             u'friends_base_rel_+', 'followers_base',
+             'relating_basepeople', '+'],
+            (None, None, None, None, None, None)),
+        Person: (
+            ['friends_abstract_rel_+', 'followers_abstract',
+             'friends_base_rel_+', 'followers_base',
+             'relating_basepeople', '+', u'friends_inherited_rel_+',
+             'followers_concrete', 'relating_people', '+'],
+            (BasePerson, BasePerson, BasePerson, BasePerson,
+             BasePerson, BasePerson, None, None, None, None))
+    },
+    'get_all_related_many_to_many_local': {
+        BasePerson: [
+            'friends_abstract_rel_+',
+            'followers_abstract',
+            'friends_base_rel_+',
+            'followers_base',
+            'relating_basepeople',
+            '+'],
+        Person: [
+            'friends_inherited_rel_+',
+            'followers_concrete',
+            'relating_people', '+']
+    },
 }
 
 
@@ -356,26 +383,20 @@ class RelatedObjectsTests(OptionsBaseTests):
 class RelatedM2MTests(OptionsBaseTests):
 
     def test_related_m2m_with_model(self):
-        objects = Person._meta.get_all_related_m2m_objects_with_model()
-        self.eq_field_names_and_models(objects, [
-            u'model_options:baseperson',
-            u'model_options:baseperson',
-            u'model_options:baseperson',
-            u'model_options:baseperson',
-            u'model_options:relating',
-            u'model_options:relating',
-            u'model_options:person',
-            u'model_options:person',
-            u'model_options:relating',
-            u'model_options:relating'
-        ], ())
+        k = 'get_all_related_many_to_many_with_model'
+        for model, (expected_names, expected_models) in TEST_RESULTS[k].items():
+            objects = model._meta.get_all_related_m2m_objects_with_model()
+            fields, models = zip(*objects)
+            self.eq_field_query_names_and_models(objects, expected_names,
+                                                 expected_models)
 
     def test_related_m2m_local_only(self):
-        objects = Person._meta.get_all_related_many_to_many_objects(
-            local_only=True)
-        self.assertEquals([o.field.related_query_name() for o in objects], [
-            u'friends_inherited_rel_+', 'followers_concrete', 'relating_people', '+'
-        ])
+        k = 'get_all_related_many_to_many_local'
+        for model, expected_names in TEST_RESULTS[k].items():
+            objects = model._meta.get_all_related_many_to_many_objects(
+                local_only=True)
+            self.assertEquals([o.field.related_query_name()
+                              for o in objects], expected_names)
 
     def test_related_m2m_asymmetrical(self):
         m2m = Person._meta.many_to_many
