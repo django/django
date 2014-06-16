@@ -50,10 +50,10 @@ class OperationWriter(object):
         if getattr(migrations, name, None) == self.operation.__class__:
             self.feed('migrations.%s(' % name)
         else:
-            imports.add('from %s import %s' % (
+            imports.add('import %s' % (self.operation.__class__.__module__))
+            self.feed('%s.%s(' % (
                 self.operation.__class__.__module__, name
             ))
-            self.feed('%s(' % (name))
 
         self.indent()
         for arg_name in argspec.args[1:]:

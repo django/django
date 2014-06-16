@@ -8,7 +8,6 @@ import unittest
 
 from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
-from django.db.migrations.operations.base import Operation
 from django.db.migrations.writer import MigrationWriter, SettingsReference
 from django.test import TestCase
 from django.conf import settings
@@ -17,35 +16,14 @@ from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import get_default_timezone
 
-import operations
+import custom_migration_operations.operations
+import custom_migration_operations.more_operations
 
 class TestModel1(object):
     def upload_to(self):
         return "somewhere dynamic"
     thing = models.FileField(upload_to=upload_to)
 
-class TestOperation(Operation):
-    def __init__(self):
-        pass
-
-    @property
-    def reversible(self):
-        return True
-
-    def state_forwards(self, app_label, state):
-        pass
-
-    def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        pass
-
-    def state_backwards(self, app_label, state):
-        pass
-
-    def database_backwards(self, app_label, schema_editor, from_state, to_state):
-        pass
-
-class CreateModel(TestOperation):
-    pass
 
 class WriterTests(TestCase):
     """
@@ -250,17 +228,18 @@ class WriterTests(TestCase):
     def test_custom_operation(self):
         migration = type(str("Migration"), (migrations.Migration,), {
             "operations": [
-                TestOperation(),
-                CreateModel(),
+                custom_migration_operations.operations.TestOperation(),
+                custom_migration_operations.operations.CreateModel(),
                 migrations.CreateModel("MyModel", (), {}, (models.Model,)),
-                operations.TestOperation()
+                custom_migration_operations.more_operations.TestOperation()
             ],
             "dependencies": []
         })
         writer = MigrationWriter(migration)
         output = writer.as_string()
         result = self.safe_exec(output)
-        # Need a way to ensure we have two different
-        # TestOperation classes.
-        self.assertIn("TestOperation", result)
-        self.assertIn("CreateModel", result)
+        self.assertIn("custom_migration_operations", result)
+        self.assertNotEqual(
+            result['custom_migration_operations'].operations.TestOperation,
+            result['custom_migration_operations'].more_operations.TestOperation
+        )
