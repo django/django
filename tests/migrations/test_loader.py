@@ -77,7 +77,7 @@ class LoaderTests(TestCase):
         )
 
         # Ensure we've included unmigrated apps in there too
-        self.assertIn("contenttypes", project_state.real_apps)
+        self.assertIn("auth", project_state.real_apps)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_unmigdep"})
     def test_load_unmigrated_dependency(self):
