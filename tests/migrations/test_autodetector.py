@@ -5,6 +5,7 @@ from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ProjectState, ModelState
 from django.db.migrations.graph import MigrationGraph
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser
 
 
 class DeconstructableObject(object):
@@ -67,7 +68,9 @@ class AutodetectorTests(TestCase):
     book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "newfield")]})
     attribution = ModelState("otherapp", "Attribution", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("book", models.ForeignKey("otherapp.Book"))])
     edition = ModelState("thirdapp", "Edition", [("id", models.AutoField(primary_key=True)), ("book", models.ForeignKey("otherapp.Book"))])
-    custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))])
+    custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))], bases=(AbstractBaseUser, ))
+    custom_user_no_inherit = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))])
+    aardvark = ModelState("thirdapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
     knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
     rabbit = ModelState("eggs", "Rabbit", [("id", models.AutoField(primary_key=True)), ("knight", models.ForeignKey("eggs.Knight")), ("parent", models.ForeignKey("eggs.Rabbit"))], {"unique_together": [("parent", "knight")]})
 
@@ -913,3 +916,34 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="author", order_with_respect_to="book")
         # Make sure the _order field is not in the CreateModel fields
         self.assertNotIn("_order", [name for name, field in changes['testapp'][0].operations[0].fields])
+
+    def test_swappable_first_inheritance(self):
+        """
+        Tests that swappable models get their CreateModel first.
+        """
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([self.custom_user, self.aardvark])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'thirdapp', 1)
+        self.assertOperationTypes(changes, 'thirdapp', 0, ["CreateModel", "CreateModel"])
+        self.assertOperationAttributes(changes, 'thirdapp', 0, 0, name="CustomUser")
+        self.assertOperationAttributes(changes, 'thirdapp', 0, 1, name="Aardvark")
+
+    @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
+    def test_swappable_first_setting(self):
+        """
+        Tests that swappable models get their CreateModel first.
+        """
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([self.custom_user_no_inherit, self.aardvark])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'thirdapp', 1)
+        self.assertOperationTypes(changes, 'thirdapp', 0, ["CreateModel", "CreateModel"])
+        self.assertOperationAttributes(changes, 'thirdapp', 0, 0, name="CustomUser")
+        self.assertOperationAttributes(changes, 'thirdapp', 0, 1, name="Aardvark")
