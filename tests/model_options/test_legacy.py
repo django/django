@@ -85,20 +85,44 @@ TEST_RESULTS = {
         AbstractPerson: [
             'data_abstract', 'fk_abstract_id',
             'content_type_abstract_id', 'object_id_abstract']
-    }
+    },
+    'many_to_many': {
+        Person: [
+            'm2m_abstract', 'friends_abstract',
+            'following_abstract', 'm2m_base',
+            'friends_base', 'following_base',
+            'm2m_inherited', 'friends_inherited',
+            'following_inherited'],
+        BasePerson: [
+            'm2m_abstract', 'friends_abstract',
+            'following_abstract', 'm2m_base',
+            'friends_base', 'following_base'],
+        AbstractPerson: [
+            'm2m_abstract', 'friends_abstract',
+            'following_abstract']
+    },
+    'many_to_many_with_model': {
+        Person: [
+            BasePerson, BasePerson, BasePerson,
+            BasePerson, BasePerson, BasePerson,
+            None, None, None],
+        BasePerson: [None, None, None, None, None, None],
+        AbstractPerson: [None, None, None]
+    },
+
 }
 
 
 class DataTests(OptionsBaseTests):
 
     def test_fields(self):
-        for model, expected_result in TEST_RESULTS['fields'].iteritems():
+        for model, expected_result in TEST_RESULTS['fields'].items():
             fields = model._meta.fields
             self.assertEquals([f.attname for f in fields],
                               expected_result)
 
     def test_local_fields(self):
-        for model, expected_result in TEST_RESULTS['local_fields'].iteritems():
+        for model, expected_result in TEST_RESULTS['local_fields'].items():
             fields = model._meta.local_fields
             self.assertEquals([f.attname for f in fields],
                               expected_result)
@@ -106,7 +130,7 @@ class DataTests(OptionsBaseTests):
                             related.ManyToManyRel) for f in fields]))
 
     def test_local_concrete_fields(self):
-        for model, expected_result in TEST_RESULTS['local_concrete_fields'].iteritems():
+        for model, expected_result in TEST_RESULTS['local_concrete_fields'].items():
             fields = model._meta.local_concrete_fields
             self.assertEquals([f.attname for f in fields],
                               expected_result)
@@ -117,21 +141,17 @@ class DataTests(OptionsBaseTests):
 class M2MTests(OptionsBaseTests):
 
     def test_many_to_many(self):
-        fields = Person._meta.many_to_many
-        self.assertEquals([f.attname for f in fields], [
-                          'm2m_abstract', 'friends_abstract',
-                          'following_abstract', 'm2m_base',
-                          'friends_base', 'following_base',
-                          'm2m_inherited', 'friends_inherited',
-                          'following_inherited'])
-        self.assertTrue(all([isinstance(f.rel, related.ManyToManyRel)
-                             for f in fields]))
+        for model, expected_result in TEST_RESULTS['many_to_many'].items():
+            fields = model._meta.many_to_many
+            self.assertEquals([f.attname for f in fields],
+                              expected_result)
+            self.assertTrue(all([isinstance(f.rel, related.ManyToManyRel)
+                                 for f in fields]))
 
     def test_many_to_many_with_model(self):
-        models = OrderedDict(Person._meta.get_m2m_with_model()).values()
-        self.assertEquals(models, [BasePerson, BasePerson, BasePerson,
-                                   BasePerson, BasePerson, BasePerson,
-                                   None, None, None])
+        for model, expected_result in TEST_RESULTS['many_to_many_with_model'].items():
+            models = OrderedDict(model._meta.get_m2m_with_model()).values()
+            self.assertEquals(models, expected_result)
 
 
 class RelatedObjectsTests(OptionsBaseTests):
