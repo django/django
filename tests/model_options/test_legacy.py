@@ -346,7 +346,10 @@ TEST_RESULTS = {
              'relating_basepeople', '+', u'friends_inherited_rel_+',
              'followers_concrete', 'relating_people', '+'],
             (BasePerson, BasePerson, BasePerson, BasePerson,
-             BasePerson, BasePerson, None, None, None, None))
+             BasePerson, BasePerson, None, None, None, None)),
+        Relation: (
+            ['m2m_abstract_rel', 'm2m_base_rel', 'm2m_concrete_rel'],
+            (None, None, None))
     },
     'get_all_related_many_to_many_local': {
         BasePerson: [
@@ -359,7 +362,10 @@ TEST_RESULTS = {
         Person: [
             'friends_inherited_rel_+',
             'followers_concrete',
-            'relating_people', '+']
+            'relating_people', '+'],
+        Relation: [
+            'm2m_abstract_rel',
+            'm2m_base_rel', 'm2m_concrete_rel']
     },
     'virtual_fields': {
         AbstractPerson: [
