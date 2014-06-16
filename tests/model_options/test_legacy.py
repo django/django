@@ -287,6 +287,8 @@ TEST_RESULTS = {
             'relating_people', '+']
     },
     'virtual_fields': {
+        AbstractPerson: [
+            'generic_relation_abstract', 'content_object_abstract'],
         BasePerson: [
             'generic_relation_base', 'content_object_base',
             'generic_relation_abstract', 'content_object_abstract'],
