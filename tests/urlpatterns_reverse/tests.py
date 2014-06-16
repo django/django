@@ -325,7 +325,7 @@ LOGIN_URL = reverse_lazy('login')""")
         self.remove_settings('settings.py')
 
     def test_lazy_in_settings(self):
-        out, err = self.run_manage(['sqlall', 'auth'])
+        out, err = self.run_manage(['validate'])
         self.assertNoOutput(err)
 
 
