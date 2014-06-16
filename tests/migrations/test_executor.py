@@ -1,10 +1,11 @@
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
-from django.test import override_settings
+from django.test import modify_settings, override_settings
 
 from .test_base import MigrationTestBase
 
 
+@modify_settings(INSTALLED_APPS={'append': 'migrations2'})
 class ExecutorTests(MigrationTestBase):
     """
     Tests the migration executor (full end-to-end running).
@@ -13,7 +14,7 @@ class ExecutorTests(MigrationTestBase):
     test failures first, as they may be propagating into here.
     """
 
-    available_apps = ["migrations", "django.contrib.sessions"]
+    available_apps = ["migrations", "migrations2"]
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_run(self):
@@ -94,7 +95,10 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_book")
 
-    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations", "sessions": "migrations.test_migrations_2"})
+    @override_settings(MIGRATION_MODULES={
+        "migrations": "migrations.test_migrations",
+        "migrations2": "migrations2.test_migrations_2",
+    })
     def test_empty_plan(self):
         """
         Tests that re-planning a full migration of a fully-migrated set doesn't
@@ -106,27 +110,34 @@ class ExecutorTests(MigrationTestBase):
         were being unmigrated.
         """
         # Make the initial plan, check it
-        # We use 'sessions' here as the second app as it's always present
-        # in INSTALLED_APPS, so we can happily assign it test migrations.
         executor = MigrationExecutor(connection)
-        plan = executor.migration_plan([("migrations", "0002_second"), ("sessions", "0001_initial")])
+        plan = executor.migration_plan([
+            ("migrations", "0002_second"),
+            ("migrations2", "0001_initial"),
+        ])
         self.assertEqual(
             plan,
             [
                 (executor.loader.graph.nodes["migrations", "0001_initial"], False),
                 (executor.loader.graph.nodes["migrations", "0002_second"], False),
-                (executor.loader.graph.nodes["sessions", "0001_initial"], False),
+                (executor.loader.graph.nodes["migrations2", "0001_initial"], False),
             ],
         )
         # Fake-apply all migrations
-        executor.migrate([("migrations", "0002_second"), ("sessions", "0001_initial")], fake=True)
+        executor.migrate([
+            ("migrations", "0002_second"),
+            ("migrations2", "0001_initial")
+        ], fake=True)
         # Rebuild the graph to reflect the new DB state
         executor.loader.build_graph()
         # Now plan a second time and make sure it's empty
-        plan = executor.migration_plan([("migrations", "0002_second"), ("sessions", "0001_initial")])
+        plan = executor.migration_plan([
+            ("migrations", "0002_second"),
+            ("migrations2", "0001_initial"),
+        ])
         self.assertEqual(plan, [])
         # Erase all the fake records
-        executor.recorder.record_unapplied("sessions", "0001_initial")
+        executor.recorder.record_unapplied("migrations2", "0001_initial")
         executor.recorder.record_unapplied("migrations", "0002_second")
         executor.recorder.record_unapplied("migrations", "0001_initial")
 
