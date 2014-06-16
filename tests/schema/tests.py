@@ -478,7 +478,7 @@ class SchemaTests(TransactionTestCase):
             BookWithM2M._meta.local_many_to_many.remove(new_field)
             del BookWithM2M._meta._m2m_cache
 
-    @unittest.skipUnless(connection.features.supports_check_constraints, "No check constraints")
+    @unittest.skipUnless(connection.features.supports_column_check_constraints, "No check constraints")
     def test_check_constraints(self):
         """
         Tests creating/deleting CHECK constraints

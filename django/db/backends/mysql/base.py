@@ -184,7 +184,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allows_auto_pk_0 = False
     uses_savepoints = True
     atomic_transactions = False
-    supports_check_constraints = False
+    supports_column_check_constraints = False
 
     def __init__(self, connection):
         super(DatabaseFeatures, self).__init__(connection)
