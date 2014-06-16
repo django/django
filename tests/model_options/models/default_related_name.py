@@ -1,4 +1,3 @@
-
 from django.db import models
 
 
@@ -9,23 +8,25 @@ class Author(models.Model):
 
 class Editor(models.Model):
     name = models.CharField(max_length=128)
-    bestselling_author = models.ForeignKey(Author, null=True, blank=True)
+    bestselling_author = models.ForeignKey(Author)
 
 
 class Book(models.Model):
-    class Meta:
-        default_related_name = "books"
     title = models.CharField(max_length=128)
     authors = models.ManyToManyField(Author)
     editor = models.ForeignKey(Editor, related_name="edited_books")
 
+    class Meta:
+        default_related_name = "books"
+
 
 class Store(models.Model):
+    name = models.CharField(max_length=128)
+    address = models.CharField(max_length=128)
+
     class Meta:
         abstract = True
         default_related_name = "%(app_label)s_%(class)ss"
-    name = models.CharField(max_length=128)
-    address = models.CharField(max_length=128)
 
 
 class BookStore(Store):
@@ -33,7 +34,8 @@ class BookStore(Store):
 
 
 class EditorStore(Store):
-    class Meta:
-        default_related_name = "editor_stores"
     editor = models.ForeignKey(Editor)
     available_books = models.ManyToManyField(Book)
+
+    class Meta:
+        default_related_name = "editor_stores"

@@ -60,7 +60,10 @@ class RelatedObject(object):
             if self.field.rel.related_name:
                 return self.field.rel.related_name
             if self.opts.default_related_name:
-                return self.opts.default_related_name % {'class': self.opts.model_name.lower(), 'app_label': self.opts.app_label.lower()}
+                return self.opts.default_related_name % {
+                    'class': self.opts.model_name.lower(),
+                    'app_label': self.opts.app_label.lower()
+                }
             return self.opts.model_name + '_set'
         else:
             return self.field.rel.related_name or (self.opts.model_name)
