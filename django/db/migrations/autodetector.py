@@ -417,12 +417,14 @@ class MigrationAutodetector(object):
                 if field.rel:
                     if field.rel.to:
                         related_fields[field.name] = field
-                    if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
+                    # through will be none on M2Ms on swapped-out models;
+                    # we can treat lack of through as auto_created=True, though.
+                    if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
                         related_fields[field.name] = field
             for field in self.new_apps.get_model(app_label, model_name)._meta.local_many_to_many:
                 if field.rel.to:
                     related_fields[field.name] = field
-                if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
+                if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
                     related_fields[field.name] = field
             # Are there unique/index_together to defer?
             unique_together = model_state.options.pop('unique_together', None)
@@ -567,12 +569,14 @@ class MigrationAutodetector(object):
                 if field.rel:
                     if field.rel.to:
                         related_fields[field.name] = field
-                    if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
+                    # through will be none on M2Ms on swapped-out models;
+                    # we can treat lack of through as auto_created=True, though.
+                    if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
                         related_fields[field.name] = field
             for field in model._meta.local_many_to_many:
                 if field.rel.to:
                     related_fields[field.name] = field
-                if hasattr(field.rel, "through") and not field.rel.through._meta.auto_created:
+                if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
                     related_fields[field.name] = field
             # Generate option removal first
             unique_together = model_state.options.pop('unique_together', None)
