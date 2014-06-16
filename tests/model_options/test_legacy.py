@@ -11,6 +11,22 @@ from .models import (
 
 class OptionsBaseTests(test.TestCase):
 
+    def _debug(self, f, m):
+        print "Attname"
+        print [x.name for x in f]
+        try:
+            print "Related Query Name"
+            print [x.field.related_query_name() for x in f]
+        except:
+            pass
+        print "Models"
+
+        def asd(m2):
+            if m2 is not None:
+                m2 = m2.__name__
+            return m2
+        print map(asd, m)
+
     def eq_field_query_names_and_models(self, objects, names_eq, models_eq):
         fields, models = zip(*objects)
         self.assertEquals([o.field.related_query_name()
@@ -187,30 +203,35 @@ class RelatedM2MTests(OptionsBaseTests):
         self.eq_field_names_and_models(objects, [
             u'model_options:baseperson',
             u'model_options:baseperson',
+            u'model_options:baseperson',
+            u'model_options:baseperson',
             u'model_options:relating',
             u'model_options:relating',
+            u'model_options:person',
+            u'model_options:person',
             u'model_options:relating',
             u'model_options:relating'
-        ], (BasePerson, BasePerson, BasePerson, BasePerson, None, None))
+        ], (BasePerson, BasePerson, BasePerson, BasePerson, BasePerson,
+            BasePerson, None, None, None, None))
 
     def test_related_m2m_local_only(self):
         objects = Person._meta.get_all_related_many_to_many_objects(
             local_only=True)
         self.assertEquals([o.field.related_query_name() for o in objects], [
-            'relating_people', '+'
+            u'friends_inherited_rel_+', 'followers_concrete', 'relating_people', '+'
         ])
 
     def test_related_m2m_asymmetrical(self):
         m2m = Person._meta.many_to_many
-        self.assertTrue('following' in [f.attname for f in m2m])
+        self.assertTrue('following_base' in [f.attname for f in m2m])
         related_m2m = Person._meta.get_all_related_many_to_many_objects()
-        self.assertTrue('followers' in [o.field.related_query_name() for o in related_m2m])
+        self.assertTrue('followers_base' in [o.field.related_query_name() for o in related_m2m])
 
     def test_related_m2m_symmetrical(self):
         m2m = Person._meta.many_to_many
-        self.assertTrue('friends' in [f.attname for f in m2m])
+        self.assertTrue('friends_base' in [f.attname for f in m2m])
         related_m2m = Person._meta.get_all_related_many_to_many_objects()
-        self.assertTrue('friends_rel_+' in [o.field.related_query_name() for o in related_m2m])
+        self.assertTrue('friends_inherited_rel_+' in [o.field.related_query_name() for o in related_m2m])
 
 
 class VirtualFieldsTests(OptionsBaseTests):
