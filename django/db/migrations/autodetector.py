@@ -366,7 +366,6 @@ class MigrationAutodetector(object):
             pass
         return item
 
-
     def generate_renamed_models(self):
         """
         Finds any renamed models, and generates the operations for them,
