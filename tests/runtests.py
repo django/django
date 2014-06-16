@@ -129,8 +129,9 @@ def setup(verbosity, test_labels):
     # Ensure the middleware classes are seen as overridden otherwise we get a compatibility warning.
     settings._explicit_settings.add('MIDDLEWARE_CLASSES')
     settings.MIGRATION_MODULES = {
-        # this module doesn't actually exist, but this lets us skip creating
-        # migrations for the test modules for some reason.
+        # these 'tests.migrations' modules don't actually exist, but this lets
+        # us skip creating migrations for the test models.
+        'auth': 'django.contrib.auth.tests.migrations',
         'contenttypes': 'django.contrib.contenttypes.tests.migrations',
     }
 
