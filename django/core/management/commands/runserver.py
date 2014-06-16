@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from optparse import make_option
 from datetime import datetime
 import errno
 import os
@@ -26,19 +25,20 @@ DEFAULT_PORT = "8000"
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
-            help='Tells Django to use an IPv6 address.'),
-        make_option('--nothreading', action='store_false', dest='use_threading', default=True,
-            help='Tells Django to NOT use threading.'),
-        make_option('--noreload', action='store_false', dest='use_reloader', default=True,
-            help='Tells Django to NOT use the auto-reloader.'),
-    )
     help = "Starts a lightweight Web server for development."
-    args = '[optional port number, or ipaddr:port]'
 
     # Validation is called explicitly each time the server is reloaded.
     requires_system_checks = False
+
+    def add_arguments(self, parser):
+        parser.add_argument('addrport', nargs='?',
+            help='Optional port number, or ipaddr:port')
+        parser.add_argument('--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
+            help='Tells Django to use an IPv6 address.')
+        parser.add_argument('--nothreading', action='store_false', dest='use_threading', default=True,
+            help='Tells Django to NOT use threading.')
+        parser.add_argument('--noreload', action='store_false', dest='use_reloader', default=True,
+            help='Tells Django to NOT use the auto-reloader.')
 
     def get_handler(self, *args, **options):
         """
@@ -46,7 +46,7 @@ class Command(BaseCommand):
         """
         return get_internal_wsgi_application()
 
-    def handle(self, addrport='', *args, **options):
+    def handle(self, *args, **options):
         from django.conf import settings
 
         if not settings.DEBUG and not settings.ALLOWED_HOSTS:
@@ -55,17 +55,15 @@ class Command(BaseCommand):
         self.use_ipv6 = options.get('use_ipv6')
         if self.use_ipv6 and not socket.has_ipv6:
             raise CommandError('Your Python does not support IPv6.')
-        if args:
-            raise CommandError('Usage is runserver %s' % self.args)
         self._raw_ipv6 = False
-        if not addrport:
+        if not options.get('addrport'):
             self.addr = ''
             self.port = DEFAULT_PORT
         else:
-            m = re.match(naiveip_re, addrport)
+            m = re.match(naiveip_re, options['addrport'])
             if m is None:
                 raise CommandError('"%s" is not a valid port number '
-                                   'or address:port pair.' % addrport)
+                                   'or address:port pair.' % options['addrport'])
             self.addr, _ipv4, _ipv6, _fqdn, self.port = m.groups()
             if not self.port.isdigit():
                 raise CommandError("%r is not a valid port number." % self.port)
@@ -79,18 +77,18 @@ class Command(BaseCommand):
         if not self.addr:
             self.addr = '::1' if self.use_ipv6 else '127.0.0.1'
             self._raw_ipv6 = bool(self.use_ipv6)
-        self.run(*args, **options)
+        self.run(**options)
 
-    def run(self, *args, **options):
+    def run(self, **options):
         """
         Runs the server, using the autoreloader if needed
         """
         use_reloader = options.get('use_reloader')
 
         if use_reloader:
-            autoreload.main(self.inner_run, args, options)
+            autoreload.main(self.inner_run, None, options)
         else:
-            self.inner_run(*args, **options)
+            self.inner_run(None, **options)
 
     def inner_run(self, *args, **options):
         from django.conf import settings

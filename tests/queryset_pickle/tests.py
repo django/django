@@ -2,8 +2,11 @@ from __future__ import unicode_literals
 
 import pickle
 import datetime
+import warnings
 
 from django.test import TestCase
+from django.utils.encoding import force_text
+from django.utils.version import get_major_version, get_version
 
 from .models import Group, Event, Happening, Container, M2MModel
 
@@ -108,3 +111,29 @@ class PickleabilityTestCase(TestCase):
         # Second pickling
         groups = pickle.loads(pickle.dumps(groups))
         self.assertQuerysetEqual(groups, [g], lambda x: x)
+
+    def test_missing_django_version_unpickling(self):
+        """
+        #21430 -- Verifies a warning is raised for querysets that are
+        unpickled without a Django version
+        """
+        qs = Group.missing_django_version_objects.all()
+        with warnings.catch_warnings(record=True) as recorded:
+            pickle.loads(pickle.dumps(qs))
+            msg = force_text(recorded.pop().message)
+            self.assertEqual(msg,
+                "Pickled queryset instance's Django version is not specified.")
+
+    def test_unsupported_unpickle(self):
+        """
+        #21430 -- Verifies a warning is raised for querysets that are
+        unpickled with a different Django version than the current
+        """
+        qs = Group.previous_django_version_objects.all()
+        with warnings.catch_warnings(record=True) as recorded:
+            pickle.loads(pickle.dumps(qs))
+            msg = force_text(recorded.pop().message)
+            self.assertEqual(msg,
+                "Pickled queryset instance's Django version %s does not "
+                "match the current version %s."
+                % (str(float(get_major_version()) - 0.1), get_version()))

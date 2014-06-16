@@ -5,10 +5,12 @@ The main QuerySet implementation. This provides the public API for the ORM.
 from collections import deque
 import copy
 import sys
+import warnings
 
 from django.conf import settings
 from django.core import exceptions
-from django.db import connections, router, transaction, IntegrityError
+from django.db import (connections, router, transaction, IntegrityError,
+    DJANGO_VERSION_PICKLE_KEY)
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import AutoField, Empty
 from django.db.models.query_utils import (Q, select_related_descend,
@@ -19,6 +21,7 @@ from django.db.models import sql
 from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
+from django.utils.version import get_version
 
 # The maximum number (one less than the max to be precise) of results to fetch
 # in a get() query
@@ -90,7 +93,25 @@ class QuerySet(object):
         # Force the cache to be fully populated.
         self._fetch_all()
         obj_dict = self.__dict__.copy()
+        obj_dict[DJANGO_VERSION_PICKLE_KEY] = get_version()
         return obj_dict
+
+    def __setstate__(self, state):
+        msg = None
+        pickled_version = state.get(DJANGO_VERSION_PICKLE_KEY)
+        if pickled_version:
+            current_version = get_version()
+            if current_version != pickled_version:
+                msg = ("Pickled queryset instance's Django version %s does"
+                    " not match the current version %s."
+                    % (pickled_version, current_version))
+        else:
+            msg = "Pickled queryset instance's Django version is not specified."
+
+        if msg:
+            warnings.warn(msg, RuntimeWarning, stacklevel=2)
+
+        self.__dict__.update(state)
 
     def __reduce__(self):
         """

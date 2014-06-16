@@ -1,6 +1,5 @@
 from importlib import import_module
 import os
-from optparse import make_option
 import unittest
 from unittest import TestSuite, defaultTestLoader
 
@@ -19,17 +18,6 @@ class DiscoverRunner(object):
     test_runner = unittest.TextTestRunner
     test_loader = defaultTestLoader
     reorder_by = (TestCase, SimpleTestCase)
-    option_list = (
-        make_option('-t', '--top-level-directory',
-            action='store', dest='top_level', default=None,
-            help='Top level of project for unittest discovery.'),
-        make_option('-p', '--pattern', action='store', dest='pattern',
-            default="test*.py",
-            help='The test matching pattern. Defaults to test*.py.'),
-        make_option('-k', '--keepdb', action='store_true', dest='keepdb',
-            default=False,
-            help='Preserve the test DB between runs. Defaults to False'),
-    )
 
     def __init__(self, pattern=None, top_level=None,
                  verbosity=1, interactive=True, failfast=False, keepdb=False,
@@ -42,6 +30,18 @@ class DiscoverRunner(object):
         self.interactive = interactive
         self.failfast = failfast
         self.keepdb = keepdb
+
+    @classmethod
+    def add_arguments(cls, parser):
+        parser.add_argument('-t', '--top-level-directory',
+            action='store', dest='top_level', default=None,
+            help='Top level of project for unittest discovery.')
+        parser.add_argument('-p', '--pattern', action='store', dest='pattern',
+            default="test*.py",
+            help='The test matching pattern. Defaults to test*.py.')
+        parser.add_argument('-k', '--keepdb', action='store_true', dest='keepdb',
+            default=False,
+            help='Preserve the test DB between runs. Defaults to False')
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment()

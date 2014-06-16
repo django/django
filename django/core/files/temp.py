@@ -69,6 +69,13 @@ if os.name == 'nt':
         def __del__(self):
             self.close()
 
+        def __enter__(self):
+            self.file.__enter__()
+            return self
+
+        def __exit__(self, exc, value, tb):
+            self.file.__exit__(exc, value, tb)
+
     NamedTemporaryFile = TemporaryFile
 else:
     NamedTemporaryFile = tempfile.NamedTemporaryFile

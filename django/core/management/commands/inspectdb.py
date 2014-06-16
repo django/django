@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 import keyword
 import re
-from optparse import make_option
 
 from django.core.management.base import NoArgsCommand, CommandError
 from django.db import connections, DEFAULT_DB_ALIAS
@@ -12,15 +11,14 @@ from django.db import connections, DEFAULT_DB_ALIAS
 class Command(NoArgsCommand):
     help = "Introspects the database tables in the given database and outputs a Django model module."
 
-    option_list = NoArgsCommand.option_list + (
-        make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database to '
-                'introspect.  Defaults to using the "default" database.'),
-    )
-
     requires_system_checks = False
 
     db_module = 'django.db'
+
+    def add_arguments(self, parser):
+        parser.add_argument('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a database to '
+            'introspect. Defaults to using the "default" database.')
 
     def handle_noargs(self, **options):
         try:
@@ -30,7 +28,7 @@ class Command(NoArgsCommand):
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
     def handle_inspection(self, options):
-        connection = connections[options.get('database')]
+        connection = connections[options['database']]
         # 'table_name_filter' is a stealth option
         table_name_filter = options.get('table_name_filter')
 

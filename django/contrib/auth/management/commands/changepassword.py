@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import getpass
-from optparse import make_option
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
@@ -10,10 +9,6 @@ from django.utils.encoding import force_str
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Specifies the database to use. Default is "default".'),
-    )
     help = "Change a user's password for django.contrib.auth."
 
     requires_system_checks = False
@@ -24,12 +19,16 @@ class Command(BaseCommand):
             raise CommandError("aborted")
         return p
 
-    def handle(self, *args, **options):
-        if len(args) > 1:
-            raise CommandError("need exactly one or zero arguments for username")
+    def add_arguments(self, parser):
+        parser.add_argument('username', nargs='?',
+            help='Username to change password for; by default, it\'s the current username.')
+        parser.add_argument('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS,
+            help='Specifies the database to use. Default is "default".')
 
-        if args:
-            username, = args
+    def handle(self, *args, **options):
+        if options.get('username'):
+            username = options['username']
         else:
             username = getpass.getuser()
 

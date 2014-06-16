@@ -411,6 +411,7 @@ class TestFixtures(TestCase):
             % widget.pk
         )
 
+    @skipUnlessDBFeature('supports_forward_references')
     def test_loaddata_works_when_fixture_has_forward_refs(self):
         """
         Regression for #3615 - Forward references cause fixtures not to load in MySQL (InnoDB)
@@ -435,6 +436,7 @@ class TestFixtures(TestCase):
                 verbosity=0,
             )
 
+    @skipUnlessDBFeature('supports_forward_references')
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
                                      os.path.join(_cur_dir, 'fixtures_2')])
     def test_loaddata_forward_refs_split_fixtures(self):

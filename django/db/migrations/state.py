@@ -5,6 +5,7 @@ from django.apps.registry import Apps, apps as global_apps
 from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.fields.related import do_pending_lookups
+from django.db.models.fields.proxy import OrderWrt
 from django.conf import settings
 from django.utils import six
 from django.utils.encoding import force_text
@@ -44,11 +45,13 @@ class ProjectState(object):
             # Any apps in self.real_apps should have all their models included
             # in the render. We don't use the original model instances as there
             # are some variables that refer to the Apps object.
+            # FKs/M2Ms from real apps are also not included as they just
+            # mess things up with partial states (due to lack of dependencies)
             real_models = []
             for app_label in self.real_apps:
                 app = global_apps.get_app_config(app_label)
                 for model in app.get_models():
-                    real_models.append(ModelState.from_model(model))
+                    real_models.append(ModelState.from_model(model, exclude_rels=True))
             # Populate the app registry with a stub for each application.
             app_labels = set(model_state.app_label for model_state in self.models.values())
             self.apps = Apps([AppConfigStub(label) for label in sorted(self.real_apps + list(app_labels))])
@@ -155,13 +158,17 @@ class ModelState(object):
                 )
 
     @classmethod
-    def from_model(cls, model):
+    def from_model(cls, model, exclude_rels=False):
         """
         Feed me a model, get a ModelState representing it out.
         """
         # Deconstruct the fields
         fields = []
         for field in model._meta.local_fields:
+            if getattr(field, "rel", None) and exclude_rels:
+                continue
+            if isinstance(field, OrderWrt):
+                continue
             name, path, args, kwargs = field.deconstruct()
             field_class = import_string(path)
             try:
@@ -173,17 +180,18 @@ class ModelState(object):
                     model._meta.object_name,
                     e,
                 ))
-        for field in model._meta.local_many_to_many:
-            name, path, args, kwargs = field.deconstruct()
-            field_class = import_string(path)
-            try:
-                fields.append((name, field_class(*args, **kwargs)))
-            except TypeError as e:
-                raise TypeError("Couldn't reconstruct m2m field %s on %s: %s" % (
-                    name,
-                    model._meta.object_name,
-                    e,
-                ))
+        if not exclude_rels:
+            for field in model._meta.local_many_to_many:
+                name, path, args, kwargs = field.deconstruct()
+                field_class = import_string(path)
+                try:
+                    fields.append((name, field_class(*args, **kwargs)))
+                except TypeError as e:
+                    raise TypeError("Couldn't reconstruct m2m field %s on %s: %s" % (
+                        name,
+                        model._meta.object_name,
+                        e,
+                    ))
         # Extract the options
         options = {}
         for name in DEFAULT_NAMES:
@@ -199,6 +207,12 @@ class ModelState(object):
                     options[name] = set(normalize_together(it))
                 else:
                     options[name] = model._meta.original_attrs[name]
+        # If we're ignoring relationships, remove all field-listing model
+        # options (that option basically just means "make a stub model")
+        if exclude_rels:
+            for key in ["unique_together", "index_together", "order_with_respect_to"]:
+                if key in options:
+                    del options[key]
 
         def flatten_bases(model):
             bases = []

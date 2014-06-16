@@ -366,6 +366,19 @@ class ConditionalGetMiddlewareTest(TestCase):
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertEqual(self.resp.status_code, 200)
 
+    def test_if_none_match_and_redirect(self):
+        self.req.META['HTTP_IF_NONE_MATCH'] = self.resp['ETag'] = 'spam'
+        self.resp['Location'] = '/'
+        self.resp.status_code = 301
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 301)
+
+    def test_if_none_match_and_client_error(self):
+        self.req.META['HTTP_IF_NONE_MATCH'] = self.resp['ETag'] = 'spam'
+        self.resp.status_code = 400
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 400)
+
     @override_settings(USE_ETAGS=True)
     def test_etag(self):
         req = HttpRequest()
@@ -418,6 +431,21 @@ class ConditionalGetMiddlewareTest(TestCase):
         self.resp['Last-Modified'] = 'Sat, 12 Feb 2011 17:41:44 GMT'
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertEqual(self.resp.status_code, 200)
+
+    def test_if_modified_since_and_redirect(self):
+        self.req.META['HTTP_IF_MODIFIED_SINCE'] = 'Sat, 12 Feb 2011 17:38:44 GMT'
+        self.resp['Last-Modified'] = 'Sat, 12 Feb 2011 17:35:44 GMT'
+        self.resp['Location'] = '/'
+        self.resp.status_code = 301
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 301)
+
+    def test_if_modified_since_and_client_error(self):
+        self.req.META['HTTP_IF_MODIFIED_SINCE'] = 'Sat, 12 Feb 2011 17:38:44 GMT'
+        self.resp['Last-Modified'] = 'Sat, 12 Feb 2011 17:35:44 GMT'
+        self.resp.status_code = 400
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 400)
 
 
 class XFrameOptionsMiddlewareTest(TestCase):

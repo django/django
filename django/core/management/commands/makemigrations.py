@@ -1,7 +1,6 @@
 import sys
 import os
 import operator
-from optparse import make_option
 
 from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
@@ -15,22 +14,21 @@ from django.utils.six.moves import reduce
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--dry-run', action='store_true', dest='dry_run', default=False,
-            help="Just show what migrations would be made; don't actually write them."),
-        make_option('--merge', action='store_true', dest='merge', default=False,
-            help="Enable fixing of migration conflicts."),
-        make_option('--empty', action='store_true', dest='empty', default=False,
-            help="Create an empty migration."),
-    )
-
     help = "Creates new migration(s) for apps."
-    usage_str = "Usage: ./manage.py makemigrations [--dry-run] [app [app ...]]"
-    args = "[app_label [app_label ...]]"
+
+    def add_arguments(self, parser):
+        parser.add_argument('args', metavar='app_label', nargs='*',
+            help='Specify the app label(s) to create migrations for.')
+        parser.add_argument('--dry-run', action='store_true', dest='dry_run', default=False,
+            help="Just show what migrations would be made; don't actually write them.")
+        parser.add_argument('--merge', action='store_true', dest='merge', default=False,
+            help="Enable fixing of migration conflicts.")
+        parser.add_argument('--empty', action='store_true', dest='empty', default=False,
+            help="Create an empty migration.")
 
     def handle(self, *app_labels, **options):
 
-        self.verbosity = int(options.get('verbosity'))
+        self.verbosity = options.get('verbosity')
         self.interactive = options.get('interactive')
         self.dry_run = options.get('dry_run', False)
         self.merge = options.get('merge', False)

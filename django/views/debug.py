@@ -1164,13 +1164,13 @@ DEFAULT_URLCONF_TEMPLATE = """
 
 <div id="instructions">
   <p>
-    {{ instructions }}
+    {{ instructions|safe }}
   </p>
 </div>
 
 <div id="explanation">
   <p>
-    {{ explanation }}
+    {{ explanation|safe }}
   </p>
 </div>
 </body></html>

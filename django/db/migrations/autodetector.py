@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import re
 import datetime
 
+from django.utils import six
 from django.db import models
 from django.db.migrations import operations
 from django.db.migrations.migration import Migration
@@ -22,6 +23,17 @@ class MigrationAutodetector(object):
     depends on first). A user interface may offer single-app usage
     if it wishes, with the caveat that it may not always be possible.
     """
+
+    # Model options we want to compare and preserve in an AlterModelOptions op
+    ALTER_OPTION_KEYS = [
+        "get_latest_by",
+        "ordering",
+        "permissions",
+        "default_permissions",
+        "select_on_save",
+        "verbose_name",
+        "verbose_name_plural",
+    ]
 
     def __init__(self, from_state, to_state, questioner=None):
         self.from_state = from_state
@@ -93,23 +105,32 @@ class MigrationAutodetector(object):
         # into migrations to resolve dependencies caused by M2Ms and FKs.
         self.generated_operations = {}
 
-        # Prepare some old/new state and model lists, ignoring
-        # proxy models and unmigrated apps.
+        # Prepare some old/new state and model lists, separating
+        # proxy models and ignoring unmigrated apps.
         self.old_apps = self.from_state.render(ignore_swappable=True)
         self.new_apps = self.to_state.render()
         self.old_model_keys = []
+        self.old_proxy_keys = []
+        self.new_model_keys = []
+        self.new_proxy_keys = []
         for al, mn in sorted(self.from_state.models.keys()):
             model = self.old_apps.get_model(al, mn)
-            if not model._meta.proxy and model._meta.managed and al not in self.from_state.real_apps:
-                self.old_model_keys.append((al, mn))
-        self.new_model_keys = []
+            if model._meta.managed and al not in self.from_state.real_apps:
+                if model._meta.proxy:
+                    self.old_proxy_keys.append((al, mn))
+                else:
+                    self.old_model_keys.append((al, mn))
+
         for al, mn in sorted(self.to_state.models.keys()):
             model = self.new_apps.get_model(al, mn)
-            if not model._meta.proxy and model._meta.managed and (
+            if model._meta.managed and (
                 al not in self.from_state.real_apps or
                 (convert_apps and al in convert_apps)
             ):
-                self.new_model_keys.append((al, mn))
+                if model._meta.proxy:
+                    self.new_proxy_keys.append((al, mn))
+                else:
+                    self.new_model_keys.append((al, mn))
 
         # Renames have to come first
         self.generate_renamed_models()
@@ -127,7 +148,11 @@ class MigrationAutodetector(object):
             new_model_state = self.to_state.models[app_label, model_name]
             self.old_field_keys.update((app_label, model_name, x) for x, y in old_model_state.fields)
             self.new_field_keys.update((app_label, model_name, x) for x, y in new_model_state.fields)
-            # Through model stuff
+
+        # Through model map generation
+        for app_label, model_name in sorted(self.old_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
             for field_name, field in old_model_state.fields:
                 old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field_by_name(field_name)[0]
                 if hasattr(old_field, "rel") and hasattr(old_field.rel, "through") and not old_field.rel.through._meta.auto_created:
@@ -140,6 +165,9 @@ class MigrationAutodetector(object):
         # Generate non-rename model operations
         self.generate_created_models()
         self.generate_deleted_models()
+        self.generate_created_proxies()
+        self.generate_deleted_proxies()
+        self.generate_altered_options()
 
         # Generate field operations
         self.generate_added_fields()
@@ -147,6 +175,7 @@ class MigrationAutodetector(object):
         self.generate_altered_fields()
         self.generate_altered_unique_together()
         self.generate_altered_index_together()
+        self.generate_altered_order_with_respect_to()
 
         # Now, reordering to make things possible. The order we have already
         # isn't bad, but we need to pull a few things around so FKs work nicely
@@ -205,7 +234,7 @@ class MigrationAutodetector(object):
                         elif dep[0] != app_label:
                             # External app dependency. See if it's not yet
                             # satisfied.
-                            for other_operation in self.generated_operations[dep[0]]:
+                            for other_operation in self.generated_operations.get(dep[0], []):
                                 if self.check_dependency(other_operation, dep):
                                     deps_satisfied = False
                                     break
@@ -215,7 +244,12 @@ class MigrationAutodetector(object):
                                 if self.migrations.get(dep[0], None):
                                     operation_dependencies.add((dep[0], self.migrations[dep[0]][-1].name))
                                 else:
-                                    operation_dependencies.add((dep[0], "__latest__"))
+                                    # If we can't find the other app, we add a __latest__ dependency,
+                                    # but only if we've already been through once and checked everything
+                                    if chop_mode:
+                                        operation_dependencies.add((dep[0], "__latest__"))
+                                    else:
+                                        deps_satisfied = False
                     if deps_satisfied:
                         chopped.append(operation)
                         dependencies.update(operation_dependencies)
@@ -289,9 +323,22 @@ class MigrationAutodetector(object):
                 operation.model_name.lower() == dependency[1].lower() and
                 operation.name.lower() == dependency[2].lower()
             )
+        # Removed model
+        elif dependency[2] is None and dependency[3] is False:
+            return (
+                isinstance(operation, operations.DeleteModel) and
+                operation.name.lower() == dependency[1].lower()
+            )
+        # order_with_respect_to being unset for a field
+        elif dependency[2] is not None and dependency[3] == "order_wrt_unset":
+            return (
+                isinstance(operation, operations.AlterOrderWithRespectTo) and
+                operation.name.lower() == dependency[1].lower() and
+                (operation.order_with_respect_to or "").lower() != dependency[2].lower()
+            )
         # Unknown dependency. Raise an error.
         else:
-            raise ValueError("Can't handle dependency %r" % dependency)
+            raise ValueError("Can't handle dependency %r" % (dependency, ))
 
     def add_operation(self, app_label, operation, dependencies=None):
         # Dependencies are (app_label, model_name, field_name, create/delete as True/False)
@@ -359,7 +406,17 @@ class MigrationAutodetector(object):
             # Are there unique/index_together to defer?
             unique_together = model_state.options.pop('unique_together', None)
             index_together = model_state.options.pop('index_together', None)
-            # Generate creation operatoin
+            order_with_respect_to = model_state.options.pop('order_with_respect_to', None)
+            # Depend on the deletion of any possible proxy version of us
+            dependencies = [
+                (app_label, model_name, None, False),
+            ]
+            # Depend on all bases
+            for base in model_state.bases:
+                if isinstance(base, six.string_types) and "." in base:
+                    base_app_label, base_name = base.split(".", 1)
+                    dependencies.append((base_app_label, base_name, None, False))
+            # Generate creation operation
             self.add_operation(
                 app_label,
                 operations.CreateModel(
@@ -367,7 +424,8 @@ class MigrationAutodetector(object):
                     fields=[d for d in model_state.fields if d[0] not in related_fields],
                     options=model_state.options,
                     bases=model_state.bases,
-                )
+                ),
+                dependencies=dependencies,
             )
             # Generate operations for each related field
             for name, field in sorted(related_fields.items()):
@@ -387,6 +445,8 @@ class MigrationAutodetector(object):
                         None,
                         True
                     ))
+                # Depend on our own model being created
+                dependencies.append((app_label, model_name, None, True))
                 # Make operation
                 self.add_operation(
                     app_label,
@@ -398,6 +458,11 @@ class MigrationAutodetector(object):
                     dependencies=list(set(dependencies)),
                 )
             # Generate other opns
+            related_dependencies = [
+                (app_label, model_name, name, True)
+                for name, field in sorted(related_fields.items())
+            ]
+            related_dependencies.append((app_label, model_name, None, True))
             if unique_together:
                 self.add_operation(
                     app_label,
@@ -405,10 +470,7 @@ class MigrationAutodetector(object):
                         name=model_name,
                         unique_together=unique_together,
                     ),
-                    dependencies=[
-                        (app_label, model_name, name, True)
-                        for name, field in sorted(related_fields.items())
-                    ]
+                    dependencies=related_dependencies
                 )
             if index_together:
                 self.add_operation(
@@ -417,11 +479,53 @@ class MigrationAutodetector(object):
                         name=model_name,
                         index_together=index_together,
                     ),
+                    dependencies=related_dependencies
+                )
+            if order_with_respect_to:
+                self.add_operation(
+                    app_label,
+                    operations.AlterOrderWithRespectTo(
+                        name=model_name,
+                        order_with_respect_to=order_with_respect_to,
+                    ),
                     dependencies=[
-                        (app_label, model_name, name, True)
-                        for name, field in sorted(related_fields.items())
+                        (app_label, model_name, order_with_respect_to, True),
+                        (app_label, model_name, None, True),
                     ]
                 )
+
+    def generate_created_proxies(self):
+        """
+        Makes CreateModel statements for proxy models.
+        We use the same statements as that way there's less code duplication,
+        but of course for proxy models we can skip all that pointless field
+        stuff and just chuck out an operation.
+        """
+        added_proxies = set(self.new_proxy_keys) - set(self.old_proxy_keys)
+        for app_label, model_name in sorted(added_proxies):
+            model_state = self.to_state.models[app_label, model_name]
+            assert model_state.options.get("proxy", False)
+            # Depend on the deletion of any possible non-proxy version of us
+            dependencies = [
+                (app_label, model_name, None, False),
+            ]
+            # Depend on all bases
+            for base in model_state.bases:
+                if isinstance(base, six.string_types) and "." in base:
+                    base_app_label, base_name = base.split(".", 1)
+                    dependencies.append((base_app_label, base_name, None, False))
+            # Generate creation operation
+            self.add_operation(
+                app_label,
+                operations.CreateModel(
+                    name=model_state.name,
+                    fields=[],
+                    options=model_state.options,
+                    bases=model_state.bases,
+                ),
+                # Depend on the deletion of any possible non-proxy version of us
+                dependencies=dependencies,
+            )
 
     def generate_deleted_models(self):
         """
@@ -511,6 +615,21 @@ class MigrationAutodetector(object):
                 dependencies=list(set(dependencies)),
             )
 
+    def generate_deleted_proxies(self):
+        """
+        Makes DeleteModel statements for proxy models.
+        """
+        deleted_proxies = set(self.old_proxy_keys) - set(self.new_proxy_keys)
+        for app_label, model_name in sorted(deleted_proxies):
+            model_state = self.from_state.models[app_label, model_name]
+            assert model_state.options.get("proxy", False)
+            self.add_operation(
+                app_label,
+                operations.DeleteModel(
+                    name=model_state.name,
+                ),
+            )
+
     def generate_added_fields(self):
         # New fields
         self.renamed_fields = {}
@@ -579,7 +698,10 @@ class MigrationAutodetector(object):
                 operations.RemoveField(
                     model_name=model_name,
                     name=field_name,
-                )
+                ),
+                # We might need to depend on the removal of an order_with_respect_to;
+                # this is safely ignored if there isn't one
+                dependencies=[(app_label, model_name, field_name, "order_wrt_unset")],
             )
 
     def generate_altered_fields(self):
@@ -640,6 +762,60 @@ class MigrationAutodetector(object):
                         name=model_name,
                         index_together=new_model_state.options['index_together'],
                     )
+                )
+
+    def generate_altered_options(self):
+        """
+        Works out if any non-schema-affecting options have changed and
+        makes an operation to represent them in state changes (in case Python
+        code in migrations needs them)
+        """
+        models_to_check = self.kept_model_keys.union(set(self.new_proxy_keys).intersection(self.old_proxy_keys))
+        for app_label, model_name in sorted(models_to_check):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            old_options = dict(
+                option for option in old_model_state.options.items()
+                if option[0] in self.ALTER_OPTION_KEYS
+            )
+            new_options = dict(
+                option for option in new_model_state.options.items()
+                if option[0] in self.ALTER_OPTION_KEYS
+            )
+            if old_options != new_options:
+                self.add_operation(
+                    app_label,
+                    operations.AlterModelOptions(
+                        name=model_name,
+                        options=new_options,
+                    )
+                )
+
+    def generate_altered_order_with_respect_to(self):
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            if old_model_state.options.get("order_with_respect_to", None) != new_model_state.options.get("order_with_respect_to", None):
+                # Make sure it comes second if we're adding
+                # (removal dependency is part of RemoveField)
+                dependencies = []
+                if new_model_state.options.get("order_with_respect_to", None):
+                    dependencies.append((
+                        app_label,
+                        model_name,
+                        new_model_state.options["order_with_respect_to"],
+                        True,
+                    ))
+                # Actually generate the operation
+                self.add_operation(
+                    app_label,
+                    operations.AlterOrderWithRespectTo(
+                        name=model_name,
+                        order_with_respect_to=new_model_state.options.get('order_with_respect_to', None),
+                    ),
+                    dependencies=dependencies,
                 )
 
     def arrange_for_graph(self, changes, graph):

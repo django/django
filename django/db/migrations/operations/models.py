@@ -32,17 +32,17 @@ class CreateModel(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         apps = to_state.render()
         model = apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, model):
+        if router.allow_migrate(schema_editor.connection.alias, model) and not model._meta.proxy:
             schema_editor.create_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         apps = from_state.render()
         model = apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, model):
+        if router.allow_migrate(schema_editor.connection.alias, model) and not model._meta.proxy:
             schema_editor.delete_model(model)
 
     def describe(self):
-        return "Create model %s" % (self.name, )
+        return "Create %smodel %s" % ("proxy " if self.options.get("proxy", False) else "", self.name)
 
     def references_model(self, name, app_label=None):
         strings_to_check = [self.name]
@@ -85,13 +85,13 @@ class DeleteModel(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         apps = from_state.render()
         model = apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, model):
+        if router.allow_migrate(schema_editor.connection.alias, model) and not model._meta.proxy:
             schema_editor.delete_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         apps = to_state.render()
         model = apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, model):
+        if router.allow_migrate(schema_editor.connection.alias, model) and not model._meta.proxy:
             schema_editor.create_model(model)
 
     def references_model(self, name, app_label=None):
@@ -283,3 +283,71 @@ class AlterIndexTogether(Operation):
 
     def describe(self):
         return "Alter index_together for %s (%s constraints)" % (self.name, len(self.index_together))
+
+
+class AlterOrderWithRespectTo(Operation):
+    """
+    Represents a change with the order_with_respect_to option.
+    """
+
+    def __init__(self, name, order_with_respect_to):
+        self.name = name
+        self.order_with_respect_to = order_with_respect_to
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.name.lower()]
+        model_state.options['order_with_respect_to'] = self.order_with_respect_to
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        from_model = from_state.render().get_model(app_label, self.name)
+        to_model = to_state.render().get_model(app_label, self.name)
+        if router.allow_migrate(schema_editor.connection.alias, to_model):
+            # Remove a field if we need to
+            if from_model._meta.order_with_respect_to and not to_model._meta.order_with_respect_to:
+                schema_editor.remove_field(from_model, from_model._meta.get_field_by_name("_order")[0])
+            # Add a field if we need to (altering the column is untouched as
+            # it's likely a rename)
+            elif to_model._meta.order_with_respect_to and not from_model._meta.order_with_respect_to:
+                field = to_model._meta.get_field_by_name("_order")[0]
+                schema_editor.add_field(
+                    from_model,
+                    field,
+                )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.name.lower()
+
+    def describe(self):
+        return "Set order_with_respect_to on %s to %s" % (self.name, self.order_with_respect_to)
+
+
+class AlterModelOptions(Operation):
+    """
+    Sets new model options that don't directly affect the database schema
+    (like verbose_name, permissions, ordering). Python code in migrations
+    may still need them.
+    """
+
+    def __init__(self, name, options):
+        self.name = name
+        self.options = options
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.name.lower()]
+        model_state.options = dict(model_state.options)
+        model_state.options.update(self.options)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.name.lower()
+
+    def describe(self):
+        return "Change Meta options on %s" % (self.name, )

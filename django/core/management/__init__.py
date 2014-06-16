@@ -1,6 +1,7 @@
+from __future__ import unicode_literals
+
 import collections
 from importlib import import_module
-from optparse import OptionParser, NO_DEFAULT
 import os
 import sys
 
@@ -8,7 +9,8 @@ import django
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management.base import BaseCommand, CommandError, handle_default_options
+from django.core.management.base import (BaseCommand, CommandError,
+    CommandParser, handle_default_options)
 from django.core.management.color import color_style
 from django.utils import lru_cache
 from django.utils import six
@@ -93,78 +95,21 @@ def call_command(name, *args, **options):
 
     if isinstance(app_name, BaseCommand):
         # If the command is already loaded, use it directly.
-        klass = app_name
+        command = app_name
     else:
-        klass = load_command_class(app_name, name)
+        command = load_command_class(app_name, name)
 
-    # Grab out a list of defaults from the options. optparse does this for us
-    # when the script runs from the command line, but since call_command can
-    # be called programmatically, we need to simulate the loading and handling
-    # of defaults (see #10080 for details).
-    defaults = {}
-    for opt in klass.option_list:
-        if opt.default is NO_DEFAULT:
-            defaults[opt.dest] = None
-        else:
-            defaults[opt.dest] = opt.default
-    defaults.update(options)
+    # Simulate argument parsing to get the option defaults (see #10080 for details).
+    parser = command.create_parser('', name)
+    if command.use_argparse:
+        defaults = parser.parse_args(args=args)
+        defaults = dict(defaults._get_kwargs(), **options)
+    else:
+        # Legacy optparse method
+        defaults, _ = parser.parse_args(args=[])
+        defaults = dict(defaults.__dict__, **options)
 
-    return klass.execute(*args, **defaults)
-
-
-class LaxOptionParser(OptionParser):
-    """
-    An option parser that doesn't raise any errors on unknown options.
-
-    This is needed because the --settings and --pythonpath options affect
-    the commands (and thus the options) that are available to the user.
-    """
-    def error(self, msg):
-        pass
-
-    def print_help(self):
-        """Output nothing.
-
-        The lax options are included in the normal option parser, so under
-        normal usage, we don't need to print the lax options.
-        """
-        pass
-
-    def print_lax_help(self):
-        """Output the basic options available to every command.
-
-        This just redirects to the default print_help() behavior.
-        """
-        OptionParser.print_help(self)
-
-    def _process_args(self, largs, rargs, values):
-        """
-        Overrides OptionParser._process_args to exclusively handle default
-        options and ignore args and other options.
-
-        This overrides the behavior of the super class, which stop parsing
-        at the first unrecognized option.
-        """
-        while rargs:
-            arg = rargs[0]
-            try:
-                if arg[0:2] == "--" and len(arg) > 2:
-                    # process a single long option (possibly with value(s))
-                    # the superclass code pops the arg off rargs
-                    self._process_long_opt(rargs, values)
-                elif arg[:1] == "-" and len(arg) > 1:
-                    # process a cluster of short options (possibly with
-                    # value(s) for the last one only)
-                    # the superclass code pops the arg off rargs
-                    self._process_short_opts(rargs, values)
-                else:
-                    # it's either a non-default option or an arg
-                    # either way, add it to the args list so we can keep
-                    # dealing with options
-                    del rargs[0]
-                    raise Exception
-            except:  # Needed because we might need to catch a SystemExit
-                largs.append(arg)
+    return command.execute(*args, **defaults)
 
 
 class ManagementUtility(object):
@@ -296,8 +241,13 @@ class ManagementUtility(object):
                     # Fail silently if DJANGO_SETTINGS_MODULE isn't set. The
                     # user will find out once they execute the command.
                     pass
-            options += [(s_opt.get_opt_string(), s_opt.nargs) for s_opt in
-                        subcommand_cls.option_list]
+            parser = subcommand_cls.create_parser('', cwords[0])
+            if subcommand_cls.use_argparse:
+                options += [(sorted(s_opt.option_strings)[0], s_opt.nargs != 0) for s_opt in
+                            parser._actions if s_opt.option_strings]
+            else:
+                options += [(s_opt.get_opt_string(), s_opt.nargs) for s_opt in
+                            parser.option_list]
             # filter out previously specified options from available options
             prev_opts = [x.split('=')[0] for x in cwords[1:cword - 1]]
             options = [opt for opt in options if opt[0] not in prev_opts]
@@ -317,22 +267,23 @@ class ManagementUtility(object):
         Given the command-line arguments, this figures out which subcommand is
         being run, creates a parser appropriate to that command, and runs it.
         """
-        # Preprocess options to extract --settings and --pythonpath.
-        # These options could affect the commands that are available, so they
-        # must be processed early.
-        parser = LaxOptionParser(usage="%prog subcommand [options] [args]",
-                                 version=django.get_version(),
-                                 option_list=BaseCommand.option_list)
-        try:
-            options, args = parser.parse_args(self.argv)
-            handle_default_options(options)
-        except:  # Needed because parser.parse_args can raise SystemExit
-            pass  # Ignore any option errors at this point.
-
         try:
             subcommand = self.argv[1]
         except IndexError:
             subcommand = 'help'  # Display help if no arguments were given.
+
+        # Preprocess options to extract --settings and --pythonpath.
+        # These options could affect the commands that are available, so they
+        # must be processed early.
+        parser = CommandParser(None, usage="%(prog)s subcommand [options] [args]", add_help=False)
+        parser.add_argument('--settings')
+        parser.add_argument('--pythonpath')
+        parser.add_argument('args', nargs='*')  # catch-all
+        try:
+            options, args = parser.parse_known_args(self.argv[2:])
+            handle_default_options(options)
+        except CommandError:
+            pass  # Ignore any option errors at this point.
 
         no_settings_commands = [
             'help', 'version', '--help', '--version', '-h',
@@ -355,22 +306,17 @@ class ManagementUtility(object):
         self.autocomplete()
 
         if subcommand == 'help':
-            if len(args) <= 2:
-                parser.print_lax_help()
-                sys.stdout.write(self.main_help_text() + '\n')
-            elif args[2] == '--commands':
+            if '--commands' in args:
                 sys.stdout.write(self.main_help_text(commands_only=True) + '\n')
+            elif len(options.args) < 1:
+                sys.stdout.write(self.main_help_text() + '\n')
             else:
-                self.fetch_command(args[2]).print_help(self.prog_name, args[2])
-        elif subcommand == 'version':
-            sys.stdout.write(parser.get_version() + '\n')
+                self.fetch_command(options.args[0]).print_help(self.prog_name, options.args[0])
         # Special-cases: We want 'django-admin.py --version' and
         # 'django-admin.py --help' to work, for backwards compatibility.
-        elif self.argv[1:] == ['--version']:
-            # LaxOptionParser already takes care of printing the version.
-            pass
+        elif subcommand == 'version' or self.argv[1:] == ['--version']:
+            sys.stdout.write(django.get_version() + '\n')
         elif self.argv[1:] in (['--help'], ['-h']):
-            parser.print_lax_help()
             sys.stdout.write(self.main_help_text() + '\n')
         else:
             self.fetch_command(subcommand).run_from_argv(self.argv)
