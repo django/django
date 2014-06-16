@@ -8,7 +8,7 @@ from django.db.models.fields.related import do_pending_lookups
 from django.db.models.fields.proxy import OrderWrt
 from django.conf import settings
 from django.utils import six
-from django.utils.encoding import force_text
+from django.utils.encoding import force_text, smart_text
 from django.utils.module_loading import import_string
 
 
@@ -68,7 +68,7 @@ class ProjectState(object):
                     except InvalidBasesError:
                         new_unrendered_models.append(model)
                 if len(new_unrendered_models) == len(unrendered_models):
-                    raise InvalidBasesError("Cannot resolve bases for %r" % new_unrendered_models)
+                    raise InvalidBasesError("Cannot resolve bases for %r\nThis can happen if you are inheriting models from an app with migrations (e.g. contrib.auth)\n in an app with no migrations; see https://docs.djangoproject.com/en/1.7/topics/migrations/#dependencies for more" % new_unrendered_models)
                 unrendered_models = new_unrendered_models
             # make sure apps has no dangling references
             if self.apps._pending_lookups:
@@ -100,7 +100,7 @@ class ProjectState(object):
     def from_apps(cls, apps):
         "Takes in an Apps and returns a ProjectState matching it"
         app_models = {}
-        for model in apps.get_models():
+        for model in apps.get_models(include_swapped=True):
             model_state = ModelState.from_model(model)
             app_models[(model_state.app_label, model_state.name.lower())] = model_state
         return cls(app_models)
@@ -207,6 +207,8 @@ class ModelState(object):
                     options[name] = set(normalize_together(it))
                 else:
                     options[name] = model._meta.original_attrs[name]
+        # Force-convert all options to text_type (#23226)
+        options = cls.force_text_recursive(options)
         # If we're ignoring relationships, remove all field-listing model
         # options (that option basically just means "make a stub model")
         if exclude_rels:
@@ -250,6 +252,23 @@ class ModelState(object):
             bases,
         )
 
+    @classmethod
+    def force_text_recursive(cls, value):
+        if isinstance(value, six.string_types):
+            return smart_text(value)
+        elif isinstance(value, list):
+            return [cls.force_text_recursive(x) for x in value]
+        elif isinstance(value, tuple):
+            return tuple(cls.force_text_recursive(x) for x in value)
+        elif isinstance(value, set):
+            return set(cls.force_text_recursive(x) for x in value)
+        elif isinstance(value, dict):
+            return dict(
+                (cls.force_text_recursive(k), cls.force_text_recursive(v))
+                for k, v in value.items()
+            )
+        return value
+
     def construct_fields(self):
         "Deep-clone the fields using deconstruction"
         for name, field in self.fields:
@@ -272,8 +291,6 @@ class ModelState(object):
         # First, make a Meta object
         meta_contents = {'app_label': self.app_label, "apps": apps}
         meta_contents.update(self.options)
-        if "unique_together" in meta_contents:
-            meta_contents["unique_together"] = list(meta_contents["unique_together"])
         meta = type(str("Meta"), tuple(), meta_contents)
         # Then, work out our bases
         try:
@@ -299,6 +316,9 @@ class ModelState(object):
             if fname == name:
                 return field
         raise ValueError("No field called %s on model %s" % (name, self.name))
+
+    def __repr__(self):
+        return "<ModelState: '%s.%s'>" % (self.app_label, self.name)
 
     def __eq__(self, other):
         return (

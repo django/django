@@ -2,11 +2,14 @@ from django.db.models import Q, Sum
 from django.db.utils import IntegrityError
 from django.test import TestCase, skipIfDBFeature
 from django.forms.models import modelform_factory
+from django.db.models.deletion import ProtectedError
 
 from .models import (
     Address, Place, Restaurant, Link, CharLink, TextLink,
     Person, Contact, Note, Organization, OddRelation1, OddRelation2, Company,
-    Developer, Team, Guild, Tag, Board, HasLinkThing, A, B, C, D)
+    Developer, Team, Guild, Tag, Board, HasLinkThing, A, B, C, D,
+    Related, Content, Node,
+)
 
 
 class GenericRelationTests(TestCase):
@@ -247,3 +250,17 @@ class GenericRelationTests(TestCase):
         form.save()
         links = HasLinkThing._meta.get_field_by_name('links')[0]
         self.assertEqual(links.save_form_data_calls, 1)
+
+    def test_ticket_22998(self):
+        related = Related.objects.create()
+        content = Content.objects.create(related_obj=related)
+        Node.objects.create(content=content)
+
+        # deleting the Related cascades to the Content cascades to the Node,
+        # where the pre_delete signal should fire and prevent deletion.
+        with self.assertRaises(ProtectedError):
+            related.delete()
+
+    def test_ticket_22982(self):
+        place = Place.objects.create(name='My Place')
+        self.assertIn('GenericRelatedObjectManager', str(place.links))

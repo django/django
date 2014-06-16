@@ -9,7 +9,8 @@ import sys
 from itertools import dropwhile
 
 import django
-from django.core.management.base import CommandError, NoArgsCommand
+from django.conf import settings
+from django.core.management.base import CommandError, BaseCommand
 from django.core.management.utils import (handle_extensions, find_command,
     popen_wrapper)
 from django.utils.encoding import force_str
@@ -56,8 +57,6 @@ class TranslatableFile(object):
 
         Uses the xgettext GNU gettext utility.
         """
-
-        from django.conf import settings
         from django.utils.translation import templatize
 
         if command.verbosity > 1:
@@ -162,7 +161,7 @@ def write_pot_file(potfile, msgs):
         fp.write(msgs)
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = ("Runs over the entire source tree of the current directory and "
 "pulls out all strings marked for translation. It creates (or updates) a message "
 "file in the conf/locale (in the django tree) or locale (for projects and "
@@ -210,7 +209,7 @@ class Command(NoArgsCommand):
         parser.add_argument('--keep-pot', action='store_true', dest='keep_pot',
             default=False, help="Keep .pot file after making messages. Useful when debugging.")
 
-    def handle_noargs(self, *args, **options):
+    def handle(self, *args, **options):
         locale = options.get('locale')
         exclude = options.get('exclude')
         self.domain = options.get('domain')
@@ -218,9 +217,20 @@ class Command(NoArgsCommand):
         process_all = options.get('all')
         extensions = options.get('extensions')
         self.symlinks = options.get('symlinks')
+
+        # Need to ensure that the i18n framework is enabled
+        if settings.configured:
+            settings.USE_I18N = True
+        else:
+            settings.configure(USE_I18N=True)
+
         ignore_patterns = options.get('ignore_patterns')
         if options.get('use_default_ignore_patterns'):
             ignore_patterns += ['CVS', '.*', '*~', '*.pyc']
+        base_path = os.path.abspath('.')
+        for path in (settings.MEDIA_ROOT, settings.STATIC_ROOT):
+            if path and path.startswith(base_path):
+                ignore_patterns.append('%s*' % path[len(base_path) + 1:])
         self.ignore_patterns = list(set(ignore_patterns))
 
         # Avoid messing with mutable class variables
@@ -250,13 +260,6 @@ class Command(NoArgsCommand):
         if (locale is None and not exclude and not process_all) or self.domain is None:
             raise CommandError("Type '%s help %s' for usage information." % (
                 os.path.basename(sys.argv[0]), sys.argv[1]))
-
-        # Need to ensure that the i18n framework is enabled
-        from django.conf import settings
-        if settings.configured:
-            settings.USE_I18N = True
-        else:
-            settings.configure(USE_I18N=True)
 
         if self.verbosity > 1:
             self.stdout.write('examining files with the extensions: %s\n'
@@ -357,11 +360,21 @@ class Command(NoArgsCommand):
             Check if the given path should be ignored or not.
             """
             filename = os.path.basename(path)
-            ignore = lambda pattern: fnmatch.fnmatchcase(filename, pattern)
+            ignore = lambda pattern: (fnmatch.fnmatchcase(filename, pattern) or
+                fnmatch.fnmatchcase(path, pattern))
             return any(ignore(pattern) for pattern in ignore_patterns)
 
-        dir_suffix = '%s*' % os.sep
-        norm_patterns = [p[:-len(dir_suffix)] if p.endswith(dir_suffix) else p for p in self.ignore_patterns]
+        ignore_patterns = [os.path.normcase(p) for p in self.ignore_patterns]
+        dir_suffixes = {'%s*' % path_sep for path_sep in {'/', os.sep}}
+        norm_patterns = []
+        for p in ignore_patterns:
+            for dir_suffix in dir_suffixes:
+                if p.endswith(dir_suffix):
+                    norm_patterns.append(p[:-len(dir_suffix)])
+                    break
+            else:
+                norm_patterns.append(p)
+
         all_files = []
         for dirpath, dirnames, filenames in os.walk(root, topdown=True, followlinks=self.symlinks):
             for dirname in dirnames[:]:

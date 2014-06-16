@@ -108,7 +108,7 @@ Variables included in the cycle will be escaped.  You can disable auto-escaping
 with::
 
     {% for o in some_list %}
-        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}
+        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
             ...
         </tr>
     {% endfor %}
@@ -725,6 +725,44 @@ and ``bar`` will be loaded from ``somelibrary``::
 
 See :doc:`Custom tag and filter libraries </howto/custom-template-tags>` for
 more information.
+
+.. templatetag:: lorem
+
+lorem
+^^^^^
+
+.. versionadded:: 1.8
+
+    The tag was previously located in :mod:`django.contrib.webdesign`.
+
+Displays random "lorem ipsum" Latin text. This is useful for providing sample
+data in templates.
+
+Usage::
+
+    {% lorem [count] [method] [random] %}
+
+The ``{% lorem %}`` tag can be used with zero, one, two or three arguments.
+The arguments are:
+
+===========  =============================================================
+Argument     Description
+===========  =============================================================
+``count``    A number (or variable) containing the number of paragraphs or
+             words to generate (default is 1).
+``method``   Either ``w`` for words, ``p`` for HTML paragraphs or ``b``
+             for plain-text paragraph blocks (default is ``b``).
+``random``   The word ``random``, which if given, does not use the common
+             paragraph ("Lorem ipsum dolor sit amet...") when generating
+             text.
+===========  =============================================================
+
+Examples:
+
+* ``{% lorem %}`` will output the common "lorem ipsum" paragraph.
+* ``{% lorem 3 p %}`` will output the common "lorem ipsum" paragraph
+  and two random paragraphs each wrapped in HTML ``<p>`` tags.
+* ``{% lorem 2 w random %}`` will output two random Latin words.
 
 .. templatetag:: now
 
@@ -1880,19 +1918,38 @@ If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output could be ``"b"``.
 removetags
 ^^^^^^^^^^
 
+.. deprecated:: 1.8
+
+    ``removetags`` cannot guarantee HTML safe output and has been deprecated due
+    to security concerns. Consider using `bleach`_ instead.
+
+.. _bleach: http://bleach.readthedocs.org/en/latest/
+
 Removes a space-separated list of [X]HTML tags from the output.
 
 For example::
 
-    {{ value|removetags:"b span"|safe }}
+    {{ value|removetags:"b span" }}
 
 If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
-output will be ``"Joel <button>is</button> a slug"``.
+unescaped output will be ``"Joel <button>is</button> a slug"``.
 
 Note that this filter is case-sensitive.
 
 If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"`` the
-output will be ``"<B>Joel</B> <button>is</button> a slug"``.
+unescaped output will be ``"<B>Joel</B> <button>is</button> a slug"``.
+
+.. admonition:: No safety guarantee
+
+    Note that ``removetags`` doesn't give any guarantee about its output being
+    HTML safe. In particular, it doesn't work recursively, so an input like
+    ``"<sc<script>ript>alert('XSS')</sc</script>ript>"`` won't be safe even if
+    you apply ``|removetags:"script"``. So if the input is user provided,
+    **NEVER** apply the ``safe`` filter to a ``removetags`` output. If you are
+    looking for something more robust, you can use the ``bleach`` Python
+    library, notably its `clean`_ method.
+
+.. _clean: http://bleach.readthedocs.org/en/latest/clean.html
 
 .. templatefilter:: rjust
 
@@ -2009,10 +2066,10 @@ output will be ``"Joel is a slug"``.
 .. admonition:: No safety guarantee
 
     Note that ``striptags`` doesn't give any guarantee about its output being
-    entirely HTML safe, particularly with non valid HTML input. So **NEVER**
-    apply the ``safe`` filter to a ``striptags`` output.
-    If you are looking for something more robust, you can use the ``bleach``
-    Python library, notably its `clean`_ method.
+    HTML safe, particularly with non valid HTML input. So **NEVER** apply the
+    ``safe`` filter to a ``striptags`` output. If you are looking for something
+    more robust, you can use the ``bleach`` Python library, notably its
+    `clean`_ method.
 
 .. _clean: http://bleach.readthedocs.org/en/latest/clean.html
 
@@ -2221,8 +2278,11 @@ contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
     </ul>
     </li>
 
-Note: An older, more restrictive and verbose input format is also supported:
-``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``,
+.. deprecated:: 1.8
+
+    An older, more restrictive and verbose input format is also supported:
+    ``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``.
+    Support for this syntax will be removed in Django 2.0.
 
 .. templatefilter:: upper
 
@@ -2276,6 +2336,12 @@ This template tag works on links prefixed with ``http://``, ``https://``, or
 It also supports domain-only links ending in one of the original top level
 domains (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
 ``.org``). For example, ``djangoproject.com`` gets converted.
+
+.. versionchanged:: 1.8
+
+    Support for domain-only links that include characters after the top-level
+    domain (e.g. ``djangoproject.com/`` and ``djangoproject.com/download/``)
+    was added.
 
 Links can have trailing punctuation (periods, commas, close-parens) and leading
 punctuation (opening parens), and ``urlize`` will still do the right thing.

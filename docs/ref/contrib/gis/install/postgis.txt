@@ -93,9 +93,7 @@ user.  For example, you can use the following to become the ``postgres`` user::
 
    The location *and* name of the PostGIS SQL files (e.g., from
    ``POSTGIS_SQL_PATH`` below) depends on the version of PostGIS.
-   PostGIS versions 1.3 and below use ``<pg_sharedir>/contrib/lwpostgis.sql``;
-   whereas version 1.4 uses ``<sharedir>/contrib/postgis.sql`` and
-   version 1.5 uses ``<sharedir>/contrib/postgis-1.5/postgis.sql``.
+   Version 1.5 uses ``<sharedir>/contrib/postgis-1.5/postgis.sql``.
 
    To complicate matters, Debian/Ubuntu distributions have their own separate
    directory naming system that might change with time. In this case, use the
@@ -128,8 +126,6 @@ the following scripts are available:
 ===============  =============================================
 PostGIS version  Bash shell script
 ===============  =============================================
-1.3              :download:`create_template_postgis-1.3.sh`
-1.4              :download:`create_template_postgis-1.4.sh`
 1.5              :download:`create_template_postgis-1.5.sh`
 Debian/Ubuntu    :download:`create_template_postgis-debian.sh`
 ===============  =============================================

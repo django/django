@@ -1,14 +1,23 @@
+from importlib import import_module
 import os
+import tempfile
 
 from django import conf
 from django.contrib import admin
 from django.test import TestCase, override_settings
 from django.utils.autoreload import gen_filenames
+from django.utils._os import upath
 
 LOCALE_PATH = os.path.join(os.path.dirname(__file__), 'locale')
 
 
 class TestFilenameGenerator(TestCase):
+    def setUp(self):
+        # Empty cached variables
+        from django.utils import autoreload
+        autoreload._cached_modules = set()
+        autoreload._cached_filenames = []
+
     def test_django_locales(self):
         """
         Test that gen_filenames() also yields the built-in django locale files.
@@ -64,3 +73,26 @@ class TestFilenameGenerator(TestCase):
             os.path.join(os.path.dirname(conf.__file__), 'locale', 'nl',
                          'LC_MESSAGES', 'django.mo'),
             filenames)
+
+    def test_only_new_files(self):
+        """
+        When calling a second time gen_filenames with only_new = True, only
+        files from newly loaded modules should be given.
+        """
+        list(gen_filenames())
+        from fractions import Fraction  # NOQA
+        filenames2 = list(gen_filenames(only_new=True))
+        self.assertEqual(len(filenames2), 1)
+        self.assertTrue(filenames2[0].endswith('fractions.py'))
+        self.assertFalse(any(f.endswith('.pyc') for f in gen_filenames()))
+
+    def test_deleted_removed(self):
+        fd, filepath = tempfile.mkstemp(dir=os.path.dirname(upath(__file__)), suffix='.py')
+        try:
+            _, filename = os.path.split(filepath)
+            import_module('.%s' % filename.replace('.py', ''), package='utils_tests')
+            self.assertIn(filepath, gen_filenames())
+        finally:
+            os.close(fd)
+            os.remove(filepath)
+        self.assertNotIn(filepath, gen_filenames())

@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 
-from unittest import skipUnless
 from xml.dom import minidom
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
-from django.test import TestCase, modify_settings, override_settings
+from django.test import (
+    TestCase, modify_settings, override_settings, skipUnlessDBFeature
+)
 
 if HAS_GEOS:
     from .models import City
@@ -15,8 +15,9 @@ if HAS_GEOS:
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
 @override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoapp.urls')
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@skipUnlessDBFeature("gis_enabled")
 class GeoFeedTest(TestCase):
+    fixtures = ['initial']
 
     def setUp(self):
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()

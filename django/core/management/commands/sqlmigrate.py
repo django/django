@@ -10,6 +10,8 @@ from django.db.migrations.loader import AmbiguityError
 class Command(BaseCommand):
     help = "Prints the SQL statements for the named migration."
 
+    output_transaction = True
+
     def add_arguments(self, parser):
         parser.add_argument('app_label',
             help='App label of the application containing the migration.')
@@ -20,6 +22,13 @@ class Command(BaseCommand):
                  '"default" database.')
         parser.add_argument('--backwards', action='store_true', dest='backwards',
             default=False, help='Creates SQL to unapply the migration, rather than to apply it')
+
+    def execute(self, *args, **options):
+        # sqlmigrate doesn't support coloring its output but we need to force
+        # no_color=True so that the BEGIN/COMMIT statements added by
+        # output_transaction don't get colored either.
+        options['no_color'] = True
+        return super(Command, self).execute(*args, **options)
 
     def handle(self, *args, **options):
         # Get the database we're operating from
@@ -35,14 +44,15 @@ class Command(BaseCommand):
         try:
             migration = executor.loader.get_migration_by_prefix(app_label, migration_name)
         except AmbiguityError:
-            raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (app_label, migration_name))
+            raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (
+                migration_name, app_label))
         except KeyError:
-            raise CommandError("Cannot find a migration matching '%s' from app '%s'. Is it in INSTALLED_APPS?" % (app_label, migration_name))
+            raise CommandError("Cannot find a migration matching '%s' from app '%s'. Is it in INSTALLED_APPS?" % (
+                migration_name, app_label))
         targets = [(app_label, migration.name)]
 
         # Make a plan that represents just the requested migrations and show SQL
         # for it
         plan = [(executor.loader.graph.nodes[targets[0]], options['backwards'])]
         sql_statements = executor.collect_sql(plan)
-        for statement in sql_statements:
-            self.stdout.write(statement)
+        return '\n'.join(sql_statements)

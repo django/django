@@ -25,7 +25,7 @@ class Person(models.Model):
 class Employee(Person):
     employee_num = models.IntegerField(default=0)
     profile = models.ForeignKey('Profile', related_name='profiles', null=True)
-    accounts = models.ManyToManyField('Account', related_name='employees', blank=True, null=True)
+    accounts = models.ManyToManyField('Account', related_name='employees', blank=True)
 
 
 @python_2_unicode_compatible

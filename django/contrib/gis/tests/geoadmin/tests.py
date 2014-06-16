@@ -1,19 +1,16 @@
 from __future__ import unicode_literals
 
-from unittest import skipUnless
-
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, skipUnlessDBFeature
 
-if HAS_GEOS and HAS_SPATIAL_DB:
+if HAS_GEOS:
     from django.contrib.gis import admin
     from django.contrib.gis.geos import Point
 
     from .models import City
 
 
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@skipUnlessDBFeature("gis_enabled")
 @override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoadmin.urls')
 class GeoAdminTest(TestCase):
 
@@ -35,7 +32,8 @@ class GeoAdminTest(TestCase):
         result = geoadmin.get_map_widget(City._meta.get_field('point'))(
         ).render('point', Point(-79.460734, 40.18476))
         self.assertIn(
-            """geodjango_point.layers.base = new OpenLayers.Layer.WMS("OpenLayers WMS", "http://vmap0.tiles.osgeo.org/wms/vmap0", {layers: \'basic\', format: 'image/jpeg'});""",
+            """geodjango_point.layers.base = new OpenLayers.Layer.WMS("OpenLayers WMS", """
+            """"http://vmap0.tiles.osgeo.org/wms/vmap0", {layers: 'basic', format: 'image/jpeg'});""",
             result)
 
     def test_olwidget_has_changed(self):
@@ -44,7 +42,7 @@ class GeoAdminTest(TestCase):
         """
         geoadmin = admin.site._registry[City]
         form = geoadmin.get_changelist_form(None)()
-        has_changed = form.fields['point']._has_changed
+        has_changed = form.fields['point'].has_changed
 
         initial = Point(13.4197458572965953, 52.5194108501149799, srid=4326)
         data_same = "SRID=3857;POINT(1493879.2754093995 6894592.019687599)"

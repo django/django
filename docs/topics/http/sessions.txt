@@ -20,7 +20,7 @@ To enable session functionality, do the following:
 
 * Edit the :setting:`MIDDLEWARE_CLASSES` setting and make sure
   it contains ``'django.contrib.sessions.middleware.SessionMiddleware'``.
-  The default ``settings.py`` created by ``django-admin.py startproject``
+  The default ``settings.py`` created by ``django-admin startproject``
   has ``SessionMiddleware`` activated.
 
 If you don't want to use sessions, you might as well remove the
@@ -64,7 +64,9 @@ sure you've configured your cache; see the :doc:`cache documentation
     cache backend. The local-memory cache backend doesn't retain data long
     enough to be a good choice, and it'll be faster to use file or database
     sessions directly instead of sending everything through the file or
-    database cache backends.
+    database cache backends. Additionally, the local-memory cache backend is
+    NOT multi-process safe, therefore probably not a good choice for production
+    environments.
 
 If you have multiple caches defined in :setting:`CACHES`, Django will use the
 default cache. To use another cache, set :setting:`SESSION_CACHE_ALIAS` to the
@@ -121,15 +123,8 @@ and the :setting:`SECRET_KEY` setting.
 
 .. note::
 
-    When using cookies-based sessions :mod:`django.contrib.sessions` can be
-    removed from :setting:`INSTALLED_APPS` setting because data is loaded
-    from the key itself and not from the database, so there is no need for the
-    creation and usage of ``django.contrib.sessions.models.Session`` table.
-
-.. note::
-
     It's recommended to leave the :setting:`SESSION_COOKIE_HTTPONLY` setting
-    ``True`` to prevent tampering of the stored data from JavaScript.
+    on ``True`` to prevent access to the stored data from JavaScript.
 
 .. warning::
 

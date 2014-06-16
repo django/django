@@ -103,10 +103,10 @@ class LayerMapping(object):
 
         # Getting the geometry column associated with the model (an
         # exception will be raised if there is no geometry column).
-        if self.spatial_backend.mysql:
-            transform = False
-        else:
+        if connections[self.using].features.supports_transform:
             self.geo_field = self.geometry_field()
+        else:
+            transform = False
 
         # Checking the source spatial reference system, and getting
         # the coordinate transformation object (unless the `transform`
@@ -374,8 +374,11 @@ class LayerMapping(object):
             # If we have more than the maximum digits allowed, then throw an
             # InvalidDecimal exception.
             if n_prec > max_prec:
-                raise InvalidDecimal('A DecimalField with max_digits %d, decimal_places %d must round to an absolute value less than 10^%d.' %
-                                     (model_field.max_digits, model_field.decimal_places, max_prec))
+                raise InvalidDecimal(
+                    'A DecimalField with max_digits %d, decimal_places %d must '
+                    'round to an absolute value less than 10^%d.' %
+                    (model_field.max_digits, model_field.decimal_places, max_prec)
+                )
             val = d
         elif isinstance(ogr_field, (OFTReal, OFTString)) and isinstance(model_field, models.IntegerField):
             # Attempt to convert any OFTReal and OFTString value to an OFTInteger.
@@ -406,7 +409,10 @@ class LayerMapping(object):
         try:
             return rel_model.objects.using(self.using).get(**fk_kwargs)
         except ObjectDoesNotExist:
-            raise MissingForeignKey('No ForeignKey %s model found with keyword arguments: %s' % (rel_model.__name__, fk_kwargs))
+            raise MissingForeignKey(
+                'No ForeignKey %s model found with keyword arguments: %s' %
+                (rel_model.__name__, fk_kwargs)
+            )
 
     def verify_geom(self, geom, model_field):
         """
@@ -571,7 +577,10 @@ class LayerMapping(object):
                         if strict:
                             # Bailing out if the `strict` keyword is set.
                             if not silent:
-                                stream.write('Failed to save the feature (id: %s) into the model with the keyword arguments:\n' % feat.fid)
+                                stream.write(
+                                    'Failed to save the feature (id: %s) into the '
+                                    'model with the keyword arguments:\n' % feat.fid
+                                )
                                 stream.write('%s\n' % kwargs)
                             raise
                         elif not silent:

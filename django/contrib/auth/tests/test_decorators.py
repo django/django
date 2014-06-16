@@ -99,7 +99,9 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_permissioned_denied_exception_raised(self):
 
-        @permission_required(['auth.add_customuser', 'auth.change_customuser', 'non-existent-permission'], raise_exception=True)
+        @permission_required([
+            'auth.add_customuser', 'auth.change_customuser', 'non-existent-permission'
+        ], raise_exception=True)
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')

@@ -4,9 +4,12 @@ from __future__ import unicode_literals
 
 import re
 import sys
+import warnings
 
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, force_str
 from django.utils.functional import allow_lazy
+from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, mark_safe
 from django.utils import six
 from django.utils.six.moves.urllib.parse import quote, unquote, urlsplit, urlunsplit
@@ -25,19 +28,25 @@ DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
 word_split_re = re.compile(r'(\s+)')
 simple_url_re = re.compile(r'^https?://\[?\w', re.IGNORECASE)
-simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)$', re.IGNORECASE)
+simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$', re.IGNORECASE)
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
 link_target_attribute_re = re.compile(r'(<a [^>]*?)target=[^\s>]+')
-html_gunk_re = re.compile(r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
-hard_coded_bullets_re = re.compile(r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join(re.escape(x) for x in DOTS), re.DOTALL)
+html_gunk_re = re.compile(
+    r'(?:<br clear="all">|<i><\/i>|<b><\/b>|<em><\/em>|<strong><\/strong>|'
+    '<\/?smallcaps>|<\/?uppercase>)', re.IGNORECASE)
+hard_coded_bullets_re = re.compile(
+    r'((?:<p>(?:%s).*?[a-zA-Z].*?</p>\s*)+)' % '|'.join(re.escape(x)
+    for x in DOTS), re.DOTALL)
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
 
 
 def escape(text):
     """
-    Returns the given text with ampersands, quotes and angle brackets encoded for use in HTML.
+    Returns the given text with ampersands, quotes and angle brackets encoded
+    for use in HTML.
     """
-    return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
+    return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;')
+        .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
 escape = allow_lazy(escape, six.text_type)
 
 _js_escapes = {
@@ -176,6 +185,11 @@ strip_tags = allow_lazy(strip_tags)
 
 def remove_tags(html, tags):
     """Returns the given HTML with given tags removed."""
+    warnings.warn(
+        "django.utils.html.remove_tags() and the removetags template filter "
+        "are deprecated. Consider using the bleach library instead.",
+        RemovedInDjango20Warning, stacklevel=3
+    )
     tags = [re.escape(tag) for tag in tags.split()]
     tags_re = '(%s)' % '|'.join(tags)
     starttag_re = re.compile(r'<%s(/?>|(\s+[^>]*>))' % tags_re, re.U)
@@ -194,6 +208,10 @@ strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, six.text_type)
 
 def strip_entities(value):
     """Returns the given HTML with all entities (&something;) stripped."""
+    warnings.warn(
+        "django.utils.html.strip_entities() is deprecated.",
+        RemovedInDjango20Warning, stacklevel=2
+    )
     return re.sub(r'&(?:\w+|#\d+);', '', force_text(value))
 strip_entities = allow_lazy(strip_entities, six.text_type)
 
@@ -215,7 +233,7 @@ def smart_urlquote(url):
 
     url = unquote(force_str(url))
     # See http://bugs.python.org/issue2637
-    url = quote(url, safe=b'!*\'();:@&=+$,/?#[]~')
+    url = quote(url, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + str('~'))
 
     return force_text(url)
 

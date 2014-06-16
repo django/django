@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser, Group, User, UserManager
+from django.contrib.auth.models import AbstractUser, Group, Permission, User, UserManager
 from django.contrib.auth.tests.utils import skipIfCustomUser
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.db.models.signals import post_save
 from django.test import TestCase, override_settings
@@ -41,6 +42,64 @@ class LoadDataWithNaturalKeysTestCase(TestCase):
         user = User.objects.get(username='my_username')
         group = Group.objects.get(name='my_group')
         self.assertEqual(group, user.groups.get())
+
+
+class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
+    multi_db = True
+
+    def test_load_data_with_user_permissions(self):
+        # Create test contenttypes for both databases
+        default_objects = [
+            ContentType.objects.db_manager('default').create(
+                model='examplemodela',
+                name='example model a',
+                app_label='app_a',
+            ),
+            ContentType.objects.db_manager('default').create(
+                model='examplemodelb',
+                name='example model b',
+                app_label='app_b',
+            ),
+        ]
+        other_objects = [
+            ContentType.objects.db_manager('other').create(
+                model='examplemodelb',
+                name='example model b',
+                app_label='app_b',
+            ),
+            ContentType.objects.db_manager('other').create(
+                model='examplemodela',
+                name='example model a',
+                app_label='app_a',
+            ),
+        ]
+
+        # Now we create the test UserPermission
+        Permission.objects.db_manager("default").create(
+            name="Can delete example model b",
+            codename="delete_examplemodelb",
+            content_type=default_objects[1],
+        )
+        Permission.objects.db_manager("other").create(
+            name="Can delete example model b",
+            codename="delete_examplemodelb",
+            content_type=other_objects[0],
+        )
+
+        perm_default = Permission.objects.get_by_natural_key(
+            'delete_examplemodelb',
+            'app_b',
+            'examplemodelb',
+        )
+
+        perm_other = Permission.objects.db_manager('other').get_by_natural_key(
+            'delete_examplemodelb',
+            'app_b',
+            'examplemodelb',
+        )
+
+        self.assertEqual(perm_default.content_type_id, default_objects[1].id)
+        self.assertEqual(perm_other.content_type_id, other_objects[0].id)
 
 
 @skipIfCustomUser
@@ -96,6 +155,13 @@ class AbstractUserTestCase(TestCase):
         self.assertEqual(message.body, "This is a message")
         self.assertEqual(message.from_email, "from@domain.com")
         self.assertEqual(message.to, [abstract_user.email])
+
+    def test_last_login_default(self):
+        user1 = User.objects.create(username='user1')
+        self.assertIsNone(user1.last_login)
+
+        user2 = User.objects.create_user(username='user2')
+        self.assertIsNone(user2.last_login)
 
 
 class IsActiveTestCase(TestCase):

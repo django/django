@@ -40,7 +40,10 @@ class GoogleMap(object):
             try:
                 self.key = settings.GOOGLE_MAPS_API_KEY
             except AttributeError:
-                raise GoogleMapException('Google Maps API Key not found (try adding GOOGLE_MAPS_API_KEY to your settings).')
+                raise GoogleMapException(
+                    'Google Maps API Key not found (try adding '
+                    'GOOGLE_MAPS_API_KEY to your settings).'
+                )
         else:
             self.key = key
 

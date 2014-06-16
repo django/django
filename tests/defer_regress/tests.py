@@ -6,11 +6,14 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.backends.db import SessionStore
 from django.db.models import Count
+from django.db.models.query_utils import deferred_class_factory, DeferredAttribute
 from django.test import TestCase, override_settings
 
 from .models import (
     ResolveThis, Item, RelatedItem, Child, Leaf, Proxy, SimpleItem, Feature,
-    ItemAndSimpleItem, OneToOneItem, SpecialFeature, Location, Request)
+    ItemAndSimpleItem, OneToOneItem, SpecialFeature, Location, Request,
+    ProxyRelated,
+)
 
 
 class DeferRegressionTest(TestCase):
@@ -207,6 +210,17 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(obj.item, item2)
         self.assertEqual(obj.item_id, item2.id)
 
+    def test_proxy_model_defer_with_selected_related(self):
+        # Regression for #22050
+        item = Item.objects.create(name="first", value=47)
+        RelatedItem.objects.create(item=item)
+        # Defer fields with only()
+        obj = ProxyRelated.objects.all().select_related().only('item__name')[0]
+        with self.assertNumQueries(0):
+            self.assertEqual(obj.item.name, "first")
+        with self.assertNumQueries(1):
+            self.assertEqual(obj.item.value, 47)
+
     def test_only_with_select_related(self):
         # Test for #17485.
         item = SimpleItem.objects.create(name='first', value=47)
@@ -220,13 +234,23 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(len(qs), 1)
 
     def test_deferred_class_factory(self):
-        from django.db.models.query_utils import deferred_class_factory
         new_class = deferred_class_factory(
             Item,
             ('this_is_some_very_long_attribute_name_so_modelname_truncation_is_triggered',))
         self.assertEqual(
             new_class.__name__,
             'Item_Deferred_this_is_some_very_long_attribute_nac34b1f495507dad6b02e2cb235c875e')
+
+    def test_deferred_class_factory_already_deferred(self):
+        deferred_item1 = deferred_class_factory(Item, ('name',))
+        deferred_item2 = deferred_class_factory(deferred_item1, ('value',))
+        self.assertIs(deferred_item2._meta.proxy_for_model, Item)
+        self.assertFalse(isinstance(deferred_item2.__dict__.get('name'), DeferredAttribute))
+        self.assertTrue(isinstance(deferred_item2.__dict__.get('value'), DeferredAttribute))
+
+    def test_deferred_class_factory_no_attrs(self):
+        deferred_cls = deferred_class_factory(Item, ())
+        self.assertFalse(deferred_cls._deferred)
 
 
 class DeferAnnotateSelectRelatedTest(TestCase):

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from collections import defaultdict
 import datetime
 import decimal
 
@@ -57,7 +58,7 @@ def quote(s):
     res = list(s)
     for i in range(len(res)):
         c = res[i]
-        if c in """:/_#?;@&=+$,"<>%\\""":
+        if c in """:/_#?;@&=+$,"[]<>%\\""":
             res[i] = '_%02X' % ord(c)
     return ''.join(res)
 
@@ -154,7 +155,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
 
     protected = [format_callback(obj) for obj in collector.protected]
 
-    return to_delete, perms_needed, protected
+    return to_delete, collector.model_count, perms_needed, protected
 
 
 class NestedObjects(Collector):
@@ -162,6 +163,7 @@ class NestedObjects(Collector):
         super(NestedObjects, self).__init__(*args, **kwargs)
         self.edges = {}  # {from_instance: [to_instances]}
         self.protected = set()
+        self.model_count = defaultdict(int)
 
     def add_edge(self, source, target):
         self.edges.setdefault(source, []).append(target)
@@ -176,6 +178,7 @@ class NestedObjects(Collector):
                 self.add_edge(getattr(obj, related_name), obj)
             else:
                 self.add_edge(None, obj)
+            self.model_count[obj._meta.verbose_name_plural] += 1
         try:
             return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
         except models.ProtectedError as e:

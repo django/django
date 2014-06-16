@@ -106,6 +106,8 @@ class Field(RegisterLookupMixin):
         'blank': _('This field cannot be blank.'),
         'unique': _('%(model_name)s with this %(field_label)s '
                     'already exists.'),
+        # Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
+        # Eg: "Title must be unique for pub_date year"
         'unique_for_date': _("%(field_label)s must be unique for "
                              "%(date_field_label)s %(lookup_type)s."),
     }
@@ -556,6 +558,11 @@ class Field(RegisterLookupMixin):
     def db_type_suffix(self, connection):
         return connection.creation.data_types_suffix.get(self.get_internal_type())
 
+    def get_db_converters(self, connection):
+        if hasattr(self, 'from_db_value'):
+            return [self.from_db_value]
+        return []
+
     @property
     def unique(self):
         return self._unique or self.primary_key
@@ -724,29 +731,33 @@ class Field(RegisterLookupMixin):
     def get_validator_unique_lookup_type(self):
         return '%s__exact' % self.name
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
+    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
         """Returns choices with a default blank choices included, for use
         as SelectField choices for this field."""
         blank_defined = False
-        for choice, __ in self.choices:
-            if choice in ('', None):
-                blank_defined = True
-                break
+        choices = list(self.choices) if self.choices else []
+        named_groups = choices and isinstance(choices[0][1], (list, tuple))
+        if not named_groups:
+            for choice, __ in choices:
+                if choice in ('', None):
+                    blank_defined = True
+                    break
 
         first_choice = (blank_choice if include_blank and
                         not blank_defined else [])
         if self.choices:
-            return first_choice + list(self.choices)
+            return first_choice + choices
         rel_model = self.rel.to
+        limit_choices_to = limit_choices_to or self.get_limit_choices_to()
         if hasattr(self.rel, 'get_related_field'):
             lst = [(getattr(x, self.rel.get_related_field().attname),
                    smart_text(x))
                    for x in rel_model._default_manager.complex_filter(
-                       self.get_limit_choices_to())]
+                       limit_choices_to)]
         else:
             lst = [(x._get_pk_val(), smart_text(x))
                    for x in rel_model._default_manager.complex_filter(
-                       self.get_limit_choices_to())]
+                       limit_choices_to)]
         return first_choice + lst
 
     def get_choices_default(self):
@@ -909,10 +920,10 @@ class AutoField(Field):
             return None
         return int(value)
 
-    def contribute_to_class(self, cls, name):
+    def contribute_to_class(self, cls, name, **kwargs):
         assert not cls._meta.has_auto_field, \
             "A model can't have more than one AutoField."
-        super(AutoField, self).contribute_to_class(cls, name)
+        super(AutoField, self).contribute_to_class(cls, name, **kwargs)
         cls._meta.has_auto_field = True
         cls._meta.auto_field = self
 
@@ -991,8 +1002,7 @@ class BooleanField(Field):
         # Unlike most fields, BooleanField figures out include_blank from
         # self.null instead of self.blank.
         if self.choices:
-            include_blank = (self.null or
-                             not (self.has_default() or 'initial' in kwargs))
+            include_blank = not (self.has_default() or 'initial' in kwargs)
             defaults = {'choices': self.get_choices(include_blank=include_blank)}
         else:
             defaults = {'form_class': forms.BooleanField}
@@ -1221,8 +1231,8 @@ class DateField(DateTimeCheckMixin, Field):
         else:
             return super(DateField, self).pre_save(model_instance, add)
 
-    def contribute_to_class(self, cls, name):
-        super(DateField, self).contribute_to_class(cls, name)
+    def contribute_to_class(self, cls, name, **kwargs):
+        super(DateField, self).contribute_to_class(cls, name, **kwargs)
         if not self.null:
             setattr(cls, 'get_next_by_%s' % self.name,
                 curry(cls._get_next_or_previous_by_FIELD, field=self,
@@ -1567,10 +1577,8 @@ class EmailField(CharField):
     description = _("Email address")
 
     def __init__(self, *args, **kwargs):
-        # max_length should be overridden to 254 characters to be fully
-        # compliant with RFCs 3696 and 5321
-
-        kwargs['max_length'] = kwargs.get('max_length', 75)
+        # max_length=254 to be compliant with RFCs 3696 and 5321
+        kwargs['max_length'] = kwargs.get('max_length', 254)
         super(EmailField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
@@ -2080,6 +2088,9 @@ class TimeField(DateTimeCheckMixin, Field):
             kwargs["auto_now"] = self.auto_now
         if self.auto_now_add is not False:
             kwargs["auto_now_add"] = self.auto_now_add
+        if self.auto_now or self.auto_now_add:
+            del kwargs['blank']
+            del kwargs['editable']
         return name, path, args, kwargs
 
     def get_internal_type(self):
@@ -2174,6 +2185,11 @@ class BinaryField(Field):
         super(BinaryField, self).__init__(*args, **kwargs)
         if self.max_length is not None:
             self.validators.append(validators.MaxLengthValidator(self.max_length))
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(BinaryField, self).deconstruct()
+        del kwargs['editable']
+        return name, path, args, kwargs
 
     def get_internal_type(self):
         return "BinaryField"

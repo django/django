@@ -73,6 +73,44 @@ class TranslationTests(TestCase):
         finally:
             deactivate()
 
+    def test_override_decorator(self):
+
+        @translation.override('pl')
+        def func_pl():
+            self.assertEqual(get_language(), 'pl')
+
+        @translation.override(None)
+        def func_none():
+            self.assertEqual(get_language(), settings.LANGUAGE_CODE)
+
+        try:
+            activate('de')
+            func_pl()
+            self.assertEqual(get_language(), 'de')
+            func_none()
+            self.assertEqual(get_language(), 'de')
+        finally:
+            deactivate()
+
+    def test_override_exit(self):
+        """
+        Test that the language restored is the one used when the function was
+        called, not the one used when the decorator was initialized. refs #23381
+        """
+        activate('fr')
+
+        @translation.override('pl')
+        def func_pl():
+            pass
+        deactivate()
+
+        try:
+            activate('en')
+            func_pl()
+            self.assertEqual(get_language(), 'en')
+        finally:
+            deactivate()
+
     def test_lazy_objects(self):
         """
         Format string interpolation should work with *_lazy objects.
@@ -154,6 +192,17 @@ class TranslationTests(TestCase):
             self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 5}, 'Willkommen Jim, 5 guten Resultate')
             with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
                 complex_context_deferred % {'name': 'Jim'}
+
+    @skipUnless(six.PY2, "PY3 doesn't have distinct int and long types")
+    def test_ungettext_lazy_long(self):
+        """
+        Regression test for #22820: int and long should be treated alike in ungettext_lazy.
+        """
+        result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', 4)
+        self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
+        # Now with a long
+        result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', long(4))
+        self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
@@ -734,6 +783,12 @@ class FormattingTests(TestCase):
             with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=False):
                 self.assertEqual(sanitize_separators('12\xa0345'), '12\xa0345')
 
+        with patch_formats(get_language(), THOUSAND_SEPARATOR='.', DECIMAL_SEPARATOR=','):
+            with self.settings(USE_THOUSAND_SEPARATOR=True):
+                self.assertEqual(sanitize_separators('10.234'), '10234')
+                # Suspicion that user entered dot as decimal separator (#22171)
+                self.assertEqual(sanitize_separators('10.10'), '10.10')
+
     def test_iter_format_modules(self):
         """
         Tests the iter_format_modules function.
@@ -983,6 +1038,16 @@ class MiscTests(TestCase):
         r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-tw,en'}
         self.assertEqual(g(r), 'zh-tw')
 
+    def test_special_fallback_language(self):
+        """
+        Some languages may have special fallbacks that don't follow the simple
+        'fr-ca' -> 'fr' logic (notably Chinese codes).
+        """
+        r = self.rf.get('/')
+        r.COOKIES = {}
+        r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-my,en'}
+        self.assertEqual(get_language_from_request(r), 'zh-hans')
+
     def test_parse_language_cookie(self):
         """
         Now test that we parse language preferences stored in a cookie correctly.
@@ -1155,6 +1220,16 @@ class TestLanguageInfo(TestCase):
 
     def test_unknown_language_code_and_country_code(self):
         six.assertRaisesRegex(self, KeyError, r"Unknown language code xx-xx and xx\.", get_language_info, 'xx-xx')
+
+    def test_fallback_language_code(self):
+        """
+        get_language_info return the first fallback language info if the lang_info
+        struct does not contain the 'name' key.
+        """
+        li = get_language_info('zh-my')
+        self.assertEqual(li['code'], 'zh-hans')
+        li = get_language_info('zh-cn')
+        self.assertEqual(li['code'], 'zh-cn')
 
 
 class MultipleLocaleActivationTests(TestCase):

@@ -100,7 +100,6 @@ class OneToOneTests(TestCase):
         assert_filter_waiters(restaurant__place__exact=self.p1)
         assert_filter_waiters(restaurant__place__pk=self.p1.pk)
         assert_filter_waiters(restaurant__exact=self.p1.pk)
-        assert_filter_waiters(restaurant__exact=self.p1)
         assert_filter_waiters(restaurant__pk=self.p1.pk)
         assert_filter_waiters(restaurant=self.p1.pk)
         assert_filter_waiters(restaurant=self.r)

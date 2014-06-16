@@ -41,6 +41,9 @@ class AdminSite(object):
     # Text to put at the top of the admin index page.
     index_title = ugettext_lazy('Site administration')
 
+    # URL for the "View site" link at the top of each admin page.
+    site_url = '/'
+
     login_form = None
     index_template = None
     app_index_template = None
@@ -49,10 +52,9 @@ class AdminSite(object):
     password_change_template = None
     password_change_done_template = None
 
-    def __init__(self, name='admin', app_name='admin'):
+    def __init__(self, name='admin'):
         self._registry = {}  # model_class class -> admin_class instance
         self.name = name
-        self.app_name = app_name
         self._actions = {'delete_selected': actions.delete_selected}
         self._global_actions = self._actions.copy()
 
@@ -113,6 +115,12 @@ class AdminSite(object):
             if model not in self._registry:
                 raise NotRegistered('The model %s is not registered' % model.__name__)
             del self._registry[model]
+
+    def is_registered(self, model):
+        """
+        Check if a model class is registered with this `AdminSite`.
+        """
+        return model in self._registry
 
     def add_action(self, action, name=None):
         """
@@ -231,9 +239,11 @@ class AdminSite(object):
             url(r'^login/$', self.login, name='login'),
             url(r'^logout/$', wrap(self.logout), name='logout'),
             url(r'^password_change/$', wrap(self.password_change, cacheable=True), name='password_change'),
-            url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True), name='password_change_done'),
+            url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True),
+                name='password_change_done'),
             url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
-            url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$', wrap(contenttype_views.shortcut), name='view_on_site'),
+            url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$', wrap(contenttype_views.shortcut),
+                name='view_on_site'),
         ]
 
         # Add in each model's views, and create a list of valid URLS for the
@@ -257,7 +267,7 @@ class AdminSite(object):
 
     @property
     def urls(self):
-        return self.get_urls(), self.app_name, self.name
+        return self.get_urls(), 'admin', self.name
 
     def each_context(self):
         """
@@ -267,6 +277,7 @@ class AdminSite(object):
         return {
             'site_title': self.site_title,
             'site_header': self.site_header,
+            'site_url': self.site_url,
         }
 
     def password_change(self, request):
@@ -399,7 +410,11 @@ class AdminSite(object):
                         app_dict[app_label] = {
                             'name': apps.get_app_config(app_label).verbose_name,
                             'app_label': app_label,
-                            'app_url': reverse('admin:app_list', kwargs={'app_label': app_label}, current_app=self.name),
+                            'app_url': reverse(
+                                'admin:app_list',
+                                kwargs={'app_label': app_label},
+                                current_app=self.name,
+                            ),
                             'has_module_perms': has_module_perms,
                             'models': [model_dict],
                         }

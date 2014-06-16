@@ -282,14 +282,14 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         args = ['noargs_command', '--settings=test_project.settings']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_environment(self):
         "default: django-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
 
 class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
@@ -297,7 +297,8 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
     contains the test application specified using a full path.
     """
     def setUp(self):
-        self.write_settings('settings.py', ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts'])
+        self.write_settings('settings.py', ['django.contrib.auth', 'django.contrib.contenttypes',
+                                            'admin_scripts', 'admin_scripts.complex_app'])
 
     def tearDown(self):
         self.remove_settings('settings.py')
@@ -315,6 +316,13 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
+
+    def test_sqlclear_builtin_with_settings(self):
+        "fulldefault: django-admin builtin commands succeed if a setting file is provided"
+        args = ['sqlclear', '--settings=test_project.settings', 'complex_app']
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, '-- App creates no tables in the database. Nothing to do.')
 
     def test_builtin_with_environment(self):
         "fulldefault: django-admin builtin commands succeed if the environment contains settings"
@@ -349,14 +357,14 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         args = ['noargs_command', '--settings=test_project.settings']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_environment(self):
         "fulldefault: django-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
 
 class DjangoAdminMinimalSettings(AdminScriptTestCase):
@@ -483,14 +491,14 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         args = ['noargs_command', '--settings=test_project.alternate_settings']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_environment(self):
         "alternate: django-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_django_admin(args, 'test_project.alternate_settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
 
 class DjangoAdminMultipleSettings(AdminScriptTestCase):
@@ -553,14 +561,14 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         args = ['noargs_command', '--settings=test_project.alternate_settings']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_environment(self):
         "alternate: django-admin can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_django_admin(args, 'test_project.alternate_settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
 
 class DjangoAdminSettingsDirectory(AdminScriptTestCase):
@@ -718,21 +726,21 @@ class ManageDefaultSettings(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_settings(self):
         "default: manage.py can execute user commands when settings are provided as argument"
         args = ['noargs_command', '--settings=test_project.settings']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_environment(self):
         "default: manage.py can execute user commands when settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_manage(args, 'test_project.settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
 
 class ManageFullPathDefaultSettings(AdminScriptTestCase):
@@ -785,21 +793,21 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_settings(self):
         "fulldefault: manage.py can execute user commands when settings are provided as argument"
         args = ['noargs_command', '--settings=test_project.settings']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_environment(self):
         "fulldefault: manage.py can execute user commands when settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_manage(args, 'test_project.settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
 
 class ManageMinimalSettings(AdminScriptTestCase):
@@ -929,21 +937,21 @@ class ManageAlternateSettings(AdminScriptTestCase):
         "alternate: manage.py can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=alternate_settings']
         out, err = self.run_manage(args)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(out, "EXECUTE: noargs_command options=[('no_color', False), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', False), ('verbosity', 1)]")
         self.assertNoOutput(err)
 
     def test_custom_command_with_environment(self):
         "alternate: manage.py can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_manage(args, 'alternate_settings')
-        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(out, "EXECUTE: noargs_command options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
         self.assertNoOutput(err)
 
     def test_custom_command_output_color(self):
         "alternate: manage.py output syntax color can be deactivated with the `--no-color` option"
         args = ['noargs_command', '--no-color', '--settings=alternate_settings']
         out, err = self.run_manage(args)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_color', True), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(out, "EXECUTE: noargs_command options=[('no_color', True), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', False), ('verbosity', 1)]")
         self.assertNoOutput(err)
 
 
@@ -1008,14 +1016,14 @@ class ManageMultipleSettings(AdminScriptTestCase):
         args = ['noargs_command', '--settings=alternate_settings']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
     def test_custom_command_with_environment(self):
         "multiple: manage.py can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_manage(args, 'alternate_settings')
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand")
+        self.assertOutput(out, "EXECUTE: noargs_command")
 
 
 class ManageSettingsWithSettingsErrors(AdminScriptTestCase):
@@ -1385,6 +1393,7 @@ class CommandTypes(AdminScriptTestCase):
         out = StringIO()
 
         call_command('color_command', no_color=True, stdout=out)
+        self.assertEqual(os.environ.get('DJANGO_COLORS', ''), 'nocolor')
         self.assertEqual(out.getvalue(), 'BEGIN\n')
 
     def test_base_command(self):
@@ -1496,7 +1505,7 @@ class CommandTypes(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:NoArgsCommand options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(out, "EXECUTE: noargs_command options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
 
     def test_noargs_with_args(self):
         "NoArg Commands raise an error if an argument is provided"

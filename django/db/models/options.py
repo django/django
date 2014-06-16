@@ -20,7 +20,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
-                 'select_on_save')
+                 'select_on_save', 'default_related_name')
 
 
 def normalize_together(option_together):
@@ -98,6 +98,8 @@ class Options(object):
 
         # A custom app registry to use, if you're making a separate model set.
         self.apps = apps
+
+        self.default_related_name = None
 
     @property
     def app_config(self):
@@ -439,7 +441,9 @@ class Options(object):
         for f, model in self.get_fields_with_model():
             cache[f.name] = cache[f.attname] = (f, model, True, False)
         for f in self.virtual_fields:
-            cache[f.name] = (f, None if f.model == self.model else f.model, True, False)
+            if hasattr(f, 'related'):
+                cache[f.name] = cache[f.attname] = (
+                    f, None if f.model == self.model else f.model, True, False)
         if apps.ready:
             self._name_map = cache
         return cache

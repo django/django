@@ -106,7 +106,7 @@ test_data = (
     ('product', '/product/chocolate+($2.00)/', [], {'price': '2.00', 'product': 'chocolate'}),
     ('headlines', '/headlines/2007.5.21/', [], dict(year=2007, month=5, day=21)),
     ('windows', r'/windows_path/C:%5CDocuments%20and%20Settings%5Cspam/', [], dict(drive_name='C', path=r'Documents and Settings\spam')),
-    ('special', r'/special_chars/%2B%5C%24%2A/', [r'+\$*'], {}),
+    ('special', r'/special_chars/~@+%5C$*%7C/', [r'~@+\$*|'], {}),
     ('special', r'/special_chars/some%20resource/', [r'some resource'], {}),
     ('special', r'/special_chars/10%25%20complete/', [r'10% complete'], {}),
     ('special', r'/special_chars/some%20resource/', [], {'chars': r'some resource'}),
@@ -152,6 +152,9 @@ test_data = (
     ('defaults', '/defaults_view2/3/', [], {'arg1': 3, 'arg2': 2}),
     ('defaults', NoReverseMatch, [], {'arg1': 3, 'arg2': 3}),
     ('defaults', NoReverseMatch, [], {'arg2': 1}),
+
+    # Security tests
+    ('security', '/%2Fexample.com/security/', ['/example.com'], {}),
 )
 
 
@@ -325,7 +328,7 @@ LOGIN_URL = reverse_lazy('login')""")
         self.remove_settings('settings.py')
 
     def test_lazy_in_settings(self):
-        out, err = self.run_manage(['sqlall', 'auth'])
+        out, err = self.run_manage(['validate'])
         self.assertNoOutput(err)
 
 
@@ -614,15 +617,15 @@ class ErrorHandlerResolutionTests(TestCase):
 
     def test_named_handlers(self):
         handler = (empty_view, {})
-        self.assertEqual(self.resolver.resolve400(), handler)
-        self.assertEqual(self.resolver.resolve404(), handler)
-        self.assertEqual(self.resolver.resolve500(), handler)
+        self.assertEqual(self.resolver.resolve_error_handler(400), handler)
+        self.assertEqual(self.resolver.resolve_error_handler(404), handler)
+        self.assertEqual(self.resolver.resolve_error_handler(500), handler)
 
     def test_callable_handers(self):
         handler = (empty_view, {})
-        self.assertEqual(self.callable_resolver.resolve400(), handler)
-        self.assertEqual(self.callable_resolver.resolve404(), handler)
-        self.assertEqual(self.callable_resolver.resolve500(), handler)
+        self.assertEqual(self.callable_resolver.resolve_error_handler(400), handler)
+        self.assertEqual(self.callable_resolver.resolve_error_handler(404), handler)
+        self.assertEqual(self.callable_resolver.resolve_error_handler(500), handler)
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_full_import')

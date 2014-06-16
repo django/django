@@ -85,8 +85,7 @@ Other branches
 ==============
 
 Django uses branches to prepare for releases of Django (whether they be
-:term:`major <Major release>`, :term:`minor <Minor release>`, or
-:term:`micro <Micro release>`).
+:term:`major <Major release>` or :term:`minor <Minor release>`).
 
 In the past when Django was hosted on Subversion, branches were also used for
 feature development. Now Django is hosted on Git and feature development is
@@ -244,7 +243,8 @@ branches, used for Google Summer of Code projects.
 Tags
 ====
 
-Each Django release is tagged and signed by Django's release manager.
+Each Django release is tagged and signed by a :ref:`releaser
+<releasers-list>`.
 
 The tags can be found on GitHub's `tags`_ page.
 

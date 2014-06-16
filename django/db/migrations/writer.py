@@ -6,15 +6,19 @@ import decimal
 import collections
 from importlib import import_module
 import os
+import re
 import sys
 import types
 
 from django.apps import apps
-from django.db import models
+from django.db import models, migrations
 from django.db.migrations.loader import MigrationLoader
 from django.utils import datetime_safe, six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
+
+
+COMPILED_REGEX_TYPE = type(re.compile(''))
 
 
 class SettingsReference(str):
@@ -44,7 +48,15 @@ class OperationWriter(object):
         argspec = inspect.getargspec(self.operation.__init__)
         normalized_kwargs = inspect.getcallargs(self.operation.__init__, *args, **kwargs)
 
-        self.feed('migrations.%s(' % name)
+        # See if this operation is in django.db.migrations. If it is,
+        # We can just use the fact we already have that imported,
+        # otherwise, we need to add an import for the operation class.
+        if getattr(migrations, name, None) == self.operation.__class__:
+            self.feed('migrations.%s(' % name)
+        else:
+            imports.add('import %s' % (self.operation.__class__.__module__))
+            self.feed('%s.%s(' % (self.operation.__class__.__module__, name))
+
         self.indent()
         for arg_name in argspec.args[1:]:
             arg_value = normalized_kwargs[arg_name]
@@ -99,6 +111,7 @@ class MigrationWriter(object):
 
     def __init__(self, migration):
         self.migration = migration
+        self.needs_manual_porting = False
 
     def as_string(self):
         """
@@ -130,9 +143,20 @@ class MigrationWriter(object):
                 dependencies.append("        %s," % self.serialize(dependency)[0])
         items["dependencies"] = "\n".join(dependencies) + "\n" if dependencies else ""
 
-        # Format imports nicely
+        # Format imports nicely, swapping imports of functions from migration files
+        # for comments
+        migration_imports = set()
+        for line in list(imports):
+            if re.match("^import (.*)\.\d+[^\s]*$", line):
+                migration_imports.add(line.split("import")[1].strip())
+                imports.remove(line)
+                self.needs_manual_porting = True
         imports.discard("from django.db import models")
         items["imports"] = "\n".join(imports) + "\n" if imports else ""
+        if migration_imports:
+            items["imports"] += "\n\n# Functions from the following migrations need manual copying.\n# Move them and any dependencies into this file, then update the\n# RunPython operations to refer to the local versions:\n# %s" % (
+                "\n# ".join(migration_imports)
+            )
 
         # If there's a replaces, make a string for it
         if self.migration.replaces:
@@ -150,6 +174,12 @@ class MigrationWriter(object):
         # See if we can import the migrations module directly
         try:
             migrations_module = import_module(migrations_package_name)
+
+            # Python 3 fails when the migrations directory does not have a
+            # __init__.py file
+            if not hasattr(migrations_module, '__file__'):
+                raise ImportError
+
             basedir = os.path.dirname(migrations_module.__file__)
         except ImportError:
             app_config = apps.get_app_config(self.migration.app_label)
@@ -249,6 +279,10 @@ class MigrationWriter(object):
             if isinstance(value, datetime_safe.date):
                 value_repr = "datetime.%s" % value_repr
             return value_repr, set(["import datetime"])
+        # Times
+        elif isinstance(value, datetime.time):
+            value_repr = repr(value)
+            return value_repr, set(["import datetime"])
         # Settings references
         elif isinstance(value, SettingsReference):
             return "settings.%s" % value.setting_name, set(["from django.conf import settings"])
@@ -299,13 +333,14 @@ class MigrationWriter(object):
             module = import_module(module_name)
             if not hasattr(module, value.__name__):
                 raise ValueError(
-                    "Could not find function %s in %s.\nPlease note that "
-                    "due to Python 2 limitations, you cannot serialize "
-                    "unbound method functions (e.g. a method declared\n"
-                    "and used in the same class body). Please move the "
-                    "function into the main module body to use migrations.\n"
-                    "For more information, see https://docs.djangoproject.com/en/1.7/topics/migrations/#serializing-values"
-                )
+                    "Could not find function %s in %s.\n"
+                    "Please note that due to Python 2 limitations, you cannot "
+                    "serialize unbound method functions (e.g. a method "
+                    "declared and used in the same class body). Please move "
+                    "the function into the main module body to use migrations.\n"
+                    "For more information, see "
+                    "https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values"
+                    % (value.__name__, module_name))
             return "%s.%s" % (module_name, value.__name__), set(["import %s" % module_name])
         # Classes
         elif isinstance(value, type):
@@ -330,6 +365,17 @@ class MigrationWriter(object):
             # "()", not "(,)" because (,) is invalid Python syntax.
             format = "(%s)" if len(strings) != 1 else "(%s,)"
             return format % (", ".join(strings)), imports
+        # Compiled regex
+        elif isinstance(value, COMPILED_REGEX_TYPE):
+            imports = set(["import re"])
+            regex_pattern, pattern_imports = cls.serialize(value.pattern)
+            regex_flags, flag_imports = cls.serialize(value.flags)
+            imports.update(pattern_imports)
+            imports.update(flag_imports)
+            args = [regex_pattern]
+            if value.flags:
+                args.append(regex_flags)
+            return "re.compile(%s)" % ', '.join(args), imports
         # Uh oh.
         else:
             raise ValueError("Cannot serialize: %r\nThere are some values Django cannot serialize into migration files.\nFor more, see https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing" % value)

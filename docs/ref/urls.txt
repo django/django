@@ -78,7 +78,7 @@ The ``optional_dictionary`` and ``optional_name`` parameters are described in
 static()
 --------
 
-.. function:: static.static(prefix, view='django.views.static.serve', **kwargs)
+.. function:: static.static(prefix, view=django.views.static.serve, **kwargs)
 
 Helper function to return a URL pattern for serving files in debug mode::
 
@@ -88,6 +88,11 @@ Helper function to return a URL pattern for serving files in debug mode::
     urlpatterns = [
         # ... the rest of your URLconf goes here ...
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+.. versionchanged:: 1.8
+
+    The ``view`` argument changed from a string
+    (``'django.views.static.serve'``) to the function.
 
 url()
 -----
@@ -111,9 +116,14 @@ function or method. See :ref:`views-extra-options` for an example.
 See :ref:`Naming URL patterns <naming-url-patterns>` for why the ``name``
 parameter is useful.
 
-The ``prefix`` parameter has the same meaning as the first argument to
-``patterns()`` and is only relevant when you're passing a string as the
-``view`` parameter.
+.. deprecated:: 1.8
+
+    Support for string ``view`` arguments is deprecated and will be removed in
+    Django 2.0. Pass the callable  instead.
+
+    The ``prefix`` parameter has the same meaning as the first argument to
+    ``patterns()`` and is only relevant when you're passing a string as the
+    ``view`` parameter.
 
 include()
 ---------

@@ -102,7 +102,7 @@ subclass).
 AlterOrderWithRespectTo
 -----------------------
 
-.. class:: AlterIndexTogether(name, order_with_respect_to)
+.. class:: AlterOrderWithRespectTo(name, order_with_respect_to)
 
 Makes or deletes the ``_order`` column needed for the
 :attr:`~django.db.models.Options.order_with_respect_to` option on the ``Meta``
@@ -111,11 +111,12 @@ subclass.
 AlterModelOptions
 -----------------
 
-.. class:: AlterIndexTogether(name, options)
+.. class:: AlterModelOptions(name, options)
 
 Stores changes to miscellaneous model options (settings on a model's ``Meta``)
 like ``permissions`` and ``verbose_name``. Does not affect the database, but
-persists these changes for :class:`RunPython` instances to use.
+persists these changes for :class:`RunPython` instances to use. ``options``
+should be a dictionary mapping option names to values.
 
 AddField
 --------
@@ -218,8 +219,10 @@ model::
         # if we directly import it, it'll be the wrong version
         Country = apps.get_model("myapp", "Country")
         db_alias = schema_editor.connection.alias
-        Country.objects.create(name="USA", code="us", using=db_alias)
-        Country.objects.create(name="France", code="fr", using=db_alias)
+        Country.objects.using(db_alias).bulk_create([
+            Country(name="USA", code="us"),
+            Country(name="France", code="fr"),
+        ])
 
     class Migration(migrations.Migration):
 
@@ -238,10 +241,12 @@ ORM and/or python code for.
 
 If you're upgrading from South, this is basically the South pattern as an
 operation - one or two methods for forwards and backwards, with an ORM and
-schema operations available. You should be able to translate the ``orm.Model``
-or ``orm["appname", "Model"]`` references from South directly into
-``apps.get_model("appname", "Model")`` references here and leave most of the
-rest of the code unchanged for data migrations.
+schema operations available. Most of the time, you should be able to translate
+the ``orm.Model`` or ``orm["appname", "Model"]`` references from South directly
+into ``apps.get_model("appname", "Model")`` references here and leave most of
+the rest of the code unchanged for data migrations. However, ``apps`` will only
+have references to models in the current app unless migrations in other apps
+are added to the migration's dependencies.
 
 Much like :class:`RunSQL`, ensure that if you change schema inside here you're
 either doing it outside the scope of the Django model system (e.g. triggers)

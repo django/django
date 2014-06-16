@@ -20,8 +20,6 @@ from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.backends.utils import format_number, CursorWrapper
 from django.db.models import Sum, Avg, Variance, StdDev
-from django.db.models.fields import (AutoField, DateField, DateTimeField,
-    DecimalField, IntegerField, TimeField)
 from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
 from django.test import (TestCase, TransactionTestCase, override_settings,
@@ -133,16 +131,6 @@ class SQLiteTests(TestCase):
             self.assertRaises(NotImplementedError,
                 models.Item.objects.all().aggregate, aggregate('last_modified'))
 
-    def test_convert_values_to_handle_null_value(self):
-        from django.db.backends.sqlite3.base import DatabaseOperations
-        convert_values = DatabaseOperations(connection).convert_values
-        self.assertIsNone(convert_values(None, AutoField(primary_key=True)))
-        self.assertIsNone(convert_values(None, DateField()))
-        self.assertIsNone(convert_values(None, DateTimeField()))
-        self.assertIsNone(convert_values(None, DecimalField()))
-        self.assertIsNone(convert_values(None, IntegerField()))
-        self.assertIsNone(convert_values(None, TimeField()))
-
 
 @unittest.skipUnless(connection.vendor == 'postgresql', "Test only for PostgreSQL")
 class PostgreSQLTests(TestCase):
@@ -152,12 +140,12 @@ class PostgreSQLTests(TestCase):
 
     def test_parsing(self):
         """Test PostgreSQL version parsing from `SELECT version()` output"""
-        self.assert_parses("PostgreSQL 8.3 beta4", 80300)
-        self.assert_parses("PostgreSQL 8.3", 80300)
-        self.assert_parses("EnterpriseDB 8.3", 80300)
-        self.assert_parses("PostgreSQL 8.3.6", 80306)
-        self.assert_parses("PostgreSQL 8.4beta1", 80400)
-        self.assert_parses("PostgreSQL 8.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)", 80301)
+        self.assert_parses("PostgreSQL 9.3 beta4", 90300)
+        self.assert_parses("PostgreSQL 9.3", 90300)
+        self.assert_parses("EnterpriseDB 9.3", 90300)
+        self.assert_parses("PostgreSQL 9.3.6", 90306)
+        self.assert_parses("PostgreSQL 9.4beta1", 90400)
+        self.assert_parses("PostgreSQL 9.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)", 90301)
 
     def test_version_detection(self):
         """Test PostgreSQL version detection"""
@@ -169,7 +157,7 @@ class PostgreSQLTests(TestCase):
                 pass
 
             def fetchone(self):
-                return ["PostgreSQL 8.3"]
+                return ["PostgreSQL 9.3"]
 
             def __enter__(self):
                 return self
@@ -184,7 +172,7 @@ class PostgreSQLTests(TestCase):
 
         # psycopg2 < 2.0.12 code path
         conn = OlderConnectionMock()
-        self.assertEqual(pg_version.get_version(conn), 80300)
+        self.assertEqual(pg_version.get_version(conn), 90300)
 
     def test_connect_and_rollback(self):
         """
@@ -257,30 +245,6 @@ class PostgreSQLTests(TestCase):
         for lookup in ('iexact', 'contains', 'icontains', 'startswith',
                        'istartswith', 'endswith', 'iendswith', 'regex', 'iregex'):
             self.assertIn('::text', do.lookup_cast(lookup))
-
-
-@unittest.skipUnless(connection.vendor == 'mysql', "Test only for MySQL")
-class MySQLTests(TestCase):
-
-    def test_autoincrement(self):
-        """
-        Check that auto_increment fields are reset correctly by sql_flush().
-        Before MySQL version 5.0.13 TRUNCATE did not do auto_increment reset.
-        Refs #16961.
-        """
-        statements = connection.ops.sql_flush(no_style(),
-                                              tables=['test'],
-                                              sequences=[{
-                                                  'table': 'test',
-                                                  'col': 'somecol',
-                                              }])
-        found_reset = False
-        for sql in statements:
-            found_reset = found_reset or 'ALTER TABLE' in sql
-        if connection.mysql_version < (5, 0, 13):
-            self.assertTrue(found_reset)
-        else:
-            self.assertFalse(found_reset)
 
 
 class DateQuotingTest(TestCase):
@@ -379,26 +343,23 @@ class LongNameTest(TestCase):
     check it is. Refs #8901.
     """
 
-    @skipUnlessDBFeature('supports_long_model_names')
     def test_sequence_name_length_limits_create(self):
         """Test creation of model with long name and long pk name doesn't error. Ref #8901"""
-        models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
+        models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
 
-    @skipUnlessDBFeature('supports_long_model_names')
     def test_sequence_name_length_limits_m2m(self):
         """Test an m2m save of a model with a long name and a long m2m field name doesn't error as on Django >=1.2 this now uses object saves. Ref #8901"""
-        obj = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
+        obj = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
         rel_obj = models.Person.objects.create(first_name='Django', last_name='Reinhardt')
         obj.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.add(rel_obj)
 
-    @skipUnlessDBFeature('supports_long_model_names')
     def test_sequence_name_length_limits_flush(self):
         """Test that sequence resetting as part of a flush with model with long name and long pk name doesn't error. Ref #8901"""
         # A full flush is expensive to the full test, so we dig into the
         # internals to generate the likely offending SQL and run it manually
 
         # Some convenience aliases
-        VLM = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+        VLM = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
         VLM_m2m = VLM.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.through
         tables = [
             VLM._meta.db_table,

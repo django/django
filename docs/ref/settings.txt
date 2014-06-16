@@ -88,8 +88,8 @@ middleware; if so this middleware must be listed first in
     wildcard::
 
         ALLOWED_HOSTS = [
-            '.example.com', # Allow domain and subdomains
-            '.example.com.', # Also allow FQDN and subdomains
+            '.example.com',  # Allow domain and subdomains
+            '.example.com.',  # Also allow FQDN and subdomains
         ]
 
     In Django 1.7, the trailing dot is stripped when performing host validation,
@@ -613,7 +613,7 @@ Supported for the PostgreSQL_ (``postgresql_psycopg2``) and MySQL_ (``mysql``)
 backends.
 
 .. _PostgreSQL: http://www.postgresql.org/docs/current/static/multibyte.html
-.. _MySQL: http://dev.mysql.com/doc/refman/5.0/en/charset-database.html
+.. _MySQL: http://dev.mysql.com/doc/refman/5.6/en/charset-database.html
 
 .. setting:: TEST_COLLATION
 
@@ -1241,9 +1241,12 @@ FILE_UPLOAD_HANDLERS
 Default::
 
     ("django.core.files.uploadhandler.MemoryFileUploadHandler",
-     "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
+     "django.core.files.uploadhandler.TemporaryFileUploadHandler")
 
-A tuple of handlers to use for uploading. See :doc:`/topics/files` for details.
+A tuple of handlers to use for uploading. Changing this setting allows complete
+customization -- even replacement -- of Django's upload process.
+
+See :doc:`/topics/files` for details.
 
 .. setting:: FILE_UPLOAD_MAX_MEMORY_SIZE
 
@@ -1281,14 +1284,17 @@ FILE_UPLOAD_PERMISSIONS
 
 Default: ``None``
 
-The numeric mode (i.e. ``0644``) to set newly uploaded files to. For
+The numeric mode (i.e. ``0o644``) to set newly uploaded files to. For
 more information about what these modes mean, see the documentation for
 :func:`os.chmod`.
 
 If this isn't given or is ``None``, you'll get operating-system
 dependent behavior. On most platforms, temporary files will have a mode
-of ``0600``, and files saved from memory will be saved using the
+of ``0o600``, and files saved from memory will be saved using the
 system's standard umask.
+
+For security reasons, these permissions aren't applied to the temporary files
+that are stored in :setting:`FILE_UPLOAD_TEMP_DIR`.
 
 This setting also determines the default permissions for collected static files
 when using the :djadmin:`collectstatic` management command. See
@@ -1303,7 +1309,6 @@ when using the :djadmin:`collectstatic` management command. See
     way that modes must be specified. If you try to use ``644``, you'll
     get totally incorrect behavior.
 
-
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
 FILE_UPLOAD_TEMP_DIR
@@ -1311,9 +1316,11 @@ FILE_UPLOAD_TEMP_DIR
 
 Default: ``None``
 
-The directory to store data temporarily while uploading files. If ``None``,
-Django will use the standard temporary directory for the operating system. For
-example, this will default to '/tmp' on \*nix-style operating systems.
+The directory to store data (typically files larger than
+:setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`) temporarily while uploading files.
+If ``None``, Django will use the standard temporary directory for the operating
+system. For example, this will default to ``/tmp`` on \*nix-style operating
+systems.
 
 See :doc:`/topics/files` for details.
 
@@ -1622,7 +1629,7 @@ Example::
 
     LOCALE_PATHS = (
         '/home/www/project/common_files/locale',
-        '/var/local/translations/locale'
+        '/var/local/translations/locale',
     )
 
 Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
@@ -1713,6 +1720,11 @@ for :doc:`managing stored files </topics/files>`. It must end in a slash if set
 to a non-empty value. You will need to :ref:`configure these files to be served
 <serving-uploaded-files-in-development>` in both development and production.
 
+In order to use ``{{ MEDIA_URL }}`` in your templates, you must have
+``'django.core.context_processors.media'`` in your
+:setting:`TEMPLATE_CONTEXT_PROCESSORS`. It's there by default, but be sure
+to include it if you override that setting and want this behavior.
+
 Example: ``"http://media.example.com/"``
 
 .. warning::
@@ -1734,7 +1746,7 @@ MIDDLEWARE_CLASSES
 Default::
 
     ('django.middleware.common.CommonMiddleware',
-     'django.middleware.csrf.CsrfViewMiddleware',)
+     'django.middleware.csrf.CsrfViewMiddleware')
 
 A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
 
@@ -1752,7 +1764,7 @@ MIGRATION_MODULES
 
 Default::
 
-    {} # empty dictionary
+    {}  # empty dictionary
 
 A dictionary specifying the package where migration modules can be found on a per-app basis. The default value
 of this setting is an empty dictionary, but the default package name for migration modules is ``migrations``.
@@ -1840,7 +1852,7 @@ A secret key for a particular Django installation. This is used to provide
 :doc:`cryptographic signing </topics/signing>`, and should be set to a unique,
 unpredictable value.
 
-:djadmin:`django-admin.py startproject <startproject>` automatically adds a
+:djadmin:`django-admin startproject <startproject>` automatically adds a
 randomly-generated ``SECRET_KEY`` to each new project.
 
 Django will refuse to start if :setting:`SECRET_KEY` is not set.
@@ -1925,7 +1937,7 @@ A dictionary of modules containing serializer definitions (provided as
 strings), keyed by a string identifier for that serialization type. For
 example, to define a YAML serializer, use::
 
-    SERIALIZATION_MODULES = { 'yaml' : 'path.to.yaml_serializer' }
+    SERIALIZATION_MODULES = {'yaml': 'path.to.yaml_serializer'}
 
 .. setting:: SERVER_EMAIL
 
@@ -2252,7 +2264,7 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin.py
+    The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` includes ``USE_L10N = True`` for convenience.
 
 .. setting:: USE_THOUSAND_SEPARATOR
@@ -2286,7 +2298,7 @@ See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 .. note::
 
     The default :file:`settings.py` file created by
-    :djadmin:`django-admin.py startproject <startproject>` includes
+    :djadmin:`django-admin startproject <startproject>` includes
     ``USE_TZ = True`` for convenience.
 
 .. setting:: USE_X_FORWARDED_HOST
@@ -2308,7 +2320,7 @@ WSGI_APPLICATION
 Default: ``None``
 
 The full Python path of the WSGI application object that Django's built-in
-servers (e.g. :djadmin:`runserver`) will use. The :djadmin:`django-admin.py
+servers (e.g. :djadmin:`runserver`) will use. The :djadmin:`django-admin
 startproject <startproject>` management command will create a simple
 ``wsgi.py`` file with an ``application`` callable in it, and point this setting
 to that ``application``.
@@ -2373,6 +2385,14 @@ AUTH_USER_MODEL
 Default: 'auth.User'
 
 The model to use to represent a User. See :ref:`auth-custom-user`.
+
+.. warning::
+    You cannot change the AUTH_USER_MODEL setting during the lifetime of
+    a project (i.e. once you have made and migrated models that depend on it)
+    without serious effort. It is intended to be set at the project start,
+    and the model it refers to must be available in the first migration of
+    the app that it lives in.
+    See :ref:`auth-custom-user` for more details.
 
 .. setting:: LOGIN_REDIRECT_URL
 
@@ -2439,7 +2459,7 @@ Default::
      'django.contrib.auth.hashers.SHA1PasswordHasher',
      'django.contrib.auth.hashers.MD5PasswordHasher',
      'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
-     'django.contrib.auth.hashers.CryptPasswordHasher',)
+     'django.contrib.auth.hashers.CryptPasswordHasher')
 
 .. _settings-messages:
 
@@ -2503,7 +2523,7 @@ Default::
     messages.INFO: 'info',
     messages.SUCCESS: 'success',
     messages.WARNING: 'warning',
-    messages.ERROR: 'error',}
+    messages.ERROR: 'error'}
 
 This sets the mapping of message level to message tag, which is typically
 rendered as a CSS class in HTML. If you specify a value, it will extend
@@ -2912,6 +2932,8 @@ Error reporting
 * :setting:`IGNORABLE_404_URLS`
 * :setting:`MANAGERS`
 * :setting:`SILENCED_SYSTEM_CHECKS`
+
+.. _file-upload-settings:
 
 File uploads
 ------------

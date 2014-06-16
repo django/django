@@ -25,6 +25,11 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(primary_key=True)),
                 ("fluffy", models.BooleanField(default=True)),
             ],
-        )
+        ),
+
+        migrations.AlterUniqueTogether(
+            name='author',
+            unique_together=set([('name', 'slug')]),
+        ),
 
     ]

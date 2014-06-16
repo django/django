@@ -81,6 +81,10 @@ SingleObjectMixin
 
         Returns context data for displaying the list of objects.
 
+        The base implementation of this method requires that the ``object``
+        attribute be set by the view (even if ``None``). Be sure to do this if
+        you are using this mixin without one of the built-in views that does so.
+
     .. method:: get_slug_field()
 
         Returns the name of a slug field to be used to look up by slug. By

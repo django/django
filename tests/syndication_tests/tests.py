@@ -405,8 +405,8 @@ class SyndicationFeedTest(FeedTestCase):
         items = chan.getElementsByTagName('item')
 
         self.assertChildNodeContent(items[0], {
-            'title': 'Title in your templates: My first entry',
-            'description': 'Description in your templates: My first entry',
+            'title': 'Title in your templates: My first entry\n',
+            'description': 'Description in your templates: My first entry\n',
             'link': 'http://example.com/blog/1/',
         })
 
@@ -422,8 +422,8 @@ class SyndicationFeedTest(FeedTestCase):
         items = chan.getElementsByTagName('item')
 
         self.assertChildNodeContent(items[0], {
-            'title': 'My first entry (foo is bar)',
-            'description': 'My first entry (foo is bar)',
+            'title': 'My first entry (foo is bar)\n',
+            'description': 'My first entry (foo is bar)\n',
         })
 
     def test_add_domain(self):

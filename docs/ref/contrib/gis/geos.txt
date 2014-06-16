@@ -226,7 +226,7 @@ Returns a boolean indicating whether the geometry is a ``LinearRing``.
 Returns a boolean indicating whether the geometry is 'simple'. A geometry
 is simple if and only if it does not intersect itself (except at boundary
 points).  For example, a :class:`LineString` object is not simple if it
-intersects itself. Thus, :class:`LinearRing` and :class`Polygon` objects
+intersects itself. Thus, :class:`LinearRing` and :class:`Polygon` objects
 are always simple because they do cannot intersect themselves, by
 definition.
 
@@ -440,17 +440,16 @@ topological relationship between this geometry and the other.
 
 .. method:: GEOSGeometry.simplify(tolerance=0.0, preserve_topology=False)
 
-Returns a new :class:`GEOSGeometry`, simplified using the Douglas-Peucker
-algorithm to the specified tolerance.  A higher tolerance value implies
-less points in the output.  If no tolerance is tolerance provided,
-it defaults to 0.
+Returns a new :class:`GEOSGeometry`, simplified to the specified tolerance
+using the Douglas-Peucker algorithm. A higher tolerance value implies
+fewer points in the output. If no tolerance is provided, it defaults to 0.
 
-By default, this function does not preserve topology - e.g.,
-:class:`Polygon` objects can be split, collapsed into lines or disappear.
-:class:`Polygon` holes can be created or disappear, and lines can cross.
+By default, this function does not preserve topology. For example,
+:class:`Polygon` objects can be split, be collapsed into lines, or disappear.
+:class:`Polygon` holes can be created or disappear, and lines may cross.
 By specifying ``preserve_topology=True``, the result will have the same
-dimension and number of components as the input, however, this is
-significantly slower.
+dimension and number of components as the input; this is significantly
+slower, however.
 
 .. method:: GEOSGeometry.sym_difference(other)
 

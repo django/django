@@ -145,12 +145,14 @@ else:
 
         HMAC+SHA256 is used as the default pseudo random function.
 
-        As of 2011, 10,000 iterations was the recommended default which
-        took 100ms on a 2.2Ghz Core 2 Duo. This is probably the bare
-        minimum for security given 1000 iterations was recommended in
-        2001. This code is very well optimized for CPython and is only
-        four times slower than openssl's implementation. Look in
-        django.contrib.auth.hashers for the present default.
+        As of 2014, 100,000 iterations was the recommended default which took
+        100ms on a 2.7Ghz Intel i7 with an optimized implementation. This is
+        probably the bare minimum for security given 1000 iterations was
+        recommended in 2001. This code is very well optimized for CPython and
+        is about five times slower than OpenSSL's implementation. Look in
+        django.contrib.auth.hashers for the present default, it is lower than
+        the recommended 100,000 because of the performance difference between
+        this and an optimized implementation.
         """
         assert iterations > 0
         if not digest:

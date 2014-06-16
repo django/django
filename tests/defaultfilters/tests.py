@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 import unittest
+import warnings
 
 from django.template.defaultfilters import (
     add, addslashes, capfirst, center, cut, date, default, default_if_none,
@@ -264,8 +265,12 @@ class DefaultFiltersTests(TestCase):
             '<a href="http://www.google.com" rel="nofollow">www.google.com</a>')
         self.assertEqual(urlize('djangoproject.org'),
             '<a href="http://djangoproject.org" rel="nofollow">djangoproject.org</a>')
+        self.assertEqual(urlize('djangoproject.org/'),
+            '<a href="http://djangoproject.org/" rel="nofollow">djangoproject.org/</a>')
         self.assertEqual(urlize('info@djangoproject.org'),
             '<a href="mailto:info@djangoproject.org">info@djangoproject.org</a>')
+        self.assertEqual(urlize('some.organization'),
+            'some.organization'),
 
         # Check urlize with https addresses
         self.assertEqual(urlize('https://google.com'),
@@ -428,9 +433,13 @@ class DefaultFiltersTests(TestCase):
                          'line 1<br />line 2')
 
     def test_removetags(self):
-        self.assertEqual(removetags('some <b>html</b> with <script>alert'
-            '("You smell")</script> disallowed <img /> tags', 'script img'),
-            'some <b>html</b> with alert("You smell") disallowed  tags')
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            self.assertEqual(removetags('some <b>html</b> with <script>alert'
+                '("You smell")</script> disallowed <img /> tags', 'script img'),
+                'some <b>html</b> with alert("You smell") disallowed  tags')
+
+    def test_striptags(self):
         self.assertEqual(striptags('some <b>html</b> with <script>alert'
             '("You smell")</script> disallowed <img /> tags'),
             'some html with alert("You smell") disallowed  tags')
@@ -544,21 +553,30 @@ class DefaultFiltersTests(TestCase):
         b = ULItem('b')
         self.assertEqual(unordered_list([a, b]), '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
 
+        def item_generator():
+            yield a
+            yield b
+
+        self.assertEqual(unordered_list(item_generator()), '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
+
         # Old format for unordered lists should still work
-        self.assertEqual(unordered_list(['item 1', []]), '\t<li>item 1</li>')
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
 
-        self.assertEqual(unordered_list(['item 1', [['item 1.1', []]]]),
-            '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>')
+            self.assertEqual(unordered_list(['item 1', []]), '\t<li>item 1</li>')
 
-        self.assertEqual(unordered_list(['item 1', [['item 1.1', []],
-            ['item 1.2', []]]]), '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1'
-            '</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>')
+            self.assertEqual(unordered_list(['item 1', [['item 1.1', []]]]),
+                '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>')
 
-        self.assertEqual(unordered_list(['States', [['Kansas', [['Lawrence',
-            []], ['Topeka', []]]], ['Illinois', []]]]), '\t<li>States\n\t'
-            '<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>'
-            '\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>'
-            'Illinois</li>\n\t</ul>\n\t</li>')
+            self.assertEqual(unordered_list(['item 1', [['item 1.1', []],
+                ['item 1.2', []]]]), '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1'
+                '</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>')
+
+            self.assertEqual(unordered_list(['States', [['Kansas', [['Lawrence',
+                []], ['Topeka', []]]], ['Illinois', []]]]), '\t<li>States\n\t'
+                '<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>'
+                '\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>'
+                'Illinois</li>\n\t</ul>\n\t</li>')
 
     def test_add(self):
         self.assertEqual(add('1', '2'), 3)
@@ -699,7 +717,9 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(escape(123), '123')
         self.assertEqual(linebreaks_filter(123), '<p>123</p>')
         self.assertEqual(linebreaksbr(123), '123')
-        self.assertEqual(removetags(123, 'a'), '123')
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            self.assertEqual(removetags(123, 'a'), '123')
         self.assertEqual(striptags(123), '123')
 
 

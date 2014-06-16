@@ -103,7 +103,7 @@ class Aggregate(RegisterLookupMixin):
         return []
 
     @property
-    def output_type(self):
+    def output_field(self):
         return self.field
 
 

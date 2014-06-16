@@ -49,7 +49,12 @@ class HttpRequest(object):
         # Any variable assignment made here should also happen in
         # `WSGIRequest.__init__()`.
 
-        self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
+        self.GET = QueryDict(mutable=True)
+        self.POST = QueryDict(mutable=True)
+        self.COOKIES = {}
+        self.META = {}
+        self.FILES = MultiValueDict()
+
         self.path = ''
         self.path_info = ''
         self.method = None
@@ -84,15 +89,18 @@ class HttpRequest(object):
         else:
             msg = "Invalid HTTP_HOST header: %r." % host
             if domain:
-                msg += "You may need to add %r to ALLOWED_HOSTS." % domain
+                msg += " You may need to add %r to ALLOWED_HOSTS." % domain
             else:
-                msg += "The domain name provided is not valid according to RFC 1034/1035"
+                msg += " The domain name provided is not valid according to RFC 1034/1035."
             raise DisallowedHost(msg)
 
     def get_full_path(self):
         # RFC 3986 requires query string arguments to be in the ASCII range.
         # Rather than crash if this doesn't happen, we encode defensively.
-        return '%s%s' % (self.path, ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) if self.META.get('QUERY_STRING', '') else '')
+        return '%s%s' % (
+            self.path,
+            ('?' + iri_to_uri(self.META.get('QUERY_STRING', ''))) if self.META.get('QUERY_STRING', '') else ''
+        )
 
     def get_signed_cookie(self, key, default=RAISE_ERROR, salt='', max_age=None):
         """
@@ -152,7 +160,9 @@ class HttpRequest(object):
             try:
                 header, value = settings.SECURE_PROXY_SSL_HEADER
             except ValueError:
-                raise ImproperlyConfigured('The SECURE_PROXY_SSL_HEADER setting must be a tuple containing two values.')
+                raise ImproperlyConfigured(
+                    'The SECURE_PROXY_SSL_HEADER setting must be a tuple containing two values.'
+                )
             if self.META.get(header, None) == value:
                 return 'https'
         # Failing that, fall back to _get_scheme(), which is a hook for
@@ -299,26 +309,37 @@ class HttpRequest(object):
 
 class QueryDict(MultiValueDict):
     """
-    A specialized MultiValueDict that takes a query string when initialized.
-    This is immutable unless you create a copy of it.
+    A specialized MultiValueDict which represents a query string.
 
-    Values retrieved from this class are converted from the given encoding
+    A QueryDict can be used to represent GET or POST data. It subclasses
+    MultiValueDict since keys in such data can be repeated, for instance
+    in the data from a form with a <select multiple> field.
+
+    By default QueryDicts are immutable, though the copy() method
+    will always return a mutable copy.
+
+    Both keys and values set on this class are converted from the given encoding
     (DEFAULT_CHARSET by default) to unicode.
     """
+
     # These are both reset in __init__, but is specified here at the class
     # level so that unpickling will have valid values
     _mutable = True
     _encoding = None
 
-    def __init__(self, query_string, mutable=False, encoding=None):
+    def __init__(self, query_string=None, mutable=False, encoding=None):
         super(QueryDict, self).__init__()
         if not encoding:
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
         if six.PY3:
             if isinstance(query_string, bytes):
-                # query_string contains URL-encoded data, a subset of ASCII.
-                query_string = query_string.decode()
+                # query_string normally contains URL-encoded data, a subset of ASCII.
+                try:
+                    query_string = query_string.decode(encoding)
+                except UnicodeDecodeError:
+                    # ... but some user agents are misbehaving :-(
+                    query_string = query_string.decode('iso-8859-1')
             for key, value in parse_qsl(query_string or '',
                                         keep_blank_values=True,
                                         encoding=encoding):
@@ -326,8 +347,12 @@ class QueryDict(MultiValueDict):
         else:
             for key, value in parse_qsl(query_string or '',
                                         keep_blank_values=True):
+                try:
+                    value = value.decode(encoding)
+                except UnicodeDecodeError:
+                    value = value.decode('iso-8859-1')
                 self.appendlist(force_text(key, encoding, errors='replace'),
-                                force_text(value, encoding, errors='replace'))
+                                value)
         self._mutable = mutable
 
     @property

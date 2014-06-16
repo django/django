@@ -4,12 +4,12 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db import DEFAULT_DB_ALIAS
 from django.core.management import call_command
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.six.moves import input
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = "Deprecated - use 'migrate' instead."
 
     def add_arguments(self, parser):
@@ -20,7 +20,7 @@ class Command(NoArgsCommand):
         parser.add_argument('--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to synchronize. Defaults to the "default" database.')
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         warnings.warn("The syncdb command will be removed in Django 1.9", RemovedInDjango19Warning)
         call_command("migrate", **options)
 

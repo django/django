@@ -68,6 +68,11 @@ class BlockNode(Node):
         return result
 
     def super(self):
+        if not hasattr(self, 'context'):
+            raise TemplateSyntaxError(
+                "'%s' object has no attribute 'context'. Did you use "
+                "{{ block.super }} in a base template?" % self.__class__.__name__
+            )
         render_context = self.context.render_context
         if (BLOCK_CONTEXT_KEY in render_context and
                 render_context[BLOCK_CONTEXT_KEY].get_block(self.name) is not None):
@@ -223,7 +228,10 @@ def do_include(parser, token):
     """
     bits = token.split_contents()
     if len(bits) < 2:
-        raise TemplateSyntaxError("%r tag takes at least one argument: the name of the template to be included." % bits[0])
+        raise TemplateSyntaxError(
+            "%r tag takes at least one argument: the name of the template to "
+            "be included." % bits[0]
+        )
     options = {}
     remaining_bits = bits[2:]
     while remaining_bits:

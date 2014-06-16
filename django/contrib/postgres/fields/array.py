@@ -94,6 +94,14 @@ class ArrayField(Field):
             value = [self.base_field.to_python(val) for val in vals]
         return value
 
+    def get_default(self):
+        """Overridden from the default to prevent string-mangling."""
+        if self.has_default():
+            if callable(self.default):
+                return self.default()
+            return self.default
+        return ''
+
     def value_to_string(self, obj):
         values = []
         vals = self._get_val_from_obj(obj)
@@ -159,7 +167,8 @@ class ArrayContainsLookup(Lookup):
         lhs, lhs_params = self.process_lhs(qn, connection)
         rhs, rhs_params = self.process_rhs(qn, connection)
         params = lhs_params + rhs_params
-        return '%s @> %s' % (lhs, rhs), params
+        type_cast = self.lhs.source.db_type(connection)
+        return '%s @> %s::%s' % (lhs, rhs, type_cast), params
 
 
 ArrayField.register_lookup(ArrayContainsLookup)
@@ -195,7 +204,7 @@ class ArrayLenTransform(Transform):
     lookup_name = 'len'
 
     @property
-    def output_type(self):
+    def output_field(self):
         return IntegerField()
 
     def as_sql(self, qn, connection):
@@ -218,7 +227,7 @@ class IndexTransform(Transform):
         return '%s[%s]' % (lhs, self.index), params
 
     @property
-    def output_type(self):
+    def output_field(self):
         return self.base_field
 
 

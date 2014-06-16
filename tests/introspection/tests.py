@@ -20,8 +20,8 @@ class IntrospectionTests(TestCase):
             cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
             tl = connection.introspection.django_table_names()
             cursor.execute("DROP TABLE django_ixn_test_table;")
-            self.assertTrue('django_ixn_testcase_table' not in tl,
-                         "django_table_names() returned a non-Django table")
+            self.assertNotIn('django_ixn_test_table', tl,
+                             "django_table_names() returned a non-Django table")
 
     def test_django_table_names_retval_type(self):
         # Ticket #15216
@@ -59,7 +59,8 @@ class IntrospectionTests(TestCase):
             ['AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
              'CharField', 'CharField', 'CharField',
              'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
-             'BinaryField' if connection.features.can_introspect_binary_field else 'TextField']
+             'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
+             'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField']
         )
 
     # The following test fails on Oracle due to #17202 (can't correctly
@@ -70,7 +71,7 @@ class IntrospectionTests(TestCase):
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
             [r[3] for r in desc if datatype(r[1], r) == 'CharField'],
-            [30, 30, 75]
+            [30, 30, 254]
         )
 
     @skipUnlessDBFeature('can_introspect_null')
@@ -80,7 +81,7 @@ class IntrospectionTests(TestCase):
         nullable_by_backend = connection.features.interprets_empty_strings_as_nulls
         self.assertEqual(
             [r[6] for r in desc],
-            [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True]
+            [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False]
         )
 
     # Regression test for #9991 - 'real' types in postgres

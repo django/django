@@ -50,6 +50,15 @@ class Book(models.Model):
         apps = new_apps
 
 
+class BookWeak(models.Model):
+    author = models.ForeignKey(Author, db_constraint=False)
+    title = models.CharField(max_length=100, db_index=True)
+    pub_date = models.DateTimeField()
+
+    class Meta:
+        apps = new_apps
+
+
 class BookWithM2M(models.Model):
     author = models.ForeignKey(Author)
     title = models.CharField(max_length=100, db_index=True)
@@ -129,8 +138,16 @@ class UniqueTest(models.Model):
         unique_together = ["year", "slug"]
 
 
+class AuthorWithEvenLongerName(models.Model):
+    name = models.CharField(max_length=255)
+    height = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        apps = new_apps
+
+
 class BookWithLongName(models.Model):
-    author_foreign_key_with_really_long_field_name = models.ForeignKey(Author)
+    author_foreign_key_with_really_long_field_name = models.ForeignKey(AuthorWithEvenLongerName)
 
     class Meta:
         apps = new_apps

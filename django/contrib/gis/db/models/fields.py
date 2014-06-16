@@ -197,6 +197,11 @@ class GeometryField(Field):
         else:
             return geom
 
+    def from_db_value(self, value, connection):
+        if value is not None:
+            value = Geometry(value)
+        return value
+
     def get_srid(self, geom):
         """
         Returns the default SRID for the given geometry, taking into account
@@ -210,8 +215,8 @@ class GeometryField(Field):
             return gsrid
 
     ### Routines overloaded from Field ###
-    def contribute_to_class(self, cls, name):
-        super(GeometryField, self).contribute_to_class(cls, name)
+    def contribute_to_class(self, cls, name, **kwargs):
+        super(GeometryField, self).contribute_to_class(cls, name, **kwargs)
 
         # Setup for lazy-instantiated Geometry object.
         setattr(cls, self.attname, GeometryProxy(Geometry, self))

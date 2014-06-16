@@ -103,7 +103,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
     supports_foreign_keys = False
-    supports_check_constraints = False
+    supports_column_check_constraints = False
     autocommits_when_autocommit_is_off = True
     can_introspect_decimal_field = False
     can_introspect_positive_integer_field = True
@@ -117,6 +117,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def uses_savepoints(self):
         return Database.sqlite_version_info >= (3, 6, 8)
+
+    @cached_property
+    def can_release_savepoints(self):
+        return self.uses_savepoints
 
     @cached_property
     def supports_stddev(self):
@@ -259,27 +263,36 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         return six.text_type(value)
 
-    def convert_values(self, value, field):
-        """SQLite returns floats when it should be returning decimals,
-        and gets dates and datetimes wrong.
-        For consistency with other backends, coerce when required.
-        """
-        if value is None:
-            return None
-
-        internal_type = field.get_internal_type()
-        if internal_type == 'DecimalField':
-            return backend_utils.typecast_decimal(field.format_number(value))
-        elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
-            return int(value)
+    def get_db_converters(self, internal_type):
+        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+        if internal_type == 'DateTimeField':
+            converters.append(self.convert_datetimefield_value)
         elif internal_type == 'DateField':
-            return parse_date(value)
-        elif internal_type == 'DateTimeField':
-            return parse_datetime_with_timezone_support(value)
+            converters.append(self.convert_datefield_value)
         elif internal_type == 'TimeField':
-            return parse_time(value)
+            converters.append(self.convert_timefield_value)
+        elif internal_type == 'DecimalField':
+            converters.append(self.convert_decimalfield_value)
+        return converters
 
-        # No field, or the field isn't known to be a decimal or integer
+    def convert_decimalfield_value(self, value, field):
+        if value is not None:
+            value = backend_utils.typecast_decimal(field.format_number(value))
+        return value
+
+    def convert_datefield_value(self, value, field):
+        if value is not None and not isinstance(value, datetime.date):
+            value = parse_date(value)
+        return value
+
+    def convert_datetimefield_value(self, value, field):
+        if value is not None and not isinstance(value, datetime.datetime):
+            value = parse_datetime_with_timezone_support(value)
+        return value
+
+    def convert_timefield_value(self, value, field):
+        if value is not None and not isinstance(value, datetime.time):
+            value = parse_time(value)
         return value
 
     def bulk_insert_sql(self, fields, num_values):
@@ -421,15 +434,18 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def check_constraints(self, table_names=None):
         """
-        Checks each table name in `table_names` for rows with invalid foreign key references. This method is
-        intended to be used in conjunction with `disable_constraint_checking()` and `enable_constraint_checking()`, to
-        determine if rows with invalid references were entered while constraint checks were off.
+        Checks each table name in `table_names` for rows with invalid foreign
+        key references. This method is intended to be used in conjunction with
+        `disable_constraint_checking()` and `enable_constraint_checking()`, to
+        determine if rows with invalid references were entered while constraint
+        checks were off.
 
-        Raises an IntegrityError on the first invalid foreign key reference encountered (if any) and provides
-        detailed information about the invalid reference in the error message.
+        Raises an IntegrityError on the first invalid foreign key reference
+        encountered (if any) and provides detailed information about the
+        invalid reference in the error message.
 
-        Backends can override this method if they can more directly apply constraint checking (e.g. via "SET CONSTRAINTS
-        ALL IMMEDIATE")
+        Backends can override this method if they can more directly apply
+        constraint checking (e.g. via "SET CONSTRAINTS ALL IMMEDIATE")
         """
         cursor = self.cursor()
         if table_names is None:

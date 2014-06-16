@@ -97,7 +97,7 @@ In the ``polls/urls.py`` file include the following code:
     from polls import views
 
     urlpatterns = [
-        url(r'^$', views.index, name='index')
+        url(r'^$', views.index, name='index'),
     ]
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
@@ -267,7 +267,7 @@ what you can do with them. And there's no need to add URL cruft such as
 ``.html`` -- unless you want to, in which case you can do something like
 this::
 
-    (r'^polls/latest\.html$', 'polls.views.index'),
+    url(r'^polls/latest\.html$', views.index),
 
 But, don't do that. It's silly.
 
@@ -466,7 +466,7 @@ provides a shortcut. Here's the ``detail()`` view, rewritten:
 .. snippet::
     :filename: polls/views.py
 
-    from django.shortcuts import render, get_object_or_404
+    from django.shortcuts import get_object_or_404, render
 
     from polls.models import Question
     # ...
@@ -577,8 +577,7 @@ make it so that Django knows which app view to create for a url when using the
 ``{% url %}`` template tag?
 
 The answer is to add namespaces to your root URLconf. In the ``mysite/urls.py``
-file (the project's ``urls.py``, not the application's), go ahead and change
-it to include namespacing:
+file, go ahead and change it to include namespacing:
 
 .. snippet::
     :filename: mysite/urls.py

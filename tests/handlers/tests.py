@@ -42,14 +42,30 @@ class HandlerTests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_non_ascii_query_string(self):
-        """Test that non-ASCII query strings are properly decoded (#20530)."""
+        """
+        Test that non-ASCII query strings are properly decoded (#20530, #22996).
+        """
         environ = RequestFactory().get('/').environ
-        raw_query_string = 'want=café'
-        if six.PY3:
-            raw_query_string = raw_query_string.encode('utf-8').decode('iso-8859-1')
-        environ['QUERY_STRING'] = raw_query_string
-        request = WSGIRequest(environ)
-        self.assertEqual(request.GET['want'], "café")
+        raw_query_strings = [
+            b'want=caf%C3%A9',  # This is the proper way to encode 'café'
+            b'want=caf\xc3\xa9',  # UA forgot to quote bytes
+            b'want=caf%E9',  # UA quoted, but not in UTF-8
+            b'want=caf\xe9',  # UA forgot to convert Latin-1 to UTF-8 and to quote (typical of MSIE)
+        ]
+        got = []
+        for raw_query_string in raw_query_strings:
+            if six.PY3:
+                # Simulate http.server.BaseHTTPRequestHandler.parse_request handling of raw request
+                environ['QUERY_STRING'] = str(raw_query_string, 'iso-8859-1')
+            else:
+                environ['QUERY_STRING'] = raw_query_string
+            request = WSGIRequest(environ)
+            got.append(request.GET['want'])
+        if six.PY2:
+            self.assertListEqual(got, ['café', 'café', 'café', 'café'])
+        else:
+            # On Python 3, %E9 is converted to the unicode replacement character by parse_qsl
+            self.assertListEqual(got, ['café', 'café', 'caf\ufffd', 'café'])
 
     def test_non_ascii_cookie(self):
         """Test that non-ASCII cookies set in JavaScript are properly decoded (#20557)."""
@@ -98,6 +114,7 @@ class SignalsTests(TestCase):
 
     def setUp(self):
         self.signals = []
+        self.signaled_environ = None
         request_started.connect(self.register_started)
         request_finished.connect(self.register_finished)
 
@@ -107,6 +124,7 @@ class SignalsTests(TestCase):
 
     def register_started(self, **kwargs):
         self.signals.append('started')
+        self.signaled_environ = kwargs.get('environ')
 
     def register_finished(self, **kwargs):
         self.signals.append('finished')
@@ -115,6 +133,7 @@ class SignalsTests(TestCase):
         response = self.client.get('/regular/')
         self.assertEqual(self.signals, ['started', 'finished'])
         self.assertEqual(response.content, b"regular content")
+        self.assertEqual(self.signaled_environ, response.wsgi_request.environ)
 
     def test_request_signals_streaming_response(self):
         response = self.client.get('/streaming/')

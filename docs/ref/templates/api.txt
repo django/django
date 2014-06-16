@@ -274,6 +274,31 @@ Builtin variables
 Every context contains ``True``, ``False`` and ``None``. As you would expect,
 these variables resolve to the corresponding Python objects.
 
+Limitations with string literals
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's template language has no way to escape the characters used for its own
+syntax. For example, the :ttag:`templatetag` tag is required if you need to
+output character sequences like ``{%`` and ``%}``.
+
+A similar issue exists if you want to include these sequences in template filter
+or tag arguments. For example, when parsing a block tag, Django's template
+parser looks for the first occurrence of ``%}`` after a ``{%``. This prevents
+the use of ``"%}"`` as a string literal. For example, a ``TemplateSyntaxError``
+will be raised for the following expressions::
+
+  {% include "template.html" tvar="Some string literal with %} in it." %}
+
+  {% with tvar="Some string literal with %} in it." %}{% endwith %}
+
+The same issue can be triggered by using a reserved sequence in filter
+arguments::
+
+  {{ some.variable|default:"}}" }}
+
+If you need to use strings with these sequences, store them in template
+variables or use a custom template tag or filter to workaround the limitation.
+
 Playing with Context objects
 ----------------------------
 
@@ -320,7 +345,7 @@ If you ``pop()`` too much, it'll raise
     >>> c.pop()
     Traceback (most recent call last):
     ...
-    django.template.ContextPopException
+    ContextPopException
 
 .. versionadded:: 1.7
 
@@ -530,7 +555,8 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
   you're in :setting:`DEBUG` mode.
 * ``sql_queries`` -- A list of ``{'sql': ..., 'time': ...}`` dictionaries,
   representing every SQL query that has happened so far during the request
-  and how long it took. The list is in order by query.
+  and how long it took. The list is in order by query and lazily generated
+  on access.
 
 django.core.context_processors.i18n
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

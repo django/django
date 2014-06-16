@@ -288,9 +288,7 @@ The :ref:`simple_tag<howto-custom-template-tags-simple-tags>`,
 newly introduced
 :ref:`assignment_tag<howto-custom-template-tags-assignment-tags>` template
 helper functions may now accept any number of positional or keyword arguments.
-For example:
-
-.. code-block:: python
+For example::
 
     @register.simple_tag
     def my_tag(a, b, *args, **kwargs):

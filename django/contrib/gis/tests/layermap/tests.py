@@ -8,10 +8,9 @@ import unittest
 from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql
-from django.db import router
+from django.db import connection, router
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils._os import upath
 
 if HAS_GDAL:
@@ -36,7 +35,8 @@ NUMS = [1, 2, 1, 19, 1]  # Number of polygons for each.
 STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
+@skipUnless(HAS_GDAL, "LayerMapTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class LayerMapTest(TestCase):
 
     def test_init(self):
@@ -150,7 +150,7 @@ class LayerMapTest(TestCase):
             # Unique may take tuple or string parameters.
             for arg in ('name', ('name', 'mpoly')):
                 lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique=arg)
-        except:
+        except Exception:
             self.fail('No exception should be raised for proper use of keywords.')
 
         # Testing invalid params for the `unique` keyword.
@@ -158,7 +158,7 @@ class LayerMapTest(TestCase):
             self.assertRaises(e, LayerMapping, County, co_shp, co_mapping, transform=False, unique=arg)
 
         # No source reference system defined in the shapefile, should raise an error.
-        if not mysql:
+        if connection.features.supports_transform:
             self.assertRaises(LayerMapError, LayerMapping, County, co_shp, co_mapping)
 
         # Passing in invalid ForeignKey mapping parameters -- must be a dictionary
@@ -319,7 +319,8 @@ class OtherRouter(object):
         return True
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
+@skipUnless(HAS_GDAL, "LayerMapRouterTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class LayerMapRouterTest(TestCase):
 
     def setUp(self):

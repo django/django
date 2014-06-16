@@ -20,13 +20,28 @@ from django.test import TestCase, RequestFactory, override_settings
 from django.test.utils import override_with_test_loader
 from django.utils.encoding import force_text, force_bytes
 from django.utils import six
-from django.views.debug import ExceptionReporter
+from django.views.debug import CallableSettingWrapper, ExceptionReporter
 
 from .. import BrokenException, except_args
 from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
     custom_exception_reporter_filter_view, sensitive_method_view,
     sensitive_args_function_caller, sensitive_kwargs_function_caller,
     multivalue_dict_key_error)
+
+
+class CallableSettingWrapperTests(TestCase):
+    """ Unittests for CallableSettingWrapper
+    """
+    def test_repr(self):
+        class WrappedCallable(object):
+            def __repr__(self):
+                return "repr from the wrapped callable"
+
+            def __call__(self):
+                pass
+
+        actual = repr(CallableSettingWrapper(WrappedCallable()))
+        self.assertEqual(actual, "repr from the wrapped callable")
 
 
 @override_settings(DEBUG=True, TEMPLATE_DEBUG=True,
@@ -43,6 +58,11 @@ class DebugViewTests(TestCase):
         response = self.client.post('/raises/', data)
         self.assertContains(response, 'file_data.txt', status_code=500)
         self.assertNotContains(response, 'haha', status_code=500)
+
+    def test_400(self):
+        # Ensure that when DEBUG=True, technical_500_template() is called.
+        response = self.client.get('/raises400/')
+        self.assertContains(response, '<div class="context" id="', status_code=400)
 
     def test_403(self):
         # Ensure no 403.html template exists to test the default case.
@@ -67,7 +87,18 @@ class DebugViewTests(TestCase):
 
     def test_404_not_in_urls(self):
         response = self.client.get('/not-in-urls')
+        self.assertNotContains(response, "Raised by:", status_code=404)
         self.assertContains(response, "<code>not-in-urls</code>, didn't match", status_code=404)
+
+    def test_technical_404(self):
+        response = self.client.get('/views/technical404/')
+        self.assertContains(response, "Raised by:", status_code=404)
+        self.assertContains(response, "view_tests.views.technical404", status_code=404)
+
+    def test_classbased_technical_404(self):
+        response = self.client.get('/views/classbased404/')
+        self.assertContains(response, "Raised by:", status_code=404)
+        self.assertContains(response, "view_tests.views.Http404View", status_code=404)
 
     def test_view_exceptions(self):
         for n in range(len(except_args)):
@@ -270,6 +301,52 @@ class ExceptionReporterTests(TestCase):
         self.assertNotIn('<h2>Traceback ', html)
         self.assertIn('<h2>Request information</h2>', html)
         self.assertIn('<p>Request data not supplied</p>', html)
+
+    def test_non_utf8_values_handling(self):
+        "Non-UTF-8 exceptions/values should not make the output generation choke."
+        try:
+            class NonUtf8Output(Exception):
+                def __repr__(self):
+                    return b'EXC\xe9EXC'
+            somevar = b'VAL\xe9VAL'  # NOQA
+            raise NonUtf8Output()
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn('VAL\\xe9VAL', html)
+        self.assertIn('EXC\\xe9EXC', html)
+
+    def test_unprintable_values_handling(self):
+        "Unprintable values should not make the output generation choke."
+        try:
+            class OomOutput(object):
+                def __repr__(self):
+                    raise MemoryError('OOM')
+            oomvalue = OomOutput()  # NOQA
+            raise ValueError()
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn('<td class="code"><pre>Error in formatting', html)
+
+    def test_too_large_values_handling(self):
+        "Large values should not create a large HTML."
+        large = 256 * 1024
+        repr_of_str_adds = len(repr(''))
+        try:
+            class LargeOutput(object):
+                def __repr__(self):
+                    return repr('A' * large)
+            largevalue = LargeOutput()  # NOQA
+            raise ValueError()
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
+        self.assertIn('&lt;trimmed %d bytes string&gt;' % (large + repr_of_str_adds,), html)
 
     @skipIf(six.PY2, 'Bug manifests on PY3 only')
     def test_unfrozen_importlib(self):
@@ -641,6 +718,21 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
         def callable_setting():
             return "This should not be displayed"
         with self.settings(DEBUG=True, FOOBAR=callable_setting):
+            response = self.client.get('/raises500/')
+            self.assertNotContains(response, "This should not be displayed", status_code=500)
+
+    def test_callable_settings_forbidding_to_set_attributes(self):
+        """
+        Callable settings which forbid to set attributes should not break
+        the debug page (#23070).
+        """
+        class CallableSettingWithSlots(object):
+            __slots__ = []
+
+            def __call__(self):
+                return "This should not be displayed"
+
+        with self.settings(DEBUG=True, WITH_SLOTS=CallableSettingWithSlots()):
             response = self.client.get('/raises500/')
             self.assertNotContains(response, "This should not be displayed", status_code=500)
 

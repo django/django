@@ -45,7 +45,7 @@ class BaseDatabaseWrapper(object):
         self.alias = alias
         # Query logging in debug mode or when explicitly enabled.
         self.queries_log = deque(maxlen=self.queries_limit)
-        self.use_debug_cursor = False
+        self.force_debug_cursor = False
 
         # Transaction related attributes.
         # Tracks if the connection is in autocommit mode. Per PEP 249, by
@@ -75,7 +75,7 @@ class BaseDatabaseWrapper(object):
 
     @property
     def queries_logged(self):
-        return self.use_debug_cursor or settings.DEBUG
+        return self.force_debug_cursor or settings.DEBUG
 
     @property
     def queries(self):
@@ -466,7 +466,10 @@ class BaseDatabaseWrapper(object):
         """
         Only required when autocommits_when_autocommit_is_off = True.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a _start_transaction_under_autocommit() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseWrapper may require a '
+            '_start_transaction_under_autocommit() method'
+        )
 
     def schema_editor(self, *args, **kwargs):
         "Returns a new instance of this backend's SchemaEditor"
@@ -474,6 +477,7 @@ class BaseDatabaseWrapper(object):
 
 
 class BaseDatabaseFeatures(object):
+    gis_enabled = False
     allows_group_by_pk = False
     # True if django.db.backends.utils.typecast_timestamp is used on values
     # returned from dates() calls.
@@ -497,6 +501,7 @@ class BaseDatabaseFeatures(object):
     can_return_id_from_insert = False
     has_bulk_insert = False
     uses_savepoints = False
+    can_release_savepoints = False
     can_combine_inserts_with_and_without_auto_increment_pk = False
 
     # If True, don't use integer foreign keys referring to, e.g., positive
@@ -520,8 +525,8 @@ class BaseDatabaseFeatures(object):
     # at the end of each save operation?
     supports_forward_references = True
 
-    # Does the backend allow very long model names without error?
-    supports_long_model_names = True
+    # Does the backend truncate names properly when they are too long?
+    truncates_names = False
 
     # Is there a REAL datatype in addition to floats/doubles?
     has_real_datatype = False
@@ -634,7 +639,7 @@ class BaseDatabaseFeatures(object):
     supports_foreign_keys = True
 
     # Does it support CHECK constraints?
-    supports_check_constraints = True
+    supports_column_check_constraints = True
 
     # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
     # parameter passing? Note this can be provided by the backend even if not
@@ -664,6 +669,9 @@ class BaseDatabaseFeatures(object):
     implied_column_null = False
 
     uppercases_column_names = False
+
+    # Does the backend support "select for update" queries with limit (and offset)?
+    supports_select_for_update_with_limit = True
 
     def __init__(self, connection):
         self.connection = connection
@@ -1185,20 +1193,13 @@ class BaseDatabaseOperations(object):
             second = timezone.make_aware(second, tz)
         return [first, second]
 
-    def convert_values(self, value, field):
+    def get_db_converters(self, internal_type):
+        """Get a list of functions needed to convert field data.
+
+        Some field types on some backends do not provide data in the correct
+        format, this is the hook for coverter functions.
         """
-        Coerce the value returned by the database backend into a consistent type
-        that is compatible with the field type.
-        """
-        if value is None or field is None:
-            return value
-        internal_type = field.get_internal_type()
-        if internal_type == 'FloatField':
-            return float(value)
-        elif (internal_type and (internal_type.endswith('IntegerField')
-                                 or internal_type == 'AutoField')):
-            return int(value)
-        return value
+        return []
 
     def check_aggregate_support(self, aggregate_func):
         """Check that the backend supports the provided aggregate
@@ -1262,6 +1263,14 @@ class BaseDatabaseIntrospection(object):
         The default table name converter is for case sensitive comparison.
         """
         return name
+
+    def column_name_converter(self, name):
+        """
+        Apply a conversion to the column name for the purposes of comparison.
+
+        Uses table_name_converter() by default.
+        """
+        return self.table_name_converter(name)
 
     def table_names(self, cursor=None):
         """
