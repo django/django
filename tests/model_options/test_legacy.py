@@ -95,35 +95,47 @@ class RelatedObjectsTests(OptionsBaseTests):
         objects = Person._meta.get_all_related_objects_with_model(
             include_hidden=True)
         self.eq_field_names_and_models(objects, [
-            'model_options:baseperson_m2m_base',
-            'model_options:baseperson_following',
-            'model_options:baseperson_following',
-            'model_options:baseperson_friends',
-            'model_options:baseperson_friends',
-            'model_options:baseperson_m2m_abstract',
-            'model_options:relating_basepeople',
-            'model_options:relating_basepeople_hidden',
-            'model_options:relating',
-            'model_options:relating',
-            'model_options:person_m2m_inherited',
-            'model_options:relating_people',
-            'model_options:relating_people_hidden',
-            'model_options:relating',
-            'model_options:relating'
+            u'model_options:baseperson_friends_base',
+            u'model_options:baseperson_friends_base',
+            u'model_options:baseperson_m2m_base',
+            u'model_options:baseperson_following_base',
+            u'model_options:baseperson_following_base',
+            u'model_options:baseperson_m2m_abstract',
+            u'model_options:baseperson_friends_abstract',
+            u'model_options:baseperson_friends_abstract',
+            u'model_options:baseperson_following_abstract',
+            u'model_options:baseperson_following_abstract',
+            u'model_options:relating_basepeople',
+            u'model_options:relating_basepeople_hidden',
+            u'model_options:relating', u'model_options:relating',
+            u'model_options:person_m2m_inherited',
+            u'model_options:person_friends_inherited',
+            u'model_options:person_friends_inherited',
+            u'model_options:person_following_inherited',
+            u'model_options:person_following_inherited',
+            u'model_options:relating_people',
+            u'model_options:relating_people_hidden',
+            u'model_options:relating', u'model_options:relating'
         ], (BasePerson, BasePerson, BasePerson, BasePerson,
             BasePerson, BasePerson, BasePerson, BasePerson,
-            BasePerson, BasePerson, None, None, None, None, None))
+            BasePerson, BasePerson, BasePerson, BasePerson,
+            BasePerson, BasePerson, None, None, None, None,
+            None, None, None, None, None))
 
     def test_related_objects_include_hidden_local_only(self):
         objects = Person._meta.get_all_related_objects_with_model(
             include_hidden=True, local_only=True)
         self.eq_field_names_and_models(objects, [
-            'model_options:person_m2m_inherited',
-            'model_options:relating_people',
-            'model_options:relating_people_hidden',
-            'model_options:relating',
-            'model_options:relating'
-        ], (None, None, None, None, None))
+            u'model_options:person_m2m_inherited',
+            u'model_options:person_friends_inherited',
+            u'model_options:person_friends_inherited',
+            u'model_options:person_following_inherited',
+            u'model_options:person_following_inherited',
+            u'model_options:relating_people',
+            u'model_options:relating_people_hidden',
+            u'model_options:relating',
+            u'model_options:relating'
+        ], (None, None, None, None, None, None, None, None, None))
 
     def test_related_objects_proxy(self):
         objects = Person._meta.get_all_related_objects_with_model(
@@ -138,26 +150,34 @@ class RelatedObjectsTests(OptionsBaseTests):
         objects = Person._meta.get_all_related_objects_with_model(
             include_proxy_eq=True, include_hidden=True)
         self.eq_field_names_and_models(objects, [
-            'model_options:baseperson_m2m_base',
-            'model_options:baseperson_following',
-            'model_options:baseperson_following',
-            'model_options:baseperson_friends',
-            'model_options:baseperson_friends',
-            'model_options:baseperson_m2m_abstract',
-            'model_options:relating_basepeople',
-            'model_options:relating_basepeople_hidden',
-            'model_options:relating',
-            'model_options:relating',
-            'model_options:person_m2m_inherited',
-            'model_options:relating_people',
-            'model_options:relating_people_hidden',
-            'model_options:relating',
-            'model_options:relating',
-            'model_options:relating',
-            'model_options:relating'
+            u'model_options:baseperson_friends_base',
+            u'model_options:baseperson_friends_base',
+            u'model_options:baseperson_m2m_base',
+            u'model_options:baseperson_following_base',
+            u'model_options:baseperson_following_base',
+            u'model_options:baseperson_m2m_abstract',
+            u'model_options:baseperson_friends_abstract',
+            u'model_options:baseperson_friends_abstract',
+            u'model_options:baseperson_following_abstract',
+            u'model_options:baseperson_following_abstract',
+            u'model_options:relating_basepeople',
+            u'model_options:relating_basepeople_hidden',
+            u'model_options:relating',
+            u'model_options:relating',
+            u'model_options:person_m2m_inherited',
+            u'model_options:person_friends_inherited',
+            u'model_options:person_friends_inherited',
+            u'model_options:person_following_inherited',
+            u'model_options:person_following_inherited',
+            u'model_options:relating_people',
+            u'model_options:relating_people_hidden',
+            u'model_options:relating', u'model_options:relating',
+            u'model_options:relating', u'model_options:relating'
         ], (BasePerson, BasePerson, BasePerson, BasePerson,
             BasePerson, BasePerson, BasePerson, BasePerson,
-            BasePerson, BasePerson, None, None, None, None, None, None, None))
+            BasePerson, BasePerson, BasePerson, BasePerson,
+            BasePerson, BasePerson, None, None, None, None,
+            None, None, None, None, None, None, None))
 
 
 class RelatedM2MTests(OptionsBaseTests):
