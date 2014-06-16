@@ -104,7 +104,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         body['__module__'] = model.__module__
 
         temp_model = type(model._meta.object_name, model.__bases__, body)
-        # Create a new table with that format
+        # Create a new table with that format. We remove things from the
+        # deferred SQL that match our table name, too
+        self.deferred_sql = [x for x in self.deferred_sql if model._meta.db_table not in x]
         self.create_model(temp_model)
         # Copy data from the old table
         field_maps = list(mapping.items())
