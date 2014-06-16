@@ -425,7 +425,7 @@ class MigrationAutodetector(object):
                     options=model_state.options,
                     bases=model_state.bases,
                 ),
-                dependencies = dependencies,
+                dependencies=dependencies,
             )
             # Generate operations for each related field
             for name, field in sorted(related_fields.items()):
@@ -524,7 +524,7 @@ class MigrationAutodetector(object):
                     bases=model_state.bases,
                 ),
                 # Depend on the deletion of any possible non-proxy version of us
-                dependencies = dependencies,
+                dependencies=dependencies,
             )
 
     def generate_deleted_models(self):
@@ -815,7 +815,7 @@ class MigrationAutodetector(object):
                         name=model_name,
                         order_with_respect_to=new_model_state.options.get('order_with_respect_to', None),
                     ),
-                    dependencies = dependencies,
+                    dependencies=dependencies,
                 )
 
     def arrange_for_graph(self, changes, graph):

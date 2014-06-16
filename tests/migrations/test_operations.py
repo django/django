@@ -237,8 +237,8 @@ class OperationTests(MigrationTestBase):
         operation = migrations.CreateModel(
             "ProxyPony",
             [],
-            options = {"proxy": True},
-            bases = ("test_crprmo.Pony", ),
+            options={"proxy": True},
+            bases=("test_crprmo.Pony", ),
         )
         new_state = project_state.clone()
         operation.state_forwards("test_crprmo", new_state)
