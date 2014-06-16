@@ -634,7 +634,7 @@ class BaseDatabaseFeatures(object):
     supports_foreign_keys = True
 
     # Does it support CHECK constraints?
-    supports_check_constraints = True
+    supports_column_check_constraints = True
 
     # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
     # parameter passing? Note this can be provided by the backend even if not
