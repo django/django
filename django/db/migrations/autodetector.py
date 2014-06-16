@@ -5,6 +5,7 @@ import datetime
 
 from django.utils import six
 from django.db import models
+from django.conf import settings
 from django.db.migrations import operations
 from django.db.migrations.migration import Migration
 from django.db.migrations.questioner import MigrationQuestioner
@@ -345,6 +346,27 @@ class MigrationAutodetector(object):
         operation._auto_deps = dependencies or []
         self.generated_operations.setdefault(app_label, []).append(operation)
 
+    def swappable_first_key(self, item):
+        """
+        Sorting key function that places potential swappable models first in
+        lists of created models (only real way to solve #22783)
+        """
+        try:
+            model = self.new_apps.get_model(item[0], item[1])
+            base_names = [base.__name__ for base in model.__bases__]
+            string_version = "%s.%s" % (item[0], item[1])
+            if (
+                model._meta.swappable or
+                "AbstractUser" in base_names or
+                "AbstractBaseUser" in base_names or
+                settings.AUTH_USER_MODEL.lower() == string_version.lower()
+            ):
+                return ("___" + item[0], "___" + item[1])
+        except LookupError:
+            pass
+        return item
+
+
     def generate_renamed_models(self):
         """
         Finds any renamed models, and generates the operations for them,
@@ -388,7 +410,7 @@ class MigrationAutodetector(object):
         that might be deferred (e.g. unique_together, index_together)
         """
         added_models = set(self.new_model_keys) - set(self.old_model_keys)
-        for app_label, model_name in sorted(added_models):
+        for app_label, model_name in sorted(added_models, key=self.swappable_first_key):
             model_state = self.to_state.models[app_label, model_name]
             # Gather related fields
             related_fields = {}
