@@ -49,43 +49,42 @@ TEST_RESULTS = {
             'fk_inherited_id', 'data_not_concrete_inherited',
             'content_type_concrete_id', 'object_id_concrete'],
         BasePerson: [
-            'id', 'data_abstract',
-            'fk_abstract_id',
-            'data_not_concrete_abstract',
-            'content_type_abstract_id',
-            'object_id_abstract', 'data_base',
-            'fk_base_id', 'data_not_concrete_base',
-            'content_type_base_id', 'object_id_base'],
+            'id', 'data_abstract', 'fk_abstract_id',
+            'data_not_concrete_abstract', 'content_type_abstract_id',
+            'object_id_abstract', 'data_base', 'fk_base_id',
+            'data_not_concrete_base', 'content_type_base_id', 'object_id_base'],
         AbstractPerson: [
-            'data_abstract',
-            'fk_abstract_id',
-            'data_not_concrete_abstract',
-            'content_type_abstract_id',
-            'object_id_abstract']
+            'data_abstract', 'fk_abstract_id', 'data_not_concrete_abstract',
+            'content_type_abstract_id', 'object_id_abstract']
     },
     'local_fields': {
         Person: [
-            'baseperson_ptr_id', 'data_inherited',
-            'fk_inherited_id', 'data_not_concrete_inherited',
-            'content_type_concrete_id', 'object_id_concrete'],
+            'baseperson_ptr_id', 'data_inherited', 'fk_inherited_id',
+            'data_not_concrete_inherited', 'content_type_concrete_id',
+            'object_id_concrete'],
         BasePerson: [
-            'id',
-            'data_abstract',
-            'fk_abstract_id',
-            'data_not_concrete_abstract',
-            'content_type_abstract_id',
-            'object_id_abstract',
-            'data_base',
-            'fk_base_id',
-            'data_not_concrete_base',
-            'content_type_base_id',
+            'id', 'data_abstract', 'fk_abstract_id', 'data_not_concrete_abstract',
+            'content_type_abstract_id', 'object_id_abstract', 'data_base',
+            'fk_base_id', 'data_not_concrete_base', 'content_type_base_id',
             'object_id_base'],
         AbstractPerson: [
-            'data_abstract',
-            'fk_abstract_id',
-            'data_not_concrete_abstract',
-            'content_type_abstract_id',
-            'object_id_abstract']
+            'data_abstract', 'fk_abstract_id', 'data_not_concrete_abstract',
+            'content_type_abstract_id', 'object_id_abstract']
+    },
+    'local_concrete_fields': {
+        Person: [
+            'baseperson_ptr_id', 'data_inherited',
+            'fk_inherited_id', 'content_type_concrete_id',
+            'object_id_concrete'],
+        BasePerson: [
+            'id', 'data_abstract',
+            'fk_abstract_id', 'content_type_abstract_id',
+            'object_id_abstract', 'data_base',
+            'fk_base_id', 'content_type_base_id',
+            'object_id_base'],
+        AbstractPerson: [
+            'data_abstract', 'fk_abstract_id',
+            'content_type_abstract_id', 'object_id_abstract']
     }
 }
 
@@ -107,13 +106,12 @@ class DataTests(OptionsBaseTests):
                             related.ManyToManyRel) for f in fields]))
 
     def test_local_concrete_fields(self):
-        fields = Person._meta.local_concrete_fields
-        self.assertEquals([f.attname for f in fields], [
-                          'baseperson_ptr_id', 'data_inherited',
-                          'fk_inherited_id', 'content_type_concrete_id',
-                          'object_id_concrete'])
-        self.assertTrue(all([f.column is not None
-                             for f in fields]))
+        for model, expected_result in TEST_RESULTS['local_concrete_fields'].iteritems():
+            fields = model._meta.local_concrete_fields
+            self.assertEquals([f.attname for f in fields],
+                              expected_result)
+            self.assertTrue(all([f.column is not None
+                                 for f in fields]))
 
 
 class M2MTests(OptionsBaseTests):
