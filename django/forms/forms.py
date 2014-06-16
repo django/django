@@ -529,6 +529,10 @@ class BoundField(object):
         return len(list(self.__iter__()))
 
     def __getitem__(self, idx):
+        # Prevent unnecessary reevaluation when accessing BoundField's attrs
+        # from templates.
+        if not isinstance(idx, six.integer_types):
+            raise TypeError
         return list(self.__iter__())[idx]
 
     @property
