@@ -286,6 +286,15 @@ TEST_RESULTS = {
             'followers_concrete',
             'relating_people', '+']
     },
+    'virtual_fields': {
+        BasePerson: [
+            'generic_relation_base', 'content_object_base',
+            'generic_relation_abstract', 'content_object_abstract'],
+        Person: [
+            'content_object_concrete', 'generic_relation_concrete',
+            'generic_relation_base', 'content_object_base',
+            'generic_relation_abstract', 'content_object_abstract']
+        },
 }
 
 
@@ -414,10 +423,9 @@ class RelatedM2MTests(OptionsBaseTests):
 class VirtualFieldsTests(OptionsBaseTests):
 
     def test_virtual_fields(self):
-        self.assertEquals([f.name for f in Person._meta.virtual_fields], [
-                          'content_object_concrete', 'generic_relation_concrete',
-                          'generic_relation_base', 'content_object_base',
-                          'generic_relation_abstract', 'content_object_abstract'])
+        for model, expected_names in TEST_RESULTS['virtual_fields'].items():
+            objects = model._meta.virtual_fields
+            self.assertEquals([f.name for f in objects], expected_names)
 
 
 class GetFieldByNameTests(OptionsBaseTests):
