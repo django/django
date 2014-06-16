@@ -5,7 +5,7 @@ from django.db.models.fields import related, CharField
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 from .models import (
-    AbstractPerson, BasePerson, Person
+    AbstractPerson, BasePerson, Person, Relating, Relation
 )
 
 TEST_RESULTS = {
@@ -25,7 +25,12 @@ TEST_RESULTS = {
             'data_not_concrete_base', 'content_type_base_id', 'object_id_base'],
         AbstractPerson: [
             'data_abstract', 'fk_abstract_id', 'data_not_concrete_abstract',
-            'content_type_abstract_id', 'object_id_abstract']
+            'content_type_abstract_id', 'object_id_abstract'],
+        Relating: [
+            'id', 'baseperson_id',
+            'baseperson_hidden_id', 'person_id',
+            'person_hidden_id', 'proxyperson_id',
+            'proxyperson_hidden_id']
     },
     'local_fields': {
         Person: [
@@ -39,7 +44,12 @@ TEST_RESULTS = {
             'object_id_base'],
         AbstractPerson: [
             'data_abstract', 'fk_abstract_id', 'data_not_concrete_abstract',
-            'content_type_abstract_id', 'object_id_abstract']
+            'content_type_abstract_id', 'object_id_abstract'],
+        Relating: [
+            'id', u'baseperson_id',
+            'baseperson_hidden_id',
+            'person_id', 'person_hidden_id',
+            'proxyperson_id', 'proxyperson_hidden_id']
     },
     'local_concrete_fields': {
         Person: [
@@ -54,7 +64,15 @@ TEST_RESULTS = {
             'object_id_base'],
         AbstractPerson: [
             'data_abstract', 'fk_abstract_id',
-            'content_type_abstract_id', 'object_id_abstract']
+            'content_type_abstract_id', 'object_id_abstract'],
+        Relating: [
+            'id',
+            'baseperson_id',
+            'baseperson_hidden_id',
+            'person_id',
+            'person_hidden_id',
+            'proxyperson_id',
+            'proxyperson_hidden_id']
     },
     'many_to_many': {
         Person: [
@@ -69,7 +87,10 @@ TEST_RESULTS = {
             'friends_base', 'following_base'],
         AbstractPerson: [
             'm2m_abstract', 'friends_abstract',
-            'following_abstract']
+            'following_abstract'],
+        Relating: [
+            'basepeople', 'basepeople_hidden',
+            'people', 'people_hidden']
     },
     'many_to_many_with_model': {
         Person: [
@@ -77,7 +98,8 @@ TEST_RESULTS = {
             BasePerson, BasePerson, BasePerson,
             None, None, None],
         BasePerson: [None, None, None, None, None, None],
-        AbstractPerson: [None, None, None]
+        AbstractPerson: [None, None, None],
+        Relating: [None, None, None, None]
     },
     'get_all_related_objects_with_model': {
         Person: (
@@ -85,7 +107,15 @@ TEST_RESULTS = {
             (BasePerson, None)),
         BasePerson: (
             ['person', 'relating_baseperson'],
-            (None, None))
+            (None, None)),
+        Relation: (
+            ['fk_abstract_rel',
+             'fo_abstract_rel',
+             'fk_base_rel',
+             'fo_base_rel',
+             'fk_concrete_rel',
+             'fo_concrete_rel'],
+            (None, None, None, None, None, None)),
     },
     'get_all_related_objects_with_model_local': {
         Person: (
@@ -93,7 +123,15 @@ TEST_RESULTS = {
             (None,)),
         BasePerson: (
             ['person', 'relating_baseperson'],
-            (None, None,))
+            (None, None,)),
+        Relation: (
+            ['fk_abstract_rel',
+             'fo_abstract_rel',
+             'fk_base_rel',
+             'fo_base_rel',
+             'fk_concrete_rel',
+             'fo_concrete_rel'],
+            (None, None, None, None, None, None)),
     },
     'get_all_related_objects_with_model_hidden': {
         BasePerson: (
@@ -140,7 +178,28 @@ TEST_RESULTS = {
             BasePerson, BasePerson, BasePerson, BasePerson,
             BasePerson, BasePerson, BasePerson, BasePerson,
             BasePerson, BasePerson, None, None, None, None,
-            None, None, None, None, None))
+            None, None, None, None, None)),
+        Relation: (
+            [u'model_options:baseperson_m2m_base',
+             u'model_options:baseperson_m2m_abstract',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:person_m2m_inherited',
+             u'model_options:person',
+             u'model_options:person',
+             u'model_options:person',
+             u'model_options:person',
+             u'model_options:person',
+             u'model_options:proxyperson',
+             u'model_options:proxyperson',
+             u'model_options:proxyperson'],
+            (None, None, None, None, None, None, None, None,
+             None, None, None, None, None, None, None, None,
+             None)),
     },
     'get_all_related_objects_with_model_hidden_local': {
         BasePerson: (
@@ -161,15 +220,36 @@ TEST_RESULTS = {
              None, None, None, None, None, None, None)),
         Person: (
             [u'model_options:person_m2m_inherited',
-            u'model_options:person_friends_inherited',
-            u'model_options:person_friends_inherited',
-            u'model_options:person_following_inherited',
-            u'model_options:person_following_inherited',
-            u'model_options:relating_people',
-            u'model_options:relating_people_hidden',
-            u'model_options:relating',
-            u'model_options:relating'],
-            (None, None, None, None, None, None, None, None, None))
+             u'model_options:person_friends_inherited',
+             u'model_options:person_friends_inherited',
+             u'model_options:person_following_inherited',
+             u'model_options:person_following_inherited',
+             u'model_options:relating_people',
+             u'model_options:relating_people_hidden',
+             u'model_options:relating',
+             u'model_options:relating'],
+            (None, None, None, None, None, None, None, None, None)),
+        Relation: (
+            [u'model_options:baseperson_m2m_base',
+             u'model_options:baseperson_m2m_abstract',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:person_m2m_inherited',
+             u'model_options:person',
+             u'model_options:person',
+             u'model_options:person',
+             u'model_options:person',
+             u'model_options:person',
+             u'model_options:proxyperson',
+             u'model_options:proxyperson',
+             u'model_options:proxyperson'],
+            (None, None, None, None, None, None,
+             None, None, None, None, None, None,
+             None, None, None, None, None))
     },
     'get_all_related_objects_with_model_proxy': {
         BasePerson: (
@@ -177,7 +257,11 @@ TEST_RESULTS = {
             (None, None)),
         Person: (
             ['relating_baseperson', 'relating_person', 'relating_proxyperson'],
-            (BasePerson, None, None))
+            (BasePerson, None, None)),
+        Relation: (
+            ['fk_abstract_rel', 'fo_abstract_rel', 'fk_base_rel',
+             'fo_base_rel', 'fk_concrete_rel', 'fo_concrete_rel'],
+            (None, None, None, None, None, None))
     },
     'get_all_related_objects_with_model_proxy_hidden': {
         BasePerson: (
@@ -227,7 +311,28 @@ TEST_RESULTS = {
              BasePerson, BasePerson, BasePerson, BasePerson,
              BasePerson, BasePerson, BasePerson, BasePerson,
              BasePerson, BasePerson, None, None, None, None,
-             None, None, None, None, None, None, None))
+             None, None, None, None, None, None, None)),
+        Relation: (
+            [u'model_options:baseperson_m2m_base',
+             u'model_options:baseperson_m2m_abstract',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:baseperson',
+             u'model_options:person_m2m_inherited',
+             u'model_options:person',
+             u'model_options:person',
+             u'model_options:person',
+             u'model_options:person',
+             u'model_options:person',
+             u'model_options:proxyperson',
+             u'model_options:proxyperson',
+             u'model_options:proxyperson'],
+            (None, None, None, None, None, None, None,
+             None, None, None, None, None, None, None,
+             None, None, None))
     },
     'get_all_related_many_to_many_with_model': {
         BasePerson: (
