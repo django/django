@@ -91,8 +91,8 @@ class LoaderTests(TestCase):
         self.assertEqual(
             migration_loader.graph.forwards_plan(("migrations", "0001_initial")),
             [
-                ('contenttypes', u'0001_initial'),
-                ('auth', u'0001_initial'),
+                ('contenttypes', '0001_initial'),
+                ('auth', '0001_initial'),
                 ("migrations", "0001_initial"),
             ],
         )
