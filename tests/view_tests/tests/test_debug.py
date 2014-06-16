@@ -72,7 +72,18 @@ class DebugViewTests(TestCase):
 
     def test_404_not_in_urls(self):
         response = self.client.get('/not-in-urls')
+        self.assertNotContains(response, "Raised by:", status_code=404)
         self.assertContains(response, "<code>not-in-urls</code>, didn't match", status_code=404)
+
+    def test_technical_404(self):
+        response = self.client.get('/views/technical404/')
+        self.assertContains(response, "Raised by:", status_code=404)
+        self.assertContains(response, "view_tests.views.technical404", status_code=404)
+
+    def test_classbased_technical_404(self):
+        response = self.client.get('/views/classbased404/')
+        self.assertContains(response, "Raised by:", status_code=404)
+        self.assertContains(response, "view_tests.views.Http404View", status_code=404)
 
     def test_view_exceptions(self):
         for n in range(len(except_args)):

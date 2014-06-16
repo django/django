@@ -7,6 +7,7 @@ import sys
 import types
 
 from django.conf import settings
+from django.core.urlresolvers import resolve, Resolver404
 from django.http import (HttpResponse, HttpResponseNotFound, HttpRequest,
     build_request_repr)
 from django.template import Template, Context, TemplateDoesNotExist
@@ -496,6 +497,23 @@ def technical_404_response(request, exception):
     if isinstance(urlconf, types.ModuleType):
         urlconf = urlconf.__name__
 
+    caller = ''
+    try:
+        resolver_match = resolve(request.path)
+    except Resolver404:
+        pass
+    else:
+        obj = resolver_match.func
+
+        if hasattr(obj, '__name__'):
+            caller = obj.__name__
+        elif hasattr(obj, '__class__') and hasattr(obj.__class__, '__name__'):
+            caller = obj.__class__.__name__
+
+        if hasattr(obj, '__module__'):
+            module = obj.__module__
+            caller = '%s.%s' % (module, caller)
+
     t = Template(TECHNICAL_404_TEMPLATE, name='Technical 404 template')
     c = Context({
         'urlconf': urlconf,
@@ -505,6 +523,7 @@ def technical_404_response(request, exception):
         'reason': force_bytes(exception, errors='replace'),
         'request': request,
         'settings': get_safe_settings(),
+        'raising_view_name': caller,
     })
     return HttpResponseNotFound(t.render(c), content_type='text/html')
 
@@ -1091,8 +1110,14 @@ TECHNICAL_404_TEMPLATE = """
       </tr>
       <tr>
         <th>Request URL:</th>
-      <td>{{ request.build_absolute_uri|escape }}</td>
+        <td>{{ request.build_absolute_uri|escape }}</td>
       </tr>
+      {% if raising_view_name %}
+      <tr>
+        <th>Raised by:</th>
+        <td>{{ raising_view_name }}</td>
+      </tr>
+      {% endif %}
     </table>
   </div>
   <div id="info">
