@@ -20,6 +20,10 @@ class AbstractPerson(models.Model):
     # M2M fields
     m2m_abstract = models.ManyToManyField(Relation,
                                           related_name='m2m_abstract_rel')
+    friends_abstract = models.ManyToManyField('self', related_name='friends_abstract',
+                                              symmetrical=True)
+    following_abstract = models.ManyToManyField('self', related_name='followers_abstract',
+                                                symmetrical=False)
 
     # VIRTUAL fields
     data_not_concrete_abstract = models.ForeignObject(
@@ -46,9 +50,9 @@ class BasePerson(AbstractPerson):
 
     # M2M fields
     m2m_base = models.ManyToManyField(Relation, related_name='m2m_base_rel')
-    friends = models.ManyToManyField('self', related_name='friends',
+    friends_base = models.ManyToManyField('self', related_name='friends_base',
                                      symmetrical=True)
-    following = models.ManyToManyField('self', related_name='followers',
+    following_base = models.ManyToManyField('self', related_name='followers_base',
                                        symmetrical=False)
 
     # VIRTUAL fields
@@ -77,6 +81,10 @@ class Person(BasePerson):
     # M2M Fields
     m2m_inherited = models.ManyToManyField(Relation,
                                            related_name='m2m_concrete_rel')
+    friends_inherited = models.ManyToManyField('self', related_name='friends_concrete',
+                                     symmetrical=True)
+    following_inherited = models.ManyToManyField('self', related_name='followers_concrete',
+                                       symmetrical=False)
 
     # VIRTUAL fields
     data_not_concrete_inherited = models.ForeignObject(
