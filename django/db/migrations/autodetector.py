@@ -244,10 +244,10 @@ class MigrationAutodetector(object):
                                 if self.migrations.get(dep[0], None):
                                     operation_dependencies.add((dep[0], self.migrations[dep[0]][-1].name))
                                 else:
-                                    # If we can't find the other app, we add a __latest__ dependency,
+                                    # If we can't find the other app, we add a __first__ dependency,
                                     # but only if we've already been through once and checked everything
                                     if chop_mode:
-                                        operation_dependencies.add((dep[0], "__latest__"))
+                                        operation_dependencies.add((dep[0], "__first__"))
                                     else:
                                         deps_satisfied = False
                     if deps_satisfied:
