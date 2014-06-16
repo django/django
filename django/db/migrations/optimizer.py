@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
+from django.utils import six
 
 
 class MigrationOptimizer(object):
@@ -205,10 +206,12 @@ class MigrationOptimizer(object):
             # Don't allow optimisations of FKs through models they reference
             if hasattr(other.field, "rel") and other.field.rel:
                 for between in in_between:
-                    if between.references_model(
-                        other.field.rel.to._meta.object_name,
-                        other.field.rel.to._meta.app_label,
-                    ):
+                    if isinstance(other.field.rel.to, six.string_types):
+                        object_name, app_label = other.field.rel.to.split(".", 1)
+                    else:
+                        object_name = other.field.rel.to._meta.object_name
+                        app_label = other.field.rel.to._meta.app_label
+                    if between.references_model(object_name, app_label):
                         return None
             # OK, that's fine
             return [
