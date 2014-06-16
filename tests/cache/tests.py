@@ -1078,6 +1078,12 @@ for _cache_params in settings.CACHES.values():
     if _cache_params['BACKEND'].startswith('django.core.cache.backends.memcached.'):
         memcached_params = _cache_params
 
+memcached_never_expiring_params = memcached_params.copy()
+memcached_never_expiring_params['TIMEOUT'] = None
+
+memcached_far_future_params = memcached_params.copy()
+memcached_far_future_params['TIMEOUT'] = 31536000  # 60*60*24*365, 1 year
+
 
 @unittest.skipUnless(memcached_params, "memcached not available")
 @override_settings(CACHES=caches_setting_for_tests(base=memcached_params))
@@ -1108,6 +1114,18 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
             if cache_config['BACKEND'] == 'django.core.cache.backends.memcached.MemcachedCache':
                 self.assertEqual(caches[cache_key]._cache.pickleProtocol,
                                  pickle.HIGHEST_PROTOCOL)
+
+    @override_settings(CACHES=caches_setting_for_tests(base=memcached_never_expiring_params))
+    def test_default_never_expiring_timeout(self):
+        # Regression test for #22845
+        cache.set('infinite_foo', 'bar')
+        self.assertEqual(cache.get('infinite_foo'), 'bar')
+
+    @override_settings(CACHES=caches_setting_for_tests(base=memcached_far_future_params))
+    def test_default_far_future_timeout(self):
+        # Regression test for #22845
+        cache.set('future_foo', 'bar')
+        self.assertEqual(cache.get('future_foo'), 'bar')
 
     def test_cull(self):
         # culling isn't implemented, memcached deals with it.
