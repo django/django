@@ -7,6 +7,7 @@ import sys
 import types
 
 from django.conf import settings
+from django.core.urlresolvers import resolve, Resolver404
 from django.http import (HttpResponse, HttpResponseServerError,
     HttpResponseNotFound, HttpRequest, build_request_repr)
 from django.template import Template, Context, TemplateDoesNotExist
@@ -496,6 +497,14 @@ def technical_404_response(request, exception):
     if isinstance(urlconf, types.ModuleType):
         urlconf = urlconf.__name__
 
+    caller = ''
+    try:
+        obj = resolve(request.path)
+    except Resolver404:
+        pass
+    else:
+        caller = obj.view_name
+
     t = Template(TECHNICAL_404_TEMPLATE, name='Technical 404 template')
     c = Context({
         'urlconf': urlconf,
@@ -505,6 +514,7 @@ def technical_404_response(request, exception):
         'reason': force_bytes(exception, errors='replace'),
         'request': request,
         'settings': get_safe_settings(),
+        'named_callable': caller
     })
     return HttpResponseNotFound(t.render(c), content_type='text/html')
 
@@ -1093,6 +1103,12 @@ TECHNICAL_404_TEMPLATE = """
         <th>Request URL:</th>
       <td>{{ request.build_absolute_uri|escape }}</td>
       </tr>
+      {% if named_callable %}
+      <tr>
+        <th>Raised by:</th>
+      <td>{{ named_callable }}</td>
+      </tr>
+      {% endif %}
     </table>
   </div>
   <div id="info">

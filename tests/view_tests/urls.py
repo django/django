@@ -57,6 +57,8 @@ urlpatterns = [
     url(r'raises404/$', views.raises404),
     url(r'raises500/$', views.raises500),
 
+    url(r'technical404/$', views.technical404),
+    
     # i18n views
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^jsi18n/$', i18n.javascript_catalog, js_info_dict),
