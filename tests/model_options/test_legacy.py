@@ -5,7 +5,7 @@ from django.db.models.fields import related, CharField
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 from .models import (
-    BasePerson, Person
+    AbstractPerson, BasePerson, Person
 )
 
 
@@ -38,19 +38,41 @@ class OptionsBaseTests(test.TestCase):
         self.assertEquals([o.name for o in fields], names_eq)
         self.assertEquals(models, models_eq)
 
+TEST_RESULTS = {
+    'fields': {
+        Person: [
+            'id', 'data_abstract', u'fk_abstract_id',
+            'data_not_concrete_abstract', u'content_type_abstract_id',
+            'object_id_abstract', 'data_base', u'fk_base_id',
+            'data_not_concrete_base', u'content_type_base_id',
+            'object_id_base', u'baseperson_ptr_id', 'data_inherited',
+            'fk_inherited_id', 'data_not_concrete_inherited',
+            'content_type_concrete_id', 'object_id_concrete'],
+        BasePerson: [
+            'id', 'data_abstract',
+            'fk_abstract_id',
+            'data_not_concrete_abstract',
+            'content_type_abstract_id',
+            'object_id_abstract', 'data_base',
+            'fk_base_id', 'data_not_concrete_base',
+            'content_type_base_id', 'object_id_base'],
+        AbstractPerson: [
+            'data_abstract',
+            'fk_abstract_id',
+            'data_not_concrete_abstract',
+            'content_type_abstract_id',
+            'object_id_abstract']
+    }
+}
+
 
 class DataTests(OptionsBaseTests):
 
     def test_fields(self):
-        fields = Person._meta.fields
-        self.assertEquals([f.attname for f in fields], [
-                          u'id', 'data_abstract', u'fk_abstract_id',
-                          'data_not_concrete_abstract', u'content_type_abstract_id',
-                          'object_id_abstract', 'data_base', u'fk_base_id',
-                          'data_not_concrete_base', u'content_type_base_id',
-                          'object_id_base', u'baseperson_ptr_id', 'data_inherited',
-                          u'fk_inherited_id', 'data_not_concrete_inherited',
-                          u'content_type_concrete_id', 'object_id_concrete'])
+        for model, expected_result in TEST_RESULTS['fields'].iteritems():
+            fields = model._meta.fields
+            self.assertEquals([f.attname for f in fields],
+                              expected_result)
 
     def test_local_fields(self):
         fields = Person._meta.local_fields
