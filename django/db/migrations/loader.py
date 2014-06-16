@@ -39,10 +39,11 @@ class MigrationLoader(object):
     in memory.
     """
 
-    def __init__(self, connection, load=True):
+    def __init__(self, connection, load=True, ignore_no_migrations=False):
         self.connection = connection
         self.disk_migrations = None
         self.applied_migrations = None
+        self.ignore_no_migrations = ignore_no_migrations
         if load:
             self.build_graph()
 
@@ -156,7 +157,10 @@ class MigrationLoader(object):
                 else:
                     return list(self.graph.root_nodes(key[0]))[-1]
             except IndexError:
-                raise ValueError("Dependency on app with no migrations: %s" % key[0])
+                if self.ignore_no_migrations:
+                    return None
+                else:
+                    raise ValueError("Dependency on app with no migrations: %s" % key[0])
         raise ValueError("Dependency on unknown app: %s" % key[0])
 
     def build_graph(self):

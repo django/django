@@ -49,7 +49,7 @@ class Command(BaseCommand):
 
         # Load the current graph state. Pass in None for the connection so
         # the loader doesn't try to resolve replaced migrations from DB.
-        loader = MigrationLoader(None)
+        loader = MigrationLoader(None, ignore_no_migrations=True)
 
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any and they don't want to merge
