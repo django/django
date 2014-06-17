@@ -12,7 +12,7 @@ class Col(object):
         return "%s.%s" % (qn(self.alias), qn(self.target.column)), []
 
     @property
-    def output_type(self):
+    def output_field(self):
         return self.source
 
     def relabeled_clone(self, relabels):
@@ -22,10 +22,10 @@ class Col(object):
         return [(self.alias, self.target.column)]
 
     def get_lookup(self, name):
-        return self.output_type.get_lookup(name)
+        return self.output_field.get_lookup(name)
 
     def get_transform(self, name):
-        return self.output_type.get_transform(name)
+        return self.output_field.get_transform(name)
 
     def prepare(self):
         return self

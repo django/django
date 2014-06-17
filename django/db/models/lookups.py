@@ -26,16 +26,16 @@ class RegisterLookupMixin(object):
 
     def get_lookup(self, lookup_name):
         found = self._get_lookup(lookup_name)
-        if found is None and hasattr(self, 'output_type'):
-            return self.output_type.get_lookup(lookup_name)
+        if found is None and hasattr(self, 'output_field'):
+            return self.output_field.get_lookup(lookup_name)
         if found is not None and not issubclass(found, Lookup):
             return None
         return found
 
     def get_transform(self, lookup_name):
         found = self._get_lookup(lookup_name)
-        if found is None and hasattr(self, 'output_type'):
-            return self.output_type.get_transform(lookup_name)
+        if found is None and hasattr(self, 'output_field'):
+            return self.output_field.get_transform(lookup_name)
         if found is not None and not issubclass(found, Transform):
             return None
         return found
@@ -64,8 +64,8 @@ class Transform(RegisterLookupMixin):
         raise NotImplementedError
 
     @cached_property
-    def output_type(self):
-        return self.lhs.output_type
+    def output_field(self):
+        return self.lhs.output_field
 
     def relabeled_clone(self, relabels):
         return self.__class__(self.lhs.relabeled_clone(relabels))
@@ -82,11 +82,11 @@ class Lookup(RegisterLookupMixin):
         self.rhs = self.get_prep_lookup()
 
     def get_prep_lookup(self):
-        return self.lhs.output_type.get_prep_lookup(self.lookup_name, self.rhs)
+        return self.lhs.output_field.get_prep_lookup(self.lookup_name, self.rhs)
 
     def get_db_prep_lookup(self, value, connection):
         return (
-            '%s', self.lhs.output_type.get_db_prep_lookup(
+            '%s', self.lhs.output_field.get_db_prep_lookup(
                 self.lookup_name, value, connection, prepared=True))
 
     def process_lhs(self, qn, connection, lhs=None):
@@ -138,8 +138,8 @@ class BuiltinLookup(Lookup):
     def process_lhs(self, qn, connection, lhs=None):
         lhs_sql, params = super(BuiltinLookup, self).process_lhs(
             qn, connection, lhs)
-        field_internal_type = self.lhs.output_type.get_internal_type()
-        db_type = self.lhs.output_type.db_type(connection=connection)
+        field_internal_type = self.lhs.output_field.get_internal_type()
+        db_type = self.lhs.output_field.db_type(connection=connection)
         lhs_sql = connection.ops.field_cast_sql(
             db_type, field_internal_type) % lhs_sql
         lhs_sql = connection.ops.lookup_cast(self.lookup_name) % lhs_sql
@@ -203,7 +203,7 @@ class In(BuiltinLookup):
     lookup_name = 'in'
 
     def get_db_prep_lookup(self, value, connection):
-        params = self.lhs.output_type.get_db_prep_lookup(
+        params = self.lhs.output_field.get_db_prep_lookup(
             self.lookup_name, value, connection, prepared=True)
         if not params:
             # TODO: check why this leads to circular import
@@ -299,7 +299,7 @@ class DateLookup(BuiltinLookup):
     def process_lhs(self, qn, connection, lhs=None):
         from django.db.models import DateTimeField
         lhs, params = super(DateLookup, self).process_lhs(qn, connection, lhs)
-        if isinstance(self.lhs.output_type, DateTimeField):
+        if isinstance(self.lhs.output_field, DateTimeField):
             tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
             sql, tz_params = connection.ops.datetime_extract_sql(self.extract_type, lhs, tzname)
             return connection.ops.lookup_cast(self.lookup_name) % sql, tz_params
