@@ -173,7 +173,11 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _add_fallback(self):
         """Sets the GNUTranslations() fallback with the default language."""
-        if self.__language == settings.LANGUAGE_CODE:
+        # Don't set a fallback for the default language or for
+        # en-us (as it's empty, so it'll ALWAYS fall back to the default
+        # language; found this as part of #21498, as we set en-us for
+        # management commands)
+        if self.__language == settings.LANGUAGE_CODE or self.__language == "en-us":
             return
         default_translation = translation(settings.LANGUAGE_CODE)
         self.add_fallback(default_translation)
