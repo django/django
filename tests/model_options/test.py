@@ -384,30 +384,6 @@ class OptionsBaseTests(test.TestCase):
         return tuple([(f.name, m) for f, m in res])
 
 
-#class ConvertTests(OptionsBaseTests):
-
-    #def test_loor(self):
-        #for test_name, models_2_test in TEST_RESULTS.items():
-            #if test_name is not 'get_all_related_objects_with_model_local':
-                #continue
-            #res = {test_name: {}}
-            #for model, results in models_2_test.items():
-                #if isinstance(results, tuple) and len(results) == 2:
-                    #fields, models = results
-
-                    #def _m(m):
-                        #if m is not None:
-                            #m = m.__name__
-                        #return m
-
-                    #models = map(_m, models)
-                    #results = (fields, models)
-
-                    #res[test_name][model] = zip(*results)
-            #if len(res[test_name]) > 0:
-                #import ipdb; ipdb.set_trace()
-
-
 class DataTests(OptionsBaseTests):
 
     def test_fields(self):
