@@ -8,7 +8,7 @@ from django.db.transaction import atomic
 from django.utils.encoding import force_bytes
 from django.utils.log import getLogger
 from django.utils.six.moves import reduce
-from django.utils.six import callable
+from django.utils import six
 
 logger = getLogger('django.db.backends.schema')
 
@@ -169,11 +169,14 @@ class BaseDatabaseSchemaEditor(object):
         if field.has_default():
             default = field.get_default()
         elif not field.null and field.blank and field.empty_strings_allowed:
-            default = ""
+            if field.get_internal_type() == "BinaryField":
+                default = six.binary_type()
+            else:
+                default = six.text_type()
         else:
             default = None
         # If it's a callable, call it
-        if callable(default):
+        if six.callable(default):
             default = default()
         # Run it through the field's get_db_prep_save method so we can send it
         # to the database.
