@@ -215,6 +215,7 @@ class WriterTests(TestCase):
         test_apps = [
             'migrations.migrations_test_apps.normal',
             'migrations.migrations_test_apps.with_package_model',
+            'migrations.migrations_test_apps.without_init_file',
         ]
 
         base_dir = os.path.dirname(os.path.dirname(__file__))
