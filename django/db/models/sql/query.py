@@ -1102,7 +1102,7 @@ class Query(object):
                 raise FieldError(
                     "Unsupported lookup '%s' for %s or join on the field not "
                     "permitted." %
-                    (lookup, lhs.output_type.__class__.__name__))
+                    (lookup, lhs.output_field.__class__.__name__))
             lookups = lookups[1:]
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
@@ -1190,7 +1190,7 @@ class Query(object):
                     raise FieldError(
                         "Join on field '%s' not permitted. Did you "
                         "misspell '%s' for the lookup type?" %
-                        (col.output_type.name, lookups[0]))
+                        (col.output_field.name, lookups[0]))
                 if len(lookups) > 1:
                     raise FieldError("Nested lookup '%s' not supported." %
                                      LOOKUP_SEP.join(lookups))
