@@ -141,11 +141,11 @@ this case where there is no other lookup specified, Django interprets
 ``change__abs=27`` as ``change__abs__exact=27``.
 
 When looking for which lookups are allowable after the ``Transform`` has been
-applied, Django uses the ``output_type`` attribute. We didn't need to specify
+applied, Django uses the ``output_field`` attribute. We didn't need to specify
 this here as it didn't change, but supposing we were applying ``AbsoluteValue``
 to some field which represents a more complex type (for example a point
 relative to an origin, or a complex number) then we may have wanted to specify
-``output_type = FloatField``, which will ensure that further lookups like
+``output_field = FloatField``, which will ensure that further lookups like
 ``abs__lte`` behave as they would for a ``FloatField``.
 
 Writing an efficient abs__lt lookup
@@ -315,10 +315,10 @@ to this API.
     field. Generally speaking, you will not need to override ``get_lookup()``
     or ``get_transform()``, and can use ``register_lookup()`` instead.
 
-.. attribute:: output_type
+.. attribute:: output_field
 
-    The ``output_type`` attribute is used by the ``get_lookup()`` method to check for
-    lookups. The output_type should be a field.
+    The ``output_field`` attribute is used by the ``get_lookup()`` method to
+    check for lookups. The ``output_field`` should be a field.
 
 Note that this documentation lists only the public methods of the API.
 
