@@ -103,253 +103,235 @@ TEST_RESULTS = {
     },
     'get_all_related_objects_with_model': {
         Person: (
-            ['relating_baseperson', 'relating_person'],
-            (BasePerson, None)),
+            ('relating_baseperson', BasePerson),
+            ('relating_person', None)),
         BasePerson: (
-            ['person', 'relating_baseperson'],
-            (None, None)),
+            ('person', None),
+            ('relating_baseperson', None)),
         Relation: (
-            ['fk_abstract_rel',
-             'fo_abstract_rel',
-             'fk_base_rel',
-             'fo_base_rel',
-             'fk_concrete_rel',
-             'fo_concrete_rel'],
-            (None, None, None, None, None, None)),
+            ('fk_abstract_rel', None),
+            ('fo_abstract_rel', None),
+            ('fk_base_rel', None),
+            ('fo_base_rel', None),
+            ('fk_concrete_rel', None),
+            ('fo_concrete_rel', None)),
     },
     'get_all_related_objects_with_model_local': {
         Person: (
-            ['relating_person'],
-            (None,)),
+            ('relating_person', None),),
         BasePerson: (
-            ['person', 'relating_baseperson'],
-            (None, None,)),
+            ('person', None),
+            ('relating_baseperson', None)),
         Relation: (
-            ['fk_abstract_rel',
-             'fo_abstract_rel',
-             'fk_base_rel',
-             'fo_base_rel',
-             'fk_concrete_rel',
-             'fo_concrete_rel'],
-            (None, None, None, None, None, None)),
+            ('fk_abstract_rel', None),
+            ('fo_abstract_rel', None),
+            ('fk_base_rel', None),
+            ('fo_base_rel', None),
+            ('fk_concrete_rel', None),
+            ('fo_concrete_rel', None)),
     },
     'get_all_related_objects_with_model_hidden': {
         BasePerson: (
-            [u'model_options:baseperson_friends_base',
-             u'model_options:baseperson_friends_base',
-             u'model_options:baseperson_m2m_base',
-             u'model_options:baseperson_following_base',
-             u'model_options:baseperson_following_base',
-             u'model_options:baseperson_m2m_abstract',
-             u'model_options:baseperson_friends_abstract',
-             u'model_options:baseperson_friends_abstract',
-             u'model_options:baseperson_following_abstract',
-             u'model_options:baseperson_following_abstract',
-             u'model_options:person',
-             u'model_options:relating_basepeople',
-             u'model_options:relating_basepeople_hidden',
-             u'model_options:relating',
-             u'model_options:relating'],
-            (None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None)),
+            (u'model_options:baseperson_friends_base', None),
+            (u'model_options:baseperson_friends_base', None),
+            (u'model_options:baseperson_m2m_base', None),
+            (u'model_options:baseperson_following_base', None),
+            (u'model_options:baseperson_following_base', None),
+            (u'model_options:baseperson_m2m_abstract', None),
+            (u'model_options:baseperson_friends_abstract', None),
+            (u'model_options:baseperson_friends_abstract', None),
+            (u'model_options:baseperson_following_abstract', None),
+            (u'model_options:baseperson_following_abstract', None),
+            (u'model_options:person', None),
+            (u'model_options:relating_basepeople', None),
+            (u'model_options:relating_basepeople_hidden', None),
+            (u'model_options:relating', None),
+            (u'model_options:relating', None)),
         Person: (
-            [u'model_options:baseperson_friends_base',
-            u'model_options:baseperson_friends_base',
-            u'model_options:baseperson_m2m_base',
-            u'model_options:baseperson_following_base',
-            u'model_options:baseperson_following_base',
-            u'model_options:baseperson_m2m_abstract',
-            u'model_options:baseperson_friends_abstract',
-            u'model_options:baseperson_friends_abstract',
-            u'model_options:baseperson_following_abstract',
-            u'model_options:baseperson_following_abstract',
-            u'model_options:relating_basepeople',
-            u'model_options:relating_basepeople_hidden',
-            u'model_options:relating', u'model_options:relating',
-            u'model_options:person_m2m_inherited',
-            u'model_options:person_friends_inherited',
-            u'model_options:person_friends_inherited',
-            u'model_options:person_following_inherited',
-            u'model_options:person_following_inherited',
-            u'model_options:relating_people',
-            u'model_options:relating_people_hidden',
-            u'model_options:relating', u'model_options:relating'],
-            (BasePerson, BasePerson, BasePerson, BasePerson,
-            BasePerson, BasePerson, BasePerson, BasePerson,
-            BasePerson, BasePerson, BasePerson, BasePerson,
-            BasePerson, BasePerson, None, None, None, None,
-            None, None, None, None, None)),
+            (u'model_options:baseperson_friends_base', BasePerson),
+            (u'model_options:baseperson_friends_base', BasePerson),
+            (u'model_options:baseperson_m2m_base', BasePerson),
+            (u'model_options:baseperson_following_base', BasePerson),
+            (u'model_options:baseperson_following_base', BasePerson),
+            (u'model_options:baseperson_m2m_abstract', BasePerson),
+            (u'model_options:baseperson_friends_abstract', BasePerson),
+            (u'model_options:baseperson_friends_abstract', BasePerson),
+            (u'model_options:baseperson_following_abstract', BasePerson),
+            (u'model_options:baseperson_following_abstract', BasePerson),
+            (u'model_options:relating_basepeople', BasePerson),
+            (u'model_options:relating_basepeople_hidden', BasePerson),
+            (u'model_options:relating', BasePerson),
+            (u'model_options:relating', BasePerson),
+            (u'model_options:person_m2m_inherited', None),
+            (u'model_options:person_friends_inherited', None),
+            (u'model_options:person_friends_inherited', None),
+            (u'model_options:person_following_inherited', None),
+            (u'model_options:person_following_inherited', None),
+            (u'model_options:relating_people', None),
+            (u'model_options:relating_people_hidden', None),
+            (u'model_options:relating', None),
+            (u'model_options:relating', None)),
         Relation: (
-            [u'model_options:baseperson_m2m_base',
-             u'model_options:baseperson_m2m_abstract',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:person_m2m_inherited',
-             u'model_options:person',
-             u'model_options:person',
-             u'model_options:person',
-             u'model_options:person',
-             u'model_options:person',
-             u'model_options:proxyperson',
-             u'model_options:proxyperson',
-             u'model_options:proxyperson'],
-            (None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None,
-             None)),
+            (u'model_options:baseperson_m2m_base', None),
+            (u'model_options:baseperson_m2m_abstract', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:person_m2m_inherited', None),
+            (u'model_options:person', None),
+            (u'model_options:person', None),
+            (u'model_options:person', None),
+            (u'model_options:person', None),
+            (u'model_options:person', None),
+            (u'model_options:proxyperson', None),
+            (u'model_options:proxyperson', None),
+            (u'model_options:proxyperson', None)),
     },
     'get_all_related_objects_with_model_hidden_local': {
         BasePerson: (
-            [u'model_options:baseperson_friends_base',
-             u'model_options:baseperson_friends_base',
-             u'model_options:baseperson_m2m_base',
-             u'model_options:baseperson_following_base',
-             u'model_options:baseperson_following_base',
-             u'model_options:baseperson_m2m_abstract',
-             u'model_options:baseperson_friends_abstract',
-             u'model_options:baseperson_friends_abstract',
-             u'model_options:baseperson_following_abstract',
-             u'model_options:baseperson_following_abstract',
-             u'model_options:person', u'model_options:relating_basepeople',
-             u'model_options:relating_basepeople_hidden',
-             u'model_options:relating', u'model_options:relating'],
-            (None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None)),
+            (u'model_options:baseperson_friends_base', None),
+            (u'model_options:baseperson_friends_base', None),
+            (u'model_options:baseperson_m2m_base', None),
+            (u'model_options:baseperson_following_base', None),
+            (u'model_options:baseperson_following_base', None),
+            (u'model_options:baseperson_m2m_abstract', None),
+            (u'model_options:baseperson_friends_abstract', None),
+            (u'model_options:baseperson_friends_abstract', None),
+            (u'model_options:baseperson_following_abstract', None),
+            (u'model_options:baseperson_following_abstract', None),
+            (u'model_options:person', None),
+            (u'model_options:relating_basepeople', None),
+            (u'model_options:relating_basepeople_hidden', None),
+            (u'model_options:relating', None),
+            (u'model_options:relating', None)),
         Person: (
-            [u'model_options:person_m2m_inherited',
-             u'model_options:person_friends_inherited',
-             u'model_options:person_friends_inherited',
-             u'model_options:person_following_inherited',
-             u'model_options:person_following_inherited',
-             u'model_options:relating_people',
-             u'model_options:relating_people_hidden',
-             u'model_options:relating',
-             u'model_options:relating'],
-            (None, None, None, None, None, None, None, None, None)),
+            (u'model_options:person_m2m_inherited', None),
+            (u'model_options:person_friends_inherited', None),
+            (u'model_options:person_friends_inherited', None),
+            (u'model_options:person_following_inherited', None),
+            (u'model_options:person_following_inherited', None),
+            (u'model_options:relating_people', None),
+            (u'model_options:relating_people_hidden', None),
+            (u'model_options:relating', None),
+            (u'model_options:relating', None)),
         Relation: (
-            [u'model_options:baseperson_m2m_base',
-             u'model_options:baseperson_m2m_abstract',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:person_m2m_inherited',
-             u'model_options:person',
-             u'model_options:person',
-             u'model_options:person',
-             u'model_options:person',
-             u'model_options:person',
-             u'model_options:proxyperson',
-             u'model_options:proxyperson',
-             u'model_options:proxyperson'],
-            (None, None, None, None, None, None,
-             None, None, None, None, None, None,
-             None, None, None, None, None))
+            (u'model_options:baseperson_m2m_base', None),
+            (u'model_options:baseperson_m2m_abstract', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:person_m2m_inherited', None),
+            (u'model_options:person', None),
+            (u'model_options:person', None),
+            (u'model_options:person', None),
+            (u'model_options:person', None),
+            (u'model_options:person', None),
+            (u'model_options:proxyperson', None),
+            (u'model_options:proxyperson', None),
+            (u'model_options:proxyperson', None)),
     },
     'get_all_related_objects_with_model_proxy': {
         BasePerson: (
-            ['person', 'relating_baseperson'],
-            (None, None)),
+            ('person', None),
+            ('relating_baseperson', None)),
         Person: (
-            ['relating_baseperson', 'relating_person', 'relating_proxyperson'],
-            (BasePerson, None, None)),
+            ('relating_baseperson', BasePerson),
+            ('relating_person', None), ('relating_proxyperson', None)),
         Relation: (
-            ['fk_abstract_rel', 'fo_abstract_rel', 'fk_base_rel',
-             'fo_base_rel', 'fk_concrete_rel', 'fo_concrete_rel'],
-            (None, None, None, None, None, None))
+            ('fk_abstract_rel', None), ('fo_abstract_rel', None),
+            ('fk_base_rel', None), ('fo_base_rel', None),
+            ('fk_concrete_rel', None), ('fo_concrete_rel', None)),
     },
     'get_all_related_objects_with_model_proxy_hidden': {
         BasePerson: (
-            [u'model_options:baseperson_friends_base',
-             u'model_options:baseperson_friends_base',
-             u'model_options:baseperson_m2m_base',
-             u'model_options:baseperson_following_base',
-             u'model_options:baseperson_following_base',
-             u'model_options:baseperson_m2m_abstract',
-             u'model_options:baseperson_friends_abstract',
-             u'model_options:baseperson_friends_abstract',
-             u'model_options:baseperson_following_abstract',
-             u'model_options:baseperson_following_abstract',
-             u'model_options:person',
-             u'model_options:relating_basepeople',
-             u'model_options:relating_basepeople_hidden',
-             u'model_options:relating', u'model_options:relating'],
-            (None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None)),
+            (u'model_options:baseperson_friends_base', None),
+            (u'model_options:baseperson_friends_base', None),
+            (u'model_options:baseperson_m2m_base', None),
+            (u'model_options:baseperson_following_base', None),
+            (u'model_options:baseperson_following_base', None),
+            (u'model_options:baseperson_m2m_abstract', None),
+            (u'model_options:baseperson_friends_abstract', None),
+            (u'model_options:baseperson_friends_abstract', None),
+            (u'model_options:baseperson_following_abstract', None),
+            (u'model_options:baseperson_following_abstract', None),
+            (u'model_options:person', None),
+            (u'model_options:relating_basepeople', None),
+            (u'model_options:relating_basepeople_hidden', None),
+            (u'model_options:relating', None),
+            (u'model_options:relating', None)),
         Person: (
-            [u'model_options:baseperson_friends_base',
-             u'model_options:baseperson_friends_base',
-             u'model_options:baseperson_m2m_base',
-             u'model_options:baseperson_following_base',
-             u'model_options:baseperson_following_base',
-             u'model_options:baseperson_m2m_abstract',
-             u'model_options:baseperson_friends_abstract',
-             u'model_options:baseperson_friends_abstract',
-             u'model_options:baseperson_following_abstract',
-             u'model_options:baseperson_following_abstract',
-             u'model_options:relating_basepeople',
-             u'model_options:relating_basepeople_hidden',
-             u'model_options:relating',
-             u'model_options:relating',
-             u'model_options:person_m2m_inherited',
-             u'model_options:person_friends_inherited',
-             u'model_options:person_friends_inherited',
-             u'model_options:person_following_inherited',
-             u'model_options:person_following_inherited',
-             u'model_options:relating_people',
-             u'model_options:relating_people_hidden',
-             u'model_options:relating',
-             u'model_options:relating',
-             u'model_options:relating',
-             u'model_options:relating'],
-            (BasePerson, BasePerson, BasePerson, BasePerson,
-             BasePerson, BasePerson, BasePerson, BasePerson,
-             BasePerson, BasePerson, BasePerson, BasePerson,
-             BasePerson, BasePerson, None, None, None, None,
-             None, None, None, None, None, None, None)),
+            (u'model_options:baseperson_friends_base', BasePerson),
+            (u'model_options:baseperson_friends_base', BasePerson),
+            (u'model_options:baseperson_m2m_base', BasePerson),
+            (u'model_options:baseperson_following_base', BasePerson),
+            (u'model_options:baseperson_following_base', BasePerson),
+            (u'model_options:baseperson_m2m_abstract', BasePerson),
+            (u'model_options:baseperson_friends_abstract', BasePerson),
+            (u'model_options:baseperson_friends_abstract', BasePerson),
+            (u'model_options:baseperson_following_abstract', BasePerson),
+            (u'model_options:baseperson_following_abstract', BasePerson),
+            (u'model_options:relating_basepeople', BasePerson),
+            (u'model_options:relating_basepeople_hidden', BasePerson),
+            (u'model_options:relating', BasePerson),
+            (u'model_options:relating', BasePerson),
+            (u'model_options:person_m2m_inherited', None),
+            (u'model_options:person_friends_inherited', None),
+            (u'model_options:person_friends_inherited', None),
+            (u'model_options:person_following_inherited', None),
+            (u'model_options:person_following_inherited', None),
+            (u'model_options:relating_people', None),
+            (u'model_options:relating_people_hidden', None),
+            (u'model_options:relating', None),
+            (u'model_options:relating', None),
+            (u'model_options:relating', None),
+            (u'model_options:relating', None)),
         Relation: (
-            [u'model_options:baseperson_m2m_base',
-             u'model_options:baseperson_m2m_abstract',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:baseperson',
-             u'model_options:person_m2m_inherited',
-             u'model_options:person',
-             u'model_options:person',
-             u'model_options:person',
-             u'model_options:person',
-             u'model_options:person',
-             u'model_options:proxyperson',
-             u'model_options:proxyperson',
-             u'model_options:proxyperson'],
-            (None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None,
-             None, None, None))
+            (u'model_options:baseperson_m2m_base', None),
+            (u'model_options:baseperson_m2m_abstract', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:baseperson', None),
+            (u'model_options:person_m2m_inherited', None),
+            (u'model_options:person', None),
+            (u'model_options:person', None),
+            (u'model_options:person', None),
+            (u'model_options:person', None),
+            (u'model_options:person', None),
+            (u'model_options:proxyperson', None),
+            (u'model_options:proxyperson', None),
+            (u'model_options:proxyperson', None))
     },
     'get_all_related_many_to_many_with_model': {
         BasePerson: (
-            [u'friends_abstract_rel_+', 'followers_abstract',
-             u'friends_base_rel_+', 'followers_base',
-             'relating_basepeople', '+'],
-            (None, None, None, None, None, None)),
+            (u'friends_abstract_rel_+', None),
+            ('followers_abstract', None),
+            (u'friends_base_rel_+', None),
+            ('followers_base', None),
+            ('relating_basepeople', None),
+            ('+', None)),
         Person: (
-            ['friends_abstract_rel_+', 'followers_abstract',
-             'friends_base_rel_+', 'followers_base',
-             'relating_basepeople', '+', u'friends_inherited_rel_+',
-             'followers_concrete', 'relating_people', '+'],
-            (BasePerson, BasePerson, BasePerson, BasePerson,
-             BasePerson, BasePerson, None, None, None, None)),
+            ('friends_abstract_rel_+', BasePerson),
+            ('followers_abstract', BasePerson),
+            ('friends_base_rel_+', BasePerson),
+            ('followers_base', BasePerson),
+            ('relating_basepeople', BasePerson),
+            ('+', BasePerson),
+            (u'friends_inherited_rel_+', None),
+            ('followers_concrete', None),
+            ('relating_people', None), ('+', None)),
         Relation: (
-            ['m2m_abstract_rel', 'm2m_base_rel', 'm2m_concrete_rel'],
-            (None, None, None))
+            ('m2m_abstract_rel', None),
+            ('m2m_base_rel', None),
+            ('m2m_concrete_rel', None)),
     },
     'get_all_related_many_to_many_local': {
         BasePerson: [
@@ -393,6 +375,37 @@ class OptionsBaseTests(test.TestCase):
         fields, models = zip(*objects)
         self.assertEquals([o.name for o in fields], names_eq)
         self.assertEquals(models, models_eq)
+
+    def _map_rq_names(self, res):
+        return tuple([(o.field.related_query_name(), m)
+                for o, m in res])
+
+    def _map_names(self, res):
+        return tuple([(f.name, m) for f, m in res])
+
+
+#class ConvertTests(OptionsBaseTests):
+
+    #def test_loor(self):
+        #for test_name, models_2_test in TEST_RESULTS.items():
+            #if test_name is not 'get_all_related_objects_with_model_local':
+                #continue
+            #res = {test_name: {}}
+            #for model, results in models_2_test.items():
+                #if isinstance(results, tuple) and len(results) == 2:
+                    #fields, models = results
+
+                    #def _m(m):
+                        #if m is not None:
+                            #m = m.__name__
+                        #return m
+
+                    #models = map(_m, models)
+                    #results = (fields, models)
+
+                    #res[test_name][model] = zip(*results)
+            #if len(res[test_name]) > 0:
+                #import ipdb; ipdb.set_trace()
 
 
 class DataTests(OptionsBaseTests):
@@ -440,69 +453,61 @@ class RelatedObjectsTests(OptionsBaseTests):
 
     def test_related_objects(self):
         k = 'get_all_related_objects_with_model'
-        for model, (expected_names, expected_models) in TEST_RESULTS[k].items():
+        for model, expected in TEST_RESULTS[k].items():
             objects = model._meta.get_all_related_objects_with_model()
-            self.eq_field_query_names_and_models(objects, expected_names,
-                                                 expected_models)
+            self.assertEquals(self._map_rq_names(objects), expected)
 
     def test_related_objects_local(self):
         k = 'get_all_related_objects_with_model_local'
-        for model, (expected_names, expected_models) in TEST_RESULTS[k].items():
+        for model, expected in TEST_RESULTS[k].items():
             objects = model._meta.get_all_related_objects_with_model(
                 local_only=True)
-            self.eq_field_query_names_and_models(objects, expected_names,
-                                                 expected_models)
+            self.assertEquals(self._map_rq_names(objects), expected)
 
     def test_related_objects_include_hidden(self):
         k = 'get_all_related_objects_with_model_hidden'
-        for model, (expected_names, expected_models) in TEST_RESULTS[k].items():
+        for model, expected in TEST_RESULTS[k].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_hidden=True)
-            self.eq_field_names_and_models(objects, expected_names,
-                                           expected_models)
+            self.assertEquals(self._map_names(objects), expected)
 
     def test_related_objects_include_hidden_local_only(self):
         k = 'get_all_related_objects_with_model_hidden_local'
-        for model, (expected_names, expected_models) in TEST_RESULTS[k].items():
+        for model, expected in TEST_RESULTS[k].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_hidden=True, local_only=True)
-            self.eq_field_names_and_models(objects, expected_names,
-                                           expected_models)
+            self.assertEquals(self._map_names(objects), expected)
 
     def test_related_objects_proxy(self):
         k = 'get_all_related_objects_with_model_proxy'
-        for model, (expected_names, expected_models) in TEST_RESULTS[k].items():
+        for model, expected in TEST_RESULTS[k].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_proxy_eq=True)
-            self.eq_field_query_names_and_models(objects, expected_names,
-                                                 expected_models)
+            self.assertEquals(self._map_rq_names(objects), expected)
 
     def test_related_objects_proxy_hidden(self):
         k = 'get_all_related_objects_with_model_proxy_hidden'
-        for model, (expected_names, expected_models) in TEST_RESULTS[k].items():
+        for model, expected in TEST_RESULTS[k].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_proxy_eq=True, include_hidden=True)
-            self.eq_field_names_and_models(objects, expected_names,
-                                           expected_models)
+            self.assertEquals(self._map_names(objects), expected)
 
 
 class RelatedM2MTests(OptionsBaseTests):
 
     def test_related_m2m_with_model(self):
         k = 'get_all_related_many_to_many_with_model'
-        for model, (expected_names, expected_models) in TEST_RESULTS[k].items():
+        for model, expected in TEST_RESULTS[k].items():
             objects = model._meta.get_all_related_m2m_objects_with_model()
-            fields, models = zip(*objects)
-            self.eq_field_query_names_and_models(objects, expected_names,
-                                                 expected_models)
+            self.assertEquals(self._map_rq_names(objects), expected)
 
     def test_related_m2m_local_only(self):
         k = 'get_all_related_many_to_many_local'
-        for model, expected_names in TEST_RESULTS[k].items():
+        for model, expected in TEST_RESULTS[k].items():
             objects = model._meta.get_all_related_many_to_many_objects(
                 local_only=True)
             self.assertEquals([o.field.related_query_name()
-                              for o in objects], expected_names)
+                              for o in objects], expected)
 
     def test_related_m2m_asymmetrical(self):
         m2m = Person._meta.many_to_many
