@@ -287,7 +287,9 @@ class SchemaTests(TransactionTestCase):
             )
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
-        self.assertEqual(columns['bits'][0], "BinaryField")
+        # MySQL annoyingly uses the same backend, so it'll come back as one of
+        # these two types.
+        self.assertIn(columns['bits'][0], ("BinaryField", "TextField"))
 
     def test_alter(self):
         """
