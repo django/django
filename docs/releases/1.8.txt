@@ -471,3 +471,10 @@ to add custom arguments to commands has changed: instead of extending the
 :meth:`~django.core.management.BaseCommand.add_arguments` method and add
 arguments through ``argparse.add_argument()``. See
 :ref:`this example <custom-commands-options>` for more details.
+
+``django.core.management.NoArgsCommand``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The class :class:`~django.core.management.NoArgsCommand` is now deprecated and
+will be removed in Django 2.0. Use :class:`~django.core.management.BaseCommand`
+instead, which takes no arguments by default.

@@ -4,7 +4,8 @@ import os
 from collections import OrderedDict
 
 from django.core.files.storage import FileSystemStorage
-from django.core.management.base import CommandError, NoArgsCommand
+from django.core.management.base import CommandError, BaseCommand
+from django.core.management.color import no_style
 from django.utils.encoding import smart_text
 from django.utils.six.moves import input
 
@@ -12,7 +13,7 @@ from django.contrib.staticfiles.finders import get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     """
     Command that allows to copy or symlink static files from different
     locations to the settings.STATIC_ROOT.
@@ -21,12 +22,13 @@ class Command(NoArgsCommand):
     requires_system_checks = False
 
     def __init__(self, *args, **kwargs):
-        super(NoArgsCommand, self).__init__(*args, **kwargs)
+        super(BaseCommand, self).__init__(*args, **kwargs)
         self.copied_files = []
         self.symlinked_files = []
         self.unmodified_files = []
         self.post_processed_files = []
         self.storage = staticfiles_storage
+        self.style = no_style()
         try:
             self.storage.path('')
         except NotImplementedError:
@@ -79,7 +81,7 @@ class Command(NoArgsCommand):
         """
         Perform the bulk of the work of collectstatic.
 
-        Split off from handle_noargs() to facilitate testing.
+        Split off from handle() to facilitate testing.
         """
         if self.symlink and not self.local:
             raise CommandError("Can't symlink to a remote destination.")
@@ -130,7 +132,7 @@ class Command(NoArgsCommand):
             'post_processed': self.post_processed_files,
         }
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         self.set_options(**options)
 
         message = ['\n']

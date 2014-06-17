@@ -603,6 +603,14 @@ class NoArgsCommand(BaseCommand):
     """
     args = ''
 
+    def __init__(self):
+        warnings.warn(
+            "NoArgsCommand class is deprecated and will be removed in Django 2.0. "
+            "Use BaseCommand instead, which takes no arguments by default.",
+            RemovedInDjango20Warning
+        )
+        super(NoArgsCommand, self).__init__()
+
     def handle(self, *args, **options):
         if args:
             raise CommandError("Command doesn't accept any arguments")
