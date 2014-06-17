@@ -18,8 +18,8 @@
 #
 #  $ python scripts/manage_translations.py lang_stats --language=es --resources=admin
 
+from argparse import ArgumentParser
 import os
-from optparse import OptionParser
 from subprocess import call, Popen, PIPE
 
 from django.core.management import call_command
@@ -167,18 +167,15 @@ def fetch(resources=None, languages=None):
 if __name__ == "__main__":
     RUNABLE_SCRIPTS = ('update_catalogs', 'lang_stats', 'fetch')
 
-    parser = OptionParser(usage="usage: %prog [options] cmd")
-    parser.add_option("-r", "--resources", action='append',
+    parser = ArgumentParser()
+    parser.add_argument('cmd', nargs=1)
+    parser.add_argument("-r", "--resources", action='append',
         help="limit operation to the specified resources")
-    parser.add_option("-l", "--languages", action='append',
+    parser.add_argument("-l", "--languages", action='append',
         help="limit operation to the specified languages")
-    options, args = parser.parse_args()
+    options = parser.parse_args()
 
-    if not args:
-        parser.print_usage()
-        exit(1)
-
-    if args[0] in RUNABLE_SCRIPTS:
-        eval(args[0])(options.resources, options.languages)
+    if options.cmd[0] in RUNABLE_SCRIPTS:
+        eval(options.cmd[0])(options.resources, options.languages)
     else:
         print("Available commands are: %s" % ", ".join(RUNABLE_SCRIPTS))

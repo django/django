@@ -46,3 +46,17 @@ class MigrationTestBase(TransactionTestCase):
 
     def assertIndexNotExists(self, table, columns):
         return self.assertIndexExists(table, columns, False)
+
+    def assertFKExists(self, table, columns, to, value=True):
+        with connection.cursor() as cursor:
+            self.assertEqual(
+                value,
+                any(
+                    c["foreign_key"] == to
+                    for c in connection.introspection.get_constraints(cursor, table).values()
+                    if c['columns'] == list(columns)
+                ),
+            )
+
+    def assertFKNotExists(self, table, columns, to, value=True):
+        return self.assertFKExists(table, columns, to, False)

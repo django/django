@@ -349,6 +349,8 @@ look better:
   ``:class:`~django.contrib.contenttypes.models.ContentType``` will just
   display a link with the title "ContentType".
 
+.. _documentation-spelling-check:
+
 Spelling check
 --------------
 

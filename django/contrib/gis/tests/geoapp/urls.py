@@ -18,6 +18,10 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    url(r'^sitemaps/kml/(?P<label>\w+)/(?P<model>\w+)/(?P<field_name>\w+)\.kml$', gis_sitemap_views.kml),
-    url(r'^sitemaps/kml/(?P<label>\w+)/(?P<model>\w+)/(?P<field_name>\w+)\.kmz$', gis_sitemap_views.kmz),
+    url(r'^sitemaps/kml/(?P<label>\w+)/(?P<model>\w+)/(?P<field_name>\w+)\.kml$',
+        gis_sitemap_views.kml,
+        name='django.contrib.gis.sitemaps.views.kml'),
+    url(r'^sitemaps/kml/(?P<label>\w+)/(?P<model>\w+)/(?P<field_name>\w+)\.kmz$',
+        gis_sitemap_views.kmz,
+        name='django.contrib.gis.sitemaps.views.kmz'),
 ]

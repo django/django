@@ -209,6 +209,27 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         errors = checks.run_checks()
         self.assertEqual(errors, ['performed!'])
 
+    def test_unsaved_instance_on_generic_foreign_key(self):
+        """
+        #10811 -- Assigning an unsaved object to GenericForeignKey
+        should raise an exception.
+        """
+        class Model(models.Model):
+            content_type = models.ForeignKey(ContentType, null=True)
+            object_id = models.PositiveIntegerField(null=True)
+            content_object = GenericForeignKey('content_type', 'object_id')
+
+        author = Author(name='Author')
+        model = Model()
+        model.content_object = None   # no error here as content_type allows None
+        with self.assertRaisesMessage(ValueError,
+                                    'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
+                                    % (author, author._meta.object_name)):
+            model.content_object = author   # raised ValueError here as author is unsaved
+
+        author.save()
+        model.content_object = author   # no error because the instance is saved
+
 
 class GenericRelationshipTests(IsolatedModelsTestCase):
 

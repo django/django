@@ -116,6 +116,13 @@ described here.
     Django version N+1. Pickles should not be used as part of a long-term
     archival strategy.
 
+    .. versionadded:: 1.8
+
+    Since pickle compatibility errors can be difficult to diagnose, such as
+    silently corrupted objects, a ``RuntimeWarning`` is raised when you try to
+    unpickle a queryset in a Django version that is different than the one in
+    which it was pickled.
+
 .. _queryset-api:
 
 QuerySet API
@@ -2633,9 +2640,10 @@ aggregate functions, see
 
 .. admonition:: Note
 
-    Aggregation functions will return ``None`` when used with an empty
-    ``QuerySet``. For example, the ``Count`` aggregation function will return
-    ``None`` instead of ``0`` if the ``QuerySet`` contains no entries.
+    Aggregation functions return ``None`` when used with an empty
+    ``QuerySet``. For example, the ``Sum`` aggregation function returns ``None``
+    instead of ``0`` if the ``QuerySet`` contains no entries. An exception is
+    ``Count``, which does return ``0`` if the ``QuerySet`` is empty.
 
 Avg
 ~~~

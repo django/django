@@ -124,6 +124,12 @@ class ArticleAdmin(admin.ModelAdmin):
         return super(ArticleAdmin, self).save_model(request, obj, form, change)
 
 
+class ArticleAdmin2(admin.ModelAdmin):
+
+    def has_module_permission(self, request):
+        return False
+
+
 class RowLevelChangePermissionModelAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         """ Only allow changing objects with even id number """
@@ -923,3 +929,5 @@ site.register(Group, GroupAdmin)
 site2 = admin.AdminSite(name="namespaced_admin")
 site2.register(User, UserAdmin)
 site2.register(Group, GroupAdmin)
+site7 = admin.AdminSite(name="admin7")
+site7.register(Article, ArticleAdmin2)

@@ -663,10 +663,13 @@ def add_metaclass(metaclass):
 ### Additional customizations for Django ###
 
 if PY3:
+    _assertCountEqual = "assertCountEqual"
     _assertRaisesRegex = "assertRaisesRegex"
     _assertRegex = "assertRegex"
     memoryview = memoryview
+    buffer_types = (bytes, bytearray, memoryview)
 else:
+    _assertCountEqual = "assertItemsEqual"
     _assertRaisesRegex = "assertRaisesRegexp"
     _assertRegex = "assertRegexpMatches"
     # memoryview and buffer are not strictly equivalent, but should be fine for
@@ -676,6 +679,11 @@ else:
         memoryview = memoryview
     else:
         memoryview = buffer
+    buffer_types = (bytearray, memoryview)
+
+
+def assertCountEqual(self, *args, **kwargs):
+    return getattr(self, _assertCountEqual)(*args, **kwargs)
 
 
 def assertRaisesRegex(self, *args, **kwargs):

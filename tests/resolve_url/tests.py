@@ -1,9 +1,11 @@
 from __future__ import unicode_literals
+import warnings
 
 from django.core.urlresolvers import NoReverseMatch
 from django.contrib.auth.views import logout
 from django.shortcuts import resolve_url
 from django.test import TestCase, override_settings
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import UnimportantThing
 
@@ -60,8 +62,10 @@ class ResolveUrlTests(TestCase):
         Tests that passing a view function to ``resolve_url`` will result in
         the URL path mapping to that view.
         """
-        resolved_url = resolve_url('django.contrib.auth.views.logout')
-        self.assertEqual('/accounts/logout/', resolved_url)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            resolved_url = resolve_url('django.contrib.auth.views.logout')
+            self.assertEqual('/accounts/logout/', resolved_url)
 
     def test_domain(self):
         """

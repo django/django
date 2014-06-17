@@ -654,6 +654,14 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(pluralize(1), '')
         self.assertEqual(pluralize(0), 's')
         self.assertEqual(pluralize(2), 's')
+
+        # Ticket #22798
+        self.assertEqual(pluralize(0.5), 's')
+        self.assertEqual(pluralize(1.5), 's')
+
+        self.assertEqual(pluralize(decimal.Decimal(1)), '')
+        self.assertEqual(pluralize(decimal.Decimal(0)), 's')
+        self.assertEqual(pluralize(decimal.Decimal(2)), 's')
         self.assertEqual(pluralize([1]), '')
         self.assertEqual(pluralize([]), 's')
         self.assertEqual(pluralize([1, 2, 3]), 's')

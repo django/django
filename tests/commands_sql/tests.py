@@ -27,7 +27,7 @@ class SQLCommandsTestCase(TestCase):
 
     def test_sql_delete(self):
         app_config = apps.get_app_config('commands_sql')
-        output = sql_delete(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
+        output = sql_delete(app_config, no_style(), connections[DEFAULT_DB_ALIAS], close_connection=False)
         drop_tables = [o for o in output if o.startswith('DROP TABLE')]
         self.assertEqual(len(drop_tables), 3)
         # Lower so that Oracle's upper case tbl names wont break
@@ -71,6 +71,9 @@ class SQLCommandsRouterTestCase(TestCase):
     def test_router_honored(self):
         app_config = apps.get_app_config('commands_sql')
         for sql_command in (sql_all, sql_create, sql_delete, sql_indexes, sql_destroy_indexes):
-            output = sql_command(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
+            if sql_command is sql_delete:
+                output = sql_command(app_config, no_style(), connections[DEFAULT_DB_ALIAS], close_connection=False)
+            else:
+                output = sql_command(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
             self.assertEqual(len(output), 0,
                 "%s command is not honoring routers" % sql_command.__name__)

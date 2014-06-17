@@ -3,7 +3,7 @@ from importlib import import_module
 import os
 import tempfile
 
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
@@ -107,4 +107,5 @@ class TestStorage(object):
         self.assertTrue(storage.file_storage.exists(tmp_name))
 
         storage.reset()
+        storage.update_response(HttpResponse())
         self.assertFalse(storage.file_storage.exists(tmp_name))

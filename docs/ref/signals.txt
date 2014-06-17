@@ -491,16 +491,21 @@ Arguments sent with this signal:
     The database alias used for synchronization. Defaults to the ``default``
     database.
 
-For example, ``yourapp/management/__init__.py`` could be written like::
+For example, you could register a callback in an
+:class:`~django.apps.AppConfig` like this::
 
+    from django.apps import AppConfig
     from django.db.models.signals import post_migrate
-    import yourapp.models
 
     def my_callback(sender, **kwargs):
         # Your specific logic here
         pass
 
-    post_migrate.connect(my_callback, sender=yourapp.models)
+    class MyAppConfig(AppConfig):
+        ...
+
+        def ready(self):
+            post_migrate.connect(my_callback, sender=self)
 
 post_syncdb
 -----------

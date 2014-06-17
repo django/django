@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from optparse import make_option
+
 from collections import OrderedDict
 from importlib import import_module
 import itertools
@@ -20,26 +20,28 @@ from django.utils.module_loading import module_has_submodule
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--noinput', action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.'),
-        make_option('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
-            help='Tells Django not to load any initial data after database synchronization.'),
-        make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
-                'Defaults to the "default" database.'),
-        make_option('--fake', action='store_true', dest='fake', default=False,
-            help='Mark migrations as run without actually running them'),
-        make_option('--list', '-l', action='store_true', dest='list', default=False,
-            help='Show a list of all known migrations and which are applied'),
-    )
-
     help = "Updates database schema. Manages both apps with migrations and those without."
-    args = "[app_label] [migration_name]"
+
+    def add_arguments(self, parser):
+        parser.add_argument('app_label', nargs='?',
+            help='App label of an application to synchronize the state.')
+        parser.add_argument('migration_name', nargs='?',
+            help='Database state will be brought to the state after that migration.')
+        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
+            help='Tells Django to NOT prompt the user for input of any kind.')
+        parser.add_argument('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
+            help='Tells Django not to load any initial data after database synchronization.')
+        parser.add_argument('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
+                'Defaults to the "default" database.')
+        parser.add_argument('--fake', action='store_true', dest='fake', default=False,
+            help='Mark migrations as run without actually running them')
+        parser.add_argument('--list', '-l', action='store_true', dest='list', default=False,
+            help='Show a list of all known migrations and which are applied')
 
     def handle(self, *args, **options):
 
-        self.verbosity = int(options.get('verbosity'))
+        self.verbosity = options.get('verbosity')
         self.interactive = options.get('interactive')
         self.show_traceback = options.get('traceback')
         self.load_initial_data = options.get('load_initial_data')
@@ -57,7 +59,7 @@ class Command(BaseCommand):
 
         # If they asked for a migration listing, quit main execution flow and show it
         if options.get("list", False):
-            return self.show_migration_list(connection, args)
+            return self.show_migration_list(connection, [options['app_label']] if options['app_label'] else None)
 
         # Work out which apps have migrations and which do not
         executor = MigrationExecutor(connection, self.migration_progress_callback)
@@ -75,10 +77,8 @@ class Command(BaseCommand):
         # If they supplied command line arguments, work out what they mean.
         run_syncdb = False
         target_app_labels_only = True
-        if len(args) > 2:
-            raise CommandError("Too many command-line arguments (expecting 'app_label' or 'app_label migrationname')")
-        elif len(args) == 2:
-            app_label, migration_name = args
+        if options['app_label'] and options['migration_name']:
+            app_label, migration_name = options['app_label'], options['migration_name']
             if app_label not in executor.loader.migrated_apps:
                 raise CommandError("App '%s' does not have migrations (you cannot selectively sync unmigrated apps)" % app_label)
             if migration_name == "zero":
@@ -92,8 +92,8 @@ class Command(BaseCommand):
                     raise CommandError("Cannot find a migration matching '%s' from app '%s'." % (app_label, migration_name))
                 targets = [(app_label, migration.name)]
             target_app_labels_only = False
-        elif len(args) == 1:
-            app_label = args[0]
+        elif options['app_label']:
+            app_label = options['app_label']
             if app_label not in executor.loader.migrated_apps:
                 raise CommandError("App '%s' does not have migrations (you cannot selectively sync unmigrated apps)" % app_label)
             targets = [key for key in executor.loader.graph.leaf_nodes() if key[0] == app_label]

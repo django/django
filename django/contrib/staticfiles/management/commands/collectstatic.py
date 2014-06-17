@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import os
 from collections import OrderedDict
-from optparse import make_option
 
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError, NoArgsCommand
@@ -18,32 +17,6 @@ class Command(NoArgsCommand):
     Command that allows to copy or symlink static files from different
     locations to the settings.STATIC_ROOT.
     """
-    option_list = NoArgsCommand.option_list + (
-        make_option('--noinput',
-            action='store_false', dest='interactive', default=True,
-            help="Do NOT prompt the user for input of any kind."),
-        make_option('--no-post-process',
-            action='store_false', dest='post_process', default=True,
-            help="Do NOT post process collected files."),
-        make_option('-i', '--ignore', action='append', default=[],
-            dest='ignore_patterns', metavar='PATTERN',
-            help="Ignore files or directories matching this glob-style "
-                "pattern. Use multiple times to ignore more."),
-        make_option('-n', '--dry-run',
-            action='store_true', dest='dry_run', default=False,
-            help="Do everything except modify the filesystem."),
-        make_option('-c', '--clear',
-            action='store_true', dest='clear', default=False,
-            help="Clear the existing files using the storage "
-                 "before trying to copy or link the original file."),
-        make_option('-l', '--link',
-            action='store_true', dest='link', default=False,
-            help="Create a symbolic link to each file instead of copying."),
-        make_option('--no-default-ignore', action='store_false',
-            dest='use_default_ignore_patterns', default=True,
-            help="Don't ignore the common private glob-style patterns 'CVS', "
-                "'.*' and '*~'."),
-    )
     help = "Collect static files in a single location."
     requires_system_checks = False
 
@@ -61,12 +34,38 @@ class Command(NoArgsCommand):
         else:
             self.local = True
 
+    def add_arguments(self, parser):
+        parser.add_argument('--noinput',
+            action='store_false', dest='interactive', default=True,
+            help="Do NOT prompt the user for input of any kind.")
+        parser.add_argument('--no-post-process',
+            action='store_false', dest='post_process', default=True,
+            help="Do NOT post process collected files.")
+        parser.add_argument('-i', '--ignore', action='append', default=[],
+            dest='ignore_patterns', metavar='PATTERN',
+            help="Ignore files or directories matching this glob-style "
+                "pattern. Use multiple times to ignore more.")
+        parser.add_argument('-n', '--dry-run',
+            action='store_true', dest='dry_run', default=False,
+            help="Do everything except modify the filesystem.")
+        parser.add_argument('-c', '--clear',
+            action='store_true', dest='clear', default=False,
+            help="Clear the existing files using the storage "
+                 "before trying to copy or link the original file.")
+        parser.add_argument('-l', '--link',
+            action='store_true', dest='link', default=False,
+            help="Create a symbolic link to each file instead of copying.")
+        parser.add_argument('--no-default-ignore', action='store_false',
+            dest='use_default_ignore_patterns', default=True,
+            help="Don't ignore the common private glob-style patterns 'CVS', "
+                "'.*' and '*~'.")
+
     def set_options(self, **options):
         """
         Set instance variables based on an options dict
         """
         self.interactive = options['interactive']
-        self.verbosity = int(options.get('verbosity', 1))
+        self.verbosity = options['verbosity']
         self.symlink = options['link']
         self.clear = options['clear']
         self.dry_run = options['dry_run']

@@ -23,7 +23,7 @@ from .models import (Article, ArticleStatus, Author, Author1, BetterWriter, BigI
     ImprovedArticle, ImprovedArticleWithParentLink, Inventory, Person, Post, Price,
     Product, Publication, TextFile, Triple, Writer, WriterProfile,
     Colour, ColourfulItem, DateTimePost, CustomErrorMessage,
-    test_images, StumpJoke, Character)
+    test_images, StumpJoke, Character, Student)
 
 if test_images:
     from .models import ImageFile, OptionalImageFile
@@ -198,6 +198,34 @@ class ModelFormBaseTest(TestCase):
         self.assertTrue(form.is_valid())
         instance = construct_instance(form, Person(), fields=())
         self.assertEqual(instance.name, '')
+
+    def test_blank_with_null_foreign_key_field(self):
+        """
+        #13776 -- ModelForm's with models having a FK set to null=False and
+        required=False should be valid.
+        """
+        class FormForTestingIsValid(forms.ModelForm):
+            class Meta:
+                model = Student
+                fields = '__all__'
+
+            def __init__(self, *args, **kwargs):
+                super(FormForTestingIsValid, self).__init__(*args, **kwargs)
+                self.fields['character'].required = False
+
+        char = Character.objects.create(username='user',
+                                        last_action=datetime.datetime.today())
+        data = {'study': 'Engineering'}
+        data2 = {'study': 'Engineering', 'character': char.pk}
+
+        # form is valid because required=False for field 'character'
+        f1 = FormForTestingIsValid(data)
+        self.assertTrue(f1.is_valid())
+
+        f2 = FormForTestingIsValid(data2)
+        self.assertTrue(f2.is_valid())
+        obj = f2.save()
+        self.assertEqual(obj.character, char)
 
     def test_missing_fields_attribute(self):
         message = (

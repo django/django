@@ -613,8 +613,11 @@ SpatiaLite  ``Distance(poly, geom) <= 5``
 dwithin
 -------
 
-Returns models where the distance to the geometry field from the
-lookup geometry are within the given distance from one another.
+Returns models where the distance to the geometry field from the lookup
+geometry are within the given distance from one another. Note that you can only
+provide :class:`~django.contrib.gis.measure.Distance` objects if the targeted
+geometries are in a projected system. For geographic geometries, you should use
+units of the geometry field (e.g. degrees for ``WGS84``) .
 
 Example::
 

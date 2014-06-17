@@ -12,8 +12,18 @@ from django.db import models, router
 from django.utils.deprecation import RemovedInDjango19Warning
 
 
+def check_for_migrations(app_config, connection):
+    # Inner import, else tests imports it too early as it needs settings
+    from django.db.migrations.loader import MigrationLoader
+    loader = MigrationLoader(connection)
+    if app_config.label in loader.migrated_apps:
+        raise CommandError("App '%s' has migrations. Only the sqlmigrate and sqlflush commands can be used when an app has migrations." % app_config.label)
+
+
 def sql_create(app_config, style, connection):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
+
+    check_for_migrations(app_config, connection)
 
     if connection.settings_dict['ENGINE'] == 'django.db.backends.dummy':
         # This must be the "dummy" database backend, which means the user
@@ -58,8 +68,10 @@ def sql_create(app_config, style, connection):
     return final_output
 
 
-def sql_delete(app_config, style, connection):
+def sql_delete(app_config, style, connection, close_connection=True):
     "Returns a list of the DROP TABLE SQL statements for the given app."
+
+    check_for_migrations(app_config, connection)
 
     # This should work even if a connection isn't available
     try:
@@ -97,7 +109,7 @@ def sql_delete(app_config, style, connection):
     finally:
         # Close database connection explicitly, in case this output is being piped
         # directly into a database client, to avoid locking issues.
-        if cursor:
+        if cursor and close_connection:
             cursor.close()
             connection.close()
 
@@ -122,6 +134,9 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_
 
 def sql_custom(app_config, style, connection):
     "Returns a list of the custom table modifying SQL statements for the given app."
+
+    check_for_migrations(app_config, connection)
+
     output = []
 
     app_models = router.get_migratable_models(app_config, connection.alias)
@@ -134,6 +149,9 @@ def sql_custom(app_config, style, connection):
 
 def sql_indexes(app_config, style, connection):
     "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
+
+    check_for_migrations(app_config, connection)
+
     output = []
     for model in router.get_migratable_models(app_config, connection.alias, include_auto_created=True):
         output.extend(connection.creation.sql_indexes_for_model(model, style))
@@ -142,6 +160,9 @@ def sql_indexes(app_config, style, connection):
 
 def sql_destroy_indexes(app_config, style, connection):
     "Returns a list of the DROP INDEX SQL statements for all models in the given app."
+
+    check_for_migrations(app_config, connection)
+
     output = []
     for model in router.get_migratable_models(app_config, connection.alias, include_auto_created=True):
         output.extend(connection.creation.sql_destroy_indexes_for_model(model, style))
@@ -149,6 +170,9 @@ def sql_destroy_indexes(app_config, style, connection):
 
 
 def sql_all(app_config, style, connection):
+
+    check_for_migrations(app_config, connection)
+
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
     return sql_create(app_config, style, connection) + sql_custom(app_config, style, connection) + sql_indexes(app_config, style, connection)
 
