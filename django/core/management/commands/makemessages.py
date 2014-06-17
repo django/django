@@ -9,7 +9,7 @@ import sys
 from itertools import dropwhile
 
 import django
-from django.core.management.base import CommandError, NoArgsCommand
+from django.core.management.base import CommandError, BaseCommand
 from django.core.management.utils import (handle_extensions, find_command,
     popen_wrapper)
 from django.utils.encoding import force_str
@@ -162,7 +162,7 @@ def write_pot_file(potfile, msgs):
         fp.write(msgs)
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = ("Runs over the entire source tree of the current directory and "
 "pulls out all strings marked for translation. It creates (or updates) a message "
 "file in the conf/locale (in the django tree) or locale (for projects and "
@@ -210,7 +210,7 @@ class Command(NoArgsCommand):
         parser.add_argument('--keep-pot', action='store_true', dest='keep_pot',
             default=False, help="Keep .pot file after making messages. Useful when debugging.")
 
-    def handle_noargs(self, *args, **options):
+    def handle(self, *args, **options):
         locale = options.get('locale')
         exclude = options.get('exclude')
         self.domain = options.get('domain')

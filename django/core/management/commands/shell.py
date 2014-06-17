@@ -1,9 +1,9 @@
 import os
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = "Runs a Python interactive interpreter. Tries to use IPython or bpython, if one of them is available."
     requires_system_checks = False
     shells = ['ipython', 'bpython']
@@ -60,7 +60,7 @@ class Command(NoArgsCommand):
                 pass
         raise ImportError
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         try:
             if options['plain']:
                 # Don't bother loading IPython, because the user wants plain Python.

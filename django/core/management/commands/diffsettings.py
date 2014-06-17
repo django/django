@@ -1,4 +1,4 @@
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 
 def module_to_dict(module, omittable=lambda k: k.startswith('_')):
@@ -6,7 +6,7 @@ def module_to_dict(module, omittable=lambda k: k.startswith('_')):
     return dict((k, repr(v)) for k, v in module.__dict__.items() if not omittable(k))
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = """Displays differences between the current settings.py and Django's
     default settings. Settings that don't appear in the defaults are
     followed by "###"."""
@@ -18,7 +18,7 @@ class Command(NoArgsCommand):
             help='Display all settings, regardless of their value. '
             'Default values are prefixed by "###".')
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         # Inspired by Postfix's "postconf -n".
         from django.conf import settings, global_settings
 
