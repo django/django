@@ -267,7 +267,7 @@ what you can do with them. And there's no need to add URL cruft such as
 ``.html`` -- unless you want to, in which case you can do something like
 this::
 
-    (r'^polls/latest\.html$', 'polls.views.index'),
+    url(r'^polls/latest\.html$', views.index),
 
 But, don't do that. It's silly.
 
