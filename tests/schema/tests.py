@@ -4,9 +4,10 @@ import unittest
 
 from django.test import TransactionTestCase
 from django.db import connection, DatabaseError, IntegrityError, OperationalError
-from django.db.models.fields import IntegerField, TextField, CharField, SlugField, BooleanField
+from django.db.models.fields import IntegerField, TextField, CharField, SlugField, BooleanField, BinaryField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
+from django.utils import six
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
     UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough)
@@ -268,6 +269,25 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(field_type, 'IntegerField')
         # Make sure the values were transformed correctly
         self.assertEqual(Author.objects.extra(where=["thing = 1"]).count(), 2)
+
+    def test_add_field_binary(self):
+        """
+        Tests binary fields get a sane default (#22851)
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Add the new field
+        new_field = BinaryField(blank=True)
+        new_field.set_attributes_from_name("bits")
+        with connection.schema_editor() as editor:
+            editor.add_field(
+                Author,
+                new_field,
+            )
+        # Ensure the field is right afterwards
+        columns = self.column_classes(Author)
+        self.assertEqual(columns['bits'][0], "BinaryField")
 
     def test_alter(self):
         """
