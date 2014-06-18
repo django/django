@@ -523,7 +523,10 @@ class RelatedObjectsTests(OptionsBaseTests):
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_hidden=True, local_only=True)
-            self.assertEqual(self._map_names(objects), expected)
+            self.assertEqual(
+                sorted(self._map_names(objects), key=self.key_name),
+                sorted(expected, key=self.key_name)
+            )
 
     def test_related_objects_proxy(self):
         result_key = 'get_all_related_objects_with_model_proxy'
