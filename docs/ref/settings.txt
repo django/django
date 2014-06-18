@@ -2374,6 +2374,12 @@ Default: 'auth.User'
 
 The model to use to represent a User. See :ref:`auth-custom-user`.
 
+.. warning::
+    You cannot change the AUTH_USER_MODEL setting during the lifetime of
+    a project (i.e. once you have made and migrated models that depend on it)
+    without serious effort. It is intended to be set at the project start.
+    See :ref:`auth-custom-user` for more details.
+
 .. setting:: LOGIN_REDIRECT_URL
 
 LOGIN_REDIRECT_URL

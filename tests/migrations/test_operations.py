@@ -8,6 +8,7 @@ except ImportError:
     sqlparse = None
 
 from django import test
+from django.test import override_settings
 from django.db import connection, migrations, models, router
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
@@ -18,11 +19,9 @@ from django.db.utils import IntegrityError, DatabaseError
 from .test_base import MigrationTestBase
 
 
-class OperationTests(MigrationTestBase):
+class OperationTestBase(MigrationTestBase):
     """
-    Tests running the operations and making sure they do what they say they do.
-    Each test looks at their state changing, and then their database operation -
-    both forwards and backwards.
+    Common functions to help test operations.
     """
 
     def apply_operations(self, app_label, project_state, operations):
@@ -36,6 +35,16 @@ class OperationTests(MigrationTestBase):
         migration.operations = operations
         with connection.schema_editor() as editor:
             return migration.unapply(project_state, editor)
+
+    def make_test_state(self, app_label, operation, **kwargs):
+        """
+        Makes a test state using set_up_test_model and returns the
+        original state and the state after the migration is applied.
+        """
+        project_state = self.set_up_test_model(app_label, **kwargs)
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        return project_state, new_state
 
     def set_up_test_model(self, app_label, second_model=False, third_model=False, related_model=False, mti_model=False, proxy_model=False):
         """
@@ -74,6 +83,9 @@ class OperationTests(MigrationTestBase):
                 ("pink", models.IntegerField(default=3)),
                 ("weight", models.FloatField()),
             ],
+            options = {
+                "swappable": "TEST_SWAP_MODEL",
+            },
         )]
         if second_model:
             operations.append(migrations.CreateModel(
@@ -121,6 +133,15 @@ class OperationTests(MigrationTestBase):
             ))
 
         return self.apply_operations(app_label, ProjectState(), operations)
+
+
+class OperationTests(OperationTestBase):
+    """
+    Tests running the operations and making sure they do what they say they do.
+    Each test looks at their state changing, and then their database operation -
+    both forwards and backwards.
+    """
+
 
     def test_create_model(self):
         """
@@ -382,15 +403,13 @@ class OperationTests(MigrationTestBase):
         """
         Tests the AddField operation.
         """
-        project_state = self.set_up_test_model("test_adfl")
         # Test the state alteration
         operation = migrations.AddField(
             "Pony",
             "height",
             models.FloatField(null=True, default=5),
         )
-        new_state = project_state.clone()
-        operation.state_forwards("test_adfl", new_state)
+        project_state, new_state = self.make_test_state("test_adfl", operation)
         self.assertEqual(len(new_state.models["test_adfl", "pony"].fields), 4)
         field = [
             f for n, f in new_state.models["test_adfl", "pony"].fields
@@ -1117,3 +1136,87 @@ class MultiDBOperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_crmo", editor, new_state, project_state)
         self.assertTableNotExists("test_crmo_pony")
+
+
+class SwappableOperationTests(OperationTestBase):
+    """
+    Tests that key operations ignore swappable models
+    (we don't want to replicate all of them here, as the functionality
+    is in a common base class anyway)
+    """
+
+    available_apps = [
+        "migrations",
+        "django.contrib.auth",
+    ]
+
+    @override_settings(TEST_SWAP_MODEL="migrations.SomeFakeModel")
+    def test_create_ignore_swapped(self):
+        """
+        Tests that the CreateTable operation ignores swapped models.
+        """
+        operation = migrations.CreateModel(
+            "Pony",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("pink", models.IntegerField(default=1)),
+            ],
+            options = {
+                "swappable": "TEST_SWAP_MODEL",
+            },
+        )
+        # Test the state alteration (it should still be there!)
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        operation.state_forwards("test_crigsw", new_state)
+        self.assertEqual(new_state.models["test_crigsw", "pony"].name, "Pony")
+        self.assertEqual(len(new_state.models["test_crigsw", "pony"].fields), 2)
+        # Test the database alteration
+        self.assertTableNotExists("test_crigsw_pony")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_crigsw", editor, project_state, new_state)
+        self.assertTableNotExists("test_crigsw_pony")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_crigsw", editor, new_state, project_state)
+        self.assertTableNotExists("test_crigsw_pony")
+
+    @override_settings(TEST_SWAP_MODEL="migrations.SomeFakeModel")
+    def test_delete_ignore_swapped(self):
+        """
+        Tests the DeleteModel operation ignores swapped models.
+        """
+        operation = migrations.DeleteModel("Pony")
+        project_state, new_state = self.make_test_state("test_dligsw", operation)
+        # Test the database alteration
+        self.assertTableNotExists("test_dligsw_pony")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_dligsw", editor, project_state, new_state)
+        self.assertTableNotExists("test_dligsw_pony")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_dligsw", editor, new_state, project_state)
+        self.assertTableNotExists("test_dligsw_pony")
+
+    @override_settings(TEST_SWAP_MODEL="migrations.SomeFakeModel")
+    def test_add_field_ignore_swapped(self):
+        """
+        Tests the AddField operation.
+        """
+        # Test the state alteration
+        operation = migrations.AddField(
+            "Pony",
+            "height",
+            models.FloatField(null=True, default=5),
+        )
+        project_state, new_state = self.make_test_state("test_adfligsw", operation)
+        # Test the database alteration
+        self.assertTableNotExists("test_adfligsw_pont")
+        self.assertColumnNotExists("test_adfligsw_pony", "height")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_adfligsw", editor, project_state, new_state)
+        self.assertColumnNotExists("test_adfligsw_pony", "height")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_adfligsw", editor, new_state, project_state)
+        self.assertColumnNotExists("test_adfligsw_pony", "height")
