@@ -472,8 +472,7 @@ class DataTests(OptionsBaseTests):
         for model, expected_result in TEST_RESULTS['local_fields'].items():
             fields = model._meta.local_fields
             self.assertEqual([f.attname for f in fields], expected_result)
-            self.assertTrue(all([f.rel is None or not isinstance(f.rel,
-                            related.ManyToManyRel) for f in fields]))
+            self.assertTrue(all([f.model is model for f in fields]))
 
     def test_local_concrete_fields(self):
         for model, expected_result in TEST_RESULTS['local_concrete_fields'].items():
