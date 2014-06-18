@@ -447,17 +447,6 @@ TEST_RESULTS = {
 
 class OptionsBaseTests(test.TestCase):
 
-    def eq_field_query_names_and_models(self, objects, names_eq, models_eq):
-        fields, models = zip(*objects)
-        self.assertEqual([o.field.related_query_name()
-                          for o in fields], names_eq)
-        self.assertEqual(models, models_eq)
-
-    def eq_field_names_and_models(self, objects, names_eq, models_eq):
-        fields, models = zip(*objects)
-        self.assertEqual([o.name for o in fields], names_eq)
-        self.assertEqual(models, models_eq)
-
     def _map_rq_names(self, res):
         return tuple([(o.field.related_query_name(), m)
                 for o, m in res])
