@@ -1,7 +1,7 @@
 from django import test
 from collections import OrderedDict
 
-from django.db.models.fields import related, CharField
+from django.db.models.fields import related, CharField, Field
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 from .models import (
@@ -469,10 +469,13 @@ class DataTests(OptionsBaseTests):
             self.assertEqual([f.attname for f in fields], expected_result)
 
     def test_local_fields(self):
+        is_data_field = lambda f: isinstance(f, Field) and not isinstance(f, related.ManyToManyField)
+
         for model, expected_result in TEST_RESULTS['local_fields'].items():
             fields = model._meta.local_fields
             self.assertEqual([f.attname for f in fields], expected_result)
             self.assertTrue(all([f.model is model for f in fields]))
+            self.assertTrue(all([is_data_field(f) for f in fields]))
 
     def test_local_concrete_fields(self):
         for model, expected_result in TEST_RESULTS['local_concrete_fields'].items():
