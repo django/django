@@ -142,6 +142,26 @@ class LoaderTests(TestCase):
             ],
         )
 
+    @override_settings(MIGRATION_MODULES={
+        "migrations": "migrations.test_migrations_first",
+        "migrations2": "migrations2.test_migrations_2_first",
+    })
+    @modify_settings(INSTALLED_APPS={'append': 'migrations2'})
+    def test_first(self):
+        """
+        Makes sure the '__first__' migrations build correctly.
+        """
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(
+            migration_loader.graph.forwards_plan(("migrations", "second")),
+            [
+                ("migrations", "thefirst"),
+                ("migrations2", "0001_initial"),
+                ("migrations2", "0002_second"),
+                ("migrations", "second"),
+            ],
+        )
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_name_match(self):
         "Tests prefix name matching"
