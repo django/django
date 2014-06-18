@@ -3,7 +3,8 @@ from django import test
 from django.db.models.fields import related, CharField, Field
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models.options import (
-    DATA
+    DATA, M2M, RELATED_OBJECTS,
+    LOCAL_ONLY, CONCRETE, INCLUDE_HIDDEN
 )
 
 from .models import (
@@ -483,6 +484,11 @@ class OptionsBaseTests(test.TestCase):
     def _map_names(self, res):
         return tuple([(f.name, m) for f, m in res])
 
+    def _model(self, current_model, field):
+        direct = isinstance(field, Field) or isinstance(field, GenericForeignKey)
+        model = field.model if direct else field.parent_model._meta.concrete_model
+        return None if model == current_model else model
+
 
 class DataTests(OptionsBaseTests):
 
@@ -495,14 +501,14 @@ class DataTests(OptionsBaseTests):
         is_data_field = lambda f: isinstance(f, Field) and not isinstance(f, related.ManyToManyField)
 
         for model, expected_result in TEST_RESULTS['local_fields'].items():
-            fields = model._meta.local_fields
+            fields = model._meta.get_new_fields(types=DATA, opts=LOCAL_ONLY)
             self.assertEqual([f.attname for f in fields], expected_result)
             self.assertTrue(all([f.model is model for f in fields]))
             self.assertTrue(all([is_data_field(f) for f in fields]))
 
     def test_local_concrete_fields(self):
         for model, expected_result in TEST_RESULTS['local_concrete_fields'].items():
-            fields = model._meta.local_concrete_fields
+            fields = model._meta.get_new_fields(types=DATA, opts=LOCAL_ONLY | CONCRETE)
             self.assertEqual([f.attname for f in fields], expected_result)
             self.assertTrue(all([f.column is not None for f in fields]))
 
@@ -511,14 +517,14 @@ class M2MTests(OptionsBaseTests):
 
     def test_many_to_many(self):
         for model, expected_result in TEST_RESULTS['many_to_many'].items():
-            fields = model._meta.many_to_many
+            fields = model._meta.get_new_fields(types=M2M)
             self.assertEqual([f.attname for f in fields], expected_result)
             self.assertTrue(all([isinstance(f.rel, related.ManyToManyRel)
                                  for f in fields]))
 
     def test_many_to_many_with_model(self):
         for model, expected_result in TEST_RESULTS['many_to_many_with_model'].items():
-            models = [model for field, model in model._meta.get_m2m_with_model()]
+            models = [self._model(model, field) for field in model._meta.get_new_fields(types=M2M)]
             self.assertEqual(models, expected_result)
 
 
@@ -529,19 +535,23 @@ class RelatedObjectsTests(OptionsBaseTests):
     def test_related_objects(self):
         result_key = 'get_all_related_objects_with_model'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = model._meta.get_all_related_objects_with_model()
+            objects = [(field, self._model(model, field))
+                       for field in model._meta.get_new_fields(types=RELATED_OBJECTS)]
             self.assertEqual(self._map_rq_names(objects), expected)
 
     def test_related_objects_local(self):
         result_key = 'get_all_related_objects_with_model_local'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = model._meta.get_all_related_objects_with_model(local_only=True)
+            objects = [(field, self._model(model, field))
+                       for field in model._meta.get_new_fields(types=RELATED_OBJECTS, opts=LOCAL_ONLY)]
             self.assertEqual(self._map_rq_names(objects), expected)
 
     def test_related_objects_include_hidden(self):
         result_key = 'get_all_related_objects_with_model_hidden'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = model._meta.get_all_related_objects_with_model(include_hidden=True)
+            objects = [(field, self._model(model, field))
+                       for field in model._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN)]
+            import ipdb; ipdb.set_trace()
             self.assertEqual(
                 sorted(self._map_names(objects), key=self.key_name),
                 sorted(expected, key=self.key_name)
