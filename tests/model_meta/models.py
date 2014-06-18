@@ -18,12 +18,9 @@ class AbstractPerson(models.Model):
     fk_abstract = models.ForeignKey(Relation, related_name='fk_abstract_rel')
 
     # M2M fields
-    m2m_abstract = models.ManyToManyField(Relation,
-                                          related_name='m2m_abstract_rel')
-    friends_abstract = models.ManyToManyField('self', related_name='friends_abstract',
-                                              symmetrical=True)
-    following_abstract = models.ManyToManyField('self', related_name='followers_abstract',
-                                                symmetrical=False)
+    m2m_abstract = models.ManyToManyField(Relation, related_name='m2m_abstract_rel')
+    friends_abstract = models.ManyToManyField('self', related_name='friends_abstract', symmetrical=True)
+    following_abstract = models.ManyToManyField('self', related_name='followers_abstract', symmetrical=False)
 
     # VIRTUAL fields
     data_not_concrete_abstract = models.ForeignObject(
@@ -36,8 +33,7 @@ class AbstractPerson(models.Model):
     # GFK fields
     content_type_abstract = models.ForeignKey(ContentType, related_name='+')
     object_id_abstract = models.PositiveIntegerField()
-    content_object_abstract = GenericForeignKey('content_type_abstract',
-                                                'object_id_abstract')
+    content_object_abstract = GenericForeignKey('content_type_abstract', 'object_id_abstract')
 
     # GR fields
     generic_relation_abstract = GenericRelation(Relation)
@@ -50,10 +46,8 @@ class BasePerson(AbstractPerson):
 
     # M2M fields
     m2m_base = models.ManyToManyField(Relation, related_name='m2m_base_rel')
-    friends_base = models.ManyToManyField('self', related_name='friends_base',
-                                     symmetrical=True)
-    following_base = models.ManyToManyField('self', related_name='followers_base',
-                                       symmetrical=False)
+    friends_base = models.ManyToManyField('self', related_name='friends_base', symmetrical=True)
+    following_base = models.ManyToManyField('self', related_name='followers_base', symmetrical=False)
 
     # VIRTUAL fields
     data_not_concrete_base = models.ForeignObject(
@@ -63,11 +57,9 @@ class BasePerson(AbstractPerson):
     )
 
     # GFK fields
-    content_type_base = models.ForeignKey(ContentType,
-                                          related_name='+')
+    content_type_base = models.ForeignKey(ContentType, related_name='+')
     object_id_base = models.PositiveIntegerField()
-    content_object_base = GenericForeignKey('content_type_base',
-                                            'object_id_base')
+    content_object_base = GenericForeignKey('content_type_base', 'object_id_base')
 
     # GR fields
     generic_relation_base = GenericRelation(Relation)
@@ -79,12 +71,9 @@ class Person(BasePerson):
     fk_inherited = models.ForeignKey(Relation, related_name='fk_concrete_rel')
 
     # M2M Fields
-    m2m_inherited = models.ManyToManyField(Relation,
-                                           related_name='m2m_concrete_rel')
-    friends_inherited = models.ManyToManyField('self', related_name='friends_concrete',
-                                     symmetrical=True)
-    following_inherited = models.ManyToManyField('self', related_name='followers_concrete',
-                                       symmetrical=False)
+    m2m_inherited = models.ManyToManyField(Relation, related_name='m2m_concrete_rel')
+    friends_inherited = models.ManyToManyField('self', related_name='friends_concrete', symmetrical=True)
+    following_inherited = models.ManyToManyField('self', related_name='followers_concrete', symmetrical=False)
 
     # VIRTUAL fields
     data_not_concrete_inherited = models.ForeignObject(
@@ -96,8 +85,7 @@ class Person(BasePerson):
     # GFK fields
     content_type_concrete = models.ForeignKey(ContentType, related_name='+')
     object_id_concrete = models.PositiveIntegerField()
-    content_object_concrete = GenericForeignKey('content_type_concrete',
-                                                'object_id_concrete')
+    content_object_concrete = GenericForeignKey('content_type_concrete', 'object_id_concrete')
 
     # GR fields
     generic_relation_concrete = GenericRelation(Relation)
@@ -112,31 +100,21 @@ class ProxyPerson(Person):
 class Relating(models.Model):
 
     # ForeignKey to BasePerson
-    baseperson = models.ForeignKey(BasePerson,
-                               related_name='relating_baseperson')
-    baseperson_hidden = models.ForeignKey(BasePerson,
-                               related_name='+')
+    baseperson = models.ForeignKey(BasePerson, related_name='relating_baseperson')
+    baseperson_hidden = models.ForeignKey(BasePerson, related_name='+')
 
     # ForeignKey to Person
-    person = models.ForeignKey(Person,
-                               related_name='relating_person')
-    person_hidden = models.ForeignKey(Person,
-                                      related_name='+')
+    person = models.ForeignKey(Person, related_name='relating_person')
+    person_hidden = models.ForeignKey(Person, related_name='+')
 
     # ForeignKey to ProxyPerson
-    proxyperson = models.ForeignKey(ProxyPerson,
-                                    related_name='relating_proxyperson')
-    proxyperson_hidden = models.ForeignKey(ProxyPerson,
-                                      related_name='+')
+    proxyperson = models.ForeignKey(ProxyPerson, related_name='relating_proxyperson')
+    proxyperson_hidden = models.ForeignKey(ProxyPerson, related_name='+')
 
     # ManyToManyField to BasePerson
-    basepeople = models.ManyToManyField(BasePerson,
-                                        related_name='relating_basepeople')
-    basepeople_hidden = models.ManyToManyField(BasePerson,
-                                               related_name='+')
+    basepeople = models.ManyToManyField(BasePerson, related_name='relating_basepeople')
+    basepeople_hidden = models.ManyToManyField(BasePerson, related_name='+')
 
     # ManyToManyField to Person
-    people = models.ManyToManyField(Person,
-                                    related_name='relating_people')
-    people_hidden = models.ManyToManyField(Person,
-                                           related_name='+')
+    people = models.ManyToManyField(Person, related_name='relating_people')
+    people_hidden = models.ManyToManyField(Person, related_name='+')
