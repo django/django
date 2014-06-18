@@ -3,8 +3,8 @@ from django import test
 from django.db.models.fields import related, CharField, Field
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models.options import (
-    DATA, M2M, RELATED_OBJECTS,
-    LOCAL_ONLY, CONCRETE, INCLUDE_HIDDEN
+    DATA, M2M, RELATED_OBJECTS, RELATED_M2M, VIRTUAL,
+    LOCAL_ONLY, CONCRETE, INCLUDE_HIDDEN, INCLUDE_PROXY
 )
 
 from .models import (
@@ -551,7 +551,6 @@ class RelatedObjectsTests(OptionsBaseTests):
         for model, expected in TEST_RESULTS[result_key].items():
             objects = [(field, self._model(model, field))
                        for field in model._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN)]
-            import ipdb; ipdb.set_trace()
             self.assertEqual(
                 sorted(self._map_names(objects), key=self.key_name),
                 sorted(expected, key=self.key_name)
@@ -560,8 +559,8 @@ class RelatedObjectsTests(OptionsBaseTests):
     def test_related_objects_include_hidden_local_only(self):
         result_key = 'get_all_related_objects_with_model_hidden_local'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = model._meta.get_all_related_objects_with_model(
-                include_hidden=True, local_only=True)
+            objects = [(field, self._model(model, field))
+                       for field in model._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN | LOCAL_ONLY)]
             self.assertEqual(
                 sorted(self._map_names(objects), key=self.key_name),
                 sorted(expected, key=self.key_name)
@@ -570,15 +569,15 @@ class RelatedObjectsTests(OptionsBaseTests):
     def test_related_objects_proxy(self):
         result_key = 'get_all_related_objects_with_model_proxy'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = model._meta.get_all_related_objects_with_model(
-                include_proxy_eq=True)
+            objects = [(field, self._model(model, field))
+                       for field in model._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_PROXY)]
             self.assertEqual(self._map_rq_names(objects), expected)
 
     def test_related_objects_proxy_hidden(self):
         result_key = 'get_all_related_objects_with_model_proxy_hidden'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = model._meta.get_all_related_objects_with_model(
-                include_proxy_eq=True, include_hidden=True)
+            objects = [(field, self._model(model, field))
+                       for field in model._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_PROXY | INCLUDE_HIDDEN)]
             self.assertEqual(
                 sorted(self._map_names(objects), key=self.key_name),
                 sorted(expected, key=self.key_name)
@@ -590,27 +589,27 @@ class RelatedM2MTests(OptionsBaseTests):
     def test_related_m2m_with_model(self):
         result_key = 'get_all_related_many_to_many_with_model'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = model._meta.get_all_related_m2m_objects_with_model()
+            objects = [(field, self._model(model, field))
+                       for field in model._meta.get_new_fields(types=RELATED_M2M)]
             self.assertEqual(self._map_rq_names(objects), expected)
 
     def test_related_m2m_local_only(self):
         result_key = 'get_all_related_many_to_many_local'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = model._meta.get_all_related_many_to_many_objects(
-                local_only=True)
+            objects = model._meta.get_new_fields(types=RELATED_M2M, opts=LOCAL_ONLY)
             self.assertEqual([o.field.related_query_name()
                               for o in objects], expected)
 
     def test_related_m2m_asymmetrical(self):
-        m2m = Person._meta.many_to_many
+        m2m = Person._meta.get_new_fields(types=M2M)
         self.assertTrue('following_base' in [f.attname for f in m2m])
-        related_m2m = Person._meta.get_all_related_many_to_many_objects()
+        related_m2m = Person._meta.get_new_fields(types=RELATED_M2M)
         self.assertTrue('followers_base' in [o.field.related_query_name() for o in related_m2m])
 
     def test_related_m2m_symmetrical(self):
-        m2m = Person._meta.many_to_many
+        m2m = Person._meta.get_new_fields(types=M2M)
         self.assertTrue('friends_base' in [f.attname for f in m2m])
-        related_m2m = Person._meta.get_all_related_many_to_many_objects()
+        related_m2m = Person._meta.get_new_fields(types=RELATED_M2M)
         self.assertIn('friends_inherited_rel_+', [o.field.related_query_name() for o in related_m2m])
 
 
@@ -618,7 +617,7 @@ class VirtualFieldsTests(OptionsBaseTests):
 
     def test_virtual_fields(self):
         for model, expected_names in TEST_RESULTS['virtual_fields'].items():
-            objects = model._meta.virtual_fields
+            objects = model._meta.get_new_fields(types=VIRTUAL)
             self.assertEqual(sorted([f.name for f in objects]), sorted(expected_names))
 
 

@@ -165,24 +165,26 @@ class Options(object):
     def get_new_fields(self, types, opts=NONE, **kwargs):
         fields = OrderedDict()
 
-        if types & NON_RELATED_FIELDS:
-            if not (opts & LOCAL_ONLY) and not (types & VIRTUAL):
+        if types & VIRTUAL:
+            for field in self.virtual_fields:
+                fields[field] = True
+
+        if types & DATA:
+            if not opts & LOCAL_ONLY:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(types,
-                                  opts, **dict(kwargs, recursive=True)))
-
-            if types & VIRTUAL:
-                for field in self.virtual_fields:
+                    fields.update(parent._meta.get_new_fields(types=DATA,
+                                  opts=opts, **dict(kwargs, recursive=True)))
+            for field in self.local_fields:
+                if not ((opts & CONCRETE) and field.column is None):
                     fields[field] = True
 
-            if types & DATA:
-                for field in self.local_fields:
-                    if not ((opts & CONCRETE) and field.column is None):
-                        fields[field] = True
-
-            if types & M2M:
-                for field in self.local_many_to_many:
-                    fields[field] = True
+        if types & M2M:
+            if not opts & LOCAL_ONLY:
+                for parent in self.parents:
+                    fields.update(parent._meta.get_new_fields(types=M2M,
+                                  opts=opts, **dict(kwargs, recursive=True)))
+            for field in self.local_many_to_many:
+                fields[field] = True
 
         if types & RELATED_M2M:
             related_m2m_fields = OrderedDict()
@@ -207,15 +209,13 @@ class Options(object):
             # ERROR? check
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
-                    for obj, _ in parent._meta.get_new_fields(types=RELATED_OBJECTS,
-                                                              opts=INCLUDE_HIDDEN,
-                                                              **dict(kwargs, recursive=True)).iteritems():
+                    for obj in parent._meta.get_new_fields(types=RELATED_OBJECTS,
+                                                           opts=INCLUDE_HIDDEN, **kwargs):
                         if self._validate_related_object(obj):
                             related_fields[obj] = True
 
             for model in self.get_non_swapped_models(True):
-                # NOTE: missing virtual fields
-                for f in model._meta.get_new_fields(types=DATA,
+                for f in model._meta.get_new_fields(types=DATA | VIRTUAL,
                                                     opts=INCLUDE_HIDDEN):
                     has_rel_attr = hasattr(f, 'rel') and f.rel
                     if has_rel_attr and f.has_class_relation():
@@ -223,6 +223,10 @@ class Options(object):
                         if (to_meta == self) or ((opts & INCLUDE_PROXY)
                                 and self.concrete_model == to_meta.concrete_model):
                             related_fields[f.related] = True
+                            #related = f.related
+                            #if not opts & INCLUDE_HIDDEN:
+                                #if not related.field.rel.is_hidden():
+                                    #related_fields[related] = True
 
             if not opts & INCLUDE_HIDDEN:
                 related_fields = OrderedDict([(k, v) for k, v in related_fields.items()
