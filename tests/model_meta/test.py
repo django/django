@@ -367,14 +367,14 @@ class OptionsBaseTests(test.TestCase):
 
     def eq_field_query_names_and_models(self, objects, names_eq, models_eq):
         fields, models = zip(*objects)
-        self.assertEquals([o.field.related_query_name()
+        self.assertEqual([o.field.related_query_name()
                           for o in fields], names_eq)
-        self.assertEquals(models, models_eq)
+        self.assertEqual(models, models_eq)
 
     def eq_field_names_and_models(self, objects, names_eq, models_eq):
         fields, models = zip(*objects)
-        self.assertEquals([o.name for o in fields], names_eq)
-        self.assertEquals(models, models_eq)
+        self.assertEqual([o.name for o in fields], names_eq)
+        self.assertEqual(models, models_eq)
 
     def _map_rq_names(self, res):
         return tuple([(o.field.related_query_name(), m)
@@ -389,24 +389,20 @@ class DataTests(OptionsBaseTests):
     def test_fields(self):
         for model, expected_result in TEST_RESULTS['fields'].items():
             fields = model._meta.fields
-            self.assertEquals([f.attname for f in fields],
-                              expected_result)
+            self.assertEqual([f.attname for f in fields], expected_result)
 
     def test_local_fields(self):
         for model, expected_result in TEST_RESULTS['local_fields'].items():
             fields = model._meta.local_fields
-            self.assertEquals([f.attname for f in fields],
-                              expected_result)
+            self.assertEqual([f.attname for f in fields], expected_result)
             self.assertTrue(all([f.rel is None or not isinstance(f.rel,
                             related.ManyToManyRel) for f in fields]))
 
     def test_local_concrete_fields(self):
         for model, expected_result in TEST_RESULTS['local_concrete_fields'].items():
             fields = model._meta.local_concrete_fields
-            self.assertEquals([f.attname for f in fields],
-                              expected_result)
-            self.assertTrue(all([f.column is not None
-                                 for f in fields]))
+            self.assertEqual([f.attname for f in fields], expected_result)
+            self.assertTrue(all([f.column is not None for f in fields]))
 
 
 class M2MTests(OptionsBaseTests):
@@ -414,15 +410,14 @@ class M2MTests(OptionsBaseTests):
     def test_many_to_many(self):
         for model, expected_result in TEST_RESULTS['many_to_many'].items():
             fields = model._meta.many_to_many
-            self.assertEquals([f.attname for f in fields],
-                              expected_result)
+            self.assertEqual([f.attname for f in fields], expected_result)
             self.assertTrue(all([isinstance(f.rel, related.ManyToManyRel)
                                  for f in fields]))
 
     def test_many_to_many_with_model(self):
         for model, expected_result in TEST_RESULTS['many_to_many_with_model'].items():
             models = OrderedDict(model._meta.get_m2m_with_model()).values()
-            self.assertEquals(models, expected_result)
+            self.assertEqual(models, expected_result)
 
 
 class RelatedObjectsTests(OptionsBaseTests):
@@ -431,42 +426,40 @@ class RelatedObjectsTests(OptionsBaseTests):
         result_key = 'get_all_related_objects_with_model'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model()
-            self.assertEquals(self._map_rq_names(objects), expected)
+            self.assertEqual(self._map_rq_names(objects), expected)
 
     def test_related_objects_local(self):
         result_key = 'get_all_related_objects_with_model_local'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = model._meta.get_all_related_objects_with_model(
-                local_only=True)
-            self.assertEquals(self._map_rq_names(objects), expected)
+            objects = model._meta.get_all_related_objects_with_model(local_only=True)
+            self.assertEqual(self._map_rq_names(objects), expected)
 
     def test_related_objects_include_hidden(self):
         result_key = 'get_all_related_objects_with_model_hidden'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = model._meta.get_all_related_objects_with_model(
-                include_hidden=True)
-            self.assertEquals(self._map_names(objects), expected)
+            objects = model._meta.get_all_related_objects_with_model(include_hidden=True)
+            self.assertEqual(self._map_names(objects), expected)
 
     def test_related_objects_include_hidden_local_only(self):
         result_key = 'get_all_related_objects_with_model_hidden_local'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_hidden=True, local_only=True)
-            self.assertEquals(self._map_names(objects), expected)
+            self.assertEqual(self._map_names(objects), expected)
 
     def test_related_objects_proxy(self):
         result_key = 'get_all_related_objects_with_model_proxy'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_proxy_eq=True)
-            self.assertEquals(self._map_rq_names(objects), expected)
+            self.assertEqual(self._map_rq_names(objects), expected)
 
     def test_related_objects_proxy_hidden(self):
         result_key = 'get_all_related_objects_with_model_proxy_hidden'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_proxy_eq=True, include_hidden=True)
-            self.assertEquals(self._map_names(objects), expected)
+            self.assertEqual(self._map_names(objects), expected)
 
 
 class RelatedM2MTests(OptionsBaseTests):
@@ -475,14 +468,14 @@ class RelatedM2MTests(OptionsBaseTests):
         result_key = 'get_all_related_many_to_many_with_model'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_m2m_objects_with_model()
-            self.assertEquals(self._map_rq_names(objects), expected)
+            self.assertEqual(self._map_rq_names(objects), expected)
 
     def test_related_m2m_local_only(self):
         result_key = 'get_all_related_many_to_many_local'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_many_to_many_objects(
                 local_only=True)
-            self.assertEquals([o.field.related_query_name()
+            self.assertEqual([o.field.related_query_name()
                               for o in objects], expected)
 
     def test_related_m2m_asymmetrical(self):
@@ -495,7 +488,7 @@ class RelatedM2MTests(OptionsBaseTests):
         m2m = Person._meta.many_to_many
         self.assertTrue('friends_base' in [f.attname for f in m2m])
         related_m2m = Person._meta.get_all_related_many_to_many_objects()
-        self.assertTrue('friends_inherited_rel_+' in [o.field.related_query_name() for o in related_m2m])
+        self.assertIn('friends_inherited_rel_+', [o.field.related_query_name() for o in related_m2m])
 
 
 class VirtualFieldsTests(OptionsBaseTests):
@@ -503,32 +496,32 @@ class VirtualFieldsTests(OptionsBaseTests):
     def test_virtual_fields(self):
         for model, expected_names in TEST_RESULTS['virtual_fields'].items():
             objects = model._meta.virtual_fields
-            self.assertEquals([f.name for f in objects], expected_names)
+            self.assertEqual([f.name for f in objects], expected_names)
 
 
 class GetFieldByNameTests(OptionsBaseTests):
 
     def test_get_data_field(self):
         field_info = Person._meta.get_field_by_name('data_abstract')
-        self.assertEquals(field_info[1:], (BasePerson, True, False))
+        self.assertEqual(field_info[1:], (BasePerson, True, False))
         self.assertTrue(isinstance(field_info[0], CharField))
 
     def test_get_m2m_field(self):
         field_info = Person._meta.get_field_by_name('m2m_base')
-        self.assertEquals(field_info[1:], (BasePerson, True, True))
+        self.assertEqual(field_info[1:], (BasePerson, True, True))
         self.assertTrue(isinstance(field_info[0], related.ManyToManyField))
 
     def test_get_related_object(self):
         field_info = Person._meta.get_field_by_name('relating_baseperson')
-        self.assertEquals(field_info[1:], (BasePerson, False, False))
+        self.assertEqual(field_info[1:], (BasePerson, False, False))
         self.assertTrue(isinstance(field_info[0], related.RelatedObject))
 
     def test_get_related_m2m(self):
         field_info = Person._meta.get_field_by_name('relating_people')
-        self.assertEquals(field_info[1:], (None, False, True))
+        self.assertEqual(field_info[1:], (None, False, True))
         self.assertTrue(isinstance(field_info[0], related.RelatedObject))
 
     def test_get_virtual_field(self):
         field_info = Person._meta.get_field_by_name('content_object_base')
-        self.assertEquals(field_info[1:], (None, True, False))
+        self.assertEqual(field_info[1:], (None, True, False))
         self.assertTrue(isinstance(field_info[0], GenericForeignKey))
