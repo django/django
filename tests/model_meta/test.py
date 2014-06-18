@@ -504,24 +504,24 @@ class GetFieldByNameTests(OptionsBaseTests):
     def test_get_data_field(self):
         field_info = Person._meta.get_field_by_name('data_abstract')
         self.assertEqual(field_info[1:], (BasePerson, True, False))
-        self.assertTrue(isinstance(field_info[0], CharField))
+        self.assertIsInstance(field_info[0], CharField)
 
     def test_get_m2m_field(self):
         field_info = Person._meta.get_field_by_name('m2m_base')
         self.assertEqual(field_info[1:], (BasePerson, True, True))
-        self.assertTrue(isinstance(field_info[0], related.ManyToManyField))
+        self.assertIsInstance(field_info[0], related.ManyToManyField)
 
     def test_get_related_object(self):
         field_info = Person._meta.get_field_by_name('relating_baseperson')
         self.assertEqual(field_info[1:], (BasePerson, False, False))
-        self.assertTrue(isinstance(field_info[0], related.RelatedObject))
+        self.assertIsInstance(field_info[0], related.RelatedObject)
 
     def test_get_related_m2m(self):
         field_info = Person._meta.get_field_by_name('relating_people')
         self.assertEqual(field_info[1:], (None, False, True))
-        self.assertTrue(isinstance(field_info[0], related.RelatedObject))
+        self.assertIsInstance(field_info[0], related.RelatedObject)
 
     def test_get_virtual_field(self):
         field_info = Person._meta.get_field_by_name('content_object_base')
         self.assertEqual(field_info[1:], (None, True, False))
-        self.assertTrue(isinstance(field_info[0], GenericForeignKey))
+        self.assertIsInstance(field_info[0], GenericForeignKey)
