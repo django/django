@@ -74,7 +74,7 @@ class MigrationGraph(object):
         for node in self.nodes:
             if not any(key[0] == node[0] for key in self.dependencies.get(node, set())) and (not app or app == node[0]):
                 roots.add(node)
-        return roots
+        return sorted(roots)
 
     def leaf_nodes(self, app=None):
         """
@@ -88,7 +88,7 @@ class MigrationGraph(object):
         for node in self.nodes:
             if not any(key[0] == node[0] for key in self.dependents.get(node, set())) and (not app or app == node[0]):
                 leaves.add(node)
-        return leaves
+        return sorted(leaves)
 
     def dfs(self, start, get_children):
         """
