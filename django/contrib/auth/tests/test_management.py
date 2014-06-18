@@ -118,7 +118,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         command = changepassword.Command()
         command._get_pass = lambda *args: 'not qwerty'
 
-        command.execute("joe", stdout=self.stdout)
+        command.execute(username="joe", stdout=self.stdout)
         command_output = self.stdout.getvalue().strip()
 
         self.assertEqual(command_output, "Changing password for user 'joe'\nPassword changed successfully for user 'joe'")
@@ -133,7 +133,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         command._get_pass = lambda *args: args or 'foo'
 
         with self.assertRaises(CommandError):
-            command.execute("joe", stdout=self.stdout, stderr=self.stderr)
+            command.execute(username="joe", stdout=self.stdout, stderr=self.stderr)
 
     def test_that_changepassword_command_works_with_nonascii_output(self):
         """
@@ -146,7 +146,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         command = changepassword.Command()
         command._get_pass = lambda *args: 'not qwerty'
 
-        command.execute("J\xfalia", stdout=self.stdout)
+        command.execute(username="J\xfalia", stdout=self.stdout)
 
 
 @skipIfCustomUser
@@ -333,6 +333,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             stdin=sentinel,
             stdout=six.StringIO(),
             interactive=False,
+            verbosity=0,
             username='janet',
             email='janet@example.com',
         )
@@ -342,6 +343,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         command.execute(
             stdout=six.StringIO(),
             interactive=False,
+            verbosity=0,
             username='joe',
             email='joe@example.com',
         )

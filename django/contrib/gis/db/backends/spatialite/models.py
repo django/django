@@ -7,7 +7,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
-class GeometryColumns(models.Model):
+class SpatialiteGeometryColumns(models.Model):
     """
     The 'geometry_columns' table from SpatiaLite.
     """
@@ -19,6 +19,7 @@ class GeometryColumns(models.Model):
     spatial_index_enabled = models.IntegerField()
 
     class Meta:
+        app_label = 'gis'
         db_table = 'geometry_columns'
         managed = False
 
@@ -44,7 +45,7 @@ class GeometryColumns(models.Model):
                 self.coord_dimension, self.type, self.srid)
 
 
-class SpatialRefSys(models.Model, SpatialRefSysMixin):
+class SpatialiteSpatialRefSys(models.Model, SpatialRefSysMixin):
     """
     The 'spatial_ref_sys' table from SpatiaLite.
     """
@@ -64,5 +65,6 @@ class SpatialRefSys(models.Model, SpatialRefSysMixin):
         return SpatialReference(self.proj4text).wkt
 
     class Meta:
+        app_label = 'gis'
         db_table = 'spatial_ref_sys'
         managed = False

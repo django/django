@@ -52,14 +52,17 @@ def smart_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     return force_text(s, encoding, strings_only, errors)
 
 
+_PROTECTED_TYPES = six.integer_types + (type(None), float, Decimal,
+    datetime.datetime, datetime.date, datetime.time)
+
+
 def is_protected_type(obj):
     """Determine if the object instance is of a protected type.
 
     Objects of protected types are preserved as-is when passed to
     force_text(strings_only=True).
     """
-    return isinstance(obj, six.integer_types + (type(None), float, Decimal,
-        datetime.datetime, datetime.date, datetime.time))
+    return isinstance(obj, _PROTECTED_TYPES)
 
 
 def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):

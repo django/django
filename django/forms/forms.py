@@ -280,7 +280,7 @@ class BaseForm(object):
         field -- i.e., from Form.clean(). Returns an empty ErrorList if there
         are none.
         """
-        return self.errors.get(NON_FIELD_ERRORS, self.error_class())
+        return self.errors.get(NON_FIELD_ERRORS, self.error_class(error_class='nonfield'))
 
     def _raw_value(self, fieldname):
         """
@@ -331,7 +331,10 @@ class BaseForm(object):
                 if field != NON_FIELD_ERRORS and field not in self.fields:
                     raise ValueError(
                         "'%s' has no field named '%s'." % (self.__class__.__name__, field))
-                self._errors[field] = self.error_class()
+                if field == NON_FIELD_ERRORS:
+                    self._errors[field] = self.error_class(error_class='nonfield')
+                else:
+                    self._errors[field] = self.error_class()
             self._errors[field].extend(error_list)
             if field in self.cleaned_data:
                 del self.cleaned_data[field]

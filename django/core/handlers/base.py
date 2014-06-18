@@ -134,6 +134,12 @@ class BaseHandler(object):
             if hasattr(response, 'render') and callable(response.render):
                 for middleware_method in self._template_response_middleware:
                     response = middleware_method(request, response)
+                    # Complain if the template response middleware returned None (a common error).
+                    if response is None:
+                        raise ValueError(
+                            "%s.process_template_response didn't return an "
+                            "HttpResponse object. It returned None instead."
+                            % (middleware_method.__self__.__class__.__name__))
                 response = response.render()
 
         except http.Http404 as e:
@@ -202,10 +208,18 @@ class BaseHandler(object):
             # Apply response middleware, regardless of the response
             for middleware_method in self._response_middleware:
                 response = middleware_method(request, response)
+                # Complain if the response middleware returned None (a common error).
+                if response is None:
+                    raise ValueError(
+                        "%s.process_response didn't return an "
+                        "HttpResponse object. It returned None instead."
+                        % (middleware_method.__self__.__class__.__name__))
             response = self.apply_response_fixes(request, response)
         except:  # Any exception should be gathered and handled
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+
+        response._closable_objects.append(request)
 
         return response
 

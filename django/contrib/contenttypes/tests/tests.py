@@ -3,51 +3,11 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.shortcuts import get_current_site
-from django.db import models
 from django.http import HttpRequest, Http404
 from django.test import TestCase, override_settings
-from django.utils.http import urlquote
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 
-
-class ConcreteModel(models.Model):
-    name = models.CharField(max_length=10)
-
-
-class ProxyModel(ConcreteModel):
-    class Meta:
-        proxy = True
-
-
-@python_2_unicode_compatible
-class FooWithoutUrl(models.Model):
-    """
-    Fake model not defining ``get_absolute_url`` for
-    :meth:`ContentTypesTests.test_shortcut_view_without_get_absolute_url`"""
-    name = models.CharField(max_length=30, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class FooWithUrl(FooWithoutUrl):
-    """
-    Fake model defining ``get_absolute_url`` for
-    :meth:`ContentTypesTests.test_shortcut_view`
-    """
-
-    def get_absolute_url(self):
-        return "/users/%s/" % urlquote(self.name)
-
-
-class FooWithBrokenAbsoluteUrl(FooWithoutUrl):
-    """
-    Fake model defining a ``get_absolute_url`` method containing an error
-    """
-
-    def get_absolute_url(self):
-        return "/users/%s/" % self.unknown_field
+from .models import ConcreteModel, ProxyModel, FooWithoutUrl, FooWithUrl, FooWithBrokenAbsoluteUrl
 
 
 class ContentTypesTests(TestCase):

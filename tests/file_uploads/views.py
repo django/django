@@ -157,3 +157,9 @@ def file_upload_content_type_extra(request):
             (k, smart_str(v)) for k, v in uploadedfile.content_type_extra.items()
         ])
     return HttpResponse(json.dumps(params))
+
+
+def file_upload_fd_closing(request, access):
+    if access == 't':
+        request.FILES  # Trigger file parsing.
+    return HttpResponse('')

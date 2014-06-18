@@ -476,8 +476,6 @@ class QueryTestCase(TestCase):
         dive = Book.objects.using('other').create(title="Dive into Python",
             published=datetime.date(2009, 5, 4))
 
-        mark = Person.objects.using('other').create(name="Mark Pilgrim")
-
         # Set a foreign key with an object from a different database
         with self.assertRaises(ValueError):
             dive.editor = marty
@@ -491,54 +489,6 @@ class QueryTestCase(TestCase):
         with self.assertRaises(ValueError):
             with transaction.atomic(using='default'):
                 marty.edited.add(dive)
-
-        # BUT! if you assign a FK object when the base object hasn't
-        # been saved yet, you implicitly assign the database for the
-        # base object.
-        chris = Person(name="Chris Mills")
-        html5 = Book(title="Dive into HTML5", published=datetime.date(2010, 3, 15))
-        # initially, no db assigned
-        self.assertEqual(chris._state.db, None)
-        self.assertEqual(html5._state.db, None)
-
-        # old object comes from 'other', so the new object is set to use 'other'...
-        dive.editor = chris
-        html5.editor = mark
-        self.assertEqual(chris._state.db, 'other')
-        self.assertEqual(html5._state.db, 'other')
-        # ... but it isn't saved yet
-        self.assertEqual(list(Person.objects.using('other').values_list('name', flat=True)),
-            ['Mark Pilgrim'])
-        self.assertEqual(list(Book.objects.using('other').values_list('title', flat=True)),
-            ['Dive into Python'])
-
-        # When saved (no using required), new objects goes to 'other'
-        chris.save()
-        html5.save()
-        self.assertEqual(list(Person.objects.using('default').values_list('name', flat=True)),
-            ['Marty Alchin'])
-        self.assertEqual(list(Person.objects.using('other').values_list('name', flat=True)),
-            ['Chris Mills', 'Mark Pilgrim'])
-        self.assertEqual(list(Book.objects.using('default').values_list('title', flat=True)),
-            ['Pro Django'])
-        self.assertEqual(list(Book.objects.using('other').values_list('title', flat=True)),
-            ['Dive into HTML5', 'Dive into Python'])
-
-        # This also works if you assign the FK in the constructor
-        water = Book(title="Dive into Water", published=datetime.date(2001, 1, 1), editor=mark)
-        self.assertEqual(water._state.db, 'other')
-        # ... but it isn't saved yet
-        self.assertEqual(list(Book.objects.using('default').values_list('title', flat=True)),
-            ['Pro Django'])
-        self.assertEqual(list(Book.objects.using('other').values_list('title', flat=True)),
-            ['Dive into HTML5', 'Dive into Python'])
-
-        # When saved, the new book goes to 'other'
-        water.save()
-        self.assertEqual(list(Book.objects.using('default').values_list('title', flat=True)),
-            ['Pro Django'])
-        self.assertEqual(list(Book.objects.using('other').values_list('title', flat=True)),
-            ['Dive into HTML5', 'Dive into Python', 'Dive into Water'])
 
     def test_foreign_key_deletion(self):
         "Cascaded deletions of Foreign Key relations issue queries on the right database"
@@ -1148,6 +1098,7 @@ class RouterTestCase(TestCase):
         # old object comes from 'other', so the new object is set to use the
         # source of 'other'...
         self.assertEqual(dive._state.db, 'other')
+        chris.save()
         dive.editor = chris
         html5.editor = mark
 

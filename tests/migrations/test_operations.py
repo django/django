@@ -37,7 +37,7 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             return migration.unapply(project_state, editor)
 
-    def set_up_test_model(self, app_label, second_model=False, third_model=False, related_model=False, mti_model=False):
+    def set_up_test_model(self, app_label, second_model=False, third_model=False, related_model=False, mti_model=False, proxy_model=False):
         """
         Creates a test model state and database table.
         """
@@ -112,6 +112,13 @@ class OperationTests(MigrationTestBase):
                 ],
                 bases=['%s.Pony' % app_label],
             ))
+        if proxy_model:
+            operations.append(migrations.CreateModel(
+                "ProxyPony",
+                fields=[],
+                options={"proxy": True},
+                bases=['%s.Pony' % app_label],
+            ))
 
         return self.apply_operations(app_label, ProjectState(), operations)
 
@@ -148,6 +155,49 @@ class OperationTests(MigrationTestBase):
         self.assertEqual(len(definition[1]), 2)
         self.assertEqual(len(definition[2]), 0)
         self.assertEqual(definition[1][0], "Pony")
+
+    def test_create_model_with_unique_after(self):
+        """
+        Tests the CreateModel operation directly followed by an
+        AlterUniqueTogether (bug #22844 - sqlite remake issues)
+        """
+        operation1 = migrations.CreateModel(
+            "Pony",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("pink", models.IntegerField(default=1)),
+            ],
+        )
+        operation2 = migrations.CreateModel(
+            "Rider",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("number", models.IntegerField(default=1)),
+                ("pony", models.ForeignKey("test_crmoua.Pony")),
+            ],
+        )
+        operation3 = migrations.AlterUniqueTogether(
+            "Rider",
+            [
+                ("number", "pony"),
+            ],
+        )
+        # Test the database alteration
+        project_state = ProjectState()
+        self.assertTableNotExists("test_crmoua_pony")
+        self.assertTableNotExists("test_crmoua_rider")
+        with connection.schema_editor() as editor:
+            new_state = project_state.clone()
+            operation1.state_forwards("test_crmoua", new_state)
+            operation1.database_forwards("test_crmoua", editor, project_state, new_state)
+            project_state, new_state = new_state, new_state.clone()
+            operation2.state_forwards("test_crmoua", new_state)
+            operation2.database_forwards("test_crmoua", editor, project_state, new_state)
+            project_state, new_state = new_state, new_state.clone()
+            operation3.state_forwards("test_crmoua", new_state)
+            operation3.database_forwards("test_crmoua", editor, project_state, new_state)
+        self.assertTableExists("test_crmoua_pony")
+        self.assertTableExists("test_crmoua_rider")
 
     def test_create_model_m2m(self):
         """
@@ -221,6 +271,34 @@ class OperationTests(MigrationTestBase):
             operation.database_backwards("test_crmoih", editor, new_state, project_state)
         self.assertTableNotExists("test_crmoih_shetlandpony")
 
+    def test_create_proxy_model(self):
+        """
+        Tests that CreateModel ignores proxy models.
+        """
+        project_state = self.set_up_test_model("test_crprmo")
+        # Test the state alteration
+        operation = migrations.CreateModel(
+            "ProxyPony",
+            [],
+            options={"proxy": True},
+            bases=("test_crprmo.Pony", ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards("test_crprmo", new_state)
+        self.assertIn(("test_crprmo", "proxypony"), new_state.models)
+        # Test the database alteration
+        self.assertTableNotExists("test_crprmo_proxypony")
+        self.assertTableExists("test_crprmo_pony")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_crprmo", editor, project_state, new_state)
+        self.assertTableNotExists("test_crprmo_proxypony")
+        self.assertTableExists("test_crprmo_pony")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_crprmo", editor, new_state, project_state)
+        self.assertTableNotExists("test_crprmo_proxypony")
+        self.assertTableExists("test_crprmo_pony")
+
     def test_delete_model(self):
         """
         Tests the DeleteModel operation.
@@ -241,72 +319,64 @@ class OperationTests(MigrationTestBase):
             operation.database_backwards("test_dlmo", editor, new_state, project_state)
         self.assertTableExists("test_dlmo_pony")
 
+    def test_delete_proxy_model(self):
+        """
+        Tests the DeleteModel operation ignores proxy models.
+        """
+        project_state = self.set_up_test_model("test_dlprmo", proxy_model=True)
+        # Test the state alteration
+        operation = migrations.DeleteModel("ProxyPony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_dlprmo", new_state)
+        self.assertIn(("test_dlprmo", "proxypony"), project_state.models)
+        self.assertNotIn(("test_dlprmo", "proxypony"), new_state.models)
+        # Test the database alteration
+        self.assertTableExists("test_dlprmo_pony")
+        self.assertTableNotExists("test_dlprmo_proxypony")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_dlprmo", editor, project_state, new_state)
+        self.assertTableExists("test_dlprmo_pony")
+        self.assertTableNotExists("test_dlprmo_proxypony")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_dlprmo", editor, new_state, project_state)
+        self.assertTableExists("test_dlprmo_pony")
+        self.assertTableNotExists("test_dlprmo_proxypony")
+
     def test_rename_model(self):
         """
         Tests the RenameModel operation.
         """
-        project_state = self.set_up_test_model("test_rnmo")
+        project_state = self.set_up_test_model("test_rnmo", related_model=True)
         # Test the state alteration
         operation = migrations.RenameModel("Pony", "Horse")
         new_state = project_state.clone()
         operation.state_forwards("test_rnmo", new_state)
         self.assertNotIn(("test_rnmo", "pony"), new_state.models)
         self.assertIn(("test_rnmo", "horse"), new_state.models)
+        # Remember, RenameModel also repoints all incoming FKs and M2Ms
+        self.assertEqual("test_rnmo.Horse", new_state.models["test_rnmo", "rider"].fields[1][1].rel.to)
         # Test the database alteration
         self.assertTableExists("test_rnmo_pony")
         self.assertTableNotExists("test_rnmo_horse")
+        if connection.features.supports_foreign_keys:
+            self.assertFKExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_pony", "id"))
+            self.assertFKNotExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_horse", "id"))
         with connection.schema_editor() as editor:
             operation.database_forwards("test_rnmo", editor, project_state, new_state)
         self.assertTableNotExists("test_rnmo_pony")
         self.assertTableExists("test_rnmo_horse")
+        if connection.features.supports_foreign_keys:
+            self.assertFKNotExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_pony", "id"))
+            self.assertFKExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_horse", "id"))
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_rnmo", editor, new_state, project_state)
-        self.assertTableExists("test_dlmo_pony")
+        self.assertTableExists("test_rnmo_pony")
         self.assertTableNotExists("test_rnmo_horse")
-
-    # See #22248 - this will fail until that's fixed.
-    #
-    # def test_rename_model_with_related(self):
-    #     """
-    #     Tests the real-world combo of a RenameModel operation with AlterField
-    #     for a related field.
-    #     """
-    #     project_state = self.set_up_test_model(
-    #         "test_rnmowr", related_model=True)
-    #     # Test the state alterations
-    #     model_operation = migrations.RenameModel("Pony", "Horse")
-    #     new_state = project_state.clone()
-    #     model_operation.state_forwards("test_rnmowr", new_state)
-    #     self.assertNotIn(("test_rnmowr", "pony"), new_state.models)
-    #     self.assertIn(("test_rnmowr", "horse"), new_state.models)
-
-    #     self.assertEqual(
-    #         "Pony",
-    #         project_state.render().get_model("test_rnmowr", "rider")
-    #         ._meta.get_field_by_name("pony")[0].rel.to._meta.object_name)
-    #     field_operation = migrations.AlterField(
-    #         "Rider", "pony", models.ForeignKey("Horse"))
-    #     field_operation.state_forwards("test_rnmowr", new_state)
-    #     self.assertEqual(
-    #         "Horse",
-    #         new_state.render().get_model("test_rnmowr", "rider")
-    #         ._meta.get_field_by_name("pony")[0].rel.to._meta.object_name)
-
-    #     # Test the database alterations
-    #     self.assertTableExists("test_rnmowr_pony")
-    #     self.assertTableNotExists("test_rnmowr_horse")
-    #     with connection.schema_editor() as editor:
-    #         model_operation.database_forwards("test_rnmowr", editor, project_state, new_state)
-    #         field_operation.database_forwards("test_rnmowr", editor, project_state, new_state)
-    #     self.assertTableNotExists("test_rnmowr_pony")
-    #     self.assertTableExists("test_rnmowr_horse")
-    #     # And test reversal
-    #     with connection.schema_editor() as editor:
-    #         field_operation.database_backwards("test_rnmowr", editor, new_state, project_state)
-    #         model_operation.database_backwards("test_rnmowr", editor, new_state, project_state)
-    #     self.assertTableExists("test_rnmowr_pony")
-    #     self.assertTableNotExists("test_rnmowr_horse")
+        if connection.features.supports_foreign_keys:
+            self.assertFKExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_pony", "id"))
+            self.assertFKNotExists("test_rnmo_rider", ["pony_id"], ("test_rnmo_horse", "id"))
 
     def test_add_field(self):
         """
@@ -821,6 +891,41 @@ class OperationTests(MigrationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alinto", editor, new_state, project_state)
         self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])
+
+    def test_alter_model_options(self):
+        """
+        Tests the AlterModelOptions operation.
+        """
+        project_state = self.set_up_test_model("test_almoop")
+        # Test the state alteration (no DB alteration to test)
+        operation = migrations.AlterModelOptions("Pony", {"permissions": [("can_groom", "Can groom")]})
+        new_state = project_state.clone()
+        operation.state_forwards("test_almoop", new_state)
+        self.assertEqual(len(project_state.models["test_almoop", "pony"].options.get("permissions", [])), 0)
+        self.assertEqual(len(new_state.models["test_almoop", "pony"].options.get("permissions", [])), 1)
+        self.assertEqual(new_state.models["test_almoop", "pony"].options["permissions"][0][0], "can_groom")
+
+    def test_alter_order_with_respect_to(self):
+        """
+        Tests the AlterOrderWithRespectTo operation.
+        """
+        project_state = self.set_up_test_model("test_alorwrtto", related_model=True)
+        # Test the state alteration
+        operation = migrations.AlterOrderWithRespectTo("Rider", "pony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_alorwrtto", new_state)
+        self.assertEqual(project_state.models["test_alorwrtto", "rider"].options.get("order_with_respect_to", None), None)
+        self.assertEqual(new_state.models["test_alorwrtto", "rider"].options.get("order_with_respect_to", None), "pony")
+        # Make sure there's no matching index
+        self.assertColumnNotExists("test_alorwrtto_rider", "_order")
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_alorwrtto", editor, project_state, new_state)
+        self.assertColumnExists("test_alorwrtto_rider", "_order")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_alorwrtto", editor, new_state, project_state)
+        self.assertColumnNotExists("test_alorwrtto_rider", "_order")
 
     @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql(self):

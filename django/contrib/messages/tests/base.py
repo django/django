@@ -158,10 +158,9 @@ class BaseTests(object):
         data = {
             'messages': ['Test message %d' % x for x in range(5)],
         }
-        show_url = reverse('django.contrib.messages.tests.urls.show')
+        show_url = reverse('show_message')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
-            add_url = reverse('django.contrib.messages.tests.urls.add',
-                              args=(level,))
+            add_url = reverse('add_message', args=(level,))
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
             self.assertTrue('messages' in response.context)
@@ -175,10 +174,9 @@ class BaseTests(object):
         data = {
             'messages': ['Test message %d' % x for x in range(5)],
         }
-        show_url = reverse('django.contrib.messages.tests.urls.show_template_response')
+        show_url = reverse('show_template_response')
         for level in self.levels.keys():
-            add_url = reverse('django.contrib.messages.tests.urls.add_template_response',
-                              args=(level,))
+            add_url = reverse('add_template_response', args=(level,))
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
             self.assertTrue('messages' in response.context)
@@ -191,7 +189,7 @@ class BaseTests(object):
                 self.assertNotContains(response, msg)
 
     def test_context_processor_message_levels(self):
-        show_url = reverse('django.contrib.messages.tests.urls.show_template_response')
+        show_url = reverse('show_template_response')
         response = self.client.get(show_url)
 
         self.assertTrue('DEFAULT_MESSAGE_LEVELS' in response.context)
@@ -206,12 +204,11 @@ class BaseTests(object):
         data = {
             'messages': ['Test message %d' % x for x in range(5)],
         }
-        show_url = reverse('django.contrib.messages.tests.urls.show')
+        show_url = reverse('show_message')
         messages = []
         for level in ('debug', 'info', 'success', 'warning', 'error'):
             messages.extend([Message(self.levels[level], msg) for msg in data['messages']])
-            add_url = reverse('django.contrib.messages.tests.urls.add',
-                              args=(level,))
+            add_url = reverse('add_message', args=(level,))
             self.client.post(add_url, data)
         response = self.client.get(show_url)
         self.assertTrue('messages' in response.context)
@@ -233,10 +230,9 @@ class BaseTests(object):
         data = {
             'messages': ['Test message %d' % x for x in range(5)],
         }
-        reverse('django.contrib.messages.tests.urls.show')
+        reverse('show_message')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
-            add_url = reverse('django.contrib.messages.tests.urls.add',
-                              args=(level,))
+            add_url = reverse('add_message', args=(level,))
             self.assertRaises(MessageFailure, self.client.post, add_url,
                               data, follow=True)
 
@@ -254,10 +250,9 @@ class BaseTests(object):
             'messages': ['Test message %d' % x for x in range(5)],
             'fail_silently': True,
         }
-        show_url = reverse('django.contrib.messages.tests.urls.show')
+        show_url = reverse('show_message')
         for level in ('debug', 'info', 'success', 'warning', 'error'):
-            add_url = reverse('django.contrib.messages.tests.urls.add',
-                              args=(level,))
+            add_url = reverse('add_message', args=(level,))
             response = self.client.post(add_url, data, follow=True)
             self.assertRedirects(response, show_url)
             self.assertFalse('messages' in response.context)

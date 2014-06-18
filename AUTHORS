@@ -154,6 +154,7 @@ answer newbie questions, and generally made Django that much better:
     Antonio Cavedoni <http://cavedoni.com/>
     cedric@terramater.net
     Chris Chamberlin <dja@cdc.msbx.net>
+    Greg Chapple <gregchapple1@gmail.com>
     Amit Chakradeo <http://amit.chakradeo.net/>
     ChaosKCW
     Kowito Charoenratchatabhan <kowito@felspar.com>
@@ -421,6 +422,7 @@ answer newbie questions, and generally made Django that much better:
     Javier Mansilla <javimansilla@gmail.com>
     masonsimon+django@gmail.com
     Manuzhai
+    Moayad Mardini <moayad.m@gmail.com>
     Petr Marhoun <petr.marhoun@gmail.com>
     Petar Marić <http://www.petarmaric.com/>
     Nuno Mariz <nmariz@gmail.com>
@@ -510,6 +512,7 @@ answer newbie questions, and generally made Django that much better:
     polpak@yahoo.com
     Ross Poulton <ross@rossp.org>
     Mihai Preda <mihai_preda@yahoo.com>
+    Nick Presta <nick@nickpresta.ca>
     Matthias Pronk <django@masida.nl>
     Jyrki Pulliainen <jyrki.pulliainen@gmail.com>
     Thejaswi Puthraya <thejaswi.puthraya@gmail.com>
@@ -691,6 +694,7 @@ answer newbie questions, and generally made Django that much better:
     Gasper Zejn <zejn@kiberpipa.org>
     Jarek Zgoda <jarek.zgoda@gmail.com>
     Cheng Zhang
+    <Please alphabetize new entries>
 
 A big THANK YOU goes to:
 
@@ -701,7 +705,7 @@ A big THANK YOU goes to:
 
     Ian Bicking for convincing Adrian to ditch code generation.
 
-    Mark Pilgrim for "Dive Into Python" (http://diveintopython.net,
+    Mark Pilgrim for "Dive Into Python" (http://www.diveintopython.net,
     http://www.diveintopython3.net).
 
     Guido van Rossum for creating Python.

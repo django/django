@@ -1518,3 +1518,117 @@ class CustomModelAdminTests(CheckTestCase):
                 validator_class = CustomValidator
 
             self.assertIsInvalid(CustomModelAdmin, ValidationTestModel, 'error!')
+
+
+class ListDisplayEditableTests(CheckTestCase):
+    def test_list_display_links_is_none(self):
+        """
+        list_display and list_editable can contain the same values
+        when list_display_links is None
+        """
+        class ProductAdmin(ModelAdmin):
+            list_display = ['name', 'slug', 'pub_date']
+            list_editable = list_display
+            list_display_links = None
+        self.assertIsValid(ProductAdmin, ValidationTestModel)
+
+    def test_list_display_same_as_list_editable(self):
+        """
+        The first item in list_display can be the same as the first
+        in list_editable
+        """
+        class ProductAdmin(ModelAdmin):
+            list_display = ['name', 'slug', 'pub_date']
+            list_editable = ['name', 'slug']
+            list_display_links = ['pub_date']
+        self.assertIsValid(ProductAdmin, ValidationTestModel)
+
+
+class ModelAdminPermissionTests(TestCase):
+
+    class MockUser(object):
+        def has_module_perms(self, app_label):
+            if app_label == "modeladmin":
+                return True
+            return False
+
+    class MockAddUser(MockUser):
+        def has_perm(self, perm):
+            if perm == "modeladmin.add_band":
+                return True
+            return False
+
+    class MockChangeUser(MockUser):
+        def has_perm(self, perm):
+            if perm == "modeladmin.change_band":
+                return True
+            return False
+
+    class MockDeleteUser(MockUser):
+        def has_perm(self, perm):
+            if perm == "modeladmin.delete_band":
+                return True
+            return False
+
+    def test_has_add_permission(self):
+        """
+        Ensure that has_add_permission returns True for users who can add
+        objects and False for users who can't.
+        """
+        ma = ModelAdmin(Band, AdminSite())
+        request = MockRequest()
+        request.user = self.MockAddUser()
+        self.assertTrue(ma.has_add_permission(request))
+        request.user = self.MockChangeUser()
+        self.assertFalse(ma.has_add_permission(request))
+        request.user = self.MockDeleteUser()
+        self.assertFalse(ma.has_add_permission(request))
+
+    def test_has_change_permission(self):
+        """
+        Ensure that has_change_permission returns True for users who can edit
+        objects and False for users who can't.
+        """
+        ma = ModelAdmin(Band, AdminSite())
+        request = MockRequest()
+        request.user = self.MockAddUser()
+        self.assertFalse(ma.has_change_permission(request))
+        request.user = self.MockChangeUser()
+        self.assertTrue(ma.has_change_permission(request))
+        request.user = self.MockDeleteUser()
+        self.assertFalse(ma.has_change_permission(request))
+
+    def test_has_delete_permission(self):
+        """
+        Ensure that has_delete_permission returns True for users who can delete
+        objects and False for users who can't.
+        """
+        ma = ModelAdmin(Band, AdminSite())
+        request = MockRequest()
+        request.user = self.MockAddUser()
+        self.assertFalse(ma.has_delete_permission(request))
+        request.user = self.MockChangeUser()
+        self.assertFalse(ma.has_delete_permission(request))
+        request.user = self.MockDeleteUser()
+        self.assertTrue(ma.has_delete_permission(request))
+
+    def test_has_module_permission(self):
+        """
+        Ensure that has_module_permission returns True for users who have any
+        permission for the module and False for users who don't.
+        """
+        ma = ModelAdmin(Band, AdminSite())
+        request = MockRequest()
+        request.user = self.MockAddUser()
+        self.assertTrue(ma.has_module_permission(request))
+        request.user = self.MockChangeUser()
+        self.assertTrue(ma.has_module_permission(request))
+        request.user = self.MockDeleteUser()
+        self.assertTrue(ma.has_module_permission(request))
+        ma.opts.app_label = "anotherapp"
+        request.user = self.MockAddUser()
+        self.assertFalse(ma.has_module_permission(request))
+        request.user = self.MockChangeUser()
+        self.assertFalse(ma.has_module_permission(request))
+        request.user = self.MockDeleteUser()
+        self.assertFalse(ma.has_module_permission(request))

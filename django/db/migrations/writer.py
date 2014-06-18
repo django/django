@@ -10,7 +10,7 @@ import sys
 import types
 
 from django.apps import apps
-from django.db import models
+from django.db import models, migrations
 from django.db.migrations.loader import MigrationLoader
 from django.utils import datetime_safe, six
 from django.utils.encoding import force_text
@@ -44,7 +44,15 @@ class OperationWriter(object):
         argspec = inspect.getargspec(self.operation.__init__)
         normalized_kwargs = inspect.getcallargs(self.operation.__init__, *args, **kwargs)
 
-        self.feed('migrations.%s(' % name)
+        # See if this operation is in django.db.migrations. If it is,
+        # We can just use the fact we already have that imported,
+        # otherwise, we need to add an import for the operation class.
+        if getattr(migrations, name, None) == self.operation.__class__:
+            self.feed('migrations.%s(' % name)
+        else:
+            imports.add('import %s' % (self.operation.__class__.__module__))
+            self.feed('%s.%s(' % (self.operation.__class__.__module__, name))
+
         self.indent()
         for arg_name in argspec.args[1:]:
             arg_value = normalized_kwargs[arg_name]
@@ -284,13 +292,29 @@ class MigrationWriter(object):
                 klass = value.__self__
                 module = klass.__module__
                 return "%s.%s.%s" % (module, klass.__name__, value.__name__), set(["import %s" % module])
-            elif value.__name__ == '<lambda>':
+            # Further error checking
+            if value.__name__ == '<lambda>':
                 raise ValueError("Cannot serialize function: lambda")
-            elif value.__module__ is None:
+            if value.__module__ is None:
                 raise ValueError("Cannot serialize function %r: No module" % value)
-            else:
-                module = value.__module__
-                return "%s.%s" % (module, value.__name__), set(["import %s" % module])
+            # Python 3 is a lot easier, and only uses this branch if it's not local.
+            if getattr(value, "__qualname__", None) and getattr(value, "__module__", None):
+                if "<" not in value.__qualname__:  # Qualname can include <locals>
+                    return "%s.%s" % (value.__module__, value.__qualname__), set(["import %s" % value.__module__])
+            # Python 2/fallback version
+            module_name = value.__module__
+            # Make sure it's actually there and not an unbound method
+            module = import_module(module_name)
+            if not hasattr(module, value.__name__):
+                raise ValueError(
+                    "Could not find function %s in %s.\nPlease note that "
+                    "due to Python 2 limitations, you cannot serialize "
+                    "unbound method functions (e.g. a method declared\n"
+                    "and used in the same class body). Please move the "
+                    "function into the main module body to use migrations.\n"
+                    "For more information, see https://docs.djangoproject.com/en/1.7/topics/migrations/#serializing-values"
+                )
+            return "%s.%s" % (module_name, value.__name__), set(["import %s" % module_name])
         # Classes
         elif isinstance(value, type):
             special_cases = [

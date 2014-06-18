@@ -103,8 +103,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_bulk_insert = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
     supports_foreign_keys = False
-    supports_check_constraints = False
+    supports_column_check_constraints = False
     autocommits_when_autocommit_is_off = True
+    can_introspect_decimal_field = False
     can_introspect_positive_integer_field = True
     can_introspect_small_integer_field = True
     supports_transactions = True

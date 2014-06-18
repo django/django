@@ -4,6 +4,7 @@ from django.test import TestCase, override_settings
 from django.db import connection, connections
 from django.db.migrations.loader import MigrationLoader, AmbiguityError
 from django.db.migrations.recorder import MigrationRecorder
+from django.test import modify_settings
 from django.utils import six
 
 
@@ -46,6 +47,7 @@ class LoaderTests(TestCase):
     """
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    @modify_settings(INSTALLED_APPS={'append': 'basic'})
     def test_load(self):
         """
         Makes sure the loader can load the migrations for the test apps,
@@ -77,7 +79,7 @@ class LoaderTests(TestCase):
         )
 
         # Ensure we've included unmigrated apps in there too
-        self.assertIn("contenttypes", project_state.real_apps)
+        self.assertIn("basic", project_state.real_apps)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_unmigdep"})
     def test_load_unmigrated_dependency(self):
@@ -89,6 +91,8 @@ class LoaderTests(TestCase):
         self.assertEqual(
             migration_loader.graph.forwards_plan(("migrations", "0001_initial")),
             [
+                ('contenttypes', '0001_initial'),
+                ('auth', '0001_initial'),
                 ("migrations", "0001_initial"),
             ],
         )
@@ -100,6 +104,22 @@ class LoaderTests(TestCase):
         self.assertEqual(
             [x for x, y in book_state.fields],
             ["id", "user"]
+        )
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_run_before"})
+    def test_run_before(self):
+        """
+        Makes sure the loader uses Migration.run_before.
+        """
+        # Load and test the plan
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(
+            migration_loader.graph.forwards_plan(("migrations", "0002_second")),
+            [
+                ("migrations", "0001_initial"),
+                ("migrations", "0003_third"),
+                ("migrations", "0002_second"),
+            ],
         )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})

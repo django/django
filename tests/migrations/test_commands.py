@@ -102,6 +102,29 @@ class MigrateTests(MigrationTestBase):
         call_command("sqlmigrate", "migrations", "0001", stdout=stdout, backwards=True)
         self.assertIn("drop table", stdout.getvalue().lower())
 
+    @override_system_checks([])
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.migrated_app",
+            "migrations.migrations_test_apps.migrated_unapplied_app",
+            "migrations.migrations_test_apps.unmigrated_app"])
+    def test_regression_22823_unmigrated_fk_to_migrated_model(self):
+        """
+        https://code.djangoproject.com/ticket/22823
+
+        Assuming you have 3 apps, `A`, `B`, and `C`, such that:
+
+        * `A` has migrations
+        * `B` has a migration we want to apply
+        * `C` has no migrations, but has an FK to `A`
+
+        When we try to migrate "B", an exception occurs because the
+        "B" was not included in the ProjectState that is used to detect
+        soft-applied migrations.
+        """
+        stdout = six.StringIO()
+        call_command("migrate", "migrated_unapplied_app", stdout=stdout)
+
 
 class MakeMigrationsTests(MigrationTestBase):
     """

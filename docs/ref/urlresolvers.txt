@@ -16,12 +16,11 @@ your code, Django provides the following function:
 :ref:`URL pattern name <naming-url-patterns>`, or the callable view object.
 For example, given the following ``url``::
 
-    url(r'^archive/$', 'news.views.archive', name='news_archive')
+    from news import views
+
+    url(r'^archive/$', views.archive, name='news_archive')
 
 you can use any of the following to reverse the URL::
-
-    # using the Python path
-    reverse('news.views.archive')
 
     # using the named URL
     reverse('news_archive')
@@ -63,6 +62,10 @@ namespaces into URLs on specific application instances, according to the
 The ``urlconf`` argument is the URLconf module containing the url patterns to
 use for reversing. By default, the root URLconf for the current thread is used.
 
+.. deprecated:: 1.8
+
+    The ability to reverse using the Python path, e.g.
+    ``reverse('news.views.archive')``, has been deprecated.
 
 .. admonition:: Make sure your views are all correct.
 

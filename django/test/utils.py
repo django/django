@@ -509,7 +509,7 @@ class CaptureQueriesContext(object):
     def __enter__(self):
         self.use_debug_cursor = self.connection.use_debug_cursor
         self.connection.use_debug_cursor = True
-        self.initial_queries = len(self.connection.queries)
+        self.initial_queries = len(self.connection.queries_log)
         self.final_queries = None
         request_started.disconnect(reset_queries)
         return self
@@ -519,7 +519,7 @@ class CaptureQueriesContext(object):
         request_started.connect(reset_queries)
         if exc_type is not None:
             return
-        self.final_queries = len(self.connection.queries)
+        self.final_queries = len(self.connection.queries_log)
 
 
 class IgnoreDeprecationWarningsMixin(object):

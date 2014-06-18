@@ -80,7 +80,7 @@ class CursorDebugWrapper(CursorWrapper):
             stop = time()
             duration = stop - start
             sql = self.db.ops.last_executed_query(self.cursor, sql, params)
-            self.db.queries.append({
+            self.db.queries_log.append({
                 'sql': sql,
                 'time': "%.3f" % duration,
             })
@@ -99,7 +99,7 @@ class CursorDebugWrapper(CursorWrapper):
                 times = len(param_list)
             except TypeError:           # param_list could be an iterator
                 times = '?'
-            self.db.queries.append({
+            self.db.queries_log.append({
                 'sql': '%s times: %s' % (times, sql),
                 'time': "%.3f" % duration,
             })

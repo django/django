@@ -454,12 +454,7 @@ SECURE_PROXY_SSL_HEADER = None
 # response phase the middleware will be applied in reverse order.
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    # 'django.middleware.http.ConditionalGetMiddleware',
-    # 'django.middleware.gzip.GZipMiddleware',
 )
 
 ############
@@ -577,6 +572,10 @@ DEFAULT_EXCEPTION_REPORTER_FILTER = 'django.views.debug.SafeExceptionReporterFil
 
 # The name of the class to use to run the test suite
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
+# Apps that don't need to be serialized at test database creation time
+# (only apps with migrations are to start with)
+TEST_NON_SERIALIZED_APPS = []
 
 ############
 # FIXTURES #

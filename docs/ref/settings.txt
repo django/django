@@ -586,6 +586,8 @@ TEST
 
     All :setting:`TEST <DATABASE-TEST>` sub-entries used to be independent
     entries in the database settings dictionary, with a ``TEST_`` prefix.
+    For backwards compatibility with older versions of Django, you can define
+    both versions of the settings as long as they match.
     Further, ``TEST_CREATE``, ``TEST_USER_CREATE`` and ``TEST_PASSWD``
     were changed to ``CREATE_DB``, ``CREATE_USER`` and ``PASSWORD``
     respectively.
@@ -1732,12 +1734,16 @@ MIDDLEWARE_CLASSES
 Default::
 
     ('django.middleware.common.CommonMiddleware',
-     'django.contrib.sessions.middleware.SessionMiddleware',
-     'django.middleware.csrf.CsrfViewMiddleware',
-     'django.contrib.auth.middleware.AuthenticationMiddleware',
-     'django.contrib.messages.middleware.MessageMiddleware',)
+     'django.middleware.csrf.CsrfViewMiddleware',)
 
 A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
+
+.. versionchanged:: 1.7
+
+    :class:`~django.contrib.sessions.middleware.SessionMiddleware`,
+    :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`, and
+    :class:`~django.contrib.messages.middleware.MessageMiddleware` were removed
+    from this setting.
 
 .. setting:: MIGRATION_MODULES
 
@@ -2077,6 +2083,26 @@ Default: ``'django.test.runner.DiscoverRunner'``
 
 The name of the class to use for starting the test suite. See
 :ref:`other-testing-frameworks`.
+
+.. setting:: TEST_NON_SERIALIZED_APPS
+
+TEST_NON_SERIALIZED_APPS
+------------------------
+
+.. versionadded:: 1.7
+
+Default: ``[]``
+
+In order to restore the database state between tests for
+``TransactionTestCase``\s and database backends without transactions, Django
+will :ref:`serialize the contents of all apps with migrations
+<test-case-serialized-rollback>` when it starts the test run so it can then
+reload from that copy before tests that need it.
+
+This slows down the startup time of the test runner; if you have apps that
+you know don't need this feature, you can add their full names in here (e.g.
+``'django.contrib.contenttypes'``) to exclude them from this serialization
+process.
 
 .. setting:: THOUSAND_SEPARATOR
 
@@ -2983,6 +3009,7 @@ Templates
 Testing
 -------
 * Database: :setting:`TEST <DATABASE-TEST>`
+* :setting:`TEST_NON_SERIALIZED_APPS`
 * :setting:`TEST_RUNNER`
 
 URLs

@@ -713,11 +713,11 @@ class FormsTestCase(TestCase):
 
         f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
         self.assertEqual(f.errors['__all__'], ['Please make sure your passwords match.'])
-        self.assertHTMLEqual(f.as_table(), """<tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
+        self.assertHTMLEqual(f.as_table(), """<tr><td colspan="2"><ul class="errorlist nonfield"><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><th>Username:</th><td><input type="text" name="username" value="adrian" maxlength="10" /></td></tr>
 <tr><th>Password1:</th><td><input type="password" name="password1" /></td></tr>
 <tr><th>Password2:</th><td><input type="password" name="password2" /></td></tr>""")
-        self.assertHTMLEqual(f.as_ul(), """<li><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></li>
+        self.assertHTMLEqual(f.as_ul(), """<li><ul class="errorlist nonfield"><li>Please make sure your passwords match.</li></ul></li>
 <li>Username: <input type="text" name="username" value="adrian" maxlength="10" /></li>
 <li>Password1: <input type="password" name="password1" /></li>
 <li>Password2: <input type="password" name="password2" /></li>""")
@@ -947,15 +947,15 @@ class FormsTestCase(TestCase):
         # prepended. This message is displayed at the top of the output, regardless of
         # its field's order in the form.
         p = Person({'first_name': 'John', 'last_name': 'Lennon', 'birthday': '1940-10-9'}, auto_id=False)
-        self.assertHTMLEqual(p.as_table(), """<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></td></tr>
+        self.assertHTMLEqual(p.as_table(), """<tr><td colspan="2"><ul class="errorlist nonfield"><li>(Hidden field hidden_text) This field is required.</li></ul></td></tr>
 <tr><th>First name:</th><td><input type="text" name="first_name" value="John" /></td></tr>
 <tr><th>Last name:</th><td><input type="text" name="last_name" value="Lennon" /></td></tr>
 <tr><th>Birthday:</th><td><input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></td></tr>""")
-        self.assertHTMLEqual(p.as_ul(), """<li><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></li>
+        self.assertHTMLEqual(p.as_ul(), """<li><ul class="errorlist nonfield"><li>(Hidden field hidden_text) This field is required.</li></ul></li>
 <li>First name: <input type="text" name="first_name" value="John" /></li>
 <li>Last name: <input type="text" name="last_name" value="Lennon" /></li>
 <li>Birthday: <input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></li>""")
-        self.assertHTMLEqual(p.as_p(), """<ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul>
+        self.assertHTMLEqual(p.as_p(), """<ul class="errorlist nonfield"><li>(Hidden field hidden_text) This field is required.</li></ul>
 <p>First name: <input type="text" name="first_name" value="John" /></p>
 <p>Last name: <input type="text" name="last_name" value="Lennon" /></p>
 <p>Birthday: <input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></p>""")
@@ -1637,7 +1637,7 @@ class FormsTestCase(TestCase):
         # Case 2: POST with erroneous data (a redisplayed form, with errors).)
         self.assertHTMLEqual(my_function('POST', {'username': 'this-is-a-long-username', 'password1': 'foo', 'password2': 'bar'}), """<form action="" method="post">
 <table>
-<tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
+<tr><td colspan="2"><ul class="errorlist nonfield"><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><th>Username:</th><td><ul class="errorlist"><li>Ensure this value has at most 10 characters (it has 23).</li></ul><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
 <tr><th>Password1:</th><td><input type="password" name="password1" /></td></tr>
 <tr><th>Password2:</th><td><input type="password" name="password2" /></td></tr>
@@ -1764,7 +1764,7 @@ class FormsTestCase(TestCase):
 <input type="submit" />
 </form>''')
         self.assertHTMLEqual(t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)})), """<form action="">
-<ul class="errorlist"><li>Please make sure your passwords match.</li></ul>
+<ul class="errorlist nonfield"><li>Please make sure your passwords match.</li></ul>
 <p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
 <p><label>Password: <input type="password" name="password1" /></label></p>
 <p><label>Password (again): <input type="password" name="password2" /></label></p>
@@ -2137,7 +2137,7 @@ class FormsTestCase(TestCase):
         control = [
             '<li>foo<ul class="errorlist"><li>This field is required.</li></ul></li>',
             '<li>bar<ul class="errorlist"><li>This field is required.</li></ul></li>',
-            '<li>__all__<ul class="errorlist"><li>Non-field error.</li></ul></li>',
+            '<li>__all__<ul class="errorlist nonfield"><li>Non-field error.</li></ul></li>',
         ]
         for error in control:
             self.assertInHTML(error, errors)
@@ -2199,4 +2199,78 @@ class FormsTestCase(TestCase):
         self.assertEqual(
             json.loads(e.as_json()),
             [{"message": "Foo", "code": ""}, {"message": "Foobar", "code": "foobar"}]
+        )
+
+    def test_error_list_class_not_specified(self):
+        e = ErrorList()
+        e.append('Foo')
+        e.append(ValidationError('Foo%(bar)s', code='foobar', params={'bar': 'bar'}))
+        self.assertEqual(
+            e.as_ul(),
+            '<ul class="errorlist"><li>Foo</li><li>Foobar</li></ul>'
+        )
+
+    def test_error_list_class_has_one_class_specified(self):
+        e = ErrorList(error_class='foobar-error-class')
+        e.append('Foo')
+        e.append(ValidationError('Foo%(bar)s', code='foobar', params={'bar': 'bar'}))
+        self.assertEqual(
+            e.as_ul(),
+            '<ul class="errorlist foobar-error-class"><li>Foo</li><li>Foobar</li></ul>'
+        )
+
+    def test_error_list_with_hidden_field_errors_has_correct_class(self):
+        class Person(Form):
+            first_name = CharField()
+            last_name = CharField(widget=HiddenInput)
+
+        p = Person({'first_name': 'John'})
+        self.assertHTMLEqual(
+            p.as_ul(),
+            """<li><ul class="errorlist nonfield"><li>(Hidden field last_name) This field is required.</li></ul></li><li><label for="id_first_name">First name:</label> <input id="id_first_name" name="first_name" type="text" value="John" /><input id="id_last_name" name="last_name" type="hidden" /></li>"""
+        )
+        self.assertHTMLEqual(
+            p.as_p(),
+            """<ul class="errorlist nonfield"><li>(Hidden field last_name) This field is required.</li></ul>
+<p><label for="id_first_name">First name:</label> <input id="id_first_name" name="first_name" type="text" value="John" /><input id="id_last_name" name="last_name" type="hidden" /></p>"""
+        )
+        self.assertHTMLEqual(
+            p.as_table(),
+            """<tr><td colspan="2"><ul class="errorlist nonfield"><li>(Hidden field last_name) This field is required.</li></ul></td></tr>
+<tr><th><label for="id_first_name">First name:</label></th><td><input id="id_first_name" name="first_name" type="text" value="John" /><input id="id_last_name" name="last_name" type="hidden" /></td></tr>"""
+        )
+
+    def test_error_list_with_non_field_errors_has_correct_class(self):
+        class Person(Form):
+            first_name = CharField()
+            last_name = CharField()
+
+            def clean(self):
+                raise ValidationError('Generic validation error')
+
+        p = Person({'first_name': 'John', 'last_name': 'Lennon'})
+        self.assertHTMLEqual(
+            str(p.non_field_errors()),
+            '<ul class="errorlist nonfield"><li>Generic validation error</li></ul>'
+        )
+        self.assertHTMLEqual(
+            p.as_ul(),
+            """<li><ul class="errorlist nonfield"><li>Generic validation error</li></ul></li><li><label for="id_first_name">First name:</label> <input id="id_first_name" name="first_name" type="text" value="John" /></li>
+<li><label for="id_last_name">Last name:</label> <input id="id_last_name" name="last_name" type="text" value="Lennon" /></li>"""
+        )
+        self.assertHTMLEqual(
+            p.non_field_errors().as_text(),
+            '* Generic validation error'
+        )
+        self.assertHTMLEqual(
+            p.as_p(),
+            """<ul class="errorlist nonfield"><li>Generic validation error</li></ul>
+<p><label for="id_first_name">First name:</label> <input id="id_first_name" name="first_name" type="text" value="John" /></p>
+<p><label for="id_last_name">Last name:</label> <input id="id_last_name" name="last_name" type="text" value="Lennon" /></p>"""
+        )
+        self.assertHTMLEqual(
+            p.as_table(),
+            """<tr><td colspan="2"><ul class="errorlist nonfield"><li>Generic validation error</li></ul></td></tr>
+<tr><th><label for="id_first_name">First name:</label></th><td><input id="id_first_name" name="first_name" type="text" value="John" /></td></tr>
+<tr><th><label for="id_last_name">Last name:</label></th><td><input id="id_last_name" name="last_name" type="text" value="Lennon" /></td></tr>"""
         )
