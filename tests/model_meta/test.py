@@ -1,5 +1,4 @@
 from django import test
-from collections import OrderedDict
 
 from django.db.models.fields import related, CharField, Field
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -146,15 +145,20 @@ TEST_RESULTS = {
         Relating: [
             'basepeople',
             'basepeople_hidden',
-            'people', 'people_hidden']
+            'people',
+            'people_hidden']
     },
     'many_to_many_with_model': {
         Person: [
             BasePerson,
             BasePerson,
             BasePerson,
-            BasePerson, BasePerson, BasePerson,
-            None, None, None],
+            BasePerson,
+            BasePerson,
+            BasePerson,
+            None,
+            None,
+            None],
         BasePerson: [
             None,
             None,
@@ -418,7 +422,8 @@ TEST_RESULTS = {
             'relating_people', '+'],
         Relation: [
             'm2m_abstract_rel',
-            'm2m_base_rel', 'm2m_concrete_rel']
+            'm2m_base_rel',
+            'm2m_concrete_rel']
     },
     'virtual_fields': {
         AbstractPerson: [
