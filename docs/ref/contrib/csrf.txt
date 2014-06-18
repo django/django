@@ -139,45 +139,9 @@ The above code could be simplified by using the `jQuery cookie plugin
     :func:`~django.views.decorators.csrf.ensure_csrf_cookie`.
 
 Finally, you'll have to actually set the header on your AJAX request, while
-protecting the CSRF token from being sent to other domains.
-
-.. code-block:: javascript
-
-    function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-    function sameOrigin(url) {
-        // test that a given url is a same-origin URL
-        // url could be relative or scheme relative or absolute
-        var host = document.location.host; // host + port
-        var protocol = document.location.protocol;
-        var sr_origin = '//' + host;
-        var origin = protocol + sr_origin;
-        // Allow absolute or scheme relative URLs to same origin
-        return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
-            (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
-            // or any other URL that isn't scheme relative or absolute i.e relative.
-            !(/^(\/\/|http:|https:).*/.test(url));
-    }
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-                // Send the token to same-origin, relative URLs only.
-                // Send the token only if the method warrants CSRF protection
-                // Using the CSRFToken value acquired earlier
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
-
-.. note::
-
-    Due to a bug introduced in jQuery 1.5, the example above will not work
-    correctly on that version. Make sure you are running at least jQuery 1.5.1.
-
-You can use `settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in
-jQuery 1.5 and newer in order to replace the ``sameOrigin`` logic above:
+protecting the CSRF token from being sent to other domains using
+`settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5.1 and
+newer:
 
 .. code-block:: javascript
 
@@ -192,15 +156,6 @@ jQuery 1.5 and newer in order to replace the ``sameOrigin`` logic above:
             }
         }
     });
-
-.. note::
-
-    In a `security release blogpost`_, a simpler "same origin test" example
-    was provided which only checked for a relative URL. The ``sameOrigin``
-    test above supersedes that example—it works for edge cases like
-    scheme-relative or absolute URLs for the same domain.
-
-.. _security release blogpost: https://www.djangoproject.com/weblog/2011/feb/08/security/
 
 Other template engines
 ----------------------
