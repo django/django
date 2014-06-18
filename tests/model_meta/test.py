@@ -494,6 +494,8 @@ class M2MTests(OptionsBaseTests):
 
 
 class RelatedObjectsTests(OptionsBaseTests):
+    def setUp(self):
+        self.key_name = lambda r: r[0]
 
     def test_related_objects(self):
         result_key = 'get_all_related_objects_with_model'
@@ -511,7 +513,10 @@ class RelatedObjectsTests(OptionsBaseTests):
         result_key = 'get_all_related_objects_with_model_hidden'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(include_hidden=True)
-            self.assertEqual(self._map_names(objects), expected)
+            self.assertEqual(
+                sorted(self._map_names(objects), key=self.key_name),
+                sorted(expected, key=self.key_name)
+            )
 
     def test_related_objects_include_hidden_local_only(self):
         result_key = 'get_all_related_objects_with_model_hidden_local'
@@ -532,7 +537,10 @@ class RelatedObjectsTests(OptionsBaseTests):
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_proxy_eq=True, include_hidden=True)
-            self.assertEqual(self._map_names(objects), expected)
+            self.assertEqual(
+                sorted(self._map_names(objects), key=self.key_name),
+                sorted(expected, key=self.key_name)
+            )
 
 
 class RelatedM2MTests(OptionsBaseTests):
@@ -569,7 +577,7 @@ class VirtualFieldsTests(OptionsBaseTests):
     def test_virtual_fields(self):
         for model, expected_names in TEST_RESULTS['virtual_fields'].items():
             objects = model._meta.virtual_fields
-            self.assertEqual([f.name for f in objects], expected_names)
+            self.assertEqual(sorted([f.name for f in objects]), sorted(expected_names))
 
 
 class GetFieldByNameTests(OptionsBaseTests):
