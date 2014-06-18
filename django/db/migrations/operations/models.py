@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.db import models, router
+from django.db import models
 from django.db.models.options import normalize_together
 from django.db.migrations.state import ModelState
 from django.db.migrations.operations.base import Operation
@@ -32,13 +32,13 @@ class CreateModel(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         apps = to_state.render()
         model = apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, model) and not model._meta.proxy:
+        if self.allowed_to_migrate(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         apps = from_state.render()
         model = apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, model) and not model._meta.proxy:
+        if self.allowed_to_migrate(schema_editor.connection.alias, model):
             schema_editor.delete_model(model)
 
     def describe(self):
@@ -85,13 +85,13 @@ class DeleteModel(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         apps = from_state.render()
         model = apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, model) and not model._meta.proxy:
+        if self.allowed_to_migrate(schema_editor.connection.alias, model):
             schema_editor.delete_model(model)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         apps = to_state.render()
         model = apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, model) and not model._meta.proxy:
+        if self.allowed_to_migrate(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
 
     def references_model(self, name, app_label=None):
@@ -141,7 +141,7 @@ class RenameModel(Operation):
         new_apps = to_state.render()
         old_model = old_apps.get_model(app_label, self.old_name)
         new_model = new_apps.get_model(app_label, self.new_name)
-        if router.allow_migrate(schema_editor.connection.alias, new_model):
+        if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
             # Move the main table
             schema_editor.alter_db_table(
                 new_model,
@@ -194,7 +194,7 @@ class AlterModelTable(Operation):
         new_apps = to_state.render()
         old_model = old_apps.get_model(app_label, self.name)
         new_model = new_apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, new_model):
+        if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
             schema_editor.alter_db_table(
                 new_model,
                 old_model._meta.db_table,
@@ -231,7 +231,7 @@ class AlterUniqueTogether(Operation):
         new_apps = to_state.render()
         old_model = old_apps.get_model(app_label, self.name)
         new_model = new_apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, new_model):
+        if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
             schema_editor.alter_unique_together(
                 new_model,
                 getattr(old_model._meta, "unique_together", set()),
@@ -268,7 +268,7 @@ class AlterIndexTogether(Operation):
         new_apps = to_state.render()
         old_model = old_apps.get_model(app_label, self.name)
         new_model = new_apps.get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, new_model):
+        if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
             schema_editor.alter_index_together(
                 new_model,
                 getattr(old_model._meta, "index_together", set()),
@@ -301,7 +301,7 @@ class AlterOrderWithRespectTo(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.name)
         to_model = to_state.render().get_model(app_label, self.name)
-        if router.allow_migrate(schema_editor.connection.alias, to_model):
+        if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
             # Remove a field if we need to
             if from_model._meta.order_with_respect_to and not to_model._meta.order_with_respect_to:
                 schema_editor.remove_field(from_model, from_model._meta.get_field_by_name("_order")[0])

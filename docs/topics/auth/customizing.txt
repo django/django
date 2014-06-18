@@ -389,7 +389,8 @@ use as your User model.
 
    Changing this setting after you have tables created is not supported
    by :djadmin:`makemigrations` and will result in you having to manually
-   write a set of migrations to fix your schema.
+   fix your schema, port your data from the old user table, and possibly
+   manually reapply some migrations.
 
 Referencing the User model
 --------------------------
