@@ -83,7 +83,7 @@ class OperationTestBase(MigrationTestBase):
                 ("pink", models.IntegerField(default=3)),
                 ("weight", models.FloatField()),
             ],
-            options = {
+            options={
                 "swappable": "TEST_SWAP_MODEL",
             },
         )]
@@ -141,7 +141,6 @@ class OperationTests(OperationTestBase):
     Each test looks at their state changing, and then their database operation -
     both forwards and backwards.
     """
-
 
     def test_create_model(self):
         """
@@ -1161,7 +1160,7 @@ class SwappableOperationTests(OperationTestBase):
                 ("id", models.AutoField(primary_key=True)),
                 ("pink", models.IntegerField(default=1)),
             ],
-            options = {
+            options={
                 "swappable": "TEST_SWAP_MODEL",
             },
         )
