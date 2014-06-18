@@ -26,7 +26,8 @@ TEST_RESULTS = {
             'fk_inherited_id',
             'data_not_concrete_inherited',
             'content_type_concrete_id',
-            'object_id_concrete'],
+            'object_id_concrete',
+            ],
         BasePerson: [
             'id',
             'data_abstract',
@@ -38,13 +39,15 @@ TEST_RESULTS = {
             'fk_base_id',
             'data_not_concrete_base',
             'content_type_base_id',
-            'object_id_base'],
+            'object_id_base',
+            ],
         AbstractPerson: [
             'data_abstract',
             'fk_abstract_id',
             'data_not_concrete_abstract',
             'content_type_abstract_id',
-            'object_id_abstract'],
+            'object_id_abstract',
+            ],
         Relating: [
             'id',
             'baseperson_id',
@@ -52,7 +55,8 @@ TEST_RESULTS = {
             'person_id',
             'person_hidden_id',
             'proxyperson_id',
-            'proxyperson_hidden_id']
+            'proxyperson_hidden_id',
+            ]
     },
     'local_fields': {
         Person: [
@@ -61,7 +65,8 @@ TEST_RESULTS = {
             'fk_inherited_id',
             'data_not_concrete_inherited',
             'content_type_concrete_id',
-            'object_id_concrete'],
+            'object_id_concrete',
+            ],
         BasePerson: [
             'id',
             'data_abstract',
@@ -73,13 +78,15 @@ TEST_RESULTS = {
             'fk_base_id',
             'data_not_concrete_base',
             'content_type_base_id',
-            'object_id_base'],
+            'object_id_base',
+            ],
         AbstractPerson: [
             'data_abstract',
             'fk_abstract_id',
             'data_not_concrete_abstract',
             'content_type_abstract_id',
-            'object_id_abstract'],
+            'object_id_abstract',
+            ],
         Relating: [
             'id',
             'baseperson_id',
@@ -87,7 +94,8 @@ TEST_RESULTS = {
             'person_id',
             'person_hidden_id',
             'proxyperson_id',
-            'proxyperson_hidden_id']
+            'proxyperson_hidden_id',
+            ]
     },
     'local_concrete_fields': {
         Person: [
@@ -95,7 +103,8 @@ TEST_RESULTS = {
             'data_inherited',
             'fk_inherited_id',
             'content_type_concrete_id',
-            'object_id_concrete'],
+            'object_id_concrete',
+            ],
         BasePerson: [
             'id',
             'data_abstract',
@@ -105,12 +114,14 @@ TEST_RESULTS = {
             'data_base',
             'fk_base_id',
             'content_type_base_id',
-            'object_id_base'],
+            'object_id_base',
+            ],
         AbstractPerson: [
             'data_abstract',
             'fk_abstract_id',
             'content_type_abstract_id',
-            'object_id_abstract'],
+            'object_id_abstract',
+            ],
         Relating: [
             'id',
             'baseperson_id',
@@ -118,7 +129,8 @@ TEST_RESULTS = {
             'person_id',
             'person_hidden_id',
             'proxyperson_id',
-            'proxyperson_hidden_id']
+            'proxyperson_hidden_id',
+            ]
     },
     'many_to_many': {
         Person: [
@@ -130,23 +142,27 @@ TEST_RESULTS = {
             'following_base',
             'm2m_inherited',
             'friends_inherited',
-            'following_inherited'],
+            'following_inherited',
+            ],
         BasePerson: [
             'm2m_abstract',
             'friends_abstract',
             'following_abstract',
             'm2m_base',
             'friends_base',
-            'following_base'],
+            'following_base',
+            ],
         AbstractPerson: [
             'm2m_abstract',
             'friends_abstract',
-            'following_abstract'],
+            'following_abstract',
+            ],
         Relating: [
             'basepeople',
             'basepeople_hidden',
             'people',
-            'people_hidden']
+            'people_hidden',
+            ]
     },
     'many_to_many_with_model': {
         Person: [
@@ -158,23 +174,27 @@ TEST_RESULTS = {
             BasePerson,
             None,
             None,
-            None],
+            None,
+            ],
         BasePerson: [
             None,
             None,
             None,
             None,
             None,
-            None],
+            None,
+            ],
         AbstractPerson: [
             None,
             None,
-            None],
+            None,
+            ],
         Relating: [
             None,
             None,
             None,
-            None]
+            None,
+            ]
     },
     'get_all_related_objects_with_model': {
         Person: (
@@ -415,32 +435,39 @@ TEST_RESULTS = {
             'friends_base_rel_+',
             'followers_base',
             'relating_basepeople',
-            '+'],
+            '+',
+            ],
         Person: [
             'friends_inherited_rel_+',
             'followers_concrete',
-            'relating_people', '+'],
+            'relating_people',
+            '+',
+            ],
         Relation: [
             'm2m_abstract_rel',
             'm2m_base_rel',
-            'm2m_concrete_rel']
+            'm2m_concrete_rel',
+            ]
     },
     'virtual_fields': {
         AbstractPerson: [
             'generic_relation_abstract',
-            'content_object_abstract'],
+            'content_object_abstract',
+            ],
         BasePerson: [
             'generic_relation_base',
             'content_object_base',
             'generic_relation_abstract',
-            'content_object_abstract'],
+            'content_object_abstract',
+            ],
         Person: [
             'content_object_concrete',
             'generic_relation_concrete',
             'generic_relation_base',
             'content_object_base',
             'generic_relation_abstract',
-            'content_object_abstract']
+            'content_object_abstract',
+            ]
     },
 }
 
