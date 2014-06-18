@@ -1212,11 +1212,10 @@ class SwappableOperationTests(OperationTestBase):
         project_state, new_state = self.make_test_state("test_adfligsw", operation)
         # Test the database alteration
         self.assertTableNotExists("test_adfligsw_pont")
-        self.assertColumnNotExists("test_adfligsw_pony", "height")
         with connection.schema_editor() as editor:
             operation.database_forwards("test_adfligsw", editor, project_state, new_state)
-        self.assertColumnNotExists("test_adfligsw_pony", "height")
+        self.assertTableNotExists("test_adfligsw_pont")
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adfligsw", editor, new_state, project_state)
-        self.assertColumnNotExists("test_adfligsw_pony", "height")
+        self.assertTableNotExists("test_adfligsw_pont")
