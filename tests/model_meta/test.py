@@ -493,7 +493,7 @@ class M2MTests(OptionsBaseTests):
 
     def test_many_to_many_with_model(self):
         for model, expected_result in TEST_RESULTS['many_to_many_with_model'].items():
-            models = OrderedDict(model._meta.get_m2m_with_model()).values()
+            models = [model for field, model in model._meta.get_m2m_with_model()]
             self.assertEqual(models, expected_result)
 
 
