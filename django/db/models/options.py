@@ -22,6 +22,21 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save', 'default_related_name')
 
+DATA = 0b00001
+M2M = 0b00010
+RELATED_OBJECTS = 0b00100
+RELATED_M2M = 0b01000
+VIRTUAL = 0b10000
+
+# Aggregates
+NON_RELATED_FIELDS = DATA | M2M | VIRTUAL
+
+NONE = 0b0000
+LOCAL_ONLY = 0b0001
+CONCRETE = 0b0010
+INCLUDE_HIDDEN = 0b0100
+INCLUDE_PROXY = 0b1000
+
 
 def normalize_together(option_together):
     """
@@ -109,6 +124,107 @@ class Options(object):
     @property
     def installed(self):
         return self.app_config is not None
+
+    def get_non_swapped_models(self, include_auto_created=True):
+        apps = self.apps.get_models(include_auto_created=
+                                    include_auto_created)
+        return filter(lambda a: not a._meta.swapped, apps)
+
+    def _validate_related_object(self, obj):
+        parent_list = self.get_parent_list()
+        return not ((obj.field.creation_counter < 0
+                or obj.field.rel.parent_link)
+                and obj.model not in parent_list)
+
+    def get_new_field(self, field_name, opts=NONE):
+        base = {}
+        for field, name in self.get_new_fields(types=RELATED_M2M,
+                                               recursive=True).iteritems():
+            base[name] = field
+        for field, name in self.get_new_fields(types=RELATED_OBJECTS,
+                                               recursive=True).iteritems():
+            base[name] = field
+        for field, name in self.get_new_fields(types=M2M,
+                                               recursive=True).iteritems():
+            base[name] = field
+        for field, name in self.get_new_fields(types=DATA,
+                                               recursive=True).iteritems():
+            base[name] = field
+        for field, name in self.get_new_fields(types=VIRTUAL,
+                                               recursive=True).iteritems():
+            base[name] = field
+        try:
+            return base[field_name]
+        except KeyError:
+            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
+
+    def get_new_fields(self, types, opts=NONE, **kwargs):
+        fields = OrderedDict()
+
+        if types & VIRTUAL:
+            for field in self.virtual_fields:
+                fields[field] = field.name
+
+        if types & DATA:
+            if not opts & LOCAL_ONLY:
+                for parent in self.parents:
+                    fields.update(parent._meta.get_new_fields(types=DATA, opts=opts, **dict(kwargs, recursive=True)))
+            for field in self.local_fields:
+                if not ((opts & CONCRETE) and field.column is None):
+                    fields[field] = field.name
+
+        if types & M2M:
+            if not opts & LOCAL_ONLY:
+                for parent in self.parents:
+                    fields.update(parent._meta.get_new_fields(types=M2M, opts=opts, **dict(kwargs, recursive=True)))
+            for field in self.local_many_to_many:
+                fields[field] = field.name
+
+        if types & RELATED_M2M:
+            related_m2m_fields = OrderedDict()
+            if not (opts & LOCAL_ONLY):
+                for parent in self.parents:
+                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_M2M, **dict(kwargs, recursive=True)).iteritems():
+                        is_valid = not (obj.field.creation_counter < 0
+                                    and obj.model not in self.get_parent_list())
+                        if is_valid:
+                            related_m2m_fields[obj] = query_name
+
+            for model in self.get_non_swapped_models(False):
+                for f in model._meta.get_new_fields(types=M2M):
+                    has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
+                    if has_rel_attr and self == f.rel.to._meta:
+                        related_m2m_fields[f.related] = f.related_query_name()
+
+            fields.update(related_m2m_fields)
+
+        if types & RELATED_OBJECTS:
+            related_fields = OrderedDict()
+            # ERROR? check
+            if not (opts & LOCAL_ONLY):
+                for parent in self.parents:
+                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN, **dict(kwargs, recursive=True)).iteritems():
+                        if self._validate_related_object(obj):
+                            related_fields[obj] = query_name
+
+            for model in self.get_non_swapped_models(True):
+                for f in model._meta.get_new_fields(types=DATA | VIRTUAL, opts=INCLUDE_HIDDEN):
+                    has_rel_attr = hasattr(f, 'rel') and f.rel
+                    if has_rel_attr and f.has_class_relation():
+                        to_meta = f.rel.to._meta
+                        if (to_meta == self) or ((opts & INCLUDE_PROXY)
+                                and self.concrete_model == to_meta.concrete_model):
+                            related_fields[f.related] = f.related_query_name()
+
+            if not opts & INCLUDE_HIDDEN:
+                related_fields = OrderedDict([(k, v) for k, v in related_fields.items()
+                                              if not k.field.rel.is_hidden()])
+            fields.update(related_fields)
+
+        if 'recursive' not in kwargs:
+            fields = tuple(fields.keys())
+
+        return fields
 
     def contribute_to_class(self, cls, name):
         from django.db import connection
@@ -298,6 +414,7 @@ class Options(object):
 
     @cached_property
     def fields(self):
+        # get_fields(local=RECURSIVE)
         """
         The getter for self.fields. This returns the list of field objects
         available to this model (including through parent models).
@@ -313,13 +430,16 @@ class Options(object):
 
     @cached_property
     def concrete_fields(self):
+        # get_fields(local=RECURSIVE | CONCRETE)
         return [f for f in self.fields if f.column is not None]
 
     @cached_property
     def local_concrete_fields(self):
+        # get_fields(local=CONCRETE)
         return [f for f in self.local_fields if f.column is not None]
 
     def get_fields_with_model(self):
+        # get_fields(local=RECURSIVE)
         """
         Returns a sequence of (field, model) pairs for all fields. The "model"
         element is None for fields on the current model. Mostly of use when
@@ -332,6 +452,7 @@ class Options(object):
         return self._field_cache
 
     def get_concrete_fields_with_model(self):
+        # get_fields(local=RECURSIVE | CONCRETE)
         return [(field, model) for field, model in self.get_fields_with_model() if
                 field.column is not None]
 
@@ -348,6 +469,7 @@ class Options(object):
         self._field_name_cache = [x for x, _ in cache]
 
     def _many_to_many(self):
+        #get_fields(m2m=RECURSIVE)
         try:
             self._m2m_cache
         except AttributeError:
@@ -356,6 +478,7 @@ class Options(object):
     many_to_many = property(_many_to_many)
 
     def get_m2m_with_model(self):
+        #get_fields(m2m=RECURSIVE)
         """
         The many-to-many version of get_fields_with_model().
         """
@@ -416,6 +539,7 @@ class Options(object):
         debugging output (a list of choices), so any internal-only field names
         are not included.
         """
+        #fields = filter(lambda val: not val.endswith('+'), get_fields(m2m=RECURSIVE))
         try:
             cache = self._name_map
         except AttributeError:
@@ -455,6 +579,14 @@ class Options(object):
     def get_all_related_objects_with_model(self, local_only=False,
                                            include_hidden=False,
                                            include_proxy_eq=False):
+        #bits = LOCAL
+        #if not local_only:
+            #bits |= RECURSIVE
+        #if include_hidden:
+            #bits |= HIDDEN
+        #if include_proxy_eq:
+            #bits |= PROXY
+        #get_fields(related=bits)
         """
         Returns a list of (related-object, model) pairs. Similar to
         get_fields_with_model().
@@ -476,13 +608,18 @@ class Options(object):
         cache = OrderedDict()
         parent_list = self.get_parent_list()
         for parent in self.parents:
+            # For each parent, recursively call this fn
             for obj, model in parent._meta.get_all_related_objects_with_model(include_hidden=True):
+                # If model is invalid, continue
                 if (obj.field.creation_counter < 0 or obj.field.rel.parent_link) and obj.model not in parent_list:
                     continue
+
+                # Add model to cache
                 if not model:
                     cache[obj] = parent
                 else:
                     cache[obj] = model
+
         # Collect also objects which are in relation to some proxy child/parent of self.
         proxy_cache = cache.copy()
         for klass in self.apps.get_models(include_auto_created=True):
@@ -490,11 +627,15 @@ class Options(object):
                 for f in klass._meta.local_fields + klass._meta.virtual_fields:
                     if (hasattr(f, 'rel') and f.rel and not isinstance(f.rel.to, six.string_types)
                             and f.generate_reverse_relation):
+                        # If its on the same model
                         if self == f.rel.to._meta:
                             cache[f.related] = None
                             proxy_cache[f.related] = None
+                        # If its on another model
                         elif self.concrete_model == f.rel.to._meta.concrete_model:
                             proxy_cache[f.related] = None
+
+        # Only return direct related links
         self._related_objects_cache = cache
         self._related_objects_proxy_cache = proxy_cache
 
