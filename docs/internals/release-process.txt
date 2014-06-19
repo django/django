@@ -65,7 +65,7 @@ security purposes, please see :doc:`our security policies <security>`.
       default; you can turn on display of these warnings with the ``-Wd`` option
       of Python.
 
-    * Django 1.8 will still contain the backwards-compatible replica. This
+    * Django 1.8 will still contain the backwards-compatible secondary. This
       warning becomes *loud* by default, and will likely be quite annoying.
 
     * Django 1.9 will remove the feature outright.

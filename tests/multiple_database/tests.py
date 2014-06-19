@@ -804,7 +804,7 @@ class QueryTestCase(TestCase):
         self.assertEqual(book.editor._state.db, 'other')
 
     def test_subquery(self):
-        """Make sure as_sql works with subqueries and primary/replica."""
+        """Make sure as_sql works with subqueries and primary/secondary."""
         sub = Person.objects.using('other').filter(name='fff')
         qs = Book.objects.filter(editor__in=sub)
 
@@ -869,7 +869,7 @@ class RouterTestCase(TestCase):
     multi_db = True
 
     def setUp(self):
-        # Make the 'other' database appear to be a replica of the 'default'
+        # Make the 'other' database appear to be a secondary of the 'default'
         self.old_routers = router.routers
         router.routers = [TestRouter()]
 
@@ -1021,7 +1021,7 @@ class RouterTestCase(TestCase):
         try:
             dive.editor = marty
         except ValueError:
-            self.fail("Assignment across primary/replica databases with a common source should be ok")
+            self.fail("Assignment across primary/secondary databases with a common source should be ok")
 
         # Database assignments of original objects haven't changed...
         self.assertEqual(marty._state.db, 'default')
@@ -1039,7 +1039,7 @@ class RouterTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('Source database should have a copy of saved object')
 
-        # This isn't a real primary/replica database, so restore the original from other
+        # This isn't a real primary/secondary database, so restore the original from other
         dive = Book.objects.using('other').get(title='Dive into Python')
         self.assertEqual(dive._state.db, 'other')
 
@@ -1047,7 +1047,7 @@ class RouterTestCase(TestCase):
         try:
             marty.edited = [pro, dive]
         except ValueError:
-            self.fail("Assignment across primary/replica databases with a common source should be ok")
+            self.fail("Assignment across primary/secondary databases with a common source should be ok")
 
         # Assignment implies a save, so database assignments of original objects have changed...
         self.assertEqual(marty._state.db, 'default')
@@ -1061,7 +1061,7 @@ class RouterTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('Source database should have a copy of saved object')
 
-        # This isn't a real primary/replica database, so restore the original from other
+        # This isn't a real primary/secondary database, so restore the original from other
         dive = Book.objects.using('other').get(title='Dive into Python')
         self.assertEqual(dive._state.db, 'other')
 
@@ -1069,7 +1069,7 @@ class RouterTestCase(TestCase):
         try:
             marty.edited.add(dive)
         except ValueError:
-            self.fail("Assignment across primary/replica databases with a common source should be ok")
+            self.fail("Assignment across primary/secondary databases with a common source should be ok")
 
         # Add implies a save, so database assignments of original objects have changed...
         self.assertEqual(marty._state.db, 'default')
@@ -1083,7 +1083,7 @@ class RouterTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('Source database should have a copy of saved object')
 
-        # This isn't a real primary/replica database, so restore the original from other
+        # This isn't a real primary/secondary database, so restore the original from other
         dive = Book.objects.using('other').get(title='Dive into Python')
 
         # If you assign a FK object when the base object hasn't
@@ -1147,7 +1147,7 @@ class RouterTestCase(TestCase):
         mark = Person.objects.using('default').create(pk=2, name="Mark Pilgrim")
 
         # Now save back onto the usual database.
-        # This simulates primary/replica - the objects exist on both database,
+        # This simulates primary/secondary - the objects exist on both database,
         # but the _state.db is as it is for all other tests.
         pro.save(using='default')
         marty.save(using='default')
@@ -1164,7 +1164,7 @@ class RouterTestCase(TestCase):
         try:
             marty.book_set = [pro, dive]
         except ValueError:
-            self.fail("Assignment across primary/replica databases with a common source should be ok")
+            self.fail("Assignment across primary/secondary databases with a common source should be ok")
 
         # Database assignments don't change
         self.assertEqual(marty._state.db, 'default')
@@ -1183,7 +1183,7 @@ class RouterTestCase(TestCase):
         try:
             marty.book_set.add(dive)
         except ValueError:
-            self.fail("Assignment across primary/replica databases with a common source should be ok")
+            self.fail("Assignment across primary/secondary databases with a common source should be ok")
 
         # Database assignments don't change
         self.assertEqual(marty._state.db, 'default')
@@ -1202,7 +1202,7 @@ class RouterTestCase(TestCase):
         try:
             dive.authors = [mark, marty]
         except ValueError:
-            self.fail("Assignment across primary/replica databases with a common source should be ok")
+            self.fail("Assignment across primary/secondary databases with a common source should be ok")
 
         # Database assignments don't change
         self.assertEqual(marty._state.db, 'default')
@@ -1224,7 +1224,7 @@ class RouterTestCase(TestCase):
         try:
             dive.authors.add(marty)
         except ValueError:
-            self.fail("Assignment across primary/replica databases with a common source should be ok")
+            self.fail("Assignment across primary/secondary databases with a common source should be ok")
 
         # Database assignments don't change
         self.assertEqual(marty._state.db, 'default')
@@ -1262,7 +1262,7 @@ class RouterTestCase(TestCase):
         try:
             bob.userprofile = alice_profile
         except ValueError:
-            self.fail("Assignment across primary/replica databases with a common source should be ok")
+            self.fail("Assignment across primary/secondary databases with a common source should be ok")
 
         # Database assignments of original objects haven't changed...
         self.assertEqual(alice._state.db, 'default')
@@ -1293,7 +1293,7 @@ class RouterTestCase(TestCase):
         try:
             review1.content_object = dive
         except ValueError:
-            self.fail("Assignment across primary/replica databases with a common source should be ok")
+            self.fail("Assignment across primary/secondary databases with a common source should be ok")
 
         # Database assignments of original objects haven't changed...
         self.assertEqual(pro._state.db, 'default')
@@ -1312,7 +1312,7 @@ class RouterTestCase(TestCase):
         except Book.DoesNotExist:
             self.fail('Source database should have a copy of saved object')
 
-        # This isn't a real primary/replica database, so restore the original from other
+        # This isn't a real primary/secondary database, so restore the original from other
         dive = Book.objects.using('other').get(title='Dive into Python')
         self.assertEqual(dive._state.db, 'other')
 
@@ -1320,7 +1320,7 @@ class RouterTestCase(TestCase):
         try:
             dive.reviews.add(review1)
         except ValueError:
-            self.fail("Assignment across primary/replica databases with a common source should be ok")
+            self.fail("Assignment across primary/secondary databases with a common source should be ok")
 
         # Database assignments of original objects haven't changed...
         self.assertEqual(pro._state.db, 'default')
@@ -1395,7 +1395,7 @@ class RouterTestCase(TestCase):
         self.assertEqual(pro.reviews.db_manager('default').all().db, 'default')
 
     def test_subquery(self):
-        """Make sure as_sql works with subqueries and primary/replica."""
+        """Make sure as_sql works with subqueries and primary/secondary."""
         # Create a book and author on the other database
 
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
@@ -1433,7 +1433,7 @@ class AuthTestCase(TestCase):
     multi_db = True
 
     def setUp(self):
-        # Make the 'other' database appear to be a replica of the 'default'
+        # Make the 'other' database appear to be a secondary of the 'default'
         self.old_routers = router.routers
         router.routers = [AuthRouter()]
 
