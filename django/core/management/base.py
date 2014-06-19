@@ -605,7 +605,7 @@ class NoArgsCommand(BaseCommand):
 
     def __init__(self):
         warnings.warn(
-            "NoArgsCommand class is deprecated and will be removed in Django 2.0."
+            "NoArgsCommand class is deprecated and will be removed in Django 2.0. "
             "Use BaseCommand instead, which takes no arguments by default.",
             RemovedInDjango20Warning
         )

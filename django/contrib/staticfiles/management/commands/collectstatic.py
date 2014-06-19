@@ -5,6 +5,7 @@ from collections import OrderedDict
 
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError, BaseCommand
+from django.core.management.color import no_style
 from django.utils.encoding import smart_text
 from django.utils.six.moves import input
 
@@ -27,6 +28,7 @@ class Command(BaseCommand):
         self.unmodified_files = []
         self.post_processed_files = []
         self.storage = staticfiles_storage
+        self.style = no_style()
         try:
             self.storage.path('')
         except NotImplementedError:

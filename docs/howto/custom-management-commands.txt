@@ -433,7 +433,7 @@ Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
 
 .. deprecated:: 1.8
 
-  Use :class:`BaseCommand` instead, which takes no arguments by default.
+    Use :class:`BaseCommand` instead, which takes no arguments by default.
 
 A command which takes no arguments on the command line.
 
