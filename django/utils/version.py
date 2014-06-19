@@ -4,7 +4,10 @@ import datetime
 import os
 import subprocess
 
+from django.utils.lru_cache import lru_cache
 
+
+@lru_cache(maxsize=None)
 def get_version(version=None):
     "Returns a PEP 386-compliant version number from VERSION."
     version = get_complete_version(version)
