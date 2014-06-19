@@ -4,6 +4,8 @@ import datetime
 import os
 import subprocess
 
+from django.utils.lru_cache import lru_cache
+
 
 def get_version(version=None):
     "Returns a PEP 386-compliant version number from VERSION."
@@ -50,6 +52,7 @@ def get_complete_version(version=None):
     return version
 
 
+@lru_cache()
 def get_git_changeset():
     """Returns a numeric identifier of the latest git changeset.
 
