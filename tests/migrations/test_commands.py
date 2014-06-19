@@ -493,3 +493,49 @@ class MakeMigrationsTests(MigrationTestBase):
             if os.path.exists(merge_file):
                 os.remove(merge_file)
         self.assertNotIn("Created new merge migration", stdout.getvalue())
+
+    @override_system_checks([])
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_changes"},
+        INSTALLED_APPS=[
+            "migrations",
+            "migrations.migrations_test_apps.unspecified_app_with_conflict"])
+    def test_makemigrations_unspecified_app_with_conflict_no_merge(self):
+        """
+        Makes sure that makemigrations does not raise a CommandError when an
+        unspecified app has conflicting migrations.
+        """
+        try:
+            call_command("makemigrations", "migrations", merge=False, verbosity=0)
+        except CommandError:
+            self.fail("Makemigrations fails resolving conflicts in an unspecified app")
+
+    @override_system_checks([])
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.migrated_app",
+            "migrations.migrations_test_apps.unspecified_app_with_conflict"])
+    def test_makemigrations_unspecified_app_with_conflict_merge(self):
+        """
+        Makes sure that makemigrations does not create a merge for an
+        unspecified app even if it has conflicting migrations.
+        """
+        # Monkeypatch interactive questioner to auto accept
+        old_input = questioner.input
+        questioner.input = lambda _: "y"
+        stdout = six.StringIO()
+        merge_file = os.path.join(self.test_dir,
+                                  'migrations_test_apps',
+                                  'unspecified_app_with_conflict',
+                                  'migrations',
+                                  '0003_merge.py')
+        try:
+            call_command("makemigrations", "migrated_app", merge=True, interactive=True, stdout=stdout)
+            self.assertFalse(os.path.exists(merge_file))
+            self.assertIn("No conflicts detected to merge.", stdout.getvalue())
+        except CommandError:
+            self.fail("Makemigrations fails resolving conflicts in an unspecified app")
+        finally:
+            questioner.input = old_input
+            if os.path.exists(merge_file):
+                os.remove(merge_file)
