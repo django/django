@@ -1103,7 +1103,7 @@ class MultiDBOperationTests(MigrationTestBase):
     multi_db = True
 
     def setUp(self):
-        # Make the 'other' database appear to be a replica of the 'default'
+        # Make the 'other' database appear to be a secondary of the 'default'
         self.old_routers = router.routers
         router.routers = [MigrateNothingRouter()]
 

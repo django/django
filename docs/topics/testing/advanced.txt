@@ -64,17 +64,17 @@ The following is a simple unit test using the request factory::
 Tests and multiple databases
 ============================
 
-.. _topics-testing-primaryreplica:
+.. _topics-testing-primarysecondary:
 
-Testing primary/replica configurations
+Testing primary/secondary configurations
 --------------------------------------
 
-If you're testing a multiple database configuration with primary/replica
+If you're testing a multiple database configuration with primary/secondary
 (referred to as master/slave by some databases) replication, this strategy of
 creating test databases poses a problem.
 When the test databases are created, there won't be any replication,
 and as a result, data created on the primary won't be seen on the
-replica.
+secondary.
 
 To compensate for this, Django allows you to define that a database is
 a *test mirror*. Consider the following (simplified) example database
@@ -87,31 +87,31 @@ configuration::
             'HOST': 'dbprimary',
              # ... plus some other settings
         },
-        'replica': {
+        'secondary': {
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'myproject',
-            'HOST': 'dbreplica',
+            'HOST': 'dbsecondary',
             'TEST_MIRROR': 'default'
             # ... plus some other settings
         }
     }
 
 In this setup, we have two database servers: ``dbprimary``, described
-by the database alias ``default``, and ``dbreplica`` described by the
-alias ``replica``. As you might expect, ``dbreplica`` has been configured
-by the database administrator as a read replica of ``dbprimary``, so in
-normal activity, any write to ``default`` will appear on ``replica``.
+by the database alias ``default``, and ``dbsecondary`` described by the
+alias ``secondary``. As you might expect, ``dbsecondary`` has been configured
+by the database administrator as a read secondary of ``dbprimary``, so in
+normal activity, any write to ``default`` will appear on ``secondary``.
 
 If Django created two independent test databases, this would break any
-tests that expected replication to occur. However, the ``replica``
+tests that expected replication to occur. However, the ``secondary``
 database has been configured as a test mirror (using the
 :setting:`TEST_MIRROR` setting), indicating that under testing,
-``replica`` should be treated as a mirror of ``default``.
+``secondary`` should be treated as a mirror of ``default``.
 
-When the test environment is configured, a test version of ``replica``
-will *not* be created. Instead the connection to ``replica``
+When the test environment is configured, a test version of ``secondary``
+will *not* be created. Instead the connection to ``secondary``
 will be redirected to point at ``default``. As a result, writes to
-``default`` will appear on ``replica`` -- but because they are actually
+``default`` will appear on ``secondary`` -- but because they are actually
 the same database, not because there is data replication between the
 two databases.
 

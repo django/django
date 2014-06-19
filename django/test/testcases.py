@@ -814,7 +814,7 @@ class TransactionTestCase(SimpleTestCase):
             if self.reset_sequences:
                 self._reset_sequences(db_name)
 
-            # If we need to provide replica initial data from migrated apps,
+            # If we need to provide secondary initial data from migrated apps,
             # then do so.
             if self.serialized_rollback and hasattr(connections[db_name], "_test_serialized_contents"):
                 if self.available_apps is not None:
