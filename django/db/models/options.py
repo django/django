@@ -167,40 +167,38 @@ class Options(object):
 
         if types & VIRTUAL:
             for field in self.virtual_fields:
-                fields[field] = True
+                fields[field] = field.name
 
         if types & DATA:
             if not opts & LOCAL_ONLY:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(types=DATA,
-                                  opts=opts, **dict(kwargs, recursive=True)))
+                    fields.update(parent._meta.get_new_fields(types=DATA, opts=opts, **dict(kwargs, recursive=True)))
             for field in self.local_fields:
                 if not ((opts & CONCRETE) and field.column is None):
-                    fields[field] = True
+                    fields[field] = field.name
 
         if types & M2M:
             if not opts & LOCAL_ONLY:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(types=M2M,
-                                  opts=opts, **dict(kwargs, recursive=True)))
+                    fields.update(parent._meta.get_new_fields(types=M2M, opts=opts, **dict(kwargs, recursive=True)))
             for field in self.local_many_to_many:
-                fields[field] = True
+                fields[field] = field.name
 
         if types & RELATED_M2M:
             related_m2m_fields = OrderedDict()
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
-                    for obj in parent._meta.get_new_fields(types=RELATED_M2M, **kwargs):
+                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_M2M, **dict(kwargs, recursive=True)).iteritems():
                         is_valid = not (obj.field.creation_counter < 0
                                     and obj.model not in self.get_parent_list())
                         if is_valid:
-                            related_m2m_fields[obj] = True
+                            related_m2m_fields[obj] = query_name
 
             for model in self.get_non_swapped_models(False):
                 for f in model._meta.get_new_fields(types=M2M):
                     has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
                     if has_rel_attr and self == f.rel.to._meta:
-                        related_m2m_fields[f.related] = True
+                        related_m2m_fields[f.related] = f.related_query_name()
 
             fields.update(related_m2m_fields)
 
@@ -209,31 +207,25 @@ class Options(object):
             # ERROR? check
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
-                    for obj in parent._meta.get_new_fields(types=RELATED_OBJECTS,
-                                                           opts=INCLUDE_HIDDEN, **kwargs):
+                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN, **dict(kwargs, recursive=True)).iteritems():
                         if self._validate_related_object(obj):
-                            related_fields[obj] = True
+                            related_fields[obj] = query_name
 
             for model in self.get_non_swapped_models(True):
-                for f in model._meta.get_new_fields(types=DATA | VIRTUAL,
-                                                    opts=INCLUDE_HIDDEN):
+                for f in model._meta.get_new_fields(types=DATA | VIRTUAL, opts=INCLUDE_HIDDEN):
                     has_rel_attr = hasattr(f, 'rel') and f.rel
                     if has_rel_attr and f.has_class_relation():
                         to_meta = f.rel.to._meta
                         if (to_meta == self) or ((opts & INCLUDE_PROXY)
                                 and self.concrete_model == to_meta.concrete_model):
-                            related_fields[f.related] = True
-                            #related = f.related
-                            #if not opts & INCLUDE_HIDDEN:
-                                #if not related.field.rel.is_hidden():
-                                    #related_fields[related] = True
+                            related_fields[f.related] = f.related_query_name()
 
             if not opts & INCLUDE_HIDDEN:
                 related_fields = OrderedDict([(k, v) for k, v in related_fields.items()
                                               if not k.field.rel.is_hidden()])
             fields.update(related_fields)
 
-        if not 'recursive' in kwargs:
+        if 'recursive' not in kwargs:
             fields = tuple(fields.keys())
 
         return fields
