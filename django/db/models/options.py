@@ -14,6 +14,8 @@ from django.utils.functional import cached_property
 from django.utils.text import camel_case_to_spaces
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
+from django.utils.lru_cache import lru_cache
+
 
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
@@ -128,45 +130,30 @@ class Options(object):
                                     include_auto_created)
         return filter(lambda a: not a._meta.swapped, apps)
 
-    def _validate_related_object(self, obj):
-        parent_list = self.get_parent_list()
-        return not ((obj.field.creation_counter < 0
-                or obj.field.rel.parent_link)
-                and obj.model not in parent_list)
+    @lru_cache(maxsize=None)
+    def _get_field_map(self):
+        types = RELATED_M2M | RELATED_OBJECTS | M2M | DATA | VIRTUAL
+        return dict(map(lambda (field, fn): (fn, field), self.get_new_fields(types=types, recursive=True).iteritems()))
 
     def get_new_field(self, field_name, opts=NONE):
-        base = {}
-        for field, name in self.get_new_fields(types=RELATED_M2M,
-                                               recursive=True).iteritems():
-            base[name] = field
-        for field, name in self.get_new_fields(types=RELATED_OBJECTS,
-                                               recursive=True).iteritems():
-            base[name] = field
-        for field, name in self.get_new_fields(types=M2M,
-                                               recursive=True).iteritems():
-            base[name] = field
-        for field, name in self.get_new_fields(types=DATA,
-                                               recursive=True).iteritems():
-            base[name] = field
-        for field, name in self.get_new_fields(types=VIRTUAL,
-                                               recursive=True).iteritems():
-            base[name] = field
         try:
-            return base[field_name]
+            return self._get_field_map()[field_name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
+    @lru_cache(maxsize=None)
     def get_new_fields(self, types, opts=NONE, **kwargs):
+        map_field_fn = lambda field: (field, field.name)
+        recursive_kwargs = dict(kwargs, recursive=True)
         fields = OrderedDict()
 
         if types & VIRTUAL:
-            for field in self.virtual_fields:
-                fields[field] = field.name
+            fields.update(map(map_field_fn, self.virtual_fields))
 
         if types & DATA:
             if not opts & LOCAL_ONLY:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(types=DATA, opts=opts, **dict(kwargs, recursive=True)))
+                    fields.update(parent._meta.get_new_fields(types=DATA, opts=opts, **recursive_kwargs))
             for field in self.local_fields:
                 if not ((opts & CONCRETE) and field.column is None):
                     fields[field] = field.name
@@ -174,15 +161,14 @@ class Options(object):
         if types & M2M:
             if not opts & LOCAL_ONLY:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(types=M2M, opts=opts, **dict(kwargs, recursive=True)))
-            for field in self.local_many_to_many:
-                fields[field] = field.name
+                    fields.update(parent._meta.get_new_fields(types=M2M, opts=opts, **recursive_kwargs))
+            fields.update(map(map_field_fn, self.local_many_to_many))
 
         if types & RELATED_M2M:
             related_m2m_fields = OrderedDict()
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
-                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_M2M, **dict(kwargs, recursive=True)).iteritems():
+                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_M2M, **recursive_kwargs).iteritems():
                         is_valid = not (obj.field.creation_counter < 0
                                     and obj.model not in self.get_parent_list())
                         if is_valid:
@@ -197,12 +183,15 @@ class Options(object):
             fields.update(related_m2m_fields)
 
         if types & RELATED_OBJECTS:
+            parent_list = self.get_parent_list()
             related_fields = OrderedDict()
             # ERROR? check
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
-                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN, **dict(kwargs, recursive=True)).iteritems():
-                        if self._validate_related_object(obj):
+                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN, **recursive_kwargs).iteritems():
+                        if not ((obj.field.creation_counter < 0
+                                or obj.field.rel.parent_link)
+                                and obj.model not in parent_list):
                             related_fields[obj] = query_name
 
             for model in self.get_non_swapped_models(True):
