@@ -79,20 +79,21 @@ would appear in the URL, browser history and server logs, all in plaintext.
 Neither would it be suitable for large quantities of data, or for binary data,
 such as an image. A web application that uses ``GET`` requests for admin forms
 is a security risk: it can be easy for an attacker to mimic a form's request to
-gain access to sensitive parts of the system. ``POST`` offers a great deal more
-control over access.
+gain access to sensitive parts of the system. ``POST`` offers more control over
+access.
 
-On the other hand, ``GET`` is suitable for things like web search form, because
-the URLS that represent a ``GET`` request can easily be bookmarked, shared, or
-resubmitted.
+On the other hand, ``GET`` is suitable for things like a web search form,
+because the URLS that represent a ``GET`` request can easily be bookmarked,
+shared, or resubmitted.
 
 Django's role in forms
 ======================
 
-Handling forms is a complex business. Consider Django's admin, where a large
-quantity of data may need to be prepared for display in a form, rendered as
-HTML, edited using a convenient interface, returned to the server, validated
-and cleaned up, and then saved or passed on for further processing.
+Handling forms is a complex business. Consider Django's admin, where numerous
+items of data of various different types may need to be prepared for display in
+a form, rendered as HTML, edited using a convenient interface, returned to the
+server, validated and cleaned up, and then saved or passed on for further
+processing.
 
 Django's form functionality can simplify and automate vast portions of this
 work, and also do it more safely and securely than most programmers would be
