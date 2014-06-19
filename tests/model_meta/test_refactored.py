@@ -489,6 +489,16 @@ class OptionsBaseTests(test.TestCase):
         model = field.model if direct else field.parent_model._meta.concrete_model
         return None if model == current_model else model
 
+    def _details(self, current_model, connection):
+        direct = isinstance(connection, Field) or isinstance(connection, GenericForeignKey)
+        model = connection.model if direct else connection.parent_model._meta.concrete_model
+        if model == current_model:
+            model = None
+
+        field = connection if direct else connection.field
+        m2m = isinstance(field, related.ManyToManyField)
+        return connection, model, direct, m2m
+
 
 class DataTests(OptionsBaseTests):
 
@@ -624,26 +634,26 @@ class VirtualFieldsTests(OptionsBaseTests):
 class GetFieldByNameTests(OptionsBaseTests):
 
     def test_get_data_field(self):
-        field_info = Person._meta.get_field_by_name('data_abstract')
+        field_info = self._details(Person, Person._meta.get_new_field('data_abstract'))
         self.assertEqual(field_info[1:], (BasePerson, True, False))
         self.assertIsInstance(field_info[0], CharField)
 
     def test_get_m2m_field(self):
-        field_info = Person._meta.get_field_by_name('m2m_base')
+        field_info = self._details(Person, Person._meta.get_new_field('m2m_base'))
         self.assertEqual(field_info[1:], (BasePerson, True, True))
         self.assertIsInstance(field_info[0], related.ManyToManyField)
 
     def test_get_related_object(self):
-        field_info = Person._meta.get_field_by_name('relating_baseperson')
+        field_info = self._details(Person, Person._meta.get_new_field('relating_baseperson'))
         self.assertEqual(field_info[1:], (BasePerson, False, False))
         self.assertIsInstance(field_info[0], related.RelatedObject)
 
     def test_get_related_m2m(self):
-        field_info = Person._meta.get_field_by_name('relating_people')
+        field_info = self._details(Person, Person._meta.get_new_field('relating_people'))
         self.assertEqual(field_info[1:], (None, False, True))
         self.assertIsInstance(field_info[0], related.RelatedObject)
 
     def test_get_virtual_field(self):
-        field_info = Person._meta.get_field_by_name('content_object_base')
+        field_info = self._details(Person, Person._meta.get_new_field('content_object_base'))
         self.assertEqual(field_info[1:], (None, True, False))
         self.assertIsInstance(field_info[0], GenericForeignKey)

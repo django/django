@@ -135,32 +135,26 @@ class Options(object):
                 and obj.model not in parent_list)
 
     def get_new_field(self, field_name, opts=NONE):
-        field, model, direct, m2m = self.get_field_details(field_name,
-                                                           opts)
-        return field
-
-    def get_field_details(self, field_name, opts=NONE):
-        base = OrderedDict()
-        for name, data in self.get_new_fields(types=RELATED_M2M,
-                                           opts=opts, with_model=True):
-            base[name] = data + (False, True,)
-        for name, data in self.get_new_fields(types=RELATED_OBJECTS,
-                                           opts=opts, with_model=True):
-            base[name] = data + (False, False,)
-        for name, data in self.get_new_fields(types=M2M,
-                                              opts=opts, with_model=True):
-            base[name] = data + (True, True,)
-        for name, data in self.get_new_fields(types=DATA,
-                                              opts=opts, with_model=True):
-            base[name] = data + (True, False,)
-        for name, data in self.get_new_fields(types=VIRTUAL,
-                                              opts=opts, with_model=True):
-            base[name] = data + (True, False,)
+        base = {}
+        for field, name in self.get_new_fields(types=RELATED_M2M,
+                                               recursive=True).iteritems():
+            base[name] = field
+        for field, name in self.get_new_fields(types=RELATED_OBJECTS,
+                                               recursive=True).iteritems():
+            base[name] = field
+        for field, name in self.get_new_fields(types=M2M,
+                                               recursive=True).iteritems():
+            base[name] = field
+        for field, name in self.get_new_fields(types=DATA,
+                                               recursive=True).iteritems():
+            base[name] = field
+        for field, name in self.get_new_fields(types=VIRTUAL,
+                                               recursive=True).iteritems():
+            base[name] = field
         try:
             return base[field_name]
         except KeyError:
-            raise FieldDoesNotExist('%s has no field named %r'
-                    % (self.object_name, field_name))
+            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
     def get_new_fields(self, types, opts=NONE, **kwargs):
         fields = OrderedDict()
