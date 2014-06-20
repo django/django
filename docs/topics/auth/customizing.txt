@@ -392,6 +392,14 @@ use as your User model.
    fix your schema, port your data from the old user table, and possibly
    manually reapply some migrations.
 
+.. warning::
+
+   Due to limitations of Django's dynamic dependency feature for swappable
+   models, you must ensure that the model referenced by :setting:`AUTH_USER_MODEL`
+   is created in the first migration of its app (usually called ``0001_initial``);
+   otherwise, you will have dependency issues.
+
+
 Referencing the User model
 --------------------------
 
