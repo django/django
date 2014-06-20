@@ -83,7 +83,9 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* Added :attr:`~django.contrib.sitemaps.Sitemap.i18n` class attribute to
+  :class:`django.contrib.Sitemap`. It is now possible to have all your multiple
+  language URLs in your sitemap.
 
 :mod:`django.contrib.sites`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
