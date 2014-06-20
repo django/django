@@ -11,3 +11,6 @@ Bugfixes
 
 * Corrected email and URL validation to reject a trailing dash
   (`#22579 <http://code.djangoproject.com/ticket/22579>`_).
+
+* Prevented indexes on PostgreSQL virtual fields
+  (`#22514 <http://code.djangoproject.com/ticket/22514>`_).
