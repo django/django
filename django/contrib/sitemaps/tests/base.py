@@ -39,4 +39,4 @@ class SitemapTestsBase(TestCase):
         cache.clear()
         # Create an object for sitemap content.
         TestModel.objects.create(name='Test Object')
-        I18nTestModel.objects.create(name='Test Object')
+        self.i18n_model = I18nTestModel.objects.create(name='Test Object')

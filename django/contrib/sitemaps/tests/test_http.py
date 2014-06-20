@@ -178,7 +178,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/simple/i18n.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>{0}/en/i18n/testmodel/1/</loc><changefreq>never</changefreq><priority>0.5</priority></url><url><loc>{0}/pt/i18n/testmodel/1/</loc><changefreq>never</changefreq><priority>0.5</priority></url>
+<url><loc>{0}/en/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url><url><loc>{0}/pt/i18n/testmodel/{1}/</loc><changefreq>never</changefreq><priority>0.5</priority></url>
 </urlset>
-""".format(self.base_url)
+""".format(self.base_url, self.i18n_model.pk)
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
