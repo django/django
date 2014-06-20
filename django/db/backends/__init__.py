@@ -520,6 +520,10 @@ class BaseDatabaseFeatures(object):
     # at the end of each save operation?
     supports_forward_references = True
 
+    # Does the backend uses proper method like 'truncate_name'
+    # to auto-truncate column names?
+    truncates_name = False
+
     # Is there a REAL datatype in addition to floats/doubles?
     has_real_datatype = False
     supports_subqueries_in_group_by = True
