@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"POT-Creation-Date: 2014-06-20 22:48+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -1179,16 +1179,6 @@ msgstr ""
 #: utils/dates.py:56
 msgctxt "alt. month"
 msgid "December"
-msgstr ""
-
-#: utils/image.py:109
-#, python-format
-msgid "Neither Pillow nor PIL could be imported: %s"
-msgstr ""
-
-#: utils/image.py:134
-#, python-format
-msgid "The '_imaging' module for the PIL could not be imported: %s"
 msgstr ""
 
 #: utils/ipv6.py:10
