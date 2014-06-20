@@ -60,6 +60,12 @@ Migrations will run the same way on the same dataset and produce consistent
 results, meaning that what you see in development and staging is, under the
 same circumstances, exactly what will happen in production.
 
+Django will make migrations for any change to your models or fields - even
+options that don't affect the database - as the only way it can reconstruct
+a field correctly is to have all the changes in the history, and you might
+need those options in some data migrations later on (for example, if you've
+set custom validators).
+
 Backend Support
 ---------------
 

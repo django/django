@@ -132,7 +132,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.MIGRATE_HEADING("Running migrations:"))
         if not plan:
             if self.verbosity >= 1:
-                self.stdout.write("  No migrations needed.")
+                self.stdout.write("  No migrations to apply.")
                 # If there's changes that aren't in migrations yet, tell them how to fix it.
                 autodetector = MigrationAutodetector(
                     executor.loader.project_state(),
