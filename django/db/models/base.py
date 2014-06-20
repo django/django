@@ -1469,7 +1469,7 @@ class Model(six.with_metaclass(ModelBase)):
                 continue
             connection = connections[db]
             max_name_length = connection.ops.max_name_length()
-            if max_name_length is None:
+            if max_name_length is None or connection.features.truncates_name:
                 continue
             else:
                 if allowed_len is None:
