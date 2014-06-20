@@ -46,8 +46,16 @@ class SchemaIndexesTests(TestCase):
     Test index handling by the db.backends.schema infrastructure.
     """
     def test_index_together(self):
-        index_sql = connection.schema_editor()._model_indexes_sql(Article)
+        editor = connection.schema_editor()
+        index_sql = editor._model_indexes_sql(Article)
         self.assertEqual(len(index_sql), 1)
+        # Ensure the index name is properly quoted
+        self.assertIn(
+            connection.ops.quote_name(
+                editor._create_index_name(Article, ['headline', 'pub_date'], suffix='_idx')
+            ),
+            index_sql[0]
+        )
 
     def test_index_together_single_list(self):
         # Test for using index_together with a single list (#22172)
