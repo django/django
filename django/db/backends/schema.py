@@ -225,14 +225,7 @@ class BaseDatabaseSchemaEditor(object):
             params.extend(extra_params)
             # Indexes
             if field.db_index and not field.unique:
-                self.deferred_sql.append(
-                    self.sql_create_index % {
-                        "name": self._create_index_name(model, [field.column], suffix=""),
-                        "table": self.quote_name(model._meta.db_table),
-                        "columns": self.quote_name(field.column),
-                        "extra": "",
-                    }
-                )
+                self.deferred_sql.append(self._create_index_sql(model, [field], suffix=""))
             # FK
             if field.rel and field.db_constraint:
                 to_table = field.rel.to._meta.db_table
@@ -277,14 +270,9 @@ class BaseDatabaseSchemaEditor(object):
         }
         self.execute(sql, params)
         # Add any index_togethers
-        for fields in model._meta.index_together:
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
-            self.execute(self.sql_create_index % {
-                "table": self.quote_name(model._meta.db_table),
-                "name": self._create_index_name(model, columns, suffix="_idx"),
-                "columns": ", ".join(self.quote_name(column) for column in columns),
-                "extra": "",
-            })
+        for field_names in model._meta.index_together:
+            fields = [model._meta.get_field_by_name(field)[0] for field in field_names]
+            self.execute(self._create_index_sql(model, fields, suffix="_idx"))
         # Make M2M tables
         for field in model._meta.local_many_to_many:
             if field.rel.through._meta.auto_created:
@@ -362,14 +350,9 @@ class BaseDatabaseSchemaEditor(object):
                 },
             )
         # Created indexes
-        for fields in news.difference(olds):
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
-            self.execute(self.sql_create_index % {
-                "table": self.quote_name(model._meta.db_table),
-                "name": self._create_index_name(model, columns, suffix="_idx"),
-                "columns": ", ".join(self.quote_name(column) for column in columns),
-                "extra": "",
-            })
+        for field_names in news.difference(olds):
+            fields = [model._meta.get_field_by_name(field)[0] for field in field_names]
+            self.execute(self._create_index_sql(model, fields, suffix="_idx"))
 
     def alter_db_table(self, model, old_db_table, new_db_table):
         """
@@ -429,14 +412,7 @@ class BaseDatabaseSchemaEditor(object):
             self.execute(sql)
         # Add an index, if required
         if field.db_index and not field.unique:
-            self.deferred_sql.append(
-                self.sql_create_index % {
-                    "name": self._create_index_name(model, [field.column], suffix=""),
-                    "table": self.quote_name(model._meta.db_table),
-                    "columns": self.quote_name(field.column),
-                    "extra": "",
-                }
-            )
+            self.deferred_sql.append(self._create_index_sql(model, [field]))
         # Add any FK constraints later
         if field.rel and self.connection.features.supports_foreign_keys and field.db_constraint:
             to_table = field.rel.to._meta.db_table
@@ -706,14 +682,7 @@ class BaseDatabaseSchemaEditor(object):
         if (not old_field.db_index and new_field.db_index and
                 not new_field.unique and not
                 (not old_field.unique and new_field.unique)):
-            self.execute(
-                self.sql_create_index % {
-                    "table": self.quote_name(model._meta.db_table),
-                    "name": self._create_index_name(model, [new_field.column], suffix="_uniq"),
-                    "columns": self.quote_name(new_field.column),
-                    "extra": "",
-                }
-            )
+            self.execute(self._create_index_sql(model, [new_field], suffix="_uniq"))
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
         rels_to_update = []
@@ -882,6 +851,15 @@ class BaseDatabaseSchemaEditor(object):
         if index_name[0].isdigit():
             index_name = "D%s" % index_name[:-1]
         return index_name
+
+    def _create_index_sql(self, model, fields, suffix=""):
+        columns = [field.column for field in fields]
+        return self.sql_create_index % {
+            "table": self.quote_name(model._meta.db_table),
+            "name": self._create_index_name(model, columns, suffix=suffix),
+            "columns": ", ".join(self.quote_name(column) for column in columns),
+            "extra": "",
+        }
 
     def _constraint_names(self, model, column_names=None, unique=None,
                           primary_key=None, index=None, foreign_key=None,
