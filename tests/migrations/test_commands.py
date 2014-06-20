@@ -474,9 +474,9 @@ class MakeMigrationsTests(MigrationTestBase):
         old_input = questioner.input
         questioner.input = lambda _: "N"
         stdout = six.StringIO()
+        merge_file = os.path.join(self.test_dir, 'test_migrations_conflict', '0003_merge.py')
         try:
             call_command("makemigrations", "migrations", merge=True, stdout=stdout)
-            merge_file = os.path.join(self.test_dir, 'test_migrations_conflict', '0003_merge.py')
             # This will fail if interactive is False by default
             self.assertFalse(os.path.exists(merge_file))
         except CommandError:
