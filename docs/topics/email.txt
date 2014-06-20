@@ -24,11 +24,12 @@ In two lines::
         ['to@example.com'], fail_silently=False)
 
 Mail is sent using the SMTP host and port specified in the
-:setting:`EMAIL_HOST` and :setting:`EMAIL_PORT` settings. The
-:setting:`EMAIL_HOST_USER` and :setting:`EMAIL_HOST_PASSWORD` settings, if
-set, are used to authenticate to the SMTP server, and the
-:setting:`EMAIL_USE_TLS` and :setting:`EMAIL_USE_SSL` settings control whether
-a secure connection is used.
+:setting:`SMTP_CONFIG['HOST']<SMTP_CONFIG>` and :setting:`SMTP_CONFIG['PORT']
+<SMTP_CONFIG>` settings. The :setting:`SMTP_CONFIG['USER']<SMTP_CONFIG>` and
+:setting:`SMTP_CONFIG['PASSWORD']<SMTP_CONFIG>` settings, if set, are used to
+authenticate to the SMTP server, and the :setting:`SMTP_CONFIG['USE_TLS']
+<USE_TLS>` and :setting:`SMTP_CONFIG['USE_SSL']<USE_SSL>` settings control
+whether a secure connection is used.
 
 .. note::
 
@@ -58,10 +59,10 @@ are required.
   :exc:`~smtplib.SMTPException`.
 * ``auth_user``: The optional username to use to authenticate to the SMTP
   server. If this isn't provided, Django will use the value of the
-  :setting:`EMAIL_HOST_USER` setting.
+  :setting:`SMTP_CONFIG['USER']<SMTP_CONFIG>` setting.
 * ``auth_password``: The optional password to use to authenticate to the
   SMTP server. If this isn't provided, Django will use the value of the
-  :setting:`EMAIL_HOST_PASSWORD` setting.
+  :setting:`SMTP_CONFIG['PASSWORD']<SMTP_CONFIG>` setting.
 * ``connection``: The optional email backend to use to send the mail.
   If unspecified, an instance of the default backend will be used.
   See the documentation on :ref:`Email backends <topic-email-backends>`
@@ -448,9 +449,9 @@ SMTP backend
 
     This is the default backend. Email will be sent through a SMTP server.
     The server address and authentication credentials are set in the
-    :setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
-    :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS` and
-    :setting:`EMAIL_USE_SSL` settings in your settings file.
+    :setting:`SMTP_CONFIG` setting (keys ``HOST``, ``PORT``, ``USER``,
+    ``PASSWORD``, :setting:`USE_TLS` and :setting:`USE_SSL`) in your settings
+    file.
 
     The SMTP backend is the default configuration inherited by Django. If you
     want to specify it explicitly, put the following in your settings::
@@ -648,9 +649,11 @@ anything. Python has a built-in way to accomplish this with a single command::
 
 This command will start a simple SMTP server listening on port 1025 of
 localhost. This server simply prints to standard output all email headers and
-the email body. You then only need to set the :setting:`EMAIL_HOST` and
-:setting:`EMAIL_PORT` accordingly. For a more detailed discussion of SMTP
-server options, see the Python documentation for the :mod:`smtpd` module.
+the email body. You then only need to set the
+:setting:`SMTP_CONFIG['HOST']<SMTP_CONFIG>` and
+:setting:`SMTP_CONFIG['PORT']<SMTP_CONFIG>` accordingly. For a more detailed
+discussion of SMTP server options, see the Python documentation for the
+:mod:`smtpd` module.
 
 For information about unit-testing the sending of emails in your application,
 see the :ref:`topics-testing-email` section of the testing documentation.

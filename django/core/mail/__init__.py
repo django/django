@@ -45,8 +45,8 @@ def send_mail(subject, message, from_email, recipient_list,
     Easy wrapper for sending a single message to a recipient list. All members
     of the recipient list will see the other recipients in the 'To' field.
 
-    If auth_user is None, the EMAIL_HOST_USER setting is used.
-    If auth_password is None, the EMAIL_HOST_PASSWORD setting is used.
+    If auth_user and auth_password are None, values from the SMTP_CONFIG setting
+    are used.
 
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
@@ -69,9 +69,8 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=None,
     each message to each recipient list. Returns the number of emails sent.
 
     If from_email is None, the DEFAULT_FROM_EMAIL setting is used.
-    If auth_user and auth_password are set, they're used to log in.
-    If auth_user is None, the EMAIL_HOST_USER setting is used.
-    If auth_password is None, the EMAIL_HOST_PASSWORD setting is used.
+    If auth_user and auth_password are set, they're used to log in. Otherwise,
+    values from the SMTP_CONFIG setting are used.
 
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.

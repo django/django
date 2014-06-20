@@ -183,17 +183,28 @@ DATABASE_ROUTERS = []
 # to a module that defines an EmailBackend class.
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-# Host for sending email.
+# Host for sending email (deprecated, will be removed in Django 2.0).
 EMAIL_HOST = 'localhost'
 
-# Port for sending email.
+# Port for sending email (deprecated, will be removed in Django 2.0).
 EMAIL_PORT = 25
 
 # Optional SMTP authentication information for EMAIL_HOST.
+# (deprecated, will be removed in Django 2.0)
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
+
+# SMTP configuration used by the SMTP EmailBackend.
+SMTP_CONFIG = {
+    'HOST': EMAIL_HOST,
+    'PORT': EMAIL_PORT,
+    'USER': EMAIL_HOST_USER,
+    'PASSWORD': EMAIL_HOST_PASSWORD,
+    'USE_TLS': EMAIL_USE_TLS,
+    'USE_SSL': EMAIL_USE_SSL,
+}
 
 # List of strings representing installed apps.
 INSTALLED_APPS = ()

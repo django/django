@@ -9,10 +9,12 @@ a list of all possible variables.
 import importlib
 import os
 import time     # Needed for Windows
+import warnings
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import dict_merge
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import LazyObject, empty
 from django.utils import six
 
@@ -104,6 +106,11 @@ class Settings(BaseSettings):
             )
 
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS", "LOCALE_PATHS")
+        obsolete_email_settings = {
+            'EMAIL_HOST': 'HOST', 'EMAIL_PORT': 'PORT',
+            'EMAIL_HOST_USER': 'USER', 'EMAIL_HOST_PASSWORD': 'PASSWORD',
+            'EMAIL_USE_TLS': 'USE_TLS', 'EMAIL_USE_SSL': 'USE_SSL',
+        }
         self._explicit_settings = set()
         for setting in dir(mod):
             if setting.isupper():
@@ -113,6 +120,12 @@ class Settings(BaseSettings):
                         isinstance(setting_value, six.string_types)):
                     raise ImproperlyConfigured("The %s setting must be a tuple. "
                             "Please fix your settings." % setting)
+                if setting in obsolete_email_settings:
+                    warnings.warn(
+                        "EMAIL_* smtp-related settings are deprecated and should "
+                        "be now defined in the SMTP_CONFIG setting dict.",
+                        RemovedInDjango20Warning)
+                    self.SMTP_CONFIG[obsolete_email_settings[setting]] = setting_value
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 

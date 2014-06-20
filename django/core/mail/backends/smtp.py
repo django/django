@@ -17,17 +17,17 @@ class EmailBackend(BaseEmailBackend):
                  use_tls=None, fail_silently=False, use_ssl=None, timeout=None,
                  **kwargs):
         super(EmailBackend, self).__init__(fail_silently=fail_silently)
-        self.host = host or settings.EMAIL_HOST
-        self.port = port or settings.EMAIL_PORT
-        self.username = settings.EMAIL_HOST_USER if username is None else username
-        self.password = settings.EMAIL_HOST_PASSWORD if password is None else password
-        self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
-        self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
+        self.host = host or settings.SMTP_CONFIG['HOST']
+        self.port = port or settings.SMTP_CONFIG['PORT']
+        self.username = settings.SMTP_CONFIG['USER'] if username is None else username
+        self.password = settings.SMTP_CONFIG['PASSWORD'] if password is None else password
+        self.use_tls = settings.SMTP_CONFIG['USE_TLS'] if use_tls is None else use_tls
+        self.use_ssl = settings.SMTP_CONFIG['USE_SSL'] if use_ssl is None else use_ssl
         self.timeout = timeout
         if self.use_ssl and self.use_tls:
             raise ValueError(
-                "EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set "
-                "one of those settings to True.")
+                "SMTP_CONFIG['USE_TLS']/SMTP_CONFIG['USE_SSL'] are mutually exclusive, "
+                "so only set one of those settings to True.")
         self.connection = None
         self._lock = threading.RLock()
 

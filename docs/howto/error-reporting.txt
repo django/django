@@ -28,8 +28,9 @@ the HTTP request that caused the error.
 
    In order to send email, Django requires a few settings telling it
    how to connect to your mail server. At the very least, you'll need
-   to specify :setting:`EMAIL_HOST` and possibly
-   :setting:`EMAIL_HOST_USER` and :setting:`EMAIL_HOST_PASSWORD`,
+   to specify :setting:`SMTP_CONFIG['HOST'] <SMTP_CONFIG>` and possibly
+   :setting:`SMTP_CONFIG['USER']  <SMTP_CONFIG>` and
+   :setting:`SMTP_CONFIG['PASSWORD']  <SMTP_CONFIG>`,
    though other settings may be also required depending on your mail
    server's configuration. Consult :doc:`the Django settings
    documentation </ref/settings>` for a full list of email-related
