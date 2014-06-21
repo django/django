@@ -44,18 +44,10 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.auth',
     'django.contrib.sites',
-    'django.contrib.flatpages',
-    'django.contrib.redirects',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.admin.apps.SimpleAdminConfig',
-    'django.contrib.admindocs',
     'django.contrib.staticfiles',
-    'django.contrib.humanize',
-    'staticfiles_tests',
-    'staticfiles_tests.apps.test',
-    'staticfiles_tests.apps.no_label',
-    'servers.another_app',
 ]
 
 ALWAYS_MIDDLEWARE_CLASSES = (

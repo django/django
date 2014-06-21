@@ -11,8 +11,15 @@ from django.test import TestCase, modify_settings, override_settings
 from .models import Person, Company
 
 
-@override_settings(ROOT_URLCONF='admin_docs.urls')
-class MiscTests(TestCase):
+@override_settings(
+    PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF='admin_docs.urls')
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.admindocs'})
+class AdminDocsTestCase(TestCase):
+    pass
+
+
+class MiscTests(AdminDocsTestCase):
 
     def setUp(self):
         User.objects.create_superuser('super', None, 'secret')
@@ -30,10 +37,8 @@ class MiscTests(TestCase):
         self.client.get('/admindocs/views/')  # should not raise
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
-                   ROOT_URLCONF='admin_docs.urls')
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
-class AdminDocViewTests(TestCase):
+class AdminDocViewTests(AdminDocsTestCase):
     fixtures = ['data.xml']
 
     def setUp(self):
@@ -108,9 +113,7 @@ class AdminDocViewTests(TestCase):
             utils.docutils_is_available = True
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
-    ROOT_URLCONF='admin_docs.urls')
-class XViewMiddlewareTest(TestCase):
+class XViewMiddlewareTest(AdminDocsTestCase):
     fixtures = ['data.xml']
 
     def test_xview_func(self):
@@ -151,8 +154,7 @@ class XViewMiddlewareTest(TestCase):
 
 
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
-@override_settings(ROOT_URLCONF='admin_docs.urls')
-class DefaultRoleTest(TestCase):
+class DefaultRoleTest(AdminDocsTestCase):
 
     def test_parse_rst(self):
         """
@@ -187,10 +189,8 @@ class DefaultRoleTest(TestCase):
         self.assertEqual(parts['fragment'], markup)
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
-    ROOT_URLCONF='admin_docs.urls')
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
-class TestModelDetailView(TestCase):
+class TestModelDetailView(AdminDocsTestCase):
     """
     Tests that various details render correctly
     """
