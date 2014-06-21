@@ -98,11 +98,13 @@ class BaseHandler(object):
                 resolver_match = resolver.resolve(request.path_info)
                 callback, callback_args, callback_kwargs = resolver_match
                 request.resolver_match = resolver_match
+
                 # Apply view middleware
                 for middleware_method in self._view_middleware:
                     response = middleware_method(request, callback, callback_args, callback_kwargs)
                     if response:
                         break
+
             if response is None:
                 wrapped_callback = self.make_view_atomic(callback)
                 try:
@@ -276,7 +278,7 @@ class BaseHandler(object):
             # has gone wrong here, we return a minimal error message to the
             # user and log the issue.
 
-            logger.error('500 Resolve Error: %s', request.path,
+            logger.error('Error in 500 Callback: %s', request.path,
                 exc_info=sys.exc_info(),
                 extra={
                     'status_code': 500,

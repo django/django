@@ -47,8 +47,8 @@ class DefaultsTests(TestCase):
 
     def test_server_error_without_handler_error(self):
         """
-        The server_error view raises a 500 status and while handling
-        the error, the next error is raised.
+        The server_error view raises a 500 status and no further error is
+        raised while handling the error.
         """
 
         @receiver(got_request_exception)
