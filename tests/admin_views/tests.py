@@ -30,7 +30,7 @@ from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import patch_logger
-from django.test import override_settings
+from django.test import modify_settings, override_settings
 from django.utils import formats
 from django.utils import translation
 from django.utils.cache import get_max_age
@@ -1491,7 +1491,8 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(shortcut_url, follow=False)
         # Can't use self.assertRedirects() because User.get_absolute_url() is silly.
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, 'http://example.com/dummy/foo/')
+        # Domain may depend on contrib.sites tests also run
+        six.assertRegex(self, response.url, 'http://(testserver|example.com)/dummy/foo/')
 
     def test_has_module_permission(self):
         """
@@ -4193,6 +4194,7 @@ except ImportError:
 @unittest.skipUnless(docutils, "no docutils installed.")
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF="admin_views.urls")
+@modify_settings(INSTALLED_APPS={'append': ['django.contrib.admindocs', 'django.contrib.flatpages']})
 class AdminDocsTest(TestCase):
     fixtures = ['admin-views-users.xml']
 
