@@ -70,6 +70,9 @@ except ImportError:
 
 RUN_RELOADER = True
 
+FILE_MODIFIED = 1
+I18N_MODIFIED = 2
+
 _mtimes = {}
 _win = (sys.platform == "win32")
 
@@ -115,13 +118,30 @@ def gen_filenames():
             yield filename
 
 
+def reset_translations():
+    import gettext
+    from django.utils.translation import trans_real
+    gettext._translations = {}
+    trans_real._translations = {}
+    trans_real._default = None
+    trans_real._active = threading.local()
+
+
 def inotify_code_changed():
     """
     Checks for changed code using inotify. After being called
     it blocks until a change event has been fired.
     """
+    class EventHandler(pyinotify.ProcessEvent):
+        modified_code = None
+        def process_default(self, event):
+            if event.path.endswith('.mo'):
+                EventHandler.modified_code = I18N_MODIFIED
+            else:
+                EventHandler.modified_code = FILE_MODIFIED
+
     wm = pyinotify.WatchManager()
-    notifier = pyinotify.Notifier(wm)
+    notifier = pyinotify.Notifier(wm, EventHandler())
 
     def update_watch(sender=None, **kwargs):
         mask = (
@@ -141,10 +161,12 @@ def inotify_code_changed():
     # Block until an event happens.
     update_watch()
     notifier.check_events(timeout=None)
+    notifier.read_events()
+    notifier.process_events()
     notifier.stop()
 
     # If we are here the code must have changed.
-    return True
+    return EventHandler.modified_code
 
 
 def code_changed():
@@ -163,7 +185,7 @@ def code_changed():
                 del _error_files[_error_files.index(filename)]
             except ValueError:
                 pass
-            return True
+            return I18N_MODIFIED if filename.endswith('.mo') else FILE_MODIFIED
     return False
 
 
@@ -212,8 +234,11 @@ def reloader_thread():
     else:
         fn = code_changed
     while RUN_RELOADER:
-        if fn():
+        change = fn()
+        if change == FILE_MODIFIED:
             sys.exit(3)  # force reload
+        elif change == I18N_MODIFIED:
+            reset_translations()
         time.sleep(1)
 
 
