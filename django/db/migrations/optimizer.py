@@ -160,6 +160,19 @@ class MigrationOptimizer(object):
                 return om(operation, other, in_between or [])
         return None
 
+    def model_to_key(self, model):
+        """
+        Takes either a model class or a "appname.ModelName" string
+        and returns (appname, modelname)
+        """
+        if isinstance(model, six.string_types):
+            return model.split(".", 1)
+        else:
+            return (
+                model._meta.app_label,
+                model._meta.object_name,
+            )
+
     def reduce_model_create_delete(self, operation, other, in_between):
         """
         Folds a CreateModel and a DeleteModel into nothing.
@@ -206,13 +219,15 @@ class MigrationOptimizer(object):
             # Don't allow optimisations of FKs through models they reference
             if hasattr(other.field, "rel") and other.field.rel:
                 for between in in_between:
-                    if isinstance(other.field.rel.to, six.string_types):
-                        object_name, app_label = other.field.rel.to.split(".", 1)
-                    else:
-                        object_name = other.field.rel.to._meta.object_name
-                        app_label = other.field.rel.to._meta.app_label
+                    # Check that it doesn't point to the model
+                    app_label, object_name = self.model_to_key(other.field.rel.to)
                     if between.references_model(object_name, app_label):
                         return None
+                    # Check that it's not through the model
+                    if getattr(other.field.rel, "through", None):
+                        app_label, object_name = self.model_to_key(other.field.rel.through)
+                        if between.references_model(object_name, app_label):
+                            return None
             # OK, that's fine
             return [
                 migrations.CreateModel(
