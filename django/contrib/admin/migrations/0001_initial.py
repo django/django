@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('action_flag', models.PositiveSmallIntegerField(verbose_name='action flag')),
                 ('change_message', models.TextField(verbose_name='change message', blank=True)),
                 ('content_type', models.ForeignKey(to_field='id', blank=True, to='contenttypes.ContentType', null=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, to_field='id')),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'ordering': ('-action_time',),
