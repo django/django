@@ -108,8 +108,8 @@ class Command(BaseCommand):
         # Print some useful info
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
-            if run_syncdb:
-                self.stdout.write(self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") + (", ".join(executor.loader.unmigrated_apps) or "(none)"))
+            if run_syncdb and executor.loader.unmigrated_apps:
+                self.stdout.write(self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") + (", ".join(executor.loader.unmigrated_apps)))
             if target_app_labels_only:
                 self.stdout.write(self.style.MIGRATE_LABEL("  Apply all migrations: ") + (", ".join(set(a for a, n in targets)) or "(none)"))
             else:
@@ -122,7 +122,7 @@ class Command(BaseCommand):
         # If you ever manage to get rid of this, I owe you many, many drinks.
         # Note that pre_migrate is called from inside here, as it needs
         # the list of models about to be installed.
-        if run_syncdb:
+        if run_syncdb and executor.loader.unmigrated_apps:
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
             created_models = self.sync_apps(connection, executor.loader.unmigrated_apps)
