@@ -499,11 +499,20 @@ def technical_404_response(request, exception):
 
     caller = ''
     try:
-        obj = resolve(request.path)
+        resolver_match = resolve(request.path)
     except Resolver404:
         pass
     else:
-        caller = obj.view_name
+        obj = resolver_match.func
+
+        if hasattr(obj, '__name__'):
+            caller = obj.__name__
+        elif hasattr(obj, '__class__') and hasattr(obj.__class__, '__name__'):
+            caller = obj.__class__.__name__
+
+        if hasattr(obj, '__module__'):
+            module = obj.__module__
+            caller = '%s.%s' % (module, caller)
 
     t = Template(TECHNICAL_404_TEMPLATE, name='Technical 404 template')
     c = Context({
@@ -514,7 +523,7 @@ def technical_404_response(request, exception):
         'reason': force_bytes(exception, errors='replace'),
         'request': request,
         'settings': get_safe_settings(),
-        'named_callable': caller
+        'raising_view_name': caller,
     })
     return HttpResponseNotFound(t.render(c), content_type='text/html')
 
@@ -1103,10 +1112,10 @@ TECHNICAL_404_TEMPLATE = """
         <th>Request URL:</th>
       <td>{{ request.build_absolute_uri|escape }}</td>
       </tr>
-      {% if named_callable %}
+      {% if raising_view_name %}
       <tr>
         <th>Raised by:</th>
-      <td>{{ named_callable }}</td>
+      <td>{{ raising_view_name }}</td>
       </tr>
       {% endif %}
     </table>
