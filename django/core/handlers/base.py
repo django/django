@@ -70,6 +70,16 @@ class BaseHandler(object):
                 view = transaction.atomic(using=db.alias)(view)
         return view
 
+    def get_exception_response(self, request, resolver, status_code):
+        try:
+            callback, param_dict = resolver.resolve_error_handler(status_code)
+            response = callback(request, **param_dict)
+        except:
+            signals.got_request_exception.send(sender=self.__class__, request=request)
+            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+
+        return response
+
     def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
 
@@ -151,12 +161,7 @@ class BaseHandler(object):
             if settings.DEBUG:
                 response = debug.technical_404_response(request, e)
             else:
-                try:
-                    callback, param_dict = resolver.resolve404()
-                    response = callback(request, **param_dict)
-                except:
-                    signals.got_request_exception.send(sender=self.__class__, request=request)
-                    response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+                response = self.get_exception_response(request, resolver, 404)
 
         except PermissionDenied:
             logger.warning(
@@ -165,14 +170,7 @@ class BaseHandler(object):
                     'status_code': 403,
                     'request': request
                 })
-            try:
-                callback, param_dict = resolver.resolve403()
-                response = callback(request, **param_dict)
-            except:
-                signals.got_request_exception.send(
-                    sender=self.__class__, request=request)
-                response = self.handle_uncaught_exception(request,
-                    resolver, sys.exc_info())
+            response = self.get_exception_response(request, resolver, 403)
 
         except SuspiciousOperation as e:
             # The request logger receives events for any problematic request
@@ -186,14 +184,7 @@ class BaseHandler(object):
                     'request': request
                 })
 
-            try:
-                callback, param_dict = resolver.resolve400()
-                response = callback(request, **param_dict)
-            except:
-                signals.got_request_exception.send(
-                    sender=self.__class__, request=request)
-                response = self.handle_uncaught_exception(request,
-                    resolver, sys.exc_info())
+            response = self.get_exception_response(request, resolver, 400)
 
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
@@ -251,7 +242,7 @@ class BaseHandler(object):
         if resolver.urlconf_module is None:
             six.reraise(*exc_info)
         # Return an HttpResponse that displays a friendly error message.
-        callback, param_dict = resolver.resolve500()
+        callback, param_dict = resolver.resolve_error_handler(500)
         return callback(request, **param_dict)
 
     def apply_response_fixes(self, request, response):
