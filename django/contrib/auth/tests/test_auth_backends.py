@@ -48,16 +48,15 @@ class BaseModelBackendTest(object):
     def test_has_perm(self):
         user = self.UserModel._default_manager.get(pk=self.user.pk)
         self.assertEqual(user.has_perm('auth.test'), False)
+
         user.is_staff = True
         user.save()
         self.assertEqual(user.has_perm('auth.test'), False)
+
         user.is_superuser = True
         user.save()
         self.assertEqual(user.has_perm('auth.test'), True)
-        user.is_staff = False
-        user.is_superuser = False
-        user.save()
-        self.assertEqual(user.has_perm('auth.test'), False)
+
         user.is_staff = True
         user.is_superuser = True
         user.is_active = False
@@ -69,7 +68,6 @@ class BaseModelBackendTest(object):
         content_type = ContentType.objects.get_for_model(Group)
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
         user.user_permissions.add(perm)
-        user.save()
 
         # reloading user to purge the _perm_cache
         user = self.UserModel._default_manager.get(pk=self.user.pk)
@@ -77,21 +75,20 @@ class BaseModelBackendTest(object):
         self.assertEqual(user.get_group_permissions(), set([]))
         self.assertEqual(user.has_module_perms('Group'), False)
         self.assertEqual(user.has_module_perms('auth'), True)
+
         perm = Permission.objects.create(name='test2', content_type=content_type, codename='test2')
         user.user_permissions.add(perm)
-        user.save()
         perm = Permission.objects.create(name='test3', content_type=content_type, codename='test3')
         user.user_permissions.add(perm)
-        user.save()
         user = self.UserModel._default_manager.get(pk=self.user.pk)
         self.assertEqual(user.get_all_permissions(), set(['auth.test2', 'auth.test', 'auth.test3']))
         self.assertEqual(user.has_perm('test'), False)
         self.assertEqual(user.has_perm('auth.test'), True)
         self.assertEqual(user.has_perms(['auth.test2', 'auth.test3']), True)
+
         perm = Permission.objects.create(name='test_group', content_type=content_type, codename='test_group')
         group = Group.objects.create(name='test_group')
         group.permissions.add(perm)
-        group.save()
         user.groups.add(group)
         user = self.UserModel._default_manager.get(pk=self.user.pk)
         exp = set(['auth.test2', 'auth.test', 'auth.test3', 'auth.test_group'])
@@ -109,12 +106,54 @@ class BaseModelBackendTest(object):
         content_type = ContentType.objects.get_for_model(Group)
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
         user.user_permissions.add(perm)
-        user.save()
 
         self.assertEqual(user.has_perm('auth.test', 'object'), False)
         self.assertEqual(user.get_all_permissions('object'), set([]))
         self.assertEqual(user.has_perm('auth.test'), True)
         self.assertEqual(user.get_all_permissions(), set(['auth.test']))
+
+    def test_inactive_has_no_permissions(self):
+        """
+        #17903 -- Inactive users shouldn't have permissions in
+        `get_group_permissions` nor `get_all_permissions`.
+        """
+        backend = ModelBackend()
+
+        user = self.UserModel._default_manager.get(pk=self.user.pk)
+        content_type = ContentType.objects.get_for_model(Group)
+        perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
+        user.user_permissions.add(perm)
+
+        # default with user and all permissions
+        self.assertEqual('auth.test' in backend.get_all_permissions(user), True)
+        self.assertEqual('auth.test' in backend.get_user_permissions(user), True)
+
+        # Inactive users should not have any permission in `get_all_permissions` and
+        # `get_user_permissions`
+        user.is_active = False
+        user.save()
+        self.assertEqual('auth.test' in backend.get_all_permissions(user), False)
+        self.assertEqual('auth.test' in backend.get_user_permissions(user), False)
+
+        # since the backend cached group permissions on the user instance, we have
+        # to reload it.
+        user = self.UserModel._default_manager.get(pk=self.user.pk)
+
+        # test group permissions
+        perm = Permission.objects.create(name='test2', content_type=content_type, codename='test2')
+        group = Group.objects.create(name='test_group')
+        user.groups.add(group)
+        group.permissions.add(perm)
+
+        # default with group
+        user.is_active = True
+        user.save()
+        self.assertEqual('auth.test2' in backend.get_group_permissions(user), True)
+
+        # Inactive users should not have permissions in `get_group_permissions`
+        user.is_active = False
+        user.save()
+        self.assertEqual('auth.test2' in backend.get_group_permissions(user), False)
 
     def test_get_all_superuser_permissions(self):
         """A superuser has all permissions. Refs #14795."""

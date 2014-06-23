@@ -35,7 +35,7 @@ class ModelBackend(object):
         be either "group" or "user" to return permissions from
         `_get_group_permissions` or `_get_user_permissions` respectively.
         """
-        if user_obj.is_anonymous() or obj is not None:
+        if not user_obj.is_active or obj is not None:
             return set()
 
         perm_cache_name = '_%s_perm_cache' % from_name
@@ -63,7 +63,7 @@ class ModelBackend(object):
         return self._get_permissions(user_obj, obj, 'group')
 
     def get_all_permissions(self, user_obj, obj=None):
-        if user_obj.is_anonymous() or obj is not None:
+        if not user_obj.is_active or obj is not None:
             return set()
         if not hasattr(user_obj, '_perm_cache'):
             user_obj._perm_cache = self.get_user_permissions(user_obj)
