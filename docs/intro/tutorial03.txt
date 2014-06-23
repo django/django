@@ -577,8 +577,7 @@ make it so that Django knows which app view to create for a url when using the
 ``{% url %}`` template tag?
 
 The answer is to add namespaces to your root URLconf. In the ``mysite/urls.py``
-file (the project's ``urls.py``, not the application's), go ahead and change
-it to include namespacing:
+file, go ahead and change it to include namespacing:
 
 .. snippet::
     :filename: mysite/urls.py
