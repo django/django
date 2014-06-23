@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 from django.core.files.storage import FileSystemStorage
@@ -5,7 +6,7 @@ from django.db import models
 from django.forms import ModelForm
 
 
-temp_storage_dir = tempfile.mkdtemp()
+temp_storage_dir = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
 temp_storage = FileSystemStorage(temp_storage_dir)
 
 class Photo(models.Model):
