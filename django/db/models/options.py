@@ -300,6 +300,7 @@ class Options(object):
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
+        self.get_new_fields.cache_clear()
         if field.rel and isinstance(field.rel, ManyToManyRel):
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
             if hasattr(self, '_m2m_cache'):
@@ -399,7 +400,7 @@ class Options(object):
         return None
     swapped = property(_swapped)
 
-    @cached_property
+    @property
     def fields(self):
         # get_fields(local=RECURSIVE)
         """
@@ -409,21 +410,24 @@ class Options(object):
         Callers are not permitted to modify this list, since it's a reference
         to this instance (not a copy).
         """
-        try:
-            self._field_name_cache
-        except AttributeError:
-            self._fill_fields_cache()
-        return self._field_name_cache
+        return list(self.get_new_fields(types=DATA))
+        #try:
+            #self._field_name_cache
+        #except AttributeError:
+            #self._fill_fields_cache()
+        #return self._field_name_cache
 
-    @cached_property
+    @property
     def concrete_fields(self):
+        return list(self.get_new_fields(types=DATA, opts=CONCRETE))
         # get_fields(local=RECURSIVE | CONCRETE)
-        return [f for f in self.fields if f.column is not None]
+        #return [f for f in self.fields if f.column is not None]
 
-    @cached_property
+    @property
     def local_concrete_fields(self):
+        return self.get_new_fields(types=DATA, opts=CONCRETE | LOCAL_ONLY)
         # get_fields(local=CONCRETE)
-        return [f for f in self.local_fields if f.column is not None]
+        #return [f for f in self.local_fields if f.column is not None]
 
     def get_fields_with_model(self):
         # get_fields(local=RECURSIVE)
@@ -457,11 +461,12 @@ class Options(object):
 
     def _many_to_many(self):
         #get_fields(m2m=RECURSIVE)
-        try:
-            self._m2m_cache
-        except AttributeError:
-            self._fill_m2m_cache()
-        return list(self._m2m_cache)
+        return list(self.get_new_fields(types=M2M))
+        #try:
+            #self._m2m_cache
+        #except AttributeError:
+            #self._fill_m2m_cache()
+        #return list(self._m2m_cache)
     many_to_many = property(_many_to_many)
 
     def get_m2m_with_model(self):
