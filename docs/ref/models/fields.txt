@@ -7,8 +7,8 @@ Model field reference
 
 .. currentmodule:: django.db.models
 
-This document contains all the gory details about all the `field options`_ and
-`field types`_ Django's got to offer.
+This document contains all the API references of :class:`Field` including the
+`field options`_ and `field types`_ Django offers.
 
 .. seealso::
 
@@ -1519,3 +1519,191 @@ accepted by :class:`ForeignKey`, plus one extra argument:
 
 See :doc:`One-to-one relationships </topics/db/examples/one_to_one>` for usage
 examples of ``OneToOneField``.
+
+Field API reference
+===================
+
+.. class:: Field
+
+    ``Field`` is an abstract class that represents a database table column.
+    Django uses fields to create the database table (:meth:`db_type`), to map
+    Python types to database (:meth:`get_prep_value`) and vice-versa
+    (:meth:`to_python`), and to apply :doc:`/ref/models/lookups`
+    (:meth:`get_prep_lookup`).
+
+    A field is thus a fundamental piece in different Django APIs, notably,
+    :class:`models <django.db.models.Model>` and :class:`querysets
+    <django.db.models.query.QuerySet>`.
+
+    In models, a field is instantiated as a class attribute and represents a
+    particular table column, see :doc:`/topics/db/models`. It has attributes
+    such as :attr:`null` and :attr:`unique`, and methods that Django uses to
+    map the field value to database-specific values.
+
+    A ``Field`` is a subclass of
+    :class:`~django.db.models.lookups.RegisterLookupMixin` and thus both
+    :class:`~django.db.models.Transform` and
+    :class:`~django.db.models.Lookup` can be registered on it to be used
+    in ``QuerySet``\s (e.g. ``field_name__exact="foo"``). All :ref:`built-in
+    lookups <field-lookups>` are registered by default.
+
+    All of Django's built-in fields, such as :class:`CharField`, are particular
+    implementations of ``Field``. If you need a custom field, you can either
+    subclass any of the built-in fields or write a ``Field``` from scratch. In
+    either case, see :doc:`/howto/custom-model-fields`.
+
+    .. attribute:: description
+
+        A verbose description of the field, e.g. for the
+        :mod:`django.contrib.admindocs` application.
+
+        The description can be of the form::
+
+            description = _("String (up to %(max_length)s)")
+
+        where the arguments are interpolated from the field's ``__dict__``.
+
+    To map a ``Field`` to a database-specific type, Django exposes two methods:
+
+    .. method:: get_internal_type()
+
+        Returns a string naming this field for backend specific purposes.
+        By default, it returns the class name.
+
+        See :ref:`emulating-built-in-field-types` for usage in custom fields.
+
+    .. method:: db_type(connection)
+
+        Returns the database column data type for the :class:`Field`, taking
+        into account the ``connection``.
+
+        See :ref:`custom-database-types` for usage in custom fields.
+
+    There are three main situations where Django needs to interact with the
+    database backend and fields:
+
+    * when it queries the database (Python value -> database backend value)
+    * when it loads data from the database (database backend value -> Python
+      value)
+    * when it saves to the database (Python value -> database backend value)
+
+    When querying, :meth:`get_db_prep_value` and :meth:`get_prep_value` are used:
+
+    .. method:: get_prep_value(value)
+
+        ``value`` is the current value of the model's attribute, and the method
+        should return data in a format that has been prepared for use as a
+        parameter in a query.
+
+        See :ref:`converting-python-objects-to-query-values` for usage.
+
+    .. method:: get_db_prep_value(value, connection, prepared=False)
+
+        Converts ``value`` to a backend-specific value. By default it returns
+        ``value`` if ``prepared=True`` and :meth:`~Field.get_prep_value` if is
+        ``False``.
+
+        See :ref:`converting-query-values-to-database-values` for usage.
+
+    When loading data, :meth:`to_python` is used:
+
+    .. method:: to_python(value)
+
+        Converts a value as returned by the database (or a serializer) to a
+        Python object. It is the reverse of :meth:`get_prep_value`.
+
+        The default implementation returns ``value``, which is the common case
+        when the database backend already returns the correct Python type.
+
+        See :ref:`converting-database-values-to-python-objects` for usage.
+
+    When saving, :meth:`pre_save` and :meth:`get_db_prep_save` are used:
+
+    .. method:: get_db_prep_save(value, connection)
+
+        Same as the :meth:`get_db_prep_value`, but called when the field value
+        must be *saved* to the database. By default returns
+        :meth:`get_db_prep_value`.
+
+    .. method:: pre_save(model_instance, add)
+
+        Method called prior to :meth:`get_db_prep_save` to prepare the value
+        before being saved (e.g. for :attr:`DateField.auto_now`).
+
+        ``model_instance`` is the instance this field belongs to and ``add``
+        is whether the instance is being saved to the database for the first
+        time.
+
+        It should return the value of the appropriate attribute from
+        ``model_instance`` for this field. The attribute name is in
+        ``self.attname`` (this is set up by :class:`~django.db.models.Field`).
+
+        See :ref:`preprocessing-values-before-saving` for usage.
+
+    Besides saving to the database, the field also needs to know how to
+    serialize its value (inverse of :meth:`to_python`):
+
+    .. method:: value_to_string(obj)
+
+        Converts ``obj`` to a string. Used to serialize the value of the field.
+
+        See :ref:`converting-model-field-to-serialization` for usage.
+
+    When a lookup is used on a field, the value may need to be "prepared".
+    Django exposes two methods for this:
+
+    .. method:: get_prep_lookup(lookup_type, value)
+
+        Prepares ``value`` to the database prior to be used in a lookup.
+        The ``lookup_type`` will be one of the valid Django filter lookups:
+        ``"exact"``, ``"iexact"``, ``"contains"``, ``"icontains"``,
+        ``"gt"``, ``"gte"``, ``"lt"``, ``"lte"``, ``"in"``, ``"startswith"``,
+        ``"istartswith"``, ``"endswith"``, ``"iendswith"``, ``"range"``,
+        ``"year"``, ``"month"``, ``"day"``, ``"isnull"``, ``"search"``,
+        ``"regex"``, and ``"iregex"``.
+
+        .. versionadded:: 1.7
+
+        If you are using :doc:`Custom lookups </ref/models/lookups>` the
+        ``lookup_type`` can be any ``lookup_name`` registered in the field.
+
+        See :ref:`preparing-values-for-use-in-database-lookups` for usage.
+
+    .. method:: get_db_prep_lookup(lookup_type, value, connection, prepared=False)
+
+        Similar to :meth:`get_db_prep_value`, but for performing a lookup.
+
+        As with :meth:`get_db_prep_value`, the specific connection that will
+        be used for the query is passed as ``connection``. In addition,
+        ``prepared`` describes whether the value has already been prepared with
+        :meth:`get_prep_lookup`.
+
+    When using :class:`model forms <django.forms.ModelForm>`, the ``Field``
+    needs to know which form field it should be represented by:
+
+    .. method:: formfield(form_class=None, choices_form_class=None, **kwargs)
+
+        Returns the default :class:`django.forms.Field` of this field for
+        :class:`~django.forms.ModelForm`.
+
+        By default, if both ``form_class`` and ``choices_form_class`` are
+        ``None``, it uses :class:`~django.forms.CharField`; if
+        ``choices_form_class`` is given, it returns
+        :class:`~django.forms.TypedChoiceField`.
+
+        See :ref:`specifying-form-field-for-model-field` for usage.
+
+    .. method:: deconstruct()
+
+        .. versionadded:: 1.7
+
+        Returns a 4-tuple with enough information to recreate the field:
+
+        1. The name of the field on the model.
+        2. The import path of the field (e.g. ``"django.db.models.IntegerField"``).
+           This should be the most portable version, so less specific may be better.
+        3. A list of positional arguments.
+        4. A dict of keyword arguments.
+
+        This method must be added to fields prior to 1.7 to migrate its data
+        using :doc:`/topics/migrations`.
