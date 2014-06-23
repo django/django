@@ -49,3 +49,41 @@ use the full path to the file, like so:
 ``python C:\pythonXY\Scripts\django-admin.py``.
 
 .. _virtualenv: http://www.virtualenv.org/
+
+ASCII locale prone to errors
+----------------------------
+
+Using a pure ASCII locale will result in ``UnicodeDecodeError`` when dealing
+with non-ASCII characters.::
+
+    UnicodeDecodeError: 'ascii' codec can't decode byte 0x?? in position ?:
+    ordinal not in range(128)
+
+This is quite likely to happen when running the ``makemessages`` command. Be
+sure to have a proper UTF-8 locale when running commands that could have to
+deal with non-ASCII characters. On UNIX based systems the command ``locale``
+can be used to determine the locale::
+
+    $ locale
+    LANG=
+    LC_COLLATE="C"
+    LC_CTYPE="C"
+    LC_MESSAGES="C"
+    LC_MONETARY="C"
+    LC_NUMERIC="C"
+    LC_TIME="C"
+    LC_ALL=
+
+The above is an example of an all ASCII locale. To change to an UTF-8 locale
+use ``export`` to set the ``LANG`` environment variable::
+
+    $ export LANG='da_DK.UTF-8'
+    $ locale
+    LANG="da_DK.UTF-8"
+    LC_COLLATE="da_DK.UTF-8"
+    LC_CTYPE="da_DK.UTF-8"
+    LC_MESSAGES="da_DK.UTF-8"
+    LC_MONETARY="da_DK.UTF-8"
+    LC_NUMERIC="da_DK.UTF-8"
+    LC_TIME="da_DK.UTF-8"
+    LC_ALL=
