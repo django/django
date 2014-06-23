@@ -155,7 +155,7 @@ details on these changes.
   prefixed by ``TEST_``, will no longer be supported.
 
 * The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
-  :class:`~django.forms.MultipleModelChoiceField` will be removed.
+  :class:`~django.forms.ModelMultipleChoiceField` will be removed.
 
 .. _deprecation-removed-in-1.8:
 
