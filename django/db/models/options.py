@@ -633,13 +633,17 @@ class Options(object):
         self._related_objects_proxy_cache = proxy_cache
 
     def get_all_related_many_to_many_objects(self, local_only=False):
-        try:
-            cache = self._related_many_to_many_cache
-        except AttributeError:
-            cache = self._fill_related_many_to_many_cache()
+        opts = NONE
         if local_only:
-            return [k for k, v in cache.items() if not v]
-        return list(cache)
+            opts |= LOCAL_ONLY
+        return list(self.get_new_fields(types=RELATED_M2M, opts=opts))
+        #try:
+            #cache = self._related_many_to_many_cache
+        #except AttributeError:
+            #cache = self._fill_related_many_to_many_cache()
+        #if local_only:
+            #return [k for k, v in cache.items() if not v]
+        #return list(cache)
 
     def _map_model(self, connection):
         direct = isinstance(connection, Field) or hasattr(connection, 'is_gfk')
