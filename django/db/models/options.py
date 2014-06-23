@@ -437,6 +437,7 @@ class Options(object):
         element is None for fields on the current model. Mostly of use when
         constructing queries so that we know which model a field belongs to.
         """
+        #return list(map(self._map_model, self.get_new_fields(types=DATA)))
         try:
             self._field_cache
         except AttributeError:
@@ -444,9 +445,7 @@ class Options(object):
         return self._field_cache
 
     def get_concrete_fields_with_model(self):
-        # get_fields(local=RECURSIVE | CONCRETE)
-        return [(field, model) for field, model in self.get_fields_with_model() if
-                field.column is not None]
+        return list(map(self._map_model, self.get_new_fields(types=DATA, opts=CONCRETE)))
 
     def _fill_fields_cache(self):
         cache = []
@@ -665,7 +664,7 @@ class Options(object):
     def _map_model(self, connection):
         direct = isinstance(connection, Field) or hasattr(connection, 'is_gfk')
         model = connection.model if direct else connection.parent_model._meta.concrete_model
-        if model == self.concrete_model:
+        if model == self.model:
             model = None
 
         return connection, model
