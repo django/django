@@ -475,11 +475,12 @@ class Options(object):
         """
         The many-to-many version of get_fields_with_model().
         """
-        try:
-            self._m2m_cache
-        except AttributeError:
-            self._fill_m2m_cache()
-        return list(six.iteritems(self._m2m_cache))
+        return list(map(self._map_model, self.get_new_fields(types=M2M)))
+        #try:
+            #self._m2m_cache
+        #except AttributeError:
+            #self._fill_m2m_cache()
+        #return list(six.iteritems(self._m2m_cache))
 
     def _fill_m2m_cache(self):
         cache = OrderedDict()
@@ -565,9 +566,17 @@ class Options(object):
 
     def get_all_related_objects(self, local_only=False, include_hidden=False,
                                 include_proxy_eq=False):
-        return [k for k, v in self.get_all_related_objects_with_model(
-                local_only=local_only, include_hidden=include_hidden,
-                include_proxy_eq=include_proxy_eq)]
+        opts = NONE
+        if local_only:
+            opts |= LOCAL_ONLY
+        if include_hidden:
+            opts |= INCLUDE_HIDDEN
+        if include_proxy_eq:
+            opts |= INCLUDE_PROXY
+        return list(self.get_new_fields(types=RELATED_OBJECTS, opts=opts))
+        #return [k for k, v in self.get_all_related_objects_with_model(
+                #local_only=local_only, include_hidden=include_hidden,
+                #include_proxy_eq=include_proxy_eq)]
 
     def get_all_related_objects_with_model(self, local_only=False,
                                            include_hidden=False,
