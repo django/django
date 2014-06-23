@@ -1151,8 +1151,9 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
             cache_params.update({'LOCATION': self.dirname})
 
     def tearDown(self):
-        shutil.rmtree(self.dirname)
         super(FileBasedCacheTests, self).tearDown()
+        # Call parent first, as cache.clear() may recreate cache base directory
+        shutil.rmtree(self.dirname)
 
     def test_ignores_non_cache_files(self):
         fname = os.path.join(self.dirname, 'not-a-cache-file')
