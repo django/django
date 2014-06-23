@@ -97,10 +97,17 @@ class MigrateTests(MigrationTestBase):
         stdout = six.StringIO()
         call_command("sqlmigrate", "migrations", "0001", stdout=stdout)
         self.assertIn("create table", stdout.getvalue().lower())
+
+        # Cannot generate the reverse SQL unless we've applied the migration.
+        call_command("migrate", "migrations", verbosity=0)
+
         # And backwards is a DROP TABLE
         stdout = six.StringIO()
         call_command("sqlmigrate", "migrations", "0001", stdout=stdout, backwards=True)
         self.assertIn("drop table", stdout.getvalue().lower())
+
+        # Cleanup by unmigrating everything
+        call_command("migrate", "migrations", "zero", verbosity=0)
 
     @override_system_checks([])
     @override_settings(
