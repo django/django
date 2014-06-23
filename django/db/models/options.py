@@ -437,16 +437,16 @@ class Options(object):
         element is None for fields on the current model. Mostly of use when
         constructing queries so that we know which model a field belongs to.
         """
-        #return list(map(self._map_model, self.get_new_fields(types=DATA)))
-        try:
-            self._field_cache
-        except AttributeError:
-            self._fill_fields_cache()
-        return self._field_cache
+        return list(map(self._map_model, self.get_new_fields(types=DATA)))
+        #try:
+            #self._field_cache
+        #except AttributeError:
+            #self._fill_fields_cache()
+        #return self._field_cache
 
     def get_concrete_fields_with_model(self):
         return list(map(self._map_model, self.get_new_fields(types=DATA, opts=CONCRETE)))
-
+            
     def _fill_fields_cache(self):
         cache = []
         for parent in self.parents:
