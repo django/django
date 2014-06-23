@@ -497,11 +497,15 @@ class Options(object):
         """
         Returns the requested field by name. Raises FieldDoesNotExist on error.
         """
-        to_search = (self.fields + self.many_to_many) if many_to_many else self.fields
-        for f in to_search:
-            if f.name == name:
-                return f
-        raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, name))
+        grouded_fields = dict([(f.name, f) for f in self.get_new_fields(types=DATA | M2M)])
+        try:
+            return grouded_fields[name]
+        except KeyError:
+            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, name))
+        #to_search = (self.fields + self.many_to_many) if many_to_many else self.fields
+        #for f in to_search:
+            #if f.name == name:
+                #return f
 
     def get_field_by_name(self, name):
         """
@@ -600,18 +604,18 @@ class Options(object):
         Returns a list of (related-object, model) pairs. Similar to
         get_fields_with_model().
         """
-        try:
-            self._related_objects_cache
-        except AttributeError:
-            self._fill_related_objects_cache()
-        predicates = []
-        if local_only:
-            predicates.append(lambda k, v: not v)
-        if not include_hidden:
-            predicates.append(lambda k, v: not k.field.rel.is_hidden())
-        cache = (self._related_objects_proxy_cache if include_proxy_eq
-                 else self._related_objects_cache)
-        return [t for t in cache.items() if all(p(*t) for p in predicates)]
+        #try:
+            #self._related_objects_cache
+        #except AttributeError:
+            #self._fill_related_objects_cache()
+        #predicates = []
+        #if local_only:
+            #predicates.append(lambda k, v: not v)
+        #if not include_hidden:
+            #predicates.append(lambda k, v: not k.field.rel.is_hidden())
+        #cache = (self._related_objects_proxy_cache if include_proxy_eq
+                 #else self._related_objects_cache)
+        #return [t for t in cache.items() if all(p(*t) for p in predicates)]
 
     def _fill_related_objects_cache(self):
         cache = OrderedDict()
