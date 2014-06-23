@@ -155,6 +155,12 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
         # Run it normally
+        self.assertEqual(
+            executor.migration_plan([("migrations", "0001_initial")]),
+            [
+                (executor.loader.graph.nodes["migrations", "0001_initial"], False),
+            ],
+        )
         executor.migrate([("migrations", "0001_initial")])
         # Are the tables there now?
         self.assertTableExists("migrations_author")
@@ -171,9 +177,17 @@ class ExecutorTests(MigrationTestBase):
         # Make sure that was faked
         self.assertEqual(state["faked"], True)
         # Finally, migrate forwards; this should fake-apply our initial migration
+        executor.loader.build_graph()
+        self.assertEqual(
+            executor.migration_plan([("migrations", "0001_initial")]),
+            [
+                (executor.loader.graph.nodes["migrations", "0001_initial"], False),
+            ],
+        )
         executor.migrate([("migrations", "0001_initial")])
         self.assertEqual(state["faked"], True)
         # And migrate back to clean up the database
+        executor.loader.build_graph()
         executor.migrate([("migrations", None)])
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")

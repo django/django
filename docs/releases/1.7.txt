@@ -934,7 +934,7 @@ script with::
     >>> import django
     >>> django.setup()
 
-Otherwise, you will hit ``RuntimeError: App registry isn't ready yet.``
+Otherwise, you will hit an ``AppRegistryNotReady`` exception.
 
 App registry consistency
 ^^^^^^^^^^^^^^^^^^^^^^^^

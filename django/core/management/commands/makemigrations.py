@@ -25,6 +25,8 @@ class Command(BaseCommand):
             help="Enable fixing of migration conflicts.")
         parser.add_argument('--empty', action='store_true', dest='empty', default=False,
             help="Create an empty migration.")
+        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
+            help='Tells Django to NOT prompt the user for input of any kind.')
 
     def handle(self, *app_labels, **options):
 
@@ -154,7 +156,7 @@ class Command(BaseCommand):
         if self.interactive:
             questioner = InteractiveMigrationQuestioner()
         else:
-            questioner = MigrationQuestioner()
+            questioner = MigrationQuestioner(defaults={'ask_merge': True})
         for app_label, migration_names in conflicts.items():
             # Grab out the migrations in question, and work out their
             # common ancestor.

@@ -201,6 +201,44 @@ class OptimizerTests(TestCase):
             ],
         )
 
+    def test_create_model_add_field_not_through_fk(self):
+        """
+        AddField should NOT optimize into CreateModel if it's an FK to a model
+        that's between them.
+        """
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Link", [("url", models.TextField())]),
+                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link")),
+            ],
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("Link", [("url", models.TextField())]),
+                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link")),
+            ],
+        )
+
+    def test_create_model_add_field_not_through_m2m_through(self):
+        """
+        AddField should NOT optimize into CreateModel if it's an M2M using a
+        through that's created between them.
+        """
+        # Note: The middle model is not actually a valid through model,
+        # but that doesn't matter, as we never render it.
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("LinkThrough", []),
+                migrations.AddField("Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")),
+            ],
+            [
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                migrations.CreateModel("LinkThrough", []),
+                migrations.AddField("Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")),
+            ],
+        )
+
     def test_create_model_alter_field(self):
         """
         AlterField should optimize into CreateModel.

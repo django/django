@@ -41,6 +41,15 @@ TEST_SETTINGS = {
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         'django.contrib.staticfiles.finders.DefaultStorageFinder',
     ),
+    'INSTALLED_APPS': (
+        'django.contrib.contenttypes',
+        'django.contrib.auth',
+        'django.contrib.admin.apps.SimpleAdminConfig',
+        'django.contrib.staticfiles',
+        'staticfiles_tests',
+        'staticfiles_tests.apps.test',
+        'staticfiles_tests.apps.no_label',
+    ),
 }
 from django.contrib.staticfiles.management.commands.collectstatic import Command as CollectstaticCommand
 
@@ -240,8 +249,6 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
         self.assertIn(os.path.join('staticfiles_tests', 'apps', 'no_label', 'static'),
                       searched_locations)
         self.assertIn(os.path.join('django', 'contrib', 'admin', 'static'),
-                      searched_locations)
-        self.assertIn(os.path.join('tests', 'servers', 'another_app', 'static'),
                       searched_locations)
         # FileSystemFinder searched locations
         self.assertIn(TEST_SETTINGS['STATICFILES_DIRS'][1][1], searched_locations)

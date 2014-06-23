@@ -1,9 +1,11 @@
 from datetime import datetime
 from django.conf.urls import url
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib.sitemaps import Sitemap, GenericSitemap, FlatPageSitemap, views
+from django.http import HttpResponse
 from django.views.decorators.cache import cache_page
 
-from django.contrib.sitemaps.tests.base import TestModel
+from django.contrib.sitemaps.tests.base import I18nTestModel, TestModel
 
 
 class SimpleSitemap(Sitemap):
@@ -14,6 +16,15 @@ class SimpleSitemap(Sitemap):
 
     def items(self):
         return [object()]
+
+
+class SimpleI18nSitemap(Sitemap):
+    changefreq = "never"
+    priority = 0.5
+    i18n = True
+
+    def items(self):
+        return I18nTestModel.objects.all()
 
 
 class EmptySitemap(Sitemap):
@@ -42,8 +53,16 @@ class FixedLastmodMixedSitemap(Sitemap):
         return [o1, o2]
 
 
+def testmodelview(request, id):
+    return HttpResponse()
+
+
 simple_sitemaps = {
     'simple': SimpleSitemap,
+}
+
+simple_i18nsitemaps = {
+    'simple': SimpleI18nSitemap,
 }
 
 empty_sitemaps = {
@@ -74,6 +93,7 @@ urlpatterns = [
     url(r'^simple/sitemap-(?P<section>.+)\.xml$', views.sitemap,
         {'sitemaps': simple_sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     url(r'^simple/sitemap\.xml$', views.sitemap, {'sitemaps': simple_sitemaps}),
+    url(r'^simple/i18n\.xml$', views.sitemap, {'sitemaps': simple_i18nsitemaps}),
     url(r'^simple/custom-sitemap\.xml$', views.sitemap,
         {'sitemaps': simple_sitemaps, 'template_name': 'custom_sitemap.xml'}),
     url(r'^empty/sitemap\.xml$', views.sitemap, {'sitemaps': empty_sitemaps}),
@@ -86,3 +106,7 @@ urlpatterns = [
     url(r'^cached/sitemap-(?P<section>.+)\.xml', cache_page(1)(views.sitemap),
         {'sitemaps': simple_sitemaps}, name='cached_sitemap')
 ]
+
+urlpatterns += i18n_patterns(
+    url(r'^i18n/testmodel/(?P<id>\d+)/$', testmodelview, name='i18n_testmodel'),
+)

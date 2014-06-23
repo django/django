@@ -382,9 +382,9 @@ Troubleshooting
 
 Here are some common problems that you may encounter during initialization:
 
-* ``RuntimeError: App registry isn't ready yet.`` This happens when importing
-  an application configuration or a models module triggers code that depends
-  on the app registry.
+* ``AppRegistryNotReady`` This happens when importing an application
+  configuration or a models module triggers code that depends on the app
+  registry.
 
   For example, :func:`~django.utils.translation.ugettext()` uses the app
   registry to look up translation catalogs in applications. To translate at
