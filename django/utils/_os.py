@@ -120,4 +120,6 @@ def symlinks_supported():
     else:
         os.remove(symlink_path)
     finally:
+        os.rmdir(original_path)
+        os.rmdir(tmpdir)
         return supported
