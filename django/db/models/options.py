@@ -572,6 +572,14 @@ class Options(object):
     def get_all_related_objects_with_model(self, local_only=False,
                                            include_hidden=False,
                                            include_proxy_eq=False):
+        opts = NONE
+        if local_only:
+            opts |= LOCAL_ONLY
+        if include_hidden:
+            opts |= INCLUDE_HIDDEN
+        if include_proxy_eq:
+            opts |= INCLUDE_PROXY
+        return list(map(self._map_model, self.get_new_fields(types=RELATED_OBJECTS, opts=opts)))
         #bits = LOCAL
         #if not local_only:
             #bits |= RECURSIVE
