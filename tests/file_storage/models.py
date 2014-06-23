@@ -5,6 +5,7 @@
 and where files should be stored.
 """
 
+import os
 import random
 import tempfile
 
@@ -12,7 +13,7 @@ from django.db import models
 from django.core.files.storage import FileSystemStorage
 
 
-temp_storage_location = tempfile.mkdtemp()
+temp_storage_location = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
 temp_storage = FileSystemStorage(location=temp_storage_location)
 
 
