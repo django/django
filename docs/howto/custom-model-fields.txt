@@ -105,8 +105,6 @@ say, all the *north* cards first, then the *east*, *south* and *west* cards. So
 What does a field class do?
 ---------------------------
 
-.. class:: Field
-
 All of Django's fields (and when we say *fields* in this document, we always
 mean model fields and not :doc:`form fields </ref/forms/fields>`) are subclasses
 of :class:`django.db.models.Field`. Most of the information that Django records
@@ -193,10 +191,7 @@ card values plus their suits; 104 characters in total.
     you want your fields to be more strict about the options they select, or to
     use the simpler, more permissive behavior of the current fields.
 
-.. method:: Field.__init__()
-
-The :meth:`~django.db.models.Field.__init__` method takes the following
-parameters:
+The ``Field.__init__()`` method takes the following parameters:
 
 * :attr:`~django.db.models.Field.verbose_name`
 * ``name``
@@ -396,15 +391,13 @@ correct datatype.
 Documenting your custom field
 -----------------------------
 
-.. attribute:: Field.description
-
 As always, you should document your field type, so users will know what it is.
 In addition to providing a docstring for it, which is useful for developers,
 you can also allow users of the admin app to see a short description of the
 field type via the :doc:`django.contrib.admindocs
 </ref/contrib/admin/admindocs>` application. To do this simply provide
-descriptive text in a ``description`` class attribute of your custom field. In
-the above example, the description displayed by the ``admindocs``
+descriptive text in a :attr:`~Field.description` class attribute of your custom
+field. In the above example, the description displayed by the ``admindocs``
 application for a ``HandField`` will be 'A hand of cards (bridge style)'.
 
 In the :mod:`django.contrib.admindocs` display, the field description is
@@ -422,17 +415,13 @@ the ``__metaclass__``, you might consider overriding a few standard methods,
 depending on your field's behavior. The list of methods below is in
 approximately decreasing order of importance, so start from the top.
 
+.. _custom-database-types:
+
 Custom database types
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.db_type(connection)
-
-Returns the database column data type for the :class:`~django.db.models.Field`,
-taking into account the connection object, and the settings associated with it.
-
-Say you've created a PostgreSQL custom type called ``mytype``. You can use this
-field with Django by subclassing ``Field`` and implementing the
-:meth:`.db_type` method, like so::
+Say you've created a PostgreSQL custom type called ``mytype``. You can
+subclass ``Field`` and implement the :meth:`~Field.db_type` method, like so::
 
     from django.db import models
 
@@ -450,7 +439,7 @@ Once you have ``MytypeField``, you can use it in any model, just like any other
 If you aim to build a database-agnostic application, you should account for
 differences in database column types. For example, the date/time column type
 in PostgreSQL is called ``timestamp``, while the same column in MySQL is called
-``datetime``. The simplest way to handle this in a :meth:`.db_type`
+``datetime``. The simplest way to handle this in a :meth:`~Field.db_type`
 method is to check the ``connection.settings_dict['ENGINE']`` attribute.
 
 For example::
@@ -462,7 +451,7 @@ For example::
             else:
                 return 'timestamp'
 
-The :meth:`.db_type` method is called by Django when the framework
+The :meth:`~Field.db_type` method is called by Django when the framework
 constructs the ``CREATE TABLE`` statements for your application -- that is,
 when you first create your tables. It is also called when constructing a
 ``WHERE`` clause that includes the model field -- that is, when you retrieve data
@@ -489,7 +478,7 @@ sense to have a ``CharMaxlength25Field``, shown here::
 
 The better way of doing this would be to make the parameter specifiable at run
 time -- i.e., when the class is instantiated. To do that, just implement
-:meth:`django.db.models.Field.__init__`, like so::
+``Field.__init__()``, like so::
 
     # This is a much more flexible example.
     class BetterCharField(models.Field):
@@ -511,21 +500,14 @@ over this field. You are then responsible for creating the column in the right
 table in some other way, of course, but this gives you a way to tell Django to
 get out of the way.
 
+.. _converting-database-values-to-python-objects:
+
 Converting database values to Python objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.to_python(value)
-
-Converts a value as returned by your database (or a serializer) to a Python
-object.
-
-The default implementation simply returns ``value``, for the common case in
-which the database backend already returns data in the correct format (as a
-Python string, for example).
-
-If your custom :class:`~django.db.models.Field` class deals with data structures
-that are more complex than strings, dates, integers or floats, then you'll need
-to override this method. As a general rule, the method should deal gracefully
+If your custom :class:`~Field` class deals with data structures that are more
+complex than strings, dates, integers or floats, then you'll need to override
+:meth:`~Field.to_python`. As a general rule, the method should deal gracefully
 with any of the following arguments:
 
 * An instance of the correct type (e.g., ``Hand`` in our ongoing example).
@@ -560,9 +542,9 @@ Python object type we want to store in the model's attribute. If anything is
 going wrong during value conversion, you should raise a
 :exc:`~django.core.exceptions.ValidationError` exception.
 
-**Remember:** If your custom field needs the :meth:`.to_python` method to be
+**Remember:** If your custom field needs the :meth:`~Field.to_python` method to be
 called when it is created, you should be using `The SubfieldBase metaclass`_
-mentioned earlier. Otherwise :meth:`.to_python` won't be called
+mentioned earlier. Otherwise :meth:`~Field.to_python` won't be called
 automatically.
 
 .. warning::
@@ -572,21 +554,14 @@ automatically.
     :meth:`~Field.get_prep_value`, should handle the case when ``value`` is
     ``None``.
 
+.. _converting-python-objects-to-query-values:
+
 Converting Python objects to query values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.get_prep_value(value)
-
-This is the reverse of :meth:`.to_python` when working with the
-database backends (as opposed to serialization). The ``value``
-parameter is the current value of the model's attribute (a field has
-no reference to its containing model, so it cannot retrieve the value
-itself), and the method should return data in a format that has been
-prepared for use as a parameter in a query.
-
-This conversion should *not* include any database-specific
-conversions. If database-specific conversions are required, they
-should be made in the call to :meth:`.get_db_prep_value`.
+Since using a database requires conversion in both ways, if you override
+:meth:`~Field.to_python` you also have to override :meth:`~Field.get_prep_value`
+to convert Python objects back to query values.
 
 For example::
 
@@ -607,49 +582,38 @@ For example::
     objects in their results. This problem cannot occur if you always
     return a string type from :meth:`.get_prep_value`.
 
+.. _converting-query-values-to-database-values:
 
 Converting query values to database values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.get_db_prep_value(value, connection, prepared=False)
-
 Some data types (for example, dates) need to be in a specific format
 before they can be used by a database backend.
-:meth:`.get_db_prep_value` is the method where those conversions should
+:meth:`~Field.get_db_prep_value` is the method where those conversions should
 be made. The specific connection that will be used for the query is
 passed as the ``connection`` parameter. This allows you to use
 backend-specific conversion logic if it is required.
 
-The ``prepared`` argument describes whether or not the value has
-already been passed through :meth:`.get_prep_value` conversions. When
-``prepared`` is False, the default implementation of
-:meth:`.get_db_prep_value` will call :meth:`.get_prep_value` to do
-initial data conversions before performing any database-specific
-processing.
+For example, Django uses the following method for its
+:class:``~models.BinaryField``::
 
-.. method:: Field.get_db_prep_save(value, connection)
+    def get_db_prep_value(self, value, connection, prepared=False):
+        value = super(BinaryField, self).get_db_prep_value(value, connection, prepared)
+        if value is not None:
+            return connection.Database.Binary(value)
+        return value
 
-Same as the above, but called when the Field value must be *saved* to
-the database. As the default implementation just calls
-:meth:`.get_db_prep_value`, you shouldn't need to implement this method
-unless your custom field needs a special conversion when being saved
-that is not the same as the conversion used for normal query
-parameters (which is implemented by :meth:`.get_db_prep_value`).
+In case your custom field needs a special conversion when being saved that is
+not the same as the conversion used for normal query parameters, you can
+override :meth:`~Field.get_db_prep_save`.
+
+.. _preprocessing-values-before-saving:
 
 Preprocessing values before saving
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.pre_save(model_instance, add)
-
-This method is called just prior to :meth:`.get_db_prep_save` and should return
-the value of the appropriate attribute from ``model_instance`` for this field.
-The attribute name is in ``self.attname`` (this is set up by
-:class:`~django.db.models.Field`). If the model is being saved to the database
-for the first time, the ``add`` parameter will be ``True``, otherwise it will be
-``False``.
-
-You only need to override this method if you want to preprocess the value
-somehow, just before saving. For example, Django's
+If you want to preprocess the value just before saving, you can use
+:meth:`~Field.pre_save`. For example, Django's
 :class:`~django.db.models.DateTimeField` uses this method to set the attribute
 correctly in the case of :attr:`~django.db.models.DateField.auto_now` or
 :attr:`~django.db.models.DateField.auto_now_add`.
@@ -659,20 +623,20 @@ the end. You should also update the model's attribute if you make any changes
 to the value so that code holding references to the model will always see the
 correct value.
 
+.. _preparing-values-for-use-in-database-lookups:
+
 Preparing values for use in database lookups
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As with value conversions, preparing a value for database lookups is a
 two phase process.
 
-.. method:: Field.get_prep_lookup(lookup_type, value)
-
-:meth:`.get_prep_lookup` performs the first phase of lookup preparation,
-performing generic data validity checks
+:meth:`.get_prep_lookup` performs the first phase of lookup preparation:
+type conversion and data validation.
 
 Prepares the ``value`` for passing to the database when used in a lookup (a
-``WHERE`` constraint in SQL). The ``lookup_type`` will be one of the valid
-Django filter lookups: ``exact``, ``iexact``, ``contains``, ``icontains``,
+``WHERE`` constraint in SQL). The ``lookup_type`` parameter will be one of the
+valid Django filter lookups: ``exact``, ``iexact``, ``contains``, ``icontains``,
 ``gt``, ``gte``, ``lt``, ``lte``, ``in``, ``startswith``, ``istartswith``,
 ``endswith``, ``iendswith``, ``range``, ``year``, ``month``, ``day``,
 ``isnull``, ``search``, ``regex``, and ``iregex``.
@@ -688,17 +652,18 @@ should raise either a ``ValueError`` if the ``value`` is of the wrong sort (a
 list when you were expecting an object, for example) or a ``TypeError`` if
 your field does not support that type of lookup. For many fields, you can get
 by with handling the lookup types that need special handling for your field
-and pass the rest to the :meth:`.get_db_prep_lookup` method of the parent class.
+and pass the rest to the :meth:`~Field.get_db_prep_lookup` method of the parent
+class.
 
-If you needed to implement ``get_db_prep_save()``, you will usually need to
-implement ``get_prep_lookup()``. If you don't, ``get_prep_value`` will be
-called by the default implementation, to manage ``exact``, ``gt``, ``gte``,
+If you needed to implement :meth:`.get_db_prep_save`, you will usually need to
+implement :meth:`.get_prep_lookup`. If you don't, :meth:`.get_prep_value` will
+be called by the default implementation, to manage ``exact``, ``gt``, ``gte``,
 ``lt``, ``lte``, ``in`` and ``range`` lookups.
 
 You may also want to implement this method to limit the lookup types that could
 be used with your custom field type.
 
-Note that, for ``range`` and ``in`` lookups, ``get_prep_lookup`` will receive
+Note that, for ``"range"`` and ``"in"`` lookups, ``get_prep_lookup`` will receive
 a list of objects (presumably of the right type) and will need to convert them
 to a list of things of the right type for passing to the database. Most of the
 time, you can reuse ``get_prep_value()``, or at least factor out some common
@@ -719,21 +684,16 @@ accepted lookup types to ``exact`` and ``in``::
             else:
                 raise TypeError('Lookup type %r not supported.' % lookup_type)
 
-.. method:: Field.get_db_prep_lookup(lookup_type, value, connection, prepared=False)
+For performing database-specific data conversions required by a lookup,
+you can override :meth:`~Field.get_db_prep_lookup`.
 
-Performs any database-specific data conversions required by a lookup.
-As with :meth:`.get_db_prep_value`, the specific connection that will
-be used for the query is passed as the ``connection`` parameter.
-The ``prepared`` argument describes whether the value has already been
-prepared with :meth:`.get_prep_lookup`.
+.. _specifying-form-field-for-model-field:
 
 Specifying the form field for a model field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.formfield(form_class=None, choices_form_class=None, **kwargs)
-
-Returns the default form field to use when this model field is displayed in a
-form.  This method is called by the :class:`~django.forms.ModelForm` helper.
+To customize the form field used by :class:`~django.forms.ModelForm`, you can
+override :meth:`~Field.formfield`.
 
 The form field class can be specified via the ``form_class`` and
 ``choices_form_class`` arguments; the latter is used if the field has choices
@@ -748,7 +708,8 @@ delegate further handling to the parent class. This might require you to write
 a custom form field (and even a form widget). See the :doc:`forms documentation
 </topics/forms/index>` for information about this.
 
-Continuing our ongoing example, we can write the :meth:`.formfield` method as::
+Continuing our ongoing example, we can write the :meth:`~Field.formfield` method
+as::
 
     class HandField(models.Field):
         # ...
@@ -767,14 +728,10 @@ fields.
 .. _helper functions: ../forms/#generating-forms-for-models
 .. _forms documentation: ../forms/
 
+.. _emulating-built-in-field-types:
+
 Emulating built-in field types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. method:: Field.get_internal_type()
-
-Returns a string giving the name of the :class:`~django.db.models.Field`
-subclass we are emulating at the database level. This is used to determine the
-type of database column for simple cases.
 
 If you have created a :meth:`.db_type` method, you don't need to worry about
 :meth:`.get_internal_type` -- it won't be used much. Sometimes, though, your
@@ -796,21 +753,21 @@ storing a string.
 If :meth:`.get_internal_type` returns a string that is not known to Django for
 the database backend you are using -- that is, it doesn't appear in
 ``django.db.backends.<db_name>.creation.data_types`` -- the string will still be
-used by the serializer, but the default :meth:`.db_type` method will return
-``None``. See the documentation of :meth:`.db_type` for reasons why this might be
-useful. Putting a descriptive string in as the type of the field for the
-serializer is a useful idea if you're ever going to be using the serializer
-output in some other place, outside of Django.
+used by the serializer, but the default :meth:`~Field.db_type` method will
+return ``None``. See the documentation of :meth:`~Field.db_type` for reasons why
+this might be useful. Putting a descriptive string in as the type of the field
+for the serializer is a useful idea if you're ever going to be using the
+serializer output in some other place, outside of Django.
+
+.. _converting-model-field-to-serialization:
 
 Converting field data for serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Field.value_to_string(obj)
-
-This method is used by the serializers to convert the field into a string for
-output. Calling ``Field._get_val_from_obj(obj)`` is the best way to get the
-value to serialize. For example, since our ``HandField`` uses strings for its
-data storage anyway, we can reuse some existing conversion code::
+To customize how the values are serialized by a serializer, you can override
+:meth:`~Field.value_to_string`. Calling ``Field._get_val_from_obj(obj)`` is the
+best way to get the value serialized. For example, since our ``HandField`` uses
+strings for its data storage anyway, we can reuse some existing conversion code::
 
     class HandField(models.Field):
         # ...
@@ -841,9 +798,8 @@ smoothly:
    Python 2) automatically converts to the string form of your Python object,
    you can save yourself a lot of work.
 
-
 Writing a ``FileField`` subclass
-=================================
+================================
 
 In addition to the above methods, fields that deal with files have a few other
 special requirements which must be taken into account. The majority of the
