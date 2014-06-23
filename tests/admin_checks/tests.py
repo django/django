@@ -9,7 +9,7 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from .models import Song, Book, Album, TwoAlbumFKAndAnE, City, State, Influence
+from .models import Song, Book, Book2, Album, TwoAlbumFKAndAnE, City, State, Influence
 
 
 class SongForm(forms.ModelForm):
@@ -528,6 +528,23 @@ class SystemChecksTestCase(TestCase):
             inlines = [AuthorsInline]
 
         errors = BookAdmin.check(model=Book)
+        self.assertEqual(errors, [])
+
+    def test_explicit_through_and_throug_fields_override(self):
+        """
+        Regression test for #12203 -- If the explicitly provided through model
+        is specified as a string and through_fields is specified as tuple, 
+        the admin should still be able use Model.m2m_field.through
+        """
+
+        class AuthorsInline(admin.TabularInline):
+            model = Book2.authors.through
+
+        class Book2Admin(admin.ModelAdmin):
+            inlines = [AuthorsInline]
+            fields = ['name', 'subtitle', 'price', 'authors']
+
+        errors = Book2Admin.check(model=Book2)
         self.assertEqual(errors, [])
 
     def test_non_model_fields(self):
