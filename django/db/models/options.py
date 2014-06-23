@@ -15,6 +15,7 @@ from django.utils.text import camel_case_to_spaces
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
 from django.utils.lru_cache import lru_cache
+from django.db.models.fields import Field
 
 
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
@@ -640,16 +641,25 @@ class Options(object):
             return [k for k, v in cache.items() if not v]
         return list(cache)
 
+    def _map_model(self, connection):
+        direct = isinstance(connection, Field) or hasattr(connection, 'is_gfk')
+        model = connection.model if direct else connection.parent_model._meta.concrete_model
+        if model == self.concrete_model:
+            model = None
+
+        return connection, model
+
     def get_all_related_m2m_objects_with_model(self):
         """
         Returns a list of (related-m2m-object, model) pairs. Similar to
         get_fields_with_model().
         """
-        try:
-            cache = self._related_many_to_many_cache
-        except AttributeError:
-            cache = self._fill_related_many_to_many_cache()
-        return list(six.iteritems(cache))
+        return list(map(self._map_model, self.get_new_fields(types=RELATED_M2M)))
+        #try:
+            #cache = self._related_many_to_many_cache
+        #except AttributeError:
+            #cache = self._fill_related_many_to_many_cache()
+        #return list(six.iteritems(cache))
 
     def _fill_related_many_to_many_cache(self):
         cache = OrderedDict()
