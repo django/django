@@ -169,7 +169,10 @@ class FieldDeconstructionTests(TestCase):
 
     def test_foreign_key(self):
         # Test basic pointing
+        from django.contrib.auth.models import Permission
         field = models.ForeignKey("auth.Permission")
+        field.rel.to = Permission
+        field.rel.field_name = "id"
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
@@ -194,6 +197,12 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"to": "auth.User", "on_delete": models.SET_NULL})
+        # Test to_field preservation
+        field = models.ForeignKey("auth.Permission", to_field="foobar")
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.ForeignKey")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"to": "auth.Permission", "to_field": "foobar"})
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
     def test_foreign_key_swapped(self):
