@@ -438,7 +438,7 @@ class MigrationAutodetector(object):
             for base in model_state.bases:
                 if isinstance(base, six.string_types) and "." in base:
                     base_app_label, base_name = base.split(".", 1)
-                    dependencies.append((base_app_label, base_name, None, False))
+                    dependencies.append((base_app_label, base_name, None, True))
             # Generate creation operation
             self.add_operation(
                 app_label,
