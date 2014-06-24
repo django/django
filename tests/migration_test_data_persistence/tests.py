@@ -1,11 +1,11 @@
-from django.test import TransactionTestCase
+from django.test import TransactionTestCase, TestCase
 from .models import Book
 
 
 class MigrationDataPersistenceTestCase(TransactionTestCase):
     """
     Tests that data loaded in migrations is available if we set
-    serialized_rollback = True.
+    serialized_rollback = True on TransactionTestCase
     """
 
     available_apps = ["migration_test_data_persistence"]
@@ -18,16 +18,13 @@ class MigrationDataPersistenceTestCase(TransactionTestCase):
         )
 
 
-class MigrationDataNoPersistenceTestCase(TransactionTestCase):
+class MigrationDataNormalPersistenceTestCase(TestCase):
     """
-    Tests the failure case
+    Tests that data loaded in migrations is available on TestCase
     """
 
-    available_apps = ["migration_test_data_persistence"]
-    serialized_rollback = False
-
-    def test_no_persistence(self):
+    def test_persistence(self):
         self.assertEqual(
             Book.objects.count(),
-            0,
+            1,
         )

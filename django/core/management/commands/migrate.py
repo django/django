@@ -129,6 +129,18 @@ class Command(BaseCommand):
         else:
             created_models = []
 
+        # The test runner requires us to flush after a syncdb but before migrations,
+        # so do that here.
+        if options.get("test_flush", False):
+            call_command(
+                'flush',
+                verbosity=max(self.verbosity - 1, 0),
+                interactive=False,
+                database=db,
+                reset_sequences=False,
+                inhibit_post_migrate=True,
+            )
+
         # Migrate!
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Running migrations:"))
