@@ -1673,7 +1673,8 @@ class ForeignKey(ForeignObject):
         if self.rel.on_delete is not CASCADE:
             kwargs['on_delete'] = self.rel.on_delete
         # Rel needs more work.
-        if self.rel.field_name:
+        to_meta = getattr(self.rel.to, "_meta", None)
+        if self.rel.field_name and (not to_meta or (to_meta.pk and self.rel.field_name != to_meta.pk.name)):
             kwargs['to_field'] = self.rel.field_name
         return name, path, args, kwargs
 
