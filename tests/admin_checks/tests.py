@@ -9,7 +9,7 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from .models import Song, Book, Book2, Album, TwoAlbumFKAndAnE, City, State, Influence
+from .models import Song, Author, Book, Book2, Album, TwoAlbumFKAndAnE, City, State, Influence
 
 
 class SongForm(forms.ModelForm):
@@ -530,12 +530,21 @@ class SystemChecksTestCase(TestCase):
         errors = BookAdmin.check(model=Book)
         self.assertEqual(errors, [])
 
-    def test_explicit_through_and_throug_fields_override(self):
+    def test_explicit_through_and_through_fields(self):
         """
-        Regression test for #12203 -- If the explicitly provided through model
-        is specified as a string and through_fields is specified as tuple, 
-        the admin should still be able use Model.m2m_field.through
+        Regression test for #12203 -- If through model and through_fields is 
+        specified explicitly as tuple, the admin should still be able to use 
+        Model.m2m_field.through and should not report
+        `cannot include the ManyToManyField ... because that field manually 
+        specifies a relationship model?`
         """
+        author = Author.objects.create(name='VINAY KUMAR SHARMA <vinaykrsharma@live.in>')
+        
+        book2 = Book2.objects.create(name='Django 2020',subtitle='Django in 2020',price=99.99)
+        
+        AuthorsBooks2 = Book2.authors.through
+        authorsbooks2 = AuthorsBooks2.objects.create(author=author, book=book2, priority=1)
+        authorsbooks2.save()
 
         class AuthorsInline(admin.TabularInline):
             model = Book2.authors.through
@@ -546,6 +555,13 @@ class SystemChecksTestCase(TestCase):
 
         errors = Book2Admin.check(model=Book2)
         self.assertEqual(errors, [])
+        
+        """Find books"""
+        self.assertGreater(Book2.objects.count(), 0)
+        """Must be authors in relation also"""
+        self.assertGreater(Author.objects.count(), 0)
+        """Book should have authors in relation using through model"""
+        self.assertGreater(book2.authors.count(), 0)
 
     def test_non_model_fields(self):
         """

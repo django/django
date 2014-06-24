@@ -37,6 +37,10 @@ class TwoAlbumFKAndAnE(models.Model):
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
+    
+    # On Python 3: def __str__(self):
+    def __unicode__(self):
+        return self.name
 
 
 class Book(models.Model):
@@ -54,11 +58,19 @@ class Book2(models.Model):
     subtitle = models.CharField(max_length=100)
     price = models.FloatField()
     authors = models.ManyToManyField(Author, through='AuthorsBooks2', through_fields=('book', 'author'))
+    
+    # On Python 3: def __str__(self):
+    def __unicode__(self):
+        return '%s ($ %s)' % (self.name, self.price)
 
 class AuthorsBooks2(models.Model):
     author = models.ForeignKey(Author)
     book = models.ForeignKey(Book2)
     priority = models.IntegerField()
+    
+    # On Python 3: def __str__(self):
+    def __unicode__(self):
+        return '%s by %s' % (self.author.name, self.book.name)
 
 class State(models.Model):
     name = models.CharField(max_length=15)
