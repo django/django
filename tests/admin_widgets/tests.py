@@ -386,8 +386,11 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
 
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            w.render('test', band.pk, attrs={}),
-            '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" /><a href="/admin_widgets/band/?_to_field=id" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Linkin Park</strong>' % dict(admin_static_prefix(), bandpk=band.pk)
+            w.render('test', band.pk, attrs={}), (
+                '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" />'
+                '<a href="/admin_widgets/band/?_to_field=id" class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
+                '&nbsp;<strong>Linkin Park</strong>'
+            ) % {'bandpk': band.pk}
         )
 
     def test_relations_to_non_primary_key(self):
@@ -401,8 +404,11 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
         rel = models.Inventory._meta.get_field('parent').rel
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            w.render('test', core.parent_id, attrs={}),
-            '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" /><a href="/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Apple</strong>' % admin_static_prefix()
+            w.render('test', core.parent_id, attrs={}), (
+                '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" />'
+                '<a href="/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" title="Lookup">'
+                '</a>&nbsp;<strong>Apple</strong>'
+            )
         )
 
     def test_fk_related_model_not_in_admin(self):
@@ -443,8 +449,11 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
             barcode=94, name='Child of hidden', parent=hidden
         )
         self.assertHTMLEqual(
-            w.render('test', child_of_hidden.parent_id, attrs={}),
-            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" /><a href="/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>&nbsp;<strong>Hidden</strong>' % admin_static_prefix()
+            w.render('test', child_of_hidden.parent_id, attrs={}), (
+                '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" />'
+                '<a href="/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" title="Lookup">'
+                '</a>&nbsp;<strong>Hidden</strong>'
+            )
         )
 
 
@@ -461,13 +470,17 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
 
         w = widgets.ManyToManyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            w.render('test', [m1.pk, m2.pk], attrs={}),
-            '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" /><a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/static/admin/img/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk, m2pk=m2.pk)
+            w.render('test', [m1.pk, m2.pk], attrs={}), (
+                '<input type="text" name="test" value="%(m1pk)s,%(m2pk)s" class="vManyToManyRawIdAdminField" />'
+                '<a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
+            ) % dict(m1pk=m1.pk, m2pk=m2.pk)
         )
 
         self.assertHTMLEqual(
-            w.render('test', [m1.pk]),
-            '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField" /><a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_STATIC_PREFIX)simg/selector-search.gif" width="16" height="16" alt="Lookup" /></a>' % dict(admin_static_prefix(), m1pk=m1.pk)
+            w.render('test', [m1.pk]), (
+                '<input type="text" name="test" value="%(m1pk)s" class="vManyToManyRawIdAdminField">'
+                '<a href="/admin_widgets/member/" class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
+            ) % dict(m1pk=m1.pk)
         )
 
     def test_m2m_related_model_not_in_admin(self):
