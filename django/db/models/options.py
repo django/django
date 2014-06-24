@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 from django.apps import apps
 from django.conf import settings
-from django.db.models.fields.related import ManyToManyRel
+from django.db.models.fields.related import ManyToManyRel, ManyToManyField
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
@@ -134,7 +134,11 @@ class Options(object):
     #@lru_cache(maxsize=None)
     def _get_field_map(self):
         types = RELATED_M2M | RELATED_OBJECTS | M2M | DATA | VIRTUAL
-        return dict(map(lambda (field, fn): (fn, field), self.get_new_fields(types=types, recursive=True).iteritems()))
+        res = {}
+        for field, names in self.get_new_fields(types=types, recursive=True).iteritems():
+            for name in names:
+                res[name] = field
+        return res
 
     def get_new_field(self, field_name, opts=NONE):
         try:
@@ -144,12 +148,13 @@ class Options(object):
 
     @lru_cache(maxsize=None)
     def get_new_fields(self, types, opts=NONE, **kwargs):
-        map_field_fn = lambda field: (field, field.name)
+        map_field_fn = lambda field: (field, (field.name, field.attname))
         recursive_kwargs = dict(kwargs, recursive=True)
         fields = OrderedDict()
 
         if types & VIRTUAL:
-            fields.update(map(map_field_fn, self.virtual_fields))
+            for field in self.virtual_fields:
+                fields[field] = (field.name,)
 
         if types & DATA:
             if not opts & LOCAL_ONLY:
@@ -157,7 +162,7 @@ class Options(object):
                     fields.update(parent._meta.get_new_fields(types=DATA, opts=opts, **recursive_kwargs))
             for field in self.local_fields:
                 if not ((opts & CONCRETE) and field.column is None):
-                    fields[field] = field.name
+                    fields[field] = (field.name, field.attname)
 
         if types & M2M:
             if not opts & LOCAL_ONLY:
@@ -179,7 +184,7 @@ class Options(object):
                 for f in model._meta.get_new_fields(types=M2M):
                     has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
                     if has_rel_attr and self == f.rel.to._meta:
-                        related_m2m_fields[f.related] = f.related_query_name()
+                        related_m2m_fields[f.related] = (f.related_query_name(),)
 
             fields.update(related_m2m_fields)
 
@@ -202,7 +207,7 @@ class Options(object):
                         to_meta = f.rel.to._meta
                         if (to_meta == self) or ((opts & INCLUDE_PROXY)
                                 and self.concrete_model == to_meta.concrete_model):
-                            related_fields[f.related] = f.related_query_name()
+                            related_fields[f.related] = (f.related_query_name(),)
 
             if not opts & INCLUDE_HIDDEN:
                 related_fields = OrderedDict([(k, v) for k, v in related_fields.items()
@@ -675,6 +680,16 @@ class Options(object):
             model = None
 
         return connection, model
+
+    def _map_details(self, connection):
+        direct = isinstance(connection, Field) or hasattr(connection, 'is_gfk')
+        model = connection.model if direct else connection.parent_model._meta.concrete_model
+        if model == self.model:
+            model = None
+
+        field = connection if direct else connection.field
+        m2m = isinstance(field, ManyToManyField)
+        return connection, model, direct, m2m
 
     def get_all_related_m2m_objects_with_model(self):
         """
