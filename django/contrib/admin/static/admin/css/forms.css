@@ -374,3 +374,13 @@ body.popup .submit-row {
 .empty-form {
     display: none;
 }
+
+/* RELATED FIELD ADD ONE */
+
+.add-another {
+    width: 10px;
+    height: 10px;
+    background-image: url(../img/icon_addlink.gif);
+    margin-left: 5px;
+    display: inline-block;
+}
