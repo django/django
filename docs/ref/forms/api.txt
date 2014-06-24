@@ -376,6 +376,8 @@ You can write code to perform validation for particular form fields (based on
 their name) or for the form as a whole (considering combinations of various
 fields). More information about this is in :doc:`/ref/forms/validation`.
 
+.. _ref-forms-api-outputting-html:
+
 Outputting forms as HTML
 ------------------------
 
@@ -491,6 +493,8 @@ it calls its ``as_table()`` method behind the scenes::
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" /></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+
+.. _ref-forms-api-styling-form-rows:
 
 Styling required or erroneous form rows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
