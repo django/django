@@ -211,6 +211,10 @@ Requests and Responses
   <django.http.HttpRequest.build_absolute_uri>` method now handles paths
   starting with ``//`` correctly.
 
+* If :setting:`DEBUG` is ``True`` and a request raises a
+  :exc:`~django.core.exceptions.SuspiciousOperation`, the response will be
+  rendered with a detailed error page.
+
 Tests
 ^^^^^
 
