@@ -131,7 +131,7 @@ class Options(object):
                                     include_auto_created)
         return filter(lambda a: not a._meta.swapped, apps)
 
-    @lru_cache(maxsize=None)
+    #@lru_cache(maxsize=None)
     def _get_field_map(self):
         types = RELATED_M2M | RELATED_OBJECTS | M2M | DATA | VIRTUAL
         return dict(map(lambda (field, fn): (fn, field), self.get_new_fields(types=types, recursive=True).iteritems()))
@@ -536,15 +536,18 @@ class Options(object):
         debugging output (a list of choices), so any internal-only field names
         are not included.
         """
+        fields = self._get_field_map()
+        return [val for val in fields.keys() if not val.endswith('+')]
+
         #fields = filter(lambda val: not val.endswith('+'), get_fields(m2m=RECURSIVE))
-        try:
-            cache = self._name_map
-        except AttributeError:
-            cache = self.init_name_map()
-        names = sorted(cache.keys())
-        # Internal-only names end with "+" (symmetrical m2m related names being
-        # the main example). Trim them.
-        return [val for val in names if not val.endswith('+')]
+        #try:
+            #cache = self._name_map
+        #except AttributeError:
+            #cache = self.init_name_map()
+        #names = sorted(cache.keys())
+        ## Internal-only names end with "+" (symmetrical m2m related names being
+        ## the main example). Trim them.
+        #return [val for val in names if not val.endswith('+')]
 
     def init_name_map(self):
         """
