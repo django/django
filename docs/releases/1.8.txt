@@ -211,6 +211,17 @@ Requests and Responses
   <django.http.HttpRequest.build_absolute_uri>` method now handles paths
   starting with ``//`` correctly.
 
+* The ``query_string`` argument of :class:`~django.http.QueryDict` is now
+  optional, defaulting to ``None``, so a blank ``QueryDict`` can now be
+  instantiated with ``QueryDict()`` instead of ``QueryDict(None)`` or
+  ``QueryDict('')``.
+
+* The ``GET`` and ``POST`` attributes of an :class:`~django.http.HttpRequest`
+  object are now :class:`~django.http.QueryDict`\ s rather than dictionaries,
+  and the ``FILES`` attribute is now a ``MultiValueDict``.
+  This brings this class into line with the documentation and with
+  ``WSGIRequest``.
+
 Tests
 ^^^^^
 
