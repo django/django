@@ -44,6 +44,11 @@ class DebugViewTests(TestCase):
         self.assertContains(response, 'file_data.txt', status_code=500)
         self.assertNotContains(response, 'haha', status_code=500)
 
+    def test_400(self):
+        # Ensure that when DEBUG=True, technical_500_template() is called.
+        response = self.client.get('/raises400/')
+        self.assertContains(response, '<div class="context" id="', status_code=400)
+
     def test_403(self):
         # Ensure no 403.html template exists to test the default case.
         with override_with_test_loader({}):
