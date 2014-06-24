@@ -183,6 +183,8 @@ class BaseHandler(object):
                     'status_code': 400,
                     'request': request
                 })
+            if settings.DEBUG:
+                return debug.technical_500_response(request, *sys.exc_info(), status_code=400)
 
             response = self.get_exception_response(request, resolver, 400)
 
