@@ -226,7 +226,7 @@ must test for streaming responses and adjust their behavior accordingly::
     Response middleware may wrap it in a new generator, but must not consume
     it. Wrapping is typically implemented as follows::
 
-        def wrap_streaming_content(content)
+        def wrap_streaming_content(content):
             for chunk in content:
                 yield alter_content(chunk)
 
