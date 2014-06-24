@@ -306,7 +306,7 @@ class Options(object):
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
-        self.get_new_fields.cache_clear()
+        #self.get_new_fields.cache_clear()
         if field.rel and isinstance(field.rel, ManyToManyRel):
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
             if hasattr(self, '_m2m_cache'):
