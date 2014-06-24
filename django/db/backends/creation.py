@@ -371,6 +371,7 @@ class BaseDatabaseCreation(object):
             interactive=False,
             database=self.connection.alias,
             test_database=True,
+            test_flush=True,
         )
 
         # We then serialize the current state of the database into a string
@@ -379,14 +380,6 @@ class BaseDatabaseCreation(object):
         # a TransactionTestCase still get a clean database on every test run.
         if serialize:
             self.connection._test_serialized_contents = self.serialize_db_to_string()
-
-        # Finally, we flush the database to clean
-        call_command(
-            'flush',
-            verbosity=max(verbosity - 1, 0),
-            interactive=False,
-            database=self.connection.alias
-        )
 
         call_command('createcachetable', database=self.connection.alias)
 
