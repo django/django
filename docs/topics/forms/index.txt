@@ -148,9 +148,9 @@ Instantiating, processing, and rendering forms
 
 When rendering an object in Django we generally:
 
-1. get hold of it in the view (fetch it from the database, for example)
-2. pass it to the template context
-3. expand it to HTML markup using template variables
+    1. get hold of it in the view (fetch it from the database, for example)
+    2. pass it to the template context
+    3. expand it to HTML markup using template variables
 
 Rendering a form in a template involves nearly the same work as rendering any
 other kind of object, but there are some key differences.
@@ -338,12 +338,12 @@ from that ``{{ form }}`` by Django's template language.
 
 .. admonition:: Forms and Cross Site Request Forgery protection
 
-   Django ships with an easy-to-use :doc:`protection against Cross Site Request
-   Forgeries </ref/contrib/csrf>`. When submitting a form via ``POST`` with
-   CSRF protection enabled you must use the :ttag:`csrf_token` template tag
-   as in the preceding example. However, since CSRF protection is not
-   directly tied to forms in templates, this tag is omitted from the
-   following examples in this document.
+    Django ships with an easy-to-use :doc:`protection against Cross Site Request
+    Forgeries </ref/contrib/csrf>`. When submitting a form via ``POST`` with
+    CSRF protection enabled you must use the :ttag:`csrf_token` template tag
+    as in the preceding example. However, since CSRF protection is not
+    directly tied to forms in templates, this tag is omitted from the
+    following examples in this document.
 
 We now have a working web form, described by a Django :class:`Form`, processed
 by a view, and rendered as an HTML ``<form>``.
@@ -427,8 +427,8 @@ data will have been converted nicely into Python types for you.
 
 .. note::
 
-   You can still access the unvalidated data directly from ``request.POST`` at
-   this point, but the validated data is better.
+    You can still access the unvalidated data directly from ``request.POST`` at
+    this point, but the validated data is better.
 
 In the contact form example above, ``cc_myself`` will be a boolean value.
 Likewise, fields such as :class:`IntegerField` and :class:`FloatField` convert
@@ -455,7 +455,7 @@ Here's how the form data could be processed in the view that handles this form:
 
 .. tip::
 
-   For more on sending email from Django, see :doc:`/topics/email`.
+    For more on sending email from Django, see :doc:`/topics/email`.
 
 Some field types need some extra handling. For example, files that are uploaded
 using a form need to be handled differently (they can be retrieved from
@@ -495,14 +495,14 @@ Here's the output of ``{{ form.as_p }}`` for our ``ContactForm`` instance:
 
 .. code-block:: html+django
 
-   <p><label for="id_subject">Subject:</label>
-       <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
-   <p><label for="id_message">Message:</label>
-       <input type="text" name="message" id="id_message" /></p>
-   <p><label for="id_sender">Sender:</label>
-       <input type="email" name="sender" id="id_sender" /></p>
-   <p><label for="id_cc_myself">Cc myself:</label>
-       <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
+    <p><label for="id_subject">Subject:</label>
+        <input id="id_subject" type="text" name="subject" maxlength="100" /></p>
+    <p><label for="id_message">Message:</label>
+        <input type="text" name="message" id="id_message" /></p>
+    <p><label for="id_sender">Sender:</label>
+        <input type="email" name="sender" id="id_sender" /></p>
+    <p><label for="id_cc_myself">Cc myself:</label>
+        <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
 
 Note that each form field has an ID attribute set to ``id_<field-name>``, which
 is referenced by the accompanying label tag. This is important for ensuring
@@ -558,9 +558,9 @@ rendered as an unordered list. This might look like:
 
 .. code-block:: html+django
 
-   <ul class="errorlist">
-       <li>Sender is required.</li>
-   </ul>
+    <ul class="errorlist">
+        <li>Sender is required.</li>
+    </ul>
 
 The list has a CSS class of ``errorlist`` to allow you to style its appearance.
 If you wish to further customize the display of errors you can do so by looping
@@ -650,9 +650,9 @@ Useful attributes on ``{{ field }}`` include:
 
 .. code-block:: html+django
 
-        {% if field.is_hidden %}
-           {# Do something special #}
-        {% endif %}
+    {% if field.is_hidden %}
+       {# Do something special #}
+    {% endif %}
 
 ``{{ field.field }}``
     The :class:`~django.forms.Field` instance from the form class that
