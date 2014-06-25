@@ -213,18 +213,21 @@ class AlterModelTable(Operation):
 
 class AlterUniqueTogether(Operation):
     """
-    Changes the value of index_together to the target one.
+    Changes the value of unique_together to the target one.
     Input value of unique_together must be a set of tuples.
     """
+    option_name = "unique_together"
 
     def __init__(self, name, unique_together):
         self.name = name
         unique_together = normalize_together(unique_together)
-        self.unique_together = set(tuple(cons) for cons in unique_together)
+        # need None rather than an empty set to prevent infinite migrations
+        # after removing unique_together from a model
+        self.unique_together = set(tuple(cons) for cons in unique_together) or None
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
-        model_state.options["unique_together"] = self.unique_together
+        model_state.options[self.option_name] = self.unique_together
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         old_apps = from_state.render()
@@ -234,8 +237,8 @@ class AlterUniqueTogether(Operation):
         if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
             schema_editor.alter_unique_together(
                 new_model,
-                getattr(old_model._meta, "unique_together", set()),
-                getattr(new_model._meta, "unique_together", set()),
+                getattr(old_model._meta, self.option_name, set()),
+                getattr(new_model._meta, self.option_name, set()),
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -245,7 +248,7 @@ class AlterUniqueTogether(Operation):
         return name.lower() == self.name.lower()
 
     def describe(self):
-        return "Alter unique_together for %s (%s constraints)" % (self.name, len(self.unique_together))
+        return "Alter %s for %s (%s constraints)" % (self.option_name, self.name, len(self.unique_together))
 
 
 class AlterIndexTogether(Operation):
@@ -253,15 +256,18 @@ class AlterIndexTogether(Operation):
     Changes the value of index_together to the target one.
     Input value of index_together must be a set of tuples.
     """
+    option_name = "index_together"
 
     def __init__(self, name, index_together):
         self.name = name
         index_together = normalize_together(index_together)
-        self.index_together = set(tuple(cons) for cons in index_together)
+        # need None rather than an empty set to prevent infinite migrations
+        # after removing unique_together from a model
+        self.index_together = set(tuple(cons) for cons in index_together) or None
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
-        model_state.options["index_together"] = self.index_together
+        model_state.options[self.option_name] = self.index_together
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         old_apps = from_state.render()
@@ -271,8 +277,8 @@ class AlterIndexTogether(Operation):
         if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
             schema_editor.alter_index_together(
                 new_model,
-                getattr(old_model._meta, "index_together", set()),
-                getattr(new_model._meta, "index_together", set()),
+                getattr(old_model._meta, self.option_name, set()),
+                getattr(new_model._meta, self.option_name, set()),
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -282,7 +288,7 @@ class AlterIndexTogether(Operation):
         return name.lower() == self.name.lower()
 
     def describe(self):
-        return "Alter index_together for %s (%s constraints)" % (self.name, len(self.index_together))
+        return "Alter %s for %s (%s constraints)" % (self.self.option_name, self.name, len(self.index_together))
 
 
 class AlterOrderWithRespectTo(Operation):
