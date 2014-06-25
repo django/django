@@ -212,7 +212,7 @@ class DeferRegressionTest(TestCase):
     def test_proxy_model_defer_with_selected_related(self):
         # Regression for #22050
         item = Item.objects.create(name="first", value=47)
-        related = RelatedItem.objects.create(item=item)
+        RelatedItem.objects.create(item=item)
         # Defer fields with only()
         obj = ProxyRelated.objects.all().select_related().only('item__name')[0]
         with self.assertNumQueries(0):
