@@ -134,8 +134,9 @@ maps a model class's fields to HTML form ``<input>`` elements via a
 :class:`Form`; this is what the Django admin is based upon.)
 
 A form's fields are themselves classes; they manage form data and perform
-validation when a form is submitted. A ``DateField`` and a ``FileField`` handle
-very different kinds of data and have to do different things with them.
+validation when a form is submitted. A :class:`DateField` and a
+:class:`FileField` handle very different kinds of data and have to do
+different things with them.
 
 A form field is represented to a user in the browser as a HTML "widget" - a
 piece of user interface machinery. Each field type has an appropriate default
@@ -355,9 +356,9 @@ and know a little bit about some of the underlying machinery.
 More about Django :class:`Form` classes
 =======================================
 
-All form classes are created as subclasses of ``django.forms.Form``, including
-the :doc:`ModelForm </topics/forms/modelforms>` you encounter in Django's
-admin.
+All form classes are created as subclasses of :class:`django.forms.Form`,
+including the :doc:`ModelForm </topics/forms/modelforms>` you encounter in
+Django's admin.
 
 .. admonition:: Models and Forms
 
@@ -397,8 +398,8 @@ we could use to implement "contact me" functionality on a personal Web site:
         sender = forms.EmailField()
         cc_myself = forms.BooleanField(required=False)
 
-Our earlier form used a single field, ``your_name``, a ``CharField``. In this
-case, our form has four fields: ``subject``, ``message``, ``sender`` and
+Our earlier form used a single field, ``your_name``, a :class:`CharField`. In
+this case, our form has four fields: ``subject``, ``message``, ``sender`` and
 ``cc_myself``. :class:`CharField`, :class:`EmailField` and
 :class:`BooleanField` are just three of the available field types; a full list
 can be found in :doc:`/ref/forms/fields`.
@@ -411,10 +412,10 @@ which in turn corresponds to an HTML form widget such as ``<input
 type="text">``.
 
 In most cases, the field will have a sensible default widget. For example, by
-default, a ``CharField`` will have a :class:`TextInput` widget, that produces an
-``<input type="text">`` in the HTML. If you needed ``<input type="textarea">``
-instead, you'd specify the appropriate widget when defining your form field,
-as we have done for the ``message`` field.
+default, a :class:`CharField` will have a :class:`TextInput` widget, that
+produces an ``<input type="text">`` in the HTML. If you needed
+``<input type="textarea">`` instead, you'd specify the appropriate widget when
+defining your form field, as we have done for the ``message`` field.
 
 Field data
 ^^^^^^^^^^
