@@ -9,7 +9,7 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from .models import Song, Author, Book, Book2, Album, TwoAlbumFKAndAnE, City, State, Influence
+from .models import Song, Book, Book2, Album, TwoAlbumFKAndAnE, City, State, Influence
 
 
 class SongForm(forms.ModelForm):
@@ -532,13 +532,13 @@ class SystemChecksTestCase(TestCase):
 
     def test_explicit_through_and_through_fields(self):
         """
-        Regression test for #12203 -- If through model and through_fields is 
-        specified explicitly as tuple, the admin should still be able to use 
+        Regression test for #12203 -- If through model and through_fields is
+        specified explicitly as tuple, the admin should still be able to use
         Model.m2m_field.through and should not report
-        `cannot include the ManyToManyField ... because that field manually 
+        `cannot include the ManyToManyField ... because that field manually
         specifies a relationship model?`
         """
-        
+
         class AuthorsInline(admin.TabularInline):
             model = Book2.authors.through
 
