@@ -525,12 +525,9 @@ class Options(object):
 
         Uses a cache internally, so after the first access, this is very fast.
         """
+        fields = self._get_field_map()
         try:
-            try:
-                return self._name_map[name]
-            except AttributeError:
-                cache = self.init_name_map()
-                return cache[name]
+            return self._map_details(fields[name])
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r'
                     % (self.object_name, name))
