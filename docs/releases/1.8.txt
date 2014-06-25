@@ -215,6 +215,11 @@ Requests and Responses
   :exc:`~django.core.exceptions.SuspiciousOperation`, the response will be
   rendered with a detailed error page.
 
+* The ``query_string`` argument of :class:`~django.http.QueryDict` is now
+  optional, defaulting to ``None``, so a blank ``QueryDict`` can now be
+  instantiated with ``QueryDict()`` instead of ``QueryDict(None)`` or
+  ``QueryDict('')``.
+
 Tests
 ^^^^^
 

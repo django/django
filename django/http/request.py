@@ -317,7 +317,7 @@ class QueryDict(MultiValueDict):
     _mutable = True
     _encoding = None
 
-    def __init__(self, query_string, mutable=False, encoding=None):
+    def __init__(self, query_string=None, mutable=False, encoding=None):
         super(QueryDict, self).__init__()
         if not encoding:
             encoding = settings.DEFAULT_CHARSET

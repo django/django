@@ -355,12 +355,15 @@ Methods
 :class:`QueryDict` implements all the standard dictionary methods because it's
 a subclass of dictionary. Exceptions are outlined here:
 
-.. method:: QueryDict.__init__(query_string, mutable=False, encoding=None)
+.. method:: QueryDict.__init__(query_string=None, mutable=False, encoding=None)
 
    Instantiates a ``QueryDict`` object based on ``query_string``.
 
           >>> QueryDict('a=1&a=2&c=3')
           <QueryDict: {u'a': [u'1', u'2'], u'b': [u'1']}>
+
+   If ``query_string`` is not passed in, the resulting ``QueryDict`` will be
+   empty (it will have no keys or values).
 
    Most ``QueryDict``\ s you encounter, and in particular those at
    ``request.POST`` and ``request.GET``, will be immutable. If you are
@@ -369,6 +372,10 @@ a subclass of dictionary. Exceptions are outlined here:
 
    Strings for setting both keys and values will be converted from ``encoding``
    to unicode. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
+
+   .. versionchanged:: 1.8
+
+        In previous versions, ``query_string`` was a required positional argument.
 
 .. method:: QueryDict.__getitem__(key)
 
@@ -523,7 +530,7 @@ In addition, ``QueryDict`` has the following methods:
     Optionally, urlencode can be passed characters which
     do not require encoding. For example::
 
-        >>> q = QueryDict('', mutable=True)
+        >>> q = QueryDict(mutable=True)
         >>> q['next'] = '/a&b/'
         >>> q.urlencode(safe='/')
         'next=/a%26b/'
