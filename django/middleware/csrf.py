@@ -167,7 +167,15 @@ class CsrfViewMiddleware(object):
             # Check non-cookie token for match.
             request_csrf_token = ""
             if request.method == "POST":
-                request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
+                try:
+                    request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
+                except IOError:
+                    # Handle a broken connection before we've completed reading
+                    # the POST data. process_view shouldn't raise any
+                    # exceptions, so we'll ignore and serve the user a 403
+                    # (assuming they're still listening, which they probably
+                    # aren't because of the error).
+                    pass
 
             if request_csrf_token == "":
                 # Fall back to X-CSRFToken, to make things easier for AJAX,
