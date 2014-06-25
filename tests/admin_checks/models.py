@@ -51,19 +51,6 @@ class AuthorsBooks(models.Model):
     book = models.ForeignKey(Book)
 
 
-class Book2(models.Model):
-    name = models.CharField(max_length=100)
-    subtitle = models.CharField(max_length=100)
-    price = models.FloatField()
-    authors = models.ManyToManyField(Author, through='AuthorsBooks2', through_fields=('book', 'author'))
-
-
-class AuthorsBooks2(models.Model):
-    author = models.ForeignKey(Author)
-    book = models.ForeignKey(Book2)
-    priority = models.IntegerField()
-
-
 class State(models.Model):
     name = models.CharField(max_length=15)
 

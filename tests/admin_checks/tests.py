@@ -3,13 +3,14 @@ from __future__ import unicode_literals
 import warnings
 
 from django import forms
+from django.db import models
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from .models import Song, Book, Book2, Album, TwoAlbumFKAndAnE, City, State, Influence
+from .models import Song, Author, Book, Album, TwoAlbumFKAndAnE, City, State, Influence
 
 
 class SongForm(forms.ModelForm):
@@ -537,16 +538,22 @@ class SystemChecksTestCase(TestCase):
         Model.m2m_field.through and should not report
         `cannot include the ManyToManyField ... because that field manually
         specifies a relationship model?`
+        #12203 -- If through ManyToManyField.model and through_fields are
+        specified, the admin should be able to use the field.
         """
 
-        class AuthorsInline(admin.TabularInline):
-            model = Book2.authors.through
+        class Book2(models.Model):
+            authors = models.ManyToManyField(Author, through='AuthorsBooks2', through_fields=('book', 'author'))
 
-        class Book2Admin(admin.ModelAdmin):
-            inlines = [AuthorsInline]
-            fields = ['name', 'subtitle', 'price', 'authors']
+        class AuthorsBooks2(models.Model):
+            author = models.ForeignKey(Author)
+            book = models.ForeignKey(Book2)
+            priority = models.IntegerField()
 
-        errors = Book2Admin.check(model=Book2)
+        class BookAdmin(admin.ModelAdmin):
+            fields = ['authors']
+
+        errors = BookAdmin.check(model=Book2)
         self.assertEqual(errors, [])
 
     def test_non_model_fields(self):
