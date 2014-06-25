@@ -146,7 +146,7 @@ class Options(object):
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
-    #@lru_cache(maxsize=None)
+    @lru_cache(maxsize=None)
     def get_new_fields(self, types, opts=NONE, **kwargs):
         map_field_fn = lambda field: (field, (field.name, field.attname))
         recursive_kwargs = dict(kwargs, recursive=True)
@@ -306,7 +306,7 @@ class Options(object):
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
-        #self.get_new_fields.cache_clear()
+        self.get_new_fields.cache_clear()
         if field.rel and isinstance(field.rel, ManyToManyRel):
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
             if hasattr(self, '_m2m_cache'):
@@ -338,6 +338,7 @@ class Options(object):
             del self._name_map
 
     def add_virtual_field(self, field):
+        self.get_new_fields.cache_clear()
         self.virtual_fields.append(field)
 
     def setup_pk(self, field):
