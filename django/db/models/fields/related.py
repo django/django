@@ -913,7 +913,7 @@ def create_many_related_manager(superclass, rel):
                     self.prefetch_cache_name)
 
         def add(self, *objs):
-            if not rel.through._meta.auto_created:
+            if not rel.through._meta.auto_created and rel.through_fields is None:
                 opts = self.through._meta
                 raise AttributeError(
                     "Cannot use add() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." %
@@ -1183,7 +1183,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
         return manager
 
     def __set__(self, instance, value):
-        if not self.field.rel.through._meta.auto_created:
+        if not self.field.rel.through._meta.auto_created and self.field.rel.through_fields is None:
             opts = self.field.rel.through._meta
             raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model.  Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
 
