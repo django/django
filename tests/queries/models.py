@@ -368,6 +368,9 @@ class Article(models.Model):
     name = models.CharField(max_length=20)
     created = models.DateTimeField()
 
+    def __str__(self):
+        return self.name
+
 
 @python_2_unicode_compatible
 class Food(models.Model):
