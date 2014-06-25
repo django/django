@@ -932,14 +932,14 @@ Attributes
 
     An iterator of strings representing the content.
 
-.. attribute:: HttpResponse.status_code
+.. attribute:: StreamingHttpResponse.status_code
 
     The `HTTP status code`_ for the response.
 
-.. attribute:: HttpResponse.reason_phrase
+.. attribute:: StreamingHttpResponse.reason_phrase
 
     The HTTP reason phrase for the response.
 
-.. attribute:: HttpResponse.streaming
+.. attribute:: StreamingHttpResponse.streaming
 
     This is always ``True``.
