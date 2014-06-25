@@ -21,6 +21,11 @@ class RelatedItem(models.Model):
     item = models.ForeignKey(Item)
 
 
+class ProxyRelated(RelatedItem):
+    class Meta:
+        proxy = True
+
+
 class Child(models.Model):
     name = models.CharField(max_length=10)
     value = models.IntegerField()

@@ -9,7 +9,7 @@ from django.db.models import Count
 from django.test import TestCase, override_settings
 
 from .models import (
-    ResolveThis, Item, RelatedItem, Child, Leaf, Proxy, SimpleItem, Feature,
+    ResolveThis, Item, RelatedItem, ProxyRelated, Child, Leaf, Proxy, SimpleItem, Feature,
     ItemAndSimpleItem, OneToOneItem, SpecialFeature, Location, Request)
 
 
@@ -206,6 +206,14 @@ class DeferRegressionTest(TestCase):
         obj = ItemAndSimpleItem.objects.defer('item').select_related('simple').get()
         self.assertEqual(obj.item, item2)
         self.assertEqual(obj.item_id, item2.id)
+
+        related = RelatedItem.objects.create(item=item1)
+        ### Defer fields with only()
+        obj = ProxyRelated.objects.all().select_related().only('item__name')[0]
+        with self.assertNumQueries(0):
+            self.assertEqual(obj.item.name, "first")
+        with self.assertNumQueries(1):
+            self.assertEqual(obj.item.value, 47)
 
     def test_only_with_select_related(self):
         # Test for #17485.
