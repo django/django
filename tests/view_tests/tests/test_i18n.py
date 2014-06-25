@@ -6,9 +6,10 @@ from os import path
 import unittest
 
 from django.conf import settings
+from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.core.urlresolvers import reverse
 from django.test import (
-    LiveServerTestCase, TestCase, modify_settings, override_settings)
+    TestCase, modify_settings, override_settings)
 from django.utils import six
 from django.utils._os import upath
 from django.utils.module_loading import import_string
@@ -208,25 +209,11 @@ skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
 
 @unittest.skipIf(skip_selenium, 'Selenium tests not requested')
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class JavascriptI18nTests(LiveServerTestCase):
+class JavascriptI18nTests(AdminSeleniumWebDriverTestCase):
 
     # The test cases use translations from these apps.
     available_apps = ['django.contrib.admin', 'view_tests']
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
-
-    @classmethod
-    def setUpClass(cls):
-        try:
-            cls.selenium = import_string(cls.webdriver_class)()
-        except Exception as e:
-            raise unittest.SkipTest('Selenium webdriver "%s" not installed or '
-                                    'not operational: %s' % (cls.webdriver_class, str(e)))
-        super(JavascriptI18nTests, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.selenium.quit()
-        super(JavascriptI18nTests, cls).tearDownClass()
 
     @override_settings(LANGUAGE_CODE='de')
     def test_javascript_gettext(self):

@@ -23,6 +23,8 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
             raise SkipTest('Selenium tests not requested')
         try:
             cls.selenium = import_string(cls.webdriver_class)()
+            # set an implicit wait of 10 seconds for Selenium operations
+            cls.selenium.implicitly_wait(10)
         except Exception as e:
             raise SkipTest('Selenium webdriver "%s" not installed or not '
                            'operational: %s' % (cls.webdriver_class, str(e)))
