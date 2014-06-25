@@ -567,6 +567,44 @@ class AutodetectorTests(TestCase):
         self.assertEqual(action2.__class__.__name__, "AlterUniqueTogether")
         self.assertEqual(action2.unique_together, set([("title", "newfield")]))
 
+    def test_remove_index_together(self):
+        author_index_together = ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))
+        ], {"index_together": [("id", "name")]})
+
+        before = self.make_project_state([author_index_together])
+        after = self.make_project_state([self.author_name])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        migration = changes['testapp'][0]
+        # Right number of actions?
+        self.assertEqual(len(migration.operations), 1)
+        # Right actions?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterIndexTogether")
+        self.assertEqual(action.index_together, None)
+
+    def test_remove_unique_together(self):
+        author_unique_together = ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))
+        ], {"unique_together": [("id", "name")]})
+
+        before = self.make_project_state([author_unique_together])
+        after = self.make_project_state([self.author_name])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        migration = changes['testapp'][0]
+        # Right number of actions?
+        self.assertEqual(len(migration.operations), 1)
+        # Right actions?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
+        self.assertEqual(action.unique_together, None)
+
     def test_proxy(self):
         "Tests that the autodetector correctly deals with proxy models"
         # First, we test adding a proxy model
