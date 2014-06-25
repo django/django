@@ -17,7 +17,7 @@ from django.db.models.query_utils import (Q, select_related_descend,
     deferred_class_factory, InvalidQuery)
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import CURSOR
-from django.db.models import sql
+from django.db.models import signals, sql
 from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
@@ -594,12 +594,24 @@ class QuerySet(object):
         """
         assert self.query.can_filter(), \
             "Cannot update a query once a slice has been taken."
+        meta = self.model._meta
         self._for_write = True
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
+        extra_data = {}
+        if not meta.auto_created:
+            responses = signals.pre_update.send(
+                sender=self.model, update_fields=kwargs,
+                queryset=self._clone(), using=self.db)
+            for rcvr, response in responses:
+                extra_data.update(response)
         with transaction.atomic(using=self.db, savepoint=False):
             rows = query.get_compiler(self.db).execute_sql(CURSOR)
         self._result_cache = None
+        if not meta.auto_created:
+            signals.post_update.send(
+                sender=self.model, update_fields=kwargs,
+                extra_data=extra_data, using=self.db)
         return rows
     update.alters_data = True
 
@@ -608,7 +620,7 @@ class QuerySet(object):
         A version of update that accepts field objects instead of field names.
         Used primarily for model saving and not intended for use by general
         code (it requires too much poking around at model internals to be
-        useful at that level).
+        useful at that level). This does not send pre/post update signals.
         """
         assert self.query.can_filter(), \
             "Cannot update a query once a slice has been taken."

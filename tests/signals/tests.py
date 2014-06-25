@@ -18,6 +18,8 @@ class BaseSignalTest(TestCase):
             len(signals.post_save.receivers),
             len(signals.pre_delete.receivers),
             len(signals.post_delete.receivers),
+            len(signals.pre_update.receivers),
+            len(signals.post_update.receivers),
         )
 
     def tearDown(self):
@@ -27,6 +29,8 @@ class BaseSignalTest(TestCase):
             len(signals.post_save.receivers),
             len(signals.pre_delete.receivers),
             len(signals.post_delete.receivers),
+            len(signals.pre_update.receivers),
+            len(signals.post_update.receivers),
         )
         self.assertEqual(self.pre_signals, post_signals)
 
@@ -141,6 +145,104 @@ class SignalTests(BaseSignalTest):
         finally:
             signals.pre_delete.disconnect(pre_delete_handler)
             signals.post_delete.disconnect(post_delete_handler)
+
+    def test_update_signals(self):
+        data = []
+        self.maxDiff = 1024
+
+        def clean(o):
+            # convert strings to basic string type for testing
+            if isinstance(o, six.string_types):
+                return str(o)
+            elif isinstance(o, dict):
+                return dict((clean(k), clean(v)) for k, v in o.items())
+            elif isinstance(o, (tuple, list)):
+                return tuple(clean(v) for v in o)
+            elif isinstance(o, list):
+                return list(clean(v) for v in o)
+            return o
+
+        def pre_update_handler(sender, update_fields, queryset, **kwargs):
+            self.assertEqual(queryset.model, sender)
+            all = sender._default_manager.order_by('pk').all()
+            all_data = [
+                (p.pk, p.first_name, p.last_name) for p in all
+            ]
+            queryset_data = [
+                (p.pk, p.first_name, p.last_name) for p in queryset
+            ]
+            data.append(
+                ('pre_update', update_fields, all_data, queryset_data)
+            )
+            return {
+                'pks': list(queryset.values_list('pk', flat=True))
+            }
+
+        def post_update_handler(sender, update_fields, extra_data, **kwargs):
+            all = sender._default_manager.order_by('pk').all()
+            all_data = [
+                (p.pk, p.first_name, p.last_name) for p in all
+            ]
+            data.append(
+                ('post_update', update_fields, all_data, extra_data)
+            )
+
+        signals.pre_update.connect(pre_update_handler, weak=False)
+        signals.post_update.connect(post_update_handler, weak=False)
+
+        try:
+            p1 = Person.objects.create(first_name="James", last_name="Smith")
+            p2 = Person.objects.create(first_name="John", last_name="Jones")
+            p3 = Person.objects.create(first_name="Bob", last_name="Jones")
+
+            self.assertEqual(data, [])
+
+            # what we're expecting
+            update_kwargs = dict(last_name="Johnson")
+            pre_data = [(p.pk, p.first_name, p.last_name) for p in p1, p2, p3]
+            pre_qs_data = [t for t in pre_data if t[0] in [p2.pk, p3.pk]]
+            post_data = pre_data[:]
+            post_data[1] = (p2.pk, p2.first_name, "Johnson")
+            post_data[2] = (p3.pk, p3.first_name, "Johnson")
+            post_extra_data = {'pks': [p2.pk, p3.pk]}
+
+            # run the update and check result
+            qs = Person.objects.order_by('pk').filter(last_name="Jones")
+            qs.update(last_name="Johnson")
+
+            self.assertEqual(clean(data), clean([
+                ('pre_update', update_kwargs, pre_data, pre_qs_data),
+                ('post_update', update_kwargs, post_data, post_extra_data),
+            ]))
+
+            data[:] = []
+            p2.last_name, p3.last_name = "Johnson", "Johnson"
+
+            # what we're expecting for the next test
+            update_kwargs = dict(last_name="Johnson")
+            pre_data = [(p.pk, p.first_name, p.last_name) for p in p1, p2, p3]
+            pre_qs_data = [pre_data[2], pre_data[1]]
+            post_data = pre_data[:]
+            post_data = [(p.pk, p.first_name, p.last_name) for p in p1, p2, p3]
+            post_data[1] = (p2.pk, "Robert", "Jones")
+            post_data[2] = (p3.pk, "Robert", "Jones")
+            post_extra_data = {'pks': [p3.pk, p2.pk]}
+
+            # test updating two fields, and with an ordered queryset.
+            qs = Person.objects.order_by('first_name')
+            qs = qs.filter(last_name="Johnson")
+            qs.update(first_name="Robert", last_name="Jones")
+
+            kwargs = dict(first_name="Robert", last_name="Jones")
+
+            self.assertEqual(clean(data), clean([
+                ('pre_update', kwargs, pre_data, pre_qs_data),
+                ('post_update', kwargs, post_data, post_extra_data),
+            ]))
+
+        finally:
+            signals.pre_update.disconnect(pre_update_handler)
+            signals.post_update.disconnect(post_update_handler)
 
     def test_decorators(self):
         data = []
