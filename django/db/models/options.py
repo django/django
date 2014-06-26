@@ -10,7 +10,7 @@ from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
-from django.utils.functional import cached_property
+from django.utils.functional import conditional_cached_property
 from django.utils.text import camel_case_to_spaces
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
@@ -126,10 +126,15 @@ class Options(object):
     def installed(self):
         return self.app_config is not None
 
-    def get_non_swapped_models(self, include_auto_created=True):
-        apps = self.apps.get_models(include_auto_created=
-                                    include_auto_created)
-        return filter(lambda a: not a._meta.swapped, apps)
+    @conditional_cached_property
+    def non_swapped_models_auto_created(self):
+        models = self.apps.get_models(include_auto_created=True)
+        return apps.ready, filter(lambda a: not a._meta.swapped, models)
+
+    @conditional_cached_property
+    def non_swapped_models(self):
+        models = self.apps.get_models(include_auto_created=False)
+        return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
     #@lru_cache(maxsize=None)
     def _get_field_map(self):
@@ -162,7 +167,7 @@ class Options(object):
                         if is_valid:
                             related_m2m_fields[obj] = query_name
 
-            for model in self.get_non_swapped_models(False):
+            for model in self.non_swapped_models:
                 for f in model._meta.get_new_fields(types=M2M):
                     has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
                     if has_rel_attr and self == f.rel.to._meta:
@@ -182,7 +187,7 @@ class Options(object):
                                 and obj.model not in parent_list):
                             related_fields[obj] = query_name
 
-            for model in self.get_non_swapped_models(True):
+            for model in self.non_swapped_models_auto_created:
                 for f in model._meta.get_new_fields(types=DATA | VIRTUAL, opts=INCLUDE_HIDDEN):
                     has_rel_attr = hasattr(f, 'rel') and f.rel
                     if has_rel_attr and f.has_class_relation():
