@@ -134,6 +134,7 @@ def inotify_code_changed():
     """
     class EventHandler(pyinotify.ProcessEvent):
         modified_code = None
+
         def process_default(self, event):
             if event.path.endswith('.mo'):
                 EventHandler.modified_code = I18N_MODIFIED
