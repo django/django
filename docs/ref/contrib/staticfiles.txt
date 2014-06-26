@@ -26,6 +26,7 @@ following settings:
 * :setting:`STATIC_ROOT`
 * :setting:`STATIC_URL`
 * :setting:`STATICFILES_DIRS`
+* :setting:`STATICFILES_IGNORE_PATTERNS` 
 * :setting:`STATICFILES_STORAGE`
 * :setting:`STATICFILES_FINDERS`
 
@@ -124,6 +125,11 @@ Some commonly used options are:
 
     Don't ignore the common private glob-style patterns ``'CVS'``, ``'.*'``
     and ``'*~'``.
+
+    .. versionchanged:: 1.8
+
+    This option is deprecated and will be ignored in future. Please set 
+    :setting:`STATICFILES_IGNORE_PATTERNS` instead. 
 
 For a full list of options, refer to the commands own help by running::
 

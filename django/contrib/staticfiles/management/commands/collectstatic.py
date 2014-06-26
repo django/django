@@ -1,8 +1,10 @@
 from __future__ import unicode_literals
 
 import os
+import warnings
 from collections import OrderedDict
 
+from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import CommandError, BaseCommand
 from django.core.management.color import no_style
@@ -71,11 +73,18 @@ class Command(BaseCommand):
         self.symlink = options['link']
         self.clear = options['clear']
         self.dry_run = options['dry_run']
-        ignore_patterns = options['ignore_patterns']
-        if options['use_default_ignore_patterns']:
-            ignore_patterns += ['CVS', '.*', '*~']
-        self.ignore_patterns = list(set(ignore_patterns))
         self.post_process = options['post_process']
+
+	ignore_patterns = set(settings.STATICFILES_IGNORE_PATTERNS)
+ 	ignore_patterns.update(options['ignore_patterns']) 
+ 	if not options['use_default_ignore_patterns']: 
+ 	    # Hard-coded patterns which were default before 
+ 	    ignore_patterns = ignore_patterns - set(['CVS', '.*', '*~']) 
+ 	    warnings.warn("--no-default-ignore option will be ignored in" 
+ 	                  " future. Please override STATICFILES_IGNORE_PATTERS" 
+ 	                  " if you don't want to use default patterns.", 
+ 	                  PendingDeprecationWarning)
+	self.ignore_patterns = list(ignore_patterns)
 
     def collect(self):
         """
