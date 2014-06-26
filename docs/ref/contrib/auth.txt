@@ -296,18 +296,20 @@ Fields
 :class:`~django.contrib.auth.models.Permission` objects have the following
 fields:
 
-.. attribute:: name
+.. class:: models.Permission
 
-    Required. 50 characters or fewer. Example: ``'Can vote'``.
+    .. attribute:: name
 
-.. attribute:: content_type
+        Required. 50 characters or fewer. Example: ``'Can vote'``.
 
-    Required. A reference to the ``django_content_type`` database table, which
-    contains a record for each installed Django model.
+    .. attribute:: content_type
 
-.. attribute:: codename
+        Required. A reference to the ``django_content_type`` database table,
+        which contains a record for each installed model.
 
-    Required. 100 characters or fewer. Example: ``'can_vote'``.
+    .. attribute:: codename
+
+        Required. 100 characters or fewer. Example: ``'can_vote'``.
 
 Methods
 -------
@@ -325,19 +327,21 @@ Fields
 
 :class:`~django.contrib.auth.models.Group` objects have the following fields:
 
-.. attribute:: name
+.. class:: models.Group
 
-    Required. 80 characters or fewer. Any characters are permitted. Example:
-    ``'Awesome Users'``.
+    .. attribute:: name
 
-.. attribute:: permissions
+        Required. 80 characters or fewer. Any characters are permitted. Example:
+        ``'Awesome Users'``.
 
-    Many-to-many field to :class:`~django.contrib.auth.models.Permission`::
+    .. attribute:: permissions
 
-        group.permissions = [permission_list]
-        group.permissions.add(permission, permission, ...)
-        group.permissions.remove(permission, permission, ...)
-        group.permissions.clear()
+        Many-to-many field to :class:`~django.contrib.auth.models.Permission`::
+
+            group.permissions = [permission_list]
+            group.permissions.add(permission, permission, ...)
+            group.permissions.remove(permission, permission, ...)
+            group.permissions.clear()
 
 .. _topics-auth-signals:
 
