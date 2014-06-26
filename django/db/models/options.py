@@ -138,7 +138,7 @@ class Options(object):
         models = self.apps.get_models(include_auto_created=False)
         return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
-    @cached_property
+    @property
     def _field_map(self):
         types = ALL
         res = {}
@@ -147,7 +147,7 @@ class Options(object):
                 res[name] = field
         return res
 
-    def get_new_field(self, field_name, opts=NONE):
+    def get_new_field(self, field_name):
         try:
             return self._field_map[field_name]
         except KeyError:
@@ -320,6 +320,8 @@ class Options(object):
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
+        #if hasattr(self, '_field_map'):
+            #del self._field_map
         self._get_new_fields_cache = {}
 
         if field.rel and isinstance(field.rel, ManyToManyRel):
