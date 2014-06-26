@@ -81,7 +81,7 @@ class Command(BaseCommand):
  	    # Hard-coded patterns which were default before 
  	    ignore_patterns = ignore_patterns - set(['CVS', '.*', '*~']) 
  	    warnings.warn("--no-default-ignore option will be ignored in" 
- 	                  " future. Please override STATICFILES_IGNORE_PATTERS" 
+ 	                  " future. Please override STATICFILES_IGNORE_PATTERNS" 
  	                  " if you don't want to use default patterns.", 
  	                  PendingDeprecationWarning)
 	self.ignore_patterns = list(ignore_patterns)
