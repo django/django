@@ -20,7 +20,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str, force_text, iri_to_uri
 from django.utils.functional import lazy
-from django.utils.http import urlquote
+from django.utils.http import RFC3986_SUBDELIMS, urlquote
 from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
 from django.utils import six, lru_cache
@@ -453,7 +453,9 @@ class RegexURLResolver(LocaleRegexProvider):
                 # arguments in order to return a properly encoded URL.
                 candidate_pat = prefix_norm.replace('%', '%%') + result
                 if re.search('^%s%s' % (prefix_norm, pattern), candidate_pat % candidate_subs, re.UNICODE):
-                    candidate_subs = dict((k, urlquote(v)) for (k, v) in candidate_subs.items())
+                    # safe characters from `pchar` definition of RFC 3986
+                    candidate_subs = dict((k, urlquote(v, safe=RFC3986_SUBDELIMS + str('/~:@')))
+                                          for (k, v) in candidate_subs.items())
                     return candidate_pat % candidate_subs
         # lookup_view can be URL label, or dotted path, or callable, Any of
         # these can be passed in at the top, but callables are not friendly in

@@ -7,6 +7,7 @@ import sys
 
 from django.utils.encoding import force_text, force_str
 from django.utils.functional import allow_lazy
+from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, mark_safe
 from django.utils import six
 from django.utils.six.moves.urllib.parse import quote, unquote, urlsplit, urlunsplit
@@ -215,7 +216,7 @@ def smart_urlquote(url):
 
     url = unquote(force_str(url))
     # See http://bugs.python.org/issue2637
-    url = quote(url, safe=b'!*\'();:@&=+$,/?#[]~')
+    url = quote(url, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + str('~'))
 
     return force_text(url)
 

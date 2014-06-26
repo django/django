@@ -30,6 +30,9 @@ RFC1123_DATE = re.compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
 RFC850_DATE = re.compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
 ASCTIME_DATE = re.compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
 
+RFC3986_GENDELIMS = str(":/?#[]@")
+RFC3986_SUBDELIMS = str("!$&'()*+,;=")
+
 
 def urlquote(url, safe='/'):
     """
