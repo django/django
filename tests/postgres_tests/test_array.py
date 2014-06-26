@@ -176,6 +176,9 @@ class TestQuerying(TestCase):
             [instance]
         )
 
+    def test_char_contains(self):
+        list(CharArrayModel.objects.filter(field__contains=['text']))
+
 
 class TestChecks(TestCase):
 
