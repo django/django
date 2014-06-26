@@ -37,7 +37,6 @@ class BaseModelBackendTest(object):
         self.curr_auth = settings.AUTHENTICATION_BACKENDS
         settings.AUTHENTICATION_BACKENDS = (self.backend,)
         Group._meta._get_field_map.cache_clear()
-        Group._meta.get_new_fields.cache_clear()
         self.create_users()
 
     def tearDown(self):

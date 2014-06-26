@@ -10,7 +10,7 @@ from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
-from django.utils.functional import conditional_cached_property
+from django.utils.functional import conditional_cached_property, cached_property
 from django.utils.text import camel_case_to_spaces
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
@@ -67,6 +67,7 @@ def normalize_together(option_together):
 @python_2_unicode_compatible
 class Options(object):
     def __init__(self, meta, app_label=None):
+        self._get_new_fields_cache = {}
         self.local_fields = []
         self.local_many_to_many = []
         self.virtual_fields = []
@@ -137,8 +138,8 @@ class Options(object):
         models = self.apps.get_models(include_auto_created=False)
         return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
-    @lru_cache(maxsize=None)
-    def _get_field_map(self):
+    @cached_property
+    def _field_map(self):
         types = ALL
         res = {}
         for field, names in self.get_new_fields(types=types, recursive=True).iteritems():
@@ -148,12 +149,18 @@ class Options(object):
 
     def get_new_field(self, field_name, opts=NONE):
         try:
-            return self._get_field_map()[field_name]
+            return self._field_map[field_name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
-    @lru_cache(maxsize=None)
     def get_new_fields(self, types, opts=NONE, **kwargs):
+
+        cache_key = (types, opts, frozenset(kwargs))
+        try:
+            return self._get_new_fields_cache[cache_key]
+        except KeyError:
+            pass
+
         map_field_fn = lambda field: (field, (field.name, field.attname))
         recursive_kwargs = dict(kwargs, recursive=True)
         fields = OrderedDict()
@@ -223,6 +230,7 @@ class Options(object):
         if 'recursive' not in kwargs:
             fields = tuple(fields.keys())
 
+        self._get_new_fields_cache[cache_key] = fields
         return fields
 
     def contribute_to_class(self, cls, name):
@@ -312,8 +320,10 @@ class Options(object):
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
-        self._get_field_map.cache_clear()
-        self.get_new_fields.cache_clear()
+        if hasattr(self, '_field_map'):
+            del self._field_map
+        self._get_new_fields_cache = {}
+
         if field.rel and isinstance(field.rel, ManyToManyRel):
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
             if hasattr(self, '_m2m_cache'):
@@ -345,8 +355,9 @@ class Options(object):
             del self._name_map
 
     def add_virtual_field(self, field):
-        self._get_field_map.cache_clear()
-        self.get_new_fields.cache_clear()
+        if hasattr(self, '_field_map'):
+            del self._field_map
+        self._get_new_fields_cache = {}
         self.virtual_fields.append(field)
 
     def setup_pk(self, field):
@@ -533,7 +544,7 @@ class Options(object):
 
         Uses a cache internally, so after the first access, this is very fast.
         """
-        fields = self._get_field_map()
+        fields = self._field_map
         try:
             return self._map_details(fields[name])
         except KeyError:
@@ -547,7 +558,7 @@ class Options(object):
         debugging output (a list of choices), so any internal-only field names
         are not included.
         """
-        fields = self._get_field_map()
+        fields = self._field_map
         return [val for val in fields.keys() if not val.endswith('+')]
 
         #fields = filter(lambda val: not val.endswith('+'), get_fields(m2m=RECURSIVE))
