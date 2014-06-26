@@ -3990,7 +3990,7 @@ class UserAdminTest(TestCase):
         response = self.client.get('/test_admin/admin/admin_views/album/add/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '/test_admin/admin/auth/user/add')
-        self.assertContains(response, 'class="add-another" id="add_id_owner" onclick="return showAddAnotherPopup(this);"')
+        self.assertContains(response, 'class="add-another" id="add_id_owner"')
         response = self.client.get('/test_admin/admin/auth/user/add/?_popup=1')
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'name="_continue"')
