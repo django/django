@@ -153,23 +153,22 @@ class Options(object):
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
-    def get_new_fields(self, types, opts=NONE, **kwargs):
+    def get_new_fields(self, types, opts=NONE, recursive=False):
 
-        cache_key = (types, opts, frozenset(kwargs))
+        cache_key = (types, opts, recursive)
         try:
             return self._get_new_fields_cache[cache_key]
         except KeyError:
             pass
 
         map_field_fn = lambda field: (field, (field.name, field.attname))
-        recursive_kwargs = dict(kwargs, recursive=True)
         fields = OrderedDict()
 
         if types & RELATED_M2M:
             related_m2m_fields = OrderedDict()
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
-                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_M2M, **recursive_kwargs).iteritems():
+                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_M2M, recursive=True).iteritems():
                         is_valid = not (obj.field.creation_counter < 0
                                     and obj.model not in self.get_parent_list())
                         if is_valid:
@@ -189,7 +188,7 @@ class Options(object):
             # ERROR? check
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
-                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN, **recursive_kwargs).iteritems():
+                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN, recursive=True).iteritems():
                         if not ((obj.field.creation_counter < 0
                                 or obj.field.rel.parent_link)
                                 and obj.model not in parent_list):
@@ -212,13 +211,13 @@ class Options(object):
         if types & M2M:
             if not opts & LOCAL_ONLY:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(types=M2M, opts=opts, **recursive_kwargs))
+                    fields.update(parent._meta.get_new_fields(types=M2M, opts=opts, recursive=True))
             fields.update(map(map_field_fn, self.local_many_to_many))
 
         if types & DATA:
             if not opts & LOCAL_ONLY:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(types=DATA, opts=opts, **recursive_kwargs))
+                    fields.update(parent._meta.get_new_fields(types=DATA, opts=opts, recursive=True))
             for field in self.local_fields:
                 if not ((opts & CONCRETE) and field.column is None):
                     fields[field] = (field.name, field.attname)
@@ -227,7 +226,7 @@ class Options(object):
             for field in self.virtual_fields:
                 fields[field] = (field.name,)
 
-        if 'recursive' not in kwargs:
+        if not recursive:
             fields = tuple(fields.keys())
 
         self._get_new_fields_cache[cache_key] = fields
