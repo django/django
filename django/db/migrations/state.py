@@ -29,6 +29,9 @@ class ProjectState(object):
         # Apps to include from main registry, usually unmigrated ones
         self.real_apps = real_apps or []
 
+    def __repr__(self):
+        return 'ModelState(%r, %r, %r, options=%r, bases=%r)' % (self.app_label, self.name, self.fields, self.options, self.bases)
+
     def add_model_state(self, model_state):
         self.models[(model_state.app_label, model_state.name.lower())] = model_state
 
