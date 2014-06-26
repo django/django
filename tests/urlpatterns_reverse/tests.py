@@ -106,7 +106,7 @@ test_data = (
     ('product', '/product/chocolate+($2.00)/', [], {'price': '2.00', 'product': 'chocolate'}),
     ('headlines', '/headlines/2007.5.21/', [], dict(year=2007, month=5, day=21)),
     ('windows', r'/windows_path/C:%5CDocuments%20and%20Settings%5Cspam/', [], dict(drive_name='C', path=r'Documents and Settings\spam')),
-    ('special', r'/special_chars/%2B%5C%24%2A/', [r'+\$*'], {}),
+    ('special', r'/special_chars/~@+%5C$*%7C/', [r'~@+\$*|'], {}),
     ('special', r'/special_chars/some%20resource/', [r'some resource'], {}),
     ('special', r'/special_chars/10%25%20complete/', [r'10% complete'], {}),
     ('special', r'/special_chars/some%20resource/', [], {'chars': r'some resource'}),

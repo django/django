@@ -36,7 +36,7 @@ from django.utils import translation
 from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes, force_text
 from django.utils.html import escape
-from django.utils.http import urlencode, urlquote
+from django.utils.http import urlencode
 from django.utils.six.moves.urllib.parse import parse_qsl, urljoin, urlparse
 from django.utils._os import upath
 from django.utils import six
@@ -1748,7 +1748,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         prefix = '/test_admin/admin/admin_views/modelwithstringprimarykey/'
         response = self.client.get(prefix)
         # this URL now comes through reverse(), thus url quoting and iri_to_uri encoding
-        pk_final_url = escape(iri_to_uri(urlquote(quote(self.pk))))
+        pk_final_url = escape(iri_to_uri(quote(self.pk)))
         should_contain = """<th class="field-__str__"><a href="%s%s/">%s</a></th>""" % (prefix, pk_final_url, escape(self.pk))
         self.assertContains(response, should_contain)
 
@@ -1756,14 +1756,14 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         "The link from the recent actions list referring to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/')
         link = reverse('admin:admin_views_modelwithstringprimarykey_change', args=(quote(self.pk),))
-        should_contain = """<a href="%s">%s</a>""" % (link, escape(self.pk))
+        should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_without_content_type(self):
         "If a LogEntry is missing content_type it will not display it in span tag under the hyperlink."
         response = self.client.get('/test_admin/admin/')
         link = reverse('admin:admin_views_modelwithstringprimarykey_change', args=(quote(self.pk),))
-        should_contain = """<a href="%s">%s</a>""" % (link, escape(self.pk))
+        should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
         self.assertContains(response, should_contain)
         should_contain = "Model with string primary key"  # capitalized in Recent Actions
         self.assertContains(response, should_contain)
@@ -1785,7 +1785,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         log_entry_name = "Model with string primary key"  # capitalized in Recent Actions
         logentry = LogEntry.objects.get(content_type__name__iexact=log_entry_name)
         model = "modelwithstringprimarykey"
-        desired_admin_url = "/test_admin/admin/admin_views/%s/%s/" % (model, escape(iri_to_uri(urlquote(quote(self.pk)))))
+        desired_admin_url = "/test_admin/admin/admin_views/%s/%s/" % (model, iri_to_uri(quote(self.pk)))
         self.assertEqual(logentry.get_admin_url(), desired_admin_url)
 
         logentry.content_type.model = "non-existent"
@@ -1795,7 +1795,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/delete/' % quote(self.pk))
         # this URL now comes through reverse(), thus url quoting and iri_to_uri encoding
-        should_contain = """/%s/">%s</a>""" % (escape(iri_to_uri(urlquote(quote(self.pk)))), escape(self.pk))
+        should_contain = """/%s/">%s</a>""" % (escape(iri_to_uri(quote(self.pk))), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_url_conflicts_with_add(self):
