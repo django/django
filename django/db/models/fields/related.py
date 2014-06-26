@@ -118,6 +118,7 @@ class RelatedField(Field):
             ]
         return []
 
+    @cached_property
     def has_class_relation(self):
         return (hasattr(self, 'rel')
             and self.rel

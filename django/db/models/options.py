@@ -191,7 +191,7 @@ class Options(object):
             for model in self.non_swapped_models_auto_created:
                 for f in model._meta.get_new_fields(types=DATA | VIRTUAL, opts=INCLUDE_HIDDEN):
                     has_rel_attr = hasattr(f, 'rel') and f.rel
-                    if has_rel_attr and f.has_class_relation():
+                    if has_rel_attr and f.has_class_relation:
                         to_meta = f.rel.to._meta
                         if (to_meta == self) or ((opts & INCLUDE_PROXY)
                                 and self.concrete_model == to_meta.concrete_model):
