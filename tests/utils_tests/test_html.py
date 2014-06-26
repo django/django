@@ -173,7 +173,11 @@ class TestUtilsHtml(TestCase):
         # Ensure that everything unsafe is quoted, !*'();:@&=+$,/?#[]~ is considered safe as per RFC
         self.assertEqual(quote('http://example.com/path/öäü/'), 'http://example.com/path/%C3%B6%C3%A4%C3%BC/')
         self.assertEqual(quote('http://example.com/%C3%B6/ä/'), 'http://example.com/%C3%B6/%C3%A4/')
-        self.assertEqual(quote('http://example.com/?x=1&y=2'), 'http://example.com/?x=1&y=2')
+        self.assertEqual(quote('http://example.com/?x=1&y=2+3&z='), 'http://example.com/?x=1&y=2+3&z=')
+        self.assertEqual(quote('http://example.com/?q=http://example.com/?x=1%26q=django'),
+                         'http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango')
+        self.assertEqual(quote('http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango'),
+                         'http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango')
 
     def test_conditional_escape(self):
         s = '<h1>interop</h1>'
