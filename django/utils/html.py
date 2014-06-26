@@ -12,7 +12,7 @@ from django.utils.functional import allow_lazy
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, mark_safe
 from django.utils import six
-from django.utils.six.moves.urllib.parse import quote, unquote, urlsplit, urlunsplit
+from django.utils.six.moves.urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 from django.utils.text import normalize_newlines
 
 from .html_parser import HTMLParser, HTMLParseError
@@ -218,25 +218,38 @@ strip_entities = allow_lazy(strip_entities, six.text_type)
 
 def smart_urlquote(url):
     "Quotes a URL if it isn't already quoted."
+    def unquote_quote(segment):
+        segment = unquote(force_str(segment))
+        # Tilde is part of RFC3986 Unreserved Characters
+        # http://tools.ietf.org/html/rfc3986#section-2.3
+        # See also http://bugs.python.org/issue16285
+        segment = quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + str('~'))
+        return force_text(segment)
+
     # Handle IDN before quoting.
     try:
         scheme, netloc, path, query, fragment = urlsplit(url)
-        try:
-            netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
-        except UnicodeError:  # invalid domain part
-            pass
-        else:
-            url = urlunsplit((scheme, netloc, path, query, fragment))
     except ValueError:
         # invalid IPv6 URL (normally square brackets in hostname part).
-        pass
+        return unquote_quote(url)
 
-    url = unquote(force_str(url))
-    # See http://bugs.python.org/issue2637
-    url = quote(url, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + str('~'))
+    try:
+        netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
+    except UnicodeError:  # invalid domain part
+        return unquote_quote(url)
 
-    return force_text(url)
+    if query:
+        # Separately unquoting key/value, so as to not mix querystring separators
+        # included in query values. See #22267.
+        query_parts = [(unquote(force_str(q[0])), unquote(force_str(q[1])))
+                       for q in parse_qsl(query, keep_blank_values=True)]
+        # urlencode will take care of quoting
+        query = urlencode(query_parts)
 
+    path = unquote_quote(path)
+    fragment = unquote_quote(fragment)
+
+    return urlunsplit((scheme, netloc, path, query, fragment))
 
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
