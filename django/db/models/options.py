@@ -320,8 +320,6 @@ class Options(object):
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
-        if hasattr(self, '_field_map'):
-            del self._field_map
         self._get_new_fields_cache = {}
 
         if field.rel and isinstance(field.rel, ManyToManyRel):
@@ -355,8 +353,6 @@ class Options(object):
             del self._name_map
 
     def add_virtual_field(self, field):
-        if hasattr(self, '_field_map'):
-            del self._field_map
         self._get_new_fields_cache = {}
         self.virtual_fields.append(field)
 
