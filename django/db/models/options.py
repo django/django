@@ -33,6 +33,7 @@ VIRTUAL = 0b10000
 
 # Aggregates
 NON_RELATED_FIELDS = DATA | M2M | VIRTUAL
+ALL = RELATED_M2M | RELATED_OBJECTS | M2M | DATA | VIRTUAL
 
 NONE = 0b0000
 LOCAL_ONLY = 0b0001
@@ -138,7 +139,7 @@ class Options(object):
 
     @lru_cache(maxsize=None)
     def _get_field_map(self):
-        types = RELATED_M2M | RELATED_OBJECTS | M2M | DATA | VIRTUAL
+        types = ALL
         res = {}
         for field, names in self.get_new_fields(types=types, recursive=True).iteritems():
             for name in names:
