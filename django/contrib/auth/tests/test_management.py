@@ -503,8 +503,8 @@ class PermissionTestCase(TestCase):
 
         permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
         models.Permission.objects.filter(content_type=permission_content_type).delete()
-        models.Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control"
+        models.Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control" * 5
 
         six.assertRaisesRegex(self, exceptions.ValidationError,
-            "The verbose_name of permission is longer than 39 characters",
+            "The verbose_name of permission is longer than 244 characters",
             create_permissions, auth_app_config, verbosity=0)
