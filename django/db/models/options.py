@@ -136,7 +136,7 @@ class Options(object):
         models = self.apps.get_models(include_auto_created=False)
         return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
-    #@lru_cache(maxsize=None)
+    @lru_cache(maxsize=None)
     def _get_field_map(self):
         types = RELATED_M2M | RELATED_OBJECTS | M2M | DATA | VIRTUAL
         res = {}
@@ -311,6 +311,7 @@ class Options(object):
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
+        self._get_field_map.cache_clear()
         self.get_new_fields.cache_clear()
         if field.rel and isinstance(field.rel, ManyToManyRel):
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
@@ -343,6 +344,7 @@ class Options(object):
             del self._name_map
 
     def add_virtual_field(self, field):
+        self._get_field_map.cache_clear()
         self.get_new_fields.cache_clear()
         self.virtual_fields.append(field)
 
