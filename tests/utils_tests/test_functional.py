@@ -1,6 +1,6 @@
 import unittest
 
-from django.utils.functional import lazy, lazy_property, cached_property
+from django.utils.functional import lazy, lazy_property, cached_property, conditional_cached_property
 
 
 class FunctionalTestCase(unittest.TestCase):
@@ -66,6 +66,21 @@ class FunctionalTestCase(unittest.TestCase):
 
         # check that it behaves like a property when there's no instance
         self.assertIsInstance(A.value, cached_property)
+
+    def test_conditional_cached_property(self):
+
+        class B(object):
+
+            @conditional_cached_property
+            def value(self):
+                return self.should_cache, (1, object())
+
+        b = B()
+        b.should_cache = False
+        self.assertNotEquals(b.value, b.value)
+
+        b.should_cache = True
+        self.assertEquals(b.value, b.value)
 
     def test_lazy_equality(self):
         """
