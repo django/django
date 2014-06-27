@@ -130,19 +130,18 @@ class Options(object):
     def installed(self):
         return self.app_config is not None
 
-    @property
+    @conditional_cached_property
     def non_swapped_models_auto_created(self):
         models = self.apps.get_models(include_auto_created=True)
-        return filter(lambda a: not a._meta.swapped, models)
-        #return apps.ready, filter(lambda a: not a._meta.swapped, models)
+        #return filter(lambda a: not a._meta.swapped, models)
+        return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
-    @property
+    @conditional_cached_property
     def non_swapped_models(self):
         models = self.apps.get_models(include_auto_created=False)
-        return filter(lambda a: not a._meta.swapped, models)
-        #return apps.ready, filter(lambda a: not a._meta.swapped, models)
+        #return filter(lambda a: not a._meta.swapped, models)
+        return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
-    #@cached_property
     @property
     def _field_map(self):
         try:
