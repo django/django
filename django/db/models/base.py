@@ -351,12 +351,12 @@ class ModelState(object):
     """
     A class for storing instance state
     """
-    def __init__(self, db=None, adding=True):
+    def __init__(self, db=None):
         self.db = db
         # If true, uniqueness validation checks will consider this a new, as-yet-unsaved object.
         # Necessary for correct validation of new instances of objects with explicit (non-auto) PKs.
         # This impacts validation only; it has no effect on the actual save.
-        self.adding = adding
+        self.adding = True
 
 
 class Model(six.with_metaclass(ModelBase)):
@@ -459,12 +459,13 @@ class Model(six.with_metaclass(ModelBase)):
         signals.post_init.send(sender=self.__class__, instance=self)
 
     @classmethod
-    def from_db(cls, using, field_names, values):
+    def from_db(cls, db, field_names, values):
         if cls._deferred:
             new = cls(**dict(zip(field_names, values)))
         else:
             new = cls(*values)
-        new._state = ModelState(using, False)
+        new._state.adding = False
+        new._state.db = db
         return new
 
     def __repr__(self):

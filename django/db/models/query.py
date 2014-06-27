@@ -1407,18 +1407,21 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
 
     return klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx
 
-def reorder_for_init(klass, field_names, values):
+
+def reorder_for_init(model, field_names, values):
     """
-    Reorders given field names and values for the fields
-    in the same way as klass' __init__ expects to find them.
+    Reorders given field names and values for those fields
+    to be in the same order as model.__init__() expects to find them.
     """
     new_names, new_values = [], []
-    for f in klass._meta.concrete_fields:
+    for f in model._meta.concrete_fields:
         if f.attname not in field_names:
             continue
         new_names.append(f.attname)
         new_values.append(values[field_names.index(f.attname)])
+    assert len(new_names) == len(field_names)
     return new_names, new_values
+
 
 def get_cached_row(row, index_start, using, klass_info, offset=0,
                    parent_data=()):
