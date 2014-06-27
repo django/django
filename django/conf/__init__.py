@@ -170,3 +170,6 @@ class UserSettingsHolder(BaseSettings):
         return (deleted or set_locally or set_on_default)
 
 settings = LazySettings()
+if (os.environ['DJANGO_COMMAND'] is 'help'):
+    settings.configure()
+
