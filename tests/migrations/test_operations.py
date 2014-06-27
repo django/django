@@ -154,6 +154,7 @@ class OperationTests(OperationTestBase):
                 ("pink", models.IntegerField(default=1)),
             ],
         )
+        self.assertEqual(operation.describe(), "Create model Pony")
         # Test the state alteration
         project_state = ProjectState()
         new_state = project_state.clone()
@@ -303,6 +304,7 @@ class OperationTests(OperationTestBase):
             options={"proxy": True},
             bases=("test_crprmo.Pony", ),
         )
+        self.assertEqual(operation.describe(), "Create proxy model ProxyPony")
         new_state = project_state.clone()
         operation.state_forwards("test_crprmo", new_state)
         self.assertIn(("test_crprmo", "proxypony"), new_state.models)
@@ -326,6 +328,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_dlmo")
         # Test the state alteration
         operation = migrations.DeleteModel("Pony")
+        self.assertEqual(operation.describe(), "Delete model Pony")
         new_state = project_state.clone()
         operation.state_forwards("test_dlmo", new_state)
         self.assertNotIn(("test_dlmo", "pony"), new_state.models)
@@ -370,6 +373,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_rnmo", related_model=True)
         # Test the state alteration
         operation = migrations.RenameModel("Pony", "Horse")
+        self.assertEqual(operation.describe(), "Rename model Pony to Horse")
         new_state = project_state.clone()
         operation.state_forwards("test_rnmo", new_state)
         self.assertNotIn(("test_rnmo", "pony"), new_state.models)
@@ -408,6 +412,7 @@ class OperationTests(OperationTestBase):
             "height",
             models.FloatField(null=True, default=5),
         )
+        self.assertEqual(operation.describe(), "Add field height to Pony")
         project_state, new_state = self.make_test_state("test_adfl", operation)
         self.assertEqual(len(new_state.models["test_adfl", "pony"].fields), 4)
         field = [
@@ -709,6 +714,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_rmfl")
         # Test the state alteration
         operation = migrations.RemoveField("Pony", "pink")
+        self.assertEqual(operation.describe(), "Remove field pink from Pony")
         new_state = project_state.clone()
         operation.state_forwards("test_rmfl", new_state)
         self.assertEqual(len(new_state.models["test_rmfl", "pony"].fields), 2)
@@ -729,6 +735,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_rfk", related_model=True)
         self.assertColumnExists("test_rfk_rider", "pony_id")
         operation = migrations.RemoveField("Rider", "pony")
+
         new_state = project_state.clone()
         operation.state_forwards("test_rfk", new_state)
         with connection.schema_editor() as editor:
@@ -745,6 +752,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_almota")
         # Test the state alteration
         operation = migrations.AlterModelTable("Pony", "test_almota_pony_2")
+        self.assertEqual(operation.describe(), "Rename table for Pony to test_almota_pony_2")
         new_state = project_state.clone()
         operation.state_forwards("test_almota", new_state)
         self.assertEqual(new_state.models["test_almota", "pony"].options["db_table"], "test_almota_pony_2")
@@ -768,6 +776,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_alfl")
         # Test the state alteration
         operation = migrations.AlterField("Pony", "pink", models.IntegerField(null=True))
+        self.assertEqual(operation.describe(), "Alter field pink on Pony")
         new_state = project_state.clone()
         operation.state_forwards("test_alfl", new_state)
         self.assertEqual(project_state.models["test_alfl", "pony"].get_field_by_name("pink").null, False)
@@ -836,6 +845,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_rnfl")
         # Test the state alteration
         operation = migrations.RenameField("Pony", "pink", "blue")
+        self.assertEqual(operation.describe(), "Rename field pink on Pony to blue")
         new_state = project_state.clone()
         operation.state_forwards("test_rnfl", new_state)
         self.assertIn("blue", [n for n, f in new_state.models["test_rnfl", "pony"].fields])
@@ -860,6 +870,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_alunto")
         # Test the state alteration
         operation = migrations.AlterUniqueTogether("Pony", [("pink", "weight")])
+        self.assertEqual(operation.describe(), "Alter unique_together for Pony (1 constraint(s))")
         new_state = project_state.clone()
         operation.state_forwards("test_alunto", new_state)
         self.assertEqual(len(project_state.models["test_alunto", "pony"].options.get("unique_together", set())), 0)
@@ -895,6 +906,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_alinto")
         # Test the state alteration
         operation = migrations.AlterIndexTogether("Pony", [("pink", "weight")])
+        self.assertEqual(operation.describe(), "Alter index_together for Pony (1 constraint(s))")
         new_state = project_state.clone()
         operation.state_forwards("test_alinto", new_state)
         self.assertEqual(len(project_state.models["test_alinto", "pony"].options.get("index_together", set())), 0)
@@ -917,6 +929,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_almoop")
         # Test the state alteration (no DB alteration to test)
         operation = migrations.AlterModelOptions("Pony", {"permissions": [("can_groom", "Can groom")]})
+        self.assertEqual(operation.describe(), "Change Meta options on Pony")
         new_state = project_state.clone()
         operation.state_forwards("test_almoop", new_state)
         self.assertEqual(len(project_state.models["test_almoop", "pony"].options.get("permissions", [])), 0)
@@ -930,6 +943,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_alorwrtto", related_model=True)
         # Test the state alteration
         operation = migrations.AlterOrderWithRespectTo("Rider", "pony")
+        self.assertEqual(operation.describe(), "Set order_with_respect_to on Rider to pony")
         new_state = project_state.clone()
         operation.state_forwards("test_alorwrtto", new_state)
         self.assertEqual(project_state.models["test_alorwrtto", "rider"].options.get("order_with_respect_to", None), None)
@@ -960,6 +974,7 @@ class OperationTests(OperationTestBase):
             "DROP TABLE i_love_ponies",
             state_operations=[migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])],
         )
+        self.assertEqual(operation.describe(), "Raw SQL operation")
         # Test the state alteration
         new_state = project_state.clone()
         operation.state_forwards("test_runsql", new_state)
@@ -998,6 +1013,7 @@ class OperationTests(OperationTestBase):
             Pony.objects.filter(pink=1, weight=3.55).delete()
             Pony.objects.filter(weight=5).delete()
         operation = migrations.RunPython(inner_method, reverse_code=inner_method_reverse)
+        self.assertEqual(operation.describe(), "Raw Python operation")
         # Test the state alteration does nothing
         new_state = project_state.clone()
         operation.state_forwards("test_runpython", new_state)
