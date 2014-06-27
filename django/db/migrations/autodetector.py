@@ -565,7 +565,6 @@ class MigrationAutodetector(object):
             model = self.old_apps.get_model(app_label, model_name)
             # Gather related fields
             related_fields = {}
-            import ipdb; ipdb.set_trace()
             for field in model._meta.local_fields:
                 if field.rel:
                     if field.rel.to:

@@ -145,12 +145,16 @@ class Options(object):
     #@cached_property
     @property
     def _field_map(self):
-        types = ALL
-        res = {}
-        for field, names in self.get_new_fields(types=types, recursive=True).iteritems():
-            for name in names:
-                res[name] = field
-        return res
+        try:
+            return self._field_map_cache
+        except AttributeError:
+            types = ALL
+            res = {}
+            for field, names in self.get_new_fields(types=types, recursive=True).iteritems():
+                for name in names:
+                    res[name] = field
+            self._field_map_cache = res
+            return res
 
     def get_new_field(self, field_name):
         try:
@@ -322,6 +326,10 @@ class Options(object):
     def _expire_cache(self):
         #if hasattr(self, '_field_map'):
             #del self._field_map
+        try:
+            del self._field_map_cache
+        except AttributeError:
+            pass
         self._get_new_fields_cache = {}
 
     def add_field(self, field):
