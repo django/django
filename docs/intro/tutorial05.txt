@@ -381,6 +381,8 @@ With that ready, we can ask the client to do some work for us::
     >>> response = client.get('/polls/')
     >>> response.content
     '\n\n\n    <ul>\n    \n        <li><a href="/polls/1/">Who is your favorite Beatle?</a></li>\n    \n    </ul>\n\n'
+    >>> # If the following doesn't work, you probably omitted the call to
+    >>> # setup_test_environment() described above
     >>> response.context['latest_question_list']
     [<Question: Who is your favorite Beatle?>]
 
