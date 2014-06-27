@@ -598,7 +598,6 @@ class MigrationAutodetector(object):
                     )
                 )
             # Then remove each related field
-            import ipdb; ipdb.set_trace()
             for name, field in sorted(related_fields.items()):
                 self.add_operation(
                     app_label,

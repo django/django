@@ -140,18 +140,14 @@ class Options(object):
         models = self.apps.get_models(include_auto_created=False)
         return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
-    @property
+    @cached_property
     def _field_map(self):
-        try:
-            return self._field_map_cache
-        except AttributeError:
-            types = ALL
-            res = {}
-            for field, names in self.get_new_fields(types=types, recursive=True).iteritems():
-                for name in names:
-                    res[name] = field
-            self._field_map_cache = res
-            return res
+        types = ALL
+        res = {}
+        for field, names in self.get_new_fields(types=types, recursive=True).iteritems():
+            for name in names:
+                res[name] = field
+        return res
 
     def get_new_field(self, field_name):
         try:
@@ -321,12 +317,14 @@ class Options(object):
                 model.add_to_class('id', auto)
 
     def _expire_cache(self):
-        #if hasattr(self, '_field_map'):
-            #del self._field_map
         try:
-            del self._field_map_cache
+            del self._field_map
         except AttributeError:
             pass
+        #try:
+            #del self._field_map_cache
+        #except AttributeError:
+            #pass
         self._get_new_fields_cache = {}
 
     def add_field(self, field):
