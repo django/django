@@ -130,15 +130,17 @@ class Options(object):
     def installed(self):
         return self.app_config is not None
 
-    @conditional_cached_property
+    @property
     def non_swapped_models_auto_created(self):
         models = self.apps.get_models(include_auto_created=True)
-        return apps.ready, filter(lambda a: not a._meta.swapped, models)
+        return filter(lambda a: not a._meta.swapped, models)
+        #return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
-    @conditional_cached_property
+    @property
     def non_swapped_models(self):
         models = self.apps.get_models(include_auto_created=False)
-        return apps.ready, filter(lambda a: not a._meta.swapped, models)
+        return filter(lambda a: not a._meta.swapped, models)
+        #return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
     @cached_property
     def _field_map(self):
@@ -316,48 +318,26 @@ class Options(object):
                         auto_created=True)
                 model.add_to_class('id', auto)
 
+    def _expire_cache(self):
+        self._get_new_fields_cache = {}
+        if hasattr(self, '_field_map'):
+            del self._field_map
+
     def add_field(self, field):
         # Insert the given field in the order in which it was created, using
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
-        #if hasattr(self, '_field_map'):
-            #del self._field_map
-        self._get_new_fields_cache = {}
-
         if field.rel and isinstance(field.rel, ManyToManyRel):
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
-            if hasattr(self, '_m2m_cache'):
-                del self._m2m_cache
         else:
             self.local_fields.insert(bisect(self.local_fields, field), field)
             self.setup_pk(field)
-            if hasattr(self, '_field_cache'):
-                del self._field_cache
-                del self._field_name_cache
-                # The fields, concrete_fields and local_concrete_fields are
-                # implemented as cached properties for performance reasons.
-                # The attrs will not exists if the cached property isn't
-                # accessed yet, hence the try-excepts.
-                try:
-                    del self.fields
-                except AttributeError:
-                    pass
-                try:
-                    del self.concrete_fields
-                except AttributeError:
-                    pass
-                try:
-                    del self.local_concrete_fields
-                except AttributeError:
-                    pass
-
-        if hasattr(self, '_name_map'):
-            del self._name_map
+        self._expire_cache()
 
     def add_virtual_field(self, field):
-        self._get_new_fields_cache = {}
         self.virtual_fields.append(field)
+        self._expire_cache()
 
     def setup_pk(self, field):
         if not self.pk and field.primary_key:
