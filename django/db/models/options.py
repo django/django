@@ -67,6 +67,8 @@ def normalize_together(option_together):
 @python_2_unicode_compatible
 class Options(object):
     def __init__(self, meta, app_label=None):
+        self._map_details_cache = {}
+        self._map_model_cache = {}
         self._get_new_fields_cache = {}
         self.local_fields = []
         self.local_many_to_many = []
@@ -138,7 +140,7 @@ class Options(object):
         models = self.apps.get_models(include_auto_created=False)
         return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
-    @property
+    @cached_property
     def _field_map(self):
         types = ALL
         res = {}
@@ -688,21 +690,30 @@ class Options(object):
         #return list(cache)
 
     def _map_model(self, connection):
-        direct = isinstance(connection, Field) or hasattr(connection, 'is_gfk')
-        model = connection.model if direct else connection.parent_model._meta.concrete_model
-        if model == self.model:
-            model = None
+        try:
+            return connection, self._map_model_cache[connection]
+        except KeyError:
+            direct = isinstance(connection, Field) or hasattr(connection, 'is_gfk')
+            model = connection.model if direct else connection.parent_model._meta.concrete_model
+            if model == self.model:
+                model = None
 
+            self._map_model_cache[connection] = model
         return connection, model
 
     def _map_details(self, connection):
-        direct = isinstance(connection, Field) or hasattr(connection, 'is_gfk')
-        model = connection.model if direct else connection.parent_model._meta.concrete_model
-        if model == self.model:
-            model = None
+        try:
+            model, direct, m2m = self._map_details_cache[connection]
+            return connection, model, direct, m2m
+        except KeyError:
+            direct = isinstance(connection, Field) or hasattr(connection, 'is_gfk')
+            model = connection.model if direct else connection.parent_model._meta.concrete_model
+            if model == self.model:
+                model = None
 
-        field = connection if direct else connection.field
-        m2m = isinstance(field, ManyToManyField)
+            field = connection if direct else connection.field
+            m2m = isinstance(field, ManyToManyField)
+            self._map_details_cache[connection] = model, direct, m2m
         return connection, model, direct, m2m
 
     def get_all_related_m2m_objects_with_model(self):
