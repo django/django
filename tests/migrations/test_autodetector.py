@@ -701,6 +701,7 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.author_name])  # removes both the model and FK
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
+        import ipdb; ipdb.set_trace()
         # Right number of migrations?
         self.assertEqual(len(changes['testapp']), 1)
         # Right number of actions?
