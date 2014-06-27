@@ -133,13 +133,11 @@ class Options(object):
     @conditional_cached_property
     def non_swapped_models_auto_created(self):
         models = self.apps.get_models(include_auto_created=True)
-        #return filter(lambda a: not a._meta.swapped, models)
         return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
     @conditional_cached_property
     def non_swapped_models(self):
         models = self.apps.get_models(include_auto_created=False)
-        #return filter(lambda a: not a._meta.swapped, models)
         return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
     @property
