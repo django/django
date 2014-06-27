@@ -553,30 +553,28 @@ class Options(object):
 
         Uses a cache internally, so after the first access, this is very fast.
         """
-        res_a = None
-        res_b = None
         fields = self._field_map
         try:
-            res_a = self._map_details(fields[name])
+            return self._map_details(fields[name])
         except KeyError:
-            res_a = 'failed'
+            #res_a = 'failed'
 
-        try:
-            try:
-                res_b = self._name_map[name]
-            except AttributeError:
-                cache = self.init_name_map()
-                res_b = cache[name]
-        except KeyError:
-            res_b = 'failed'
-        if res_a != res_b:
-            pass
+        #try:
+            #try:
+                #res_b = self._name_map[name]
+            #except AttributeError:
+                #cache = self.init_name_map()
+                #res_b = cache[name]
+        #except KeyError:
+            #res_b = 'failed'
+        #if res_a != res_b:
+            #pass
 
-        if res_a == 'failed':
+        #if res_a == 'failed':
             raise FieldDoesNotExist('%s has no field named %r'
                     % (self.object_name, name))
-        else:
-            return res_a
+        #else:
+            #return res_a
 
     def get_all_field_names(self):
         """
