@@ -16,6 +16,8 @@ from django.views.decorators.debug import (sensitive_post_parameters,
 from django.utils._os import upath
 from django.utils.log import getLogger
 
+from django.views.generic import View
+
 from . import BrokenException, except_args
 
 dirs = (os.path.join(os.path.dirname(upath(__file__)), 'other_templates'),)
@@ -62,6 +64,12 @@ def raises404(request):
 
 def technical404(request):
     raise Http404("Testing technical 404.")
+
+
+class ClassView(View):
+
+    def get(self, request):
+        raise Http404("Testing class-based technical 404.")
 
 
 def redirect(request):
