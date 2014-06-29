@@ -23,10 +23,10 @@ def _check_middleware_classes(app_configs=None, **kwargs):
         return [
             Warning(
                 "MIDDLEWARE_CLASSES is not set.",
-                hint=("Django 1.7 changed the global defaults for the MIDDLEWARE_CLASSES."
+                hint=("Django 1.7 changed the global defaults for the MIDDLEWARE_CLASSES. "
                       "django.contrib.sessions.middleware.SessionMiddleware, "
                       "django.contrib.auth.middleware.AuthenticationMiddleware, and "
-                      "django.contrib.messages.middleware.MessageMiddleware were removed from the defaults."
+                      "django.contrib.messages.middleware.MessageMiddleware were removed from the defaults. "
                       "If your project needs these middleware then you should configure this setting."),
                 obj=None,
                 id='1_7.W001',
