@@ -39,6 +39,12 @@ class PageDetail(generic.DetailView):
     template_name_field = 'template'
 
 
+class CustomAuthorDetail(generic.DetailView):
+    """Own defined queryset."""
+    def get_queryset(self):
+        return Author.objects.order_by('pk')[:1]
+
+
 class DictList(generic.ListView):
     """A ListView that doesn't use a model."""
     queryset = [

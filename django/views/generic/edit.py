@@ -105,8 +105,9 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
                 model = self.object.__class__
             else:
                 # Try to get a queryset and extract the model class
-                # from that
-                model = self.get_queryset().model
+                # from that. The default implementation of get_queryset can throw an exception
+                # while lookup pk or slug in the URL. So it should be called in the last instance.
+                model = self.queryset is not None and self.queryset.model or self.get_queryset().model
 
             if self.fields is None:
                 raise ImproperlyConfigured(

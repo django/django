@@ -35,6 +35,8 @@ urlpatterns = [
         views.AuthorDetail.as_view()),
     url(r'^detail/author/bycustomslug/(?P<foo>[\w-]+)/$',
         views.AuthorDetail.as_view(slug_url_kwarg='foo')),
+    url(r'^detail/author/withoutslug/$',
+        views.CustomAuthorDetail.as_view()),
     url(r'^detail/author/(?P<pk>[0-9]+)/template_name_suffix/$',
         views.AuthorDetail.as_view(template_name_suffix='_view')),
     url(r'^detail/author/(?P<pk>[0-9]+)/template_name/$',
