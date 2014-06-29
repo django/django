@@ -515,6 +515,20 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(list(OrderFields2.base_fields),
                          ['slug', 'name'])
 
+    def test_extra_required_fields_in_form_meta(self):
+        class FormWithExtraRequiredInMeta(forms.ModelForm):
+            """For this test we specify fields,
+            which are NOT required in model, and
+            make sure, that they become required after
+            specifying them in Meta.extra_required.
+            """
+            class Meta:
+                model = Book
+                fields = ['author', 'special_id']
+                extra_required = ['author', 'special_id']
+        self.assertEqual([f.required for f in FormWithExtraRequiredInMeta.base_fields.itervalues()],
+                         [True, True])
+
 
 class FieldOverridesByFormMetaForm(forms.ModelForm):
     class Meta:
