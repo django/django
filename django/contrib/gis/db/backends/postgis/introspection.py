@@ -30,7 +30,7 @@ class PostGISIntrospection(DatabaseIntrospection):
             # The value for the geography type is actually a tuple
             # to pass in the `geography=True` keyword to the field
             # definition.
-            field_types.append(('geography', ('GeometryField', {'geography' : True})))
+            field_types.append(('geography', ('GeometryField', {'geography': True})))
         postgis_types = {}
 
         # The OID integers associated with the geometry type may
