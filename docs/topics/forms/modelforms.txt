@@ -608,6 +608,29 @@ the field declaratively and setting its ``validators`` parameter::
     on fields and their arguments.
 
 
+If you want to make fields required, which are not required
+by model design, you can specify them in ``extra_required`` property
+of Meta::
+
+
+    from django.db import models
+    from django.forms import ModelForm
+
+    # `title` and `author` are not required in model..
+    class Book(models.Model):
+        title = models.CharField(max_length=100, blank=True)
+        author = models.CharField(max_length=100, blank=True)
+
+    # ..but they may become so in `extra_required`
+    class BookForm(ModelForm):
+
+        class Meta:
+            model = Book
+            fields = ['title', 'author']
+            extra_required = ['title', 'author']
+
+
+
 Enabling localization of fields
 -------------------------------
 

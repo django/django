@@ -231,6 +231,7 @@ class ModelFormOptions(object):
         self.model = getattr(options, 'model', None)
         self.fields = getattr(options, 'fields', None)
         self.exclude = getattr(options, 'exclude', None)
+        self.extra_required = getattr(options, 'extra_required', None)
         self.widgets = getattr(options, 'widgets', None)
         self.localized_fields = getattr(options, 'localized_fields', None)
         self.labels = getattr(options, 'labels', None)
@@ -298,6 +299,12 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
             fields = new_class.declared_fields
 
         new_class.base_fields = fields
+
+        # Need to set field.required, if it's in 'extra_required'
+        # of ModelForm Meta class.
+        for field_name in new_class.base_fields.keys():
+            if opts.extra_required and field_name in opts.extra_required:
+                setattr(new_class.base_fields[field_name], 'required', True)
 
         return new_class
 
