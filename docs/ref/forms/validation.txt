@@ -1,3 +1,5 @@
+.. currentmodule:: django.forms
+
 .. _form-and-field-validation:
 
 Form and field validation
@@ -82,7 +84,7 @@ overridden:
   called, you also have access to the form's errors attribute which
   contains all the errors raised by cleaning of individual fields.
 
-  Note that any errors raised by your ``Form.clean()`` override will not
+  Note that any errors raised by your :meth:`Form.clean()` override will not
   be associated with any field in particular. They go into a special
   "field" (called ``__all__``), which you can access via the
   :meth:`~django.forms.Form.non_field_errors` method if you need to. If you
@@ -98,8 +100,8 @@ These methods are run in the order given above, one field at a time.  That is,
 for each field in the form (in the order they are declared in the form
 definition), the ``Field.clean()`` method (or its override) is run, then
 ``clean_<fieldname>()``. Finally, once those two methods are run for every
-field, the ``Form.clean()`` method, or its override, is executed whether or not
-the previous methods have raised errors.
+field, the `:meth:`Form.clean()` method, or its override, is executed whether
+or not the previous methods have raised errors.
 
 Examples of each of these methods are provided below.
 
@@ -325,25 +327,25 @@ write a cleaning method that operates on the ``recipients`` field, like so::
             return data
 
 Sometimes you may want to add an error message to a particular field from the
-form's ``clean()`` method, in which case you can use
+form's :meth:`~Form.clean()` method, in which case you can use
 :meth:`~django.forms.Form.add_error()`. Note that this won't always be
 appropriate and the more typical situation is to raise a ``ValidationError``
 from , which is turned into a form-wide error that is available through the
 :meth:`Form.non_field_errors() <django.forms.Form.non_field_errors>` method.
 
+.. _validating-fields-with-clean:
+
 Cleaning and validating fields that depend on each other
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. method:: django.forms.Form.clean()
 
 Suppose we add another requirement to our contact form: if the ``cc_myself``
 field is ``True``, the ``subject`` must contain the word ``"help"``. We are
 performing validation on more than one field at a time, so the form's
-``clean()`` method is a good spot to do this. Notice that we are talking about
-the ``clean()`` method on the form here, whereas earlier we were writing a
-``clean()`` method on a field. It's important to keep the field and form
-difference clear when working out where to validate things. Fields are single
-data points, forms are a collection of fields.
+:meth:`~Form.clean()` method is a good spot to do this. Notice that we are
+talking about the ``clean()`` method on the form here, whereas earlier we were
+writing a ``clean()`` method on a field. It's important to keep the field and
+form difference clear when working out where to validate things. Fields are
+single data points, forms are a collection of fields.
 
 By the time the form's ``clean()`` method is called, all the individual field
 clean methods will have been run (the previous two sections), so
