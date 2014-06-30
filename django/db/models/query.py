@@ -257,6 +257,8 @@ class QuerySet(object):
             for field in self.model._meta.get_new_fields(types=DATA, opts=CONCRETE):
                 field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
                 model = field.model if field_is_direct else field.parent_model._meta.concrete_model
+                if model == self.model._meta.model:
+                    model = None
                 # TODO: refactor this stange bit
                 if model is None:
                     model = self.model
@@ -1361,6 +1363,8 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         for field, in klass._meta.get_new_fields(types=DATA, opts=CONCRETE):
             field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
             model = field.model if field_is_direct else field.parent_model._meta.concrete_model
+            if model == klass._meta.model:
+                model = None
             if field.name not in load_fields:
                 skip.add(field.attname)
             elif from_parent and issubclass(from_parent, model.__class__):
