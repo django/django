@@ -5,7 +5,8 @@ from django.core.exceptions import FieldError
 from django.db.backends.utils import truncate_name
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ExpressionNode
-from django.db.models.options import RELATED_OBJECTS
+from django.db.models.fields import Field
+from django.db.models.options import RELATED_OBJECTS, DATA, CONCRETE
 from django.db.models.query_utils import select_related_descend, QueryWrapper
 from django.db.models.sql.constants import (CURSOR, SINGLE, MULTI, NO_RESULTS,
         ORDER_DIR, GET_ITERATOR_CHUNK_SIZE, SelectInfo)
@@ -298,7 +299,9 @@ class SQLCompiler(object):
         # be used by local fields.
         seen_models = {None: start_alias}
 
-        for field, model in opts.get_concrete_fields_with_model():
+        for field in opts.get_new_fields(types=DATA, opts=CONCRETE):
+            field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
+            model = field.model if field_is_direct else field.parent_model._meta.concrete_model
             if from_parent and model is not None and issubclass(from_parent, model):
                 # Avoid loading data for already loaded parents.
                 continue

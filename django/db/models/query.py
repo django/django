@@ -12,7 +12,7 @@ from django.core import exceptions
 from django.db import (connections, router, transaction, IntegrityError,
     DJANGO_VERSION_PICKLE_KEY)
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import AutoField, Empty
+from django.db.models.fields import Field, AutoField, Empty
 # Circular Dependency
 #from django.db.models.options import RELATED_OBJECTS
 from django.db.models.query_utils import (Q, select_related_descend,
@@ -25,7 +25,9 @@ from django.utils import six
 from django.utils import timezone
 from django.utils.version import get_version
 
+DATA = 0b00001
 RELATED_OBJECTS = 0b00100
+CONCRETE = 0b0010
 
 # The maximum number (one less than the max to be precise) of results to fetch
 # in a get() query
@@ -252,7 +254,10 @@ class QuerySet(object):
         # If only/defer clauses have been specified,
         # build the list of fields that are to be loaded.
         if only_load:
-            for field, model in self.model._meta.get_concrete_fields_with_model():
+            for field in self.model._meta.get_new_fields(types=DATA, opts=CONCRETE):
+                field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
+                model = field.model if field_is_direct else field.parent_model._meta.concrete_model
+                # TODO: refactor this stange bit
                 if model is None:
                     model = self.model
                 try:
@@ -1353,7 +1358,9 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         skip = set()
         init_list = []
         # Build the list of fields that *haven't* been requested
-        for field, model in klass._meta.get_concrete_fields_with_model():
+        for field, in klass._meta.get_new_fields(types=DATA, opts=CONCRETE):
+            field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
+            model = field.model if field_is_direct else field.parent_model._meta.concrete_model
             if field.name not in load_fields:
                 skip.add(field.attname)
             elif from_parent and issubclass(from_parent, model.__class__):
