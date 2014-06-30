@@ -19,7 +19,7 @@ from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
     OneToOneField, add_lazy_relation)
 from django.db.models.manager import ensure_default_manager
-from django.db.models.options import Options
+from django.db.models.options import Options, DATA, LOCAL_ONLY, CONCRETE
 from django.db.models.query import Q
 from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
 from django.db.models import signals
@@ -681,7 +681,7 @@ class Model(six.with_metaclass(ModelBase)):
         for a single table.
         """
         meta = cls._meta
-        non_pks = [f for f in meta.local_concrete_fields if not f.primary_key]
+        non_pks = [f for f in meta.get_new_fields(types=DATA, opts=CONCRETE | LOCAL_ONLY) if not f.primary_key]
 
         if update_fields:
             non_pks = [f for f in non_pks
@@ -713,7 +713,7 @@ class Model(six.with_metaclass(ModelBase)):
                     **{field.name: getattr(self, field.attname)}).count()
                 self._order = order_value
 
-            fields = meta.local_concrete_fields
+            fields = meta.get_new_fields(types=DATA, opts=CONCRETE | LOCAL_ONLY)
             if not pk_set:
                 fields = [f for f in fields if not isinstance(f, AutoField)]
 

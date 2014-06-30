@@ -27,6 +27,7 @@ from django.utils.version import get_version
 
 DATA = 0b00001
 RELATED_OBJECTS = 0b00100
+LOCAL_ONLY = 0b0001
 CONCRETE = 0b0010
 
 # The maximum number (one less than the max to be precise) of results to fetch
@@ -425,7 +426,7 @@ class QuerySet(object):
             return objs
         self._for_write = True
         connection = connections[self.db]
-        fields = self.model._meta.local_concrete_fields
+        fields = self.model._meta.get_new_fields(types=DATA, opts=LOCAL_ONLY | CONCRETE)
         with transaction.atomic(using=self.db, savepoint=False):
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
                     and self.model._meta.has_auto_field):
@@ -1385,7 +1386,9 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
 
         field_count = len(klass._meta.concrete_fields)
         # Check if we need to skip some parent fields.
-        if from_parent and len(klass._meta.local_concrete_fields) != len(klass._meta.concrete_fields):
+        local_concrete_fields = klass._meta.get_new_fields(types=DATA, opts=LOCAL_ONLY | CONCRETE)
+        concrete_fields = klass._meta.get_new_fields(types=DATA, opts=CONCRETE)
+        if from_parent and len(local_concrete_fields) != len(concrete_fields):
             # Only load those fields which haven't been already loaded into
             # 'from_parent'.
             non_seen_models = [p for p in klass._meta.get_parent_list()
