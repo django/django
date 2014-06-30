@@ -623,13 +623,13 @@ class ReverseSingleRelatedObjectDescriptor(object):
         # Set the values of the related field.
         else:
             for lh_field, rh_field in self.field.related_fields:
-                val = getattr(value, rh_field.attname)
-                if val is None:
+                pk = value._get_pk_val()
+                if pk is None:
                     raise ValueError(
                         'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
                         (value, self.field.rel.to._meta.object_name)
                     )
-                setattr(instance, lh_field.attname, val)
+                setattr(instance, lh_field.attname, getattr(value, rh_field.attname))
 
         # Since we already know what the related object is, seed the related
         # object caches now, too. This avoids another db hit if you get the
