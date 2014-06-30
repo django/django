@@ -22,6 +22,7 @@ from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.functional import cached_property
 from django.utils import six
 from django.utils import timezone
+from django.db.models.options import M2M
 
 
 class BaseDatabaseWrapper(object):
@@ -1298,7 +1299,7 @@ class BaseDatabaseIntrospection(object):
                 if not model._meta.managed:
                     continue
                 tables.add(model._meta.db_table)
-                tables.update(f.m2m_db_table() for f in model._meta.local_many_to_many)
+                tables.update(f.m2m_db_table() for f in model._meta.get_new_fields(types=M2M))
         tables = list(tables)
         if only_existing:
             existing_tables = self.table_names()
@@ -1340,7 +1341,7 @@ class BaseDatabaseIntrospection(object):
                         sequence_list.append({'table': model._meta.db_table, 'column': f.column})
                         break  # Only one AutoField is allowed per model, so don't bother continuing.
 
-                for f in model._meta.local_many_to_many:
+                for f in model._meta.get_new_fields(types=M2M):
                     # If this is an m2m using an intermediate table,
                     # we don't need to reset the sequence.
                     if f.rel.through is None:
