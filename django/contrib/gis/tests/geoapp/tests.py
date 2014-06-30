@@ -795,7 +795,7 @@ class GeoQuerySetTest(TestCase):
         self.assertEqual(None, qs.unionagg(field_name='point'))
 
     def test_non_concrete_field(self):
-        pkfield = City._meta.get_field_by_name('id')[0]
+        pkfield = City._meta.get_new_field('id', True)
         orig_pkfield_col = pkfield.column
         pkfield.column = None
         try:

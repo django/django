@@ -297,12 +297,12 @@ class GenericRelation(ForeignObject):
 
     def resolve_related_fields(self):
         self.to_fields = [self.model._meta.pk.name]
-        return [(self.rel.to._meta.get_field_by_name(self.object_id_field_name)[0],
+        return [(self.rel.to._meta.get_new_field(self.object_id_field_name, True),
                  self.model._meta.pk)]
 
     def get_path_info(self):
         opts = self.rel.to._meta
-        target = opts.get_field_by_name(self.object_id_field_name)[0]
+        target = opts.get_new_field(self.object_id_field_name, True)
         return [PathInfo(self.model._meta, opts, (target,), self.rel, True, False)]
 
     def get_reverse_path_info(self):
@@ -338,7 +338,7 @@ class GenericRelation(ForeignObject):
                                                  for_concrete_model=self.for_concrete_model)
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
-        field = self.rel.to._meta.get_field_by_name(self.content_type_field_name)[0]
+        field = self.rel.to._meta.get_new_field(self.content_type_field_name)
         contenttype_pk = self.get_content_type().pk
         cond = where_class()
         lookup = field.get_lookup('exact')(Col(remote_alias, field, field), contenttype_pk)

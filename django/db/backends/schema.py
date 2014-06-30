@@ -259,7 +259,7 @@ class BaseDatabaseSchemaEditor(object):
                     self.deferred_sql.extend(autoinc_sql)
         # Add any unique_togethers
         for fields in model._meta.unique_together:
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [model._meta.get_new_field(field, True).column for field in fields]
             column_sqls.append(self.sql_create_table_unique % {
                 "columns": ", ".join(self.quote_name(column) for column in columns),
             })
@@ -271,7 +271,7 @@ class BaseDatabaseSchemaEditor(object):
         self.execute(sql, params)
         # Add any index_togethers
         for fields in model._meta.index_together:
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [model._meta.get_new_field(field, True).column for field in fields]
             self.execute(self.sql_create_index % {
                 "table": self.quote_name(model._meta.db_table),
                 "name": self._create_index_name(model, columns, suffix="_idx"),
@@ -307,7 +307,7 @@ class BaseDatabaseSchemaEditor(object):
         news = set(tuple(fields) for fields in new_unique_together)
         # Deleted uniques
         for fields in olds.difference(news):
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [model._meta.get_new_field(field, True).column for field in fields]
             constraint_names = self._constraint_names(model, columns, unique=True)
             if len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
@@ -323,7 +323,7 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Created uniques
         for fields in news.difference(olds):
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [model._meta.get_new_field(field, True).column for field in fields]
             self.execute(self.sql_create_unique % {
                 "table": self.quote_name(model._meta.db_table),
                 "name": self._create_index_name(model, columns, suffix="_uniq"),
@@ -340,7 +340,7 @@ class BaseDatabaseSchemaEditor(object):
         news = set(tuple(fields) for fields in new_index_together)
         # Deleted indexes
         for fields in olds.difference(news):
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [model._meta.get_new_field(field, True).column for field in fields]
             constraint_names = self._constraint_names(model, list(columns), index=True)
             if len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
@@ -356,7 +356,7 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Created indexes
         for fields in news.difference(olds):
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [model._meta.get_new_field(field, True).column for field in fields]
             self.execute(self.sql_create_index % {
                 "table": self.quote_name(model._meta.db_table),
                 "name": self._create_index_name(model, columns, suffix="_idx"),
@@ -804,8 +804,8 @@ class BaseDatabaseSchemaEditor(object):
             new_field.rel.through,
             # We need the field that points to the target model, so we can tell alter_field to change it -
             # this is m2m_reverse_field_name() (as opposed to m2m_field_name, which points to our model)
-            old_field.rel.through._meta.get_field_by_name(old_field.m2m_reverse_field_name())[0],
-            new_field.rel.through._meta.get_field_by_name(new_field.m2m_reverse_field_name())[0],
+            old_field.rel.through._meta.get_new_field(old_field.m2m_reverse_field_name(), True),
+            new_field.rel.through._meta.get_new_field(new_field.m2m_reverse_field_name(), True),
         )
 
     def _create_index_name(self, model, column_names, suffix=""):
