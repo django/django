@@ -535,18 +535,14 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
 ``EmailField``
 --------------
 
-.. class:: EmailField([max_length=75, **options])
+.. class:: EmailField([max_length=254, **options])
 
 A :class:`CharField` that checks that the value is a valid email address.
 
-.. admonition:: Incompliance to RFCs
+.. versionchanged:: 1.8
 
-    The default 75 character ``max_length`` is not capable of storing all
-    possible RFC3696/5321-compliant email addresses. In order to store all
-    possible valid email addresses, a ``max_length`` of 254 is required.
-    The default ``max_length`` of 75 exists for historical reasons. The
-    default has not been changed in order to maintain backwards
-    compatibility with existing uses of :class:`EmailField`.
+    The default ``max_length`` was increased from 75 to 254 in order to be
+    compliant with RFC3696/5321.
 
 ``FileField``
 -------------
