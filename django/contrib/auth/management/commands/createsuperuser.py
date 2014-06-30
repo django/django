@@ -115,7 +115,7 @@ class Command(BaseCommand):
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = options.get(field_name)
                     while user_data[field_name] is None:
-                        raw_value = input(force_str('%s: ' % capfirst(field.verbose_name)))
+                        raw_value = input(force_str('%s%s: ' % (capfirst(field.verbose_name), ' (%s.%s)' % (field.rel.to._meta.object_name, field.rel.field_name) if field.rel else '')))
                         try:
                             user_data[field_name] = field.clean(raw_value, None)
                         except exceptions.ValidationError as e:
