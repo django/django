@@ -373,6 +373,17 @@ lookups::
     ...
     ValueError: Cannot query "<Book: Django>": Must be "Author" instance.
 
+Default ``EmailField.max_length`` increased to 254
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The old default 75 character ``max_length`` was not capable of storing all
+possible RFC3696/5321-compliant email addresses. In order to store all
+possible valid email addresses, the ``max_length`` has been increased to 254
+characters. You will need to generate and apply database migrations for your
+affected models (or add ``max_length=75`` if you wish to keep the length on
+your current fields). A migration for
+:attr:`django.contrib.auth.models.User.email` is included.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

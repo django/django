@@ -124,7 +124,9 @@ class EmailValidator(object):
         r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"$)',  # quoted-string
         re.IGNORECASE)
     domain_regex = re.compile(
-        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,}(?<!-))$',
+        # max length of the domain is 251: 254 (max email length) minus one
+        # period and two characters for the TLD.
+        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,249}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,}(?<!-))$',
         re.IGNORECASE)
     literal_regex = re.compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)

@@ -54,7 +54,7 @@ class InspectDBTestCase(TestCase):
         assertFieldType('date_time_field', "models.DateTimeField()")
         if (connection.features.can_introspect_max_length and
                 not connection.features.interprets_empty_strings_as_nulls):
-            assertFieldType('email_field', "models.CharField(max_length=75)")
+            assertFieldType('email_field', "models.CharField(max_length=254)")
             assertFieldType('file_field', "models.CharField(max_length=100)")
             assertFieldType('file_path_field', "models.CharField(max_length=100)")
         if connection.features.can_introspect_ip_address_field:

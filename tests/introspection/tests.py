@@ -70,7 +70,7 @@ class IntrospectionTests(TestCase):
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
             [r[3] for r in desc if datatype(r[1], r) == 'CharField'],
-            [30, 30, 75]
+            [30, 30, 254]
         )
 
     @skipUnlessDBFeature('can_introspect_null')
