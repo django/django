@@ -186,7 +186,7 @@ class Deserializer(base.Deserializer):
         # {m2m_accessor_attribute : [list_of_related_objects]})
         m2m_data = {}
 
-        model_fields = [val for val in Model._meta._field_map.keys() if not val.endswith('+')]
+        model_fields = [val for val in Model._meta._get_field_map().keys() if not val.endswith('+')]
         # Deseralize each field.
         for field_node in node.getElementsByTagName("field"):
             # If the field is missing the name attribute, bail (are you

@@ -1396,7 +1396,7 @@ class Query(object):
         return path, final_field, targets, names[pos + 1:]
 
     def raise_field_error(self, opts, name):
-        field_names = [val for val in opts._field_map.keys() if not val.endswith('+')]
+        field_names = [val for val in opts._get_field_map().keys() if not val.endswith('+')]
         available = field_names + list(self.aggregate_select)
         raise FieldError("Cannot resolve keyword %r into field. "
                          "Choices are: %s" % (name, ", ".join(available)))
@@ -1631,7 +1631,7 @@ class Query(object):
                 # from the model on which the lookup failed.
                 raise
             else:
-                _field_names = [val for val in opts._field_map.keys() if not val.endswith('+')]
+                _field_names = [val for val in opts._get_field_map().keys() if not val.endswith('+')]
                 names = sorted(_field_names + list(self.extra)
                                + list(self.aggregate_select))
                 raise FieldError("Cannot resolve keyword %r into field. "
