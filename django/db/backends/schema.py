@@ -231,7 +231,7 @@ class BaseDatabaseSchemaEditor(object):
             # FK
             if field.rel:
                 to_table = field.rel.to._meta.db_table
-                to_column = field.rel.to._meta.get_field(field.rel.field_name).column
+                to_column = field.rel.to._meta.get_new_field(field.rel.field_name).column
                 if self.connection.features.supports_foreign_keys:
                     self.deferred_sql.append(
                         self.sql_create_fk % {
@@ -431,7 +431,7 @@ class BaseDatabaseSchemaEditor(object):
         # Add any FK constraints later
         if field.rel and self.connection.features.supports_foreign_keys:
             to_table = field.rel.to._meta.db_table
-            to_column = field.rel.to._meta.get_field(field.rel.field_name).column
+            to_column = field.rel.to._meta.get_new_field(field.rel.field_name).column
             self.deferred_sql.append(
                 self.sql_create_fk % {
                     "name": self.quote_name('%s_refs_%s_%x' % (

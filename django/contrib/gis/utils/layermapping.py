@@ -188,7 +188,7 @@ class LayerMapping(object):
             # Ensuring that a corresponding field exists in the model
             # for the given field name in the mapping.
             try:
-                model_field = self.model._meta.get_field(field_name)
+                model_field = self.model._meta.get_new_field(field_name)
             except models.fields.FieldDoesNotExist:
                 raise LayerMapError('Given mapping field "%s" not in given Model fields.' % field_name)
 
@@ -230,7 +230,7 @@ class LayerMapping(object):
                     for rel_name, ogr_field in ogr_name.items():
                         idx = check_ogr_fld(ogr_field)
                         try:
-                            rel_model._meta.get_field(rel_name)
+                            rel_model._meta.get_new_field(rel_name)
                         except models.fields.FieldDoesNotExist:
                             raise LayerMapError('ForeignKey mapping field "%s" not in %s fields.' %
                                                 (rel_name, rel_model.__class__.__name__))
@@ -400,7 +400,7 @@ class LayerMapping(object):
         # Constructing and verifying the related model keyword arguments.
         fk_kwargs = {}
         for field_name, ogr_name in rel_mapping.items():
-            fk_kwargs[field_name] = self.verify_ogr_field(feat[ogr_name], rel_model._meta.get_field(field_name))
+            fk_kwargs[field_name] = self.verify_ogr_field(feat[ogr_name], rel_model._meta.get_new_field(field_name))
 
         # Attempting to retrieve and return the related model.
         try:

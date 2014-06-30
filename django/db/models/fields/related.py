@@ -822,7 +822,7 @@ def create_many_related_manager(superclass, rel):
             self.model = model
             self.query_field_name = query_field_name
 
-            source_field = through._meta.get_field(source_field_name)
+            source_field = through._meta.get_new_field(source_field_name)
             source_related_fields = source_field.related_fields
 
             self.core_filters = {}
@@ -832,7 +832,7 @@ def create_many_related_manager(superclass, rel):
             self.instance = instance
             self.symmetrical = symmetrical
             self.source_field = source_field
-            self.target_field = through._meta.get_field(target_field_name)
+            self.target_field = through._meta.get_new_field(target_field_name)
             self.source_field_name = source_field_name
             self.target_field_name = target_field_name
             self.reverse = reverse
@@ -912,7 +912,7 @@ def create_many_related_manager(superclass, rel):
 
             # For non-autocreated 'through' models, can't assume we are
             # dealing with PK values.
-            fk = self.through._meta.get_field(self.source_field_name)
+            fk = self.through._meta.get_new_field(self.source_field_name)
             join_table = self.through._meta.db_table
             connection = connections[queryset.db]
             qn = connection.ops.quote_name
@@ -1009,7 +1009,7 @@ def create_many_related_manager(superclass, rel):
                                 'Cannot add "%r": instance is on database "%s", value is on database "%s"' %
                                 (obj, self.instance._state.db, obj._state.db)
                             )
-                        fk_val = self.through._meta.get_field(
+                        fk_val = self.through._meta.get_new_field(
                             target_field_name).get_foreign_related_value(obj)[0]
                         if fk_val is None:
                             raise ValueError(
@@ -1547,7 +1547,7 @@ class ForeignObject(RelatedField):
                 for source in sources:
                     # Account for one-to-one relations when sent a different model
                     while not isinstance(value, source.model) and source.rel:
-                        source = source.rel.to._meta.get_field(source.rel.field_name)
+                        source = source.rel.to._meta.get_new_field(source.rel.field_name)
                     value_list.append(getattr(value, source.attname))
                 return tuple(value_list)
             elif not isinstance(value, tuple):
@@ -2091,7 +2091,7 @@ class ManyToManyField(RelatedField):
                         hint = None
 
                     try:
-                        field = through._meta.get_field(field_name)
+                        field = through._meta.get_new_field(field_name)
                     except FieldDoesNotExist:
                         errors.append(
                             checks.Error(

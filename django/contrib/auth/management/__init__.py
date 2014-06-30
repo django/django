@@ -101,7 +101,7 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     ]
     # Validate the permissions before bulk_creation to avoid cryptic
     # database error when the verbose_name is longer than 50 characters
-    permission_name_max_length = Permission._meta.get_field('name').max_length
+    permission_name_max_length = Permission._meta.get_new_field('name').max_length
     verbose_name_max_length = permission_name_max_length - 11  # len('Can change ') prefix
     for perm in perms:
         if len(perm.name) > permission_name_max_length:
@@ -164,7 +164,7 @@ def get_default_username(check_db=True):
 
     # Run the username validator
     try:
-        auth_app.User._meta.get_field('username').run_validators(default_username)
+        auth_app.User._meta.get_new_field('username').run_validators(default_username)
     except exceptions.ValidationError:
         return ''
 

@@ -68,7 +68,7 @@ class GenericForeignKey(object):
 
     def _check_object_id_field(self):
         try:
-            self.model._meta.get_field(self.fk_field)
+            self.model._meta.get_new_field(self.fk_field)
         except FieldDoesNotExist:
             return [
                 checks.Error(
@@ -86,7 +86,7 @@ class GenericForeignKey(object):
         valid content_type field (is a ForeignKey to ContentType). """
 
         try:
-            field = self.model._meta.get_field(self.ct_field)
+            field = self.model._meta.get_new_field(self.ct_field)
         except FieldDoesNotExist:
             return [
                 checks.Error(
@@ -157,7 +157,7 @@ class GenericForeignKey(object):
         fk_dict = defaultdict(set)
         # We need one instance for each group in order to get the right db:
         instance_dict = {}
-        ct_attname = self.model._meta.get_field(self.ct_field).get_attname()
+        ct_attname = self.model._meta.get_new_field(self.ct_field).get_attname()
         for instance in instances:
             # We avoid looking for values if either ct_id or fkey value is None
             ct_id = getattr(instance, ct_attname)
@@ -207,7 +207,7 @@ class GenericForeignKey(object):
             # lookups are cached (see ticket #5570). This takes more code than
             # the naive ``getattr(instance, self.ct_field)``, but has better
             # performance when dealing with GFKs in loops and such.
-            f = self.model._meta.get_field(self.ct_field)
+            f = self.model._meta.get_new_field(self.ct_field)
             ct_id = getattr(instance, f.get_attname(), None)
             if ct_id is not None:
                 ct = self.get_content_type(id=ct_id, using=instance._state.db)

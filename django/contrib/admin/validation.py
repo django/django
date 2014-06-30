@@ -195,7 +195,7 @@ class BaseValidator(object):
                     if not hasattr(cls, field):
                         if not hasattr(model, field):
                             try:
-                                model._meta.get_field(field)
+                                model._meta.get_new_field(field)
                             except models.FieldDoesNotExist:
                                 raise ImproperlyConfigured("%s.readonly_fields[%d], %r is not a callable or an attribute of %r or found in the model %r."
                                     % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))
@@ -246,7 +246,7 @@ class ModelAdminValidator(BaseValidator):
                     if not hasattr(cls, field):
                         if not hasattr(model, field):
                             try:
-                                model._meta.get_field(field)
+                                model._meta.get_new_field(field)
                             except models.FieldDoesNotExist:
                                 raise ImproperlyConfigured("%s.list_display[%d], %r is not a callable or an attribute of %r or found in the model %r."
                                     % (cls.__name__, idx, field, cls.__name__, model._meta.object_name))

@@ -113,7 +113,7 @@ def Deserializer(object_list, **options):
             if isinstance(field_value, str):
                 field_value = smart_text(field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True)
 
-            field = Model._meta.get_field(field_name)
+            field = Model._meta.get_new_field(field_name)
 
             # Handle M2M relations
             if field.rel and isinstance(field.rel, models.ManyToManyRel):
@@ -139,10 +139,10 @@ def Deserializer(object_list, **options):
                             if field.rel.to._meta.pk.rel:
                                 value = value.pk
                         else:
-                            value = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                            value = field.rel.to._meta.get_new_field(field.rel.field_name).to_python(field_value)
                         data[field.attname] = value
                     else:
-                        data[field.attname] = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                        data[field.attname] = field.rel.to._meta.get_new_field(field.rel.field_name).to_python(field_value)
                 else:
                     data[field.attname] = None
 

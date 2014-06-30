@@ -120,7 +120,7 @@ class BaseDatabaseCreation(object):
         for field_constraints in opts.unique_together:
             table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' %
                 ", ".join(
-                    [style.SQL_FIELD(qn(opts.get_field(f).column))
+                    [style.SQL_FIELD(qn(opts.get_new_field(f).column))
                      for f in field_constraints]))
 
         full_statement = [style.SQL_KEYWORD('CREATE TABLE') + ' ' +
@@ -158,7 +158,7 @@ class BaseDatabaseCreation(object):
         if rel_to in known_models or rel_to == model:
             output = [style.SQL_KEYWORD('REFERENCES') + ' ' +
                 style.SQL_TABLE(qn(rel_to._meta.db_table)) + ' (' +
-                style.SQL_FIELD(qn(rel_to._meta.get_field(
+                style.SQL_FIELD(qn(rel_to._meta.get_new_field(
                     field.rel.field_name).column)) + ')' +
                 self.connection.ops.deferrable_sql()
             ]
@@ -186,7 +186,7 @@ class BaseDatabaseCreation(object):
                 r_table = rel_opts.db_table
                 r_col = f.column
                 table = opts.db_table
-                col = opts.get_field(f.rel.field_name).column
+                col = opts.get_new_field(f.rel.field_name).column
                 # For MySQL, r_name must be unique in the first 64 characters.
                 # So we are careful with character usage here.
                 r_name = '%s_refs_%s_%s' % (
@@ -278,7 +278,7 @@ class BaseDatabaseCreation(object):
             table = rel_class._meta.db_table
             col = f.column
             r_table = model._meta.db_table
-            r_col = model._meta.get_field(f.rel.field_name).column
+            r_col = model._meta.get_new_field(f.rel.field_name).column
             r_name = '%s_refs_%s_%s' % (
                 col, r_col, self._digest(table, r_table))
             output.append('%s %s %s %s;' % (

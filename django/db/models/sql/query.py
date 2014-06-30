@@ -1033,7 +1033,7 @@ class Query(object):
             # The simplest cases. No joins required -
             # just reference the provided column alias.
             field_name = field_list[0]
-            source = opts.get_field(field_name)
+            source = opts.get_new_field(field_name)
             col = field_name
         # We want to have the alias in SELECT clause even if mask is set.
         self.append_aggregate_mask([alias])

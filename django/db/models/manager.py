@@ -24,7 +24,7 @@ def ensure_default_manager(cls):
     if not getattr(cls, '_default_manager', None):
         # Create the default manager, if needed.
         try:
-            cls._meta.get_field('objects')
+            cls._meta.get_new_field('objects')
             raise ValueError("Model %s must specify a custom Manager, because it has a field named 'objects'" % cls.__name__)
         except FieldDoesNotExist:
             pass
