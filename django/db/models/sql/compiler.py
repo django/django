@@ -639,10 +639,15 @@ class SQLCompiler(object):
             else:
                 restricted = False
 
-        for f, model in opts.get_fields_with_model():
+        for f in opts.get_new_fields(types=DATA):
+            # TODO: deprecated
             # The get_fields_with_model() returns None for fields that live
             # in the field's local model. So, for those fields we want to use
             # the f.model - that is the field's local model.
+            direct = isinstance(f, Field) or hasattr(f, 'is_gfk')
+            model = f.model if direct else f.parent_model._meta.concrete_model
+            if model == opts.model:
+                model = None
             field_model = model or f.model
             if not select_related_descend(f, restricted, requested,
                                           only_load.get(field_model)):

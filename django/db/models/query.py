@@ -1360,7 +1360,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         skip = set()
         init_list = []
         # Build the list of fields that *haven't* been requested
-        for field, in klass._meta.get_new_fields(types=DATA, opts=CONCRETE):
+        for field in klass._meta.get_new_fields(types=DATA, opts=CONCRETE):
             field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
             model = field.model if field_is_direct else field.parent_model._meta.concrete_model
             if model == klass._meta.model:
@@ -1504,7 +1504,11 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
     for f, klass_info in reverse_related_fields:
         # Transfer data from this object to childs.
         parent_data = []
-        for rel_field, rel_model in klass_info[0]._meta.get_fields_with_model():
+        for rel_field in klass_info[0]._meta.get_new_fields(types=DATA):
+            direct = isinstance(rel_field, Field) or hasattr(rel_field, 'is_gfk')
+            rel_model = rel_field.model if direct else rel_field.parent_model._meta.concrete_model
+            if rel_model == klass_info[0]._meta.model:
+                rel_model = None
             if rel_model is not None and isinstance(obj, rel_model):
                 parent_data.append((rel_field, getattr(obj, rel_field.attname)))
         # Recursively retrieve the data for the related object

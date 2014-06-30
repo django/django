@@ -16,7 +16,9 @@ from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.aggregates import refs_aggregate
 from django.db.models.expressions import ExpressionNode
-from django.db.models.fields import FieldDoesNotExist
+from django.db.models.fields import Field, FieldDoesNotExist
+# CIRCULAR
+#from django.db.models.options import DATA
 from django.db.models.query_utils import Q
 from django.db.models.related import PathInfo
 from django.db.models.sql import aggregates as base_aggregates_module
@@ -30,6 +32,8 @@ from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_text
 from django.utils.tree import Node
+
+DATA = 0b00001
 
 __all__ = ['Query', 'RawQuery']
 
@@ -614,9 +618,13 @@ class Query(object):
             # models.
             workset = {}
             for model, values in six.iteritems(seen):
-                for field, m in model._meta.get_fields_with_model():
+                for field in model._meta.get_new_fields(types=DATA):
                     if field in values:
                         continue
+                    direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
+                    m = field.model if direct else field.parent_model._meta.concrete_model
+                    if m == model._meta.model:
+                        m = None
                     add_to_dict(workset, m or model, field)
             for model, values in six.iteritems(must_include):
                 # If we haven't included a model in workset, we don't add the
@@ -934,7 +942,11 @@ class Query(object):
         root_alias = self.tables[0]
         seen = {None: root_alias}
 
-        for field, model in opts.get_fields_with_model():
+        for field in opts.get_new_fields(types=DATA):
+            direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
+            model = field.model if direct else field.parent_model._meta.concrete_model
+            if model == opts.model:
+                model = None
             if model not in seen:
                 self.join_parent_model(opts, model, root_alias, seen)
         self.included_inherited_models = seen
