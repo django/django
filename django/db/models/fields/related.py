@@ -13,6 +13,8 @@ from django.db.models.fields import (AutoField, Field, IntegerField,
 from django.db.models.lookups import IsNull
 from django.db.models.related import RelatedObject, PathInfo
 from django.db.models.query import QuerySet
+# CIRCULAR IMPORT
+#from django.db.models.options import RELATED_OBJECTS, RELATED_M2M
 from django.db.models.sql.datastructures import Col
 from django.utils.encoding import smart_text
 from django.utils import six
@@ -22,6 +24,10 @@ from django.core import exceptions
 from django import forms
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
+
+# CIRCULAR IMPORT
+RELATED_OBJECTS = 0b00100
+RELATED_M2M = 0b01000
 
 
 def add_lazy_relation(cls, field, relation, operation):
@@ -218,8 +224,8 @@ class RelatedField(Field):
         # Check clashes between accessors/reverse query names of `field` and
         # any other field accessor -- i. e. Model.foreign accessor clashes with
         # Model.m2m accessor.
-        potential_clashes = rel_opts.get_all_related_many_to_many_objects()
-        potential_clashes += rel_opts.get_all_related_objects()
+        potential_clashes = rel_opts.get_new_fields(types=RELATED_M2M)
+        potential_clashes += rel_opts.get_new_fields(types=RELATED_OBJECTS)
         potential_clashes = (r for r in potential_clashes
             if r.field is not self)
         for clash_field in potential_clashes:

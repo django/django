@@ -10,6 +10,7 @@ from django.db.migrations import operations
 from django.db.migrations.migration import Migration
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.optimizer import MigrationOptimizer
+from django.db.models.options import RELATED_M2M
 
 
 class MigrationAutodetector(object):
@@ -618,7 +619,7 @@ class MigrationAutodetector(object):
                     related_object.field.name,
                     False,
                 ))
-            for related_object in model._meta.get_all_related_many_to_many_objects():
+            for related_object in model._meta.get_new_fields(types=RELATED_M2M):
                 dependencies.append((
                     related_object.model._meta.app_label,
                     related_object.model._meta.object_name,

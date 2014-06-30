@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, router
-from django.db.models.options import normalize_together
+from django.db.models.options import normalize_together, RELATED_M2M, RELATED_OBJECTS
 from django.db.migrations.state import ModelState
 from django.db.migrations.operations.base import Operation
 from django.utils import six
@@ -116,8 +116,8 @@ class RenameModel(Operation):
         # Get all of the related objects we need to repoint
         apps = state.render(skip_cache=True)
         model = apps.get_model(app_label, self.old_name)
-        related_objects = model._meta.get_all_related_objects()
-        related_m2m_objects = model._meta.get_all_related_many_to_many_objects()
+        related_objects = model._meta.get_new_fields(types=RELATED_OBJECTS)
+        related_m2m_objects = model._meta.get_new_fields(types=RELATED_M2M)
         # Rename the model
         state.models[app_label, self.new_name.lower()] = state.models[app_label, self.old_name.lower()]
         state.models[app_label, self.new_name.lower()].name = self.new_name
@@ -149,8 +149,8 @@ class RenameModel(Operation):
                 new_model._meta.db_table,
             )
             # Alter the fields pointing to us
-            related_objects = old_model._meta.get_all_related_objects()
-            related_m2m_objects = old_model._meta.get_all_related_many_to_many_objects()
+            related_objects = old_model._meta.get_new_fields(types=RELATED_OBJECTS)
+            related_m2m_objects = old_model._meta.get_new_fields(types=RELATED_M2M)
             for related_object in (related_objects + related_m2m_objects):
                 to_field = new_apps.get_model(
                     related_object.model._meta.app_label,
