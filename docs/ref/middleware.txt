@@ -131,14 +131,6 @@ Handles conditional GET operations. If the response has a ``ETag`` or
 
 Also sets the ``Date`` and ``Content-Length`` response-headers.
 
-Reverse proxy middleware
-------------------------
-
-.. class:: SetRemoteAddrFromForwardedFor
-
-This middleware was removed in Django 1.1. See :ref:`the release notes
-<removed-setremoteaddrfromforwardedfor-middleware>` for details.
-
 Locale middleware
 -----------------
 
