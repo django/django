@@ -569,8 +569,7 @@ class Options(object):
         debugging output (a list of choices), so any internal-only field names
         are not included.
         """
-        fields = self._field_map
-        return [val for val in fields.keys() if not val.endswith('+')]
+        return [val for val in self._get_field_map().keys() if not val.endswith('+')]
 
         #fields = filter(lambda val: not val.endswith('+'), get_fields(m2m=RECURSIVE))
         #try:
