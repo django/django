@@ -9,8 +9,8 @@ from django.contrib.auth import models, management
 from django.contrib.auth.checks import check_user_model
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.management.commands import changepassword, createsuperuser
-from django.contrib.auth.models import User
-from django.contrib.auth.tests.custom_user import CustomUser
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.tests.custom_user import CustomUser, CustomUserWithFK, Email
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
@@ -348,6 +348,62 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             email='joe@example.com',
         )
         self.assertIs(command.stdin, sys.stdin)
+
+    @override_settings(AUTH_USER_MODEL='auth.CustomUserWithFK')
+    def test_required_field_with_fk(self):
+        new_io = six.StringIO()
+        group = Group.objects.create(name='mygroup')
+        email = Email.objects.create(email='mymail@gmail.com')
+        call_command(
+            'createsuperuser',
+            interactive=False,
+            username='user',
+            email='mymail@gmail.com',
+            group=group.pk,
+            stdout=new_io,
+            skip_checks=True,
+        )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, 'Superuser created successfully.')
+        u = CustomUserWithFK._default_manager.get(email=email)
+        self.assertEqual(u.username, "user")
+        self.assertEqual(u.group, group)
+
+        non_existent_email = 'mymail2@gmail.com'
+        with self.assertRaisesMessage(CommandError,
+                'email instance with email %r does not exist.' % non_existent_email):
+            call_command(
+                'createsuperuser',
+                interactive=False,
+                username='user',
+                email=non_existent_email,
+                stdout=new_io,
+                skip_checks=True,
+            )
+
+    @override_settings(AUTH_USER_MODEL='auth.CustomUserWithFK')
+    def test_required_fields_with_fk_interactive(self):
+        new_io = six.StringIO()
+        group = Group.objects.create(name='mygroup')
+        email = Email.objects.create(email='mymail@gmail.com')
+
+        @mock_inputs({'password': "nopasswd", 'username': "user", 'email': "mymail@gmail.com", 'group': group.pk})
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdout=new_io,
+                stdin=MockTTY(),
+                skip_checks=True,
+            )
+
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, 'Superuser created successfully.')
+            u = CustomUserWithFK._default_manager.get(email=email)
+            self.assertEqual(u.username, 'user')
+            self.assertEqual(u.group, group)
+
+        test(self)
 
 
 class CustomUserModelValidationTestCase(TestCase):
