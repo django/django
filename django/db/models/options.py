@@ -69,6 +69,7 @@ class Options(object):
     def __init__(self, meta, app_label=None):
         self._map_details_cache = {}
         self._map_model_cache = {}
+        self._field_map_cache = {}
         self._get_new_fields_cache = {}
         self.local_fields = []
         self.local_many_to_many = []
@@ -140,18 +141,20 @@ class Options(object):
         models = self.apps.get_models(include_auto_created=False)
         return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
-    @cached_property
-    def _field_map(self):
-        types = ALL
-        res = {}
-        for field, names in self.get_new_fields(types=types, recursive=True).iteritems():
-            for name in names:
-                res[name] = field
-        return res
-
-    def get_new_field(self, field_name):
+    def _get_field_map(self, types=ALL):
         try:
-            return self._field_map[field_name]
+            return self._field_map_cache[types]
+        except KeyError:
+            res = {}
+            for field, names in self.get_new_fields(types=types, recursive=True).iteritems():
+                for name in names:
+                    res[name] = field
+            self._field_map_cache[types] = res
+            return res
+
+    def get_new_field(self, field_name, types=ALL):
+        try:
+            return self._get_field_map(types)[field_name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
@@ -317,14 +320,7 @@ class Options(object):
                 model.add_to_class('id', auto)
 
     def _expire_cache(self):
-        try:
-            del self._field_map
-        except AttributeError:
-            pass
-        #try:
-            #del self._field_map_cache
-        #except AttributeError:
-            #pass
+        self._field_map_cache = {}
         self._get_new_fields_cache = {}
 
     def add_field(self, field):
@@ -529,15 +525,7 @@ class Options(object):
         """
         Returns the requested field by name. Raises FieldDoesNotExist on error.
         """
-        grouded_fields = dict([(f.name, f) for f in self.get_new_fields(types=DATA | M2M)])
-        try:
-            return grouded_fields[name]
-        except KeyError:
-            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, name))
-        #to_search = (self.fields + self.many_to_many) if many_to_many else self.fields
-        #for f in to_search:
-            #if f.name == name:
-                #return f
+        return self.get_new_field(name, types=DATA | M2M)
 
     def get_field_by_name(self, name):
         """
@@ -551,7 +539,7 @@ class Options(object):
 
         Uses a cache internally, so after the first access, this is very fast.
         """
-        fields = self._field_map
+        fields = self._get_field_map(types=ALL)
         try:
             return self._map_details(fields[name])
         except KeyError:
