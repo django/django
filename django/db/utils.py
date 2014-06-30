@@ -286,10 +286,10 @@ class ConnectionRouter(object):
                     chosen_db = method(model, **hints)
                     if chosen_db:
                         return chosen_db
-            try:
-                return hints['instance']._state.db or DEFAULT_DB_ALIAS
-            except KeyError:
-                return DEFAULT_DB_ALIAS
+            instance = hints.get('instance')
+            if instance is not None and instance._state.db:
+                return instance._state.db
+            return DEFAULT_DB_ALIAS
         return _route_db
 
     db_for_read = _router_func('db_for_read')

@@ -515,8 +515,7 @@ password resets. You must then provide some key implementation details:
         will be prompted to supply a value for each of these fields. It must
         include any field for which :attr:`~django.db.models.Field.blank` is
         ``False`` or undefined and may include additional fields you want
-        prompted for when a user is created interactively. However, it will not
-        work for :class:`~django.db.models.ForeignKey` fields.
+        prompted for when a user is created interactively.
         ``REQUIRED_FIELDS`` has no effect in other parts of Django, like
         creating a user in the admin.
 
@@ -535,6 +534,15 @@ password resets. You must then provide some key implementation details:
             ``REQUIRED_FIELDS`` must contain all required fields on your
             ``User`` model, but should *not* contain the ``USERNAME_FIELD`` or
             ``password`` as these fields will always be prompted for.
+
+        .. versionadded:: 1.8
+
+        :attr:`REQUIRED_FIELDS` now supports
+        :class:`~django.db.models.ForeignKey`\s. Since there is no way to pass
+        model instances during the :djadmin:`createsuperuser` prompt, expect the
+        user to enter the value of :attr:`~django.db.models.ForeignKey.to_field`
+        value (the :attr:`~django.db.models.Field.primary_key` by default) of an
+        existing instance.
 
     .. attribute:: is_active
 
