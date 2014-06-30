@@ -71,6 +71,12 @@ should consider its data immutable, whether it has data or not.
 Using forms to validate data
 ----------------------------
 
+.. method:: Form.clean()
+
+Implement a ``clean()`` method on your ``Form`` when you must add custom
+validation for fields that are interdependent. See
+:ref:`validating-fields-with-clean` for example usage.
+
 .. method:: Form.is_valid()
 
 The primary task of a :class:`Form` object is to validate data. With a bound
