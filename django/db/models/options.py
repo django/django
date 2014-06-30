@@ -152,8 +152,9 @@ class Options(object):
             self._field_map_cache[types] = res
             return res
 
-    def get_new_field(self, field_name, types=ALL):
+    def get_new_field(self, field_name, include_relations=False):
         try:
+            types = ALL if include_relations else NON_RELATED_FIELDS
             return self._get_field_map(types)[field_name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
@@ -525,7 +526,7 @@ class Options(object):
         """
         Returns the requested field by name. Raises FieldDoesNotExist on error.
         """
-        return self.get_new_field(name, types=DATA | M2M)
+        return self.get_new_field(name)
 
     def get_field_by_name(self, name):
         """
