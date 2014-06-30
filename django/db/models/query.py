@@ -13,6 +13,8 @@ from django.db import (connections, router, transaction, IntegrityError,
     DJANGO_VERSION_PICKLE_KEY)
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import AutoField, Empty
+# Circular Dependency
+#from django.db.models.options import RELATED_OBJECTS
 from django.db.models.query_utils import (Q, select_related_descend,
     deferred_class_factory, InvalidQuery)
 from django.db.models.deletion import Collector
@@ -22,6 +24,8 @@ from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
 from django.utils.version import get_version
+
+RELATED_OBJECTS = 0b00100
 
 # The maximum number (one less than the max to be precise) of results to fetch
 # in a get() query
@@ -1401,7 +1405,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
 
     reverse_related_fields = []
     if restricted:
-        for o in klass._meta.get_all_related_objects():
+        for o in klass._meta.get_new_fields(types=RELATED_OBJECTS):
             if o.field.unique and select_related_descend(o.field, restricted, requested,
                                                          only_load.get(o.model), reverse=True):
                 next = requested[o.field.related_query_name()]

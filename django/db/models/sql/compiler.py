@@ -5,6 +5,7 @@ from django.core.exceptions import FieldError
 from django.db.backends.utils import truncate_name
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ExpressionNode
+from django.db.models.options import RELATED_OBJECTS
 from django.db.models.query_utils import select_related_descend, QueryWrapper
 from django.db.models.sql.constants import (CURSOR, SINGLE, MULTI, NO_RESULTS,
         ORDER_DIR, GET_ITERATOR_CHUNK_SIZE, SelectInfo)
@@ -658,7 +659,7 @@ class SQLCompiler(object):
         if restricted:
             related_fields = [
                 (o.field, o.model)
-                for o in opts.get_all_related_objects()
+                for o in opts.get_new_fields(types=RELATED_OBJECTS)
                 if o.field.unique
             ]
             for f, model in related_fields:

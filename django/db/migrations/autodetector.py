@@ -10,7 +10,7 @@ from django.db.migrations import operations
 from django.db.migrations.migration import Migration
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.optimizer import MigrationOptimizer
-from django.db.models.options import RELATED_M2M
+from django.db.models.options import RELATED_M2M, RELATED_OBJECTS
 
 
 class MigrationAutodetector(object):
@@ -612,7 +612,7 @@ class MigrationAutodetector(object):
             # and the removal of all its own related fields, and if it's
             # a through model the field that references it.
             dependencies = []
-            for related_object in model._meta.get_all_related_objects():
+            for related_object in model._meta.get_new_fields(types=RELATED_OBJECTS):
                 dependencies.append((
                     related_object.model._meta.app_label,
                     related_object.model._meta.object_name,
