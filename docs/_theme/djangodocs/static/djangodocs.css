@@ -121,7 +121,7 @@ div.admonition-behind-the-scenes { padding-left:65px; background:url(docicons-be
 /*** versoinadded/changes ***/
 div.versionadded, div.versionchanged {  }
 div.versionadded span.title, div.versionchanged span.title, span.versionmodified { font-weight: bold; }
-div.deprecated { color:#555; }
+div.versionadded, div.versionchanged, div.deprecated { color:#555; }
 
 /*** p-links ***/
 a.headerlink { color: #c60f0f; font-size: 0.8em; padding: 0 4px 0 4px; text-decoration: none; visibility: hidden; }
