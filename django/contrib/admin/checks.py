@@ -6,7 +6,6 @@ from itertools import chain
 from django.contrib.admin.utils import get_fields_from_path, NotRelationField, flatten
 from django.core import checks
 from django.db import models
-from django.db.models.options import NON_RELATED_FIELDS
 from django.db.models.fields import FieldDoesNotExist
 from django.forms.models import BaseModelForm, _get_foreign_key, BaseModelFormSet
 
@@ -56,7 +55,7 @@ class BaseModelAdminChecks(object):
         ManyToManyField. """
 
         try:
-            field = model._meta.get_new_field(field_name, types=NON_RELATED_FIELDS)
+            field = model._meta.get_new_field(field_name)
         except models.FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E002')
@@ -171,7 +170,7 @@ class BaseModelAdminChecks(object):
             return []
         else:
             try:
-                field = model._meta.get_new_field(field_name, types=NON_RELATED_FIELDS)
+                field = model._meta.get_new_field(field_name)
             except models.FieldDoesNotExist:
                 # If we can't find a field on the model that matches, it could
                 # be an extra field on the form.
@@ -251,7 +250,7 @@ class BaseModelAdminChecks(object):
         check that given field exists and is a ManyToManyField. """
 
         try:
-            field = model._meta.get_new_field(field_name, types=NON_RELATED_FIELDS)
+            field = model._meta.get_new_field(field_name)
         except models.FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E019')
@@ -280,7 +279,7 @@ class BaseModelAdminChecks(object):
         field and that the field is a ForeignKey or has `choices` defined. """
 
         try:
-            field = model._meta.get_new_field(field_name, types=NON_RELATED_FIELDS)
+            field = model._meta.get_new_field(field_name)
         except models.FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E022')
@@ -359,7 +358,7 @@ class BaseModelAdminChecks(object):
         )
 
         try:
-            field = model._meta.get_new_field(field_name, types=NON_RELATED_FIELDS)
+            field = model._meta.get_new_field(field_name)
         except models.FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E027')
@@ -396,7 +395,7 @@ class BaseModelAdminChecks(object):
         `field_name` is "title". """
 
         try:
-            model._meta.get_new_field(field_name, types=NON_RELATED_FIELDS)
+            model._meta.get_new_field(field_name)
         except models.FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E030')
@@ -441,7 +440,7 @@ class BaseModelAdminChecks(object):
                 field_name = field_name[1:]
 
             try:
-                model._meta.get_new_field(field_name, types=NON_RELATED_FIELDS)
+                model._meta.get_new_field(field_name)
             except models.FieldDoesNotExist:
                 return refer_to_missing_field(field=field_name, option=label,
                                               model=model, obj=cls, id='admin.E033')
@@ -470,7 +469,7 @@ class BaseModelAdminChecks(object):
             return []
         else:
             try:
-                model._meta.get_new_field(field_name, types=NON_RELATED_FIELDS)
+                model._meta.get_new_field(field_name)
             except models.FieldDoesNotExist:
                 return [
                     checks.Error(
@@ -583,7 +582,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         elif hasattr(model, item):
             # getattr(model, item) could be an X_RelatedObjectsDescriptor
             try:
-                field = model._meta.get_new_field(item, types=NON_RELATED_FIELDS)
+                field = model._meta.get_new_field(item)
             except models.FieldDoesNotExist:
                 try:
                     field = getattr(model, item)
@@ -614,7 +613,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 return []
         else:
             try:
-                model._meta.get_new_field(item, types=NON_RELATED_FIELDS)
+                model._meta.get_new_field(item)
             except models.FieldDoesNotExist:
                 return [
                     # This is a deliberate repeat of E108; there's more than one path
@@ -833,7 +832,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             return []
         else:
             try:
-                field = model._meta.get_new_field(cls.date_hierarchy, types=NON_RELATED_FIELDS)
+                field = model._meta.get_new_field(cls.date_hierarchy)
             except models.FieldDoesNotExist:
                 return refer_to_missing_field(option='date_hierarchy',
                                               field=cls.date_hierarchy,

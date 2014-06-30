@@ -24,7 +24,6 @@ from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.db import models, transaction, router
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.options import NON_RELATED_FIELDS
 from django.db.models.related import RelatedObject
 from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
 from django.db.models.sql.constants import QUERY_TERMS
@@ -1326,7 +1325,7 @@ class ModelAdmin(BaseModelAdmin):
         initial = dict(request.GET.items())
         for k in initial:
             try:
-                f = self.model._meta.get_new_field(k, types=NON_RELATED_FIELDS)
+                f = self.model._meta.get_new_field(k)
             except models.FieldDoesNotExist:
                 continue
             # We have to special-case M2Ms as a list of comma-separated PKs.

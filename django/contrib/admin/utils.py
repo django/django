@@ -7,7 +7,6 @@ from django.contrib.auth import get_permission_codename
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.options import NON_RELATED_FIELDS
 from django.forms.forms import pretty_name
 from django.utils import formats
 from django.utils.html import format_html
@@ -262,7 +261,7 @@ def model_ngettext(obj, n=None):
 def lookup_field(name, obj, model_admin=None):
     opts = obj._meta
     try:
-        f = opts.get_new_field(name, types=NON_RELATED_FIELDS)
+        f = opts.get_new_field(name)
     except models.FieldDoesNotExist:
         # For non-field values, the value is either a method, property or
         # returned via a callable.

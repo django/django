@@ -1,7 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
-from django.db.models.options import NON_RELATED_FIELDS
 from django.forms.models import BaseModelForm, BaseModelFormSet, _get_foreign_key
 from django.contrib.admin.utils import get_fields_from_path, NotRelationField
 
@@ -42,7 +41,7 @@ class BaseValidator(object):
                     # things.
                     continue
                 try:
-                    f = model._meta.get_new_field(field, types=NON_RELATED_FIELDS)
+                    f = model._meta.get_new_field(field)
                 except models.FieldDoesNotExist:
                     # If we can't find a field on the model that matches, it could be an
                     # extra field on the form; nothing to check so move on to the next field.
@@ -420,7 +419,7 @@ def check_isdict(cls, label, obj):
 
 def get_field(cls, model, label, field):
     try:
-        return model._meta.get_new_field(field, types=NON_RELATED_FIELDS)
+        return model._meta.get_new_field(field)
     except models.FieldDoesNotExist:
         raise ImproperlyConfigured("'%s.%s' refers to field '%s' that is missing from model '%s.%s'."
                 % (cls.__name__, label, field, model._meta.app_label, model.__name__))
@@ -428,7 +427,7 @@ def get_field(cls, model, label, field):
 
 def fetch_attr(cls, model, label, field):
     try:
-        return model._meta.get_new_field(field, types=NON_RELATED_FIELDS)
+        return model._meta.get_new_field(field)
     except models.FieldDoesNotExist:
         pass
     try:
