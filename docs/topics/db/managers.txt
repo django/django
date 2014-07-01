@@ -297,7 +297,7 @@ returns a *subclass* of your base ``Manager`` with a copy of the custom
 
     class BaseManager(models.Manager):
         def __init__(self, *args, **kwargs):
-            ...
+            pass
 
         def manager_only_method(self):
             return
@@ -307,14 +307,14 @@ returns a *subclass* of your base ``Manager`` with a copy of the custom
             return
 
     class MyModel(models.Model):
-        objects = BaseManager.from_queryset(CustomQueryset)(*args, **kwargs)
+        objects = BaseManager.from_queryset(CustomQueryset)()
 
 You may also store the generated class into a variable::
 
     CustomManager = BaseManager.from_queryset(CustomQueryset)
 
     class MyModel(models.Model):
-        objects = CustomManager(*args, **kwargs)
+        objects = CustomManager()
 
 .. _custom-managers-and-inheritance:
 
