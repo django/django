@@ -167,6 +167,19 @@ class WriterTests(TestCase):
         with self.assertRaises(ValueError):
             self.serialize_round_trip(TestModel2.thing)
 
+    def test_serialize_local_function_reference_message(self):
+        """
+        Make sure user is seeing which module/function is the issue
+        """
+        class TestModel2(object):
+            def upload_to(self):
+                return "somewhere dynamic"
+            thing = models.FileField(upload_to=upload_to)
+
+        with six.assertRaisesRegex(self, ValueError,
+                '^Could not find function upload_to in migrations.test_writer'):
+            self.serialize_round_trip(TestModel2.thing)
+
     def test_simple_migration(self):
         """
         Tests serializing a simple migration.
