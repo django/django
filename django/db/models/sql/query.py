@@ -593,7 +593,7 @@ class Query(object):
             opts = orig_opts
             for name in parts[:-1]:
                 old_model = cur_model
-                source = opts.get_field_by_name(name)[0]
+                source = opts.get_new_field(name, True)
                 if is_reverse_o2o(source):
                     cur_model = source.model
                 else:
@@ -605,8 +605,10 @@ class Query(object):
                 if not is_reverse_o2o(source):
                     must_include[old_model].add(source)
                 add_to_dict(must_include, cur_model, opts.pk)
-            field, model, _, _ = opts.get_field_by_name(parts[-1])
-            if model is None:
+            field = opts.get_new_field(parts[-1])
+            direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
+            model = field.model if direct else field.parent_model._meta.concrete_model
+            if model == opts.model:
                 model = cur_model
             if not is_reverse_o2o(field):
                 add_to_dict(seen, model, field)
@@ -1033,7 +1035,7 @@ class Query(object):
             # The simplest cases. No joins required -
             # just reference the provided column alias.
             field_name = field_list[0]
-            source = opts.get_new_field(field_name)
+            source = opts.get_new_field(field_name, True)
             col = field_name
         # We want to have the alias in SELECT clause even if mask is set.
         self.append_aggregate_mask([alias])
@@ -1348,7 +1350,9 @@ class Query(object):
             if name == 'pk':
                 name = opts.pk.name
             try:
-                field, model, direct, m2m = opts.get_field_by_name(name)
+                field = opts.get_new_field(name, True)
+                direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
+                model = field.model if direct else field.parent_model._meta.concrete_model
             except FieldDoesNotExist:
                 # We didn't found the current field, so move position back
                 # one step.
@@ -1357,7 +1361,7 @@ class Query(object):
             # Check if we need any joins for concrete inheritance cases (the
             # field lives in parent, but we are currently in one of its
             # children)
-            if model:
+            if model is not opts.model:
                 # The field lives on a base class of the current model.
                 # Skip the chain of proxy to the concrete proxied model
                 proxied_model = opts.concrete_model
