@@ -525,3 +525,10 @@ instead, which takes no arguments by default.
 option ``cache_choices``. This cached querysets between multiple renderings of
 the same ``Form`` object. This option is subject to an accelerated deprecation
 and will be removed in Django 1.9.
+
+``django.template.resolve_variable()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The function has been informally marked as "Deprecated" for some time. Replace
+``resolve_variable(path, context)`` with
+``django.template.Variable(path).resolve(context)``.
