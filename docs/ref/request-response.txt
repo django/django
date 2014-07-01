@@ -314,6 +314,13 @@ Methods
     If you write your own XMLHttpRequest call (on the browser side), you'll
     have to set this header manually if you want ``is_ajax()`` to work.
 
+    If a response varies on whether or not it's requested via AJAX and you are
+    using some form of caching like Django's :mod:`cache middleware
+    <django.middleware.cache>`, you should decorate the view with
+    :func:`vary_on_headers('HTTP_X_REQUESTED_WITH')
+    <django.views.decorators.vary.vary_on_headers>` so that the responses are
+    properly cached.
+
 .. method:: HttpRequest.read(size=None)
 .. method:: HttpRequest.readline()
 .. method:: HttpRequest.readlines()
