@@ -321,14 +321,18 @@ class Options(object):
                 model.add_to_class('id', auto)
 
     def _expire_cache(self):
-        #if hasattr(self, 'fields'):
-            #del self.fields
-        #if hasattr(self, 'local_fields'):
-            #del self.local_fields
-        #if hasattr(self, 'local_concrete_fields'):
-            #del self.local_concrete_fields
-        #if hasattr(self, 'many_to_many'):
-            #del self.many_to_many
+        try:
+            del self.fields
+        except AttributeError:
+            pass
+        try:
+            del self.concrete_fields
+        except AttributeError:
+            pass
+        try:
+            del self.local_concrete_fields
+        except AttributeError:
+            pass
         self._field_map_cache = {}
         self._get_new_fields_cache = {}
 
@@ -337,7 +341,6 @@ class Options(object):
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
-        self._expire_cache()
         if field.rel and isinstance(field.rel, ManyToManyRel):
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
             if hasattr(self, '_m2m_cache'):
@@ -345,28 +348,7 @@ class Options(object):
         else:
             self.local_fields.insert(bisect(self.local_fields, field), field)
             self.setup_pk(field)
-            if hasattr(self, '_field_cache'):
-                del self._field_cache
-                del self._field_name_cache
-                # The fields, concrete_fields and local_concrete_fields are
-                # implemented as cached properties for performance reasons.
-                # The attrs will not exists if the cached property isn't
-                # accessed yet, hence the try-excepts.
-                try:
-                    del self.fields
-                except AttributeError:
-                    pass
-                try:
-                    del self.concrete_fields
-                except AttributeError:
-                    pass
-                try:
-                    del self.local_concrete_fields
-                except AttributeError:
-                    pass
-
-        if hasattr(self, '_name_map'):
-            del self._name_map
+        self._expire_cache()
 
     def add_virtual_field(self, field):
         self.virtual_fields.append(field)
