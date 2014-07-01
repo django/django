@@ -30,7 +30,7 @@ class AddField(Operation):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if router.allow_migrate(schema_editor.connection.alias, to_model):
-            field = to_model._meta.get_field_by_name(self.name)[0]
+            field = to_model._meta.get_new_field(self.name, True)
             if not self.preserve_default:
                 field.default = self.field.default
             schema_editor.add_field(
@@ -43,7 +43,7 @@ class AddField(Operation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
         if router.allow_migrate(schema_editor.connection.alias, from_model):
-            schema_editor.remove_field(from_model, from_model._meta.get_field_by_name(self.name)[0])
+            schema_editor.remove_field(from_model, from_model._meta.get_new_field(self.name, True))
 
     def describe(self):
         return "Add field %s to %s" % (self.name, self.model_name)
@@ -82,13 +82,13 @@ class RemoveField(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
         if router.allow_migrate(schema_editor.connection.alias, from_model):
-            schema_editor.remove_field(from_model, from_model._meta.get_field_by_name(self.name)[0])
+            schema_editor.remove_field(from_model, from_model._meta.get_new_field(self.name, True))
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if router.allow_migrate(schema_editor.connection.alias, to_model):
-            schema_editor.add_field(from_model, to_model._meta.get_field_by_name(self.name)[0])
+            schema_editor.add_field(from_model, to_model._meta.get_new_field(self.name, True))
 
     def describe(self):
         return "Remove field %s from %s" % (self.name, self.model_name)
@@ -119,8 +119,8 @@ class AlterField(Operation):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if router.allow_migrate(schema_editor.connection.alias, to_model):
-            from_field = from_model._meta.get_field_by_name(self.name)[0]
-            to_field = to_model._meta.get_field_by_name(self.name)[0]
+            from_field = from_model._meta.get_new_field(self.name, True)
+            to_field = to_model._meta.get_new_field(self.name, True)
             # If the field is a relatedfield with an unresolved rel.to, just
             # set it equal to the other field side. Bandaid fix for AlterField
             # migrations that are part of a RenameModel change.
@@ -173,8 +173,8 @@ class RenameField(Operation):
         if router.allow_migrate(schema_editor.connection.alias, to_model):
             schema_editor.alter_field(
                 from_model,
-                from_model._meta.get_field_by_name(self.old_name)[0],
-                to_model._meta.get_field_by_name(self.new_name)[0],
+                from_model._meta.get_new_field(self.old_name, True),
+                to_model._meta.get_new_field(self.new_name, True),
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -183,8 +183,8 @@ class RenameField(Operation):
         if router.allow_migrate(schema_editor.connection.alias, to_model):
             schema_editor.alter_field(
                 from_model,
-                from_model._meta.get_field_by_name(self.new_name)[0],
-                to_model._meta.get_field_by_name(self.old_name)[0],
+                from_model._meta.get_new_field(self.new_name, True),
+                to_model._meta.get_new_field(self.old_name, True),
             )
 
     def describe(self):
