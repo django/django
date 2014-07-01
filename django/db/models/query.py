@@ -857,6 +857,8 @@ class QuerySet(object):
         """
         Reverses the ordering of the QuerySet.
         """
+        assert self.query.can_filter(), \
+            "Cannot change a query once a slice has been taken"
         clone = self._clone()
         clone.query.standard_ordering = not clone.query.standard_ordering
         return clone

@@ -679,3 +679,24 @@ class Student(models.Model):
 class Classroom(models.Model):
     school = models.ForeignKey(School)
     students = models.ManyToManyField(Student, related_name='classroom')
+
+
+@python_2_unicode_compatible
+class ModelWithoutOrdering(models.Model):
+    name = models.CharField(max_length=10)
+    order_number = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class ModelWithOrdering(models.Model):
+    name = models.CharField(max_length=10)
+    order_number = models.IntegerField()
+
+    class Meta:
+        ordering = ('order_number', )
+
+    def __str__(self):
+        return self.name

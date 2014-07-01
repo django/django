@@ -28,7 +28,9 @@ from .models import (
     BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
     MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser,
     CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
-    Company, Employment, CustomPk, CustomPkTag, Classroom, School, Student)
+    Company, Employment, CustomPk, CustomPkTag, Classroom, School, Student,
+    ModelWithoutOrdering, ModelWithOrdering)
+
 
 
 class BaseQuerysetTest(TestCase):
@@ -698,13 +700,14 @@ class Queries1Tests(BaseQuerysetTest):
                 q.extra(select={'foo': "1"}),
                 []
             )
+            self.assertQuerysetEqual(q.reverse(), [])
+            # Sorting and filtering operations should be before slicing (ticket 22550).
             q.query.low_mark = 1
             self.assertRaisesMessage(
                 AssertionError,
                 'Cannot change a query once a slice has been taken',
                 q.extra, select={'foo': "1"}
             )
-            self.assertQuerysetEqual(q.reverse(), [])
             self.assertQuerysetEqual(q.defer('meal'), [])
             self.assertQuerysetEqual(q.only('meal'), [])
 
@@ -3495,3 +3498,54 @@ class Ticket22429Tests(TestCase):
 
         queryset = Student.objects.filter(~Q(classroom__school=F('school')))
         self.assertQuerysetEqual(queryset, [st2], lambda x: x)
+
+
+class Ticket22550Tests(TestCase):
+    def setUp(self):
+        ModelWithoutOrdering.objects.create(name='name1', order_number=1)
+        ModelWithoutOrdering.objects.create(name='name2', order_number=2)
+        ModelWithOrdering.objects.create(name='name1', order_number=1)
+        ModelWithOrdering.objects.create(name='name2', order_number=2)
+
+    def test_ticket_22550(self):
+        qs_no = ModelWithoutOrdering.objects.all()
+        qs_do = ModelWithOrdering.objects.all()
+        # using explicit sort order
+        self.assertQuerysetEqual(
+            qs_no.order_by('order_number').reverse(),
+            ['<ModelWithoutOrdering: name2>', '<ModelWithoutOrdering: name1>']
+        )
+        self.assertEqual(repr(qs_no.order_by('-order_number').last()), '<ModelWithoutOrdering: name1>')
+        # using implicit sorder
+        self.assertQuerysetEqual(
+            qs_do.reverse(),
+            ['<ModelWithOrdering: name2>', '<ModelWithOrdering: name1>']
+        )
+        # overriding default sort order
+        self.assertEqual(repr(qs_do.order_by('-order_number').last()), '<ModelWithOrdering: name1>')
+        # After slicing, reordering should no longer work.
+        qs_no_slice = qs_no.order_by('order_number')[0:2]
+        qs_do_slice = qs_do[0:2]
+        self.assertRaisesMessage(
+            AssertionError,
+            'Cannot change a query once a slice has been taken',
+            qs_no_slice.reverse
+        )
+        self.assertRaisesMessage(
+            AssertionError,
+            'Cannot change a query once a slice has been taken',
+            qs_no_slice.last
+        )
+        self.assertRaisesMessage(
+            AssertionError,
+            'Cannot change a query once a slice has been taken',
+            qs_do_slice.reverse
+        )
+        self.assertRaisesMessage(
+            AssertionError,
+            'Cannot change a query once a slice has been taken',
+            qs_do_slice.last
+        )
+        # Maintain functionality of first(), as that does not require reordering.
+        self.assertEqual(repr(qs_no_slice.first()), '<ModelWithoutOrdering: name1>')
+        self.assertEqual(repr(qs_do_slice.first()), '<ModelWithOrdering: name1>')

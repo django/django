@@ -362,6 +362,10 @@ every *second* object of the first 10::
 
     >>> Entry.objects.all()[:10:2]
 
+Filtering and ordering operations are not possible after slicing, as they would
+lead to inconsistent results across different database backends. For pagination
+purposes, filters and sorting should be applied before slicing.
+
 To retrieve a *single* object rather than a list
 (e.g. ``SELECT foo FROM bar LIMIT 1``), use a simple index instead of a
 slice. For example, this returns the first ``Entry`` in the database, after
