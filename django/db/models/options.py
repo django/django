@@ -321,6 +321,14 @@ class Options(object):
                 model.add_to_class('id', auto)
 
     def _expire_cache(self):
+        #if hasattr(self, 'fields'):
+            #del self.fields
+        #if hasattr(self, 'local_fields'):
+            #del self.local_fields
+        #if hasattr(self, 'local_concrete_fields'):
+            #del self.local_concrete_fields
+        #if hasattr(self, 'many_to_many'):
+            #del self.many_to_many
         self._field_map_cache = {}
         self._get_new_fields_cache = {}
 
@@ -430,7 +438,7 @@ class Options(object):
         return None
     swapped = property(_swapped)
 
-    @property
+    @cached_property
     def fields(self):
         # get_fields(local=RECURSIVE)
         """
@@ -447,13 +455,13 @@ class Options(object):
             #self._fill_fields_cache()
         #return self._field_name_cache
 
-    @property
+    @cached_property
     def concrete_fields(self):
         return list(self.get_new_fields(types=DATA, opts=CONCRETE))
         # get_fields(local=RECURSIVE | CONCRETE)
         #return [f for f in self.fields if f.column is not None]
 
-    @property
+    @cached_property
     def local_concrete_fields(self):
         return self.get_new_fields(types=DATA, opts=CONCRETE | LOCAL_ONLY)
         # get_fields(local=CONCRETE)
@@ -488,7 +496,8 @@ class Options(object):
         self._field_cache = tuple(cache)
         self._field_name_cache = [x for x, _ in cache]
 
-    def _many_to_many(self):
+    @cached_property
+    def many_to_many(self):
         #get_fields(m2m=RECURSIVE)
         return list(self.get_new_fields(types=M2M))
         #try:
@@ -496,7 +505,6 @@ class Options(object):
         #except AttributeError:
             #self._fill_m2m_cache()
         #return list(self._m2m_cache)
-    many_to_many = property(_many_to_many)
 
     def get_m2m_with_model(self):
         #get_fields(m2m=RECURSIVE)
