@@ -69,7 +69,6 @@ class Options(object):
     def __init__(self, meta, app_label=None):
         self._map_details_cache = {}
         self._map_model_cache = {}
-        self._field_map_cache = {}
         self._get_new_fields_cache = {}
         self.local_fields = []
         self.local_many_to_many = []
@@ -142,23 +141,11 @@ class Options(object):
         return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
     def get_new_field(self, field_name, include_relations=False):
-        types = ALL if include_relations else NON_RELATED_FIELDS
+        selected_map = self.field_map if include_relations else self.concrete_field_map
         try:
-            field_map = self._field_map_cache[types]
-            try:
-                return field_map[field_name]
-            except KeyError:
-                raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
+            return selected_map[field_name]
         except KeyError:
-            res = {}
-            for field, names in self.get_new_fields(types=types, recursive=True).iteritems():
-                for name in names:
-                    res[name] = field
-            self._field_map_cache[types] = res
-            try:
-                return res[field_name]
-            except KeyError:
-                raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
+            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
     def get_new_fields(self, types, opts=NONE, recursive=False):
 
@@ -334,7 +321,14 @@ class Options(object):
             del self.local_concrete_fields
         except AttributeError:
             pass
-        self._field_map_cache = {}
+        try:
+            del self.field_map
+        except AttributeError:
+            pass
+        try:
+            del self.concrete_field_map
+        except AttributeError:
+            pass
         self._get_new_fields_cache = {}
 
     def add_field(self, field):
@@ -420,6 +414,22 @@ class Options(object):
                     return swapped_for
         return None
     swapped = property(_swapped)
+
+    @cached_property
+    def field_map(self):
+        res = {}
+        for field, names in self.get_new_fields(types=ALL, recursive=True).iteritems():
+            for name in names:
+                res[name] = field
+        return res
+
+    @cached_property
+    def concrete_field_map(self):
+        res = {}
+        for field, names in self.get_new_fields(types=NON_RELATED_FIELDS, recursive=True).iteritems():
+            for name in names:
+                res[name] = field
+        return res
 
     @cached_property
     def fields(self):
