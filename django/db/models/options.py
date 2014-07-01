@@ -451,8 +451,6 @@ class Options(object):
     @cached_property
     def concrete_fields(self):
         return list(self.get_new_fields(types=DATA, opts=CONCRETE))
-        # get_fields(local=RECURSIVE | CONCRETE)
-        #return [f for f in self.fields if f.column is not None]
 
     @cached_property
     def local_concrete_fields(self):

@@ -258,10 +258,7 @@ class QuerySet(object):
             for field in self.model._meta.get_new_fields(types=DATA, opts=CONCRETE):
                 field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
                 model = field.model if field_is_direct else field.parent_model._meta.concrete_model
-                if model == self.model._meta.model:
-                    model = None
-                # TODO: refactor this stange bit
-                if model is None:
+                if model is self.model._meta.model:
                     model = self.model
                 try:
                     if field.name in only_load[model]:
