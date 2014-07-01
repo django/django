@@ -605,7 +605,7 @@ class Query(object):
                 if not is_reverse_o2o(source):
                     must_include[old_model].add(source)
                 add_to_dict(must_include, cur_model, opts.pk)
-            field = opts.get_new_field(parts[-1])
+            field = opts.get_new_field(parts[-1], True)
             direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
             model = field.model if direct else field.parent_model._meta.concrete_model
             if model == opts.model:
