@@ -2826,6 +2826,20 @@ This would allow you to refer to the local file
 
     <a href="{% static "downloads/polls_20101022.tar.gz" %}">
 
+.. setting:: STATICFILES_IGNORE_PATTERNS 
+ 
+STATICFILES_IGNORE_PATTERNS 
+--------------------------- 
+ 
+.. versionadded:: 1.8
+ 
+Default: ``['CVS', '.*', '*~']`` 
+ 
+List of file patterns which will be ignored when collecting static files with 
+the :djadmin:`collectstatic` management command. 
+ 
+This list can be further extended with command line option ``-i``. 
+
 .. setting:: STATICFILES_STORAGE
 
 STATICFILES_STORAGE

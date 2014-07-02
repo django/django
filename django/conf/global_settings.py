@@ -602,6 +602,8 @@ STATICFILES_FINDERS = (
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+STATICFILES_IGNORE_PATTERNS = ['CVS', '.*', '*~']
+
 ##############
 # MIGRATIONS #
 ##############
