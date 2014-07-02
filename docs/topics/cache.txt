@@ -296,8 +296,9 @@ Local-memory caching
 This is the default cache if another is not specified in your settings file. If
 you want the speed advantages of in-memory caching but don't have the capability
 of running Memcached, consider the local-memory cache backend. This cache is
-multi-process and thread-safe. To use it, set :setting:`BACKEND <CACHES-BACKEND>`
-to ``"django.core.cache.backends.locmem.LocMemCache"``. For example::
+per-process (see below) and thread-safe. To use it, set :setting:`BACKEND
+<CACHES-BACKEND>` to ``"django.core.cache.backends.locmem.LocMemCache"``. For
+example::
 
     CACHES = {
         'default': {
