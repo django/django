@@ -299,7 +299,7 @@ class SQLCompiler(object):
         # be used by local fields.
         seen_models = {None: start_alias}
 
-        for field in opts.get_new_fields(types=DATA, opts=CONCRETE):
+        for field in opts.concrete_fields:
             field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
             model = field.model if field_is_direct else field.parent_model._meta.concrete_model
             if model == opts.model:
@@ -639,7 +639,7 @@ class SQLCompiler(object):
             else:
                 restricted = False
 
-        for f in opts.get_new_fields(types=DATA):
+        for f in opts.fields:
             # TODO: deprecated
             # The get_fields_with_model() returns None for fields that live
             # in the field's local model. So, for those fields we want to use

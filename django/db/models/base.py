@@ -681,7 +681,7 @@ class Model(six.with_metaclass(ModelBase)):
         for a single table.
         """
         meta = cls._meta
-        non_pks = [f for f in meta.get_new_fields(types=DATA, opts=CONCRETE | LOCAL_ONLY) if not f.primary_key]
+        non_pks = [f for f in meta.local_concrete_fields if not f.primary_key]
 
         if update_fields:
             non_pks = [f for f in non_pks
@@ -713,7 +713,7 @@ class Model(six.with_metaclass(ModelBase)):
                     **{field.name: getattr(self, field.attname)}).count()
                 self._order = order_value
 
-            fields = meta.get_new_fields(types=DATA, opts=CONCRETE | LOCAL_ONLY)
+            fields = meta.local_concrete_fields
             if not pk_set:
                 fields = [f for f in fields if not isinstance(f, AutoField)]
 

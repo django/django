@@ -944,7 +944,7 @@ class Query(object):
         root_alias = self.tables[0]
         seen = {None: root_alias}
 
-        for field in opts.get_new_fields(types=DATA):
+        for field in opts.fields:
             direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
             model = field.model if direct else field.parent_model._meta.concrete_model
             if model == opts.model:

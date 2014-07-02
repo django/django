@@ -471,7 +471,7 @@ class Options(object):
 
     def get_concrete_fields_with_model(self):
         return list(map(self._map_model, self.get_new_fields(types=DATA, opts=CONCRETE)))
-            
+
     def _fill_fields_cache(self):
         cache = []
         for parent in self.parents:

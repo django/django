@@ -126,7 +126,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         seen = self.query.included_inherited_models.copy()
         if start_alias:
             seen[None] = start_alias
-        for field in opts.get_new_fields(types=DATA, opts=CONCRETE):
+        for field in opts.concrete_fields:
             field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
             model = field.model if field_is_direct else field.parent_model._meta.concrete_model
             if model == opts.model:

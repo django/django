@@ -255,7 +255,7 @@ class QuerySet(object):
         # If only/defer clauses have been specified,
         # build the list of fields that are to be loaded.
         if only_load:
-            for field in self.model._meta.get_new_fields(types=DATA, opts=CONCRETE):
+            for field in self.model._meta.concrete_fields:
                 field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
                 model = field.model if field_is_direct else field.parent_model._meta.concrete_model
                 if model is self.model._meta.model:
@@ -423,7 +423,7 @@ class QuerySet(object):
             return objs
         self._for_write = True
         connection = connections[self.db]
-        fields = self.model._meta.get_new_fields(types=DATA, opts=LOCAL_ONLY | CONCRETE)
+        fields = self.model._meta.local_concrete_fields
         with transaction.atomic(using=self.db, savepoint=False):
             if (connection.features.can_combine_inserts_with_and_without_auto_increment_pk
                     and self.model._meta.has_auto_field):
@@ -1358,7 +1358,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         skip = set()
         init_list = []
         # Build the list of fields that *haven't* been requested
-        for field in klass._meta.get_new_fields(types=DATA, opts=CONCRETE):
+        for field in klass._meta.concrete_fields:
             field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
             model = field.model if field_is_direct else field.parent_model._meta.concrete_model
             if model == klass._meta.model:
@@ -1383,9 +1383,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
 
         field_count = len(klass._meta.concrete_fields)
         # Check if we need to skip some parent fields.
-        local_concrete_fields = klass._meta.get_new_fields(types=DATA, opts=LOCAL_ONLY | CONCRETE)
-        concrete_fields = klass._meta.get_new_fields(types=DATA, opts=CONCRETE)
-        if from_parent and len(local_concrete_fields) != len(concrete_fields):
+        if from_parent and len(klass._meta.local_concrete_fields) != len(klass._meta.concrete_fields):
             # Only load those fields which haven't been already loaded into
             # 'from_parent'.
             non_seen_models = [p for p in klass._meta.get_parent_list()
@@ -1504,7 +1502,7 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
     for f, klass_info in reverse_related_fields:
         # Transfer data from this object to childs.
         parent_data = []
-        for rel_field in klass_info[0]._meta.get_new_fields(types=DATA):
+        for rel_field in klass_info[0]._meta.fields:
             direct = isinstance(rel_field, Field) or hasattr(rel_field, 'is_gfk')
             rel_model = rel_field.model if direct else rel_field.parent_model._meta.concrete_model
             if rel_model == klass_info[0]._meta.model:
