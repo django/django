@@ -14,7 +14,6 @@ from django.utils.functional import conditional_cached_property, cached_property
 from django.utils.text import camel_case_to_spaces
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
-from django.utils.lru_cache import lru_cache
 from django.db.models.fields import Field
 
 
@@ -179,7 +178,6 @@ class Options(object):
         if types & RELATED_OBJECTS:
             parent_list = self.get_parent_list()
             related_fields = OrderedDict()
-            # ERROR? check
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
                     for obj, query_name in parent._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN, recursive=True).iteritems():
@@ -418,7 +416,7 @@ class Options(object):
     @cached_property
     def field_map(self):
         res = {}
-        for field, names in self.get_new_fields(types=ALL, recursive=True).iteritems():
+        for field, names in six.iteritems(self.get_new_fields(types=ALL, recursive=True)):
             for name in names:
                 res[name] = field
         return res
@@ -426,14 +424,13 @@ class Options(object):
     @cached_property
     def concrete_field_map(self):
         res = {}
-        for field, names in self.get_new_fields(types=NON_RELATED_FIELDS, recursive=True).iteritems():
+        for field, names in six.iteritems(self.get_new_fields(types=NON_RELATED_FIELDS, recursive=True)):
             for name in names:
                 res[name] = field
         return res
 
     @cached_property
     def fields(self):
-        # get_fields(local=RECURSIVE)
         """
         The getter for self.fields. This returns the list of field objects
         available to this model (including through parent models).
