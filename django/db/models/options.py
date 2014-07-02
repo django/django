@@ -141,23 +141,24 @@ class Options(object):
         models = self.apps.get_models(include_auto_created=False)
         return apps.ready, filter(lambda a: not a._meta.swapped, models)
 
-    def _get_field_map(self, types=ALL):
+    def get_new_field(self, field_name, include_relations=False):
+        types = ALL if include_relations else NON_RELATED_FIELDS
         try:
-            return self._field_map_cache[types]
+            field_map = self._field_map_cache[types]
+            try:
+                return field_map[field_name]
+            except KeyError:
+                raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
         except KeyError:
             res = {}
             for field, names in self.get_new_fields(types=types, recursive=True).iteritems():
                 for name in names:
                     res[name] = field
             self._field_map_cache[types] = res
-            return res
-
-    def get_new_field(self, field_name, include_relations=False):
-        try:
-            types = ALL if include_relations else NON_RELATED_FIELDS
-            return self._get_field_map(types)[field_name]
-        except KeyError:
-            raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
+            try:
+                return res[field_name]
+            except KeyError:
+                raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
     def get_new_fields(self, types, opts=NONE, recursive=False):
 
