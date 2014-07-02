@@ -86,8 +86,8 @@ from the database.
 In addition to creating the new model, the ``from_db()`` method must set the
 ``adding`` and ``db`` flags in the new instance's ``_state`` attribute.
 
-Below is an example showing how torecord the initial values of fields that
-are loaded from the database:: 
+Below is an example showing how to record the initial values of fields that
+are loaded from the database::
 
     @classmethod
     def from_db(cls, db, field_names, values):
