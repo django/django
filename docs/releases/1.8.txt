@@ -391,6 +391,13 @@ Miscellaneous
 
 * Support for SpatiaLite < 2.4 has been dropped.
 
+* ``ForeignKey.default_error_message['invalid']`` has been changed from
+  ``'%(model)s instance with pk %(pk)r does not exist.'`` to
+  ``'%(model)s instance with %(field)s %(value)r does not exist.'`` If you are
+  using this message in your own code, please update the list of interpolated
+  parameters. Internally, Django will continue to provide the
+  ``pk`` parameter in ``params`` for backwards compatibility.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
