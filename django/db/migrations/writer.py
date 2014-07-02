@@ -158,6 +158,12 @@ class MigrationWriter(object):
         # See if we can import the migrations module directly
         try:
             migrations_module = import_module(migrations_package_name)
+
+            # Python 3 fails when the migrations directory does not have a
+            # __init__.py file
+            if not hasattr(migrations_module, '__file__'):
+                raise ImportError
+
             basedir = os.path.dirname(migrations_module.__file__)
         except ImportError:
             app_config = apps.get_app_config(self.migration.app_label)

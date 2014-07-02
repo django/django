@@ -439,7 +439,7 @@ class MigrationAutodetector(object):
             for base in model_state.bases:
                 if isinstance(base, six.string_types) and "." in base:
                     base_app_label, base_name = base.split(".", 1)
-                    dependencies.append((base_app_label, base_name, None, False))
+                    dependencies.append((base_app_label, base_name, None, True))
             # Generate creation operation
             self.add_operation(
                 app_label,
@@ -762,33 +762,26 @@ class MigrationAutodetector(object):
                     )
                 )
 
-    def generate_altered_unique_together(self):
+    def _generate_altered_foo_together(self, operation):
+        option_name = operation.option_name
         for app_label, model_name in sorted(self.kept_model_keys):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
-            if old_model_state.options.get("unique_together", None) != new_model_state.options.get("unique_together", None):
+            if old_model_state.options.get(option_name) != new_model_state.options.get(option_name):
                 self.add_operation(
                     app_label,
-                    operations.AlterUniqueTogether(
+                    operation(
                         name=model_name,
-                        unique_together=new_model_state.options['unique_together'],
+                        **{option_name: new_model_state.options.get(option_name)}
                     )
                 )
 
+    def generate_altered_unique_together(self):
+        self._generate_altered_foo_together(operations.AlterUniqueTogether)
+
     def generate_altered_index_together(self):
-        for app_label, model_name in sorted(self.kept_model_keys):
-            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
-            old_model_state = self.from_state.models[app_label, old_model_name]
-            new_model_state = self.to_state.models[app_label, model_name]
-            if old_model_state.options.get("index_together", None) != new_model_state.options.get("index_together", None):
-                self.add_operation(
-                    app_label,
-                    operations.AlterIndexTogether(
-                        name=model_name,
-                        index_together=new_model_state.options['index_together'],
-                    )
-                )
+        self._generate_altered_foo_together(operations.AlterIndexTogether)
 
     def generate_altered_options(self):
         """

@@ -8,11 +8,7 @@ class Relation(models.Model):
     pass
 
 
-# Models
 class AbstractPerson(models.Model):
-    class Meta:
-        abstract = True
-
     # DATA fields
     data_abstract = models.CharField(max_length=10)
     fk_abstract = models.ForeignKey(Relation, related_name='fk_abstract_rel')
@@ -27,7 +23,7 @@ class AbstractPerson(models.Model):
         Relation,
         from_fields=['abstract_non_concrete_id'],
         to_fields=['id'],
-        related_name='fo_abstract_rel'
+        related_name='fo_abstract_rel',
     )
 
     # GFK fields
@@ -37,6 +33,9 @@ class AbstractPerson(models.Model):
 
     # GR fields
     generic_relation_abstract = GenericRelation(Relation)
+
+    class Meta:
+        abstract = True
 
 
 class BasePerson(AbstractPerson):
@@ -52,8 +51,9 @@ class BasePerson(AbstractPerson):
     # VIRTUAL fields
     data_not_concrete_base = models.ForeignObject(
         Relation,
-        from_fields=['base_non_concrete_id'], to_fields=['id'],
-        related_name='fo_base_rel'
+        from_fields=['base_non_concrete_id'],
+        to_fields=['id'],
+        related_name='fo_base_rel',
     )
 
     # GFK fields
@@ -78,8 +78,9 @@ class Person(BasePerson):
     # VIRTUAL fields
     data_not_concrete_inherited = models.ForeignObject(
         Relation,
-        from_fields=['model_non_concrete_id'], to_fields=['id'],
-        related_name='fo_concrete_rel'
+        from_fields=['model_non_concrete_id'],
+        to_fields=['id'],
+        related_name='fo_concrete_rel',
     )
 
     # GFK fields
@@ -96,7 +97,6 @@ class ProxyPerson(Person):
         proxy = True
 
 
-# Models with FK pointing to Person
 class Relating(models.Model):
 
     # ForeignKey to BasePerson

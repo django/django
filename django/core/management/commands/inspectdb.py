@@ -4,11 +4,11 @@ from collections import OrderedDict
 import keyword
 import re
 
-from django.core.management.base import NoArgsCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError
 from django.db import connections, DEFAULT_DB_ALIAS
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = "Introspects the database tables in the given database and outputs a Django model module."
 
     requires_system_checks = False
@@ -20,7 +20,7 @@ class Command(NoArgsCommand):
             default=DEFAULT_DB_ALIAS, help='Nominates a database to '
             'introspect. Defaults to using the "default" database.')
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         try:
             for line in self.handle_inspection(options):
                 self.stdout.write("%s\n" % line)

@@ -4,7 +4,7 @@ import sys
 import threading
 import warnings
 
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.utils import lru_cache
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils._os import upath
@@ -116,7 +116,7 @@ class Apps(object):
         Raises an exception if the registry isn't ready.
         """
         if not self.ready:
-            raise RuntimeError("App registry isn't ready yet.")
+            raise AppRegistryNotReady()
 
     def get_app_configs(self):
         """

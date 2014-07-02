@@ -589,7 +589,7 @@ class Query(object):
         must_include = {orig_opts.concrete_model: set([orig_opts.pk])}
         for field_name in field_names:
             parts = field_name.split(LOOKUP_SEP)
-            cur_model = self.model
+            cur_model = self.model._meta.concrete_model
             opts = orig_opts
             for name in parts[:-1]:
                 old_model = cur_model
@@ -1098,6 +1098,32 @@ class Query(object):
                     (lookup, self.get_meta().model.__name__))
         return lookup_parts, field_parts, False
 
+    def check_query_object_type(self, value, opts):
+        """
+        Checks whether the object passed while querying is of the correct type.
+        If not, it raises a ValueError specifying the wrong object.
+        """
+        if hasattr(value, '_meta'):
+            if not (value._meta.concrete_model == opts.concrete_model
+                    or opts.concrete_model in value._meta.get_parent_list()
+                    or value._meta.concrete_model in opts.get_parent_list()):
+                raise ValueError(
+                    'Cannot query "%s": Must be "%s" instance.' %
+                    (value, opts.object_name))
+
+    def check_related_objects(self, field, value, opts):
+        """
+        Checks the type of object passed to query relations.
+        """
+        if field.rel:
+            # testing for iterable of models
+            if hasattr(value, '__iter__'):
+                for v in value:
+                    self.check_query_object_type(v, opts)
+            else:
+                # expecting single model instance here
+                self.check_query_object_type(value, opts)
+
     def build_lookup(self, lookups, lhs, rhs):
         lookups = lookups[:]
         while lookups:
@@ -1116,7 +1142,7 @@ class Query(object):
                 raise FieldError(
                     "Unsupported lookup '%s' for %s or join on the field not "
                     "permitted." %
-                    (lookup, lhs.output_type.__class__.__name__))
+                    (lookup, lhs.output_field.__class__.__name__))
             lookups = lookups[1:]
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
@@ -1173,6 +1199,9 @@ class Query(object):
         try:
             field, sources, opts, join_list, path = self.setup_joins(
                 parts, opts, alias, can_reuse=can_reuse, allow_many=allow_many)
+
+            self.check_related_objects(field, value, opts)
+
             # split_exclude() needs to know which joins were generated for the
             # lookup parts
             self._lookup_joins = join_list
@@ -1204,7 +1233,7 @@ class Query(object):
                     raise FieldError(
                         "Join on field '%s' not permitted. Did you "
                         "misspell '%s' for the lookup type?" %
-                        (col.output_type.name, lookups[0]))
+                        (col.output_field.name, lookups[0]))
                 if len(lookups) > 1:
                     raise FieldError("Nested lookup '%s' not supported." %
                                      LOOKUP_SEP.join(lookups))

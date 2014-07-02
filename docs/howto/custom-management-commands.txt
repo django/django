@@ -152,8 +152,8 @@ require a system-neutral string language (for which we use 'en-us').
 
 If, for some reason, your custom management command needs to use a fixed locale
 different from 'en-us', you should manually activate and deactivate it in your
-:meth:`~BaseCommand.handle` or :meth:`~NoArgsCommand.handle_noargs` method using
-the functions provided by the I18N support code:
+:meth:`~BaseCommand.handle` method using the functions provided by the I18N
+support code:
 
 .. code-block:: python
 
@@ -369,8 +369,9 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     potential problems. Serious problems are raised as a :class:`CommandError`;
     warnings are output to stderr; minor notifications are output to stdout.
 
-    If ``apps`` and ``tags`` are both None, all system checks are performed.
-    ``tags`` can be a list of check tags, like ``compatibility`` or ``models``.
+    If ``app_configs`` and ``tags`` are both ``None``, all system checks are
+    performed. ``tags`` can be a list of check tags, like ``compatibility`` or
+    ``models``.
 
 .. method:: BaseCommand.validate(app=None, display_num_errors=False)
 
@@ -430,6 +431,10 @@ Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
     string as given on the command line.
 
 .. class:: NoArgsCommand
+
+.. deprecated:: 1.8
+
+    Use :class:`BaseCommand` instead, which takes no arguments by default.
 
 A command which takes no arguments on the command line.
 

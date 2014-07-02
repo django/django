@@ -87,9 +87,11 @@ class Command(BaseCommand):
                 try:
                     migration = executor.loader.get_migration_by_prefix(app_label, migration_name)
                 except AmbiguityError:
-                    raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (app_label, migration_name))
+                    raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (
+                        migration_name, app_label))
                 except KeyError:
-                    raise CommandError("Cannot find a migration matching '%s' from app '%s'." % (app_label, migration_name))
+                    raise CommandError("Cannot find a migration matching '%s' from app '%s'." % (
+                        migration_name, app_label))
                 targets = [(app_label, migration.name)]
             target_app_labels_only = False
         elif options['app_label']:
@@ -106,8 +108,8 @@ class Command(BaseCommand):
         # Print some useful info
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
-            if run_syncdb:
-                self.stdout.write(self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") + (", ".join(executor.loader.unmigrated_apps) or "(none)"))
+            if run_syncdb and executor.loader.unmigrated_apps:
+                self.stdout.write(self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") + (", ".join(executor.loader.unmigrated_apps)))
             if target_app_labels_only:
                 self.stdout.write(self.style.MIGRATE_LABEL("  Apply all migrations: ") + (", ".join(set(a for a, n in targets)) or "(none)"))
             else:
@@ -120,19 +122,31 @@ class Command(BaseCommand):
         # If you ever manage to get rid of this, I owe you many, many drinks.
         # Note that pre_migrate is called from inside here, as it needs
         # the list of models about to be installed.
-        if run_syncdb:
+        if run_syncdb and executor.loader.unmigrated_apps:
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
             created_models = self.sync_apps(connection, executor.loader.unmigrated_apps)
         else:
             created_models = []
 
+        # The test runner requires us to flush after a syncdb but before migrations,
+        # so do that here.
+        if options.get("test_flush", False):
+            call_command(
+                'flush',
+                verbosity=max(self.verbosity - 1, 0),
+                interactive=False,
+                database=db,
+                reset_sequences=False,
+                inhibit_post_migrate=True,
+            )
+
         # Migrate!
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Running migrations:"))
         if not plan:
             if self.verbosity >= 1:
-                self.stdout.write("  No migrations needed.")
+                self.stdout.write("  No migrations to apply.")
                 # If there's changes that aren't in migrations yet, tell them how to fix it.
                 autodetector = MigrationAutodetector(
                     executor.loader.project_state(),

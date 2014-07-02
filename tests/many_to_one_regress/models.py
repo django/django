@@ -26,13 +26,17 @@ class Third(models.Model):
 
 
 class Parent(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20, unique=True)
     bestchild = models.ForeignKey('Child', null=True, related_name='favored_by')
 
 
 class Child(models.Model):
     name = models.CharField(max_length=20)
     parent = models.ForeignKey(Parent)
+
+
+class ToFieldChild(models.Model):
+    parent = models.ForeignKey(Parent, to_field='name')
 
 
 # Multiple paths to the same model (#7110, #7125)

@@ -71,6 +71,7 @@ class AutodetectorTests(TestCase):
     custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))], bases=(AbstractBaseUser, ))
     custom_user_no_inherit = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))])
     aardvark = ModelState("thirdapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
+    aardvark_based_on_author = ModelState("testapp", "Aardvark", [], bases=("testapp.Author", ))
     knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
     rabbit = ModelState("eggs", "Rabbit", [("id", models.AutoField(primary_key=True)), ("knight", models.ForeignKey("eggs.Knight")), ("parent", models.ForeignKey("eggs.Rabbit"))], {"unique_together": [("parent", "knight")]})
 
@@ -566,6 +567,44 @@ class AutodetectorTests(TestCase):
         self.assertEqual(action2.__class__.__name__, "AlterUniqueTogether")
         self.assertEqual(action2.unique_together, set([("title", "newfield")]))
 
+    def test_remove_index_together(self):
+        author_index_together = ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))
+        ], {"index_together": [("id", "name")]})
+
+        before = self.make_project_state([author_index_together])
+        after = self.make_project_state([self.author_name])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        migration = changes['testapp'][0]
+        # Right number of actions?
+        self.assertEqual(len(migration.operations), 1)
+        # Right actions?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterIndexTogether")
+        self.assertEqual(action.index_together, None)
+
+    def test_remove_unique_together(self):
+        author_unique_together = ModelState("testapp", "Author", [
+            ("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))
+        ], {"unique_together": [("id", "name")]})
+
+        before = self.make_project_state([author_unique_together])
+        after = self.make_project_state([self.author_name])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        migration = changes['testapp'][0]
+        # Right number of actions?
+        self.assertEqual(len(migration.operations), 1)
+        # Right actions?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
+        self.assertEqual(action.unique_together, None)
+
     def test_proxy(self):
         "Tests that the autodetector correctly deals with proxy models"
         # First, we test adding a proxy model
@@ -947,3 +986,19 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'thirdapp', 0, ["CreateModel", "CreateModel"])
         self.assertOperationAttributes(changes, 'thirdapp', 0, 0, name="CustomUser")
         self.assertOperationAttributes(changes, 'thirdapp', 0, 1, name="Aardvark")
+
+    @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
+    def test_bases_first(self):
+        """
+        Tests that bases of other models come first.
+        """
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([self.aardvark_based_on_author, self.author_name])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Author")
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="Aardvark")

@@ -7,7 +7,6 @@ from django.db import connection, DatabaseError, IntegrityError, OperationalErro
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField, BooleanField, BinaryField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
-from django.utils import six
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
     UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough)

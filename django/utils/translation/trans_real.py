@@ -11,6 +11,7 @@ import warnings
 
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import AppRegistryNotReady
 from django.dispatch import receiver
 from django.test.signals import setting_changed
 from django.utils.deprecation import RemovedInDjango19Warning
@@ -160,7 +161,14 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _add_installed_apps_translations(self):
         """Merges translations from each installed app."""
-        for app_config in reversed(list(apps.get_app_configs())):
+        try:
+            app_configs = reversed(list(apps.get_app_configs()))
+        except AppRegistryNotReady:
+            raise AppRegistryNotReady(
+                "The translation infrastructure cannot be initialized before the "
+                "apps registry is ready. Check that you don't make non-lazy "
+                "gettext calls at import time.")
+        for app_config in app_configs:
             localedir = os.path.join(app_config.path, 'locale')
             translation = self._new_gnu_trans(localedir)
             self.merge(translation)

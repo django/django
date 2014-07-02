@@ -46,6 +46,9 @@ Minor features
 * :class:`~django.contrib.auth.forms.PasswordResetForm` now
   has a method :meth:`~django.contrib.auth.forms.PasswordResetForm.send_email`
   that can be overridden to customize the mail to be sent.
+* The ``max_length`` of :attr:`Permission.name
+  <django.contrib.auth.models.Permission.name>` has been increased from 50 to
+  255 characters. Please run the database migration.
 
 :mod:`django.contrib.formtools`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -83,7 +86,8 @@ Minor features
 :mod:`django.contrib.sitemaps`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The new :attr:`Sitemap.i18n <django.contrib.sitemaps.Sitemap.i18n>` attribute
+  allows you to generate a sitemap based on the :setting:`LANGUAGES` setting.
 
 :mod:`django.contrib.sites`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -178,12 +182,20 @@ Models
 * Django now logs at most 9000 queries in ``connections.queries``, in order
   to prevent excessive memory usage in long-running processes in debug mode.
 
+* There is now a model ``Meta`` option to define a
+  :attr:`default related name <django.db.models.Options.default_related_name>`
+  for all relational fields of a model.
+
 * Pickling models and querysets across different versions of Django isn't
   officially supported (it may work, but there's no guarantee). An extra
   variable that specifies the current Django version is now added to the
   pickled state of models and querysets, and Django raises a ``RuntimeWarning``
   when these objects are unpickled in a different version than the one in
   which they were pickled.
+
+* Added :meth:`Model.from_db() <django.db.models.Model.from_db()>` which
+  Django uses whenever objects are loaded using the ORM. The method allows
+  customizing model loading behavior.
 
 Signals
 ^^^^^^^
@@ -205,6 +217,21 @@ Requests and Responses
 * The :meth:`HttpRequest.build_absolute_uri()
   <django.http.HttpRequest.build_absolute_uri>` method now handles paths
   starting with ``//`` correctly.
+
+* If :setting:`DEBUG` is ``True`` and a request raises a
+  :exc:`~django.core.exceptions.SuspiciousOperation`, the response will be
+  rendered with a detailed error page.
+
+* The ``query_string`` argument of :class:`~django.http.QueryDict` is now
+  optional, defaulting to ``None``, so a blank ``QueryDict`` can now be
+  instantiated with ``QueryDict()`` instead of ``QueryDict(None)`` or
+  ``QueryDict('')``.
+
+* The ``GET`` and ``POST`` attributes of an :class:`~django.http.HttpRequest`
+  object are now :class:`~django.http.QueryDict`\s rather than dictionaries,
+  and the ``FILES`` attribute is now a ``MultiValueDict``.
+  This brings this class into line with the documentation and with
+  ``WSGIRequest``.
 
 Tests
 ^^^^^
@@ -304,6 +331,43 @@ Now to implement the same behavior, you have to create an
 ``add_arguments(cls, parser)`` class method on the test runner and call
 ``parser.add_argument`` to add any custom arguments, as parser is now an
 :py:class:`argparse.ArgumentParser` instance.
+
+Model check ensures auto-generated column names are within limits specified by database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A field name that's longer than the column name length supported by a database
+can create problems. For example, with MySQL you'll get an exception trying to
+create the column, and with PostgreSQL the column name is truncated by the
+database (you may see a warning in the PostgreSQL logs).
+
+A model check has been introduced to better alert users to this scenario before
+the actual creation of database tables.
+
+If you have an existing model where this check seems to be a false positive,
+for example on PostgreSQL where the name was already being truncated, simply
+use :attr:`~django.db.models.Field.db_column` to specify the name that's being
+used.
+
+The check also applies to the columns generated in an implicit
+``ManyToManyField.through`` model. If you run into an issue there, use
+:attr:`~django.db.models.ManyToManyField.through` to create an explicit model
+and then specify :attr:`~django.db.models.Field.db_column` on its column(s)
+as needed.
+
+Query relation lookups now check object types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Querying for model lookups now checks if the object passed is of correct type
+and raises a :exc:`ValueError` if not. Previously, Django didn't care if the
+object was of correct type; it just used the object's related field attribute
+(e.g. ``id``) for the lookup. Now, an error is raised to prevent incorrect
+lookups::
+
+    >>> book = Book.objects.create(name="Django")
+    >>> book = Book.objects.filter(author=book)
+    Traceback (most recent call last):
+    ...
+    ValueError: Cannot query "<Book: Django>": Must be "Author" instance.
 
 Miscellaneous
 ~~~~~~~~~~~~~
@@ -445,3 +509,26 @@ to add custom arguments to commands has changed: instead of extending the
 :meth:`~django.core.management.BaseCommand.add_arguments` method and add
 arguments through ``argparse.add_argument()``. See
 :ref:`this example <custom-commands-options>` for more details.
+
+``django.core.management.NoArgsCommand``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The class :class:`~django.core.management.NoArgsCommand` is now deprecated and
+will be removed in Django 2.0. Use :class:`~django.core.management.BaseCommand`
+instead, which takes no arguments by default.
+
+``cache_choices`` option of ``ModelChoiceField`` and ``ModelMultipleChoiceField``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:class:`~django.forms.ModelChoiceField` and
+:class:`~django.forms.ModelMultipleChoiceField` took an undocumented, untested
+option ``cache_choices``. This cached querysets between multiple renderings of
+the same ``Form`` object. This option is subject to an accelerated deprecation
+and will be removed in Django 1.9.
+
+``django.template.resolve_variable()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The function has been informally marked as "Deprecated" for some time. Replace
+``resolve_variable(path, context)`` with
+``django.template.Variable(path).resolve(context)``.

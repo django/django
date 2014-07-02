@@ -195,7 +195,7 @@ class ArrayLenTransform(Transform):
     lookup_name = 'len'
 
     @property
-    def output_type(self):
+    def output_field(self):
         return IntegerField()
 
     def as_sql(self, qn, connection):
@@ -218,7 +218,7 @@ class IndexTransform(Transform):
         return '%s[%s]' % (lhs, self.index), params
 
     @property
-    def output_type(self):
+    def output_field(self):
         return self.base_field
 
 

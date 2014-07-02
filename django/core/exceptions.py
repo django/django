@@ -12,6 +12,11 @@ class DjangoRuntimeWarning(RuntimeWarning):
     pass
 
 
+class AppRegistryNotReady(Exception):
+    """The django.apps registry is not populated yet"""
+    pass
+
+
 class ObjectDoesNotExist(Exception):
     """The requested object does not exist"""
     silent_variable_failure = True

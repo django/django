@@ -95,6 +95,23 @@ Django quotes column and table names behind the scenes.
     setting, if set. If the backend doesn't support tablespaces, this option is
     ignored.
 
+``default_related_name``
+------------------------
+
+.. attribute:: Options.default_related_name
+
+.. versionadded:: 1.8
+
+    The name that will be used by default for the relation from a related object
+    back to this one. The default is ``<model_name>_set``.
+
+    As the reverse name for a field should be unique, be careful if you intend
+    to subclass your model. To work around name collisions, part of the name
+    should contain ``'%(app_label)s'`` and ``'%(model_name)s'``, which are
+    replaced respectively by the name of the application the model is in,
+    and the name of the model, both lowercased. See the paragraph on
+    :ref:`related names for abstract models <abstract-related-name>`.
+
 ``get_latest_by``
 -----------------
 

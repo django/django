@@ -530,7 +530,7 @@ class RegexField(CharField):
         'Enter a valid value' is too generic for you.
         """
         # error_message is just kept for backwards compatibility:
-        if error_message:
+        if error_message is not None:
             error_messages = kwargs.get('error_messages') or {}
             error_messages['invalid'] = error_message
             kwargs['error_messages'] = error_messages

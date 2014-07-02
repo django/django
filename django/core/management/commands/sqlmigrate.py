@@ -35,9 +35,11 @@ class Command(BaseCommand):
         try:
             migration = executor.loader.get_migration_by_prefix(app_label, migration_name)
         except AmbiguityError:
-            raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (app_label, migration_name))
+            raise CommandError("More than one migration matches '%s' in app '%s'. Please be more specific." % (
+                migration_name, app_label))
         except KeyError:
-            raise CommandError("Cannot find a migration matching '%s' from app '%s'. Is it in INSTALLED_APPS?" % (app_label, migration_name))
+            raise CommandError("Cannot find a migration matching '%s' from app '%s'. Is it in INSTALLED_APPS?" % (
+                migration_name, app_label))
         targets = [(app_label, migration.name)]
 
         # Make a plan that represents just the requested migrations and show SQL

@@ -155,7 +155,7 @@ class MigrationLoader(object):
                 if key[1] == "__first__":
                     return list(self.graph.root_nodes(key[0]))[0]
                 else:
-                    return list(self.graph.root_nodes(key[0]))[-1]
+                    return list(self.graph.leaf_nodes(key[0]))[0]
             except IndexError:
                 if self.ignore_no_migrations:
                     return None
@@ -223,8 +223,19 @@ class MigrationLoader(object):
         self.graph = MigrationGraph()
         for key, migration in normal.items():
             self.graph.add_node(key, migration)
+        # Add all internal dependencies first to ensure __first__ dependencies
+        # find the correct root node.
         for key, migration in normal.items():
             for parent in migration.dependencies:
+                if parent[0] != key[0] or parent[1] == '__first__':
+                    # Ignore __first__ references to the same app (#22325)
+                    continue
+                self.graph.add_dependency(key, parent)
+        for key, migration in normal.items():
+            for parent in migration.dependencies:
+                if parent[0] == key[0]:
+                    # Internal dependencies already added.
+                    continue
                 parent = self.check_key(parent, key[0])
                 if parent is not None:
                     self.graph.add_dependency(key, parent)

@@ -423,7 +423,7 @@ Atom1Feed
 .. module:: django.utils.functional
     :synopsis: Functional programming tools.
 
-.. class:: cached_property(object)
+.. class:: cached_property(object, name)
 
     The ``@cached_property`` decorator caches the result of a method with a
     single ``self`` argument as a property. The cached result will persist
@@ -482,6 +482,24 @@ Atom1Feed
     based on ``datetime.now()``, or simply if a change were saved to the
     database by some other process in the brief interval between subsequent
     invocations of a method on the same instance.
+
+    .. versionadded:: 1.8
+
+    You can use the ``name`` argument to make cached properties of other
+    methods. For example, if you had an expensive ``get_friends()`` method and
+    wanted to allow calling it without retrieving the cached value, you could
+    write::
+
+        friends = cached_property(get_friends, name='friends')
+
+    While ``person.get_friends()`` will recompute the friends on each call, the
+    value of the cached property will persist until you delete it as described
+    above::
+
+        x = person.friends         # calls first time
+        y = person.get_friends()   # calls again
+        z = person.friends         # does not call
+        x is z                     # is True
 
 .. function:: allow_lazy(func, *resultclasses)
 

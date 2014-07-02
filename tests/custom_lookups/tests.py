@@ -46,7 +46,7 @@ class YearTransform(models.Transform):
         return connection.ops.date_extract_sql('year', lhs_sql), params
 
     @property
-    def output_type(self):
+    def output_field(self):
         return models.IntegerField()
 
 
@@ -98,7 +98,7 @@ class SQLFunc(models.Lookup):
         return '%s()', [self.name]
 
     @property
-    def output_type(self):
+    def output_field(self):
         return CustomField()
 
 
@@ -342,7 +342,7 @@ class TrackCallsYearTransform(YearTransform):
         return connection.ops.date_extract_sql('year', lhs_sql), params
 
     @property
-    def output_type(self):
+    def output_field(self):
         return models.IntegerField()
 
     def get_lookup(self, lookup_name):

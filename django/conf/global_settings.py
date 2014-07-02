@@ -259,11 +259,6 @@ ABSOLUTE_URL_OVERRIDES = {}
 # Example: ('/home/html', '/var/www')
 ALLOWED_INCLUDE_ROOTS = ()
 
-# If this is an admin settings module, this should be a list of
-# settings modules (in the format 'foo.bar.baz') for which this admin
-# is an admin.
-ADMIN_FOR = ()
-
 # List of compiled regular expression objects representing URLs that need not
 # be reported by BrokenLinkEmailsMiddleware. Here are a few examples:
 #    import re

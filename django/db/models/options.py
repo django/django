@@ -22,7 +22,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
-                 'select_on_save')
+                 'select_on_save', 'default_related_name')
 
 DATA = 0b00001
 M2M = 0b00010
@@ -119,6 +119,8 @@ class Options(object):
 
         # A custom app registry to use, if you're making a separate model set.
         self.apps = apps
+
+        self.default_related_name = None
 
     @property
     def app_config(self):
