@@ -161,7 +161,7 @@ class Options(object):
             related_m2m_fields = OrderedDict()
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
-                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_M2M, recursive=True).iteritems():
+                    for obj, query_name in six.iteritems(parent._meta.get_new_fields(types=RELATED_M2M, recursive=True)):
                         is_valid = not (obj.field.creation_counter < 0
                                     and obj.model not in self.get_parent_list())
                         if is_valid:
@@ -180,7 +180,7 @@ class Options(object):
             related_fields = OrderedDict()
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
-                    for obj, query_name in parent._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN, recursive=True).iteritems():
+                    for obj, query_name in six.iteritems(parent._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN, recursive=True)):
                         if not ((obj.field.creation_counter < 0
                                 or obj.field.rel.parent_link)
                                 and obj.model not in parent_list):
