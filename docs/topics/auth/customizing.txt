@@ -399,6 +399,14 @@ use as your User model.
    is created in the first migration of its app (usually called ``0001_initial``);
    otherwise, you will have dependency issues.
 
+   In addition, you may run into a CircularDependencyError when running your
+   migrations as Django won't be able to automatically break the dependency
+   loop due to the dynamic dependency. If you see this error, you should
+   break the loop by moving the models depended on by your User model
+   into a second migration (you can try making two normal models that
+   have a ForeignKey to each other and seeing how ``makemigrations`` resolves that
+   circular dependency if you want to see how it's usually done)
+
 
 Referencing the User model
 --------------------------
