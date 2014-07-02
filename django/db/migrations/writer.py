@@ -319,7 +319,7 @@ class MigrationWriter(object):
                     "and used in the same class body). Please move the "
                     "function into the main module body to use migrations.\n"
                     "For more information, see https://docs.djangoproject.com/en/1.7/topics/migrations/#serializing-values"
-                )
+                    % (value.__name__, module_name))
             return "%s.%s" % (module_name, value.__name__), set(["import %s" % module_name])
         # Classes
         elif isinstance(value, type):
