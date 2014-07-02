@@ -86,10 +86,10 @@ class FunctionalTestCase(unittest.TestCase):
 
         b = B()
         b.should_cache = False
-        self.assertNotEquals(b.value, b.value)
+        self.assertNotEqual(b.value, b.value)
 
         b.should_cache = True
-        self.assertEquals(b.value, b.value)
+        self.assertEqual(b.value, b.value)
 
     def test_lazy_equality(self):
         """
