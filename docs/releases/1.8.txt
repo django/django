@@ -207,7 +207,9 @@ Signals
 Templates
 ^^^^^^^^^
 
-* ...
+* :tfilter:`urlize` now supports domain-only links that include characters after
+  the top-level domain (e.g. ``djangoproject.com/`` and
+  ``djangoproject.com/download/``).
 
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^

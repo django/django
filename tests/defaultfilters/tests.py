@@ -264,6 +264,8 @@ class DefaultFiltersTests(TestCase):
             '<a href="http://www.google.com" rel="nofollow">www.google.com</a>')
         self.assertEqual(urlize('djangoproject.org'),
             '<a href="http://djangoproject.org" rel="nofollow">djangoproject.org</a>')
+        self.assertEqual(urlize('djangoproject.org/'),
+            '<a href="http://djangoproject.org/" rel="nofollow">djangoproject.org/</a>')
         self.assertEqual(urlize('info@djangoproject.org'),
             '<a href="mailto:info@djangoproject.org">info@djangoproject.org</a>')
 
