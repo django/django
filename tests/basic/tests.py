@@ -25,12 +25,12 @@ class ModelInstanceCreationTests(TestCase):
             pub_date=datetime(2005, 7, 28),
         )
         self.assertIsNone(a.id)
-        self.assertEquals(Article.objects.all().count(), 0)
+        self.assertEqual(Article.objects.all().count(), 0)
 
         # Save it into the database. You have to call save() explicitly.
         a.save()
         self.assertIsNotNone(a.id)
-        self.assertEquals(Article.objects.all().count(), 1)
+        self.assertEqual(Article.objects.all().count(), 1)
 
     def test_can_initialize_model_instance_using_positional_arguments(self):
         """
