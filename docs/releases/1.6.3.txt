@@ -103,7 +103,7 @@ correct types before querying.
 Additionally, developers of custom model fields are now warned via
 documentation to ensure their custom field classes will perform
 appropriate type conversions, and users of the :meth:`raw()
-<django.db.models.query.QuerySet.raw>` and :meth:`extra()
+<django.db.models.Manager.raw>` and :meth:`extra()
 <django.db.models.query.QuerySet.extra>` query methods -- which allow the
 developer to supply raw SQL or SQL fragments -- will be advised to ensure they
 perform appropriate manual type conversions prior to executing queries.
