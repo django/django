@@ -268,6 +268,8 @@ class DefaultFiltersTests(TestCase):
             '<a href="http://djangoproject.org/" rel="nofollow">djangoproject.org/</a>')
         self.assertEqual(urlize('info@djangoproject.org'),
             '<a href="mailto:info@djangoproject.org">info@djangoproject.org</a>')
+        self.assertEqual(urlize('some.organization'),
+            'some.organization'),
 
         # Check urlize with https addresses
         self.assertEqual(urlize('https://google.com'),
