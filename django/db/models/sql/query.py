@@ -620,14 +620,12 @@ class Query(object):
             # models.
             workset = {}
             for model, values in six.iteritems(seen):
-                for field in model._meta.get_new_fields(types=DATA):
+                for field in model._meta.fields:
                     if field in values:
                         continue
                     direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
                     m = field.model if direct else field.parent_model._meta.concrete_model
-                    if m == model._meta.model:
-                        m = None
-                    add_to_dict(workset, m or model, field)
+                    add_to_dict(workset, m, field)
             for model, values in six.iteritems(must_include):
                 # If we haven't included a model in workset, we don't add the
                 # corresponding must_include fields for that model, since an
@@ -947,9 +945,7 @@ class Query(object):
         for field in opts.fields:
             direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
             model = field.model if direct else field.parent_model._meta.concrete_model
-            if model == opts.model:
-                model = None
-            if model not in seen:
+            if model is not opts.model and model not in seen:
                 self.join_parent_model(opts, model, root_alias, seen)
         self.included_inherited_models = seen
 

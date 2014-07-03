@@ -1352,8 +1352,6 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         for field in klass._meta.concrete_fields:
             field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
             model = field.model if field_is_direct else field.parent_model._meta.concrete_model
-            if model == klass._meta.model:
-                model = None
             if field.name not in load_fields:
                 skip.add(field.attname)
             elif from_parent and issubclass(from_parent, model.__class__):

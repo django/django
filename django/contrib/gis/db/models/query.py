@@ -782,8 +782,6 @@ class GeoQuerySet(QuerySet):
             # use the db table for the _parent_ model instead.
             direct = isinstance(geo_field, Field) or hasattr(field, 'is_gfk')
             parent_model = geo_field.model if direct else geo_field.parent_model._meta.concrete_model
-            if parent_model == opts.model:
-                parent_model = None
             return self.query.get_compiler(self.db)._field_column(geo_field, parent_model._meta.db_table)
         else:
             return self.query.get_compiler(self.db)._field_column(geo_field)
