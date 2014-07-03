@@ -441,11 +441,6 @@ class Options(object):
         to this instance (not a copy).
         """
         return list(self.get_new_fields(types=DATA))
-        #try:
-            #self._field_name_cache
-        #except AttributeError:
-            #self._fill_fields_cache()
-        #return self._field_name_cache
 
     @cached_property
     def concrete_fields(self):
@@ -454,22 +449,14 @@ class Options(object):
     @cached_property
     def local_concrete_fields(self):
         return self.get_new_fields(types=DATA, opts=CONCRETE | LOCAL_ONLY)
-        # get_fields(local=CONCRETE)
-        #return [f for f in self.local_fields if f.column is not None]
 
     def get_fields_with_model(self):
-        # get_fields(local=RECURSIVE)
         """
         Returns a sequence of (field, model) pairs for all fields. The "model"
         element is None for fields on the current model. Mostly of use when
         constructing queries so that we know which model a field belongs to.
         """
         return list(map(self._map_model, self.get_new_fields(types=DATA)))
-        #try:
-            #self._field_cache
-        #except AttributeError:
-            #self._fill_fields_cache()
-        #return self._field_cache
 
     def get_concrete_fields_with_model(self):
         return list(map(self._map_model, self.get_new_fields(types=DATA, opts=CONCRETE)))
@@ -488,25 +475,13 @@ class Options(object):
 
     @cached_property
     def many_to_many(self):
-        #get_fields(m2m=RECURSIVE)
         return list(self.get_new_fields(types=M2M))
-        #try:
-            #self._m2m_cache
-        #except AttributeError:
-            #self._fill_m2m_cache()
-        #return list(self._m2m_cache)
 
     def get_m2m_with_model(self):
-        #get_fields(m2m=RECURSIVE)
         """
         The many-to-many version of get_fields_with_model().
         """
         return list(map(self._map_model, self.get_new_fields(types=M2M)))
-        #try:
-            #self._m2m_cache
-        #except AttributeError:
-            #self._fill_m2m_cache()
-        #return list(six.iteritems(self._m2m_cache))
 
     def _fill_m2m_cache(self):
         cache = OrderedDict()
@@ -549,16 +524,6 @@ class Options(object):
         """
         return [val for val in self.field_map.keys() if not val.endswith('+')]
 
-        #fields = filter(lambda val: not val.endswith('+'), get_fields(m2m=RECURSIVE))
-        #try:
-            #cache = self._name_map
-        #except AttributeError:
-            #cache = self.init_name_map()
-        #names = sorted(cache.keys())
-        ## Internal-only names end with "+" (symmetrical m2m related names being
-        ## the main example). Trim them.
-        #return [val for val in names if not val.endswith('+')]
-
     def init_name_map(self):
         """
         Initialises the field name -> field object mapping.
@@ -590,13 +555,14 @@ class Options(object):
         if include_proxy_eq:
             opts |= INCLUDE_PROXY
         return list(self.get_new_fields(types=RELATED_OBJECTS, opts=opts))
-        #return [k for k, v in self.get_all_related_objects_with_model(
-                #local_only=local_only, include_hidden=include_hidden,
-                #include_proxy_eq=include_proxy_eq)]
 
     def get_all_related_objects_with_model(self, local_only=False,
                                            include_hidden=False,
                                            include_proxy_eq=False):
+        """
+        Returns a list of (related-object, model) pairs. Similar to
+        get_fields_with_model().
+        """
         opts = NONE
         if local_only:
             opts |= LOCAL_ONLY
@@ -605,30 +571,6 @@ class Options(object):
         if include_proxy_eq:
             opts |= INCLUDE_PROXY
         return list(map(self._map_model, self.get_new_fields(types=RELATED_OBJECTS, opts=opts)))
-        #bits = LOCAL
-        #if not local_only:
-            #bits |= RECURSIVE
-        #if include_hidden:
-            #bits |= HIDDEN
-        #if include_proxy_eq:
-            #bits |= PROXY
-        #get_fields(related=bits)
-        """
-        Returns a list of (related-object, model) pairs. Similar to
-        get_fields_with_model().
-        """
-        #try:
-            #self._related_objects_cache
-        #except AttributeError:
-            #self._fill_related_objects_cache()
-        #predicates = []
-        #if local_only:
-            #predicates.append(lambda k, v: not v)
-        #if not include_hidden:
-            #predicates.append(lambda k, v: not k.field.rel.is_hidden())
-        #cache = (self._related_objects_proxy_cache if include_proxy_eq
-                 #else self._related_objects_cache)
-        #return [t for t in cache.items() if all(p(*t) for p in predicates)]
 
     def _fill_related_objects_cache(self):
         cache = OrderedDict()
@@ -670,13 +612,6 @@ class Options(object):
         if local_only:
             opts |= LOCAL_ONLY
         return list(self.get_new_fields(types=RELATED_M2M, opts=opts))
-        #try:
-            #cache = self._related_many_to_many_cache
-        #except AttributeError:
-            #cache = self._fill_related_many_to_many_cache()
-        #if local_only:
-            #return [k for k, v in cache.items() if not v]
-        #return list(cache)
 
     def _map_model(self, connection):
         try:
@@ -711,11 +646,6 @@ class Options(object):
         get_fields_with_model().
         """
         return list(map(self._map_model, self.get_new_fields(types=RELATED_M2M)))
-        #try:
-            #cache = self._related_many_to_many_cache
-        #except AttributeError:
-            #cache = self._fill_related_many_to_many_cache()
-        #return list(six.iteritems(cache))
 
     def _fill_related_many_to_many_cache(self):
         cache = OrderedDict()
