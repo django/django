@@ -798,6 +798,7 @@ class GeoQuerySetTest(TestCase):
         pkfield = City._meta.get_new_field('id', True)
         orig_pkfield_col = pkfield.column
         pkfield.column = None
+        City._meta._expire_cache()
         try:
             list(City.objects.all())
         finally:
