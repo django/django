@@ -87,20 +87,14 @@ class Command(BaseCommand):
                 # Get a username
                 verbose_field_name = self.username_field.verbose_name
                 while username is None:
+                    input_msg = capfirst(verbose_field_name)
+                    if default_username:
+                        input_msg += " (leave blank to use '%s')" % default_username
+                    username_rel = self.username_field.rel
+                    input_msg = force_str('%s%s: ' % (input_msg,
+                        ' (%s.%s)' % (username_rel.to._meta.object_name, username_rel.field_name) if username_rel else ''))
+                    username = self.get_input_data(self.username_field, input_msg, default_username)
                     if not username:
-                        input_msg = capfirst(verbose_field_name)
-                        if default_username:
-                            input_msg = "%s (leave blank to use '%s')" % (
-                                input_msg, default_username)
-                        raw_value = input(force_str('%s: ' % input_msg))
-
-                    if default_username and raw_value == '':
-                        raw_value = default_username
-                    try:
-                        username = self.username_field.clean(raw_value, None)
-                    except exceptions.ValidationError as e:
-                        self.stderr.write("Error: %s" % '; '.join(e.messages))
-                        username = None
                         continue
                     try:
                         self.UserModel._default_manager.db_manager(database).get_by_natural_key(username)
@@ -115,12 +109,9 @@ class Command(BaseCommand):
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = options.get(field_name)
                     while user_data[field_name] is None:
-                        raw_value = input(force_str('%s%s: ' % (capfirst(field.verbose_name), ' (%s.%s)' % (field.rel.to._meta.object_name, field.rel.field_name) if field.rel else '')))
-                        try:
-                            user_data[field_name] = field.clean(raw_value, None)
-                        except exceptions.ValidationError as e:
-                            self.stderr.write("Error: %s" % '; '.join(e.messages))
-                            user_data[field_name] = None
+                        message = force_str('%s%s: ' % (capfirst(field.verbose_name),
+                            ' (%s.%s)' % (field.rel.to._meta.object_name, field.rel.field_name) if field.rel else ''))
+                        user_data[field_name] = self.get_input_data(field, message)
 
                 # Get a password
                 while password is None:
@@ -153,3 +144,19 @@ class Command(BaseCommand):
             self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
             if options['verbosity'] >= 1:
                 self.stdout.write("Superuser created successfully.")
+
+    def get_input_data(self, field, message, default=None):
+        """
+        Override this method if you want to customize data inputs or
+        validation exceptions.
+        """
+        raw_value = input(message)
+        if default and raw_value == '':
+            raw_value = default
+        try:
+            val = field.clean(raw_value, None)
+        except exceptions.ValidationError as e:
+            self.stderr.write("Error: %s" % '; '.join(e.messages))
+            val = None
+
+        return val

@@ -40,7 +40,7 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUserWithFKManager(BaseUserManager):
     def create_superuser(self, username, email, group, password):
-        user = self.model(username=username, email_id=email, group_id=group)
+        user = self.model(username_id=username, email_id=email, group_id=group)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -96,8 +96,8 @@ class CustomUser(AbstractBaseUser):
 
 
 class CustomUserWithFK(AbstractBaseUser):
-    username = models.CharField(max_length=30, unique=True)
-    email = models.ForeignKey(Email, to_field='email')
+    username = models.ForeignKey(Email, related_name='primary')
+    email = models.ForeignKey(Email, to_field='email', related_name='secondary')
     group = models.ForeignKey(Group)
 
     custom_objects = CustomUserWithFKManager()
