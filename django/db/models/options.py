@@ -160,22 +160,19 @@ class Options(object):
         fields = OrderedDict()
 
         if types & RELATED_M2M:
-            related_m2m_fields = OrderedDict()
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
                     for obj, query_name in six.iteritems(parent._meta.get_new_fields(types=RELATED_M2M, recursive=True)):
                         is_valid = not (obj.field.creation_counter < 0
                                     and obj.model not in self.get_parent_list())
                         if is_valid:
-                            related_m2m_fields[obj] = query_name
+                            fields[obj] = query_name
 
             for model in self.non_swapped_models:
                 for f in model._meta.get_new_fields(types=M2M):
                     has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
                     if has_rel_attr and self == f.rel.to._meta:
-                        related_m2m_fields[f.related] = (f.related_query_name(),)
-
-            fields.update(related_m2m_fields)
+                        fields[f.related] = (f.related_query_name(),)
 
         if types & RELATED_OBJECTS:
             parent_list = self.get_parent_list()
@@ -186,20 +183,22 @@ class Options(object):
                         if not ((obj.field.creation_counter < 0
                                 or obj.field.rel.parent_link)
                                 and obj.model not in parent_list):
-                            related_fields[obj] = query_name
+                            if (opts & INCLUDE_HIDDEN) or not obj.field.rel.is_hidden():
+                                related_fields[obj] = query_name
 
             for model in self.non_swapped_models_auto_created:
                 for f in model._meta.get_new_fields(types=DATA | VIRTUAL, opts=INCLUDE_HIDDEN):
-                    has_rel_attr = hasattr(f, 'rel') and f.rel
-                    if has_rel_attr and f.has_class_relation:
+                    try:
+                        is_related = f.rel and f.has_class_relation
+                    except AttributeError:
+                        continue
+                    if is_related:
                         to_meta = f.rel.to._meta
                         if (to_meta == self) or ((opts & INCLUDE_PROXY)
                                 and self.concrete_model == to_meta.concrete_model):
-                            related_fields[f.related] = (f.related_query_name(),)
+                            if (opts & INCLUDE_HIDDEN) or not f.related.field.rel.is_hidden():
+                                related_fields[f.related] = (f.related_query_name(),)
 
-            if not opts & INCLUDE_HIDDEN:
-                related_fields = OrderedDict([(k, v) for k, v in related_fields.items()
-                                              if not k.field.rel.is_hidden()])
             fields.update(related_fields)
 
         if types & M2M:
