@@ -176,7 +176,6 @@ class Options(object):
 
         if types & RELATED_OBJECTS:
             parent_list = self.get_parent_list()
-            related_fields = OrderedDict()
             if not (opts & LOCAL_ONLY):
                 for parent in self.parents:
                     for obj, query_name in six.iteritems(parent._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN, recursive=True)):
@@ -184,7 +183,7 @@ class Options(object):
                                 or obj.field.rel.parent_link)
                                 and obj.model not in parent_list):
                             if (opts & INCLUDE_HIDDEN) or not obj.field.rel.is_hidden():
-                                related_fields[obj] = query_name
+                                fields[obj] = query_name
 
             for model in self.non_swapped_models_auto_created:
                 for f in model._meta.get_new_fields(types=DATA | VIRTUAL, opts=INCLUDE_HIDDEN):
@@ -197,9 +196,7 @@ class Options(object):
                         if (to_meta == self) or ((opts & INCLUDE_PROXY)
                                 and self.concrete_model == to_meta.concrete_model):
                             if (opts & INCLUDE_HIDDEN) or not f.related.field.rel.is_hidden():
-                                related_fields[f.related] = (f.related_query_name(),)
-
-            fields.update(related_fields)
+                                fields[f.related] = (f.related_query_name(),)
 
         if types & M2M:
             if not opts & LOCAL_ONLY:
