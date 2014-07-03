@@ -803,3 +803,4 @@ class GeoQuerySetTest(TestCase):
             list(City.objects.all())
         finally:
             pkfield.column = orig_pkfield_col
+            City._meta._expire_cache()
