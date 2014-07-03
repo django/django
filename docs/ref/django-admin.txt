@@ -1478,6 +1478,16 @@ it when running interactively.
 Use the ``--database`` option to specify the database into which the superuser
 object will be saved.
 
+.. versionadded:: 1.8
+
+You can subclass the management command and override ``get_input_data()`` if you
+want to customize data input and validation. Consult the source code for
+details on the existing implementation and the method's parameters. For example,
+it could be useful if you have a ``ForeignKey`` in
+:attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` and want to
+allow creating an instance instead of entering the primary key of an existing
+instance.
+
 ``django.contrib.gis``
 ----------------------
 
