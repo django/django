@@ -49,7 +49,8 @@ Minor features
 * The ``max_length`` of :attr:`Permission.name
   <django.contrib.auth.models.Permission.name>` has been increased from 50 to
   255 characters. Please run the database migration.
-* :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
+* :attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD` and
+  :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
   :class:`~django.db.models.ForeignKey`\s.
 
 :mod:`django.contrib.formtools`
