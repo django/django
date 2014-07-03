@@ -188,15 +188,14 @@ class Options(object):
             for model in self.non_swapped_models_auto_created:
                 for f in model._meta.get_new_fields(types=DATA | VIRTUAL, opts=INCLUDE_HIDDEN):
                     try:
-                        is_related = f.rel and f.has_class_relation
+                        if f.rel and f.has_class_relation:
+                            to_meta = f.rel.to._meta
+                            if (to_meta == self) or ((opts & INCLUDE_PROXY)
+                                    and self.concrete_model == to_meta.concrete_model):
+                                if (opts & INCLUDE_HIDDEN) or not f.related.field.rel.is_hidden():
+                                    fields[f.related] = (f.related_query_name(),)
                     except AttributeError:
                         continue
-                    if is_related:
-                        to_meta = f.rel.to._meta
-                        if (to_meta == self) or ((opts & INCLUDE_PROXY)
-                                and self.concrete_model == to_meta.concrete_model):
-                            if (opts & INCLUDE_HIDDEN) or not f.related.field.rel.is_hidden():
-                                fields[f.related] = (f.related_query_name(),)
 
         if types & M2M:
             if not opts & LOCAL_ONLY:
