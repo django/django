@@ -38,6 +38,24 @@ class CustomUserManager(BaseUserManager):
         return u
 
 
+class CustomUserWithFKManager(BaseUserManager):
+    def create_user(self, username, email, group, password=None):
+        user = self.model(username=username, email_id=email, group_id=group)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, email, group, password):
+        u = self.create_user(username, email=email, group=group, password=password)
+        u.is_admin = True
+        u.save(using=self._db)
+        return u
+
+
+class Email(models.Model):
+    email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
+
+
 class CustomUser(AbstractBaseUser):
     email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
     is_active = models.BooleanField(default=True)
@@ -81,6 +99,20 @@ class CustomUser(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+
+
+class CustomUserWithFK(AbstractBaseUser):
+    username = models.CharField(max_length=30, unique=True)
+    email = models.ForeignKey(Email, to_field='email')
+    group = models.ForeignKey(Group)
+
+    custom_objects = CustomUserWithFKManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email', 'group']
+
+    class Meta:
+        app_label = 'auth'
 
 
 # At this point, temporarily remove the groups and user_permissions M2M
