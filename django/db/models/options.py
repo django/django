@@ -156,7 +156,6 @@ class Options(object):
         except KeyError:
             pass
 
-        map_field_fn = lambda field: (field, (field.name, field.attname))
         fields = OrderedDict()
 
         if types & RELATED_M2M:
@@ -169,7 +168,7 @@ class Options(object):
                             fields[obj] = query_name
 
             for model in self.non_swapped_models:
-                for f in model._meta.get_new_fields(types=M2M):
+                for f in model._meta.many_to_many:
                     has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
                     if has_rel_attr and self == f.rel.to._meta:
                         fields[f.related] = (f.related_query_name(),)
@@ -186,7 +185,7 @@ class Options(object):
                                 fields[obj] = query_name
 
             for model in self.non_swapped_models_auto_created:
-                for f in model._meta.get_new_fields(types=DATA | VIRTUAL, opts=INCLUDE_HIDDEN):
+                for f in model._meta.fields + model._meta.virtual_fields:
                     try:
                         if f.rel and f.has_class_relation:
                             to_meta = f.rel.to._meta
@@ -201,7 +200,7 @@ class Options(object):
             if not opts & LOCAL_ONLY:
                 for parent in self.parents:
                     fields.update(parent._meta.get_new_fields(types=M2M, opts=opts, recursive=True))
-            fields.update(map(map_field_fn, self.local_many_to_many))
+            fields.update((field, (field.name, field.attname)) for field in self.local_many_to_many)
 
         if types & DATA:
             if not opts & LOCAL_ONLY:
