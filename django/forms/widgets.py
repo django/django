@@ -643,6 +643,8 @@ class ChoiceFieldRenderer(object):
     """
 
     choice_input_class = None
+    outer_html = '<ul{id_attr}>{content}</ul>'
+    inner_html = '<li>{choice_value}{sub_widgets}</li>'
 
     def __init__(self, name, value, attrs, choices):
         self.name = name
@@ -664,8 +666,7 @@ class ChoiceFieldRenderer(object):
         item in the list will get an id of `$id_$i`).
         """
         id_ = self.attrs.get('id', None)
-        start_tag = format_html('<ul id="{0}">', id_) if id_ else '<ul>'
-        output = [start_tag]
+        output = []
         for i, choice in enumerate(self.choices):
             choice_value, choice_label = choice
             if isinstance(choice_label, (tuple, list)):
@@ -677,14 +678,16 @@ class ChoiceFieldRenderer(object):
                                                       attrs=attrs_plus,
                                                       choices=choice_label)
                 sub_ul_renderer.choice_input_class = self.choice_input_class
-                output.append(format_html('<li>{0}{1}</li>', choice_value,
-                                          sub_ul_renderer.render()))
+                output.append(format_html(self.inner_html, choice_value=choice_value,
+                                          sub_widgets=sub_ul_renderer.render()))
             else:
                 w = self.choice_input_class(self.name, self.value,
                                             self.attrs.copy(), choice, i)
-                output.append(format_html('<li>{0}</li>', force_text(w)))
-        output.append('</ul>')
-        return mark_safe('\n'.join(output))
+                output.append(format_html(self.inner_html,
+                                          choice_value=force_text(w), sub_widgets=''))
+        return format_html(self.outer_html,
+                           id_attr=format_html(' id="{0}"', id_) if id_ else '',
+                           content=mark_safe('\n'.join(output)))
 
 
 class RadioFieldRenderer(ChoiceFieldRenderer):
