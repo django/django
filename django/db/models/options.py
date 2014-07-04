@@ -157,7 +157,7 @@ class Options(object):
                         if is_valid:
                             fields[obj] = query_name
 
-            for model in apps.non_swapped_models:
+            for model in self.apps.non_swapped_models:
                 for f in model._meta.many_to_many:
                     has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
                     if has_rel_attr and self == f.rel.to._meta:
@@ -174,7 +174,7 @@ class Options(object):
                             if (opts & INCLUDE_HIDDEN) or not obj.field.rel.is_hidden():
                                 fields[obj] = query_name
 
-            for model in apps.non_swapped_models_auto_created:
+            for model in self.apps.non_swapped_models_auto_created:
                 for f in model._meta.fields + model._meta.virtual_fields:
                     try:
                         if f.rel and f.has_class_relation:
