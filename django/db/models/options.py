@@ -10,7 +10,7 @@ from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
-from django.utils.functional import conditional_cached_property, cached_property
+from django.utils.functional import cached_property
 from django.utils.text import camel_case_to_spaces
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
@@ -131,16 +131,6 @@ class Options(object):
     def installed(self):
         return self.app_config is not None
 
-    @conditional_cached_property
-    def non_swapped_models_auto_created(self):
-        models = self.apps.get_models(include_auto_created=True)
-        return apps.ready, tuple(a for a in models if not a._meta.swapped)
-
-    @conditional_cached_property
-    def non_swapped_models(self):
-        models = self.apps.get_models(include_auto_created=False)
-        return apps.ready, tuple(a for a in models if not a._meta.swapped)
-
     def get_new_field(self, field_name, include_relations=False):
         selected_map = self.field_map if include_relations else self.concrete_field_map
         try:
@@ -167,7 +157,7 @@ class Options(object):
                         if is_valid:
                             fields[obj] = query_name
 
-            for model in self.non_swapped_models:
+            for model in apps.non_swapped_models:
                 for f in model._meta.many_to_many:
                     has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
                     if has_rel_attr and self == f.rel.to._meta:
@@ -184,7 +174,7 @@ class Options(object):
                             if (opts & INCLUDE_HIDDEN) or not obj.field.rel.is_hidden():
                                 fields[obj] = query_name
 
-            for model in self.non_swapped_models_auto_created:
+            for model in apps.non_swapped_models_auto_created:
                 for f in model._meta.fields + model._meta.virtual_fields:
                     try:
                         if f.rel and f.has_class_relation:
