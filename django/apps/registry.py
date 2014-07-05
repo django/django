@@ -329,6 +329,12 @@ class Apps(object):
 
         This is mostly used in tests.
         """
+        for cached_property in ['non_swapped_models',
+                                'non_swapped_models_auto_created']:
+            try:
+                delattr(self, cached_property)
+            except AttributeError:
+                pass
         self.get_models.cache_clear()
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
