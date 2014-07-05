@@ -9,6 +9,12 @@ LOCALE_PATH = os.path.join(os.path.dirname(__file__), 'locale')
 
 
 class TestFilenameGenerator(TestCase):
+    def setUp(self):
+        # Empty cached variables
+        from django.utils import autoreload
+        autoreload._cached_modules = set()
+        autoreload._cached_filenames = []
+
     def test_django_locales(self):
         """
         Test that gen_filenames() also yields the built-in django locale files.
@@ -64,3 +70,14 @@ class TestFilenameGenerator(TestCase):
             os.path.join(os.path.dirname(conf.__file__), 'locale', 'nl',
                          'LC_MESSAGES', 'django.mo'),
             filenames)
+
+    def test_only_new_files(self):
+        """
+        When calling a second time gen_filenames with only_new = True, only
+        files from newly loaded modules should be given.
+        """
+        filenames1 = list(gen_filenames())
+        from fractions import Fraction
+        filenames2 = list(gen_filenames(only_new=True))
+        self.assertEqual(len(filenames2), 1)
+        self.assertTrue(filenames2[0].endswith('fractions.py'))
