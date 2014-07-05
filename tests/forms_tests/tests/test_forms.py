@@ -22,7 +22,9 @@ from django.template import Template, Context
 from django.test import TestCase
 from django.test.utils import str_prefix
 from django.utils.datastructures import MultiValueDict, MergeDict
-from django.utils.safestring import mark_safe
+from django.utils.encoding import force_text
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
 
 
@@ -1374,6 +1376,21 @@ class FormsTestCase(TestCase):
         self.assertEqual(unbound['username'].value(), 'djangonaut')
         self.assertEqual(bound['password'].value(), 'foo')
         self.assertEqual(unbound['password'].value(), None)
+
+    def test_boundfield_rendering(self):
+        """
+        Python 2 issue: Test that rendering a BoundField with bytestring content
+        doesn't lose it's safe string status (#22950).
+        """
+        class CustomWidget(TextInput):
+            def render(self, name, value, attrs=None):
+                return format_html(str('<input{0} />'), ' id=custom')
+
+        class SampleForm(Form):
+            name = CharField(widget=CustomWidget)
+
+        f = SampleForm(data={'name': 'bar'})
+        self.assertIsInstance(force_text(f['name']), SafeData)
 
     def test_initial_datetime_values(self):
         now = datetime.datetime.now()
