@@ -1386,7 +1386,7 @@ class ManyToManyField(RelatedField):
 
     def _get_path_info(self, direct=False):
         """
-        Called by both direct an indirect m2m traversal.
+        Called by both direct and indirect m2m traversal.
         """
         pathinfos = []
         int_model = self.rel.through
