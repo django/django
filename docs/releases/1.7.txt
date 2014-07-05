@@ -1390,13 +1390,6 @@ Miscellaneous
   a relation from the related object back to the content type for filtering,
   ordering and other query operations.
 
-* When a model field's :attr:`~django.db.models.Field.validators` contains
-  a :class:`~django.core.validators.RegexValidator`, the regular expression
-  must now be passed as a regular expression string. You can no longer use a
-  pre-compiled regular expression in this case, as it is not serializable.
-  The :attr:`~django.core.validators.RegexValidator.flags` attribute was added
-  to :class:`~django.core.validators.RegexValidator` to simplify this change.
-
 * When running tests on PostgreSQL, the :setting:`USER` will need read access
   to the built-in ``postgres`` database. This is in lieu of the previous
   behavior of connecting to the actual non-test database.
