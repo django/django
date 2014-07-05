@@ -391,6 +391,12 @@ Models
   by the database, which can lead to somewhat complex queries involving nested
   ``REPLACE`` function calls.
 
+* You can now refresh model instances by using :meth:`Model.refresh_from_db()
+  <django.db.models.Model.refresh_from_db>`.
+
+* You can now get the set of deferred fields for a model using
+  :meth:`Model.get_deferred_fields() <django.db.models.Model.get_deferred_fields>`.
+
 Signals
 ^^^^^^^
 

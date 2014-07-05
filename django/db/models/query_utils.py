@@ -109,14 +109,8 @@ class DeferredAttribute(object):
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance, name)
             if val is None:
-                # We use only() instead of values() here because we want the
-                # various data coercion methods (to_python(), etc.) to be
-                # called here.
-                val = getattr(
-                    non_deferred_model._base_manager.only(name).using(
-                        instance._state.db).get(pk=instance.pk),
-                    self.field_name
-                )
+                instance.refresh_from_db(fields=[self.field_name])
+                val = getattr(instance, self.field_name)
             data[self.field_name] = val
         return data[self.field_name]
 
