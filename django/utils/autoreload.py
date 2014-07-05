@@ -77,20 +77,31 @@ _mtimes = {}
 _win = (sys.platform == "win32")
 
 _error_files = []
+_cached_modules = set()
+_cached_filenames = []
 
-
-def gen_filenames():
+def gen_filenames(only_new=False):
     """
-    Yields a generator over filenames referenced in sys.modules and translation
+    Returns a list of filenames referenced in sys.modules and translation
     files.
     """
     # N.B. ``list(...)`` is needed, because this runs in parallel with
     # application code which might be mutating ``sys.modules``, and this will
     # fail with RuntimeError: cannot mutate dictionary while iterating
-    filenames = [filename.__file__ for filename in list(sys.modules.values())
-                if hasattr(filename, '__file__')]
+    global _cached_modules, _cached_filenames
+    module_values = set(sys.modules.values())
+    if _cached_modules == module_values:
+        # No changes in module list, short-circuit the function
+        if only_new:
+            return []
+        else:
+            return _cached_filenames
 
-    if settings.USE_I18N:
+    new_modules = module_values - _cached_modules
+    new_filenames = [filename.__file__ for filename in new_modules
+                     if hasattr(filename, '__file__')]
+
+    if not _cached_filenames and settings.USE_I18N:
         # Add the names of the .mo files that can be generated
         # by compilemessages management command to the list of files watched.
         basedirs = [os.path.join(os.path.dirname(os.path.dirname(__file__)),
@@ -105,9 +116,14 @@ def gen_filenames():
             for dirpath, dirnames, locale_filenames in os.walk(basedir):
                 for filename in locale_filenames:
                     if filename.endswith('.mo'):
-                        filenames.append(os.path.join(dirpath, filename))
+                        new_filenames.append(os.path.join(dirpath, filename))
 
-    for filename in filenames + _error_files:
+    if only_new:
+        filelist = new_filenames
+    else:
+        filelist = _cached_filenames + new_filenames + _error_files
+    filenames = []
+    for filename in filelist:
         if not filename:
             continue
         if filename.endswith(".pyc") or filename.endswith(".pyo"):
@@ -115,7 +131,10 @@ def gen_filenames():
         if filename.endswith("$py.class"):
             filename = filename[:-9] + ".py"
         if os.path.exists(filename):
-            yield filename
+            filenames.append(filename)
+    _cached_modules = _cached_modules.union(new_modules)
+    _cached_filenames += new_filenames
+    return filenames
 
 
 def reset_translations():
@@ -145,6 +164,10 @@ def inotify_code_changed():
     notifier = pyinotify.Notifier(wm, EventHandler())
 
     def update_watch(sender=None, **kwargs):
+        if sender and getattr(sender, 'handles_files', False):
+            # No need to update watches when request serves files.
+            # (sender is supposed to be a django.core.handlers.BaseHandler subclass)
+            return
         mask = (
             pyinotify.IN_MODIFY |
             pyinotify.IN_DELETE |
@@ -153,7 +176,7 @@ def inotify_code_changed():
             pyinotify.IN_MOVED_TO |
             pyinotify.IN_CREATE
         )
-        for path in gen_filenames():
+        for path in gen_filenames(only_new=True):
             wm.add_watch(path, mask)
 
     # New modules may get imported when a request is processed.
