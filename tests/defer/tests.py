@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db.models.query_utils import DeferredAttribute, InvalidQuery
 from django.test import TestCase
 
-from .models import Secondary, Primary, Child, BigChild, ChildProxy
+from .models import Secondary, Primary, Child, BigChild, ChildProxy, RefreshPrimaryProxy
 
 
 class DeferTests(TestCase):
@@ -189,3 +189,29 @@ class DeferTests(TestCase):
         s1_defer = Secondary.objects.only('pk').get(pk=s1.pk)
         self.assertEqual(s1, s1_defer)
         self.assertEqual(s1_defer, s1)
+
+    def test_refresh_not_loading_deferred_fields(self):
+        s = Secondary.objects.create()
+        rf = Primary.objects.create(name='foo', value='bar', related=s)
+        rf2 = Primary.objects.only('related', 'value').get()
+        rf.name = 'new foo'
+        rf.value = 'new bar'
+        rf.save()
+        with self.assertNumQueries(1):
+            rf2.refresh_from_db()
+            self.assertEqual(rf2.value, 'new bar')
+        with self.assertNumQueries(1):
+            self.assertEqual(rf2.name, 'new foo')
+
+    def test_custom_refresh_on_deferred_loading(self):
+        s = Secondary.objects.create()
+        rf = RefreshPrimaryProxy.objects.create(name='foo', value='bar', related=s)
+        rf2 = RefreshPrimaryProxy.objects.only('related').get()
+        rf.name = 'new foo'
+        rf.value = 'new bar'
+        rf.save()
+        with self.assertNumQueries(1):
+            # Customized refresh_from_db() reloads all deferred fields on
+            # access of any of them.
+            self.assertEqual(rf2.name, 'new foo')
+            self.assertEqual(rf2.value, 'new bar')

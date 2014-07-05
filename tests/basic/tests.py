@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import threading
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
@@ -713,3 +713,60 @@ class SelectOnSaveTests(TestCase):
                 asos.save(update_fields=['pub_date'])
         finally:
             Article._base_manager.__class__ = orig_class
+
+
+class ModelRefreshTests(TestCase):
+    def _truncate_ms(self, val):
+        # MySQL < 5.6.4 removes microseconds from the datetimes which can cause
+        # problems when comparing the original value to that loaded from DB
+        return val - timedelta(microseconds=val.microsecond)
+
+    def test_refresh(self):
+        a = Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
+        Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
+        Article.objects.filter(pk=a.pk).update(headline='new headline')
+        with self.assertNumQueries(1):
+            a.refresh_from_db()
+            self.assertEqual(a.headline, 'new headline')
+
+        orig_pub_date = a.pub_date
+        new_pub_date = a.pub_date + timedelta(10)
+        Article.objects.update(headline='new headline 2', pub_date=new_pub_date)
+        with self.assertNumQueries(1):
+            a.refresh_from_db(fields=['headline'])
+            self.assertEqual(a.headline, 'new headline 2')
+            self.assertEqual(a.pub_date, orig_pub_date)
+        with self.assertNumQueries(1):
+            a.refresh_from_db()
+            self.assertEqual(a.pub_date, new_pub_date)
+
+    def test_refresh_fk(self):
+        s1 = SelfRef.objects.create()
+        s2 = SelfRef.objects.create()
+        s3 = SelfRef.objects.create(selfref=s1)
+        s3_copy = SelfRef.objects.get(pk=s3.pk)
+        s3_copy.selfref.touched = True
+        s3.selfref = s2
+        s3.save()
+        with self.assertNumQueries(1):
+            s3_copy.refresh_from_db()
+        with self.assertNumQueries(1):
+            # The old related instance was thrown away (the selfref_id has
+            # changed). It needs to be reloaded on access, so one query
+            # executed.
+            self.assertFalse(hasattr(s3_copy.selfref, 'touched'))
+            self.assertEqual(s3_copy.selfref, s2)
+
+    def test_refresh_unsaved(self):
+        pub_date = self._truncate_ms(datetime.now())
+        a = Article.objects.create(pub_date=pub_date)
+        a2 = Article(id=a.pk)
+        with self.assertNumQueries(1):
+            a2.refresh_from_db()
+        self.assertEqual(a2.pub_date, pub_date)
+        self.assertEqual(a2._state.db, "default")
+
+    def test_refresh_no_fields(self):
+        a = Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
+        with self.assertNumQueries(0):
+            a.refresh_from_db(fields=[])
