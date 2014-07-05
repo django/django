@@ -13,6 +13,8 @@ from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
 from django.db import (router, connections, transaction, DatabaseError,
     DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY)
+from django.db.models import signals
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
@@ -21,7 +23,6 @@ from django.db.models.manager import ensure_default_manager
 from django.db.models.options import Options
 from django.db.models.query import Q
 from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
-from django.db.models import signals
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.encoding import force_str, force_text
@@ -551,6 +552,71 @@ class Model(six.with_metaclass(ModelBase)):
         return setattr(self, self._meta.pk.attname, value)
 
     pk = property(_get_pk_val, _set_pk_val)
+
+    def get_deferred_fields(self):
+        """
+        Returns a set containing names of deferred fields for this instance.
+        """
+        return {
+            f.attname for f in self._meta.concrete_fields
+            if isinstance(self.__class__.__dict__.get(f.attname), DeferredAttribute)
+        }
+
+    def refresh_from_db(self, using=None, fields=None, **kwargs):
+        """
+        Reloads field values from the database.
+
+        By default, the reloading happens from the database this instance was
+        loaded from, or by the read router if this instance wasn't loaded from
+        any database. The using parameter will override the default.
+
+        Fields can be used to specify which fields to reload. The fields
+        should be an iterable of field attnames. If fields is None, then
+        all non-deferred fields are reloaded.
+
+        When accessing deferred fields of an instance, the deferred loading
+        of the field will call this method.
+        """
+        if fields is not None:
+            if len(fields) == 0:
+                return
+            if any(LOOKUP_SEP in f for f in fields):
+                raise ValueError(
+                    'Found "%s" in fields argument. Relations and transforms '
+                    'are not allowed in fields.' % LOOKUP_SEP)
+
+        db = using if using is not None else self._state.db
+        if self._deferred:
+            non_deferred_model = self._meta.proxy_for_model
+        else:
+            non_deferred_model = self.__class__
+        db_instance_qs = non_deferred_model._default_manager.using(db).filter(pk=self.pk)
+
+        # Use provided fields, if not set then reload all non-deferred fields.
+        if fields is not None:
+            fields = list(fields)
+            db_instance_qs = db_instance_qs.only(*fields)
+        elif self._deferred:
+            deferred_fields = self.get_deferred_fields()
+            fields = [f.attname for f in self._meta.concrete_fields
+                      if f.attname not in deferred_fields]
+            db_instance_qs = db_instance_qs.only(*fields)
+
+        db_instance = db_instance_qs.get()
+        non_loaded_fields = db_instance.get_deferred_fields()
+        for field in self._meta.concrete_fields:
+            if field.attname in non_loaded_fields:
+                # This field wasn't refreshed - skip ahead.
+                continue
+            setattr(self, field.attname, getattr(db_instance, field.attname))
+            # Throw away stale foreign key references.
+            if field.rel and field.get_cache_name() in self.__dict__:
+                rel_instance = getattr(self, field.get_cache_name())
+                local_val = getattr(db_instance, field.attname)
+                related_val = getattr(rel_instance, field.related_field.attname)
+                if local_val != related_val:
+                    del self.__dict__[field.get_cache_name()]
+        self._state.db = db_instance._state.db
 
     def serializable_value(self, field_name):
         """
