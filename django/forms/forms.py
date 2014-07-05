@@ -563,6 +563,17 @@ class BoundField(object):
             name = self.html_name
         else:
             name = self.html_initial_name
+
+        if self.field.required:
+            if not hasattr(self.form, 'use_required_attribute'):
+                warnings.warn(
+                    "From Django 1.9, since `%s` is required, HTML5 `required` "
+                    "attribute will be set by default. To control the "
+                    "behaviour, use form attribute `use_required_attribute`."
+                    % self.name, DeprecationWarning
+                )
+            elif self.form.use_required_attribute:
+                attrs['required'] = True
         return widget.render(name, self.value(), attrs=attrs)
 
     def as_text(self, attrs=None, **kwargs):

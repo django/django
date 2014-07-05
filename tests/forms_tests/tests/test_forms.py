@@ -1935,6 +1935,38 @@ class FormsTestCase(TestCase):
             '<label for="id_field" class="foo required">Field:</label>')
         self.assertHTMLEqual(f['field2'].label_tag(), '<label for="id_field2">Field2:</label>')
 
+    def test_optional_html_required_attr(self):
+        class MyForm(Form):
+            use_required_attribute = True
+            f1 = CharField(max_length=30)
+            f2 = CharField(max_length=30, required=False)
+            f3 = CharField(widget=Textarea(attrs={'rows': 80, 'cols': 20}))
+            f4 = ChoiceField(choices=[('H', 'HTML'), ('C', 'CSS')])
+            f5 = IntegerField(required=False)
+            f6 = CharField(widget=PasswordInput)
+
+        form = MyForm()
+        self.assertHTMLEqual(form.as_p(), """<p><label for="id_f1">F1:</label><input id="id_f1" maxlength="30" name="f1" type="text" required /></p>
+            <p><label for="id_f2">F2:</label><input id="id_f2" maxlength="30" name="f2" type="text" /></p>
+            <p><label for="id_f3">F3:</label><textarea cols="20" id="id_f3" name="f3" rows="80" required /></p>
+            <p><label for="id_f4">F4:</label><select id="id_f4" name="f4" required ><option value="H">HTML</option><option value="C">CSS</option></select></p>
+            <p><label for="id_f5">F5:</label><input id="id_f5" name="f5" type="number" /></p>
+            <p><label for="id_f6">F6:</label><input id="id_f6" name="f6" type="password" required /></p>""")
+
+        self.assertHTMLEqual(form.as_ul(),"""<li><label for="id_f1">F1:</label><input id="id_f1" maxlength="30" name="f1" required type="text" /></li>
+            <li><label for="id_f2">F2:</label><input id="id_f2" maxlength="30" name="f2" type="text" /></li>
+            <li><label for="id_f3">F3:</label><textarea cols="20" id="id_f3" name="f3" required rows="80" /></li>
+            <li><label for="id_f4">F4:</label><select id="id_f4" name="f4" required><option value="H">HTML</option><option value="C">CSS</option></select></li>
+            <li><label for="id_f5">F5:</label><input id="id_f5" name="f5" type="number" /></li>
+            <li><label for="id_f6">F6:</label><input id="id_f6" name="f6" required type="password" /></li>""")
+
+        self.assertHTMLEqual(form.as_table(),"""<tr><th><label for="id_f1">F1:</label></th><td><input id="id_f1" maxlength="30" name="f1" required type="text" /></td></tr>
+            <tr><th><label for="id_f2">F2:</label></th><td><input id="id_f2" maxlength="30" name="f2" type="text" /></td></tr>
+            <tr><th><label for="id_f3">F3:</label></th><td><textarea cols="20" id="id_f3" name="f3" required rows="80" /></td></tr>
+            <tr><th><label for="id_f4">F4:</label></th><td><select id="id_f4" name="f4" required><option value="H">HTML</option><option value="C">CSS</option></select></td></tr>
+            <tr><th><label for="id_f5">F5:</label></th><td><input id="id_f5" name="f5" type="number" /></td></tr>
+            <tr><th><label for="id_f6">F6:</label></th><td><input id="id_f6" name="f6" required type="password" /></td></tr>""")
+
     def test_label_split_datetime_not_displayed(self):
         class EventForm(Form):
             happened_at = SplitDateTimeField(widget=widgets.SplitHiddenDateTimeWidget)

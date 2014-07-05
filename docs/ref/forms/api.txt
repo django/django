@@ -546,7 +546,7 @@ classes, as needed. The HTML will look something like::
 
 .. _ref-forms-api-configuring-label:
 
-Configuring form elements' HTML ``id`` attributes and ``<label>`` tags
+Configuring form elements' HTML  attributes and tags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. attribute:: Form.auto_id
@@ -636,6 +636,13 @@ If ``auto_id`` is set to any other true value -- such as a string that doesn't
 include ``%s`` -- then the library will act as if ``auto_id`` is ``True``.
 
 By default, ``auto_id`` is set to the string ``'id_%s'``.
+
+.. attribute:: Form.use_required_attribute
+
+.. versionadded:: 1.8
+
+This attribute allows one to set HTML5 ``required`` attribute for the fields
+which are required.
 
 .. attribute:: Form.label_suffix
 
