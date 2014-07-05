@@ -179,7 +179,9 @@ class InspectDBTestCase(TestCase):
         unsuitable for Python identifiers
         """
         out = StringIO()
-        call_command('inspectdb', stdout=out)
+        call_command('inspectdb',
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
+                     stdout=out)
         output = out.getvalue()
         base_name = 'Field' if not connection.features.uppercases_column_names else 'field'
         self.assertIn("field = models.IntegerField()", output)
@@ -192,6 +194,18 @@ class InspectDBTestCase(TestCase):
             self.assertIn("tamaño = models.IntegerField()", output)
         else:
             self.assertIn("tama_o = models.IntegerField(db_column='tama\\xf1o')", output)
+
+    def test_table_name_introspection(self):
+        """
+        Introspection of table names containing special characters,
+        unsuitable for Python identifiers
+        """
+        out = StringIO()
+        call_command('inspectdb',
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
+                     stdout=out)
+        output = out.getvalue()
+        self.assertIn("class InspectdbSpecialTableName(models.Model):", output)
 
     def test_managed_models(self):
         """Test that by default the command generates models with `Meta.managed = False` (#14305)"""
