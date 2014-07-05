@@ -413,10 +413,14 @@ class MigrationAutodetector(object):
             model_state = self.to_state.models[app_label, model_name]
             # Gather related fields
             related_fields = {}
+            primary_key_rel = None
             for field in self.new_apps.get_model(app_label, model_name)._meta.local_fields:
                 if field.rel:
                     if field.rel.to:
-                        related_fields[field.name] = field
+                        if field.primary_key:
+                            primary_key_rel = field.rel.to
+                        else:
+                            related_fields[field.name] = field
                     # through will be none on M2Ms on swapped-out models;
                     # we can treat lack of through as auto_created=True, though.
                     if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
@@ -439,6 +443,14 @@ class MigrationAutodetector(object):
                 if isinstance(base, six.string_types) and "." in base:
                     base_app_label, base_name = base.split(".", 1)
                     dependencies.append((base_app_label, base_name, None, True))
+            # Depend on the other end of the primary key if it's a relation
+            if primary_key_rel:
+                dependencies.append((
+                        primary_key_rel._meta.app_label,
+                        primary_key_rel._meta.object_name,
+                        None,
+                        True
+                    ))
             # Generate creation operation
             self.add_operation(
                 app_label,
