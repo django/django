@@ -164,7 +164,9 @@ def inotify_code_changed():
     notifier = pyinotify.Notifier(wm, EventHandler())
 
     def update_watch(sender=None, **kwargs):
-        if sender and 'static' in sender.__name__.lower():
+        if sender and getattr(sender, 'handle_files', False):
+            # No need to update watches when request serves files.
+            # (sender is supposed to be a django.core.handlers.BaseHandler subclass)
             return
         mask = (
             pyinotify.IN_MODIFY |

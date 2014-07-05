@@ -12,6 +12,8 @@ class StaticFilesHandler(WSGIHandler):
     WSGI middleware that intercepts calls to the static files directory, as
     defined by the STATIC_URL setting, and serves those files.
     """
+    handle_files = True
+
     def __init__(self, application):
         self.application = application
         self.base_url = urlparse(self.get_base_url())
