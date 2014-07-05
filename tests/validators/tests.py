@@ -66,9 +66,9 @@ TEST_DATA = (
     (validate_email, '"\\\011"@here.com', None),
     (validate_email, '"\\\012"@here.com', ValidationError),
     (validate_email, 'trailingdot@shouldfail.com.', ValidationError),
-    # Max length of domain name in email is 251 (see validator for calculation)
-    (validate_email, 'a@%s.com' % ('a' * 251), None),
-    (validate_email, 'a@%s.com' % ('a' * 252), ValidationError),
+    # Max length of domain name in email is 249 (see validator for calculation)
+    (validate_email, 'a@%s.us' % ('a' * 249), None),
+    (validate_email, 'a@%s.us' % ('a' * 250), ValidationError),
 
     (validate_slug, 'slug-ok', None),
     (validate_slug, 'longer-slug-still-ok', None),
