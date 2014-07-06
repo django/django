@@ -24,7 +24,7 @@ class GeoAdminTest(TestCase):
 
     def test_olmap_OSM_rendering(self):
         geoadmin = admin.site._registry[City]
-        result = geoadmin.get_map_widget(City._meta.get_field('point'))(
+        result = geoadmin.get_map_widget(City._meta.get_new_field('point'))(
         ).render('point', Point(-79.460734, 40.18476))
         self.assertIn(
             """geodjango_point.layers.base = new OpenLayers.Layer.OSM("OpenStreetMap (Mapnik)");""",
@@ -32,7 +32,7 @@ class GeoAdminTest(TestCase):
 
     def test_olmap_WMS_rendering(self):
         geoadmin = admin.GeoModelAdmin(City, admin.site)
-        result = geoadmin.get_map_widget(City._meta.get_field('point'))(
+        result = geoadmin.get_map_widget(City._meta.get_new_field('point'))(
         ).render('point', Point(-79.460734, 40.18476))
         self.assertIn(
             """geodjango_point.layers.base = new OpenLayers.Layer.WMS("OpenLayers WMS", "http://vmap0.tiles.osgeo.org/wms/vmap0", {layers: \'basic\', format: 'image/jpeg'});""",

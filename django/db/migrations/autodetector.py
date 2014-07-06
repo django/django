@@ -10,6 +10,7 @@ from django.db.migrations import operations
 from django.db.migrations.migration import Migration
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.optimizer import MigrationOptimizer
+from django.db.models.options import RELATED_M2M, RELATED_OBJECTS
 
 
 class MigrationAutodetector(object):
@@ -155,7 +156,7 @@ class MigrationAutodetector(object):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             for field_name, field in old_model_state.fields:
-                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field_by_name(field_name)[0]
+                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_new_field(field_name, True)
                 if hasattr(old_field, "rel") and getattr(old_field.rel, "through", None) and not old_field.rel.through._meta.auto_created:
                     through_key = (
                         old_field.rel.through._meta.app_label,
@@ -623,14 +624,14 @@ class MigrationAutodetector(object):
             # and the removal of all its own related fields, and if it's
             # a through model the field that references it.
             dependencies = []
-            for related_object in model._meta.get_all_related_objects():
+            for related_object in model._meta.get_new_fields(types=RELATED_OBJECTS):
                 dependencies.append((
                     related_object.model._meta.app_label,
                     related_object.model._meta.object_name,
                     related_object.field.name,
                     False,
                 ))
-            for related_object in model._meta.get_all_related_many_to_many_objects():
+            for related_object in model._meta.get_new_fields(types=RELATED_M2M):
                 dependencies.append((
                     related_object.model._meta.app_label,
                     related_object.model._meta.object_name,
@@ -750,8 +751,8 @@ class MigrationAutodetector(object):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             new_model_state = self.to_state.models[app_label, model_name]
             old_field_name = self.renamed_fields.get((app_label, model_name, field_name), field_name)
-            old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field_by_name(old_field_name)[0]
-            new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+            old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_new_field(old_field_name, True)
+            new_field = self.new_apps.get_model(app_label, model_name)._meta.get_new_field(field_name, True)
             # Implement any model renames on relations; these are handled by RenameModel
             # so we need to exclude them from the comparison
             if hasattr(new_field, "rel") and getattr(new_field.rel, "to", None):

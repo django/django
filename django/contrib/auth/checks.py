@@ -35,7 +35,7 @@ def check_user_model(**kwargs):
         )
 
     # Check that the username field is unique
-    if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
+    if not cls._meta.get_new_field(cls.USERNAME_FIELD).unique:
         if (settings.AUTHENTICATION_BACKENDS ==
                 ('django.contrib.auth.backends.ModelBackend',)):
             errors.append(

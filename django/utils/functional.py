@@ -60,6 +60,17 @@ class cached_property(object):
         return res
 
 
+class conditional_cached_property(cached_property):
+
+    def __get__(self, instance, type=None):
+        if instance is None:
+            return self
+        should_cache, res = self.func(instance)
+        if should_cache:
+            instance.__dict__[self.func.__name__] = res
+        return res
+
+
 class Promise(object):
     """
     This is just a base class for the proxy class created in

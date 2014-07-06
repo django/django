@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.db.models.options import normalize_together
+from django.db.models.options import normalize_together, RELATED_M2M, RELATED_OBJECTS
 from django.db.migrations.state import ModelState
 from django.db.migrations.operations.base import Operation
 from django.utils import six
@@ -116,8 +116,8 @@ class RenameModel(Operation):
         # Get all of the related objects we need to repoint
         apps = state.render(skip_cache=True)
         model = apps.get_model(app_label, self.old_name)
-        related_objects = model._meta.get_all_related_objects()
-        related_m2m_objects = model._meta.get_all_related_many_to_many_objects()
+        related_objects = model._meta.get_new_fields(types=RELATED_OBJECTS)
+        related_m2m_objects = model._meta.get_new_fields(types=RELATED_M2M)
         # Rename the model
         state.models[app_label, self.new_name.lower()] = state.models[app_label, self.old_name.lower()]
         state.models[app_label, self.new_name.lower()].name = self.new_name
@@ -149,13 +149,13 @@ class RenameModel(Operation):
                 new_model._meta.db_table,
             )
             # Alter the fields pointing to us
-            related_objects = old_model._meta.get_all_related_objects()
-            related_m2m_objects = old_model._meta.get_all_related_many_to_many_objects()
+            related_objects = old_model._meta.get_new_fields(types=RELATED_OBJECTS)
+            related_m2m_objects = old_model._meta.get_new_fields(types=RELATED_M2M)
             for related_object in (related_objects + related_m2m_objects):
                 to_field = new_apps.get_model(
                     related_object.model._meta.app_label,
                     related_object.model._meta.object_name.lower(),
-                )._meta.get_field_by_name(related_object.field.name)[0]
+                )._meta.get_new_field(related_object.field.name, True)
                 schema_editor.alter_field(
                     related_object.model,
                     related_object.field,
@@ -310,11 +310,11 @@ class AlterOrderWithRespectTo(Operation):
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
             # Remove a field if we need to
             if from_model._meta.order_with_respect_to and not to_model._meta.order_with_respect_to:
-                schema_editor.remove_field(from_model, from_model._meta.get_field_by_name("_order")[0])
+                schema_editor.remove_field(from_model, from_model._meta.get_new_field("_order", True))
             # Add a field if we need to (altering the column is untouched as
             # it's likely a rename)
             elif to_model._meta.order_with_respect_to and not from_model._meta.order_with_respect_to:
-                field = to_model._meta.get_field_by_name("_order")[0]
+                field = to_model._meta.get_new_field("_order", True)
                 schema_editor.add_field(
                     from_model,
                     field,

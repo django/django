@@ -211,7 +211,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
     def test_non_ascii_verbose_name(self):
         # Aliased so the string doesn't get extracted
         from django.utils.translation import ugettext_lazy as ulazy
-        username_field = User._meta.get_field('username')
+        username_field = User._meta.get_new_field('username')
         old_verbose_name = username_field.verbose_name
         username_field.verbose_name = ulazy('u\u017eivatel')
         new_io = six.StringIO()

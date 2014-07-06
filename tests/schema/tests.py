@@ -497,7 +497,7 @@ class SchemaTests(TransactionTestCase):
                 editor.remove_field(BookWithM2M, BookWithM2M._meta.get_field_by_name("uniques")[0])
             # Cleanup model states
             BookWithM2M._meta.local_many_to_many.remove(new_field)
-            del BookWithM2M._meta._m2m_cache
+            BookWithM2M._meta._expire_cache()
 
     @unittest.skipUnless(connection.features.supports_column_check_constraints, "No check constraints")
     def test_check_constraints(self):

@@ -23,7 +23,7 @@ def lookup_needs_distinct(opts, lookup_path):
     Returns True if 'distinct()' should be used to query the given lookup path.
     """
     field_name = lookup_path.split('__', 1)[0]
-    field = opts.get_field_by_name(field_name)[0]
+    field = opts.get_new_field(field_name, True)
     if hasattr(field, 'get_path_info') and any(path.m2m for path in field.get_path_info()):
         return True
     return False
@@ -261,7 +261,7 @@ def model_ngettext(obj, n=None):
 def lookup_field(name, obj, model_admin=None):
     opts = obj._meta
     try:
-        f = opts.get_field(name)
+        f = opts.get_new_field(name)
     except models.FieldDoesNotExist:
         # For non-field values, the value is either a method, property or
         # returned via a callable.
@@ -297,7 +297,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     """
     attr = None
     try:
-        field = model._meta.get_field_by_name(name)[0]
+        field = model._meta.get_new_field(name, True)
         try:
             label = field.verbose_name
         except AttributeError:
@@ -345,11 +345,10 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
 def help_text_for_field(name, model):
     help_text = ""
     try:
-        field_data = model._meta.get_field_by_name(name)
+        field = model._meta.get_new_field(name, True)
     except models.FieldDoesNotExist:
         pass
     else:
-        field = field_data[0]
         if hasattr(field, 'help_text'):
             help_text = field.help_text
     return smart_text(help_text)
@@ -421,7 +420,8 @@ def reverse_field_path(model, path):
     parent = model
     pieces = path.split(LOOKUP_SEP)
     for piece in pieces:
-        field, model, direct, m2m = parent._meta.get_field_by_name(piece)
+        field = parent._meta.get_new_field(piece, True)
+        direct = isinstance(field, models.Field) or hasattr(field, 'is_gfk')
         # skip trailing data field if extant:
         if len(reversed_path) == len(pieces) - 1:  # final iteration
             try:
@@ -454,7 +454,7 @@ def get_fields_from_path(model, path):
             parent = get_model_from_relation(fields[-1])
         else:
             parent = model
-        fields.append(parent._meta.get_field_by_name(piece)[0])
+        fields.append(parent._meta.get_new_field(piece, True))
     return fields
 
 
