@@ -300,6 +300,9 @@ class ModelState(object):
                 return field
         raise ValueError("No field called %s on model %s" % (name, self.name))
 
+    def __repr__(self):
+        return "<ModelState: '%s.%s'>" % (self.app_label, self.name)
+
     def __eq__(self, other):
         return (
             (self.app_label == other.app_label) and
