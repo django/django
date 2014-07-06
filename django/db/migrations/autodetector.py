@@ -446,11 +446,11 @@ class MigrationAutodetector(object):
             # Depend on the other end of the primary key if it's a relation
             if primary_key_rel:
                 dependencies.append((
-                        primary_key_rel._meta.app_label,
-                        primary_key_rel._meta.object_name,
-                        None,
-                        True
-                    ))
+                    primary_key_rel._meta.app_label,
+                    primary_key_rel._meta.object_name,
+                    None,
+                    True
+                ))
             # Generate creation operation
             self.add_operation(
                 app_label,
