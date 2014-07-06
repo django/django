@@ -88,8 +88,8 @@ middleware; if so this middleware must be listed first in
     wildcard::
 
         ALLOWED_HOSTS = [
-            '.example.com', # Allow domain and subdomains
-            '.example.com.', # Also allow FQDN and subdomains
+            '.example.com',  # Allow domain and subdomains
+            '.example.com.',  # Also allow FQDN and subdomains
         ]
 
     In Django 1.7, the trailing dot is stripped when performing host validation,
@@ -1241,7 +1241,7 @@ FILE_UPLOAD_HANDLERS
 Default::
 
     ("django.core.files.uploadhandler.MemoryFileUploadHandler",
-     "django.core.files.uploadhandler.TemporaryFileUploadHandler",)
+     "django.core.files.uploadhandler.TemporaryFileUploadHandler")
 
 A tuple of handlers to use for uploading. See :doc:`/topics/files` for details.
 
@@ -1622,7 +1622,7 @@ Example::
 
     LOCALE_PATHS = (
         '/home/www/project/common_files/locale',
-        '/var/local/translations/locale'
+        '/var/local/translations/locale',
     )
 
 Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
@@ -1739,7 +1739,7 @@ MIDDLEWARE_CLASSES
 Default::
 
     ('django.middleware.common.CommonMiddleware',
-     'django.middleware.csrf.CsrfViewMiddleware',)
+     'django.middleware.csrf.CsrfViewMiddleware')
 
 A tuple of middleware classes to use. See :doc:`/topics/http/middleware`.
 
@@ -1757,7 +1757,7 @@ MIGRATION_MODULES
 
 Default::
 
-    {} # empty dictionary
+    {}  # empty dictionary
 
 A dictionary specifying the package where migration modules can be found on a per-app basis. The default value
 of this setting is an empty dictionary, but the default package name for migration modules is ``migrations``.
@@ -1930,7 +1930,7 @@ A dictionary of modules containing serializer definitions (provided as
 strings), keyed by a string identifier for that serialization type. For
 example, to define a YAML serializer, use::
 
-    SERIALIZATION_MODULES = { 'yaml' : 'path.to.yaml_serializer' }
+    SERIALIZATION_MODULES = {'yaml': 'path.to.yaml_serializer'}
 
 .. setting:: SERVER_EMAIL
 
@@ -2452,7 +2452,7 @@ Default::
      'django.contrib.auth.hashers.SHA1PasswordHasher',
      'django.contrib.auth.hashers.MD5PasswordHasher',
      'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
-     'django.contrib.auth.hashers.CryptPasswordHasher',)
+     'django.contrib.auth.hashers.CryptPasswordHasher')
 
 .. _settings-messages:
 
@@ -2516,7 +2516,7 @@ Default::
     messages.INFO: 'info',
     messages.SUCCESS: 'success',
     messages.WARNING: 'warning',
-    messages.ERROR: 'error',}
+    messages.ERROR: 'error'}
 
 This sets the mapping of message level to message tag, which is typically
 rendered as a CSS class in HTML. If you specify a value, it will extend
