@@ -101,6 +101,20 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             '/test_admin/%s/admin_views/article/add/' % self.urlbit,
             status_code=301)
 
+    def testAdminStaticTemplateTag(self):
+        """
+        Test that admin_static.static is pointing to the collectstatic version
+        (as django.contrib.collectstatic is in installed apps).
+        """
+        from django.contrib.admin.templatetags.admin_static import static
+        from django.contrib.staticfiles.storage import staticfiles_storage
+        old_url = staticfiles_storage.base_url
+        staticfiles_storage.base_url = '/test/'
+        try:
+            self.assertEqual(static('path'), '/test/path')
+        finally:
+            staticfiles_storage.base_url = old_url
+
     def testBasicAddGet(self):
         """
         A smoke test to ensure GET on the add_view works.

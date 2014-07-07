@@ -7,7 +7,7 @@ from unittest import skipUnless
 from django.apps import apps, AppConfig
 from django.apps.registry import Apps
 from django.contrib.admin.models import LogEntry
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.db import models
 from django.test import TestCase, override_settings
 from django.test.utils import extend_sys_path
@@ -130,6 +130,11 @@ class AppsTests(TestCase):
         self.assertTrue(apps.is_installed('django.contrib.auth'))
         self.assertTrue(apps.is_installed('django.contrib.staticfiles'))
         self.assertFalse(apps.is_installed('django.contrib.webdesign'))
+
+        fake_registry = Apps()
+        fake_registry.ready = False
+        with self.assertRaises(AppRegistryNotReady):
+            fake_registry.is_installed('django.contrib.admin')
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_model(self):
