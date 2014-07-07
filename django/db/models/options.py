@@ -133,14 +133,15 @@ class Options(object):
         except KeyError:
             pass
 
+        options = {'include_parents': include_parents, 'include_non_concrete': include_non_concrete, 'include_hidden': include_hidden,
+                   'include_proxy': include_proxy}
         fields = OrderedDict()
 
         if related_m2m:
             if include_parents:
                 for parent in self.parents:
                     for obj, query_name in six.iteritems(parent._meta.get_new_fields(data=False, related_m2m=True,
-                                                         include_parents=include_parents, include_non_concrete=include_non_concrete,
-                                                         include_hidden=include_hidden, include_proxy=include_proxy, recursive=True)):
+                                                         **dict(options, recursive=True))):
                         is_valid = not (obj.field.creation_counter < 0
                                     and obj.model not in self.get_parent_list())
                         if is_valid:
@@ -157,8 +158,7 @@ class Options(object):
             if include_parents:
                 for parent in self.parents:
                     for obj, query_name in six.iteritems(parent._meta.get_new_fields(data=False, related_objects=True,
-                                                         include_parents=include_parents, include_non_concrete=include_non_concrete,
-                                                         include_hidden=True, include_proxy=include_proxy, recursive=True)):
+                                                         **dict(options, recursive=True, include_hidden=True))):
                         if not ((obj.field.creation_counter < 0
                                 or obj.field.rel.parent_link)
                                 and obj.model not in parent_list):
@@ -179,17 +179,13 @@ class Options(object):
         if m2m:
             if include_parents:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(data=False, m2m=True,
-                                                              include_parents=include_parents, include_non_concrete=include_non_concrete,
-                                                              include_hidden=include_hidden, include_proxy=include_proxy, recursive=True))
-
+                    fields.update(parent._meta.get_new_fields(data=False, m2m=True, **dict(options, recursive=True)))
             fields.update((field, (field.name, field.attname)) for field in self.local_many_to_many)
 
         if data:
             if include_parents:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(include_parents=include_parents, include_non_concrete=include_non_concrete,
-                                                              include_hidden=include_hidden, include_proxy=include_proxy, recursive=True))
+                    fields.update(parent._meta.get_new_fields(**dict(options, recursive=True)))
             for field in self.local_fields:
                 if include_non_concrete or field.column is not None:
                     fields[field] = (field.name, field.attname)
