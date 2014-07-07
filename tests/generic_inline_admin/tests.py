@@ -46,21 +46,21 @@ class GenericAdminViewTest(TestCase):
     def tearDown(self):
         self.client.logout()
 
-    def testBasicAddGet(self):
+    def test_basic_add_GET(self):
         """
         A smoke test to ensure GET on the add_view works.
         """
         response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/add/')
         self.assertEqual(response.status_code, 200)
 
-    def testBasicEditGet(self):
+    def test_basic_edit_GET(self):
         """
         A smoke test to ensure GET on the change_view works.
         """
         response = self.client.get('/generic_inline_admin/admin/generic_inline_admin/episode/%d/' % self.episode_pk)
         self.assertEqual(response.status_code, 200)
 
-    def testBasicAddPost(self):
+    def test_basic_add_POST(self):
         """
         A smoke test to ensure POST on add_view works.
         """
@@ -74,7 +74,7 @@ class GenericAdminViewTest(TestCase):
         response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/episode/add/', post_data)
         self.assertEqual(response.status_code, 302)  # redirect somewhere
 
-    def testBasicEditPost(self):
+    def test_basic_edit_POST(self):
         """
         A smoke test to ensure POST on edit_view works.
         """
@@ -95,7 +95,7 @@ class GenericAdminViewTest(TestCase):
         response = self.client.post(url, post_data)
         self.assertEqual(response.status_code, 302)  # redirect somewhere
 
-    def testGenericInlineFormset(self):
+    def test_generic_inline_formset(self):
         EpisodeMediaFormSet = generic_inlineformset_factory(Media, can_delete=False, exclude=['description', 'keywords'], extra=3)
         e = Episode.objects.get(name='This Week in Django')
 
@@ -119,7 +119,7 @@ class GenericAdminViewTest(TestCase):
         self.assertHTMLEqual(formset.forms[0].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-0-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-0-url" type="url" name="generic_inline_admin-media-content_type-object_id-0-url" value="http://example.com/logo.png" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-0-id" value="%s" id="id_generic_inline_admin-media-content_type-object_id-0-id" /></p>' % self.png_media_pk)
         self.assertHTMLEqual(formset.forms[1].as_p(), '<p><label for="id_generic_inline_admin-media-content_type-object_id-1-url">Url:</label> <input id="id_generic_inline_admin-media-content_type-object_id-1-url" type="url" name="generic_inline_admin-media-content_type-object_id-1-url" maxlength="200" /><input type="hidden" name="generic_inline_admin-media-content_type-object_id-1-id" id="id_generic_inline_admin-media-content_type-object_id-1-id" /></p>')
 
-    def testGenericInlineFormsetFactory(self):
+    def test_generic_inline_formset_factory(self):
         # Regression test for #10522.
         inline_formset = generic_inlineformset_factory(Media,
             exclude=('url',))
@@ -153,7 +153,7 @@ class GenericInlineAdminParametersTest(TestCase):
         Media.objects.create(content_object=e, url='http://example.com/podcast.mp3')
         return e
 
-    def testNoParam(self):
+    def test_no_param(self):
         """
         With one initial form, extra (default) at 3, there should be 4 forms.
         """
@@ -163,7 +163,7 @@ class GenericInlineAdminParametersTest(TestCase):
         self.assertEqual(formset.total_form_count(), 4)
         self.assertEqual(formset.initial_form_count(), 1)
 
-    def testExtraParam(self):
+    def test_extra_param(self):
         """
         With extra=0, there should be one form.
         """
@@ -202,7 +202,7 @@ class GenericInlineAdminParametersTest(TestCase):
         self.assertEqual(formset.total_form_count(), 2)
         self.assertEqual(formset.initial_form_count(), 1)
 
-    def testMinNumParam(self):
+    def test_min_num_param(self):
         """
         With extra=3 and min_num=2, there should be five forms.
         """
@@ -234,7 +234,7 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
     def tearDown(self):
         self.client.logout()
 
-    def testAdd(self):
+    def test_add(self):
         category_id = Category.objects.create(name='male').pk
         post_data = {
             "name": "John Doe",

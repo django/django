@@ -53,7 +53,7 @@ class DispatcherTests(unittest.TestCase):
         self.assertFalse(signal.has_listeners())
         self.assertEqual(signal.receivers, [])
 
-    def testExact(self):
+    def test_exact(self):
         a_signal.connect(receiver_1_arg, sender=self)
         expected = [(receiver_1_arg, "test")]
         result = a_signal.send(sender=self, val="test")
@@ -61,7 +61,7 @@ class DispatcherTests(unittest.TestCase):
         a_signal.disconnect(receiver_1_arg, sender=self)
         self._testIsClean(a_signal)
 
-    def testIgnoredSender(self):
+    def test_ignored_sender(self):
         a_signal.connect(receiver_1_arg)
         expected = [(receiver_1_arg, "test")]
         result = a_signal.send(sender=self, val="test")
@@ -69,7 +69,7 @@ class DispatcherTests(unittest.TestCase):
         a_signal.disconnect(receiver_1_arg)
         self._testIsClean(a_signal)
 
-    def testGarbageCollected(self):
+    def test_garbage_collected(self):
         a = Callable()
         a_signal.connect(a.a, sender=self)
         expected = []
@@ -79,7 +79,7 @@ class DispatcherTests(unittest.TestCase):
         self.assertEqual(result, expected)
         self._testIsClean(a_signal)
 
-    def testCachedGarbagedCollected(self):
+    def test_cached_garbaged_collected(self):
         """
         Make sure signal caching sender receivers don't prevent garbage
         collection of senders.
@@ -97,7 +97,7 @@ class DispatcherTests(unittest.TestCase):
             # Disconnect after reference check since it flushes the tested cache.
             d_signal.disconnect(receiver_1_arg)
 
-    def testMultipleRegistration(self):
+    def test_multiple_registration(self):
         a = Callable()
         a_signal.connect(a)
         a_signal.connect(a)
@@ -113,7 +113,7 @@ class DispatcherTests(unittest.TestCase):
         garbage_collect()
         self._testIsClean(a_signal)
 
-    def testUidRegistration(self):
+    def test_uid_registration(self):
         def uid_based_receiver_1(**kwargs):
             pass
 
@@ -126,7 +126,7 @@ class DispatcherTests(unittest.TestCase):
         a_signal.disconnect(dispatch_uid="uid")
         self._testIsClean(a_signal)
 
-    def testRobust(self):
+    def test_robust(self):
         """Test the sendRobust function"""
         def fails(val, **kwargs):
             raise ValueError('this')
@@ -140,7 +140,7 @@ class DispatcherTests(unittest.TestCase):
         a_signal.disconnect(fails)
         self._testIsClean(a_signal)
 
-    def testDisconnection(self):
+    def test_disconnection(self):
         receiver_1 = Callable()
         receiver_2 = Callable()
         receiver_3 = Callable()
@@ -170,7 +170,7 @@ class ReceiverTestCase(unittest.TestCase):
     Test suite for receiver.
 
     """
-    def testReceiverSingleSignal(self):
+    def test_receiver_single_signal(self):
         @receiver(a_signal)
         def f(val, **kwargs):
             self.state = val
@@ -178,7 +178,7 @@ class ReceiverTestCase(unittest.TestCase):
         a_signal.send(sender=self, val=True)
         self.assertTrue(self.state)
 
-    def testReceiverSignalList(self):
+    def test_receiver_signal_list(self):
         @receiver([a_signal, b_signal, c_signal])
         def f(val, **kwargs):
             self.state.append(val)
