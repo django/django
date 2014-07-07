@@ -80,6 +80,7 @@ _error_files = []
 _cached_modules = set()
 _cached_filenames = []
 
+
 def gen_filenames(only_new=False):
     """
     Returns a list of filenames referenced in sys.modules and translation
