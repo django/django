@@ -511,7 +511,7 @@ class DataTests(OptionsBaseTests):
         is_data_field = lambda f: isinstance(f, Field) and not isinstance(f, related.ManyToManyField)
 
         for model, expected_result in TEST_RESULTS['local_fields'].items():
-            fields = model._meta.get_fields(include_parents=False)
+            fields = model._meta.get_new_fields(include_parents=False)
             self.assertEqual([f.attname for f in fields], expected_result)
             self.assertTrue(all([f.model is model for f in fields]))
             self.assertTrue(all([is_data_field(f) for f in fields]))
@@ -611,15 +611,15 @@ class RelatedM2MTests(OptionsBaseTests):
                               for o in objects], expected)
 
     def test_related_m2m_asymmetrical(self):
-        m2m = Person._meta.get_new_fields(data=False, related_m2m=True)
+        m2m = Person._meta.get_new_fields(data=False, m2m=True)
         self.assertTrue('following_base' in [f.attname for f in m2m])
-        related_m2m = Person._meta.get_new_fields(types=RELATED_M2M)
+        related_m2m = Person._meta.get_new_fields(data=False, related_m2m=True)
         self.assertTrue('followers_base' in [o.field.related_query_name() for o in related_m2m])
 
     def test_related_m2m_symmetrical(self):
-        m2m = Person._meta.get_new_fields(data=False, related_m2m=True)
+        m2m = Person._meta.get_new_fields(data=False, m2m=True)
         self.assertTrue('friends_base' in [f.attname for f in m2m])
-        related_m2m = Person._meta.get_new_fields(types=RELATED_M2M)
+        related_m2m = Person._meta.get_new_fields(data=False, related_m2m=True)
         self.assertIn('friends_inherited_rel_+', [o.field.related_query_name() for o in related_m2m])
 
 
@@ -627,7 +627,7 @@ class VirtualFieldsTests(OptionsBaseTests):
 
     def test_virtual_fields(self):
         for model, expected_names in TEST_RESULTS['virtual_fields'].items():
-            objects = model._meta.get_new_fields(types=VIRTUAL)
+            objects = model._meta.get_new_fields(data=False, virtual=True)
             self.assertEqual(sorted([f.name for f in objects]), sorted(expected_names))
 
 

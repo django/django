@@ -138,9 +138,12 @@ class Options(object):
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
-    def get_new_fields(self, types, opts=NONE, recursive=False):
+    def get_new_fields(self, m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False,
+                       include_parents=True, include_non_concrete=True, include_hidden=False, include_proxy=False, **kwargs):
 
-        cache_key = (types, opts, recursive)
+        recursive = kwargs.get('recursive', False)
+        cache_key = (m2m, data, related_m2m, related_objects, virtual, include_parents,
+                     include_non_concrete, include_hidden, include_proxy, recursive)
         try:
             return self._get_new_fields_cache[cache_key]
         except KeyError:
@@ -148,10 +151,10 @@ class Options(object):
 
         fields = OrderedDict()
 
-        if types & RELATED_M2M:
-            if not (opts & LOCAL_ONLY):
+        if related_m2m:
+            if include_parents:
                 for parent in self.parents:
-                    for obj, query_name in six.iteritems(parent._meta.get_new_fields(types=RELATED_M2M, recursive=True)):
+                    for obj, query_name in six.iteritems(parent._meta.get_new_fields(data=False, related_m2m=True, recursive=True)):
                         is_valid = not (obj.field.creation_counter < 0
                                     and obj.model not in self.get_parent_list())
                         if is_valid:
@@ -163,15 +166,16 @@ class Options(object):
                     if has_rel_attr and self == f.rel.to._meta:
                         fields[f.related] = (f.related_query_name(),)
 
-        if types & RELATED_OBJECTS:
+        if related_objects:
             parent_list = self.get_parent_list()
-            if not (opts & LOCAL_ONLY):
+            if include_parents:
                 for parent in self.parents:
-                    for obj, query_name in six.iteritems(parent._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_HIDDEN, recursive=True)):
+                    for obj, query_name in six.iteritems(parent._meta.get_new_fields(data=False,
+                            related_objects=True, include_hidden=True, recursive=True)):
                         if not ((obj.field.creation_counter < 0
                                 or obj.field.rel.parent_link)
                                 and obj.model not in parent_list):
-                            if (opts & INCLUDE_HIDDEN) or not obj.field.rel.is_hidden():
+                            if include_hidden or not obj.field.rel.is_hidden():
                                 fields[obj] = query_name
 
             for model in self.apps.non_swapped_models_auto_created:
@@ -179,28 +183,27 @@ class Options(object):
                     try:
                         if f.rel and f.has_class_relation:
                             to_meta = f.rel.to._meta
-                            if (to_meta == self) or ((opts & INCLUDE_PROXY)
-                                    and self.concrete_model == to_meta.concrete_model):
-                                if (opts & INCLUDE_HIDDEN) or not f.related.field.rel.is_hidden():
+                            if (to_meta == self) or (include_proxy and self.concrete_model == to_meta.concrete_model):
+                                if include_hidden or not f.related.field.rel.is_hidden():
                                     fields[f.related] = (f.related_query_name(),)
                     except AttributeError:
                         continue
 
-        if types & M2M:
-            if not opts & LOCAL_ONLY:
+        if m2m:
+            if include_parents:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(types=M2M, opts=opts, recursive=True))
+                    fields.update(parent._meta.get_new_fields(data=False, m2m=True, recursive=True))
             fields.update((field, (field.name, field.attname)) for field in self.local_many_to_many)
 
-        if types & DATA:
-            if not opts & LOCAL_ONLY:
+        if data:
+            if include_parents:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(types=DATA, opts=opts, recursive=True))
+                    fields.update(parent._meta.get_new_fields(recursive=True))
             for field in self.local_fields:
-                if not ((opts & CONCRETE) and field.column is None):
+                if include_non_concrete or field.column is not None:
                     fields[field] = (field.name, field.attname)
 
-        if types & VIRTUAL:
+        if virtual:
             for field in self.virtual_fields:
                 fields[field] = (field.name,)
 
@@ -402,7 +405,8 @@ class Options(object):
     @cached_property
     def field_map(self):
         res = {}
-        for field, names in six.iteritems(self.get_new_fields(types=ALL, recursive=True)):
+        for field, names in six.iteritems(self.get_new_fields(m2m=True, related_objects=True,
+                                          related_m2m=True, virtual=True, recursive=True)):
             for name in names:
                 res[name] = field
         return res
@@ -410,7 +414,7 @@ class Options(object):
     @cached_property
     def concrete_field_map(self):
         res = {}
-        for field, names in six.iteritems(self.get_new_fields(types=NON_RELATED_FIELDS, recursive=True)):
+        for field, names in six.iteritems(self.get_new_fields(data=True, m2m=True, recursive=True)):
             for name in names:
                 res[name] = field
         return res
@@ -424,15 +428,15 @@ class Options(object):
         Callers are not permitted to modify this list, since it's a reference
         to this instance (not a copy).
         """
-        return list(self.get_new_fields(types=DATA))
+        return list(self.get_new_fields())
 
     @cached_property
     def concrete_fields(self):
-        return list(self.get_new_fields(types=DATA, opts=CONCRETE))
+        return list(self.get_new_fields(include_non_concrete=False))
 
     @cached_property
     def local_concrete_fields(self):
-        return self.get_new_fields(types=DATA, opts=CONCRETE | LOCAL_ONLY)
+        return self.get_new_fields(include_parents=False, include_non_concrete=False)
 
     def get_fields_with_model(self):
         """
@@ -440,10 +444,10 @@ class Options(object):
         element is None for fields on the current model. Mostly of use when
         constructing queries so that we know which model a field belongs to.
         """
-        return list(map(self._map_model, self.get_new_fields(types=DATA)))
+        return list(map(self._map_model, self.get_new_fields()))
 
     def get_concrete_fields_with_model(self):
-        return list(map(self._map_model, self.get_new_fields(types=DATA, opts=CONCRETE)))
+        return list(map(self._map_model, self.get_new_fields(include_non_concrete=False)))
 
     def _fill_fields_cache(self):
         cache = []
@@ -459,13 +463,13 @@ class Options(object):
 
     @cached_property
     def many_to_many(self):
-        return list(self.get_new_fields(types=M2M))
+        return list(self.get_new_fields(data=False, m2m=True))
 
     def get_m2m_with_model(self):
         """
         The many-to-many version of get_fields_with_model().
         """
-        return list(map(self._map_model, self.get_new_fields(types=M2M)))
+        return list(map(self._map_model, self.get_new_fields(data=False, m2m=True)))
 
     def _fill_m2m_cache(self):
         cache = OrderedDict()
@@ -531,14 +535,10 @@ class Options(object):
 
     def get_all_related_objects(self, local_only=False, include_hidden=False,
                                 include_proxy_eq=False):
-        opts = NONE
-        if local_only:
-            opts |= LOCAL_ONLY
-        if include_hidden:
-            opts |= INCLUDE_HIDDEN
-        if include_proxy_eq:
-            opts |= INCLUDE_PROXY
-        return list(self.get_new_fields(types=RELATED_OBJECTS, opts=opts))
+        include_parents = local_only is False
+        return list(self.get_new_fields(data=False, related_objects=True,
+                    include_parents=include_parents, include_hidden=include_hidden,
+                    include_proxy=include_proxy_eq))
 
     def get_all_related_objects_with_model(self, local_only=False,
                                            include_hidden=False,
@@ -547,14 +547,11 @@ class Options(object):
         Returns a list of (related-object, model) pairs. Similar to
         get_fields_with_model().
         """
-        opts = NONE
-        if local_only:
-            opts |= LOCAL_ONLY
-        if include_hidden:
-            opts |= INCLUDE_HIDDEN
-        if include_proxy_eq:
-            opts |= INCLUDE_PROXY
-        return list(map(self._map_model, self.get_new_fields(types=RELATED_OBJECTS, opts=opts)))
+        include_parents = local_only is False
+        fields = self.get_new_fields(data=False, related_objects=True,
+                            include_parents=include_parents, include_hidden=include_hidden,
+                            include_proxy=include_proxy_eq)
+        return list(map(self._map_model, fields))
 
     def _fill_related_objects_cache(self):
         cache = OrderedDict()
@@ -592,10 +589,7 @@ class Options(object):
         self._related_objects_proxy_cache = proxy_cache
 
     def get_all_related_many_to_many_objects(self, local_only=False):
-        opts = NONE
-        if local_only:
-            opts |= LOCAL_ONLY
-        return list(self.get_new_fields(types=RELATED_M2M, opts=opts))
+        return list(self.get_new_fields(data=False, related_m2m=True, include_parents=local_only is not True))
 
     def _map_model(self, connection):
         try:
@@ -629,7 +623,7 @@ class Options(object):
         Returns a list of (related-m2m-object, model) pairs. Similar to
         get_fields_with_model().
         """
-        return list(map(self._map_model, self.get_new_fields(types=RELATED_M2M)))
+        return list(map(self._map_model, self.get_new_fields(data=False, related_m2m=True)))
 
     def _fill_related_many_to_many_cache(self):
         cache = OrderedDict()
