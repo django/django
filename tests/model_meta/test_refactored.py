@@ -479,10 +479,10 @@ TEST_RESULTS = {
 class OptionsBaseTests(test.TestCase):
 
     def _map_rq_names(self, res):
-        return tuple([(o.field.related_query_name(), m) for o, m in res])
+        return tuple((o.field.related_query_name(), m) for o, m in res)
 
     def _map_names(self, res):
-        return tuple([(f.name, m) for f, m in res])
+        return tuple((f.name, m) for f, m in res)
 
     def _model(self, current_model, field):
         direct = isinstance(field, Field) or isinstance(field, GenericForeignKey)
