@@ -71,61 +71,61 @@ class AdminFormfieldForDBFieldTests(TestCase):
         # Return the formfield so that other tests can continue
         return ff
 
-    def testDateField(self):
+    def test_DateField(self):
         self.assertFormfield(models.Event, 'start_date', widgets.AdminDateWidget)
 
-    def testDateTimeField(self):
+    def test_DateTimeField(self):
         self.assertFormfield(models.Member, 'birthdate', widgets.AdminSplitDateTime)
 
-    def testTimeField(self):
+    def test_TimeField(self):
         self.assertFormfield(models.Event, 'start_time', widgets.AdminTimeWidget)
 
-    def testTextField(self):
+    def test_TextField(self):
         self.assertFormfield(models.Event, 'description', widgets.AdminTextareaWidget)
 
-    def testURLField(self):
+    def test_URLField(self):
         self.assertFormfield(models.Event, 'link', widgets.AdminURLFieldWidget)
 
-    def testIntegerField(self):
+    def test_IntegerField(self):
         self.assertFormfield(models.Event, 'min_age', widgets.AdminIntegerFieldWidget)
 
-    def testCharField(self):
+    def test_CharField(self):
         self.assertFormfield(models.Member, 'name', widgets.AdminTextInputWidget)
 
-    def testEmailField(self):
+    def test_EmailField(self):
         self.assertFormfield(models.Member, 'email', widgets.AdminEmailInputWidget)
 
-    def testFileField(self):
+    def test_FileField(self):
         self.assertFormfield(models.Album, 'cover_art', widgets.AdminFileWidget)
 
-    def testForeignKey(self):
+    def test_ForeignKey(self):
         self.assertFormfield(models.Event, 'main_band', forms.Select)
 
-    def testRawIDForeignKey(self):
+    def test_raw_id_ForeignKey(self):
         self.assertFormfield(models.Event, 'main_band', widgets.ForeignKeyRawIdWidget,
                              raw_id_fields=['main_band'])
 
-    def testRadioFieldsForeignKey(self):
+    def test_radio_fields_ForeignKey(self):
         ff = self.assertFormfield(models.Event, 'main_band', widgets.AdminRadioSelect,
                                   radio_fields={'main_band': admin.VERTICAL})
         self.assertEqual(ff.empty_label, None)
 
-    def testManyToMany(self):
+    def test_many_to_many(self):
         self.assertFormfield(models.Band, 'members', forms.SelectMultiple)
 
-    def testRawIDManyTOMany(self):
+    def test_raw_id_many_to_many(self):
         self.assertFormfield(models.Band, 'members', widgets.ManyToManyRawIdWidget,
                              raw_id_fields=['members'])
 
-    def testFilteredManyToMany(self):
+    def test_filtered_many_to_many(self):
         self.assertFormfield(models.Band, 'members', widgets.FilteredSelectMultiple,
                              filter_vertical=['members'])
 
-    def testFormfieldOverrides(self):
+    def test_formfield_overrides(self):
         self.assertFormfield(models.Event, 'start_date', forms.TextInput,
                              formfield_overrides={DateField: {'widget': forms.TextInput}})
 
-    def testFormfieldOverridesWidgetInstances(self):
+    def test_formfield_overrides_widget_instances(self):
         """
         Test that widget instances in formfield_overrides are not shared between
         different fields. (#19423)
@@ -142,14 +142,14 @@ class AdminFormfieldForDBFieldTests(TestCase):
         self.assertEqual(f2.widget.attrs['maxlength'], '20')
         self.assertEqual(f2.widget.attrs['size'], '10')
 
-    def testFieldWithChoices(self):
+    def test_field_with_choices(self):
         self.assertFormfield(models.Member, 'gender', forms.Select)
 
-    def testChoicesWithRadioFields(self):
+    def test_choices_with_radio_fields(self):
         self.assertFormfield(models.Member, 'gender', widgets.AdminRadioSelect,
                              radio_fields={'gender': admin.VERTICAL})
 
-    def testInheritance(self):
+    def test_inheritance(self):
         self.assertFormfield(models.Album, 'backside_art', widgets.AdminFileWidget)
 
     def test_m2m_widgets(self):
@@ -169,7 +169,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
 class AdminFormfieldForDBFieldWithRequestTests(DjangoTestCase):
     fixtures = ["admin-widgets-users.xml"]
 
-    def testFilterChoicesByRequestUser(self):
+    def test_filter_choices_by_request_user(self):
         """
         Ensure the user can only see their own cars in the foreign key dropdown.
         """
@@ -190,7 +190,7 @@ class AdminForeignKeyWidgetChangeList(DjangoTestCase):
     def tearDown(self):
         self.client.logout()
 
-    def test_changelist_foreignkey(self):
+    def test_changelist_ForeignKey(self):
         response = self.client.get('/admin_widgets/car/')
         self.assertContains(response, '/auth/user/add/')
 
@@ -972,7 +972,7 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         models.Band.objects.create(id=98, name='Green Potatoes')
         super(AdminRawIdWidgetSeleniumFirefoxTests, self).setUp()
 
-    def test_foreignkey(self):
+    def test_ForeignKey(self):
         self.admin_login(username='super', password='secret', login_url='/')
         self.selenium.get(
             '%s%s' % (self.live_server_url, '/admin_widgets/event/add/'))
@@ -1058,7 +1058,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
     fixtures = ['admin-widgets-users.xml']
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
-    def test_foreign_key_using_to_field(self):
+    def test_ForeignKey_using_to_field(self):
         self.admin_login(username='super', password='secret', login_url='/')
         self.selenium.get('%s%s' % (
             self.live_server_url,

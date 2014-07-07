@@ -16,7 +16,7 @@ from .models import Photo, PhotoForm, temp_storage_dir
 
 class Bug639Test(unittest.TestCase):
 
-    def testBug639(self):
+    def test_bug_639(self):
         """
         Simulate a file upload and check how many times Model.save() gets
         called.
