@@ -1428,7 +1428,7 @@ class Query(object):
         field_names = [val for val in opts.field_map.keys() if not val.endswith('+')]
         available = field_names + list(self.aggregate_select)
         raise FieldError("Cannot resolve keyword %r into field. "
-                         "Choices are: %s" % (name, ", ".join(available)))
+                         "Choices are: %s" % (name, ", ".join(sorted(available))))
 
     def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True):
         """

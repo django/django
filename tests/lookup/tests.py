@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 from operator import attrgetter
-from unittest import skipUnless, skip
+from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection
@@ -465,7 +465,6 @@ class LookupTests(TestCase):
                 '<Article: Article 1>',
             ])
 
-    @skip("Relies non non-deterministic dict ordering")
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages
         try:
