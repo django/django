@@ -24,22 +24,6 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save', 'default_related_name')
 
-DATA = 0b00001
-M2M = 0b00010
-RELATED_OBJECTS = 0b00100
-RELATED_M2M = 0b01000
-VIRTUAL = 0b10000
-
-# Aggregates
-NON_RELATED_FIELDS = DATA | M2M | VIRTUAL
-ALL = RELATED_M2M | RELATED_OBJECTS | M2M | DATA | VIRTUAL
-
-NONE = 0b0000
-LOCAL_ONLY = 0b0001
-CONCRETE = 0b0010
-INCLUDE_HIDDEN = 0b0100
-INCLUDE_PROXY = 0b1000
-
 
 def normalize_together(option_together):
     """
@@ -154,7 +138,9 @@ class Options(object):
         if related_m2m:
             if include_parents:
                 for parent in self.parents:
-                    for obj, query_name in six.iteritems(parent._meta.get_new_fields(data=False, related_m2m=True, recursive=True)):
+                    for obj, query_name in six.iteritems(parent._meta.get_new_fields(data=False, related_m2m=True,
+                                                         include_parents=include_parents, include_non_concrete=include_non_concrete,
+                                                         include_hidden=include_hidden, include_proxy=include_proxy, recursive=True)):
                         is_valid = not (obj.field.creation_counter < 0
                                     and obj.model not in self.get_parent_list())
                         if is_valid:
@@ -170,8 +156,9 @@ class Options(object):
             parent_list = self.get_parent_list()
             if include_parents:
                 for parent in self.parents:
-                    for obj, query_name in six.iteritems(parent._meta.get_new_fields(data=False,
-                            related_objects=True, include_hidden=True, recursive=True)):
+                    for obj, query_name in six.iteritems(parent._meta.get_new_fields(data=False, related_objects=True,
+                                                         include_parents=include_parents, include_non_concrete=include_non_concrete,
+                                                         include_hidden=True, include_proxy=include_proxy, recursive=True)):
                         if not ((obj.field.creation_counter < 0
                                 or obj.field.rel.parent_link)
                                 and obj.model not in parent_list):
@@ -192,13 +179,17 @@ class Options(object):
         if m2m:
             if include_parents:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(data=False, m2m=True, recursive=True))
+                    fields.update(parent._meta.get_new_fields(data=False, m2m=True,
+                                                              include_parents=include_parents, include_non_concrete=include_non_concrete,
+                                                              include_hidden=include_hidden, include_proxy=include_proxy, recursive=True))
+
             fields.update((field, (field.name, field.attname)) for field in self.local_many_to_many)
 
         if data:
             if include_parents:
                 for parent in self.parents:
-                    fields.update(parent._meta.get_new_fields(recursive=True))
+                    fields.update(parent._meta.get_new_fields(include_parents=include_parents, include_non_concrete=include_non_concrete,
+                                                              include_hidden=include_hidden, include_proxy=include_proxy, recursive=True))
             for field in self.local_fields:
                 if include_non_concrete or field.column is not None:
                     fields[field] = (field.name, field.attname)
@@ -414,7 +405,7 @@ class Options(object):
     @cached_property
     def concrete_field_map(self):
         res = {}
-        for field, names in six.iteritems(self.get_new_fields(data=True, m2m=True, recursive=True)):
+        for field, names in six.iteritems(self.get_new_fields(m2m=True, virtual=True, recursive=True)):
             for name in names:
                 res[name] = field
         return res

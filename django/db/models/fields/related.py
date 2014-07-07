@@ -13,8 +13,6 @@ from django.db.models.fields import (AutoField, Field, IntegerField,
 from django.db.models.lookups import IsNull
 from django.db.models.related import RelatedObject, PathInfo
 from django.db.models.query import QuerySet
-# CIRCULAR IMPORT
-#from django.db.models.options import RELATED_OBJECTS, RELATED_M2M
 from django.db.models.sql.datastructures import Col
 from django.utils.encoding import smart_text
 from django.utils import six
@@ -24,10 +22,6 @@ from django.core import exceptions
 from django import forms
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
-
-# CIRCULAR IMPORT
-RELATED_OBJECTS = 0b00100
-RELATED_M2M = 0b01000
 
 
 def add_lazy_relation(cls, field, relation, operation):

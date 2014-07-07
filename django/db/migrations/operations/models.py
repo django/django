@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.db.models.options import normalize_together, RELATED_M2M, RELATED_OBJECTS
+from django.db.models.options import normalize_together
 from django.db.migrations.state import ModelState
 from django.db.migrations.operations.base import Operation
 from django.utils import six

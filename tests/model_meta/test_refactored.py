@@ -2,10 +2,6 @@ from django import test
 
 from django.db.models.fields import related, CharField, Field
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.db.models.options import (
-    DATA, M2M, RELATED_OBJECTS, RELATED_M2M, VIRTUAL,
-    LOCAL_ONLY, CONCRETE, INCLUDE_HIDDEN, INCLUDE_PROXY
-)
 
 from .models import (
     AbstractPerson, BasePerson, Person, Relating, Relation

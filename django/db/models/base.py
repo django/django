@@ -19,7 +19,7 @@ from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
     OneToOneField, add_lazy_relation)
 from django.db.models.manager import ensure_default_manager
-from django.db.models.options import Options, DATA, LOCAL_ONLY, CONCRETE
+from django.db.models.options import Options
 from django.db.models.query import Q
 from django.db.models.query_utils import DeferredAttribute, deferred_class_factory
 from django.db.models import signals

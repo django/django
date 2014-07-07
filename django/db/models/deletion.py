@@ -3,14 +3,7 @@ from operator import attrgetter
 
 from django.db import connections, transaction, IntegrityError
 from django.db.models import signals, sql
-# Circular Dependency
-#from django.db.models.options import RELATED_OBJECTS, INCLUDE_HIDDEN, INCLUDE_PROXY
 from django.utils import six
-
-
-RELATED_OBJECTS = 0b00100
-INCLUDE_HIDDEN = 0b0100
-INCLUDE_PROXY = 0b1000
 
 
 class ProtectedError(IntegrityError):

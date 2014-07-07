@@ -13,8 +13,6 @@ from django.db import (connections, router, transaction, IntegrityError,
     DJANGO_VERSION_PICKLE_KEY)
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import Field, AutoField, Empty
-# Circular Dependency
-#from django.db.models.options import RELATED_OBJECTS
 from django.db.models.query_utils import (Q, select_related_descend,
     deferred_class_factory, InvalidQuery)
 from django.db.models.deletion import Collector
@@ -24,11 +22,6 @@ from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
 from django.utils.version import get_version
-
-DATA = 0b00001
-RELATED_OBJECTS = 0b00100
-LOCAL_ONLY = 0b0001
-CONCRETE = 0b0010
 
 # The maximum number (one less than the max to be precise) of results to fetch
 # in a get() query
