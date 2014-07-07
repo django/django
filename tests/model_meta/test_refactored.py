@@ -478,7 +478,7 @@ TEST_RESULTS = {
 
 class OptionsBaseTests(test.TestCase):
 
-    def _map_rq_names(self, res):
+    def _map_related_query_names(self, res):
         return tuple((o.field.related_query_name(), m) for o, m in res)
 
     def _map_names(self, res):
@@ -547,14 +547,14 @@ class RelatedObjectsTests(OptionsBaseTests):
         for model, expected in TEST_RESULTS[result_key].items():
             objects = [(field, self._model(model, field))
                        for field in model._meta.get_new_fields(types=RELATED_OBJECTS)]
-            self.assertEqual(self._map_rq_names(objects), expected)
+            self.assertEqual(self._map_related_query_names(objects), expected)
 
     def test_related_objects_local(self):
         result_key = 'get_all_related_objects_with_model_local'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = [(field, self._model(model, field))
                        for field in model._meta.get_new_fields(types=RELATED_OBJECTS, opts=LOCAL_ONLY)]
-            self.assertEqual(self._map_rq_names(objects), expected)
+            self.assertEqual(self._map_related_query_names(objects), expected)
 
     def test_related_objects_include_hidden(self):
         result_key = 'get_all_related_objects_with_model_hidden'
@@ -581,7 +581,7 @@ class RelatedObjectsTests(OptionsBaseTests):
         for model, expected in TEST_RESULTS[result_key].items():
             objects = [(field, self._model(model, field))
                        for field in model._meta.get_new_fields(types=RELATED_OBJECTS, opts=INCLUDE_PROXY)]
-            self.assertEqual(self._map_rq_names(objects), expected)
+            self.assertEqual(self._map_related_query_names(objects), expected)
 
     def test_related_objects_proxy_hidden(self):
         result_key = 'get_all_related_objects_with_model_proxy_hidden'
@@ -601,7 +601,7 @@ class RelatedM2MTests(OptionsBaseTests):
         for model, expected in TEST_RESULTS[result_key].items():
             objects = [(field, self._model(model, field))
                        for field in model._meta.get_new_fields(types=RELATED_M2M)]
-            self.assertEqual(self._map_rq_names(objects), expected)
+            self.assertEqual(self._map_related_query_names(objects), expected)
 
     def test_related_m2m_local_only(self):
         result_key = 'get_all_related_many_to_many_local'
