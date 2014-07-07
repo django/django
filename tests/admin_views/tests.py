@@ -18,6 +18,7 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
+from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.utils import quote
@@ -26,6 +27,7 @@ from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Group, User, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase, skipUnlessDBFeature
@@ -100,6 +102,18 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertRedirects(response,
             '/test_admin/%s/admin_views/article/add/' % self.urlbit,
             status_code=301)
+
+    def test_admin_static_template_tag(self):
+        """
+        Test that admin_static.static is pointing to the collectstatic version
+        (as django.contrib.collectstatic is in installed apps).
+        """
+        old_url = staticfiles_storage.base_url
+        staticfiles_storage.base_url = '/test/'
+        try:
+            self.assertEqual(static('path'), '/test/path')
+        finally:
+            staticfiles_storage.base_url = old_url
 
     def test_basic_add_GET(self):
         """
