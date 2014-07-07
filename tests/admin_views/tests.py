@@ -548,7 +548,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             response = self.client.get('/test_admin/admin/jsi18n/')
             self.assertContains(response, 'Choisir une heure')
 
-    def test_L10N_deactivated(self):
+    def test_l10n_deactivated(self):
         """
         Check if L10N is deactivated, the JavaScript i18n view doesn't
         return localized date/time formats. Refs #14824.
