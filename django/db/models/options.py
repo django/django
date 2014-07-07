@@ -284,26 +284,12 @@ class Options(object):
                 model.add_to_class('id', auto)
 
     def _expire_cache(self):
-        try:
-            del self.fields
-        except AttributeError:
-            pass
-        try:
-            del self.concrete_fields
-        except AttributeError:
-            pass
-        try:
-            del self.local_concrete_fields
-        except AttributeError:
-            pass
-        try:
-            del self.field_map
-        except AttributeError:
-            pass
-        try:
-            del self.concrete_field_map
-        except AttributeError:
-            pass
+        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields',
+                          'field_map', 'concrete_field_map',):
+            try:
+                delattr(self, cache_key)
+            except AttributeError:
+                pass
         self._get_new_fields_cache = {}
 
     def add_field(self, field):
