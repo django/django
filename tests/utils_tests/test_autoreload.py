@@ -76,8 +76,8 @@ class TestFilenameGenerator(TestCase):
         When calling a second time gen_filenames with only_new = True, only
         files from newly loaded modules should be given.
         """
-        filenames1 = list(gen_filenames())
-        from fractions import Fraction
+        list(gen_filenames())
+        from fractions import Fraction  # NOQA
         filenames2 = list(gen_filenames(only_new=True))
         self.assertEqual(len(filenames2), 1)
         self.assertTrue(filenames2[0].endswith('fractions.py'))
