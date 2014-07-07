@@ -489,15 +489,15 @@ class OptionsBaseTests(test.TestCase):
         model = field.model if direct else field.parent_model._meta.concrete_model
         return None if model == current_model else model
 
-    def _details(self, current_model, connection):
-        direct = isinstance(connection, Field) or isinstance(connection, GenericForeignKey)
-        model = connection.model if direct else connection.parent_model._meta.concrete_model
+    def _details(self, current_model, relation):
+        direct = isinstance(relation, Field) or isinstance(relation, GenericForeignKey)
+        model = relation.model if direct else relation.parent_model._meta.concrete_model
         if model == current_model:
             model = None
 
-        field = connection if direct else connection.field
+        field = relation if direct else relation.field
         m2m = isinstance(field, related.ManyToManyField)
-        return connection, model, direct, m2m
+        return relation, model, direct, m2m
 
 
 class DataTests(OptionsBaseTests):
