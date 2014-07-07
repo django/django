@@ -123,9 +123,8 @@ class Options(object):
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
     def get_new_fields(self, m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False,
-                       include_parents=True, include_non_concrete=True, include_hidden=False, include_proxy=False, **kwargs):
+                       include_parents=True, include_non_concrete=True, include_hidden=False, include_proxy=False, recursive=False):
 
-        recursive = kwargs.get('recursive', False)
         cache_key = (m2m, data, related_m2m, related_objects, virtual, include_parents,
                      include_non_concrete, include_hidden, include_proxy, recursive)
         try:
@@ -133,9 +132,11 @@ class Options(object):
         except KeyError:
             pass
 
-        options = {'include_parents': include_parents, 'include_non_concrete': include_non_concrete, 'include_hidden': include_hidden,
-                   'include_proxy': include_proxy}
         fields = OrderedDict()
+        options = {'include_parents': include_parents,
+                   'include_non_concrete': include_non_concrete,
+                   'include_hidden': include_hidden,
+                   'include_proxy': include_proxy}
 
         if related_m2m:
             if include_parents:
