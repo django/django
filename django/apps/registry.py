@@ -207,10 +207,8 @@ class Apps(object):
         Checks whether an application with this name exists in the registry.
 
         app_name is the full name of the app eg. 'django.contrib.admin'.
-
-        It's safe to call this method at import time, even while the registry
-        is being populated. It returns False for apps that aren't loaded yet.
         """
+        self.check_ready()
         return any(ac.name == app_name for ac in self.app_configs.values())
 
     def get_containing_app_config(self, object_name):

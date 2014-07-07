@@ -301,10 +301,6 @@ Application registry
     Checks whether an application with the given name exists in the registry.
     ``app_name`` is the full name of the app, e.g. ``'django.contrib.admin'``.
 
-    Unlike :meth:`~django.apps.apps.get_app_config`, this method can be called
-    safely at import time. If the registry is still being populated, it may
-    return ``False``, even though the app will become available later.
-
 .. method:: apps.get_model(app_label, model_name)
 
     Returns the :class:`~django.db.models.Model` with the given ``app_label``
