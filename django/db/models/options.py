@@ -439,7 +439,7 @@ class Options(object):
         result = set()
         for _, names in six.iteritems(self.get_new_fields(related_objects=True, related_m2m=True,
                                          virtual=True, recursive=True)):
-            result.update(name for name in names)
+            result.update(name for name in names if not name.endswith('+'))
         return list(result)
 
     def get_m2m_with_model(self):
