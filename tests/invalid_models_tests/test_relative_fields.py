@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.core.checks import Error
+from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
 from django.test.utils import override_settings
 from django.test.testcases import skipIfDBFeature
@@ -58,6 +58,35 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 id='fields.E300',
             ),
         ]
+        self.assertEqual(errors, expected)
+
+    def test_many_to_many_with_useless_options(self):
+        class Model(models.Model):
+            name = models.CharField(max_length=20)
+
+        class ModelM2M(models.Model):
+            m2m = models.ManyToManyField(Model, null=True, validators=[''])
+
+        errors = ModelM2M.check()
+        field = ModelM2M._meta.get_field('m2m')
+
+        expected = [
+            DjangoWarning(
+                'null has no effect on ManyToManyField.',
+                hint=None,
+                obj=field,
+                id='fields.W340',
+            )
+        ]
+        expected.append(
+            DjangoWarning(
+                'ManyToManyField does not support validators.',
+                hint=None,
+                obj=field,
+                id='fields.W341',
+            )
+        )
+
         self.assertEqual(errors, expected)
 
     def test_ambiguous_relationship_model(self):

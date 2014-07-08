@@ -148,6 +148,8 @@ Related Fields
 * **fields.E338**: The intermediary model ``<through model>`` has no field
   ``<field name>``.
 * **fields.E339**: ``<model>.<field name>`` is not a foreign key to ``<model>``.
+* **fields.W340**: ``null`` has no effect on ``ManyToManyField``.
+* **fields.W341**: ``ManyToManyField`` does not support ``validators``.
 
 Signals
 ~~~~~~~

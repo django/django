@@ -8,6 +8,7 @@ certain test -- e.g. being a DateField or ForeignKey.
 import datetime
 
 from django.db import models
+from django.db.models.fields.related import ManyToManyField
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.encoding import smart_text, force_text
 from django.utils.translation import ugettext_lazy as _
@@ -207,8 +208,8 @@ class RelatedFieldListFilter(FieldListFilter):
                 'display': val,
             }
         if (isinstance(self.field, models.related.RelatedObject) and
-                self.field.field.null or hasattr(self.field, 'rel') and
-                self.field.null):
+                (self.field.field.null or isinstance(self.field.field, ManyToManyField)) or
+                hasattr(self.field, 'rel') and (self.field.null or isinstance(self.field, ManyToManyField))):
             yield {
                 'selected': bool(self.lookup_val_isnull),
                 'query_string': cl.get_query_string({

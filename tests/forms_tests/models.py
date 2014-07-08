@@ -92,7 +92,7 @@ class ChoiceFieldModel(models.Model):
 class OptionalMultiChoiceModel(models.Model):
     multi_choice = models.ManyToManyField(ChoiceOptionModel, blank=False, related_name='not_relevant',
                                           default=lambda: ChoiceOptionModel.objects.filter(name='default'))
-    multi_choice_optional = models.ManyToManyField(ChoiceOptionModel, blank=True, null=True,
+    multi_choice_optional = models.ManyToManyField(ChoiceOptionModel, blank=True,
                                                    related_name='not_relevant2')
 
 

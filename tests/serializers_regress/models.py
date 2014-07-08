@@ -168,7 +168,7 @@ class FKDataNaturalKey(models.Model):
 
 
 class M2MData(models.Model):
-    data = models.ManyToManyField(Anchor, null=True)
+    data = models.ManyToManyField(Anchor)
 
 
 class O2OData(models.Model):
@@ -181,7 +181,7 @@ class FKSelfData(models.Model):
 
 
 class M2MSelfData(models.Model):
-    data = models.ManyToManyField('self', null=True, symmetrical=False)
+    data = models.ManyToManyField('self', symmetrical=False)
 
 
 class FKDataToField(models.Model):
@@ -193,7 +193,7 @@ class FKDataToO2O(models.Model):
 
 
 class M2MIntermediateData(models.Model):
-    data = models.ManyToManyField(Anchor, null=True, through='Intermediate')
+    data = models.ManyToManyField(Anchor, through='Intermediate')
 
 
 class Intermediate(models.Model):
