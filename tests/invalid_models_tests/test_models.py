@@ -540,6 +540,27 @@ class OtherModelTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_non_valid(self):
+        class RelationModel(models.Model):
+            pass
+
+        class Model(models.Model):
+            relation = models.ManyToManyField(RelationModel)
+
+            class Meta:
+                ordering = ['relation']
+
+        errors = Model.check()
+        expected = [
+            Error(
+                "'ordering' refers to the non-existent field 'relation'.",
+                hint=None,
+                obj=Model,
+                id='models.E015',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
     def test_ordering_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
