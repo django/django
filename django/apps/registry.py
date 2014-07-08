@@ -6,6 +6,7 @@ import warnings
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.utils import lru_cache
+from django.utils.functional import conditional_cached_property
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils._os import upath
 
@@ -171,6 +172,16 @@ class Apps(object):
                 include_auto_created, include_deferred, include_swapped)))
         return result
 
+    @conditional_cached_property
+    def non_swapped_models_auto_created(self):
+        models = self.get_models(include_auto_created=True)
+        return self.ready, tuple(a for a in models if not a._meta.swapped)
+
+    @conditional_cached_property
+    def non_swapped_models(self):
+        models = self.get_models(include_auto_created=False)
+        return self.ready, tuple(a for a in models if not a._meta.swapped)
+
     def get_model(self, app_label, model_name=None):
         """
         Returns the model matching the given app_label and model_name.
@@ -318,6 +329,12 @@ class Apps(object):
 
         This is mostly used in tests.
         """
+        for cached_property in ['non_swapped_models',
+                                'non_swapped_models_auto_created']:
+            try:
+                delattr(self, cached_property)
+            except AttributeError:
+                pass
         self.get_models.cache_clear()
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###

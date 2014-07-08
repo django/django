@@ -41,7 +41,7 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
         else:
             # Check that the ct_field and ct_fk_fields exist
             try:
-                cls.model._meta.get_field(cls.ct_field)
+                cls.model._meta.get_new_field(cls.ct_field)
             except FieldDoesNotExist:
                 return [
                     checks.Error(
@@ -55,7 +55,7 @@ class GenericInlineModelAdminChecks(InlineModelAdminChecks):
                 ]
 
             try:
-                cls.model._meta.get_field(cls.ct_fk_field)
+                cls.model._meta.get_new_field(cls.ct_fk_field)
             except FieldDoesNotExist:
                 return [
                     checks.Error(

@@ -5,6 +5,7 @@ from django.core.exceptions import FieldError
 from django.db.backends.utils import truncate_name
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import ExpressionNode
+from django.db.models.fields import Field
 from django.db.models.query_utils import select_related_descend, QueryWrapper
 from django.db.models.sql.constants import (CURSOR, SINGLE, MULTI, NO_RESULTS,
         ORDER_DIR, GET_ITERATOR_CHUNK_SIZE, SelectInfo)
@@ -297,7 +298,11 @@ class SQLCompiler(object):
         # be used by local fields.
         seen_models = {None: start_alias}
 
-        for field, model in opts.get_concrete_fields_with_model():
+        for field in opts.concrete_fields:
+            field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
+            model = field.model if field_is_direct else field.parent_model._meta.concrete_model
+            if model == opts.model:
+                model = None
             if from_parent and model is not None and issubclass(from_parent, model):
                 # Avoid loading data for already loaded parents.
                 continue
@@ -633,10 +638,15 @@ class SQLCompiler(object):
             else:
                 restricted = False
 
-        for f, model in opts.get_fields_with_model():
+        for f in opts.fields:
+            # TODO: deprecated
             # The get_fields_with_model() returns None for fields that live
             # in the field's local model. So, for those fields we want to use
             # the f.model - that is the field's local model.
+            direct = isinstance(f, Field) or hasattr(f, 'is_gfk')
+            model = f.model if direct else f.parent_model._meta.concrete_model
+            if model == opts.model:
+                model = None
             field_model = model or f.model
             if not select_related_descend(f, restricted, requested,
                                           only_load.get(field_model)):
@@ -658,7 +668,7 @@ class SQLCompiler(object):
         if restricted:
             related_fields = [
                 (o.field, o.model)
-                for o in opts.get_all_related_objects()
+                for o in opts.get_new_fields(data=False, related_objects=True)
                 if o.field.unique
             ]
             for f, model in related_fields:

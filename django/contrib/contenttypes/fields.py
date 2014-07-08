@@ -23,6 +23,7 @@ class GenericForeignKey(object):
     """
 
     def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
+        self.is_gfk = True
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
@@ -67,7 +68,7 @@ class GenericForeignKey(object):
 
     def _check_object_id_field(self):
         try:
-            self.model._meta.get_field(self.fk_field)
+            self.model._meta.get_new_field(self.fk_field)
         except FieldDoesNotExist:
             return [
                 checks.Error(
@@ -85,7 +86,7 @@ class GenericForeignKey(object):
         valid content_type field (is a ForeignKey to ContentType). """
 
         try:
-            field = self.model._meta.get_field(self.ct_field)
+            field = self.model._meta.get_new_field(self.ct_field)
         except FieldDoesNotExist:
             return [
                 checks.Error(
@@ -156,7 +157,7 @@ class GenericForeignKey(object):
         fk_dict = defaultdict(set)
         # We need one instance for each group in order to get the right db:
         instance_dict = {}
-        ct_attname = self.model._meta.get_field(self.ct_field).get_attname()
+        ct_attname = self.model._meta.get_new_field(self.ct_field).get_attname()
         for instance in instances:
             # We avoid looking for values if either ct_id or fkey value is None
             ct_id = getattr(instance, ct_attname)
@@ -206,7 +207,7 @@ class GenericForeignKey(object):
             # lookups are cached (see ticket #5570). This takes more code than
             # the naive ``getattr(instance, self.ct_field)``, but has better
             # performance when dealing with GFKs in loops and such.
-            f = self.model._meta.get_field(self.ct_field)
+            f = self.model._meta.get_new_field(self.ct_field)
             ct_id = getattr(instance, f.get_attname(), None)
             if ct_id is not None:
                 ct = self.get_content_type(id=ct_id, using=instance._state.db)
@@ -296,12 +297,12 @@ class GenericRelation(ForeignObject):
 
     def resolve_related_fields(self):
         self.to_fields = [self.model._meta.pk.name]
-        return [(self.rel.to._meta.get_field_by_name(self.object_id_field_name)[0],
+        return [(self.rel.to._meta.get_new_field(self.object_id_field_name, True),
                  self.model._meta.pk)]
 
     def get_path_info(self):
         opts = self.rel.to._meta
-        target = opts.get_field_by_name(self.object_id_field_name)[0]
+        target = opts.get_new_field(self.object_id_field_name, True)
         return [PathInfo(self.model._meta, opts, (target,), self.rel, True, False)]
 
     def get_reverse_path_info(self):
@@ -337,7 +338,7 @@ class GenericRelation(ForeignObject):
                                                  for_concrete_model=self.for_concrete_model)
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
-        field = self.rel.to._meta.get_field_by_name(self.content_type_field_name)[0]
+        field = self.rel.to._meta.get_new_field(self.content_type_field_name)
         contenttype_pk = self.get_content_type().pk
         cond = where_class()
         lookup = field.get_lookup('exact')(Col(remote_alias, field, field), contenttype_pk)

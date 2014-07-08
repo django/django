@@ -134,8 +134,7 @@ class Collector(object):
             return False
         # Foreign keys pointing to this model, both from m2m and other
         # models.
-        for related in opts.get_all_related_objects(
-                include_hidden=True, include_proxy_eq=True):
+        for related in opts.get_new_fields(data=False, related_objects=True, include_hidden=True, include_proxy=True):
             if related.field.rel.on_delete is not DO_NOTHING:
                 return False
         # GFK deletes
@@ -172,7 +171,7 @@ class Collector(object):
         model = new_objs[0].__class__
 
         # Recursively collect concrete model's parent models, but not their
-        # related objects. These will be found by meta.get_all_related_objects()
+        # related objects. These will be found by meta.get_new_fields
         concrete_model = model._meta.concrete_model
         for ptr in six.itervalues(concrete_model._meta.parents):
             if ptr:
@@ -187,8 +186,7 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
-            for related in model._meta.get_all_related_objects(
-                    include_hidden=True, include_proxy_eq=True):
+            for related in model._meta.get_new_fields(data=False, related_objects=True, include_hidden=True, include_proxy=True):
                 field = related.field
                 if field.rel.on_delete == DO_NOTHING:
                     continue
