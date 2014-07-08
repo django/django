@@ -1444,11 +1444,11 @@ class Model(six.with_metaclass(ModelBase)):
 
         for field_name in fields:
             try:
-                cls._meta.get_new_field(field_name)
+                cls._meta.get_new_field(field_name, m2m=False)
             except FieldDoesNotExist:
                 if field_name.endswith('_id'):
                     try:
-                        field = cls._meta.get_new_field(field_name[:-3])
+                        field = cls._meta.get_new_field(field_name[:-3], m2m=False)
                     except FieldDoesNotExist:
                         pass
                     else:
