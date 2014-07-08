@@ -53,6 +53,7 @@ class Options(object):
         self._map_details_cache = {}
         self._map_model_cache = {}
         self._get_new_fields_cache = {}
+        self._get_new_field_cache = {}
         self.local_fields = []
         self.local_many_to_many = []
         self.virtual_fields = []
@@ -115,10 +116,21 @@ class Options(object):
     def installed(self):
         return self.app_config is not None
 
-    def get_new_field(self, field_name, include_relations=False):
-        selected_map = self.field_map if include_relations else self.concrete_field_map
+    def get_new_field(self, field_name, m2m=False, data=True, related_objects=False, related_m2m=False, virtual=True):
+
+        cache_key = (m2m, data, related_objects, related_m2m, virtual)
         try:
-            return selected_map[field_name]
+            field_map = self._get_new_field_cache[cache_key]
+        except KeyError:
+            res = {}
+            for field, names in six.iteritems(self.get_new_fields(m2m=m2m, data=data,
+                                              related_objects=related_objects, related_m2m=related_m2m,
+                                              virtual=virtual, recursive=True)):
+                for name in names:
+                    res[name] = field
+            field_map = self._get_new_field_cache[cache_key] = res
+        try:
+            return field_map[field_name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
@@ -284,8 +296,7 @@ class Options(object):
                 model.add_to_class('id', auto)
 
     def _expire_cache(self):
-        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields',
-                          'field_map', 'concrete_field_map',):
+        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields',):
             try:
                 delattr(self, cache_key)
             except AttributeError:
@@ -475,7 +486,8 @@ class Options(object):
 
         Uses a cache internally, so after the first access, this is very fast.
         """
-        return self._map_details(self.get_new_field(name, include_relations=True))
+        return self._map_details(self.get_new_field(name, m2m=True, related_objects=True,
+                                 related_m2m=True, virtual=True))
 
     def get_all_field_names(self):
         """

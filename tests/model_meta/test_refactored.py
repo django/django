@@ -1,5 +1,6 @@
 from django import test
 
+from django.db.models import FieldDoesNotExist
 from django.db.models.fields import related, CharField, Field
 from django.contrib.contenttypes.fields import GenericForeignKey
 
@@ -630,26 +631,33 @@ class VirtualFieldsTests(OptionsBaseTests):
 class GetFieldByNameTests(OptionsBaseTests):
 
     def test_get_data_field(self):
-        field_info = self._details(Person, Person._meta.get_new_field('data_abstract', True))
+        field_info = self._details(Person, Person._meta.get_new_field('data_abstract'))
         self.assertEqual(field_info[1:], (BasePerson, True, False))
         self.assertIsInstance(field_info[0], CharField)
 
     def test_get_m2m_field(self):
-        field_info = self._details(Person, Person._meta.get_new_field('m2m_base', True))
+        field_info = self._details(Person, Person._meta.get_new_field('m2m_base', m2m=True))
         self.assertEqual(field_info[1:], (BasePerson, True, True))
         self.assertIsInstance(field_info[0], related.ManyToManyField)
 
     def test_get_related_object(self):
-        field_info = self._details(Person, Person._meta.get_new_field('relating_baseperson', True))
+        field_info = self._details(Person, Person._meta.get_new_field('relating_baseperson', related_objects=True))
         self.assertEqual(field_info[1:], (BasePerson, False, False))
         self.assertIsInstance(field_info[0], related.RelatedObject)
 
     def test_get_related_m2m(self):
-        field_info = self._details(Person, Person._meta.get_new_field('relating_people', True))
+        field_info = self._details(Person, Person._meta.get_new_field('relating_people', related_m2m=True))
         self.assertEqual(field_info[1:], (None, False, True))
         self.assertIsInstance(field_info[0], related.RelatedObject)
 
     def test_get_virtual_field(self):
-        field_info = self._details(Person, Person._meta.get_new_field('content_object_base', True))
+        field_info = self._details(Person, Person._meta.get_new_field('content_object_base', virtual=True))
         self.assertEqual(field_info[1:], (None, True, False))
         self.assertIsInstance(field_info[0], GenericForeignKey)
+
+    def test_get_m2m_field_invalid(self):
+        self.assertRaises(
+            FieldDoesNotExist,
+            Person._meta.get_new_field,
+            'm2m_base'
+        )
