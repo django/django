@@ -712,8 +712,12 @@ class BaseInlineFormSet(BaseModelFormSet):
             # Remove the foreign key from the form's data
             form.data[form.add_prefix(self.fk.name)] = None
 
-        # Set the fk value here so that the form can do it's validation.
-        setattr(form.instance, self.fk.get_attname(), self.instance.pk)
+        # Set the fk value here so that the form can do its validation.
+        fk_value = self.instance.pk
+        if self.fk.rel.field_name != self.fk.rel.to._meta.pk.name:
+            fk_value = getattr(self.instance, self.fk.rel.field_name)
+            fk_value = getattr(fk_value, 'pk', fk_value)
+        setattr(form.instance, self.fk.get_attname(), fk_value)
         return form
 
     @classmethod
