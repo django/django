@@ -301,6 +301,7 @@ class Options(object):
                 delattr(self, cache_key)
             except AttributeError:
                 pass
+        self._get_new_field_cache = {}
         self._get_new_fields_cache = {}
 
     def add_field(self, field):
