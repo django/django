@@ -49,6 +49,8 @@ Minor features
 * The ``max_length`` of :attr:`Permission.name
   <django.contrib.auth.models.Permission.name>` has been increased from 50 to
   255 characters. Please run the database migration.
+* :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
+  :class:`~django.db.models.ForeignKey`\s.
 
 :mod:`django.contrib.formtools`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -207,7 +209,9 @@ Signals
 Templates
 ^^^^^^^^^
 
-* ...
+* :tfilter:`urlize` now supports domain-only links that include characters after
+  the top-level domain (e.g. ``djangoproject.com/`` and
+  ``djangoproject.com/download/``).
 
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -369,6 +373,17 @@ lookups::
     ...
     ValueError: Cannot query "<Book: Django>": Must be "Author" instance.
 
+Default ``EmailField.max_length`` increased to 254
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The old default 75 character ``max_length`` was not capable of storing all
+possible RFC3696/5321-compliant email addresses. In order to store all
+possible valid email addresses, the ``max_length`` has been increased to 254
+characters. You will need to generate and apply database migrations for your
+affected models (or add ``max_length=75`` if you wish to keep the length on
+your current fields). A migration for
+:attr:`django.contrib.auth.models.User.email` is included.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -390,6 +405,13 @@ Miscellaneous
   variable, rather than an empty string.
 
 * Support for SpatiaLite < 2.4 has been dropped.
+
+* ``ForeignKey.default_error_message['invalid']`` has been changed from
+  ``'%(model)s instance with pk %(pk)r does not exist.'`` to
+  ``'%(model)s instance with %(field)s %(value)r does not exist.'`` If you are
+  using this message in your own code, please update the list of interpolated
+  parameters. Internally, Django will continue to provide the
+  ``pk`` parameter in ``params`` for backwards compatibility.
 
 .. _deprecated-features-1.8:
 

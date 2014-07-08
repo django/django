@@ -374,3 +374,9 @@ one of the following:
 * Find synonyms that the spell checker recognizes.
 * If, and only if, you are sure the word you are using is correct - add it
   to ``docs/spelling_wordlist`` (please keep the list in alphabetical order).
+
+Translating documentation
+-------------------------
+
+See :ref:`Localizing the Django documentation <translating-documentation>` if
+you'd like to help translate the documentation into another language.

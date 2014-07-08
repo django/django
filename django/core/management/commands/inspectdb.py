@@ -32,7 +32,7 @@ class Command(BaseCommand):
         # 'table_name_filter' is a stealth option
         table_name_filter = options.get('table_name_filter')
 
-        table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '').replace('-', '')
+        table2model = lambda table_name: re.sub(r'[^a-zA-Z0-9]', '', table_name.title())
         strip_prefix = lambda s: s[1:] if s.startswith("u'") else s
 
         with connection.cursor() as cursor:
@@ -209,7 +209,7 @@ class Command(BaseCommand):
             field_type = 'TextField'
             field_notes.append('This field type is a guess.')
 
-        # This is a hook for DATA_TYPES_REVERSE to return a tuple of
+        # This is a hook for data_types_reverse to return a tuple of
         # (field_type, field_params_dict).
         if type(field_type) is tuple:
             field_type, new_params = field_type

@@ -1607,7 +1607,7 @@ class ForeignObject(RelatedField):
 class ForeignKey(ForeignObject):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _('%(model)s instance with pk %(pk)r does not exist.')
+        'invalid': _('%(model)s instance with %(field)s %(value)r does not exist.')
     }
     description = _("Foreign Key (type determined by related field)")
 
@@ -1714,7 +1714,10 @@ class ForeignKey(ForeignObject):
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
-                params={'model': self.rel.to._meta.verbose_name, 'pk': value},
+                params={
+                    'model': self.rel.to._meta.verbose_name, 'pk': value,
+                    'field': self.rel.field_name, 'value': value,
+                },  # 'pk' is included for backwards compatibilty
             )
 
     def get_attname(self):
@@ -2149,7 +2152,7 @@ class ManyToManyField(RelatedField):
 
     def _get_path_info(self, direct=False):
         """
-        Called by both direct an indirect m2m traversal.
+        Called by both direct and indirect m2m traversal.
         """
         pathinfos = []
         int_model = self.rel.through

@@ -6,6 +6,7 @@ import decimal
 import collections
 from importlib import import_module
 import os
+import re
 import sys
 import types
 
@@ -15,6 +16,9 @@ from django.db.migrations.loader import MigrationLoader
 from django.utils import datetime_safe, six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
+
+
+COMPILED_REGEX_TYPE = type(re.compile(''))
 
 
 class SettingsReference(str):
@@ -319,7 +323,7 @@ class MigrationWriter(object):
                     "and used in the same class body). Please move the "
                     "function into the main module body to use migrations.\n"
                     "For more information, see https://docs.djangoproject.com/en/1.7/topics/migrations/#serializing-values"
-                )
+                    % (value.__name__, module_name))
             return "%s.%s" % (module_name, value.__name__), set(["import %s" % module_name])
         # Classes
         elif isinstance(value, type):
@@ -344,6 +348,17 @@ class MigrationWriter(object):
             # "()", not "(,)" because (,) is invalid Python syntax.
             format = "(%s)" if len(strings) != 1 else "(%s,)"
             return format % (", ".join(strings)), imports
+        # Compiled regex
+        elif isinstance(value, COMPILED_REGEX_TYPE):
+            imports = set(["import re"])
+            regex_pattern, pattern_imports = cls.serialize(value.pattern)
+            regex_flags, flag_imports = cls.serialize(value.flags)
+            imports.update(pattern_imports)
+            imports.update(flag_imports)
+            args = [regex_pattern]
+            if value.flags:
+                args.append(regex_flags)
+            return "re.compile(%s)" % ', '.join(args), imports
         # Uh oh.
         else:
             raise ValueError("Cannot serialize: %r\nThere are some values Django cannot serialize into migration files.\nFor more, see https://docs.djangoproject.com/en/dev/topics/migrations/#migration-serializing" % value)

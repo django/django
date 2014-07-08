@@ -490,20 +490,6 @@ Donald Stufft
 
     .. _Nebula Inc: https://www.nebula.com/
 
-`Daniel Lindsley`_
-    Pythonista since 2003, Djangonaut since 2006. Daniel started with Django
-    just after the v0.90 release (back when ``Manipulators`` looked good) & fell
-    in love. Since then, he wrote third-party apps like Haystack & Tastypie
-    & has run the annual Django Dash since 2007. One of the testing faithful,
-    Daniel's contributions include rewriting the ``Forms`` test suite & the
-    addition of ``request.is_ajax``. Daniel currently works as a Python
-    developer at `Amazon Web Services`_ on the ``boto`` library.
-
-    Daniel lives in Seattle, WA, USA.
-
-    .. _`Daniel Lindsley`: http://toastdriven.com/
-    .. _`Amazon Web Services`: https://aws.amazon.com/
-
 Marc Tamlyn
     Marc started life on the web using Django 1.2 back in 2010, and has never
     looked back. He was involved with rewriting the class based view
@@ -518,7 +504,7 @@ Marc Tamlyn
 Shai Berger
     Shai started working with Python back in 1998, and with Django just
     before 1.0. He is a Free Software enthusiast, but life happens, and
-    he was driven by consulting gigs to contribute to the Oracle and 
+    he was driven by consulting gigs to contribute to the Oracle and
     SQL Server backends of South, and then the Oracle backend of Django
     itself. Finally, he joined core to help maintain the Oracle backend.
 

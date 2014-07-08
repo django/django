@@ -1707,9 +1707,9 @@ class InlineModelAdmin(BaseModelAdmin):
     """
     Options for inline editing of ``model`` instances.
 
-    Provide ``name`` to specify the attribute name of the ``ForeignKey`` from
-    ``model`` to its parent. This is required if ``model`` has more than one
-    ``ForeignKey`` to its parent.
+    Provide ``fk_name`` to specify the attribute name of the ``ForeignKey``
+    from ``model`` to its parent. This is required if ``model`` has more than
+    one ``ForeignKey`` to its parent.
     """
     model = None
     fk_name = None
@@ -1771,8 +1771,8 @@ class InlineModelAdmin(BaseModelAdmin):
             # Take the custom ModelForm's Meta.exclude into account only if the
             # InlineModelAdmin doesn't define its own.
             exclude.extend(self.form._meta.exclude)
-        # if exclude is an empty list we use None, since that's the actual
-        # default
+        # If exclude is an empty list we use None, since that's the actual
+        # default.
         exclude = exclude or None
         can_delete = self.can_delete and self.has_delete_permission(request, obj)
         defaults = {

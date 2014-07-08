@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import datetime
 import os
+import re
 import tokenize
 import unittest
 
@@ -103,18 +104,6 @@ class WriterTests(TestCase):
         string, imports = MigrationWriter.serialize(safe_datetime)
         self.assertEqual(string, repr(datetime.datetime(2014, 3, 31, 16, 4, 31)))
         self.assertEqual(imports, {'import datetime'})
-        # Classes
-        validator = RegexValidator(message="hello")
-        string, imports = MigrationWriter.serialize(validator)
-        self.assertEqual(string, "django.core.validators.RegexValidator(message='hello')")
-        self.serialize_round_trip(validator)
-        validator = EmailValidator(message="hello")  # Test with a subclass.
-        string, imports = MigrationWriter.serialize(validator)
-        self.assertEqual(string, "django.core.validators.EmailValidator(message='hello')")
-        self.serialize_round_trip(validator)
-        validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
-        string, imports = MigrationWriter.serialize(validator)
-        self.assertEqual(string, "custom.EmailValidator(message='hello')")
         # Django fields
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
         self.assertSerializedFieldEqual(models.TextField(null=True, blank=True))
@@ -134,6 +123,51 @@ class WriterTests(TestCase):
                 set(),
             )
         )
+
+    def test_serialize_compiled_regex(self):
+        """
+        Make sure compiled regex can be serialized.
+        """
+        regex = re.compile(r'^\w+$', re.U)
+        self.assertSerializedEqual(regex)
+
+    def test_serialize_class_based_validators(self):
+        """
+        Ticket #22943: Test serialization of class-based validators, including
+        compiled regexes.
+        """
+        validator = RegexValidator(message="hello")
+        string = MigrationWriter.serialize(validator)[0]
+        self.assertEqual(string, "django.core.validators.RegexValidator(message='hello')")
+        self.serialize_round_trip(validator)
+
+        # Test with a compiled regex.
+        validator = RegexValidator(regex=re.compile(r'^\w+$', re.U))
+        string = MigrationWriter.serialize(validator)[0]
+        self.assertEqual(string, "django.core.validators.RegexValidator(regex=re.compile('^\\\\w+$', 32))")
+        self.serialize_round_trip(validator)
+
+        # Test a string regex with flag
+        validator = RegexValidator(r'^[0-9]+$', flags=re.U)
+        string = MigrationWriter.serialize(validator)[0]
+        self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=32)")
+        self.serialize_round_trip(validator)
+
+        # Test message and code
+        validator = RegexValidator('^[-a-zA-Z0-9_]+$', 'Invalid', 'invalid')
+        string = MigrationWriter.serialize(validator)[0]
+        self.assertEqual(string, "django.core.validators.RegexValidator('^[-a-zA-Z0-9_]+$', 'Invalid', 'invalid')")
+        self.serialize_round_trip(validator)
+
+        # Test with a subclass.
+        validator = EmailValidator(message="hello")
+        string = MigrationWriter.serialize(validator)[0]
+        self.assertEqual(string, "django.core.validators.EmailValidator(message='hello')")
+        self.serialize_round_trip(validator)
+
+        validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
+        string = MigrationWriter.serialize(validator)[0]
+        self.assertEqual(string, "custom.EmailValidator(message='hello')")
 
     def test_serialize_empty_nonempty_tuple(self):
         """
@@ -165,6 +199,19 @@ class WriterTests(TestCase):
                 return "somewhere dynamic"
             thing = models.FileField(upload_to=upload_to)
         with self.assertRaises(ValueError):
+            self.serialize_round_trip(TestModel2.thing)
+
+    def test_serialize_local_function_reference_message(self):
+        """
+        Make sure user is seeing which module/function is the issue
+        """
+        class TestModel2(object):
+            def upload_to(self):
+                return "somewhere dynamic"
+            thing = models.FileField(upload_to=upload_to)
+
+        with six.assertRaisesRegex(self, ValueError,
+                '^Could not find function upload_to in migrations.test_writer'):
             self.serialize_round_trip(TestModel2.thing)
 
     def test_simple_migration(self):

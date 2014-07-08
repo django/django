@@ -64,3 +64,14 @@ Django source tree, as for any code change:
 .. _Transifex: https://www.transifex.com/
 .. _Django project page: https://www.transifex.com/projects/p/django/
 .. _Transifex User Guide: http://support.transifex.com/
+
+.. _translating-documentation:
+
+Documentation
+-------------
+
+There is also an opportunity to translate the documentation, though this is a
+huge undertaking to complete entirely (you have been warned!). We use the same
+`Transifex tool <https://www.transifex.com/projects/p/django-docs/>`_. The
+translations will appear at ``https://docs.djangoproject.com/<language_code>/``
+when at least the ``docs/intro/*`` files are fully translated in your language.

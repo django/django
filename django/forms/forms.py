@@ -563,7 +563,7 @@ class BoundField(object):
             name = self.html_name
         else:
             name = self.html_initial_name
-        return widget.render(name, self.value(), attrs=attrs)
+        return force_text(widget.render(name, self.value(), attrs=attrs))
 
     def as_text(self, attrs=None, **kwargs):
         """

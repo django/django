@@ -22,7 +22,9 @@ from django.template import Template, Context
 from django.test import TestCase
 from django.test.utils import str_prefix
 from django.utils.datastructures import MultiValueDict, MergeDict
-from django.utils.safestring import mark_safe
+from django.utils.encoding import force_text
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
 
 
@@ -740,6 +742,53 @@ class FormsTestCase(TestCase):
         with six.assertRaisesRegex(self, ValueError, "has no field named"):
             f.add_error('missing_field', 'Some error.')
 
+    def test_update_error_dict(self):
+        class CodeForm(Form):
+            code = CharField(max_length=10)
+
+            def clean(self):
+                try:
+                    raise ValidationError({'code': [ValidationError('Code error 1.')]})
+                except ValidationError as e:
+                    self._errors = e.update_error_dict(self._errors)
+
+                try:
+                    raise ValidationError({'code': [ValidationError('Code error 2.')]})
+                except ValidationError as e:
+                    self._errors = e.update_error_dict(self._errors)
+
+                try:
+                    raise ValidationError({'code': forms.ErrorList(['Code error 3.'])})
+                except ValidationError as e:
+                    self._errors = e.update_error_dict(self._errors)
+
+                try:
+                    raise ValidationError('Non-field error 1.')
+                except ValidationError as e:
+                    self._errors = e.update_error_dict(self._errors)
+
+                try:
+                    raise ValidationError([ValidationError('Non-field error 2.')])
+                except ValidationError as e:
+                    self._errors = e.update_error_dict(self._errors)
+
+                # Ensure that the newly added list of errors is an instance of ErrorList.
+                for field, error_list in self._errors.items():
+                    if not isinstance(error_list, self.error_class):
+                        self._errors[field] = self.error_class(error_list)
+
+        form = CodeForm({'code': 'hello'})
+        # Trigger validation.
+        self.assertFalse(form.is_valid())
+
+        # Check that update_error_dict didn't lose track of the ErrorDict type.
+        self.assertTrue(isinstance(form._errors, forms.ErrorDict))
+
+        self.assertEqual(dict(form.errors), {
+            'code': ['Code error 1.', 'Code error 2.', 'Code error 3.'],
+            NON_FIELD_ERRORS: ['Non-field error 1.', 'Non-field error 2.'],
+        })
+
     def test_has_error(self):
         class UserRegistration(Form):
             username = CharField(max_length=10)
@@ -1327,6 +1376,21 @@ class FormsTestCase(TestCase):
         self.assertEqual(unbound['username'].value(), 'djangonaut')
         self.assertEqual(bound['password'].value(), 'foo')
         self.assertEqual(unbound['password'].value(), None)
+
+    def test_boundfield_rendering(self):
+        """
+        Python 2 issue: Test that rendering a BoundField with bytestring content
+        doesn't lose it's safe string status (#22950).
+        """
+        class CustomWidget(TextInput):
+            def render(self, name, value, attrs=None):
+                return format_html(str('<input{0} />'), ' id=custom')
+
+        class SampleForm(Form):
+            name = CharField(widget=CustomWidget)
+
+        f = SampleForm(data={'name': 'bar'})
+        self.assertIsInstance(force_text(f['name']), SafeData)
 
     def test_initial_datetime_values(self):
         now = datetime.datetime.now()
