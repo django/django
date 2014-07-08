@@ -106,7 +106,7 @@ class AuthenticationFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.non_field_errors(),
                 [force_text(form.error_messages['invalid_login'] % {
-                    'username': User._meta.get_field('username').verbose_name
+                    'username': User._meta.get_new_field('username').verbose_name
                 })])
 
     def test_inactive_user(self):
@@ -191,7 +191,7 @@ class AuthenticationFormTest(TestCase):
 
         form = CustomAuthenticationForm()
         UserModel = get_user_model()
-        username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
+        username_field = UserModel._meta.get_new_field(UserModel.USERNAME_FIELD)
         self.assertEqual(form.fields['username'].label, capfirst(username_field.verbose_name))
 
     def test_username_field_label_empty_string(self):

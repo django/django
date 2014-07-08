@@ -287,7 +287,7 @@ class DateMixin(object):
         if it's a `DateField`.
         """
         model = self.get_queryset().model if self.model is None else self.model
-        field = model._meta.get_field(self.get_date_field())
+        field = model._meta.get_new_field(self.get_date_field())
         return isinstance(field, models.DateTimeField)
 
     def _make_date_lookup_arg(self, value):

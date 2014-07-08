@@ -212,7 +212,7 @@ class ChangeList(object):
         proper model field name can be matched.
         """
         try:
-            field = self.lookup_opts.get_field(field_name)
+            field = self.lookup_opts.get_new_field(field_name)
             return field.name
         except models.FieldDoesNotExist:
             # See whether field_name is a name of a non-field
@@ -364,7 +364,7 @@ class ChangeList(object):
     def has_related_field_in_list_display(self):
         for field_name in self.list_display:
             try:
-                field = self.lookup_opts.get_field(field_name)
+                field = self.lookup_opts.get_new_field(field_name)
             except models.FieldDoesNotExist:
                 pass
             else:

@@ -2,6 +2,8 @@ import datetime
 
 from django.conf import settings
 from django.db.backends.utils import truncate_name, typecast_date, typecast_timestamp
+from django.db.models.fields import Field
+from django.db.models.options import DATA, CONCRETE
 from django.db.models.sql import compiler
 from django.db.models.sql.constants import MULTI
 from django.utils import six
@@ -124,7 +126,11 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         seen = self.query.included_inherited_models.copy()
         if start_alias:
             seen[None] = start_alias
-        for field, model in opts.get_concrete_fields_with_model():
+        for field in opts.concrete_fields:
+            field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
+            model = field.model if field_is_direct else field.parent_model._meta.concrete_model
+            if model == opts.model:
+                model = None
             if from_parent and model is not None and issubclass(from_parent, model):
                 # Avoid loading data for already loaded parents.
                 continue

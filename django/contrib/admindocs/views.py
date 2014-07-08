@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db import models
+from django.db.models.options import RELATED_M2M, RELATED_OBJECTS
 from django.core.exceptions import ViewDoesNotExist
 from django.http import Http404
 from django.core import urlresolvers
@@ -249,7 +250,7 @@ class ModelDetailView(BaseAdminDocsView):
                 })
 
         # Gather related objects
-        for rel in opts.get_all_related_objects() + opts.get_all_related_many_to_many_objects():
+        for rel in opts.get_new_fields(types=RELATED_OBJECTS | RELATED_M2M):
             verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': rel.opts.app_label, 'object_name': rel.opts.object_name}
             accessor = rel.get_accessor_name()
             fields.append({

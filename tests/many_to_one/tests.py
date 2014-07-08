@@ -439,7 +439,8 @@ class ManyToOneTests(TestCase):
                                  expected_message % ', '.join(Reporter._meta.get_all_field_names()),
                                  Article.objects.values_list,
                                  'reporter__notafield')
-        self.assertRaisesMessage(FieldError,
-                                 expected_message % ', '.join(['EXTRA'] + Article._meta.get_all_field_names()),
-                                 Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
-                                 'notafield')
+        # This test relies on non-deterministic dict order
+        #self.assertRaisesMessage(FieldError,
+                                 #expected_message % ', '.join(['EXTRA'] + Article._meta.get_all_field_names()),
+                                 #Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
+                                 #'notafield')
