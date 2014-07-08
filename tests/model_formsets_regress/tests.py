@@ -7,7 +7,10 @@ from django.forms.models import modelform_factory, inlineformset_factory, modelf
 from django.test import TestCase
 from django.utils import six
 
-from .models import User, UserSite, Restaurant, Manager, Network, Host
+from .models import (
+    User, UserSite, UserProfile, ProfileNetwork, Restaurant, Manager, Network,
+    Host,
+)
 
 
 class InlineFormsetTests(TestCase):
@@ -153,6 +156,37 @@ class InlineFormsetTests(TestCase):
             self.assertEqual(manager[1]['name'], 'Terry Gilliam')
         else:
             self.fail('Errors found on formset:%s' % form_set.errors)
+
+    def test_inline_model_with_to_field(self):
+        """
+        #13794 --- An inline model with a to_field of a formset with instance
+        has working relations.
+        """
+        FormSet = inlineformset_factory(User, UserSite, exclude=('is_superuser',))
+
+        user = User.objects.create(username="guido", serial=1337)
+        UserSite.objects.create(user=user, data=10)
+        formset = FormSet(instance=user)
+
+        # Testing the inline model's relation
+        self.assertEqual(formset[0].instance.user_id, "guido")
+
+    def test_inline_model_with_to_field_to_rel(self):
+        """
+        #13794 --- An inline model with a to_field to a related field of a
+        formset with instance has working relations.
+        """
+        FormSet = inlineformset_factory(UserProfile, ProfileNetwork, exclude=[])
+
+        user = User.objects.create(username="guido", serial=1337, pk=1)
+        self.assertEqual(user.pk, 1)
+        profile = UserProfile.objects.create(user=user, about="about", pk=2)
+        self.assertEqual(profile.pk, 2)
+        ProfileNetwork.objects.create(profile=profile, network=10, identifier=10)
+        formset = FormSet(instance=profile)
+
+        # Testing the inline model's relation
+        self.assertEqual(formset[0].instance.profile_id, 1)
 
     def test_formset_with_none_instance(self):
         "A formset with instance=None can be created. Regression for #11872"

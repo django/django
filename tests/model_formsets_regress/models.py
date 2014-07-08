@@ -12,6 +12,17 @@ class UserSite(models.Model):
     data = models.IntegerField()
 
 
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, unique=True, to_field="username")
+    about = models.TextField()
+
+
+class ProfileNetwork(models.Model):
+    profile = models.ForeignKey(UserProfile, to_field="user")
+    network = models.IntegerField()
+    identifier = models.IntegerField()
+
+
 class Place(models.Model):
     name = models.CharField(max_length=50)
 
