@@ -711,6 +711,35 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
         self.assertNotIn(cleared_file_name, manifest_content)
 
 
+class CustomCachedStaticFilesStorage(storage.CachedStaticFilesStorage):
+    """
+    Used by TestPatterns.
+    """
+    patterns = storage.CachedStaticFilesStorage.patterns + (
+        ("*.js", (
+            (r"""(//# sourceMappingURL=(.*))""", """//# sourceMappingURL=%s"""),
+        )),
+    )
+
+
+@override_settings(**dict(
+    TEST_SETTINGS,
+    STATICFILES_STORAGE='staticfiles_tests.tests.CustomCachedStaticFilesStorage',
+))
+class TestPatterns(CollectionTestCase):
+    def test_extended_patterns_for_multiple_filetypes(self):
+        """
+        Handles overriding patterns for multiple filetypes. See #22972.
+        """
+        self.run_collectstatic()
+
+        with storage.staticfiles_storage.open('test.2ea6c8d4aeaf.js') as relfile:
+            content = relfile.read()
+            self.assertIn(b'window.loadUrl(window.location.hash);', content)
+            self.assertNotIn(b'test.js.map', content)
+            self.assertIn(b'test.js.e10057caf159.map', content)
+
+
 # we set DEBUG to False here since the template tag wouldn't work otherwise
 @override_settings(**dict(
     TEST_SETTINGS,

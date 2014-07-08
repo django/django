@@ -235,8 +235,10 @@ class HashedFilesMixin(object):
                 # ..to apply each replacement pattern to the content
                 if name in adjustable_paths:
                     content = original_file.read().decode(settings.FILE_CHARSET)
-                    for patterns in self._patterns.values():
-                        for pattern, template in patterns:
+                    for path_pattern, content_patterns in self._patterns.items():
+                        if not matches_patterns(name, [path_pattern]):
+                            continue
+                        for pattern, template in content_patterns:
                             converter = self.url_converter(name, template)
                             try:
                                 content = pattern.sub(converter, content)
