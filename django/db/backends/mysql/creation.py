@@ -8,6 +8,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     # If a column type is set to None, it won't be included in the output.
     data_types = {
         'AutoField': 'integer AUTO_INCREMENT',
+        'BigAutoField': 'bigint AUTO_INCREMENT',
         'BinaryField': 'longblob',
         'BooleanField': 'bool',
         'CharField': 'varchar(%(max_length)s)',

@@ -33,10 +33,10 @@ from django.utils.itercompat import is_iterable
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
 # makes these strings unicode
 __all__ = [str(x) for x in (
-    'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
-    'BooleanField', 'CharField', 'CommaSeparatedIntegerField', 'DateField',
-    'DateTimeField', 'DecimalField', 'EmailField', 'Empty', 'Field',
-    'FieldDoesNotExist', 'FilePathField', 'FloatField',
+    'AutoField', 'BigAutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField',
+    'BinaryField', 'BooleanField', 'CharField', 'CommaSeparatedIntegerField',
+    'DateField', 'DateTimeField', 'DecimalField', 'EmailField', 'Empty',
+    'Field', 'FieldDoesNotExist', 'FilePathField', 'FloatField',
     'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
     'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
     'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
@@ -510,6 +510,13 @@ class Field(RegisterLookupMixin):
         self.run_validators(value)
         return value
 
+    def _internal_to_db_type(self, internal_type, connection):
+        data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
+        try:
+            return connection.creation.data_types[internal_type] % data
+        except KeyError:
+            return None
+
     def db_type(self, connection):
         """
         Returns the database column data type for this field, for the provided
@@ -555,6 +562,13 @@ class Field(RegisterLookupMixin):
 
     def db_type_suffix(self, connection):
         return connection.creation.data_types_suffix.get(self.get_internal_type())
+
+    def rel_db_type(self, connection):
+        """
+        Returns the database column data type for related field referencing
+        to this.
+        """
+        return self.db_type(connection)
 
     @property
     def unique(self):
@@ -880,7 +894,10 @@ class AutoField(Field):
         return name, path, args, kwargs
 
     def get_internal_type(self):
-        return "AutoField"
+        return 'AutoField'
+
+    def rel_db_type(self, connection):
+        return self._internal_to_db_type('IntegerField', connection)
 
     def to_python(self, value):
         if value is None:
@@ -918,6 +935,16 @@ class AutoField(Field):
 
     def formfield(self, **kwargs):
         return None
+
+
+class BigAutoField(Field):
+    description = _("Big (8 byte) integer")
+
+    def get_internal_type(self):
+        return 'BigAutoField'
+
+    def rel_db_type(self, connection):
+        return self._internal_to_db_type('BigIntegerField', connection)
 
 
 class BooleanField(Field):
@@ -1932,6 +1959,11 @@ class PositiveIntegerField(IntegerField):
     def get_internal_type(self):
         return "PositiveIntegerField"
 
+    def rel_db_type(self, connection):
+        if connection.features.related_fields_match_type:
+            return self.db_type(connection)
+        return self._internal_to_db_type('IntegerField', connection)
+
     def formfield(self, **kwargs):
         defaults = {'min_value': 0}
         defaults.update(kwargs)
@@ -1943,6 +1975,11 @@ class PositiveSmallIntegerField(IntegerField):
 
     def get_internal_type(self):
         return "PositiveSmallIntegerField"
+
+    def rel_db_type(self, connection):
+        if connection.features.related_fields_match_type:
+            return self.db_type(connection)
+        return self._internal_to_db_type('IntegerField', connection)
 
     def formfield(self, **kwargs):
         defaults = {'min_value': 0}

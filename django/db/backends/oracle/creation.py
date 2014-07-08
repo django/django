@@ -21,6 +21,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     data_types = {
         'AutoField': 'NUMBER(11)',
+        'BigAutoField': 'NUMBER(19)',
         'BinaryField': 'BLOB',
         'BooleanField': 'NUMBER(1)',
         'CharField': 'NVARCHAR2(%(max_length)s)',

@@ -369,6 +369,17 @@ according to available IDs. You usually won't need to use this directly; a
 primary key field will automatically be added to your model if you don't specify
 otherwise. See :ref:`automatic-primary-key-fields`.
 
+
+``BigAutoField``
+-------------
+
+.. class:: BigAutoField(**options)
+
+.. versionadded:: 1.7
+
+An :class:`AutoField` with extended values range (from 1 to 9223372036854775807).
+
+
 ``BigIntegerField``
 -------------------
 
