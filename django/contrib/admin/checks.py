@@ -177,7 +177,7 @@ class BaseModelAdminChecks(object):
                 return []
             else:
                 if (isinstance(field, models.ManyToManyField) and
-                        not field.rel.through._meta.auto_created):
+                        not field.rel.through._meta.auto_created) and field.rel.through_fields is None:
                     return [
                         checks.Error(
                             ("The value of '%s' cannot include the ManyToManyField '%s', "
