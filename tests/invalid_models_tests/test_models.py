@@ -31,6 +31,31 @@ def get_max_column_name_length():
     return (allowed_len, db_alias)
 
 
+# Ordering cannot be done on a M2M field.
+class M2MOnOrderingTests(IsolatedModelsTestCase):
+
+    def test_non_valid(self):
+        class RelationModel(models.Model):
+            class Meta:
+                index_together = 42
+
+        class Model(models.Model):
+            relation = models.ManyToManyField(RelationModel)
+            class Meta:
+                ordering = ['relation']
+
+        errors = Model.check()
+        expected = [
+            Error(
+                "'ordering' refers to the non-existent field 'relation'.",
+                hint=None,
+                obj=Model,
+                id='models.E015',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+
 class IndexTogetherTests(IsolatedModelsTestCase):
 
     def test_non_iterable(self):
