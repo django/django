@@ -1899,6 +1899,7 @@ class ManyToManyField(RelatedField):
         errors = super(ManyToManyField, self).check(**kwargs)
         errors.extend(self._check_unique(**kwargs))
         errors.extend(self._check_relationship_model(**kwargs))
+        errors.extend(self._check_ignored_options(**kwargs))
         return errors
 
     def _check_unique(self, **kwargs):
@@ -1912,6 +1913,31 @@ class ManyToManyField(RelatedField):
                 )
             ]
         return []
+
+    def _check_ignored_options(self, **kwargs):
+        warnings = []
+
+        if self.null:
+            warnings.append(
+                checks.Warning(
+                    'null has no effect on ManyToManyField.',
+                    hint=None,
+                    obj=self,
+                    id='fields.W340',
+                )
+            )
+
+        if len(self._validators) > 0:
+            warnings.append(
+                checks.Warning(
+                    'ManyToManyField does not support validators.',
+                    hint=None,
+                    obj=self,
+                    id='fields.W341',
+                )
+            )
+
+        return warnings
 
     def _check_relationship_model(self, from_model=None, **kwargs):
         if hasattr(self.rel.through, '_meta'):

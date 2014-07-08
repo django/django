@@ -1448,6 +1448,10 @@ that control how the relationship functions.
 
     If in doubt, leave it to its default of ``True``.
 
+:class:`ManyToManyField` does not support :attr:`~Field.validators`.
+
+:attr:`~Field.null` has no effect since there is no way to require a
+relationship at the database level.
 
 .. _ref-onetoone:
 

@@ -101,7 +101,7 @@ class Item(models.Model):
     name = models.CharField(max_length=10)
     created = models.DateTimeField()
     modified = models.DateTimeField(blank=True, null=True)
-    tags = models.ManyToManyField(Tag, blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True)
     creator = models.ForeignKey(Author)
     note = models.ForeignKey(Note)
 
