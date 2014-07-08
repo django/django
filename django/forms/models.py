@@ -431,6 +431,17 @@ class BaseModelForm(BaseForm):
         except ValidationError as e:
             self._update_errors(e)
 
+        # Validation of m2m data. Refs. #19671
+        for f in self.instance._meta.many_to_many + self.instance._meta.virtual_fields:
+            if exclude and f.name in exclude:
+                continue
+            if f.name in self.cleaned_data:
+                try:
+                    f.clean(self.cleaned_data[f.name], self.instance)
+                except ValidationError as e:
+                    e.error_dict = {f.name: e}
+                    self._update_errors(e)
+
         # Validate uniqueness if needed.
         if self._validate_unique:
             self.validate_unique()

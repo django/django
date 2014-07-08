@@ -22,7 +22,7 @@ from .models import (Article, ArticleStatus, Author, Author1, BetterWriter, BigI
     DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel, FlexibleDatePost, Homepage,
     ImprovedArticle, ImprovedArticleWithParentLink, Inventory, Person, Post, Price,
     Product, Publication, TextFile, Triple, Writer, WriterProfile,
-    Colour, ColourfulItem, DateTimePost, CustomErrorMessage,
+    Colour, ColourfulItem, DateTimePost, CustomErrorMessage, M2MCustomValidate,
     test_images, StumpJoke, Character, Student)
 
 if test_images:
@@ -226,6 +226,16 @@ class ModelFormBaseTest(TestCase):
         self.assertTrue(f2.is_valid())
         obj = f2.save()
         self.assertEqual(obj.character, char)
+
+    def test_m2m_field_custom_validate(self):
+        class M2MCustomValidateForm(forms.ModelForm):
+            class Meta:
+                model = M2MCustomValidate
+                fields = '__all__'
+
+        author = Author.objects.create(full_name='Anubhav Joshi')
+        form = M2MCustomValidateForm({'authors': [author.pk]})
+        self.assertEqual(list(form.errors), ['authors'])
 
     def test_missing_fields_attribute(self):
         message = (

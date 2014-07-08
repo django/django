@@ -407,3 +407,12 @@ class StumpJoke(models.Model):
 class Student(models.Model):
     character = models.ForeignKey(Character)
     study = models.CharField(max_length=30)
+
+
+def validate_m2m_field(value):
+    raise ValidationError('Many to many validator called')
+
+
+# Model for #19671
+class M2MCustomValidate(models.Model):
+    authors = models.ManyToManyField(Author, validators=[validate_m2m_field])
