@@ -454,7 +454,7 @@ class LayerMapping(object):
         # Use the `get_field_by_name` on the model's options so that we
         # get the correct field instance if there's model inheritance.
         opts = self.model._meta
-        return opts.get_new_field(self.geom_field, True)
+        return opts.get_new_field(self.geom_field, related_objects=True, related_m2m=True, virtual=True)
 
     def make_multi(self, geom_type, model_field):
         """

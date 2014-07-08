@@ -210,7 +210,7 @@ class BaseDatabaseCreation(object):
         for f in model._meta.local_fields:
             output.extend(self.sql_indexes_for_field(model, f, style))
         for fs in model._meta.index_together:
-            fields = [model._meta.get_new_field(f, True) for f in fs]
+            fields = [model._meta.get_new_field(f, related_objects=True, related_m2m=True, virtual=True) for f in fs]
             output.extend(self.sql_indexes_for_fields(model, fields, style))
         return output
 
@@ -301,7 +301,7 @@ class BaseDatabaseCreation(object):
         for f in model._meta.local_fields:
             output.extend(self.sql_destroy_indexes_for_field(model, f, style))
         for fs in model._meta.index_together:
-            fields = [model._meta.get_new_field(f, True) for f in fs]
+            fields = [model._meta.get_new_field(f, related_objects=True, related_m2m=True, virtual=True) for f in fs]
             output.extend(self.sql_destroy_indexes_for_fields(model, fields, style))
         return output
 

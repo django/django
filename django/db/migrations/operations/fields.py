@@ -29,7 +29,7 @@ class AddField(Operation):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
-            field = to_model._meta.get_new_field(self.name, True)
+            field = to_model._meta.get_new_field(self.name, related_objects=True, related_m2m=True, virtual=True)
             if not self.preserve_default:
                 field.default = self.field.default
             schema_editor.add_field(
@@ -42,7 +42,7 @@ class AddField(Operation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
         if self.allowed_to_migrate(schema_editor.connection.alias, from_model):
-            schema_editor.remove_field(from_model, from_model._meta.get_new_field(self.name, True))
+            schema_editor.remove_field(from_model, from_model._meta.get_new_field(self.name, related_objects=True, related_m2m=True, virtual=True))
 
     def describe(self):
         return "Add field %s to %s" % (self.name, self.model_name)
@@ -81,13 +81,13 @@ class RemoveField(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
         if self.allowed_to_migrate(schema_editor.connection.alias, from_model):
-            schema_editor.remove_field(from_model, from_model._meta.get_new_field(self.name, True))
+            schema_editor.remove_field(from_model, from_model._meta.get_new_field(self.name, related_objects=True, related_m2m=True, virtual=True))
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
-            schema_editor.add_field(from_model, to_model._meta.get_new_field(self.name, True))
+            schema_editor.add_field(from_model, to_model._meta.get_new_field(self.name, related_objects=True, related_m2m=True, virtual=True))
 
     def describe(self):
         return "Remove field %s from %s" % (self.name, self.model_name)
@@ -118,8 +118,8 @@ class AlterField(Operation):
         from_model = from_state.render().get_model(app_label, self.model_name)
         to_model = to_state.render().get_model(app_label, self.model_name)
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
-            from_field = from_model._meta.get_new_field(self.name, True)
-            to_field = to_model._meta.get_new_field(self.name, True)
+            from_field = from_model._meta.get_new_field(self.name, related_objects=True, related_m2m=True, virtual=True)
+            to_field = to_model._meta.get_new_field(self.name, related_objects=True, related_m2m=True, virtual=True)
             # If the field is a relatedfield with an unresolved rel.to, just
             # set it equal to the other field side. Bandaid fix for AlterField
             # migrations that are part of a RenameModel change.
@@ -172,8 +172,8 @@ class RenameField(Operation):
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
             schema_editor.alter_field(
                 from_model,
-                from_model._meta.get_new_field(self.old_name, True),
-                to_model._meta.get_new_field(self.new_name, True),
+                from_model._meta.get_new_field(self.old_name, related_objects=True, related_m2m=True, virtual=True),
+                to_model._meta.get_new_field(self.new_name, related_objects=True, related_m2m=True, virtual=True),
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -182,8 +182,8 @@ class RenameField(Operation):
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
             schema_editor.alter_field(
                 from_model,
-                from_model._meta.get_new_field(self.new_name, True),
-                to_model._meta.get_new_field(self.old_name, True),
+                from_model._meta.get_new_field(self.new_name, related_objects=True, related_m2m=True, virtual=True),
+                to_model._meta.get_new_field(self.old_name, related_objects=True, related_m2m=True, virtual=True),
             )
 
     def describe(self):

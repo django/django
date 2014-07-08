@@ -659,5 +659,5 @@ class GetFieldByNameTests(OptionsBaseTests):
         self.assertRaises(
             FieldDoesNotExist,
             Person._meta.get_new_field,
-            'm2m_base'
+            **{'field_name': 'm2m_base', 'm2m': False}
         )
