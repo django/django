@@ -270,4 +270,4 @@ is not found, we look for a ``Transform`` and then the ``exact`` lookup on that
   to calling ``myfield.get_transform('mytransform')`` and then
   ``mytransform.get_lookup('exact')``.
 
-For the API references of lookups, see :doc:`ref/models/lookups`.
+For the API references of lookups, see :doc:`/ref/models/lookups`.

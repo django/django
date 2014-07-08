@@ -7,14 +7,14 @@ Lookup API reference
 
 .. currentmodule:: django.db.models
 
-This document has the API references of lookups, the Django API for building the ``WHERE``
-clause of a database query. To learn how to *use* lookups, see
-:doc:`topics/db/queries`; to learn how to *create* new lookups, see
-:doc:`howto/custom-lookups`.
+This document has the API references of lookups, the Django API for building
+the ``WHERE`` clause of a database query. To learn how to *use* lookups, see
+:doc:`/topics/db/queries`; to learn how to *create* new lookups, see
+:doc:`/howto/custom-lookups`.
 
-Django Lookup API has two components, a ``Register`` that registers lookups, and the
-`Query Expression API <query-expression>`_, a set of methods that a class has to
-implement to be registable as lookup.
+Django Lookup API has two components, a ``Register`` that registers lookups, and
+the `Query Expression API <query-expression>`_, a set of methods that a class
+has to implement to be registable as lookup.
 
 Django has two base classes that follow the Query Expression API and from where
 all Django Builtin lookups are derived from:
@@ -22,13 +22,11 @@ all Django Builtin lookups are derived from:
 * :class:`Lookup`: to lookup a field (e.g. the ``exact`` of ``field_name__exact``)
 * :class:`Transform`: to transform a field
 
-In a query expression, the first element is always the name of the class
-that registered the lookup, followed by an optional arbitrary number of ``Transform``s,
-and ends with a ``Lookup``::
+A lookup expression consists of three parts:
 
-    F("field_name__transformPlus10__exact")
-
-When the last lookup is not provided, Django uses ``"exact"``.
+* Fields part (e.g. ``Book.objects.filter(author__best_friends__first_name...``);
+* Transforms part (may be omitted) (e.g. ``__lower__first3chars__reversed``);
+* A lookup (e.g. ``__icontains``) that, if omitted, Django uses ``__exact``.
 
 Registration API
 ~~~~~~~~~~~~~~~~
@@ -36,12 +34,11 @@ Registration API
 Django uses :class:`~RegisterLookupMixin` to give a class the interface to
 register lookups on itself. The two prominent examples are
 :class:`~django.db.models.Field`, the base class of all model fields, and
-:class:`~django.db.models.Aggregate`, the base class of all Django aggregates.
+``Aggregate``, the base class of all Django aggregates.
 
 .. class:: RegisterLookupMixin
 
-    A mixin that implements the lookup API on a class. It uses the class
-    attribute ``class_lookups`` to store the registered lookups.
+    A mixin that implements the lookup API on a class.
 
     .. classmethod:: register_lookup(lookup)
 
@@ -65,8 +62,9 @@ register lookups on itself. The two prominent examples are
         has the registered transform named ``transform_name``, returning the first
         match.
 
-For a class to be a lookup, it must follow the `Query Expression API <query-expression>`_.
-:class:`~Lookup` and :class:`~Transform` naturally follow this API.
+For a class to be a lookup, it must follow the `Query Expression API
+<query-expression>`_. :class:`~Lookup` and :class:`~Transform` naturally
+follow this API.
 
 .. _query-expression:
 
@@ -81,74 +79,72 @@ methods:
 
 .. method:: as_sql(self, qn, connection)
 
-    Responsible for producing the query string and parameters for the
-    expression. The ``qn`` is a ``SQLCompiler`` object, which has a
-    ``compile()`` method that can be used to compile other expressions. The
-    ``connection`` is the connection used to execute the query.
+    Responsible for producing the query string and parameters for the expression.
+    The ``qn`` is a ``SQLCompiler`` object, which has a ``compile()`` method
+    that can be used to compile other expressions. The ``connection`` is the
+    connection used to execute the query.
 
-    Calling ``expression.as_sql()`` is usually incorrect - instead
-    ``qn.compile(expression)`` should be used. The ``qn.compile()`` method will
-    take care of calling vendor-specific methods of the expression.
+    Calling ``expression.as_sql()`` is usually incorrect - instead ``qn
+    .compile(expression)`` should be used. The ``qn.compile()`` method will take
+    care of calling vendor-specific methods of the expression.
 
 .. method:: as_vendorname(self, qn, connection)
 
-    Works like ``as_sql()`` method. When an expression is compiled by
-    ``qn.compile()``, Django will first try to call ``as_vendorname()``, where
+    Works like ``as_sql()`` method. When an expression is compiled by ``qn
+    .compile()``, Django will first try to call ``as_vendorname()``, where
     ``vendorname`` is the vendor name of the backend used for executing the query.
     The ``vendorname`` is one of ``postgresql``, ``oracle``, ``sqlite`` or
     ``mysql`` for Django's built-in backends.
 
 .. method:: get_lookup(lookup_name)
 
-    Must return the lookup ``lookup_name``. For instance, by returning
+    Must return the lookup named ``lookup_name``. For instance, by returning
     ``self.output_type.get_lookup(lookup_name)``.
 
 .. method:: get_transform(transform_name)
 
-    Must return the lookup ``transform_name``. For instance, by returning
+    Must return the lookup named ``transform_name``. For instance, by returning
     ``self.output_type.get_transform(transform_name)``.
 
 .. attribute:: output_type
 
-    Defines the type of class returned by the ``get_lookup()``.
-    It must be a :class:`~django.db.models.Field` instance.
+    Defines the type of class returned by the ``get_lookup()``. It must be a
+    :class:`~django.db.models.Field` instance.
 
 Transform reference
 ~~~~~~~~~~~~~~~~~~~
 
 .. class:: Transform
 
-    A ``Transform`` is a generic class to implement field transformations.
-    A prominent example is ``__year`` that transforms a ``DateField`` into a
+    A ``Transform`` is a generic class to implement field transformations. A
+    prominent example is ``__year`` that transforms a ``DateField`` into a
     ``IntegerField``.
 
     The notation to use a ``Transform`` in an lookup expression is
-    ``<lhs>__<lookup_name>``.
+    ``<expression>__<transformation>`` (e.g. ``date__year``).
 
-    This class follows the `Query Expression API <query-expression>`_,
-    which implies that the expression ``<lhs>__<lookup_name1>__<lookup_name2>``
-    where `lookup_name1` and `lookup_name2` are two transformations
-    is valid.
+    This class follows the `Query Expression API <query-expression>`_, which
+    implies that you can use ``<expression>__<transform1>__<transform2>``.
 
     .. attribute:: lhs
 
-        The left-hand side - what is being transformed.
-        It must follow the `Query Expression API <query-expression>`_.
+        The left-hand side - what is being transformed. It must follow the
+        `Query Expression API <query-expression>`_.
 
     .. attribute:: lookup_name
 
-        The name of the lookup, used for identifying it on parsing
-        query expressions. It cannot contain the string ``"__"``.
+        The name of the lookup, used for identifying it on parsing query
+        expressions. It cannot contain the string ``"__"``.
 
     .. attribute:: output_type
 
-        Defines the class this transformation outputs.
-        It must be a :class:`~django.db.models.Field` instance.
-        By default is the same as its ``lhs.output_type``.
+        Defines the class this transformation outputs. It must be a
+        :class:`~django.db.models.Field` instance. By default is the same as
+        its ``lhs.output_type``.
 
     .. method:: as_sql
 
-        To be overridden; raises :class:`NotImplemented`.
+        To be overridden; raises py:class:`NotImplementedError`.
 
     .. method:: get_lookup(lookup_name)
 
@@ -164,32 +160,34 @@ Lookup reference
 
 .. class:: Lookup
 
-    A ``Lookup`` is a generic class to implement lookups.
-    A lookup is a query expression with a left-hand side, :attr:`lhs`,
-    a right-hand side, :attr:`rhs`, and a ``lookup_name``.
+    A ``Lookup`` is a generic class to implement lookups. A lookup is a query
+    expression with a left-hand side, :attr:`lhs`, a right-hand side,
+    :attr:`rhs`, and a ``lookup_name`` that is used to produce a boolean
+    comparison between ``lhs`` and ``rhs`` such as ``lhs in rhs`` or
+    ``lhs > rhs``.
 
     The notation to use a lookup in an expression is
     ``<lhs>__<lookup_name>=<rhs>``.
 
     This class doesn't follow the `Query Expression API <query-expression>`_
-    since it has ``=<rhs>`` on its construction: lookups are always
-    ends of a query expression.
+    since it has ``=<rhs>`` on its construction: lookups are always the end of
+    a lookup expression.
 
     .. attribute:: lhs
 
-        The left-hand side - what is being looked up.
-        The object must follow the `Query Expression API <query-expression>`_.
+        The left-hand side - what is being looked up. The object must follow
+        the `Query Expression API <query-expression>`_.
 
     .. attribute:: rhs
 
-        The right-hand side - what ``lhs`` is being looked against.
-        It can be a plain value, or something that compiles
-        into SQL, typically a ``F()`` object or a ``Queryset``.
+        The right-hand side - what ``lhs`` is being looked against. It can be
+        a plain value, or something that compiles into SQL, typically a ``F
+        ()`` object or a ``Queryset``.
 
     .. attribute:: lookup_name
 
-        The name of this lookup, used to identify it on parsing
-        query expressions. It cannot contain the string ``"__"``.
+        The name of this lookup, used to identify it on parsing query
+        expressions. It cannot contain the string ``"__"``.
 
     .. method:: process_lhs(qn, connection[, lhs=None])
 
@@ -198,9 +196,9 @@ Lookup reference
         :param connection: the connection (for compiling vendor specific SQL)
         :param lhs: if not ``None``, the processed ``lhs`` is this and not ``self.lhs``.
 
-        Returns a tuple ``(lhs_string, lhs_params)``, as returned
-        by ``qn.compile(lhs)``.
-        This method can be overridden to tune how the ``lhs`` is processed.
+        Returns a tuple ``(lhs_string, lhs_params)``, as returned by ``qn
+        .compile(lhs)``. This method can be overridden to tune how the
+        ``lhs`` is processed.
 
     .. method:: process_rhs(qn, connection)
 
