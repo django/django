@@ -116,9 +116,9 @@ class Options(object):
     def installed(self):
         return self.app_config is not None
 
-    def get_new_field(self, field_name, m2m=False, data=True, related_objects=False, related_m2m=False, virtual=True):
+    def get_new_field(self, field_name, m2m=True, data=True, related_objects=False, related_m2m=False, virtual=True):
 
-        cache_key = (m2m, data, related_objects, related_m2m, virtual)
+        cache_key = (m2m, data, related_objects, related_m2m, virtual,)
         try:
             field_map = self._get_new_field_cache[cache_key]
         except KeyError:
