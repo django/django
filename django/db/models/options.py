@@ -296,7 +296,7 @@ class Options(object):
                 model.add_to_class('id', auto)
 
     def _expire_cache(self):
-        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields',):
+        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',):
             try:
                 delattr(self, cache_key)
             except AttributeError:
@@ -389,23 +389,6 @@ class Options(object):
     swapped = property(_swapped)
 
     @cached_property
-    def field_map(self):
-        res = {}
-        for field, names in six.iteritems(self.get_new_fields(m2m=True, related_objects=True,
-                                          related_m2m=True, virtual=True, recursive=True)):
-            for name in names:
-                res[name] = field
-        return res
-
-    @cached_property
-    def concrete_field_map(self):
-        res = {}
-        for field, names in six.iteritems(self.get_new_fields(m2m=True, virtual=True, recursive=True)):
-            for name in names:
-                res[name] = field
-        return res
-
-    @cached_property
     def fields(self):
         """
         The getter for self.fields. This returns the list of field objects
@@ -450,6 +433,14 @@ class Options(object):
     @cached_property
     def many_to_many(self):
         return list(self.get_new_fields(data=False, m2m=True))
+
+    @cached_property
+    def field_names(self):
+        result = set()
+        for _, names in six.iteritems(self.get_new_fields(related_objects=True, related_m2m=True,
+                                         virtual=True, recursive=True)):
+            result.update(name for name in names)
+        return list(result)
 
     def get_m2m_with_model(self):
         """
@@ -497,7 +488,7 @@ class Options(object):
         debugging output (a list of choices), so any internal-only field names
         are not included.
         """
-        return [val for val in self.field_map.keys() if not val.endswith('+')]
+        return self.field_names
 
     def init_name_map(self):
         """
