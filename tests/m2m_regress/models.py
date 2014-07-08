@@ -60,7 +60,7 @@ class Line(models.Model):
 
 class Worksheet(models.Model):
     id = models.CharField(primary_key=True, max_length=100)
-    lines = models.ManyToManyField(Line, blank=True, null=True)
+    lines = models.ManyToManyField(Line, blank=True)
 
 
 # Regression for #11226 -- A model with the same name that another one to

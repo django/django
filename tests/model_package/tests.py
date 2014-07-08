@@ -11,7 +11,7 @@ from .models.article import Article
 class Advertisement(models.Model):
     customer = models.CharField(max_length=100)
     publications = models.ManyToManyField(
-        "model_package.Publication", null=True, blank=True
+        "model_package.Publication", blank=True
     )
 
 
