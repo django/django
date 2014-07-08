@@ -705,9 +705,6 @@ For example, this model has a few custom methods::
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
         birth_date = models.DateField()
-        address = models.CharField(max_length=100)
-        city = models.CharField(max_length=50)
-        state = models.CharField(max_length=2)      # yes, this is America-centric
 
         def baby_boomer_status(self):
             "Returns the person's baby-boomer status."
@@ -718,10 +715,6 @@ For example, this model has a few custom methods::
                 return "Baby boomer"
             else:
                 return "Post-boomer"
-
-        def is_midwestern(self):
-            "Returns True if this person is from the Midwest."
-            return self.state in ('IL', 'WI', 'MI', 'IN', 'OH', 'IA', 'MO')
 
         def _get_full_name(self):
             "Returns the person's full name."
