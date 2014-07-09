@@ -248,9 +248,7 @@ class QuerySet(object):
         # build the list of fields that are to be loaded.
         if only_load:
             for field in self.model._meta.concrete_fields:
-                field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
-                model = field.model if field_is_direct else field.parent_model._meta.concrete_model
-                assert model == field.get_connected_model()
+                model = field.get_connected_model()
                 if model is self.model._meta.model:
                     model = self.model
                 try:
@@ -1344,9 +1342,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         init_list = []
         # Build the list of fields that *haven't* been requested
         for field in klass._meta.concrete_fields:
-            field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
-            model = field.model if field_is_direct else field.parent_model._meta.concrete_model
-            assert model == field.get_connected_model()
+            model = field.get_connected_model()
             if field.name not in load_fields:
                 skip.add(field.attname)
             elif from_parent and issubclass(from_parent, model.__class__):
