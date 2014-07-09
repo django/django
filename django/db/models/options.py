@@ -436,11 +436,13 @@ class Options(object):
 
     @cached_property
     def field_names(self):
-        result = set()
-        for _, names in six.iteritems(self.get_new_fields(related_objects=True, related_m2m=True,
-                                         virtual=True, recursive=True)):
-            result.update(name for name in names if not name.endswith('+'))
-        return list(result)
+        res = {}
+        for field, names in six.iteritems(self.get_new_fields(m2m=True, related_objects=True,
+                                          related_m2m=True, virtual=True, recursive=True)):
+            for name in names:
+                if not name.endswith('+'):
+                    res[name] = field
+        return res.keys()
 
     def get_m2m_with_model(self):
         """
