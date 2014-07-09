@@ -250,6 +250,7 @@ class QuerySet(object):
             for field in self.model._meta.concrete_fields:
                 field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
                 model = field.model if field_is_direct else field.parent_model._meta.concrete_model
+                assert model == field.get_connected_model()
                 if model is self.model._meta.model:
                     model = self.model
                 try:
@@ -1345,6 +1346,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         for field in klass._meta.concrete_fields:
             field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
             model = field.model if field_is_direct else field.parent_model._meta.concrete_model
+            assert model == field.get_connected_model()
             if field.name not in load_fields:
                 skip.add(field.attname)
             elif from_parent and issubclass(from_parent, model.__class__):
@@ -1502,8 +1504,7 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
         # Transfer data from this object to childs.
         parent_data = []
         for rel_field in klass_info[0]._meta.fields:
-            direct = isinstance(rel_field, Field) or hasattr(rel_field, 'is_gfk')
-            rel_model = rel_field.model if direct else rel_field.parent_model._meta.concrete_model
+            rel_model = rel_field.get_connected_model()
             if rel_model == klass_info[0]._meta.model:
                 rel_model = None
             if rel_model is not None and isinstance(obj, rel_model):

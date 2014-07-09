@@ -299,8 +299,7 @@ class SQLCompiler(object):
         seen_models = {None: start_alias}
 
         for field in opts.concrete_fields:
-            field_is_direct = isinstance(field, Field) or hasattr(field, 'is_gfk')
-            model = field.model if field_is_direct else field.parent_model._meta.concrete_model
+            model = field.get_connected_model()
             if model == opts.model:
                 model = None
             if from_parent and model is not None and issubclass(from_parent, model):
@@ -643,8 +642,7 @@ class SQLCompiler(object):
             # The get_fields_with_model() returns None for fields that live
             # in the field's local model. So, for those fields we want to use
             # the f.model - that is the field's local model.
-            direct = isinstance(f, Field) or hasattr(f, 'is_gfk')
-            model = f.model if direct else f.parent_model._meta.concrete_model
+            model = f.get_connected_model()
             if model == opts.model:
                 model = None
             field_model = model or f.model
