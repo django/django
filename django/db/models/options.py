@@ -117,33 +117,57 @@ class Options(object):
         return self.app_config is not None
 
     def get_new_field(self, field_name, m2m=True, data=True, related_objects=False, related_m2m=False, virtual=True):
-
+        """
+        Returns a field instance given a field name. By default will only search in data and
+        many to many fields. This can be changed by enabling or disabling field types using
+        the flags available. Hidden or proxy fields cannot be retreived.
+        """
+        # Creates a cache key composed of all arguments
         cache_key = (m2m, data, related_objects, related_m2m, virtual,)
+
+        # If result has already been cached, return the result in cache.
         try:
             field_map = self._get_new_field_cache[cache_key]
         except KeyError:
             res = {}
+
+            # call get_fields with recursive=True in order to have a field_instance -> names map
             for field, names in six.iteritems(self.get_new_fields(m2m=m2m, data=data,
                                               related_objects=related_objects, related_m2m=related_m2m,
                                               virtual=virtual, recursive=True)):
                 for name in names:
+                    # Map each possible name for a field to it's field instance
                     res[name] = field
+
+            # Store result into cache for later access
             field_map = self._get_new_field_cache[cache_key] = res
         try:
+            # Retreive field instance by name from cached or just-computer field map
             return field_map[field_name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
     def get_new_fields(self, m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False,
                        include_parents=True, include_non_concrete=True, include_hidden=False, include_proxy=False, recursive=False):
+        """
+        Returns a list of fields associated to the model. By default will only search in data.
+        This can be changed by enabling or disabling field types using
+        the flags available.
+        """
 
+        # Creates a cache key composed of all arguments
         cache_key = (m2m, data, related_m2m, related_objects, virtual, include_parents,
                      include_non_concrete, include_hidden, include_proxy, recursive)
+
+        # If result has already been cached, return the result in cache.
         try:
             return self._get_new_fields_cache[cache_key]
         except KeyError:
             pass
 
+        # Using an OrderedDict to preserve the order of insertion. This is fundamental
+        # when displaying a ModelForm or django.contrib.admin panel and no specific ordering
+        # is provided. For this reason, order of field insertion must be preserved
         fields = OrderedDict()
         options = {'include_parents': include_parents,
                    'include_non_concrete': include_non_concrete,
@@ -152,6 +176,8 @@ class Options(object):
 
         if related_m2m:
             if include_parents:
+                # Recursively call get_fields on each parent, with the same options provided
+                # in this call
                 for parent in self.parents:
                     for obj, query_name in six.iteritems(parent._meta.get_new_fields(data=False, related_m2m=True,
                                                          **dict(options, recursive=True))):
@@ -162,13 +188,18 @@ class Options(object):
 
             for model in self.apps.non_swapped_models:
                 for f in model._meta.many_to_many:
+                    # Loop through every m2m field of every model in every registered app.
                     has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
                     if has_rel_attr and self == f.rel.to._meta:
+                        # If a field is a Related M2M and points to the current model,
+                        # then it must be added to the fields dict
                         fields[f.related] = (f.related_query_name(),)
 
         if related_objects:
             parent_list = self.get_parent_list()
             if include_parents:
+                # Recursively call get_fields on each parent, with the same options provided
+                # in this call
                 for parent in self.parents:
                     for obj, query_name in six.iteritems(parent._meta.get_new_fields(data=False, related_objects=True,
                                                          **dict(options, recursive=True, include_hidden=True))):
@@ -176,40 +207,59 @@ class Options(object):
                                 or obj.field.rel.parent_link)
                                 and obj.model not in parent_list):
                             if include_hidden or not obj.field.rel.is_hidden():
+                                # If hidden fields should be included or the relation
+                                # is not intentionally hidden, add to the fields dict
                                 fields[obj] = query_name
 
             for model in self.apps.non_swapped_models_auto_created:
                 for f in model._meta.fields + model._meta.virtual_fields:
+                    # Loop through every data and virtual field of every model in every registered app.
                     try:
                         if f.rel and f.has_class_relation:
                             to_meta = f.rel.to._meta
                             if (to_meta == self) or (include_proxy and self.concrete_model == to_meta.concrete_model):
+                                # Field must point to the current model, or if include_proxy field
+                                # can also points to another proxy model that inherits from this model.
                                 if include_hidden or not f.related.field.rel.is_hidden():
+                                    # If hidden fields should be included or the relation
+                                    # is not intentionally hidden, add to the fields dict
                                     fields[f.related] = (f.related_query_name(),)
                     except AttributeError:
+                        # If field does not have a rel attribute, it will cause an
+                        # AttributeError. This is to avoid another conditional statement
+                        # with hasattr(f, 'rel')
                         continue
 
         if m2m:
             if include_parents:
                 for parent in self.parents:
+                    # Extend the fields dict with all the m2m fields of each parent.
                     fields.update(parent._meta.get_new_fields(data=False, m2m=True, **dict(options, recursive=True)))
             fields.update((field, (field.name, field.attname)) for field in self.local_many_to_many)
 
         if data:
             if include_parents:
                 for parent in self.parents:
+                    # Extend the fields dict with all the m2m fields of each parent.
                     fields.update(parent._meta.get_new_fields(**dict(options, recursive=True)))
             for field in self.local_fields:
                 if include_non_concrete or field.column is not None:
+                    # If only concrete fields are allowed, check that field column
+                    # is not None, then add to field dict
                     fields[field] = (field.name, field.attname)
 
         if virtual:
+            # Virtual fields to not need to recursively search parents.
             for field in self.virtual_fields:
                 fields[field] = (field.name,)
 
         if not recursive:
+            # By default, fields contains field instances as keys and all possible names
+            # if the field instance as values. when get_fields is called, we only want to
+            # return field instances, so we just preserve the keys.
             fields = tuple(fields.keys())
 
+        # Store result into cache for later access
         self._get_new_fields_cache[cache_key] = fields
         return fields
 
@@ -391,20 +441,25 @@ class Options(object):
     @cached_property
     def fields(self):
         """
-        The getter for self.fields. This returns the list of field objects
-        available to this model (including through parent models).
-
-        Callers are not permitted to modify this list, since it's a reference
-        to this instance (not a copy).
+        Returns a list of all data fields on the model and it's parents.
+        All hidden and proxy fields are omitted.
         """
         return list(self.get_new_fields())
 
     @cached_property
     def concrete_fields(self):
+        """
+        Returns a list of all concrete data fields on the model and it's parents.
+        All hidden and proxy fields are omitted.
+        """
         return list(self.get_new_fields(include_non_concrete=False))
 
     @cached_property
     def local_concrete_fields(self):
+        """
+        Returns a list of all concrete data fields on the model.
+        All hidden and proxy fields are omitted.
+        """
         return self.get_new_fields(include_parents=False, include_non_concrete=False)
 
     def get_fields_with_model(self):
@@ -432,10 +487,20 @@ class Options(object):
 
     @cached_property
     def many_to_many(self):
+        """
+        Returns a list of all many to many fields on the model and
+        it's parents.
+        All hidden and proxy fields are omitted.
+        """
         return list(self.get_new_fields(data=False, m2m=True))
 
     @cached_property
     def field_names(self):
+        """
+        Returns a list of all field names in the model. The list contains
+        data, m2m, related objects, related m2m and virtual fields.
+        All hidden and proxy fields are omitted.
+        """
         res = set()
         for _, names in six.iteritems(self.get_new_fields(m2m=True, related_objects=True,
                                           related_m2m=True, virtual=True, recursive=True)):
