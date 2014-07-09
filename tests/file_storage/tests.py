@@ -19,7 +19,8 @@ from django.core.cache import cache
 from django.core.exceptions import SuspiciousOperation
 from django.core.files.base import File, ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
-from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.uploadedfile import (InMemoryUploadedFile, SimpleUploadedFile,
+    TemporaryUploadedFile)
 from django.test import LiveServerTestCase, SimpleTestCase
 from django.test import override_settings
 from django.utils import six
@@ -96,7 +97,7 @@ class FileStorageTests(unittest.TestCase):
         shutil.rmtree(self.temp_dir)
         shutil.rmtree(self.temp_dir2)
 
-    def test_emtpy_location(self):
+    def test_empty_location(self):
         """
         Makes sure an exception is raised if the location is empty
         """
@@ -206,6 +207,23 @@ class FileStorageTests(unittest.TestCase):
 
         self.storage.delete('path/to/test.file')
 
+    def test_save_doesnt_close(self):
+        with TemporaryUploadedFile('test', 'text/plain', 1, 'utf8') as file:
+            file.write(b'1')
+            file.seek(0)
+            self.assertFalse(file.closed)
+            self.storage.save('path/to/test.file', file)
+            self.assertFalse(file.closed)
+            self.assertFalse(file.file.closed)
+
+        file = InMemoryUploadedFile(six.StringIO('1'), '', 'test',
+                                    'text/plain', 1, 'utf8')
+        with file:
+            self.assertFalse(file.closed)
+            self.storage.save('path/to/test.file', file)
+            self.assertFalse(file.closed)
+            self.assertFalse(file.file.closed)
+
     def test_file_path(self):
         """
         File storage returns the full path of a file
@@ -238,6 +256,14 @@ class FileStorageTests(unittest.TestCase):
 
         self.storage.base_url = None
         self.assertRaises(ValueError, self.storage.url, 'test.file')
+
+        # #22717: missing ending slash in base_url should be auto-corrected
+        storage = self.storage_class(location=self.temp_dir,
+            base_url='/no_ending_slash')
+        self.assertEqual(
+            storage.url('test.file'),
+            '%s%s' % (storage.base_url, 'test.file')
+        )
 
     def test_listdir(self):
         """

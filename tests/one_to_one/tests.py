@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db import transaction, IntegrityError
 from django.test import TestCase
 
-from .models import (Place, Restaurant, Waiter, ManualPrimaryKey, RelatedModel,
+from .models import (Place, Restaurant, Bar, Waiter, ManualPrimaryKey, RelatedModel,
     MultiModel)
 
 
@@ -100,7 +100,6 @@ class OneToOneTests(TestCase):
         assert_filter_waiters(restaurant__place__exact=self.p1)
         assert_filter_waiters(restaurant__place__pk=self.p1.pk)
         assert_filter_waiters(restaurant__exact=self.p1.pk)
-        assert_filter_waiters(restaurant__exact=self.p1)
         assert_filter_waiters(restaurant__pk=self.p1.pk)
         assert_filter_waiters(restaurant=self.p1.pk)
         assert_filter_waiters(restaurant=self.r)
@@ -128,3 +127,20 @@ class OneToOneTests(TestCase):
         with self.assertRaises(IntegrityError):
             with transaction.atomic():
                 mm.save()
+
+    def test_unsaved_object(self):
+        """
+        #10811 -- Assigning an unsaved object to a OneToOneField
+        should raise an exception.
+        """
+        place = Place(name='User', address='London')
+        with self.assertRaisesMessage(ValueError,
+                            'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
+                            % (place, Restaurant.place.field.rel.to._meta.object_name)):
+            Restaurant.objects.create(place=place, serves_hot_dogs=True, serves_pizza=False)
+        bar = Bar()
+        p = Place(name='User', address='London')
+        with self.assertRaisesMessage(ValueError,
+                            'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
+                            % (bar, p._meta.object_name)):
+            p.bar = bar

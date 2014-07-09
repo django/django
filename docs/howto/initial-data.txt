@@ -82,7 +82,7 @@ Automatically loading initial data fixtures
     If an application uses migrations, there is no automatic loading of
     fixtures. Since migrations will be required for applications in Django 2.0,
     this behavior is considered deprecated. If you want to load initial data
-    for an app, consider doing it in a migration.
+    for an app, consider doing it in a :ref:`data migration <data-migrations>`.
 
 If you create a fixture named ``initial_data.[xml/yaml/json]``, that fixture will
 be loaded every time you run :djadmin:`migrate`. This is extremely convenient,
@@ -115,7 +115,8 @@ Providing initial SQL data
     If an application uses migrations, there is no loading of initial SQL data
     (including backend-specific SQL data). Since migrations will be required
     for applications in Django 2.0, this behavior is considered deprecated.
-    If you want to use initial SQL for an app, consider doing it in a migration.
+    If you want to use initial SQL for an app, consider doing it in a
+    :ref:`data migration <data-migrations>`.
 
 Django provides a hook for passing the database arbitrary SQL that's executed
 just after the CREATE TABLE statements when you run :djadmin:`migrate`. You can

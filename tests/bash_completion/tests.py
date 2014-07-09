@@ -46,13 +46,13 @@ class BashCompletionTests(unittest.TestCase):
 
     def test_django_admin_py(self):
         "django_admin.py will autocomplete option flags"
-        self._user_input('django-admin.py sqlall --v')
+        self._user_input('django-admin.py sqlall --verb')
         output = self._run_autocomplete()
         self.assertEqual(output, ['--verbosity='])
 
     def test_manage_py(self):
         "manage.py will autocomplete option flags"
-        self._user_input('manage.py sqlall --v')
+        self._user_input('manage.py sqlall --verb')
         output = self._run_autocomplete()
         self.assertEqual(output, ['--verbosity='])
 

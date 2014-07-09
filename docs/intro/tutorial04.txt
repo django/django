@@ -233,6 +233,8 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
         url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
     ]
 
+.. _tutorial04-amend-views:
+
 Amend views
 -----------
 

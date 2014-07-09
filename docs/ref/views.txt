@@ -9,7 +9,7 @@ Several of Django's built-in views are documented in
 :doc:`/topics/http/views` as well as elsewhere in the documentation.
 
 Serving files in development
-----------------------------
+============================
 
 .. function:: static.serve(request, path, document_root, show_indexes=False)
 
@@ -47,3 +47,104 @@ ships with a small URL helper function :func:`~django.conf.urls.static.static`
 that takes as parameters the prefix such as :setting:`MEDIA_URL` and a dotted
 path to a view, such as ``'django.views.static.serve'``. Any other function
 parameter will be transparently passed to the view.
+
+.. _error-views:
+
+Error views
+===========
+
+Django comes with a few views by default for handling HTTP errors. To override
+these with your own custom views, see :ref:`customizing-error-views`.
+
+.. _http_not_found_view:
+
+The 404 (page not found) view
+-----------------------------
+
+.. function:: defaults.page_not_found(request, template_name='404.html')
+
+When you raise :exc:`~django.http.Http404` from within a view, Django loads a
+special view devoted to handling 404 errors. By default, it's the view
+:func:`django.views.defaults.page_not_found`, which either produces a very
+simple "Not Found" message or loads and renders the template ``404.html`` if
+you created it in your root template directory.
+
+The default 404 view will pass one variable to the template: ``request_path``,
+which is the URL that resulted in the error.
+
+Three things to note about 404 views:
+
+* The 404 view is also called if Django doesn't find a match after
+  checking every regular expression in the URLconf.
+
+* The 404 view is passed a :class:`~django.template.RequestContext` and
+  will have access to variables supplied by your
+  :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting (e.g., ``MEDIA_URL``).
+
+* If :setting:`DEBUG` is set to ``True`` (in your settings module), then
+  your 404 view will never be used, and your URLconf will be displayed
+  instead, with some debug information.
+
+.. _http_internal_server_error_view:
+
+The 500 (server error) view
+---------------------------
+
+.. function:: defaults.server_error(request, template_name='500.html')
+
+Similarly, Django executes special-case behavior in the case of runtime errors
+in view code. If a view results in an exception, Django will, by default, call
+the view ``django.views.defaults.server_error``, which either produces a very
+simple "Server Error" message or loads and renders the template ``500.html`` if
+you created it in your root template directory.
+
+The default 500 view passes no variables to the ``500.html`` template and is
+rendered with an empty ``Context`` to lessen the chance of additional errors.
+
+If :setting:`DEBUG` is set to ``True`` (in your settings module), then
+your 500 view will never be used, and the traceback will be displayed
+instead, with some debug information.
+
+.. _http_forbidden_view:
+
+The 403 (HTTP Forbidden) view
+-----------------------------
+
+.. function:: defaults.permission_denied(request, template_name='403.html')
+
+In the same vein as the 404 and 500 views, Django has a view to handle 403
+Forbidden errors. If a view results in a 403 exception then Django will, by
+default, call the view ``django.views.defaults.permission_denied``.
+
+This view loads and renders the template ``403.html`` in your root template
+directory, or if this file does not exist, instead serves the text
+"403 Forbidden", as per :rfc:`2616` (the HTTP 1.1 Specification).
+
+``django.views.defaults.permission_denied`` is triggered by a
+:exc:`~django.core.exceptions.PermissionDenied` exception. To deny access in a
+view you can use code like this::
+
+    from django.core.exceptions import PermissionDenied
+
+    def edit(request, pk):
+        if not request.user.is_staff:
+            raise PermissionDenied
+        # ...
+
+.. _http_bad_request_view:
+
+The 400 (bad request) view
+--------------------------
+
+.. function:: defaults.bad_request(request, template_name='400.html')
+
+When a :exc:`~django.core.exceptions.SuspiciousOperation` is raised in Django,
+it may be handled by a component of Django (for example resetting the session
+data). If not specifically handled, Django will consider the current request a
+'bad request' instead of a server error.
+
+``django.views.defaults.bad_request``, is otherwise very similar to the
+``server_error`` view, but returns with the status code 400 indicating that
+the error condition was the result of a client operation.
+
+``bad_request`` views are also only used when :setting:`DEBUG` is ``False``.

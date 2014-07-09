@@ -197,17 +197,17 @@ Using routers
 
 Database routers are installed using the :setting:`DATABASE_ROUTERS`
 setting. This setting defines a list of class names, each specifying a
-router that should be used by the leader router
+router that should be used by the master router
 (``django.db.router``).
 
-The leader router is used by Django's database operations to allocate
+The master router is used by Django's database operations to allocate
 database usage. Whenever a query needs to know which database to use,
-it calls the leader router, providing a model and a hint (if
+it calls the master router, providing a model and a hint (if
 available). Django then tries each router in turn until a database
 suggestion can be found. If no suggestion can be found, it tries the
 current ``_state.db`` of the hint instance. If a hint instance wasn't
 provided, or the instance doesn't currently have database state, the
-leader router will allocate the ``default`` database.
+master router will allocate the ``default`` database.
 
 An example
 ----------
@@ -225,16 +225,17 @@ An example
     introduce referential integrity problems that Django can't
     currently handle.
 
-    The leader/follower configuration described is also flawed -- it
+    The primary/replica (referred to as master/slave by some databases)
+    configuration described is also flawed -- it
     doesn't provide any solution for handling replication lag (i.e.,
     query inconsistencies introduced because of the time taken for a
-    write to propagate to the followers). It also doesn't consider the
+    write to propagate to the replicas). It also doesn't consider the
     interaction of transactions with the database utilization strategy.
 
 So - what does this mean in practice? Let's consider another sample
 configuration. This one will have several databases: one for the
-``auth`` application, and all other apps using a leader/follower setup
-with two read followers. Here are the settings specifying these
+``auth`` application, and all other apps using a primary/replica setup
+with two read replicas. Here are the settings specifying these
 databases::
 
     DATABASES = {
@@ -244,20 +245,20 @@ databases::
             'USER': 'mysql_user',
             'PASSWORD': 'swordfish',
         },
-        'leader': {
-            'NAME': 'leader',
+        'primary': {
+            'NAME': 'primary',
             'ENGINE': 'django.db.backends.mysql',
             'USER': 'mysql_user',
             'PASSWORD': 'spam',
         },
-        'follower1': {
-            'NAME': 'follower1',
+        'replica1': {
+            'NAME': 'replica1',
             'ENGINE': 'django.db.backends.mysql',
             'USER': 'mysql_user',
             'PASSWORD': 'eggs',
         },
-        'follower2': {
-            'NAME': 'follower2',
+        'replica2': {
+            'NAME': 'replica2',
             'ENGINE': 'django.db.backends.mysql',
             'USER': 'mysql_user',
             'PASSWORD': 'bacon',
@@ -309,30 +310,30 @@ send queries for the ``auth`` app to ``auth_db``::
             return None
 
 And we also want a router that sends all other apps to the
-leader/follower configuration, and randomly chooses a follower to read
+primary/replica configuration, and randomly chooses a replica to read
 from::
 
     import random
 
-    class LeaderFollowerRouter(object):
+    class PrimaryReplicaRouter(object):
         def db_for_read(self, model, **hints):
             """
-            Reads go to a randomly-chosen follower.
+            Reads go to a randomly-chosen replica.
             """
-            return random.choice(['follower1', 'follower2'])
+            return random.choice(['replica1', 'replica2'])
 
         def db_for_write(self, model, **hints):
             """
-            Writes always go to leader.
+            Writes always go to primary.
             """
-            return 'leader'
+            return 'primary'
 
         def allow_relation(self, obj1, obj2, **hints):
             """
             Relations between objects are allowed if both objects are
-            in the leader/follower pool.
+            in the primary/replica pool.
             """
-            db_list = ('leader', 'follower1', 'follower2')
+            db_list = ('primary', 'replica1', 'replica2')
             if obj1._state.db in db_list and obj2._state.db in db_list:
                 return True
             return None
@@ -347,17 +348,17 @@ Finally, in the settings file, we add the following (substituting
 ``path.to.`` with the actual python path to the module(s) where the
 routers are defined)::
 
-    DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.LeaderFollowerRouter']
+    DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.PrimaryReplicaRouter']
 
 The order in which routers are processed is significant. Routers will
 be queried in the order the are listed in the
 :setting:`DATABASE_ROUTERS` setting . In this example, the
-``AuthRouter`` is processed before the ``LeaderFollowerRouter``, and as a
+``AuthRouter`` is processed before the ``PrimaryReplicaRouter``, and as a
 result, decisions concerning the models in ``auth`` are processed
 before any other decision is made. If the :setting:`DATABASE_ROUTERS`
 setting listed the two routers in the other order,
-``LeaderFollowerRouter.allow_migrate()`` would be processed first. The
-catch-all nature of the LeaderFollowerRouter implementation would mean
+``PrimaryReplicaRouter.allow_migrate()`` would be processed first. The
+catch-all nature of the PrimaryReplicaRouter implementation would mean
 that all models would be available on all databases.
 
 With this setup installed, lets run some Django code::
@@ -369,7 +370,7 @@ With this setup installed, lets run some Django code::
     >>> # This save will also be directed to 'auth_db'
     >>> fred.save()
 
-    >>> # These retrieval will be randomly allocated to a follower database
+    >>> # These retrieval will be randomly allocated to a replica database
     >>> dna = Person.objects.get(name='Douglas Adams')
 
     >>> # A new object has no database allocation when created
@@ -379,10 +380,10 @@ With this setup installed, lets run some Django code::
     >>> # the same database as the author object
     >>> mh.author = dna
 
-    >>> # This save will force the 'mh' instance onto the leader database...
+    >>> # This save will force the 'mh' instance onto the primary database...
     >>> mh.save()
 
-    >>> # ... but if we re-retrieve the object, it will come back on a follower
+    >>> # ... but if we re-retrieve the object, it will come back on a replica
     >>> mh = Book.objects.get(title='Mostly Harmless')
 
 
@@ -690,7 +691,7 @@ In addition, some objects are automatically created just after
   database).
 
 For common setups with multiple databases, it isn't useful to have these
-objects in more than one database. Common setups include leader / follower and
+objects in more than one database. Common setups include primary/replica and
 connecting to external databases. Therefore, it's recommended:
 
 - either to run :djadmin:`migrate` only for the default database;

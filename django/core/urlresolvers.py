@@ -12,13 +12,15 @@ import functools
 from importlib import import_module
 import re
 from threading import local
+import warnings
 
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str, force_text, iri_to_uri
 from django.utils.functional import lazy
-from django.utils.http import urlquote
+from django.utils.http import RFC3986_SUBDELIMS, urlquote
 from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
 from django.utils import six, lru_cache
@@ -391,7 +393,7 @@ class RegexURLResolver(LocaleRegexProvider):
             raise ImproperlyConfigured(msg.format(name=self.urlconf_name))
         return patterns
 
-    def _resolve_special(self, view_type):
+    def resolve_error_handler(self, view_type):
         callback = getattr(self.urlconf_module, 'handler%s' % view_type, None)
         if not callback:
             # No handler specified in file; use default
@@ -399,18 +401,6 @@ class RegexURLResolver(LocaleRegexProvider):
             from django.conf import urls
             callback = getattr(urls, 'handler%s' % view_type)
         return get_callable(callback), {}
-
-    def resolve400(self):
-        return self._resolve_special('400')
-
-    def resolve403(self):
-        return self._resolve_special('403')
-
-    def resolve404(self):
-        return self._resolve_special('404')
-
-    def resolve500(self):
-        return self._resolve_special('500')
 
     def reverse(self, lookup_view, *args, **kwargs):
         return self._reverse_with_prefix(lookup_view, '', *args, **kwargs)
@@ -424,11 +414,18 @@ class RegexURLResolver(LocaleRegexProvider):
         if not self._populated:
             self._populate()
 
+        original_lookup = lookup_view
         try:
             if lookup_view in self._callback_strs:
                 lookup_view = get_callable(lookup_view, True)
         except (ImportError, AttributeError) as e:
             raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
+        else:
+            if not callable(original_lookup) and callable(lookup_view):
+                warnings.warn(
+                    'Reversing by dotted path is deprecated (%s).' % original_lookup,
+                    RemovedInDjango20Warning, stacklevel=3
+                )
         possibilities = self.reverse_dict.getlist(lookup_view)
 
         prefix_norm, prefix_args = normalize(urlquote(_prefix))[0]
@@ -456,7 +453,9 @@ class RegexURLResolver(LocaleRegexProvider):
                 # arguments in order to return a properly encoded URL.
                 candidate_pat = prefix_norm.replace('%', '%%') + result
                 if re.search('^%s%s' % (prefix_norm, pattern), candidate_pat % candidate_subs, re.UNICODE):
-                    candidate_subs = dict((k, urlquote(v)) for (k, v) in candidate_subs.items())
+                    # safe characters from `pchar` definition of RFC 3986
+                    candidate_subs = dict((k, urlquote(v, safe=RFC3986_SUBDELIMS + str('/~:@')))
+                                          for (k, v) in candidate_subs.items())
                     return candidate_pat % candidate_subs
         # lookup_view can be URL label, or dotted path, or callable, Any of
         # these can be passed in at the top, but callables are not friendly in

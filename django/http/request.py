@@ -5,6 +5,7 @@ import os
 import re
 import sys
 from io import BytesIO
+from itertools import chain
 from pprint import pformat
 
 from django.conf import settings
@@ -15,7 +16,7 @@ from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils import six
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
-from django.utils.six.moves.urllib.parse import parse_qsl, urlencode, quote, urljoin
+from django.utils.six.moves.urllib.parse import parse_qsl, urlencode, quote, urljoin, urlsplit
 
 
 RAISE_ERROR = object()
@@ -48,7 +49,12 @@ class HttpRequest(object):
         # Any variable assignment made here should also happen in
         # `WSGIRequest.__init__()`.
 
-        self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
+        self.GET = QueryDict(mutable=True)
+        self.POST = QueryDict(mutable=True)
+        self.COOKIES = {}
+        self.META = {}
+        self.FILES = MultiValueDict()
+
         self.path = ''
         self.path_info = ''
         self.method = None
@@ -83,9 +89,9 @@ class HttpRequest(object):
         else:
             msg = "Invalid HTTP_HOST header: %r." % host
             if domain:
-                msg += "You may need to add %r to ALLOWED_HOSTS." % domain
+                msg += " You may need to add %r to ALLOWED_HOSTS." % domain
             else:
-                msg += "The domain name provided is not valid according to RFC 1034/1035"
+                msg += " The domain name provided is not valid according to RFC 1034/1035."
             raise DisallowedHost(msg)
 
     def get_full_path(self):
@@ -119,14 +125,25 @@ class HttpRequest(object):
     def build_absolute_uri(self, location=None):
         """
         Builds an absolute URI from the location and the variables available in
-        this request. If no location is specified, the absolute URI is built on
-        ``request.get_full_path()``.
+        this request. If no ``location`` is specified, the absolute URI is
+        built on ``request.get_full_path()``. Anyway, if the location is
+        absolute, it is simply converted to an RFC 3987 compliant URI and
+        returned and if location is relative or is scheme-relative (i.e.,
+        ``//example.com/``), it is urljoined to a base URL constructed from the
+        request variables.
         """
-        if not location:
-            location = self.get_full_path()
-        if not absolute_http_url_re.match(location):
-            current_uri = '%s://%s%s' % (self.scheme,
-                                         self.get_host(), self.path)
+        if location is None:
+            # Make it an absolute url (but schemeless and domainless) for the
+            # edge case that the path starts with '//'.
+            location = '//%s' % self.get_full_path()
+        bits = urlsplit(location)
+        if not (bits.scheme and bits.netloc):
+            current_uri = '{scheme}://{host}{path}'.format(scheme=self.scheme,
+                                                           host=self.get_host(),
+                                                           path=self.path)
+            # Join the constructed URL with the provided location, which will
+            # allow the provided ``location`` to apply query strings to the
+            # base path as well as override the host, if it begins with //
             location = urljoin(current_uri, location)
         return iri_to_uri(location)
 
@@ -245,6 +262,11 @@ class HttpRequest(object):
         else:
             self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
 
+    def close(self):
+        if hasattr(self, '_files'):
+            for f in chain.from_iterable(l[1] for l in self._files.lists()):
+                f.close()
+
     # File-like and iterator interface.
     #
     # Expects self._stream to be set to an appropriate source of bytes by
@@ -282,18 +304,25 @@ class HttpRequest(object):
 
 class QueryDict(MultiValueDict):
     """
-    A specialized MultiValueDict that takes a query string when initialized.
-    This is immutable unless you create a copy of it.
+    A specialized MultiValueDict which represents a query string.
 
-    Values retrieved from this class are converted from the given encoding
+    A QueryDict can be used to represent GET or POST data. It subclasses
+    MultiValueDict since keys in such data can be repeated, for instance
+    in the data from a form with a <select multiple> field.
+
+    By default QueryDicts are immutable, though the copy() method
+    will always return a mutable copy.
+
+    Both keys and values set on this class are converted from the given encoding
     (DEFAULT_CHARSET by default) to unicode.
     """
+
     # These are both reset in __init__, but is specified here at the class
     # level so that unpickling will have valid values
     _mutable = True
     _encoding = None
 
-    def __init__(self, query_string, mutable=False, encoding=None):
+    def __init__(self, query_string=None, mutable=False, encoding=None):
         super(QueryDict, self).__init__()
         if not encoding:
             encoding = settings.DEFAULT_CHARSET

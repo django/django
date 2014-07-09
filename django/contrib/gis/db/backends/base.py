@@ -1,6 +1,6 @@
 """
 Base/mixin classes for the spatial backend database operations and the
-`SpatialRefSys` model the backend.
+`<Backend>SpatialRefSys` model.
 """
 import re
 

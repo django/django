@@ -461,7 +461,7 @@ class FormsFormsetTestCase(TestCase):
     def test_formsets_with_ordering(self):
         # FormSets with ordering ######################################################
         # We can also add ordering ability to a FormSet with an argument to
-        # formset_factory. This will add a integer field to each form instance. When
+        # formset_factory. This will add an integer field to each form instance. When
         # form validation succeeds, [form.cleaned_data for form in formset.forms] will have the data in the correct
         # order specified by the ordering fields. If a number is duplicated in the set
         # of ordering fields, for instance form 0 and form 3 are both marked as 1, then

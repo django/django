@@ -367,10 +367,9 @@ class AdminSite(object):
         apps that have been registered in this site.
         """
         app_dict = {}
-        user = request.user
         for model, model_admin in self._registry.items():
             app_label = model._meta.app_label
-            has_module_perms = user.has_module_perms(app_label)
+            has_module_perms = model_admin.has_module_permission(request)
 
             if has_module_perms:
                 perms = model_admin.get_model_perms(request)
@@ -424,14 +423,14 @@ class AdminSite(object):
                                 current_app=self.name)
 
     def app_index(self, request, app_label, extra_context=None):
-        user = request.user
         app_name = apps.get_app_config(app_label).verbose_name
-        has_module_perms = user.has_module_perms(app_label)
-        if not has_module_perms:
-            raise PermissionDenied
         app_dict = {}
         for model, model_admin in self._registry.items():
             if app_label == model._meta.app_label:
+                has_module_perms = model_admin.has_module_permission(request)
+                if not has_module_perms:
+                    raise PermissionDenied
+
                 perms = model_admin.get_model_perms(request)
 
                 # Check whether user has any perm for this module.

@@ -7,15 +7,13 @@ import getpass
 import unicodedata
 
 from django.apps import apps
-from django.contrib.auth import (models as auth_app, get_permission_codename,
-    get_user_model)
+from django.contrib.auth import models as auth_app, get_permission_codename
 from django.core import exceptions
 from django.core.management.base import CommandError
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models import signals
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils import six
-from django.utils.six.moves import input
 
 
 def _get_all_permissions(opts, ctype):
@@ -119,30 +117,6 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
             print("Adding permission '%s'" % perm)
 
 
-def create_superuser(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
-    try:
-        apps.get_model('auth', 'Permission')
-    except LookupError:
-        return
-
-    UserModel = get_user_model()
-
-    from django.core.management import call_command
-
-    if not UserModel._default_manager.exists() and interactive:
-        msg = ("\nYou have installed Django's auth system, and "
-            "don't have any superusers defined.\nWould you like to create one "
-            "now? (yes/no): ")
-        confirm = input(msg)
-        while 1:
-            if confirm not in ('yes', 'no'):
-                confirm = input('Please enter either "yes" or "no": ')
-                continue
-            if confirm == 'yes':
-                call_command("createsuperuser", interactive=True, database=using)
-            break
-
-
 def get_system_username():
     """
     Try to determine the current system user's username.
@@ -207,6 +181,3 @@ def get_default_username(check_db=True):
 
 signals.post_migrate.connect(create_permissions,
     dispatch_uid="django.contrib.auth.management.create_permissions")
-signals.post_migrate.connect(create_superuser,
-    sender=apps.get_app_config('auth'),
-    dispatch_uid="django.contrib.auth.management.create_superuser")

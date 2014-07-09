@@ -158,6 +158,8 @@ been discussed on |django-developers|.
 If you're not sure whether your patch should be considered non-trivial, just
 ask.
 
+.. _deprecating-a-feature:
+
 Deprecating a feature
 ---------------------
 
@@ -264,3 +266,71 @@ minified scripts when submitting patches for Django's javascript.
 .. _Closure Compiler: https://developers.google.com/closure/compiler/
 .. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
 .. _ticket tracker: https://code.djangoproject.com/newticket
+
+Patch review checklist
+----------------------
+
+Use this checklist to review a pull request. If you are reviewing a pull
+request that is not your own and it passes all the criteria below, please set
+the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
+If you've left comments for improvement on the pull request, please tick the
+appropriate flags on the Trac ticket based on the results of your review:
+"Patch needs improvement", "Needs documentation", and/or "Needs tests". As time
+and interest permits, core developers do final reviews of "Ready for checkin"
+tickets and will either commit the patch or bump it back to "Accepted" if
+further works need to be done. If you're looking to become a core developer,
+doing thorough reviews of patches is a great way to earn trust.
+
+Looking for a patch to review? Check out the "Patches needing review" section
+of the `Django Development Dashboard <https://dashboard.djangoproject.com/>`_.
+Looking to get your patch reviewed? Ensure the Trac flags on the ticket are
+set so that the ticket appears in that queue.
+
+Documentation
+~~~~~~~~~~~~~
+
+* Does the documentation build without any errors (``make html``, or
+  ``make.bat html`` on Windows, from the ``docs`` directory)?
+* Does the documentation follow the writing style guidelines in
+  :doc:`/internals/contributing/writing-documentation`?
+* Are there any :ref:`spelling errors <documentation-spelling-check>`?
+
+Bugs
+~~~~
+
+* Is there a proper regression test (the test should fail before the fix
+  is applied)?
+
+New Features
+~~~~~~~~~~~~
+
+* Are there tests to "exercise" all of the new code?
+* Is there a release note in ``docs/releases/A.B.txt``?
+* Is there documentation for the feature and is it annotated appropriately with
+  ``.. versionadded:: A.B`` or ``.. versionchanged:: A.B``?
+
+Deprecating a feature
+~~~~~~~~~~~~~~~~~~~~~
+
+See the :ref:`deprecating-a-feature` guide.
+
+All code changes
+~~~~~~~~~~~~~~~~
+
+* Does the :doc:`coding style
+  </internals/contributing/writing-code/coding-style>` conform to our
+  guidelines? Are there any ``flake8`` errors?
+* If the change is backwards incompatible in any way, is there a note
+  in the release notes (``docs/releases/A.B.txt``)?
+* Is Django's test suite passing? Ask in ``#django-developers`` for a core dev
+  to build the pull request against our continuous integration server.
+
+All tickets
+~~~~~~~~~~~
+
+* Is the pull request a single squashed commit with a message that follows our
+  :ref:`commit message format <committing-guidelines>`?
+* Are you the patch author and a new contributor? Please add yourself to the
+  ``AUTHORS`` file and submit a `Contributor License Agreement`_.
+
+.. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/

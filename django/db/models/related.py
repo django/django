@@ -57,7 +57,14 @@ class RelatedObject(object):
             # If this is a symmetrical m2m relation on self, there is no reverse accessor.
             if getattr(self.field.rel, 'symmetrical', False) and self.model == self.parent_model:
                 return None
-            return self.field.rel.related_name or (self.opts.model_name + '_set')
+            if self.field.rel.related_name:
+                return self.field.rel.related_name
+            if self.opts.default_related_name:
+                return self.opts.default_related_name % {
+                    'model_name': self.opts.model_name.lower(),
+                    'app_label': self.opts.app_label.lower(),
+                }
+            return self.opts.model_name + '_set'
         else:
             return self.field.rel.related_name or (self.opts.model_name)
 

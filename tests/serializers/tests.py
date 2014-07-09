@@ -16,7 +16,7 @@ except ImportError:
 
 from django.core import management, serializers
 from django.db import transaction, connection
-from django.test import TestCase, TransactionTestCase, override_settings
+from django.test import TestCase, TransactionTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
 from django.utils.six import StringIO
@@ -267,6 +267,7 @@ class SerializersTransactionTestBase(object):
 
     available_apps = ['serializers']
 
+    @skipUnlessDBFeature('supports_forward_references')
     def test_forward_refs(self):
         """
         Tests that objects ids can be referenced before they are

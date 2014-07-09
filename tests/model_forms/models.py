@@ -401,3 +401,9 @@ class Character(models.Model):
 class StumpJoke(models.Model):
     most_recently_fooled = models.ForeignKey(Character, limit_choices_to=today_callable_dict, related_name="+")
     has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")
+
+
+# Model for #13776
+class Student(models.Model):
+    character = models.ForeignKey(Character)
+    study = models.CharField(max_length=30)

@@ -33,7 +33,8 @@ return model instances:
 
 This method takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
-can be iterated over just like a normal QuerySet to provide object instances.
+can be iterated over just like a normal
+:class:`~django.db.models.query.QuerySet` to provide object instances.
 
 This is best illustrated with an example. Suppose you have the following model::
 
@@ -83,6 +84,17 @@ options that make it very powerful.
     table contains the values ``'abc'``, ``'def'`` and you query for ``WHERE mycolumn=0``,
     both rows will match. To prevent this, perform the correct typecasting
     before using the value in a query.
+
+.. warning::
+
+    While a ``RawQuerySet`` instance can be iterated over like a normal
+    :class:`~django.db.models.query.QuerySet`, ``RawQuerySet`` doesn't
+    implement all methods you can use with ``QuerySet``. For example,
+    ``__bool__()`` and ``__len__()`` are not defined in ``RawQuerySet``, and
+    thus all ``RawQuerySet`` instances are considered ``True``. The reason
+    these methods are not implemented in ``RawQuerySet`` is that implementing
+    them without internal caching would be a performance drawback and adding
+    such caching would be backward incompatible.
 
 Mapping query fields to model fields
 ------------------------------------

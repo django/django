@@ -144,7 +144,7 @@ class TarArchive(BaseArchive):
         # note: python<=2.5 doesn't seem to know about pax headers, filter them
         members = [member for member in self._archive.getmembers()
                    if member.name != 'pax_global_header']
-        leading = self.has_leading_dir(members)
+        leading = self.has_leading_dir(x.name for x in members)
         for member in members:
             name = member.name
             if leading:

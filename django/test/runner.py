@@ -1,6 +1,5 @@
 from importlib import import_module
 import os
-from optparse import make_option
 import unittest
 from unittest import TestSuite, defaultTestLoader
 
@@ -19,17 +18,9 @@ class DiscoverRunner(object):
     test_runner = unittest.TextTestRunner
     test_loader = defaultTestLoader
     reorder_by = (TestCase, SimpleTestCase)
-    option_list = (
-        make_option('-t', '--top-level-directory',
-            action='store', dest='top_level', default=None,
-            help='Top level of project for unittest discovery.'),
-        make_option('-p', '--pattern', action='store', dest='pattern',
-            default="test*.py",
-            help='The test matching pattern. Defaults to test*.py.'),
-    )
 
     def __init__(self, pattern=None, top_level=None,
-                 verbosity=1, interactive=True, failfast=False,
+                 verbosity=1, interactive=True, failfast=False, keepdb=False,
                  **kwargs):
 
         self.pattern = pattern
@@ -38,6 +29,19 @@ class DiscoverRunner(object):
         self.verbosity = verbosity
         self.interactive = interactive
         self.failfast = failfast
+        self.keepdb = keepdb
+
+    @classmethod
+    def add_arguments(cls, parser):
+        parser.add_argument('-t', '--top-level-directory',
+            action='store', dest='top_level', default=None,
+            help='Top level of project for unittest discovery.')
+        parser.add_argument('-p', '--pattern', action='store', dest='pattern',
+            default="test*.py",
+            help='The test matching pattern. Defaults to test*.py.')
+        parser.add_argument('-k', '--keepdb', action='store_true', dest='keepdb',
+            default=False,
+            help='Preserve the test DB between runs. Defaults to False')
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment()
@@ -106,7 +110,7 @@ class DiscoverRunner(object):
         return reorder_suite(suite, self.reorder_by)
 
     def setup_databases(self, **kwargs):
-        return setup_databases(self.verbosity, self.interactive, **kwargs)
+        return setup_databases(self.verbosity, self.interactive, self.keepdb, **kwargs)
 
     def run_suite(self, suite, **kwargs):
         return self.test_runner(
@@ -121,7 +125,7 @@ class DiscoverRunner(object):
         old_names, mirrors = old_config
         for connection, old_name, destroy in old_names:
             if destroy:
-                connection.creation.destroy_test_db(old_name, self.verbosity)
+                connection.creation.destroy_test_db(old_name, self.verbosity, self.keepdb)
 
     def teardown_test_environment(self, **kwargs):
         unittest.removeHandler()
@@ -250,7 +254,7 @@ def partition_suite(suite, classes, bins):
                 bins[-1].addTest(test)
 
 
-def setup_databases(verbosity, interactive, **kwargs):
+def setup_databases(verbosity, interactive, keepdb=False, **kwargs):
     from django.db import connections, DEFAULT_DB_ALIAS
 
     # First pass -- work out which databases actually need to be created,
@@ -294,7 +298,11 @@ def setup_databases(verbosity, interactive, **kwargs):
             connection = connections[alias]
             if test_db_name is None:
                 test_db_name = connection.creation.create_test_db(
-                    verbosity, autoclobber=not interactive)
+                    verbosity,
+                    autoclobber=not interactive,
+                    keepdb=keepdb,
+                    serialize=connection.settings_dict.get("TEST_SERIALIZE", True),
+                )
                 destroy = True
             else:
                 connection.settings_dict['NAME'] = test_db_name

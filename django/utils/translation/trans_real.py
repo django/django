@@ -11,10 +11,11 @@ import warnings
 
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import AppRegistryNotReady
 from django.dispatch import receiver
 from django.test.signals import setting_changed
 from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_text
 from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six, lru_cache
@@ -160,7 +161,14 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _add_installed_apps_translations(self):
         """Merges translations from each installed app."""
-        for app_config in reversed(list(apps.get_app_configs())):
+        try:
+            app_configs = reversed(list(apps.get_app_configs()))
+        except AppRegistryNotReady:
+            raise AppRegistryNotReady(
+                "The translation infrastructure cannot be initialized before the "
+                "apps registry is ready. Check that you don't make non-lazy "
+                "gettext calls at import time.")
+        for app_config in app_configs:
             localedir = os.path.join(app_config.path, 'locale')
             translation = self._new_gnu_trans(localedir)
             self.merge(translation)
@@ -173,7 +181,11 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _add_fallback(self):
         """Sets the GNUTranslations() fallback with the default language."""
-        if self.__language == settings.LANGUAGE_CODE:
+        # Don't set a fallback for the default language or for
+        # en-us (as it's empty, so it'll ALWAYS fall back to the default
+        # language; found this as part of #21498, as we set en-us for
+        # management commands)
+        if self.__language == settings.LANGUAGE_CODE or self.__language == "en-us":
             return
         default_translation = translation(settings.LANGUAGE_CODE)
         self.add_fallback(default_translation)
@@ -530,7 +542,7 @@ def templatize(src, origin=None):
     from django.template import (Lexer, TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK,
             TOKEN_COMMENT, TRANSLATOR_COMMENT_MARK)
     src = force_text(src, settings.FILE_CHARSET)
-    out = StringIO()
+    out = StringIO('')
     message_context = None
     intrans = False
     inplural = False
@@ -701,7 +713,7 @@ def templatize(src, origin=None):
                     comment_lineno_cache = t.lineno
             else:
                 out.write(blankout(t.contents, 'X'))
-    return force_str(out.getvalue())
+    return out.getvalue()
 
 
 def parse_accept_lang_header(lang_string):

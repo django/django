@@ -4,7 +4,7 @@ from django.db import models
 from django.test import TestCase
 
 from .models import (
-    First, Third, Parent, Child, Category, Record, Relation, Car, Driver)
+    First, Third, Parent, Child, ToFieldChild, Category, Record, Relation, Car, Driver)
 
 
 class ManyToOneRegressionTests(TestCase):
@@ -66,8 +66,15 @@ class ManyToOneRegressionTests(TestCase):
 
         # Creation using keyword argument and unsaved related instance (#8070).
         p = Parent()
-        c = Child(parent=p)
-        self.assertTrue(c.parent is p)
+        with self.assertRaisesMessage(ValueError,
+                'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
+                % (p, Child.parent.field.rel.to._meta.object_name)):
+            Child(parent=p)
+
+        with self.assertRaisesMessage(ValueError,
+                'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
+                % (p, Child.parent.field.rel.to._meta.object_name)):
+            ToFieldChild(parent=p)
 
         # Creation using attname keyword argument and an id will cause the
         # related object to be fetched.

@@ -39,10 +39,11 @@ class MigrationLoader(object):
     in memory.
     """
 
-    def __init__(self, connection, load=True):
+    def __init__(self, connection, load=True, ignore_no_migrations=False):
         self.connection = connection
         self.disk_migrations = None
         self.applied_migrations = None
+        self.ignore_no_migrations = ignore_no_migrations
         if load:
             self.build_graph()
 
@@ -134,6 +135,34 @@ class MigrationLoader(object):
         else:
             return self.disk_migrations[results[0]]
 
+    def check_key(self, key, current_app):
+        if (key[1] != "__first__" and key[1] != "__latest__") or key in self.graph:
+            return key
+        # Special-case __first__, which means "the first migration" for
+        # migrated apps, and is ignored for unmigrated apps. It allows
+        # makemigrations to declare dependencies on apps before they even have
+        # migrations.
+        if key[0] == current_app:
+            # Ignore __first__ references to the same app (#22325)
+            return
+        if key[0] in self.unmigrated_apps:
+            # This app isn't migrated, but something depends on it.
+            # The models will get auto-added into the state, though
+            # so we're fine.
+            return
+        if key[0] in self.migrated_apps:
+            try:
+                if key[1] == "__first__":
+                    return list(self.graph.root_nodes(key[0]))[0]
+                else:
+                    return list(self.graph.leaf_nodes(key[0]))[0]
+            except IndexError:
+                if self.ignore_no_migrations:
+                    return None
+                else:
+                    raise ValueError("Dependency on app with no migrations: %s" % key[0])
+        raise ValueError("Dependency on unknown app: %s" % key[0])
+
     def build_graph(self):
         """
         Builds a migration dependency graph using both the disk and database.
@@ -194,27 +223,26 @@ class MigrationLoader(object):
         self.graph = MigrationGraph()
         for key, migration in normal.items():
             self.graph.add_node(key, migration)
+        # Add all internal dependencies first to ensure __first__ dependencies
+        # find the correct root node.
         for key, migration in normal.items():
             for parent in migration.dependencies:
-                # Special-case __first__, which means "the first migration" for
-                # migrated apps, and is ignored for unmigrated apps. It allows
-                # makemigrations to declare dependencies on apps before they
-                # even have migrations.
-                if parent[1] == "__first__" and parent not in self.graph:
-                    if parent[0] == key[0]:
-                        # Ignore __first__ references to the same app (#22325)
-                        continue
-                    elif parent[0] in self.unmigrated_apps:
-                        # This app isn't migrated, but something depends on it.
-                        # The models will get auto-added into the state, though
-                        # so we're fine.
-                        continue
-                    elif parent[0] in self.migrated_apps:
-                        parent = list(self.graph.root_nodes(parent[0]))[0]
-                    else:
-                        raise ValueError("Dependency on unknown app %s" % parent[0])
+                if parent[0] != key[0] or parent[1] == '__first__':
+                    # Ignore __first__ references to the same app (#22325)
+                    continue
+                self.graph.add_dependency(key, parent)
+        for key, migration in normal.items():
+            for parent in migration.dependencies:
+                if parent[0] == key[0]:
+                    # Internal dependencies already added.
+                    continue
+                parent = self.check_key(parent, key[0])
                 if parent is not None:
                     self.graph.add_dependency(key, parent)
+            for child in migration.run_before:
+                child = self.check_key(child, key[0])
+                if child is not None:
+                    self.graph.add_dependency(child, key)
 
     def detect_conflicts(self):
         """

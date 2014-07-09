@@ -2,10 +2,10 @@ from __future__ import unicode_literals
 
 import os
 from collections import OrderedDict
-from optparse import make_option
 
 from django.core.files.storage import FileSystemStorage
-from django.core.management.base import CommandError, NoArgsCommand
+from django.core.management.base import CommandError, BaseCommand
+from django.core.management.color import no_style
 from django.utils.encoding import smart_text
 from django.utils.six.moves import input
 
@@ -13,47 +13,22 @@ from django.contrib.staticfiles.finders import get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     """
     Command that allows to copy or symlink static files from different
     locations to the settings.STATIC_ROOT.
     """
-    option_list = NoArgsCommand.option_list + (
-        make_option('--noinput',
-            action='store_false', dest='interactive', default=True,
-            help="Do NOT prompt the user for input of any kind."),
-        make_option('--no-post-process',
-            action='store_false', dest='post_process', default=True,
-            help="Do NOT post process collected files."),
-        make_option('-i', '--ignore', action='append', default=[],
-            dest='ignore_patterns', metavar='PATTERN',
-            help="Ignore files or directories matching this glob-style "
-                "pattern. Use multiple times to ignore more."),
-        make_option('-n', '--dry-run',
-            action='store_true', dest='dry_run', default=False,
-            help="Do everything except modify the filesystem."),
-        make_option('-c', '--clear',
-            action='store_true', dest='clear', default=False,
-            help="Clear the existing files using the storage "
-                 "before trying to copy or link the original file."),
-        make_option('-l', '--link',
-            action='store_true', dest='link', default=False,
-            help="Create a symbolic link to each file instead of copying."),
-        make_option('--no-default-ignore', action='store_false',
-            dest='use_default_ignore_patterns', default=True,
-            help="Don't ignore the common private glob-style patterns 'CVS', "
-                "'.*' and '*~'."),
-    )
     help = "Collect static files in a single location."
     requires_system_checks = False
 
     def __init__(self, *args, **kwargs):
-        super(NoArgsCommand, self).__init__(*args, **kwargs)
+        super(BaseCommand, self).__init__(*args, **kwargs)
         self.copied_files = []
         self.symlinked_files = []
         self.unmodified_files = []
         self.post_processed_files = []
         self.storage = staticfiles_storage
+        self.style = no_style()
         try:
             self.storage.path('')
         except NotImplementedError:
@@ -61,12 +36,38 @@ class Command(NoArgsCommand):
         else:
             self.local = True
 
+    def add_arguments(self, parser):
+        parser.add_argument('--noinput',
+            action='store_false', dest='interactive', default=True,
+            help="Do NOT prompt the user for input of any kind.")
+        parser.add_argument('--no-post-process',
+            action='store_false', dest='post_process', default=True,
+            help="Do NOT post process collected files.")
+        parser.add_argument('-i', '--ignore', action='append', default=[],
+            dest='ignore_patterns', metavar='PATTERN',
+            help="Ignore files or directories matching this glob-style "
+                "pattern. Use multiple times to ignore more.")
+        parser.add_argument('-n', '--dry-run',
+            action='store_true', dest='dry_run', default=False,
+            help="Do everything except modify the filesystem.")
+        parser.add_argument('-c', '--clear',
+            action='store_true', dest='clear', default=False,
+            help="Clear the existing files using the storage "
+                 "before trying to copy or link the original file.")
+        parser.add_argument('-l', '--link',
+            action='store_true', dest='link', default=False,
+            help="Create a symbolic link to each file instead of copying.")
+        parser.add_argument('--no-default-ignore', action='store_false',
+            dest='use_default_ignore_patterns', default=True,
+            help="Don't ignore the common private glob-style patterns 'CVS', "
+                "'.*' and '*~'.")
+
     def set_options(self, **options):
         """
         Set instance variables based on an options dict
         """
         self.interactive = options['interactive']
-        self.verbosity = int(options.get('verbosity', 1))
+        self.verbosity = options['verbosity']
         self.symlink = options['link']
         self.clear = options['clear']
         self.dry_run = options['dry_run']
@@ -80,7 +81,7 @@ class Command(NoArgsCommand):
         """
         Perform the bulk of the work of collectstatic.
 
-        Split off from handle_noargs() to facilitate testing.
+        Split off from handle() to facilitate testing.
         """
         if self.symlink and not self.local:
             raise CommandError("Can't symlink to a remote destination.")
@@ -131,7 +132,7 @@ class Command(NoArgsCommand):
             'post_processed': self.post_processed_files,
         }
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         self.set_options(**options)
 
         message = ['\n']

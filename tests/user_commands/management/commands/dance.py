@@ -1,5 +1,3 @@
-from optparse import make_option
-
 from django.core.management.base import BaseCommand, CommandError
 
 
@@ -8,10 +6,9 @@ class Command(BaseCommand):
     args = ''
     requires_system_checks = True
 
-    option_list = BaseCommand.option_list + (
-        make_option("-s", "--style", default="Rock'n'Roll"),
-        make_option("-x", "--example")
-    )
+    def add_arguments(self, parser):
+        parser.add_argument("-s", "--style", default="Rock'n'Roll")
+        parser.add_argument("-x", "--example")
 
     def handle(self, *args, **options):
         example = options["example"]

@@ -58,6 +58,8 @@ class ImageFieldTestMixin(object):
         """
         Removes temp directory and all its contents.
         """
+        self.file1.close()
+        self.file2.close()
         shutil.rmtree(temp_storage_dir)
 
     def check_dimensions(self, instance, width, height,

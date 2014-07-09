@@ -101,6 +101,17 @@ class BadExceptionMiddleware(TestMiddleware):
         raise TestException('Test Exception Exception')
 
 
+# Sample middlewares that omit to return an HttpResonse
+class NoTemplateResponseMiddleware(TestMiddleware):
+    def process_template_response(self, request, response):
+        super(NoTemplateResponseMiddleware, self).process_template_response(request, response)
+
+
+class NoResponseMiddleware(TestMiddleware):
+    def process_response(self, request, response):
+        super(NoResponseMiddleware, self).process_response(request, response)
+
+
 @override_settings(ROOT_URLCONF='middleware_exceptions.urls')
 class BaseMiddlewareExceptionTest(TestCase):
 
@@ -775,6 +786,39 @@ class BadMiddlewareTests(BaseMiddlewareExceptionTest):
         self.assert_middleware_usage(bad_middleware, True, True, False, True, True)
         self.assert_middleware_usage(post_middleware, True, True, False, True, True)
 
+    def test_process_response_no_response_middleware(self):
+        pre_middleware = TestMiddleware()
+        middleware = NoResponseMiddleware()
+        post_middleware = TestMiddleware()
+        self._add_middleware(post_middleware)
+        self._add_middleware(middleware)
+        self._add_middleware(pre_middleware)
+        self.assert_exceptions_handled('/middleware_exceptions/view/', [
+            "NoResponseMiddleware.process_response didn't return an HttpResponse object. It returned None instead."
+        ],
+            ValueError())
+
+        # Check that the right middleware methods have been invoked
+        self.assert_middleware_usage(pre_middleware, True, True, False, False, False)
+        self.assert_middleware_usage(middleware, True, True, False, True, False)
+        self.assert_middleware_usage(post_middleware, True, True, False, True, False)
+
+    def test_process_template_response_no_response_middleware(self):
+        pre_middleware = TestMiddleware()
+        middleware = NoTemplateResponseMiddleware()
+        post_middleware = TestMiddleware()
+        self._add_middleware(post_middleware)
+        self._add_middleware(middleware)
+        self._add_middleware(pre_middleware)
+        self.assert_exceptions_handled('/middleware_exceptions/template_response/', [
+            "NoTemplateResponseMiddleware.process_template_response didn't return an HttpResponse object. It returned None instead."
+        ],
+            ValueError())
+
+        # Check that the right middleware methods have been invoked
+        self.assert_middleware_usage(pre_middleware, True, True, False, True, False)
+        self.assert_middleware_usage(middleware, True, True, True, True, False)
+        self.assert_middleware_usage(post_middleware, True, True, True, True, False)
 
 _missing = object()
 

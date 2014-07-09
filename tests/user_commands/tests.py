@@ -74,6 +74,24 @@ class CommandTests(SimpleTestCase):
             if current_path is not None:
                 os.environ['PATH'] = current_path
 
+    def test_optparse_compatibility(self):
+        """
+        optparse should be supported during Django 1.8/1.9 releases.
+        """
+        out = StringIO()
+        management.call_command('optparse_cmd', stdout=out)
+        self.assertEqual(out.getvalue(), "All right, let's dance Rock'n'Roll.\n")
+
+        # Simulate command line execution
+        old_stdout, old_stderr = sys.stdout, sys.stderr
+        sys.stdout, sys.stderr = StringIO(), StringIO()
+        try:
+            management.execute_from_command_line(['django-admin', 'optparse_cmd'])
+        finally:
+            output = sys.stdout.getvalue()
+            sys.stdout, sys.stderr = old_stdout, old_stderr
+        self.assertEqual(output, "All right, let's dance Rock'n'Roll.\n")
+
 
 class UtilsTests(SimpleTestCase):
 

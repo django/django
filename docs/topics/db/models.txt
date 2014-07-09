@@ -705,9 +705,6 @@ For example, this model has a few custom methods::
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
         birth_date = models.DateField()
-        address = models.CharField(max_length=100)
-        city = models.CharField(max_length=50)
-        state = models.CharField(max_length=2)      # yes, this is America-centric
 
         def baby_boomer_status(self):
             "Returns the person's baby-boomer status."
@@ -718,10 +715,6 @@ For example, this model has a few custom methods::
                 return "Baby boomer"
             else:
                 return "Post-boomer"
-
-        def is_midwestern(self):
-            "Returns True if this person is from the Midwest."
-            return self.state in ('IL', 'WI', 'MI', 'IN', 'OH', 'IA', 'MO')
 
         def _get_full_name(self):
             "Returns the person's full name."
@@ -839,11 +832,14 @@ Model inheritance
 =================
 
 Model inheritance in Django works almost identically to the way normal
-class inheritance works in Python. The only decision you have to make
-is whether you want the parent models to be models in their own right
-(with their own database tables), or if the parents are just holders
-of common information that will only be visible through the child
-models.
+class inheritance works in Python, but the basics at the beginning of the page
+should still be followed. That means the base class should subclass
+:class:`django.db.models.Model`.
+
+The only decision you have to make is whether you want the parent models to be
+models in their own right (with their own database tables), or if the parents
+are just holders of common information that will only be visible through the
+child models.
 
 There are three styles of inheritance that are possible in Django.
 

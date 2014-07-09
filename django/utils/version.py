@@ -7,19 +7,14 @@ import subprocess
 
 def get_version(version=None):
     "Returns a PEP 386-compliant version number from VERSION."
-    if version is None:
-        from django import VERSION as version
-    else:
-        assert len(version) == 5
-        assert version[3] in ('alpha', 'beta', 'rc', 'final')
+    version = get_complete_version(version)
 
     # Now build the two parts of the version number:
-    # main = X.Y[.Z]
+    # major = X.Y[.Z]
     # sub = .devN - for pre-alpha releases
     #     | {a|b|c}N - for alpha, beta and rc releases
 
-    parts = 2 if version[2] == 0 else 3
-    main = '.'.join(str(x) for x in version[:parts])
+    major = get_major_version(version)
 
     sub = ''
     if version[3] == 'alpha' and version[4] == 0:
@@ -31,7 +26,28 @@ def get_version(version=None):
         mapping = {'alpha': 'a', 'beta': 'b', 'rc': 'c'}
         sub = mapping[version[3]] + str(version[4])
 
-    return str(main + sub)
+    return str(major + sub)
+
+
+def get_major_version(version=None):
+    "Returns major version from VERSION."
+    version = get_complete_version(version)
+    parts = 2 if version[2] == 0 else 3
+    major = '.'.join(str(x) for x in version[:parts])
+    return major
+
+
+def get_complete_version(version=None):
+    """Returns a tuple of the django version. If version argument is non-empy,
+    then checks for correctness of the tuple provided.
+    """
+    if version is None:
+        from django import VERSION as version
+    else:
+        assert len(version) == 5
+        assert version[3] in ('alpha', 'beta', 'rc', 'final')
+
+    return version
 
 
 def get_git_changeset():
@@ -41,6 +57,10 @@ def get_git_changeset():
     This value isn't guaranteed to be unique, but collisions are very unlikely,
     so it's sufficient for generating the development version numbers.
     """
+    # FIXME: Replace with @lru_cache when we upgrade the docs server to PY2.7+.
+    if hasattr(get_git_changeset, 'cache'):
+        return get_git_changeset.cache
+
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     git_log = subprocess.Popen('git log --pretty=format:%ct --quiet -1 HEAD',
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -49,5 +69,9 @@ def get_git_changeset():
     try:
         timestamp = datetime.datetime.utcfromtimestamp(int(timestamp))
     except ValueError:
-        return None
-    return timestamp.strftime('%Y%m%d%H%M%S')
+        changeset = None
+    else:
+        changeset = timestamp.strftime('%Y%m%d%H%M%S')
+
+    get_git_changeset.cache = changeset
+    return changeset

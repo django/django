@@ -17,8 +17,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.template.base import TemplateDoesNotExist
 from django.test import TestCase, RequestFactory, override_settings
-from django.test.utils import (
-    setup_test_template_loader, restore_template_loaders)
+from django.test.utils import override_with_test_loader
 from django.utils.encoding import force_text, force_bytes
 from django.utils import six
 from django.views.debug import ExceptionReporter
@@ -45,25 +44,23 @@ class DebugViewTests(TestCase):
         self.assertContains(response, 'file_data.txt', status_code=500)
         self.assertNotContains(response, 'haha', status_code=500)
 
+    def test_400(self):
+        # Ensure that when DEBUG=True, technical_500_template() is called.
+        response = self.client.get('/raises400/')
+        self.assertContains(response, '<div class="context" id="', status_code=400)
+
     def test_403(self):
         # Ensure no 403.html template exists to test the default case.
-        setup_test_template_loader({})
-        try:
+        with override_with_test_loader({}):
             response = self.client.get('/raises403/')
             self.assertContains(response, '<h1>403 Forbidden</h1>', status_code=403)
-        finally:
-            restore_template_loaders()
 
     def test_403_template(self):
         # Set up a test 403.html template.
-        setup_test_template_loader(
-            {'403.html': 'This is a test template for a 403 Forbidden error.'}
-        )
-        try:
+        with override_with_test_loader({'403.html': 'This is a test template '
+                                        'for a 403 Forbidden error.'}):
             response = self.client.get('/raises403/')
             self.assertContains(response, 'test template', status_code=403)
-        finally:
-            restore_template_loaders()
 
     def test_404(self):
         response = self.client.get('/raises404/')
@@ -75,7 +72,18 @@ class DebugViewTests(TestCase):
 
     def test_404_not_in_urls(self):
         response = self.client.get('/not-in-urls')
+        self.assertNotContains(response, "Raised by:", status_code=404)
         self.assertContains(response, "<code>not-in-urls</code>, didn't match", status_code=404)
+
+    def test_technical_404(self):
+        response = self.client.get('/views/technical404/')
+        self.assertContains(response, "Raised by:", status_code=404)
+        self.assertContains(response, "view_tests.views.technical404", status_code=404)
+
+    def test_classbased_technical_404(self):
+        response = self.client.get('/views/classbased404/')
+        self.assertContains(response, "Raised by:", status_code=404)
+        self.assertContains(response, "view_tests.views.Http404View", status_code=404)
 
     def test_view_exceptions(self):
         for n in range(len(except_args)):

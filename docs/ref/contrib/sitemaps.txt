@@ -54,7 +54,8 @@ Initialization
 To activate sitemap generation on your Django site, add this line to your
 :doc:`URLconf </topics/http/urls>`::
 
-   (r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+   url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
+       {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
 
 This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
 
@@ -231,6 +232,15 @@ Sitemap class reference
         sitemap was requested is used. If the sitemap is built outside the
         context of a request, the default is ``'http'``.
 
+    .. attribute:: Sitemap.i18n
+
+        .. versionadded:: 1.8
+
+        **Optional.**
+
+        A boolean attribute that defines if the URLs of this sitemap should
+        be generated using all of your :setting:`LANGUAGES`. The default is
+        ``False``.
 
 Shortcuts
 =========
@@ -284,7 +294,8 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
         # ...
 
         # the sitemap
-        url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps}),
+        url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
+            {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     ]
 
 .. _URLconf: ../url_dispatch/
@@ -325,7 +336,8 @@ the sitemap. For example::
         url(r'^about/$', 'views.about', name='about'),
         url(r'^license/$', 'views.license', name='license'),
         # ...
-        url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
+        url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
+            {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
     ]
 
 

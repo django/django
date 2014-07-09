@@ -7,7 +7,7 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
-from django.db import models
+from django.db import connections, models, router
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
@@ -209,6 +209,27 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         errors = checks.run_checks()
         self.assertEqual(errors, ['performed!'])
 
+    def test_unsaved_instance_on_generic_foreign_key(self):
+        """
+        #10811 -- Assigning an unsaved object to GenericForeignKey
+        should raise an exception.
+        """
+        class Model(models.Model):
+            content_type = models.ForeignKey(ContentType, null=True)
+            object_id = models.PositiveIntegerField(null=True)
+            content_object = GenericForeignKey('content_type', 'object_id')
+
+        author = Author(name='Author')
+        model = Model()
+        model.content_object = None   # no error here as content_type allows None
+        with self.assertRaisesMessage(ValueError,
+                                    'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
+                                    % (author, author._meta.object_name)):
+            model.content_object = author   # raised ValueError here as author is unsaved
+
+        author.save()
+        model.content_object = author   # no error because the instance is saved
+
 
 class GenericRelationshipTests(IsolatedModelsTestCase):
 
@@ -335,3 +356,40 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+
+class TestRouter(object):
+    def db_for_read(self, model, **hints):
+        return 'other'
+
+    def db_for_write(self, model, **hints):
+        return 'default'
+
+
+class ContentTypesMultidbTestCase(TestCase):
+
+    def setUp(self):
+        self.old_routers = router.routers
+        router.routers = [TestRouter()]
+
+        # Whenever a test starts executing, only the "default" database is
+        # connected. We explicitly connect to the "other" database here. If we
+        # don't do it, then it will be implicitly connected later when we query
+        # it, but in that case some database backends may automatically perform
+        # extra queries upon connecting (notably mysql executes
+        # "SET SQL_AUTO_IS_NULL = 0"), which will affect assertNumQueries().
+        connections['other'].ensure_connection()
+
+    def tearDown(self):
+        router.routers = self.old_routers
+
+    def test_multidb(self):
+        """
+        Test that, when using multiple databases, we use the db_for_read (see
+        #20401).
+        """
+        ContentType.objects.clear_cache()
+
+        with self.assertNumQueries(0, using='default'), \
+                self.assertNumQueries(1, using='other'):
+            ContentType.objects.get_for_model(Author)

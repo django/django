@@ -8,11 +8,14 @@ from decimal import Decimal
 import re
 import threading
 import unittest
+import warnings
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
 from django.db import (connection, connections, DEFAULT_DB_ALIAS,
-    DatabaseError, IntegrityError, transaction)
+    DatabaseError, IntegrityError, reset_queries, transaction)
+from django.db.backends import BaseDatabaseWrapper
 from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.backends.utils import format_number, CursorWrapper
@@ -23,7 +26,7 @@ from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
 from django.test import (TestCase, TransactionTestCase, override_settings,
     skipUnlessDBFeature, skipIfDBFeature)
-from django.test.utils import str_prefix
+from django.test.utils import str_prefix, IgnoreAllDeprecationWarningsMixin
 from django.utils import six
 from django.utils.six.moves import xrange
 
@@ -334,9 +337,9 @@ class LastExecutedQueryTest(TestCase):
         """
         Test that last_executed_query() returns an Unicode string
         """
-        persons = models.Reporter.objects.filter(raw_data=b'\x00\x46  \xFE').extra(select={'föö': 1})
-        sql, params = persons.query.sql_with_params()
-        cursor = persons.query.get_compiler('default').execute_sql(CURSOR)
+        data = models.RawData.objects.filter(raw_data=b'\x00\x46  \xFE').extra(select={'föö': 1})
+        sql, params = data.query.sql_with_params()
+        cursor = data.query.get_compiler('default').execute_sql(CURSOR)
         last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
         self.assertIsInstance(last_sql, six.text_type)
 
@@ -376,26 +379,23 @@ class LongNameTest(TestCase):
     check it is. Refs #8901.
     """
 
-    @skipUnlessDBFeature('supports_long_model_names')
     def test_sequence_name_length_limits_create(self):
         """Test creation of model with long name and long pk name doesn't error. Ref #8901"""
-        models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
+        models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
 
-    @skipUnlessDBFeature('supports_long_model_names')
     def test_sequence_name_length_limits_m2m(self):
         """Test an m2m save of a model with a long name and a long m2m field name doesn't error as on Django >=1.2 this now uses object saves. Ref #8901"""
-        obj = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
+        obj = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
         rel_obj = models.Person.objects.create(first_name='Django', last_name='Reinhardt')
         obj.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.add(rel_obj)
 
-    @skipUnlessDBFeature('supports_long_model_names')
     def test_sequence_name_length_limits_flush(self):
         """Test that sequence resetting as part of a flush with model with long name and long pk name doesn't error. Ref #8901"""
         # A full flush is expensive to the full test, so we dig into the
         # internals to generate the likely offending SQL and run it manually
 
         # Some convenience aliases
-        VLM = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+        VLM = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
         VLM_m2m = VLM.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.through
         tables = [
             VLM._meta.db_table,
@@ -630,7 +630,7 @@ class BackendTestCase(TestCase):
         # to use ProgrammingError).
         with self.assertRaises(connection.features.closed_cursor_error_class):
             # cursor should be closed, so no queries should be possible.
-            cursor.execute("select 1")
+            cursor.execute("SELECT 1" + connection.features.bare_select_suffix)
 
     @unittest.skipUnless(connection.vendor == 'postgresql',
                          "Psycopg2 specific cursor.closed attribute needed")
@@ -665,6 +665,66 @@ class BackendTestCase(TestCase):
                 connection.close()
             except Exception:
                 pass
+
+    @override_settings(DEBUG=True)
+    def test_queries(self):
+        """
+        Test the documented API of connection.queries.
+        """
+        reset_queries()
+
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1" + connection.features.bare_select_suffix)
+        self.assertEqual(1, len(connection.queries))
+
+        self.assertIsInstance(connection.queries, list)
+        self.assertIsInstance(connection.queries[0], dict)
+        six.assertCountEqual(self, connection.queries[0].keys(), ['sql', 'time'])
+
+        reset_queries()
+        self.assertEqual(0, len(connection.queries))
+
+    # Unfortunately with sqlite3 the in-memory test database cannot be closed.
+    @skipUnlessDBFeature('test_db_allows_multiple_connections')
+    @override_settings(DEBUG=True)
+    def test_queries_limit(self):
+        """
+        Test that the backend doesn't store an unlimited number of queries.
+
+        Regression for #12581.
+        """
+        old_queries_limit = BaseDatabaseWrapper.queries_limit
+        BaseDatabaseWrapper.queries_limit = 3
+        new_connections = ConnectionHandler(settings.DATABASES)
+        new_connection = new_connections[DEFAULT_DB_ALIAS]
+
+        # Initialize the connection and clear initialization statements.
+        with new_connection.cursor():
+            pass
+        new_connection.queries_log.clear()
+
+        try:
+            with new_connection.cursor() as cursor:
+                cursor.execute("SELECT 1" + new_connection.features.bare_select_suffix)
+                cursor.execute("SELECT 2" + new_connection.features.bare_select_suffix)
+
+            with warnings.catch_warnings(record=True) as w:
+                self.assertEqual(2, len(new_connection.queries))
+                self.assertEqual(0, len(w))
+
+            with new_connection.cursor() as cursor:
+                cursor.execute("SELECT 3" + new_connection.features.bare_select_suffix)
+                cursor.execute("SELECT 4" + new_connection.features.bare_select_suffix)
+
+            with warnings.catch_warnings(record=True) as w:
+                self.assertEqual(3, len(new_connection.queries))
+                self.assertEqual(1, len(w))
+                self.assertEqual(str(w[0].message), "Limit for query logging "
+                    "exceeded, only the last 3 queries will be returned.")
+
+        finally:
+            BaseDatabaseWrapper.queries_limit = old_queries_limit
+            new_connection.close()
 
 
 # We don't make these tests conditional because that means we would need to
@@ -1015,3 +1075,125 @@ class BackendUtilTests(TestCase):
               '0.1')
         equal('0.1234567890', 12, 0,
               '0')
+
+
+class DBTestSettingsRenamedTests(IgnoreAllDeprecationWarningsMixin, TestCase):
+
+    mismatch_msg = ("Connection 'test-deprecation' has mismatched TEST "
+                    "and TEST_* database settings.")
+
+    @classmethod
+    def setUpClass(cls):
+        # Silence "UserWarning: Overriding setting DATABASES can lead to
+        # unexpected behavior."
+        cls.warning_classes.append(UserWarning)
+
+    def setUp(self):
+        super(DBTestSettingsRenamedTests, self).setUp()
+        self.handler = ConnectionHandler()
+        self.db_settings = {'default': {}}
+
+    def test_mismatched_database_test_settings_1(self):
+        # if the TEST setting is used, all TEST_* keys must appear in it.
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {},
+                'TEST_NAME': 'foo',
+            }
+        })
+        with override_settings(DATABASES=self.db_settings):
+            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
+                self.handler.prepare_test_settings('test-deprecation')
+
+    def test_mismatched_database_test_settings_2(self):
+        # if the TEST setting is used, all TEST_* keys must match.
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {'NAME': 'foo'},
+                'TEST_NAME': 'bar',
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
+                self.handler.prepare_test_settings('test-deprecation')
+
+    def test_mismatched_database_test_settings_3(self):
+        # Verifies the mapping of an aliased key.
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {'CREATE_DB': 'foo'},
+                'TEST_CREATE': 'bar',
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
+                self.handler.prepare_test_settings('test-deprecation')
+
+    def test_mismatched_database_test_settings_4(self):
+        # Verifies the mapping of an aliased key when the aliased key is missing.
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {},
+                'TEST_CREATE': 'bar',
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
+                self.handler.prepare_test_settings('test-deprecation')
+
+    def test_mismatched_settings_old_none(self):
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {'CREATE_DB': None},
+                'TEST_CREATE': '',
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
+                self.handler.prepare_test_settings('test-deprecation')
+
+    def test_mismatched_settings_new_none(self):
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {},
+                'TEST_CREATE': None,
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            with self.assertRaisesMessage(ImproperlyConfigured, self.mismatch_msg):
+                self.handler.prepare_test_settings('test-deprecation')
+
+    def test_matched_test_settings(self):
+        # should be able to define new settings and the old, if they match
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {'NAME': 'foo'},
+                'TEST_NAME': 'foo',
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            self.handler.prepare_test_settings('test-deprecation')
+
+    def test_new_settings_only(self):
+        # should be able to define new settings without the old
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST': {'NAME': 'foo'},
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            self.handler.prepare_test_settings('test-deprecation')
+
+    def test_old_settings_only(self):
+        # should be able to define old settings without the new
+        self.db_settings.update({
+            'test-deprecation': {
+                'TEST_NAME': 'foo',
+            },
+        })
+        with override_settings(DATABASES=self.db_settings):
+            self.handler.prepare_test_settings('test-deprecation')
+
+    def test_empty_settings(self):
+        with override_settings(DATABASES=self.db_settings):
+            self.handler.prepare_test_settings('default')

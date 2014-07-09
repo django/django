@@ -1048,6 +1048,14 @@ class SessionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'YES')
 
+    def test_session_initiated(self):
+        session = self.client.session
+        session['session_var'] = 'foo'
+        session.save()
+
+        response = self.client.get('/check_session/')
+        self.assertEqual(response.content, b'foo')
+
     def test_logout(self):
         """Logout should work whether the user is logged in or not (#9978)."""
         self.client.logout()
@@ -1072,6 +1080,25 @@ class SessionTests(TestCase):
     @override_settings(AUTH_USER_MODEL='test_client_regress.CustomUser')
     def test_logout_with_custom_user(self):
         """Logout should send user_logged_out signal if custom user was logged in."""
+        def listener(*args, **kwargs):
+            self.assertEqual(kwargs['sender'], CustomUser)
+            listener.executed = True
+        listener.executed = False
+        u = CustomUser.custom_objects.create(email='test@test.com')
+        u.set_password('password')
+        u.save()
+
+        user_logged_out.connect(listener)
+        self.client.login(username='test@test.com', password='password')
+        self.client.logout()
+        user_logged_out.disconnect(listener)
+        self.assertTrue(listener.executed)
+
+    @override_settings(AUTHENTICATION_BACKENDS=(
+        'django.contrib.auth.backends.ModelBackend',
+        'test_client_regress.auth_backends.CustomUserBackend'))
+    def test_logout_with_custom_auth_backend(self):
+        "Request a logout after logging in with custom authentication backend"
         def listener(*args, **kwargs):
             self.assertEqual(kwargs['sender'], CustomUser)
             listener.executed = True

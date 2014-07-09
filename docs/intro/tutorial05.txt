@@ -246,7 +246,7 @@ past:
 
     def was_published_recently(self):
         now = timezone.now()
-        return now - datetime.timedelta(days=1) <= self.pub_date < now
+        return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
 and run the test again::
 
@@ -381,6 +381,8 @@ With that ready, we can ask the client to do some work for us::
     >>> response = client.get('/polls/')
     >>> response.content
     '\n\n\n    <ul>\n    \n        <li><a href="/polls/1/">Who is your favorite Beatle?</a></li>\n    \n    </ul>\n\n'
+    >>> # If the following doesn't work, you probably omitted the call to
+    >>> # setup_test_environment() described above
     >>> response.context['latest_question_list']
     [<Question: Who is your favorite Beatle?>]
 
@@ -390,7 +392,7 @@ Improving our view
 The list of polls shows polls that aren't published yet (i.e. those that have a
 ``pub_date`` in the future). Let's fix that.
 
-In :doc:`Tutorial 4 </intro/tutorial04>` we introduced a class-based view,
+In :ref:`Tutorial 4 <tutorial04-amend-views>` we introduced a class-based view,
 based on :class:`~django.views.generic.list.ListView`:
 
 .. snippet::

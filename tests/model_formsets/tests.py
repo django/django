@@ -1165,7 +1165,7 @@ class ModelFormsetTest(TestCase):
 
     def test_inlineformset_factory_with_null_fk(self):
         # inlineformset_factory tests with fk having null=True. see #9462.
-        # create some data that will exbit the issue
+        # create some data that will exhibit the issue
         team = Team.objects.create(name="Red Vipers")
         Player(name="Timmy").save()
         Player(name="Bobby", team=team).save()

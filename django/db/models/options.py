@@ -20,7 +20,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
-                 'select_on_save')
+                 'select_on_save', 'default_related_name')
 
 
 def normalize_together(option_together):
@@ -99,6 +99,8 @@ class Options(object):
         # A custom app registry to use, if you're making a separate model set.
         self.apps = apps
 
+        self.default_related_name = None
+
     @property
     def app_config(self):
         # Don't go through get_app_config to avoid triggering imports.
@@ -167,7 +169,8 @@ class Options(object):
         if self.order_with_respect_to:
             self.order_with_respect_to = self.get_field(self.order_with_respect_to)
             self.ordering = ('_order',)
-            model.add_to_class('_order', OrderWrt())
+            if not any(isinstance(field, OrderWrt) for field in model._meta.local_fields):
+                model.add_to_class('_order', OrderWrt())
         else:
             self.order_with_respect_to = None
 
@@ -541,7 +544,7 @@ class Options(object):
         """
         Returns a list of parent classes leading to 'model' (order from closet
         to most distant ancestor). This has to handle the case were 'model' is
-        a granparent or even more distant relation.
+        a grandparent or even more distant relation.
         """
         if not self.parents:
             return None

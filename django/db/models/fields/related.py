@@ -617,12 +617,19 @@ class ReverseSingleRelatedObjectDescriptor(object):
             if related is not None:
                 setattr(related, self.field.related.get_cache_name(), None)
 
-        # Set the value of the related field
-        for lh_field, rh_field in self.field.related_fields:
-            try:
-                setattr(instance, lh_field.attname, getattr(value, rh_field.attname))
-            except AttributeError:
+            for lh_field, rh_field in self.field.related_fields:
                 setattr(instance, lh_field.attname, None)
+
+        # Set the values of the related field.
+        else:
+            for lh_field, rh_field in self.field.related_fields:
+                pk = value._get_pk_val()
+                if pk is None:
+                    raise ValueError(
+                        'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
+                        (value, self.field.rel.to._meta.object_name)
+                    )
+                setattr(instance, lh_field.attname, getattr(value, rh_field.attname))
 
         # Since we already know what the related object is, seed the related
         # object caches now, too. This avoids another db hit if you get the
@@ -1440,14 +1447,16 @@ class ForeignObject(RelatedField):
     @staticmethod
     def get_instance_value_for_fields(instance, fields):
         ret = []
+        opts = instance._meta
         for field in fields:
             # Gotcha: in some cases (like fixture loading) a model can have
             # different values in parent_ptr_id and parent's id. So, use
             # instance.pk (that is, parent_ptr_id) when asked for instance.id.
-            opts = instance._meta
             if field.primary_key:
                 possible_parent_link = opts.get_ancestor_link(field.model)
-                if not possible_parent_link or possible_parent_link.primary_key:
+                if (not possible_parent_link or
+                        possible_parent_link.primary_key or
+                        possible_parent_link.model._meta.abstract):
                     ret.append(instance.pk)
                     continue
             ret.append(getattr(instance, field.attname))
@@ -1591,7 +1600,7 @@ class ForeignObject(RelatedField):
 class ForeignKey(ForeignObject):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _('%(model)s instance with pk %(pk)r does not exist.')
+        'invalid': _('%(model)s instance with %(field)s %(value)r does not exist.')
     }
     description = _("Foreign Key (type determined by related field)")
 
@@ -1664,7 +1673,8 @@ class ForeignKey(ForeignObject):
         if self.rel.on_delete is not CASCADE:
             kwargs['on_delete'] = self.rel.on_delete
         # Rel needs more work.
-        if self.rel.field_name:
+        to_meta = getattr(self.rel.to, "_meta", None)
+        if self.rel.field_name and (not to_meta or (to_meta.pk and self.rel.field_name != to_meta.pk.name)):
             kwargs['to_field'] = self.rel.field_name
         return name, path, args, kwargs
 
@@ -1697,7 +1707,10 @@ class ForeignKey(ForeignObject):
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
-                params={'model': self.rel.to._meta.verbose_name, 'pk': value},
+                params={
+                    'model': self.rel.to._meta.verbose_name, 'pk': value,
+                    'field': self.rel.field_name, 'value': value,
+                },  # 'pk' is included for backwards compatibilty
             )
 
     def get_attname(self):
@@ -2131,7 +2144,7 @@ class ManyToManyField(RelatedField):
 
     def _get_path_info(self, direct=False):
         """
-        Called by both direct an indirect m2m traversal.
+        Called by both direct and indirect m2m traversal.
         """
         pathinfos = []
         int_model = self.rel.through

@@ -7,7 +7,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
-class GeometryColumns(models.Model):
+class PostGISGeometryColumns(models.Model):
     """
     The 'geometry_columns' table from the PostGIS. See the PostGIS
     documentation at Ch. 4.2.2.
@@ -47,7 +47,7 @@ class GeometryColumns(models.Model):
                 self.coord_dimension, self.type, self.srid)
 
 
-class SpatialRefSys(models.Model, SpatialRefSysMixin):
+class PostGISSpatialRefSys(models.Model, SpatialRefSysMixin):
     """
     The 'spatial_ref_sys' table from PostGIS. See the PostGIS
     documentaiton at Ch. 4.2.1.

@@ -96,11 +96,6 @@ class OneToOneRegressionTests(TestCase):
         r = Restaurant(place=p)
         self.assertTrue(r.place is p)
 
-        # Creation using keyword argument and unsaved related instance (#8070).
-        p = Place()
-        r = Restaurant(place=p)
-        self.assertTrue(r.place is p)
-
         # Creation using attname keyword argument and an id will cause the related
         # object to be fetched.
         p = Place.objects.get(name="Demon Dogs")

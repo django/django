@@ -3,7 +3,7 @@ from importlib import import_module
 import os
 import tempfile
 
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.storage import FileSystemStorage
@@ -101,8 +101,11 @@ class TestStorage(object):
         file_ = SimpleUploadedFile('file.txt', b'content')
         storage.set_step_files(step, {'file': file_})
 
-        tmp_name = storage.get_step_files(step)['file'].name
+        with storage.get_step_files(step)['file'] as file:
+            tmp_name = file.name
+
         self.assertTrue(storage.file_storage.exists(tmp_name))
 
         storage.reset()
+        storage.update_response(HttpResponse())
         self.assertFalse(storage.file_storage.exists(tmp_name))

@@ -34,10 +34,10 @@ All attributes should be considered read-only, unless stated otherwise below.
 
 .. attribute:: HttpRequest.scheme
 
-   .. versionadded:: 1.7
+    .. versionadded:: 1.7
 
-   A string representing the scheme of the request (``http`` or ``https``
-   usually).
+    A string representing the scheme of the request (``http`` or ``https``
+    usually).
 
 .. attribute:: HttpRequest.body
 
@@ -251,68 +251,75 @@ Methods
 
 .. method:: HttpRequest.get_full_path()
 
-   Returns the ``path``, plus an appended query string, if applicable.
+    Returns the ``path``, plus an appended query string, if applicable.
 
-   Example: ``"/music/bands/the_beatles/?print=true"``
+    Example: ``"/music/bands/the_beatles/?print=true"``
 
 .. method:: HttpRequest.build_absolute_uri(location)
 
-   Returns the absolute URI form of ``location``. If no location is provided,
-   the location will be set to ``request.get_full_path()``.
+    Returns the absolute URI form of ``location``. If no location is provided,
+    the location will be set to ``request.get_full_path()``.
 
-   If the location is already an absolute URI, it will not be altered.
-   Otherwise the absolute URI is built using the server variables available in
-   this request.
+    If the location is already an absolute URI, it will not be altered.
+    Otherwise the absolute URI is built using the server variables available in
+    this request.
 
-   Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
+    Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
 
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
 
-   Returns a cookie value for a signed cookie, or raises a
-   ``django.core.signing.BadSignature`` exception if the signature is
-   no longer valid. If you provide the ``default`` argument the exception
-   will be suppressed and that default value will be returned instead.
+    Returns a cookie value for a signed cookie, or raises a
+    ``django.core.signing.BadSignature`` exception if the signature is
+    no longer valid. If you provide the ``default`` argument the exception
+    will be suppressed and that default value will be returned instead.
 
-   The optional ``salt`` argument can be used to provide extra protection
-   against brute force attacks on your secret key. If supplied, the
-   ``max_age`` argument will be checked against the signed timestamp
-   attached to the cookie value to ensure the cookie is not older than
-   ``max_age`` seconds.
+    The optional ``salt`` argument can be used to provide extra protection
+    against brute force attacks on your secret key. If supplied, the
+    ``max_age`` argument will be checked against the signed timestamp
+    attached to the cookie value to ensure the cookie is not older than
+    ``max_age`` seconds.
 
-   For example::
+    For example::
 
-          >>> request.get_signed_cookie('name')
-          'Tony'
-          >>> request.get_signed_cookie('name', salt='name-salt')
-          'Tony' # assuming cookie was set using the same salt
-          >>> request.get_signed_cookie('non-existing-cookie')
-          ...
-          KeyError: 'non-existing-cookie'
-          >>> request.get_signed_cookie('non-existing-cookie', False)
-          False
-          >>> request.get_signed_cookie('cookie-that-was-tampered-with')
-          ...
-          BadSignature: ...
-          >>> request.get_signed_cookie('name', max_age=60)
-          ...
-          SignatureExpired: Signature age 1677.3839159 > 60 seconds
-          >>> request.get_signed_cookie('name', False, max_age=60)
-          False
+        >>> request.get_signed_cookie('name')
+        'Tony'
+        >>> request.get_signed_cookie('name', salt='name-salt')
+        'Tony' # assuming cookie was set using the same salt
+        >>> request.get_signed_cookie('non-existing-cookie')
+        ...
+        KeyError: 'non-existing-cookie'
+        >>> request.get_signed_cookie('non-existing-cookie', False)
+        False
+        >>> request.get_signed_cookie('cookie-that-was-tampered-with')
+        ...
+        BadSignature: ...
+        >>> request.get_signed_cookie('name', max_age=60)
+        ...
+        SignatureExpired: Signature age 1677.3839159 > 60 seconds
+        >>> request.get_signed_cookie('name', False, max_age=60)
+        False
 
-   See :doc:`cryptographic signing </topics/signing>` for more information.
+    See :doc:`cryptographic signing </topics/signing>` for more information.
 
 .. method:: HttpRequest.is_secure()
 
-   Returns ``True`` if the request is secure; that is, if it was made with
-   HTTPS.
+    Returns ``True`` if the request is secure; that is, if it was made with
+    HTTPS.
 
 .. method:: HttpRequest.is_ajax()
 
-   Returns ``True`` if the request was made via an ``XMLHttpRequest``, by
-   checking the ``HTTP_X_REQUESTED_WITH`` header for the string
-   ``'XMLHttpRequest'``. Most modern JavaScript libraries send this header.
-   If you write your own XMLHttpRequest call (on the browser side), you'll
-   have to set this header manually if you want ``is_ajax()`` to work.
+    Returns ``True`` if the request was made via an ``XMLHttpRequest``, by
+    checking the ``HTTP_X_REQUESTED_WITH`` header for the string
+    ``'XMLHttpRequest'``. Most modern JavaScript libraries send this header.
+    If you write your own XMLHttpRequest call (on the browser side), you'll
+    have to set this header manually if you want ``is_ajax()`` to work.
+
+    If a response varies on whether or not it's requested via AJAX and you are
+    using some form of caching like Django's :mod:`cache middleware
+    <django.middleware.cache>`, you should decorate the view with
+    :func:`vary_on_headers('HTTP_X_REQUESTED_WITH')
+    <django.views.decorators.vary.vary_on_headers>` so that the responses are
+    properly cached.
 
 .. method:: HttpRequest.read(size=None)
 .. method:: HttpRequest.readline()
@@ -339,21 +346,43 @@ QueryDict objects
 
 .. class:: QueryDict
 
-In an :class:`HttpRequest` object, the ``GET`` and ``POST`` attributes are instances
-of ``django.http.QueryDict``. :class:`QueryDict` is a dictionary-like
-class customized to deal with multiple values for the same key. This is
-necessary because some HTML form elements, notably
-``<select multiple="multiple">``, pass multiple values for the same key.
+In an :class:`HttpRequest` object, the ``GET`` and ``POST`` attributes are
+instances of ``django.http.QueryDict``, a dictionary-like class customized to
+deal with multiple values for the same key. This is necessary because some HTML
+form elements, notably ``<select multiple>``, pass multiple values for the same
+key.
 
-``QueryDict`` instances are immutable, unless you create a ``copy()`` of them.
-That means you can't change attributes of ``request.POST`` and ``request.GET``
-directly.
+The ``QueryDict``\ s at ``request.POST`` and ``request.GET`` will be immutable
+when accessed in a normal request/response cycle. To get a mutable version you
+need to use ``.copy()``.
 
 Methods
 -------
 
-:class:`QueryDict` implements all the standard dictionary methods, because it's
+:class:`QueryDict` implements all the standard dictionary methods because it's
 a subclass of dictionary. Exceptions are outlined here:
+
+.. method:: QueryDict.__init__(query_string=None, mutable=False, encoding=None)
+
+    Instantiates a ``QueryDict`` object based on ``query_string``.
+
+    >>> QueryDict('a=1&a=2&c=3')
+    <QueryDict: {u'a': [u'1', u'2'], u'b': [u'1']}>
+
+    If ``query_string`` is not passed in, the resulting ``QueryDict`` will be
+    empty (it will have no keys or values).
+
+    Most ``QueryDict``\ s you encounter, and in particular those at
+    ``request.POST`` and ``request.GET``, will be immutable. If you are
+    instantiating one yourself, you can make it mutable by passing
+    ``mutable=True`` to its ``__init__()``.
+
+    Strings for setting both keys and values will be converted from ``encoding``
+    to unicode. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
+
+    .. versionchanged:: 1.8
+
+        In previous versions, ``query_string`` was a required positional argument.
 
 .. method:: QueryDict.__getitem__(key)
 
@@ -367,8 +396,8 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Sets the given key to ``[value]`` (a Python list whose single element is
     ``value``). Note that this, as other dictionary functions that have side
-    effects, can only be called on a mutable ``QueryDict`` (one that was created
-    via ``copy()``).
+    effects, can only be called on a mutable ``QueryDict`` (such as one that
+    was created via ``copy()``).
 
 .. method:: QueryDict.__contains__(key)
 
@@ -391,22 +420,21 @@ a subclass of dictionary. Exceptions are outlined here:
     dictionary ``update()`` method, except it *appends* to the current
     dictionary items rather than replacing them. For example::
 
-          >>> q = QueryDict('a=1')
-          >>> q = q.copy() # to make it mutable
-          >>> q.update({'a': '2'})
-          >>> q.getlist('a')
-          ['1', '2']
-          >>> q['a'] # returns the last
-          ['2']
+        >>> q = QueryDict('a=1', mutable=True)
+        >>> q.update({'a': '2'})
+        >>> q.getlist('a')
+        ['1', '2']
+        >>> q['a'] # returns the last
+        ['2']
 
 .. method:: QueryDict.items()
 
     Just like the standard dictionary ``items()`` method, except this uses the
     same last-value logic as ``__getitem__()``. For example::
 
-           >>> q = QueryDict('a=1&a=2&a=3')
-           >>> q.items()
-           [('a', '3')]
+        >>> q = QueryDict('a=1&a=2&a=3')
+        >>> q.items()
+        [('a', '3')]
 
 .. method:: QueryDict.iteritems()
 
@@ -424,9 +452,9 @@ a subclass of dictionary. Exceptions are outlined here:
     Just like the standard dictionary ``values()`` method, except this uses the
     same last-value logic as ``__getitem__()``. For example::
 
-           >>> q = QueryDict('a=1&a=2&a=3')
-           >>> q.values()
-           ['3']
+        >>> q = QueryDict('a=1&a=2&a=3')
+        >>> q.values()
+        ['3']
 
 .. method:: QueryDict.itervalues()
 
@@ -437,8 +465,7 @@ In addition, ``QueryDict`` has the following methods:
 .. method:: QueryDict.copy()
 
     Returns a copy of the object, using ``copy.deepcopy()`` from the Python
-    standard library. The copy will be mutable -- that is, you can change its
-    values.
+    standard library. This copy will be mutable even if the original was not.
 
 .. method:: QueryDict.getlist(key, default)
 
@@ -510,7 +537,7 @@ In addition, ``QueryDict`` has the following methods:
     Optionally, urlencode can be passed characters which
     do not require encoding. For example::
 
-        >>> q = QueryDict('', mutable=True)
+        >>> q = QueryDict(mutable=True)
         >>> q['next'] = '/a&b/'
         >>> q.urlencode(safe='/')
         'next=/a%26b/'
@@ -912,14 +939,14 @@ Attributes
 
     An iterator of strings representing the content.
 
-.. attribute:: HttpResponse.status_code
+.. attribute:: StreamingHttpResponse.status_code
 
     The `HTTP status code`_ for the response.
 
-.. attribute:: HttpResponse.reason_phrase
+.. attribute:: StreamingHttpResponse.reason_phrase
 
     The HTTP reason phrase for the response.
 
-.. attribute:: HttpResponse.streaming
+.. attribute:: StreamingHttpResponse.streaming
 
     This is always ``True``.

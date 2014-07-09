@@ -11,9 +11,9 @@ from django.test import TransactionTestCase
 if HAS_SPATIAL_DB:
     from django.contrib.gis.db.models import fields
     try:
-        from django.contrib.gis.models import GeometryColumns
+        GeometryColumns = connection.ops.geometry_columns()
         HAS_GEOMETRY_COLUMNS = True
-    except ImportError:
+    except NotImplementedError:
         HAS_GEOMETRY_COLUMNS = False
 
 

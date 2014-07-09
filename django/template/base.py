@@ -4,11 +4,13 @@ import re
 from functools import partial
 from importlib import import_module
 from inspect import getargspec, getcallargs
+import warnings
 
 from django.apps import apps
 from django.conf import settings
 from django.template.context import (BaseContext, Context, RequestContext,  # NOQA: imported for backwards compatibility
     ContextPopException)
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.itercompat import is_iterable
 from django.utils.text import (smart_split, unescape_string_literal,
     get_text_list)
@@ -658,6 +660,9 @@ def resolve_variable(path, context):
 
     Deprecated; use the Variable class instead.
     """
+    warnings.warn("resolve_variable() is deprecated. Use django.template."
+                  "Variable(path).resolve(context) instead",
+                  RemovedInDjango20Warning, stacklevel=2)
     return Variable(path).resolve(context)
 
 

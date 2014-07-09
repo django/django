@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import sys
 import unittest
+import warnings
 
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -17,6 +18,7 @@ from django.http import HttpRequest, HttpResponseRedirect, HttpResponsePermanent
 from django.shortcuts import redirect
 from django.test import TestCase, override_settings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from admin_scripts.tests import AdminScriptTestCase
 
@@ -104,7 +106,7 @@ test_data = (
     ('product', '/product/chocolate+($2.00)/', [], {'price': '2.00', 'product': 'chocolate'}),
     ('headlines', '/headlines/2007.5.21/', [], dict(year=2007, month=5, day=21)),
     ('windows', r'/windows_path/C:%5CDocuments%20and%20Settings%5Cspam/', [], dict(drive_name='C', path=r'Documents and Settings\spam')),
-    ('special', r'/special_chars/%2B%5C%24%2A/', [r'+\$*'], {}),
+    ('special', r'/special_chars/~@+%5C$*%7C/', [r'~@+\$*|'], {}),
     ('special', r'/special_chars/some%20resource/', [r'some resource'], {}),
     ('special', r'/special_chars/10%25%20complete/', [r'10% complete'], {}),
     ('special', r'/special_chars/some%20resource/', [], {'chars': r'some resource'}),
@@ -173,13 +175,15 @@ class NoURLPatternsTests(TestCase):
 class URLPatternReverse(TestCase):
 
     def test_urlpattern_reverse(self):
-        for name, expected, args, kwargs in test_data:
-            try:
-                got = reverse(name, args=args, kwargs=kwargs)
-            except NoReverseMatch:
-                self.assertEqual(expected, NoReverseMatch)
-            else:
-                self.assertEqual(got, expected)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            for name, expected, args, kwargs in test_data:
+                try:
+                    got = reverse(name, args=args, kwargs=kwargs)
+                except NoReverseMatch:
+                    self.assertEqual(expected, NoReverseMatch)
+                else:
+                    self.assertEqual(got, expected)
 
     def test_reverse_none(self):
         # Reversing None should raise an error, not return the last un-named view.
@@ -321,7 +325,7 @@ LOGIN_URL = reverse_lazy('login')""")
         self.remove_settings('settings.py')
 
     def test_lazy_in_settings(self):
-        out, err = self.run_manage(['sqlall', 'auth'])
+        out, err = self.run_manage(['validate'])
         self.assertNoOutput(err)
 
 
@@ -373,8 +377,10 @@ class ReverseShortcutTests(TestCase):
 
     def test_reverse_by_path_nested(self):
         # Views that are added to urlpatterns using include() should be
-        # reversable by doted path.
-        self.assertEqual(reverse('urlpatterns_reverse.views.nested_view'), '/includes/nested_path/')
+        # reversible by doted path.
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            self.assertEqual(reverse('urlpatterns_reverse.views.nested_view'), '/includes/nested_path/')
 
     def test_redirect_view_object(self):
         from .views import absolute_kwargs_view
@@ -439,7 +445,7 @@ class NamespaceTests(TestCase):
         self.assertEqual('/ns-included1/+%5C$*/', reverse('inc-ns1:inc-special-view'))
 
     def test_namespace_pattern_with_variable_prefix(self):
-        "When using a include with namespaces when there is a regex variable in front of it"
+        "When using an include with namespaces when there is a regex variable in front of it"
         self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', kwargs={'outer': 42}))
         self.assertEqual('/ns-outer/42/normal/', reverse('inc-outer:inc-normal-view', args=[42]))
         self.assertEqual('/ns-outer/42/normal/37/4/', reverse('inc-outer:inc-normal-view', kwargs={'outer': 42, 'arg1': 37, 'arg2': 4}))
@@ -608,15 +614,15 @@ class ErrorHandlerResolutionTests(TestCase):
 
     def test_named_handlers(self):
         handler = (empty_view, {})
-        self.assertEqual(self.resolver.resolve400(), handler)
-        self.assertEqual(self.resolver.resolve404(), handler)
-        self.assertEqual(self.resolver.resolve500(), handler)
+        self.assertEqual(self.resolver.resolve_error_handler(400), handler)
+        self.assertEqual(self.resolver.resolve_error_handler(404), handler)
+        self.assertEqual(self.resolver.resolve_error_handler(500), handler)
 
     def test_callable_handers(self):
         handler = (empty_view, {})
-        self.assertEqual(self.callable_resolver.resolve400(), handler)
-        self.assertEqual(self.callable_resolver.resolve404(), handler)
-        self.assertEqual(self.callable_resolver.resolve500(), handler)
+        self.assertEqual(self.callable_resolver.resolve_error_handler(400), handler)
+        self.assertEqual(self.callable_resolver.resolve_error_handler(404), handler)
+        self.assertEqual(self.callable_resolver.resolve_error_handler(500), handler)
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_full_import')

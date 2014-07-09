@@ -94,7 +94,7 @@ class TestInline(TestCase):
         }
         response = self.client.post('/admin/admin_inlines/titlecollection/add/', data)
         # Here colspan is "4": two fields (title1 and title2), one hidden field and the delete checkbox.
-        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist"><li>The two titles must be the same</li></ul></td></tr>')
+        self.assertContains(response, '<tr><td colspan="4"><ul class="errorlist nonfield"><li>The two titles must be the same</li></ul></td></tr>')
 
     def test_no_parent_callable_lookup(self):
         """Admin inline `readonly_field` shouldn't invoke parent ModelAdmin callable"""

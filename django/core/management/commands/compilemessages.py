@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import codecs
 import glob
 import os
-from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import find_command, popen_wrapper
@@ -30,13 +29,6 @@ def is_writable(path):
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--locale', '-l', dest='locale', action='append', default=[],
-                    help='Locale(s) to process (e.g. de_AT). Default is to process all. Can be '
-                         'used multiple times.'),
-        make_option('--exclude', '-x', dest='exclude', action='append', default=[],
-                    help='Locales to exclude. Default is none. Can be used multiple times.'),
-    )
     help = 'Compiles .po files to .mo files for use with builtin gettext support.'
 
     requires_system_checks = False
@@ -44,6 +36,13 @@ class Command(BaseCommand):
 
     program = 'msgfmt'
     program_options = ['--check-format']
+
+    def add_arguments(self, parser):
+        parser.add_argument('--locale', '-l', dest='locale', action='append', default=[],
+            help='Locale(s) to process (e.g. de_AT). Default is to process all. '
+            'Can be used multiple times.')
+        parser.add_argument('--exclude', '-x', dest='exclude', action='append', default=[],
+            help='Locales to exclude. Default is none. Can be used multiple times.')
 
     def handle(self, **options):
         locale = options.get('locale')

@@ -98,7 +98,7 @@ class Settings(BaseSettings):
                 % (self.SETTINGS_MODULE, e)
             )
 
-        tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS")
+        tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS", "LOCALE_PATHS")
         self._explicit_settings = set()
         for setting in dir(mod):
             if setting.isupper():

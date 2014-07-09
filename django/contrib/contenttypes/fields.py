@@ -223,6 +223,11 @@ class GenericForeignKey(object):
         if value is not None:
             ct = self.get_content_type(obj=value)
             fk = value._get_pk_val()
+            if fk is None:
+                raise ValueError(
+                    'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
+                    (value, value._meta.object_name)
+                )
 
         setattr(instance, self.ct_field, ct)
         setattr(instance, self.fk_field, fk)

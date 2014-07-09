@@ -70,6 +70,16 @@ class BaseHandler(object):
                 view = transaction.atomic(using=db.alias)(view)
         return view
 
+    def get_exception_response(self, request, resolver, status_code):
+        try:
+            callback, param_dict = resolver.resolve_error_handler(status_code)
+            response = callback(request, **param_dict)
+        except:
+            signals.got_request_exception.send(sender=self.__class__, request=request)
+            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+
+        return response
+
     def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
 
@@ -134,6 +144,12 @@ class BaseHandler(object):
             if hasattr(response, 'render') and callable(response.render):
                 for middleware_method in self._template_response_middleware:
                     response = middleware_method(request, response)
+                    # Complain if the template response middleware returned None (a common error).
+                    if response is None:
+                        raise ValueError(
+                            "%s.process_template_response didn't return an "
+                            "HttpResponse object. It returned None instead."
+                            % (middleware_method.__self__.__class__.__name__))
                 response = response.render()
 
         except http.Http404 as e:
@@ -145,12 +161,7 @@ class BaseHandler(object):
             if settings.DEBUG:
                 response = debug.technical_404_response(request, e)
             else:
-                try:
-                    callback, param_dict = resolver.resolve404()
-                    response = callback(request, **param_dict)
-                except:
-                    signals.got_request_exception.send(sender=self.__class__, request=request)
-                    response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+                response = self.get_exception_response(request, resolver, 404)
 
         except PermissionDenied:
             logger.warning(
@@ -159,14 +170,7 @@ class BaseHandler(object):
                     'status_code': 403,
                     'request': request
                 })
-            try:
-                callback, param_dict = resolver.resolve403()
-                response = callback(request, **param_dict)
-            except:
-                signals.got_request_exception.send(
-                    sender=self.__class__, request=request)
-                response = self.handle_uncaught_exception(request,
-                    resolver, sys.exc_info())
+            response = self.get_exception_response(request, resolver, 403)
 
         except SuspiciousOperation as e:
             # The request logger receives events for any problematic request
@@ -179,15 +183,10 @@ class BaseHandler(object):
                     'status_code': 400,
                     'request': request
                 })
+            if settings.DEBUG:
+                return debug.technical_500_response(request, *sys.exc_info(), status_code=400)
 
-            try:
-                callback, param_dict = resolver.resolve400()
-                response = callback(request, **param_dict)
-            except:
-                signals.got_request_exception.send(
-                    sender=self.__class__, request=request)
-                response = self.handle_uncaught_exception(request,
-                    resolver, sys.exc_info())
+            response = self.get_exception_response(request, resolver, 400)
 
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
@@ -202,10 +201,18 @@ class BaseHandler(object):
             # Apply response middleware, regardless of the response
             for middleware_method in self._response_middleware:
                 response = middleware_method(request, response)
+                # Complain if the response middleware returned None (a common error).
+                if response is None:
+                    raise ValueError(
+                        "%s.process_response didn't return an "
+                        "HttpResponse object. It returned None instead."
+                        % (middleware_method.__self__.__class__.__name__))
             response = self.apply_response_fixes(request, response)
         except:  # Any exception should be gathered and handled
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+
+        response._closable_objects.append(request)
 
         return response
 
@@ -237,7 +244,7 @@ class BaseHandler(object):
         if resolver.urlconf_module is None:
             six.reraise(*exc_info)
         # Return an HttpResponse that displays a friendly error message.
-        callback, param_dict = resolver.resolve500()
+        callback, param_dict = resolver.resolve_error_handler(500)
         return callback(request, **param_dict)
 
     def apply_response_fixes(self, request, response):

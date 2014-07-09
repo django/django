@@ -5,6 +5,7 @@ from django.apps.registry import Apps, apps as global_apps
 from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.fields.related import do_pending_lookups
+from django.db.models.fields.proxy import OrderWrt
 from django.conf import settings
 from django.utils import six
 from django.utils.encoding import force_text
@@ -38,17 +39,19 @@ class ProjectState(object):
             real_apps=self.real_apps,
         )
 
-    def render(self, include_real=None, ignore_swappable=False):
+    def render(self, include_real=None, ignore_swappable=False, skip_cache=False):
         "Turns the project state into actual models in a new Apps"
-        if self.apps is None:
+        if self.apps is None or skip_cache:
             # Any apps in self.real_apps should have all their models included
             # in the render. We don't use the original model instances as there
             # are some variables that refer to the Apps object.
+            # FKs/M2Ms from real apps are also not included as they just
+            # mess things up with partial states (due to lack of dependencies)
             real_models = []
             for app_label in self.real_apps:
                 app = global_apps.get_app_config(app_label)
                 for model in app.get_models():
-                    real_models.append(ModelState.from_model(model))
+                    real_models.append(ModelState.from_model(model, exclude_rels=True))
             # Populate the app registry with a stub for each application.
             app_labels = set(model_state.app_label for model_state in self.models.values())
             self.apps = Apps([AppConfigStub(label) for label in sorted(self.real_apps + list(app_labels))])
@@ -87,13 +90,17 @@ class ProjectState(object):
                         ))
                     else:
                         do_pending_lookups(model)
-        return self.apps
+        try:
+            return self.apps
+        finally:
+            if skip_cache:
+                self.apps = None
 
     @classmethod
     def from_apps(cls, apps):
         "Takes in an Apps and returns a ProjectState matching it"
         app_models = {}
-        for model in apps.get_models():
+        for model in apps.get_models(include_swapped=True):
             model_state = ModelState.from_model(model)
             app_models[(model_state.app_label, model_state.name.lower())] = model_state
         return cls(app_models)
@@ -143,15 +150,25 @@ class ModelState(object):
         # Sanity-check that fields is NOT a dict. It must be ordered.
         if isinstance(self.fields, dict):
             raise ValueError("ModelState.fields cannot be a dict - it must be a list of 2-tuples.")
+        # Sanity-check that fields are NOT already bound to a model.
+        for name, field in fields:
+            if hasattr(field, 'model'):
+                raise ValueError(
+                    'ModelState.fields cannot be bound to a model - "%s" is.' % name
+                )
 
     @classmethod
-    def from_model(cls, model):
+    def from_model(cls, model, exclude_rels=False):
         """
         Feed me a model, get a ModelState representing it out.
         """
         # Deconstruct the fields
         fields = []
         for field in model._meta.local_fields:
+            if getattr(field, "rel", None) and exclude_rels:
+                continue
+            if isinstance(field, OrderWrt):
+                continue
             name, path, args, kwargs = field.deconstruct()
             field_class = import_string(path)
             try:
@@ -163,17 +180,18 @@ class ModelState(object):
                     model._meta.object_name,
                     e,
                 ))
-        for field in model._meta.local_many_to_many:
-            name, path, args, kwargs = field.deconstruct()
-            field_class = import_string(path)
-            try:
-                fields.append((name, field_class(*args, **kwargs)))
-            except TypeError as e:
-                raise TypeError("Couldn't reconstruct m2m field %s on %s: %s" % (
-                    name,
-                    model._meta.object_name,
-                    e,
-                ))
+        if not exclude_rels:
+            for field in model._meta.local_many_to_many:
+                name, path, args, kwargs = field.deconstruct()
+                field_class = import_string(path)
+                try:
+                    fields.append((name, field_class(*args, **kwargs)))
+                except TypeError as e:
+                    raise TypeError("Couldn't reconstruct m2m field %s on %s: %s" % (
+                        name,
+                        model._meta.object_name,
+                        e,
+                    ))
         # Extract the options
         options = {}
         for name in DEFAULT_NAMES:
@@ -189,6 +207,12 @@ class ModelState(object):
                     options[name] = set(normalize_together(it))
                 else:
                     options[name] = model._meta.original_attrs[name]
+        # If we're ignoring relationships, remove all field-listing model
+        # options (that option basically just means "make a stub model")
+        if exclude_rels:
+            for key in ["unique_together", "index_together", "order_with_respect_to"]:
+                if key in options:
+                    del options[key]
 
         def flatten_bases(model):
             bases = []
@@ -226,19 +250,19 @@ class ModelState(object):
             bases,
         )
 
-    def clone(self):
-        "Returns an exact copy of this ModelState"
-        # We deep-clone the fields using deconstruction
-        fields = []
+    def construct_fields(self):
+        "Deep-clone the fields using deconstruction"
         for name, field in self.fields:
             _, path, args, kwargs = field.deconstruct()
             field_class = import_string(path)
-            fields.append((name, field_class(*args, **kwargs)))
-        # Now make a copy
+            yield name, field_class(*args, **kwargs)
+
+    def clone(self):
+        "Returns an exact copy of this ModelState"
         return self.__class__(
             app_label=self.app_label,
             name=self.name,
-            fields=fields,
+            fields=list(self.construct_fields()),
             options=dict(self.options),
             bases=self.bases,
         )
@@ -260,7 +284,7 @@ class ModelState(object):
         except LookupError:
             raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
         # Turn fields into a dict for the body, add other bits
-        body = dict(self.fields)
+        body = dict(self.construct_fields())
         body['Meta'] = meta
         body['__module__'] = "__fake__"
         # Then, make a Model object
@@ -275,6 +299,9 @@ class ModelState(object):
             if fname == name:
                 return field
         raise ValueError("No field called %s on model %s" % (name, self.name))
+
+    def __repr__(self):
+        return "<ModelState: '%s.%s'>" % (self.app_label, self.name)
 
     def __eq__(self, other):
         return (

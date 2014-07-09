@@ -4,7 +4,7 @@ import binascii
 import unittest
 from unittest import skipUnless
 
-from django.contrib.gis import memoryview
+from django.utils.six import memoryview
 
 from ..import HAS_GEOS
 

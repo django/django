@@ -52,7 +52,7 @@ class Child(Parent):
     data = models.CharField(max_length=10)
 
 
-# Models to regression test #7572
+# Models to regression test #7572, #20820
 class Channel(models.Model):
     name = models.CharField(max_length=255)
 
@@ -67,6 +67,17 @@ class Article(models.Model):
 
 # Subclass of a model with a ManyToManyField for test_ticket_20820
 class SpecialArticle(Article):
+    pass
+
+
+# Models to regression test #22421
+class CommonFeature(Article):
+
+    class Meta:
+        abstract = True
+
+
+class Feature(CommonFeature):
     pass
 
 

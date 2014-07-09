@@ -142,7 +142,7 @@ class CookieStorage(BaseStorage):
 
     def _decode(self, data):
         """
-        Safely decodes a encoded text stream back into a list of messages.
+        Safely decodes an encoded text stream back into a list of messages.
 
         If the encoded text stream contained an invalid hash or was in an
         invalid format, ``None`` is returned.

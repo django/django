@@ -21,6 +21,37 @@ automatically-generated admin site.
     The admin isn't intended to be used by site visitors. It's for site
     managers.
 
+Creating an admin user
+======================
+
+First we'll need to create a user who can login to the admin site. Run the
+following command:
+
+.. code-block:: bash
+
+    $ python manage.py createsuperuser
+
+Enter your desired username and press enter.
+
+.. code-block:: text
+
+    Username: admin
+
+You will then be prompted for your desired email address:
+
+.. code-block:: text
+
+    Email address: admin@example.com
+
+The final step is to enter your password. You will be asked to enter your
+password twice, the second time as a confirmation of the first.
+
+.. code-block:: text
+
+    Password: **********
+    Password (again): *********
+    Superuser created successfully.
+
 Start the development server
 ============================
 
@@ -59,10 +90,7 @@ browser's settings and on whether Django has a translation for this language.
 Enter the admin site
 ====================
 
-Now, try logging in. You created a superuser account in the first part of this
-tutorial, remember?  If you didn't create one or forgot the password you can
-:ref:`create another one <topics-auth-creating-superusers>`.
-
+Now, try logging in with the superuser account you created in the previous step.
 You should see the Django admin index page:
 
 .. image:: _images/admin02.png

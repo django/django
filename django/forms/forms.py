@@ -92,8 +92,8 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
                 declared_fields.update(base.declared_fields)
 
             # Field shadowing.
-            for attr in base.__dict__.keys():
-                if attr in declared_fields:
+            for attr, value in base.__dict__.items():
+                if value is None and attr in declared_fields:
                     declared_fields.pop(attr)
 
         new_class.base_fields = declared_fields
@@ -280,7 +280,7 @@ class BaseForm(object):
         field -- i.e., from Form.clean(). Returns an empty ErrorList if there
         are none.
         """
-        return self.errors.get(NON_FIELD_ERRORS, self.error_class())
+        return self.errors.get(NON_FIELD_ERRORS, self.error_class(error_class='nonfield'))
 
     def _raw_value(self, fieldname):
         """
@@ -331,7 +331,10 @@ class BaseForm(object):
                 if field != NON_FIELD_ERRORS and field not in self.fields:
                     raise ValueError(
                         "'%s' has no field named '%s'." % (self.__class__.__name__, field))
-                self._errors[field] = self.error_class()
+                if field == NON_FIELD_ERRORS:
+                    self._errors[field] = self.error_class(error_class='nonfield')
+                else:
+                    self._errors[field] = self.error_class()
             self._errors[field].extend(error_list)
             if field in self.cleaned_data:
                 del self.cleaned_data[field]
@@ -560,7 +563,7 @@ class BoundField(object):
             name = self.html_name
         else:
             name = self.html_initial_name
-        return widget.render(name, self.value(), attrs=attrs)
+        return force_text(widget.render(name, self.value(), attrs=attrs))
 
     def as_text(self, attrs=None, **kwargs):
         """

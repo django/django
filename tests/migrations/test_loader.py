@@ -4,6 +4,7 @@ from django.test import TestCase, override_settings
 from django.db import connection, connections
 from django.db.migrations.loader import MigrationLoader, AmbiguityError
 from django.db.migrations.recorder import MigrationRecorder
+from django.test import modify_settings
 from django.utils import six
 
 
@@ -18,23 +19,23 @@ class RecorderTests(TestCase):
         """
         recorder = MigrationRecorder(connection)
         self.assertEqual(
-            recorder.applied_migrations(),
+            set((x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"),
             set(),
         )
         recorder.record_applied("myapp", "0432_ponies")
         self.assertEqual(
-            recorder.applied_migrations(),
+            set((x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"),
             set([("myapp", "0432_ponies")]),
         )
         # That should not affect records of another database
         recorder_other = MigrationRecorder(connections['other'])
         self.assertEqual(
-            recorder_other.applied_migrations(),
+            set((x, y) for (x, y) in recorder_other.applied_migrations() if x == "myapp"),
             set(),
         )
         recorder.record_unapplied("myapp", "0432_ponies")
         self.assertEqual(
-            recorder.applied_migrations(),
+            set((x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"),
             set(),
         )
 
@@ -46,6 +47,7 @@ class LoaderTests(TestCase):
     """
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    @modify_settings(INSTALLED_APPS={'append': 'basic'})
     def test_load(self):
         """
         Makes sure the loader can load the migrations for the test apps,
@@ -77,7 +79,7 @@ class LoaderTests(TestCase):
         )
 
         # Ensure we've included unmigrated apps in there too
-        self.assertIn("contenttypes", project_state.real_apps)
+        self.assertIn("basic", project_state.real_apps)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_unmigdep"})
     def test_load_unmigrated_dependency(self):
@@ -89,6 +91,8 @@ class LoaderTests(TestCase):
         self.assertEqual(
             migration_loader.graph.forwards_plan(("migrations", "0001_initial")),
             [
+                ('contenttypes', '0001_initial'),
+                ('auth', '0001_initial'),
                 ("migrations", "0001_initial"),
             ],
         )
@@ -100,6 +104,62 @@ class LoaderTests(TestCase):
         self.assertEqual(
             [x for x, y in book_state.fields],
             ["id", "user"]
+        )
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_run_before"})
+    def test_run_before(self):
+        """
+        Makes sure the loader uses Migration.run_before.
+        """
+        # Load and test the plan
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(
+            migration_loader.graph.forwards_plan(("migrations", "0002_second")),
+            [
+                ("migrations", "0001_initial"),
+                ("migrations", "0003_third"),
+                ("migrations", "0002_second"),
+            ],
+        )
+
+    @modify_settings(INSTALLED_APPS={'append': 'basic'})
+    @override_settings(MIGRATION_MODULES={
+        "migrations": "migrations.test_migrations_latest",
+        "basic": "migrations.test_migrations_latest_basic",
+    })
+    def test_latest(self):
+        """
+        Makes sure that __latest__ works correctly.
+        """
+        # Load and test the plan
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(
+            migration_loader.graph.forwards_plan(("migrations", "0001_initial")),
+            [
+                ("basic", "0001_initial"),
+                ("basic", "0002_second"),
+                ("migrations", "0001_initial"),
+            ],
+        )
+
+    @override_settings(MIGRATION_MODULES={
+        "migrations": "migrations.test_migrations_first",
+        "migrations2": "migrations2.test_migrations_2_first",
+    })
+    @modify_settings(INSTALLED_APPS={'append': 'migrations2'})
+    def test_first(self):
+        """
+        Makes sure the '__first__' migrations build correctly.
+        """
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(
+            migration_loader.graph.forwards_plan(("migrations", "second")),
+            [
+                ("migrations", "thefirst"),
+                ("migrations2", "0001_initial"),
+                ("migrations2", "0002_second"),
+                ("migrations", "second"),
+            ],
         )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
@@ -136,14 +196,14 @@ class LoaderTests(TestCase):
         recorder = MigrationRecorder(connection)
         # Loading with nothing applied should just give us the one node
         self.assertEqual(
-            len(migration_loader.graph.nodes),
+            len([x for x in migration_loader.graph.nodes if x[0] == "migrations"]),
             1,
         )
         # However, fake-apply one migration and it should now use the old two
         recorder.record_applied("migrations", "0001_initial")
         migration_loader.build_graph()
         self.assertEqual(
-            len(migration_loader.graph.nodes),
+            len([x for x in migration_loader.graph.nodes if x[0] == "migrations"]),
             2,
         )
         recorder.flush()

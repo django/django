@@ -22,12 +22,12 @@ from .models import (
     ExtraInfo, Fan, Item, LeafA, Join, LeafB, LoopX, LoopZ, ManagedModel,
     Member, NamedCategory, Note, Number, Plaything, PointerA, Ranking, Related,
     Report, ReservedName, Tag, TvChef, Valid, X, Food, Eaten, Node, ObjectA,
-    ObjectB, ObjectC, CategoryItem, SimpleCategory, SpecialCategory,
-    OneToOneCategory, NullableName, ProxyCategory, SingleObject, RelatedObject,
-    ModelA, ModelB, ModelC, ModelD, Responsibility, Job, JobResponsibilities,
-    BaseA, FK1, Identifier, Program, Channel, Page, Paragraph, Chapter, Book,
-    MyObject, Order, OrderItem, SharedConnection, Task, Staff, StaffUser,
-    CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
+    ProxyObjectA, ChildObjectA, ObjectB, ProxyObjectB, ObjectC, CategoryItem,
+    SimpleCategory, SpecialCategory, OneToOneCategory, NullableName, ProxyCategory,
+    SingleObject, RelatedObject, ModelA, ModelB, ModelC, ModelD, Responsibility, Job,
+    JobResponsibilities, BaseA, FK1, Identifier, Program, Channel, Page, Paragraph,
+    Chapter, Book, MyObject, Order, OrderItem, SharedConnection, Task, Staff,
+    StaffUser, CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
     Company, Employment, CustomPk, CustomPkTag, Classroom, School, Student)
 
 
@@ -1710,7 +1710,7 @@ class NullableRelOrderingTests(TestCase):
         qs = qs.order_by('others__single__name')
         # The ordering by others__single__pk will add one new join (to single)
         # and that join must be LEFT join. The already existing join to related
-        # objects must be kept INNER. So, we have both a INNER and a LEFT join
+        # objects must be kept INNER. So, we have both an INNER and a LEFT join
         # in the query.
         self.assertEqual(str(qs.query).count('LEFT'), 1)
         self.assertEqual(str(qs.query).count('INNER'), 1)
@@ -2143,6 +2143,129 @@ class ValuesQuerysetTests(BaseQuerysetTest):
         qs = qs.order_by('value_plus_one')
         qs = qs.values_list('num', flat=True)
         self.assertQuerysetEqual(qs, [72], self.identity)
+
+
+class QuerySetSupportsPythonIdioms(TestCase):
+
+    def setUp(self):
+        some_date = datetime.datetime(2014, 5, 16, 12, 1)
+        for i in range(1, 8):
+            Article.objects.create(
+                name="Article {}".format(i), created=some_date)
+
+    def get_ordered_articles(self):
+        return Article.objects.all().order_by('name')
+
+    def test_can_get_items_using_index_and_slice_notation(self):
+        self.assertEqual(self.get_ordered_articles()[0].name, 'Article 1')
+        self.assertQuerysetEqual(self.get_ordered_articles()[1:3],
+            ["<Article: Article 2>", "<Article: Article 3>"])
+
+    def test_slicing_with_steps_can_be_used(self):
+        self.assertQuerysetEqual(self.get_ordered_articles()[::2],
+            ["<Article: Article 1>",
+             "<Article: Article 3>",
+             "<Article: Article 5>",
+             "<Article: Article 7>"])
+
+    @unittest.skipUnless(six.PY2, "Python 2 only -- Python 3 doesn't have longs.")
+    def test_slicing_works_with_longs(self):
+        self.assertEqual(self.get_ordered_articles()[long(0)].name, 'Article 1')
+        self.assertQuerysetEqual(self.get_ordered_articles()[long(1):long(3)],
+            ["<Article: Article 2>", "<Article: Article 3>"])
+        self.assertQuerysetEqual(self.get_ordered_articles()[::long(2)],
+            ["<Article: Article 1>",
+            "<Article: Article 3>",
+            "<Article: Article 5>",
+            "<Article: Article 7>"])
+
+        # And can be mixed with ints.
+        self.assertQuerysetEqual(self.get_ordered_articles()[1:long(3)],
+            ["<Article: Article 2>", "<Article: Article 3>"])
+
+    def test_slicing_without_step_is_lazy(self):
+        with self.assertNumQueries(0):
+            self.get_ordered_articles()[0:5]
+
+    def test_slicing_with_tests_is_not_lazy(self):
+        with self.assertNumQueries(1):
+            self.get_ordered_articles()[0:5:3]
+
+    def test_slicing_can_slice_again_after_slicing(self):
+        self.assertQuerysetEqual(self.get_ordered_articles()[0:5][0:2],
+            ["<Article: Article 1>",
+             "<Article: Article 2>"])
+        self.assertQuerysetEqual(self.get_ordered_articles()[0:5][4:],
+            ["<Article: Article 5>"])
+        self.assertQuerysetEqual(self.get_ordered_articles()[0:5][5:], [])
+
+        # Some more tests!
+        self.assertQuerysetEqual(self.get_ordered_articles()[2:][0:2],
+            ["<Article: Article 3>", "<Article: Article 4>"])
+        self.assertQuerysetEqual(self.get_ordered_articles()[2:][:2],
+            ["<Article: Article 3>", "<Article: Article 4>"])
+        self.assertQuerysetEqual(self.get_ordered_articles()[2:][2:3],
+            ["<Article: Article 5>"])
+
+        # Using an offset without a limit is also possible.
+        self.assertQuerysetEqual(self.get_ordered_articles()[5:],
+            ["<Article: Article 6>",
+             "<Article: Article 7>"])
+
+    def test_slicing_cannot_filter_queryset_once_sliced(self):
+        six.assertRaisesRegex(
+            self,
+            AssertionError,
+            "Cannot filter a query once a slice has been taken.",
+            Article.objects.all()[0:5].filter,
+            id=1,
+        )
+
+    def test_slicing_cannot_reorder_queryset_once_sliced(self):
+        six.assertRaisesRegex(
+            self,
+            AssertionError,
+            "Cannot reorder a query once a slice has been taken.",
+            Article.objects.all()[0:5].order_by,
+            'id',
+        )
+
+    def test_slicing_cannot_combine_queries_once_sliced(self):
+        six.assertRaisesRegex(
+            self,
+            AssertionError,
+            "Cannot combine queries once a slice has been taken.",
+            lambda: Article.objects.all()[0:1] & Article.objects.all()[4:5]
+        )
+
+    def test_slicing_negative_indexing_not_supported_for_single_element(self):
+        """hint: inverting your ordering might do what you need"""
+        six.assertRaisesRegex(
+            self,
+            AssertionError,
+            "Negative indexing is not supported.",
+            lambda: Article.objects.all()[-1]
+        )
+
+    def test_slicing_negative_indexing_not_supported_for_range(self):
+        """hint: inverting your ordering might do what you need"""
+        six.assertRaisesRegex(
+            self,
+            AssertionError,
+            "Negative indexing is not supported.",
+            lambda: Article.objects.all()[0:-5]
+        )
+
+    def test_can_get_number_of_items_in_queryset_using_standard_len(self):
+        self.assertEqual(len(Article.objects.filter(name__exact='Article 1')), 1)
+
+    def test_can_combine_queries_using_and_and_or_operators(self):
+        s1 = Article.objects.filter(name__exact='Article 1')
+        s2 = Article.objects.filter(name__exact='Article 2')
+        self.assertQuerysetEqual((s1 | s2).order_by('name'),
+            ["<Article: Article 1>",
+             "<Article: Article 2>"])
+        self.assertQuerysetEqual(s1 & s2, [])
 
 
 class WeirdQuerysetSlicingTests(BaseQuerysetTest):
@@ -3238,20 +3361,85 @@ class Ticket12807Tests(TestCase):
 
 
 class RelatedLookupTypeTests(TestCase):
+    error = 'Cannot query "%s": Must be "%s" instance.'
+
+    def setUp(self):
+        self.oa = ObjectA.objects.create(name="oa")
+        self.poa = ProxyObjectA.objects.get(name="oa")
+        self.coa = ChildObjectA.objects.create(name="coa")
+        self.wrong_type = Order.objects.create(id=self.oa.pk)
+        self.ob = ObjectB.objects.create(name="ob", objecta=self.oa, num=1)
+        ProxyObjectB.objects.create(name="pob", objecta=self.oa, num=2)
+        self.pob = ProxyObjectB.objects.all()
+        ObjectC.objects.create(childobjecta=self.coa)
+
     def test_wrong_type_lookup(self):
-        oa = ObjectA.objects.create(name="oa")
-        wrong_type = Order.objects.create(id=oa.pk)
-        ob = ObjectB.objects.create(name="ob", objecta=oa, num=1)
-        # Currently Django doesn't care if the object is of correct
-        # type, it will just use the objecta's related fields attribute
-        # (id) for model lookup. Making things more restrictive could
-        # be a good idea...
-        self.assertQuerysetEqual(
-            ObjectB.objects.filter(objecta=wrong_type),
-            [ob], lambda x: x)
-        self.assertQuerysetEqual(
-            ObjectB.objects.filter(objecta__in=[wrong_type]),
-            [ob], lambda x: x)
+        """
+        A ValueError is raised when the incorrect object type is passed to a
+        query lookup.
+        """
+        # Passing incorrect object type
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.wrong_type, ObjectA._meta.object_name)):
+            ObjectB.objects.get(objecta=self.wrong_type)
+
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.wrong_type, ObjectA._meta.object_name)):
+            ObjectB.objects.filter(objecta__in=[self.wrong_type])
+
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.wrong_type, ObjectA._meta.object_name)):
+            ObjectB.objects.filter(objecta=self.wrong_type)
+
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.wrong_type, ObjectB._meta.object_name)):
+            ObjectA.objects.filter(objectb__in=[self.wrong_type, self.ob])
+
+        # Passing an object of the class on which query is done.
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.ob, ObjectA._meta.object_name)):
+            ObjectB.objects.filter(objecta__in=[self.poa, self.ob])
+
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.ob, ChildObjectA._meta.object_name)):
+            ObjectC.objects.exclude(childobjecta__in=[self.coa, self.ob])
+
+    def test_wrong_backward_lookup(self):
+        """
+        A ValueError is raised when the incorrect object type is passed to a
+        query lookup for backward relations.
+        """
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.oa, ObjectB._meta.object_name)):
+            ObjectA.objects.filter(objectb__in=[self.oa, self.ob])
+
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.oa, ObjectB._meta.object_name)):
+            ObjectA.objects.exclude(objectb=self.oa)
+
+        with self.assertRaisesMessage(ValueError,
+                self.error % (self.wrong_type, ObjectB._meta.object_name)):
+            ObjectA.objects.get(objectb=self.wrong_type)
+
+    def test_correct_lookup(self):
+        """
+        When passing proxy model objects, child objects, or parent objects,
+        lookups work fine.
+        """
+        out_a = ['<ObjectA: oa>', ]
+        out_b = ['<ObjectB: ob>', '<ObjectB: pob>']
+        out_c = ['<ObjectC: >']
+
+        # proxy model objects
+        self.assertQuerysetEqual(ObjectB.objects.filter(objecta=self.poa).order_by('name'), out_b)
+        self.assertQuerysetEqual(ObjectA.objects.filter(objectb__in=self.pob).order_by('pk'), out_a * 2)
+
+        # child objects
+        self.assertQuerysetEqual(ObjectB.objects.filter(objecta__in=[self.coa]), [])
+        self.assertQuerysetEqual(ObjectB.objects.filter(objecta__in=[self.poa, self.coa]).order_by('name'), out_b)
+
+        # parent objects
+        self.assertQuerysetEqual(ObjectC.objects.exclude(childobjecta=self.oa), out_c)
 
 
 class Ticket14056Tests(TestCase):

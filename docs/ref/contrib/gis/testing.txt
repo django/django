@@ -120,24 +120,6 @@ database, as described in :ref:`create_spatialite_db`. Then just do this::
 
     $ python manage.py test
 
-Settings
---------
-
-.. setting:: SPATIALITE_SQL
-
-``SPATIALITE_SQL``
-^^^^^^^^^^^^^^^^^^
-
-Only relevant when using a SpatiaLite version 2.3.
-
-By default, the GeoDjango test runner looks for the :ref:`file containing the
-SpatiaLite database-initialization SQL code <create_spatialite_db>` in the
-same directory where it was invoked (by default the same directory where
-``manage.py`` is located). To use a different location, add the following to
-your settings::
-
-    SPATIALITE_SQL='/path/to/init_spatialite-2.3.sql'
-
 .. _geodjango-tests:
 
 GeoDjango tests

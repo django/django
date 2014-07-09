@@ -12,8 +12,8 @@ from django.conf import settings
 from django.core import checks
 from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
-from django.db import (router, transaction, DatabaseError,
-    DEFAULT_DB_ALIAS)
+from django.db import (router, connections, transaction, DatabaseError,
+    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY)
 from django.db.models.deletion import Collector
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.related import (ForeignObjectRel, ManyToOneRel,
@@ -30,6 +30,7 @@ from django.utils.functional import curry
 from django.utils.six.moves import zip
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _
+from django.utils.version import get_version
 
 
 def subclass_exception(name, parents, module, attached_to=None):
@@ -194,9 +195,6 @@ class ModelBase(type):
                     base = parent
             if base is None:
                 raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
-            if (new_class._meta.local_fields or
-                    new_class._meta.local_many_to_many):
-                raise FieldError("Proxy model '%s' contains model fields." % name)
             new_class._meta.setup_proxy(base)
             new_class._meta.concrete_model = base._meta.concrete_model
         else:
@@ -460,6 +458,16 @@ class Model(six.with_metaclass(ModelBase)):
         super(Model, self).__init__()
         signals.post_init.send(sender=self.__class__, instance=self)
 
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        if cls._deferred:
+            new = cls(**dict(zip(field_names, values)))
+        else:
+            new = cls(*values)
+        new._state.adding = False
+        new._state.db = db
+        return new
+
     def __repr__(self):
         try:
             u = six.text_type(self)
@@ -498,6 +506,7 @@ class Model(six.with_metaclass(ModelBase)):
         only module-level classes can be pickled by the default path.
         """
         data = self.__dict__
+        data[DJANGO_VERSION_PICKLE_KEY] = get_version()
         if not self._deferred:
             class_id = self._meta.app_label, self._meta.object_name
             return model_unpickle, (class_id, [], simple_class_factory), data
@@ -509,6 +518,23 @@ class Model(six.with_metaclass(ModelBase)):
         model = self._meta.proxy_for_model
         class_id = model._meta.app_label, model._meta.object_name
         return (model_unpickle, (class_id, defers, deferred_class_factory), data)
+
+    def __setstate__(self, state):
+        msg = None
+        pickled_version = state.get(DJANGO_VERSION_PICKLE_KEY)
+        if pickled_version:
+            current_version = get_version()
+            if current_version != pickled_version:
+                msg = ("Pickled model instance's Django version %s does"
+                    " not match the current version %s."
+                    % (pickled_version, current_version))
+        else:
+            msg = "Pickled model instance's Django version is not specified."
+
+        if msg:
+            warnings.warn(msg, RuntimeWarning, stacklevel=2)
+
+        self.__dict__.update(state)
 
     def _get_pk_val(self, meta=None):
         if not meta:
@@ -1047,10 +1073,12 @@ class Model(six.with_metaclass(ModelBase)):
     def check(cls, **kwargs):
         errors = []
         errors.extend(cls._check_swappable())
+        errors.extend(cls._check_model())
         errors.extend(cls._check_managers(**kwargs))
         if not cls._meta.swapped:
             errors.extend(cls._check_fields(**kwargs))
             errors.extend(cls._check_m2m_through_same_relationship())
+            errors.extend(cls._check_long_column_names())
             clash_errors = cls._check_id_field() + cls._check_field_name_clashes()
             errors.extend(clash_errors)
             # If there are field name clashes, hide consequent column name
@@ -1090,6 +1118,21 @@ class Model(six.with_metaclass(ModelBase)):
                         hint=None,
                         obj=None,
                         id='models.E002',
+                    )
+                )
+        return errors
+
+    @classmethod
+    def _check_model(cls):
+        errors = []
+        if cls._meta.proxy:
+            if cls._meta.local_fields or cls._meta.local_many_to_many:
+                errors.append(
+                    checks.Error(
+                        "Proxy model '%s' contains model fields." % cls.__name__,
+                        hint=None,
+                        obj=None,
+                        id='models.E017',
                     )
                 )
         return errors
@@ -1357,7 +1400,7 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def _check_ordering(cls):
-        """ Check "ordering" option -- is it a list of lists and do all fields
+        """ Check "ordering" option -- is it a list of strings and do all fields
         exist? """
 
         from django.db.models import FieldDoesNotExist
@@ -1401,6 +1444,14 @@ class Model(six.with_metaclass(ModelBase)):
             try:
                 cls._meta.get_field(field_name, many_to_many=False)
             except FieldDoesNotExist:
+                if field_name.endswith('_id'):
+                    try:
+                        field = cls._meta.get_field(field_name[:-3], many_to_many=False)
+                    except FieldDoesNotExist:
+                        pass
+                    else:
+                        if field.attname == field_name:
+                            continue
                 errors.append(
                     checks.Error(
                         "'ordering' refers to the non-existent field '%s'." % field_name,
@@ -1409,6 +1460,76 @@ class Model(six.with_metaclass(ModelBase)):
                         id='models.E015',
                     )
                 )
+        return errors
+
+    @classmethod
+    def _check_long_column_names(cls):
+        """
+        Check that any auto-generated column names are shorter than the limits
+        for each database in which the model will be created.
+        """
+        errors = []
+        allowed_len = None
+        db_alias = None
+
+        # Find the minimum max allowed length among all specified db_aliases.
+        for db in settings.DATABASES.keys():
+            # skip databases where the model won't be created
+            if not router.allow_migrate(db, cls):
+                continue
+            connection = connections[db]
+            max_name_length = connection.ops.max_name_length()
+            if max_name_length is None or connection.features.truncates_name:
+                continue
+            else:
+                if allowed_len is None:
+                    allowed_len = max_name_length
+                    db_alias = db
+                elif max_name_length < allowed_len:
+                    allowed_len = max_name_length
+                    db_alias = db
+
+        if allowed_len is None:
+            return errors
+
+        for f in cls._meta.local_fields:
+            _, column_name = f.get_attname_column()
+
+            # Check if auto-generated name for the field is too long
+            # for the database.
+            if (f.db_column is None and column_name is not None
+                    and len(column_name) > allowed_len):
+                errors.append(
+                    checks.Error(
+                        'Autogenerated column name too long for field "%s". '
+                        'Maximum length is "%s" for database "%s".'
+                        % (column_name, allowed_len, db_alias),
+                        hint="Set the column name manually using 'db_column'.",
+                        obj=cls,
+                        id='models.E018',
+                    )
+                )
+
+        for f in cls._meta.local_many_to_many:
+            # Check if auto-generated name for the M2M field is too long
+            # for the database.
+            for m2m in f.rel.through._meta.local_fields:
+                _, rel_name = m2m.get_attname_column()
+                if (m2m.db_column is None and rel_name is not None
+                        and len(rel_name) > allowed_len):
+                    errors.append(
+                        checks.Error(
+                            'Autogenerated column name too long for M2M field '
+                            '"%s". Maximum length is "%s" for database "%s".'
+                            % (rel_name, allowed_len, db_alias),
+                            hint=("Use 'through' to create a separate model "
+                                "for M2M and then set column_name using "
+                                "'db_column'."),
+                            obj=cls,
+                            id='models.E019',
+                        )
+                    )
+
         return errors
 
 

@@ -35,10 +35,9 @@ older versions of Django and install a newer one.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    to |django-users| or drop by `#django on irc.freenode.net`__ to chat
-    with other Django users who might be able to help.
-
-__ irc://irc.freenode.net/django
+    to |django-users| or drop by `#django on irc.freenode.net
+    <irc://irc.freenode.net/django>`_ to chat with other Django users who might
+    be able to help.
 
 Creating a project
 ==================
@@ -206,40 +205,7 @@ The :djadmin:`migrate` command looks at the :setting:`INSTALLED_APPS` setting
 and creates any necessary database tables according to the database settings
 in your :file:`mysite/settings.py` file and the database migrations shipped
 with the app (we'll cover those later). You'll see a message for each
-migration it applies, and you'll get a prompt asking you if you'd like to
-create a superuser account for the authentication system.
-
-First, you'll be asked if you would like to create a superuser. Type the word
-``yes`` and hit enter.
-
-.. code-block:: text
-
-    You have installed Django's auth system, and don't have any superusers defined.
-    Would you like to create one now? (yes/no): yes
-
-Next, enter a username. By default, this will be your system username. Enter
-your desired username and press enter.
-
-.. code-block:: text
-
-    Username (leave blank to use 'your_username'): admin
-
-You will then be prompted for your desired email address:
-
-.. code-block:: text
-
-    Email address: admin@example.com
-
-The final step is to enter your password. You will be asked to enter your
-password twice, the second time as a confirmation of the first.
-
-.. code-block:: text
-
-    Password: **********
-    Password (again): *********
-    Superuser created successfully.
-
-With that done, if you're interested, run the command-line client for your
+migration it applies. If you're interested, run the command-line client for your
 database and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or
 ``.schema`` (SQLite) to display the tables Django created.
 

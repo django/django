@@ -1,3 +1,4 @@
+from collections import deque
 import datetime
 import time
 import warnings
@@ -30,17 +31,21 @@ class BaseDatabaseWrapper(object):
     ops = None
     vendor = 'unknown'
 
+    queries_limit = 9000
+
     def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS,
                  allow_thread_sharing=False):
         # Connection related attributes.
+        # The underlying database connection.
         self.connection = None
-        self.queries = []
         # `settings_dict` should be a dictionary containing keys such as
         # NAME, USER, etc. It's called `settings_dict` instead of `settings`
         # to disambiguate it from Django settings modules.
         self.settings_dict = settings_dict
         self.alias = alias
-        self.use_debug_cursor = None
+        # Query logging in debug mode or when explicitly enabled.
+        self.queries_log = deque(maxlen=self.queries_limit)
+        self.use_debug_cursor = False
 
         # Transaction related attributes.
         # Tracks if the connection is in autocommit mode. Per PEP 249, by
@@ -68,16 +73,17 @@ class BaseDatabaseWrapper(object):
         self.allow_thread_sharing = allow_thread_sharing
         self._thread_ident = thread.get_ident()
 
-    def __eq__(self, other):
-        if isinstance(other, BaseDatabaseWrapper):
-            return self.alias == other.alias
-        return NotImplemented
+    @property
+    def queries_logged(self):
+        return self.use_debug_cursor or settings.DEBUG
 
-    def __ne__(self, other):
-        return not self == other
-
-    def __hash__(self):
-        return hash(self.alias)
+    @property
+    def queries(self):
+        if len(self.queries_log) == self.queries_log.maxlen:
+            warnings.warn(
+                "Limit for query logging exceeded, only the last {} queries "
+                "will be returned.".format(self.queries_log.maxlen))
+        return list(self.queries_log)
 
     ##### Backend-specific methods for creating connections and cursors #####
 
@@ -154,8 +160,7 @@ class BaseDatabaseWrapper(object):
         Creates a cursor, opening a connection if necessary.
         """
         self.validate_thread_sharing()
-        if (self.use_debug_cursor or
-                (self.use_debug_cursor is None and settings.DEBUG)):
+        if self.queries_logged:
             cursor = self.make_debug_cursor(self._cursor())
         else:
             cursor = self.make_cursor(self._cursor())
@@ -429,7 +434,7 @@ class BaseDatabaseWrapper(object):
 
     def make_debug_cursor(self, cursor):
         """
-        Creates a cursor that logs all queries in self.queries.
+        Creates a cursor that logs all queries in self.queries_log.
         """
         return utils.CursorDebugWrapper(cursor, self)
 
@@ -492,7 +497,6 @@ class BaseDatabaseFeatures(object):
     can_return_id_from_insert = False
     has_bulk_insert = False
     uses_savepoints = False
-    can_release_savepoints = True
     can_combine_inserts_with_and_without_auto_increment_pk = False
 
     # If True, don't use integer foreign keys referring to, e.g., positive
@@ -516,8 +520,9 @@ class BaseDatabaseFeatures(object):
     # at the end of each save operation?
     supports_forward_references = True
 
-    # Does the backend allow very long model names without error?
-    supports_long_model_names = True
+    # Does the backend uses proper method like 'truncate_name'
+    # to auto-truncate column names?
+    truncates_name = False
 
     # Is there a REAL datatype in addition to floats/doubles?
     has_real_datatype = False
@@ -571,6 +576,13 @@ class BaseDatabaseFeatures(object):
     # Can the backend determine reliably the length of a CharField?
     can_introspect_max_length = True
 
+    # Can the backend determine reliably if a field is nullable?
+    # Note that this is separate from interprets_empty_strings_as_nulls,
+    # although the latter feature, when true, interferes with correct
+    # setting (and introspection) of CharFields' nullability.
+    # This is True for all core backends.
+    can_introspect_null = True
+
     # Confirm support for introspected foreign keys
     # Every database can do this reliably, except MySQL,
     # which can't do it for MyISAM tables
@@ -587,6 +599,9 @@ class BaseDatabaseFeatures(object):
 
     # Can the backend introspect an BooleanField, instead of an IntegerField?
     can_introspect_boolean_field = True
+
+    # Can the backend introspect an DecimalField, instead of an FloatField?
+    can_introspect_decimal_field = True
 
     # Can the backend introspect an IPAddressField, instead of an CharField?
     can_introspect_ip_address_field = False
@@ -620,7 +635,7 @@ class BaseDatabaseFeatures(object):
     supports_foreign_keys = True
 
     # Does it support CHECK constraints?
-    supports_check_constraints = True
+    supports_column_check_constraints = True
 
     # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
     # parameter passing? Note this can be provided by the backend even if not
@@ -649,7 +664,7 @@ class BaseDatabaseFeatures(object):
     # If NULL is implied on columns without needing to be explicitly specified
     implied_column_null = False
 
-    uppercases_column_names = True
+    uppercases_column_names = False
 
     def __init__(self, connection):
         self.connection = connection

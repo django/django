@@ -4,7 +4,7 @@ from django.apps import apps
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
-from django.core.exceptions import FieldError
+from django.core import checks
 from django.db import models, DEFAULT_DB_ALIAS
 from django.db.models import signals
 from django.test import TestCase, override_settings
@@ -143,13 +143,25 @@ class ProxyModelTests(TestCase):
         self.assertRaises(TypeError, build_no_base_classes)
 
     def test_new_fields(self):
-        def build_new_fields():
-            class NoNewFields(Person):
-                newfield = models.BooleanField()
+        class NoNewFields(Person):
+            newfield = models.BooleanField()
 
-                class Meta:
-                    proxy = True
-        self.assertRaises(FieldError, build_new_fields)
+            class Meta:
+                proxy = True
+                # don't register this model in the app_cache for the current app,
+                # otherwise the check fails when other tests are being run.
+                app_label = 'no_such_app'
+
+        errors = NoNewFields.check()
+        expected = [
+            checks.Error(
+                "Proxy model 'NoNewFields' contains model fields.",
+                hint=None,
+                obj=None,
+                id='models.E017',
+            )
+        ]
+        self.assertEqual(errors, expected)
 
     @override_settings(TEST_SWAPPABLE_MODEL='proxy_models.AlternateModel')
     def test_swappable(self):

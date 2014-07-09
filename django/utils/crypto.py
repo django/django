@@ -79,7 +79,8 @@ def get_random_string(length=12,
 
 if hasattr(hmac, "compare_digest"):
     # Prefer the stdlib implementation, when available.
-    constant_time_compare = hmac.compare_digest
+    def constant_time_compare(val1, val2):
+        return hmac.compare_digest(force_bytes(val1), force_bytes(val2))
 else:
     def constant_time_compare(val1, val2):
         """
@@ -127,7 +128,7 @@ if hasattr(hashlib, "pbkdf2_hmac"):
         Implements PBKDF2 with the same API as Django's existing
         implementation, using the stdlib.
 
-        This is used in Python 3.4 and up.
+        This is used in Python 2.7.8+ and 3.4+.
         """
         if digest is None:
             digest = hashlib.sha256

@@ -257,32 +257,41 @@ class CustomPrefetchTests(TestCase):
     def setUp(self):
         self.person1 = Person.objects.create(name="Joe")
         self.person2 = Person.objects.create(name="Mary")
+
+        # Set main_room for each house before creating the next one for
+        # databases where supports_nullable_unique_constraints is False.
+
         self.house1 = House.objects.create(name='House 1', address="123 Main St", owner=self.person1)
-        self.house2 = House.objects.create(name='House 2', address="45 Side St", owner=self.person1)
-        self.house3 = House.objects.create(name='House 3', address="6 Downing St", owner=self.person2)
-        self.house4 = House.objects.create(name='house 4', address="7 Regents St", owner=self.person2)
         self.room1_1 = Room.objects.create(name="Dining room", house=self.house1)
         self.room1_2 = Room.objects.create(name="Lounge", house=self.house1)
         self.room1_3 = Room.objects.create(name="Kitchen", house=self.house1)
+        self.house1.main_room = self.room1_1
+        self.house1.save()
+        self.person1.houses.add(self.house1)
+
+        self.house2 = House.objects.create(name='House 2', address="45 Side St", owner=self.person1)
         self.room2_1 = Room.objects.create(name="Dining room", house=self.house2)
         self.room2_2 = Room.objects.create(name="Lounge", house=self.house2)
         self.room2_3 = Room.objects.create(name="Kitchen", house=self.house2)
+        self.house2.main_room = self.room2_1
+        self.house2.save()
+        self.person1.houses.add(self.house2)
+
+        self.house3 = House.objects.create(name='House 3', address="6 Downing St", owner=self.person2)
         self.room3_1 = Room.objects.create(name="Dining room", house=self.house3)
         self.room3_2 = Room.objects.create(name="Lounge", house=self.house3)
         self.room3_3 = Room.objects.create(name="Kitchen", house=self.house3)
+        self.house3.main_room = self.room3_1
+        self.house3.save()
+        self.person2.houses.add(self.house3)
+
+        self.house4 = House.objects.create(name='house 4', address="7 Regents St", owner=self.person2)
         self.room4_1 = Room.objects.create(name="Dining room", house=self.house4)
         self.room4_2 = Room.objects.create(name="Lounge", house=self.house4)
         self.room4_3 = Room.objects.create(name="Kitchen", house=self.house4)
-        self.person1.houses.add(self.house1, self.house2)
-        self.person2.houses.add(self.house3, self.house4)
-        self.house1.main_room = self.room1_1
-        self.house1.save()
-        self.house2.main_room = self.room2_1
-        self.house2.save()
-        self.house3.main_room = self.room3_1
-        self.house3.save()
         self.house4.main_room = self.room4_1
         self.house4.save()
+        self.person2.houses.add(self.house4)
 
     def test_traverse_qs(self):
         qs = Person.objects.prefetch_related('houses')
@@ -869,27 +878,38 @@ class LookupOrderingTest(TestCase):
         self.person1 = Person.objects.create(name="Joe")
         self.person2 = Person.objects.create(name="Mary")
 
-        self.house1 = House.objects.create(address="123 Main St")
-        self.house2 = House.objects.create(address="45 Side St")
-        self.house3 = House.objects.create(address="6 Downing St")
-        self.house4 = House.objects.create(address="7 Regents St")
+        # Set main_room for each house before creating the next one for
+        # databases where supports_nullable_unique_constraints is False.
 
+        self.house1 = House.objects.create(address="123 Main St")
         self.room1_1 = Room.objects.create(name="Dining room", house=self.house1)
         self.room1_2 = Room.objects.create(name="Lounge", house=self.house1)
         self.room1_3 = Room.objects.create(name="Kitchen", house=self.house1)
+        self.house1.main_room = self.room1_1
+        self.house1.save()
+        self.person1.houses.add(self.house1)
 
+        self.house2 = House.objects.create(address="45 Side St")
         self.room2_1 = Room.objects.create(name="Dining room", house=self.house2)
         self.room2_2 = Room.objects.create(name="Lounge", house=self.house2)
+        self.house2.main_room = self.room2_1
+        self.house2.save()
+        self.person1.houses.add(self.house2)
 
+        self.house3 = House.objects.create(address="6 Downing St")
         self.room3_1 = Room.objects.create(name="Dining room", house=self.house3)
         self.room3_2 = Room.objects.create(name="Lounge", house=self.house3)
         self.room3_3 = Room.objects.create(name="Kitchen", house=self.house3)
+        self.house3.main_room = self.room3_1
+        self.house3.save()
+        self.person2.houses.add(self.house3)
 
+        self.house4 = House.objects.create(address="7 Regents St")
         self.room4_1 = Room.objects.create(name="Dining room", house=self.house4)
         self.room4_2 = Room.objects.create(name="Lounge", house=self.house4)
-
-        self.person1.houses.add(self.house1, self.house2)
-        self.person2.houses.add(self.house3, self.house4)
+        self.house4.main_room = self.room4_1
+        self.house4.save()
+        self.person2.houses.add(self.house4)
 
     def test_order(self):
         with self.assertNumQueries(4):
@@ -1130,6 +1150,10 @@ class Ticket21760Tests(TestCase):
             house = House.objects.create()
             for _ in range(3):
                 self.rooms.append(Room.objects.create(house=house))
+            # Set main_room for each house before creating the next one for
+            # databases where supports_nullable_unique_constraints is False.
+            house.main_room = self.rooms[-3]
+            house.save()
 
     def test_bug(self):
         prefetcher = get_prefetcher(self.rooms[0], 'house')[0]

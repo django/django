@@ -264,8 +264,12 @@ class DefaultFiltersTests(TestCase):
             '<a href="http://www.google.com" rel="nofollow">www.google.com</a>')
         self.assertEqual(urlize('djangoproject.org'),
             '<a href="http://djangoproject.org" rel="nofollow">djangoproject.org</a>')
+        self.assertEqual(urlize('djangoproject.org/'),
+            '<a href="http://djangoproject.org/" rel="nofollow">djangoproject.org/</a>')
         self.assertEqual(urlize('info@djangoproject.org'),
             '<a href="mailto:info@djangoproject.org">info@djangoproject.org</a>')
+        self.assertEqual(urlize('some.organization'),
+            'some.organization'),
 
         # Check urlize with https addresses
         self.assertEqual(urlize('https://google.com'),
@@ -654,6 +658,14 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(pluralize(1), '')
         self.assertEqual(pluralize(0), 's')
         self.assertEqual(pluralize(2), 's')
+
+        # Ticket #22798
+        self.assertEqual(pluralize(0.5), 's')
+        self.assertEqual(pluralize(1.5), 's')
+
+        self.assertEqual(pluralize(decimal.Decimal(1)), '')
+        self.assertEqual(pluralize(decimal.Decimal(0)), 's')
+        self.assertEqual(pluralize(decimal.Decimal(2)), 's')
         self.assertEqual(pluralize([1]), '')
         self.assertEqual(pluralize([]), 's')
         self.assertEqual(pluralize([1, 2, 3]), 's')

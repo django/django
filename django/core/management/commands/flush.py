@@ -1,36 +1,35 @@
 import sys
 from importlib import import_module
-from optparse import make_option
 
 from django.apps import apps
 from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
 from django.core.management import call_command
-from django.core.management.base import NoArgsCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.core.management.sql import sql_flush, emit_post_migrate_signal
 from django.utils.six.moves import input
 from django.utils import six
 
 
-class Command(NoArgsCommand):
-    option_list = NoArgsCommand.option_list + (
-        make_option('--noinput', action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.'),
-        make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database to flush. '
-                'Defaults to the "default" database.'),
-        make_option('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
-            help='Tells Django not to load any initial data after database synchronization.'),
-    )
-    help = ('Returns the database to the state it was in immediately after '
-           'migrate was first executed. This means that all data will be removed '
-           'from the database, any post-migration handlers will be '
-           're-executed, and the initial_data fixture will be re-installed.')
+class Command(BaseCommand):
+    help = ('Removes ALL DATA from the database, including data added during '
+           'migrations. Unmigrated apps will also have their initial_data '
+           'fixture reloaded. Does not achieve a "fresh install" state.')
 
-    def handle_noargs(self, **options):
+    def add_arguments(self, parser):
+        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
+            help='Tells Django to NOT prompt the user for input of any kind.')
+        parser.add_argument('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS,
+            help='Nominates a database to flush. Defaults to the "default" database.')
+        parser.add_argument('--no-initial-data', action='store_false',
+            dest='load_initial_data', default=True,
+            help='Tells Django not to load any initial data after database synchronization.')
+
+    def handle(self, **options):
         database = options.get('database')
         connection = connections[database]
-        verbosity = int(options.get('verbosity'))
+        verbosity = options.get('verbosity')
         interactive = options.get('interactive')
         # The following are stealth options used by Django's internals.
         reset_sequences = options.get('reset_sequences', True)
@@ -54,7 +53,7 @@ class Command(NoArgsCommand):
         if interactive:
             confirm = input("""You have requested a flush of the database.
 This will IRREVERSIBLY DESTROY all data currently in the %r database,
-and return each table to a fresh state.
+and return each table to an empty state.
 Are you sure you want to do this?
 
     Type 'yes' to continue, or 'no' to cancel: """ % connection.settings_dict['NAME'])

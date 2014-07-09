@@ -32,6 +32,18 @@ about each item can often be found in the release notes of two versions prior.
   and migrations will become compulsory for all apps. This includes automatic
   loading of fixtures and support for initial SQL data.
 
+* The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
+  Python path will be removed.
+
+* Support for :py:mod:`optparse` will be dropped for custom management commands
+  (replaced by :py:mod:`argparse`).
+
+* The class :class:`~django.core.management.NoArgsCommand` will be removed. Use
+  :class:`~django.core.management.BaseCommand` instead, which takes no arguments
+  by default.
+
+* ``django.template.resolve_variable`` will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
@@ -143,6 +155,9 @@ details on these changes.
 
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, will no longer be supported.
+
+* The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
+  :class:`~django.forms.ModelMultipleChoiceField` will be removed.
 
 .. _deprecation-removed-in-1.8:
 

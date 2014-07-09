@@ -41,6 +41,15 @@ TEST_SETTINGS = {
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         'django.contrib.staticfiles.finders.DefaultStorageFinder',
     ),
+    'INSTALLED_APPS': (
+        'django.contrib.contenttypes',
+        'django.contrib.auth',
+        'django.contrib.admin.apps.SimpleAdminConfig',
+        'django.contrib.staticfiles',
+        'staticfiles_tests',
+        'staticfiles_tests.apps.test',
+        'staticfiles_tests.apps.no_label',
+    ),
 }
 from django.contrib.staticfiles.management.commands.collectstatic import Command as CollectstaticCommand
 
@@ -128,7 +137,7 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
                         ignore_errors=True, onerror=rmtree_errorhandler)
 
     def run_collectstatic(self, **kwargs):
-        call_command('collectstatic', interactive=False, verbosity='0',
+        call_command('collectstatic', interactive=False, verbosity=0,
                      ignore_patterns=['*.ignoreme'], **kwargs)
 
     def _get_file(self, filepath):
@@ -240,8 +249,6 @@ class TestFindStatic(CollectionTestCase, TestDefaults):
         self.assertIn(os.path.join('staticfiles_tests', 'apps', 'no_label', 'static'),
                       searched_locations)
         self.assertIn(os.path.join('django', 'contrib', 'admin', 'static'),
-                      searched_locations)
-        self.assertIn(os.path.join('tests', 'servers', 'another_app', 'static'),
                       searched_locations)
         # FileSystemFinder searched locations
         self.assertIn(TEST_SETTINGS['STATICFILES_DIRS'][1][1], searched_locations)
@@ -559,7 +566,7 @@ class TestHashedFiles(object):
         """
         collectstatic_args = {
             'interactive': False,
-            'verbosity': '0',
+            'verbosity': 0,
             'link': False,
             'clear': False,
             'dry_run': False,
@@ -678,16 +685,17 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
         self.assertEqual(hashed_files, manifest)
 
     def test_clear_empties_manifest(self):
+        cleared_file_name = os.path.join('test', 'cleared.txt')
         # collect the additional file
         self.run_collectstatic()
 
         hashed_files = storage.staticfiles_storage.hashed_files
-        self.assertIn('test/cleared.txt', hashed_files)
+        self.assertIn(cleared_file_name, hashed_files)
 
         manifest_content = storage.staticfiles_storage.load_manifest()
-        self.assertIn('test/cleared.txt', manifest_content)
+        self.assertIn(cleared_file_name, manifest_content)
 
-        original_path = storage.staticfiles_storage.path('test/cleared.txt')
+        original_path = storage.staticfiles_storage.path(cleared_file_name)
         self.assertTrue(os.path.exists(original_path))
 
         # delete the original file form the app, collect with clear
@@ -697,10 +705,10 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
         self.assertFileNotFound(original_path)
 
         hashed_files = storage.staticfiles_storage.hashed_files
-        self.assertNotIn('test/cleared.txt', hashed_files)
+        self.assertNotIn(cleared_file_name, hashed_files)
 
         manifest_content = storage.staticfiles_storage.load_manifest()
-        self.assertNotIn('test/cleared.txt', manifest_content)
+        self.assertNotIn(cleared_file_name, manifest_content)
 
 
 # we set DEBUG to False here since the template tag wouldn't work otherwise
@@ -951,7 +959,7 @@ class TestStaticFilePermissions(BaseCollectionTestCase, StaticFilesTestCase):
 
     command_params = {'interactive': False,
                       'post_process': True,
-                      'verbosity': '0',
+                      'verbosity': 0,
                       'ignore_patterns': ['*.ignoreme'],
                       'use_default_ignore_patterns': True,
                       'clear': False,

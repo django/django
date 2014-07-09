@@ -5,10 +5,12 @@ The main QuerySet implementation. This provides the public API for the ORM.
 from collections import deque
 import copy
 import sys
+import warnings
 
 from django.conf import settings
 from django.core import exceptions
-from django.db import connections, router, transaction, IntegrityError
+from django.db import (connections, router, transaction, IntegrityError,
+    DJANGO_VERSION_PICKLE_KEY)
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import AutoField, Empty
 from django.db.models.query_utils import (Q, select_related_descend,
@@ -19,6 +21,7 @@ from django.db.models import sql
 from django.utils.functional import partition
 from django.utils import six
 from django.utils import timezone
+from django.utils.version import get_version
 
 # The maximum number (one less than the max to be precise) of results to fetch
 # in a get() query
@@ -90,7 +93,25 @@ class QuerySet(object):
         # Force the cache to be fully populated.
         self._fetch_all()
         obj_dict = self.__dict__.copy()
+        obj_dict[DJANGO_VERSION_PICKLE_KEY] = get_version()
         return obj_dict
+
+    def __setstate__(self, state):
+        msg = None
+        pickled_version = state.get(DJANGO_VERSION_PICKLE_KEY)
+        if pickled_version:
+            current_version = get_version()
+            if current_version != pickled_version:
+                msg = ("Pickled queryset instance's Django version %s does"
+                    " not match the current version %s."
+                    % (pickled_version, current_version))
+        else:
+            msg = "Pickled queryset instance's Django version is not specified."
+
+        if msg:
+            warnings.warn(msg, RuntimeWarning, stacklevel=2)
+
+        self.__dict__.update(state)
 
     def __reduce__(self):
         """
@@ -220,8 +241,7 @@ class QuerySet(object):
         aggregate_select = list(self.query.aggregate_select)
 
         only_load = self.query.get_loaded_field_names()
-        if not fill_cache:
-            fields = self.model._meta.concrete_fields
+        fields = self.model._meta.concrete_fields
 
         load_fields = []
         # If only/defer clauses have been specified,
@@ -239,9 +259,6 @@ class QuerySet(object):
                     # Therefore, we need to load all fields from this model
                     load_fields.append(field.name)
 
-        index_start = len(extra_select)
-        aggregate_start = index_start + len(load_fields or self.model._meta.concrete_fields)
-
         skip = None
         if load_fields and not fill_cache:
             # Some fields have been deferred, so we have to initialize
@@ -254,30 +271,25 @@ class QuerySet(object):
                 else:
                     init_list.append(field.attname)
             model_cls = deferred_class_factory(self.model, skip)
+        else:
+            model_cls = self.model
+            init_list = [f.attname for f in fields]
 
         # Cache db and model outside the loop
         db = self.db
-        model = self.model
         compiler = self.query.get_compiler(using=db)
+        index_start = len(extra_select)
+        aggregate_start = index_start + len(init_list)
+
         if fill_cache:
-            klass_info = get_klass_info(model, max_depth=max_depth,
+            klass_info = get_klass_info(model_cls, max_depth=max_depth,
                                         requested=requested, only_load=only_load)
         for row in compiler.results_iter():
             if fill_cache:
                 obj, _ = get_cached_row(row, index_start, db, klass_info,
                                         offset=len(aggregate_select))
             else:
-                # Omit aggregates in object creation.
-                row_data = row[index_start:aggregate_start]
-                if skip:
-                    obj = model_cls(**dict(zip(init_list, row_data)))
-                else:
-                    obj = model(*row_data)
-
-                # Store the source database of the object
-                obj._state.db = db
-                # This object came from the database; it's not being added.
-                obj._state.adding = False
+                obj = model_cls.from_db(db, init_list, row[index_start:aggregate_start])
 
             if extra_select:
                 for i, k in enumerate(extra_select):
@@ -1396,6 +1408,21 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     return klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx
 
 
+def reorder_for_init(model, field_names, values):
+    """
+    Reorders given field names and values for those fields
+    to be in the same order as model.__init__() expects to find them.
+    """
+    new_names, new_values = [], []
+    for f in model._meta.concrete_fields:
+        if f.attname not in field_names:
+            continue
+        new_names.append(f.attname)
+        new_values.append(values[field_names.index(f.attname)])
+    assert len(new_names) == len(field_names)
+    return new_names, new_values
+
+
 def get_cached_row(row, index_start, using, klass_info, offset=0,
                    parent_data=()):
     """
@@ -1430,18 +1457,19 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
          fields[pk_idx] == '')):
         obj = None
     elif field_names:
-        fields = list(fields)
+        values = list(fields)
+        parent_values = []
+        parent_field_names = []
         for rel_field, value in parent_data:
-            field_names.append(rel_field.attname)
-            fields.append(value)
-        obj = klass(**dict(zip(field_names, fields)))
+            parent_field_names.append(rel_field.attname)
+            parent_values.append(value)
+        field_names, values = reorder_for_init(
+            klass, parent_field_names + field_names,
+            parent_values + values)
+        obj = klass.from_db(using, field_names, values)
     else:
-        obj = klass(*fields)
-    # If an object was retrieved, set the database state.
-    if obj:
-        obj._state.db = using
-        obj._state.adding = False
-
+        field_names = [f.attname for f in klass._meta.concrete_fields]
+        obj = klass.from_db(using, field_names, fields)
     # Instantiate related fields
     index_end = index_start + field_count + offset
     # Iterate over each related object, populating any
@@ -1473,7 +1501,7 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
                 parent_data.append((rel_field, getattr(obj, rel_field.attname)))
         # Recursively retrieve the data for the related object
         cached_row = get_cached_row(row, index_end, using, klass_info,
-                                   parent_data=parent_data)
+                                    parent_data=parent_data)
         # If the recursive descent found an object, populate the
         # descriptor caches relevant to the object
         if cached_row:
@@ -1513,15 +1541,18 @@ class RawQuerySet(object):
         self.params = params or ()
         self.translations = translations or {}
 
-    def __iter__(self):
-        # Mapping of attrnames to row column positions. Used for constructing
-        # the model using kwargs, needed when not all model's fields are present
-        # in the query.
-        model_init_field_names = {}
-        # A list of tuples of (column name, column position). Used for
-        # annotation fields.
-        annotation_fields = []
+    def resolve_model_init_order(self):
+        """
+        Resolve the init field names and value positions
+        """
+        model_init_names = [f.attname for f in self.model._meta.fields
+                            if f.attname in self.columns]
+        annotation_fields = [(column, pos) for pos, column in enumerate(self.columns)
+                             if column not in self.model_fields]
+        model_init_order = [self.columns.index(fname) for fname in model_init_names]
+        return model_init_names, model_init_order, annotation_fields
 
+    def __iter__(self):
         # Cache some things for performance reasons outside the loop.
         db = self.db
         compiler = connections[db].ops.compiler('SQLCompiler')(
@@ -1532,18 +1563,12 @@ class RawQuerySet(object):
         query = iter(self.query)
 
         try:
-            # Find out which columns are model's fields, and which ones should be
-            # annotated to the model.
-            for pos, column in enumerate(self.columns):
-                if column in self.model_fields:
-                    model_init_field_names[self.model_fields[column].attname] = pos
-                else:
-                    annotation_fields.append((column, pos))
+            model_init_names, model_init_pos, annotation_fields = self.resolve_model_init_order()
 
             # Find out which model's fields are not present in the query.
             skip = set()
             for field in self.model._meta.fields:
-                if field.attname not in model_init_field_names:
+                if field.attname not in model_init_names:
                     skip.add(field.attname)
             if skip:
                 if self.model._meta.pk.attname in skip:
@@ -1551,34 +1576,17 @@ class RawQuerySet(object):
                 model_cls = deferred_class_factory(self.model, skip)
             else:
                 model_cls = self.model
-                # All model's fields are present in the query. So, it is possible
-                # to use *args based model instantiation. For each field of the model,
-                # record the query column position matching that field.
-                model_init_field_pos = []
-                for field in self.model._meta.fields:
-                    model_init_field_pos.append(model_init_field_names[field.attname])
             if need_resolv_columns:
                 fields = [self.model_fields.get(c, None) for c in self.columns]
-            # Begin looping through the query values.
             for values in query:
                 if need_resolv_columns:
                     values = compiler.resolve_columns(values, fields)
                 # Associate fields to values
-                if skip:
-                    model_init_kwargs = {}
-                    for attname, pos in six.iteritems(model_init_field_names):
-                        model_init_kwargs[attname] = values[pos]
-                    instance = model_cls(**model_init_kwargs)
-                else:
-                    model_init_args = [values[pos] for pos in model_init_field_pos]
-                    instance = model_cls(*model_init_args)
+                model_init_values = [values[pos] for pos in model_init_pos]
+                instance = model_cls.from_db(db, model_init_names, model_init_values)
                 if annotation_fields:
                     for column, pos in annotation_fields:
                         setattr(instance, column, values[pos])
-
-                instance._state.db = db
-                instance._state.adding = False
-
                 yield instance
         finally:
             # Done iterating the Query. If it has its own cursor, close it.
@@ -1780,7 +1788,7 @@ def prefetch_related_objects(result_cache, related_lookups):
                 # Last one, this *must* resolve to something that supports
                 # prefetching, otherwise there is no point adding it and the
                 # developer asking for it has made a mistake.
-                raise ValueError("'%s' does not resolve to a item that supports "
+                raise ValueError("'%s' does not resolve to an item that supports "
                                  "prefetching - this is an invalid parameter to "
                                  "prefetch_related()." % lookup.prefetch_through)
 

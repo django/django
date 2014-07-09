@@ -7,7 +7,6 @@ from __future__ import unicode_literals
 # Python, ctypes and types dependencies.
 from ctypes import addressof, byref, c_double
 
-from django.contrib.gis import memoryview
 # super-class for mutable list behavior
 from django.contrib.gis.geos.mutable_list import ListMixin
 
@@ -80,7 +79,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         elif isinstance(geo_input, GEOM_PTR):
             # When the input is a pointer to a geometry (GEOM_PTR).
             g = geo_input
-        elif isinstance(geo_input, memoryview):
+        elif isinstance(geo_input, six.memoryview):
             # When the input is a buffer (WKB).
             g = wkb_r().read(geo_input)
         elif isinstance(geo_input, GEOSGeometry):
@@ -151,7 +150,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def __setstate__(self, state):
         # Instantiating from the tuple state that was pickled.
         wkb, srid = state
-        ptr = wkb_r().read(memoryview(wkb))
+        ptr = wkb_r().read(six.memoryview(wkb))
         if not ptr:
             raise GEOSException('Invalid Geometry loaded from pickled state.')
         self.ptr = ptr

@@ -49,3 +49,38 @@ use the full path to the file, like so:
 ``python C:\pythonXY\Scripts\django-admin.py``.
 
 .. _virtualenv: http://www.virtualenv.org/
+
+Miscellaneous
+=============
+
+I'm getting a ``UnicodeDecodeError``. What am I doing wrong?
+------------------------------------------------------------
+
+This class of errors happen when a bytestring containing non-ASCII sequences is
+transformed into a Unicode string and the specified encoding is incorrect. The
+output generally looks like this::
+
+    UnicodeDecodeError: 'ascii' codec can't decode byte 0x?? in position ?:
+    ordinal not in range(128)
+
+The resolution mostly depends on the context, however here are two common
+pitfalls producing this error:
+
+* Your system locale may be a default ASCII locale, like the "C" locale on
+  UNIX-like systems (can be checked by the ``locale`` command). If it's the
+  case, please refer to your system documentation to learn how you can change
+  this to a UTF-8 locale.
+
+* You created raw bytestrings, which is easy to do on Python 2::
+
+      my_string = 'café'
+
+  Either use the ``u''`` prefix or even better, add the
+  ``from __future__ import unicode_literals`` line at the top of your file
+  so that your code will be compatible with Python 3.2 which doesn't support
+  the ``u''`` prefix.
+
+Related resources:
+
+* :doc:`Unicode in Django </ref/unicode>`
+* https://wiki.python.org/moin/UnicodeDecodeError

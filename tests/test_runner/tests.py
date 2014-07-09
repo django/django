@@ -3,7 +3,6 @@ Tests for django test runner
 """
 from __future__ import unicode_literals
 
-from optparse import make_option
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
@@ -152,11 +151,6 @@ class ManageCommandTests(unittest.TestCase):
 
 
 class CustomOptionsTestRunner(runner.DiscoverRunner):
-    option_list = (
-        make_option('--option_a', '-a', action='store', dest='option_a', default='1'),
-        make_option('--option_b', '-b', action='store', dest='option_b', default='2'),
-        make_option('--option_c', '-c', action='store', dest='option_c', default='3'),
-    )
 
     def __init__(self, verbosity=1, interactive=True, failfast=True, option_a=None, option_b=None, option_c=None, **kwargs):
         super(CustomOptionsTestRunner, self).__init__(verbosity=verbosity, interactive=interactive,
@@ -164,6 +158,12 @@ class CustomOptionsTestRunner(runner.DiscoverRunner):
         self.option_a = option_a
         self.option_b = option_b
         self.option_c = option_c
+
+    @classmethod
+    def add_arguments(cls, parser):
+        parser.add_argument('--option_a', '-a', action='store', dest='option_a', default='1'),
+        parser.add_argument('--option_b', '-b', action='store', dest='option_b', default='2'),
+        parser.add_argument('--option_c', '-c', action='store', dest='option_c', default='3'),
 
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
         print("%s:%s:%s" % (self.option_a, self.option_b, self.option_c))
@@ -309,8 +309,8 @@ class AliasedDatabaseTeardownTest(unittest.TestCase):
         old_create_test_db = DatabaseCreation.create_test_db
         try:
             destroyed_names = []
-            DatabaseCreation.destroy_test_db = lambda self, old_database_name, verbosity=1: destroyed_names.append(old_database_name)
-            DatabaseCreation.create_test_db = lambda self, verbosity=1, autoclobber=False: self._get_test_db_name()
+            DatabaseCreation.destroy_test_db = lambda self, old_database_name, verbosity=1, keepdb=False, serialize=True: destroyed_names.append(old_database_name)
+            DatabaseCreation.create_test_db = lambda self, verbosity=1, autoclobber=False, keepdb=False, serialize=True: self._get_test_db_name()
 
             db.connections = db.ConnectionHandler({
                 'default': {

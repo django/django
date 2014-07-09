@@ -585,7 +585,7 @@ class Query(object):
         must_include = {orig_opts.concrete_model: set([orig_opts.pk])}
         for field_name in field_names:
             parts = field_name.split(LOOKUP_SEP)
-            cur_model = self.model
+            cur_model = self.model._meta.concrete_model
             opts = orig_opts
             for name in parts[:-1]:
                 old_model = cur_model
@@ -664,16 +664,16 @@ class Query(object):
         If 'create' is true, a new alias is always created. Otherwise, the
         most recently created alias for the table (if one exists) is reused.
         """
-        current = self.table_map.get(table_name)
-        if not create and current:
-            alias = current[0]
+        alias_list = self.table_map.get(table_name)
+        if not create and alias_list:
+            alias = alias_list[0]
             self.alias_refcount[alias] += 1
             return alias, False
 
         # Create a new alias for this table.
-        if current:
+        if alias_list:
             alias = '%s%d' % (self.alias_prefix, len(self.alias_map) + 1)
-            current.append(alias)
+            alias_list.append(alias)
         else:
             # The first occurrence of a table uses the table name directly.
             alias = table_name
@@ -900,7 +900,7 @@ class Query(object):
             return alias
 
         # No reuse is possible, so we need a new alias.
-        alias, _ = self.table_alias(table, True)
+        alias, _ = self.table_alias(table, create=True)
         if not lhs:
             # Not all tables need to be joined to anything. No join type
             # means the later columns are ignored.
@@ -1008,7 +1008,7 @@ class Query(object):
 
             # Join promotion note - we must not remove any rows here, so use
             # outer join if there isn't any existing join.
-            field, sources, opts, join_list, path = self.setup_joins(
+            _, sources, opts, join_list, path = self.setup_joins(
                 field_list, opts, self.get_initial_alias())
 
             # Process the join chain to see if it can be trimmed
@@ -1084,6 +1084,32 @@ class Query(object):
                     (lookup, self.get_meta().model.__name__))
         return lookup_parts, field_parts, False
 
+    def check_query_object_type(self, value, opts):
+        """
+        Checks whether the object passed while querying is of the correct type.
+        If not, it raises a ValueError specifying the wrong object.
+        """
+        if hasattr(value, '_meta'):
+            if not (value._meta.concrete_model == opts.concrete_model
+                    or opts.concrete_model in value._meta.get_parent_list()
+                    or value._meta.concrete_model in opts.get_parent_list()):
+                raise ValueError(
+                    'Cannot query "%s": Must be "%s" instance.' %
+                    (value, opts.object_name))
+
+    def check_related_objects(self, field, value, opts):
+        """
+        Checks the type of object passed to query relations.
+        """
+        if field.rel:
+            # testing for iterable of models
+            if hasattr(value, '__iter__'):
+                for v in value:
+                    self.check_query_object_type(v, opts)
+            else:
+                # expecting single model instance here
+                self.check_query_object_type(value, opts)
+
     def build_lookup(self, lookups, lhs, rhs):
         lookups = lookups[:]
         while lookups:
@@ -1102,7 +1128,7 @@ class Query(object):
                 raise FieldError(
                     "Unsupported lookup '%s' for %s or join on the field not "
                     "permitted." %
-                    (lookup, lhs.output_type.__class__.__name__))
+                    (lookup, lhs.output_field.__class__.__name__))
             lookups = lookups[1:]
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
@@ -1158,7 +1184,10 @@ class Query(object):
 
         try:
             field, sources, opts, join_list, path = self.setup_joins(
-                parts, opts, alias, can_reuse, allow_many)
+                parts, opts, alias, can_reuse=can_reuse, allow_many=allow_many)
+
+            self.check_related_objects(field, value, opts)
+
             # split_exclude() needs to know which joins were generated for the
             # lookup parts
             self._lookup_joins = join_list
@@ -1190,7 +1219,7 @@ class Query(object):
                     raise FieldError(
                         "Join on field '%s' not permitted. Did you "
                         "misspell '%s' for the lookup type?" %
-                        (col.output_type.name, lookups[0]))
+                        (col.output_field.name, lookups[0]))
                 if len(lookups) > 1:
                     raise FieldError("Nested lookup '%s' not supported." %
                                      LOOKUP_SEP.join(lookups))
@@ -1491,7 +1520,7 @@ class Query(object):
         query.remove_inherited_models()
 
         # Add extra check to make sure the selected field will not be null
-        # since we are adding a IN <subquery> clause. This prevents the
+        # since we are adding an IN <subquery> clause. This prevents the
         # database from tripping over IN (...,NULL,...) selects and returning
         # nothing
         alias, col = query.select[0].col
@@ -1605,9 +1634,8 @@ class Query(object):
             for name in field_names:
                 # Join promotion note - we must not remove any rows here, so
                 # if there is no existing joins, use outer join.
-                field, targets, u2, joins, path = self.setup_joins(
-                    name.split(LOOKUP_SEP), opts, alias, can_reuse=None,
-                    allow_many=allow_m2m)
+                _, targets, _, joins, path = self.setup_joins(
+                    name.split(LOOKUP_SEP), opts, alias, allow_many=allow_m2m)
                 targets, final_alias, joins = self.trim_joins(targets, joins, path)
                 for target in targets:
                     self.select.append(SelectInfo((final_alias, target.column), target))
@@ -2091,7 +2119,7 @@ class JoinPromoter(object):
             # join.
             # Note that in this example we could just as well have the __gte
             # clause and the OR clause swapped. Or we could replace the __gte
-            # clause with a OR clause containing rel_a__col=1|rel_a__col=2,
+            # clause with an OR clause containing rel_a__col=1|rel_a__col=2,
             # and again we could safely demote to INNER.
         query.promote_joins(to_promote)
         query.demote_joins(to_demote)

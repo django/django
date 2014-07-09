@@ -202,7 +202,7 @@ function MapWidget(options) {
     var defaults_style = {
         'fillColor': '#' + this.options.color,
         'fillOpacity': this.options.opacity,
-        'strokeColor': '#' + this.options.color,
+        'strokeColor': '#' + this.options.color
     };
     if (this.options.geom_name == 'LineString') {
         defaults_style['strokeWidth'] = 3;

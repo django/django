@@ -1,24 +1,20 @@
-from optparse import make_option
 import os
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 
-class Command(NoArgsCommand):
-    shells = ['ipython', 'bpython']
-
-    option_list = NoArgsCommand.option_list + (
-        make_option('--plain', action='store_true', dest='plain',
-            help='Tells Django to use plain Python, not IPython or bpython.'),
-        make_option('--no-startup', action='store_true', dest='no_startup',
-            help='When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.'),
-        make_option('-i', '--interface', action='store', type='choice', choices=shells,
-                    dest='interface',
-            help='Specify an interactive interpreter interface. Available options: "ipython" and "bpython"'),
-
-    )
+class Command(BaseCommand):
     help = "Runs a Python interactive interpreter. Tries to use IPython or bpython, if one of them is available."
     requires_system_checks = False
+    shells = ['ipython', 'bpython']
+
+    def add_arguments(self, parser):
+        parser.add_argument('--plain', action='store_true', dest='plain',
+            help='Tells Django to use plain Python, not IPython or bpython.')
+        parser.add_argument('--no-startup', action='store_true', dest='no_startup',
+            help='When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.')
+        parser.add_argument('-i', '--interface', choices=self.shells, dest='interface',
+            help='Specify an interactive interpreter interface. Available options: "ipython" and "bpython"')
 
     def _ipython_pre_011(self):
         """Start IPython pre-0.11"""
@@ -64,17 +60,13 @@ class Command(NoArgsCommand):
                 pass
         raise ImportError
 
-    def handle_noargs(self, **options):
-        use_plain = options.get('plain', False)
-        no_startup = options.get('no_startup', False)
-        interface = options.get('interface', None)
-
+    def handle(self, **options):
         try:
-            if use_plain:
+            if options['plain']:
                 # Don't bother loading IPython, because the user wants plain Python.
                 raise ImportError
 
-            self.run_shell(shell=interface)
+            self.run_shell(shell=options['interface'])
         except ImportError:
             import code
             # Set up a dictionary to serve as the environment for the shell, so
@@ -94,7 +86,7 @@ class Command(NoArgsCommand):
 
             # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
             # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
-            if not no_startup:
+            if not options['no_startup']:
                 for pythonrc in (os.environ.get("PYTHONSTARTUP"), '~/.pythonrc.py'):
                     if not pythonrc:
                         continue

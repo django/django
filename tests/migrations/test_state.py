@@ -356,7 +356,7 @@ class StateTests(TestCase):
         project_state = ProjectState()
         project_state.add_model_state(ModelState.from_model(TestModel))
         with self.assertRaises(ValueError):
-            rendered_state = project_state.render()
+            project_state.render()
 
         # If we include the real app it should succeed
         project_state = ProjectState(real_apps=["contenttypes"])
@@ -367,8 +367,66 @@ class StateTests(TestCase):
             1,
         )
 
+    def test_ignore_order_wrt(self):
+        """
+        Makes sure ProjectState doesn't include OrderWrt fields when
+        making from existing models.
+        """
+        new_apps = Apps()
+
+        class Author(models.Model):
+            name = models.TextField()
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        class Book(models.Model):
+            author = models.ForeignKey(Author)
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+                order_with_respect_to = "author"
+
+        # Make a valid ProjectState and render it
+        project_state = ProjectState()
+        project_state.add_model_state(ModelState.from_model(Author))
+        project_state.add_model_state(ModelState.from_model(Book))
+        self.assertEqual(
+            [name for name, field in project_state.models["migrations", "book"].fields],
+            ["id", "author"],
+        )
+
 
 class ModelStateTests(TestCase):
     def test_custom_model_base(self):
         state = ModelState.from_model(ModelWithCustomBase)
         self.assertEqual(state.bases, (models.Model,))
+
+    def test_bound_field_sanity_check(self):
+        field = models.CharField(max_length=1)
+        field.model = models.Model
+        with self.assertRaisesMessage(ValueError,
+                'ModelState.fields cannot be bound to a model - "field" is.'):
+            ModelState('app', 'Model', [('field', field)])
+
+    def test_fields_immutability(self):
+        """
+        Tests that rendering a model state doesn't alter its internal fields.
+        """
+        apps = Apps()
+        field = models.CharField(max_length=1)
+        state = ModelState('app', 'Model', [('name', field)])
+        Model = state.render(apps)
+        self.assertNotEqual(Model._meta.get_field('name'), field)
+
+    def test_repr(self):
+        field = models.CharField(max_length=1)
+        state = ModelState('app', 'Model', [('name', field)], bases=['app.A', 'app.B', 'app.C'])
+        self.assertEqual(repr(state), "<ModelState: 'app.Model'>")
+
+        project_state = ProjectState()
+        project_state.add_model_state(state)
+        with self.assertRaisesMessage(InvalidBasesError, "Cannot resolve bases for [<ModelState: 'app.Model'>]"):
+            project_state.render()

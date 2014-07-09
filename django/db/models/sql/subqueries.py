@@ -215,7 +215,7 @@ class DateQuery(Query):
         Converts the query into an extraction query.
         """
         try:
-            result = self.setup_joins(
+            field, _, _, joins, _ = self.setup_joins(
                 field_name.split(LOOKUP_SEP),
                 self.get_meta(),
                 self.get_initial_alias(),
@@ -224,9 +224,8 @@ class DateQuery(Query):
             raise FieldDoesNotExist("%s has no field named '%s'" % (
                 self.get_meta().object_name, field_name
             ))
-        field = result[0]
         self._check_field(field)                # overridden in DateTimeQuery
-        alias = result[3][-1]
+        alias = joins[-1]
         select = self._get_select((alias, field.column), lookup_type)
         self.clear_select_clause()
         self.select = [SelectInfo(select, None)]

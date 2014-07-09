@@ -652,6 +652,8 @@ Providing one or more app names as arguments will limit the migrations created
 to the app(s) specified and any dependencies needed (the table at the other end
 of a ``ForeignKey``, for example).
 
+The :djadminopt:`--noinput` option may be provided to suppress all user prompts.
+
 .. django-admin-option:: --empty
 
 The ``--empty`` option will cause ``makemigrations`` to output an empty
@@ -659,6 +661,17 @@ migration for the specified apps, for manual editing. This option is only
 for advanced users and should not be used unless you are familiar with
 the migration format, migration operations, and the dependencies between
 your migrations.
+
+.. django-admin-option:: --dry-run
+
+The ``--dry-run`` option shows what migrations would be made without
+actually writing any migrations files to disk. Using this option along with
+``--verbosity 3`` will also show the complete migrations files that would be
+written.
+
+.. django-admin-option:: --merge
+
+The ``--merge`` option enables fixing of migration conflicts.
 
 migrate [<app_label> [<migrationname>]]
 ---------------------------------------
@@ -681,7 +694,29 @@ The behavior of this command changes depending on the arguments provided:
 * ``<app_label> <migrationname>``: Brings the database schema to a state where it
   would have just run the given migration, but no further - this may involve
   unapplying migrations if you have previously migrated past the named
-  migration. Use the name `zero` to unapply all migrations for an app.
+  migration. Use the name ``zero`` to unapply all migrations for an app.
+
+.. django-admin-option:: --fake
+
+The ``--fake`` option tells Django to mark the migrations as having been
+applied or unapplied, but without actually running the SQL to change your
+database schema.
+
+This is intended for advanced users to manipulate the
+current migration state directly if they're manually applying changes;
+be warned that using ``--fake`` runs the risk of putting the migration state
+table into a state where manual recovery will be needed to make migrations
+run correctly.
+
+.. django-admin-option:: --list, -l
+
+The ``--list`` option will list all of the apps Django knows about, the
+migrations available for each app and if they are applied or not (marked by
+an ``[X]`` next to the migration name).
+
+Apps without migrations are also included in the list, but will have
+``(no migrations)`` printed under them.
+
 
 runfcgi [options]
 -----------------
@@ -1299,6 +1334,17 @@ The ``--liveserver`` option can be used to override the default address where
 the live server (used with :class:`~django.test.LiveServerTestCase`) is
 expected to run from. The default value is ``localhost:8081``.
 
+.. django-admin-option:: --keepdb
+
+.. versionadded:: 1.8
+
+The ``--keepdb`` option can be used to preserve the test database between test
+runs. This has the advantage of skipping both the create and destroy actions
+which greatly decreases the time to run tests, especially those in a large
+test suite. If the test database does not exist, it will be created on the first
+run and then preserved for each subsequent run. Any unapplied migrations will also
+be applied to the test database before running the test suite.
+
 testserver <fixture fixture ...>
 --------------------------------
 
@@ -1413,9 +1459,8 @@ This command is only available if Django's :doc:`authentication system
 </topics/auth/index>` (``django.contrib.auth``) is installed.
 
 Creates a superuser account (a user who has all permissions). This is
-useful if you need to create an initial superuser account but did not
-do so during the first :djadmin:`migrate`, or if you need to programmatically
-generate superuser accounts for your site(s).
+useful if you need to create an initial superuser account or if you need to
+programmatically generate superuser accounts for your site(s).
 
 When run interactively, this command will prompt for a password for
 the new superuser account. When run non-interactively, no password
@@ -1432,6 +1477,16 @@ it when running interactively.
 
 Use the ``--database`` option to specify the database into which the superuser
 object will be saved.
+
+.. versionadded:: 1.8
+
+You can subclass the management command and override ``get_input_data()`` if you
+want to customize data input and validation. Consult the source code for
+details on the existing implementation and the method's parameters. For example,
+it could be useful if you have a ``ForeignKey`` in
+:attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` and want to
+allow creating an instance instead of entering the primary key of an existing
+instance.
 
 ``django.contrib.gis``
 ----------------------
@@ -1507,7 +1562,7 @@ variable.
 Note that this option is unnecessary in ``manage.py``, because it takes care of
 setting the Python path for you.
 
-.. _import search path: http://diveintopython.net/getting_to_know_python/everything_is_an_object.html
+.. _import search path: http://www.diveintopython.net/getting_to_know_python/everything_is_an_object.html
 
 .. django-admin-option:: --settings
 

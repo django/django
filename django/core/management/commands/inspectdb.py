@@ -3,26 +3,24 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 import keyword
 import re
-from optparse import make_option
 
-from django.core.management.base import NoArgsCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError
 from django.db import connections, DEFAULT_DB_ALIAS
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = "Introspects the database tables in the given database and outputs a Django model module."
-
-    option_list = NoArgsCommand.option_list + (
-        make_option('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a database to '
-                'introspect.  Defaults to using the "default" database.'),
-    )
 
     requires_system_checks = False
 
     db_module = 'django.db'
 
-    def handle_noargs(self, **options):
+    def add_arguments(self, parser):
+        parser.add_argument('--database', action='store', dest='database',
+            default=DEFAULT_DB_ALIAS, help='Nominates a database to '
+            'introspect. Defaults to using the "default" database.')
+
+    def handle(self, **options):
         try:
             for line in self.handle_inspection(options):
                 self.stdout.write("%s\n" % line)
@@ -30,11 +28,11 @@ class Command(NoArgsCommand):
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
     def handle_inspection(self, options):
-        connection = connections[options.get('database')]
+        connection = connections[options['database']]
         # 'table_name_filter' is a stealth option
         table_name_filter = options.get('table_name_filter')
 
-        table2model = lambda table_name: table_name.title().replace('_', '').replace(' ', '').replace('-', '')
+        table2model = lambda table_name: re.sub(r'[^a-zA-Z0-9]', '', table_name.title())
         strip_prefix = lambda s: s[1:] if s.startswith("u'") else s
 
         with connection.cursor() as cursor:
@@ -211,7 +209,7 @@ class Command(NoArgsCommand):
             field_type = 'TextField'
             field_notes.append('This field type is a guess.')
 
-        # This is a hook for DATA_TYPES_REVERSE to return a tuple of
+        # This is a hook for data_types_reverse to return a tuple of
         # (field_type, field_params_dict).
         if type(field_type) is tuple:
             field_type, new_params = field_type
