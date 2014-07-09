@@ -209,9 +209,16 @@ The default cannot be a mutable object (model instance, list, set, etc.), as a
 reference to the same instance of that object would be used as the default
 value in all new model instances. Instead, wrap the desired default in a
 callable.  For example, if you had a custom ``JSONField`` and wanted to specify
-a dictionary as the default, use a ``lambda`` as follows::
+a dictionary as the default, use a function as follows::
 
-    contact_info = JSONField("ContactInfo", default=lambda:{"email": "to1@example.com"})
+    def contact_default():
+        return {"email": "to1@example.com"}
+
+    contact_info = JSONField("ContactInfo", default=contact_default)
+
+Note that ``lambda``\s cannot be used for field options like ``default``
+because they cannot be :ref:`serialized by migrations <migration-serializing>`.
+See that documentation for other caveats.
 
 ``editable``
 ------------
@@ -1101,7 +1108,10 @@ define the details of how the relation works.
     with the Python ``datetime`` module to limit selections by date range. For
     example::
 
-        limit_choices_to = lambda: {'pub_date__lte': datetime.date.utcnow()}
+        def limit_pub_date_choices():
+            return {'pub_date__lte': datetime.date.utcnow()}
+
+        limit_choices_to = limit_pub_date_choices
 
     If ``limit_choices_to`` is or returns a :class:`Q object
     <django.db.models.Q>`, which is useful for :ref:`complex queries
