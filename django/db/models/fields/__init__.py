@@ -567,6 +567,9 @@ class Field(RegisterLookupMixin):
         if self.verbose_name is None and self.name:
             self.verbose_name = self.name.replace('_', ' ')
 
+    def get_connected_model(self):
+        return self.model
+
     def contribute_to_class(self, cls, name, virtual_only=False):
         self.set_attributes_from_name(name)
         self.model = cls

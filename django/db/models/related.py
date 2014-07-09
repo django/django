@@ -20,6 +20,9 @@ class RelatedObject(object):
         self.name = '%s:%s' % (self.opts.app_label, self.opts.model_name)
         self.var_name = self.opts.model_name
 
+    def get_connected_model(self):
+        return self.parent_model._meta.concrete_model
+
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
                     limit_to_currently_related=False):
         """Returns choices with a default blank choices included, for use

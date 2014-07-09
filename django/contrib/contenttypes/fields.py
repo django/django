@@ -29,6 +29,9 @@ class GenericForeignKey(object):
         self.for_concrete_model = for_concrete_model
         self.editable = False
 
+    def get_connected_model(self):
+        return self.model
+
     def contribute_to_class(self, cls, name):
         self.name = name
         self.model = cls
