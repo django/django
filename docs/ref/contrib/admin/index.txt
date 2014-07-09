@@ -880,6 +880,14 @@ subclass::
                   ('is_staff', admin.BooleanFieldListFilter),
               )
 
+      Or if you want to limit the choices of a related model to the ones
+      involved in that relation::
+
+          class BookAdmin(admin.ModelAdmin):
+              list_filter = (
+                  ('author', admin.RelatedOnlyFieldListFilter),
+              )
+
       .. note::
 
         The ``FieldListFilter`` API is considered internal and might be
