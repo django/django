@@ -549,17 +549,22 @@ class Options(object):
     def get_all_related_objects(self, local_only=False, include_hidden=False,
                                 include_proxy_eq=False):
         include_parents = local_only is False
-        return list(self.get_new_fields(data=False, related_objects=True,
-                    include_parents=include_parents, include_hidden=include_hidden,
-                    include_proxy=include_proxy_eq))
+        return list(self.get_new_fields(
+            data=False, related_objects=True,
+            include_parents=include_parents,
+            include_hidden=include_hidden,
+            include_proxy=include_proxy_eq
+        ))
 
-    def get_all_related_objects_with_model(self, local_only=False,
-                                           include_hidden=False,
+    def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
                                            include_proxy_eq=False):
         include_parents = local_only is False
-        fields = self.get_new_fields(data=False, related_objects=True,
-                            include_parents=include_parents, include_hidden=include_hidden,
-                            include_proxy=include_proxy_eq)
+        fields = self.get_new_fields(
+            data=False, related_objects=True,
+            include_parents=include_parents,
+            include_hidden=include_hidden,
+            include_proxy=include_proxy_eq
+        )
         return list(map(self._map_model, fields))
 
     def get_all_related_many_to_many_objects(self, local_only=False):
