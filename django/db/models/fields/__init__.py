@@ -571,7 +571,7 @@ class Field(RegisterLookupMixin):
         self.set_attributes_from_name(name)
         self.model = cls
         if virtual_only:
-            cls._meta.add_virtual_field(self)
+            cls._meta.add_field(self, virtual=True)
         else:
             cls._meta.add_field(self)
         if self.choices:

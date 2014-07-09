@@ -1407,7 +1407,8 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     if field_names:
         pk_idx = field_names.index(klass._meta.pk.attname)
     else:
-        pk_idx = klass._meta.pk_index()
+        meta = klass._meta
+        pk_idx = meta.concrete_fields.index(meta.pk)
 
     return klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx
 

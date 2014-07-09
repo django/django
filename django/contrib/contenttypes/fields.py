@@ -33,7 +33,7 @@ class GenericForeignKey(object):
         self.name = name
         self.model = cls
         self.cache_attr = "_%s_cache" % name
-        cls._meta.add_virtual_field(self)
+        cls._meta.add_field(self, virtual=True)
 
         # Only run pre-initialization field assignment on non-abstract models
         if not cls._meta.abstract:
