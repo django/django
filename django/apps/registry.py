@@ -5,7 +5,7 @@ import threading
 import warnings
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
-from django.utils import lru_cache
+from django.utils import lru_cache, six
 from django.utils.functional import conditional_cached_property
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils._os import upath
@@ -190,6 +190,19 @@ class Apps(object):
                     continue
 
         return self.ready, (related_objects_graph, related_objects_proxy_graph)
+
+    @conditional_cached_property
+    def related_m2m_relation_graph(self):
+        related_m2m_graph = defaultdict(list)
+
+        for model in self.get_models(include_auto_created=False):
+            for f in model._meta.get_new_fields(m2m=True, data=False):
+                if f.rel and not isinstance(f.rel.to, six.string_types):
+                    related_m2m_graph[f.rel.to._meta].append(f)
+
+        return self.ready, related_m2m_graph
+
+    @conditional_cached_property
     def non_swapped_models_auto_created(self):
         models = self.get_models(include_auto_created=True)
         return self.ready, tuple(a for a in models if not a._meta.swapped)
@@ -346,7 +359,8 @@ class Apps(object):
 
         This is mostly used in tests.
         """
-        for cached_property in ['non_swapped_models',
+        for cached_property in ['related_objects_relation_graph',
+                                'non_swapped_models',
                                 'non_swapped_models_auto_created']:
             try:
                 delattr(self, cached_property)

@@ -425,24 +425,12 @@ class Options(object):
                                 # is not intentionally hidden, add to the fields dict
                                 fields[obj] = query_name
 
-            for model in self.apps.non_swapped_models_auto_created:
-                for f in model._meta.fields + model._meta.virtual_fields:
-                    # Loop through every data and virtual field of every model in every registered app.
-                    try:
-                        if f.rel and f.has_class_relation:
-                            to_meta = f.rel.to._meta
-                            if (to_meta == self) or (include_proxy and self.concrete_model == to_meta.concrete_model):
-                                # Field must point to the current model, or if include_proxy field
-                                # can also points to another proxy model that inherits from this model.
-                                if include_hidden or not f.related.field.rel.is_hidden():
-                                    # If hidden fields should be included or the relation
-                                    # is not intentionally hidden, add to the fields dict
-                                    fields[f.related] = (f.related_query_name(),)
-                    except AttributeError:
-                        # If field does not have a rel attribute, it will cause an
-                        # AttributeError. This is to avoid another conditional statement
-                        # with hasattr(f, 'rel')
-                        continue
+            tree, proxy_tree = self.apps.related_objects_relation_graph
+            for f in tree[self] if not self.proxy else tree[self] + proxy_tree[self.concrete_model]:
+                if include_hidden or not f.related.field.rel.is_hidden():
+                    # If hidden fields should be included or the relation
+                    # is not intentionally hidden, add to the fields dict
+                    fields[f.related] = (f.related_query_name(),)
 
         if m2m:
             if include_parents:
