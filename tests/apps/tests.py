@@ -340,3 +340,18 @@ class AppRelationsTest(TestCase):
             [field.related_query_name() for field in proxy_tree[Relation]],
             [u'fk_to_proxy']
         )
+
+    def test_relations_related_m2m(self):
+        tree = new_apps_2.related_m2m_relation_graph
+        self.assertEquals(
+            [field.related_query_name() for field in tree[Relation._meta]],
+            [u'm2m_abstract_rel', u'm2m_base_rel']
+        )
+
+        self.assertEquals(
+            [field.related_query_name() for field in tree[BasePerson._meta]],
+            [u'friends_abstract_rel_+', u'followers_abstract', u'friends_base_rel_+',
+             u'followers_base']
+        )
+
+        self.assertEquals([field.related_query_name() for field in tree[AbstractPerson._meta]],[])
