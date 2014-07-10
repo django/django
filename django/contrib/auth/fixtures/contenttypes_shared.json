@@ -1,0 +1,14 @@
+[
+{
+    "pk": null,
+    "model": "auth.permission",
+    "fields": {
+        "codename": "delete_examplemodelb",
+        "name": "Can delete example model b",
+        "content_type": [
+            "app_b",
+            "examplemodelb"
+        ]
+    }
+}
+]
