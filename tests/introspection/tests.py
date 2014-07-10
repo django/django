@@ -20,8 +20,8 @@ class IntrospectionTests(TestCase):
             cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
             tl = connection.introspection.django_table_names()
             cursor.execute("DROP TABLE django_ixn_test_table;")
-            self.assertTrue('django_ixn_testcase_table' not in tl,
-                         "django_table_names() returned a non-Django table")
+            self.assertNotIn('django_ixn_test_table', tl,
+                             "django_table_names() returned a non-Django table")
 
     def test_django_table_names_retval_type(self):
         # Ticket #15216
