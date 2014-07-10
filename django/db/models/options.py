@@ -426,7 +426,10 @@ class Options(object):
                                 fields[obj] = query_name
 
             tree, proxy_tree = self.apps.related_objects_relation_graph
-            for f in tree[self] if not self.proxy else tree[self] + proxy_tree[self.concrete_model]:
+            all_fields = tree[self] if not self.proxy else tree[self] + tree[self.concrete_model._meta]
+            if include_proxy:
+                all_fields += proxy_tree[self.concrete_model]
+            for f in all_fields:
                 if include_hidden or not f.related.field.rel.is_hidden():
                     # If hidden fields should be included or the relation
                     # is not intentionally hidden, add to the fields dict
