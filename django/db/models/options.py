@@ -400,14 +400,9 @@ class Options(object):
                         if is_valid:
                             fields[obj] = query_name
 
-            for model in self.apps.non_swapped_models:
-                for f in model._meta.many_to_many:
-                    # Loop through every m2m field of every model in every registered app.
-                    has_rel_attr = f.rel and not isinstance(f.rel.to, six.string_types)
-                    if has_rel_attr and self == f.rel.to._meta:
-                        # If a field is a Related M2M and points to the current model,
-                        # then it must be added to the fields dict
-                        fields[f.related] = (f.related_query_name(),)
+            tree = self.apps.related_m2m_relation_graph
+            for f in tree[self] if not self.proxy else tree[self] + tree[self.concrete_model._meta]:
+                fields[f.related] = (f.related_query_name(),)
 
         if related_objects:
             parent_list = self.get_parent_list()

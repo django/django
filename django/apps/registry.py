@@ -202,16 +202,6 @@ class Apps(object):
 
         return self.ready, related_m2m_graph
 
-    @conditional_cached_property
-    def non_swapped_models_auto_created(self):
-        models = self.get_models(include_auto_created=True)
-        return self.ready, tuple(a for a in models if not a._meta.swapped)
-
-    @conditional_cached_property
-    def non_swapped_models(self):
-        models = self.get_models(include_auto_created=False)
-        return self.ready, tuple(a for a in models if not a._meta.swapped)
-
     def get_model(self, app_label, model_name=None):
         """
         Returns the model matching the given app_label and model_name.
@@ -360,6 +350,7 @@ class Apps(object):
         This is mostly used in tests.
         """
         for cached_property in ['related_objects_relation_graph',
+                                'related_m2m_relation_graph',
                                 'non_swapped_models',
                                 'non_swapped_models_auto_created']:
             try:
