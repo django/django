@@ -369,7 +369,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure that all users are present in the author's list filter
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(filterspec.lookup_choices, [(1, u'alfred'), (2, u'bob'), (3, u'lisa')])
+        self.assertEqual(filterspec.lookup_choices, [(1, 'alfred'), (2, 'bob'), (3, 'lisa')])
 
         request = self.request_factory.get('/', {'author__isnull': 'True'})
         changelist = self.get_changelist(request, Book, modeladmin)
@@ -404,7 +404,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure that all users are present in the contrib's list filter
         filterspec = changelist.get_filters(request)[0][2]
-        self.assertEqual(filterspec.lookup_choices, [(1, u'alfred'), (2, u'bob'), (3, u'lisa')])
+        self.assertEqual(filterspec.lookup_choices, [(1, 'alfred'), (2, 'bob'), (3, 'lisa')])
 
         request = self.request_factory.get('/', {'contributors__isnull': 'True'})
         changelist = self.get_changelist(request, Book, modeladmin)
@@ -491,7 +491,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure that only actual authors are present in author's list filter
         filterspec = changelist.get_filters(request)[0][1]
-        self.assertEqual(filterspec.lookup_choices, [(1, u'alfred'), (2, u'bob')])
+        self.assertEqual(filterspec.lookup_choices, [(1, 'alfred'), (2, 'bob')])
 
     def test_relatedonlyfieldlistfilter_manytomany(self):
         modeladmin = BookAdminRelatedOnlyFilter(Book, site)
@@ -501,7 +501,7 @@ class ListFiltersTests(TestCase):
 
         # Make sure that only actual contributors are present in contrib's list filter
         filterspec = changelist.get_filters(request)[0][2]
-        self.assertEqual(filterspec.lookup_choices, [(2, u'bob'), (3, u'lisa')])
+        self.assertEqual(filterspec.lookup_choices, [(2, 'bob'), (3, 'lisa')])
 
     def test_booleanfieldlistfilter(self):
         modeladmin = BookAdmin(Book, site)
