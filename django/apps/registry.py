@@ -173,6 +173,23 @@ class Apps(object):
         return result
 
     @conditional_cached_property
+    def related_objects_relation_graph(self):
+        related_objects_graph = defaultdict(list)
+        related_objects_proxy_graph = defaultdict(list)
+        for model in self.get_models(include_auto_created=True):
+            for f in model._meta.get_new_fields(data=True, virtual=True):
+                try:
+                    if f.rel and f.has_class_relation:
+                        related_objects_graph[f.rel.to._meta].append(f)
+                        if f.rel.to._meta.proxy:
+                            related_objects_proxy_graph[f.rel.to._meta.concrete_model].append(f)
+                except AttributeError:
+                    # if field does not have a rel attribute, it will cause an
+                    # attributeerror. this is to avoid another conditional statement
+                    # with hasattr(f, 'rel')
+                    continue
+
+        return self.ready, (related_objects_graph, related_objects_proxy_graph)
     def non_swapped_models_auto_created(self):
         models = self.get_models(include_auto_created=True)
         return self.ready, tuple(a for a in models if not a._meta.swapped)

@@ -15,7 +15,10 @@ from django.utils._os import upath
 from django.utils import six
 
 from .default_config_app.apps import CustomConfig
-from .models import TotallyNormal, SoAlternative, new_apps
+from .models import (
+    TotallyNormal, SoAlternative, new_apps,
+    Relation, AbstractPerson, BasePerson, new_apps_2
+)
 
 
 # Small list with a variety of cases for tests that iterate on installed apps.
@@ -312,3 +315,28 @@ class NamespacePackageAppTests(TestCase):
             with self.settings(INSTALLED_APPS=['nsapp.apps.NSAppConfig']):
                 app_config = apps.get_app_config('nsapp')
                 self.assertEqual(app_config.path, upath(self.app_path))
+
+
+class AppRelationsTest(TestCase):
+
+    def test_relations_related_objects(self):
+        tree, _ = new_apps_2.related_objects_relation_graph
+        self.assertEquals(
+            [field.related_query_name() for field in tree[Relation._meta]],
+            [u'BasePerson_m2m_base+', u'BasePerson_m2m_abstract+', u'fk_base_rel', u'fo_base_rel']
+        )
+        self.assertEquals(
+            [field.related_query_name() for field in tree[BasePerson._meta]],
+            [u'BasePerson_friends_base+', u'BasePerson_friends_base+', u'BasePerson_m2m_base+',
+             u'BasePerson_following_base+', u'BasePerson_following_base+', u'BasePerson_m2m_abstract+',
+             u'BasePerson_friends_abstract+', u'BasePerson_friends_abstract+', u'BasePerson_following_abstract+',
+             u'BasePerson_following_abstract+']
+        )
+        self.assertEquals([field.related_query_name() for field in tree[AbstractPerson._meta]], [])
+
+    def test_relations_proxy_objects(self):
+        _, proxy_tree = new_apps_2.related_objects_relation_graph
+        self.assertEquals(
+            [field.related_query_name() for field in proxy_tree[Relation]],
+            [u'fk_to_proxy']
+        )
