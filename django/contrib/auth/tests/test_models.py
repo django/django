@@ -65,7 +65,7 @@ class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
             '<ContentType: example model a>',
         ])
 
-        # Now we create the test userpermission
+        # Now we create the test UserPermission
         management.call_command('loaddata', 'contenttypes_shared.json', verbosity=3, database='default')
         management.call_command('loaddata', 'contenttypes_shared.json', verbosity=3, database='other')
 
@@ -73,7 +73,7 @@ class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
         self.assertTrue(Permission.objects.filter(codename='delete_examplemodelb').exists())
         self.assertTrue(Permission.objects.db_manager('other').filter(codename='delete_examplemodelb').exists())
 
-        # Now test that Permission.get_by_nat_key works/doesen't work.
+        # Now test that Permission.get_by_nat_key works/doesn't work.
         try:
             perm_default = Permission.objects.get_by_natural_key(
                 'delete_examplemodelb',
