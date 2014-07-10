@@ -68,7 +68,7 @@ class ProjectState(object):
                     except InvalidBasesError:
                         new_unrendered_models.append(model)
                 if len(new_unrendered_models) == len(unrendered_models):
-                    raise InvalidBasesError("Cannot resolve bases for %r" % new_unrendered_models)
+                    raise InvalidBasesError("Cannot resolve bases for %r\nThis can happen if you are inheriting models from an app with migrations (e.g. contrib.auth)\n in an app with no migrations; see https://docs.djangoproject.com/en/1.7/topics/migrations/#dependencies for more" % new_unrendered_models)
                 unrendered_models = new_unrendered_models
             # make sure apps has no dangling references
             if self.apps._pending_lookups:
