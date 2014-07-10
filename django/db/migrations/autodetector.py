@@ -47,7 +47,7 @@ class MigrationAutodetector(object):
         Takes a graph to base names on and an optional set of apps
         to try and restrict to (restriction is not guaranteed)
         """
-        changes = self._detect_changes(convert_apps)
+        changes = self._detect_changes(convert_apps, graph)
         changes = self.arrange_for_graph(changes, graph)
         if trim_to_apps:
             changes = self._trim_to_apps(changes, trim_to_apps)
@@ -90,7 +90,7 @@ class MigrationAutodetector(object):
             fields_def.append(deconstruction)
         return fields_def
 
-    def _detect_changes(self, convert_apps=None):
+    def _detect_changes(self, convert_apps=None, graph=None):
         """
         Returns a dict of migration plans which will achieve the
         change from from_state to to_state. The dict has app labels
@@ -98,6 +98,12 @@ class MigrationAutodetector(object):
 
         The resulting migrations aren't specially named, but the names
         do matter for dependencies inside the set.
+
+        convert_apps is the list of apps to convert to use migrations
+        (i.e. to make initial migrations for, in the usual case)
+
+        graph is an optional argument that, if provided, can help improve
+        dependency generation and avoid potential circular dependencies.
         """
 
         # The first phase is generating all the operations for each app
@@ -245,10 +251,16 @@ class MigrationAutodetector(object):
                                 if self.migrations.get(dep[0], None):
                                     operation_dependencies.add((dep[0], self.migrations[dep[0]][-1].name))
                                 else:
-                                    # If we can't find the other app, we add a __first__ dependency,
+                                    # If we can't find the other app, we add a first/last dependency,
                                     # but only if we've already been through once and checked everything
                                     if chop_mode:
-                                        operation_dependencies.add((dep[0], "__first__"))
+                                        # If the app already exists, we add __last__, as we don't know which
+                                        # migration contains the target field.
+                                        # If it's not yet migrated or has no migrations, we use __first__
+                                        if graph and not graph.root_nodes(dep[0]):
+                                            operation_dependencies.add((dep[0], "__first__"))
+                                        else:
+                                            operation_dependencies.add((dep[0], "__last__"))
                                     else:
                                         deps_satisfied = False
                     if deps_satisfied:

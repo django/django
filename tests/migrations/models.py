@@ -42,3 +42,11 @@ class UnserializableModel(models.Model):
     class Meta:
         # Disable auto loading of this model as we load it on our own
         apps = Apps()
+
+
+class UnmigratedModel(models.Model):
+    """
+    A model that is in a migration-less app (which this app is
+    if its migrations directory has not been repointed)
+    """
+    pass

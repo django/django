@@ -4,7 +4,8 @@ from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ProjectState, ModelState
 from django.db.migrations.graph import MigrationGraph
-from django.db import models
+from django.db.migrations.loader import MigrationLoader
+from django.db import models, connection
 from django.contrib.auth.models import AbstractBaseUser
 
 
@@ -58,6 +59,7 @@ class AutodetectorTests(TestCase):
     third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
     book = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))])
     book_proxy_fk = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("thirdapp.AuthorProxy")), ("title", models.CharField(max_length=200))])
+    book_migrations_fk = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("migrations.UnmigratedModel")), ("title", models.CharField(max_length=200))])
     book_with_no_author = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("title", models.CharField(max_length=200))])
     book_with_author_renamed = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Writer")), ("title", models.CharField(max_length=200))])
     book_with_field_and_author_renamed = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("writer", models.ForeignKey("testapp.Writer")), ("title", models.CharField(max_length=200))])
@@ -1017,3 +1019,42 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Author")
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="Aardvark")
+
+    def test_first_dependency(self):
+        """
+        Tests that a dependency to an app with no migrations uses __first__.
+        """
+        # Load graph
+        loader = MigrationLoader(connection)
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([self.book_migrations_fk])
+        after.real_apps = ["migrations"]
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes(graph=loader.graph)
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ["CreateModel"])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name="Book")
+        # Right dependencies?
+        self.assertEqual(changes['otherapp'][0].dependencies, [("migrations", "__first__")])
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_last_dependency(self):
+        """
+        Tests that a dependency to an app with existing migrations uses __first__.
+        """
+        # Load graph
+        loader = MigrationLoader(connection)
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([self.book_migrations_fk])
+        after.real_apps = ["migrations"]
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes(graph=loader.graph)
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'otherapp', 1)
+        self.assertOperationTypes(changes, 'otherapp', 0, ["CreateModel"])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name="Book")
+        # Right dependencies?
+        self.assertEqual(changes['otherapp'][0].dependencies, [("migrations", "__last__")])
