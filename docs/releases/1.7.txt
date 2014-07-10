@@ -72,6 +72,12 @@ but a few of the key features are:
   :ref:`ForeignKey <ref-foreignkey>` or :ref:`ManyToManyField <ref-manytomany>` to) apps with migrations. Read the
   :ref:`dependencies documentation <unmigrated-dependencies>` for more.
 
+
+* If you are upgrading from South, see our :ref:`upgrading-from-south`
+  documentation, and third-party app authors should read the
+  `South 1.0 release notes <http://south.readthedocs.org/en/latest/releasenotes/1.0.html#library-migration-path>`_
+  for details on how to support South and Django migrations simultaneously.
+
 .. _app-loading-refactor-17-release-note:
 
 App-loading refactor

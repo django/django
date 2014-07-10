@@ -576,6 +576,8 @@ The decorator adds logic to capture and preserve the arguments on their
 way into your constructor, and then returns those arguments exactly when
 deconstruct() is called.
 
+.. _upgrading-from-south:
+
 Upgrading from South
 --------------------
 
