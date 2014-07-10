@@ -114,7 +114,7 @@ class HashedFilesMixin(object):
             unparsed_name[2] += '?'
         return urlunsplit(unparsed_name)
 
-    def url(self, name, force=False):
+    def url(self, name, force=False, avoid_cache=False):
         """
         Returns the real URL in DEBUG mode.
         """
@@ -125,7 +125,7 @@ class HashedFilesMixin(object):
             if urlsplit(clean_name).path.endswith('/'):  # don't hash paths
                 hashed_name = name
             else:
-                hashed_name = self.stored_name(clean_name)
+                hashed_name = self.stored_name(clean_name, avoid_cache=avoid_cache)
 
         final_url = super(HashedFilesMixin, self).url(hashed_name)
 
@@ -178,7 +178,7 @@ class HashedFilesMixin(object):
                 else:
                     start, end = 1, sub_level - 1
             joined_result = '/'.join(name_parts[:-start] + url_parts[end:])
-            hashed_url = self.url(unquote(joined_result), force=True)
+            hashed_url = self.url(unquote(joined_result), force=True, avoid_cache=True)
             file_name = hashed_url.split('/')[-1:]
             relative_url = '/'.join(url.split('/')[:-1] + file_name)
 
@@ -270,10 +270,10 @@ class HashedFilesMixin(object):
     def hash_key(self, name):
         return name
 
-    def stored_name(self, name):
+    def stored_name(self, name, avoid_cache=False):
         hash_key = self.hash_key(name)
         cache_name = self.hashed_files.get(hash_key)
-        if cache_name is None:
+        if cache_name is None or avoid_cache:
             cache_name = self.clean_name(self.hashed_name(name))
             # store the hashed name if there was a miss, e.g.
             # when the files are still processed

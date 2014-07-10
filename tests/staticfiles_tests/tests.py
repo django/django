@@ -606,6 +606,44 @@ class TestHashedFiles(object):
         self.assertEqual("Post-processing 'faulty.css' failed!\n\n", err.getvalue())
 
 
+@override_settings(**dict(
+    TEST_SETTINGS,
+    STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
+    DEBUG=False,
+))
+class TestCollectionHashedFilesCache(CollectionTestCase):
+    """
+    Test changing an image file and make sure that css files refferring to that file
+    always use the newest hash even if they get processed before the image file.
+    """
+    def setUp(self):
+        self.testimage_path = os.path.join(TEST_ROOT, 'project', 'documents', 'cached', 'css', 'img', 'window.png')
+        with open(self.testimage_path, 'r+b') as f:
+            self.orig_image_content = f.read()
+        super(TestCollectionHashedFilesCache, self).setUp()
+
+    def tearDown(self):
+        with open(self.testimage_path, 'w+b') as f:
+            f.write(self.orig_image_content)
+        super(TestCollectionHashedFilesCache, self).tearDown()
+
+    def test_stored_name_avoids_cache_on_collectstatic(self):
+        finders.get_finder.cache_clear()
+        err = six.StringIO()
+        call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
+        with open(self.testimage_path, 'w+b') as f:
+            f.write("new content of png file to change it's hash")
+
+        # and now change modification time of self.testimage_path
+        # to make shure it gets collected again
+        mtime = os.path.getmtime(self.testimage_path)
+        atime = os.path.getatime(self.testimage_path)
+        os.utime(self.testimage_path, (mtime + 1, atime + 1))
+
+        call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
+        self.assertFileContains(os.path.join(settings.STATIC_ROOT, 'cached', 'css', 'window.9db38d5169f3.css'), 'window.a836fe39729e.png')
+
+
 # we set DEBUG to False here since the template tag wouldn't work otherwise
 @override_settings(**dict(
     TEST_SETTINGS,
