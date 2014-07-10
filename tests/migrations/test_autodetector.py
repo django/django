@@ -1042,7 +1042,7 @@ class AutodetectorTests(TestCase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_last_dependency(self):
         """
-        Tests that a dependency to an app with existing migrations uses __first__.
+        Tests that a dependency to an app with existing migrations uses __last__.
         """
         # Load graph
         loader = MigrationLoader(connection)
