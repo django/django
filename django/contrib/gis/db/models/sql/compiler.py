@@ -126,7 +126,7 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         if start_alias:
             seen[None] = start_alias
         for field in opts.concrete_fields:
-            model = field.get_connected_model()
+            model = field.parent_model._meta.concrete_model
             if model == opts.model:
                 model = None
             if from_parent and model is not None and issubclass(from_parent, model):

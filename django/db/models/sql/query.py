@@ -602,7 +602,7 @@ class Query(object):
                     must_include[old_model].add(source)
                 add_to_dict(must_include, cur_model, opts.pk)
             field = opts.get_new_field(parts[-1], related_objects=True, related_m2m=True, virtual=True)
-            model = field.get_connected_model()
+            model = field.parent_model._meta.concrete_model
             if model == opts.model:
                 model = cur_model
             if not is_reverse_o2o(field):
@@ -618,7 +618,7 @@ class Query(object):
                 for field in model._meta.fields:
                     if field in values:
                         continue
-                    m = field.get_connected_model()
+                    m = field.parent_model._meta.concrete_model
                     add_to_dict(workset, m, field)
             for model, values in six.iteritems(must_include):
                 # If we haven't included a model in workset, we don't add the
@@ -937,7 +937,7 @@ class Query(object):
         seen = {None: root_alias}
 
         for field in opts.fields:
-            model = field.get_connected_model()
+            model = field.parent_model._meta.concrete_model
             if model is not opts.model and model not in seen:
                 self.join_parent_model(opts, model, root_alias, seen)
         self.included_inherited_models = seen
@@ -1369,7 +1369,7 @@ class Query(object):
                 name = opts.pk.name
             try:
                 field = opts.get_new_field(name, related_objects=True, related_m2m=True, virtual=True)
-                model = field.get_connected_model()
+                model = field.parent_model._meta.concrete_model
             except FieldDoesNotExist:
                 # We didn't found the current field, so move position back
                 # one step.

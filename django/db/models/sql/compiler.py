@@ -299,7 +299,7 @@ class SQLCompiler(object):
         seen_models = {None: start_alias}
 
         for field in opts.concrete_fields:
-            model = field.get_connected_model()
+            model = field.parent_model._meta.concrete_model
             if model == opts.model:
                 model = None
             if from_parent and model is not None and issubclass(from_parent, model):
@@ -642,7 +642,7 @@ class SQLCompiler(object):
             # The get_fields_with_model() returns None for fields that live
             # in the field's local model. So, for those fields we want to use
             # the f.model - that is the field's local model.
-            model = f.get_connected_model()
+            model = f.parent_model._meta.concrete_model
             if model == opts.model:
                 model = None
             field_model = model or f.model
