@@ -88,6 +88,31 @@ class BaseAggregateTestCase(TestCase):
         )
         self.assertEqual(b.mean_age, 34.5)
 
+    def test_annotate_defer(self):
+        qs = Book.objects.annotate(
+            page_sum=Sum("pages")).defer('name').filter(pk=1)
+
+        rows = [
+            (1, "159059725", 447, "The Definitive Guide to Django: Web Development Done Right")
+        ]
+        self.assertQuerysetEqual(
+            qs.order_by('pk'), rows,
+            lambda r: (r.id, r.isbn, r.page_sum, r.name)
+        )
+
+    def test_annotate_defer_select_related(self):
+        qs = Book.objects.select_related('contact').annotate(
+            page_sum=Sum("pages")).defer('name').filter(pk=1)
+
+        rows = [
+            (1, "159059725", 447, "Adrian Holovaty",
+             "The Definitive Guide to Django: Web Development Done Right")
+        ]
+        self.assertQuerysetEqual(
+            qs.order_by('pk'), rows,
+            lambda r: (r.id, r.isbn, r.page_sum, r.contact.name, r.name)
+        )
+
     def test_annotate_m2m(self):
         books = Book.objects.filter(rating__lt=4.5).annotate(Avg("authors__age")).order_by("name")
         self.assertQuerysetEqual(
