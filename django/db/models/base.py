@@ -749,8 +749,14 @@ class Model(six.with_metaclass(ModelBase)):
             return update_fields is not None or filtered.exists()
         if self._meta.select_on_save and not forced_update:
             if filtered.exists():
-                filtered._update(values)
-                return True
+                # It may happen that the object is deleted from DB right after this check,
+                # causing the subsequent UPDATE return zero matching rows.
+                # The same result can however be reported in some rare cases when the
+                # database returns zero despite the UPDATE being executed successfully
+                # (a row is matched and updated).
+                # In order to distinguish these two cases, the object is checked for
+                # its existence in the DB again if the UPDATE query returns 0.
+                return filtered._update(values) > 0 or filtered.exists()
             else:
                 return False
         return filtered._update(values) > 0
