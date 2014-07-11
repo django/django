@@ -829,6 +829,120 @@ appropriate entities.
     If ``value`` is ``"Joel is a slug"``, the output will be
     ``"joel-is-a-slug"``.
 
+.. _time-zone-selection-functions:
+
+``django.utils.timezone``
+=========================
+
+.. module:: django.utils.timezone
+    :synopsis: Timezone support.
+
+.. data:: utc
+
+    :class:`~datetime.tzinfo` instance that represents UTC.
+
+.. function:: get_fixed_timezone(offset)
+
+    .. versionadded:: 1.7
+
+    Returns a :class:`~datetime.tzinfo` instance that represents a time zone
+    with a fixed offset from UTC.
+
+    ``offset`` is a :class:`datetime.timedelta` or an integer number of
+    minutes. Use positive values for time zones east of UTC and negative
+    values for west of UTC.
+
+.. function:: get_default_timezone()
+
+    Returns a :class:`~datetime.tzinfo` instance that represents the
+    :ref:`default time zone <default-current-time-zone>`.
+
+.. function:: get_default_timezone_name()
+
+    Returns the name of the :ref:`default time zone
+    <default-current-time-zone>`.
+
+.. function:: get_current_timezone()
+
+    Returns a :class:`~datetime.tzinfo` instance that represents the
+    :ref:`current time zone <default-current-time-zone>`.
+
+.. function:: get_current_timezone_name()
+
+    Returns the name of the :ref:`current time zone
+    <default-current-time-zone>`.
+
+.. function:: activate(timezone)
+
+    Sets the :ref:`current time zone <default-current-time-zone>`. The
+    ``timezone`` argument must be an instance of a :class:`~datetime.tzinfo`
+    subclass or, if pytz_ is available, a time zone name.
+
+.. function:: deactivate()
+
+    Unsets the :ref:`current time zone <default-current-time-zone>`.
+
+.. function:: override(timezone)
+
+    This is a Python context manager that sets the :ref:`current time zone
+    <default-current-time-zone>` on entry with :func:`activate()`, and restores
+    the previously active time zone on exit. If the ``timezone`` argument is
+    ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
+    on entry with :func:`deactivate()` instead.
+
+.. function:: localtime(value, timezone=None)
+
+    Converts an aware :class:`~datetime.datetime` to a different time zone,
+    by default the :ref:`current time zone <default-current-time-zone>`.
+
+    This function doesn't work on naive datetimes; use :func:`make_aware`
+    instead.
+
+.. function:: now()
+
+    Returns a :class:`~datetime.datetime` that represents the
+    current point in time. Exactly what's returned depends on the value of
+    :setting:`USE_TZ`:
+
+    * If :setting:`USE_TZ` is ``False``, this will be a
+      :ref:`naive <naive_vs_aware_datetimes>` datetime (i.e. a datetime
+      without an associated timezone) that represents the current time
+      in the system's local timezone.
+
+    * If :setting:`USE_TZ` is ``True``, this will be an
+      :ref:`aware <naive_vs_aware_datetimes>` datetime representing the
+      current time in UTC. Note that :func:`now` will always return
+      times in UTC regardless of the value of :setting:`TIME_ZONE`;
+      you can use :func:`localtime` to convert to a time in the current
+      time zone.
+
+.. function:: is_aware(value)
+
+    Returns ``True`` if ``value`` is aware, ``False`` if it is naive. This
+    function assumes that ``value`` is a :class:`~datetime.datetime`.
+
+.. function:: is_naive(value)
+
+    Returns ``True`` if ``value`` is naive, ``False`` if it is aware. This
+    function assumes that ``value`` is a :class:`~datetime.datetime`.
+
+.. function:: make_aware(value, timezone)
+
+    Returns an aware :class:`~datetime.datetime` that represents the same
+    point in time as ``value`` in ``timezone``, ``value`` being a naive
+    :class:`~datetime.datetime`.
+
+    This function can raise an exception if ``value`` doesn't exist or is
+    ambiguous because of DST transitions.
+
+.. function:: make_naive(value, timezone)
+
+    Returns an naive :class:`~datetime.datetime` that represents in
+    ``timezone``  the same point in time as ``value``, ``value`` being an
+    aware :class:`~datetime.datetime`
+
+.. _pytz: http://pytz.sourceforge.net/
+
 ``django.utils.translation``
 ============================
 
@@ -960,120 +1074,6 @@ For a complete discussion on the usage of the following see the
 
     Session key under which the active language for the current session is
     stored.
-
-.. _time-zone-selection-functions:
-
-``django.utils.timezone``
-=========================
-
-.. module:: django.utils.timezone
-    :synopsis: Timezone support.
-
-.. data:: utc
-
-    :class:`~datetime.tzinfo` instance that represents UTC.
-
-.. function:: get_fixed_timezone(offset)
-
-    .. versionadded:: 1.7
-
-    Returns a :class:`~datetime.tzinfo` instance that represents a time zone
-    with a fixed offset from UTC.
-
-    ``offset`` is a :class:`datetime.timedelta` or an integer number of
-    minutes. Use positive values for time zones east of UTC and negative
-    values for west of UTC.
-
-.. function:: get_default_timezone()
-
-    Returns a :class:`~datetime.tzinfo` instance that represents the
-    :ref:`default time zone <default-current-time-zone>`.
-
-.. function:: get_default_timezone_name()
-
-    Returns the name of the :ref:`default time zone
-    <default-current-time-zone>`.
-
-.. function:: get_current_timezone()
-
-    Returns a :class:`~datetime.tzinfo` instance that represents the
-    :ref:`current time zone <default-current-time-zone>`.
-
-.. function:: get_current_timezone_name()
-
-    Returns the name of the :ref:`current time zone
-    <default-current-time-zone>`.
-
-.. function:: activate(timezone)
-
-    Sets the :ref:`current time zone <default-current-time-zone>`. The
-    ``timezone`` argument must be an instance of a :class:`~datetime.tzinfo`
-    subclass or, if pytz_ is available, a time zone name.
-
-.. function:: deactivate()
-
-    Unsets the :ref:`current time zone <default-current-time-zone>`.
-
-.. function:: override(timezone)
-
-    This is a Python context manager that sets the :ref:`current time zone
-    <default-current-time-zone>` on entry with :func:`activate()`, and restores
-    the previously active time zone on exit. If the ``timezone`` argument is
-    ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
-    on entry with :func:`deactivate()` instead.
-
-.. function:: localtime(value, timezone=None)
-
-    Converts an aware :class:`~datetime.datetime` to a different time zone,
-    by default the :ref:`current time zone <default-current-time-zone>`.
-
-    This function doesn't work on naive datetimes; use :func:`make_aware`
-    instead.
-
-.. function:: now()
-
-    Returns a :class:`~datetime.datetime` that represents the
-    current point in time. Exactly what's returned depends on the value of
-    :setting:`USE_TZ`:
-
-    * If :setting:`USE_TZ` is ``False``, this will be a
-      :ref:`naive <naive_vs_aware_datetimes>` datetime (i.e. a datetime
-      without an associated timezone) that represents the current time
-      in the system's local timezone.
-
-    * If :setting:`USE_TZ` is ``True``, this will be an
-      :ref:`aware <naive_vs_aware_datetimes>` datetime representing the
-      current time in UTC. Note that :func:`now` will always return
-      times in UTC regardless of the value of :setting:`TIME_ZONE`;
-      you can use :func:`localtime` to convert to a time in the current
-      time zone.
-
-.. function:: is_aware(value)
-
-    Returns ``True`` if ``value`` is aware, ``False`` if it is naive. This
-    function assumes that ``value`` is a :class:`~datetime.datetime`.
-
-.. function:: is_naive(value)
-
-    Returns ``True`` if ``value`` is naive, ``False`` if it is aware. This
-    function assumes that ``value`` is a :class:`~datetime.datetime`.
-
-.. function:: make_aware(value, timezone)
-
-    Returns an aware :class:`~datetime.datetime` that represents the same
-    point in time as ``value`` in ``timezone``, ``value`` being a naive
-    :class:`~datetime.datetime`.
-
-    This function can raise an exception if ``value`` doesn't exist or is
-    ambiguous because of DST transitions.
-
-.. function:: make_naive(value, timezone)
-
-    Returns an naive :class:`~datetime.datetime` that represents in
-    ``timezone``  the same point in time as ``value``, ``value`` being an
-    aware :class:`~datetime.datetime`
-
-.. _pytz: http://pytz.sourceforge.net/
 
 ``django.utils.tzinfo``
 =======================
