@@ -11,6 +11,7 @@ import warnings
 
 from django.apps import apps
 from django.conf import settings
+from django.conf.locale import LANG_INFO
 from django.core.exceptions import AppRegistryNotReady
 from django.dispatch import receiver
 from django.test.signals import setting_changed
@@ -21,7 +22,6 @@ from django.utils.safestring import mark_safe, SafeData
 from django.utils import six, lru_cache
 from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning, trim_whitespace, LANGUAGE_SESSION_KEY
-
 
 # Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.
@@ -51,12 +51,10 @@ language_code_re = re.compile(r'^[a-z]{1,8}(?:-[a-z0-9]{1,8})*$', re.IGNORECASE)
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
 
 # some browsers use deprecated locales. refs #18419
-_BROWSERS_DEPRECATED_LOCALES = {
+_DJANGO_DEPRECATED_LOCALES = {
     'zh-cn': 'zh-hans',
     'zh-tw': 'zh-hant',
 }
-
-_DJANGO_DEPRECATED_LOCALES = _BROWSERS_DEPRECATED_LOCALES
 
 
 @receiver(setting_changed)
@@ -429,13 +427,16 @@ def get_supported_language_variant(lang_code, strict=False):
     if _supported is None:
         _supported = OrderedDict(settings.LANGUAGES)
     if lang_code:
-        # some browsers use deprecated language codes -- #18419
-        replacement = _BROWSERS_DEPRECATED_LOCALES.get(lang_code)
-        if lang_code not in _supported and replacement in _supported:
-            return replacement
-        # if fr-ca is not supported, try fr.
+        # If 'fr-ca' is not supported, try special fallback or language-only 'fr'.
+        possible_lang_codes = [lang_code]
+        try:
+            possible_lang_codes.extend(LANG_INFO[lang_code]['fallback'])
+        except KeyError:
+            pass
         generic_lang_code = lang_code.split('-')[0]
-        for code in (lang_code, generic_lang_code):
+        possible_lang_codes.append(generic_lang_code)
+
+        for code in possible_lang_codes:
             if code in _supported and check_for_language(code):
                 return code
         if not strict:
