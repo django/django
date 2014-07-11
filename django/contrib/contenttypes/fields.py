@@ -29,12 +29,14 @@ class GenericForeignKey(object):
         self.for_concrete_model = for_concrete_model
         self.editable = False
 
-    def get_connected_model(self):
-        return self.model
-
     def contribute_to_class(self, cls, name):
         self.name = name
+
+        # Set model to cls (as it is not associated to anything)
+        # and parent_model to cls (because it belongs to cls)
         self.model = cls
+        self.parent_model = cls
+
         self.cache_attr = "_%s_cache" % name
         cls._meta.add_field(self, virtual=True)
 
@@ -324,6 +326,7 @@ class GenericRelation(ForeignObject):
         super(GenericRelation, self).contribute_to_class(cls, name, virtual_only=True)
         # Save a reference to which model this class is on for future use
         self.model = cls
+        self.parent_model = cls
         # Add the descriptor for the relation
         setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self, self.for_concrete_model))
 
