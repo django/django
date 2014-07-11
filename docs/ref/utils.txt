@@ -829,6 +829,8 @@ appropriate entities.
     If ``value`` is ``"Joel is a slug"``, the output will be
     ``"joel-is-a-slug"``.
     
+.. _time-zone-selection-functions:
+
 ``django.utils.timezone``
 =========================
 
@@ -1072,8 +1074,6 @@ For a complete discussion on the usage of the following see the
 
     Session key under which the active language for the current session is
     stored.
-
-.. _time-zone-selection-functions:
 
 ``django.utils.tzinfo``
 =======================
