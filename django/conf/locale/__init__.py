@@ -1,8 +1,14 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-# About name_local: capitalize it as if your language name was appearing
-# inside a sentence in your language.
+"""
+LANG_INFO is a dictionary structure to provide meta information about languages.
+
+About name_local: capitalize it as if your language name was appearing
+inside a sentence in your language.
+The 'fallback' key can be used to specify a special fallback logic which doesn't
+follow the traditional 'fr-ca' -> 'fr' fallback logic.
+"""
 
 LANG_INFO = {
     'af': {
@@ -486,6 +492,7 @@ LANG_INFO = {
         'name_local': 'Tiếng Việt',
     },
     'zh-cn': {
+        'fallback': ['zh-hans'],
         'bidi': False,
         'code': 'zh-cn',
         'name': 'Simplified Chinese',
@@ -503,10 +510,23 @@ LANG_INFO = {
         'name': 'Traditional Chinese',
         'name_local': '繁體中文',
     },
+    'zh-hk': {
+        'fallback': ['zh-hant'],
+    },
+    'zh-mo': {
+        'fallback': ['zh-hant'],
+    },
+    'zh-my': {
+        'fallback': ['zh-hans'],
+    },
+    'zh-sg': {
+        'fallback': ['zh-hans'],
+    },
     'zh-tw': {
+        'fallback': ['zh-hant'],
         'bidi': False,
         'code': 'zh-tw',
         'name': 'Traditional Chinese',
         'name_local': '繁體中文',
-    }
+    },
 }

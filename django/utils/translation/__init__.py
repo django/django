@@ -212,7 +212,10 @@ string_concat = lazy(_string_concat, six.text_type)
 def get_language_info(lang_code):
     from django.conf.locale import LANG_INFO
     try:
-        return LANG_INFO[lang_code]
+        lang_info = LANG_INFO[lang_code]
+        if 'fallback' in lang_info and 'name' not in lang_info:
+            return get_language_info(lang_info['fallback'][0])
+        return lang_info
     except KeyError:
         if '-' not in lang_code:
             raise KeyError("Unknown language code %s." % lang_code)
