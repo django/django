@@ -17,7 +17,7 @@ from django.utils import six
 from .default_config_app.apps import CustomConfig
 from .models import (
     TotallyNormal, SoAlternative, new_apps,
-    Relation, AbstractPerson, BasePerson, new_apps_2
+    Relation, AbstractPerson, BasePerson, new_apps_2,
 )
 
 
@@ -321,35 +321,35 @@ class AppRelationsTest(TestCase):
 
     def test_relations_related_objects(self):
         tree, _ = new_apps_2.related_objects_relation_graph
-        self.assertEquals(
+        self.assertEqual(
             [field.related_query_name() for field in tree[Relation._meta]],
-            [u'BasePerson_m2m_base+', u'BasePerson_m2m_abstract+', u'fk_base_rel', u'fo_base_rel']
+            ['BasePerson_m2m_base+', 'BasePerson_m2m_abstract+', 'fk_base_rel', 'fo_base_rel']
         )
-        self.assertEquals(
+        self.assertEqual(
             [field.related_query_name() for field in tree[BasePerson._meta]],
-            [u'BasePerson_friends_base+', u'BasePerson_friends_base+', u'BasePerson_m2m_base+',
-             u'BasePerson_following_base+', u'BasePerson_following_base+', u'BasePerson_m2m_abstract+',
-             u'BasePerson_friends_abstract+', u'BasePerson_friends_abstract+', u'BasePerson_following_abstract+',
-             u'BasePerson_following_abstract+']
+            ['BasePerson_friends_base+', 'BasePerson_friends_base+', 'BasePerson_m2m_base+',
+             'BasePerson_following_base+', 'BasePerson_following_base+', 'BasePerson_m2m_abstract+',
+             'BasePerson_friends_abstract+', 'BasePerson_friends_abstract+', 'BasePerson_following_abstract+',
+             'BasePerson_following_abstract+']
         )
-        self.assertEquals([field.related_query_name() for field in tree[AbstractPerson._meta]], [])
+        self.assertEqual([field.related_query_name() for field in tree[AbstractPerson._meta]], [])
 
     def test_relations_proxy_objects(self):
         _, proxy_tree = new_apps_2.related_objects_relation_graph
-        self.assertEquals(
+        self.assertEqual(
             [field.related_query_name() for field in proxy_tree[Relation]],
-            [u'fk_to_proxy']
+            ['fk_to_proxy']
         )
 
     def test_relations_related_m2m(self):
         tree = new_apps_2.related_m2m_relation_graph
-        self.assertEquals(
+        self.assertEqual(
             [field.related_query_name() for field in tree[Relation._meta]],
-            [u'm2m_abstract_rel', u'm2m_base_rel']
+            ['m2m_abstract_rel', 'm2m_base_rel']
         )
-        self.assertEquals(
+        self.assertEqual(
             [field.related_query_name() for field in tree[BasePerson._meta]],
-            [u'friends_abstract_rel_+', u'followers_abstract', u'friends_base_rel_+',
-             u'followers_base']
+            ['friends_abstract_rel_+', 'followers_abstract', 'friends_base_rel_+',
+             'followers_base']
         )
-        self.assertEquals([field.related_query_name() for field in tree[AbstractPerson._meta]], [])
+        self.assertEqual([field.related_query_name() for field in tree[AbstractPerson._meta]], [])
