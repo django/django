@@ -107,3 +107,9 @@ class Command(BaseCommand):
             self.stdout.write("  the new migration will be used for new installs. Once you are sure")
             self.stdout.write("  all instances of the codebase have applied the migrations you squashed,")
             self.stdout.write("  you can delete them.")
+            if writer.needs_manual_porting:
+                self.stdout.write(self.style.MIGRATE_HEADING("Manual porting required"))
+                self.stdout.write("  Your migrations contained functions that must be manually copied over,")
+                self.stdout.write("  as we could not safely copy their implementation.")
+                self.stdout.write("  See the comment at the top of the squashed migration for details.")
+

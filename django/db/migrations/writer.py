@@ -111,6 +111,7 @@ class MigrationWriter(object):
 
     def __init__(self, migration):
         self.migration = migration
+        self.needs_manual_porting = False
 
     def as_string(self):
         """
@@ -142,9 +143,20 @@ class MigrationWriter(object):
                 dependencies.append("        %s," % self.serialize(dependency)[0])
         items["dependencies"] = "\n".join(dependencies) + "\n" if dependencies else ""
 
-        # Format imports nicely
+        # Format imports nicely, swapping imports of functions from migration files
+        # for comments
+        migration_imports = set()
+        for line in list(imports):
+            if re.match("^import (.*)\.\d+[^\s]*$", line):
+                migration_imports.add(line.split("import")[1].strip())
+                imports.remove(line)
+                self.needs_manual_porting = True
         imports.discard("from django.db import models")
         items["imports"] = "\n".join(imports) + "\n" if imports else ""
+        if migration_imports:
+            items["imports"] += "\n\n# Functions from the following migrations need manual copying.\n# Move them and any dependencies into this file, then update the\n# RunPython operations to refer to the local versions:\n# %s" % (
+                "\n# ".join(migration_imports)
+            )
 
         # If there's a replaces, make a string for it
         if self.migration.replaces:
