@@ -12,10 +12,11 @@ import unittest
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http.multipartparser import MultiPartParser
+from django.http.multipartparser import MultiPartParser, parse_header
 from django.test import TestCase, client
 from django.test import override_settings
 from django.utils.encoding import force_bytes
+from django.utils.http import urlquote
 from django.utils.six import StringIO
 
 from . import uploadhandler
@@ -118,6 +119,56 @@ class FileUploadTests(TestCase):
 
             response = self.client.post('/unicode_name/', post_data)
 
+        self.assertEqual(response.status_code, 200)
+
+    def test_unicode_file_name_rfc2231(self):
+        """
+        Test receiving file upload when filename is encoded with RFC2231
+        (#22971).
+        """
+        payload = client.FakePayload()
+        payload.write('\r\n'.join([
+            '--' + client.BOUNDARY,
+            'Content-Disposition: form-data; name="file_unicode"; filename*=UTF-8\'\'%s' % urlquote(UNICODE_FILENAME),
+            'Content-Type: application/octet-stream',
+            '',
+            'You got pwnd.\r\n',
+            '\r\n--' + client.BOUNDARY + '--\r\n'
+        ]))
+
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': "/unicode_name/",
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 200)
+
+    def test_unicode_name_rfc2231(self):
+        """
+        Test receiving file upload when filename is encoded with RFC2231
+        (#22971).
+        """
+        payload = client.FakePayload()
+        payload.write('\r\n'.join([
+            '--' + client.BOUNDARY,
+            'Content-Disposition: form-data; name*=UTF-8\'\'file_unicode; filename*=UTF-8\'\'%s' % urlquote(UNICODE_FILENAME),
+            'Content-Type: application/octet-stream',
+            '',
+            'You got pwnd.\r\n',
+            '\r\n--' + client.BOUNDARY + '--\r\n'
+        ]))
+
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': "/unicode_name/",
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': payload,
+        }
+        response = self.client.request(**r)
         self.assertEqual(response.status_code, 200)
 
     def test_dangerous_file_names(self):
@@ -483,3 +534,16 @@ class MultiParserTests(unittest.TestCase):
             'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
             'CONTENT_LENGTH': '1'
         }, StringIO('x'), [], 'utf-8')
+
+    def test_rfc2231_parsing(self):
+        test_data = (
+            (b"Content-Type: application/x-stuff; title*=us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A",
+             "This is ***fun***"),
+            (b"Content-Type: application/x-stuff; title*=UTF-8''foo-%c3%a4.html",
+             "foo-ä.html"),
+            (b"Content-Type: application/x-stuff; title*=iso-8859-1''foo-%E4.html",
+             "foo-ä.html"),
+        )
+        for raw_line, expected_title in test_data:
+            parsed = parse_header(raw_line)
+            self.assertEqual(parsed[1]['title'], expected_title)
