@@ -1,7 +1,7 @@
 from importlib import import_module
 import os
 
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.utils.module_loading import module_has_submodule
 from django.utils._os import upath
 
@@ -139,15 +139,21 @@ class AppConfig(object):
         # Entry is a path to an app config class.
         return cls(app_name, app_module)
 
+    def check_models_ready(self):
+        """
+        Raises an exception if models haven't been imported yet.
+        """
+        if self.models is None:
+            raise AppRegistryNotReady(
+                "Models for app '%s' haven't been imported yet." % self.label)
+
     def get_model(self, model_name):
         """
         Returns the model with the given case-insensitive model_name.
 
         Raises LookupError if no model exists with this name.
         """
-        if self.models is None:
-            raise LookupError(
-                "App '%s' doesn't have any models." % self.label)
+        self.check_models_ready()
         try:
             return self.models[model_name.lower()]
         except KeyError:
@@ -169,6 +175,7 @@ class AppConfig(object):
         Set the corresponding keyword argument to True to include such models.
         Keyword arguments aren't documented; they're a private API.
         """
+        self.check_models_ready()
         for model in self.models.values():
             if model._deferred and not include_deferred:
                 continue
