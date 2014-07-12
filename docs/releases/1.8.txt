@@ -563,3 +563,10 @@ and will be removed in Django 1.9.
 The function has been informally marked as "Deprecated" for some time. Replace
 ``resolve_variable(path, context)`` with
 ``django.template.Variable(path).resolve(context)``.
+
+``django.contrib.webdesign``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It provided the :ttag:`lorem` template tag which is now included in the
+built-in tags. Simply remove ``'django.contrib.webdesign'`` from
+:setting:`INSTALLED_APPS` and ``{% load webdesign %}`` from your templates.

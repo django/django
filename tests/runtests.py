@@ -135,6 +135,12 @@ def setup(verbosity, test_labels):
         handler = logging.StreamHandler()
         logger.addHandler(handler)
 
+    warnings.filterwarnings(
+        'ignore',
+        'django.contrib.webdesign will be removed in Django 2.0.',
+        RemovedInDjango20Warning
+    )
+
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()
 
