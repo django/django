@@ -91,7 +91,7 @@ any time leading up to the actual release:
 
 #. If this is a major release, make sure the tests pass, then increase
    the default PBKDF2 iterations in
-   ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 10%
+   ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 20%
    (pick a round number). Run the tests, and update the 3 failing
    hasher tests with the new values. Make sure this gets noted in the
    release notes (see release notes on 1.6 for an example).
