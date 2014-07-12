@@ -301,10 +301,6 @@ Application registry
     Checks whether an application with the given name exists in the registry.
     ``app_name`` is the full name of the app, e.g. ``'django.contrib.admin'``.
 
-    Unlike :meth:`~django.apps.apps.get_app_config`, this method can be called
-    safely at import time. If the registry is still being populated, it may
-    return ``False``, even though the app will become available later.
-
 .. method:: apps.get_model(app_label, model_name)
 
     Returns the :class:`~django.db.models.Model` with the given ``app_label``
@@ -365,12 +361,18 @@ processes all applications in the order of :setting:`INSTALLED_APPS`.
    the order of :setting:`INSTALLED_APPS`, it's strongly recommended not
    import any models at this stage.
 
+   Once this stage completes, APIs that operate of application configurations
+   such as :meth:`~apps.get_app_config()` become usable.
+
 #. Then Django attempts to import the ``models`` submodule of each application,
    if there is one.
 
    You must define or import all models in your application's ``models.py`` or
    ``models/__init__.py``. Otherwise, the application registry may not be fully
    populated at this point, which could cause the ORM to malfunction.
+
+   Once this stage completes, APIs that operate on models such as
+   :meth:`~apps.get_model()` become usable.
 
 #. Finally Django runs the :meth:`~AppConfig.ready()` method of each application
    configuration.
