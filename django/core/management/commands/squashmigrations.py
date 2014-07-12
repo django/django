@@ -112,4 +112,3 @@ class Command(BaseCommand):
                 self.stdout.write("  Your migrations contained functions that must be manually copied over,")
                 self.stdout.write("  as we could not safely copy their implementation.")
                 self.stdout.write("  See the comment at the top of the squashed migration for details.")
-
