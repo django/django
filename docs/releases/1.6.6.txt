@@ -40,3 +40,6 @@ Bugfixes
 * Fixed JavaScript errors while editing multi-geometry objects in the OpenLayers
   widget (`#23137 <https://code.djangoproject.com/ticket/23137>`_,
   `#23293 <https://code.djangoproject.com/ticket/23293>`_).
+
+* Prevented a crash on Python 3 with query strings containing unencoded
+  non-ASCII characters (`#22996 <http://code.djangoproject.com/ticket/22996>`_).
