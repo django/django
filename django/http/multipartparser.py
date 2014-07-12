@@ -16,6 +16,7 @@ from django.core.exceptions import SuspiciousMultipartForm
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils import six
+from django.utils.six.moves.urllib.parse import unquote
 from django.utils.text import unescape_entities
 from django.core.files.uploadhandler import StopUpload, SkipFile, StopFutureHandlers
 
@@ -631,8 +632,20 @@ def parse_header(line):
     for p in plist:
         i = p.find(b'=')
         if i >= 0:
+            has_encoding = False
             name = p[:i].strip().lower().decode('ascii')
+            if name.endswith('*'):
+                # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
+                # http://tools.ietf.org/html/rfc2231#section-4
+                name = name[:-1]
+                has_encoding = True
             value = p[i + 1:].strip()
+            if has_encoding:
+                encoding, lang, value = value.split(b"'")
+                if six.PY3:
+                    value = unquote(value.decode(), encoding=encoding.decode())
+                else:
+                    value = unquote(value).decode(encoding)
             if len(value) >= 2 and value[:1] == value[-1:] == b'"':
                 value = value[1:-1]
                 value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')
