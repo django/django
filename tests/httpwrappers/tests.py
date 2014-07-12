@@ -202,14 +202,14 @@ class QueryDictTests(unittest.TestCase):
         def test_invalid_input_encoding(self):
             """
             QueryDicts must be able to handle invalid input encoding (in this
-            case, bad UTF-8 encoding).
+            case, bad UTF-8 encoding), falling back to ISO-8859-1 decoding.
 
             This test doesn't apply under Python 3 because the URL is a string
             and not a bytestring.
             """
             q = QueryDict(str(b'foo=bar&foo=\xff'))
-            self.assertEqual(q['foo'], '\ufffd')
-            self.assertEqual(q.getlist('foo'), ['bar', '\ufffd'])
+            self.assertEqual(q['foo'], '\xff')
+            self.assertEqual(q.getlist('foo'), ['bar', '\xff'])
 
     def test_pickle(self):
         q = QueryDict(str(''))

@@ -313,8 +313,12 @@ class QueryDict(MultiValueDict):
         self.encoding = encoding
         if six.PY3:
             if isinstance(query_string, bytes):
-                # query_string contains URL-encoded data, a subset of ASCII.
-                query_string = query_string.decode()
+                # query_string normally contains URL-encoded data, a subset of ASCII.
+                try:
+                    query_string = query_string.decode(encoding)
+                except UnicodeDecodeError:
+                    # ... but some user agents are misbehaving :-(
+                    query_string = query_string.decode('iso-8859-1')
             for key, value in parse_qsl(query_string or '',
                                         keep_blank_values=True,
                                         encoding=encoding):
@@ -322,8 +326,12 @@ class QueryDict(MultiValueDict):
         else:
             for key, value in parse_qsl(query_string or '',
                                         keep_blank_values=True):
+                try:
+                    value = value.decode(encoding)
+                except UnicodeDecodeError:
+                    value = value.decode('iso-8859-1')
                 self.appendlist(force_text(key, encoding, errors='replace'),
-                                force_text(value, encoding, errors='replace'))
+                                value)
         self._mutable = mutable
 
     @property
