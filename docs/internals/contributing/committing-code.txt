@@ -10,24 +10,10 @@ community member who wants to contribute code to Django, have a look at
 Commit access
 -------------
 
-Django has two types of committers:
-
-Core committers
-    These are people who have a long history of contributions to Django's
-    codebase, a solid track record of being polite and helpful on the
-    mailing lists, and a proven desire to dedicate serious time to Django's
-    development. The bar is high for full commit access.
-
-Partial committers
-    These are people who are "domain experts." They have direct check-in
-    access to the subsystems that fall under their jurisdiction, and they're
-    given a formal vote in questions that involve their subsystems. This type
-    of access is likely to be given to someone who contributes a large
-    sub-framework to Django and wants to continue to maintain it.
-
-    Partial commit access is granted by the same process as full
-    committers. However, the bar is set lower; proven expertise in the area
-    in question is likely to be sufficient.
+Core developers are people who have a long history of contributions to
+Django's codebase, a solid track record of being polite and helpful on the
+mailing lists, and a proven desire to dedicate serious time to Django's
+development. The bar is high for full commit access.
 
 Decisions on new committers will follow the process explained in
 :ref:`how-we-make-decisions`. To request commit access, please contact an
