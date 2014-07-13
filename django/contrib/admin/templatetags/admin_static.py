@@ -5,6 +5,7 @@ register = Library()
 
 _static = None
 
+
 @register.simple_tag
 def static(path):
     global _static
