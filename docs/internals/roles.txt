@@ -9,6 +9,8 @@ Technical board
 
 The first technical board hasn't been elected yet.
 
+.. _committers:
+
 Committers
 ==========
 
@@ -16,6 +18,8 @@ Most :ref:`core team <core-team>` members have commit access. They're called
 "committers" or "core developers".
 
 Being part of the core team is a pre-requisite for having commit access.
+
+.. _security-team-list:
 
 Security team
 =============
@@ -34,6 +38,8 @@ The current security team members are:
 - Paul McMillan
 - Carl Meyer
 - Donald Stufft
+
+.. _releasers-list:
 
 Releasers
 =========

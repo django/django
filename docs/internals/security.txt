@@ -19,21 +19,20 @@ Reporting security issues
 **Short version: please report security issues by emailing
 security@djangoproject.com**.
 
-Most normal bugs in Django are reported to `our public Trac
-instance`_, but due to the sensitive nature of security issues, we ask
-that they **not** be publicly reported in this fashion.
+Most normal bugs in Django are reported to `our public Trac instance`_, but
+due to the sensitive nature of security issues, we ask that they **not** be
+publicly reported in this fashion.
 
-Instead, if you believe you've found something in Django which has
-security implications, please send a description of the issue via
-email to ``security@djangoproject.com``. Mail sent to that address
-reaches a subset of the core development team, who can forward
-security issues into the private committers' mailing list for broader
-discussion if needed.
+Instead, if you believe you've found something in Django which has security
+implications, please send a description of the issue via email to
+``security@djangoproject.com``. Mail sent to that address reaches a
+:ref:`subset of the core team <security-team-list>`, who can forward security
+issues into the private committers' mailing list for broader discussion if
+needed.
 
-Once you've submitted an issue via email, you should receive an
-acknowledgment from a member of the Django development team within 48
-hours, and depending on the action to be taken, you may receive
-further followup emails.
+Once you've submitted an issue via email, you should receive an acknowledgment
+from a member of the security team within 48 hours, and depending on the
+action to be taken, you may receive further followup emails.
 
 .. note::
 

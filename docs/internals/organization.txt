@@ -33,6 +33,8 @@ Until 2014, the Django Project was a benevolent_ dictatorship_.
 .. _benevolent: http://www.holovaty.com/writing/bdfls-retiring/
 .. _dictatorship: http://jacobian.org/writing/retiring-as-bdfls/
 
+.. _core-team:
+
 Core team
 =========
 
@@ -129,6 +131,8 @@ themselves as "past team members". Those who haven't made any non-trivial
 contribution in two years may be asked to move themselves to this category,
 and moved there if they don't respond. Past team members lose their privileges
 such as voting rights and commit access.
+
+.. _technical-board:
 
 Technical board
 ===============

@@ -40,9 +40,9 @@ installation, usage, or debugging of Django.
 ``django-core-mentorship``
 --------------------------
 
-The Django Core Development Mentorship list is intended to provide a welcoming
-introductory environment for developers interested in contributing to core
-Django development.
+The Django Core Mentorship list is intended to provide a welcoming
+introductory environment for community members interested in contributing to
+the Django Project.
 
 * `django-core-mentorship mailing archive`_
 * `django-core-mentorship subscription email address`_

@@ -2,9 +2,9 @@
 Committing code
 ===============
 
-This section is addressed to the :doc:`/internals/team` and to anyone
-interested in knowing how code gets committed into Django core. If you're a
-community member who wants to contribute code to Django, have a look at
+This section is addressed to the :ref:`committers` and to anyone interested in
+knowing how code gets committed into Django core. If you're a community member
+who wants to contribute code to Django, have a look at
 :doc:`writing-code/working-with-git` instead.
 
 .. _handling-pull-requests:
@@ -109,7 +109,7 @@ Django's Git repository:
 
   If you bring something up on |django-developers| and nobody responds,
   please don't take that to mean your idea is great and should be
-  implemented immediately because nobody contested it. Django's lead
+  implemented immediately because nobody contested it. Django's core
   developers don't have a lot of time to read mailing-list discussions
   immediately, so you may have to wait a couple of days before getting a
   response.
@@ -142,7 +142,7 @@ Django's Git repository:
   use frequent small commits rather than infrequent large commits. For
   example, if implementing feature X requires a small change to library Y,
   first commit the change to library Y, then commit feature X in a
-  separate commit. This goes a *long way* in helping all core Django
+  separate commit. This goes a *long way* in helping all Django core
   developers follow your changes.
 
 * Separate bug fixes from feature changes. Bugfixes may need to be backported
@@ -168,7 +168,6 @@ Django's Git repository:
     So if you try to close a pull request with the phrase "closes #400" in your
     commit message, GitHub will close the pull request, but the Trac plugin
     will also close the same numbered ticket in Trac.
-
 
 .. _Trac plugin: https://github.com/aaugustin/trac-github
 
