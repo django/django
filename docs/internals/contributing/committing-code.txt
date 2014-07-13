@@ -7,19 +7,6 @@ interested in knowing how code gets committed into Django core. If you're a
 community member who wants to contribute code to Django, have a look at
 :doc:`writing-code/working-with-git` instead.
 
-Commit access
--------------
-
-Core developers are people who have a long history of contributions to
-Django's codebase, a solid track record of being polite and helpful on the
-mailing lists, and a proven desire to dedicate serious time to Django's
-development. The bar is high for full commit access.
-
-Decisions on new committers will follow the process explained in
-:ref:`how-we-make-decisions`. To request commit access, please contact an
-existing committer privately. Public requests for commit access are potential
-flame-war starters, and will simply be ignored.
-
 .. _handling-pull-requests:
 
 Handling pull requests
