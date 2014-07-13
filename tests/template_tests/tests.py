@@ -881,6 +881,9 @@ class TemplateTests(TestCase):
             # Raise exception for custom tags used in child with {% load %} tag in parent, not in child
             'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
 
+            # Raise exception for block.super used in base template
+            'exception05': ("{% block first %}{{ block.super }}{% endblock %}", {}, template.TemplateSyntaxError),
+
             ### FILTER TAG ############################################################
             'filter01': ('{% filter upper %}{% endfilter %}', {}, ''),
             'filter02': ('{% filter upper %}django{% endfilter %}', {}, 'DJANGO'),
