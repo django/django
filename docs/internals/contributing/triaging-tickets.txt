@@ -29,7 +29,7 @@ possible, and raise issues for discussion on our mailing lists when there is
 confusion or disagreement.
 
 Django is a community project, and every contribution helps. We can't do this
-without YOU!
+without **you**!
 
 Triage workflow
 ---------------
@@ -146,7 +146,7 @@ Ready For Checkin
 
 The ticket was reviewed by any member of the community other than the person
 who supplied the patch and found to meet all the requirements for a
-commit-ready patch. A core committer now needs to give the patch a final
+commit-ready patch. A committer now needs to give the patch a final
 review prior to being committed. See the
 :ref:`New contributors' FAQ<new-contributors-faq>` for "My ticket has been in
 RFC forever! What should I do?"
