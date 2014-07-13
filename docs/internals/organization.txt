@@ -21,17 +21,10 @@ and its community.
 .. _Django Code of Conduct: https://www.djangoproject.com/conduct/
 .. _Django Software Foundation: https://www.djangoproject.com/foundation/
 
-Since 2014, the Django Project is an aristocracy_. The Django core team makes
-the decisions, elects its technical board, and nominates new team members.
-While it holds decision power in theory, it aims at using it as rarely as
-possible in practice. Rough consensus should be the norm and formal voting an
-exception.
-
-Until 2014, the Django Project was a benevolent_ dictatorship_.
-
-.. _aristocracy: http://en.wikipedia.org/wiki/Aristocracy
-.. _benevolent: http://www.holovaty.com/writing/bdfls-retiring/
-.. _dictatorship: http://jacobian.org/writing/retiring-as-bdfls/
+The Django core team makes the decisions, nominates its new members, and
+elects its technical board. While it holds decision power in theory, it aims
+at using it as rarely as possible in practice. Rough consensus should be the
+norm and formal voting an exception.
 
 .. _core-team:
 
