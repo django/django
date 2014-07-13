@@ -57,10 +57,9 @@ Since a picture is worth a thousand words, let's start there:
 
 We've got two roles in this diagram:
 
-* :doc:`Committers</internals/committers>` (also called core developers):
-  people with commit access who are responsible for making the big
-  decisions, writing large portions of the code and integrating the
-  contributions of the community.
+* Committers (also called core developers): people with commit access who are
+  responsible for making decisions and integrating the contributions of the
+  community.
 
 * Ticket triagers: anyone in the Django community who chooses to
   become involved in Django's development process. Our Trac installation
@@ -314,7 +313,7 @@ A ticket can be resolved in a number of ways:
       discussion in the |django-developers| mailing list. Feel free to
       start or join in discussions of "wontfix" tickets on the
       |django-developers| mailing list, but please do not reopen tickets
-      closed as "wontfix" by a :doc:`core developer</internals/committers>`.
+      closed as "wontfix" by a :doc:`core developer</internals/team>`.
 
 * duplicate
       Used when another ticket covers the same issue. By closing duplicate
@@ -407,7 +406,7 @@ the ticket database:
   review a patch that you submit.
 
 * Please **don't** reverse a decision that has been made by a :doc:`core
-  developer</internals/committers>`. If you disagree with a decision that
+  developer</internals/team>`. If you disagree with a decision that
   has been made, please post a message to |django-developers|.
 
 * If you're unsure if you should be making a change, don't make the

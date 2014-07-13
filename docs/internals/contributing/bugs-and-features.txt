@@ -152,7 +152,7 @@ However, consensus is not always possible. If consensus cannot be reached, or
 if the discussion towards a consensus fizzles out without a concrete decision,
 we use a more formal process.
 
-Any :doc:`core committer</internals/committers>` may call for a formal vote
+Any :doc:`core committer</internals/team>` may call for a formal vote
 using the same voting mechanism above. A proposition will be considered carried
 by the core team if:
 
@@ -170,8 +170,8 @@ take to convert that "-1" into at least a "+0".
 
 Whenever possible, these formal votes should be announced and held in
 public on the |django-developers| mailing list. However, overly sensitive
-or contentious issues -- including, most notably, votes on new core
-committers -- may be held in private.
+or contentious issues -- including, most notably, votes on new team
+members -- may be held in private.
 
 
 .. _searching: https://code.djangoproject.com/search
