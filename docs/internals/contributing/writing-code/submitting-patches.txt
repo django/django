@@ -219,7 +219,7 @@ Finally, there are a couple of updates to Django's documentation to make:
    under the ``A.B+2`` version describing what code will be removed.
 
 Once you have completed these steps, you are finished with the deprecation.
-In each minor release, all ``RemovedInDjangoXXWarning``\s matching the new
+In each major release, all ``RemovedInDjangoXXWarning``\s matching the new
 version are removed.
 
 Javascript patches
