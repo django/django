@@ -2,6 +2,8 @@
 Django team
 ===========
 
+.. _original-team-list:
+
 The original team
 =================
 
@@ -54,6 +56,8 @@ Journal-World`_ of Lawrence, Kansas, USA.
 .. _wilson miner: http://wilsonminer.com/
 .. _heroku: http://heroku.com/
 .. _Rdio: http://rdio.com
+
+.. _core-team-list:
 
 The current team
 ================
@@ -551,8 +555,8 @@ Baptiste Mispelon
     .. _Solid Links: http://solidlinks.nl/
     .. _Erik's Pony Checkup: http://ponycheckup.com/
 
-Retired team members
-====================
+Past team members
+=================
 
 Georg "Hugo" Bauer
     Georg created Django's internationalization system, managed i18n
