@@ -2,7 +2,7 @@
 Committing code
 ===============
 
-This section is addressed to the :doc:`/internals/committers` and to anyone
+This section is addressed to the :doc:`/internals/team` and to anyone
 interested in knowing how code gets committed into Django core. If you're a
 community member who wants to contribute code to Django, have a look at
 :doc:`writing-code/working-with-git` instead.

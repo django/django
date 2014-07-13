@@ -1,6 +1,6 @@
-=================
-Django committers
-=================
+===========
+Django team
+===========
 
 The original team
 =================
@@ -55,13 +55,10 @@ Journal-World`_ of Lawrence, Kansas, USA.
 .. _heroku: http://heroku.com/
 .. _Rdio: http://rdio.com
 
-Current developers
-==================
+The current team
+================
 
 Currently, Django is led by a team of volunteers from around the globe.
-
-Core developers
----------------
 
 These are the folks who have a long history of contributions, a solid track
 record of being helpful on the mailing lists, and a proven desire to dedicate
@@ -554,8 +551,8 @@ Baptiste Mispelon
     .. _Solid Links: http://solidlinks.nl/
     .. _Erik's Pony Checkup: http://ponycheckup.com/
 
-Developers Emeritus
-===================
+Retired team members
+====================
 
 Georg "Hugo" Bauer
     Georg created Django's internationalization system, managed i18n
