@@ -179,6 +179,8 @@ Management Commands
 
 * :djadmin:`runserver` now uses daemon threads for faster reloading.
 
+* :djadmin:`inspectdb` now outputs ``Meta.unique_together``.
+
 Models
 ^^^^^^
 
