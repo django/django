@@ -35,7 +35,7 @@ from .models import (Article, Chapter, Child, Parent, Picture, Widget,
     UnchangeableObject, UserMessenger, Simple, Choice, ShortMessage, Telegram,
     FilteredManager, EmptyModelHidden, EmptyModelVisible, EmptyModelMixin,
     State, City, Restaurant, Worker, ParentWithDependentChildren,
-    DependentChild, StumpJoke, FieldOverridePost)
+    DependentChild, StumpJoke, FieldOverridePost, FunkyTag)
 
 
 def callable_year(dt_value):
@@ -827,6 +827,10 @@ class RestaurantAdmin(admin.ModelAdmin):
         return {'name': 'overridden_value'}
 
 
+class FunkyTagAdmin(admin.ModelAdmin):
+    list_display = ('name', 'content_object')
+
+
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
@@ -882,6 +886,7 @@ site.register(State, StateAdmin)
 site.register(City, CityAdmin)
 site.register(Restaurant, RestaurantAdmin)
 site.register(Worker, WorkerAdmin)
+site.register(FunkyTag, FunkyTagAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
