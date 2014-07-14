@@ -27,7 +27,7 @@ class GISLookup(Lookup):
         fld_name = field_list.pop()
 
         try:
-            geo_fld = opts.get_new_field(fld_name)
+            geo_fld = opts.get_field(fld_name)
             # If the field list is still around, then it means that the
             # lookup was for a geometry field across a relationship --
             # thus we keep on getting the related model options and the
@@ -35,7 +35,7 @@ class GISLookup(Lookup):
             # until there's no more left.
             while len(field_list):
                 opts = geo_fld.rel.to._meta
-                geo_fld = opts.get_new_field(field_list.pop())
+                geo_fld = opts.get_field(field_list.pop())
         except (FieldDoesNotExist, AttributeError):
             return False
 

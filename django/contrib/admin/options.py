@@ -401,7 +401,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         rel_name = None
         for part in parts[:-1]:
             try:
-                field = model._meta.get_new_field(part, related_objects=True, related_m2m=True, virtual=True)
+                field = model._meta.get_field(part, related_objects=True, related_m2m=True, virtual=True)
             except FieldDoesNotExist:
                 # Lookups on non-existent fields are ok, since they're ignored
                 # later.
@@ -1325,7 +1325,7 @@ class ModelAdmin(BaseModelAdmin):
         initial = dict(request.GET.items())
         for k in initial:
             try:
-                f = self.model._meta.get_new_field(k)
+                f = self.model._meta.get_field(k)
             except models.FieldDoesNotExist:
                 continue
             # We have to special-case M2Ms as a list of comma-separated PKs.

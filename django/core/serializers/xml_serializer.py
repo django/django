@@ -199,7 +199,7 @@ class Deserializer(base.Deserializer):
             # be propagated correctly unless ignorenonexistent=True is used.
             if self.ignore and field_name not in Model._meta.field_names:
                 continue
-            field = Model._meta.get_new_field(field_name)
+            field = Model._meta.get_field(field_name)
 
             # As is usually the case, relation fields get the special treatment.
             if field.rel and isinstance(field.rel, models.ManyToManyRel):
@@ -240,11 +240,11 @@ class Deserializer(base.Deserializer):
                 else:
                     # Otherwise, treat like a normal PK
                     field_value = getInnerText(node).strip()
-                    obj_pk = field.rel.to._meta.get_new_field(field.rel.field_name).to_python(field_value)
+                    obj_pk = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
                 return obj_pk
             else:
                 field_value = getInnerText(node).strip()
-                return field.rel.to._meta.get_new_field(field.rel.field_name).to_python(field_value)
+                return field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
 
     def _handle_m2m_field_node(self, node, field):
         """

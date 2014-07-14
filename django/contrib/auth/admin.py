@@ -110,7 +110,7 @@ class UserAdmin(admin.ModelAdmin):
             raise PermissionDenied
         if extra_context is None:
             extra_context = {}
-        username_field = self.model._meta.get_new_field(self.model.USERNAME_FIELD)
+        username_field = self.model._meta.get_field(self.model.USERNAME_FIELD)
         defaults = {
             'auto_populated_fields': (),
             'username_help_text': username_field.help_text,

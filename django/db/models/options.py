@@ -52,8 +52,8 @@ class Options(object):
     def __init__(self, meta, app_label=None):
         self._map_details_cache = {}
         self._map_model_cache = {}
-        self._get_new_fields_cache = {}
-        self._get_new_field_cache = {}
+        self._get_fields_cache = {}
+        self._get_field_cache = {}
         self.local_fields = []
         self.local_many_to_many = []
         self.virtual_fields = []
@@ -322,8 +322,8 @@ class Options(object):
                 delattr(self, cache_key)
             except AttributeError:
                 pass
-        self._get_new_field_cache = {}
-        self._get_new_fields_cache = {}
+        self._get_field_cache = {}
+        self._get_fields_cache = {}
 
     def __repr__(self):
         return '<Options for %s>' % self.object_name
@@ -333,7 +333,7 @@ class Options(object):
 
     ### PUBLICLY USABLE AND STABLE APIS GO BELOW THIS LINE ###
 
-    def get_new_field(self, field_name, m2m=True, data=True, related_objects=False, related_m2m=False, virtual=True):
+    def get_field(self, field_name, m2m=True, data=True, related_objects=False, related_m2m=False, virtual=True):
         """
         Returns a field instance given a field name. By default will only search in data and
         many to many fields. This can be changed by enabling or disabling field types using
@@ -343,7 +343,7 @@ class Options(object):
         cache_key = (m2m, data, related_objects, related_m2m, virtual,)
 
         try:
-            field_map = self._get_new_field_cache[cache_key]
+            field_map = self._get_field_cache[cache_key]
         except KeyError:
             res = {}
 
@@ -355,7 +355,7 @@ class Options(object):
                 for name in names:
                     res[name] = field
 
-            field_map = self._get_new_field_cache[cache_key] = res
+            field_map = self._get_field_cache[cache_key] = res
         try:
             # Retreive field instance by name from cached or just-computer field map
             return field_map[field_name]
@@ -375,7 +375,7 @@ class Options(object):
                      include_non_concrete, include_hidden, include_proxy, recursive)
 
         try:
-            return self._get_new_fields_cache[cache_key]
+            return self._get_fields_cache[cache_key]
         except KeyError:
             pass
 
@@ -456,7 +456,7 @@ class Options(object):
             fields = tuple(fields.keys())
 
         # Store result into cache for later access
-        self._get_new_fields_cache[cache_key] = fields
+        self._get_fields_cache[cache_key] = fields
         return fields
 
     ### CACHED PROPERTIES FOR FAST ACCESS ###
@@ -518,11 +518,8 @@ class Options(object):
     def get_m2m_with_model(self):
         return list(map(self._map_model, self.get_fields(data=False, m2m=True)))
 
-    def get_field(self, name, many_to_many=True):
-        return self.get_new_field(name)
-
     def get_field_by_name(self, name):
-        return self._map_details(self.get_new_field(name, m2m=True, related_objects=True,
+        return self._map_details(self.get_field(name, m2m=True, related_objects=True,
                                  related_m2m=True, virtual=True))
 
     def get_all_field_names(self):

@@ -362,7 +362,7 @@ class ChangePasswordTest(AuthViewsTestCase):
             'password': password,
         })
         self.assertFormError(response, AuthenticationForm.error_messages['invalid_login'] % {
-            'username': User._meta.get_new_field('username').verbose_name
+            'username': User._meta.get_field('username').verbose_name
         })
 
     def logout(self):

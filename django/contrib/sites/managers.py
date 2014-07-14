@@ -22,7 +22,7 @@ class CurrentSiteManager(models.Manager):
     def _check_field_name(self):
         field_name = self._get_field_name()
         try:
-            field = self.model._meta.get_new_field(field_name)
+            field = self.model._meta.get_field(field_name)
         except FieldDoesNotExist:
             return [
                 checks.Error(
@@ -52,7 +52,7 @@ class CurrentSiteManager(models.Manager):
 
         if not self.__field_name:
             try:
-                self.model._meta.get_new_field('site')
+                self.model._meta.get_field('site')
             except FieldDoesNotExist:
                 self.__field_name = 'sites'
             else:

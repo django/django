@@ -56,7 +56,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 
 
 def _load_field(app_label, model_name, field_name):
-    return apps.get_model(app_label, model_name)._meta.get_new_field(field_name, related_objects=True, related_m2m=True, virtual=True)
+    return apps.get_model(app_label, model_name)._meta.get_field(field_name, related_objects=True, related_m2m=True, virtual=True)
 
 
 class FieldDoesNotExist(Exception):

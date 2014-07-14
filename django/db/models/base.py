@@ -558,7 +558,7 @@ class Model(six.with_metaclass(ModelBase)):
         and not use this method.
         """
         try:
-            field = self._meta.get_new_field(field_name, m2m=True,
+            field = self._meta.get_field(field_name, m2m=True,
                                              related_objects=True,
                                              related_m2m=True, virtual=True)
         except FieldDoesNotExist:
@@ -900,7 +900,7 @@ class Model(six.with_metaclass(ModelBase)):
 
             lookup_kwargs = {}
             for field_name in unique_check:
-                f = self._meta.get_new_field(field_name)
+                f = self._meta.get_field(field_name)
                 lookup_value = getattr(self, f.attname)
                 if lookup_value is None:
                     # no value, skip the lookup
@@ -965,7 +965,7 @@ class Model(six.with_metaclass(ModelBase)):
 
     def date_error_message(self, lookup_type, field_name, unique_for):
         opts = self._meta
-        field = opts.get_new_field(field_name)
+        field = opts.get_field(field_name)
         return ValidationError(
             message=field.error_messages['unique_for_date'],
             code='unique_for_date',
@@ -976,7 +976,7 @@ class Model(six.with_metaclass(ModelBase)):
                 'field': field_name,
                 'field_label': six.text_type(capfirst(field.verbose_name)),
                 'date_field': unique_for,
-                'date_field_label': six.text_type(capfirst(opts.get_new_field(unique_for).verbose_name)),
+                'date_field_label': six.text_type(capfirst(opts.get_field(unique_for).verbose_name)),
             }
         )
 
@@ -992,7 +992,7 @@ class Model(six.with_metaclass(ModelBase)):
 
         # A unique field
         if len(unique_check) == 1:
-            field = opts.get_new_field(unique_check[0])
+            field = opts.get_field(unique_check[0])
             params['field_label'] = six.text_type(capfirst(field.verbose_name))
             return ValidationError(
                 message=field.error_messages['unique'],
@@ -1002,7 +1002,7 @@ class Model(six.with_metaclass(ModelBase)):
 
         # unique_together
         else:
-            field_labels = [capfirst(opts.get_new_field(f).verbose_name) for f in unique_check]
+            field_labels = [capfirst(opts.get_field(f).verbose_name) for f in unique_check]
             params['field_labels'] = six.text_type(get_text_list(field_labels, _('and')))
             return ValidationError(
                 message=_("%(model_name)s with this %(field_labels)s already exists."),
@@ -1361,7 +1361,7 @@ class Model(six.with_metaclass(ModelBase)):
         errors = []
         for field_name in fields:
             try:
-                field = cls._meta.get_new_field(field_name)
+                field = cls._meta.get_field(field_name)
                     
             except models.FieldDoesNotExist:
                 errors.append(
@@ -1444,11 +1444,11 @@ class Model(six.with_metaclass(ModelBase)):
 
         for field_name in fields:
             try:
-                cls._meta.get_new_field(field_name, m2m=False)
+                cls._meta.get_field(field_name, m2m=False)
             except FieldDoesNotExist:
                 if field_name.endswith('_id'):
                     try:
-                        field = cls._meta.get_new_field(field_name[:-3], m2m=False)
+                        field = cls._meta.get_field(field_name[:-3], m2m=False)
                     except FieldDoesNotExist:
                         pass
                     else:

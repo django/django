@@ -26,7 +26,7 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
         self.UserModel = get_user_model()
-        self.username_field = self.UserModel._meta.get_new_field(self.UserModel.USERNAME_FIELD)
+        self.username_field = self.UserModel._meta.get_field(self.UserModel.USERNAME_FIELD)
 
     def add_arguments(self, parser):
         parser.add_argument('--%s' % self.UserModel.USERNAME_FIELD,
@@ -67,7 +67,7 @@ class Command(BaseCommand):
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     if options.get(field_name):
-                        field = self.UserModel._meta.get_new_field(field_name)
+                        field = self.UserModel._meta.get_field(field_name)
                         user_data[field_name] = field.clean(options[field_name], None)
                     else:
                         raise CommandError("You must use --%s with --noinput." % field_name)
@@ -106,7 +106,7 @@ class Command(BaseCommand):
                         username = None
 
                 for field_name in self.UserModel.REQUIRED_FIELDS:
-                    field = self.UserModel._meta.get_new_field(field_name)
+                    field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = options.get(field_name)
                     while user_data[field_name] is None:
                         message = force_str('%s%s: ' % (capfirst(field.verbose_name),

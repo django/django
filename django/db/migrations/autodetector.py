@@ -161,7 +161,7 @@ class MigrationAutodetector(object):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             for field_name, field in old_model_state.fields:
-                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_new_field(field_name, related_objects=True, related_m2m=True, virtual=True)
+                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(field_name, related_objects=True, related_m2m=True, virtual=True)
                 if hasattr(old_field, "rel") and getattr(old_field.rel, "through", None) and not old_field.rel.through._meta.auto_created:
                     through_key = (
                         old_field.rel.through._meta.app_label,
@@ -762,8 +762,8 @@ class MigrationAutodetector(object):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             new_model_state = self.to_state.models[app_label, model_name]
             old_field_name = self.renamed_fields.get((app_label, model_name, field_name), field_name)
-            old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_new_field(old_field_name, related_objects=True, related_m2m=True, virtual=True)
-            new_field = self.new_apps.get_model(app_label, model_name)._meta.get_new_field(field_name, related_objects=True, related_m2m=True, virtual=True)
+            old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(old_field_name, related_objects=True, related_m2m=True, virtual=True)
+            new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name, related_objects=True, related_m2m=True, virtual=True)
             # Implement any model renames on relations; these are handled by RenameModel
             # so we need to exclude them from the comparison
             if hasattr(new_field, "rel") and getattr(new_field.rel, "to", None):
