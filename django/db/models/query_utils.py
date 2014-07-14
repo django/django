@@ -186,6 +186,14 @@ def deferred_class_factory(model, attrs):
     being replaced with DeferredAttribute objects. The "pk_value" ties the
     deferred attributes to a particular instance of the model.
     """
+    if not attrs:
+        return model
+    # Never create deferred models based on deferred model
+    if model._deferred:
+        # Deferred models are proxies for the non-deferred model. We never
+        # create chains of defers => proxy_for_model is the non-deferred
+        # model.
+        model = model._meta.proxy_for_model
     # The app registry wants a unique name for each model, otherwise the new
     # class won't be created (we get an exception). Therefore, we generate
     # the name using the passed in attrs. It's OK to reuse an existing class
