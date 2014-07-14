@@ -347,10 +347,10 @@ class Options(object):
         except KeyError:
             res = {}
 
-            # Call get_fields with recursive=True in order to have a field_instance -> names map
+            # Call get_fields with export_name_map=True in order to have a field_instance -> names map
             for field, names in six.iteritems(self.get_fields(m2m=m2m, data=data,
                   related_objects=related_objects, related_m2m=related_m2m,
-                  virtual=virtual, recursive=True)):
+                  virtual=virtual, export_name_map=True)):
                 # Map each possible name for a field to it's field instance
                 for name in names:
                     res[name] = field
@@ -363,7 +363,7 @@ class Options(object):
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
     def get_fields(self, m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False,
-                       include_parents=True, include_non_concrete=True, include_hidden=False, include_proxy=False, recursive=False):
+                   include_parents=True, include_non_concrete=True, include_hidden=False, include_proxy=False, export_name_map=False):
         """
         Returns a list of fields associated to the model. By default will only search in data.
         This can be changed by enabling or disabling field types using
@@ -372,7 +372,7 @@ class Options(object):
 
         # Creates a cache key composed of all arguments
         cache_key = (m2m, data, related_m2m, related_objects, virtual, include_parents,
-                     include_non_concrete, include_hidden, include_proxy, recursive)
+                     include_non_concrete, include_hidden, include_proxy, export_name_map)
 
         try:
             return self._get_fields_cache[cache_key]
@@ -394,12 +394,16 @@ class Options(object):
                 # in this call
                 for parent in self.parents:
                     for obj, query_name in six.iteritems(parent._meta.get_fields(data=False, related_m2m=True,
-                                                         **dict(options, recursive=True))):
-                        is_valid = not (obj.field.creation_counter < 0
-                                    and obj.model not in self.get_parent_list())
-                        if is_valid:
+                                                         **dict(options, export_name_map=True))):
+                        # In order for a related M2M object to be valid, it's creation
+                        # counter must be > 0 and must be in the parent list
+                        if not (obj.field.creation_counter < 0
+                                and obj.model not in self.get_parent_list()):
                             fields[obj] = query_name
 
+            # Tree is computer once and cached until apps cache is expired. It is composed of
+            # { options_instance : [field_pointing_to_options_model, field_pointing_to_options, ..]}
+            # If the model is a proxy model, then we also add the concrete model.
             tree = self.apps.related_m2m_relation_graph
             for f in tree[self] if not self.proxy else tree[self] + tree[self.concrete_model._meta]:
                 fields[f.related] = (f.related_query_name(),)
@@ -411,7 +415,7 @@ class Options(object):
                 # in this call
                 for parent in self.parents:
                     for obj, query_name in six.iteritems(parent._meta.get_fields(data=False, related_objects=True,
-                                                         **dict(options, recursive=True, include_hidden=True))):
+                                                         **dict(options, export_name_map=True, include_hidden=True))):
                         if not ((obj.field.creation_counter < 0
                                 or obj.field.rel.parent_link)
                                 and obj.model not in parent_list):
@@ -420,9 +424,13 @@ class Options(object):
                                 # is not intentionally hidden, add to the fields dict
                                 fields[obj] = query_name
 
+            # Tree is computer once and cached until apps cache is expired. It is composed of
+            # { options_instance : [field_pointing_to_options_model, field_pointing_to_options, ..]}
+            # If the model is a proxy model, then we also add the concrete model.
             tree, proxy_tree = self.apps.related_objects_relation_graph
             all_fields = tree[self] if not self.proxy else tree[self] + tree[self.concrete_model._meta]
             if include_proxy:
+                # If we are also incluing proxied relations, also add contents in the proxy tree.
                 all_fields += proxy_tree[self.concrete_model]
             for f in all_fields:
                 if include_hidden or not f.related.field.rel.is_hidden():
@@ -434,14 +442,14 @@ class Options(object):
             if include_parents:
                 for parent in self.parents:
                     # Extend the fields dict with all the m2m fields of each parent.
-                    fields.update(parent._meta.get_fields(data=False, m2m=True, **dict(options, recursive=True)))
+                    fields.update(parent._meta.get_fields(data=False, m2m=True, **dict(options, export_name_map=True)))
             fields.update((field, (field.name, field.attname)) for field in self.local_many_to_many)
 
         if data:
             if include_parents:
                 for parent in self.parents:
                     # Extend the fields dict with all the m2m fields of each parent.
-                    fields.update(parent._meta.get_fields(**dict(options, recursive=True)))
+                    fields.update(parent._meta.get_fields(**dict(options, export_name_map=True)))
             fields.update((field, (field.name, field.attname)) for field in self.local_fields
                           if include_non_concrete or field.column is not None)
 
@@ -449,7 +457,7 @@ class Options(object):
             # Virtual fields to not need to recursively search parents.
             fields.update((field, (field.name,)) for field in self.virtual_fields)
 
-        if not recursive:
+        if not export_name_map:
             # By default, fields contains field instances as keys and all possible names
             # if the field instance as values. when get_fields is called, we only want to
             # return field instances, so we just preserve the keys.
@@ -479,7 +487,7 @@ class Options(object):
         """
         res = set()
         for _, names in six.iteritems(self.get_fields(m2m=True, related_objects=True,
-                                          related_m2m=True, virtual=True, recursive=True)):
+                                          related_m2m=True, virtual=True, export_name_map=True)):
             res.update(name for name in names if not name.endswith('+'))
         return list(res)
 
