@@ -1718,9 +1718,24 @@ class AdminViewDeletedObjectsTest(TestCase):
         """
         plot = Plot.objects.get(pk=3)
         FunkyTag.objects.create(content_object=plot, name='hott')
-        should_contain = """<li>Funky tag: hott"""
+        should_contain = """<li>Funky tag: <a href="/test_admin/admin/admin_views/funkytag/1/">hott"""
         response = self.client.get('/test_admin/admin/admin_views/plot/%s/delete/' % quote(3))
         self.assertContains(response, should_contain)
+
+
+@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+    ROOT_URLCONF="admin_views.urls")
+class TestGenericRelations(TestCase):
+    fixtures = ['admin-views-users.xml', 'deleted-objects.xml']
+
+    def setUp(self):
+        self.client.login(username='super', password='secret')
+
+    def test_generic_content_object_in_list_display(self):
+        plot = Plot.objects.get(pk=3)
+        FunkyTag.objects.create(content_object=plot, name='hott')
+        response = self.client.get('/test_admin/admin/admin_views/funkytag/')
+        self.assertContains(response, "%s</td>" % plot)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),

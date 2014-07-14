@@ -1,7 +1,7 @@
 from django import test
 
-from django.db.models.fields import related, CharField, Field
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.db.models.fields import related, CharField, Field, FieldDoesNotExist
+from django.contrib.contenttypes.fields import GenericRelation
 
 from .models import (
     AbstractPerson, BasePerson, Person, Relating, Relation
@@ -650,7 +650,12 @@ class GetFieldByNameTests(OptionsBaseTests):
         self.assertEqual(field_info[1:], (None, False, True))
         self.assertIsInstance(field_info[0], related.RelatedObject)
 
-    def test_get_virtual_field(self):
-        field_info = Person._meta.get_field_by_name('content_object_base')
+    def test_get_generic_foreign_key(self):
+        # For historic reasons generic foreign keys aren't available.
+        with self.assertRaises(FieldDoesNotExist):
+            Person._meta.get_field_by_name('content_object_base')
+
+    def test_get_generic_relation(self):
+        field_info = Person._meta.get_field_by_name('generic_relation_base')
         self.assertEqual(field_info[1:], (None, True, False))
-        self.assertIsInstance(field_info[0], GenericForeignKey)
+        self.assertIsInstance(field_info[0], GenericRelation)
