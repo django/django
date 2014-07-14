@@ -7,8 +7,6 @@ from django.utils import six
 from .models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
     SelfReferChildSibling, Worksheet, RegressionModelSplit)
 
-import unittest
-
 
 class M2MRegressionTests(TestCase):
     def test_multiple_m2m(self):
@@ -34,7 +32,6 @@ class M2MRegressionTests(TestCase):
         self.assertQuerysetEqual(e1.topics.all(), ["<Tag: t1>"])
         self.assertQuerysetEqual(e1.related.all(), ["<Tag: t2>"])
 
-    @unittest.skip("Relies non non-deterministic dict ordering")
     def test_internal_related_name_not_in_error_msg(self):
         # The secret internal related names for self-referential many-to-many
         # fields shouldn't appear in the list when an error is made.
