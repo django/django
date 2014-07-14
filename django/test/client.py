@@ -270,10 +270,13 @@ class RequestFactory(object):
         # If there are parameters, add them
         if parsed[3]:
             path += str(";") + force_str(parsed[3])
-        path = unquote(path)
-        # WSGI requires latin-1 encoded strings. See get_path_info().
         if six.PY3:
-            path = path.encode('utf-8').decode('iso-8859-1')
+            # On Python 3 `unquote_to_bytes` is used and non-ASCII values in the
+            # WSGI environ are arbitrarily decoded with ISO-8859-1.
+            from urllib.parse import unquote_to_bytes
+            path = unquote_to_bytes(path).decode('iso-8859-1')
+        else:
+            path = unquote(path)
         return path
 
     def get(self, path, data=None, secure=False, **extra):
