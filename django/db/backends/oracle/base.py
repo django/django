@@ -107,7 +107,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_bitwise_or = False
     can_defer_constraint_checks = True
     supports_partially_nullable_unique_constraints = False
-    truncates_name = True
+    truncates_names = True
     has_bulk_insert = True
     supports_tablespaces = True
     supports_sequence_reset = False
