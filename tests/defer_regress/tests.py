@@ -6,6 +6,7 @@ from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.backends.db import SessionStore
 from django.db.models import Count
+from django.db.models.query_utils import deferred_class_factory, DeferredAttribute
 from django.test import TestCase, override_settings
 
 from .models import (
@@ -233,13 +234,23 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(len(qs), 1)
 
     def test_deferred_class_factory(self):
-        from django.db.models.query_utils import deferred_class_factory
         new_class = deferred_class_factory(
             Item,
             ('this_is_some_very_long_attribute_name_so_modelname_truncation_is_triggered',))
         self.assertEqual(
             new_class.__name__,
             'Item_Deferred_this_is_some_very_long_attribute_nac34b1f495507dad6b02e2cb235c875e')
+
+    def test_deferred_class_factory_already_deferred(self):
+        deferred_item1 = deferred_class_factory(Item, ('name',))
+        deferred_item2 = deferred_class_factory(deferred_item1, ('value',))
+        self.assertIs(deferred_item2._meta.proxy_for_model, Item)
+        self.assertFalse(isinstance(deferred_item2.__dict__.get('name'), DeferredAttribute))
+        self.assertTrue(isinstance(deferred_item2.__dict__.get('value'), DeferredAttribute))
+
+    def test_deferred_class_factory_no_attrs(self):
+        deferred_cls = deferred_class_factory(Item, ())
+        self.assertFalse(deferred_cls._deferred)
 
 
 class DeferAnnotateSelectRelatedTest(TestCase):
