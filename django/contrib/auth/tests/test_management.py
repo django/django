@@ -350,15 +350,15 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertIs(command.stdin, sys.stdin)
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserWithFK')
-    def test_required_field_with_fk(self):
+    def test_fields_with_fk(self):
         new_io = six.StringIO()
         group = Group.objects.create(name='mygroup')
         email = Email.objects.create(email='mymail@gmail.com')
         call_command(
             'createsuperuser',
             interactive=False,
-            username='user',
-            email='mymail@gmail.com',
+            username=email.pk,
+            email=email.email,
             group=group.pk,
             stdout=new_io,
             skip_checks=True,
@@ -366,7 +366,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         command_output = new_io.getvalue().strip()
         self.assertEqual(command_output, 'Superuser created successfully.')
         u = CustomUserWithFK._default_manager.get(email=email)
-        self.assertEqual(u.username, "user")
+        self.assertEqual(u.username, email)
         self.assertEqual(u.group, group)
 
         non_existent_email = 'mymail2@gmail.com'
@@ -375,19 +375,24 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             call_command(
                 'createsuperuser',
                 interactive=False,
-                username='user',
+                username=email.pk,
                 email=non_existent_email,
                 stdout=new_io,
                 skip_checks=True,
             )
 
     @override_settings(AUTH_USER_MODEL='auth.CustomUserWithFK')
-    def test_required_fields_with_fk_interactive(self):
+    def test_fields_with_fk_interactive(self):
         new_io = six.StringIO()
         group = Group.objects.create(name='mygroup')
         email = Email.objects.create(email='mymail@gmail.com')
 
-        @mock_inputs({'password': "nopasswd", 'username': "user", 'email': "mymail@gmail.com", 'group': group.pk})
+        @mock_inputs({
+            'password': 'nopasswd',
+            'username (email.id)': email.pk,
+            'email (email.email)': email.email,
+            'group (group.id)': group.pk,
+        })
         def test(self):
             call_command(
                 'createsuperuser',
@@ -400,7 +405,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             command_output = new_io.getvalue().strip()
             self.assertEqual(command_output, 'Superuser created successfully.')
             u = CustomUserWithFK._default_manager.get(email=email)
-            self.assertEqual(u.username, 'user')
+            self.assertEqual(u.username, email)
             self.assertEqual(u.group, group)
 
         test(self)

@@ -1,20 +1,17 @@
 ==============
-Custom lookups
+Custom Lookups
 ==============
 
 .. versionadded:: 1.7
 
-.. module:: django.db.models.lookups
-   :synopsis: Custom lookups
-
 .. currentmodule:: django.db.models
 
-By default Django offers a wide variety of :ref:`built-in lookups
-<field-lookups>` for filtering (for example, ``exact`` and ``icontains``). This
-documentation explains how to write custom lookups and how to alter the working
-of existing lookups.
+Django offers a wide variety of :ref:`built-in lookups <field-lookups>` for
+filtering (for example, ``exact`` and ``icontains``). This documentation
+explains how to write custom lookups and how to alter the working of existing
+lookups. For the API references of lookups, see the :doc:`/ref/models/lookups`.
 
-A simple Lookup example
+A simple lookup example
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Let's start with a simple custom lookup. We will write a custom lookup ``ne``
@@ -95,14 +92,14 @@ A simple transformer example
 The custom lookup above is great, but in some cases you may want to be able to
 chain lookups together. For example, let's suppose we are building an
 application where we want to make use of the ``abs()`` operator.
-We have an ``Experiment`` model which records a start value, end value and the
+We have an ``Experiment`` model which records a start value, end value, and the
 change (start - end). We would like to find all experiments where the change
 was equal to a certain amount (``Experiment.objects.filter(change__abs=27)``),
 or where it did not exceed a certain amount
 (``Experiment.objects.filter(change__abs__lt=27)``).
 
 .. note::
-    This example is somewhat contrived, but it demonstrates nicely the range of
+    This example is somewhat contrived, but it nicely demonstrates the range of
     functionality which is possible in a database backend independent manner,
     and without duplicating functionality already in Django.
 
@@ -269,139 +266,3 @@ is not found, we look for a ``Transform`` and then the ``exact`` lookup on that
   ``myfield.get_lookup('mytransform')``, which will fail, so it will fall back
   to calling ``myfield.get_transform('mytransform')`` and then
   ``mytransform.get_lookup('exact')``.
-
-Lookups and transforms are registered using the same API - ``register_lookup``.
-
-.. _query-expression:
-
-The Query Expression API
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-A lookup can assume that the lhs responds to the query expression API.
-Currently direct field references, aggregates and ``Transform`` instances respond
-to this API.
-
-.. method:: as_sql(qn, connection)
-
-    Responsible for producing the query string and parameters for the
-    expression. The ``qn`` is a ``SQLCompiler`` object, which has a
-    ``compile()`` method that can be used to compile other expressions. The
-    ``connection`` is the connection used to execute the query.
-
-    Calling expression.as_sql() directly is usually incorrect - instead
-    ``qn.compile(expression)`` should be used. The ``qn.compile()`` method will
-    take care of calling vendor-specific methods of the expression.
-
-.. method:: as_vendorname(qn, connection)
-
-    Works like ``as_sql()`` method. When an expression is compiled by
-    ``qn.compile()``, Django will first try to call ``as_vendorname()``, where
-    vendorname is the vendor name of the backend used for executing the query.
-    The vendorname is one of ``postgresql``, ``oracle``, ``sqlite`` or
-    ``mysql`` for Django's built-in backends.
-
-.. method:: get_lookup(lookup_name)
-
-    The ``get_lookup()`` method is used to fetch lookups. By default the
-    lookup is fetched from the expression's output type in the same way
-    described in registering and fetching lookup documentation below.
-    It is possible to override this method to alter that behavior.
-
-.. method:: get_transform(lookup_name)
-
-    The ``get_transform()`` method is used when a transform is needed rather
-    than a lookup, or if a lookup is not found. This is a more complex
-    situation which is useful when there arbitrary possible lookups for a
-    field. Generally speaking, you will not need to override ``get_lookup()``
-    or ``get_transform()``, and can use ``register_lookup()`` instead.
-
-.. attribute:: output_field
-
-    The ``output_field`` attribute is used by the ``get_lookup()`` method to
-    check for lookups. The ``output_field`` should be a field.
-
-Note that this documentation lists only the public methods of the API.
-
-Lookup reference
-~~~~~~~~~~~~~~~~
-
-.. class:: Lookup
-
-    In addition to the attributes and methods below, lookups also support
-    ``as_sql`` and ``as_vendorname`` from the query expression API.
-
-.. attribute:: lhs
-
-    The ``lhs`` (left-hand side) of a lookup tells us what we are comparing the
-    rhs to. It is an object which implements the query expression API. This is
-    likely to be a field, an aggregate or a subclass of ``Transform``.
-
-.. attribute:: rhs
-
-    The ``rhs`` (right-hand side) of a lookup is the value we are comparing the
-    left hand side to. It may be a plain value, or something which compiles
-    into SQL, for example an ``F()`` object or a ``Queryset``.
-
-.. attribute:: lookup_name
-
-    This class level attribute is used when registering lookups. It determines
-    the name used in queries to trigger this lookup. For example, ``contains``
-    or ``exact``. This should not contain the string ``__``.
-
-.. method:: process_lhs(qn, connection)
-
-    This returns a tuple of ``(lhs_string, lhs_params)``. In some cases you may
-    wish to compile ``lhs`` directly in your ``as_sql`` methods using
-    ``qn.compile(self.lhs)``.
-
-.. method:: process_rhs(qn, connection)
-
-    Behaves the same as ``process_lhs`` but acts on the right-hand side.
-
-Transform reference
-~~~~~~~~~~~~~~~~~~~
-
-.. class:: Transform
-
-    In addition to implementing the query expression API Transforms have the
-    following methods and attributes.
-
-.. attribute:: lhs
-
-    The ``lhs`` (left-hand-side) of a transform contains the value to be
-    transformed. The ``lhs`` implements the query expression API.
-
-.. attribute:: lookup_name
-
-    This class level attribute is used when registering lookups. It determines
-    the name used in queries to trigger this lookup. For example, ``year``
-    or ``dayofweek``. This should not contain the string ``__``.
-
-.. _lookup-registration-api:
-
-Registering and fetching lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The lookup registration API is explained below.
-
-.. classmethod:: register_lookup(lookup)
-
-    Registers the Lookup or Transform for the class. For example
-    ``DateField.register_lookup(YearExact)`` will register ``YearExact`` for
-    all ``DateFields`` in the project, but also for fields that are instances
-    of a subclass of ``DateField`` (for example ``DateTimeField``). You can
-    register a Lookup or a Transform using the same class method.
-
-.. method:: get_lookup(lookup_name)
-
-    Django uses ``get_lookup(lookup_name)`` to fetch lookups. The
-    implementation of ``get_lookup()`` looks for a subclass which is registered
-    for the current class with the correct ``lookup_name``.
-
-.. method:: get_transform(lookup_name)
-
-    Django uses ``get_transform(lookup_name)`` to fetch transforms. The
-    implementation of ``get_transform()`` looks for a subclass which is registered
-    for the current class with the correct ``transform_name``.
-
-The lookup registration API is available for ``Transform`` and ``Field`` classes.

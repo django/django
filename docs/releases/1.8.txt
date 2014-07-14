@@ -49,7 +49,8 @@ Minor features
 * The ``max_length`` of :attr:`Permission.name
   <django.contrib.auth.models.Permission.name>` has been increased from 50 to
   255 characters. Please run the database migration.
-* :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
+* :attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD` and
+  :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
   :class:`~django.db.models.ForeignKey`\s.
 
 :mod:`django.contrib.formtools`
@@ -412,6 +413,14 @@ Miscellaneous
   using this message in your own code, please update the list of interpolated
   parameters. Internally, Django will continue to provide the
   ``pk`` parameter in ``params`` for backwards compatibility.
+
+* ``UserCreationForm.errors_messages['duplicate_username']`` is no longer used.
+  If you wish to customize that error message, :ref:`override it on the form
+  <considerations-regarding-model-errormessages>` using
+  ``Meta.errors_messages['unique']`` or, if you have a custom user model, use
+  the ``'unique'`` key in the :attr:`~django.db.models.Field.error_messages`
+  option of the field designated by
+  :attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD`.
 
 .. _deprecated-features-1.8:
 

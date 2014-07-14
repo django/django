@@ -14,4 +14,4 @@ Model API reference. For introductory material, see :doc:`/topics/db/models`.
    instances
    querysets
    queries
-   custom-lookups
+   lookups

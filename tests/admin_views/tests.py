@@ -18,6 +18,7 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
+from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.utils import quote
@@ -26,6 +27,7 @@ from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.models import Group, User, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import TestCase, skipUnlessDBFeature
@@ -36,7 +38,7 @@ from django.utils import translation
 from django.utils.cache import get_max_age
 from django.utils.encoding import iri_to_uri, force_bytes, force_text
 from django.utils.html import escape
-from django.utils.http import urlencode, urlquote
+from django.utils.http import urlencode
 from django.utils.six.moves.urllib.parse import parse_qsl, urljoin, urlparse
 from django.utils._os import upath
 from django.utils import six
@@ -100,6 +102,18 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertRedirects(response,
             '/test_admin/%s/admin_views/article/add/' % self.urlbit,
             status_code=301)
+
+    def test_admin_static_template_tag(self):
+        """
+        Test that admin_static.static is pointing to the collectstatic version
+        (as django.contrib.collectstatic is in installed apps).
+        """
+        old_url = staticfiles_storage.base_url
+        staticfiles_storage.base_url = '/test/'
+        try:
+            self.assertEqual(static('path'), '/test/path')
+        finally:
+            staticfiles_storage.base_url = old_url
 
     def test_basic_add_GET(self):
         """
@@ -1748,7 +1762,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         prefix = '/test_admin/admin/admin_views/modelwithstringprimarykey/'
         response = self.client.get(prefix)
         # this URL now comes through reverse(), thus url quoting and iri_to_uri encoding
-        pk_final_url = escape(iri_to_uri(urlquote(quote(self.pk))))
+        pk_final_url = escape(iri_to_uri(quote(self.pk)))
         should_contain = """<th class="field-__str__"><a href="%s%s/">%s</a></th>""" % (prefix, pk_final_url, escape(self.pk))
         self.assertContains(response, should_contain)
 
@@ -1756,14 +1770,14 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         "The link from the recent actions list referring to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/')
         link = reverse('admin:admin_views_modelwithstringprimarykey_change', args=(quote(self.pk),))
-        should_contain = """<a href="%s">%s</a>""" % (link, escape(self.pk))
+        should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_recentactions_without_content_type(self):
         "If a LogEntry is missing content_type it will not display it in span tag under the hyperlink."
         response = self.client.get('/test_admin/admin/')
         link = reverse('admin:admin_views_modelwithstringprimarykey_change', args=(quote(self.pk),))
-        should_contain = """<a href="%s">%s</a>""" % (link, escape(self.pk))
+        should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
         self.assertContains(response, should_contain)
         should_contain = "Model with string primary key"  # capitalized in Recent Actions
         self.assertContains(response, should_contain)
@@ -1785,7 +1799,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         log_entry_name = "Model with string primary key"  # capitalized in Recent Actions
         logentry = LogEntry.objects.get(content_type__name__iexact=log_entry_name)
         model = "modelwithstringprimarykey"
-        desired_admin_url = "/test_admin/admin/admin_views/%s/%s/" % (model, escape(iri_to_uri(urlquote(quote(self.pk)))))
+        desired_admin_url = "/test_admin/admin/admin_views/%s/%s/" % (model, iri_to_uri(quote(self.pk)))
         self.assertEqual(logentry.get_admin_url(), desired_admin_url)
 
         logentry.content_type.model = "non-existent"
@@ -1795,7 +1809,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
         response = self.client.get('/test_admin/admin/admin_views/modelwithstringprimarykey/%s/delete/' % quote(self.pk))
         # this URL now comes through reverse(), thus url quoting and iri_to_uri encoding
-        should_contain = """/%s/">%s</a>""" % (escape(iri_to_uri(urlquote(quote(self.pk)))), escape(self.pk))
+        should_contain = """/%s/">%s</a>""" % (escape(iri_to_uri(quote(self.pk))), escape(self.pk))
         self.assertContains(response, should_contain)
 
     def test_url_conflicts_with_add(self):
