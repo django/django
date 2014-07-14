@@ -39,10 +39,12 @@ class CustomColumnRegression(TestCase):
         self.assertEqual(self.a1, Author.objects.get(first_name__exact='John'))
 
     def test_filter_on_nonexistant_field(self):
-        with self.assertRaises(FieldError) as e:
-            Author.objects.filter(firstname__exact='John')
-
-        self.assertRaisesRegexp(e, "Cannot resolve keyword 'firstname' into field")
+        self.assertRaisesMessage(
+            FieldError,
+            "Cannot resolve keyword 'firstname' into field. Choices are: Author_ID, article, first_name, last_name, primary_set",
+            Author.objects.filter,
+            firstname__exact='John'
+        )
 
     def test_author_get_attributes(self):
         a = Author.objects.get(last_name__exact='Smith')
