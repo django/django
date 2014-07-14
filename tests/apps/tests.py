@@ -322,15 +322,15 @@ class AppRelationsTest(TestCase):
     def test_relations_related_objects(self):
         tree, _ = new_apps_2.related_objects_relation_graph
         self.assertEqual(
-            [field.related_query_name() for field in tree[Relation._meta]],
-            ['BasePerson_m2m_base+', 'BasePerson_m2m_abstract+', 'fk_base_rel', 'fo_base_rel']
+            sorted([field.related_query_name() for field in tree[Relation._meta]]),
+            sorted(['BasePerson_m2m_base+', 'BasePerson_m2m_abstract+', 'fk_base_rel', 'fo_base_rel'])
         )
         self.assertEqual(
-            [field.related_query_name() for field in tree[BasePerson._meta]],
-            ['BasePerson_friends_base+', 'BasePerson_friends_base+', 'BasePerson_m2m_base+',
+            sorted([field.related_query_name() for field in tree[BasePerson._meta]]),
+            sorted(['BasePerson_friends_base+', 'BasePerson_friends_base+', 'BasePerson_m2m_base+',
              'BasePerson_following_base+', 'BasePerson_following_base+', 'BasePerson_m2m_abstract+',
              'BasePerson_friends_abstract+', 'BasePerson_friends_abstract+', 'BasePerson_following_abstract+',
-             'BasePerson_following_abstract+']
+             'BasePerson_following_abstract+'])
         )
         self.assertEqual([field.related_query_name() for field in tree[AbstractPerson._meta]], [])
 
@@ -344,12 +344,12 @@ class AppRelationsTest(TestCase):
     def test_relations_related_m2m(self):
         tree = new_apps_2.related_m2m_relation_graph
         self.assertEqual(
-            [field.related_query_name() for field in tree[Relation._meta]],
-            ['m2m_abstract_rel', 'm2m_base_rel']
+            sorted([field.related_query_name() for field in tree[Relation._meta]]),
+            sorted(['m2m_abstract_rel', 'm2m_base_rel'])
         )
         self.assertEqual(
-            [field.related_query_name() for field in tree[BasePerson._meta]],
-            ['friends_abstract_rel_+', 'followers_abstract', 'friends_base_rel_+',
-             'followers_base']
+            sorted([field.related_query_name() for field in tree[BasePerson._meta]]),
+            sorted(['friends_abstract_rel_+', 'followers_abstract', 'friends_base_rel_+',
+             'followers_base'])
         )
         self.assertEqual([field.related_query_name() for field in tree[AbstractPerson._meta]], [])
