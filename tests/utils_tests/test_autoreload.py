@@ -81,3 +81,4 @@ class TestFilenameGenerator(TestCase):
         filenames2 = list(gen_filenames(only_new=True))
         self.assertEqual(len(filenames2), 1)
         self.assertTrue(filenames2[0].endswith('fractions.py'))
+        self.assertFalse(any(f.endswith('.pyc') for f in gen_filenames()))
