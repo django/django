@@ -101,6 +101,7 @@ def gen_filenames(only_new=False):
     new_modules = module_values - _cached_modules
     new_filenames = [filename.__file__ for filename in new_modules
                      if hasattr(filename, '__file__')]
+    _cached_modules = _cached_modules.union(new_modules)
 
     if not _cached_filenames and settings.USE_I18N:
         # Add the names of the .mo files that can be generated
@@ -119,10 +120,16 @@ def gen_filenames(only_new=False):
                     if filename.endswith('.mo'):
                         new_filenames.append(os.path.join(dirpath, filename))
 
+    new_filenames = clean_files(new_filenames)
+    _cached_filenames += new_filenames
     if only_new:
         filelist = new_filenames
     else:
-        filelist = _cached_filenames + new_filenames + _error_files
+        filelist = _cached_filenames + clean_files(_error_files)
+    return filelist
+
+
+def clean_files(filelist):
     filenames = []
     for filename in filelist:
         if not filename:
@@ -133,8 +140,6 @@ def gen_filenames(only_new=False):
             filename = filename[:-9] + ".py"
         if os.path.exists(filename):
             filenames.append(filename)
-    _cached_modules = _cached_modules.union(new_modules)
-    _cached_filenames += new_filenames
     return filenames
 
 
