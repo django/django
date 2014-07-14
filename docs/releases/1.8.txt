@@ -415,8 +415,12 @@ Miscellaneous
   ``pk`` parameter in ``params`` for backwards compatibility.
 
 * ``UserCreationForm.errors_messages['duplicate_username']`` is no longer used.
-  If you wish to customize that error message, use
-  ``User.error_messages['unique']`` instead.
+  If you wish to customize that error message, :ref:`override it on the form
+  <considerations-regarding-model-errormessages>` using
+  ``Meta.errors_messages['unique']`` or, if you have a custom user model, use
+  the ``'unique'`` key in the :attr:`~django.db.models.Field.error_messages`
+  option of the field designated by
+  :attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD`.
 
 .. _deprecated-features-1.8:
 
