@@ -333,12 +333,20 @@ class Options(object):
 
     ### PUBLICLY USABLE AND STABLE APIS GO BELOW THIS LINE ###
 
-    def get_field(self, field_name, m2m=True, data=True, related_objects=False, related_m2m=False, virtual=True):
+    def get_field(self, field_name, m2m=True, data=True, related_objects=False, related_m2m=False, virtual=True, **kwargs):
         """
         Returns a field instance given a field name. By default will only search in data and
         many to many fields. This can be changed by enabling or disabling field types using
         the flags available. Hidden or proxy fields cannot be retreived.
         """
+        # NOTE: previous get_field API had a many_to_many key. This key
+        # has now become m2m. In order to avoid breaking other's implementation
+        # we will catch the use of 'many_to_many' key and convert it to m2m.
+        try:
+            m2m = kwargs['many_to_many']
+        except KeyError:
+            pass
+
         # Creates a cache key composed of all arguments
         cache_key = (m2m, data, related_objects, related_m2m, virtual,)
 

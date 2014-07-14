@@ -1,5 +1,6 @@
 from django import test
 
+from django.db.models import FieldDoesNotExist
 from django.db.models.fields import related, CharField, Field
 from django.contrib.contenttypes.fields import GenericForeignKey
 
@@ -654,3 +655,10 @@ class GetFieldByNameTests(OptionsBaseTests):
         field_info = Person._meta.get_field_by_name('content_object_base')
         self.assertEqual(field_info[1:], (None, True, False))
         self.assertIsInstance(field_info[0], GenericForeignKey)
+
+    def test_get_m2m_field_invalid(self):
+        self.assertRaises(
+            FieldDoesNotExist,
+            Person._meta.get_field,
+            **{'field_name': 'm2m_base', 'many_to_many': False}
+        )
