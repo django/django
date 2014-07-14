@@ -254,13 +254,13 @@ class MigrationAutodetector(object):
                                     # If we can't find the other app, we add a first/last dependency,
                                     # but only if we've already been through once and checked everything
                                     if chop_mode:
-                                        # If the app already exists, we add __latest__, as we don't know which
-                                        # migration contains the target field.
+                                        # If the app already exists, we add a dependency on the last migration,
+                                        # as we don't know which migration contains the target field.
                                         # If it's not yet migrated or has no migrations, we use __first__
-                                        if graph and not graph.root_nodes(dep[0]):
-                                            operation_dependencies.add((dep[0], "__first__"))
+                                        if graph and graph.leaf_nodes(dep[0]):
+                                            operation_dependencies.add(graph.leaf_nodes(dep[0])[0])
                                         else:
-                                            operation_dependencies.add((dep[0], "__latest__"))
+                                            operation_dependencies.add((dep[0], "__first__"))
                                     else:
                                         deps_satisfied = False
                     if deps_satisfied:
