@@ -558,9 +558,8 @@ class Model(six.with_metaclass(ModelBase)):
         and not use this method.
         """
         try:
-            field = self._meta.get_field(field_name, m2m=True,
-                                             related_objects=True,
-                                             related_m2m=True, virtual=True)
+            field = self._meta.get_field(field_name, m2m=True, related_objects=True,
+                                         related_m2m=True, virtual=True)
         except FieldDoesNotExist:
             return getattr(self, field_name)
         return getattr(self, field.attname)

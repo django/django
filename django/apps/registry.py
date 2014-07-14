@@ -186,26 +186,61 @@ class Apps(object):
 
     @conditional_cached_property
     def related_objects_relation_graph(self):
+        """
+        Returns two dictionaries of Options instances
+        as keys and a list of fields as values.
+
+        This method is used by each model to find
+        related objects. As this method is very
+        expensive and is accessed frequently
+        (it looks up every field in a model,
+        in every app), it is computed on first access
+        and then is set as a property.
+        The method will only cache when the apps registry
+        is finalised.
+        """
         related_objects_graph = defaultdict(list)
         related_objects_proxy_graph = defaultdict(list)
         for model in self.get_models(include_auto_created=True):
             for f in model._meta.get_fields(data=True, virtual=True):
+                # Check if the field has a relation to another model
                 if hasattr(f, 'rel') and f.rel and f.has_class_relation:
+                    # Set options_instance -> field
                     related_objects_graph[f.rel.to._meta].append(f)
+                    # If the model the field is pointing to is a proxy
+                    # class, then save reference in the proxy_graph.
+                    # This is only used when get_fields contains the
+                    # include_proxy option.
                     if f.rel.to._meta.proxy:
                         related_objects_proxy_graph[f.rel.to._meta.concrete_model].append(f)
 
+        # Only cache when apps is ready
         return self.ready, (related_objects_graph, related_objects_proxy_graph)
 
     @conditional_cached_property
     def related_m2m_relation_graph(self):
+        """
+        Returns a dictionary of Options instances
+        as keys and a list of fields as values.
+
+        This method is used by each model to find
+        related m2m. As this method is very
+        expensive and is accessed frequently
+        (it looks up every field in a model,
+        in every app), it is computed on first access
+        and then is set as a property.
+        The method will only cache when the apps registry
+        is finalised.
+        """
         related_m2m_graph = defaultdict(list)
 
         for model in self.get_models(include_auto_created=False):
             for f in model._meta.get_fields(m2m=True, data=False):
                 if f.rel and not isinstance(f.rel.to, six.string_types):
+                    # Set options_instance -> field
                     related_m2m_graph[f.rel.to._meta].append(f)
 
+        # Only cache when apps is ready
         return self.ready, related_m2m_graph
 
     def get_model(self, app_label, model_name=None):
