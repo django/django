@@ -1059,7 +1059,8 @@ class AutodetectorTests(TestCase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_last_dependency(self):
         """
-        Tests that a dependency to an app with existing migrations uses __latest__.
+        Tests that a dependency to an app with existing migrations uses the
+        last migration of that app.
         """
         # Load graph
         loader = MigrationLoader(connection)
@@ -1074,4 +1075,4 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'otherapp', 0, ["CreateModel"])
         self.assertOperationAttributes(changes, 'otherapp', 0, 0, name="Book")
         # Right dependencies?
-        self.assertEqual(changes['otherapp'][0].dependencies, [("migrations", "__latest__")])
+        self.assertEqual(changes['otherapp'][0].dependencies, [("migrations", "0002_second")])
