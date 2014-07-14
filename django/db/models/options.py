@@ -338,6 +338,13 @@ class Options(object):
         Returns a field instance given a field name. By default will only search in data and
         many to many fields. This can be changed by enabling or disabling field types using
         the flags available. Hidden or proxy fields cannot be retreived.
+
+        Fields can be any of the following:
+        - data:             any field that has an entry on the database
+        - m2m:              a ManyToManyField defined on the current model
+        - related_objects:  a one-to-many relation from another model that points to the current model
+        - related_m2m:      a M2M relation from another model that points to the current model
+        - virtual:          fields that do not necessarily have an entry on the database (like GenericForeignKey)
         """
         # NOTE: previous get_field API had a many_to_many key. This key
         # has now become m2m. In order to avoid breaking other's implementation
@@ -376,6 +383,19 @@ class Options(object):
         Returns a list of fields associated to the model. By default will only search in data.
         This can be changed by enabling or disabling field types using
         the flags available.
+
+        Fields can be any of the following:
+        - data:             any field that has an entry on the database
+        - m2m:              a ManyToManyField defined on the current model
+        - related_objects:  a one-to-many relation from another model that points to the current model
+        - related_m2m:      a M2M relation from another model that points to the current model
+        - virtual:          fields that do not necessarily have an entry on the database (like GenericForeignKey)
+
+        Options can be any of the following:
+        - include_parents:        include fields derived from inheritance
+        - include_hidden:         include fields that have a related_name that starts with a "+"
+        - include_non_concrete:   include fields that do not have a column
+        - include_proxy:          include relations that point to a proxy of the model.
         """
 
         # Creates a cache key composed of all arguments
