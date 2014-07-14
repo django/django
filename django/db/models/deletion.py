@@ -136,9 +136,9 @@ class Collector(object):
             include_hidden=True, include_proxy_eq=True):
             if related.field.rel.on_delete is not DO_NOTHING:
                 return False
-        # GFK deletes
-        for relation in opts.many_to_many:
-            if not relation.rel.through:
+        for field in model._meta.virtual_fields:
+            if hasattr(field, 'bulk_related_objects'):
+                # It's something like generic foreign key.
                 return False
         return True
 
