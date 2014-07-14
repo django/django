@@ -546,6 +546,7 @@ class OtherModelTests(IsolatedModelsTestCase):
 
         class Model(models.Model):
             relation = models.ManyToManyField(RelationModel)
+
             class Meta:
                 ordering = ['relation']
 
