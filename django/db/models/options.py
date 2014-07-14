@@ -442,16 +442,12 @@ class Options(object):
                 for parent in self.parents:
                     # Extend the fields dict with all the m2m fields of each parent.
                     fields.update(parent._meta.get_new_fields(**dict(options, recursive=True)))
-            for field in self.local_fields:
-                if include_non_concrete or field.column is not None:
-                    # If only concrete fields are allowed, check that field column
-                    # is not None, then add to field dict
-                    fields[field] = (field.name, field.attname)
+            fields.update((field, (field.name, field.attname)) for field in self.local_fields
+                          if include_non_concrete or field.column is not None)
 
         if virtual:
             # Virtual fields to not need to recursively search parents.
-            for field in self.virtual_fields:
-                fields[field] = (field.name,)
+            fields.update((field, (field.name,)) for field in self.virtual_fields)
 
         if not recursive:
             # By default, fields contains field instances as keys and all possible names
