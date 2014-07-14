@@ -272,8 +272,6 @@ class ModelState(object):
         # First, make a Meta object
         meta_contents = {'app_label': self.app_label, "apps": apps}
         meta_contents.update(self.options)
-        if "unique_together" in meta_contents:
-            meta_contents["unique_together"] = list(meta_contents["unique_together"])
         meta = type(str("Meta"), tuple(), meta_contents)
         # Then, work out our bases
         try:

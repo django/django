@@ -899,6 +899,10 @@ class OperationTests(OperationTestBase):
         operation.state_forwards("test_alunto", new_state)
         self.assertEqual(len(new_state.models["test_alunto", "pony"].options.get("unique_together", set())), 1)
 
+    def test_alter_unique_together_remove(self):
+        operation = migrations.AlterUniqueTogether("Pony", None)
+        self.assertEqual(operation.describe(), "Alter unique_together for Pony (0 constraint(s))")
+
     def test_alter_index_together(self):
         """
         Tests the AlterIndexTogether operation.
@@ -921,6 +925,10 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alinto", editor, new_state, project_state)
         self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])
+
+    def test_alter_index_together_remove(self):
+        operation = migrations.AlterIndexTogether("Pony", None)
+        self.assertEqual(operation.describe(), "Alter index_together for Pony (0 constraint(s))")
 
     def test_alter_model_options(self):
         """

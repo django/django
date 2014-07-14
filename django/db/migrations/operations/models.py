@@ -248,7 +248,7 @@ class AlterUniqueTogether(Operation):
         return name.lower() == self.name.lower()
 
     def describe(self):
-        return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.unique_together))
+        return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.unique_together or ''))
 
 
 class AlterIndexTogether(Operation):
@@ -288,7 +288,7 @@ class AlterIndexTogether(Operation):
         return name.lower() == self.name.lower()
 
     def describe(self):
-        return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.index_together))
+        return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.index_together or ''))
 
 
 class AlterOrderWithRespectTo(Operation):
