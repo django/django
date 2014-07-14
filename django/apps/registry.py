@@ -189,7 +189,7 @@ class Apps(object):
         related_objects_graph = defaultdict(list)
         related_objects_proxy_graph = defaultdict(list)
         for model in self.get_models(include_auto_created=True):
-            for f in model._meta.get_new_fields(data=True, virtual=True):
+            for f in model._meta.get_fields(data=True, virtual=True):
                 if hasattr(f, 'rel') and f.rel and f.has_class_relation:
                     related_objects_graph[f.rel.to._meta].append(f)
                     if f.rel.to._meta.proxy:
@@ -202,7 +202,7 @@ class Apps(object):
         related_m2m_graph = defaultdict(list)
 
         for model in self.get_models(include_auto_created=False):
-            for f in model._meta.get_new_fields(m2m=True, data=False):
+            for f in model._meta.get_fields(m2m=True, data=False):
                 if f.rel and not isinstance(f.rel.to, six.string_types):
                     related_m2m_graph[f.rel.to._meta].append(f)
 

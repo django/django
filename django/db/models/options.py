@@ -348,7 +348,7 @@ class Options(object):
             res = {}
 
             # Call get_fields with recursive=True in order to have a field_instance -> names map
-            for field, names in six.iteritems(self.get_new_fields(m2m=m2m, data=data,
+            for field, names in six.iteritems(self.get_fields(m2m=m2m, data=data,
                   related_objects=related_objects, related_m2m=related_m2m,
                   virtual=virtual, recursive=True)):
                 # Map each possible name for a field to it's field instance
@@ -362,7 +362,7 @@ class Options(object):
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
-    def get_new_fields(self, m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False,
+    def get_fields(self, m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False,
                        include_parents=True, include_non_concrete=True, include_hidden=False, include_proxy=False, recursive=False):
         """
         Returns a list of fields associated to the model. By default will only search in data.
@@ -393,7 +393,7 @@ class Options(object):
                 # Recursively call get_fields on each parent, with the same options provided
                 # in this call
                 for parent in self.parents:
-                    for obj, query_name in six.iteritems(parent._meta.get_new_fields(data=False, related_m2m=True,
+                    for obj, query_name in six.iteritems(parent._meta.get_fields(data=False, related_m2m=True,
                                                          **dict(options, recursive=True))):
                         is_valid = not (obj.field.creation_counter < 0
                                     and obj.model not in self.get_parent_list())
@@ -410,7 +410,7 @@ class Options(object):
                 # Recursively call get_fields on each parent, with the same options provided
                 # in this call
                 for parent in self.parents:
-                    for obj, query_name in six.iteritems(parent._meta.get_new_fields(data=False, related_objects=True,
+                    for obj, query_name in six.iteritems(parent._meta.get_fields(data=False, related_objects=True,
                                                          **dict(options, recursive=True, include_hidden=True))):
                         if not ((obj.field.creation_counter < 0
                                 or obj.field.rel.parent_link)
@@ -434,14 +434,14 @@ class Options(object):
             if include_parents:
                 for parent in self.parents:
                     # Extend the fields dict with all the m2m fields of each parent.
-                    fields.update(parent._meta.get_new_fields(data=False, m2m=True, **dict(options, recursive=True)))
+                    fields.update(parent._meta.get_fields(data=False, m2m=True, **dict(options, recursive=True)))
             fields.update((field, (field.name, field.attname)) for field in self.local_many_to_many)
 
         if data:
             if include_parents:
                 for parent in self.parents:
                     # Extend the fields dict with all the m2m fields of each parent.
-                    fields.update(parent._meta.get_new_fields(**dict(options, recursive=True)))
+                    fields.update(parent._meta.get_fields(**dict(options, recursive=True)))
             fields.update((field, (field.name, field.attname)) for field in self.local_fields
                           if include_non_concrete or field.column is not None)
 
@@ -468,7 +468,7 @@ class Options(object):
         it's parents.
         All hidden and proxy fields are omitted.
         """
-        return list(self.get_new_fields(data=False, m2m=True))
+        return list(self.get_fields(data=False, m2m=True))
 
     @cached_property
     def field_names(self):
@@ -478,7 +478,7 @@ class Options(object):
         All hidden and proxy fields are omitted.
         """
         res = set()
-        for _, names in six.iteritems(self.get_new_fields(m2m=True, related_objects=True,
+        for _, names in six.iteritems(self.get_fields(m2m=True, related_objects=True,
                                           related_m2m=True, virtual=True, recursive=True)):
             res.update(name for name in names if not name.endswith('+'))
         return list(res)
@@ -489,7 +489,7 @@ class Options(object):
         Returns a list of all data fields on the model and it's parents.
         All hidden and proxy fields are omitted.
         """
-        return list(self.get_new_fields())
+        return list(self.get_fields())
 
     @cached_property
     def concrete_fields(self):
@@ -497,7 +497,7 @@ class Options(object):
         Returns a list of all concrete data fields on the model and it's parents.
         All hidden and proxy fields are omitted.
         """
-        return list(self.get_new_fields(include_non_concrete=False))
+        return list(self.get_fields(include_non_concrete=False))
 
     @cached_property
     def local_concrete_fields(self):
@@ -505,18 +505,18 @@ class Options(object):
         Returns a list of all concrete data fields on the model.
         All hidden and proxy fields are omitted.
         """
-        return self.get_new_fields(include_parents=False, include_non_concrete=False)
+        return self.get_fields(include_parents=False, include_non_concrete=False)
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
 
     def get_fields_with_model(self):
-        return list(map(self._map_model, self.get_new_fields()))
+        return list(map(self._map_model, self.get_fields()))
 
     def get_concrete_fields_with_model(self):
-        return list(map(self._map_model, self.get_new_fields(include_non_concrete=False)))
+        return list(map(self._map_model, self.get_fields(include_non_concrete=False)))
 
     def get_m2m_with_model(self):
-        return list(map(self._map_model, self.get_new_fields(data=False, m2m=True)))
+        return list(map(self._map_model, self.get_fields(data=False, m2m=True)))
 
     def get_field(self, name, many_to_many=True):
         return self.get_new_field(name)
@@ -531,7 +531,7 @@ class Options(object):
     def get_all_related_objects(self, local_only=False, include_hidden=False,
                                 include_proxy_eq=False):
         include_parents = local_only is False
-        return list(self.get_new_fields(
+        return list(self.get_fields(
             data=False, related_objects=True,
             include_parents=include_parents,
             include_hidden=include_hidden,
@@ -541,7 +541,7 @@ class Options(object):
     def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
                                            include_proxy_eq=False):
         include_parents = local_only is False
-        fields = self.get_new_fields(
+        fields = self.get_fields(
             data=False, related_objects=True,
             include_parents=include_parents,
             include_hidden=include_hidden,
@@ -550,7 +550,7 @@ class Options(object):
         return list(map(self._map_model, fields))
 
     def get_all_related_many_to_many_objects(self, local_only=False):
-        return list(self.get_new_fields(data=False, related_m2m=True, include_parents=local_only is not True))
+        return list(self.get_fields(data=False, related_m2m=True, include_parents=local_only is not True))
 
     def _map_model(self, connection):
         try:
@@ -580,4 +580,4 @@ class Options(object):
         return connection, model, direct, m2m
 
     def get_all_related_m2m_objects_with_model(self):
-        return list(map(self._map_model, self.get_new_fields(data=False, related_m2m=True)))
+        return list(map(self._map_model, self.get_fields(data=False, related_m2m=True)))

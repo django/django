@@ -134,7 +134,7 @@ class Collector(object):
             return False
         # Foreign keys pointing to this model, both from m2m and other
         # models.
-        for related in opts.get_new_fields(data=False, related_objects=True, include_hidden=True, include_proxy=True):
+        for related in opts.get_fields(data=False, related_objects=True, include_hidden=True, include_proxy=True):
             if related.field.rel.on_delete is not DO_NOTHING:
                 return False
         # GFK deletes
@@ -186,7 +186,7 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
-            for related in model._meta.get_new_fields(data=False, related_objects=True, include_hidden=True, include_proxy=True):
+            for related in model._meta.get_fields(data=False, related_objects=True, include_hidden=True, include_proxy=True):
                 field = related.field
                 if field.rel.on_delete == DO_NOTHING:
                     continue
