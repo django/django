@@ -441,7 +441,9 @@ class Options(object):
         for f, model in self.get_fields_with_model():
             cache[f.name] = cache[f.attname] = (f, model, True, False)
         for f in self.virtual_fields:
-            cache[f.name] = (f, None if f.model == self.model else f.model, True, False)
+            if hasattr(f, 'related'):
+                cache[f.name] = cache[f.attname] = (
+                    f, None if f.model == self.model else f.model, True, False)
         if apps.ready:
             self._name_map = cache
         return cache
