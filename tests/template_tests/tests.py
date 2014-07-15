@@ -1351,6 +1351,8 @@ class TemplateTests(TestCase):
             'load11': ("{% load subpackage.echo_invalid %}", {}, template.TemplateSyntaxError),
             'load12': ("{% load subpackage.missing %}", {}, template.TemplateSyntaxError),
 
+            'lorem1': ("{% lorem 3 w %}", {}, "lorem ipsum dolor"),
+
             ### I18N ##################################################################
 
             # {% spaceless %} tag

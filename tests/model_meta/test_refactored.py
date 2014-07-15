@@ -2,7 +2,7 @@ from django import test
 
 from django.db.models import FieldDoesNotExist
 from django.db.models.fields import related, CharField, Field
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 from .models import (
     AbstractPerson, BasePerson, Person, Relating, Relation
@@ -650,10 +650,15 @@ class GetFieldByNameTests(OptionsBaseTests):
         self.assertEqual(field_info[1:], (None, False, True))
         self.assertIsInstance(field_info[0], related.RelatedObject)
 
-    def test_get_virtual_field(self):
-        field_info = self._details(Person, Person._meta.get_field('content_object_base', virtual=True))
+    def test_get_generic_foreign_key(self):
+        # For historic reasons generic foreign keys aren't available.
+        with self.assertRaises(FieldDoesNotExist):
+            Person._meta.get_field('content_object_base', virtual=True)
+
+    def test_get_generic_relation(self):
+        field_info = self._details(Person, Person._meta.get_field('generic_relation_base', virtual=True))
         self.assertEqual(field_info[1:], (None, True, False))
-        self.assertIsInstance(field_info[0], GenericForeignKey)
+        self.assertIsInstance(field_info[0], GenericRelation)
 
     def test_get_m2m_field_invalid(self):
         self.assertRaises(

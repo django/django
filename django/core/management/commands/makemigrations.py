@@ -10,6 +10,7 @@ from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.questioner import MigrationQuestioner, InteractiveMigrationQuestioner
 from django.db.migrations.state import ProjectState
 from django.db.migrations.writer import MigrationWriter
+from django.utils.six import iteritems
 from django.utils.six.moves import reduce
 
 
@@ -56,6 +57,14 @@ class Command(BaseCommand):
         # Before anything else, see if there's conflicting apps and drop out
         # hard if there are any and they don't want to merge
         conflicts = loader.detect_conflicts()
+
+        # If app_labels is specified, filter out conflicting migrations for unspecified apps
+        if app_labels:
+            conflicts = dict(
+                (app_label, conflict) for app_label, conflict in iteritems(conflicts)
+                if app_label in app_labels
+            )
+
         if conflicts and not self.merge:
             name_str = "; ".join(
                 "%s in %s" % (", ".join(names), app)
