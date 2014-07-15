@@ -416,11 +416,10 @@ Miscellaneous
 
 * ``UserCreationForm.errors_messages['duplicate_username']`` is no longer used.
   If you wish to customize that error message, :ref:`override it on the form
-  <considerations-regarding-model-errormessages>` using
-  ``Meta.errors_messages['unique']`` or, if you have a custom user model, use
-  the ``'unique'`` key in the :attr:`~django.db.models.Field.error_messages`
-  option of the field designated by
-  :attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD`.
+  <modelforms-overriding-default-fields>` using the ``'unique'`` key in
+  ``Meta.errors_messages['username']`` or, if you have a custom form field for
+  ``'username'``, using the the ``'unique'`` key in its
+  :attr:`~django.forms.Field.error_messages` argument.
 
 .. _deprecated-features-1.8:
 
