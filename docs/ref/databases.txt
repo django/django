@@ -92,7 +92,8 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 9.0 and higher.
+Django supports PostgreSQL 9.0 and higher. It requires the use of Psycopg2
+2.0.9 or higher.
 
 PostgreSQL connection settings
 -------------------------------
