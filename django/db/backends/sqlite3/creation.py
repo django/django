@@ -33,6 +33,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'SmallIntegerField': 'smallint',
         'TextField': 'text',
         'TimeField': 'time',
+        'UUIDField': 'char(32)',
     }
     data_types_suffix = {
         'AutoField': 'AUTOINCREMENT',
