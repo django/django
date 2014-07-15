@@ -118,6 +118,13 @@ class TestQuerying(TestCase):
             self.objs[1:3]
         )
 
+    def test_contains_charfield(self):
+        # Regression for #22907
+        self.assertSequenceEqual(
+            CharArrayModel.objects.filter(field__contains=['text']),
+            []
+        )
+
     def test_index(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__0=2),
