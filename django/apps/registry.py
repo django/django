@@ -390,9 +390,7 @@ class Apps(object):
         This is mostly used in tests.
         """
         for cached_property in ['related_objects_relation_graph',
-                                'related_m2m_relation_graph',
-                                'non_swapped_models',
-                                'non_swapped_models_auto_created']:
+                                'related_m2m_relation_graph']:
             try:
                 delattr(self, cached_property)
             except AttributeError:
