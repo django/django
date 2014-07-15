@@ -483,15 +483,16 @@ class Options(object):
 
         if virtual:
             # Virtual fields to not need to recursively search parents.
-            # If we are exporting a map (ex. called by get_field) we do not
-            # want to include GenericForeignKeys, but only GenericRelations.
-            # If we are just listing fields (no map export), we include all
-            # virtual fields.
-            for field in self.virtual_fields:
-                if not export_name_map:
-                    fields[field] = (field.name,)
-                elif export_name_map and hasattr(field, 'related'):
-                    fields[field] = (field.name, field.attname,)
+            if export_name_map:
+                # If we are exporting a map (ex. called by get_field) we do not
+                # want to include GenericForeignKeys, but only GenericRelations
+                # (Ref. #22994).
+                fields.update((field, (field.name, field.attname)) for field in self.virtual_fields
+                              if hasattr(field, 'related'))
+            else:
+                # If we are just listing fields (no map export), we include all
+                # virtual fields.
+                fields.update((field, (field.name,)) for field in self.virtual_fields)
 
         if not export_name_map:
             # By default, fields contains field instances as keys and all possible names
