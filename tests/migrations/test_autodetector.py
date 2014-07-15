@@ -1045,4 +1045,4 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'otherapp', 0, ["CreateModel"])
         self.assertOperationAttributes(changes, 'otherapp', 0, 0, name="Book")
         # Right dependencies?
-        self.assertEqual(changes['otherapp'][0].dependencies, [("migrations", "__last__")])
+        self.assertEqual(changes['otherapp'][0].dependencies, [("migrations", "__latest__")])
