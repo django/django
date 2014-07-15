@@ -22,6 +22,7 @@ from django.utils.timezone import utc
 try:
     import psycopg2 as Database
     import psycopg2.extensions
+    import psycopg2.extras
 except ImportError as e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
@@ -33,6 +34,7 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
 psycopg2.extensions.register_adapter(SafeBytes, psycopg2.extensions.QuotedString)
 psycopg2.extensions.register_adapter(SafeText, psycopg2.extensions.QuotedString)
+psycopg2.extras.register_uuid()
 
 
 def utc_tzinfo_factory(offset):
