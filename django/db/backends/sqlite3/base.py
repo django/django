@@ -8,8 +8,9 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
-import warnings
 import re
+import uuid
+import warnings
 
 from django.conf import settings
 from django.db import utils
@@ -273,6 +274,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_timefield_value)
         elif internal_type == 'DecimalField':
             converters.append(self.convert_decimalfield_value)
+        elif internal_type == 'UUIDField':
+            converters.append(self.convert_uuidfield_value)
         return converters
 
     def convert_decimalfield_value(self, value, field):
@@ -293,6 +296,11 @@ class DatabaseOperations(BaseDatabaseOperations):
     def convert_timefield_value(self, value, field):
         if value is not None and not isinstance(value, datetime.time):
             value = parse_time(value)
+        return value
+
+    def convert_uuidfield_value(self, value, field):
+        if value is not None:
+            value = uuid.UUID(value)
         return value
 
     def bulk_insert_sql(self, fields, num_values):

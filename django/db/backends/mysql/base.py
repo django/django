@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 import datetime
 import re
 import sys
+import uuid
 import warnings
 
 try:
@@ -398,11 +399,18 @@ class DatabaseOperations(BaseDatabaseOperations):
         converters = super(DatabaseOperations, self).get_db_converters(internal_type)
         if internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
+        if internal_type == 'UUIDField':
+            converters.append(self.convert_uuidfield_value)
         return converters
 
     def convert_booleanfield_value(self, value, field):
         if value in (0, 1):
             value = bool(value)
+        return value
+
+    def convert_uuidfield_value(self, value, field):
+        if value is not None:
+            value = uuid.UUID(value)
         return value
 
 

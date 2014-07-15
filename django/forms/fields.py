@@ -9,6 +9,7 @@ import datetime
 import os
 import re
 import sys
+import uuid
 import warnings
 from decimal import Decimal, DecimalException
 from io import BytesIO
@@ -41,7 +42,7 @@ __all__ = (
     'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
     'SplitDateTimeField', 'IPAddressField', 'GenericIPAddressField', 'FilePathField',
-    'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField'
+    'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField', 'UUIDField',
 )
 
 
@@ -1224,3 +1225,25 @@ class SlugField(CharField):
     def clean(self, value):
         value = self.to_python(value).strip()
         return super(SlugField, self).clean(value)
+
+
+class UUIDField(CharField):
+    default_error_messages = {
+        'invalid': _('Enter a valid UUID.'),
+    }
+
+    def prepare_value(self, value):
+        if isinstance(value, uuid.UUID):
+            return value.hex
+        return value
+
+    def to_python(self, value):
+        value = super(UUIDField, self).to_python(value)
+        if value in self.empty_values:
+            return None
+        if not isinstance(value, uuid.UUID):
+            try:
+                value = uuid.UUID(value)
+            except ValueError:
+                raise ValidationError(self.error_messages['invalid'], code='invalid')
+        return value

@@ -6,6 +6,7 @@ import copy
 import datetime
 import decimal
 import math
+import uuid
 import warnings
 from base64 import b64decode, b64encode
 from itertools import tee
@@ -40,6 +41,7 @@ __all__ = [str(x) for x in (
     'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
     'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
     'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
+    'UUIDField',
 )]
 
 
@@ -2217,3 +2219,44 @@ class BinaryField(Field):
         if isinstance(value, six.text_type):
             return six.memoryview(b64decode(force_bytes(value)))
         return value
+
+
+class UUIDField(Field):
+    default_error_messages = {
+        'invalid': _("'%(value)s' is not a valid UUID."),
+    }
+    description = 'Universally unique identifier'
+    empty_strings_allowed = False
+
+    def __init__(self, **kwargs):
+        kwargs['max_length'] = 32
+        super(UUIDField, self).__init__(**kwargs)
+
+    def get_internal_type(self):
+        return "UUIDField"
+
+    def get_prep_value(self, value):
+        if isinstance(value, uuid.UUID):
+            return value.hex
+        if isinstance(value, six.string_types):
+            return value.replace('-', '')
+        return value
+
+    def to_python(self, value):
+        if value and not isinstance(value, uuid.UUID):
+            try:
+                return uuid.UUID(value)
+            except ValueError:
+                raise exceptions.ValidationError(
+                    self.error_messages['invalid'],
+                    code='invalid',
+                    params={'value': value},
+                )
+        return value
+
+    def formfield(self, **kwargs):
+        defaults = {
+            'form_class': forms.UUIDField,
+        }
+        defaults.update(kwargs)
+        return super(UUIDField, self).formfield(**defaults)

@@ -31,6 +31,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'SmallIntegerField': 'smallint',
         'TextField': 'text',
         'TimeField': 'time',
+        'UUIDField': 'uuid',
     }
 
     data_type_check_constraints = {

@@ -10,6 +10,7 @@ import decimal
 import re
 import platform
 import sys
+import uuid
 import warnings
 
 
@@ -264,6 +265,8 @@ WHEN (new.%(col_name)s IS NULL)
             converters.append(self.convert_datefield_value)
         elif internal_type == 'TimeField':
             converters.append(self.convert_timefield_value)
+        elif internal_type == 'UUIDField':
+            converters.append(self.convert_uuidfield_value)
         converters.append(self.convert_empty_values)
         return converters
 
@@ -308,6 +311,11 @@ WHEN (new.%(col_name)s IS NULL)
     def convert_timefield_value(self, value, field):
         if isinstance(value, Database.Timestamp):
             value = value.time()
+        return value
+
+    def convert_uuidfield_value(self, value, field):
+        if value is not None:
+            value = uuid.UUID(value)
         return value
 
     def deferrable_sql(self):

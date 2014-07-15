@@ -30,6 +30,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'SmallIntegerField': 'smallint',
         'TextField': 'longtext',
         'TimeField': 'time',
+        'UUIDField': 'char(32)',
     }
 
     def sql_table_creation_suffix(self):

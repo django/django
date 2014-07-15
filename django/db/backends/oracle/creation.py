@@ -44,6 +44,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'TextField': 'NCLOB',
         'TimeField': 'TIMESTAMP',
         'URLField': 'VARCHAR2(%(max_length)s)',
+        'UUIDField': 'VARCHAR2(32)',
     }
 
     data_type_check_constraints = {

@@ -35,6 +35,14 @@ site.
 
 .. _django-secure: https://pypi.python.org/pypi/django-secure
 
+New data types
+~~~~~~~~~~~~~~
+
+* Django now has a :class:`~django.db.models.UUIDField` for storing
+  universally unique identifiers. There is a corresponding :class:`form field
+  <django.forms.UUIDField>`. It is stored as the native ``uuid`` data type on
+  PostgreSQL and as a fixed length character field on other backends.
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -473,6 +481,8 @@ officially supports.
 
 This also includes dropping support for PostGIS 1.3 and 1.4 as these versions
 are not supported on versions of PostgreSQL later than 8.4.
+
+Django also now requires the use of Psycopg2 version 2.0.9 or higher.
 
 Support for MySQL versions older than 5.5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
