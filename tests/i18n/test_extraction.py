@@ -25,12 +25,13 @@ from django.utils.translation import TranslatorCommentWarning
 
 LOCALE = 'de'
 has_xgettext = find_command('xgettext')
+this_directory = os.path.dirname(upath(__file__))
 
 
 @skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
 class ExtractorTests(SimpleTestCase):
 
-    test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'commands'))
+    test_dir = os.path.abspath(os.path.join(this_directory, 'commands'))
 
     PO_FILE = 'locale/%s/LC_MESSAGES/django.po' % LOCALE
 
@@ -378,6 +379,17 @@ class IgnoredExtractorTests(ExtractorTests):
             self.assertNotMsgId('This should be ignored.', po_contents)
             self.assertNotMsgId('This should be ignored too.', po_contents)
 
+    @override_settings(
+        STATIC_ROOT=os.path.join(this_directory, 'commands', 'static_root/'),
+        MEDIA_ROOT=os.path.join(this_directory, 'commands', 'media_root/'))
+    def test_media_static_dirs_ignored(self):
+        os.chdir(self.test_dir)
+        stdout = StringIO()
+        management.call_command('makemessages', locale=[LOCALE], verbosity=2, stdout=stdout)
+        data = stdout.getvalue()
+        self.assertIn("ignoring directory static_root", data)
+        self.assertIn("ignoring directory media_root", data)
+
 
 class SymlinkExtractorTests(ExtractorTests):
 
@@ -550,7 +562,7 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
     LOCALES = ['en', 'fr', 'it']
     PO_FILE = 'locale/%s/LC_MESSAGES/django.po'
 
-    test_dir = os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), 'exclude'))
+    test_dir = os.path.abspath(os.path.join(this_directory, 'exclude'))
 
     def _set_times_for_all_po_files(self):
         """
@@ -608,7 +620,7 @@ class CustomLayoutExtractionTests(ExtractorTests):
 
     def setUp(self):
         self._cwd = os.getcwd()
-        self.test_dir = os.path.join(os.path.dirname(upath(__file__)), 'project_dir')
+        self.test_dir = os.path.join(this_directory, 'project_dir')
 
     def test_no_locale_raises(self):
         os.chdir(self.test_dir)
@@ -618,7 +630,7 @@ class CustomLayoutExtractionTests(ExtractorTests):
 
     @override_settings(
         LOCALE_PATHS=(os.path.join(
-            os.path.dirname(upath(__file__)), 'project_dir', 'project_locale'),)
+            this_directory, 'project_dir', 'project_locale'),)
     )
     def test_project_locale_paths(self):
         """

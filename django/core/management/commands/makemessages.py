@@ -9,6 +9,7 @@ import sys
 from itertools import dropwhile
 
 import django
+from django.conf import settings
 from django.core.management.base import CommandError, BaseCommand
 from django.core.management.utils import (handle_extensions, find_command,
     popen_wrapper)
@@ -56,8 +57,6 @@ class TranslatableFile(object):
 
         Uses the xgettext GNU gettext utility.
         """
-
-        from django.conf import settings
         from django.utils.translation import templatize
 
         if command.verbosity > 1:
@@ -218,9 +217,20 @@ class Command(BaseCommand):
         process_all = options.get('all')
         extensions = options.get('extensions')
         self.symlinks = options.get('symlinks')
+
+        # Need to ensure that the i18n framework is enabled
+        if settings.configured:
+            settings.USE_I18N = True
+        else:
+            settings.configure(USE_I18N=True)
+
         ignore_patterns = options.get('ignore_patterns')
         if options.get('use_default_ignore_patterns'):
             ignore_patterns += ['CVS', '.*', '*~', '*.pyc']
+        base_path = os.path.abspath('.')
+        for path in (settings.MEDIA_ROOT, settings.STATIC_ROOT):
+            if path and path.startswith(base_path):
+                ignore_patterns.append('%s*' % path[len(base_path) + 1:])
         self.ignore_patterns = list(set(ignore_patterns))
 
         # Avoid messing with mutable class variables
@@ -250,13 +260,6 @@ class Command(BaseCommand):
         if (locale is None and not exclude and not process_all) or self.domain is None:
             raise CommandError("Type '%s help %s' for usage information." % (
                 os.path.basename(sys.argv[0]), sys.argv[1]))
-
-        # Need to ensure that the i18n framework is enabled
-        from django.conf import settings
-        if settings.configured:
-            settings.USE_I18N = True
-        else:
-            settings.configure(USE_I18N=True)
 
         if self.verbosity > 1:
             self.stdout.write('examining files with the extensions: %s\n'
