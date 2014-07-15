@@ -119,7 +119,7 @@ class Field(RegisterLookupMixin):
     description = property(_description)
 
     def __init__(self, verbose_name=None, name=None, primary_key=False,
-            max_length=None, unique=False, blank=False, null=False,
+            min_length=None, max_length=None, unique=False, blank=False, null=False,
             db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
             serialize=True, unique_for_date=None, unique_for_month=None,
             unique_for_year=None, choices=None, help_text='', db_column=None,
@@ -129,7 +129,7 @@ class Field(RegisterLookupMixin):
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
         self.primary_key = primary_key
-        self.max_length, self._unique = max_length, unique
+        self.min_length, self.max_length, self._unique = min_length, max_length, unique
         self.blank, self.null = blank, null
         self.rel = rel
         self.default = default
@@ -532,7 +532,8 @@ class Field(RegisterLookupMixin):
         # exactly which wacky database column type you want to use.
         data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         try:
-            return connection.creation.data_types[self.get_internal_type()] % data
+            internal_type = self.get_internal_type()
+            return connection.creation.db_type(internal_type, data)
         except KeyError:
             return None
 

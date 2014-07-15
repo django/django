@@ -37,7 +37,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Hook for a database backend to use the cursor description to
         match a Django field type to a database column.
         """
-        if data_type == FIELD_TYPE.STRING: # != FIELD_TYPE.VAR_STRING
+        if data_type == FIELD_TYPE.STRING:  # != FIELD_TYPE.VAR_STRING
             params = {}
             params['min_length'] = params['max_length'] = int(description[3])
             return self.data_types_reverse[data_type], params
