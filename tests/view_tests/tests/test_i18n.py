@@ -11,13 +11,9 @@ from django.test import LiveServerTestCase, TestCase
 from django.test.utils import override_settings
 from django.utils import six, unittest
 from django.utils._os import upath
+from django.utils.module_loading import import_by_path
 from django.utils.translation import override
 from django.utils.text import javascript_quote
-
-try:
-    from selenium.webdriver.firefox import webdriver as firefox
-except ImportError:
-    firefox = None
 
 from ..urls import locale_dir
 
@@ -181,15 +177,19 @@ skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
 
 
 @unittest.skipIf(skip_selenium, 'Selenium tests not requested')
-@unittest.skipUnless(firefox, 'Selenium not installed')
 class JavascriptI18nTests(LiveServerTestCase):
 
     available_apps = []
     urls = 'view_tests.urls'
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     @classmethod
     def setUpClass(cls):
-        cls.selenium = firefox.WebDriver()
+        try:
+            cls.selenium = import_by_path(cls.webdriver_class)()
+        except Exception as e:
+            raise unittest.SkipTest('Selenium webdriver "%s" not installed or '
+                                    'not operational: %s' % (cls.webdriver_class, str(e)))
         super(JavascriptI18nTests, cls).setUpClass()
 
     @classmethod
@@ -222,3 +222,11 @@ class JavascriptI18nTests(LiveServerTestCase):
             # Force a language via GET otherwise the gettext functions are a noop!
             response = self.client.get('/jsi18n_admin/?language=de')
             self.assertContains(response, '\\x04')
+
+
+class JavascriptI18nChromeTests(JavascriptI18nTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+
+class JavascriptI18nIETests(JavascriptI18nTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
