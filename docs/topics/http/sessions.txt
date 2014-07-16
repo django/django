@@ -64,7 +64,9 @@ sure you've configured your cache; see the :doc:`cache documentation
     cache backend. The local-memory cache backend doesn't retain data long
     enough to be a good choice, and it'll be faster to use file or database
     sessions directly instead of sending everything through the file or
-    database cache backends.
+    database cache backends. Additionally, the local-memory cache backend is
+    NOT multi-process safe, therefore probably not a good choice for production
+    environments.
 
 If you have multiple caches defined in :setting:`CACHES`, Django will use the
 default cache. To use another cache, set :setting:`SESSION_CACHE_ALIAS` to the
