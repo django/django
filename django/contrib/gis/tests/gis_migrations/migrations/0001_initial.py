@@ -2,9 +2,10 @@ from django.db import models, migrations
 import django.contrib.gis.db.models.fields
 
 
-# Used for regression test of ticket #22001: https://code.djangoproject.com/ticket/22001
 class Migration(migrations.Migration):
-
+    """
+    Used for gis.specific migration tests.
+    """
     operations = [
         migrations.CreateModel(
             name='Neighborhood',
@@ -29,5 +30,21 @@ class Migration(migrations.Migration):
             options={
             },
             bases=(models.Model,),
-        )
+        ),
+        migrations.CreateModel(
+            name='Family',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100, unique=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='household',
+            name='family',
+            field=models.ForeignKey(blank=True, to='gis.Family', null=True),
+            preserve_default=True,
+        ),
     ]
