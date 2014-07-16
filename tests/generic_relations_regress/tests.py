@@ -254,7 +254,7 @@ class GenericRelationTests(TestCase):
     def test_ticket_22998(self):
         related = Related.objects.create()
         content = Content.objects.create(related_obj=related)
-        node = Node.objects.create(content=content)
+        Node.objects.create(content=content)
 
         # deleting the Related cascades to the Content cascades to the Node,
         # where the pre_delete signal should fire and prevent deletion.
