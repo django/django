@@ -13,7 +13,10 @@ class SpatialiteGeometryColumns(models.Model):
     """
     f_table_name = models.CharField(max_length=256)
     f_geometry_column = models.CharField(max_length=256)
-    type = models.CharField(max_length=30)
+    if connection.ops.spatial_version[0] >= 4:
+        type = models.IntegerField(db_column='geometry_type')
+    else:
+        type = models.CharField(max_length=30)
     coord_dimension = models.IntegerField()
     srid = models.IntegerField(primary_key=True)
     spatial_index_enabled = models.IntegerField()
