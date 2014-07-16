@@ -244,3 +244,11 @@ class JavascriptI18nTests(LiveServerTestCase):
         self.assertEqual(elem.text, "1 Resultat")
         elem = self.selenium.find_element_by_id("npgettext_plur")
         self.assertEqual(elem.text, "455 Resultate")
+
+
+class JavascriptI18nChromeTests(JavascriptI18nTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+
+class JavascriptI18nIETests(JavascriptI18nTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
