@@ -192,7 +192,7 @@ RedirectView
             pattern_name = 'article-detail'
 
             def get_redirect_url(self, *args, **kwargs):
-                article = get_object_or_404(Article, pk=pk)
+                article = get_object_or_404(Article, pk=kwargs['pk'])
                 article.update_counter()
                 return super(ArticleCounterRedirectView, self).get_redirect_url(*args, **kwargs)
 
