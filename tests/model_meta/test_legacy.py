@@ -1,7 +1,10 @@
 from django import test
+import warnings
 
 from django.db.models.fields import related, CharField, Field, FieldDoesNotExist
-from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
+from django.test.utils import IgnorePendingDeprecationWarningsMixin
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import (
     AbstractPerson, BasePerson, Person, Relating, Relation
@@ -536,12 +539,17 @@ class M2MTests(OptionsBaseTests):
 
     def test_many_to_many_with_model(self):
         for model, expected_result in TEST_RESULTS['many_to_many_with_model'].items():
-            models = [model for field, model in model._meta.get_m2m_with_model()]
+            with warnings.catch_warnings(record=True) as warning:
+                warnings.simplefilter("always")
+                models = [model for field, model in model._meta.get_m2m_with_model()]
+                self.assertEqual([RemovedInDjango20Warning], [w.message.__class__ for w in warning])
             self.assertEqual(models, expected_result)
 
 
-class RelatedObjectsTests(OptionsBaseTests):
+class RelatedObjectsTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTests):
+
     def setUp(self):
+        super(RelatedObjectsTests, self).setUp()
         self.key_name = lambda r: r[0]
 
     def test_related_objects(self):
@@ -593,7 +601,7 @@ class RelatedObjectsTests(OptionsBaseTests):
             )
 
 
-class RelatedM2MTests(OptionsBaseTests):
+class RelatedM2MTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTests):
 
     def test_related_m2m_with_model(self):
         result_key = 'get_all_related_many_to_many_with_model'
@@ -628,7 +636,7 @@ class VirtualFieldsTests(OptionsBaseTests):
             self.assertEqual(sorted([f.name for f in objects]), sorted(expected_names))
 
 
-class GetFieldByNameTests(OptionsBaseTests):
+class GetFieldByNameTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTests):
 
     def test_get_data_field(self):
         field_info = Person._meta.get_field_by_name('data_abstract')
