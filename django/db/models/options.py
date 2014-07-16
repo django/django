@@ -353,6 +353,12 @@ class Options(object):
         # we will catch the use of 'many_to_many' key and convert it to m2m.
         try:
             m2m = kwargs['many_to_many']
+            warnings.warn(
+                "The 'many_to_many' argument on get_fields will be soon "
+                "deprecated. This parameter has changed in favor of "
+                "'m2m'. Please change your implementation accordingly.",
+                RemovedInDjango20Warning
+            )
         except KeyError:
             pass
 
