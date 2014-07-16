@@ -14,3 +14,11 @@ Bugfixes
 
 * Prevented indexes on PostgreSQL virtual fields
   (`#22514 <http://code.djangoproject.com/ticket/22514>`_).
+
+* Prevented edge case where values of FK fields could be initialized with a
+  wrong value when an inline model formset is created for a relationship
+  defined to point to a field other than the PK
+  (`#13794 <https://code.djangoproject.com/ticket/13794>`_).
+
+* Restored ``pre_delete``  signals for ``GenericRelation`` cascade deletion
+  (`#22998 <https://code.djangoproject.com/ticket/22998>`_).
