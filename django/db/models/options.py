@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from bisect import bisect
 from collections import OrderedDict
+import warnings
 
 from django.apps import apps
 from django.conf import settings
@@ -9,6 +10,7 @@ from django.db.models.fields.related import ManyToManyRel, ManyToManyField
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
 from django.utils.text import camel_case_to_spaces
@@ -554,22 +556,49 @@ class Options(object):
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
 
+    class raise_deprecation(object):
+
+        def __init__(self, suggested_alternative):
+            self.suggested_alternative = suggested_alternative
+
+        def __call__(self, fn):
+
+            def wrapper(*args, **kwargs):
+                warnings.warn(
+                    "'%s' is an internal and unofficial API. Please move "
+                    "to the newer and official Options API that can "
+                    "be safely used. A suggested alternative to this current "
+                    "API call, that will be deprecated soon, is '%s'." % (
+                        fn.__name__,
+                        self.suggested_alternative,
+                    ),
+                    RemovedInDjango20Warning, stacklevel=2
+                )
+                return fn(*args, **kwargs)
+            return wrapper
+
+    @raise_deprecation(suggested_alternative="get_fields")
     def get_fields_with_model(self):
         return list(map(self._map_model, self.get_fields()))
 
+    @raise_deprecation(suggested_alternative="get_fields")
     def get_concrete_fields_with_model(self):
         return list(map(self._map_model, self.get_fields(include_non_concrete=False)))
 
+    @raise_deprecation(suggested_alternative="get_fields")
     def get_m2m_with_model(self):
         return list(map(self._map_model, self.get_fields(data=False, m2m=True)))
 
+    @raise_deprecation(suggested_alternative="get_field")
     def get_field_by_name(self, name):
         return self._map_details(self.get_field(name, m2m=True, related_objects=True,
                                  related_m2m=True, virtual=True))
 
+    @raise_deprecation(suggested_alternative="field_names")
     def get_all_field_names(self):
         return self.field_names
 
+    @raise_deprecation(suggested_alternative="get_fields")
     def get_all_related_objects(self, local_only=False, include_hidden=False,
                                 include_proxy_eq=False):
         include_parents = local_only is False
@@ -580,6 +609,7 @@ class Options(object):
             include_proxy=include_proxy_eq
         ))
 
+    @raise_deprecation(suggested_alternative="get_fields")
     def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
                                            include_proxy_eq=False):
         include_parents = local_only is False
@@ -591,6 +621,7 @@ class Options(object):
         )
         return list(map(self._map_model, fields))
 
+    @raise_deprecation(suggested_alternative="get_fields")
     def get_all_related_many_to_many_objects(self, local_only=False):
         return list(self.get_fields(data=False, related_m2m=True, include_parents=local_only is not True))
 
@@ -621,5 +652,6 @@ class Options(object):
             self._map_details_cache[connection] = model, direct, m2m
         return connection, model, direct, m2m
 
+    @raise_deprecation(suggested_alternative="get_fields")
     def get_all_related_m2m_objects_with_model(self):
         return list(map(self._map_model, self.get_fields(data=False, related_m2m=True)))
