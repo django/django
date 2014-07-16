@@ -247,11 +247,15 @@ class Command(BaseCommand):
             if params['unique']:
                 columns = params['columns']
                 if len(columns) > 1:
-                    unique_together.append(tuple(columns))
+                    # we do not want to include the u"" or u'' prefix
+                    # so we build the string rather than interpolate the tuple
+                    tup = '(' + ', '.join("'%s'" % c for c in columns) + ')'
+                    unique_together.append(tup)
         meta = ["",
                 "    class Meta:",
                 "        managed = False",
                 "        db_table = '%s'" % table_name]
         if unique_together:
-            meta += ["        unique_together = %s" % tuple(unique_together)]
+            tup = '(' + ', '.join(unique_together) + ',)'
+            meta += ["        unique_together = %s" % tup]
         return meta
