@@ -42,6 +42,7 @@ class AutodetectorTests(TestCase):
     author_proxy_options = ModelState("testapp", "AuthorProxy", [], {"proxy": True, "verbose_name": "Super Author"}, ("testapp.author", ))
     author_proxy_notproxy = ModelState("testapp", "AuthorProxy", [], {}, ("testapp.author", ))
     author_proxy_third = ModelState("thirdapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author", ))
+    author_proxy_proxy = ModelState("testapp", "AAuthorProxyProxy", [], {"proxy": True}, ("testapp.authorproxy", ))
     author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author", ))
     author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author", ))
     author_with_m2m = ModelState("testapp", "Author", [
@@ -1005,6 +1006,22 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Author")
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="Aardvark")
 
+    def test_proxy_bases_first(self):
+        """
+        Tests that bases of proxies come first.
+        """
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_empty, self.author_proxy, self.author_proxy_proxy])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel", "CreateModel"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Author")
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="AuthorProxy")
+        self.assertOperationAttributes(changes, 'testapp', 0, 2, name="AAuthorProxyProxy")
+
     def test_pk_fk_included(self):
         """
         Tests that a relation used as the primary key is kept as part of CreateModel.
@@ -1042,7 +1059,7 @@ class AutodetectorTests(TestCase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_last_dependency(self):
         """
-        Tests that a dependency to an app with existing migrations uses __last__.
+        Tests that a dependency to an app with existing migrations uses __latest__.
         """
         # Load graph
         loader = MigrationLoader(connection)
