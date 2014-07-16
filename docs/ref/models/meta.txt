@@ -10,29 +10,118 @@ Options can be used for the following:
 * You need to retreive all field instances names of a model
 * You need to retreive a single field by name
 
-Main Concepts
-=============
-
-``Options``
+Field Types
 ===========
 
-.. class:: Options(model_class, app_label=None)
+A model can have 5 types of fields:
 
-Must be initialized with the following arguments:
+Data fields
+~~~~~~~~~~~~
+A data field is any field that has an entry on the database, for example a CharField, BooleanField, a ForeignKey::
 
-.. attribute:: Options.model_class
+    class Person(models.Model):
+        data_abstract = models.CharField(max_length=10)
 
-    The model class that is to be bound to _meta
+M2M fields
+~~~~~~~~~~~~
+A M2M field that is defined on the current model::
 
-.. attribute:: Options.app_label
+    class Person(models.Model):
+        friends = models.ManyToManyField('self', related_name='friends', symmetrical=True)
 
-    The label of the app that is responsible for the model.
-    If the Model is not included in ``INSTALLED_APPS``, is imported
-    before the module is loaded, or it doesn't declare an explicit
-    ``app_label`` then ``app_label`` will be set to the last occurance of
-    a module named models
+Related Object
+~~~~~~~~~~~~~~
+A Related Object is a one-to-many relation from another model (such as a :class:`django.db.models.ForeignKey`) that points to the current model::
+
+    class City(models.Model):
+        name = models.CharField(max_length=100)
+
+    class Person(models.Model):
+        city = models.ForeignKey(City)
+
+In this case, City has a related object from Person
+
+Related M2M
+~~~~~~~~~~~
+A Related M2M is a M2M relation from another model that points to the current model::
+
+    class City(models.Model):
+        name = models.CharField(max_length=100)
+
+    class Person(models.Model):
+        cities_lived_in = models.ManyToManyField(City)
+
+In this case, City has a related m2m from Person
+
+Virtual fields
+~~~~~~~~~~~~~~
+Virtual fields do not necessarily have an entry on the database, they are "Django fields" such as a :class:`django.contrib.contenttypes.fields.GenericForeignKey`::
+
+    class Person(models.Model):
+        content_type = models.ForeignKey(ContentType, related_name='+')
+        object_id_ = models.PositiveIntegerField()
+        item = GenericForeignKey('content_type', 'object_id')
+
+:class:`django.contrib.contenttypes.fields.GenericForeignKey` uses ``content_type`` and ``object_id`` to keep track of what model type and id is set to item,
+but item itself does not have a concrete presence on the database.
+In this case, item is a virtual field.
+
+Field Filters
+=============
+
+There are 5 properties that each field can have.
+We can use these properties as filters for ``get_fields``.
+
+Local
+~~~~~
+A local field is when is not derived from inheritance. Fields from models that directly inherit from abstract models or proxy classes are still local::
+
+    class Person(models.Model):
+        name = models.CharField(max_length=50)
+
+    class Londoner(Person):
+        overdraft = models.DecimalField()
+
+Londoner has two fields (name and overdraft) but only one local field (overdraft).
+
+Hidden
+~~~~~~
+Hidden fields are only referred to related objects and related m2m. When a relational
+model (such as :class:`django.db.models.ManyToManyField`, or
+:class:`django.db.models.ForeignKey`) specifies a related_name that
+starts with a "+", it tells Django to not create a reverse relation::
+
+    class City(models.Model):
+        name = models.CharField(max_length=100)
+
+    class Person(models.Model):
+        city = models.ForeignKey(City, related_name='+')
+
+City has a related hidden object from Person (as you can't access person_set)
+
+Concrete
+~~~~~~~~
+Concrete fields are fields that have a column
+
+Proxied relations
+~~~~~~~~~~~~~~~~~
+Proxied relations are relations that point to a proxy of a model::
+
+    class Person(models.Model):
+        pass
+
+    class ProxyPerson(Person):
+        class Meta:
+            proxy = True
+
+    class RelationToProxy(models.Model):
+         proxy_person = models.ForeignKey(ProxyPerson)
+
+In this case, Person has no related objects, but it has 1 proxied related object from RelationToProxy.
 
 
+``Options API``
+===============
 
 Retrieve a field instance by name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -48,7 +137,7 @@ Retrieve a field instance by name
     are flags that are used internally to optimize the lookup. By default, ``get_field``
     will only look up data and m2m fields, but all field types can be activated.
     Hidden and proxied relations are not available. If a given name is not found
-    it will raise a ``FieldDoesNotExist`` error::
+    it will raise a `FieldDoesNotExist`` error::
 
         from django.contrib.auth.models import User
 
@@ -67,7 +156,9 @@ Retrieve a field instance by name
         *** FieldDoesNotExist: User has no field named 'does_not_exist'
 
     .. note::
-        There is an inconsistency between the defaults of get_field and get_fields. 'get_fields' by default enables only data fields while 'get_field' by default enables data and m2m. This is because of backwards-compatibility issues (read more below).
+        There is an inconsistency between the defaults of get_field and get_fields. 'get_fields'
+        by default enables only data fields while 'get_field' by default
+        enables data and m2m. This is because of backwards-compatibility issues (read more below).
 
 
 
@@ -121,450 +212,39 @@ Retrieve field instances
          <RelatedObject: auth:user_user_permissions related to user>,
          <RelatedObject: admin:logentry related to user>)
 
-virtual_fields
-~~~~~~~~~~~~~~
 
-.. attribute:: Options.virtual_fields
+``Fast-Access API``
+===================
 
-    Virtual fields are custom ``ForeignObject`` that are
-    custom-made. Examples are ``GenericRelation`` and ``GenericForeignKey``.
-    
-    Inside and ouside of core, virtual_fields are often iterated
-    and then checked if isinstance of a specific type.
-
-    * contrib/contenttypes/admin.py
-
-    * contrib/contenttypes/fields.py
-
-    * db/models/base.py
-
-    * db/models/deletion.py
-
-    * forms/models.py
-
-.. note::
-        forms/models.py:85
-        Note that for historical reasons we want to include also
-        virtual_fields here. (GenericRelation was previously a fake
-        m2m field).
-    
-
-
-
-concrete_fields
-~~~~~~~~~~~~~~~
-
-.. attribute:: Options.concrete_fields
-
-    Calls ``fields`` internally.
-    Filters out all fields that do not have a column
-
-fields
-~~~~~~
+In order to provide a simple and usable API for developers to use,
+we also needed to define some Fast-access endpoints that are used
+by Django internally. The reason these APIs exist is to ensure
+field access is always fast. This API is composed of a specific set
+of properties that are cached on first access, and are guaranteed to
+be fast.
+If you have the choice between using a fast-access API, or using one of the
+official APIs, it is reccomended to use the fast-access API for performance
+reasons
 
 .. attribute:: Options.fields
 
-    Calls ``_fill_fields_cache`` and returns ``_field_name_cache``::
+    Returns a list of all data fields.
 
-        class Photo(models.Model):
-            title = models.CharField(max_length=50)
+.. attribute:: Options.concrete_fields
 
-        >>> from photos.models import Photo
-        >>>Photo._meta.fields
-        [<django.db.models.fields.AutoField: id>,
-         <django.db.models.fields.CharField: title>]
+    Returns a list of all concrete data fields.
 
-    Usage: fields is used as a generic lookup for all
-    fields inside a model. This can be convenient when
-    dealing with deferred fields, when field cleaning
-    is performed, or with pickling. It is also widely
-    used within query.py to perform get_or_create and
-    update_or_create. It is also used to perform validation
-    such as: checking number of foreign keys, finding
-    related fields.
+.. attribute:: Options.local_concrete_fields
 
-    Used in the following files:
-
-    * db/models/base.py
-
-    * contrib/gis/sitemaps/kml.py
-
-    * contrib/gis/db/models/sql/query.py
-
-    * core/management/commands/dumpdata.py
-
-    * db/models/fields/__init__.py
-
-    * forms/models.py
-
-    * db/models/query.py
-
-    * db/models/fields/related.py
-
-    * contrib/contenttypes/views.py
-
-get_fields_with_model
-~~~~~~~~~~~~~~~~~~~~~
-
-.. method:: Options.get_fields_with_model()
-
-    Depends on ``_fill_fields_cache``
-    Returns ``_field_name_cache``.
-
-
-get_concrete_fields_with_model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. method:: Options.get_concrete_fields_with_model()
-
-    Depends on ``get_fields_with_model``
-    Filters out all fields that do not have a column
-
-
-_fill_fields_cache
-~~~~~~~~~~~~~~~~~~
-
-.. method:: Options._fill_fields_cache()
-
-    Used internally by ``get_fields_with_model``, and 
-    ``fields``.
-    It retreives an ordered list of fields, taking
-    into consideration the order defined on the model. ``_fill_fields_cache`` is
-    recursive, and takes into consideration also parent's fields.
-    Sets the following properties on the instance:
-
-    .. attribute:: Options._field_cache
-
-        A tuple of variable length componsed of 2-length tuples.
-        The first element of the tuple is the field and the
-        second element is None, if the field belongs to the model, or
-        a model class if the field belongs to a parent class::
-
-            >>> Photo._meta._field_cache
-            ((<django.db.models.fields.AutoField: id>, None),
-             (<django.db.models.fields.CharField: title>, None))
-
-    .. attribute:: Options._field_name_cache
-        
-        A list containing only the first element of the child tuples
-        in ``_field_cache``::
-
-            >>> Photo._meta._field_name_cache
-            [<django.db.models.fields.AutoField: id>,
-             <django.db.models.fields.CharField: title>]
-
-Many to Many Section
-====================
-
-many_to_many
-~~~~~~~~~~~~
+    Returns a list of all concrete data fields that
+    have not been inherited from another model.
 
 .. attribute:: Options.many_to_many
 
-    A cached property that returns an OrderedDict of fields,
-    into consideration the order defined on the model. ``fields`` is
-    recursive, and takes into consideration also parent's fields, by
-    calling ``get_field_by_name`` on each parent::
-
-        class Photo(models.Model):
-            title = models.CharField(max_length=50)
-
-        >>> from photos.models import Photo
-        >>>Photo._meta.fields
-        [<django.db.models.fields.AutoField: id>,
-         <django.db.models.fields.CharField: title>]
-
-
-get_m2m_with_model
-~~~~~~~~~~~~~~~~~~
-
-.. method:: Options.get_m2m_with_model()
-
-    Converts the OrderedDict from ``_m2m_cache`` 
-    to a list in the format (m2m-field, model)
-
-
-_fill_m2m_cache
-~~~~~~~~~~~~~~~
-
-.. method:: Options._fill_m2m_cache()
-
-    Used internally by ``get_m2m_with_model``, and 
-    ``many_to_many``.
-    It retreives an ordered list of m2m fields, taking
-    into consideration the order defined on the model. ``_fill_m2m_cache`` is
-    recursive, and takes into consideration also parent's fields.
-    Sets the following properties on the instance:
-
-    .. attribute:: Options._m2m_cache
-
-        An OrderedDict where the keys are the m2m fields and the
-        values are None if the field belongs to the model, or
-        a model class if the field belongs to a parent class::
-
-            >>> User._meta._m2m_cache
-            OrderedDict([(<django.db.models.fields.related.ManyToManyField: groups>, None),
-            (<django.db.models.fields.related.ManyToManyField: user_permissions>, None)])
-
-
-Related Many to Many objects section
-====================================
-
-get_all_related_many_to_many_objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. method:: Options.get_all_related_many_to_many_objects(local_only=False)
-    
-    Returns a list of related m2m objects, if ``local_only`` is specified
-    if it only return fields on the same model
-
-
-get_all_related_m2m_objects_with_model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. method:: Options.get_all_related_m2m_objects_with_model()
-
-    Converts the OrderedDict from ``_fill_related_many_to_many_cache`` 
-    to a list in the format (related-m2m-object, model)
-
-
-_fill_related_many_to_many_cache
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. method:: Options._fill_related_many_to_many_cache()
-
-    Used internally by ``get_all_related_m2m_objects_with_model`` and
-    ``get_all_related_many_to_many_objects``.
-    It creates a OrderedDict where to store the final restult, then it
-    loops through each parent and searches for related fields, calling
-    ``get_all_related_m2m_objects_with_model`` recursively.
-    Finally, it gets models from each app loaded at that time and
-    checks if any field of that model has a m2m relation with the current
-    model.
-    Sets the following properties on the instance:
-
-    .. attribute:: Options._related_many_to_many_cache
-
-        An OrderedDict where the keys are the related fields and the
-        values are None if the field belongs to the model, or
-        a model class if the field belongs to a parent class.
-        
-
-Related objects section
-=======================
-
-get_all_related_objects_with_model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. method:: Options.get_all_related_objects_with_model(local_only=False, include_hidden=False, include_proxy_eq=False)
-
-    .. attribute:: local_only
-
-        Return only m2m objects on the same model
-
-    .. attribute:: include_hidden
-
-        Also return hidden fields
-
-    .. attribute:: include_proxy_eq
-        
-        Will take into consideration also proxy fields. If flag
-        is present, it will take the fields to evaluate from 
-        ``_related_objects_proxy_cache``, if not it will take it
-        from ``_related_objects_cache``
-
-    A list of variable length componsed of 2-length tuples.
-    The first element of the tuple is the field and the
-    second element is None, if the field belongs to the model, or
-    a model class if the field belongs to a parent class::
-
-        >>> Permission._meta.get_all_related_m2m_objects_with_model()
-        [(<RelatedObject: auth:group related to permissions>, None),
-         (<RelatedObject: auth:user related to user_permissions>, None)]
-
-
-get_all_related_objects
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. method:: Options.get_all_related_objects(local_only=False, include_hidden=False, include_proxy_eq=False)
-
-    Uses ``get_all_related_m2m_objects_with_model``, only returning
-    the related objects without model.
-
-
-_fill_related_objects_cache
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. method:: Options._fill_related_objects_cache()
-
-    Used internally by ``get_all_related_objects`` and
-    ``get_all_related_objects_with_model``.
-    It loops through each model currently registered and checks
-    if there are fields (ex. ForeignKey) that point to the current
-    model. If a field matches this criteria, it is inserted into
-    ``_related_objects_cache`` and ``_related_objects_proxy_cache``.
-    if the field links back to the current model through a proxy
-    (ex. multi-table inheritance) it is only added to
-    ``_related_objects_proxy_cache`` and will not be present
-    in ``_related_objects_cache``.
-    Sets the following properties on the instance:
-    
-    .. attribute:: Options._related_objects_cache
-
-        An OrderedDict where the keys are the related fields and the
-        values are None if the field belongs to the model, or
-        a model class if the field belongs to a parent class.
-        Fields inside _related_objects_cache are sure to be defined
-        on the current model::
-
-            class Comment(models.Model):
-                photo = models.ForeignKey(Photo)
-                body = models.CharField(max_length=50)
-
-            >>> Photo._meta._related_objects_cache
-            OrderedDict([(<RelatedObject: photos:comment related to photo>, None)])
-            >>> Photo._meta._related_objects_proxy_cache
-            OrderedDict([(<RelatedObject: photos:comment related to photo>, None)])
-
-    .. attribute:: Options._related_objects_proxy_cache
-
-        An OrderedDict where the keys are the related fields and the
-        values are None if the field belongs to the model, or
-        a model class if the field belongs to a parent class
-        Fields inside _related_objects_proxy_cache are a combintaion
-        of fields defined on the current model and proxy fields::
-
-
-            class Photo(models.Model):
-                place = models.ForeignKey(Place)
-                title = models.CharField(max_length=50)
-
-
-            class Place(models.Model):
-                name = models.CharField(max_length=50)
-                address = models.CharField(max_length=80)
-
-
-            class FishPlace(Place):
-                class Meta:
-                    proxy = True
-
-            >>> FishPlace._meta._related_objects_cache
-            OrderedDict([(<RelatedObject: photos:photo related to place>,
-                        <class 'photos.models.Place'>)])
-
-            >>> FishPlace._meta._related_objects_proxy_cache
-            OrderedDict([(<RelatedObject: photos:photo related to place>,
-                         None),
-                         (<RelatedObject: photos:restaurant related to place_ptr>,
-                         None)])
-
-Higher-level functions
-======================
-
-init_name_map
-~~~~~~~~~~~~~
-
-.. method:: Options.init_name_map()
-
-    Internally calls ``get_all_related_m2m_objects_with_model``,
-    ``get_all_related_objects_with_model``, ``get_m2m_with_model``,
-    and ``get_fields_with_model``.
-    This is the the core part of the Meta API, it is responsible for calling most of
-    the functions above and create a dict used as a lookup table.    Sets the following properties on the instance:
-
-    .. attribute:: Options._name_map
-
-        The dict maps the field name to a field
-        object tuple. The field object is composed
-        of (field_object, model, direct, m2m)
-
-
-add_field
-~~~~~~~~~
-
-.. method:: Options.add_field(field)
-
-    Adds a field in the order it was created, based on
-    ``creation_counter``. if the field is a ``ManyToManyField``
-    it will be added to the ``local_many_to_many`` list, else
-    it will be added to the ``local_fields`` list. Finally, it
-    will expire the caching system for that field type. Finally
-    it will expire ``_name_map``, that is the result of both
-    properties.
-
-
-contribute_to_class
-~~~~~~~~~~~~~~~~~~~
-
-.. method:: Options.contribute_to_class(cls, name)
-
-    ``contribute_to_class`` is used to create a tightly coupled
-    binding between the model class and the current Options
-    instance. It is used to make the Options instance aware
-    of the model's metadata. ``contribute_to_class`` does the following
-    in order:
-
-    * Sets proprties such as ``object_name``, ``model_name``, ``model``,
-      and ``verbose_name`` from the model.
-
-
-    * If the Meta class is defined by the user on the model class,
-      this method will iterate through a it's properties,
-      and replace default attributes with the ones specified the
-      dict, if present.
-
-    * If ``unique_together`` and/or ``index_together`` are specified
-      on the user-defined Meta class, they are popped out and
-      normalized using ``normalize_together``.
-
-    * If ``verbose_name_plural`` was not specified, it will be constructed
-      dynamically.
-
-    * If ``db_table`` was not specified, it will be constructed dynamically
-      dynamically.
-
-
-Utils
-=====
-
-get_ancestor_link
-~~~~~~~~~~~~~~~~~
-
-.. method:: Options.get_ancestor_link(ancestor)
-
-    Finds the field that binds the current model with
-    an ancestor model. This is usually used for models
-    with multi-table inheritance::
-
-        class Place(models.Model):
-            name = models.CharField(max_length=50)
-            address = models.CharField(max_length=80)
-
-
-        class Restaurant(Place):
-            serves_hot_dogs = models.BooleanField()
-            serves_pizza = models.BooleanField()
-        
-        >>> Restaurant._meta.get_ancestor_link(Place)
-        <django.db.models.fields.related.OneToOneField: place_ptr>
-
-
-get_parent_list
-~~~~~~~~~~~~~~~
-
-.. method:: Options.get_parent_list()
-
-    Returns a set containing all the parents of the model. The call
-    is recursive.
-
-
-normalize_together
-~~~~~~~~~~~~~~~~~~
-
-.. method:: Options.normalize_together()
-
-    Used when attaching an Options object onto a model class.
-    if the user specified a custom ``unique_together`` or 
-    ``index_together`` inside the Meta class of the model,
-    this function ensure it is normalized to a tuple of tuples.
+    Returns a list of all m2m fields.
+
+.. note::
+    This does not mean that the official APIs are slow. Contrarily, they have been
+    optimized for speed and are cached internally. Fast-access APIs are
+    to make Django even faster, as instance attributes perform better compared
+    to functions.
