@@ -127,13 +127,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             ', '.join(y for x, y in field_maps),
             self.quote_name(model._meta.db_table),
         ))
-        # Delete the old table (not using self.delete_model to avoid deleting
-        # all implicit M2M tables)
-        self.execute(self.sql_delete_table % {
-            "table": self.quote_name(model._meta.db_table),
-        })
+        # Delete the old table
+        self.delete_model(model, handle_autom2m=False)
         # Rename the new to the old
-        self.alter_db_table(model, temp_model._meta.db_table, model._meta.db_table)
+        self.alter_db_table(temp_model, temp_model._meta.db_table, model._meta.db_table)
         # Run deferred SQL on correct table
         for sql in self.deferred_sql:
             self.execute(sql.replace(temp_model._meta.db_table, model._meta.db_table))
@@ -141,6 +138,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Fix any PK-removed field
         if restore_pk_field:
             restore_pk_field.primary_key = True
+
+    def delete_model(self, model, handle_autom2m=True):
+        if handle_autom2m:
+            super(DatabaseSchemaEditor, self).delete_model(model)
+        else:
+            # Delete the table (and only that)
+            self.execute(self.sql_delete_table % {
+                "table": self.quote_name(model._meta.db_table),
+            })
 
     def add_field(self, model, field):
         """
