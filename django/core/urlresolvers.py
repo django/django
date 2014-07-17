@@ -435,7 +435,11 @@ class RegexURLResolver(LocaleRegexProvider):
                 candidate_pat = prefix_norm.replace('%', '%%') + result
                 if re.search('^%s%s' % (prefix_norm, pattern), candidate_pat % candidate_subs, re.UNICODE):
                     candidate_subs = dict((k, urlquote(v)) for (k, v) in candidate_subs.items())
-                    return candidate_pat % candidate_subs
+                    url = candidate_pat % candidate_subs
+                    # Don't allow construction of scheme relative urls.
+                    if url.startswith('//'):
+                        url = '/%%2F%s' % url[2:]
+                    return url
         # lookup_view can be URL label, or dotted path, or callable, Any of
         # these can be passed in at the top, but callables are not friendly in
         # error messages.
