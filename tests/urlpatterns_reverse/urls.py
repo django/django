@@ -66,4 +66,7 @@ urlpatterns = patterns('',
     (r'defaults_view2/(?P<arg1>\d+)/', 'defaults_view', {'arg2': 2}, 'defaults'),
 
     url('^includes/', include(other_patterns)),
+
+    # Security tests
+    url('(.+)/security/$', empty_view, name='security'),
 )
