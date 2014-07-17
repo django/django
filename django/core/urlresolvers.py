@@ -426,6 +426,8 @@ class RegexURLResolver(LocaleRegexProvider):
                     unicode_kwargs = dict([(k, force_text(v)) for (k, v) in kwargs.items()])
                     candidate = (prefix_norm.replace('%', '%%') + result) % unicode_kwargs
                 if re.search('^%s%s' % (prefix_norm, pattern), candidate, re.UNICODE):
+                    if candidate.startswith('//'):
+                        candidate = '/%%2F%s' % candidate[2:]
                     return candidate
         # lookup_view can be URL label, or dotted path, or callable, Any of
         # these can be passed in at the top, but callables are not friendly in

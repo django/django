@@ -143,6 +143,9 @@ test_data = (
     ('defaults', '/defaults_view2/3/', [], {'arg1': 3, 'arg2': 2}),
     ('defaults', NoReverseMatch, [], {'arg1': 3, 'arg2': 3}),
     ('defaults', NoReverseMatch, [], {'arg2': 1}),
+
+    # Security tests
+    ('security', '/%2Fexample.com/security/', ['/example.com'], {}),
 )
 
 class NoURLPatternsTests(TestCase):

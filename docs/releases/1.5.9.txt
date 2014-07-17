@@ -5,3 +5,16 @@ Django 1.5.9 release notes
 *Under development*
 
 Django 1.5.9 fixes several security issues in 1.5.8.
+
+:func:`~django.core.urlresolvers.reverse()` could generate URLs pointing to other hosts
+=======================================================================================
+
+In certain situations, URL reversing could generate scheme-relative URLs  (URLs
+starting with two slashes), which could unexpectedly redirect a user  to a
+different host. An attacker could exploit this, for example, by redirecting
+users to a phishing site designed to ask for user's passwords.
+
+To remedy this, URL reversing now ensures that no URL starts with two slashes
+(//), replacing the second slash with its URL encoded counterpart (%2F). This
+approach ensures that semantics stay the same, while making the URL relative to
+the domain and not to the scheme.
