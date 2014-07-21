@@ -49,6 +49,28 @@ def normalize_together(option_together):
         return option_together
 
 
+class raise_deprecation(object):
+
+    def __init__(self, suggested_alternative):
+        self.suggested_alternative = suggested_alternative
+
+    def __call__(self, fn):
+
+        def wrapper(*args, **kwargs):
+            warnings.warn(
+                "'%s is an unofficial API that has been deprecated. "
+                "Usage of %s may be able to be replaced with "
+                "a call to '%s'" % (
+                    fn.__name__,
+                    fn.__name__,
+                    self.suggested_alternative,
+                ),
+                RemovedInDjango20Warning, stacklevel=2
+            )
+            return fn(*args, **kwargs)
+        return wrapper
+
+
 @python_2_unicode_compatible
 class Options(object):
     def __init__(self, meta, app_label=None):
@@ -561,27 +583,6 @@ class Options(object):
         return self.get_fields(include_parents=False, include_non_concrete=False)
 
     ### DEPRECATED METHODS GO BELOW THIS LINE ###
-
-    class raise_deprecation(object):
-
-        def __init__(self, suggested_alternative):
-            self.suggested_alternative = suggested_alternative
-
-        def __call__(self, fn):
-
-            def wrapper(*args, **kwargs):
-                warnings.warn(
-                    "'%s is an unofficial API that has been deprecated. "
-                    "Usage of %s may be able to be replaced with "
-                    "a call to '%s'" % (
-                        fn.__name__,
-                        fn.__name__,
-                        self.suggested_alternative,
-                    ),
-                    RemovedInDjango20Warning, stacklevel=2
-                )
-                return fn(*args, **kwargs)
-            return wrapper
 
     @raise_deprecation(suggested_alternative="get_fields")
     def get_fields_with_model(self):
