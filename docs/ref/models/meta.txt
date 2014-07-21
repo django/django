@@ -2,7 +2,15 @@
 Model ``_meta`` options
 =======================
 
-The Options API is at the core of Django, it enables introspection of Django Models with the rest of the system. This enables lookups, queries, forms, admin to understand the capabilities of every model. The Options API is hidden under the _meta attribute of each model class.
+.. module:: django.db.models.options
+   :synopsis: Model meta-class layer
+
+.. currentmodule:: django.db.models.options
+
+The Options API is at the core of Django, it enables introspection of Django
+Models with the rest of the system. This enables lookups, queries, forms,
+admin to understand the capabilities of every model. The Options API is
+hidden under the _meta attribute of each model class.
 
 Options can be used for the following:
 
@@ -17,21 +25,33 @@ A model can have 5 types of fields:
 
 Data fields
 ~~~~~~~~~~~~
-A data field is any field that has an entry on the database, for example a CharField, BooleanField, a ForeignKey::
+
+A data field is any field that has an entry on the database,
+for example a CharField, BooleanField, a ForeignKey.
+
+.. code-block:: python
 
     class Person(models.Model):
         data_abstract = models.CharField(max_length=10)
 
-M2M fields
-~~~~~~~~~~~~
-A M2M field that is defined on the current model::
+Many-to-many fields
+~~~~~~~~~~
+
+A many-to-many field that is defined on the current model.
+
+.. code-block:: python
 
     class Person(models.Model):
         friends = models.ManyToManyField('self', related_name='friends', symmetrical=True)
 
 Related Object
 ~~~~~~~~~~~~~~
-A Related Object is a one-to-many relation from another model (such as a :class:`django.db.models.ForeignKey`) that points to the current model::
+
+A Related Object is a one-to-many relation from another model
+(such as a :class:`django.db.models.ForeignKey`) that points
+to the current model.
+
+.. code-block:: python
 
     class City(models.Model):
         name = models.CharField(max_length=100)
@@ -41,9 +61,12 @@ A Related Object is a one-to-many relation from another model (such as a :class:
 
 In this case, City has a related object from Person
 
-Related M2M
-~~~~~~~~~~~
-A Related M2M is a M2M relation from another model that points to the current model::
+Related many-to-many objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A Related M2M object is a M2M relation from another model that points to the current model.
+
+.. code-block:: python
 
     class City(models.Model):
         name = models.CharField(max_length=100)
@@ -55,16 +78,22 @@ In this case, City has a related m2m from Person
 
 Virtual fields
 ~~~~~~~~~~~~~~
-Virtual fields do not necessarily have an entry on the database, they are "Django fields" such as a :class:`django.contrib.contenttypes.fields.GenericForeignKey`::
+
+ Virtual fields are model fields that do not necessarily have a
+corresponding database column. they are "Django fields" such as
+a :class:`django.contrib.contenttypes.fields.GenericForeignKey`.
+
+.. code-block:: python
 
     class Person(models.Model):
         content_type = models.ForeignKey(ContentType, related_name='+')
         object_id_ = models.PositiveIntegerField()
         item = GenericForeignKey('content_type', 'object_id')
 
-:class:`django.contrib.contenttypes.fields.GenericForeignKey` uses ``content_type`` and ``object_id`` to keep track of what model type and id is set to item,
-but item itself does not have a concrete presence on the database.
-In this case, item is a virtual field.
+:class:`django.contrib.contenttypes.fields.GenericForeignKey` uses ``content_type`` and
+``object_id`` to keep track of what model type and id is set to ``item``,
+but ``item`` itself does not have a concrete presence on the database.
+In this case, ``item`` is a virtual field.
 
 Field Filters
 =============
@@ -74,7 +103,11 @@ We can use these properties as filters for ``get_fields``.
 
 Local
 ~~~~~
-A local field is when is not derived from inheritance. Fields from models that directly inherit from abstract models or proxy classes are still local::
+
+A local field is when is not derived from inheritance. Fields from models that
+directly inherit from abstract models or proxy classes are still local.
+
+.. code-block:: python
 
     class Person(models.Model):
         name = models.CharField(max_length=50)
@@ -82,14 +115,17 @@ A local field is when is not derived from inheritance. Fields from models that d
     class Londoner(Person):
         overdraft = models.DecimalField()
 
-Londoner has two fields (name and overdraft) but only one local field (overdraft).
+``Londoner`` has two fields (name and overdraft) but only one local field (overdraft).
 
 Hidden
 ~~~~~~
-Hidden fields are only referred to related objects and related m2m. When a relational
-model (such as :class:`django.db.models.ManyToManyField`, or
-:class:`django.db.models.ForeignKey`) specifies a related_name that
-starts with a "+", it tells Django to not create a reverse relation::
+
+Hidden fields are only referred to related objects and related m2m.
+When a relational model (such as :class:`django.db.models.ManyToManyField`,
+or :class:`django.db.models.ForeignKey`) specifies a related_name that
+starts with a "+", it tells Django to not create a reverse relation.
+
+.. code-block:: python
 
     class City(models.Model):
         name = models.CharField(max_length=100)
@@ -97,15 +133,19 @@ starts with a "+", it tells Django to not create a reverse relation::
     class Person(models.Model):
         city = models.ForeignKey(City, related_name='+')
 
-City has a related hidden object from Person (as you can't access person_set)
+``City`` has a related hidden object from ``Person`` (as you can't access person_set)
 
 Concrete
 ~~~~~~~~
+
 Concrete fields are fields that have a column
 
 Proxied relations
 ~~~~~~~~~~~~~~~~~
-Proxied relations are relations that point to a proxy of a model::
+
+Proxied relations are relations that point to a proxy of a model.
+
+.. code-block:: python
 
     class Person(models.Model):
         pass
@@ -117,8 +157,8 @@ Proxied relations are relations that point to a proxy of a model::
     class RelationToProxy(models.Model):
          proxy_person = models.ForeignKey(ProxyPerson)
 
-In this case, Person has no related objects, but it has 1 proxied related object from RelationToProxy.
-
+In this case, ``Person`` has no related objects, but it has 1 proxied related
+object from ``RelationToProxy``.
 
 ``Options API``
 ===============
@@ -126,9 +166,9 @@ In this case, Person has no related objects, but it has 1 proxied related object
 Retrieve a field instance by name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Options.get_field(field_name, m2m, data, related_m2m, related_objects, virtual)
+.. method:: Options.get_field(field_name, m2m=True, data=True, related_m2m=False, related_objects=False, virtual=False)
 
-    Returns the field instance given a name of a field. ``field_name``.
+    Returns the field instance given a name of a field.
 
     ``field_name`` can be the name of a field on a model or it can also be a reverse relation
     name (related query name).
@@ -137,7 +177,9 @@ Retrieve a field instance by name
     are flags that are used internally to optimize the lookup. By default, ``get_field``
     will only look up data and m2m fields, but all field types can be activated.
     Hidden and proxied relations are not available. If a given name is not found
-    it will raise a `FieldDoesNotExist`` error::
+    it will raise a `FieldDoesNotExist`` error.
+
+    .. code-block:: python
 
         from django.contrib.auth.models import User
 
@@ -160,15 +202,15 @@ Retrieve a field instance by name
         by default enables only data fields while 'get_field' by default
         enables data and m2m. This is because of backwards-compatibility issues (read more below).
 
-
-
 Retrieve all field names
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. attribute:: Options.field_names
 
     Returns a list of all field names (including reverse relations) on the
-    current model.::
+    current model.
+
+    .. code-block:: python
 
         >>> User._meta.field_names
         ['username', 'first_name', 'last_name', 'logentry',
@@ -176,11 +218,10 @@ Retrieve all field names
          'last_login', 'groups', 'user_permissions', 'password',
          'id', 'date_joined']
 
-
 Retrieve field instances
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Options.get_fields(m2m, data, related_m2m, related_objects, virtual, include_parents, include_non_concrete, include_hidden, include_proxy, export_map)
+.. method:: Options.get_fields(m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False, include_parents=True, include_non_concrete=True, include_hidden=False, include_proxy=False, export_map=False)
 
     Returns a list of fields given a list of field types and filters.
 
@@ -188,7 +229,9 @@ Retrieve field instances
     of field instances. The flags are a combination of field types
     and field filters. All possible combinations of filters and fields
     are possible, although some will have no effect (such as
-    include_proxy combined with data or m2m by itself)::
+    include_proxy combined with data or m2m by itself).
+
+    .. code-block:: python
 
         >>> User._meta.get_fields() # Only data by default
         (<django.db.models.fields.AutoField: id>,
@@ -206,18 +249,16 @@ Retrieve field instances
         >>> User._meta.get_fields(data=False, related_objects=True) # only related_objects
         (<RelatedObject: admin:logentry related to user>,)
 
-        >>> User._meta.get_fields(data=False, related_objects=True
-                                      include_hidden=True) # only related_objects including hidden
+        >>> User._meta.get_fields(data=False, related_objects=True, include_hidden=True) # only related_objects including hidden
         (<RelatedObject: auth:user_groups related to user>,
          <RelatedObject: auth:user_user_permissions related to user>,
          <RelatedObject: admin:logentry related to user>)
-
 
 ``Fast-Access API``
 ===================
 
 In order to provide a simple and usable API for developers to use,
-we also needed to define some Fast-access endpoints that are used
+Django provides some Fast-access endpoints that are used
 by Django internally. The reason these APIs exist is to ensure
 field access is always fast. This API is composed of a specific set
 of properties that are cached on first access, and are guaranteed to
@@ -242,9 +283,3 @@ reasons
 .. attribute:: Options.many_to_many
 
     Returns a list of all m2m fields.
-
-.. note::
-    This does not mean that the official APIs are slow. Contrarily, they have been
-    optimized for speed and are cached internally. Fast-access APIs are
-    to make Django even faster, as instance attributes perform better compared
-    to functions.

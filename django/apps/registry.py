@@ -187,17 +187,14 @@ class Apps(object):
     @conditional_cached_property
     def related_objects_relation_graph(self):
         """
-        Returns two dictionaries of Options instances
-        as keys and a list of fields as values.
+        Returns two dictionaries with Options instances as keys
+        and a list of fields as values.
 
-        This method is used by each model to find
-        related objects. As this method is very
-        expensive and is accessed frequently
-        (it looks up every field in a model,
-        in every app), it is computed on first access
-        and then is set as a property.
-        The method will only cache when the apps registry
-        is finalised.
+        This method is used by each model to find related objects.
+        As this method is very expensive and is accessed frequently
+        (it looks up every field in a model, in every app),
+        it is computed on first access and then is set as a property.
+        The method will only cache when the apps registry is finalised.
         """
         related_objects_graph = defaultdict(list)
         related_objects_proxy_graph = defaultdict(list)

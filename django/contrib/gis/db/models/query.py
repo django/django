@@ -1,5 +1,4 @@
 from django.db import connections
-from django.db.models import Field
 from django.db.models.query import QuerySet, ValuesQuerySet, ValuesListQuerySet
 
 from django.contrib.gis.db.models import aggregates

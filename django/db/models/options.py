@@ -571,10 +571,10 @@ class Options(object):
 
             def wrapper(*args, **kwargs):
                 warnings.warn(
-                    "'%s' is an internal and unofficial API. Please move "
-                    "to the newer and official Options API that can "
-                    "be safely used. A suggested alternative to this current "
-                    "API call, that will be deprecated soon, is '%s'." % (
+                    "'%s is an unofficial API that has been deprecated. "
+                    "Usage of %s may be able to be replaced with "
+                    "a call to '%s'" % (
+                        fn.__name__,
                         fn.__name__,
                         self.suggested_alternative,
                     ),

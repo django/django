@@ -16,7 +16,7 @@ from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.aggregates import refs_aggregate
 from django.db.models.expressions import ExpressionNode
-from django.db.models.fields import Field, FieldDoesNotExist
+from django.db.models.fields import FieldDoesNotExist
 from django.db.models.query_utils import Q
 from django.db.models.related import PathInfo
 from django.db.models.sql import aggregates as base_aggregates_module
