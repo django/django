@@ -46,7 +46,7 @@ class OperationTestBase(MigrationTestBase):
         operation.state_forwards(app_label, new_state)
         return project_state, new_state
 
-    def set_up_test_model(self, app_label, second_model=False, third_model=False, related_model=False, mti_model=False, proxy_model=False):
+    def set_up_test_model(self, app_label, second_model=False, third_model=False, related_model=False, mti_model=False, proxy_model=False, unique_together=False):
         """
         Creates a test model state and database table.
         """
@@ -85,6 +85,7 @@ class OperationTestBase(MigrationTestBase):
             ],
             options={
                 "swappable": "TEST_SWAP_MODEL",
+                "unique_together": [["pink", "weight"]] if unique_together else [],
             },
         )]
         if second_model:
@@ -862,7 +863,7 @@ class OperationTests(OperationTestBase):
         """
         Tests the RenameField operation.
         """
-        project_state = self.set_up_test_model("test_rnfl")
+        project_state = self.set_up_test_model("test_rnfl", unique_together=True)
         # Test the state alteration
         operation = migrations.RenameField("Pony", "pink", "blue")
         self.assertEqual(operation.describe(), "Rename field pink on Pony to blue")
@@ -870,6 +871,9 @@ class OperationTests(OperationTestBase):
         operation.state_forwards("test_rnfl", new_state)
         self.assertIn("blue", [n for n, f in new_state.models["test_rnfl", "pony"].fields])
         self.assertNotIn("pink", [n for n, f in new_state.models["test_rnfl", "pony"].fields])
+        # Make sure the unique_together has the renamed column too
+        self.assertIn("blue", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
+        self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
         # Test the database alteration
         self.assertColumnExists("test_rnfl_pony", "pink")
         self.assertColumnNotExists("test_rnfl_pony", "blue")
@@ -877,6 +881,13 @@ class OperationTests(OperationTestBase):
             operation.database_forwards("test_rnfl", editor, project_state, new_state)
         self.assertColumnExists("test_rnfl_pony", "blue")
         self.assertColumnNotExists("test_rnfl_pony", "pink")
+        # Ensure the unique constraint has been ported over
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO test_rnfl_pony (blue, weight) VALUES (1, 1)")
+            with self.assertRaises(IntegrityError):
+                with atomic():
+                    cursor.execute("INSERT INTO test_rnfl_pony (blue, weight) VALUES (1, 1)")
+            cursor.execute("DELETE FROM test_rnfl_pony")
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_rnfl", editor, new_state, project_state)
