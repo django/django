@@ -308,7 +308,7 @@ class PermissionsMixin(models.Model):
     groups = models.ManyToManyField(Group, verbose_name=_('groups'),
         blank=True, help_text=_('The groups this user belongs to. A user will '
                                 'get all permissions granted to each of '
-                                'their group.'),
+                                'their groups.'),
         related_name="user_set", related_query_name="user")
     user_permissions = models.ManyToManyField(Permission,
         verbose_name=_('user permissions'), blank=True,
