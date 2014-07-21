@@ -499,6 +499,13 @@ class TemplateRegressionTests(TestCase):
         with self.assertRaises(urlresolvers.NoReverseMatch):
             t.render(Context({}))
 
+    def test_debug_tag(self):
+        from django.contrib.auth.models import Group
+        Group.objects.create(name="清風")
+        c1 = Context({"objs": Group.objects.all()})
+        t1 = Template('{% debug %} {{ objs }}')
+        self.assertIsInstance(t1.render(c1), six.text_type)
+
 
 # Set ALLOWED_INCLUDE_ROOTS so that ssi works.
 @override_settings(MEDIA_URL="/media/", STATIC_URL="/static/",
