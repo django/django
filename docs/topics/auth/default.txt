@@ -1225,7 +1225,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: SetPasswordForm
 
-    A form that lets a user change his/her password without entering the old
+    A form that lets a user change their password without entering the old
     password.
 
 .. class:: UserChangeForm
@@ -1243,7 +1243,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 Authentication data in templates
 --------------------------------
 
-The currently logged-in user and his/her permissions are made available in the
+The currently logged-in user and their permissions are made available in the
 :doc:`template context </ref/templates/api>` when you use
 :class:`~django.template.RequestContext`.
 

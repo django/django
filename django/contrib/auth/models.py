@@ -308,7 +308,7 @@ class PermissionsMixin(models.Model):
     groups = models.ManyToManyField(Group, verbose_name=_('groups'),
         blank=True, help_text=_('The groups this user belongs to. A user will '
                                 'get all permissions granted to each of '
-                                'his/her group.'),
+                                'their group.'),
         related_name="user_set", related_query_name="user")
     user_permissions = models.ManyToManyField(Permission,
         verbose_name=_('user permissions'), blank=True,
@@ -320,7 +320,7 @@ class PermissionsMixin(models.Model):
 
     def get_group_permissions(self, obj=None):
         """
-        Returns a list of permission strings that this user has through his/her
+        Returns a list of permission strings that this user has through their
         groups. This method queries all available auth backends. If an object
         is passed in, only permissions matching this object are returned.
         """
