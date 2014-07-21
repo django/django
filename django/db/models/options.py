@@ -463,12 +463,13 @@ class Options(object):
             # { options_instance : [field_pointing_to_options_model, field_pointing_to_options, ..]}
             # If the model is a proxy model, then we also add the concrete model.
             tree = self.apps.related_m2m_relation_graph
-            for f in tree[self] if not self.proxy else tree[self] + tree[self.concrete_model._meta]:
+            field_list = tree[self] if not self.proxy else tree[self] + tree[self.concrete_model._meta]
+            for f in field_list:
                 fields[f.related] = (f.related_query_name(),)
 
         if related_objects:
-            parent_list = self.get_parent_list()
             if include_parents:
+                parent_list = self.get_parent_list()
                 # Recursively call get_fields on each parent, with the same options provided
                 # in this call
                 for parent in self.parents:
@@ -508,8 +509,11 @@ class Options(object):
                 for parent in self.parents:
                     # Extend the fields dict with all the m2m fields of each parent.
                     fields.update(parent._meta.get_fields(**dict(options, export_name_map=True)))
-            fields.update((field, (field.name, field.attname)) for field in self.local_fields
-                          if include_non_concrete or field.column is not None)
+            fields.update(
+                (field, (field.name, field.attname))
+                for field in self.local_fields
+                if include_non_concrete or field.column is not None
+            )
 
         if virtual:
             # Virtual fields to not need to recursively search parents.
@@ -534,7 +538,9 @@ class Options(object):
         self._get_fields_cache[cache_key] = fields
         return fields
 
-    ### CACHED PROPERTIES FOR FAST ACCESS ###
+    ###########################################################################
+    # Cached properties for fast access
+    ###########################################################################
 
     @cached_property
     def many_to_many(self):
@@ -582,7 +588,9 @@ class Options(object):
         """
         return self.get_fields(include_parents=False, include_non_concrete=False)
 
-    ### DEPRECATED METHODS GO BELOW THIS LINE ###
+    ###########################################################################
+    # Deprecated methods
+    ###########################################################################
 
     @raise_deprecation(suggested_alternative="get_fields")
     def get_fields_with_model(self):
