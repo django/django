@@ -89,7 +89,7 @@ class CycleNode(Node):
 class DebugNode(Node):
     def render(self, context):
         from pprint import pformat
-        output = [pformat(val) for val in context]
+        output = [force_text(pformat(val)) for val in context]
         output.append('\n\n')
         output.append(pformat(sys.modules))
         return ''.join(output)

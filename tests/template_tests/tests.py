@@ -10,6 +10,7 @@ import warnings
 
 from django import template
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.core import urlresolvers
 from django.template import (base as template_base, loader, Context,
     RequestContext, Template, TemplateSyntaxError)
@@ -523,6 +524,15 @@ class TemplateRegressionTests(TestCase):
         t = loader.get_template('included_content.html')
         with self.assertRaises(urlresolvers.NoReverseMatch):
             t.render(Context({}))
+
+    def test_debug_tag_non_ascii(self):
+        """
+        Test non-ASCII model representation in debug output (#23060).
+        """
+        Group.objects.create(name="清風")
+        c1 = Context({"objs": Group.objects.all()})
+        t1 = Template('{% debug %}')
+        self.assertIn("清風", t1.render(c1))
 
 
 # Set ALLOWED_INCLUDE_ROOTS so that ssi works.
