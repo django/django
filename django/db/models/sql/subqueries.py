@@ -7,7 +7,7 @@ from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.query_utils import Q
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import DateField, DateTimeField, FieldDoesNotExist
+from django.db.models.fields import Field, DateField, DateTimeField, FieldDoesNotExist
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, NO_RESULTS, SelectInfo
 from django.db.models.sql.datastructures import Date, DateTime
 from django.db.models.sql.query import Query
