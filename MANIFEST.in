@@ -24,6 +24,7 @@ recursive-include django/contrib/auth/tests/templates *
 recursive-include django/contrib/comments/templates *
 recursive-include django/contrib/formtools/templates *
 recursive-include django/contrib/formtools/tests/templates *
+recursive-include django/contrib/formtools/tests/wizard/wizardtests/templates *
 recursive-include django/contrib/flatpages/fixtures *
 recursive-include django/contrib/flatpages/tests/templates *
 recursive-include django/contrib/gis/static *
