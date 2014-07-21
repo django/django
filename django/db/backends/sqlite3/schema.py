@@ -43,7 +43,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
-    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], rename_fields=[], override_uniques=None):
+    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], override_uniques=None):
         """
         Shortcut to transform a model from old_model into new_model
         """
@@ -52,6 +52,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Since mapping might mix column names and default values,
         # its values must be already quoted.
         mapping = dict((f.column, self.quote_name(f.column)) for f in model._meta.local_fields)
+        # This maps field names (not columns) for things like unique_together
+        rename_mapping = {}
         # If any of the new or altered fields is introducing a new PK,
         # remove the old one
         restore_pk_field = None
@@ -77,6 +79,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             del mapping[old_field.column]
             body[new_field.name] = new_field
             mapping[new_field.column] = self.quote_name(old_field.column)
+            rename_mapping[old_field.name] = new_field.name
         # Remove any deleted fields
         for field in delete_fields:
             del body[field.name]
@@ -92,11 +95,19 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # the internal references of some of the provided fields.
         body = copy.deepcopy(body)
 
+        # Work out the new value of unique_together, taking renames into
+        # account
+        if override_uniques is None:
+            override_uniques = [
+                [rename_mapping.get(n, n) for n in unique]
+                for unique in model._meta.unique_together
+            ]
+
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
             'db_table': model._meta.db_table + "__new",
-            'unique_together': model._meta.unique_together if override_uniques is None else override_uniques,
+            'unique_together': override_uniques,
             'apps': apps,
         }
         meta = type("Meta", tuple(), meta_contents)
