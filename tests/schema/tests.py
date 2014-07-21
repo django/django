@@ -9,7 +9,8 @@ from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
-    UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough)
+    UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough,
+    AuthorWithEvenLongerName)
 
 
 class SchemaTests(TransactionTestCase):
@@ -26,7 +27,7 @@ class SchemaTests(TransactionTestCase):
     models = [
         Author, AuthorWithM2M, Book, BookWithLongName, BookWithSlug,
         BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest,
-        Thing, TagThrough, BookWithM2MThrough
+        Thing, TagThrough, BookWithM2MThrough, AuthorWithEvenLongerName
     ]
 
     # Utility functions
@@ -846,14 +847,15 @@ class SchemaTests(TransactionTestCase):
         except SomeError:
             self.assertFalse(connection.in_atomic_block)
 
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
     def test_foreign_key_index_long_names_regression(self):
         """
-        Regression test for #21497. Only affects databases that supports
-        foreign keys.
+        Regression test for #21497.
+        Only affects databases that supports foreign keys.
         """
         # Create the table
         with connection.schema_editor() as editor:
-            editor.create_model(Author)
+            editor.create_model(AuthorWithEvenLongerName)
             editor.create_model(BookWithLongName)
         # Find the properly shortened column name
         column_name = connection.ops.quote_name("author_foreign_key_with_really_long_field_name_id")
@@ -863,6 +865,25 @@ class SchemaTests(TransactionTestCase):
             column_name,
             self.get_indexes(BookWithLongName._meta.db_table),
         )
+
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_add_foreign_key_long_names(self):
+        """
+        Regression test for #23009.
+        Only affects databases that supports foreign keys.
+        """
+        # Create the initial tables
+        with connection.schema_editor() as editor:
+            editor.create_model(AuthorWithEvenLongerName)
+            editor.create_model(BookWithLongName)
+        # Add a second FK, this would fail due to long ref name before the fix
+        new_field = ForeignKey(AuthorWithEvenLongerName, related_name="something")
+        new_field.set_attributes_from_name("author_other_really_long_named_i_mean_so_long_fk")
+        with connection.schema_editor() as editor:
+            editor.add_field(
+                BookWithLongName,
+                new_field,
+            )
 
     def test_creation_deletion_reserved_names(self):
         """

@@ -435,11 +435,7 @@ class BaseDatabaseSchemaEditor(object):
             to_column = field.rel.to._meta.get_field(field.rel.field_name).column
             self.deferred_sql.append(
                 self.sql_create_fk % {
-                    "name": self.quote_name('%s_refs_%s_%x' % (
-                        field.column,
-                        to_column,
-                        abs(hash((model._meta.db_table, to_table)))
-                    )),
+                    "name": self._create_index_name(model, [field.column], suffix="_fk_%s_%s" % (to_table, to_column)),
                     "table": self.quote_name(model._meta.db_table),
                     "column": self.quote_name(field.column),
                     "to_table": self.quote_name(to_table),
@@ -737,13 +733,15 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Does it have a foreign key?
         if new_field.rel:
+            to_table = new_field.rel.to._meta.db_table
+            to_column = new_field.rel.get_related_field().column
             self.execute(
                 self.sql_create_fk % {
                     "table": self.quote_name(model._meta.db_table),
-                    "name": self._create_index_name(model, [new_field.column], suffix="_fk"),
+                    "name": self._create_index_name(model, [new_field.column], suffix="_fk_%s_%s" % (to_table, to_column)),
                     "column": self.quote_name(new_field.column),
-                    "to_table": self.quote_name(new_field.rel.to._meta.db_table),
-                    "to_column": self.quote_name(new_field.rel.get_related_field().column),
+                    "to_table": self.quote_name(to_table),
+                    "to_column": self.quote_name(to_column),
                 }
             )
         # Rebuild FKs that pointed to us if we previously had to drop them
