@@ -259,8 +259,8 @@ class PasswordResetForm(forms.Form):
 
 class SetPasswordForm(forms.Form):
     """
-    A form that lets a user change set his/her password without entering the
-    old password
+    A form that lets a user change set their password without entering the old
+    password
     """
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
@@ -294,8 +294,8 @@ class SetPasswordForm(forms.Form):
 
 class PasswordChangeForm(SetPasswordForm):
     """
-    A form that lets a user change his/her password by entering
-    their old password.
+    A form that lets a user change their password by entering their old
+    password.
     """
     error_messages = dict(SetPasswordForm.error_messages, **{
         'password_incorrect': _("Your old password was entered incorrectly. "
