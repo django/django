@@ -766,6 +766,16 @@ class BaseDatabaseSchemaEditor(object):
                     "check": new_db_params['check'],
                 }
             )
+        # Drop the default if we need to
+        # (Django usually does not use in-database defaults)
+        if not self.skip_default(new_field) and new_field.default is not None:
+            sql = self.sql_alter_column % {
+                "table": self.quote_name(model._meta.db_table),
+                "changes": self.sql_alter_column_no_default % {
+                    "column": self.quote_name(new_field.column),
+                }
+            }
+            self.execute(sql)
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
