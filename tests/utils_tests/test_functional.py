@@ -84,12 +84,19 @@ class FunctionalTestCase(unittest.TestCase):
             def value(self):
                 return self.should_cache, (1, object())
 
+            def _other(self):
+                return self.should_cache, (1, object())
+
+            other = conditional_cached_property(_other, name='other')
+
         b = B()
         b.should_cache = False
         self.assertNotEqual(b.value, b.value)
+        self.assertNotEqual(b.other, b.other)
 
         b.should_cache = True
         self.assertEqual(b.value, b.value)
+        self.assertEqual(b.other, b.other)
 
     def test_lazy_equality(self):
         """
