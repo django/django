@@ -228,7 +228,7 @@ another committer, **before** you commit it in the first place!
 
 When a mistaken commit is discovered, please follow these guidelines:
 
-* If possible, have the original author revert his/her own commit.
+* If possible, have the original author revert their own commit.
 
 * Don't revert another author's changes without permission from the
   original author.
