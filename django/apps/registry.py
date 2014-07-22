@@ -227,7 +227,7 @@ class Apps(object):
         in every app), it is computed on first access
         and then is set as a property.
         The method will only cache when the apps registry
-        is finalised.
+        is finalized.
         """
         related_m2m_graph = defaultdict(list)
 
