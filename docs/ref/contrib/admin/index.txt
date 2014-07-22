@@ -1385,7 +1385,7 @@ templates used by the :class:`ModelAdmin` views:
     filtering based on add, change, and delete permissions::
 
         class MyModelAdmin(admin.ModelAdmin):
-            def get_inline_instances(request, obj=None):
+            def get_inline_instances(self, request, obj=None):
                 return [inline(self.model, self.admin_site) for inline in self.inlines]
 
 .. method:: ModelAdmin.get_urls()
