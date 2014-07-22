@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.test import TestCase
-from django.utils.encoding import iri_to_uri, force_text
+from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils.http import (cookie_date, http_date,
     urlquote, urlquote_plus, urlunquote, urlunquote_plus)
@@ -89,17 +89,3 @@ class TextTests(TestCase):
     def test_http_date(self):
         t = 1167616461.0
         self.assertEqual(http_date(t), 'Mon, 01 Jan 2007 01:54:21 GMT')
-
-    def test_iri_to_uri(self):
-        self.assertEqual(iri_to_uri('red%09ros\xe9#red'),
-            'red%09ros%C3%A9#red')
-
-        self.assertEqual(iri_to_uri('/blog/for/J\xfcrgen M\xfcnster/'),
-            '/blog/for/J%C3%BCrgen%20M%C3%BCnster/')
-
-        self.assertEqual(iri_to_uri('locations/%s' % urlquote_plus('Paris & Orl\xe9ans')),
-            'locations/Paris+%26+Orl%C3%A9ans')
-
-    def test_iri_to_uri_idempotent(self):
-        self.assertEqual(iri_to_uri(iri_to_uri('red%09ros\xe9#red')),
-            'red%09ros%C3%A9#red')

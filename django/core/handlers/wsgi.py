@@ -206,7 +206,6 @@ def get_path_info(environ):
     """
     path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '/')
 
-    # It'd be better to implement URI-to-IRI decoding, see #19508.
     return path_info.decode(UTF_8)
 
 
@@ -236,7 +235,6 @@ def get_script_name(environ):
     else:
         script_name = get_bytes_from_wsgi(environ, 'SCRIPT_NAME', '')
 
-    # It'd be better to implement URI-to-IRI decoding, see #19508.
     return script_name.decode(UTF_8)
 
 
