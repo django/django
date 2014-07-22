@@ -271,7 +271,20 @@ The functions defined in this module share the following properties:
     since we are assuming input is either UTF-8 or unicode already, we can
     simplify things a little from the full method.
 
-    Returns an ASCII string containing the encoded result.
+    Takes an IRI in UTF-8 bytes and returns ASCII bytes containing the encoded
+    result.
+
+.. function:: uri_to_iri(uri)
+
+    .. versionadded:: 1.8
+
+    Converts a Uniform Resource Identifier into an Internationalized Resource
+    Identifier.
+
+    This is an algorithm from section 3.2 of :rfc:`3987#section-3.2`.
+
+    Takes a URI in ASCII bytes and returns a unicode string containing the
+    encoded result.
 
 .. function:: filepath_to_uri(path)
 
