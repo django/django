@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from bisect import bisect
 from collections import OrderedDict
+from itertools import chain
 import warnings
 
 from django.apps import apps
@@ -444,7 +445,8 @@ class Options(object):
         options = {'include_parents': include_parents,
                    'include_non_concrete': include_non_concrete,
                    'include_hidden': include_hidden,
-                   'include_proxy': include_proxy}
+                   'include_proxy': include_proxy,
+                   'export_name_map': True}
 
         if related_m2m:
             if include_parents:
@@ -452,7 +454,7 @@ class Options(object):
                 # in this call
                 for parent in self.parents:
                     for obj, query_name in six.iteritems(parent._meta.get_fields(data=False, related_m2m=True,
-                                                         **dict(options, export_name_map=True))):
+                                                         **options)):
                         # In order for a related M2M object to be valid, it's creation
                         # counter must be > 0 and must be in the parent list
                         if not (obj.field.creation_counter < 0
@@ -463,7 +465,7 @@ class Options(object):
             # { options_instance : [field_pointing_to_options_model, field_pointing_to_options, ..]}
             # If the model is a proxy model, then we also add the concrete model.
             tree = self.apps.related_m2m_relation_graph
-            field_list = tree[self] if not self.proxy else tree[self] + tree[self.concrete_model._meta]
+            field_list = tree[self] if not self.proxy else chain(tree[self], tree[self.concrete_model._meta])
             for f in field_list:
                 fields[f.related] = (f.related_query_name(),)
 
@@ -474,7 +476,7 @@ class Options(object):
                 # in this call
                 for parent in self.parents:
                     for obj, query_name in six.iteritems(parent._meta.get_fields(data=False, related_objects=True,
-                                                         **dict(options, export_name_map=True, include_hidden=True))):
+                                                         **dict(options, include_hidden=True))):
                         if not ((obj.field.creation_counter < 0
                                 or obj.field.rel.parent_link)
                                 and obj.model not in parent_list):
@@ -487,7 +489,7 @@ class Options(object):
             # { options_instance : [field_pointing_to_options_model, field_pointing_to_options, ..]}
             # If the model is a proxy model, then we also add the concrete model.
             tree, proxy_tree = self.apps.related_objects_relation_graph
-            all_fields = tree[self] if not self.proxy else tree[self] + tree[self.concrete_model._meta]
+            all_fields = tree[self] if not self.proxy else chain(tree[self], tree[self.concrete_model._meta])
             if include_proxy:
                 # If we are also incluing proxied relations, also add contents in the proxy tree.
                 all_fields += proxy_tree[self.concrete_model]
@@ -501,14 +503,17 @@ class Options(object):
             if include_parents:
                 for parent in self.parents:
                     # Extend the fields dict with all the m2m fields of each parent.
-                    fields.update(parent._meta.get_fields(data=False, m2m=True, **dict(options, export_name_map=True)))
-            fields.update((field, (field.name, field.attname)) for field in self.local_many_to_many)
+                    fields.update(parent._meta.get_fields(data=False, m2m=True, **options))
+            fields.update(
+                (field, (field.name, field.attname))
+                for field in self.local_many_to_many
+            )
 
         if data:
             if include_parents:
                 for parent in self.parents:
                     # Extend the fields dict with all the m2m fields of each parent.
-                    fields.update(parent._meta.get_fields(**dict(options, export_name_map=True)))
+                    fields.update(parent._meta.get_fields(**options))
             fields.update(
                 (field, (field.name, field.attname))
                 for field in self.local_fields
@@ -521,12 +526,18 @@ class Options(object):
                 # If we are exporting a map (ex. called by get_field) we do not
                 # want to include GenericForeignKeys, but only GenericRelations
                 # (Ref. #22994).
-                fields.update((field, (field.name, field.attname)) for field in self.virtual_fields
-                              if hasattr(field, 'related'))
+                fields.update(
+                    (field, (field.name, field.attname))
+                    for field in self.virtual_fields
+                    if hasattr(field, 'related')
+                )
             else:
                 # If we are just listing fields (no map export), we include all
                 # virtual fields.
-                fields.update((field, (field.name,)) for field in self.virtual_fields)
+                fields.update(
+                    (field, (field.name,))
+                    for field in self.virtual_fields
+                )
 
         if not export_name_map:
             # By default, fields contains field instances as keys and all possible names

@@ -198,9 +198,10 @@ Retrieve a field instance by name
         *** FieldDoesNotExist: User has no field named 'does_not_exist'
 
     .. note::
-        There is an inconsistency between the defaults of get_field and get_fields. 'get_fields'
-        by default enables only data fields while 'get_field' by default
-        enables data and m2m. This is because of backwards-compatibility issues (read more below).
+        The default arguments of ``get_field`` might not be what you expect.
+        ``get_fields`` only enables data fields, while ``get_field``
+        enables data and m2m. This is because of backwards-compatibility
+        issues (read more below).
 
 Retrieve all field names
 ~~~~~~~~~~~~~~~~~~~~~~~~

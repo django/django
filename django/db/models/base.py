@@ -4,6 +4,7 @@ import copy
 import inspect
 import sys
 from functools import update_wrapper
+from itertools import chain
 import warnings
 
 from django.apps import apps
@@ -173,9 +174,9 @@ class ModelBase(type):
             new_class.add_to_class(obj_name, obj)
 
         # All the fields of any type declared on this model
-        new_fields = (
-            new_class._meta.local_fields +
-            new_class._meta.local_many_to_many +
+        new_fields = chain(
+            new_class._meta.local_fields,
+            new_class._meta.local_many_to_many,
             new_class._meta.virtual_fields
         )
         field_names = set(f.name for f in new_fields)
