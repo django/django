@@ -78,21 +78,39 @@ class Collector(object):
         """
         if not objs:
             return []
+
         new_objs = []
-        model = objs[0].__class__
-        instances = self.data.setdefault(model, set())
+
+        if source is not None:
+            source = source._meta.concrete_model
+
+        concrete_model_objs = {}
+
         for obj in objs:
-            if obj not in instances:
-                new_objs.append(obj)
-        instances.update(new_objs)
-        # Nullable relationships can be ignored -- they are nulled out before
-        # deleting, and therefore do not affect the order in which objects have
-        # to be deleted.
-        if source is not None and not nullable:
-            if reverse_dependency:
-                source, model = model, source
-            self.dependencies.setdefault(
-                source._meta.concrete_model, set()).add(model._meta.concrete_model)
+            model = obj.__class__
+            concrete_model = model._meta.concrete_model
+            concrete_model_objs.setdefault(concrete_model, {})
+            concrete_model_objs[concrete_model].setdefault(model, [])
+            concrete_model_objs[concrete_model][model].append(obj)
+
+        for concrete_model, model_objs in concrete_model_objs.iteritems():
+            for model, objs in model_objs.iteritems():
+                instances = self.data.setdefault(model, set())
+                for obj in objs:
+                    if obj not in instances:
+                        new_objs.append(obj)
+                instances.update(new_objs)
+            # Nullable relationships can be ignored -- they are nulled out before
+            # deleting, and therefore do not affect the order in which objects have
+            # to be deleted.
+            if source is not None and not nullable:
+                if reverse_dependency:
+                    source_, concrete_model_ = concrete_model, source
+                else:
+                    concrete_model_, source_ = concrete_model, source
+                self.dependencies.setdefault(
+                    source_, set()).add(concrete_model_)
+
         return new_objs
 
     def add_field_update(self, field, value, objs):
@@ -102,10 +120,20 @@ class Collector(object):
         """
         if not objs:
             return
-        model = objs[0].__class__
-        self.field_updates.setdefault(
-            model, {}).setdefault(
-            (field, value), set()).update(objs)
+
+        concrete_model_objs = {}
+        for obj in objs:
+            model = obj.__class__
+            concrete_model = model._meta.concrete_model
+            concrete_model_objs.setdefault(concrete_model, {})
+            concrete_model_objs[concrete_model].setdefault(model, [])
+            concrete_model_objs[concrete_model][model].append(obj)
+
+        for concrete_model, model_objs in concrete_model_objs.iteritems():
+            for model, objs in model_objs.iteritems():
+                self.field_updates.setdefault(
+                    model, {}).setdefault(
+                    (field, value), set()).update(objs)
 
     def can_fast_delete(self, objs, from_field=None):
         """
@@ -169,42 +197,52 @@ class Collector(object):
         if not new_objs:
             return
 
-        model = new_objs[0].__class__
+        concrete_model_objs = {}
+        for obj in new_objs:
+            model = obj.__class__
+            concrete_model = model._meta.concrete_model
+            concrete_model_objs.setdefault(concrete_model, {})
+            concrete_model_objs[concrete_model].setdefault(model, [])
+            concrete_model_objs[concrete_model][model].append(obj)
 
-        # Recursively collect concrete model's parent models, but not their
-        # related objects. These will be found by meta.get_all_related_objects()
-        concrete_model = model._meta.concrete_model
-        for ptr in six.itervalues(concrete_model._meta.parents):
-            if ptr:
-                # FIXME: This seems to be buggy and execute a query for each
-                # parent object fetch. We have the parent data in the obj,
-                # but we don't have a nice way to turn that data into parent
-                # object instance.
-                parent_objs = [getattr(obj, ptr.name) for obj in new_objs]
+        for concrete_model, model_objs in concrete_model_objs.iteritems():
+            parent_objs = []
+            for model, new_objs in model_objs.iteritems():
+                # Recursively collect concrete model's parent models, but not their
+                # related objects. These will be found by meta.get_all_related_objects()
+                for ptr in six.itervalues(concrete_model._meta.parents):
+                    if ptr:
+                        # FIXME: This seems to be buggy and execute a query for each
+                        # parent object fetch. We have the parent data in the obj,
+                        # but we don't have a nice way to turn that data into parent
+                        # object instance.
+                        parent_objs += [getattr(obj, ptr.name) for obj in new_objs]
+            if parent_objs:
                 self.collect(parent_objs, source=model,
                              source_attr=ptr.rel.related_name,
                              collect_related=False,
                              reverse_dependency=True)
 
-        if collect_related:
-            for related in model._meta.get_all_related_objects(
-                    include_hidden=True, include_proxy_eq=True):
-                field = related.field
-                if field.rel.on_delete == DO_NOTHING:
-                    continue
-                sub_objs = self.related_objects(related, new_objs)
-                if self.can_fast_delete(sub_objs, from_field=field):
-                    self.fast_deletes.append(sub_objs)
-                elif sub_objs:
-                    field.rel.on_delete(self, field, sub_objs, self.using)
-            for field in model._meta.virtual_fields:
-                if hasattr(field, 'bulk_related_objects'):
-                    # Its something like generic foreign key.
-                    sub_objs = field.bulk_related_objects(new_objs, self.using)
-                    self.collect(sub_objs,
-                                 source=model,
-                                 source_attr=field.rel.related_name,
-                                 nullable=True)
+            if collect_related:
+                for model, new_objs in model_objs.iteritems():
+                    for related in model._meta.get_all_related_objects(
+                            include_hidden=True, include_proxy_eq=True):
+                        field = related.field
+                        if field.rel.on_delete == DO_NOTHING:
+                            continue
+                        sub_objs = self.related_objects(related, new_objs)
+                        if self.can_fast_delete(sub_objs, from_field=field):
+                            self.fast_deletes.append(sub_objs)
+                        elif sub_objs:
+                            field.rel.on_delete(self, field, sub_objs, self.using)
+                    for field in model._meta.virtual_fields:
+                        if hasattr(field, 'bulk_related_objects'):
+                            # Its something like generic foreign key.
+                            sub_objs = field.bulk_related_objects(new_objs, self.using)
+                            self.collect(sub_objs,
+                                         source=model,
+                                         source_attr=field.rel.related_name,
+                                         nullable=True)
 
     def related_objects(self, related, objs):
         """
