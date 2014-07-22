@@ -5,8 +5,8 @@ import unittest
 import datetime
 
 from django.utils import six
-from django.utils.encoding import (filepath_to_uri, force_bytes,
-    force_text, iri_to_uri, python_2_unicode_compatible)
+from django.utils.encoding import (filepath_to_uri, force_bytes, force_text,
+    iri_to_uri, uri_to_iri)
 from django.utils.http import urlquote_plus
 
 
@@ -40,6 +40,9 @@ class TestEncodingUtils(unittest.TestCase):
         today = datetime.date.today()
         self.assertEqual(force_bytes(today, strings_only=True), today)
 
+
+class TestRFC3987IEncodingUtils(unittest.TestCase):
+
     def test_filepath_to_uri(self):
         self.assertEqual(filepath_to_uri('upload\\чубака.mp4'),
             'upload/%D1%87%D1%83%D0%B1%D0%B0%D0%BA%D0%B0.mp4')
@@ -47,22 +50,57 @@ class TestEncodingUtils(unittest.TestCase):
             'upload/%D1%87%D1%83%D0%B1%D0%B0%D0%BA%D0%B0.mp4')
 
     def test_iri_to_uri(self):
-        self.assertEqual(iri_to_uri('red%09ros\xe9#red'),
-            'red%09ros%C3%A9#red')
+        cases = [
+            # Valid UTF-8 sequences are encoded.
+            ('red%09rosé#red', 'red%09ros%C3%A9#red'),
+            ('/blog/for/Jürgen Münster/', '/blog/for/J%C3%BCrgen%20M%C3%BCnster/'),
+            ('locations/%s' % urlquote_plus('Paris & Orléans'), 'locations/Paris+%26+Orl%C3%A9ans'),
 
-        self.assertEqual(iri_to_uri('/blog/for/J\xfcrgen M\xfcnster/'),
-            '/blog/for/J%C3%BCrgen%20M%C3%BCnster/')
+            # Reserved chars remain unescaped.
+            ('%&', '%&'),
+            ('red&♥ros%#red', 'red&%E2%99%A5ros%#red'),
+        ]
 
-        self.assertEqual(iri_to_uri('locations/%s' % urlquote_plus('Paris & Orl\xe9ans')),
-            'locations/Paris+%26+Orl%C3%A9ans')
+        for iri, uri in cases:
+            self.assertEqual(iri_to_uri(iri), uri)
 
-    def test_iri_to_uri_idempotent(self):
-        self.assertEqual(iri_to_uri(iri_to_uri('red%09ros\xe9#red')),
-            'red%09ros%C3%A9#red')
+            # Test idempotency.
+            self.assertEqual(iri_to_uri(iri_to_uri(iri)), uri)
 
-    @unittest.skipIf(six.PY3, "tests a class not defining __str__ under Python 2")
-    def test_decorated_class_without_str(self):
-        with self.assertRaises(ValueError):
-            @python_2_unicode_compatible
-            class NoStr(object):
-                pass
+    def test_uri_to_iri(self):
+        cases = [
+            # Valid UTF-8 sequences are decoded.
+            ('/%E2%99%A5%E2%99%A5/', '/♥♥/'),
+            ('/%E2%99%A5%E2%99%A5/?utf8=%E2%9C%93', '/♥♥/?utf8=✓'),
+
+            # Broken UTF-8 sequences remain escaped.
+            ('/%AAd%AAj%AAa%AAn%AAg%AAo%AA/', '/%AAd%AAj%AAa%AAn%AAg%AAo%AA/'),
+            ('/%E2%99%A5%E2%E2%99%A5/', '/♥%E2♥/'),
+            ('/%E2%99%A5%E2%99%E2%99%A5/', '/♥%E2%99♥/'),
+            ('/%E2%E2%99%A5%E2%99%A5%99/', '/%E2♥♥%99/'),
+            ('/%E2%99%A5%E2%99%A5/?utf8=%9C%93%E2%9C%93%9C%93', '/♥♥/?utf8=%9C%93✓%9C%93'),
+        ]
+
+        for uri, iri in cases:
+            self.assertEqual(uri_to_iri(uri), iri)
+
+            # Test idempotency.
+            self.assertEqual(uri_to_iri(uri_to_iri(uri)), iri)
+
+    def test_complementarity(self):
+        cases = [
+            ('/blog/for/J%C3%BCrgen%20M%C3%BCnster/', '/blog/for/J\xfcrgen M\xfcnster/'),
+            ('%&', '%&'),
+            ('red&%E2%99%A5ros%#red', 'red&♥ros%#red'),
+            ('/%E2%99%A5%E2%99%A5/', '/♥♥/'),
+            ('/%E2%99%A5%E2%99%A5/?utf8=%E2%9C%93', '/♥♥/?utf8=✓'),
+            ('/%AAd%AAj%AAa%AAn%AAg%AAo%AA/', '/%AAd%AAj%AAa%AAn%AAg%AAo%AA/'),
+            ('/%E2%99%A5%E2%E2%99%A5/', '/♥%E2♥/'),
+            ('/%E2%99%A5%E2%99%E2%99%A5/', '/♥%E2%99♥/'),
+            ('/%E2%E2%99%A5%E2%99%A5%99/', '/%E2♥♥%99/'),
+            ('/%E2%99%A5%E2%99%A5/?utf8=%9C%93%E2%9C%93%9C%93', '/♥♥/?utf8=%9C%93✓%9C%93'),
+        ]
+
+        for uri, iri in cases:
+            self.assertEqual(iri_to_uri(uri_to_iri(uri)), uri)
+            self.assertEqual(uri_to_iri(iri_to_uri(iri)), iri)
