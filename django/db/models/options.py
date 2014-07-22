@@ -492,7 +492,7 @@ class Options(object):
             all_fields = tree[self] if not self.proxy else chain(tree[self], tree[self.concrete_model._meta])
             if include_proxy:
                 # If we are also incluing proxied relations, also add contents in the proxy tree.
-                all_fields += proxy_tree[self.concrete_model]
+                all_fields = chain(all_fields, proxy_tree[self.concrete_model])
             for f in all_fields:
                 if include_hidden or not f.related.field.rel.is_hidden():
                     # If hidden fields should be included or the relation
