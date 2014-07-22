@@ -7,12 +7,10 @@ class ConditionalGetMiddleware(object):
     Last-Modified header, and the request has If-None-Match or
     If-Modified-Since, the response is replaced by an HttpNotModified.
 
-    Also sets the Date and Content-Length response-headers.
+    Also sets the Date response header.
     """
     def process_response(self, request, response):
         response['Date'] = http_date()
-        if not response.streaming and not response.has_header('Content-Length'):
-            response['Content-Length'] = str(len(response.content))
 
         # If-None-Match must be ignored if original result would be anything
         # other than a 2XX or 304 status. 304 status would result in no change.
@@ -37,5 +35,16 @@ class ConditionalGetMiddleware(object):
                     # Setting the status code is enough here (same reasons as
                     # above).
                     response.status_code = 304
+
+        return response
+
+
+class ContentLengthMiddleware(object):
+    """
+    Applies the Content-Length header to a response if we know the length.
+    """
+    def process_response(self, request, response):
+        if not response.streaming and not response.has_header('Content-Length'):
+            response['Content-Length'] = str(len(response.content))
 
         return response
