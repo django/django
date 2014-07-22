@@ -12,7 +12,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core import urlresolvers
 from django.core.handlers.base import BaseHandler
-from django.core.handlers.wsgi import WSGIRequest
+from django.core.handlers.wsgi import WSGIRequest, ISO_8859_1, UTF_8
 from django.core.signals import (request_started, request_finished,
     got_request_exception)
 from django.db import close_old_connections
@@ -20,11 +20,11 @@ from django.http import SimpleCookie, HttpRequest, QueryDict
 from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.utils.functional import curry, SimpleLazyObject
-from django.utils.encoding import force_bytes, force_str
+from django.utils.encoding import force_bytes, force_str, uri_to_iri
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
 from django.utils import six
-from django.utils.six.moves.urllib.parse import unquote, urlparse, urlsplit
+from django.utils.six.moves.urllib.parse import urlparse, urlsplit
 from django.test.utils import ContextList
 
 __all__ = ('Client', 'RequestFactory', 'encode_file', 'encode_multipart')
@@ -270,11 +270,11 @@ class RequestFactory(object):
         # If there are parameters, add them
         if parsed[3]:
             path += str(";") + force_str(parsed[3])
-        path = unquote(path)
-        # WSGI requires latin-1 encoded strings. See get_path_info().
-        if six.PY3:
-            path = path.encode('utf-8').decode('iso-8859-1')
-        return path
+        path = uri_to_iri(path).encode(UTF_8)
+        # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
+        # decoded with ISO-8859-1. We replicate this behavior here.
+        # Refs comment in `get_bytes_from_wsgi()`.
+        return path.decode(ISO_8859_1) if six.PY3 else path
 
     def get(self, path, data=None, secure=False, **extra):
         "Construct a GET request."
