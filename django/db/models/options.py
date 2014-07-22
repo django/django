@@ -467,7 +467,7 @@ class Options(object):
             tree = self.apps.related_m2m_relation_graph
             field_list = tree[self] if not self.proxy else chain(tree[self], tree[self.concrete_model._meta])
             for f in field_list:
-                fields[f.related] = (f.related_query_name(),)
+                fields[f.related] = {f.related_query_name()}
 
         if related_objects:
             if include_parents:
@@ -497,7 +497,7 @@ class Options(object):
                 if include_hidden or not f.related.field.rel.is_hidden():
                     # If hidden fields should be included or the relation
                     # is not intentionally hidden, add to the fields dict
-                    fields[f.related] = (f.related_query_name(),)
+                    fields[f.related] = {f.related_query_name()}
 
         if m2m:
             if include_parents:
@@ -505,7 +505,7 @@ class Options(object):
                     # Extend the fields dict with all the m2m fields of each parent.
                     fields.update(parent._meta.get_fields(data=False, m2m=True, **options))
             fields.update(
-                (field, (field.name, field.attname))
+                (field, {field.name, field.attname})
                 for field in self.local_many_to_many
             )
 
@@ -515,7 +515,7 @@ class Options(object):
                     # Extend the fields dict with all the m2m fields of each parent.
                     fields.update(parent._meta.get_fields(**options))
             fields.update(
-                (field, (field.name, field.attname))
+                (field, {field.name, field.attname})
                 for field in self.local_fields
                 if include_non_concrete or field.column is not None
             )
@@ -527,7 +527,7 @@ class Options(object):
                 # want to include GenericForeignKeys, but only GenericRelations
                 # (Ref. #22994).
                 fields.update(
-                    (field, (field.name, field.attname))
+                    (field, {field.name, field.attname})
                     for field in self.virtual_fields
                     if hasattr(field, 'related')
                 )
@@ -535,7 +535,7 @@ class Options(object):
                 # If we are just listing fields (no map export), we include all
                 # virtual fields.
                 fields.update(
-                    (field, (field.name,))
+                    (field, {field.name})
                     for field in self.virtual_fields
                 )
 
