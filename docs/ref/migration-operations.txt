@@ -115,7 +115,8 @@ AlterModelOptions
 
 Stores changes to miscellaneous model options (settings on a model's ``Meta``)
 like ``permissions`` and ``verbose_name``. Does not affect the database, but
-persists these changes for :class:`RunPython` instances to use.
+persists these changes for :class:`RunPython` instances to use. ``options``
+should be a dict mapping option names to values.
 
 AddField
 --------
