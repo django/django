@@ -1405,6 +1405,16 @@ Miscellaneous
   method that is registered with the check framework. If you have an existing
   method called ``check()`` on one of these objects, you will need to rename it.
 
+* As noted above in the "Cache" section of "Minor Features", defining the
+  :setting:`TIMEOUT <CACHES-TIMEOUT>` argument of the
+  :setting:`CACHES` setting as ``None`` will set the cache keys as
+  "non-expiring". Previously, with the memcache backend, a
+  :setting:`TIMEOUT <CACHES-TIMEOUT>` of ``0`` would set non-expiring keys,
+  but this was inconsistent with the set-and-expire (i.e. no caching) behavior
+  of ``set("key", "value", timeout=0)``. If you want non-expiring keys,
+  please update your settings to use ``None`` instead of ``0`` as the latter
+  now designates set-and-expire in the settings as well.
+
 .. _deprecated-features-1.7:
 
 Features deprecated in 1.7
