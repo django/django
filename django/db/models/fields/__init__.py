@@ -914,10 +914,10 @@ class AutoField(Field):
             return None
         return int(value)
 
-    def contribute_to_class(self, cls, name):
+    def contribute_to_class(self, cls, name, **kwargs):
         assert not cls._meta.has_auto_field, \
             "A model can't have more than one AutoField."
-        super(AutoField, self).contribute_to_class(cls, name)
+        super(AutoField, self).contribute_to_class(cls, name, **kwargs)
         cls._meta.has_auto_field = True
         cls._meta.auto_field = self
 
@@ -1226,8 +1226,8 @@ class DateField(DateTimeCheckMixin, Field):
         else:
             return super(DateField, self).pre_save(model_instance, add)
 
-    def contribute_to_class(self, cls, name):
-        super(DateField, self).contribute_to_class(cls, name)
+    def contribute_to_class(self, cls, name, **kwargs):
+        super(DateField, self).contribute_to_class(cls, name, **kwargs)
         if not self.null:
             setattr(cls, 'get_next_by_%s' % self.name,
                 curry(cls._get_next_or_previous_by_FIELD, field=self,
