@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
+import sys
+
 from django.apps.registry import Apps, apps
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation
 )
+from django.contrib.contenttypes import management
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.db import connections, models, router
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
+from django.utils.six import StringIO
 
 from .models import Author, Article, SchemeIncludedURL
 
@@ -356,6 +360,40 @@ class GenericRelationshipTests(IsolatedModelsTestCase):
             )
         ]
         self.assertEqual(errors, expected)
+
+
+class UpdateContentTypesTests(TestCase):
+    def setUp(self):
+        self.before_count = ContentType.objects.count()
+        ContentType.objects.create(name='fake', app_label='contenttypes_tests', model='Fake')
+        self.app_config = apps.get_app_config('contenttypes_tests')
+
+    def test_interactive_true(self):
+        """
+        interactive mode of update_contenttypes() (the default) should delete
+        stale contenttypes.
+        """
+        self.old_stdout = sys.stdout
+        sys.stdout = StringIO()
+        management.input = lambda x: force_str("yes")
+        management.update_contenttypes(self.app_config)
+        output = sys.stdout.getvalue()
+        sys.stdout = self.old_stdout
+        self.assertIn("Deleting stale content type", output)
+        self.assertEqual(ContentType.objects.count(), self.before_count)
+
+    def test_interactive_false(self):
+        """
+        non-interactive mode of update_contenttypes() shouldn't delete stale
+        content types.
+        """
+        self.old_stdout = sys.stdout
+        sys.stdout = StringIO()
+        management.update_contenttypes(self.app_config, interactive=False)
+        output = sys.stdout.getvalue()
+        sys.stdout = self.old_stdout
+        self.assertIn("Stale content types remain.", output)
+        self.assertEqual(ContentType.objects.count(), self.before_count + 1)
 
 
 class TestRouter(object):
