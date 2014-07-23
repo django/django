@@ -943,8 +943,11 @@ class TestCase(TransactionTestCase):
         # Remove this when the legacy transaction management goes away.
         restore_transaction_methods()
         for db_name in reversed(self._databases_names()):
+            connection = connections[db_name]
+            if not (connection.needs_rollback or connection.errors_occurred):
+                connection.check_constraints()
             # Hack to force a rollback
-            connections[db_name].needs_rollback = True
+            connection.needs_rollback = True
             self.atomics[db_name].__exit__(None, None, None)
 
 
