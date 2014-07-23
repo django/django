@@ -1,243 +1,428 @@
-from __future__ import unicode_literals
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
 
+import sys
+
+from django.apps.registry import Apps, apps
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
+from django.contrib.contenttypes import management
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.views import shortcut
-from django.contrib.sites.shortcuts import get_current_site
-from django.http import HttpRequest, Http404
-from django.test import TestCase, override_settings
-from django.utils import six
+from django.core import checks
+from django.db import connections, models, router
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils.encoding import force_str
+from django.utils.six import StringIO
 
-from .models import ConcreteModel, ProxyModel, FooWithoutUrl, FooWithUrl, FooWithBrokenAbsoluteUrl
+from .models import Author, Article, SchemeIncludedURL
 
 
-class ContentTypesTests(TestCase):
+@override_settings(ROOT_URLCONF='contenttypes_tests.urls')
+class ContentTypesViewsTests(TestCase):
+    fixtures = ['testdata.json']
 
+    def test_shortcut_with_absolute_url(self):
+        "Can view a shortcut for an Author object that has a get_absolute_url method"
+        for obj in Author.objects.all():
+            short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, obj.pk)
+            response = self.client.get(short_url)
+            self.assertRedirects(response, 'http://testserver%s' % obj.get_absolute_url(),
+                                 status_code=302, target_status_code=404)
+
+    def test_shortcut_with_absolute_url_including_scheme(self):
+        """
+        Can view a shortcut when object's get_absolute_url returns a full URL
+        the tested URLs are in fixtures/testdata.json :
+        "http://...", "https://..." and "//..."
+        """
+        for obj in SchemeIncludedURL.objects.all():
+            short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(SchemeIncludedURL).id, obj.pk)
+            response = self.client.get(short_url)
+            self.assertRedirects(response, obj.get_absolute_url(),
+                                 status_code=302,
+                                 fetch_redirect_response=False)
+
+    def test_shortcut_no_absolute_url(self):
+        "Shortcuts for an object that has no get_absolute_url method raises 404"
+        for obj in Article.objects.all():
+            short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Article).id, obj.pk)
+            response = self.client.get(short_url)
+            self.assertEqual(response.status_code, 404)
+
+    def test_wrong_type_pk(self):
+        short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, 'nobody/expects')
+        response = self.client.get(short_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_shortcut_bad_pk(self):
+        short_url = '/shortcut/%s/%s/' % (ContentType.objects.get_for_model(Author).id, '42424242')
+        response = self.client.get(short_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_nonint_content_type(self):
+        an_author = Author.objects.all()[0]
+        short_url = '/shortcut/%s/%s/' % ('spam', an_author.pk)
+        response = self.client.get(short_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_bad_content_type(self):
+        an_author = Author.objects.all()[0]
+        short_url = '/shortcut/%s/%s/' % (42424242, an_author.pk)
+        response = self.client.get(short_url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_create_contenttype_on_the_spot(self):
+        """
+        Make sure ContentTypeManager.get_for_model creates the corresponding
+        content type if it doesn't exist in the database (for some reason).
+        """
+
+        class ModelCreatedOnTheFly(models.Model):
+            name = models.CharField()
+
+            class Meta:
+                verbose_name = 'a model created on the fly'
+                app_label = 'my_great_app'
+                apps = Apps()
+
+        ct = ContentType.objects.get_for_model(ModelCreatedOnTheFly)
+        self.assertEqual(ct.app_label, 'my_great_app')
+        self.assertEqual(ct.model, 'modelcreatedonthefly')
+        self.assertEqual(ct.name, 'a model created on the fly')
+
+
+class IsolatedModelsTestCase(TestCase):
     def setUp(self):
-        ContentType.objects.clear_cache()
+        # The unmanaged models need to be removed after the test in order to
+        # prevent bad interactions with the flush operation in other tests.
+        self._old_models = apps.app_configs['contenttypes_tests'].models.copy()
 
     def tearDown(self):
+        apps.app_configs['contenttypes_tests'].models = self._old_models
+        apps.all_models['contenttypes_tests'] = self._old_models
+        apps.clear_cache()
+
+
+class GenericForeignKeyTests(IsolatedModelsTestCase):
+
+    def test_str(self):
+        class Model(models.Model):
+            field = GenericForeignKey()
+        expected = "contenttypes_tests.Model.field"
+        actual = force_str(Model.field)
+        self.assertEqual(expected, actual)
+
+    def test_missing_content_type_field(self):
+        class TaggedItem(models.Model):
+            # no content_type field
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey()
+
+        errors = TaggedItem.content_object.check()
+        expected = [
+            checks.Error(
+                "The GenericForeignKey content type references the non-existent field 'TaggedItem.content_type'.",
+                hint=None,
+                obj=TaggedItem.content_object,
+                id='contenttypes.E002',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_invalid_content_type_field(self):
+        class Model(models.Model):
+            content_type = models.IntegerField()  # should be ForeignKey
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey(
+                'content_type', 'object_id')
+
+        errors = Model.content_object.check()
+        expected = [
+            checks.Error(
+                "'Model.content_type' is not a ForeignKey.",
+                hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                obj=Model.content_object,
+                id='contenttypes.E003',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_content_type_field_pointing_to_wrong_model(self):
+        class Model(models.Model):
+            content_type = models.ForeignKey('self')  # should point to ContentType
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey(
+                'content_type', 'object_id')
+
+        errors = Model.content_object.check()
+        expected = [
+            checks.Error(
+                "'Model.content_type' is not a ForeignKey to 'contenttypes.ContentType'.",
+                hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                obj=Model.content_object,
+                id='contenttypes.E004',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_missing_object_id_field(self):
+        class TaggedItem(models.Model):
+            content_type = models.ForeignKey(ContentType)
+            # missing object_id field
+            content_object = GenericForeignKey()
+
+        errors = TaggedItem.content_object.check()
+        expected = [
+            checks.Error(
+                "The GenericForeignKey object ID references the non-existent field 'object_id'.",
+                hint=None,
+                obj=TaggedItem.content_object,
+                id='contenttypes.E001',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_field_name_ending_with_underscore(self):
+        class Model(models.Model):
+            content_type = models.ForeignKey(ContentType)
+            object_id = models.PositiveIntegerField()
+            content_object_ = GenericForeignKey(
+                'content_type', 'object_id')
+
+        errors = Model.content_object_.check()
+        expected = [
+            checks.Error(
+                'Field names must not end with an underscore.',
+                hint=None,
+                obj=Model.content_object_,
+                id='fields.E001',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_generic_foreign_key_checks_are_performed(self):
+        class MyGenericForeignKey(GenericForeignKey):
+            def check(self, **kwargs):
+                return ['performed!']
+
+        class Model(models.Model):
+            content_object = MyGenericForeignKey()
+
+        errors = checks.run_checks()
+        self.assertEqual(errors, ['performed!'])
+
+    def test_unsaved_instance_on_generic_foreign_key(self):
+        """
+        #10811 -- Assigning an unsaved object to GenericForeignKey
+        should raise an exception.
+        """
+        class Model(models.Model):
+            content_type = models.ForeignKey(ContentType, null=True)
+            object_id = models.PositiveIntegerField(null=True)
+            content_object = GenericForeignKey('content_type', 'object_id')
+
+        author = Author(name='Author')
+        model = Model()
+        model.content_object = None   # no error here as content_type allows None
+        with self.assertRaisesMessage(ValueError,
+                                    'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
+                                    % (author, author._meta.object_name)):
+            model.content_object = author   # raised ValueError here as author is unsaved
+
+        author.save()
+        model.content_object = author   # no error because the instance is saved
+
+
+class GenericRelationshipTests(IsolatedModelsTestCase):
+
+    def test_valid_generic_relationship(self):
+        class TaggedItem(models.Model):
+            content_type = models.ForeignKey(ContentType)
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey()
+
+        class Bookmark(models.Model):
+            tags = GenericRelation('TaggedItem')
+
+        errors = Bookmark.tags.field.check()
+        self.assertEqual(errors, [])
+
+    def test_valid_generic_relationship_with_explicit_fields(self):
+        class TaggedItem(models.Model):
+            custom_content_type = models.ForeignKey(ContentType)
+            custom_object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey(
+                'custom_content_type', 'custom_object_id')
+
+        class Bookmark(models.Model):
+            tags = GenericRelation('TaggedItem',
+                content_type_field='custom_content_type',
+                object_id_field='custom_object_id')
+
+        errors = Bookmark.tags.field.check()
+        self.assertEqual(errors, [])
+
+    def test_pointing_to_missing_model(self):
+        class Model(models.Model):
+            rel = GenericRelation('MissingModel')
+
+        errors = Model.rel.field.check()
+        expected = [
+            checks.Error(
+                ("Field defines a relation with model 'MissingModel', "
+                 "which is either not installed, or is abstract."),
+                hint=None,
+                obj=Model.rel.field,
+                id='fields.E300',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_valid_self_referential_generic_relationship(self):
+        class Model(models.Model):
+            rel = GenericRelation('Model')
+            content_type = models.ForeignKey(ContentType)
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey(
+                'content_type', 'object_id')
+
+        errors = Model.rel.field.check()
+        self.assertEqual(errors, [])
+
+    def test_missing_generic_foreign_key(self):
+        class TaggedItem(models.Model):
+            content_type = models.ForeignKey(ContentType)
+            object_id = models.PositiveIntegerField()
+
+        class Bookmark(models.Model):
+            tags = GenericRelation('TaggedItem')
+
+        errors = Bookmark.tags.field.check()
+        expected = [
+            checks.Error(
+                ("The GenericRelation defines a relation with the model "
+                 "'contenttypes_tests.TaggedItem', but that model does not have a "
+                 "GenericForeignKey."),
+                hint=None,
+                obj=Bookmark.tags.field,
+                id='contenttypes.E004',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    @override_settings(TEST_SWAPPED_MODEL='contenttypes_tests.Replacement')
+    def test_pointing_to_swapped_model(self):
+        class Replacement(models.Model):
+            pass
+
+        class SwappedModel(models.Model):
+            content_type = models.ForeignKey(ContentType)
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey()
+
+            class Meta:
+                swappable = 'TEST_SWAPPED_MODEL'
+
+        class Model(models.Model):
+            rel = GenericRelation('SwappedModel')
+
+        errors = Model.rel.field.check()
+        expected = [
+            checks.Error(
+                ("Field defines a relation with the model "
+                 "'contenttypes_tests.SwappedModel', "
+                 "which has been swapped out."),
+                hint="Update the relation to point at 'settings.TEST_SWAPPED_MODEL'.",
+                obj=Model.rel.field,
+                id='fields.E301',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_field_name_ending_with_underscore(self):
+        class TaggedItem(models.Model):
+            content_type = models.ForeignKey(ContentType)
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey()
+
+        class InvalidBookmark(models.Model):
+            tags_ = GenericRelation('TaggedItem')
+
+        errors = InvalidBookmark.tags_.field.check()
+        expected = [
+            checks.Error(
+                'Field names must not end with an underscore.',
+                hint=None,
+                obj=InvalidBookmark.tags_.field,
+                id='fields.E001',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+
+class UpdateContentTypesTests(TestCase):
+    def setUp(self):
+        self.before_count = ContentType.objects.count()
+        ContentType.objects.create(name='fake', app_label='contenttypes_tests',
+            model='Fake')
+        self.app_config = apps.get_app_config('contenttypes_tests')
+
+    def test_interactive_true(self):
+        "Test interactive mode for content types post migrate signal."
+        self.old_stdout = sys.stdout
+        sys.stdout = StringIO()
+        management.input = lambda x: force_str("yes")
+        management.update_contenttypes(self.app_config)
+        output = sys.stdout.getvalue()
+        sys.stdout = self.old_stdout
+        self.assertIn("Deleting stale content type", output)
+        self.assertEqual(ContentType.objects.count(), self.before_count)
+
+    def test_interactive_false(self):
+        "Test non-interactive mode for content types post migrate signal."
+        self.old_stdout = sys.stdout
+        sys.stdout = StringIO()
+        management.update_contenttypes(self.app_config, interactive=False)
+        output = sys.stdout.getvalue()
+        sys.stdout = self.old_stdout
+        self.assertIn("Stale content types remain.", output)
+        self.assertEqual(ContentType.objects.count(), self.before_count + 1)
+
+
+class TestRouter(object):
+    def db_for_read(self, model, **hints):
+        return 'other'
+
+    def db_for_write(self, model, **hints):
+        return 'default'
+
+
+class ContentTypesMultidbTestCase(TestCase):
+
+    def setUp(self):
+        self.old_routers = router.routers
+        router.routers = [TestRouter()]
+
+        # Whenever a test starts executing, only the "default" database is
+        # connected. We explicitly connect to the "other" database here. If we
+        # don't do it, then it will be implicitly connected later when we query
+        # it, but in that case some database backends may automatically perform
+        # extra queries upon connecting (notably mysql executes
+        # "SET SQL_AUTO_IS_NULL = 0"), which will affect assertNumQueries().
+        connections['other'].ensure_connection()
+
+    def tearDown(self):
+        router.routers = self.old_routers
+
+    def test_multidb(self):
+        """
+        Test that, when using multiple databases, we use the db_for_read (see
+        #20401).
+        """
         ContentType.objects.clear_cache()
 
-    def test_lookup_cache(self):
-        """
-        Make sure that the content type cache (see ContentTypeManager)
-        works correctly. Lookups for a particular content type -- by model, ID
-        or natural key -- should hit the database only on the first lookup.
-        """
-
-        # At this point, a lookup for a ContentType should hit the DB
-        with self.assertNumQueries(1):
-            ContentType.objects.get_for_model(ContentType)
-
-        # A second hit, though, won't hit the DB, nor will a lookup by ID
-        # or natural key
-        with self.assertNumQueries(0):
-            ct = ContentType.objects.get_for_model(ContentType)
-        with self.assertNumQueries(0):
-            ContentType.objects.get_for_id(ct.id)
-        with self.assertNumQueries(0):
-            ContentType.objects.get_by_natural_key('contenttypes',
-                                                   'contenttype')
-
-        # Once we clear the cache, another lookup will again hit the DB
-        ContentType.objects.clear_cache()
-        with self.assertNumQueries(1):
-            ContentType.objects.get_for_model(ContentType)
-
-        # The same should happen with a lookup by natural key
-        ContentType.objects.clear_cache()
-        with self.assertNumQueries(1):
-            ContentType.objects.get_by_natural_key('contenttypes',
-                                                   'contenttype')
-        # And a second hit shouldn't hit the DB
-        with self.assertNumQueries(0):
-            ContentType.objects.get_by_natural_key('contenttypes',
-                                                   'contenttype')
-
-    def test_get_for_models_empty_cache(self):
-        # Empty cache.
-        with self.assertNumQueries(1):
-            cts = ContentType.objects.get_for_models(ContentType, FooWithUrl)
-        self.assertEqual(cts, {
-            ContentType: ContentType.objects.get_for_model(ContentType),
-            FooWithUrl: ContentType.objects.get_for_model(FooWithUrl),
-        })
-
-    def test_get_for_models_partial_cache(self):
-        # Partial cache
-        ContentType.objects.get_for_model(ContentType)
-        with self.assertNumQueries(1):
-            cts = ContentType.objects.get_for_models(ContentType, FooWithUrl)
-        self.assertEqual(cts, {
-            ContentType: ContentType.objects.get_for_model(ContentType),
-            FooWithUrl: ContentType.objects.get_for_model(FooWithUrl),
-        })
-
-    def test_get_for_models_full_cache(self):
-        # Full cache
-        ContentType.objects.get_for_model(ContentType)
-        ContentType.objects.get_for_model(FooWithUrl)
-        with self.assertNumQueries(0):
-            cts = ContentType.objects.get_for_models(ContentType, FooWithUrl)
-        self.assertEqual(cts, {
-            ContentType: ContentType.objects.get_for_model(ContentType),
-            FooWithUrl: ContentType.objects.get_for_model(FooWithUrl),
-        })
-
-    def test_get_for_concrete_model(self):
-        """
-        Make sure the `for_concrete_model` kwarg correctly works
-        with concrete, proxy and deferred models
-        """
-        concrete_model_ct = ContentType.objects.get_for_model(ConcreteModel)
-
-        self.assertEqual(concrete_model_ct,
-            ContentType.objects.get_for_model(ProxyModel))
-
-        self.assertEqual(concrete_model_ct,
-            ContentType.objects.get_for_model(ConcreteModel,
-                                              for_concrete_model=False))
-
-        proxy_model_ct = ContentType.objects.get_for_model(ProxyModel,
-                                                           for_concrete_model=False)
-
-        self.assertNotEqual(concrete_model_ct, proxy_model_ct)
-
-        # Make sure deferred model are correctly handled
-        ConcreteModel.objects.create(name="Concrete")
-        DeferredConcreteModel = ConcreteModel.objects.only('pk').get().__class__
-        DeferredProxyModel = ProxyModel.objects.only('pk').get().__class__
-
-        self.assertEqual(concrete_model_ct,
-            ContentType.objects.get_for_model(DeferredConcreteModel))
-
-        self.assertEqual(concrete_model_ct,
-            ContentType.objects.get_for_model(DeferredConcreteModel,
-                                              for_concrete_model=False))
-
-        self.assertEqual(concrete_model_ct,
-            ContentType.objects.get_for_model(DeferredProxyModel))
-
-        self.assertEqual(proxy_model_ct,
-            ContentType.objects.get_for_model(DeferredProxyModel,
-                                              for_concrete_model=False))
-
-    def test_get_for_concrete_models(self):
-        """
-        Make sure the `for_concrete_models` kwarg correctly works
-        with concrete, proxy and deferred models.
-        """
-        concrete_model_ct = ContentType.objects.get_for_model(ConcreteModel)
-
-        cts = ContentType.objects.get_for_models(ConcreteModel, ProxyModel)
-        self.assertEqual(cts, {
-            ConcreteModel: concrete_model_ct,
-            ProxyModel: concrete_model_ct,
-        })
-
-        proxy_model_ct = ContentType.objects.get_for_model(ProxyModel,
-                                                           for_concrete_model=False)
-        cts = ContentType.objects.get_for_models(ConcreteModel, ProxyModel,
-                                                 for_concrete_models=False)
-        self.assertEqual(cts, {
-            ConcreteModel: concrete_model_ct,
-            ProxyModel: proxy_model_ct,
-        })
-
-        # Make sure deferred model are correctly handled
-        ConcreteModel.objects.create(name="Concrete")
-        DeferredConcreteModel = ConcreteModel.objects.only('pk').get().__class__
-        DeferredProxyModel = ProxyModel.objects.only('pk').get().__class__
-
-        cts = ContentType.objects.get_for_models(DeferredConcreteModel,
-                                                 DeferredProxyModel)
-        self.assertEqual(cts, {
-            DeferredConcreteModel: concrete_model_ct,
-            DeferredProxyModel: concrete_model_ct,
-        })
-
-        cts = ContentType.objects.get_for_models(DeferredConcreteModel,
-                                                 DeferredProxyModel,
-                                                 for_concrete_models=False)
-        self.assertEqual(cts, {
-            DeferredConcreteModel: concrete_model_ct,
-            DeferredProxyModel: proxy_model_ct,
-        })
-
-    @override_settings(ALLOWED_HOSTS=['example.com'])
-    def test_shortcut_view(self):
-        """
-        Check that the shortcut view (used for the admin "view on site"
-        functionality) returns a complete URL regardless of whether the sites
-        framework is installed
-        """
-
-        request = HttpRequest()
-        request.META = {
-            "SERVER_NAME": "Example.com",
-            "SERVER_PORT": "80",
-        }
-        user_ct = ContentType.objects.get_for_model(FooWithUrl)
-        obj = FooWithUrl.objects.create(name="john")
-
-        with self.modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'}):
-            response = shortcut(request, user_ct.id, obj.id)
-            self.assertEqual("http://%s/users/john/" % get_current_site(request).domain,
-                             response._headers.get("location")[1])
-
-        with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
-            response = shortcut(request, user_ct.id, obj.id)
-            self.assertEqual("http://Example.com/users/john/",
-                             response._headers.get("location")[1])
-
-    def test_shortcut_view_without_get_absolute_url(self):
-        """
-        Check that the shortcut view (used for the admin "view on site"
-        functionality) returns 404 when get_absolute_url is not defined.
-        """
-
-        request = HttpRequest()
-        request.META = {
-            "SERVER_NAME": "Example.com",
-            "SERVER_PORT": "80",
-        }
-        user_ct = ContentType.objects.get_for_model(FooWithoutUrl)
-        obj = FooWithoutUrl.objects.create(name="john")
-
-        self.assertRaises(Http404, shortcut, request, user_ct.id, obj.id)
-
-    def test_shortcut_view_with_broken_get_absolute_url(self):
-        """
-        Check that the shortcut view does not catch an AttributeError raised
-        by the model's get_absolute_url method.
-        Refs #8997.
-        """
-        request = HttpRequest()
-        request.META = {
-            "SERVER_NAME": "Example.com",
-            "SERVER_PORT": "80",
-        }
-        user_ct = ContentType.objects.get_for_model(FooWithBrokenAbsoluteUrl)
-        obj = FooWithBrokenAbsoluteUrl.objects.create(name="john")
-
-        self.assertRaises(AttributeError, shortcut, request, user_ct.id, obj.id)
-
-    def test_missing_model(self):
-        """
-        Ensures that displaying content types in admin (or anywhere) doesn't
-        break on leftover content type records in the DB for which no model
-        is defined anymore.
-        """
-        ct = ContentType.objects.create(
-            name='Old model',
-            app_label='contenttypes',
-            model='OldModel',
-        )
-        self.assertEqual(six.text_type(ct), 'Old model')
-        self.assertIsNone(ct.model_class())
-
-        # Make sure stale ContentTypes can be fetched like any other object.
-        # Before Django 1.6 this caused a NoneType error in the caching mechanism.
-        # Instead, just return the ContentType object and let the app detect stale states.
-        ct_fetched = ContentType.objects.get_for_id(ct.pk)
-        self.assertIsNone(ct_fetched.model_class())
+        with self.assertNumQueries(0, using='default'), \
+                self.assertNumQueries(1, using='other'):
+            ContentType.objects.get_for_model(Author)
