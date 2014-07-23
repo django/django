@@ -10,6 +10,10 @@ def update_contenttypes(app_config, verbosity=2, using=DEFAULT_DB_ALIAS, **kwarg
     """
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
+
+    Kwargs:
+        interactive (bool): runs interactive and asks the user if all stale contenttypes and their foreign key should be deleted
+
     """
     if not app_config.models_module:
         return
