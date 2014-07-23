@@ -210,8 +210,8 @@ class GeometryField(Field):
             return gsrid
 
     ### Routines overloaded from Field ###
-    def contribute_to_class(self, cls, name):
-        super(GeometryField, self).contribute_to_class(cls, name)
+    def contribute_to_class(self, cls, name, **kwargs):
+        super(GeometryField, self).contribute_to_class(cls, name, **kwargs)
 
         # Setup for lazy-instantiated Geometry object.
         setattr(cls, self.attname, GeometryProxy(Geometry, self))
