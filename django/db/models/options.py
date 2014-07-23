@@ -655,7 +655,7 @@ class Options(object):
         try:
             return connection, self._map_model_cache[connection]
         except KeyError:
-            direct = isinstance(connection, Field) or hasattr(connection, 'is_gfk')
+            direct = isinstance(connection, Field) or hasattr(connection, 'for_concrete_model')
             model = connection.model if direct else connection.parent_model._meta.concrete_model
             if model == self.model:
                 model = None
@@ -668,7 +668,7 @@ class Options(object):
             model, direct, m2m = self._map_details_cache[connection]
             return connection, model, direct, m2m
         except KeyError:
-            direct = isinstance(connection, Field) or hasattr(connection, 'is_gfk')
+            direct = isinstance(connection, Field) or hasattr(connection, 'for_concrete_model')
             model = connection.model if direct else connection.parent_model._meta.concrete_model
             if model == self.model:
                 model = None

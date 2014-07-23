@@ -421,7 +421,7 @@ def reverse_field_path(model, path):
     pieces = path.split(LOOKUP_SEP)
     for piece in pieces:
         field = parent._meta.get_field(piece, related_objects=True, related_m2m=True, virtual=True)
-        direct = isinstance(field, models.Field) or hasattr(field, 'is_gfk')
+        direct = isinstance(field, models.Field) or hasattr(field, 'for_concrete_model')
         # skip trailing data field if extant:
         if len(reversed_path) == len(pieces) - 1:  # final iteration
             try:
