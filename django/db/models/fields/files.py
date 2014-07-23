@@ -300,8 +300,8 @@ class FileField(Field):
             file.save(file.name, file, save=False)
         return file
 
-    def contribute_to_class(self, cls, name):
-        super(FileField, self).contribute_to_class(cls, name)
+    def contribute_to_class(self, cls, name, **kwargs):
+        super(FileField, self).contribute_to_class(cls, name, **kwargs)
         setattr(cls, self.name, self.descriptor_class(self))
 
     def get_directory_name(self):
@@ -407,8 +407,8 @@ class ImageField(FileField):
             kwargs['height_field'] = self.height_field
         return name, path, args, kwargs
 
-    def contribute_to_class(self, cls, name):
-        super(ImageField, self).contribute_to_class(cls, name)
+    def contribute_to_class(self, cls, name, **kwargs):
+        super(ImageField, self).contribute_to_class(cls, name, **kwargs)
         # Attach update_dimension_fields so that dimension fields declared
         # after their corresponding image field don't stay cleared by
         # Model.__init__, see bug #11196.

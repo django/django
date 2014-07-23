@@ -46,11 +46,11 @@ def make_contrib(superclass, func=None):
     case that the existing contribute_to_class() calls all the necessary
     superclass methods.
     """
-    def contribute_to_class(self, cls, name):
+    def contribute_to_class(self, cls, name, **kwargs):
         if func:
-            func(self, cls, name)
+            func(self, cls, name, **kwargs)
         else:
-            super(superclass, self).contribute_to_class(cls, name)
+            super(superclass, self).contribute_to_class(cls, name, **kwargs)
         setattr(cls, self.name, Creator(self))
 
     return contribute_to_class
