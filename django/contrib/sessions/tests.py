@@ -24,6 +24,7 @@ from django.test import TestCase, RequestFactory, override_settings
 from django.test.utils import patch_logger
 from django.utils import six
 from django.utils import timezone
+from django.utils.encoding import force_text
 
 from django.contrib.sessions.exceptions import InvalidSessionKey
 
@@ -309,6 +310,16 @@ class SessionTestsMixin(object):
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
 
     backend = DatabaseSession
+
+    def test_session_str(self):
+        "Session repr should be the session key."
+        self.session['x'] = 1
+        self.session.save()
+
+        session_key = self.session.session_key
+        s = Session.objects.get(session_key=session_key)
+
+        self.assertEqual(force_text(s), session_key)
 
     def test_session_get_decoded(self):
         """
