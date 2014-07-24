@@ -762,9 +762,8 @@ following models::
         # ...
         author = models.ForeignKey(Person)
 
-...then a call to ``Book.objects.select_related('person',
-'person__city').get(id=4)`` will cache the related ``Person`` *and* the related
-``City``::
+... then a call to ``Book.objects.select_related('person__city').get(id=4)``
+will cache the related ``Person`` *and* the related ``City``::
 
     b = Book.objects.select_related('person__city').get(id=4)
     p = b.author         # Doesn't hit the database.
