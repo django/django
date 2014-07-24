@@ -66,9 +66,9 @@ class AutodetectorTests(TestCase):
     book_with_field_and_author_renamed = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("writer", models.ForeignKey("testapp.Writer")), ("title", models.CharField(max_length=200))])
     book_with_multiple_authors = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("authors", models.ManyToManyField("testapp.Author")), ("title", models.CharField(max_length=200))])
     book_with_multiple_authors_through_attribution = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("authors", models.ManyToManyField("testapp.Author", through="otherapp.Attribution")), ("title", models.CharField(max_length=200))])
-    book_unique = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("author", "title")]})
-    book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "author")]})
-    book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": [("title", "newfield")]})
+    book_unique = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": set([("author", "title")])})
+    book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": set([("title", "author")])})
+    book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": set([("title", "newfield")])})
     attribution = ModelState("otherapp", "Attribution", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("book", models.ForeignKey("otherapp.Book"))])
     edition = ModelState("thirdapp", "Edition", [("id", models.AutoField(primary_key=True)), ("book", models.ForeignKey("otherapp.Book"))])
     custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))], bases=(AbstractBaseUser, ))
@@ -77,7 +77,7 @@ class AutodetectorTests(TestCase):
     aardvark_based_on_author = ModelState("testapp", "Aardvark", [], bases=("testapp.Author", ))
     aardvark_pk_fk_author = ModelState("testapp", "Aardvark", [("id", models.OneToOneField("testapp.Author", primary_key=True))])
     knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
-    rabbit = ModelState("eggs", "Rabbit", [("id", models.AutoField(primary_key=True)), ("knight", models.ForeignKey("eggs.Knight")), ("parent", models.ForeignKey("eggs.Rabbit"))], {"unique_together": [("parent", "knight")]})
+    rabbit = ModelState("eggs", "Rabbit", [("id", models.AutoField(primary_key=True)), ("knight", models.ForeignKey("eggs.Knight")), ("parent", models.ForeignKey("eggs.Rabbit"))], {"unique_together": set([("parent", "knight")])})
 
     def repr_changes(self, changes):
         output = ""
@@ -535,6 +535,16 @@ class AutodetectorTests(TestCase):
         self.assertEqual(action.name, "book")
         self.assertEqual(action.unique_together, set([("author", "title")]))
 
+    def test_unique_together_no_changes(self):
+        "Tests that unique_togther doesn't generate a migration if no changes have been made"
+        # Make state
+        before = self.make_project_state([self.author_empty, self.book_unique])
+        after = self.make_project_state([self.author_empty, self.book_unique])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes), 0)
+
     def test_unique_together_ordering(self):
         "Tests that unique_together also triggers on ordering changes"
         # Make state
@@ -574,7 +584,7 @@ class AutodetectorTests(TestCase):
     def test_remove_index_together(self):
         author_index_together = ModelState("testapp", "Author", [
             ("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))
-        ], {"index_together": [("id", "name")]})
+        ], {"index_together": set([("id", "name")])})
 
         before = self.make_project_state([author_index_together])
         after = self.make_project_state([self.author_name])
@@ -593,7 +603,7 @@ class AutodetectorTests(TestCase):
     def test_remove_unique_together(self):
         author_unique_together = ModelState("testapp", "Author", [
             ("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))
-        ], {"unique_together": [("id", "name")]})
+        ], {"unique_together": set([("id", "name")])})
 
         before = self.make_project_state([author_unique_together])
         after = self.make_project_state([self.author_name])
