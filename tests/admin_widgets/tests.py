@@ -985,26 +985,26 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # Open the popup window and click on a band
         self.selenium.find_element_by_id('lookup_id_main_band').click()
-        self.selenium.switch_to_window('id_main_band')
+        self.selenium.switch_to.window('id_main_band')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
         self.assertTrue('/band/42/' in link.get_attribute('href'))
         link.click()
 
         # The field now contains the selected band's id
-        self.selenium.switch_to_window(main_window)
+        self.selenium.switch_to.window(main_window)
         self.wait_for_value('#id_main_band', '42')
 
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_main_band').click()
-        self.selenium.switch_to_window('id_main_band')
+        self.selenium.switch_to.window('id_main_band')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
         self.assertTrue('/band/98/' in link.get_attribute('href'))
         link.click()
 
         # The field now contains the other selected band's id
-        self.selenium.switch_to_window(main_window)
+        self.selenium.switch_to.window(main_window)
         self.wait_for_value('#id_main_band', '98')
 
     def test_many_to_many(self):
@@ -1020,26 +1020,26 @@ class AdminRawIdWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         # Open the popup window and click on a band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
-        self.selenium.switch_to_window('id_supporting_bands')
+        self.selenium.switch_to.window('id_supporting_bands')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
         self.assertTrue('/band/42/' in link.get_attribute('href'))
         link.click()
 
         # The field now contains the selected band's id
-        self.selenium.switch_to_window(main_window)
+        self.selenium.switch_to.window(main_window)
         self.wait_for_value('#id_supporting_bands', '42')
 
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
-        self.selenium.switch_to_window('id_supporting_bands')
+        self.selenium.switch_to.window('id_supporting_bands')
         self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
         self.assertTrue('/band/98/' in link.get_attribute('href'))
         link.click()
 
         # The field now contains the two selected bands' ids
-        self.selenium.switch_to_window(main_window)
+        self.selenium.switch_to.window(main_window)
         self.wait_for_value('#id_supporting_bands', '42,98')
 
 
@@ -1067,7 +1067,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         main_window = self.selenium.current_window_handle
         # Click the Add User button to add new
         self.selenium.find_element_by_id('add_id_user').click()
-        self.selenium.switch_to_window('id_user')
+        self.selenium.switch_to.window('id_user')
         self.wait_page_loaded()
         password_field = self.selenium.find_element_by_id('id_password')
         password_field.send_keys('password')
@@ -1078,7 +1078,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         save_button_css_selector = '.submit-row > input[type=submit]'
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
-        self.selenium.switch_to_window(main_window)
+        self.selenium.switch_to.window(main_window)
         # The field now contains the new user
         self.wait_for('#id_user option[value="newuser"]')
 

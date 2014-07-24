@@ -3724,7 +3724,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.get('%s%s' % (self.live_server_url,
             '/test_admin/admin/admin_views/picture/add/'))
         self.assertEqual(
-            self.selenium.switch_to_active_element(),
+            self.selenium.switch_to.active_element,
             self.selenium.find_element_by_id('id_name')
         )
 
@@ -3732,7 +3732,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.get('%s%s' % (self.live_server_url,
             '/test_admin/admin/admin_views/reservation/add/'))
         self.assertEqual(
-            self.selenium.switch_to_active_element(),
+            self.selenium.switch_to.active_element,
             self.selenium.find_element_by_id('id_start_date_0')
         )
 
