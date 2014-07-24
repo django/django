@@ -542,6 +542,23 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
     :class:`FloatField` and :class:`DecimalField` classes, please
     see :ref:`FloatField vs. DecimalField <floatfield_vs_decimalfield>`.
 
+``DurationField``
+-----------------
+
+.. versionadded:: 1.8
+
+.. class:: DurationField([**options])
+
+A field for storing periods of time - modeled in Python by
+:class:`~python:datetime.timedelta`. When used on PostgreSQL, the data type
+used is an ``interval``, otherwise a ``bigint`` of microseconds is used.
+
+.. note::
+
+    Arithmetic with ``DurationField`` works in most cases. However on all
+    databases other than PostgreSQL, comparing the value of a ``DurationField``
+    to arithmetic on ``DateTimeField`` instances will not work as expected.
+
 ``EmailField``
 --------------
 

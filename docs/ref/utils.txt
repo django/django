@@ -158,6 +158,15 @@ The functions defined in this module share the following properties:
     ``tzinfo`` attribute is a :class:`~django.utils.tzinfo.FixedOffset`
     instance.
 
+.. function:: parse_duration(value)
+
+    .. versionadded:: 1.8
+
+    Parses a string and returns a :class:`datetime.timedelta`.
+
+    Expects data in the format ``"DD HH:MM:SS.uuuuuu"`` or as specified by ISO
+    8601 (e.g. ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``).
+
 ``django.utils.decorators``
 ===========================
 

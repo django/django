@@ -47,6 +47,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
     can_return_id_from_insert = True
     has_real_datatype = True
+    has_native_duration_field = True
     can_defer_constraint_checks = True
     has_select_for_update = True
     has_select_for_update_nowait = True

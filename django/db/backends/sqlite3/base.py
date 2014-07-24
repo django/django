@@ -21,7 +21,8 @@ from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.db.models import fields, aggregates
-from django.utils.dateparse import parse_date, parse_datetime, parse_time
+from django.utils.dateparse import parse_date, parse_datetime, parse_time, parse_duration
+from django.utils.duration import duration_string
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes
@@ -175,15 +176,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         # cause a collision with a field name).
         return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
 
-    def date_interval_sql(self, sql, connector, timedelta):
-        # It would be more straightforward if we could use the sqlite strftime
-        # function, but it does not allow for keeping six digits of fractional
-        # second information, nor does it allow for formatting date and datetime
-        # values differently. So instead we register our own function that
-        # formats the datetime combined with the delta in a manner suitable
-        # for comparisons.
-        return 'django_format_dtdelta(%s, "%s", "%d", "%d", "%d")' % (sql,
-            connector, timedelta.days, timedelta.seconds, timedelta.microseconds)
+    def date_interval_sql(self, timedelta):
+        return "'%s'" % duration_string(timedelta), []
+
+    def format_for_duration_arithmetic(self, sql):
+        """Do nothing here, we will handle it in the custom function."""
+        return sql
 
     def date_trunc_sql(self, lookup_type, field_name):
         # sqlite doesn't support DATE_TRUNC, so we fake it with a user-defined
@@ -314,6 +312,14 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'django_power(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
+    def combine_duration_expression(self, connector, sub_expressions):
+        if connector not in ['+', '-']:
+            raise utils.DatabaseError('Invalid connector for timedelta: %s.' % connector)
+        fn_params = ["'%s'" % connector] + sub_expressions
+        if len(fn_params) > 3:
+            raise ValueError('Too many params for timedelta operations.')
+        return "django_format_dtdelta(%s)" % ', '.join(fn_params)
+
     def integer_field_range(self, internal_type):
         # SQLite doesn't enforce any integer constraints
         return (None, None)
@@ -408,7 +414,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("django_datetime_extract", 3, _sqlite_datetime_extract)
         conn.create_function("django_datetime_trunc", 3, _sqlite_datetime_trunc)
         conn.create_function("regexp", 2, _sqlite_regexp)
-        conn.create_function("django_format_dtdelta", 5, _sqlite_format_dtdelta)
+        conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
         conn.create_function("django_power", 2, _sqlite_power)
         return conn
 
@@ -585,19 +591,33 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname):
         return "%i-%02i-%02i %02i:%02i:%02i" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 
 
-def _sqlite_format_dtdelta(dt, conn, days, secs, usecs):
+def _sqlite_format_dtdelta(conn, lhs, rhs):
+    """
+    LHS and RHS can be either:
+        - An integer number of microseconds
+        - A string representing a timedelta object
+        - A string representing a datetime
+    """
     try:
-        dt = backend_utils.typecast_timestamp(dt)
-        delta = datetime.timedelta(int(days), int(secs), int(usecs))
+        if isinstance(lhs, int):
+            lhs = str(decimal.Decimal(lhs) / decimal.Decimal(1000000))
+        real_lhs = parse_duration(lhs)
+        if real_lhs is None:
+            real_lhs = backend_utils.typecast_timestamp(lhs)
+        if isinstance(rhs, int):
+            rhs = str(decimal.Decimal(rhs) / decimal.Decimal(1000000))
+        real_rhs = parse_duration(rhs)
+        if real_rhs is None:
+            real_rhs = backend_utils.typecast_timestamp(rhs)
         if conn.strip() == '+':
-            dt = dt + delta
+            out = real_lhs + real_rhs
         else:
-            dt = dt - delta
+            out = real_lhs - real_rhs
     except (ValueError, TypeError):
         return None
     # typecast_timestamp returns a date or a datetime without timezone.
     # It will be formatted as "%Y-%m-%d" or "%Y-%m-%d %H:%M:%S[.%f]"
-    return str(dt)
+    return str(out)
 
 
 def _sqlite_regexp(re_pattern, re_string):

@@ -29,6 +29,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'DateField': 'DATE',
         'DateTimeField': 'TIMESTAMP',
         'DecimalField': 'NUMBER(%(max_digits)s, %(decimal_places)s)',
+        'DurationField': 'NUMBER(19)',
         'FileField': 'NVARCHAR2(%(max_length)s)',
         'FilePathField': 'NVARCHAR2(%(max_length)s)',
         'FloatField': 'DOUBLE PRECISION',

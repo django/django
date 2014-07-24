@@ -1,5 +1,6 @@
 from collections import deque
 import datetime
+import decimal
 import time
 import warnings
 
@@ -18,6 +19,7 @@ from django.db.backends.signals import connection_created
 from django.db.backends import utils
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper, ProgrammingError
+from django.utils.dateparse import parse_duration
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.functional import cached_property
 from django.utils import six
@@ -574,6 +576,9 @@ class BaseDatabaseFeatures(object):
     supports_bitwise_or = True
 
     supports_binary_field = True
+
+    # Is there a true datatype for timedeltas?
+    has_native_duration_field = False
 
     # Do time/datetime fields have microsecond precision?
     supports_microsecond_precision = True
@@ -1251,7 +1256,15 @@ class BaseDatabaseOperations(object):
         Some field types on some backends do not provide data in the correct
         format, this is the hook for coverter functions.
         """
+        if not self.connection.features.has_native_duration_field and internal_type == 'DurationField':
+            return [self.convert_durationfield_value]
         return []
+
+    def convert_durationfield_value(self, value, field):
+        if value is not None:
+            value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
+            value = parse_duration(value)
+        return value
 
     def check_aggregate_support(self, aggregate_func):
         """Check that the backend supports the provided aggregate
@@ -1271,6 +1284,9 @@ class BaseDatabaseOperations(object):
         """
         conn = ' %s ' % connector
         return conn.join(sub_expressions)
+
+    def combine_duration_expression(self, connector, sub_expressions):
+        return self.combine_expression(connector, sub_expressions)
 
     def modify_insert_params(self, placeholders, params):
         """Allow modification of insert parameters. Needed for Oracle Spatial
