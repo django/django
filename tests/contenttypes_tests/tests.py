@@ -367,19 +367,20 @@ class UpdateContentTypesTests(TestCase):
         self.before_count = ContentType.objects.count()
         ContentType.objects.create(name='fake', app_label='contenttypes_tests', model='Fake')
         self.app_config = apps.get_app_config('contenttypes_tests')
+        self.old_stdout = sys.stdout
+        sys.stdout = StringIO()
+
+    def tearDown(self):
+        sys.stdout = self.old_stdout
 
     def test_interactive_true(self):
         """
         interactive mode of update_contenttypes() (the default) should delete
         stale contenttypes.
         """
-        self.old_stdout = sys.stdout
-        sys.stdout = StringIO()
         management.input = lambda x: force_str("yes")
         management.update_contenttypes(self.app_config)
-        output = sys.stdout.getvalue()
-        sys.stdout = self.old_stdout
-        self.assertIn("Deleting stale content type", output)
+        self.assertIn("Deleting stale content type", sys.stdout.getvalue())
         self.assertEqual(ContentType.objects.count(), self.before_count)
 
     def test_interactive_false(self):
@@ -387,12 +388,8 @@ class UpdateContentTypesTests(TestCase):
         non-interactive mode of update_contenttypes() shouldn't delete stale
         content types.
         """
-        self.old_stdout = sys.stdout
-        sys.stdout = StringIO()
         management.update_contenttypes(self.app_config, interactive=False)
-        output = sys.stdout.getvalue()
-        sys.stdout = self.old_stdout
-        self.assertIn("Stale content types remain.", output)
+        self.assertIn("Stale content types remain.", sys.stdout.getvalue())
         self.assertEqual(ContentType.objects.count(), self.before_count + 1)
 
 
