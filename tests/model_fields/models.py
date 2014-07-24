@@ -121,6 +121,10 @@ class DateTimeModel(models.Model):
     t = models.TimeField()
 
 
+class DurationModel(models.Model):
+    field = models.DurationField()
+
+
 class PrimaryKeyCharModel(models.Model):
     string = models.CharField(max_length=10, primary_key=True)
 

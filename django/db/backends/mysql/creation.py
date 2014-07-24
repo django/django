@@ -16,6 +16,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         'DateField': 'date',
         'DateTimeField': 'datetime',
         'DecimalField': 'numeric(%(max_digits)s, %(decimal_places)s)',
+        'DurationField': 'bigint',
         'FileField': 'varchar(%(max_length)s)',
         'FilePathField': 'varchar(%(max_length)s)',
         'FloatField': 'double precision',

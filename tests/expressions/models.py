@@ -47,6 +47,7 @@ class Experiment(models.Model):
     name = models.CharField(max_length=24)
     assigned = models.DateField()
     completed = models.DateField()
+    estimated_time = models.DurationField()
     start = models.DateTimeField()
     end = models.DateTimeField()
 
