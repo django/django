@@ -6,6 +6,7 @@ import os
 import re
 import tokenize
 import unittest
+import warnings
 
 from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
@@ -272,7 +273,12 @@ class WriterTests(TestCase):
                 migration = migrations.Migration('0001_initial', app.split('.')[-1])
                 expected_path = os.path.join(base_dir, *(app.split('.') + ['migrations', '0001_initial.py']))
                 writer = MigrationWriter(migration)
-                self.assertEqual(writer.path, expected_path)
+                # Silence warning on Python 2: Not importing directory
+                # 'tests/migrations/migrations_test_apps/without_init_file/migrations':
+                # missing __init__.py
+                with warnings.catch_warnings():
+                    warnings.filterwarnings("ignore", category=ImportWarning)
+                    self.assertEqual(writer.path, expected_path)
 
     def test_custom_operation(self):
         migration = type(str("Migration"), (migrations.Migration,), {
