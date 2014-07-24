@@ -795,13 +795,13 @@ class MigrationAutodetector(object):
             if old_model_state.options.get(option_name) is None:
                 old_value = None
             else:
-                old_value = [
-                    [
+                old_value = set([
+                    tuple(
                         self.renamed_fields.get((app_label, model_name, n), n)
                         for n in unique
-                    ]
+                    )
                     for unique in old_model_state.options[option_name]
-                ]
+                ])
             if old_value != new_model_state.options.get(option_name):
                 self.add_operation(
                     app_label,
