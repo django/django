@@ -54,9 +54,16 @@ New data types
 ~~~~~~~~~~~~~~
 
 * Django now has a :class:`~django.db.models.UUIDField` for storing
-  universally unique identifiers. There is a corresponding :class:`form field
-  <django.forms.UUIDField>`. It is stored as the native ``uuid`` data type on
-  PostgreSQL and as a fixed length character field on other backends.
+  universally unique identifiers. It is stored as the native ``uuid`` data type
+  on PostgreSQL and as a fixed length character field on other backends. There
+  is a corresponding :class:`form field <django.forms.UUIDField>`.
+
+* Django now has a :class:`~django.db.models.DurationField` for storing periods
+  of time - modeled in Python by :class:`~python:datetime.timedelta`. It is
+  stored in the native ``interval`` data type on PostgreSQL and as a ``bigint``
+  of microseconds on other backends. Date and time related arithmetic has also
+  been improved on all backends. There is a corresponding :class:`form field
+  <django.forms.DurationField>`.
 
 Query Expressions
 ~~~~~~~~~~~~~~~~~

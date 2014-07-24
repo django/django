@@ -27,6 +27,29 @@ datetime_re = re.compile(
     r'(?P<tzinfo>Z|[+-]\d{2}(?::?\d{2})?)?$'
 )
 
+standard_duration_re = re.compile(
+    r'^'
+    r'(?:(?P<days>-?\d+) )?'
+    r'((?:(?P<hours>\d+):)(?=\d+:\d+))?'
+    r'(?:(?P<minutes>\d+):)?'
+    r'(?P<seconds>\d+)'
+    r'(?:\.(?P<microseconds>\d{1,6})\d{0,6})?'
+    r'$'
+)
+
+# Support the sections of ISO 8601 date representation that are accepted by
+# timedelta
+iso8601_duration_re = re.compile(
+    r'^P'
+    r'(?:(?P<days>\d+(.\d+)?)D)?'
+    r'(?:T'
+    r'(?:(?P<hours>\d+(.\d+)?)H)?'
+    r'(?:(?P<minutes>\d+(.\d+)?)M)?'
+    r'(?:(?P<seconds>\d+(.\d+)?)S)?'
+    r')?'
+    r'$'
+)
+
 
 def parse_date(value):
     """Parses a string and return a datetime.date.
@@ -84,3 +107,21 @@ def parse_datetime(value):
         kw = {k: int(v) for k, v in six.iteritems(kw) if v is not None}
         kw['tzinfo'] = tzinfo
         return datetime.datetime(**kw)
+
+
+def parse_duration(value):
+    """Parses a duration string and returns a datetime.timedelta.
+
+    The preferred format for durations in Django is '%d %H:%M:%S.%f'.
+
+    Also supports ISO 8601 representation.
+    """
+    match = standard_duration_re.match(value)
+    if not match:
+        match = iso8601_duration_re.match(value)
+    if match:
+        kw = match.groupdict()
+        if kw.get('microseconds'):
+            kw['microseconds'] = kw['microseconds'].ljust(6, '0')
+        kw = {k: float(v) for k, v in six.iteritems(kw) if v is not None}
+        return datetime.timedelta(**kw)

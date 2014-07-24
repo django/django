@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from datetime import date, time, datetime
+from datetime import date, time, datetime, timedelta
 import unittest
 
-from django.utils.dateparse import parse_date, parse_time, parse_datetime
+from django.utils.dateparse import parse_date, parse_time, parse_datetime, parse_duration
 from django.utils.timezone import get_fixed_timezone
 
 
@@ -46,3 +46,43 @@ class DateParseTests(unittest.TestCase):
         # Invalid inputs
         self.assertEqual(parse_datetime('20120423091500'), None)
         self.assertRaises(ValueError, parse_datetime, '2012-04-56T09:15:90')
+
+
+class DurationParseTests(unittest.TestCase):
+    def test_seconds(self):
+        self.assertEqual(parse_duration('30'), timedelta(seconds=30))
+
+    def test_minutes_seconds(self):
+        self.assertEqual(parse_duration('15:30'), timedelta(minutes=15, seconds=30))
+        self.assertEqual(parse_duration('5:30'), timedelta(minutes=5, seconds=30))
+
+    def test_hours_minutes_seconds(self):
+        self.assertEqual(parse_duration('10:15:30'), timedelta(hours=10, minutes=15, seconds=30))
+        self.assertEqual(parse_duration('1:15:30'), timedelta(hours=1, minutes=15, seconds=30))
+        self.assertEqual(parse_duration('100:200:300'), timedelta(hours=100, minutes=200, seconds=300))
+
+    def test_days(self):
+        self.assertEqual(parse_duration('4 15:30'), timedelta(days=4, minutes=15, seconds=30))
+        self.assertEqual(parse_duration('4 10:15:30'), timedelta(days=4, hours=10, minutes=15, seconds=30))
+
+    def test_fractions_of_seconds(self):
+        self.assertEqual(parse_duration('15:30.1'), timedelta(minutes=15, seconds=30, milliseconds=100))
+        self.assertEqual(parse_duration('15:30.01'), timedelta(minutes=15, seconds=30, milliseconds=10))
+        self.assertEqual(parse_duration('15:30.001'), timedelta(minutes=15, seconds=30, milliseconds=1))
+        self.assertEqual(parse_duration('15:30.0001'), timedelta(minutes=15, seconds=30, microseconds=100))
+        self.assertEqual(parse_duration('15:30.00001'), timedelta(minutes=15, seconds=30, microseconds=10))
+        self.assertEqual(parse_duration('15:30.000001'), timedelta(minutes=15, seconds=30, microseconds=1))
+
+    def test_negative(self):
+        self.assertEqual(parse_duration('-4 15:30'), timedelta(days=-4, minutes=15, seconds=30))
+
+    def test_iso_8601(self):
+        self.assertEqual(parse_duration('P4Y'), None)
+        self.assertEqual(parse_duration('P4M'), None)
+        self.assertEqual(parse_duration('P4W'), None)
+        self.assertEqual(parse_duration('P4D'), timedelta(days=4))
+        self.assertEqual(parse_duration('P0.5D'), timedelta(hours=12))
+        self.assertEqual(parse_duration('PT5H'), timedelta(hours=5))
+        self.assertEqual(parse_duration('PT5M'), timedelta(minutes=5))
+        self.assertEqual(parse_duration('PT5S'), timedelta(seconds=5))
+        self.assertEqual(parse_duration('PT0.000005S'), timedelta(microseconds=5))
