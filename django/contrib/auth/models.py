@@ -186,6 +186,20 @@ class UserManager(BaseUserManager):
         return self._create_user(username, email, password, True, True,
                                  **extra_fields)
 
+    def with_perm(self, permission_name, obj=None):
+        """
+        Returns all users who have permission `permission_name`. If `obj` is
+        passed, returns all users with `permission_name` for that particular
+        object.
+
+        Defaults to using the first backend that defines `with_perm`. Returns
+        an empty QuerySet if no backends are found.
+        """
+        for backend in auth.get_backends():
+            if hasattr(backend, "with_perm"):
+                return backend.with_perm(permission_name, obj)
+        return self.get_queryset().none()
+
 
 @python_2_unicode_compatible
 class AbstractBaseUser(models.Model):

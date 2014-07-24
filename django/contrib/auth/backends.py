@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.db.models import Q
 
 
 class ModelBackend(object):
@@ -74,6 +76,24 @@ class ModelBackend(object):
         if not user_obj.is_active:
             return False
         return perm in self.get_all_permissions(user_obj, obj)
+
+    def with_perm(self, perm, obj=None):
+        """
+        Returns all users with `perm`. Ignores `obj`.
+        """
+        UserModel = get_user_model()
+        try:
+            app_label, codename = perm.split('.')
+        except ValueError:
+            raise ValueError("Permission name should be in the form 'app_label.codename'.")
+
+        user_q = Q(user_permissions__codename=codename,
+                   user_permissions__content_type__app_label=app_label)
+        group_q = Q(groups__permissions__codename=codename,
+                    groups__permissions__content_type__app_label=app_label)
+        has_permission_q = Q(is_superuser=True) | user_q | group_q
+
+        return UserModel._default_manager.filter(has_permission_q, is_active=True).distinct()
 
     def has_module_perms(self, user_obj, app_label):
         """

@@ -56,6 +56,10 @@ Minor features
 * :attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD` and
   :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
   :class:`~django.db.models.ForeignKey`\s.
+* :class:`~django.contrib.auth.models.UserManager` now has a method
+  :meth:`~django.contrib.auth.models.UserManager.with_perm` that can be
+  used to get all users that have the specified permission. Custom backends
+  may implement their own overrides to handle object permissions.
 
 :mod:`django.contrib.formtools`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
