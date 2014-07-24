@@ -238,12 +238,14 @@ class BaseValidator(object):
     message = _('Ensure this value is %(limit_value)s (it is %(show_value)s).')
     code = 'limit_value'
 
-    def __init__(self, limit_value):
+    def __init__(self, limit_value, message=None):
         self.limit_value = limit_value
+        if message:
+            self.message = message
 
     def __call__(self, value):
         cleaned = self.clean(value)
-        params = {'limit_value': self.limit_value, 'show_value': cleaned}
+        params = {'limit_value': self.limit_value, 'show_value': cleaned, 'value': value}
         if self.compare(cleaned, self.limit_value):
             raise ValidationError(self.message, code=self.code, params=params)
 

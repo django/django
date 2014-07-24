@@ -14,6 +14,7 @@ from django.core.validators import (
     validate_ipv46_address, validate_ipv4_address, validate_ipv6_address,
     validate_slug,
 )
+from django.test import SimpleTestCase
 from django.test.utils import str_prefix
 
 
@@ -243,7 +244,7 @@ def create_simple_test_method(validator, expected, value, num):
 # Dynamically assemble a test class with the contents of TEST_DATA
 
 
-class TestSimpleValidators(TestCase):
+class TestSimpleValidators(SimpleTestCase):
     def test_single_message(self):
         v = ValidationError('Not Valid')
         self.assertEqual(str(v), str_prefix("[%(_)s'Not Valid']"))
@@ -266,6 +267,11 @@ class TestSimpleValidators(TestCase):
             pass
         else:
             self.fail("TypeError not raised when flags and pre-compiled regex in RegexValidator")
+
+    def test_max_length_validator_message(self):
+        v = MaxLengthValidator(16, message='"%(value)s" has more than %(limit_value)d characters.')
+        with self.assertRaisesMessage(ValidationError, '"djangoproject.com" has more than 16 characters.'):
+            v('djangoproject.com')
 
 test_counter = 0
 for validator, value, expected in TEST_DATA:
