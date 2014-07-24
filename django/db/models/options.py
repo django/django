@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from bisect import bisect
 from collections import OrderedDict
+from functools import partial
 from itertools import chain
 import warnings
 
@@ -14,6 +15,7 @@ from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
+from django.utils.lru_cache import lru_cache
 from django.utils.text import camel_case_to_spaces
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
@@ -26,6 +28,27 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save', 'default_related_name')
+
+
+@lru_cache(maxsize=None)
+def _map_model(opts, connection):
+    direct = isinstance(connection, Field) or hasattr(connection, 'for_concrete_model')
+    model = connection.model if direct else connection.parent_model._meta.concrete_model
+    if model == opts.model:
+        model = None
+    return connection, model
+
+
+@lru_cache(maxsize=None)
+def _map_details(opts, connection):
+    direct = isinstance(connection, Field) or hasattr(connection, 'for_concrete_model')
+    model = connection.model if direct else connection.parent_model._meta.concrete_model
+    if model == opts.model:
+        model = None
+
+    field = connection if direct else connection.field
+    m2m = isinstance(field, ManyToManyField)
+    return connection, model, direct, m2m
 
 
 def normalize_together(option_together):
@@ -131,6 +154,8 @@ class Options(object):
         self.apps = apps
 
         self.default_related_name = None
+        self._map_model = partial(_map_model, self)
+        self._map_details = partial(_map_details, self)
 
     ### INTERNAL METHODS AND PROPERTIES GO BELOW THIS LINE ###
 
@@ -650,33 +675,6 @@ class Options(object):
     @raise_deprecation(suggested_alternative="get_fields")
     def get_all_related_many_to_many_objects(self, local_only=False):
         return list(self.get_fields(data=False, related_m2m=True, include_parents=local_only is not True))
-
-    def _map_model(self, connection):
-        try:
-            return connection, self._map_model_cache[connection]
-        except KeyError:
-            direct = isinstance(connection, Field) or hasattr(connection, 'for_concrete_model')
-            model = connection.model if direct else connection.parent_model._meta.concrete_model
-            if model == self.model:
-                model = None
-
-            self._map_model_cache[connection] = model
-        return connection, model
-
-    def _map_details(self, connection):
-        try:
-            model, direct, m2m = self._map_details_cache[connection]
-            return connection, model, direct, m2m
-        except KeyError:
-            direct = isinstance(connection, Field) or hasattr(connection, 'for_concrete_model')
-            model = connection.model if direct else connection.parent_model._meta.concrete_model
-            if model == self.model:
-                model = None
-
-            field = connection if direct else connection.field
-            m2m = isinstance(field, ManyToManyField)
-            self._map_details_cache[connection] = model, direct, m2m
-        return connection, model, direct, m2m
 
     @raise_deprecation(suggested_alternative="get_fields")
     def get_all_related_m2m_objects_with_model(self):
