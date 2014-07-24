@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.core import validators
 from django.db import models
+from django.db.models import Q
 from django.db.models.manager import EmptyManager
 from django.utils.crypto import get_random_string, salted_hmac
 from django.utils import six
@@ -186,6 +187,20 @@ class UserManager(BaseUserManager):
     def create_superuser(self, username, email, password, **extra_fields):
         return self._create_user(username, email, password, True, True,
                                  **extra_fields)
+
+    def with_perm(self, permission_name):
+        try:
+            appname, codename = permission_name.split('.')
+        except ValueError:
+            raise ValueError('Permission name should be in the form "appname.codename"')
+
+        user_q = Q(user_permissions__codename=codename,
+                   user_permissions__content_type__app_label=appname)
+        group_q = Q(groups__permissions__codename=codename,
+                    groups__permissions__content_type__app_label=appname)
+        has_permission_q = Q(is_superuser=True) | user_q | group_q
+
+        return self.filter(has_permission_q, is_active=True).distinct()
 
 
 @python_2_unicode_compatible

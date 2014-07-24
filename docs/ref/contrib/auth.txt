@@ -254,6 +254,17 @@ Manager methods
         Same as :meth:`create_user`, but sets :attr:`~models.User.is_staff` and
         :attr:`~models.User.is_superuser` to ``True``.
 
+    .. method:: with_perm(permission_name)
+
+        .. versionadded:: 1.8
+
+        Returns a queryset containing :class:`~django.contrib.auth.models.User`
+        objects that have the given permission, including superusers.
+
+        If ``permission_name`` isn't formatted properly, ``ValueError`` will be
+        raised. If the permision doesn't exist, the result will be an empty
+        queryset.
+
 
 Anonymous users
 ===============
