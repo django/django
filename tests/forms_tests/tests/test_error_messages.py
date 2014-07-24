@@ -154,10 +154,12 @@ class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
         e = {
             'required': 'REQUIRED',
             'invalid': 'INVALID',
+            'max_length': '"%(value)s" has more than %(limit_value)d characters.',
         }
-        f = URLField(error_messages=e)
+        f = URLField(error_messages=e, max_length=17)
         self.assertFormErrors(['REQUIRED'], f.clean, '')
         self.assertFormErrors(['INVALID'], f.clean, 'abc.c')
+        self.assertFormErrors(['"http://djangoproject.com" has more than 17 characters.'], f.clean, 'djangoproject.com')
 
     def test_booleanfield(self):
         e = {
