@@ -22,3 +22,7 @@ Bugfixes
 
 * Restored ``pre_delete``  signals for ``GenericRelation`` cascade deletion
   (`#22998 <https://code.djangoproject.com/ticket/22998>`_).
+
+* Fixed transaction handling when specifying non-default database in
+  ``createcachetable`` and ``flush``
+  (`#23089 <https://code.djangoproject.com/ticket/23089>`_).
