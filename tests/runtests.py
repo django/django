@@ -221,6 +221,11 @@ def django_tests(verbosity, interactive, failfast, test_labels):
             "use '<app_label>/sql' instead.",
             RemovedInDjango19Warning
         )
+        warnings.filterwarnings(
+            'ignore',
+            'IPAddressField has been deprecated. Use GenericIPAddressField instead.',
+            RemovedInDjango19Warning
+        )
         failures = test_runner.run_tests(
             test_labels or get_installed(), extra_tests=extra_tests)
 
