@@ -232,6 +232,13 @@ class PaginationTests(unittest.TestCase):
         self.assertEqual(page2.previous_page_number(), 1)
         self.assertIsNone(page2.next_page_number())
 
+    def test_page_range_type(self):
+        """
+        Ticket #23088: Paginator.page_range is of inconsistent type in Py2/Py3
+        """
+        paginator = Paginator([1, 2, 3], 2)
+        self.assertEqual(type(paginator.page_range), six.moves.range)
+
 
 class ModelPaginationTests(TestCase):
     """
