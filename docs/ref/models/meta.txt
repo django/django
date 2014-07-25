@@ -5,18 +5,16 @@ Model ``_meta`` options
 .. module:: django.db.models.options
    :synopsis: Model meta-class layer
 
-.. currentmodule:: django.db.models.options
-
-The Options API is at the core of Django, it enables introspection of Django
-Models with the rest of the system. This enables lookups, queries, forms,
-admin to understand the capabilities of every model. The Options API is
+The ``Options API`` is at the core of Django, it enables other parts of the
+system such as lookups, queries, forms and the admin to understand the
+capabilities of every model. The ``Options API`` is
 hidden under the _meta attribute of each model class.
 
 Options can be used for the following:
 
-* You need to retreive all field names of a model
-* You need to retreive all field instances names of a model
-* You need to retreive a single field by name
+* Retrieving all field names of a model
+* Retrieving all field instances names of a model
+* Retrieving a single field by name
 
 Field Types
 ===========
@@ -59,12 +57,12 @@ to the current model.
     class Person(models.Model):
         city = models.ForeignKey(City)
 
-In this case, City has a related object from Person
+In this case, ``City`` has a related object from ``Person``
 
 Related many-to-many objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A Related M2M object is a M2M relation from another model that points to the current model.
+A Related many-to-many object is a many-to-many relation from another model that points to the current model.
 
 .. code-block:: python
 
@@ -74,14 +72,14 @@ A Related M2M object is a M2M relation from another model that points to the cur
     class Person(models.Model):
         cities_lived_in = models.ManyToManyField(City)
 
-In this case, City has a related m2m from Person
+In this case, City has a related many-to-many from Person
 
 Virtual fields
 ~~~~~~~~~~~~~~
 
- Virtual fields are model fields that do not necessarily have a
-corresponding database column. they are "Django fields" such as
-a :class:`django.contrib.contenttypes.fields.GenericForeignKey`.
+Virtual fields are model fields that do not necessarily have a
+corresponding database column. they are "model fields" such as
+:class:`django.contrib.contenttypes.fields.GenericForeignKey`.
 
 .. code-block:: python
 
@@ -98,14 +96,16 @@ In this case, ``item`` is a virtual field.
 Field Filters
 =============
 
-There are 5 properties that each field can have.
-We can use these properties as filters for ``get_fields``.
+There are several properties that each field can have.
+
+We can use these properties as filters for :meth:`Options.get_fields()`.
 
 Local
 ~~~~~
 
-A local field is when is not derived from inheritance. Fields from models that
-directly inherit from abstract models or proxy classes are still local.
+A local field is one that's declared directly on a model and not derived from inheritance.
+Fields from models that directly inherit from abstract models or proxy classes
+are still local.
 
 .. code-block:: python
 
@@ -120,9 +120,9 @@ directly inherit from abstract models or proxy classes are still local.
 Hidden
 ~~~~~~
 
-Hidden fields are only referred to related objects and related m2m.
+Hidden fields are only referred to related objects and related many-to-many.
 When a relational model (such as :class:`django.db.models.ManyToManyField`,
-or :class:`django.db.models.ForeignKey`) specifies a related_name that
+or :class:`django.db.models.ForeignKey`) specifies a ``related_name`` that
 starts with a "+", it tells Django to not create a reverse relation.
 
 .. code-block:: python
@@ -174,16 +174,16 @@ Retrieve a field instance by name
     name (related query name).
 
     ``field_name`` is the only **required** field. All the other arguments
-    are flags that are used internally to optimize the lookup. By default, ``get_field``
-    will only look up data and m2m fields, but all field types can be activated.
-    Hidden and proxied relations are not available. If a given name is not found
+    are flags that are used internally to optimize the lookup. By default, :meth:`Options.get_field()`
+    will only look up data and many-to-many fields, but all field types can be activated.
+    Hidden and proxied relations are not available. If a field with the given name is not found
     it will raise a `FieldDoesNotExist`` error.
 
     .. code-block:: python
 
         from django.contrib.auth.models import User
 
-        >>> User._meta.get_field('username') # A data field
+        >>> User._meta.get_field('username')# A data field
         <django.db.models.fields.CharField: username>
 
         >>> User._meta.get_field('logentry', related_objects=True) # A related object
@@ -198,8 +198,8 @@ Retrieve a field instance by name
         *** FieldDoesNotExist: User has no field named 'does_not_exist'
 
     .. note::
-        The default arguments of ``get_field`` might not be what you expect.
-        ``get_fields`` only enables data fields, while ``get_field``
+        The default arguments of :meth:`Options.get_field()` might not be what you expect.
+        :meth:`Options.get_fields()` only enables data fields, while :meth:`Options.get_field()`
         enables data and m2m. This is because of backwards-compatibility
         issues (read more below).
 
@@ -226,7 +226,7 @@ Retrieve field instances
 
     Returns a list of fields given a list of field types and filters.
 
-    get_fields takes a set of flags as parameters, and returns a tuple
+    get_fields takes a set of flags as parameters and returns a tuple
     of field instances. The flags are a combination of field types
     and field filters. All possible combinations of filters and fields
     are possible, although some will have no effect (such as
@@ -263,10 +263,9 @@ Django provides some Fast-access endpoints that are used
 by Django internally. The reason these APIs exist is to ensure
 field access is always fast. This API is composed of a specific set
 of properties that are cached on first access, and are guaranteed to
-be fast.
-If you have the choice between using a fast-access API, or using one of the
-official APIs, it is reccomended to use the fast-access API for performance
-reasons
+be fast. If you have the choice between using a fast-access API
+or using one of the official APIs, it is recommended to use the
+fast-access API for performance reasons
 
 .. attribute:: Options.fields
 
@@ -283,4 +282,4 @@ reasons
 
 .. attribute:: Options.many_to_many
 
-    Returns a list of all m2m fields.
+    Returns a list of all many-to-many fields.
