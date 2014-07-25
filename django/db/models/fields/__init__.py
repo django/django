@@ -730,10 +730,12 @@ class Field(RegisterLookupMixin):
         """Returns choices with a default blank choices included, for use
         as SelectField choices for this field."""
         blank_defined = False
-        for choice, __ in self.choices:
-            if choice in ('', None):
-                blank_defined = True
-                break
+        named_groups = self.choices and isinstance(self.choices[0][1], (list, tuple))
+        if not named_groups:
+            for choice, __ in self.choices:
+                if choice in ('', None):
+                    blank_defined = True
+                    break
 
         first_choice = (blank_choice if include_blank and
                         not blank_defined else [])
