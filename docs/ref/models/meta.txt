@@ -24,7 +24,7 @@ Field Types
 A model can have 5 types of fields:
 
 Data fields
-~~~~~~~~~~~~
+~~~~~~~~~~~
 
 A data field is any field that has an entry on the database,
 for example a CharField, BooleanField, a ForeignKey.
@@ -35,7 +35,7 @@ for example a CharField, BooleanField, a ForeignKey.
         data_abstract = models.CharField(max_length=10)
 
 Many-to-many fields
-~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
 A many-to-many field that is defined on the current model.
 
