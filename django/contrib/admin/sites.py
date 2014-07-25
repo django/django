@@ -114,6 +114,12 @@ class AdminSite(object):
                 raise NotRegistered('The model %s is not registered' % model.__name__)
             del self._registry[model]
 
+    def is_registered(self, model):
+        """
+        Check if a model class is registered with this `AdminSite`.
+        """
+        return model in self._registry
+
     def add_action(self, action, name=None):
         """
         Register an action to be available globally.
