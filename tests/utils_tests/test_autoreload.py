@@ -1,9 +1,12 @@
+from importlib import import_module
 import os
+import tempfile
 
 from django import conf
 from django.contrib import admin
 from django.test import TestCase, override_settings
 from django.utils.autoreload import gen_filenames
+from django.utils._os import upath
 
 LOCALE_PATH = os.path.join(os.path.dirname(__file__), 'locale')
 
@@ -82,3 +85,13 @@ class TestFilenameGenerator(TestCase):
         self.assertEqual(len(filenames2), 1)
         self.assertTrue(filenames2[0].endswith('fractions.py'))
         self.assertFalse(any(f.endswith('.pyc') for f in gen_filenames()))
+
+    def test_deleted_removed(self):
+        _, filepath = tempfile.mkstemp(dir=os.path.dirname(upath(__file__)), suffix='.py')
+        try:
+            _, filename = os.path.split(filepath)
+            import_module('.%s' % filename.rstrip('.py'), package='utils_tests')
+            self.assertIn(filepath, gen_filenames())
+        finally:
+            os.remove(filepath)
+        self.assertNotIn(filepath, gen_filenames())
