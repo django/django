@@ -90,7 +90,7 @@ class TestFilenameGenerator(TestCase):
         _, filepath = tempfile.mkstemp(dir=os.path.dirname(upath(__file__)), suffix='.py')
         try:
             _, filename = os.path.split(filepath)
-            import_module('.%s' % filename.rstrip('.py'), package='utils_tests')
+            import_module('.%s' % filename.replace('.py', ''), package='utils_tests')
             self.assertIn(filepath, gen_filenames())
         finally:
             os.remove(filepath)
