@@ -490,7 +490,12 @@ class BaseDatabaseSchemaEditor(object):
         old_type = old_db_params['type']
         new_db_params = new_field.db_parameters(connection=self.connection)
         new_type = new_db_params['type']
-        if old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
+        if (old_type is None and old_field.rel is None) or (new_type is None and new_field.rel is None):
+            raise ValueError("Cannot alter field %s into %s - they do not properly define db_type (are you using PostGIS 1.5 or badly-written custom fields?)" % (
+                old_field,
+                new_field,
+            ))
+        elif old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
             return self._alter_many_to_many(model, old_field, new_field, strict)
         elif old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and not old_field.rel.through._meta.auto_created and not new_field.rel.through._meta.auto_created):
             # Both sides have through models; this is a no-op.
