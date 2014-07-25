@@ -12,6 +12,13 @@ about each item can often be found in the release notes of two versions prior.
 2.0
 ---
 
+* ``get_fields_with_model``, ``get_concrete_fields_with_model``,
+  ``get_m2m_with_model``, ``get_field_by_name``,  ``get_all_field_names``,
+  ``get_all_related_objects``, ``get_all_related_objects_with_model``,
+  ``get_all_related_many_to_many_objects``,
+  ``get_all_related_m2m_objects_with_model`` template tags will be removed
+  from :class:`django.db.models.options`.
+
 * ``cycle`` and ``firstof`` template tags will be removed from the ``future``
   template tag library (used during the 1.6/1.7 deprecation period).
 
