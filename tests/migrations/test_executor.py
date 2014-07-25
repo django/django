@@ -1,6 +1,7 @@
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.test import modify_settings, override_settings
+from django.apps.registry import apps as global_apps
 
 from .test_base import MigrationTestBase
 
@@ -14,7 +15,7 @@ class ExecutorTests(MigrationTestBase):
     test failures first, as they may be propagating into here.
     """
 
-    available_apps = ["migrations", "migrations2"]
+    available_apps = ["migrations", "migrations2", "django.contrib.auth", "django.contrib.contenttypes"]
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_run(self):
@@ -193,7 +194,10 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
 
     @override_settings(
-        MIGRATION_MODULES={"migrations": "migrations.test_migrations_custom_user"},
+        MIGRATION_MODULES={
+            "migrations": "migrations.test_migrations_custom_user",
+            "django.contrib.auth": "django.contrib.auth.migrations",
+        },
         AUTH_USER_MODEL="migrations.Author",
     )
     def test_custom_user(self):
@@ -208,6 +212,20 @@ class ExecutorTests(MigrationTestBase):
         executor.migrate([("migrations", "0001_initial")])
         self.assertTableExists("migrations_author")
         self.assertTableExists("migrations_tribble")
+        # Make sure the soft-application detection works (#23093)
+        # Change get_table_list to not return auth_user during this as
+        # it wouldn't be there in a normal run, and ensure migrations.Author
+        # exists in the global app registry temporarily.
+        old_get_table_list = connection.introspection.get_table_list
+        connection.introspection.get_table_list = lambda c: [x for x in old_get_table_list(c) if x != "auth_user"]
+        migrations_apps = executor.loader.project_state(("migrations", "0001_initial")).render()
+        global_apps.get_app_config("migrations").models["author"] = migrations_apps.get_model("migrations", "author")
+        try:
+            migration = executor.loader.get_migration("auth", "0001_initial")
+            self.assertEqual(executor.detect_soft_applied(migration), True)
+        finally:
+            connection.introspection.get_table_list = old_get_table_list
+            del global_apps.get_app_config("migrations").models["author"]
         # And migrate back to clean up the database
         executor.loader.build_graph()
         executor.migrate([("migrations", None)])
