@@ -1721,6 +1721,7 @@ class InlineModelAdmin(BaseModelAdmin):
     verbose_name = None
     verbose_name_plural = None
     can_delete = True
+    show_change_link = False
 
     checks_class = InlineModelAdminChecks
 
@@ -1728,6 +1729,7 @@ class InlineModelAdmin(BaseModelAdmin):
         self.admin_site = admin_site
         self.parent_model = parent_model
         self.opts = self.model._meta
+        self.has_registered_model = admin_site.is_registered(self.model)
         super(InlineModelAdmin, self).__init__()
         if self.verbose_name is None:
             self.verbose_name = self.model._meta.verbose_name

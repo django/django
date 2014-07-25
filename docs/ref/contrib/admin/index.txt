@@ -2025,6 +2025,13 @@ The ``InlineModelAdmin`` class adds:
     Specifies whether or not inline objects can be deleted in the inline.
     Defaults to ``True``.
 
+.. attribute:: InlineModelAdmin.show_change_link
+
+    .. versionadded:: 1.8
+
+    Specifies whether or not inline objects that can be changed in the
+    admin have a link to the change form. Defaults to ``False``.
+
 .. method:: InlineModelAdmin.get_formset(request, obj=None, **kwargs)
 
     Returns a :class:`~django.forms.models.BaseInlineFormSet` class for use in

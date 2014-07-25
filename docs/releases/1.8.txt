@@ -35,6 +35,10 @@ Minor features
   :meth:`~django.contrib.admin.ModelAdmin.has_module_permission`
   method to allow limiting access to the module on the admin index page.
 
+* :class:`~django.contrib.admin.InlineModelAdmin` now has an attribute
+  :attr:`~django.contrib.admin.InlineModelAdmin.show_change_link` that
+  supports showing a link to an inline object's change form.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
