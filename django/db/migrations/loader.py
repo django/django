@@ -136,7 +136,7 @@ class MigrationLoader(object):
             return self.disk_migrations[results[0]]
 
     def check_key(self, key, current_app):
-        if key[1] != "__first__" or key in self.graph:
+        if (key[1] != "__first__" and key[1] != "__latest__") or key in self.graph:
             return key
         # Special-case __first__, which means "the first migration" for
         # migrated apps, and is ignored for unmigrated apps. It allows
