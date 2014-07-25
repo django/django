@@ -961,6 +961,9 @@ Instead, you are encouraged to load initial data in migrations if you need it
 this has the added advantage that your initial data will not need updating
 every time you change the schema.
 
+Additionally, like the rest of Django's old ``syncdb`` code, ``initial_data``
+has been started down the deprecation path and will be removed in Django 1.9.
+
 deconstruct() and serializability
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

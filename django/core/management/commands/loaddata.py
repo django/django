@@ -17,6 +17,7 @@ from django.utils import lru_cache
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango19Warning
 from itertools import product
 
 try:
@@ -219,6 +220,11 @@ class Command(BaseCommand):
         if fixture_name != 'initial_data' and not fixture_files:
             # Warning kept for backwards-compatibility; why not an exception?
             warnings.warn("No fixture named '%s' found." % fixture_name)
+        elif fixture_name == 'initial_data':
+            warnings.warn(
+                'initial_data fixtures are deprecated. Use data migrations instead.',
+                RemovedInDjango19Warning
+            )
 
         return fixture_files
 

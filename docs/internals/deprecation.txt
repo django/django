@@ -28,10 +28,6 @@ about each item can often be found in the release notes of two versions prior.
 * The ``DatabaseCreation`` class on each database backend will be removed,
   and all table/schema editing will be moved to be via ``SchemaEditor`` instead.
 
-* The legacy method of syncing apps without migrations will be removed,
-  and migrations will become compulsory for all apps. This includes automatic
-  loading of fixtures and support for initial SQL data.
-
 * The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
   Python path will be removed.
 
@@ -67,6 +63,10 @@ details on these changes.
 
 * ``allow_syncdb`` on database routers will no longer automatically become
   ``allow_migrate``.
+
+* The legacy method of syncing apps without migrations will be removed,
+  and migrations will become compulsory for all apps. This includes automatic
+  loading of ``initial_data`` fixtures and support for initial SQL data.
 
 * All models will need to be defined inside an installed application or
   declare an explicit :attr:`~django.db.models.Options.app_label`.
