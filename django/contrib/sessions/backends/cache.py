@@ -10,6 +10,8 @@ class SessionStore(SessionBase):
     """
     A cache-based session store.
     """
+    requires_session_model = False
+
     def __init__(self, session_key=None):
         self._cache = caches[settings.SESSION_CACHE_ALIAS]
         super(SessionStore, self).__init__(session_key)

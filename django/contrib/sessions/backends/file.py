@@ -18,6 +18,8 @@ class SessionStore(SessionBase):
     """
     Implements a file based session store.
     """
+    requires_session_model = False
+
     def __init__(self, session_key=None):
         self.storage_path = type(self)._get_storage_path()
         self.file_prefix = settings.SESSION_COOKIE_NAME

@@ -35,6 +35,7 @@ class SessionBase(object):
     """
     TEST_COOKIE_NAME = 'testcookie'
     TEST_COOKIE_VALUE = 'worked'
+    requires_session_model = True  # For backwards compatibility
 
     def __init__(self, session_key=None):
         self._session_key = session_key

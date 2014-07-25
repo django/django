@@ -5,6 +5,7 @@ from django.contrib.sessions.backends.base import SessionBase
 
 
 class SessionStore(SessionBase):
+    requires_session_model = False
 
     def load(self):
         """
