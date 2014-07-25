@@ -729,7 +729,7 @@ class Field(RegisterLookupMixin):
         as SelectField choices for this field."""
         blank_defined = False
         for choice, __ in self.choices:
-            if choice in ('', None):
+            if not isinstance(choice, Promise) and choice in ('', None):
                 blank_defined = True
                 break
 
