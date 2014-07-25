@@ -70,6 +70,15 @@ class TestRegistration(TestCase):
         """
         self.assertRaises(ImproperlyConfigured, self.site.register, Location)
 
+    def test_is_registered_model(self):
+        "Checks for registered models should return true."
+        self.site.register(Person)
+        self.assertTrue(self.site.is_registered(Person))
+
+    def test_is_registered_not_registered_model(self):
+        "Checks for unregistered models should return false."
+        self.assertFalse(self.site.is_registered(Person))
+
 
 class TestRegistrationDecorator(TestCase):
     """

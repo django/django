@@ -13,7 +13,9 @@ from .models import (Holder, Inner, Holder2, Inner2, Holder3, Inner3, Person,
     OutfitItem, Fashionista, Teacher, Parent, Child, Author, Book, Profile,
     ProfileCollection, ParentModelWithCustomPk, ChildModel1, ChildModel2,
     Sighting, Novel, Chapter, FootNote, BinaryTree, SomeParentModel,
-    SomeChildModel)
+    SomeChildModel, Poll, Question, Inner4Stacked, Inner4Tabular, Holder4)
+
+INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
@@ -310,6 +312,38 @@ class TestInline(TestCase):
             '<div class="inline-related" id="inner_set-1">',
             count=1
         )
+
+    def test_inlines_show_change_link_registered(self):
+        "Inlines `show_change_link` for registered models when enabled."
+        holder = Holder4.objects.create(dummy=1)
+        item1 = Inner4Stacked.objects.create(dummy=1, holder=holder)
+        item2 = Inner4Tabular.objects.create(dummy=1, holder=holder)
+        items = (
+            ('inner4stacked', item1.pk),
+            ('inner4tabular', item2.pk),
+        )
+        response = self.client.get('/admin/admin_inlines/holder4/%s/' % holder.pk)
+        self.assertTrue(response.context['inline_admin_formset'].opts.has_registered_model)
+        for model, pk in items:
+            url = '/admin/admin_inlines/%s/%s/' % (model, pk)
+            self.assertContains(response, '<a href="%s" %s' % (url, INLINE_CHANGELINK_HTML))
+
+    def test_inlines_show_change_link_unregistered(self):
+        "Inlines `show_change_link` disabled for unregistered models."
+        parent = ParentModelWithCustomPk.objects.create(my_own_pk="foo", name="Foo")
+        ChildModel1.objects.create(my_own_pk="bar", name="Bar", parent=parent)
+        ChildModel2.objects.create(my_own_pk="baz", name="Baz", parent=parent)
+        response = self.client.get('/admin/admin_inlines/parentmodelwithcustompk/foo/')
+        self.assertFalse(response.context['inline_admin_formset'].opts.has_registered_model)
+        self.assertNotContains(response, INLINE_CHANGELINK_HTML)
+
+    def test_tabular_inline_show_change_link_false_registered(self):
+        "Inlines `show_change_link` disabled by default."
+        poll = Poll.objects.create(name="New poll")
+        Question.objects.create(poll=poll)
+        response = self.client.get('/admin/admin_inlines/poll/%s/' % poll.pk)
+        self.assertTrue(response.context['inline_admin_formset'].opts.has_registered_model)
+        self.assertNotContains(response, INLINE_CHANGELINK_HTML)
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
