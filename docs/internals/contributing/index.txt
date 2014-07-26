@@ -36,16 +36,15 @@ development:
 
 * :doc:`Submit patches <writing-code/submitting-patches>` for new and/or
   fixed behavior. If you're looking for an easy way to start contributing
-  to Django have a look at the `easy pickings`_ tickets.
+  to Django read :doc:`Writing your first patch for Django
+  <../../intro/contributing>` tutorial and have a look at the `easy pickings`_
+  tickets.
 
 * :doc:`Improve the documentation <writing-documentation>` or
   :doc:`write unit tests <writing-code/unit-tests>`.
 
 * :doc:`Triage tickets and review patches <triaging-tickets>` created by
   other users.
-
-* Go through :doc:`Writing your first patch for Django
-  <../../intro/contributing>` tutorial.
 
 Really, **ANYONE** can do something to help make Django better and greater!
 
