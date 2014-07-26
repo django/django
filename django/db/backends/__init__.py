@@ -45,7 +45,7 @@ class BaseDatabaseWrapper(object):
         self.alias = alias
         # Query logging in debug mode or when explicitly enabled.
         self.queries_log = deque(maxlen=self.queries_limit)
-        self.use_debug_cursor = False
+        self.force_debug_cursor = False
 
         # Transaction related attributes.
         # Tracks if the connection is in autocommit mode. Per PEP 249, by
@@ -75,7 +75,7 @@ class BaseDatabaseWrapper(object):
 
     @property
     def queries_logged(self):
-        return self.use_debug_cursor or settings.DEBUG
+        return self.force_debug_cursor or settings.DEBUG
 
     @property
     def queries(self):
