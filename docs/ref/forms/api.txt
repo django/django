@@ -6,9 +6,10 @@ The Forms API
 
 .. admonition:: About this document
 
-    This document covers the gritty details of Django's forms API. You should
-    read the :doc:`introduction to working with forms </topics/forms/index>`
-    first.
+    This document covers the gritty details of Django's forms API.
+
+.. seealso::
+    For introductory material about forms, see :doc:`/topics/forms/index`.
 
 .. _ref-forms-api-bound-unbound:
 

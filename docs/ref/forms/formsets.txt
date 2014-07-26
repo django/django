@@ -2,6 +2,9 @@
 Formset Functions
 ====================
 
+.. seealso::
+    For introductory material about formsets, see :doc:`/topics/forms/formsets`.
+
 .. module:: django.forms.formsets
    :synopsis: Django's functions for building formsets.
 

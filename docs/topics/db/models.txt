@@ -2,6 +2,9 @@
 Models
 ======
 
+.. seealso::
+    For api documentation about models, see :doc:`/ref/models/index`.
+
 .. module:: django.db.models
 
 A model is the single, definitive source of information about your data. It
