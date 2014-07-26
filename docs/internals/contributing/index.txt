@@ -44,6 +44,9 @@ development:
 * :doc:`Triage tickets and review patches <triaging-tickets>` created by
   other users.
 
+* Go through :doc:`Writing your first patch for Django
+  <../../intro/contributing>` tutorial.
+
 Really, **ANYONE** can do something to help make Django better and greater!
 
 Browse the following sections to find out how:
