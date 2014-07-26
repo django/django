@@ -147,7 +147,7 @@ class DistanceTest(TestCase):
         # Testing geodetic distance calculation with a non-point geometry
         # (a LineString of Wollongong and Shellharbour coords).
         ls = LineString(((150.902, -34.4245), (150.87, -34.5789)))
-        if oracle or connection.ops.geography:
+        if oracle or postgis:
             # Reference query:
             #  SELECT ST_distance_sphere(point, ST_GeomFromText('LINESTRING(150.9020 -34.4245,150.8700 -34.5789)', 4326)) FROM distapp_australiacity ORDER BY name;
             distances = [1120954.92533513, 140575.720018241, 640396.662906304,
@@ -157,11 +157,6 @@ class DistanceTest(TestCase):
             for city, distance in zip(qs, distances):
                 # Testing equivalence to within a meter.
                 self.assertAlmostEqual(distance, city.distance.m, 0)
-        else:
-            # PostGIS 1.4 and below is limited to disance queries only
-            # to/from point geometries, check for raising of ValueError.
-            self.assertRaises(ValueError, AustraliaCity.objects.distance, ls)
-            self.assertRaises(ValueError, AustraliaCity.objects.distance, ls.wkt)
 
         # Got the reference distances using the raw SQL statements:
         #  SELECT ST_distance_spheroid(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326), 'SPHEROID["WGS 84",6378137.0,298.257223563]') FROM distapp_australiacity WHERE (NOT (id = 11));
@@ -204,11 +199,6 @@ class DistanceTest(TestCase):
         """
         Test the `distance` GeoQuerySet method used with `transform` on a geographic field.
         """
-        # Normally you can't compute distances from a geometry field
-        # that is not a PointField (on PostGIS 1.4 and below).
-        if not connection.ops.geography:
-            self.assertRaises(ValueError, CensusZipcode.objects.distance, self.stx_pnt)
-
         # We'll be using a Polygon (created by buffering the centroid
         # of 77005 to 100m) -- which aren't allowed in geographic distance
         # queries normally, however our field has been transformed to
@@ -272,15 +262,15 @@ class DistanceTest(TestCase):
         line = GEOSGeometry('LINESTRING(144.9630 -37.8143,151.2607 -33.8870)', 4326)
         dist_qs = AustraliaCity.objects.filter(point__distance_lte=(line, D(km=100)))
 
-        if oracle or connection.ops.geography:
-            # Oracle and PostGIS 1.5 can do distance lookups on arbitrary geometries.
+        if oracle or postgis:
+            # Oracle and PostGIS can do distance lookups on arbitrary geometries.
             self.assertEqual(9, dist_qs.count())
             self.assertEqual(['Batemans Bay', 'Canberra', 'Hillsdale',
                               'Melbourne', 'Mittagong', 'Shellharbour',
                               'Sydney', 'Thirroul', 'Wollongong'],
                              self.get_names(dist_qs))
         else:
-            # PostGIS 1.4 and below only allows geodetic distance queries (utilizing
+            # spatialite only allow geodetic distance queries (utilizing
             # ST_Distance_Sphere/ST_Distance_Spheroid) from Points to PointFields
             # on geometry columns.
             self.assertRaises(ValueError, dist_qs.count)

@@ -1,5 +1,5 @@
 """
-Tests for geography support in PostGIS 1.5+
+Tests for geography support in PostGIS
 """
 from __future__ import unicode_literals
 

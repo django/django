@@ -25,12 +25,13 @@ class PostGISIntrospection(DatabaseIntrospection):
         identification integers for the PostGIS geometry and/or
         geography types (if supported).
         """
-        field_types = [('geometry', 'GeometryField')]
-        if self.connection.ops.geography:
+        field_types = [
+            ('geometry', 'GeometryField'),
             # The value for the geography type is actually a tuple
             # to pass in the `geography=True` keyword to the field
             # definition.
-            field_types.append(('geography', ('GeometryField', {'geography': True})))
+            ('geography', ('GeometryField', {'geography': True})),
+        ]
         postgis_types = {}
 
         # The OID integers associated with the geometry type may
@@ -79,12 +80,11 @@ class PostGISIntrospection(DatabaseIntrospection):
                 if not row:
                     raise GeoIntrospectionError
             except GeoIntrospectionError:
-                if self.connection.ops.geography:
-                    cursor.execute('SELECT "coord_dimension", "srid", "type" '
-                                   'FROM "geography_columns" '
-                                   'WHERE "f_table_name"=%s AND "f_geography_column"=%s',
-                                   (table_name, geo_col))
-                    row = cursor.fetchone()
+                cursor.execute('SELECT "coord_dimension", "srid", "type" '
+                               'FROM "geography_columns" '
+                               'WHERE "f_table_name"=%s AND "f_geography_column"=%s',
+                               (table_name, geo_col))
+                row = cursor.fetchone()
 
             if not row:
                 raise Exception('Could not find a geometry or geography column for "%s"."%s"' %

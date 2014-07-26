@@ -6,10 +6,10 @@ import re
 
 # This reg-exp is intentionally fairly flexible here.
 # Needs to be able to handle stuff like:
-#   PostgreSQL 8.3.6
-#   EnterpriseDB 8.3
-#   PostgreSQL 8.3 beta4
-#   PostgreSQL 8.4beta1
+#   PostgreSQL #.#.#
+#   EnterpriseDB #.#
+#   PostgreSQL #.# beta#
+#   PostgreSQL #.#beta#
 VERSION_RE = re.compile(r'\S+ (\d+)\.(\d+)\.?(\d+)?')
 
 
@@ -29,8 +29,8 @@ def get_version(connection):
     PQServerVersion()/``server_version`` connection attribute (available in
     newer psycopg2 versions.)
 
-    For example, 80304 for 8.3.4. The last two digits will be 00 in the case of
-    releases (e.g., 80400 for 'PostgreSQL 8.4') or in the case of beta and
+    For example, 90304 for 9.3.4. The last two digits will be 00 in the case of
+    releases (e.g., 90400 for 'PostgreSQL 9.4') or in the case of beta and
     prereleases (e.g. 90100 for 'PostgreSQL 9.1beta2').
 
     PQServerVersion()/``server_version`` doesn't execute a query so try that
