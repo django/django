@@ -96,7 +96,7 @@ particular application directly into your database prompt, like this::
 Using other management commands
 -------------------------------
 
-The other ``django-admin.py`` commands that interact with the database
+The other ``django-admin`` commands that interact with the database
 operate in the same way as :djadmin:`migrate` -- they only ever operate
 on one database at a time, using :djadminopt:`--database` to control
 the database used.

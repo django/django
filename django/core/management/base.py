@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 """
 Base classes for writing management commands (named commands which can
-be executed through ``django-admin.py`` or ``manage.py``).
+be executed through ``django-admin`` or ``manage.py``).
 """
 
 import os
@@ -112,7 +112,7 @@ class BaseCommand(object):
     the command-parsing and -execution behavior, the normal flow works
     as follows:
 
-    1. ``django-admin.py`` or ``manage.py`` loads the command class
+    1. ``django-admin`` or ``manage.py`` loads the command class
        and calls its ``run_from_argv()`` method.
 
     2. The ``run_from_argv()`` method calls ``create_parser()`` to get
@@ -398,7 +398,7 @@ class BaseCommand(object):
                                    "(%s) and 'can_import_settings' (%s) command "
                                    "options." % (self.leave_locale_alone,
                                                  self.can_import_settings))
-            # Switch to US English, because django-admin.py creates database
+            # Switch to US English, because django-admin creates database
             # content like permissions, and those shouldn't contain any
             # translations.
             from django.utils import translation

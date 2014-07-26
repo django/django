@@ -55,7 +55,7 @@ The ``WSGIAuthUserScript`` directive tells mod_wsgi to execute the
 ``check_password`` function in specified wsgi script, passing the user name and
 password that it receives from the prompt. In this example, the
 ``WSGIAuthUserScript`` is the same as the ``WSGIScriptAlias`` that defines your
-application :doc:`that is created by django-admin.py startproject
+application :doc:`that is created by django-admin startproject
 </howto/deployment/wsgi/index>`.
 
 .. admonition:: Using Apache 2.2 with authentication

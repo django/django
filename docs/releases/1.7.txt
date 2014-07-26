@@ -686,7 +686,7 @@ Internationalization
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
-* The :djadminopt:`--no-color` option for ``django-admin.py`` allows you to
+* The :djadminopt:`--no-color` option for ``django-admin`` allows you to
   disable the colorization of management command output.
 
 * The new :djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary`

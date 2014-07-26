@@ -53,10 +53,10 @@ code, then run the following command:
 
 .. code-block:: bash
 
-   $ django-admin.py startproject mysite
+   $ django-admin startproject mysite
 
 This will create a ``mysite`` directory in your current directory. If it didn't
-work, see :ref:`troubleshooting-django-admin-py`.
+work, see :ref:`troubleshooting-django-admin`.
 
 .. note::
 
@@ -577,7 +577,7 @@ you'll commit migrations to your version control system and ship them with
 your app; they not only make your development easier, they're also useable by
 other developers and in production.
 
-Read the :doc:`django-admin.py documentation </ref/django-admin>` for full
+Read the :doc:`django-admin documentation </ref/django-admin>` for full
 information on what the ``manage.py`` utility can do.
 
 Playing with the API
@@ -611,7 +611,7 @@ the Python import path to your :file:`mysite/settings.py` file.
     or ensure that directory is on the Python path, so that ``import mysite``
     works.
 
-    For more information on all of this, see the :doc:`django-admin.py
+    For more information on all of this, see the :doc:`django-admin
     documentation </ref/django-admin>`.
 
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::

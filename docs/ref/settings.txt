@@ -1845,7 +1845,7 @@ A secret key for a particular Django installation. This is used to provide
 :doc:`cryptographic signing </topics/signing>`, and should be set to a unique,
 unpredictable value.
 
-:djadmin:`django-admin.py startproject <startproject>` automatically adds a
+:djadmin:`django-admin startproject <startproject>` automatically adds a
 randomly-generated ``SECRET_KEY`` to each new project.
 
 Django will refuse to start if :setting:`SECRET_KEY` is not set.
@@ -2257,7 +2257,7 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin.py
+    The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` includes ``USE_L10N = True`` for convenience.
 
 .. setting:: USE_THOUSAND_SEPARATOR
@@ -2291,7 +2291,7 @@ See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 .. note::
 
     The default :file:`settings.py` file created by
-    :djadmin:`django-admin.py startproject <startproject>` includes
+    :djadmin:`django-admin startproject <startproject>` includes
     ``USE_TZ = True`` for convenience.
 
 .. setting:: USE_X_FORWARDED_HOST
@@ -2313,7 +2313,7 @@ WSGI_APPLICATION
 Default: ``None``
 
 The full Python path of the WSGI application object that Django's built-in
-servers (e.g. :djadmin:`runserver`) will use. The :djadmin:`django-admin.py
+servers (e.g. :djadmin:`runserver`) will use. The :djadmin:`django-admin
 startproject <startproject>` management command will create a simple
 ``wsgi.py`` file with an ``application`` callable in it, and point this setting
 to that ``application``.

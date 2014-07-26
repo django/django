@@ -48,28 +48,28 @@ Python `import search path`_.
 
 .. _import search path: http://www.diveintopython.net/getting_to_know_python/everything_is_an_object.html
 
-The django-admin.py utility
+The django-admin utility
 ---------------------------
 
-When using :doc:`django-admin.py </ref/django-admin>`, you can either set the
+When using :doc:`django-admin </ref/django-admin>`, you can either set the
 environment variable once, or explicitly pass in the settings module each time
 you run the utility.
 
 Example (Unix Bash shell)::
 
     export DJANGO_SETTINGS_MODULE=mysite.settings
-    django-admin.py runserver
+    django-admin runserver
 
 Example (Windows shell)::
 
     set DJANGO_SETTINGS_MODULE=mysite.settings
-    django-admin.py runserver
+    django-admin runserver
 
 Use the ``--settings`` command-line argument to specify the settings manually::
 
-    django-admin.py runserver --settings=mysite.settings
+    django-admin runserver --settings=mysite.settings
 
-.. _django-admin.py: ../django-admin/
+.. _django-admin: ../django-admin/
 
 On the server (mod_wsgi)
 --------------------------

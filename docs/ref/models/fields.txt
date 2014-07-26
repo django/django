@@ -183,7 +183,7 @@ scenes.
 
 .. attribute:: Field.db_index
 
-If ``True``, :djadmin:`django-admin.py sqlindexes <sqlindexes>` will output a
+If ``True``, :djadmin:`django-admin sqlindexes <sqlindexes>` will output a
 ``CREATE INDEX`` statement for this field.
 
 ``db_tablespace``
