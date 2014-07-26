@@ -2138,6 +2138,8 @@ class ManyToManyField(RelatedField):
     def deconstruct(self):
         name, path, args, kwargs = super(ManyToManyField, self).deconstruct()
         # Handle the simpler arguments
+        if self.db_table is not None:
+            kwargs['db_table'] = self.db_table
         if self.rel.db_constraint is not True:
             kwargs['db_constraint'] = self.rel.db_constraint
         if "help_text" in kwargs:
