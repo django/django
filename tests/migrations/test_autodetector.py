@@ -54,6 +54,7 @@ class AutodetectorTests(TestCase):
     contract = ModelState("testapp", "Contract", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("publisher", models.ForeignKey("testapp.Publisher"))])
     publisher = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=100))])
     publisher_with_author = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("name", models.CharField(max_length=100))])
+    publisher_with_aardvark_author = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Aardvark")), ("name", models.CharField(max_length=100))])
     publisher_with_book = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("otherapp.Book")), ("name", models.CharField(max_length=100))])
     other_pony = ModelState("otherapp", "Pony", [("id", models.AutoField(primary_key=True))])
     other_stable = ModelState("otherapp", "Stable", [("id", models.AutoField(primary_key=True))])
@@ -74,6 +75,7 @@ class AutodetectorTests(TestCase):
     custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))], bases=(AbstractBaseUser, ))
     custom_user_no_inherit = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))])
     aardvark = ModelState("thirdapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
+    aardvark_testapp = ModelState("testapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
     aardvark_based_on_author = ModelState("testapp", "Aardvark", [], bases=("testapp.Author", ))
     aardvark_pk_fk_author = ModelState("testapp", "Aardvark", [("id", models.OneToOneField("testapp.Author", primary_key=True))])
     knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
@@ -1086,3 +1088,20 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'otherapp', 0, 0, name="Book")
         # Right dependencies?
         self.assertEqual(changes['otherapp'][0].dependencies, [("migrations", "0002_second")])
+
+    def test_alter_fk_before_model_deletion(self):
+        """
+        Tests that ForeignKeys are altered _before_ the model they used to
+        refer to are deleted.
+        """
+        # Make state
+        before = self.make_project_state([self.author_name, self.publisher_with_author])
+        after = self.make_project_state([self.aardvark_testapp, self.publisher_with_aardvark_author])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "AlterField", "DeleteModel"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Aardvark")
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="author")
+        self.assertOperationAttributes(changes, 'testapp', 0, 2, name="Author")
