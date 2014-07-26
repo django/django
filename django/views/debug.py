@@ -31,6 +31,19 @@ def linebreak_iter(template_source):
     yield len(template_source) + 1
 
 
+class CallableSettingWrapper(object):
+    """ Object to wrap callable appearing in settings
+
+    * Not to call in the debug page (#21345).
+    * Not to break the debug page if the callable forbidding to set attributes (#23070).
+    """
+    def __init__(self, callable_setting):
+        self._wrapped = callable_setting
+
+    def __repr__(self):
+        return repr(self._wrapped)
+
+
 def cleanse_setting(key, value):
     """Cleanse an individual setting key/value of sensitive content.
 
@@ -50,7 +63,8 @@ def cleanse_setting(key, value):
         cleansed = value
 
     if callable(cleansed):
-        cleansed.do_not_call_in_templates = True
+        # For fixing #21345 and #23070
+        cleansed = CallableSettingWrapper(cleansed)
 
     return cleansed
 
