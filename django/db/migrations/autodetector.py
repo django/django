@@ -342,6 +342,13 @@ class MigrationAutodetector(object):
                 isinstance(operation, operations.DeleteModel) and
                 operation.name.lower() == dependency[1].lower()
             )
+        # Field being altered
+        elif dependency[2] is not None and dependency[3] == "alter":
+            return (
+                isinstance(operation, operations.AlterField) and
+                operation.model_name.lower() == dependency[1].lower() and
+                operation.name.lower() == dependency[2].lower()
+            )
         # order_with_respect_to being unset for a field
         elif dependency[2] is not None and dependency[3] == "order_wrt_unset":
             return (
@@ -631,7 +638,7 @@ class MigrationAutodetector(object):
                     )
                 )
             # Finally, remove the model.
-            # This depends on both the removal of all incoming fields
+            # This depends on both the removal/alteration of all incoming fields
             # and the removal of all its own related fields, and if it's
             # a through model the field that references it.
             dependencies = []
@@ -641,6 +648,12 @@ class MigrationAutodetector(object):
                     related_object.model._meta.object_name,
                     related_object.field.name,
                     False,
+                ))
+                dependencies.append((
+                    related_object.model._meta.app_label,
+                    related_object.model._meta.object_name,
+                    related_object.field.name,
+                    "alter",
                 ))
             for related_object in model._meta.get_all_related_many_to_many_objects():
                 dependencies.append((
