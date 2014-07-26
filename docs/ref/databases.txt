@@ -92,7 +92,7 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 8.4 and higher.
+Django supports PostgreSQL 9.0 and higher.
 
 PostgreSQL connection settings
 -------------------------------

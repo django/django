@@ -152,12 +152,12 @@ class PostgreSQLTests(TestCase):
 
     def test_parsing(self):
         """Test PostgreSQL version parsing from `SELECT version()` output"""
-        self.assert_parses("PostgreSQL 8.3 beta4", 80300)
-        self.assert_parses("PostgreSQL 8.3", 80300)
-        self.assert_parses("EnterpriseDB 8.3", 80300)
-        self.assert_parses("PostgreSQL 8.3.6", 80306)
-        self.assert_parses("PostgreSQL 8.4beta1", 80400)
-        self.assert_parses("PostgreSQL 8.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)", 80301)
+        self.assert_parses("PostgreSQL 9.3 beta4", 90300)
+        self.assert_parses("PostgreSQL 9.3", 90300)
+        self.assert_parses("EnterpriseDB 9.3", 90300)
+        self.assert_parses("PostgreSQL 9.3.6", 90306)
+        self.assert_parses("PostgreSQL 9.4beta1", 90400)
+        self.assert_parses("PostgreSQL 9.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)", 90301)
 
     def test_version_detection(self):
         """Test PostgreSQL version detection"""
@@ -169,7 +169,7 @@ class PostgreSQLTests(TestCase):
                 pass
 
             def fetchone(self):
-                return ["PostgreSQL 8.3"]
+                return ["PostgreSQL 9.3"]
 
             def __enter__(self):
                 return self
@@ -184,7 +184,7 @@ class PostgreSQLTests(TestCase):
 
         # psycopg2 < 2.0.12 code path
         conn = OlderConnectionMock()
-        self.assertEqual(pg_version.get_version(conn), 80300)
+        self.assertEqual(pg_version.get_version(conn), 90300)
 
     def test_connect_and_rollback(self):
         """

@@ -151,24 +151,13 @@ class GeoQuerySet(QuerySet):
         if not isinstance(precision, six.integer_types):
             raise TypeError('Precision keyword must be set with an integer.')
 
-        # Setting the options flag -- which depends on which version of
-        # PostGIS we're using. SpatiaLite only uses the first group of options.
-        if backend.spatial_version >= (1, 4, 0):
-            options = 0
-            if crs and bbox:
-                options = 3
-            elif bbox:
-                options = 1
-            elif crs:
-                options = 2
-        else:
-            options = 0
-            if crs and bbox:
-                options = 3
-            elif crs:
-                options = 1
-            elif bbox:
-                options = 2
+        options = 0
+        if crs and bbox:
+            options = 3
+        elif bbox:
+            options = 1
+        elif crs:
+            options = 2
         s = {'desc': 'GeoJSON',
              'procedure_args': {'precision': precision, 'options': options},
              'procedure_fmt': '%(geo_col)s,%(precision)s,%(options)s',
@@ -197,12 +186,7 @@ class GeoQuerySet(QuerySet):
         backend = connections[self.db].ops
         s = {'desc': 'GML', 'procedure_args': {'precision': precision}}
         if backend.postgis:
-            # PostGIS AsGML() aggregate function parameter order depends on the
-            # version -- uggh.
-            if backend.spatial_version > (1, 3, 1):
-                s['procedure_fmt'] = '%(version)s,%(geo_col)s,%(precision)s'
-            else:
-                s['procedure_fmt'] = '%(geo_col)s,%(precision)s,%(version)s'
+            s['procedure_fmt'] = '%(version)s,%(geo_col)s,%(precision)s'
             s['procedure_args'] = {'precision': precision, 'version': version}
 
         return self._spatial_attribute('gml', s, **kwargs)

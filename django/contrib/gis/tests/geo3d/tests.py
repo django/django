@@ -70,7 +70,7 @@ class Geo3DTest(TestCase):
     available within GeoDjango.  For more information, see the PostGIS docs
     on the routines that support 3D:
 
-    http://postgis.refractions.net/documentation/manual-1.4/ch08.html#PostGIS_3D_Functions
+    http://postgis.refractions.net/documentation/manual-1.5/ch08.html#PostGIS_3D_Functions
     """
 
     def _load_interstate_data(self):

@@ -784,13 +784,15 @@ available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
 
 First, there are some important requirements:
 
-* :class:`~django.contrib.gis.admin.OSMGeoAdmin` requires that the
-  :ref:`spherical mercator projection be added <addgoogleprojection>`
-  to the ``spatial_ref_sys`` table (PostGIS 1.3 and below, only).
+* :class:`~django.contrib.gis.admin.OSMGeoAdmin` requires that
+  :ref:`GDAL <ref-gdal>` is installed. If you are running GDAL 1.6 (uncommon)
+  you will also need to add the :ref:`spherical mercator projection
+  <addgoogleprojection>`  to the ``spatial_ref_sys`` table.
+
 * The PROJ.4 datum shifting files must be installed (see the
   :ref:`PROJ.4 installation instructions <proj4>` for more details).
 
-If you meet these requirements, then just substitute the ``OSMGeoAdmin``
+If you meet this requirement, then just substitute the ``OSMGeoAdmin``
 option class in your ``admin.py`` file::
 
     admin.site.register(WorldBorder, admin.OSMGeoAdmin)
