@@ -79,6 +79,14 @@ either restore Django's defaults at the end of each request, force an
 appropriate value at the beginning of each request, or disable persistent
 connections.
 
+Encoding
+--------
+
+Django assumes that all databases use UTF-8 encoding. Using other encodings may
+result in unexpected behavior such as "value too long" errors from your
+database for data that is valid in Django. See the database specific notes
+below for information on how to set up your database correctly.
+
 .. _postgresql-notes:
 
 PostgreSQL notes
