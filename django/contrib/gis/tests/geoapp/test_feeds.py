@@ -17,6 +17,7 @@ if HAS_GEOS:
 @override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoapp.urls')
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoFeedTest(TestCase):
+    fixtures = ['initial']
 
     def setUp(self):
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()

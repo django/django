@@ -16,6 +16,7 @@ if HAS_GEOS:
 
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class RelatedGeoModelTest(TestCase):
+    fixtures = ['initial']
 
     def test02_select_related(self):
         "Testing `select_related` on geographic models (see #7126)."
@@ -284,7 +285,7 @@ class RelatedGeoModelTest(TestCase):
             # Even though Dallas and Ft. Worth share same point, Collect doesn't
             # consolidate -- that's why 4 points in MultiPoint.
             self.assertEqual(4, len(coll))
-            self.assertEqual(ref_geom, coll)
+            self.assertTrue(ref_geom.equals(coll))
 
     def test15_invalid_select_related(self):
         "Testing doing select_related on the related name manager of a unique FK. See #13934."
