@@ -717,6 +717,11 @@ can be useful in situations where you might want to pass in either a model
 manager or a ``QuerySet`` and do further filtering on the result. After calling
 ``all()`` on either object, you'll definitely have a ``QuerySet`` to work with.
 
+When a ``QuerySet`` is :ref:`evaluated <when-querysets-are-evaluated>`, it
+typically caches its results. If the data in the database might have changed
+since a ``QuerySet`` was evaluated, you can get updated results for the same
+query by calling ``all()`` on a previously evaluated ``QuerySet``.
+
 select_related
 ~~~~~~~~~~~~~~
 
