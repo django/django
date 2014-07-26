@@ -1179,7 +1179,7 @@ class ModelChoiceField(ChoiceField):
         try:
             key = self.to_field_name or 'pk'
             value = self.queryset.get(**{key: value})
-        except (ValueError, self.queryset.model.DoesNotExist):
+        except (ValueError, TypeError, self.queryset.model.DoesNotExist):
             raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')
         return value
 
@@ -1227,7 +1227,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         for pk in value:
             try:
                 self.queryset.filter(**{key: pk})
-            except ValueError:
+            except (ValueError, TypeError):
                 raise ValidationError(
                     self.error_messages['invalid_pk_value'],
                     code='invalid_pk_value',
