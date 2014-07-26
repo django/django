@@ -507,15 +507,15 @@ class CaptureQueriesContext(object):
         return self.connection.queries[self.initial_queries:self.final_queries]
 
     def __enter__(self):
-        self.use_debug_cursor = self.connection.use_debug_cursor
-        self.connection.use_debug_cursor = True
+        self.force_debug_cursor = self.connection.force_debug_cursor
+        self.connection.force_debug_cursor = True
         self.initial_queries = len(self.connection.queries_log)
         self.final_queries = None
         request_started.disconnect(reset_queries)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.connection.use_debug_cursor = self.use_debug_cursor
+        self.connection.force_debug_cursor = self.force_debug_cursor
         request_started.connect(reset_queries)
         if exc_type is not None:
             return
