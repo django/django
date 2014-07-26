@@ -649,7 +649,16 @@ For each field, we describe the default widget used if you don't specify
     When you use an ``ImageField`` on a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
 
+    .. versionchanged:: 1.8
+
+        After the field has been cleaned and validated, the ``UploadedFile``
+        object will have an additional ``image`` attribute containing the Pillow
+        `Image`_ instance used to check if the file was a valid image.
+        ``UploadedFile.content_type`` is also updated with the image's content
+        type as determined by Pillow.
+
 .. _Pillow: http://pillow.readthedocs.org/en/latest/
+.. _Image: https://pillow.readthedocs.org/en/latest/reference/Image.html
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~

@@ -31,12 +31,18 @@ import pickle
 import re
 import os
 from decimal import Decimal
+from unittest import skipIf
+
+try:
+    from PIL import Image
+except ImportError:
+    Image = None
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import (
     BooleanField, CharField, ChoiceField, ComboField, DateField, DateTimeField,
     DecimalField, EmailField, Field, FileField, FilePathField, FloatField,
-    Form, forms, HiddenInput, IntegerField, MultipleChoiceField,
+    Form, forms, HiddenInput, ImageField, IntegerField, MultipleChoiceField,
     NullBooleanField, NumberInput, PasswordInput, RadioSelect, RegexField,
     SplitDateTimeField, TextInput, Textarea, TimeField, TypedChoiceField,
     TypedMultipleChoiceField, URLField, ValidationError, Widget,
@@ -741,6 +747,24 @@ class FieldsTests(SimpleTestCase):
         # with here)
         self.assertTrue(f._has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'}))
 
+    # ImageField ##################################################################
+
+    @skipIf(Image is None, "Pillow is required to test ImageField")
+    def test_imagefield_annotate_with_image_after_clean(self):
+        f = ImageField()
+
+        img_path = os.path.dirname(upath(__file__)) + '/filepath_test_files/1x1.png'
+        with open(img_path, 'rb') as img_file:
+            img_data = img_file.read()
+
+        img_file = SimpleUploadedFile('1x1.png', img_data)
+        img_file.content_type = 'text/plain'
+
+        uploaded_file = f.clean(img_file)
+
+        self.assertEqual('PNG', uploaded_file.image.format)
+        self.assertEqual('image/png', uploaded_file.content_type)
+
     # URLField ##################################################################
 
     def test_urlfield_1(self):
@@ -1262,6 +1286,7 @@ class FieldsTests(SimpleTestCase):
         f.choices.sort()
         expected = [
             ('/tests/forms_tests/tests/filepath_test_files/.dot-file', '.dot-file'),
+            ('/tests/forms_tests/tests/filepath_test_files/1x1.png', '1x1.png'),
             ('/tests/forms_tests/tests/filepath_test_files/directory', 'directory'),
             ('/tests/forms_tests/tests/filepath_test_files/fake-image.jpg', 'fake-image.jpg'),
             ('/tests/forms_tests/tests/filepath_test_files/real-text-file.txt', 'real-text-file.txt'),
