@@ -117,6 +117,10 @@ class SomeClass:
         raise SomeOtherException
     noisy_fail_attribute = property(noisy_fail_attribute)
 
+    def attribute_error_attribute(self):
+        raise AttributeError
+    attribute_error_attribute = property(attribute_error_attribute)
+
 
 class OtherClass:
     def method(self):
@@ -809,6 +813,10 @@ class TemplateTests(TestCase):
             # propagates
             'filter-syntax23': (r'1{{ var.noisy_fail_key }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)),
             'filter-syntax24': (r'1{{ var.noisy_fail_attribute }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)),
+
+            # When a property raises AttributeError, it resulted in silent failure. Now it gives original AttributeError
+            # Refs. 16383
+            'filter-syntax25': ('{{ var.attribute_error_attribute }}', {"var": SomeClass()}, (AttributeError)),
 
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),
