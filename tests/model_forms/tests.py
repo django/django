@@ -20,7 +20,7 @@ from django.utils import six
 from .models import (Article, ArticleStatus, Author, Author1, BetterWriter, BigInt, Book,
     Category, CommaSeparatedInteger, CustomFF, CustomFieldForExclusionModel,
     DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel, FlexibleDatePost, Homepage,
-    ImprovedArticle, ImprovedArticleWithParentLink, Inventory, Person, Post, Price,
+    ImprovedArticle, ImprovedArticleWithParentLink, Inventory, Person, Photo, Post, Price,
     Product, Publication, TextFile, Triple, Writer, WriterProfile,
     Colour, ColourfulItem, DateTimePost, CustomErrorMessage,
     test_images, StumpJoke, Character, Student)
@@ -1855,6 +1855,36 @@ class FileAndImageFieldTests(TestCase):
         # generate an AssertionError if it is called more than once during save.
         form = CFFForm(data={'f': None})
         form.save()
+
+    def test_file_field_multiple_save(self):
+        """
+        Simulate a file upload and check how many times Model.save() gets
+        called. Test for bug #639.
+        """
+        class PhotoForm(forms.ModelForm):
+            class Meta:
+                model = Photo
+                fields = '__all__'
+
+        # Grab an image for testing.
+        filename = os.path.join(os.path.dirname(upath(__file__)), "test.png")
+        with open(filename, "rb") as fp:
+            img = fp.read()
+
+        # Fake a POST QueryDict and FILES MultiValueDict.
+        data = {'title': 'Testing'}
+        files = {"image": SimpleUploadedFile('test.png', img, 'image/png')}
+
+        form = PhotoForm(data=data, files=files)
+        p = form.save()
+
+        try:
+            # Check the savecount stored on the object (see the model).
+            self.assertEqual(p._savecount, 1)
+        finally:
+            # Delete the "uploaded" file to avoid clogging /tmp.
+            p = Photo.objects.get()
+            p.image.delete(save=False)
 
     def test_file_path_field_blank(self):
         """
