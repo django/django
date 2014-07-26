@@ -1391,6 +1391,13 @@ class ModelChoiceFieldTests(TestCase):
             f.clean(None)
         with self.assertRaises(ValidationError):
             f.clean(0)
+
+        # Invalid types that require TypeError to be caught (#22808).
+        with self.assertRaises(ValidationError):
+            f.clean([['fail']])
+        with self.assertRaises(ValidationError):
+            f.clean([{'foo': 'bar'}])
+
         self.assertEqual(f.clean(self.c2.id).name, "It's a test")
         self.assertEqual(f.clean(self.c3.id).name, 'Third')
 
@@ -1494,6 +1501,12 @@ class ModelMultipleChoiceFieldTests(TestCase):
             f.clean('hello')
         with self.assertRaises(ValidationError):
             f.clean(['fail'])
+
+        # Invalid types that require TypeError to be caught (#22808).
+        with self.assertRaises(ValidationError):
+            f.clean([['fail']])
+        with self.assertRaises(ValidationError):
+            f.clean([{'foo': 'bar'}])
 
         # Add a Category object *after* the ModelMultipleChoiceField has already been
         # instantiated. This proves clean() checks the database during clean() rather
