@@ -559,7 +559,7 @@ Miscellaneous
 
 * Uploaded files are no longer created as executable by default. If you need
   them to be executable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
-  needs. The new default value is ``0666`` (octal) and the current umask value
+  needs. The new default value is ``0o666`` (octal) and the current umask value
   is first masked out.
 
 * The :ref:`F() expressions <query-expressions>` supported bitwise operators by
