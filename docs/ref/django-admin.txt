@@ -836,7 +836,7 @@ Write stderr to the *FILE* file.
 ``umask=UMASK``
 
 Umask to use when daemonizing. The value is interpreted as an octal number
-(default value is ``022``).
+(default value is ``0o22``).
 
 Example usage::
 
