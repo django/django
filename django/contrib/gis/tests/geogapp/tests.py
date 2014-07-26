@@ -19,6 +19,7 @@ if HAS_GEOS:
 
 @skipUnless(HAS_GEOS and postgis, "Geos and postgis are required.")
 class GeographyTest(TestCase):
+    fixtures = ['initial']
 
     def test01_fixture_load(self):
         "Ensure geography features loaded properly."

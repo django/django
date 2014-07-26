@@ -17,6 +17,7 @@ if HAS_GEOS:
 
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoRegressionTests(TestCase):
+    fixtures = ['initial']
 
     def test_update(self):
         "Testing GeoQuerySet.update(). See #10411."
