@@ -24,7 +24,7 @@ To activate a middleware component, add it to the
 
 In :setting:`MIDDLEWARE_CLASSES`, each middleware component is represented by
 a string: the full Python path to the middleware's class name. For example,
-here's the default value created by :djadmin:`django-admin.py startproject
+here's the default value created by :djadmin:`django-admin startproject
 <startproject>`::
 
     MIDDLEWARE_CLASSES = (

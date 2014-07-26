@@ -20,7 +20,7 @@ necessary to set :setting:`USE_L10N = True <USE_L10N>` in your settings file.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin.py
+    The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` includes :setting:`USE_L10N = True <USE_L10N>`
     for convenience.  Note, however, that to enable number formatting with
     thousand separators it is necessary to set :setting:`USE_THOUSAND_SEPARATOR
