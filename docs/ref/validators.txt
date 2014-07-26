@@ -171,28 +171,40 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``MaxValueValidator``
 ---------------------
-.. class:: MaxValueValidator(max_value)
+.. class:: MaxValueValidator(max_value, message=None)
+
+.. versionchanged:: 1.8
+   The ``message`` parameter was added.
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'max_value'`` if ``value`` is greater than ``max_value``.
 
 ``MinValueValidator``
 ---------------------
-.. class:: MinValueValidator(min_value)
+.. class:: MinValueValidator(min_value, message=None)
+
+.. versionchanged:: 1.8
+   The ``message`` parameter was added.
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'min_value'`` if ``value`` is less than ``min_value``.
 
 ``MaxLengthValidator``
 ----------------------
-.. class:: MaxLengthValidator(max_length)
+.. class:: MaxLengthValidator(max_length, message=None)
+
+.. versionchanged:: 1.8
+   The ``message`` parameter was added.
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'max_length'`` if the length of ``value`` is greater than ``max_length``.
 
 ``MinLengthValidator``
 ----------------------
-.. class:: MinLengthValidator(min_length)
+.. class:: MinLengthValidator(min_length, message=None)
+
+.. versionchanged:: 1.8
+   The ``message`` parameter was added.
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'min_length'`` if the length of ``value`` is less than ``min_length``.
