@@ -1,13 +1,18 @@
-=============================
-django-admin.py and manage.py
-=============================
+==========================
+django-admin and manage.py
+==========================
 
-``django-admin.py`` is Django's command-line utility for administrative tasks.
+``django-admin`` is Django's command-line utility for administrative tasks.
 This document outlines all it can do.
 
+.. versionchanged:: 1.7
+
+    Prior to Django 1.7, ``django-admin`` was only installed as
+    ``django-admin.py``.
+
 In addition, ``manage.py`` is automatically created in each Django project.
-``manage.py`` is a thin wrapper around ``django-admin.py`` that takes care of
-two things for you before delegating to ``django-admin.py``:
+``manage.py`` is a thin wrapper around ``django-admin`` that takes care of
+two things for you before delegating to ``django-admin``:
 
 * It puts your project's package on ``sys.path``.
 
@@ -20,23 +25,23 @@ two things for you before delegating to ``django-admin.py``:
 
     :func:`django.setup()` didn't exist in previous versions of Django.
 
-The ``django-admin.py`` script should be on your system path if you installed
+The ``django-admin`` script should be on your system path if you installed
 Django via its ``setup.py`` utility. If it's not on your path, you can find it
 in ``site-packages/django/bin`` within your Python installation. Consider
 symlinking it from some place on your path, such as ``/usr/local/bin``.
 
 For Windows users, who do not have symlinking functionality available, you can
-copy ``django-admin.py`` to a location on your existing path or edit the
+copy ``django-admin.exe`` to a location on your existing path or edit the
 ``PATH`` settings (under ``Settings - Control Panel - System - Advanced -
 Environment...``) to point to its installed location.
 
 Generally, when working on a single Django project, it's easier to use
-``manage.py`` than ``django-admin.py``. If you need to switch between multiple
-Django settings files, use ``django-admin.py`` with
+``manage.py`` than ``django-admin``. If you need to switch between multiple
+Django settings files, use ``django-admin`` with
 :envvar:`DJANGO_SETTINGS_MODULE` or the :djadminopt:`--settings` command line
 option.
 
-The command-line examples throughout this document use ``django-admin.py`` to
+The command-line examples throughout this document use ``django-admin`` to
 be consistent, but any example can use ``manage.py`` just as well.
 
 Usage
@@ -44,7 +49,7 @@ Usage
 
 .. code-block:: bash
 
-    $ django-admin.py <command> [options]
+    $ django-admin <command> [options]
     $ manage.py <command> [options]
 
 ``command`` should be one of the commands listed in this document.
@@ -56,13 +61,13 @@ Getting runtime help
 
 .. django-admin:: help
 
-Run ``django-admin.py help`` to display usage information and a list of the
+Run ``django-admin help`` to display usage information and a list of the
 commands provided by each application.
 
-Run ``django-admin.py help --commands`` to display a list of all available
+Run ``django-admin help --commands`` to display a list of all available
 commands.
 
-Run ``django-admin.py help <command>`` to display a description of the given
+Run ``django-admin help <command>`` to display a description of the given
 command and a list of its available options.
 
 App names
@@ -77,7 +82,7 @@ Determining the version
 
 .. django-admin:: version
 
-Run ``django-admin.py version`` to display the current Django version.
+Run ``django-admin version`` to display the current Django version.
 
 The output follows the schema described in :pep:`386`::
 
@@ -89,7 +94,7 @@ Displaying debug output
 -----------------------
 
 Use :djadminopt:`--verbosity` to specify the amount of notification and debug information
-that ``django-admin.py`` should print to the console. For more details, see the
+that ``django-admin`` should print to the console. For more details, see the
 documentation for the :djadminopt:`--verbosity` option.
 
 Available commands
@@ -149,14 +154,14 @@ are excluded.
 
 Example usage::
 
-    django-admin.py compilemessages --locale=pt_BR
-    django-admin.py compilemessages --locale=pt_BR --locale=fr
-    django-admin.py compilemessages -l pt_BR
-    django-admin.py compilemessages -l pt_BR -l fr
-    django-admin.py compilemessages --exclude=pt_BR
-    django-admin.py compilemessages --exclude=pt_BR --exclude=fr
-    django-admin.py compilemessages -x pt_BR
-    django-admin.py compilemessages -x pt_BR -x fr
+    django-admin compilemessages --locale=pt_BR
+    django-admin compilemessages --locale=pt_BR --locale=fr
+    django-admin compilemessages -l pt_BR
+    django-admin compilemessages -l pt_BR -l fr
+    django-admin compilemessages --exclude=pt_BR
+    django-admin compilemessages --exclude=pt_BR --exclude=fr
+    django-admin compilemessages -x pt_BR
+    django-admin compilemessages -x pt_BR -x fr
 
 createcachetable
 ----------------
@@ -418,7 +423,7 @@ the provided fixture names.
 If the named fixture has a file extension, only fixtures of that type
 will be loaded. For example::
 
-    django-admin.py loaddata mydata.json
+    django-admin loaddata mydata.json
 
 would only load JSON fixtures called ``mydata``. The fixture extension
 must correspond to the registered name of a
@@ -427,7 +432,7 @@ must correspond to the registered name of a
 If you omit the extensions, Django will search all available fixture types
 for a matching fixture. For example::
 
-    django-admin.py loaddata mydata
+    django-admin loaddata mydata
 
 would look for any fixture of any fixture type called ``mydata``. If a fixture
 directory contained ``mydata.json``, that fixture would be loaded
@@ -436,7 +441,7 @@ as a JSON fixture.
 The fixtures that are named can include directory components. These
 directories will be included in the search path. For example::
 
-    django-admin.py loaddata foo/bar/mydata.json
+    django-admin loaddata foo/bar/mydata.json
 
 would search ``<app_label>/fixtures/foo/bar/mydata.json`` for each installed
 application,  ``<dirname>/foo/bar/mydata.json`` for each directory in
@@ -497,7 +502,7 @@ Compressed fixtures
 
 Fixtures may be compressed in ``zip``, ``gz``, or ``bz2`` format. For example::
 
-    django-admin.py loaddata mydata.json
+    django-admin loaddata mydata.json
 
 would look for any of ``mydata.json``, ``mydata.json.zip``,
 ``mydata.json.gz``, or ``mydata.json.bz2``. The first file contained within a
@@ -546,7 +551,7 @@ available languages.
 
 Example usage::
 
-    django-admin.py makemessages --all
+    django-admin makemessages --all
 
 .. django-admin-option:: --extension
 
@@ -555,11 +560,11 @@ to examine (default: ".html", ".txt").
 
 Example usage::
 
-    django-admin.py makemessages --locale=de --extension xhtml
+    django-admin makemessages --locale=de --extension xhtml
 
 Separate multiple extensions with commas or use -e or --extension multiple times::
 
-    django-admin.py makemessages --locale=de --extension=html,txt --extension xml
+    django-admin makemessages --locale=de --extension=html,txt --extension xml
 
 Use the :djadminopt:`--locale` option (or its shorter version ``-l``) to
 specify the locale(s) to process.
@@ -572,14 +577,14 @@ are excluded.
 
 Example usage::
 
-    django-admin.py makemessages --locale=pt_BR
-    django-admin.py makemessages --locale=pt_BR --locale=fr
-    django-admin.py makemessages -l pt_BR
-    django-admin.py makemessages -l pt_BR -l fr
-    django-admin.py makemessages --exclude=pt_BR
-    django-admin.py makemessages --exclude=pt_BR --exclude=fr
-    django-admin.py makemessages -x pt_BR
-    django-admin.py makemessages -x pt_BR -x fr
+    django-admin makemessages --locale=pt_BR
+    django-admin makemessages --locale=pt_BR --locale=fr
+    django-admin makemessages -l pt_BR
+    django-admin makemessages -l pt_BR -l fr
+    django-admin makemessages --exclude=pt_BR
+    django-admin makemessages --exclude=pt_BR --exclude=fr
+    django-admin makemessages -x pt_BR
+    django-admin makemessages -x pt_BR -x fr
 
 
 .. versionchanged:: 1.7
@@ -602,7 +607,7 @@ looking for new translation strings.
 
 Example usage::
 
-    django-admin.py makemessages --locale=de --symlinks
+    django-admin makemessages --locale=de --symlinks
 
 .. django-admin-option:: --ignore
 
@@ -613,7 +618,7 @@ These patterns are used by default: ``'CVS'``, ``'.*'``, ``'*~'``, ``'*.pyc'``
 
 Example usage::
 
-    django-admin.py makemessages --locale=en_US --ignore=apps/* --ignore=secret/*.html
+    django-admin makemessages --locale=en_US --ignore=apps/* --ignore=secret/*.html
 
 .. django-admin-option:: --no-default-ignore
 
@@ -844,7 +849,7 @@ Umask to use when daemonizing. The value is interpreted as an octal number
 
 Example usage::
 
-    django-admin.py runfcgi socket=/tmp/fcgi.sock method=prefork daemonize=true \
+    django-admin runfcgi socket=/tmp/fcgi.sock method=prefork daemonize=true \
         pidfile=/var/run/django-fcgi.pid
 
 Run a FastCGI server as a daemon and write the spawned PID in a file.
@@ -898,7 +903,7 @@ the :djadmin:`check` command). If any errors are found, they will be printed
 to standard output, but it won't stop the server.
 
 You can run as many servers as you want, as long as they're on separate ports.
-Just execute ``django-admin.py runserver`` more than once.
+Just execute ``django-admin runserver`` more than once.
 
 Note that the default IP address, ``127.0.0.1``, is not accessible from other
 machines on your network. To make your development server viewable to other
@@ -923,7 +928,7 @@ memory.
 
 Example usage::
 
-    django-admin.py runserver --noreload
+    django-admin runserver --noreload
 
 .. django-admin-option:: --nothreading
 
@@ -938,46 +943,46 @@ the development server. This changes the default IP address from
 
 Example usage::
 
-    django-admin.py runserver --ipv6
+    django-admin runserver --ipv6
 
 Examples of using different ports and addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Port 8000 on IP address ``127.0.0.1``::
 
-    django-admin.py runserver
+    django-admin runserver
 
 Port 8000 on IP address ``1.2.3.4``::
 
-    django-admin.py runserver 1.2.3.4:8000
+    django-admin runserver 1.2.3.4:8000
 
 Port 7000 on IP address ``127.0.0.1``::
 
-    django-admin.py runserver 7000
+    django-admin runserver 7000
 
 Port 7000 on IP address ``1.2.3.4``::
 
-    django-admin.py runserver 1.2.3.4:7000
+    django-admin runserver 1.2.3.4:7000
 
 Port 8000 on IPv6 address ``::1``::
 
-    django-admin.py runserver -6
+    django-admin runserver -6
 
 Port 7000 on IPv6 address ``::1``::
 
-    django-admin.py runserver -6 7000
+    django-admin runserver -6 7000
 
 Port 7000 on IPv6 address ``2001:0db8:1234:5678::9``::
 
-    django-admin.py runserver [2001:0db8:1234:5678::9]:7000
+    django-admin runserver [2001:0db8:1234:5678::9]:7000
 
 Port 8000 on IPv4 address of host ``localhost``::
 
-    django-admin.py runserver localhost:8000
+    django-admin runserver localhost:8000
 
 Port 8000 on IPv6 address of host ``localhost``::
 
-    django-admin.py runserver -6 localhost:8000
+    django-admin runserver -6 localhost:8000
 
 Serving static files with the development server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -998,7 +1003,7 @@ Django will use IPython_ or bpython_ if either is installed. If you have a
 rich shell installed but want to force use of the "plain" Python interpreter,
 use the ``--plain`` option, like so::
 
-    django-admin.py shell --plain
+    django-admin shell --plain
 
 If you would like to specify either IPython or bpython as your interpreter if
 you have both installed you can specify an alternative interpreter interface
@@ -1006,14 +1011,14 @@ with the ``-i`` or ``--interface`` options like so:
 
 IPython::
 
-    django-admin.py shell -i ipython
-    django-admin.py shell --interface ipython
+    django-admin shell -i ipython
+    django-admin shell --interface ipython
 
 
 bpython::
 
-    django-admin.py shell -i bpython
-    django-admin.py shell --interface bpython
+    django-admin shell -i bpython
+    django-admin shell --interface bpython
 
 
 .. _IPython: http://ipython.scipy.org/
@@ -1025,7 +1030,7 @@ available) it reads the script pointed to by the :envvar:`PYTHONSTARTUP`
 environment variable and the ``~/.pythonrc.py`` script. If you don't wish this
 behavior you can use the ``--no-startup`` option. e.g.::
 
-    django-admin.py shell --plain --no-startup
+    django-admin shell --plain --no-startup
 
 sql <app_label app_label ...>
 -----------------------------
@@ -1194,7 +1199,7 @@ working directory.
 
 For example::
 
-    django-admin.py startapp myapp /Users/jezdez/Code/myapp
+    django-admin startapp myapp /Users/jezdez/Code/myapp
 
 .. _custom-app-and-project-templates:
 
@@ -1208,7 +1213,7 @@ containing the app template files.
 For example, this would look for an app template in the given directory when
 creating the ``myapp`` app::
 
-    django-admin.py startapp --template=/Users/jezdez/Code/my_app_template myapp
+    django-admin startapp --template=/Users/jezdez/Code/my_app_template myapp
 
 Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
 archives with the app template files, downloading and extracting them on the
@@ -1217,7 +1222,7 @@ fly.
 For example, taking advantage of Github's feature to expose repositories as
 zip files, you can use a URL like::
 
-    django-admin.py startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
+    django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
 
 When Django copies the app template files, it also renders certain files
 through the template engine: the files whose extensions match the
@@ -1268,7 +1273,7 @@ package within it. Use '.' to denote the current working directory.
 
 For example::
 
-    django-admin.py startproject myproject /Users/jezdez/Code/myproject_repo
+    django-admin startproject myproject /Users/jezdez/Code/myproject_repo
 
 As with the :djadmin:`startapp` command, the ``--template`` option lets you
 specify a directory, file path or URL of a custom project template. See the
@@ -1278,7 +1283,7 @@ formats.
 For example, this would look for a project template in the given directory
 when creating the ``myproject`` project::
 
-    django-admin.py startproject --template=/Users/jezdez/Code/my_project_template myproject
+    django-admin startproject --template=/Users/jezdez/Code/my_project_template myproject
 
 Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
 archives with the project template files, downloading and extracting them on the
@@ -1287,7 +1292,7 @@ fly.
 For example, taking advantage of Github's feature to expose repositories as
 zip files, you can use a URL like::
 
-    django-admin.py startproject --template=https://github.com/githubuser/django-project-template/archive/master.zip myproject
+    django-admin startproject --template=https://github.com/githubuser/django-project-template/archive/master.zip myproject
 
 When Django copies the project template files, it also renders certain files
 through the template engine: the files whose extensions match the
@@ -1366,7 +1371,7 @@ the given fixture(s).
 
 For example, this command::
 
-    django-admin.py testserver mydata.json
+    django-admin testserver mydata.json
 
 ...would perform the following steps:
 
@@ -1405,8 +1410,8 @@ Examples:
 
 To run the test server on port 7000 with ``fixture1`` and ``fixture2``::
 
-    django-admin.py testserver --addrport 7000 fixture1 fixture2
-    django-admin.py testserver fixture1 fixture2 --addrport 7000
+    django-admin testserver --addrport 7000 fixture1 fixture2
+    django-admin testserver fixture1 fixture2 --addrport 7000
 
 (The above statements are equivalent. We include both of them to demonstrate
 that it doesn't matter whether the options come before or after the fixture
@@ -1414,7 +1419,7 @@ arguments.)
 
 To run on 1.2.3.4:7000 with a ``test`` fixture::
 
-    django-admin.py testserver --addrport 1.2.3.4:7000 test
+    django-admin testserver --addrport 1.2.3.4:7000 test
 
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
@@ -1459,7 +1464,7 @@ it's not supplied, Django will use the ``default`` database.
 
 Example usage::
 
-    django-admin.py changepassword ringo
+    django-admin changepassword ringo
 
 createsuperuser
 ~~~~~~~~~~~~~~~
@@ -1564,10 +1569,10 @@ allows for the following options:
 
 Example usage::
 
-    django-admin.py migrate --pythonpath='/home/djangoprojects/myproject'
+    django-admin migrate --pythonpath='/home/djangoprojects/myproject'
 
 Adds the given filesystem path to the Python `import search path`_. If this
-isn't provided, ``django-admin.py`` will use the ``PYTHONPATH`` environment
+isn't provided, ``django-admin`` will use the ``PYTHONPATH`` environment
 variable.
 
 Note that this option is unnecessary in ``manage.py``, because it takes care of
@@ -1579,11 +1584,11 @@ setting the Python path for you.
 
 Example usage::
 
-    django-admin.py migrate --settings=mysite.settings
+    django-admin migrate --settings=mysite.settings
 
 Explicitly specifies the settings module to use. The settings module should be
 in Python package syntax, e.g. ``mysite.settings``. If this isn't provided,
-``django-admin.py`` will use the ``DJANGO_SETTINGS_MODULE`` environment
+``django-admin`` will use the ``DJANGO_SETTINGS_MODULE`` environment
 variable.
 
 Note that this option is unnecessary in ``manage.py``, because it uses
@@ -1593,21 +1598,21 @@ Note that this option is unnecessary in ``manage.py``, because it uses
 
 Example usage::
 
-    django-admin.py migrate --traceback
+    django-admin migrate --traceback
 
-By default, ``django-admin.py`` will show a simple error message whenever an
+By default, ``django-admin`` will show a simple error message whenever an
 :class:`~django.core.management.CommandError` occurs, but a full stack trace
-for any other exception. If you specify ``--traceback``, ``django-admin.py``
+for any other exception. If you specify ``--traceback``, ``django-admin``
 will also output a full stack trace when a ``CommandError`` is raised.
 
 .. django-admin-option:: --verbosity
 
 Example usage::
 
-    django-admin.py migrate --verbosity 2
+    django-admin migrate --verbosity 2
 
 Use ``--verbosity`` to specify the amount of notification and debug information
-that ``django-admin.py`` should print to the console.
+that ``django-admin`` should print to the console.
 
 * ``0`` means no output.
 * ``1`` means normal output (default).
@@ -1620,9 +1625,9 @@ that ``django-admin.py`` should print to the console.
 
 Example usage::
 
-    django-admin.py sqlall --no-color
+    django-admin sqlall --no-color
 
-By default, ``django-admin.py`` will format the output to be colorized. For
+By default, ``django-admin`` will format the output to be colorized. For
 example, errors will be printed to the console in red and SQL statements will
 be syntax highlighted. To prevent this and have a plain text output, pass the
 ``--no-color`` option when running your command.
@@ -1640,7 +1645,7 @@ specified, this option will default to an alias of ``default``.
 
 For example, to dump data from the database with the alias ``master``::
 
-    django-admin.py dumpdata --database=master
+    django-admin dumpdata --database=master
 
 .. django-admin-option:: --exclude
 
@@ -1648,12 +1653,12 @@ Exclude a specific application from the applications whose contents is
 output. For example, to specifically exclude the ``auth`` application from
 the output of dumpdata, you would call::
 
-    django-admin.py dumpdata --exclude=auth
+    django-admin dumpdata --exclude=auth
 
 If you want to exclude multiple applications, use multiple ``--exclude``
 directives::
 
-    django-admin.py dumpdata --exclude=auth --exclude=contenttypes
+    django-admin dumpdata --exclude=auth --exclude=contenttypes
 
 .. django-admin-option:: --locale
 
@@ -1663,7 +1668,7 @@ If not provided all locales are processed.
 .. django-admin-option:: --noinput
 
 Use the ``--noinput`` option to suppress all user prompting, such as "Are
-you sure?" confirmation messages. This is useful if ``django-admin.py`` is
+you sure?" confirmation messages. This is useful if ``django-admin`` is
 being executed as an unattended, automated script.
 
 Extra niceties
@@ -1674,7 +1679,7 @@ Extra niceties
 Syntax coloring
 ---------------
 
-The ``django-admin.py`` / ``manage.py`` commands will use pretty
+The ``django-admin`` / ``manage.py`` commands will use pretty
 color-coded output if your terminal supports ANSI-colored output. It
 won't use the color codes if you're piping the command's output to
 another program.
@@ -1770,7 +1775,7 @@ overridden as specified.
 
 .. versionadded:: 1.7
 
-Support for color-coded output from ``django-admin.py`` / ``manage.py``
+Support for color-coded output from ``django-admin`` / ``manage.py``
 utilities on Windows by relying on the ANSICON application was added in Django
 1.7.
 
@@ -1781,10 +1786,10 @@ Bash completion
 
 If you use the Bash shell, consider installing the Django bash completion
 script, which lives in ``extras/django_bash_completion`` in the Django
-distribution. It enables tab-completion of ``django-admin.py`` and
+distribution. It enables tab-completion of ``django-admin`` and
 ``manage.py`` commands, so you can, for instance...
 
-* Type ``django-admin.py``.
+* Type ``django-admin``.
 * Press [TAB] to see all available options.
 * Type ``sql``, then [TAB], to see all available options whose names start
   with ``sql``.

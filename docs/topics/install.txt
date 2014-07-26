@@ -284,7 +284,7 @@ latest bug fixes and improvements, follow these instructions:
    (If using a virtualenv_ you can omit ``sudo``.)
 
    This will make Django's code importable, and will also make the
-   ``django-admin.py`` utility command available. In other words, you're all
+   ``django-admin`` utility command available. In other words, you're all
    set!
 
    If you don't have pip_ available, see the alternative instructions for
@@ -343,7 +343,7 @@ Next you need to make the ``django-admin.py`` utility available in your
 shell PATH.
 
 On Unix-like systems, create a symbolic link to the file
-``django-trunk/django/bin/django-admin.py`` in a directory on your system
+``django-trunk/django/bin/django-admin`` in a directory on your system
 path, such as ``/usr/local/bin``. For example:
 
 .. code-block:: bash
@@ -359,3 +359,7 @@ rather than having to qualify the command with the full path to the file.
 On Windows systems, the same result can be achieved by copying the file
 ``django-trunk/django/bin/django-admin.py`` to somewhere on your system
 path, for example ``C:\Python27\Scripts``.
+
+Note that the rest of the documentation assumes this utility is installed
+as ``django-admin``. You'll have to substitute ``django-admin.py`` if you use
+this method.

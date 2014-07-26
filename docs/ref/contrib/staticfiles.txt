@@ -198,7 +198,7 @@ in your project's :setting:`INSTALLED_APPS` setting.
 
 Example usage::
 
-    django-admin.py runserver --nostatic
+    django-admin runserver --nostatic
 
 .. django-admin-option:: --insecure
 
@@ -214,7 +214,7 @@ in your project's :setting:`INSTALLED_APPS` setting. :djadmin:`runserver`
 
 Example usage::
 
-    django-admin.py runserver --insecure
+    django-admin runserver --insecure
 
 .. _staticfiles-storages:
 
