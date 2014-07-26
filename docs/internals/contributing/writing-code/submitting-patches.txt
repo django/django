@@ -267,6 +267,8 @@ minified scripts when submitting patches for Django's javascript.
 .. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
 .. _ticket tracker: https://code.djangoproject.com/newticket
 
+.. _patch-review-checklist:
+
 Patch review checklist
 ----------------------
 
