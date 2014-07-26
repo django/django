@@ -30,6 +30,7 @@ def postgis_bug_version():
 
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoModelTest(TestCase):
+    fixtures = ['initial']
 
     def test_fixtures(self):
         "Testing geographic model initialization from fixtures."
@@ -206,6 +207,7 @@ class GeoModelTest(TestCase):
 
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoLookupTest(TestCase):
+    fixtures = ['initial']
 
     @no_mysql
     def test_disjoint_lookup(self):
@@ -397,6 +399,8 @@ class GeoLookupTest(TestCase):
 
 @skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
 class GeoQuerySetTest(TestCase):
+    fixtures = ['initial']
+
     # Please keep the tests in GeoQuerySet method's alphabetic order
 
     @no_mysql

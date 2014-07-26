@@ -67,6 +67,7 @@ class FixtureTestCase(TestCase):
     def test_initial_data(self):
         "Fixtures can load initial data into models defined in packages"
         # migrate introduces 1 initial data object from initial_data.json
+        # this behavior is deprecated and will be removed in Django 1.9
         self.assertQuerysetEqual(
             Book.objects.all(), [
                 'Achieving self-awareness of Python programs'
