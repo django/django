@@ -160,6 +160,12 @@ Forms
   :attr:`~django.forms.extras.widgets.SelectDateWidget.empty_label` argument, which will
   override the top list choice label when :class:`~django.forms.DateField` is not required.
 
+* After an :class:`~django.forms.ImageField` has been cleaned and validated, the
+  ``UploadedFile`` object will have an additional ``image`` attribute containing
+  the Pillow ``Image`` instance used to check if the file was a valid image. It
+  will also update ``UploadedFile.content_type`` with the image's content type
+  as determined by Pillow.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
