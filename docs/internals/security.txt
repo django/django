@@ -229,8 +229,3 @@ releases. The list of authorized keys is in `the Django releasers
 file`_.
 
 .. _the Django releasers file: https://www.djangoproject.com/m/pgp/django-releasers.txt
-
-
-same key used to sign Django releases;
-that key has the ID ``0x3684C0C08C8B2AE1``, and is available from most
-commonly-used keyservers.
