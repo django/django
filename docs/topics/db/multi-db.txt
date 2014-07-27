@@ -386,6 +386,14 @@ With this setup installed, lets run some Django code::
     >>> # ... but if we re-retrieve the object, it will come back on a replica
     >>> mh = Book.objects.get(title='Mostly Harmless')
 
+.. versionchanged:: 1.7
+
+  If you set `DATABASE_ROUTERS` in `setting.py` consider that only models in 
+  the default ``database`` are used, if you want to add another please provide 
+  the ``database`` flag. For example::
+
+    $ ./manage.py sqlall sqlall SampleModel --database=second_db 
+
 
 Manually selecting a database
 =============================

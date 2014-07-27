@@ -1418,8 +1418,9 @@ Miscellaneous
   please update your settings to use ``None`` instead of ``0`` as the latter
   now designates set-and-expire in the settings as well.
 
-* Only models in the default database are used, if you want to add another
-  please provide the ``database`` flag.
+* If you set `DATABASE_ROUTERS` in `setting.py` to allocate database usage 
+  consider that only models in the default ``database`` are used, if you want 
+  to add another please provide the ``database`` flag.
 
 .. _deprecated-features-1.7:
 
