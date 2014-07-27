@@ -687,6 +687,12 @@ beatle J R Ringo False""")
         self.assertFalse(r[1].is_checked())
         self.assertEqual((r[1].name, r[1].value, r[1].choice_value, r[1].choice_label), ('beatle', 'J', 'P', 'Paul'))
 
+        # These individual widgets can accept extra attributes if manually rendered.
+        self.assertHTMLEqual(
+            r[1].render(attrs={'extra': 'value'}),
+            '<label><input type="radio" extra="value" name="beatle" value="P" /> Paul</label>'
+        )
+
         with self.assertRaises(IndexError):
             r[10]
 

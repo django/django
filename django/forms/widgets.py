@@ -601,13 +601,17 @@ class ChoiceInput(SubWidget):
             label_for = format_html(' for="{0}"', self.id_for_label)
         else:
             label_for = ''
-        return format_html('<label{0}>{1} {2}</label>', label_for, self.tag(), self.choice_label)
+        attrs = dict(self.attrs, **attrs) if attrs else self.attrs
+        return format_html(
+            '<label{0}>{1} {2}</label>', label_for, self.tag(attrs), self.choice_label
+        )
 
     def is_checked(self):
         return self.value == self.choice_value
 
-    def tag(self):
-        final_attrs = dict(self.attrs, type=self.input_type, name=self.name, value=self.choice_value)
+    def tag(self, attrs=None):
+        attrs = attrs or self.attrs
+        final_attrs = dict(attrs, type=self.input_type, name=self.name, value=self.choice_value)
         if self.is_checked():
             final_attrs['checked'] = 'checked'
         return format_html('<input{0} />', flatatt(final_attrs))
