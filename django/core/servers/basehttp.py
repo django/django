@@ -12,10 +12,10 @@ from __future__ import unicode_literals
 import socket
 import sys
 from wsgiref import simple_server
-from wsgiref.util import FileWrapper   # NOQA: for backwards compatibility
+from wsgiref.util import FileWrapper  # NOQA: for backwards compatibility
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management.color import color_style
+from django.core.management.color import color_style, no_style
 from django.core.wsgi import get_wsgi_application
 from django.utils import six
 from django.utils.module_loading import import_string
@@ -108,13 +108,28 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         sys.stderr.write(msg)
 
 
-def run(addr, port, wsgi_handler, ipv6=False, threading=False):
+class NoColorWSGIRequestHandler(WSGIRequestHandler):
+    """
+    Just a regular WSGIRequestHandler except it doesn't log to the standard
+    output any of the requests received, so as to not clutter the output for
+    the tests' results.
+    """
+
+    def log_message(self, *args):
+        self.style = no_style()
+        super(WSGIRequestHandler, self).log_message(*args)
+
+
+def run(addr, port, wsgi_handler, ipv6=False, threading=False, no_color=False):
     server_address = (addr, port)
     if threading:
         httpd_cls = type(str('WSGIServer'), (socketserver.ThreadingMixIn, WSGIServer), {})
     else:
         httpd_cls = WSGIServer
-    httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)
+    if no_color:
+        httpd = httpd_cls(server_address, NoColorWSGIRequestHandler, ipv6=ipv6)
+    else:
+        httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)
     if threading:
         # ThreadingMixIn.daemon_threads indicates how threads will behave on an
         # abrupt shutdown; like quitting the server by the user or restarting
