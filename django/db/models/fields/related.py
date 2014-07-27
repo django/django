@@ -1900,7 +1900,49 @@ class ManyToManyField(RelatedField):
         errors.extend(self._check_unique(**kwargs))
         errors.extend(self._check_relationship_model(**kwargs))
         errors.extend(self._check_ignored_options(**kwargs))
+        errors.extend(self._check_table_uniqueness(**kwargs))
         return errors
+
+    @staticmethod
+    def _table_exists(table):
+        """ Helper that checks if a table already exists in the registry. """
+
+        # default return values
+        table_exists = False
+        model_that_created_table = None
+
+        registered_tables = {
+            model._meta.db_table: model
+            for model in apps.get_models(include_auto_created=True)
+        }
+
+        if table in set(registered_tables.keys()):
+            table_exists = True,
+            model_that_created_table = registered_tables[table]
+
+        return table_exists, model_that_created_table
+
+    def _check_table_uniqueness(self, **kwargs):
+        """ Checks if the m2m field's table does not already exist in table
+            registry.
+        """
+
+        table_exists, model_that_created_table = self._table_exists(
+            self.db_table
+        )
+
+        if table_exists:
+            return [
+                checks.Error(
+                    "Field is using a table that has already been registered "
+                    "by {0}.".format(model_that_created_table),
+                    hint=None,
+                    obj=self,
+                    id='fields.E340',
+                )
+            ]
+
+        return []
 
     def _check_unique(self, **kwargs):
         if self.unique:
