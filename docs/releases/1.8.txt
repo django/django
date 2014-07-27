@@ -35,6 +35,9 @@ Minor features
   :meth:`~django.contrib.admin.ModelAdmin.has_module_permission`
   method to allow limiting access to the module on the admin index page.
 
+* the admin template now has a ``View site`` link that links to ``/`` in the upper right corner of the page.
+  the default behaviour can be customized by overriding the ``userlinks_viewsite`` block which is contained in the ``base.html`` template.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

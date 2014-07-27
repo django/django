@@ -712,6 +712,14 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
         color2_delete_log = LogEntry.objects.all()[0]
         self.assertEqual(color2_content_type, color2_delete_log.content_type)
+    
+    def test_view_site_link(self):
+        """
+        Ensure there is a view site link
+        """
+        url = reverse('admin:index')
+        response = self.client.get(url)
+        self.assertContains(response, 'View site')
 
 
 @override_settings(TEMPLATE_DIRS=ADMIN_VIEW_TEMPLATES_DIR)
