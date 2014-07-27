@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 
 import re
+import sys
 from functools import partial
 from importlib import import_module
-from inspect import getargspec, getcallargs
+from inspect import getargspec
 
 from django.apps import apps
 from django.conf import settings
@@ -788,6 +789,10 @@ class Variable(object):
                             current = current()
                         except TypeError:
                             try:
+                                # `getcallargs` not available on Jython
+                                if sys.platform.startswith('java'):
+                                    raise
+                                from inspect import getcallargs
                                 getcallargs(current)
                             except TypeError:  # arguments *were* required
                                 current = settings.TEMPLATE_STRING_IF_INVALID  # invalid method call
