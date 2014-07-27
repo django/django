@@ -1421,9 +1421,10 @@ do not support ``nowait``, such as MySQL, will cause a
 unexpectedly blocking.
 
 Evaluating a queryset with ``select_for_update`` in autocommit mode is
-an error because the rows are then not locked. If allowed, this would
-facilitate data corruption, and could easily be caused by calling,
-outside of any transaction, code that expects to be run in one.
+a :exc:`~django.db.transaction.TransactionManagementError` error because the
+rows are then not locked. If allowed, this would facilitate data corruption, and
+could easily be caused by calling, outside of any transaction, code that expects
+to be run in one.
 
 Using ``select_for_update`` on backends which do not support
 ``SELECT ... FOR UPDATE`` (such as SQLite) will have no effect.
@@ -1432,6 +1433,17 @@ Using ``select_for_update`` on backends which do not support
 
     It is now an error to execute a query with ``select_for_update()`` in
     autocommit mode. With earlier releases in the 1.6 series it was a no-op.
+
+.. warning::
+
+  Although `select_for_update() normally fails in autocommit mode, since
+  :class:`~django.test.TestCase` automatically wraps each test in a transaction,
+  calling `select_for_update()` in a `TestCase` even without an
+  :func:`~django.db.transaction.atomic()` block will unexpectedly
+  pass without raising a `TransactionManagementError`. To properly test
+  `select_for_update()` you should use
+  :class:`~django.test.TransactionTestCase`.
+
 
 raw
 ~~~
