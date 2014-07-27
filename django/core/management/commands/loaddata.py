@@ -220,7 +220,7 @@ class Command(BaseCommand):
         if fixture_name != 'initial_data' and not fixture_files:
             # Warning kept for backwards-compatibility; why not an exception?
             warnings.warn("No fixture named '%s' found." % fixture_name)
-        elif fixture_name == 'initial_data':
+        elif fixture_name == 'initial_data' and fixture_files:
             warnings.warn(
                 'initial_data fixtures are deprecated. Use data migrations instead.',
                 RemovedInDjango19Warning
