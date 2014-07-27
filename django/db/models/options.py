@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from copy import copy
 from bisect import bisect
 from collections import OrderedDict
 from functools import partial
@@ -460,7 +461,9 @@ class Options(object):
                      include_non_concrete, include_hidden, include_proxy, export_name_map)
 
         try:
-            return self._get_fields_cache[cache_key]
+            # In order to avoid list manipulation. Always
+            # return a shallow copy of the results
+            return copy(self._get_fields_cache[cache_key])
         except KeyError:
             pass
 
@@ -573,7 +576,9 @@ class Options(object):
 
         # Store result into cache for later access
         self._get_fields_cache[cache_key] = fields
-        return fields
+        # In order to avoid list manipulation. Always
+        # return a shallow copy of the results
+        return copy(fields)
 
     ###########################################################################
     # Cached properties for fast access
