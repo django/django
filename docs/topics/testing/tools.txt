@@ -636,7 +636,10 @@ to test the effects of commit and rollback:
     While ``commit`` and ``rollback`` operations still *appear* to work when
     used in ``TestCase``, no actual commit or rollback will be performed by the
     database. This can cause your tests to pass or fail unexpectedly. Always
-    use ``TransactionTestCase`` when testing transactional behavior.
+    use ``TransactionTestCase`` when testing transactional behavior or any code
+    that can't normally be excuted in autocommit mode
+    (:meth:`~django.db.models.query.QuerySet.select_for_update()` is an
+    example).
 
 ``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase`.
 

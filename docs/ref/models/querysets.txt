@@ -1415,23 +1415,34 @@ backends support ``select_for_update()``. However, MySQL has no support for the
 ``nowait`` argument. Obviously, users of external third-party backends should
 check with their backend's documentation for specifics in those cases.
 
-Passing ``nowait=True`` to ``select_for_update`` using database backends that
+Passing ``nowait=True`` to ``select_for_update()`` using database backends that
 do not support ``nowait``, such as MySQL, will cause a
 :exc:`~django.db.DatabaseError` to be raised. This is in order to prevent code
 unexpectedly blocking.
 
-Evaluating a queryset with ``select_for_update`` in autocommit mode is
-an error because the rows are then not locked. If allowed, this would
-facilitate data corruption, and could easily be caused by calling,
-outside of any transaction, code that expects to be run in one.
+Evaluating a queryset with ``select_for_update()`` in autocommit mode is
+a :exc:`~django.db.transaction.TransactionManagementError` error because the
+rows are not locked in that case. If allowed, this would facilitate data
+corruption and could easily be caused by calling code that expects to be run in
+a transaction outside of one.
 
-Using ``select_for_update`` on backends which do not support
+Using ``select_for_update()`` on backends which do not support
 ``SELECT ... FOR UPDATE`` (such as SQLite) will have no effect.
 
 .. versionchanged:: 1.6.3
 
     It is now an error to execute a query with ``select_for_update()`` in
     autocommit mode. With earlier releases in the 1.6 series it was a no-op.
+
+.. warning::
+
+    Although ``select_for_update()`` normally fails in autocommit mode, since
+    :class:`~django.test.TestCase` automatically wraps each test in a
+    transaction, calling ``select_for_update()`` in a ``TestCase`` even outside
+    an :func:`~django.db.transaction.atomic()` block will (perhaps unexpectedly)
+    pass without raising a ``TransactionManagementError``. To properly test
+    ``select_for_update()`` you should use
+    :class:`~django.test.TransactionTestCase`.
 
 raw
 ~~~
