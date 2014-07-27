@@ -43,6 +43,29 @@ class Whiz(models.Model):
     c = models.IntegerField(choices=CHOICES, null=True)
 
 
+class Counter:
+    def __init__(self):
+        self.n = 1
+
+    def __iter__(self):
+        return self
+
+    def next(self):  # Python 3: def __next__(self)
+        if self.n > 5:
+            raise StopIteration
+        else:
+            self.n += 1
+            return (self.n, 'val-'+str(self.n))
+
+
+class WhizIter(models.Model):
+    c = models.IntegerField(choices=Counter(), null=True)
+
+
+class WhizIterEmpty(models.Model):
+    c = models.CharField(choices=(x for x in []), blank=True, max_length=1)
+
+
 class BigD(models.Model):
     d = models.DecimalField(max_digits=38, decimal_places=30)
 
