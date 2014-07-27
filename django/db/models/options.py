@@ -572,7 +572,7 @@ class Options(object):
             # By default, fields contains field instances as keys and all possible names
             # if the field instance as values. when get_fields is called, we only want to
             # return field instances, so we just preserve the keys.
-            fields = tuple(fields.keys())
+            fields = list(fields.keys())
 
         # Store result into cache for later access
         self._get_fields_cache[cache_key] = fields
@@ -591,7 +591,7 @@ class Options(object):
         it's parents.
         All hidden and proxy fields are omitted.
         """
-        return list(self.get_fields(data=False, m2m=True))
+        return self.get_fields(data=False, m2m=True)
 
     @cached_property
     def field_names(self):
@@ -612,7 +612,7 @@ class Options(object):
         Returns a list of all data fields on the model and it's parents.
         All hidden and proxy fields are omitted.
         """
-        return list(self.get_fields())
+        return self.get_fields()
 
     @cached_property
     def concrete_fields(self):
@@ -620,7 +620,7 @@ class Options(object):
         Returns a list of all concrete data fields on the model and it's parents.
         All hidden and proxy fields are omitted.
         """
-        return list(self.get_fields(include_non_concrete=False))
+        return self.get_fields(include_non_concrete=False)
 
     @cached_property
     def local_concrete_fields(self):
@@ -636,15 +636,15 @@ class Options(object):
 
     @raise_deprecation(suggested_alternative="get_fields")
     def get_fields_with_model(self):
-        return list(map(self._map_model, self.get_fields()))
+        return map(self._map_model, self.get_fields())
 
     @raise_deprecation(suggested_alternative="get_fields")
     def get_concrete_fields_with_model(self):
-        return list(map(self._map_model, self.get_fields(include_non_concrete=False)))
+        return map(self._map_model, self.get_fields(include_non_concrete=False))
 
     @raise_deprecation(suggested_alternative="get_fields")
     def get_m2m_with_model(self):
-        return list(map(self._map_model, self.get_fields(data=False, m2m=True)))
+        return map(self._map_model, self.get_fields(data=False, m2m=True))
 
     @raise_deprecation(suggested_alternative="get_field")
     def get_field_by_name(self, name):
@@ -659,12 +659,12 @@ class Options(object):
     def get_all_related_objects(self, local_only=False, include_hidden=False,
                                 include_proxy_eq=False):
         include_parents = local_only is False
-        return list(self.get_fields(
+        return self.get_fields(
             data=False, related_objects=True,
             include_parents=include_parents,
             include_hidden=include_hidden,
             include_proxy=include_proxy_eq
-        ))
+        )
 
     @raise_deprecation(suggested_alternative="get_fields")
     def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
