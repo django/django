@@ -897,6 +897,13 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, "testapp", 1)
         # Right actions in right order?
         self.assertOperationTypes(changes, "testapp", 0, ["AlterModelOptions"])
+        # Changing them back to empty should also make a change
+        before = self.make_project_state([self.author_with_options])
+        after = self.make_project_state([self.author_empty])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelOptions"])
 
     def test_alter_model_options_proxy(self):
         """
