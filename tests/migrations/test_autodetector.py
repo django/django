@@ -1105,3 +1105,18 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Aardvark")
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="author")
         self.assertOperationAttributes(changes, 'testapp', 0, 2, name="Author")
+
+    def test_fk_dependency_other_app(self):
+        """
+        Tests that ForeignKeys correctly depend on other apps' models (#23100)
+        """
+        # Make state
+        before = self.make_project_state([self.author_name, self.book])
+        after = self.make_project_state([self.author_with_book, self.book])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AddField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="book")
+        self.assertEqual(changes['testapp'][0].dependencies, [("otherapp", "__first__")])
