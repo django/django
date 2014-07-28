@@ -10,6 +10,7 @@ from django.db.migrations import operations
 from django.db.migrations.migration import Migration
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.optimizer import MigrationOptimizer
+from django.db.migrations.operations.models import AlterModelOptions
 
 
 class MigrationAutodetector(object):
@@ -24,17 +25,6 @@ class MigrationAutodetector(object):
     depends on first). A user interface may offer single-app usage
     if it wishes, with the caveat that it may not always be possible.
     """
-
-    # Model options we want to compare and preserve in an AlterModelOptions op
-    ALTER_OPTION_KEYS = [
-        "get_latest_by",
-        "ordering",
-        "permissions",
-        "default_permissions",
-        "select_on_save",
-        "verbose_name",
-        "verbose_name_plural",
-    ]
 
     def __init__(self, from_state, to_state, questioner=None):
         self.from_state = from_state
@@ -864,11 +854,11 @@ class MigrationAutodetector(object):
             new_model_state = self.to_state.models[app_label, model_name]
             old_options = dict(
                 option for option in old_model_state.options.items()
-                if option[0] in self.ALTER_OPTION_KEYS
+                if option[0] in AlterModelOptions.ALTER_OPTION_KEYS
             )
             new_options = dict(
                 option for option in new_model_state.options.items()
-                if option[0] in self.ALTER_OPTION_KEYS
+                if option[0] in AlterModelOptions.ALTER_OPTION_KEYS
             )
             if old_options != new_options:
                 self.add_operation(
