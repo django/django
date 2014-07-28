@@ -119,6 +119,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return Database.sqlite_version_info >= (3, 6, 8)
 
     @cached_property
+    def can_release_savepoints(self):
+        return self.uses_savepoints
+
+    @cached_property
     def supports_stddev(self):
         """Confirm support for STDDEV and related stats functions
 
