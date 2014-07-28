@@ -699,7 +699,7 @@ class MigrationAutodetector(object):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
-            field = new_model_state.get_field_by_name(field_name)
+            field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
             # Scan to see if this is actually a rename!
             field_dec = self.deep_deconstruct(field)
             found_rename = False
@@ -727,6 +727,25 @@ class MigrationAutodetector(object):
                             break
             if found_rename:
                 continue
+            # Fields that are foreignkeys/m2ms depend on stuff
+            dependencies = []
+            if field.rel and field.rel.to:
+                # Account for FKs to swappable models
+                swappable_setting = getattr(field, 'swappable_setting', None)
+                if swappable_setting is not None:
+                    dep_app_label = "__setting__"
+                    dep_object_name = swappable_setting
+                else:
+                    dep_app_label = field.rel.to._meta.app_label
+                    dep_object_name = field.rel.to._meta.object_name
+                dependencies = [(dep_app_label, dep_object_name, None, True)]
+                if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
+                    dependencies.append((
+                        field.rel.through._meta.app_label,
+                        field.rel.through._meta.object_name,
+                        None,
+                        True
+                    ))
             # You can't just add NOT NULL fields with no default
             if not field.null and not field.has_default() and not isinstance(field, models.ManyToManyField):
                 field = field.clone()
@@ -738,7 +757,8 @@ class MigrationAutodetector(object):
                         name=field_name,
                         field=field,
                         preserve_default=False,
-                    )
+                    ),
+                    dependencies=dependencies,
                 )
             else:
                 self.add_operation(
@@ -747,7 +767,8 @@ class MigrationAutodetector(object):
                         model_name=model_name,
                         name=field_name,
                         field=field,
-                    )
+                    ),
+                    dependencies=dependencies,
                 )
 
     def generate_removed_fields(self):
