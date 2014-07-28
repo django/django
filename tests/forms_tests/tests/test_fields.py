@@ -758,8 +758,13 @@ class FieldsTests(SimpleTestCase):
         with open(img_path, 'rb') as img_file:
             img_data = img_file.read()
 
-        uploaded_file = f.clean(SimpleUploadedFile('1x1.png', img_data))
+        img_file = SimpleUploadedFile('1x1.png', img_data)
+        img_file.content_type = 'text/plain'
+
+        uploaded_file = f.clean(img_file)
+
         self.assertEqual('PNG', uploaded_file.image.format)
+        self.assertEqual('image/png', uploaded_file.content_type)
 
     # URLField ##################################################################
 
