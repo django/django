@@ -3814,6 +3814,37 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
             self.selenium.find_element_by_id('id_start_date_0')
         )
 
+    def test_cancel_delete_confirmation(self):
+        "Cancelling the deletion of an object takes the user back one page."
+        pizza = Pizza.objects.create(name="Panucci's Double Cheese")
+        url = reverse('admin:admin_views_pizza_change', args=(pizza.id,))
+        full_url = '%s%s' % (self.live_server_url, url)
+        self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
+        self.selenium.get(full_url)
+        self.selenium.find_element_by_class_name('deletelink').click()
+        self.selenium.find_element_by_class_name('cancel-link').click()
+        self.assertEqual(self.selenium.current_url, full_url)
+        self.assertEqual(Pizza.objects.count(), 1)
+
+    def test_cancel_delete_related_confirmation(self):
+        """
+        Cancelling the deletion of an object with relations takes the user back
+        one page.
+        """
+        pizza = Pizza.objects.create(name="Panucci's Double Cheese")
+        topping1 = Topping.objects.create(name="Cheddar")
+        topping2 = Topping.objects.create(name="Mozzarella")
+        pizza.toppings.add(topping1, topping2)
+        url = reverse('admin:admin_views_pizza_change', args=(pizza.id,))
+        full_url = '%s%s' % (self.live_server_url, url)
+        self.admin_login(username='super', password='secret', login_url='/test_admin/admin/')
+        self.selenium.get(full_url)
+        self.selenium.find_element_by_class_name('deletelink').click()
+        self.selenium.find_element_by_class_name('cancel-link').click()
+        self.assertEqual(self.selenium.current_url, full_url)
+        self.assertEqual(Pizza.objects.count(), 1)
+        self.assertEqual(Topping.objects.count(), 2)
+
 
 class SeleniumAdminViewsChromeTests(SeleniumAdminViewsFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
