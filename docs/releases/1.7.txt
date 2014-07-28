@@ -1418,6 +1418,11 @@ Miscellaneous
   please update your settings to use ``None`` instead of ``0`` as the latter
   now designates set-and-expire in the settings as well.
 
+* The ``sql*`` management commands now respect the ``allow_migrate()`` method
+  of :setting:`DATABASE_ROUTERS`. If you have models synced to non-default
+  databases, use the :djadminopt:`--database` flag to get SQL for those
+  models (previously they would always be included in the output).
+
 .. _deprecated-features-1.7:
 
 Features deprecated in 1.7
