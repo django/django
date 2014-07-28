@@ -38,3 +38,12 @@ if a file with the uploaded name already exists.
 underscore plus a random 7 character alphanumeric string (e.g. ``"_x3a1gho"``),
 rather than iterating through an underscore followed by a number (e.g. ``"_1"``,
 ``"_2"``, etc.).
+
+``RemoteUserMiddleware`` session hijacking
+==========================================
+
+When using the :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`
+and the ``RemoteUserBackend``, a change to the ``REMOTE_USER`` header between
+requests without an intervening logout could result in the prior user's session
+being co-opted by the subsequent user. The middleware now logs the user out on
+a failed login attempt.
