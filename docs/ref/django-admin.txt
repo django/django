@@ -1050,6 +1050,13 @@ specify initial data.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
+.. versionchanged:: 1.7
+
+    The ``sql*`` management commands now respect the ``allow_migrate()`` method
+    of :setting:`DATABASE_ROUTERS`. If you have models synced to non-default
+    databases, use the :djadminopt:`--database` flag to get SQL for those
+    models (previously they would always be included in the output).
+
 sqlclear <app_label app_label ...>
 ----------------------------------
 
