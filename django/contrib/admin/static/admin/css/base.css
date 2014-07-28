@@ -410,7 +410,7 @@ table.orderable-initalized .order-cell, body>tr>td.order-cell {
 
 /* FORM DEFAULTS */
 
-input, textarea, select, .form-row p {
+input, textarea, select, .form-row p, form .button {
     margin: 2px 0;
     padding: 2px 3px;
     vertical-align: middle;
@@ -432,10 +432,11 @@ textarea, select, .vTextField {
 
 .button, input[type=submit], input[type=button], .submit-row input {
     background: #fff url(../img/nav-bg.gif) bottom repeat-x;
-    padding: 3px 5px;
-    color: black;
+    padding: 3px 5px !important;
+    color: black !important;
     border: 1px solid #bbb;
     border-color: #ddd #aaa #aaa #ddd;
+    box-sizing: content-box;
 }
 
 .button:active, input[type=submit]:active, input[type=button]:active {
@@ -467,7 +468,6 @@ textarea, select, .vTextField {
     background-position: bottom;
     opacity: 0.4;
 }
-
 
 /* MODULES */
 
