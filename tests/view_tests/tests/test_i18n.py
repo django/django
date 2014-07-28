@@ -22,7 +22,7 @@ class I18NTests(TestCase):
     """ Tests django views in django/views/i18n.py """
 
     def setUp(self):
-        self.client.createSession()
+        self.client.create_session()
 
     def test_setlang(self):
         """

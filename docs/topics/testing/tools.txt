@@ -370,7 +370,7 @@ Use the ``django.test.Client`` class to make requests.
         and session data cleared to defaults. Subsequent requests will appear
         to come from an :class:`~django.contrib.auth.models.AnonymousUser`.
 
-    .. method:: Client.createSession()
+    .. method:: Client.create_session()
 
         For tests where you rely on sessions, you can use this helper function to
         start with your tests focus and skip creating a session manually.

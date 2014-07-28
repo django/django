@@ -28,7 +28,7 @@ class SessionTest(BaseTests, TestCase):
 
     def setUp(self):
         super(SessionTest, self).setUp()
-        self.client.createSession()
+        self.client.create_session()
 
     def get_request(self):
         self.session = {}

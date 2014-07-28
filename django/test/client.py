@@ -396,7 +396,7 @@ class Client(RequestFactory):
         return {}
     session = property(_session)
 
-    def createSession(self):
+    def create_session(self):
         """
         Helper method to create a session in tests that depend on an already
         existing session they can rely upon rather than creating a session

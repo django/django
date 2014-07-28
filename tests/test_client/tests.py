@@ -444,7 +444,7 @@ class ClientTest(TestCase):
 
     def test_create_session(self):
         "Verify that a session has been created for the client."
-        session = self.client.createSession()
+        session = self.client.create_session()
 
         # Check that the session exists in the configured session store
         engine = import_module(settings.SESSION_ENGINE)
@@ -458,7 +458,7 @@ class ClientTest(TestCase):
 
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
-        self.client.createSession()
+        self.client.create_session()
 
         # Session value isn't set initially
         try:
