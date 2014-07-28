@@ -219,6 +219,9 @@ class Atomic(object):
                         except DatabaseError:
                             try:
                                 connection.savepoint_rollback(sid)
+                                # The savepoint won't be reused. Release it to
+                                # minimize overhead for the database server.
+                                connection.savepoint_commit(sid)
                             except Error:
                                 # If rolling back to a savepoint fails, mark for
                                 # rollback at a higher level and avoid shadowing
@@ -249,6 +252,9 @@ class Atomic(object):
                     else:
                         try:
                             connection.savepoint_rollback(sid)
+                            # The savepoint won't be reused. Release it to
+                            # minimize overhead for the database server.
+                            connection.savepoint_commit(sid)
                         except Error:
                             # If rolling back to a savepoint fails, mark for
                             # rollback at a higher level and avoid shadowing

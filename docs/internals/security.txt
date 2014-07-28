@@ -223,7 +223,9 @@ discretion of the Django development team, and that this privilege can
 be revoked at any time, with or without explanation.
 
 If you are added to the notification list, security-related emails
-will be sent to you by Django's release manager, and all notification
-emails will be signed with the same key used to sign Django releases;
-that key has the ID ``0x3684C0C08C8B2AE1``, and is available from most
-commonly-used keyservers.
+will be sent to you by Django's release team, and all notification
+emails will be signed with a key authorized to issue Django
+releases. The list of authorized keys is in `the Django releasers
+file`_.
+
+.. _the Django releasers file: https://www.djangoproject.com/m/pgp/django-releasers.txt

@@ -45,7 +45,7 @@ class BaseDatabaseWrapper(object):
         self.alias = alias
         # Query logging in debug mode or when explicitly enabled.
         self.queries_log = deque(maxlen=self.queries_limit)
-        self.use_debug_cursor = False
+        self.force_debug_cursor = False
 
         # Transaction related attributes.
         # Tracks if the connection is in autocommit mode. Per PEP 249, by
@@ -75,7 +75,7 @@ class BaseDatabaseWrapper(object):
 
     @property
     def queries_logged(self):
-        return self.use_debug_cursor or settings.DEBUG
+        return self.force_debug_cursor or settings.DEBUG
 
     @property
     def queries(self):
@@ -497,6 +497,7 @@ class BaseDatabaseFeatures(object):
     can_return_id_from_insert = False
     has_bulk_insert = False
     uses_savepoints = False
+    can_release_savepoints = False
     can_combine_inserts_with_and_without_auto_increment_pk = False
 
     # If True, don't use integer foreign keys referring to, e.g., positive

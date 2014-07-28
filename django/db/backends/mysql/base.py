@@ -182,6 +182,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_explicit_null_ordering_when_grouping = True
     allows_auto_pk_0 = False
     uses_savepoints = True
+    can_release_savepoints = True
     atomic_transactions = False
     supports_column_check_constraints = False
 

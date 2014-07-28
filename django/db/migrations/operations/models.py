@@ -337,6 +337,17 @@ class AlterModelOptions(Operation):
     may still need them.
     """
 
+    # Model options we want to compare and preserve in an AlterModelOptions op
+    ALTER_OPTION_KEYS = [
+        "get_latest_by",
+        "ordering",
+        "permissions",
+        "default_permissions",
+        "select_on_save",
+        "verbose_name",
+        "verbose_name_plural",
+    ]
+
     def __init__(self, name, options):
         self.name = name
         self.options = options
@@ -345,6 +356,9 @@ class AlterModelOptions(Operation):
         model_state = state.models[app_label, self.name.lower()]
         model_state.options = dict(model_state.options)
         model_state.options.update(self.options)
+        for key in self.ALTER_OPTION_KEYS:
+            if key not in self.options and key in model_state.options:
+                del model_state.options[key]
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         pass

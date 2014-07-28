@@ -20,13 +20,28 @@ from django.test import TestCase, RequestFactory, override_settings
 from django.test.utils import override_with_test_loader
 from django.utils.encoding import force_text, force_bytes
 from django.utils import six
-from django.views.debug import ExceptionReporter
+from django.views.debug import CallableSettingWrapper, ExceptionReporter
 
 from .. import BrokenException, except_args
 from ..views import (sensitive_view, non_sensitive_view, paranoid_view,
     custom_exception_reporter_filter_view, sensitive_method_view,
     sensitive_args_function_caller, sensitive_kwargs_function_caller,
     multivalue_dict_key_error)
+
+
+class CallableSettingWrapperTests(TestCase):
+    """ Unittests for CallableSettingWrapper
+    """
+    def test_repr(self):
+        class WrappedCallable(object):
+            def __repr__(self):
+                return "repr from the wrapped callable"
+
+            def __call__(self):
+                pass
+
+        actual = repr(CallableSettingWrapper(WrappedCallable()))
+        self.assertEqual(actual, "repr from the wrapped callable")
 
 
 @override_settings(DEBUG=True, TEMPLATE_DEBUG=True,
@@ -657,6 +672,21 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
         def callable_setting():
             return "This should not be displayed"
         with self.settings(DEBUG=True, FOOBAR=callable_setting):
+            response = self.client.get('/raises500/')
+            self.assertNotContains(response, "This should not be displayed", status_code=500)
+
+    def test_callable_settings_forbidding_to_set_attributes(self):
+        """
+        Callable settings which forbid to set attributes should not break
+        the debug page (#23070).
+        """
+        class CallableSettingWithSlots(object):
+            __slots__ = []
+
+            def __call__(self):
+                return "This should not be displayed"
+
+        with self.settings(DEBUG=True, WITH_SLOTS=CallableSettingWithSlots()):
             response = self.client.get('/raises500/')
             self.assertNotContains(response, "This should not be displayed", status_code=500)
 

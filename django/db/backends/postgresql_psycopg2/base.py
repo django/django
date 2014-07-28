@@ -50,6 +50,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update_nowait = True
     has_bulk_insert = True
     uses_savepoints = True
+    can_release_savepoints = True
     supports_tablespaces = True
     supports_transactions = True
     can_introspect_ip_address_field = True

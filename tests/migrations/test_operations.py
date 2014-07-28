@@ -46,7 +46,7 @@ class OperationTestBase(MigrationTestBase):
         operation.state_forwards(app_label, new_state)
         return project_state, new_state
 
-    def set_up_test_model(self, app_label, second_model=False, third_model=False, related_model=False, mti_model=False, proxy_model=False, unique_together=False):
+    def set_up_test_model(self, app_label, second_model=False, third_model=False, related_model=False, mti_model=False, proxy_model=False, unique_together=False, options=False):
         """
         Creates a test model state and database table.
         """
@@ -76,6 +76,12 @@ class OperationTestBase(MigrationTestBase):
             except DatabaseError:
                 pass
         # Make the "current" state
+        model_options = {
+            "swappable": "TEST_SWAP_MODEL",
+            "unique_together": [["pink", "weight"]] if unique_together else [],
+        }
+        if options:
+            model_options["permissions"] = [("can_groom", "Can groom")]
         operations = [migrations.CreateModel(
             "Pony",
             [
@@ -83,10 +89,7 @@ class OperationTestBase(MigrationTestBase):
                 ("pink", models.IntegerField(default=3)),
                 ("weight", models.FloatField()),
             ],
-            options={
-                "swappable": "TEST_SWAP_MODEL",
-                "unique_together": [["pink", "weight"]] if unique_together else [],
-            },
+            options=model_options,
         )]
         if second_model:
             operations.append(migrations.CreateModel(
@@ -974,6 +977,19 @@ class OperationTests(OperationTestBase):
         self.assertEqual(len(project_state.models["test_almoop", "pony"].options.get("permissions", [])), 0)
         self.assertEqual(len(new_state.models["test_almoop", "pony"].options.get("permissions", [])), 1)
         self.assertEqual(new_state.models["test_almoop", "pony"].options["permissions"][0][0], "can_groom")
+
+    def test_alter_model_options_emptying(self):
+        """
+        Tests that the AlterModelOptions operation removes keys from the dict (#23121)
+        """
+        project_state = self.set_up_test_model("test_almoop", options=True)
+        # Test the state alteration (no DB alteration to test)
+        operation = migrations.AlterModelOptions("Pony", {})
+        self.assertEqual(operation.describe(), "Change Meta options on Pony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_almoop", new_state)
+        self.assertEqual(len(project_state.models["test_almoop", "pony"].options.get("permissions", [])), 1)
+        self.assertEqual(len(new_state.models["test_almoop", "pony"].options.get("permissions", [])), 0)
 
     def test_alter_order_with_respect_to(self):
         """
