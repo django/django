@@ -407,6 +407,26 @@ officially supports.
 This also includes dropping support for PostGIS 1.3 and 1.4 as these versions
 are not supported on versions of PostgreSQL later than 8.4.
 
+``AbstractUser.last_login`` allows null values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :attr:`AbstractUser.last_login <django.contrib.auth.models.User.last_login>`
+field now allows null values. Previously, it defaulted to the time when the user
+was created which was misleading if the user never logged in. Please run the
+database migration. If your custom user inherits from ``AbstractUser`` and you
+wish to set ``last_login`` to ``NULL`` for users who haven't logged in, you can
+run this query::
+
+    from django.db import models
+    from django.contrib.auth import get_user_model
+    from django.contrib.auth.models import AbstractBaseUser
+
+    UserModel = get_user_model()
+    if issubclass(UserModel, AbstractBaseUser):
+        UserModel._default_manager.filter(
+            last_login=models.F('date_joined')
+        ).update(last_login=None)
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
