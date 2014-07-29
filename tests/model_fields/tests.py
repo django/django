@@ -375,17 +375,6 @@ class ChoicesTests(test.TestCase):
         self.assertEqual(Whiz(c=None).get_c_display(), None)    # Blank value
         self.assertEqual(Whiz(c='').get_c_display(), '')        # Empty value
 
-    # TODO: _get_FIELD_display doesn't work with Iterators
-    #
-    # def test_iterator_choices_and_field_display(self):
-    #     """
-    #     Check that get_choices works with Iterators (#23112).
-    #     """
-    #     self.assertEqual(WhizIter(c=1).get_c_display(), 'val-1')    # A nested value
-    #     self.assertEqual(WhizIter(c=9).get_c_display(), 9)          # Invalid value
-    #     self.assertEqual(WhizIter(c=None).get_c_display(), None)    # Blank value
-    #     self.assertEqual(WhizIter(c='').get_c_display(), '')        # Empty value
-
     def test_iterator_choices(self):
         """
         Check that get_choices works with Iterators (#23112).
@@ -394,7 +383,6 @@ class ChoicesTests(test.TestCase):
         self.assertEqual(WhizIter(c=9).c, 9)          # Invalid value
         self.assertEqual(WhizIter(c=None).c, None)    # Blank value
         self.assertEqual(WhizIter(c='').c, '')        # Empty value
-
 
 
 class SlugFieldTests(test.TestCase):
