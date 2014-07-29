@@ -134,6 +134,10 @@ class MigrationExecutor(object):
         project_state = self.loader.project_state((migration.app_label, migration.name), at_end=True)
         apps = project_state.render()
         found_create_migration = False
+        # Bail if the migration isn't the first one in its app
+        if [name for app, name in migration.dependencies if app == migration.app_label]:
+            return False
+        # Make sure all create model are done
         for operation in migration.operations:
             if isinstance(operation, migrations.CreateModel):
                 model = apps.get_model(migration.app_label, operation.name)
@@ -144,8 +148,6 @@ class MigrationExecutor(object):
                 if model._meta.db_table not in self.connection.introspection.get_table_list(self.connection.cursor()):
                     return False
                 found_create_migration = True
-            else:
-                return False
         # If we get this far and we found at least one CreateModel migration,
         # the migration is considered implicitly applied.
         return found_create_migration
