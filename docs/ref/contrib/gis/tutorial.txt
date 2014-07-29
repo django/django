@@ -265,16 +265,26 @@ Run ``migrate``
 ---------------
 
 After defining your model, you need to sync it with the database. First,
-let's look at the SQL that will generate the table for the
-``WorldBorder`` model::
+create a database migration:
 
-    $ python manage.py sqlall world
+.. code-block:: bash
+
+    $ python manage.py makemigrations
+    Migrations for 'world':
+      0001_initial.py:
+        - Create model WorldBorder
+
+Let's look at the SQL that will generate the table for the ``WorldBorder``
+model:
+
+.. code-block:: bash
+
+    $ python manage.py sqlmigrate world 0001
 
 This command should produce the following output:
 
 .. code-block:: sql
 
-    BEGIN;
     CREATE TABLE "world_worldborder" (
         "id" serial NOT NULL PRIMARY KEY,
         "name" varchar(50) NOT NULL,
@@ -292,7 +302,6 @@ This command should produce the following output:
     )
     ;
     CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" );
-    COMMIT;
 
 .. note::
 
@@ -300,14 +309,17 @@ This command should produce the following output:
     column is added through a separate ``SELECT AddGeometryColumn(...)``
     statement.
 
-If this looks correct, run :djadmin:`migrate` to create this table in the database::
+If this looks correct, run :djadmin:`migrate` to create this table in the
+database:
+
+.. code-block:: bash
 
     $ python manage.py migrate
-    Creating table world_worldborder
-    Installing custom SQL for world.WorldBorder model
-
-The :djadmin:`migrate` command may also prompt you to create an admin user.
-Either do so now, or later by running ``django-admin.py createsuperuser``.
+    Operations to perform:
+      Apply all migrations: admin, world, contenttypes, auth, sessions
+    Running migrations:
+      ...
+      Applying world.0001_initial... OK
 
 Importing Spatial Data
 ======================
@@ -737,16 +749,22 @@ Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
         url(r'^admin/', include(admin.site.urls)),
     ]
 
-Start up the Django development server:
+Create an admin user:
+
+.. code-block:: bash
+
+    $ python manage.py createsuperuser
+
+Next, start up the Django development server:
 
 .. code-block:: bash
 
     $ python manage.py runserver
 
-Finally, browse to ``http://localhost:8000/admin/``, and log in with the admin
-user created after running :djadmin:`migrate`. Browse to any of the ``WorldBorder``
-entries -- the borders may be edited by clicking on a polygon and dragging
-the vertexes to the desired position.
+Finally, browse to ``http://localhost:8000/admin/``, and log in with the user
+you just created. Browse to any of the ``WorldBorder`` entries -- the borders
+may be edited by clicking on a polygon and dragging the vertexes to the desired
+position.
 
 .. _OpenLayers: http://openlayers.org/
 .. _Open Street Map: http://www.openstreetmap.org/
