@@ -95,13 +95,15 @@ Use a dot (``.``) to access attributes of a variable.
     following lookups, in this order:
 
     * Dictionary lookup
-    * Attribute lookup
-    * Method call
-    * List-index lookup
+    * Attribute or method lookup
+    * Numeric index lookup
 
-    This can cause some unexpected behavior with objects that override
-    dictionary lookup. For example, consider the following code snippet that
-    attempts to loop over a ``collections.defaultdict``::
+    If the resulting value is callable, it is called with no arguments. The
+    result of the call becomes the template value.
+
+    This lookup order can cause some unexpected behavior with objects that
+    override dictionary lookup. For example, consider the following code snippet
+    that attempts to loop over a ``collections.defaultdict``::
 
         {% for k, v in defaultdict.iteritems %}
             Do something with k and v here...
