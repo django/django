@@ -26,3 +26,7 @@ Bugfixes
 * Fixed transaction handling when specifying non-default database in
   ``createcachetable`` and ``flush``
   (`#23089 <https://code.djangoproject.com/ticket/23089>`_).
+
+* Fixed the "ORA-01843: not a valid month" errors when using Unicode
+  with older versions of Oracle server
+  (`#20292 <https://code.djangoproject.com/ticket/20292>`_).
