@@ -182,6 +182,19 @@ Management Commands
 Models
 ^^^^^^
 
+* Added the new :class:`~django.db.models.options.Options` API
+  that introduces a formal API which can be used publicly and will
+  be maintained. The new API is componsed of 2 main endpoints:
+  :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
+  and :meth:`Options.get_field() <django.db.models.options.Options.get_field()>`.
+  The new API contains several fast-access cached properties that are documented
+  in https://code.djangoproject.com/wiki/new_meta_api.
+
+* A series of methods in :class:`~django.db.models.options.Options` have been
+  deprecated in favor of newer ones. Each deprecated method is specified in
+  https://code.djangoproject.com/wiki/new_meta_api, it will be
+  backwards-compatible till release 2.0 and will raise a DeprecationWarning.
+
 * Django now logs at most 9000 queries in ``connections.queries``, in order
   to prevent excessive memory usage in long-running processes in debug mode.
 
