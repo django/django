@@ -65,6 +65,8 @@ class Command(BaseCommand):
         # Load the operations from all those migrations and concat together
         operations = []
         for smigration in migrations_to_squash:
+            if smigration.replaces:
+                raise CommandError("You cannot squash squashed migrations! Please transition it to a normal migration first: https://docs.djangoproject.com/en/1.7/topics/migrations/#squashing-migrations")
             operations.extend(smigration.operations)
 
         if self.verbosity > 0:
