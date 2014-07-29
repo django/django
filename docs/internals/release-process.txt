@@ -19,9 +19,9 @@ Since version 1.0, Django's release numbering works as follows:
 
 * ``C`` is the *minor version* number, which is incremented for bug and
   security fixes. A new minor release will be 100% backwards-compatible with
-  the previous minor release. The only exception is when a security issue
-  can't be fixed without breaking backwards-compatibility. If this happens,
-  the release notes will provide detailed upgrade instructions.
+  the previous minor release. The only exception is when a security or data loss
+  issue can't be fixed without breaking backwards-compatibility. If this
+  happens, the release notes will provide detailed upgrade instructions.
 
 * Before a new major release, we'll make alpha, beta, and release candidate
   releases. These are of the form ``A.B alpha/beta/rc N``, which means the
@@ -67,8 +67,9 @@ security purposes, please see :doc:`our security policies <security>`.
     fix security issues.
 
     These releases will be 100% compatible with the associated major release,
-    unless this is impossible for security reasons. So the answer to "should I
-    upgrade to the latest minor release?" will always be "yes."
+    unless this is impossible for security reasons or to prevent data loss.
+    So the answer to "should I upgrade to the latest minor release?" will always
+    be "yes."
 
 .. _backwards-compatibility-policy:
 
@@ -87,7 +88,7 @@ varying levels:
 
   * Security issues.
 
-  * Data-loss bugs.
+  * Data loss bugs.
 
   * Crashing bugs.
 
@@ -97,11 +98,8 @@ varying levels:
   for bugs that would have prevented a release in the first place (release
   blockers).
 
-* Security fixes will be applied to the current master, the previous two major
-  releases, and the current :ref:`LTS release <lts-releases>`.
-
-* Committers may choose to backport bugfixes at their own discretion,
-  provided they do not introduce backwards incompatibilities.
+* Security fixes and data loss bugs will be applied to the current master, the
+  last two major releases, and the current :ref:`LTS release <lts-releases>`.
 
 * Documentation fixes generally will be more freely backported to the last
   release branch. That's because it's highly advantageous to have the docs for
@@ -116,12 +114,13 @@ Django 1.6 and 1.7. At this point in time:
 * Critical bug fixes will be applied to the ``stable/1.6.x`` branch, and
   released as 1.6.1, 1.6.2, etc.
 
-* Security fixes will be applied to ``master``, to the ``stable/1.6.x``
-  branch, and to the ``stable/1.5.x`` branch. They will trigger the release of
-  ``1.6.1``, ``1.5.1``, etc.
+* Security fixes and bug fixes for data loss issues will be applied to
+  ``master`` and to the ``stable/1.6.x``, ``stable/1.5.x``, and
+  ``stable/1.4.x`` (LTS) branches. They will trigger the release of ``1.6.1``,
+  ``1.5.1``, ``1.4.1``, etc.
 
 * Documentation fixes will be applied to master, and, if easily backported, to
-  the ``1.6.x`` branch. Bugfixes may also be backported.
+  the ``1.6.x`` branch.
 
 .. _lts-releases:
 
@@ -129,9 +128,9 @@ Long-term support (LTS) releases
 ================================
 
 Additionally, the Django team will occasionally designate certain releases
-to be "Long-term support" (LTS) releases. LTS releases will get security fixes
-applied for a guaranteed period of time, typically 3+ years, regardless of
-the pace of releases afterwards.
+to be "Long-term support" (LTS) releases. LTS releases will get security and
+data loss fixes applied for a guaranteed period of time, typically 3+ years,
+regardless of the pace of releases afterwards.
 
 The follow releases have been designated for long-term support:
 
@@ -220,24 +219,3 @@ bugfixes. Critical bugs fixed on master must *also* be fixed on the bugfix
 branch; this means that commits need to cleanly separate bug fixes from feature
 additions. The developer who commits a fix to master will be responsible for
 also applying the fix to the current bugfix branch.
-
-How this all fits together
---------------------------
-
-Let's look at a hypothetical example for how this all first together. Imagine,
-if you will, a point about halfway between 1.5 and 1.6. At this point,
-development will be happening in a bunch of places:
-
-* On master, development towards 1.6 proceeds with small additions, bugs
-  fixes, etc. being checked in daily.
-
-* On the branch ``stable/1.5.x``, fixes for critical bugs found in
-  the 1.5 release are checked in as needed. At some point, this branch will
-  be released as "1.5.1", "1.5.2", etc.
-
-* On the branch ``stable/1.4.x``, security fixes are made if
-  needed and released as "1.4.2", "1.4.3", etc.
-
-* Development of major features is done in branches in forks of the main
-  repository. These branches will be merged into ``master`` before "1.6
-  alpha 1".
