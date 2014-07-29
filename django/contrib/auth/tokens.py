@@ -56,7 +56,7 @@ class PasswordResetTokenGenerator(object):
         key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
 
         # Ensure results are consistent across DB backends
-        login_timestamp = user.last_login.replace(microsecond=0, tzinfo=None)
+        login_timestamp = '' if user.last_login is None else user.last_login.replace(microsecond=0, tzinfo=None)
 
         value = (six.text_type(user.pk) + user.password +
                 six.text_type(login_timestamp) + six.text_type(timestamp))

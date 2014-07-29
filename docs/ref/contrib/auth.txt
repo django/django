@@ -81,8 +81,12 @@ Fields
 
     .. attribute:: last_login
 
-        A datetime of the user's last login. Is set to the current date/time by
-        default.
+        A datetime of the user's last login.
+
+        .. versionchanged:: 1.8
+
+            This field will be ``null`` if the user has never logged in.
+            Previously it was set to the current date/time by default.
 
     .. attribute:: date_joined
 
