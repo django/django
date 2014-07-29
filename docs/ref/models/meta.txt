@@ -27,20 +27,10 @@ Data fields
 A data field is any field that has an entry on the database,
 for example a CharField, BooleanField, a ForeignKey.
 
-.. code-block:: python
-
-    class Person(models.Model):
-        data_abstract = models.CharField(max_length=10)
-
 Many-to-many fields
 ~~~~~~~~~~~~~~~~~~~
 
 A many-to-many field that is defined on the current model.
-
-.. code-block:: python
-
-    class Person(models.Model):
-        friends = models.ManyToManyField('self', related_name='friends', symmetrical=True)
 
 Related Object
 ~~~~~~~~~~~~~~
