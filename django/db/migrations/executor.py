@@ -144,6 +144,8 @@ class MigrationExecutor(object):
                 if model._meta.db_table not in self.connection.introspection.get_table_list(self.connection.cursor()):
                     return False
                 found_create_migration = True
+            else:
+                return False
         # If we get this far and we found at least one CreateModel migration,
         # the migration is considered implicitly applied.
         return found_create_migration
