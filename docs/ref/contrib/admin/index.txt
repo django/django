@@ -1300,9 +1300,10 @@ templates used by the :class:`ModelAdmin` views:
                 queryset, use_distinct = super(PersonAdmin, self).get_search_results(request, queryset, search_term)
                 try:
                     search_term_as_int = int(search_term)
-                    queryset |= self.model.objects.filter(age=search_term_as_int)
-                except:
+                except ValueError:
                     pass
+                else:
+                    queryset |= self.model.objects.filter(age=search_term_as_int)
                 return queryset, use_distinct
 
 .. method:: ModelAdmin.save_related(request, form, formsets, change)
