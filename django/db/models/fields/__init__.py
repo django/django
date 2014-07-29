@@ -732,7 +732,7 @@ class Field(RegisterLookupMixin):
         blank_defined = False
         if self.choices:
             list_choices = list(self.choices)
-        named_groups = self.choices and isinstance(list_choices[0][1], (list, tuple))
+        named_groups = self.choices and list_choices and isinstance(list_choices[0][1], (list, tuple))
         if not named_groups:
             for choice, __ in self.choices:
                 if choice in ('', None):
