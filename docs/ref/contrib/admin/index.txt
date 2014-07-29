@@ -2491,7 +2491,7 @@ In this example, we register the ``AdminSite`` instance
 Note that you may not want autodiscovery of ``admin`` modules when using your
 own ``AdminSite`` instance since you will likely be importing all the per-app
 ``admin`` modules in your ``myproject.admin`` module. This means you need to
-put ``'django.contrib.admin.app.SimpleAdminConfig'`` instead of
+put ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
 ``'django.contrib.admin'`` in your :setting:`INSTALLED_APPS` setting.
 
 
