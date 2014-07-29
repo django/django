@@ -1,10 +1,12 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import six
+from django.conf import settings
 from django.db import connections, DEFAULT_DB_ALIAS, migrations
 from django.db.migrations.loader import AmbiguityError
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.writer import MigrationWriter
 from django.db.migrations.optimizer import MigrationOptimizer
+from django.db.migrations.migration import SwappableTuple
 
 
 class Command(BaseCommand):
@@ -62,12 +64,23 @@ class Command(BaseCommand):
                 if answer != "y":
                     return
 
-        # Load the operations from all those migrations and concat together
+        # Load the operations from all those migrations and concat together,
+        # along with collecting external dependencies and detecting
+        # double-squashing
         operations = []
+        dependencies = set()
         for smigration in migrations_to_squash:
             if smigration.replaces:
                 raise CommandError("You cannot squash squashed migrations! Please transition it to a normal migration first: https://docs.djangoproject.com/en/1.7/topics/migrations/#squashing-migrations")
             operations.extend(smigration.operations)
+            for dependency in smigration.dependencies:
+                if isinstance(dependency, SwappableTuple):
+                    if settings.AUTH_USER_MODEL == dependency.setting:
+                        dependencies.add(("__setting__", "AUTH_USER_MODEL"))
+                    else:
+                        dependencies.add(dependency)
+                elif dependency[0] != smigration.app_label:
+                    dependencies.add(dependency)
 
         if self.verbosity > 0:
             self.stdout.write(self.style.MIGRATE_HEADING("Optimizing..."))
@@ -92,7 +105,7 @@ class Command(BaseCommand):
 
         # Make a new migration with those operations
         subclass = type("Migration", (migrations.Migration, ), {
-            "dependencies": [],
+            "dependencies": dependencies,
             "operations": new_operations,
             "replaces": replaces,
         })

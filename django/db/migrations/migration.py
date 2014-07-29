@@ -146,8 +146,20 @@ class Migration(object):
         return project_state
 
 
+class SwappableTuple(tuple):
+    """
+    Subclass of tuple so Django can tell this was originally a swappable
+    dependency when it reads the migration file.
+    """
+
+    def __new__(cls, value, setting):
+        self = tuple.__new__(cls, value)
+        self.setting = setting
+        return self
+
+
 def swappable_dependency(value):
     """
     Turns a setting value into a dependency.
     """
-    return (value.split(".", 1)[0], "__first__")
+    return SwappableTuple((value.split(".", 1)[0], "__first__"), value)
