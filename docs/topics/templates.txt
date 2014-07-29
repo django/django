@@ -95,8 +95,7 @@ Use a dot (``.``) to access attributes of a variable.
     following lookups, in this order:
 
     * Dictionary lookup
-    * Attribute lookup
-    * Method call
+    * Attribute lookup and Method call
     * List-index lookup
 
     This can cause some unexpected behavior with objects that override
