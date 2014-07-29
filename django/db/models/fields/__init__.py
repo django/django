@@ -730,7 +730,10 @@ class Field(RegisterLookupMixin):
         """Returns choices with a default blank choices included, for use
         as SelectField choices for this field."""
         blank_defined = False
-        named_groups = self.choices and isinstance(list(self.choices)[0][1], (list, tuple))
+        list_choices = []
+        if self.choices:
+            list_choices = list(self.choices)
+        named_groups = self.choices and isinstance(list_choices[0][1], (list, tuple))
         if not named_groups:
             for choice, __ in self.choices:
                 if choice in ('', None):
@@ -740,7 +743,7 @@ class Field(RegisterLookupMixin):
         first_choice = (blank_choice if include_blank and
                         not blank_defined else [])
         if self.choices:
-            return first_choice + list(self.choices)
+            return first_choice + list_choices
         rel_model = self.rel.to
         if hasattr(self.rel, 'get_related_field'):
             lst = [(getattr(x, self.rel.get_related_field().attname),
