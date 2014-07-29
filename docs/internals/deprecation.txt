@@ -48,14 +48,14 @@ about each item can often be found in the release notes of two versions prior.
   favour of the new formal Options API:
 
   * ``get_fields_with_model()``
-  * ``get_concrete_fields_with_model``
-  * ``get_m2m_with_model``
-  * ``get_field_by_name``
-  * ``get_all_field_names``
-  * ``get_all_related_objects``
-  * ``get_all_related_objects_with_model``
-  * ``get_all_related_many_to_many_objects``
-  * ``get_all_related_m2m_objects_with_model``
+  * ``get_concrete_fields_with_model()``
+  * ``get_m2m_with_model()``
+  * ``get_field_by_name()``
+  * ``get_all_field_names()``
+  * ``get_all_related_objects()``
+  * ``get_all_related_objects_with_model()``
+  * ``get_all_related_many_to_many_objects()``
+  * ``get_all_related_m2m_objects_with_model()``
 
 .. _deprecation-removed-in-1.9:
 

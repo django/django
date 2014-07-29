@@ -182,9 +182,9 @@ Management Commands
 Models
 ^^^^^^
 
-* Added the new :class:`~django.db.models.options.Options` API
-  that introduces a formal API which can be used publicly and will
-  be maintained. The new API is componsed of 2 main endpoints:
+* Added the new Model._meta API in the :class:`~django.db.models.options.Options`
+  class. The API is formally maintained, documented and can be used for public use.
+  The new API is componsed of 2 main endpoints:
   :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
   and :meth:`Options.get_field() <django.db.models.options.Options.get_field()>`.
   The new API contains several fast-access cached properties that are documented
