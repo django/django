@@ -181,7 +181,7 @@ Retrieve a field instance by name
 
     .. code-block:: python
 
-        from django.contrib.auth.models import User
+        >>> from django.contrib.auth.models import User
 
         >>> User._meta.get_field('username')# A data field
         <django.db.models.fields.CharField: username>
@@ -195,7 +195,9 @@ Retrieve a field instance by name
         <django.db.models.fields.related.ForeignKey: user>
 
         >>> User._meta.get_field('does_not_exist') # A non existent field
-        *** FieldDoesNotExist: User has no field named 'does_not_exist'
+        Traceback (most recent call last):
+            ...
+        FieldDoesNotExist: User has no field named 'does_not_exist'
 
     .. note::
         The default arguments of :meth:`Options.get_field()` might not be what you expect.
