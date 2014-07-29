@@ -487,6 +487,23 @@ please `file a bug report <https://code.djangoproject.com/newticket>`_ either
 way detailing the models and their relationships so we can improve the
 optimizer to handle your case.
 
+Once you've squashed your migration, you should then commit it alongside the
+migrations it replaces and distribute this change to all running instances
+of your application, making sure that they run ``migrate`` to store the change
+in their database.
+
+After this has been done, you must then transition the squashed migration to
+a normal initial migration, by:
+
+- Deleting all the migration files it replaces
+- Removing the ``replaces`` argument in the ``Migration`` class of the
+  squashed migration (this is how Django tells that it is a squashed migration)
+
+.. note::
+    Once you've squashed a migration, you should not then re-squash that squashed
+    migration until you have fully transitioned it to a normal migration.
+
+
 .. _migration-serializing:
 
 Serializing values
