@@ -278,16 +278,10 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.author_name_renamed])
         autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename": True}))
         changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['testapp']), 1)
-        # Right number of actions?
-        migration = changes['testapp'][0]
-        self.assertEqual(len(migration.operations), 1)
-        # Right action?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "RenameField")
-        self.assertEqual(action.old_name, "name")
-        self.assertEqual(action.new_name, "names")
+        # Check
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["RenameField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, old_name="name", new_name="names")
 
     def test_rename_model(self):
         "Tests autodetection of renamed models"
@@ -731,21 +725,12 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.author_with_publisher, self.publisher])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
-        # Right number of migrations?
-        self.assertEqual(len(changes['testapp']), 1)
-        # Right number of actions?
-        migration = changes['testapp'][0]
-        self.assertEqual(len(migration.operations), 3)
-        # Right actions?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        self.assertEqual(action.name, "Publisher")
-        action = migration.operations[1]
-        self.assertEqual(action.__class__.__name__, "AddField")
-        self.assertEqual(action.name, "publisher")
-        action = migration.operations[2]
-        self.assertEqual(action.__class__.__name__, "RemoveField")
-        self.assertEqual(action.name, "publisher_name")
+        # Right result?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "RemoveField", "AddField"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Publisher")
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="publisher_name")
+        self.assertOperationAttributes(changes, 'testapp', 0, 2, name="publisher")
 
     def test_foreign_key_removed_before_target_model(self):
         """
