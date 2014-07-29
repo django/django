@@ -37,7 +37,7 @@ Installing the contenttypes framework
 =====================================
 
 The contenttypes framework is included in the default
-:setting:`INSTALLED_APPS` list created by ``django-admin.py startproject``,
+:setting:`INSTALLED_APPS` list created by ``django-admin startproject``,
 but if you've removed it or if you manually set up your
 :setting:`INSTALLED_APPS` list, you can enable it by adding
 ``'django.contrib.contenttypes'`` to your :setting:`INSTALLED_APPS` setting.

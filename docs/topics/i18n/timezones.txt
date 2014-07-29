@@ -40,7 +40,7 @@ or times, please try installing it before filing a bug. It's as simple as:
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin.py
+    The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` includes :setting:`USE_TZ = True <USE_TZ>`
     for convenience.
 

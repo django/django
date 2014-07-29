@@ -81,12 +81,12 @@ to create a :ref:`SpatiaLite database <create_spatialite_db>`.
 Create a New Project
 ------------------------
 
-Use the standard ``django-admin.py`` script to create a project called
+Use the standard ``django-admin`` script to create a project called
 ``geodjango``:
 
 .. code-block:: bash
 
-    $ django-admin.py startproject geodjango
+    $ django-admin startproject geodjango
 
 This will initialize a new project. Now, create a ``world`` Django application
 within the ``geodjango`` project:
@@ -307,7 +307,7 @@ If this looks correct, run :djadmin:`migrate` to create this table in the databa
     Installing custom SQL for world.WorldBorder model
 
 The :djadmin:`migrate` command may also prompt you to create an admin user.
-Either do so now, or later by running ``django-admin.py createsuperuser``.
+Either do so now, or later by running ``django-admin createsuperuser``.
 
 Importing Spatial Data
 ======================

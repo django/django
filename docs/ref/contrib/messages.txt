@@ -22,7 +22,7 @@ Enabling messages
 Messages are implemented through a :doc:`middleware </ref/middleware>`
 class and corresponding :doc:`context processor </ref/templates/api>`.
 
-The default ``settings.py`` created by ``django-admin.py startproject``
+The default ``settings.py`` created by ``django-admin startproject``
 already contains all the settings required to enable message functionality:
 
 * ``'django.contrib.messages'`` is in :setting:`INSTALLED_APPS`.
