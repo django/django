@@ -1000,6 +1000,8 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(None, f.clean('2'))
         self.assertEqual(None, f.clean('3'))
         self.assertEqual(None, f.clean('hello'))
+        self.assertEqual(True, f.clean('true'))
+        self.assertEqual(False, f.clean('false'))
 
     def test_nullbooleanfield_2(self):
         # Make sure that the internal value is preserved if using HiddenInput (#7753)
