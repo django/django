@@ -599,7 +599,7 @@ Upgrading from South
 --------------------
 
 If you already have pre-existing migrations created with
-`South 0.x <http://south.aeracode.org>`_, then the upgrade process to use
+`South <http://south.aeracode.org>`_, then the upgrade process to use
 ``django.db.migrations`` is quite simple:
 
 * Ensure all installs are fully up-to-date with their migrations
@@ -616,3 +616,19 @@ of foreign keys; in this case, ``makemigrations`` might make more than one
 initial migration, and you'll need to mark them all as applied using::
 
     python manage.py migrate --fake yourappnamehere
+
+Libraries/Third-party Apps
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are a library or app maintainer, and wish to support both South migrations
+(for Django 1.6 and below) and Django migrations (for 1.7 and above) you should
+keep two parallel migration sets in your app, one in each format.
+
+To aid in this, South 1.0 will automatically look for South-format migrations
+in a ``south_migrations`` directory first, before looking in ``migrations``,
+meaning that users' projects will transparently use the correct set as long
+as you put your South migrations in the ``south_migrations`` directory and
+your Django migrations in the ``migrations`` directory.
+
+More information is available in the
+`South 1.0 release notes <http://south.readthedocs.org/en/latest/releasenotes/1.0.html#library-migration-path>`_.
