@@ -222,7 +222,7 @@ Retrieve all field names
 Retrieve field instances
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Options.get_fields(m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False, include_parents=True, include_non_concrete=True, include_hidden=False, include_proxy=False, export_map=False)
+.. method:: Options.get_fields(m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False, include_parents=True, include_non_concrete=True, include_hidden=False, include_proxy=False)
 
     Returns a list of fields given a list of field types and filters.
 
