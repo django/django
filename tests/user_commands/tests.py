@@ -1,11 +1,13 @@
 import os
 import sys
+import warnings
 
 from django.core import management
 from django.core.management import CommandError
 from django.core.management.utils import find_command, popen_wrapper
 from django.test import SimpleTestCase
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six import StringIO
 
 
@@ -79,7 +81,9 @@ class CommandTests(SimpleTestCase):
         optparse should be supported during Django 1.8/1.9 releases.
         """
         out = StringIO()
-        management.call_command('optparse_cmd', stdout=out)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            management.call_command('optparse_cmd', stdout=out)
         self.assertEqual(out.getvalue(), "All right, let's dance Rock'n'Roll.\n")
 
         # Simulate command line execution

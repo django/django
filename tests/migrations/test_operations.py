@@ -46,7 +46,7 @@ class OperationTestBase(MigrationTestBase):
         operation.state_forwards(app_label, new_state)
         return project_state, new_state
 
-    def set_up_test_model(self, app_label, second_model=False, third_model=False, related_model=False, mti_model=False, proxy_model=False):
+    def set_up_test_model(self, app_label, second_model=False, third_model=False, related_model=False, mti_model=False, proxy_model=False, unique_together=False, options=False):
         """
         Creates a test model state and database table.
         """
@@ -76,6 +76,12 @@ class OperationTestBase(MigrationTestBase):
             except DatabaseError:
                 pass
         # Make the "current" state
+        model_options = {
+            "swappable": "TEST_SWAP_MODEL",
+            "unique_together": [["pink", "weight"]] if unique_together else [],
+        }
+        if options:
+            model_options["permissions"] = [("can_groom", "Can groom")]
         operations = [migrations.CreateModel(
             "Pony",
             [
@@ -83,9 +89,7 @@ class OperationTestBase(MigrationTestBase):
                 ("pink", models.IntegerField(default=3)),
                 ("weight", models.FloatField()),
             ],
-            options={
-                "swappable": "TEST_SWAP_MODEL",
-            },
+            options=model_options,
         )]
         if second_model:
             operations.append(migrations.CreateModel(
@@ -769,6 +773,26 @@ class OperationTests(OperationTestBase):
         self.assertTableExists("test_almota_pony")
         self.assertTableNotExists("test_almota_pony_2")
 
+    def test_alter_model_table_noop(self):
+        """
+        Tests the AlterModelTable operation if the table name is not changed.
+        """
+        project_state = self.set_up_test_model("test_almota")
+        # Test the state alteration
+        operation = migrations.AlterModelTable("Pony", "test_almota_pony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_almota", new_state)
+        self.assertEqual(new_state.models["test_almota", "pony"].options["db_table"], "test_almota_pony")
+        # Test the database alteration
+        self.assertTableExists("test_almota_pony")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_almota", editor, project_state, new_state)
+        self.assertTableExists("test_almota_pony")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_almota", editor, new_state, project_state)
+        self.assertTableExists("test_almota_pony")
+
     def test_alter_field(self):
         """
         Tests the AlterField operation.
@@ -842,7 +866,7 @@ class OperationTests(OperationTestBase):
         """
         Tests the RenameField operation.
         """
-        project_state = self.set_up_test_model("test_rnfl")
+        project_state = self.set_up_test_model("test_rnfl", unique_together=True)
         # Test the state alteration
         operation = migrations.RenameField("Pony", "pink", "blue")
         self.assertEqual(operation.describe(), "Rename field pink on Pony to blue")
@@ -850,6 +874,9 @@ class OperationTests(OperationTestBase):
         operation.state_forwards("test_rnfl", new_state)
         self.assertIn("blue", [n for n, f in new_state.models["test_rnfl", "pony"].fields])
         self.assertNotIn("pink", [n for n, f in new_state.models["test_rnfl", "pony"].fields])
+        # Make sure the unique_together has the renamed column too
+        self.assertIn("blue", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
+        self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
         # Test the database alteration
         self.assertColumnExists("test_rnfl_pony", "pink")
         self.assertColumnNotExists("test_rnfl_pony", "blue")
@@ -857,6 +884,13 @@ class OperationTests(OperationTestBase):
             operation.database_forwards("test_rnfl", editor, project_state, new_state)
         self.assertColumnExists("test_rnfl_pony", "blue")
         self.assertColumnNotExists("test_rnfl_pony", "pink")
+        # Ensure the unique constraint has been ported over
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO test_rnfl_pony (blue, weight) VALUES (1, 1)")
+            with self.assertRaises(IntegrityError):
+                with atomic():
+                    cursor.execute("INSERT INTO test_rnfl_pony (blue, weight) VALUES (1, 1)")
+            cursor.execute("DELETE FROM test_rnfl_pony")
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_rnfl", editor, new_state, project_state)
@@ -899,6 +933,10 @@ class OperationTests(OperationTestBase):
         operation.state_forwards("test_alunto", new_state)
         self.assertEqual(len(new_state.models["test_alunto", "pony"].options.get("unique_together", set())), 1)
 
+    def test_alter_unique_together_remove(self):
+        operation = migrations.AlterUniqueTogether("Pony", None)
+        self.assertEqual(operation.describe(), "Alter unique_together for Pony (0 constraint(s))")
+
     def test_alter_index_together(self):
         """
         Tests the AlterIndexTogether operation.
@@ -922,6 +960,10 @@ class OperationTests(OperationTestBase):
             operation.database_backwards("test_alinto", editor, new_state, project_state)
         self.assertIndexNotExists("test_alinto_pony", ["pink", "weight"])
 
+    def test_alter_index_together_remove(self):
+        operation = migrations.AlterIndexTogether("Pony", None)
+        self.assertEqual(operation.describe(), "Alter index_together for Pony (0 constraint(s))")
+
     def test_alter_model_options(self):
         """
         Tests the AlterModelOptions operation.
@@ -935,6 +977,19 @@ class OperationTests(OperationTestBase):
         self.assertEqual(len(project_state.models["test_almoop", "pony"].options.get("permissions", [])), 0)
         self.assertEqual(len(new_state.models["test_almoop", "pony"].options.get("permissions", [])), 1)
         self.assertEqual(new_state.models["test_almoop", "pony"].options["permissions"][0][0], "can_groom")
+
+    def test_alter_model_options_emptying(self):
+        """
+        Tests that the AlterModelOptions operation removes keys from the dict (#23121)
+        """
+        project_state = self.set_up_test_model("test_almoop", options=True)
+        # Test the state alteration (no DB alteration to test)
+        operation = migrations.AlterModelOptions("Pony", {})
+        self.assertEqual(operation.describe(), "Change Meta options on Pony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_almoop", new_state)
+        self.assertEqual(len(project_state.models["test_almoop", "pony"].options.get("permissions", [])), 1)
+        self.assertEqual(len(new_state.models["test_almoop", "pony"].options.get("permissions", [])), 0)
 
     def test_alter_order_with_respect_to(self):
         """

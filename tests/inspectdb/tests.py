@@ -217,6 +217,14 @@ class InspectDBTestCase(TestCase):
         self.longMessage = False
         self.assertIn("        managed = False", output, msg='inspectdb should generate unmanaged models.')
 
+    def test_unique_together_meta(self):
+        out = StringIO()
+        call_command('inspectdb',
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_uniquetogether'),
+                     stdout=out)
+        output = out.getvalue()
+        self.assertIn("        unique_together = (('field1', 'field2'),)", output, msg='inspectdb should generate unique_together.')
+
     @skipUnless(connection.vendor == 'sqlite',
                 "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")
     def test_custom_fields(self):

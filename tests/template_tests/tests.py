@@ -10,6 +10,7 @@ import warnings
 
 from django import template
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.core import urlresolvers
 from django.template import (base as template_base, loader, Context,
     RequestContext, Template, TemplateSyntaxError)
@@ -499,6 +500,15 @@ class TemplateRegressionTests(TestCase):
         with self.assertRaises(urlresolvers.NoReverseMatch):
             t.render(Context({}))
 
+    def test_debug_tag_non_ascii(self):
+        """
+        Test non-ASCII model representation in debug output (#23060).
+        """
+        Group.objects.create(name="清風")
+        c1 = Context({"objs": Group.objects.all()})
+        t1 = Template('{% debug %}')
+        self.assertIn("清風", t1.render(c1))
+
 
 # Set ALLOWED_INCLUDE_ROOTS so that ssi works.
 @override_settings(MEDIA_URL="/media/", STATIC_URL="/static/",
@@ -880,6 +890,9 @@ class TemplateTests(TestCase):
 
             # Raise exception for custom tags used in child with {% load %} tag in parent, not in child
             'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
+
+            # Raise exception for block.super used in base template
+            'exception05': ("{% block first %}{{ block.super }}{% endblock %}", {}, template.TemplateSyntaxError),
 
             ### FILTER TAG ############################################################
             'filter01': ('{% filter upper %}{% endfilter %}', {}, ''),

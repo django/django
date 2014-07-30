@@ -367,6 +367,8 @@ class BaseDatabaseSchemaEditor(object):
         """
         Renames the table a model points to.
         """
+        if old_db_table == new_db_table:
+            return
         self.execute(self.sql_rename_table % {
             "old_table": self.quote_name(old_db_table),
             "new_table": self.quote_name(new_db_table),
@@ -433,11 +435,7 @@ class BaseDatabaseSchemaEditor(object):
             to_column = field.rel.to._meta.get_field(field.rel.field_name).column
             self.deferred_sql.append(
                 self.sql_create_fk % {
-                    "name": self.quote_name('%s_refs_%s_%x' % (
-                        field.column,
-                        to_column,
-                        abs(hash((model._meta.db_table, to_table)))
-                    )),
+                    "name": self._create_index_name(model, [field.column], suffix="_fk_%s_%s" % (to_table, to_column)),
                     "table": self.quote_name(model._meta.db_table),
                     "column": self.quote_name(field.column),
                     "to_table": self.quote_name(to_table),
@@ -492,7 +490,12 @@ class BaseDatabaseSchemaEditor(object):
         old_type = old_db_params['type']
         new_db_params = new_field.db_parameters(connection=self.connection)
         new_type = new_db_params['type']
-        if old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
+        if (old_type is None and old_field.rel is None) or (new_type is None and new_field.rel is None):
+            raise ValueError("Cannot alter field %s into %s - they do not properly define db_type (are you using PostGIS 1.5 or badly-written custom fields?)" % (
+                old_field,
+                new_field,
+            ))
+        elif old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
             return self._alter_many_to_many(model, old_field, new_field, strict)
         elif old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and not old_field.rel.through._meta.auto_created and not new_field.rel.through._meta.auto_created):
             # Both sides have through models; this is a no-op.
@@ -735,13 +738,15 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Does it have a foreign key?
         if new_field.rel:
+            to_table = new_field.rel.to._meta.db_table
+            to_column = new_field.rel.get_related_field().column
             self.execute(
                 self.sql_create_fk % {
                     "table": self.quote_name(model._meta.db_table),
-                    "name": self._create_index_name(model, [new_field.column], suffix="_fk"),
+                    "name": self._create_index_name(model, [new_field.column], suffix="_fk_%s_%s" % (to_table, to_column)),
                     "column": self.quote_name(new_field.column),
-                    "to_table": self.quote_name(new_field.rel.to._meta.db_table),
-                    "to_column": self.quote_name(new_field.rel.get_related_field().column),
+                    "to_table": self.quote_name(to_table),
+                    "to_column": self.quote_name(to_column),
                 }
             )
         # Rebuild FKs that pointed to us if we previously had to drop them
@@ -766,6 +771,16 @@ class BaseDatabaseSchemaEditor(object):
                     "check": new_db_params['check'],
                 }
             )
+        # Drop the default if we need to
+        # (Django usually does not use in-database defaults)
+        if not self.skip_default(new_field) and new_field.default is not None:
+            sql = self.sql_alter_column % {
+                "table": self.quote_name(model._meta.db_table),
+                "changes": self.sql_alter_column_no_default % {
+                    "column": self.quote_name(new_field.column),
+                }
+            }
+            self.execute(sql)
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()

@@ -122,26 +122,6 @@ class LoaderTests(TestCase):
             ],
         )
 
-    @modify_settings(INSTALLED_APPS={'append': 'basic'})
-    @override_settings(MIGRATION_MODULES={
-        "migrations": "migrations.test_migrations_latest",
-        "basic": "migrations.test_migrations_latest_basic",
-    })
-    def test_latest(self):
-        """
-        Makes sure that __latest__ works correctly.
-        """
-        # Load and test the plan
-        migration_loader = MigrationLoader(connection)
-        self.assertEqual(
-            migration_loader.graph.forwards_plan(("migrations", "0001_initial")),
-            [
-                ("basic", "0001_initial"),
-                ("basic", "0002_second"),
-                ("migrations", "0001_initial"),
-            ],
-        )
-
     @override_settings(MIGRATION_MODULES={
         "migrations": "migrations.test_migrations_first",
         "migrations2": "migrations2.test_migrations_2_first",

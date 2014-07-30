@@ -70,3 +70,11 @@ class ColumnTypes(models.Model):
     text_field = models.TextField()
     time_field = models.TimeField()
     url_field = models.URLField()
+
+
+class UniqueTogether(models.Model):
+    field1 = models.IntegerField()
+    field2 = models.CharField(max_length=10)
+
+    class Meta:
+        unique_together = ('field1', 'field2')

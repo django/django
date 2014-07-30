@@ -43,7 +43,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         else:
             raise ValueError("Cannot quote parameter value %r of type %s" % (value, type(value)))
 
-    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], rename_fields=[], override_uniques=None):
+    def _remake_table(self, model, create_fields=[], delete_fields=[], alter_fields=[], override_uniques=None):
         """
         Shortcut to transform a model from old_model into new_model
         """
@@ -52,6 +52,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Since mapping might mix column names and default values,
         # its values must be already quoted.
         mapping = dict((f.column, self.quote_name(f.column)) for f in model._meta.local_fields)
+        # This maps field names (not columns) for things like unique_together
+        rename_mapping = {}
         # If any of the new or altered fields is introducing a new PK,
         # remove the old one
         restore_pk_field = None
@@ -77,6 +79,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             del mapping[old_field.column]
             body[new_field.name] = new_field
             mapping[new_field.column] = self.quote_name(old_field.column)
+            rename_mapping[old_field.name] = new_field.name
         # Remove any deleted fields
         for field in delete_fields:
             del body[field.name]
@@ -92,11 +95,19 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # the internal references of some of the provided fields.
         body = copy.deepcopy(body)
 
+        # Work out the new value of unique_together, taking renames into
+        # account
+        if override_uniques is None:
+            override_uniques = [
+                [rename_mapping.get(n, n) for n in unique]
+                for unique in model._meta.unique_together
+            ]
+
         # Construct a new model for the new state
         meta_contents = {
             'app_label': model._meta.app_label,
             'db_table': model._meta.db_table + "__new",
-            'unique_together': model._meta.unique_together if override_uniques is None else override_uniques,
+            'unique_together': override_uniques,
             'apps': apps,
         }
         meta = type("Meta", tuple(), meta_contents)
@@ -116,13 +127,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             ', '.join(y for x, y in field_maps),
             self.quote_name(model._meta.db_table),
         ))
-        # Delete the old table (not using self.delete_model to avoid deleting
-        # all implicit M2M tables)
-        self.execute(self.sql_delete_table % {
-            "table": self.quote_name(model._meta.db_table),
-        })
+        # Delete the old table
+        self.delete_model(model, handle_autom2m=False)
         # Rename the new to the old
-        self.alter_db_table(model, temp_model._meta.db_table, model._meta.db_table)
+        self.alter_db_table(temp_model, temp_model._meta.db_table, model._meta.db_table)
         # Run deferred SQL on correct table
         for sql in self.deferred_sql:
             self.execute(sql.replace(temp_model._meta.db_table, model._meta.db_table))
@@ -130,6 +138,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Fix any PK-removed field
         if restore_pk_field:
             restore_pk_field.primary_key = True
+
+    def delete_model(self, model, handle_autom2m=True):
+        if handle_autom2m:
+            super(DatabaseSchemaEditor, self).delete_model(model)
+        else:
+            # Delete the table (and only that)
+            self.execute(self.sql_delete_table % {
+                "table": self.quote_name(model._meta.db_table),
+            })
 
     def add_field(self, model, field):
         """

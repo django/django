@@ -696,6 +696,10 @@ The behavior of this command changes depending on the arguments provided:
   unapplying migrations if you have previously migrated past the named
   migration. Use the name ``zero`` to unapply all migrations for an app.
 
+Unlike ``syncdb``, this command does not prompt you to create a superuser if
+one doesn't exist (assuming you are using :mod:`django.contrib.auth`). Use
+:djadmin:`createsuperuser` to do that if you wish.
+
 .. django-admin-option:: --fake
 
 The ``--fake`` option tells Django to mark the migrations as having been
@@ -836,7 +840,7 @@ Write stderr to the *FILE* file.
 ``umask=UMASK``
 
 Umask to use when daemonizing. The value is interpreted as an octal number
-(default value is ``022``).
+(default value is ``0o22``).
 
 Example usage::
 
@@ -1045,6 +1049,13 @@ specify initial data.
 
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
+
+.. versionchanged:: 1.7
+
+    The ``sql*`` management commands now respect the ``allow_migrate()`` method
+    of :setting:`DATABASE_ROUTERS`. If you have models synced to non-default
+    databases, use the :djadminopt:`--database` flag to get SQL for those
+    models (previously they would always be included in the output).
 
 sqlclear <app_label app_label ...>
 ----------------------------------
