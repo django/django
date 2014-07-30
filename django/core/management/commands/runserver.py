@@ -128,7 +128,7 @@ class Command(BaseCommand):
         try:
             handler = self.get_handler(*args, **options)
             run(self.addr, int(self.port), handler,
-                ipv6=self.use_ipv6, threading=threading)
+                ipv6=self.use_ipv6, threading=threading, no_color=options['no_color'])
         except socket.error as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
