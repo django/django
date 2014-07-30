@@ -399,7 +399,7 @@ class ChoicesTests(test.TestCase):
         Check that get_choices works with an empty Iterator
         """
         f = models.CharField(choices=(x for x in []))
-        self.assertEqual(f.get_choices(True), [('', '---------')])
+        self.assertEqual(f.get_choices(include_blank=True), [('', '---------')])
 
 
 class SlugFieldTests(test.TestCase):
