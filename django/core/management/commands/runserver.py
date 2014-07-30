@@ -52,6 +52,8 @@ class Command(BaseCommand):
         if not settings.DEBUG and not settings.ALLOWED_HOSTS:
             raise CommandError('You must set settings.ALLOWED_HOSTS if DEBUG is False.')
 
+        if options.get('no_color'):
+            os.environ.setdefault("DJANGO_COLORS", "NOCOLOR_PALETTE")
         self.use_ipv6 = options.get('use_ipv6')
         if self.use_ipv6 and not socket.has_ipv6:
             raise CommandError('Your Python does not support IPv6.')
@@ -127,8 +129,6 @@ class Command(BaseCommand):
 
         try:
             handler = self.get_handler(*args, **options)
-            if options['no_color']:
-                os.environ.setdefault("DJANGO_COLORS", "NOCOLOR_PALETTE")
             run(self.addr, int(self.port), handler,
                 ipv6=self.use_ipv6, threading=threading)
         except socket.error as e:
