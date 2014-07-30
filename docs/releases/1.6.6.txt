@@ -30,3 +30,6 @@ Bugfixes
 * Fixed the "ORA-01843: not a valid month" errors when using Unicode
   with older versions of Oracle server
   (`#20292 <https://code.djangoproject.com/ticket/20292>`_).
+
+* Restored bug fix for sending unicode email with Python 2.6.5 and below
+  (`#19107 <https://code.djangoproject.com/ticket/19107>`_).
