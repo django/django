@@ -132,6 +132,8 @@ class MIMEMixin():
         """
         fp = six.StringIO()
         g = generator.Generator(fp, mangle_from_=False)
+        if sys.version_info < (2, 6, 6) and isinstance(self._payload, six.text_type):
+            self._payload = self._payload.encode(self._charset.output_charset)
         g.flatten(self, unixfrom=unixfrom)
         return fp.getvalue()
 
