@@ -44,30 +44,58 @@ class LoadDataWithNaturalKeysTestCase(TestCase):
         self.assertEqual(group, user.groups.get())
 
 
-@skipIfCustomUser
-@override_settings(USE_TZ=False)
 class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
     multi_db = True
 
     def test_load_data_with_user_permissions(self):
-        # Load data to both databases
-        management.call_command('loaddata', 'contenttypes_default.json', verbosity=0, database='default')
-        management.call_command('loaddata', 'contenttypes_other.json', verbosity=0, database='other')
+        # Create test contenttypes for both databases
+        default_objects = [
+            ContentType.objects.db_manager('default').create(
+                model='examplemodela',
+                name='example model a',
+                app_label='app_a',
+            ),
+            ContentType.objects.db_manager('default').create(
+                model='examplemodelb',
+                name='example model b',
+                app_label='app_b',
+            ),
+        ]
+        other_objects = [
+            ContentType.objects.db_manager('other').create(
+                model='examplemodelb',
+                name='example model b',
+                app_label='app_b',
+            ),
+            ContentType.objects.db_manager('other').create(
+                model='examplemodela',
+                name='example model a',
+                app_label='app_a',
+            ),
+        ]
 
         # Test that it was loaded properly
-        self.assertQuerysetEqual(ContentType.objects.filter(id__in=[7, 8]).order_by('id'), [
+        self.assertQuerysetEqual(ContentType.objects.filter(id__in=[x.id for x in default_objects]).order_by('id'), [
             '<ContentType: example model a>',
             '<ContentType: example model b>',
         ])
 
-        self.assertQuerysetEqual(ContentType.objects.db_manager('other').filter(id__in=[7, 8]).order_by('id'), [
+        self.assertQuerysetEqual(ContentType.objects.db_manager('other').filter(id__in=[x.id for x in other_objects]).order_by('id'), [
             '<ContentType: example model b>',
             '<ContentType: example model a>',
         ])
 
         # Now we create the test UserPermission
-        management.call_command('loaddata', 'contenttypes_shared.json', verbosity=3, database='default')
-        management.call_command('loaddata', 'contenttypes_shared.json', verbosity=3, database='other')
+        Permission.objects.db_manager("default").create(
+            name="Can delete example model b",
+            codename="delete_examplemodelb",
+            content_type=default_objects[1],
+        )
+        Permission.objects.db_manager("other").create(
+            name="Can delete example model b",
+            codename="delete_examplemodelb",
+            content_type=other_objects[0],
+        )
 
         # Test that new perms were loaded correctly
         self.assertTrue(Permission.objects.filter(codename='delete_examplemodelb').exists())
@@ -92,8 +120,8 @@ class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
         except (Permission.DoesNotExist, ContentType.DoesNotExist):
             self.fail('Permission.get_by_natural_key failed from "other" database.')
 
-        self.assertEquals(perm_default.content_type_id, 8)
-        self.assertEquals(perm_other.content_type_id, 7)
+        self.assertEqual(perm_default.content_type_id, default_objects[1].id)
+        self.assertEqual(perm_other.content_type_id, other_objects[0].id)
 
 
 @skipIfCustomUser
