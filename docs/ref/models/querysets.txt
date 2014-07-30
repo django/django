@@ -1714,7 +1714,7 @@ This has a number of caveats though:
 
 The ``batch_size`` parameter controls how many objects are created in single
 query. The default is to create all objects in one batch, except for SQLite
-where the default is such that at maximum 999 variables per query is used.
+where the default is such that at most 999 variables per query are used.
 
 count
 ~~~~~
@@ -2125,12 +2125,13 @@ Example::
     Blog.objects.get(name__iexact='beatles blog')
     Blog.objects.get(name__iexact=None)
 
-SQL equivalent::
+SQL equivalents::
 
     SELECT ... WHERE name ILIKE 'beatles blog';
+    SELECT ... WHERE name IS NULL;
 
-Note this will match ``'Beatles Blog'``, ``'beatles blog'``, ``'BeAtLes
-BLoG'``, etc.
+Note the first query will match ``'Beatles Blog'``, ``'beatles blog'``,
+``'BeAtLes BLoG'``, etc.
 
 .. admonition:: SQLite users
 
