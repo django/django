@@ -10,6 +10,7 @@ except ImportError:
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.db.models.fields.files import ImageFieldFile, ImageField
+from django.utils import six
 
 
 class Foo(models.Model):
@@ -43,14 +44,14 @@ class Whiz(models.Model):
     c = models.IntegerField(choices=CHOICES, null=True)
 
 
-class Counter:
+class Counter(six.Iterator):
     def __init__(self):
         self.n = 1
 
     def __iter__(self):
         return self
 
-    def next(self):  # Python 3: def __next__(self)
+    def __next__(self):
         if self.n > 5:
             raise StopIteration
         else:
