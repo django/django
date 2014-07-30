@@ -87,11 +87,12 @@ class TestFilenameGenerator(TestCase):
         self.assertFalse(any(f.endswith('.pyc') for f in gen_filenames()))
 
     def test_deleted_removed(self):
-        _, filepath = tempfile.mkstemp(dir=os.path.dirname(upath(__file__)), suffix='.py')
+        fd, filepath = tempfile.mkstemp(dir=os.path.dirname(upath(__file__)), suffix='.py')
         try:
             _, filename = os.path.split(filepath)
             import_module('.%s' % filename.replace('.py', ''), package='utils_tests')
             self.assertIn(filepath, gen_filenames())
         finally:
+            os.close(fd)
             os.remove(filepath)
         self.assertNotIn(filepath, gen_filenames())
