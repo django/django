@@ -419,7 +419,7 @@ class ValidationTest(test.TestCase):
     def test_charfield_get_choices_doesnt_evaluate_lazy_strings(self):
         # Regression test for #23098
         # Will raise ZeroDivisionError if lazy is evaluated
-        lazy_func = lazy(lambda x: 0/0, int)
+        lazy_func = lazy(lambda x: 0 / 0, int)
         f = models.CharField(choices=[(lazy_func('group'), (('a', 'A'), ('b', 'B')))])
         self.assertEqual(f.get_choices(True)[0], ('', '---------'))
 
