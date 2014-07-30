@@ -35,6 +35,10 @@ Minor features
   :meth:`~django.contrib.admin.ModelAdmin.has_module_permission`
   method to allow limiting access to the module on the admin index page.
 
+* The ``ModelAdmin's`` :attr:`~django.contrib.admin.ModelAdmin.list_filter` can
+  now use the new ``RelatedOnlyFieldListFilter`` filter for foreign key choices
+  you want to be limited to the objects involved in the relation.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
