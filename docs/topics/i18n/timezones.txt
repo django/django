@@ -85,7 +85,7 @@ this mode, the example above becomes::
     import datetime
     from django.utils.timezone import utc
 
-    now = datetime.datetime.utcnow().replace(tzinfo=utc)
+    now = utc.localize(datetime.datetime.utcnow())
 
 .. note::
 
@@ -554,7 +554,7 @@ Troubleshooting
        >>> import datetime
        >>> from django.utils import timezone
        >>> naive = datetime.datetime.utcnow()
-       >>> aware = naive.replace(tzinfo=timezone.utc)
+       >>> aware = timezone.utc.localize(naive)
        >>> naive == aware
        Traceback (most recent call last):
        ...
