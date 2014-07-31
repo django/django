@@ -75,25 +75,25 @@ test('Date.getTwoDigitTwelveHour', function() {
 });
 
 test('Date.getTwoDigitHour', function() {
-
+  expect(0);
 });
 
 test('Date.getTwoDigitMinute', function() {
-
+  expect(0);
 });
 
 test('Date.getTwoDigitSecond', function() {
-
+  expect(0);
 });
 
 test('Date.getHourMinute', function() {
-
+  expect(0);
 });
 
 test('Date.getHourMinuteSecond', function() {
-
+  expect(0);
 });
 
 test('Date.strftime', function() {
-
+  expect(0);
 });
