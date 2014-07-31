@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser, Group, User, UserManager
+from django.contrib.auth.models import AbstractUser, Group, User, UserManager, Permission
 from django.contrib.auth.tests.utils import skipIfCustomUser
-from django.core import mail
+from django.contrib.contenttypes.models import ContentType
+from django.core import mail, management
 from django.db.models.signals import post_save
 from django.test import TestCase, override_settings
 
@@ -41,6 +42,86 @@ class LoadDataWithNaturalKeysTestCase(TestCase):
         user = User.objects.get(username='my_username')
         group = Group.objects.get(name='my_group')
         self.assertEqual(group, user.groups.get())
+
+
+class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
+    multi_db = True
+
+    def test_load_data_with_user_permissions(self):
+        # Create test contenttypes for both databases
+        default_objects = [
+            ContentType.objects.db_manager('default').create(
+                model='examplemodela',
+                name='example model a',
+                app_label='app_a',
+            ),
+            ContentType.objects.db_manager('default').create(
+                model='examplemodelb',
+                name='example model b',
+                app_label='app_b',
+            ),
+        ]
+        other_objects = [
+            ContentType.objects.db_manager('other').create(
+                model='examplemodelb',
+                name='example model b',
+                app_label='app_b',
+            ),
+            ContentType.objects.db_manager('other').create(
+                model='examplemodela',
+                name='example model a',
+                app_label='app_a',
+            ),
+        ]
+
+        # Test that it was loaded properly
+        self.assertQuerysetEqual(ContentType.objects.filter(id__in=[x.id for x in default_objects]).order_by('id'), [
+            '<ContentType: example model a>',
+            '<ContentType: example model b>',
+        ])
+
+        self.assertQuerysetEqual(ContentType.objects.db_manager('other').filter(id__in=[x.id for x in other_objects]).order_by('id'), [
+            '<ContentType: example model b>',
+            '<ContentType: example model a>',
+        ])
+
+        # Now we create the test UserPermission
+        Permission.objects.db_manager("default").create(
+            name="Can delete example model b",
+            codename="delete_examplemodelb",
+            content_type=default_objects[1],
+        )
+        Permission.objects.db_manager("other").create(
+            name="Can delete example model b",
+            codename="delete_examplemodelb",
+            content_type=other_objects[0],
+        )
+
+        # Test that new perms were loaded correctly
+        self.assertTrue(Permission.objects.filter(codename='delete_examplemodelb').exists())
+        self.assertTrue(Permission.objects.db_manager('other').filter(codename='delete_examplemodelb').exists())
+
+        # Now test that Permission.get_by_nat_key works/doesn't work.
+        try:
+            perm_default = Permission.objects.get_by_natural_key(
+                'delete_examplemodelb',
+                'app_b',
+                'examplemodelb',
+            )
+        except (Permission.DoesNotExist, ContentType.DoesNotExist):
+            self.fail('Permission.get_by_natural_key failed from "default" database.')
+
+        try:
+            perm_other = Permission.objects.db_manager('other').get_by_natural_key(
+                'delete_examplemodelb',
+                'app_b',
+                'examplemodelb',
+            )
+        except (Permission.DoesNotExist, ContentType.DoesNotExist):
+            self.fail('Permission.get_by_natural_key failed from "other" database.')
+
+        self.assertEqual(perm_default.content_type_id, default_objects[1].id)
+        self.assertEqual(perm_other.content_type_id, other_objects[0].id)
 
 
 @skipIfCustomUser
