@@ -56,7 +56,7 @@ class Counter(six.Iterator):
             raise StopIteration
         else:
             self.n += 1
-            return (self.n, 'val-'+str(self.n))
+            return (self.n, 'val-' + str(self.n))
 
 
 class WhizIter(models.Model):
