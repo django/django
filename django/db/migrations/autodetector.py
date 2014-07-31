@@ -716,7 +716,6 @@ class MigrationAutodetector(object):
                             self.renamed_fields[app_label, model_name, field_name] = rem_field_name
                             break
 
-
     def generate_added_fields(self):
         """
         Fields that have been added
