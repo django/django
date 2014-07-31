@@ -9,9 +9,9 @@ var CalendarNamespace = {
     daysOfWeek: gettext('S M T W T F S').split(' '),
     firstDayOfWeek: parseInt(get_format('FIRST_DAY_OF_WEEK')),
     isLeapYear: function(year) {
-        return (((year % 4)==0) && ((year % 100)!=0) || ((year % 400)==0));
+        return (((year % 4) === 0) && ((year % 100) !== 0) || ((year % 400) === 0));
     },
-    getDaysInMonth: function(month,year) {
+    getDaysInMonth: function(month, year) {
         var days;
         if (month==1 || month==3 || month==5 || month==7 || month==8 || month==10 || month==12) {
             days = 31;
@@ -30,7 +30,7 @@ var CalendarNamespace = {
     draw: function(month, year, div_id, callback, selected) { // month = 1-12, year = 1-9999
         var today = new Date();
         var todayDay = today.getDate();
-        var todayMonth = today.getMonth()+1;
+        var todayMonth = today.getMonth() + 1;
         var todayYear = today.getFullYear();
         var todayClass = '';
 
@@ -57,10 +57,11 @@ var CalendarNamespace = {
         var calTable = document.createElement('table');
         quickElement('caption', calTable, CalendarNamespace.monthsOfYear[month-1] + ' ' + year);
         var tableBody = quickElement('tbody', calTable);
+        var i, _cell;
 
         // Draw days-of-week header
         var tableRow = quickElement('tr', tableBody);
-        for (var i = 0; i < 7; i++) {
+        for (i = 0; i < 7; i++) {
             quickElement('th', tableRow, CalendarNamespace.daysOfWeek[(i + CalendarNamespace.firstDayOfWeek) % 7]);
         }
 
@@ -69,15 +70,15 @@ var CalendarNamespace = {
 
         // Draw blanks before first of month
         tableRow = quickElement('tr', tableBody);
-        for (var i = 0; i < startingPos; i++) {
-            var _cell = quickElement('td', tableRow, ' ');
+        for (i = 0; i < startingPos; i++) {
+            _cell = quickElement('td', tableRow, ' ');
             _cell.className = "nonday";
         }
 
         // Draw days of month
         var currentDay = 1;
-        for (var i = startingPos; currentDay <= days; i++) {
-            if (i%7 == 0 && currentDay != 1) {
+        for (i = startingPos; currentDay <= days; i++) {
+            if (i % 7 === 0 && currentDay != 1) {
                 tableRow = quickElement('tr', tableBody);
             }
             if ((currentDay==todayDay) && (month==todayMonth) && (year==todayYear)) {
@@ -88,11 +89,11 @@ var CalendarNamespace = {
 
             // use UTC function; see above for explanation.
             if (isSelectedMonth && currentDay == selected.getUTCDate()) {
-                if (todayClass != '') todayClass += " ";
+                if (todayClass !== '') todayClass += " ";
                 todayClass += "selected";
             }
 
-            var cell = quickElement('td', tableRow, '', 'class', todayClass);
+            cell = quickElement('td', tableRow, '', 'class', todayClass);
 
             quickElement('a', cell, currentDay, 'href', 'javascript:void(' + callback + '('+year+','+month+','+currentDay+'));');
             currentDay++;
@@ -100,13 +101,13 @@ var CalendarNamespace = {
 
         // Draw blanks after end of month (optional, but makes for valid code)
         while (tableRow.childNodes.length < 7) {
-            var _cell = quickElement('td', tableRow, ' ');
+            _cell = quickElement('td', tableRow, ' ');
             _cell.className = "nonday";
         }
 
         calDiv.appendChild(calTable);
     }
-}
+};
 
 // Calendar -- A calendar instance
 function Calendar(div_id, callback, selected) {
@@ -166,4 +167,4 @@ Calendar.prototype = {
         this.currentYear++;
         this.drawCurrent();
     }
-}
+};

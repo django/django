@@ -8,5 +8,5 @@ docs/_build/
 docs/locale/
 tests/coverage_html/
 tests/.coverage
-tests/javascript/node_modules/
+tests/node_modules/
 build/
