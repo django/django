@@ -292,3 +292,9 @@ class SelectForUpdateTests(TransactionTestCase):
             self.assertEqual(router.db_for_write(Person), query.db)
         finally:
             router.routers = old_routers
+
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_select_for_update_with_get(self):
+        with transaction.atomic():
+            person = Person.objects.select_for_update().get(name='Reinhardt')
+        self.assertEqual(person.name, 'Reinhardt')
