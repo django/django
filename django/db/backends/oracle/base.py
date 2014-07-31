@@ -121,6 +121,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     closed_cursor_error_class = InterfaceError
     bare_select_suffix = " FROM DUAL"
     uppercases_column_names = True
+    # select for update with limit can be achieved on Oracle, but not with the current backend.
+    supports_select_for_update_with_limit = False
 
 
 class DatabaseOperations(BaseDatabaseOperations):

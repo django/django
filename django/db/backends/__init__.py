@@ -666,6 +666,9 @@ class BaseDatabaseFeatures(object):
 
     uppercases_column_names = False
 
+    # Does the backend support "select for update" queries with limit (and offset)?
+    supports_select_for_update_with_limit = True
+
     def __init__(self, connection):
         self.connection = connection
 
