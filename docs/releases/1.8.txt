@@ -23,7 +23,13 @@ Like Django 1.7, Django 1.8 requires Python 2.7 or above, though we
 What's new in Django 1.8
 ========================
 
-...
+* Added the new Model._meta API in the :class:`~django.db.models.options.Options`
+  class. The API is formally maintained, documented and can be used for public use.
+  The new API is componsed of 2 main endpoints:
+  :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
+  and :meth:`Options.get_field() <django.db.models.options.Options.get_field()>`.
+  The new API contains several fast-access cached properties that are documented
+  in :doc:`Options </ref/models/meta>`.
 
 Minor features
 ~~~~~~~~~~~~~~
@@ -184,18 +190,6 @@ Management Commands
 Models
 ^^^^^^
 
-* Added the new Model._meta API in the :class:`~django.db.models.options.Options`
-  class. The API is formally maintained, documented and can be used for public use.
-  The new API is componsed of 2 main endpoints:
-  :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
-  and :meth:`Options.get_field() <django.db.models.options.Options.get_field()>`.
-  The new API contains several fast-access cached properties that are documented
-  in https://code.djangoproject.com/wiki/new_meta_api.
-
-* A series of methods in :class:`~django.db.models.options.Options` have been
-  deprecated in favor of newer ones. Each deprecated method is specified in
-  https://code.djangoproject.com/wiki/new_meta_api, it will be
-  backwards-compatible till release 2.0 and will raise a DeprecationWarning.
 
 * Django now logs at most 9000 queries in ``connections.queries``, in order
   to prevent excessive memory usage in long-running processes in debug mode.
@@ -440,6 +434,13 @@ Miscellaneous
 
 Features deprecated in 1.8
 ==========================
+
+``django.db.models.options.Options``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+A series of methods in :class:`~django.db.models.options.Options` have been
+deprecated in favor of newer ones. Each deprecated method is specified in
+:ref:`the deprecation timeline <deprecation-removed-in-2.0>`, it will be backwards-compatible till
+release 2.0 and will raise a ``DeprecationWarning``.
 
 Loading ``cycle`` and ``firstof`` template tags from ``future`` library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
