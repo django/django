@@ -202,30 +202,41 @@ On Lawrence.com, this email has the subject line "Thanks for subscribing to
 lawrence.com alerts." On LJWorld.com, the email has the subject "Thanks for
 subscribing to LJWorld.com alerts." Same goes for the email's message body.
 
-Note that an even more flexible (but more heavyweight) way of doing this would
-be to use Django's template system. Assuming Lawrence.com and LJWorld.com have
-different template directories (:setting:`TEMPLATE_DIRS`), you could simply
-farm out to the template system like so::
+Using ``site`` in templates
+---------------------------
+
+.. versionadded:: 1.7
+
+    The current Site object is made available in the :doc:`template context
+    </ref/templates/api>` when you use
+    :class:`~django.template.RequestContext` and when your
+    :setting:`TEMPLATE_CONTEXT_PROCESSORS` setting contains
+    ``'django.contrib.sites.context_processors.site'``.
+
+Note that an even more flexible (but more heavyweight) way of sending
+email-notifications would be to use Django's template system. Assuming
+Lawrence.com and LJWorld.com have different template directories
+(:setting:`TEMPLATE_DIRS`), you could simply farm out to the template system
+like so::
 
     from django.core.mail import send_mail
-    from django.template import loader, Context
+    from django.template import loader, RequestContext
 
     def register_for_newsletter(request):
         # Check form values, etc., and subscribe the user.
         # ...
 
-        subject = loader.get_template('alerts/subject.txt').render(Context({}))
-        message = loader.get_template('alerts/message.txt').render(Context({}))
+        subject_template = loader.get_template('alerts/subject.txt')
+        subject = subject_template.render(RequestContext(request, {}))
+        message_template = loader.get_template('alerts/message.txt')
+        message = message_template.render(RequestContext(request, {}))
         send_mail(subject, message, 'editor@ljworld.com', [user.email])
 
         # ...
 
 In this case, you'd have to create :file:`subject.txt` and :file:`message.txt`
-template files for both the LJWorld.com and Lawrence.com template directories.
+template files that include ``{{ site.name }}`` and ``{{ site.domain }}``.
 That gives you more flexibility, but it's also more complex.
-
-It's a good idea to exploit the :class:`~django.contrib.sites.models.Site`
-objects as much as possible, to remove unneeded complexity and redundancy.
 
 Getting the current domain for full URLs
 ----------------------------------------
@@ -410,13 +421,10 @@ Here's how Django uses the sites framework:
   :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`
   checks the current site in retrieving flatpages to display.
 
-* In the :mod:`syndication framework <django.contrib.syndication>`, the
-  templates for ``title`` and ``description`` automatically have access to a
-  variable ``{{ site }}``, which is the
-  :class:`~django.contrib.sites.models.Site` object representing the current
-  site. Also, the hook for providing item URLs will use the ``domain`` from
-  the current :class:`~django.contrib.sites.models.Site` object if you don't
-  specify a fully-qualified domain.
+* In the :mod:`syndication framework <django.contrib.syndication>`, the hook
+  for providing item URLs will use the ``domain`` from the current
+  :class:`~django.contrib.sites.models.Site` object if you don't specify a
+  fully-qualified domain.
 
 * In the :mod:`authentication framework <django.contrib.auth>`, the
   :func:`django.contrib.auth.views.login` view passes the current
