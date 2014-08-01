@@ -7,7 +7,7 @@ requests. If you're interested in how core developers handle them, see
 
 Below, we are going to show how to create a GitHub pull request containing the
 changes for Trac ticket #xxxxx. By creating a fully-ready pull request you
-will make the committers' job easier, meaning that your work is more likely to
+will make the reviewer's job easier, meaning that your work is more likely to
 be merged into Django.
 
 You could also upload a traditional patch to Trac, but it's less practical for
