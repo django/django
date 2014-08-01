@@ -12,7 +12,7 @@ from django.core import mail
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import CommonMiddleware, BrokenLinkEmailsMiddleware
-from django.middleware.http import ConditionalGetMiddleware
+from django.middleware.http import ConditionalGetMiddleware, ContentLengthMiddleware
 from django.middleware.gzip import GZipMiddleware
 from django.test import TestCase, RequestFactory, override_settings
 from django.utils import six
@@ -322,27 +322,6 @@ class ConditionalGetMiddlewareTest(TestCase):
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertTrue('Date' in self.resp)
 
-    # Tests for the Content-Length header
-
-    def test_content_length_header_added(self):
-        content_length = len(self.resp.content)
-        self.assertFalse('Content-Length' in self.resp)
-        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertTrue('Content-Length' in self.resp)
-        self.assertEqual(int(self.resp['Content-Length']), content_length)
-
-    def test_content_length_header_not_added(self):
-        resp = StreamingHttpResponse('content')
-        self.assertFalse('Content-Length' in resp)
-        resp = ConditionalGetMiddleware().process_response(self.req, resp)
-        self.assertFalse('Content-Length' in resp)
-
-    def test_content_length_header_not_changed(self):
-        bad_content_length = len(self.resp.content) + 10
-        self.resp['Content-Length'] = bad_content_length
-        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
-        self.assertEqual(int(self.resp['Content-Length']), bad_content_length)
-
     # Tests for the ETag header
 
     def test_if_none_match_and_no_etag(self):
@@ -446,6 +425,37 @@ class ConditionalGetMiddlewareTest(TestCase):
         self.resp.status_code = 400
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertEqual(self.resp.status_code, 400)
+
+
+class ContentLengthMiddlewareTest(TestCase):
+
+    def setUp(self):
+        self.req = HttpRequest()
+        self.req.META = {
+            'SERVER_NAME': 'testserver',
+            'SERVER_PORT': 80,
+        }
+        self.req.path = self.req.path_info = "/"
+        self.resp = self.client.get(self.req.path)
+
+    def test_content_length_header_added(self):
+        content_length = len(self.resp.content)
+        self.assertFalse('Content-Length' in self.resp)
+        self.resp = ContentLengthMiddleware().process_response(self.req, self.resp)
+        self.assertTrue('Content-Length' in self.resp)
+        self.assertEqual(int(self.resp['Content-Length']), content_length)
+
+    def test_content_length_header_not_added(self):
+        resp = StreamingHttpResponse('content')
+        self.assertFalse('Content-Length' in resp)
+        resp = ContentLengthMiddleware().process_response(self.req, resp)
+        self.assertFalse('Content-Length' in resp)
+
+    def test_content_length_header_not_changed(self):
+        bad_content_length = len(self.resp.content) + 10
+        self.resp['Content-Length'] = bad_content_length
+        self.resp = ContentLengthMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(int(self.resp['Content-Length']), bad_content_length)
 
 
 class XFrameOptionsMiddlewareTest(TestCase):
