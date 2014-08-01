@@ -637,14 +637,7 @@ class SQLCompiler(object):
                 restricted = False
 
         for f in opts.fields:
-            # TODO: deprecated
-            # The get_fields_with_model() returns None for fields that live
-            # in the field's local model. So, for those fields we want to use
-            # the f.model - that is the field's local model.
-            model = f.parent_model._meta.concrete_model
-            if model == opts.model:
-                model = None
-            field_model = model or f.model
+            field_model = f.parent_model._meta.concrete_model
             if not select_related_descend(f, restricted, requested,
                                           only_load.get(field_model)):
                 continue
