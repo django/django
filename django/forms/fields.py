@@ -659,8 +659,13 @@ class ImageField(FileField):
         try:
             # load() could spot a truncated JPEG, but it loads the entire
             # image in memory, which is a DoS vector. See #3848 and #18520.
+            image = Image.open(file)
             # verify() must be called immediately after the constructor.
-            Image.open(file).verify()
+            image.verify()
+
+            # Annotating so subclasses can reuse it for their own validation
+            f.image = image
+            f.content_type = Image.MIME[image.format]
         except Exception:
             # Pillow doesn't recognize it as an image.
             six.reraise(ValidationError, ValidationError(
