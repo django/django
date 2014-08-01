@@ -259,30 +259,6 @@ class PostgreSQLTests(TestCase):
             self.assertIn('::text', do.lookup_cast(lookup))
 
 
-@unittest.skipUnless(connection.vendor == 'mysql', "Test only for MySQL")
-class MySQLTests(TestCase):
-
-    def test_autoincrement(self):
-        """
-        Check that auto_increment fields are reset correctly by sql_flush().
-        Before MySQL version 5.0.13 TRUNCATE did not do auto_increment reset.
-        Refs #16961.
-        """
-        statements = connection.ops.sql_flush(no_style(),
-                                              tables=['test'],
-                                              sequences=[{
-                                                  'table': 'test',
-                                                  'col': 'somecol',
-                                              }])
-        found_reset = False
-        for sql in statements:
-            found_reset = found_reset or 'ALTER TABLE' in sql
-        if connection.mysql_version < (5, 0, 13):
-            self.assertTrue(found_reset)
-        else:
-            self.assertFalse(found_reset)
-
-
 class DateQuotingTest(TestCase):
 
     def test_django_date_trunc(self):

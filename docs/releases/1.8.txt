@@ -407,6 +407,13 @@ officially supports.
 This also includes dropping support for PostGIS 1.3 and 1.4 as these versions
 are not supported on versions of PostgreSQL later than 8.4.
 
+Support for MySQL versions older than 5.5
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The end of upstream support periods was reached in January 2012 for MySQL 5.0
+and December 2013 for MySQL 5.1. As a consequence, Django 1.8 sets 5.5 as the
+minimum MySQL version it officially supports.
+
 Support for Oracle versions older than 11.1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
