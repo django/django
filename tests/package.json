@@ -3,7 +3,7 @@
   "version": "1.8.0",
   "devDependencies": {
     "grunt": "~0.4.5",
-    "grunt-contrib-qunit": ">=0.5.2",
+    "grunt-qunit-istanbul": ">=0.4.5",
     "grunt-contrib-jshint": ">=0.10.0",
     "grunt-contrib-watch": ">=0.6.1"
   }
