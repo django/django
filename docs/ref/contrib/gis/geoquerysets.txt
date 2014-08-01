@@ -122,10 +122,6 @@ contains_properly
 Returns true if the lookup geometry intersects the interior of the
 geometry field, but not the boundary (or exterior). [#fncontainsproperly]_
 
-.. note::
-
-    Requires PostGIS 1.4 and above.
-
 Example::
 
     Zipcode.objects.filter(poly__contains_properly=geom)
