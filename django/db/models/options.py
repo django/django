@@ -45,7 +45,7 @@ def _map_model_details(opts, link):
     if model == opts.model:
         model = None
 
-    field = connection if direct else link.field
+    field = link if direct else link.field
     m2m = isinstance(field, ManyToManyField)
     return link, model, direct, m2m
 
@@ -83,7 +83,6 @@ class raise_deprecation(object):
             warnings.warn(
                 "'%s is an unofficial API that has been deprecated. "
                 "You may be able to replace it with '%s'" % (
-                    fn.__name__,
                     fn.__name__,
                     self.suggested_alternative,
                 ),
