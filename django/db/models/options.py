@@ -10,7 +10,7 @@ import warnings
 from django.apps import apps
 from django.conf import settings
 from django.db.models.fields.related import ManyToManyRel, ManyToManyField
-from django.db.models.fields import AutoField, FieldDoesNotExist
+from django.db.models.fields import AutoField, FieldDoesNotExist, Field
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -19,8 +19,6 @@ from django.utils.functional import cached_property
 from django.utils.lru_cache import lru_cache
 from django.utils.text import camel_case_to_spaces
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
-
-from django.db.models.fields import Field
 
 
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
@@ -32,24 +30,24 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
 
 
 @lru_cache(maxsize=None)
-def _map_model(opts, connection):
-    direct = isinstance(connection, Field) or hasattr(connection, 'for_concrete_model')
-    model = connection.model if direct else connection.parent_model._meta.concrete_model
+def _map_model(opts, link):
+    direct = isinstance(link, Field) or hasattr(link, 'for_concrete_model')
+    model = link.model if direct else link.parent_model._meta.concrete_model
     if model == opts.model:
         model = None
-    return connection, model
+    return link, model
 
 
 @lru_cache(maxsize=None)
-def _map_details(opts, connection):
-    direct = isinstance(connection, Field) or hasattr(connection, 'for_concrete_model')
-    model = connection.model if direct else connection.parent_model._meta.concrete_model
+def _map_model_details(opts, link):
+    direct = isinstance(link, Field) or hasattr(link, 'for_concrete_model')
+    model = link.model if direct else link.parent_model._meta.concrete_model
     if model == opts.model:
         model = None
 
-    field = connection if direct else connection.field
+    field = connection if direct else link.field
     m2m = isinstance(field, ManyToManyField)
-    return connection, model, direct, m2m
+    return link, model, direct, m2m
 
 
 def normalize_together(option_together):
@@ -84,8 +82,7 @@ class raise_deprecation(object):
         def wrapper(*args, **kwargs):
             warnings.warn(
                 "'%s is an unofficial API that has been deprecated. "
-                "Usage of %s may be able to be replaced with "
-                "a call to '%s'" % (
+                "You may be able to replace it with '%s'" % (
                     fn.__name__,
                     fn.__name__,
                     self.suggested_alternative,
@@ -99,8 +96,6 @@ class raise_deprecation(object):
 @python_2_unicode_compatible
 class Options(object):
     def __init__(self, meta, app_label=None):
-        self._map_details_cache = {}
-        self._map_model_cache = {}
         self._get_fields_cache = {}
         self._get_field_cache = {}
         self.local_fields = []
@@ -156,7 +151,7 @@ class Options(object):
 
         self.default_related_name = None
         self._map_model = partial(_map_model, self)
-        self._map_details = partial(_map_details, self)
+        self._map_model_details = partial(_map_model_details, self)
 
     ### INTERNAL METHODS AND PROPERTIES GO BELOW THIS LINE ###
 
@@ -402,17 +397,18 @@ class Options(object):
         # we will catch the use of 'many_to_many' key and convert it to m2m.
         try:
             m2m = kwargs['many_to_many']
+        except KeyError:
+            pass
+        else:
             warnings.warn(
                 "The 'many_to_many' argument on get_fields will be soon "
                 "deprecated. This parameter has changed in favor of "
                 "'m2m'. Please change your implementation accordingly.",
                 RemovedInDjango20Warning
             )
-        except KeyError:
-            pass
 
         # Creates a cache key composed of all arguments
-        cache_key = (m2m, data, related_objects, related_m2m, virtual,)
+        cache_key = (m2m, data, related_objects, related_m2m, virtual)
 
         try:
             field_map = self._get_field_cache[cache_key]
@@ -471,11 +467,13 @@ class Options(object):
         # when displaying a ModelForm or django.contrib.admin panel and no specific ordering
         # is provided. For this reason, order of field insertion must be preserved
         fields = OrderedDict()
-        options = {'include_parents': include_parents,
-                   'include_non_concrete': include_non_concrete,
-                   'include_hidden': include_hidden,
-                   'include_proxy': include_proxy,
-                   'export_name_map': True}
+        options = {
+            'include_parents': include_parents,
+            'include_non_concrete': include_non_concrete,
+            'include_hidden': include_hidden,
+            'include_proxy': include_proxy,
+            'export_name_map': True,
+        }
 
         if related_m2m:
             if include_parents:
@@ -491,7 +489,7 @@ class Options(object):
                             fields[obj] = query_name
 
             # Tree is computer once and cached until apps cache is expired. It is composed of
-            # { options_instance : [field_pointing_to_options_model, field_pointing_to_options, ..]}
+            # {options_instance: [field_pointing_to_options_model, field_pointing_to_options, ..]}
             # If the model is a proxy model, then we also add the concrete model.
             tree = self.apps.related_m2m_relation_graph
             field_list = tree[self] if not self.proxy else chain(tree[self], tree[self.concrete_model._meta])
@@ -634,28 +632,30 @@ class Options(object):
     # Deprecated methods
     ###########################################################################
 
-    @raise_deprecation(suggested_alternative="get_fields")
+    @raise_deprecation(suggested_alternative="get_fields()")
     def get_fields_with_model(self):
         return map(self._map_model, self.get_fields())
 
-    @raise_deprecation(suggested_alternative="get_fields")
+    @raise_deprecation(suggested_alternative="get_fields()")
     def get_concrete_fields_with_model(self):
         return map(self._map_model, self.get_fields(include_non_concrete=False))
 
-    @raise_deprecation(suggested_alternative="get_fields")
+    @raise_deprecation(suggested_alternative="get_fields()")
     def get_m2m_with_model(self):
         return map(self._map_model, self.get_fields(data=False, m2m=True))
 
-    @raise_deprecation(suggested_alternative="get_field")
+    @raise_deprecation(suggested_alternative="get_field()")
     def get_field_by_name(self, name):
-        return self._map_details(self.get_field(name, m2m=True, related_objects=True,
-                                 related_m2m=True, virtual=True))
+        return self._map_model_details(self.get_field(
+            name, m2m=True, related_objects=True,
+            related_m2m=True, virtual=True
+        ))
 
     @raise_deprecation(suggested_alternative="field_names")
     def get_all_field_names(self):
         return self.field_names
 
-    @raise_deprecation(suggested_alternative="get_fields")
+    @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_objects(self, local_only=False, include_hidden=False,
                                 include_proxy_eq=False):
         include_parents = local_only is False
@@ -663,10 +663,10 @@ class Options(object):
             data=False, related_objects=True,
             include_parents=include_parents,
             include_hidden=include_hidden,
-            include_proxy=include_proxy_eq
+            include_proxy=include_proxy_eq,
         )
 
-    @raise_deprecation(suggested_alternative="get_fields")
+    @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
                                            include_proxy_eq=False):
         include_parents = local_only is False
@@ -678,10 +678,10 @@ class Options(object):
         )
         return list(map(self._map_model, fields))
 
-    @raise_deprecation(suggested_alternative="get_fields")
+    @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_many_to_many_objects(self, local_only=False):
         return list(self.get_fields(data=False, related_m2m=True, include_parents=local_only is not True))
 
-    @raise_deprecation(suggested_alternative="get_fields")
+    @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_m2m_objects_with_model(self):
         return list(map(self._map_model, self.get_fields(data=False, related_m2m=True)))

@@ -41,7 +41,7 @@ about each item can often be found in the release notes of two versions prior.
 * ``django.template.resolve_variable`` will be removed.
 
 * The following methods will be removed from :class:`django.db.models.options` in
-  favour of the new formal Options API:
+  favor of the new formal Options API:
 
   * ``get_fields_with_model()``
   * ``get_concrete_fields_with_model()``
