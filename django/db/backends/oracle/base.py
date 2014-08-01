@@ -359,21 +359,12 @@ WHEN (new.%(col_name)s IS NULL)
     def random_function_sql(self):
         return "DBMS_RANDOM.RANDOM"
 
-    def regex_lookup_9(self, lookup_type):
-        raise NotImplementedError("Regexes are not supported in Oracle before version 10g.")
-
-    def regex_lookup_10(self, lookup_type):
+    def regex_lookup(self, lookup_type):
         if lookup_type == 'regex':
             match_option = "'c'"
         else:
             match_option = "'i'"
         return 'REGEXP_LIKE(%%s, %%s, %s)' % match_option
-
-    def regex_lookup(self, lookup_type):
-        # If regex_lookup is called before it's been initialized, then create
-        # a cursor to initialize it and recur.
-        with self.connection.cursor():
-            return self.connection.ops.regex_lookup(lookup_type)
 
     def return_insert_id(self):
         return "RETURNING %s INTO %%s", (InsertIdVar(),)
@@ -646,15 +637,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 self.operators = self._standard_operators
             cursor.close()
 
-        # There's no way for the DatabaseOperations class to know the
-        # currently active Oracle version, so we do some setups here.
-        # TODO: Multi-db support will need a better solution (a way to
-        # communicate the current version).
-        if self.oracle_version is not None and self.oracle_version <= 9:
-            self.ops.regex_lookup = self.ops.regex_lookup_9
-        else:
-            self.ops.regex_lookup = self.ops.regex_lookup_10
-
         try:
             self.connection.stmtcachesize = 20
         except AttributeError:
@@ -713,11 +695,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def is_usable(self):
         try:
-            if hasattr(self.connection, 'ping'):    # Oracle 10g R2 and higher
-                self.connection.ping()
-            else:
-                # Use a cx_Oracle cursor directly, bypassing Django's utilities.
-                self.connection.cursor().execute("SELECT 1 FROM DUAL")
+            self.connection.ping()
         except Database.Error:
             return False
         else:

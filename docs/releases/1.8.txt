@@ -407,6 +407,13 @@ officially supports.
 This also includes dropping support for PostGIS 1.3 and 1.4 as these versions
 are not supported on versions of PostgreSQL later than 8.4.
 
+Support for Oracle versions older than 11.1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The end of upstream support periods was reached in July 2010 for Oracle 9.2,
+January 2012 for Oracle 10.1, and July 2013 for Oracle 10.2. As a consequence,
+Django 1.8 sets 11.1 as the minimum Oracle version it officially supports.
+
 ``AbstractUser.last_login`` allows null values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
