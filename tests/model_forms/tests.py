@@ -1462,7 +1462,9 @@ class ModelChoiceFieldTests(TestCase):
 
     def test_modelchoicefield_22745(self):
         """
-        Regression test for ticket #22745.
+        Regression test for ticket #22745. Make sure that ModelChoiceField
+        with RadioSelect widget doesn't produce unnecessary db queries
+        when accessing its BoundField's attrs.
         """
         class ModelChoiceForm(forms.Form):
             category = forms.ModelChoiceField(
@@ -1608,7 +1610,9 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
     def test_model_multiple_choice_field_22745(self):
         """
-        Regression test for ticket #22745.
+        Regression test for ticket #22745. Make sure that ModelMultipleChoiceField
+        with CheckboxSelectMultiple widget doesn't produce unnecessary db queries
+        when accessing its BoundField's attrs.
         """
         class ModelMultipleChoiceForm(forms.Form):
             categories = forms.ModelMultipleChoiceField(
