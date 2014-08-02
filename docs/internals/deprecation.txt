@@ -40,6 +40,8 @@ about each item can often be found in the release notes of two versions prior.
 
 * ``django.template.resolve_variable`` will be removed.
 
+* The ``error_message`` argument of ``django.forms.RegexField`` will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
