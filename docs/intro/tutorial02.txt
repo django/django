@@ -275,8 +275,8 @@ with the admin just as we did with ``Question``. That's easy:
     :filename: polls/admin.py
 
     from django.contrib import admin
-    from polls.models import Choice
-
+    from polls.models import Choice, Question
+    # ...
     admin.site.register(Choice)
 
 Now "Choices" is an available option in the Django admin. The "Add choice" form
@@ -319,8 +319,7 @@ registration code to read:
     class QuestionAdmin(admin.ModelAdmin):
         fieldsets = [
             (None,               {'fields': ['question_text']}),
-            ('Date information', {'fields': ['pub_date'],
-                                  'classes': ['collapse']}),
+            ('Date information', {'fields': ['pub_date'], 'classes': ['collapse']}),
         ]
         inlines = [ChoiceInline]
 
