@@ -9,19 +9,13 @@ dependencies and is easy to install and use.
 
 .. _Gunicorn: http://gunicorn.org/
 
-There are two ways to use Gunicorn with Django. One is to have Gunicorn treat
-Django as just another WSGI application. The second is to use Gunicorn's
-special `integration with Django`_.
-
-.. _integration with Django: http://docs.gunicorn.org/en/latest/run.html#django-manage-py
-
 Installing Gunicorn
 ===================
 
 Installing gunicorn is as easy as ``sudo pip install gunicorn``. For more
 details, see the `gunicorn documentation`_.
 
-.. _gunicorn documentation: http://gunicorn.org/install.html
+.. _gunicorn documentation: http://docs.gunicorn.org/en/latest/install.html
 
 Running Django in Gunicorn as a generic WSGI application
 ========================================================
@@ -44,29 +38,6 @@ So for a typical Django project, invoking gunicorn would look like::
 ensure that is to run this command from the same directory as your
 ``manage.py`` file.)
 
+See Gunicorn's `deployment documentation`_ for additional tips.
 
-Using Gunicorn's Django integration
-===================================
-
-.. note::
-
-    If you are using Django 1.4 or newer, it’s highly recommended to simply run
-    your application with the WSGI interface using the ``gunicorn`` command
-    as described above.
-
-To use Gunicorn's built-in Django integration, first add ``"gunicorn"`` to
-:setting:`INSTALLED_APPS`. Then run ``python manage.py run_gunicorn``.
-
-This provides a few Django-specific niceties:
-
-* sets the gunicorn process name to be that of the project
-
-* validates installed models
-
-* allows an ``--adminmedia`` option for passing in the location of the
-  admin media files.
-
-See Gunicorn's `deployment documentation`_ for additional tips on starting and
-maintaining the Gunicorn server.
-
-.. _deployment documentation: http://gunicorn.org/deploy.html
+.. _deployment documentation: http://docs.gunicorn.org/en/latest/deploy.html
