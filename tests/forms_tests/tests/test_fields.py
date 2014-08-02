@@ -32,6 +32,7 @@ import re
 import os
 from decimal import Decimal
 from unittest import skipIf
+import warnings
 
 try:
     from PIL import Image
@@ -630,7 +631,10 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '2A2 ')
 
     def test_regexfield_4(self):
-        f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
+        # deprecated error_message argument; remove in Django 2.0
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
         self.assertEqual('1234', f.clean('1234'))
         self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, '123')
         self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, 'abcd')

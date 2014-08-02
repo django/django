@@ -625,3 +625,9 @@ The function has been informally marked as "Deprecated" for some time. Replace
 It provided the :ttag:`lorem` template tag which is now included in the
 built-in tags. Simply remove ``'django.contrib.webdesign'`` from
 :setting:`INSTALLED_APPS` and ``{% load webdesign %}`` from your templates.
+
+``error_message`` argument to ``django.forms.RegexField``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It provided backwards compatibility for pre-1.0 code, but its functionality is
+redundant. Use ``Field.error_messages['invalid']`` instead.

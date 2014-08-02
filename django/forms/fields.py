@@ -25,7 +25,7 @@ from django.forms.widgets import (
 from django.utils import formats
 from django.utils.encoding import smart_text, force_str, force_text
 from django.utils.ipv6 import clean_ipv6_address
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
@@ -531,6 +531,11 @@ class RegexField(CharField):
         """
         # error_message is just kept for backwards compatibility:
         if error_message is not None:
+            warnings.warn(
+                "The 'error_message' argument is deprecated. Use "
+                "Field.error_messages['invalid'] instead.",
+                RemovedInDjango20Warning, stacklevel=2
+            )
             error_messages = kwargs.get('error_messages') or {}
             error_messages['invalid'] = error_message
             kwargs['error_messages'] = error_messages
