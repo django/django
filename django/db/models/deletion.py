@@ -55,7 +55,8 @@ def DO_NOTHING(collector, field, sub_objs, using):
 def get_related_objects_on_proxies(opts):
     tree, _ = opts.apps.related_objects_relation_graph
     return (f.related for f in chain.from_iterable(
-            tree[c] for c in opts.proxied_children))
+            tree[c] for c in opts.concrete_model._meta.proxied_children
+            if c is not opts))
 
 
 class Collector(object):
@@ -141,13 +142,9 @@ class Collector(object):
             return False
         # Foreign keys pointing to this model, both from m2m and other
         # models.
-        #related_opts = chain(
-            #opts.get_fields(data=False, related_objects=True, include_hidden=True),
-            #get_related_objects_on_proxies(opts)
-        #)
-        related_opts = model._meta.get_all_related_objects(
-            include_proxy_eq=True,
-            include_hidden=True
+        related_opts = chain(
+            opts.get_fields(data=False, related_objects=True, include_hidden=True),
+            get_related_objects_on_proxies(opts)
         )
 
         for related in related_opts:
@@ -202,15 +199,11 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
-            related_opts = model._meta.get_all_related_objects(
-                include_proxy_eq=True,
-                include_hidden=True
+            related_opts = chain(
+                model._meta.get_fields(data=False, related_objects=True,
+                                       include_hidden=True),
+                get_related_objects_on_proxies(model._meta)
             )
-            #related_opts = chain(
-                #model._meta.get_fields(data=False, related_objects=True,
-                                       #include_hidden=True),
-                #get_related_objects_on_proxies(model._meta)
-            #)
             for related in related_opts:
                 field = related.field
                 if field.rel.on_delete == DO_NOTHING:

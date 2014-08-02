@@ -666,12 +666,10 @@ class Options(object):
             children = chain.from_iterable(tree[c] for c in self.concrete_model._meta.proxied_children
                                            if c is not self)
             relations = (f.related for f in children
-                        if include_hidden or not f.related.field.rel.is_hidden())
-
+                         if include_hidden or not f.related.field.rel.is_hidden())
             fields = chain(fields, relations)
 
         return list(fields)
-
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
