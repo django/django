@@ -60,6 +60,11 @@ def get_internal_wsgi_application():
                     sys.exc_info()[2])
 
 
+def is_broken_pipe_error():
+    exc_type, exc_value = sys.exc_info()[:2]
+    return issubclass(exc_type, socket.error) and exc_value.args[0] == 32
+
+
 class WSGIServer(simple_server.WSGIServer, object):
     """BaseHTTPServer that implements the Python WSGI protocol"""
 
@@ -74,6 +79,19 @@ class WSGIServer(simple_server.WSGIServer, object):
         """Override server_bind to store the server name."""
         super(WSGIServer, self).server_bind()
         self.setup_environ()
+
+    def handle_error(self, request, client_address):
+        if is_broken_pipe_error():
+            sys.stderr.write("- Broken pipe from %s\n" % (client_address,))
+        else:
+            super(WSGIServer, self).handle_error(request, client_address)
+
+
+class ServerHandler(simple_server.ServerHandler):
+    def handle_error(self):
+        # Ignore broken pipe errors, otherwise pass on
+        if not is_broken_pipe_error():
+            super(ServerHandler, self).handle_error()
 
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
@@ -133,6 +151,26 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         env['PATH_INFO'] = path.decode(ISO_8859_1) if six.PY3 else path
 
         return env
+
+    def handle(self):
+        """Copy of WSGIRequestHandler, but with different ServerHandler"""
+
+        self.raw_requestline = self.rfile.readline(65537)
+        if len(self.raw_requestline) > 65536:
+            self.requestline = ''
+            self.request_version = ''
+            self.command = ''
+            self.send_error(414)
+            return
+
+        if not self.parse_request():  # An error code has been sent, just exit
+            return
+
+        handler = ServerHandler(
+            self.rfile, self.wfile, self.get_stderr(), self.get_environ()
+        )
+        handler.request_handler = self      # backpointer for logging
+        handler.run(self.server.get_app())
 
 
 def run(addr, port, wsgi_handler, ipv6=False, threading=False):
