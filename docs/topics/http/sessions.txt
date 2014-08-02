@@ -120,7 +120,7 @@ and the :setting:`SECRET_KEY` setting.
 .. note::
 
     It's recommended to leave the :setting:`SESSION_COOKIE_HTTPONLY` setting
-    ``True`` to prevent tampering of the stored data from JavaScript.
+    on ``True`` to prevent access to the stored data from JavaScript.
 
 .. warning::
 
