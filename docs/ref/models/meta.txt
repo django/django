@@ -5,6 +5,8 @@ Model ``_meta`` options
 .. module:: django.db.models.options
    :synopsis: Model meta-class layer
 
+.. class:: Options
+
 The Options API is at the core of Django, it enables other parts of the
 system such as lookups, queries, forms, and the admin to understand the
 capabilities of every model. The ``Options API`` is hidden under the
