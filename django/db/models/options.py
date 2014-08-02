@@ -430,7 +430,7 @@ class Options(object):
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
     def get_fields(self, m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False,
-                   include_parents=True, include_non_concrete=True, include_hidden=False, include_proxy=False, **kwargs):
+                   include_parents=True, include_hidden=False, include_proxy=False, **kwargs):
         """
         Returns a list of fields associated to the model. By default will only search in data.
         This can be changed by enabling or disabling field types using
@@ -446,14 +446,13 @@ class Options(object):
         Options can be any of the following:
         - include_parents:        include fields derived from inheritance
         - include_hidden:         include fields that have a related_name that starts with a "+"
-        - include_non_concrete:   include fields that do not have a column
         - include_proxy:          include relations that point to a proxy of the model.
         """
 
         # Creates a cache key composed of all arguments
         export_name_map = kwargs.get('export_name_map', False)
         cache_key = (m2m, data, related_m2m, related_objects, virtual, include_parents,
-                     include_non_concrete, include_hidden, include_proxy, export_name_map)
+                     include_hidden, include_proxy, export_name_map)
 
         try:
             # In order to avoid list manipulation. Always
@@ -468,7 +467,6 @@ class Options(object):
         fields = OrderedDict()
         options = {
             'include_parents': include_parents,
-            'include_non_concrete': include_non_concrete,
             'include_hidden': include_hidden,
             'include_proxy': include_proxy,
             'export_name_map': True,
@@ -636,7 +634,7 @@ class Options(object):
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_concrete_fields_with_model(self):
-        return map(self._map_model, self.get_fields(include_non_concrete=False))
+        return map(self._map_model, self.concrete_fields)
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_m2m_with_model(self):
