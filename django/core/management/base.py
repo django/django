@@ -320,7 +320,7 @@ class BaseCommand(object):
             parser.add_option('--pythonpath',
                 help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
             parser.add_option('--traceback', action='store_true',
-                help='Raise on exception')
+                help='Raise on CommandError exceptions')
             parser.add_option('--no-color', action='store_true', dest='no_color', default=False,
                 help="Don't colorize the command output.")
             for opt in self.option_list:
@@ -342,7 +342,7 @@ class BaseCommand(object):
             parser.add_argument('--pythonpath',
                 help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".')
             parser.add_argument('--traceback', action='store_true',
-                help='Raise on exception')
+                help='Raise on CommandError exceptions')
             parser.add_argument('--no-color', action='store_true', dest='no_color', default=False,
                 help="Don't colorize the command output.")
             if self.args:
