@@ -171,16 +171,13 @@ Version support
 
 Django supports MySQL 5.0.3 and higher.
 
-`MySQL 5.0`_ adds the ``information_schema`` database, which contains detailed
-data on all database schema. Django's ``inspectdb`` feature uses it.
+Django's ``inspectdb`` feature uses the ``information_schema`` database, which
+contains detailed data on all database schemas.
 
 Django expects the database to support Unicode (UTF-8 encoding) and delegates to
 it the task of enforcing transactions and referential integrity. It is important
 to be aware of the fact that the two latter ones aren't actually enforced by
 MySQL when using the MyISAM storage engine, see the next section.
-
-.. _MySQL: http://www.mysql.com/
-.. _MySQL 5.0: http://dev.mysql.com/doc/refman/5.0/en/index.html
 
 .. _mysql-storage-engines:
 
@@ -212,9 +209,9 @@ running ``migrate``::
         1005, "Can't create table '\\db_name\\.#sql-4a8_ab' (errno: 150)"
     )
 
-.. _storage engines: http://dev.mysql.com/doc/refman/5.5/en/storage-engines.html
-.. _MyISAM: http://dev.mysql.com/doc/refman/5.5/en/myisam-storage-engine.html
-.. _InnoDB: http://dev.mysql.com/doc/refman/5.5/en/innodb-storage-engine.html
+.. _storage engines: http://dev.mysql.com/doc/refman/5.6/en/storage-engines.html
+.. _MyISAM: http://dev.mysql.com/doc/refman/5.6/en/myisam-storage-engine.html
+.. _InnoDB: http://dev.mysql.com/doc/refman/5.6/en/innodb-storage-engine.html
 
 .. [#] Unless this was changed by the packager of your MySQL package. We've
    had reports that the Windows Community Server installer sets up InnoDB as
@@ -297,7 +294,7 @@ If you plan on using Django's :doc:`timezone support </topics/i18n/timezones>`,
 use `mysql_tzinfo_to_sql`_ to load time zone tables into the MySQL database.
 This needs to be done just once for your MySQL server, not per database.
 
-.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.5/en/mysql-tzinfo-to-sql.html
+.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
 Creating your database
 ----------------------
@@ -308,7 +305,7 @@ You can `create your database`_ using the command-line tools and this SQL::
 
 This ensures all tables and columns will use UTF-8 by default.
 
-.. _create your database: http://dev.mysql.com/doc/refman/5.0/en/create-database.html
+.. _create your database: http://dev.mysql.com/doc/refman/5.6/en/create-database.html
 
 .. _mysql-collation:
 
@@ -322,7 +319,7 @@ the MySQL documentation. In all cases, you set the collation by directly
 manipulating the database tables; Django doesn't provide a way to set this on
 the model definition.
 
-.. _documented thoroughly: http://dev.mysql.com/doc/refman/5.0/en/charset.html
+.. _documented thoroughly: http://dev.mysql.com/doc/refman/5.6/en/charset.html
 
 By default, with a UTF-8 database, MySQL will use the
 ``utf8_general_ci`` collation. This results in all string equality
@@ -420,7 +417,7 @@ Several other MySQLdb connection options may be useful, such as ``ssl``,
 ``init_command``, and ``sql_mode``. Consult the `MySQLdb documentation`_ for
 more details.
 
-.. _MySQL option file: http://dev.mysql.com/doc/refman/5.0/en/option-files.html
+.. _MySQL option file: http://dev.mysql.com/doc/refman/5.6/en/option-files.html
 .. _MySQLdb documentation: http://mysql-python.sourceforge.net/
 
 Creating your tables
