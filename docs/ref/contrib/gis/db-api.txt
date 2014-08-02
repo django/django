@@ -29,7 +29,8 @@ MySQL Spatial Limitations
 
 MySQL's spatial extensions only support bounding box operations
 (what MySQL calls minimum bounding rectangles, or MBR).  Specifically,
-`MySQL does not conform to the OGC standard <http://dev.mysql.com/doc/refman/5.1/en/functions-for-testing-spatial-relations-between-geometric-objects.html>`_:
+`MySQL does not conform to the OGC standard
+<http://dev.mysql.com/doc/refman/5.6/en/spatial-relation-functions.html>`_:
 
     Currently, MySQL does not implement these functions
     [``Contains``, ``Crosses``, ``Disjoint``, ``Intersects``, ``Overlaps``,
@@ -52,6 +53,7 @@ on a different spatial backend.
 
 Creating and Saving Geographic Models
 =====================================
+
 Here is an example of how to create a geometry object (assuming the ``Zipcode``
 model)::
 
@@ -313,8 +315,8 @@ Method                                PostGIS  Oracle  SpatiaLite
 .. [#fngeojson] *See* Howard Butler, Martin Daly, Allan Doyle, Tim Schaub, & Christopher Schmidt, `The GeoJSON Format Specification <http://geojson.org/geojson-spec.html>`_, Revision 1.0 (June 16, 2008).
 .. [#fndistsphere14] *See* `PostGIS 1.4 documentation <http://postgis.refractions.net/documentation/manual-1.4/ST_Distance_Sphere.html>`_ on ``ST_distance_sphere``.
 .. [#fndistsphere15] *See* `PostGIS 1.5 documentation <http://postgis.refractions.net/documentation/manual-1.5/ST_Distance_Sphere.html>`_ on ``ST_distance_sphere``.
-.. [#fnmysqlidx] *See* `Creating Spatial Indexes <http://dev.mysql.com/doc/refman/5.1/en/creating-spatial-indexes.html>`_
-   in the MySQL 5.1 Reference Manual:
+.. [#fnmysqlidx] *See* `Creating Spatial Indexes <http://dev.mysql.com/doc/refman/5.6/en/creating-spatial-indexes.html>`_
+   in the MySQL Reference Manual:
 
        For MyISAM tables, ``SPATIAL INDEX`` creates an R-tree index. For storage
        engines that support nonspatial indexing of spatial columns, the engine
