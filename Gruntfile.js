@@ -31,18 +31,7 @@ module.exports = function(grunt) {
     jshint: {
       all: [
         'Gruntfile.js',
-        'django/contrib/admin/static/admin/js/admin/DateTimeShortcuts.js',
-        'django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js',
-        'django/contrib/admin/static/admin/js/SelectBox.js',
-        'django/contrib/admin/static/admin/js/SelectFilter2.js',
-        'django/contrib/admin/static/admin/js/actions.js',
-        'django/contrib/admin/static/admin/js/calendar.js',
-        'django/contrib/admin/static/admin/js/collapse.js',
-        'django/contrib/admin/static/admin/js/core.js',
-        'django/contrib/admin/static/admin/js/inlines.js',
-        'django/contrib/admin/static/admin/js/prepopulate.js',
-        'django/contrib/admin/static/admin/js/timeparse.js',
-        'django/contrib/admin/static/admin/js/urlify.js'
+        'django/contrib/admin/static/**/*.js',
       ]
     },
   });
