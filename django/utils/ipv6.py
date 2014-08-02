@@ -21,7 +21,7 @@ def clean_ipv6_address(ip_str, unpack_ipv4=False,
         ip_str: A valid IPv6 address.
         unpack_ipv4: if an IPv4-mapped address is found,
         return the plain IPv4 address (default=False).
-        error_message: A error message for in the ValidationError.
+        error_message: An error message used in the ValidationError.
 
     Returns:
         A compressed IPv6 address, or the same value
