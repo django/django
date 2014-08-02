@@ -97,7 +97,7 @@ In the ``polls/urls.py`` file include the following code:
     from polls import views
 
     urlpatterns = [
-        url(r'^$', views.index, name='index')
+        url(r'^$', views.index, name='index'),
     ]
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
@@ -466,7 +466,7 @@ provides a shortcut. Here's the ``detail()`` view, rewritten:
 .. snippet::
     :filename: polls/views.py
 
-    from django.shortcuts import render, get_object_or_404
+    from django.shortcuts import get_object_or_404, render
 
     from polls.models import Question
     # ...
