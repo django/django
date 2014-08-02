@@ -491,7 +491,7 @@ pytz_. If you're using MySQL, you must install pytz_ and load the time zone
 tables with `mysql_tzinfo_to_sql`_.
 
 .. _pytz: http://pytz.sourceforge.net/
-.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.5/en/mysql-tzinfo-to-sql.html
+.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
 Addition of ``QuerySet.datetimes()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
