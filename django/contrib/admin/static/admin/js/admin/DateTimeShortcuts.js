@@ -22,13 +22,13 @@ var DateTimeShortcuts = {
         // set in the admin/base.html template, so if it's not there, someone's
         // overridden the template. In that case, we'll set a clearly-invalid
         // value in the hopes that someone will examine HTTP requests and see it.
-        if (window.__admin_media_prefix__ != undefined) {
+        if (window.__admin_media_prefix__ !== undefined) {
             DateTimeShortcuts.admin_media_prefix = window.__admin_media_prefix__;
         } else {
             DateTimeShortcuts.admin_media_prefix = '/missing-admin-media-prefix/';
         }
 
-        if (window.__admin_utc_offset__ != undefined) {
+        if (window.__admin_utc_offset__ !== undefined) {
             var serverOffset = window.__admin_utc_offset__;
             var localOffset = new Date().getTimezoneOffset() * -60;
             DateTimeShortcuts.timezoneOffset = localOffset - serverOffset;
@@ -49,7 +49,7 @@ var DateTimeShortcuts = {
     },
     // Return the current time while accounting for the server timezone.
     now: function() {
-        if (window.__admin_utc_offset__ != undefined) {
+        if (window.__admin_utc_offset__ !== undefined) {
             var serverOffset = window.__admin_utc_offset__;
             var localNow = new Date();
             var localOffset = localNow.getTimezoneOffset() * -60;
@@ -82,7 +82,7 @@ var DateTimeShortcuts = {
             );
         }
         else {
-            timezoneOffset *= -1
+            timezoneOffset *= -1;
             message = ngettext(
                 'Note: You are %s hour behind server time.',
                 'Note: You are %s hours behind server time.',
@@ -97,7 +97,7 @@ var DateTimeShortcuts = {
 
         $(inp).parent()
             .append($('<br>'))
-            .append($warning)
+            .append($warning);
     },
     // Add clock widget to a given field
     addClock: function(inp) {
@@ -110,15 +110,16 @@ var DateTimeShortcuts = {
         shortcuts_span.className = DateTimeShortcuts.shortCutsClass;
         inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
         var now_link = document.createElement('a');
-        now_link.setAttribute('href', "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", -1);");
+        now_link = setAttribute('href', "#");
+        now_link.onclick = DateTimeShortcuts.handleClockQuicklink(num, -1);
         now_link.appendChild(document.createTextNode(gettext('Now')));
         var clock_link = document.createElement('a');
         clock_link.setAttribute('href', 'javascript:DateTimeShortcuts.openClock(' + num + ');');
         clock_link.id = DateTimeShortcuts.clockLinkName + num;
         quickElement('img', clock_link, '', 'src', DateTimeShortcuts.admin_media_prefix + 'img/icon_clock.gif', 'alt', gettext('Clock'));
-        shortcuts_span.appendChild(document.createTextNode('\240'));
+        shortcuts_span.appendChild(document.createTextNode('\\240'));
         shortcuts_span.appendChild(now_link);
-        shortcuts_span.appendChild(document.createTextNode('\240|\240'));
+        shortcuts_span.appendChild(document.createTextNode('\\240|\\240'));
         shortcuts_span.appendChild(clock_link);
 
         // Create clock link div
@@ -163,8 +164,8 @@ var DateTimeShortcuts = {
         });
     },
     openClock: function(num) {
-        var clock_box = document.getElementById(DateTimeShortcuts.clockDivName+num)
-        var clock_link = document.getElementById(DateTimeShortcuts.clockLinkName+num)
+        var clock_box = document.getElementById(DateTimeShortcuts.clockDivName + num);
+        var clock_link = document.getElementById(DateTimeShortcuts.clockLinkName + num);
 
         // Recalculate the clockbox position
         // is it left-to-right or right-to-left layout ?
@@ -194,11 +195,12 @@ var DateTimeShortcuts = {
            d = DateTimeShortcuts.now();
        }
        else {
-           d = new Date(1970, 1, 1, val, 0, 0, 0)
+           d = new Date(1970, 1, 1, val, 0, 0, 0);
        }
        DateTimeShortcuts.clockInputs[num].value = d.strftime(get_format('TIME_INPUT_FORMATS')[0]);
        DateTimeShortcuts.clockInputs[num].focus();
        DateTimeShortcuts.dismissClock(num);
+       return false;
     },
     // Add calendar widget to a given field.
     addCalendar: function(inp) {
@@ -218,9 +220,9 @@ var DateTimeShortcuts = {
         cal_link.setAttribute('href', 'javascript:DateTimeShortcuts.openCalendar(' + num + ');');
         cal_link.id = DateTimeShortcuts.calendarLinkName + num;
         quickElement('img', cal_link, '', 'src', DateTimeShortcuts.admin_media_prefix + 'img/icon_calendar.gif', 'alt', gettext('Calendar'));
-        shortcuts_span.appendChild(document.createTextNode('\240'));
+        shortcuts_span.appendChild(document.createTextNode('\\240'));
         shortcuts_span.appendChild(today_link);
-        shortcuts_span.appendChild(document.createTextNode('\240|\240'));
+        shortcuts_span.appendChild(document.createTextNode('\\240|\\240'));
         shortcuts_span.appendChild(cal_link);
 
         // Create calendarbox div.
@@ -265,9 +267,9 @@ var DateTimeShortcuts = {
         var shortcuts = quickElement('div', cal_box);
         shortcuts.className = 'calendar-shortcuts';
         quickElement('a', shortcuts, gettext('Yesterday'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', -1);');
-        shortcuts.appendChild(document.createTextNode('\240|\240'));
+        shortcuts.appendChild(document.createTextNode('\\240|\\240'));
         quickElement('a', shortcuts, gettext('Today'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', 0);');
-        shortcuts.appendChild(document.createTextNode('\240|\240'));
+        shortcuts.appendChild(document.createTextNode('\\240|\\240'));
         quickElement('a', shortcuts, gettext('Tomorrow'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', +1);');
 
         // cancel bar
@@ -283,8 +285,8 @@ var DateTimeShortcuts = {
         });
     },
     openCalendar: function(num) {
-        var cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1+num)
-        var cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName+num)
+        var cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1 + num);
+        var cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName + num);
         var inp = DateTimeShortcuts.calendarInputs[num];
 
         // Determine if the current value in the input has a valid date.
@@ -346,11 +348,11 @@ var DateTimeShortcuts = {
     },
     handleCalendarQuickLink: function(num, offset) {
        var d = DateTimeShortcuts.now();
-       d.setDate(d.getDate() + offset)
+       d.setDate(d.getDate() + offset);
        DateTimeShortcuts.calendarInputs[num].value = d.strftime(get_format('DATE_INPUT_FORMATS')[0]);
        DateTimeShortcuts.calendarInputs[num].focus();
        DateTimeShortcuts.dismissCalendar(num);
     }
-}
+};
 
 addEvent(window, 'load', DateTimeShortcuts.init);

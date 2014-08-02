@@ -3,7 +3,7 @@
 		// Add anchor tag for Show/Hide link
 		$("fieldset.collapse").each(function(i, elem) {
 			// Don't hide if fields in this fieldset have errors
-			if ($(elem).find("div.errors").length == 0) {
+			if ($(elem).find("div.errors").length === 0) {
 				$(elem).addClass("collapsed").find("h2").first().append(' (<a id="fieldsetcollapser' +
 					i +'" class="collapse-toggle" href="#">' + gettext("Show") +
 					'</a>)');
