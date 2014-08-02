@@ -543,7 +543,6 @@ class Options(object):
             fields.update(
                 (field, {field.name, field.attname})
                 for field in self.local_fields
-                if include_non_concrete or field.column is not None
             )
 
         if virtual:
@@ -617,7 +616,7 @@ class Options(object):
         Returns a list of all concrete data fields on the model and it's parents.
         All hidden and proxy fields are omitted.
         """
-        return self.get_fields(include_non_concrete=False)
+        return [f for f in self.fields if f.column is not None]
 
     @cached_property
     def local_concrete_fields(self):
@@ -625,7 +624,7 @@ class Options(object):
         Returns a list of all concrete data fields on the model.
         All hidden and proxy fields are omitted.
         """
-        return self.get_fields(include_parents=False, include_non_concrete=False)
+        return [f for f in self.local_fields if f.column is not None]
 
     ###########################################################################
     # Deprecated methods
