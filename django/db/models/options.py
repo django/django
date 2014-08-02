@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from copy import copy
 from bisect import bisect
 from collections import OrderedDict
 from functools import partial
@@ -431,7 +430,7 @@ class Options(object):
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
     def get_fields(self, m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False,
-                   include_parents=True, include_hidden=False, include_proxy=False, **kwargs):
+                   include_parents=True, include_hidden=False, **kwargs):
         """
         Returns a list of fields associated to the model. By default will only search in data.
         This can be changed by enabling or disabling field types using
@@ -447,13 +446,12 @@ class Options(object):
         Options can be any of the following:
         - include_parents:        include fields derived from inheritance
         - include_hidden:         include fields that have a related_name that starts with a "+"
-        - include_proxy:          include relations that point to a proxy of the model.
         """
 
         # Creates a cache key composed of all arguments
         export_name_map = kwargs.get('export_name_map', False)
         cache_key = (m2m, data, related_m2m, related_objects, virtual, include_parents,
-                     include_hidden, include_proxy, export_name_map)
+                     include_hidden, export_name_map)
 
         try:
             # In order to avoid list manipulation. Always
@@ -514,9 +512,6 @@ class Options(object):
             # If the model is a proxy model, then we also add the concrete model.
             tree, proxy_tree = self.apps.related_objects_relation_graph
             all_fields = tree[self] if not self.proxy else chain(tree[self], tree[self.concrete_model._meta])
-            if include_proxy:
-                # If we are also incluing proxied relations, also add contents in the proxy tree.
-                all_fields = chain(all_fields, proxy_tree[self.concrete_model])
             for f in all_fields:
                 if include_hidden or not f.related.field.rel.is_hidden():
                     # If hidden fields should be included or the relation
