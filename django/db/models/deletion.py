@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from itertools import chain
 from operator import attrgetter
 
 from django.db import connections, transaction, IntegrityError
@@ -49,6 +50,12 @@ def SET_DEFAULT(collector, field, sub_objs, using):
 
 def DO_NOTHING(collector, field, sub_objs, using):
     pass
+
+
+def get_related_objects_on_proxies(opts):
+    tree, _ = opts.apps.related_objects_relation_graph
+    return (f.related for f in chain.from_iterable(
+            tree[c] for c in opts.proxied_children))
 
 
 class Collector(object):
@@ -134,7 +141,16 @@ class Collector(object):
             return False
         # Foreign keys pointing to this model, both from m2m and other
         # models.
-        for related in opts.get_fields(data=False, related_objects=True, include_hidden=True, include_proxy=True):
+        #related_opts = chain(
+            #opts.get_fields(data=False, related_objects=True, include_hidden=True),
+            #get_related_objects_on_proxies(opts)
+        #)
+        related_opts = model._meta.get_all_related_objects(
+            include_proxy_eq=True,
+            include_hidden=True
+        )
+
+        for related in related_opts:
             if related.field.rel.on_delete is not DO_NOTHING:
                 return False
         for field in model._meta.virtual_fields:
@@ -186,7 +202,16 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
-            for related in model._meta.get_fields(data=False, related_objects=True, include_hidden=True, include_proxy=True):
+            related_opts = model._meta.get_all_related_objects(
+                include_proxy_eq=True,
+                include_hidden=True
+            )
+            #related_opts = chain(
+                #model._meta.get_fields(data=False, related_objects=True,
+                                       #include_hidden=True),
+                #get_related_objects_on_proxies(model._meta)
+            #)
+            for related in related_opts:
                 field = related.field
                 if field.rel.on_delete == DO_NOTHING:
                     continue

@@ -97,6 +97,7 @@ class Options(object):
     def __init__(self, meta, app_label=None):
         self._get_fields_cache = {}
         self._get_field_cache = {}
+        self.proxied_children = []
         self.local_fields = []
         self.local_many_to_many = []
         self.virtual_fields = []
@@ -457,7 +458,7 @@ class Options(object):
         try:
             # In order to avoid list manipulation. Always
             # return a shallow copy of the results
-            return copy(self._get_fields_cache[cache_key])
+            return self._get_fields_cache[cache_key]
         except KeyError:
             pass
 
@@ -468,7 +469,6 @@ class Options(object):
         options = {
             'include_parents': include_parents,
             'include_hidden': include_hidden,
-            'include_proxy': include_proxy,
             'export_name_map': True,
         }
 
@@ -572,7 +572,7 @@ class Options(object):
         self._get_fields_cache[cache_key] = fields
         # In order to avoid list manipulation. Always
         # return a shallow copy of the results
-        return copy(fields)
+        return fields
 
     ###########################################################################
     # Cached properties for fast access
@@ -655,24 +655,32 @@ class Options(object):
     def get_all_related_objects(self, local_only=False, include_hidden=False,
                                 include_proxy_eq=False):
         include_parents = local_only is False
-        return self.get_fields(
-            data=False, related_objects=True,
-            include_parents=include_parents,
-            include_hidden=include_hidden,
-            include_proxy=include_proxy_eq,
-        )
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
-                                           include_proxy_eq=False):
-        include_parents = local_only is False
         fields = self.get_fields(
             data=False, related_objects=True,
             include_parents=include_parents,
             include_hidden=include_hidden,
-            include_proxy=include_proxy_eq
         )
-        return list(map(self._map_model, fields))
+
+        if include_proxy_eq:
+            tree, _ = self.apps.related_objects_relation_graph
+            children = chain.from_iterable(tree[c] for c in self.concrete_model._meta.proxied_children
+                                           if c is not self)
+            relations = (f.related for f in children
+                        if include_hidden or not f.related.field.rel.is_hidden())
+
+            fields = chain(fields, relations)
+
+        return list(fields)
+
+
+    @raise_deprecation(suggested_alternative="get_fields()")
+    def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
+                                           include_proxy_eq=False):
+        return map(self._map_model, self.get_all_related_objects(
+            local_only=local_only,
+            include_hidden=include_hidden,
+            include_proxy_eq=include_proxy_eq
+        ))
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_many_to_many_objects(self, local_only=False):

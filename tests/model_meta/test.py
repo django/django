@@ -108,23 +108,6 @@ class RelatedObjectsTests(OptionsBaseTests):
                 sorted(expected, key=self.key_name)
             )
 
-    def test_related_objects_proxy(self):
-        result_key = 'get_all_related_objects_with_model_proxy'
-        for model, expected in TEST_RESULTS[result_key].items():
-            objects = [(field, self._model(model, field))
-                       for field in model._meta.get_fields(data=False, related_objects=True, include_proxy=True)]
-            self.assertEqual(self._map_related_query_names(objects), expected)
-
-    def test_related_objects_proxy_hidden(self):
-        result_key = 'get_all_related_objects_with_model_proxy_hidden'
-        for model, expected in TEST_RESULTS[result_key].items():
-            objects = [(field, self._model(model, field))
-                       for field in model._meta.get_fields(data=False, related_objects=True, include_proxy=True, include_hidden=True)]
-            self.assertEqual(
-                sorted(self._map_names(objects), key=self.key_name),
-                sorted(expected, key=self.key_name)
-            )
-
 
 class RelatedM2MTests(OptionsBaseTests):
 

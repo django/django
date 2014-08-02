@@ -198,6 +198,7 @@ class ModelBase(type):
                 raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
             new_class._meta.setup_proxy(base)
             new_class._meta.concrete_model = base._meta.concrete_model
+            base._meta.concrete_model._meta.proxied_children.append(new_class._meta)
         else:
             new_class._meta.concrete_model = new_class
 
