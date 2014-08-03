@@ -632,7 +632,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_regexfield_4(self):
         # deprecated error_message argument; remove in Django 2.0
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
         self.assertEqual('1234', f.clean('1234'))
