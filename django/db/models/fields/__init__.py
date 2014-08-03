@@ -2014,6 +2014,11 @@ class BinaryField(Field):
         if self.max_length is not None:
             self.validators.append(validators.MaxLengthValidator(self.max_length))
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(BinaryField, self).deconstruct()
+        del kwargs['editable']
+        return name, path, args, kwargs
+
     def get_internal_type(self):
         return "BinaryField"
 
