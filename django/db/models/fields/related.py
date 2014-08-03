@@ -2142,8 +2142,6 @@ class ManyToManyField(RelatedField):
             kwargs['db_table'] = self.db_table
         if self.rel.db_constraint is not True:
             kwargs['db_constraint'] = self.rel.db_constraint
-        if "help_text" in kwargs:
-            del kwargs['help_text']
         # Rel needs more work.
         if isinstance(self.rel.to, six.string_types):
             kwargs['to'] = self.rel.to
