@@ -169,6 +169,8 @@ class ModelState(object):
                 continue
             if isinstance(field, OrderWrt):
                 continue
+            if field not in model._meta.concrete_fields:
+                continue
             name, path, args, kwargs = field.deconstruct()
             field_class = import_string(path)
             try:
