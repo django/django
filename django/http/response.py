@@ -13,7 +13,7 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import six, timezone
-from django.utils.encoding import force_bytes, force_text, iri_to_uri
+from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
 from django.utils.http import cookie_date
 from django.utils.six.moves import map
 from django.utils.six.moves.urllib.parse import urlparse
@@ -221,6 +221,7 @@ class HttpResponseBase(six.Iterator):
         If it is a ``datetime.datetime`` object then ``max_age`` will be calculated.
 
         """
+        value = force_str(value)
         self.cookies[key] = value
         if expires is not None:
             if isinstance(expires, datetime.datetime):
