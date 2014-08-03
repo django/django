@@ -566,55 +566,6 @@ substring filtering.
 
 .. _documented at sqlite.org: http://www.sqlite.org/faq.html#q18
 
-SQLite 3.3.6 or newer strongly recommended
-------------------------------------------
-
-Versions of SQLite 3.3.5 and older contains the following bugs:
-
-* A bug when `handling`_ ``ORDER BY`` parameters. This can cause problems when
-  you use the ``select`` parameter for the ``extra()`` QuerySet method. The bug
-  can be identified by the error message ``OperationalError: ORDER BY terms
-  must not be non-integer constants``.
-
-* A bug when handling `aggregation`_ together with DateFields and
-  DecimalFields.
-
-.. _handling: http://www.sqlite.org/cvstrac/tktview?tn=1768
-.. _aggregation: https://code.djangoproject.com/ticket/10031
-
-SQLite 3.3.6 was released in April 2006, so most current binary distributions
-for different platforms include newer version of SQLite usable from Python
-through either the ``pysqlite2`` or the ``sqlite3`` modules.
-
-Version 3.5.9
--------------
-
-The Ubuntu "Intrepid Ibex" (8.10) SQLite 3.5.9-3 package contains a bug that
-causes problems with the evaluation of query expressions. If you are using
-Ubuntu "Intrepid Ibex", you will need to update the package to version
-3.5.9-3ubuntu1 or newer (recommended) or find an alternate source for SQLite
-packages, or install SQLite from source.
-
-At one time, Debian Lenny shipped with the same malfunctioning SQLite 3.5.9-3
-package. However the Debian project has subsequently issued updated versions
-of the SQLite package that correct these bugs. If you find you are getting
-unexpected results under Debian, ensure you have updated your SQLite package
-to 3.5.9-5 or later.
-
-The problem does not appear to exist with other versions of SQLite packaged
-with other operating systems.
-
-Version 3.6.2
---------------
-
-SQLite version 3.6.2 (released August 30, 2008) introduced a bug into ``SELECT
-DISTINCT`` handling that is triggered by, among other things, Django's
-``DateQuerySet`` (returned by the ``dates()`` method on a queryset).
-
-You should avoid using this version of SQLite with Django. Either upgrade to
-3.6.3 (released September 22, 2008) or later, or downgrade to an earlier
-version of SQLite.
-
 .. _using-newer-versions-of-pysqlite:
 
 Using newer versions of the SQLite DB-API 2.0 driver
