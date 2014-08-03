@@ -347,3 +347,10 @@ class FieldDeconstructionTests(TestCase):
         self.assertEqual(path, "django.db.models.URLField")
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"max_length": 231})
+
+    def test_binary_field(self):
+        field = models.BinaryField()
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.BinaryField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {})
