@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from bisect import bisect
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple, defaultdict
 from functools import partial
 from itertools import chain
 import warnings
@@ -19,6 +19,7 @@ from django.utils.lru_cache import lru_cache
 from django.utils.text import camel_case_to_spaces
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
+RelationTree = namedtuple('RelationTree', ['related_objects', 'related_m2m'])
 
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
@@ -271,6 +272,56 @@ class Options(object):
             self.db_table = "%s_%s" % (self.app_label, self.model_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
 
+    def _populate_directed_relation_graph(self):
+        """
+        This method is used by each model to find
+        related m2m and objects. As this method is very
+        expensive and is accessed frequently
+        (it looks up every field in a model,
+        in every app), it is computed on first access
+        and then is set as a property on every model.
+        """
+        related_objects_graph = defaultdict(list)
+        related_m2m_graph = defaultdict(list)
+
+        all_models = self.apps.get_models(include_auto_created=True)
+        for model in all_models:
+            for f in chain(model._meta.fields, model._meta.virtual_fields):
+                # Check if the field has a relation to another model
+                if hasattr(f, 'rel') and f.rel and f.has_class_relation:
+                    # Set options_instance -> field
+                    related_objects_graph[f.rel.to._meta].append(f)
+
+            if not model._meta.auto_created:
+                # Many to many relations are never auto-created
+                for f in model._meta.many_to_many:
+                    # Check if the field has a relation to another model
+                    if f.rel and not isinstance(f.rel.to, six.string_types):
+                        # Set options_instance -> field
+                        related_m2m_graph[f.rel.to._meta].append(f)
+
+        for model in all_models:
+            model._meta._relation_tree = RelationTree(
+                related_objects=related_objects_graph[model._meta],
+                related_m2m=related_m2m_graph[model._meta],
+            )
+
+    @cached_property
+    def relation_tree(self):
+        # If cache is not present, populate the cache
+        try:
+            return self._relation_tree
+        except AttributeError:
+            self._populate_directed_relation_graph()
+
+        # If cache has been populated, but the
+        # current model does not have related objects
+        # return empty list
+        try:
+            return self._relation_tree
+        except AttributeError:
+            return RelationTree([], [])
+
     def add_field(self, field, virtual=False):
         # Insert the given field in the order in which it was created, using
         # the "creation_counter" attribute of the field.
@@ -450,8 +501,8 @@ class Options(object):
 
         # Creates a cache key composed of all arguments
         export_name_map = kwargs.get('export_name_map', False)
-        cache_key = (m2m, data, related_m2m, related_objects, virtual, include_parents,
-                     include_hidden, export_name_map)
+        cache_key = (m2m, data, related_m2m, related_objects, virtual,
+                     include_parents, include_hidden, export_name_map)
 
         try:
             # In order to avoid list manipulation. Always
@@ -486,8 +537,9 @@ class Options(object):
             # Tree is computer once and cached until apps cache is expired. It is composed of
             # {options_instance: [field_pointing_to_options_model, field_pointing_to_options, ..]}
             # If the model is a proxy model, then we also add the concrete model.
-            tree = self.apps.related_m2m_relation_graph
-            field_list = tree[self] if not self.proxy else chain(tree[self], tree[self.concrete_model._meta])
+            model_fields = self.relation_tree.related_m2m
+            field_list = model_fields if not self.proxy else chain(model_fields,
+                                                                   self.concrete_model._meta.relation_tree.related_m2m)
             for f in field_list:
                 fields[f.related] = {f.related_query_name()}
 
@@ -510,8 +562,9 @@ class Options(object):
             # Tree is computer once and cached until apps cache is expired. It is composed of
             # {options_instance : [field_pointing_to_options_model, field_pointing_to_options, ..]}
             # If the model is a proxy model, then we also add the concrete model.
-            tree, proxy_tree = self.apps.related_objects_relation_graph
-            all_fields = tree[self] if not self.proxy else chain(tree[self], tree[self.concrete_model._meta])
+            model_fields = self.relation_tree.related_objects
+            all_fields = model_fields if not self.proxy else chain(model_fields,
+                                                                   self.concrete_model._meta.relation_tree.related_objects)
             for f in all_fields:
                 if include_hidden or not f.related.field.rel.is_hidden():
                     # If hidden fields should be included or the relation
@@ -657,8 +710,8 @@ class Options(object):
         )
 
         if include_proxy_eq:
-            tree, _ = self.apps.related_objects_relation_graph
-            children = chain.from_iterable(tree[c] for c in self.concrete_model._meta.proxied_children
+            children = chain.from_iterable(c.relation_tree.related_objects
+                                           for c in self.concrete_model._meta.proxied_children
                                            if c is not self)
             relations = (f.related for f in children
                          if include_hidden or not f.related.field.rel.is_hidden())
