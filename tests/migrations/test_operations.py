@@ -426,13 +426,13 @@ class OperationTests(OperationTestBase):
         self.assertTableNotExists("test_rmwsrf_horserider")
         if connection.features.supports_foreign_keys:
             self.assertFKExists("test_rmwsrf_rider", ["friend_id"], ("test_rmwsrf_rider", "id"))
-            self.assertFKNotExists("test_rmwsrf_horserider", ["friend_id"], ("test_rmwsrf_horserider", "id"))
+            self.assertFKNotExists("test_rmwsrf_rider", ["friend_id"], ("test_rmwsrf_horserider", "id"))
         with connection.schema_editor() as editor:
             operation.database_forwards("test_rmwsrf", editor, project_state, new_state)
         self.assertTableNotExists("test_rmwsrf_rider")
         self.assertTableExists("test_rmwsrf_horserider")
         if connection.features.supports_foreign_keys:
-            self.assertFKNotExists("test_rmwsrf_rider", ["friend_id"], ("test_rmwsrf_rider", "id"))
+            self.assertFKNotExists("test_rmwsrf_horserider", ["friend_id"], ("test_rmwsrf_rider", "id"))
             self.assertFKExists("test_rmwsrf_horserider", ["friend_id"], ("test_rmwsrf_horserider", "id"))
         # And test reversal
         with connection.schema_editor() as editor:
@@ -441,7 +441,7 @@ class OperationTests(OperationTestBase):
         self.assertTableNotExists("test_rmwsrf_horserider")
         if connection.features.supports_foreign_keys:
             self.assertFKExists("test_rmwsrf_rider", ["friend_id"], ("test_rmwsrf_rider", "id"))
-            self.assertFKNotExists("test_rmwsrf_horserider", ["friend_id"], ("test_rmwsrf_horserider", "id"))
+            self.assertFKNotExists("test_rmwsrf_rider", ["friend_id"], ("test_rmwsrf_horserider", "id"))
 
     def test_add_field(self):
         """
