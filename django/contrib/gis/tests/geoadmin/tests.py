@@ -7,6 +7,7 @@ if HAS_GEOS:
     from django.contrib.gis import admin
     from django.contrib.gis.geos import Point
 
+    from .admin import UnmodifiableAdmin
     from .models import City
 
 
@@ -20,12 +21,30 @@ class GeoAdminTest(TestCase):
         self.assertTrue(any(geoadmin.openlayers_url in js for js in admin_js))
 
     def test_olmap_OSM_rendering(self):
-        geoadmin = admin.site._registry[City]
-        result = geoadmin.get_map_widget(City._meta.get_field('point'))(
-        ).render('point', Point(-79.460734, 40.18476))
+        delete_all_btn = """<a href="javascript:geodjango_point.clearFeatures()">Delete all Features</a>"""
+
+        original_geoadmin = admin.site._registry[City]
+        params = original_geoadmin.get_map_widget(City._meta.get_field('point')).params
+        result = original_geoadmin.get_map_widget(City._meta.get_field('point'))(
+        ).render('point', Point(-79.460734, 40.18476), params)
         self.assertIn(
             """geodjango_point.layers.base = new OpenLayers.Layer.OSM("OpenStreetMap (Mapnik)");""",
             result)
+
+        self.assertIn(delete_all_btn, result)
+
+        admin.site.unregister(City)
+        admin.site.register(City, UnmodifiableAdmin)
+        try:
+            geoadmin = admin.site._registry[City]
+            params = geoadmin.get_map_widget(City._meta.get_field('point')).params
+            result = geoadmin.get_map_widget(City._meta.get_field('point'))(
+            ).render('point', Point(-79.460734, 40.18476), params)
+
+            self.assertNotIn(delete_all_btn, result)
+        finally:
+            admin.site.unregister(City)
+            admin.site.register(City, original_geoadmin.__class__)
 
     def test_olmap_WMS_rendering(self):
         geoadmin = admin.GeoModelAdmin(City, admin.site)
