@@ -420,7 +420,7 @@ class BaseForm(object):
     def changed_data(self):
         if self._changed_data is None:
             self._changed_data = []
-            # XXX: For now we're asking the individual widgets whether or not the
+            # XXX: For now we're asking the individual fields whether or not the
             # data has changed. It would probably be more efficient to hash the
             # initial data, store it in a hidden field, and compare a hash of the
             # submitted data, but we'd need a way to easily get the string value
