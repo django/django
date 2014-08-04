@@ -2,6 +2,7 @@ import os
 import errno
 import itertools
 from datetime import datetime
+import time
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
@@ -66,17 +67,24 @@ class Storage(object):
         """
         Returns a filename that's free on the target storage system, and
         available for new content to be written to.
+        If FILE_UPLOAD_USETIME_DUPLICATE is true, we don't use the incremental method
+        to determine the new filename but instead we append a timestamp to the original filename.
         """
         dir_name, file_name = os.path.split(name)
+        # file_ext includes the dot.
         file_root, file_ext = os.path.splitext(file_name)
+
         # If the filename already exists, add an underscore and a number (before
         # the file extension, if one exists) to the filename until the generated
         # filename doesn't exist.
         count = itertools.count(1)
         while self.exists(name):
-            # file_ext includes the dot.
-            name = os.path.join(dir_name, "%s_%s%s" % (file_root, next(count), file_ext))
-
+            if settings.FILE_UPLOAD_USETIME_DUPLICATE:
+                strtime = str(int(round(time.time() * 1000)))
+                name = os.path.join(dir_name, "%s_%s_%s%s" % (file_root, strtime, next(count), file_ext))
+            else:
+                name = os.path.join(dir_name, "%s_%s%s" % (file_root, next(count), file_ext))
+        print name
         return name
 
     def path(self, name):

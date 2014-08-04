@@ -130,7 +130,10 @@ File Storage
 File Uploads
 ^^^^^^^^^^^^
 
-* ...
+* The new :setting:`FILE_UPLOAD_USETIME_DUPLICATE` setting controls if we
+  use the standard incremental method to determine the new filename or instead
+  we append a timestamp to the original filename.
+
 
 Forms
 ^^^^^

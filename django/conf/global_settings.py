@@ -319,6 +319,9 @@ FILE_UPLOAD_PERMISSIONS = None
 # see http://docs.python.org/lib/os-file-dir.html.
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = None
 
+# Whether to append timestamp to duplicate filenames during the upload.
+FILE_UPLOAD_USETIME_DUPLICATE = True
+
 # Python module path where user will place custom format definition.
 # The directory where this setting is pointing should contain subdirectories
 # named as the locales, containing a formats.py file
