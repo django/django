@@ -452,6 +452,10 @@ class Options(object):
         - related_objects:  a one-to-many relation from another model that points to the current model
         - related_m2m:      a M2M relation from another model that points to the current model
         - virtual:          fields that do not necessarily have an entry on the database (like GenericForeignKey)
+
+        Options can be any of the following:
+        - include_parents:        include fields derived from inheritance
+        - include_hidden:         include fields that have a related_name that starts with a "+"
         """
         # NOTE: previous get_field API had a many_to_many key. This key
         # has now become m2m. In order to avoid breaking other's implementation
