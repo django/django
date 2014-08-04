@@ -301,8 +301,8 @@ more information.
 
 .. _built-in-fields:
 
-Built-in Field classes
-----------------------
+Built-in ``Field`` classes
+--------------------------
 
 Naturally, the ``forms`` library comes with a set of ``Field`` classes that
 represent common validation needs. This section documents each built-in field.
@@ -871,8 +871,8 @@ For each field, we describe the default widget used if you don't specify
     These are the same as ``CharField.max_length`` and ``CharField.min_length``.
 
 
-Slightly complex built-in Field classes
----------------------------------------
+Slightly complex built-in ``Field`` classes
+-------------------------------------------
 
 ``ComboField``
 ~~~~~~~~~~~~~~
