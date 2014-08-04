@@ -130,30 +130,6 @@ relational model (such as :class:`django.db.models.ManyToManyField`, or
 
 ``City`` has a related hidden object from ``Person`` (as you can't access ``person_set``)
 
-Concrete
-~~~~~~~~
-
-Concrete fields are fields that have a column
-
-Proxied relations
-~~~~~~~~~~~~~~~~~
-
-Proxied relations are relations that point to a proxy of a model.
-
-.. code-block:: python
-
-    class Person(models.Model):
-        pass
-
-    class ProxyPerson(Person):
-        class Meta:
-            proxy = True
-
-    class RelationToProxy(models.Model):
-         proxy_person = models.ForeignKey(ProxyPerson)
-
-In this case, ``Person`` has no related objects, but it has 1 proxied related
-object from ``RelationToProxy``.
 
 ``Options API``
 ===============
@@ -219,14 +195,14 @@ Retrieve all field names
 Retrieve field instances
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Options.get_fields(m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False, include_parents=True, include_non_concrete=True, include_hidden=False, include_proxy=False)
+.. method:: Options.get_fields(m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False, include_parents=True, include_hidden=False)
 
     Returns a list of fields given a list of field types and filters.
 
     get_fields() takes a set of flags as parameters and returns a tuple of field instances.
     The flags are a combination of field types and field filters. All possible combinations
     of filters and fields are possible, although some will have no effect (such as
-    ``include_proxy`` combined with ``data`` or ``m2m`` by itself).
+    ``include_hidden`` combined with ``data`` or ``m2m`` by itself).
 
     .. code-block:: python
 
