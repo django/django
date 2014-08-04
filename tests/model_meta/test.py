@@ -2,6 +2,7 @@ from django import test
 
 from django.db.models import FieldDoesNotExist
 from django.db.models.fields import related, CharField, Field
+from django.db.models.options import IMMUTABLE_WARNING
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 from .models import BasePerson, Person
@@ -30,6 +31,18 @@ class OptionsBaseTests(test.TestCase):
         field = relation if direct else relation.field
         m2m = isinstance(field, related.ManyToManyField)
         return relation, model, direct, m2m
+
+
+class GetFieldsTests(OptionsBaseTests):
+
+    def test_get_fields_is_immutable(self):
+        for _ in range(2):
+            # Running unit test twice to ensure both non-cached and cached result
+            # are immutable.
+            fields = Person._meta.get_fields()
+            with self.assertRaises(AttributeError) as err:
+                fields += ["errors"]
+            self.assertEquals(str(err.exception), IMMUTABLE_WARNING)
 
 
 class DataTests(OptionsBaseTests):
