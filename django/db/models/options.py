@@ -12,6 +12,7 @@ from django.db.models.fields.related import ManyToManyRel, ManyToManyField
 from django.db.models.fields import AutoField, FieldDoesNotExist, Field
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
+from django.utils.datastructures import ImmutableList
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
@@ -26,6 +27,11 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save', 'default_related_name')
+
+
+IMMUTABLE_WARNING = "get_fields return type should never be mutated. If you want \
+to manipulate get_fields return type should never be mutated. If you want to \
+manipulate this list for your own use, make a copy first"
 
 
 @lru_cache(maxsize=None)
@@ -151,6 +157,11 @@ class Options(object):
         self.default_related_name = None
         self._map_model = partial(_map_model, self)
         self._map_model_details = partial(_map_model_details, self)
+
+        self._make_immutable_fields_list = partial(
+            ImmutableList,
+            warning=IMMUTABLE_WARNING
+        )
 
     ### INTERNAL METHODS AND PROPERTIES GO BELOW THIS LINE ###
 
@@ -561,7 +572,7 @@ class Options(object):
             # By default, fields contains field instances as keys and all possible names
             # if the field instance as values. when get_fields is called, we only want to
             # return field instances, so we just preserve the keys.
-            fields = list(fields.keys())
+            fields = self._make_immutable_fields_list(fields.keys())
 
         # Store result into cache for later access
         self._get_fields_cache[cache_key] = fields
