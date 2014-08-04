@@ -22,6 +22,8 @@ from django.utils.translation import activate, deactivate_all, get_language, str
 
 RelationTree = namedtuple('RelationTree', ['related_objects', 'related_m2m'])
 
+EMPTY_RELATION_TREE = RelationTree(tuple(), tuple())
+
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
@@ -312,26 +314,25 @@ class Options(object):
                         related_m2m_graph[f.rel.to._meta].append(f)
 
         for model in all_models:
-            model._meta._relation_tree = RelationTree(
-                related_objects=related_objects_graph[model._meta],
-                related_m2m=related_m2m_graph[model._meta],
+            # Set the realtion_tree using the internal __dict__.
+            # In this way we avoid calling the cached property.
+            # In attribute lookup, __dict__ takes precedence over
+            # a data descriptor (such as @cached_property). This
+            # means that the _meta.relation_tree is only called
+            # if related_objects is not in __dict__.
+            model._meta.__dict__['relation_tree'] = RelationTree(
+                related_objects=tuple(related_objects_graph[model._meta]),
+                related_m2m=tuple(related_m2m_graph[model._meta]),
             )
 
     @cached_property
     def relation_tree(self):
         # If cache is not present, populate the cache
+        self._populate_directed_relation_graph()
         try:
-            return self._relation_tree
-        except AttributeError:
-            self._populate_directed_relation_graph()
-
-        # If cache has been populated, but the
-        # current model does not have related objects
-        # return empty list
-        try:
-            return self._relation_tree
-        except AttributeError:
-            return RelationTree([], [])
+            return self.__dict__['relation_tree']
+        except KeyError:
+            return EMPTY_RELATION_TREE
 
     def add_field(self, field, virtual=False):
         # Insert the given field in the order in which it was created, using
@@ -452,10 +453,6 @@ class Options(object):
         - related_objects:  a one-to-many relation from another model that points to the current model
         - related_m2m:      a M2M relation from another model that points to the current model
         - virtual:          fields that do not necessarily have an entry on the database (like GenericForeignKey)
-
-        Options can be any of the following:
-        - include_parents:        include fields derived from inheritance
-        - include_hidden:         include fields that have a related_name that starts with a "+"
         """
         # NOTE: previous get_field API had a many_to_many key. This key
         # has now become m2m. In order to avoid breaking other's implementation
