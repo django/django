@@ -27,6 +27,12 @@ from django.utils import timezone
 class BaseDatabaseWrapper(object):
     """
     Represents a database connection.
+
+    :param settings_dict: Dictionary containing keys such as NAME, USER, etc.
+        It's called `settings_dict` instead of `settings` to disambiguate it
+        from Django settings modules.
+    :param alias:
+    :param allow_thread_sharing:
     """
     ops = None
     vendor = 'unknown'

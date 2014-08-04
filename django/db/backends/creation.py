@@ -27,6 +27,8 @@ class BaseDatabaseCreation(object):
     database *creation*, such as the column types to use for particular Django
     Fields, the SQL used to create and destroy tables, and the creation and
     destruction of test databases.
+
+    :param connection: `DatabaseWrapper` object representing database connection
     """
     data_types = {}
     data_types_suffix = {}
@@ -66,8 +68,13 @@ class BaseDatabaseCreation(object):
 
     def sql_create_model(self, model, style, known_models=set()):
         """
-        Returns the SQL required to create a single model, as a tuple of:
+        Generates the SQL required to create a single model, as a tuple of:
             (list_of_sql, pending_references_dict)
+
+        :param model: Model to generate SQL for
+        :param style: `Style` object as returned by either color_style() or no_style() in django.core.management.color
+        :param known_models:
+        :returns: Tuple of ([SQL statements list], {pending references dict})
         """
         opts = model._meta
         if not opts.managed or opts.proxy or opts.swapped:
@@ -151,7 +158,13 @@ class BaseDatabaseCreation(object):
 
     def sql_for_inline_foreign_key_references(self, model, field, known_models, style):
         """
-        Return the SQL snippet defining the foreign key reference for a field.
+        Generates the SQL snippet defining the foreign key reference for a field.
+
+        :param model: Parent model
+        :param field: Field to generate SQL for
+        :param known_models:
+        :param style: `Style` object as returned by either color_style() or no_style() in django.core.management.color
+        :returns SQL snippet
         """
         qn = self.connection.ops.quote_name
         rel_to = field.rel.to
@@ -173,7 +186,11 @@ class BaseDatabaseCreation(object):
 
     def sql_for_pending_references(self, model, style, pending_references):
         """
-        Returns any ALTER TABLE statements to add constraints after the fact.
+        Generates any ALTER TABLE statements to add constraints after the fact.
+
+        :param style: `Style` object as returned by either color_style() or no_style() in django.core.management.color
+        :param pending_references:
+        :returns: [SQL statement list]
         """
         opts = model._meta
         if not opts.managed or opts.swapped:
@@ -202,7 +219,11 @@ class BaseDatabaseCreation(object):
 
     def sql_indexes_for_model(self, model, style):
         """
-        Returns the CREATE INDEX SQL statements for a single model.
+        Generates the CREATE INDEX SQL statements for a single model.
+
+        :param model: Model to generate SQL for
+        :param style: `Style` object as returned by either color_style() or no_style() in django.core.management.color
+        :returns: [SQL statement list]
         """
         if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
@@ -216,7 +237,12 @@ class BaseDatabaseCreation(object):
 
     def sql_indexes_for_field(self, model, f, style):
         """
-        Return the CREATE INDEX SQL statements for a single model field.
+        Generates the CREATE INDEX SQL statements for a single model field.
+
+        :param model: Parent model
+        :param field: Field to generate indexes for
+        :param style: `Style` object as returned by either color_style() or no_style() in django.core.management.color
+        :returns: [SQL statement list]
         """
         if f.db_index and not f.unique:
             return self.sql_indexes_for_fields(model, [f], style)
@@ -224,6 +250,14 @@ class BaseDatabaseCreation(object):
             return []
 
     def sql_indexes_for_fields(self, model, fields, style):
+        """
+        Generates CREATE INDEX SQL statements for given fields of the model.
+
+        :param model: Parent model
+        :param fields: Fields to generate indexes for
+        :param style: `Style` object as returned by either color_style() or no_style() in django.core.management.color
+        :returns: [SQL statement list]
+        """
         if len(fields) == 1 and fields[0].db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
         elif model._meta.db_tablespace:
@@ -251,8 +285,12 @@ class BaseDatabaseCreation(object):
 
     def sql_destroy_model(self, model, references_to_delete, style):
         """
-        Return the DROP TABLE and restraint dropping statements for a single
-        model.
+        Generates the DROP TABLE and restraint dropping statements for a single model.
+
+        :param model: Model to generate SQL for
+        :param references_to_delete:
+        :param style: `Style` object as returned by either color_style() or no_style() in django.core.management.color
+        :returns: [SQL statement list]
         """
         if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
@@ -270,6 +308,14 @@ class BaseDatabaseCreation(object):
         return output
 
     def sql_remove_table_constraints(self, model, references_to_delete, style):
+        """
+        Generates ALTER TABLE statements to drop given foreign keys to another table.
+
+        :param model: Model to generate SQL for
+        :param references_to_delete:
+        :param style: `Style` object as returned by either color_style() or no_style() in django.core.management.color
+        :returns: [SQL statement list]
+        """
         if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []
@@ -293,7 +339,11 @@ class BaseDatabaseCreation(object):
 
     def sql_destroy_indexes_for_model(self, model, style):
         """
-        Returns the DROP INDEX SQL statements for a single model.
+        Generates the DROP INDEX SQL statements for a single model.
+
+        :param model: Model to generate SQL for
+        :param style: `Style` object as returned by either color_style() or no_style() in django.core.management.color
+        :returns: [SQL statement list]
         """
         if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
@@ -305,16 +355,29 @@ class BaseDatabaseCreation(object):
             output.extend(self.sql_destroy_indexes_for_fields(model, fields, style))
         return output
 
-    def sql_destroy_indexes_for_field(self, model, f, style):
+    def sql_destroy_indexes_for_field(self, model, field, style):
         """
-        Return the DROP INDEX SQL statements for a single model field.
+        Generates the DROP INDEX SQL statements for a single model field.
+
+        :param model: Parent model
+        :param field: Field to generate SQL for
+        :param style: `Style` object as returned by either color_style() or no_style() in django.core.management.color
+        :returns: [SQL statement list]
         """
-        if f.db_index and not f.unique:
-            return self.sql_destroy_indexes_for_fields(model, [f], style)
+        if field.db_index and not field.unique:
+            return self.sql_destroy_indexes_for_fields(model, [field], style)
         else:
             return []
 
     def sql_destroy_indexes_for_fields(self, model, fields, style):
+        """
+        Generates the DROP INDEX SQL statements for multiple model fields.
+
+        :param model: Parent model
+        :param fields: Fields to generate SQL for
+        :param style: `Style` object as returned by either color_style() or no_style() in django.core.management.color
+        :returns: [SQL statement list]
+        """
         if len(fields) == 1 and fields[0].db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(fields[0].db_tablespace)
         elif model._meta.db_tablespace:
