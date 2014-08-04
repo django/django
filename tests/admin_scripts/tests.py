@@ -106,7 +106,7 @@ class AdminScriptTestCase(unittest.TestCase):
         return paths
 
     def run_test(self, script, args, settings_file=None, apps=None):
-        project_dir = test_dir
+        #project_dir = test_dir
         base_dir = os.path.dirname(test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -1387,6 +1387,13 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "EXECUTE:AppCommand app=<module 'django.contrib.auth.models'")
         self.assertOutput(out, "module 'django.contrib.auth.models' from")
         self.assertOutput(out, str_prefix("'>, options=[('pythonpath', None), ('settings', None), ('traceback', None), ('verbosity', %(_)s'1')]"))
+
+    def test_sqlclear_app_command(self):
+        "Can execute sqlclear when a single app name is provided"
+        args = ['sqlclear', 'auth']
+        out, err = self.run_manage(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, "The app has not tables in the database. Nothing to do")
 
     def test_app_command_no_apps(self):
         "User AppCommands raise an error when no app name is provided"
