@@ -81,7 +81,7 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Bitte %(username)s und Passwort für einen Staff-Account korrekt eingeben."
+"Bitte %(username)s und Passwort für ein Redakteurkonto korrekt eingeben."
 
 #: forms.py:19
 msgid "Please log in again, because your session has expired."
