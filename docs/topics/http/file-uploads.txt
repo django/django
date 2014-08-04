@@ -26,7 +26,7 @@ Consider a simple form containing a :class:`~django.forms.FileField`::
 
     class UploadFileForm(forms.Form):
         title = forms.CharField(max_length=50)
-        file  = forms.FileField()
+        file = forms.FileField()
 
 A view handling this form will receive the file data in
 :attr:`request.FILES <django.http.HttpRequest.FILES>`, which is a dictionary
