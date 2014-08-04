@@ -10,9 +10,9 @@ from pprint import pformat
 
 from django.conf import settings
 from django.core import signing
-from django.core.exceptions import DisallowedHost, ImproperlyConfigured
+from django.core.exceptions import DisallowedHost, ImproperlyConfigured, SuspiciousOperation
 from django.core.files import uploadhandler
-from django.http.multipartparser import MultiPartParser, MultiPartParserError
+from django.http.multipartparser import MultiPartParser
 from django.utils import six
 from django.utils.datastructures import MultiValueDict, ImmutableList
 from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
@@ -204,13 +204,18 @@ class HttpRequest(object):
             raise AttributeError("You cannot set the upload handlers after the upload has been processed.")
         self._upload_handlers = upload_handlers
 
-    def parse_file_upload(self, META, post_data):
+    def parse_file_upload(self):
         """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
         self.upload_handlers = ImmutableList(
             self.upload_handlers,
             warning="You cannot alter upload handlers after the upload has been processed."
         )
-        parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
+        # Use already read data, if it exists, otherwise stream the request.
+        if hasattr(self, '_body'):
+            data = BytesIO(self._body)
+        else:
+            data = self
+        parser = MultiPartParser(self.META, data, self.upload_handlers, self.encoding)
         return parser.parse()
 
     @property
@@ -218,6 +223,17 @@ class HttpRequest(object):
         if not hasattr(self, '_body'):
             if self._read_started:
                 raise RawPostDataException("You cannot access body after reading from request's data stream")
+
+            # Limit the maximum request data size that will be handled in-memory.
+            try:
+                content_length = int(self.META.get('HTTP_CONTENT_LENGTH', self.META.get('CONTENT_LENGTH', 0)))
+            except (ValueError, TypeError):
+                content_length = 0
+
+            if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
+                    and content_length > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
+                raise SuspiciousOperation('Request data too large')
+
             try:
                 self._body = self.read()
             except IOError as e:
@@ -239,28 +255,23 @@ class HttpRequest(object):
             self._mark_post_parse_error()
             return
 
-        if self.META.get('CONTENT_TYPE', '').startswith('multipart/form-data'):
-            if hasattr(self, '_body'):
-                # Use already read data
-                data = BytesIO(self._body)
+        try:
+            if self.META.get('CONTENT_TYPE', '').startswith('multipart/form-data'):
+                self._post, self._files = self.parse_file_upload()
+            elif self.META.get('CONTENT_TYPE', '').startswith('application/x-www-form-urlencoded'):
+                self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
             else:
-                data = self
-            try:
-                self._post, self._files = self.parse_file_upload(self.META, data)
-            except MultiPartParserError:
-                # An error occurred while parsing POST data. Since when
-                # formatting the error the request handler might access
-                # self.POST, set self._post and self._file to prevent
-                # attempts to parse POST data again.
-                # Mark that an error occurred. This allows self.__repr__ to
-                # be explicit about it instead of simply representing an
-                # empty POST
-                self._mark_post_parse_error()
-                raise
-        elif self.META.get('CONTENT_TYPE', '').startswith('application/x-www-form-urlencoded'):
-            self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
-        else:
-            self._post, self._files = QueryDict('', encoding=self._encoding), MultiValueDict()
+                self._post, self._files = QueryDict(encoding=self._encoding), MultiValueDict()
+        except:
+            # An error occured while parsing POST data. Since when
+            # formatting the error the request handler might access
+            # self.POST, set self._post and self._file to prevent
+            # attempts to parse POST data again.
+            # Mark that an error occured. This allows self.__repr__ to
+            # be explicit about it instead of simply representing an
+            # empty POST
+            self._mark_post_parse_error()
+            raise
 
     def close(self):
         if hasattr(self, '_files'):
