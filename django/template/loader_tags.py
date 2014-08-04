@@ -103,13 +103,19 @@ class ExtendsNode(Node):
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
-        
-        if EXTENDS_HISTORY_CONTEXT_KEY not in context.render_context:
-            context.render_context[EXTENDS_HISTORY_CONTEXT_KEY] = []
-        if compiled_parent.name not in context.render_context[EXTENDS_HISTORY_CONTEXT_KEY]:
-            context.render_context[EXTENDS_HISTORY_CONTEXT_KEY].append(compiled_parent.name)
-        else:
-            raise TemplateRecursionError('Circular template extension error in %s' % context.render_context[EXTENDS_HISTORY_CONTEXT_KEY])
+
+        # Keeping a history of the templates that have already been rendered,
+        # to avoid a circular template recursion error
+        extends_history = context.render_context.get(
+            EXTENDS_HISTORY_CONTEXT_KEY)
+        if extends_history is None:
+            extends_history = []
+            context.render_context[EXTENDS_HISTORY_CONTEXT_KEY] = (
+                extends_history)
+        if compiled_parent.name in extends_history:
+            raise TemplateRecursionError(
+                'Circular template extension error in %s' % extends_history)
+        extends_history.append(compiled_parent.name)
 
         if BLOCK_CONTEXT_KEY not in context.render_context:
             context.render_context[BLOCK_CONTEXT_KEY] = BlockContext()
