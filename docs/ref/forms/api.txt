@@ -220,6 +220,43 @@ what happens with unbound forms::
     >>> f.errors
     {}
 
+
+Check if form data is changed
+-----------------------------
+
+.. method:: Form.has_changed()
+
+Use ``has_changed()`` method on your ``Form`` when you need to check if the form data has been changed.
+
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(initial=data)
+    >>> f.has_changed()
+    False
+
+This form can now be sent to the browser. When the user submits the form we reconstruct 
+it and at that point provide the original data so that the comparison can be done:
+
+    >>> f = ContactForm(request.POST, initial=data)
+    >>> f.has_changed()
+
+The response will be ``True`` if the data has been changed by the user 
+or ``False`` otherwise.
+
+
+.. note::
+
+    ``Form.has_changed()`` uses ``form.changed_data`` property where each individual 
+    widget is asked whether or not the data has changed. It would probably be more 
+    efficient to hash the initial data, store it in a hidden field, and compare a 
+    hash of the submitted data, but we'd need a way to easily get the string value 
+    for a given field. Right now, that logic is embedded in the render method of 
+    each widget.
+
+
 Dynamic initial values
 ----------------------
 
