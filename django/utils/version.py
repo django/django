@@ -38,7 +38,7 @@ def get_major_version(version=None):
 
 
 def get_complete_version(version=None):
-    """Returns a tuple of the django version. If version argument is non-empy,
+    """Returns a tuple of the django version. If version argument is non-empty,
     then checks for correctness of the tuple provided.
     """
     if version is None:
