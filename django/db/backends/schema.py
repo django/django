@@ -546,6 +546,7 @@ class BaseDatabaseSchemaEditor(object):
                     }
                 )
         # Drop any FK constraints, we'll remake them later
+        fks_dropped = set()
         if old_field.rel:
             fk_names = self._constraint_names(model, [old_field.column], foreign_key=True)
             if strict and len(fk_names) != 1:
@@ -555,6 +556,7 @@ class BaseDatabaseSchemaEditor(object):
                     old_field.column,
                 ))
             for fk_name in fk_names:
+                fks_dropped.add((old_field.column,))
                 self.execute(
                     self.sql_delete_fk % {
                         "table": self.quote_name(model._meta.db_table),
@@ -737,7 +739,7 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
         # Does it have a foreign key?
-        if new_field.rel:
+        if new_field.rel and fks_dropped:
             to_table = new_field.rel.to._meta.db_table
             to_column = new_field.rel.get_related_field().column
             self.execute(
