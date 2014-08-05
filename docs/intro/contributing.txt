@@ -189,7 +189,7 @@ present in Django's official builds. If you click to view a particular build,
 you can view the "Configuration Matrix" which shows failures broken down by
 Python version and database backend.
 
-__ http://ci.djangoproject.com/
+__ http://djangoci.com
 
 .. note::
 
