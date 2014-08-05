@@ -208,7 +208,7 @@ This is the recommended way to install Django.
 .. _pip: http://www.pip-installer.org/
 .. _virtualenv: http://www.virtualenv.org/
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
-.. _standalone pip installer: http://www.pip-installer.org/en/latest/installing.html#using-the-installer
+.. _standalone pip installer: http://www.pip-installer.org/en/latest/installing.html#install-pip
 
 Installing an official release manually
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
