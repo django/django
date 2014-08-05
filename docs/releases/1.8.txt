@@ -534,20 +534,20 @@ Selected methods in ``django.db.models.options.Options``
 The following methods in :class:`~django.db.models.options.Options` have been
 deprecated in favor of newer ones, each method will be removed in Django 2.0.
 
-  * ``get_field()``
-  * ``get_field_by_name()``
-  * ``get_all_field_names()``
-  * ``get_fields_with_model()``
-  * ``get_concrete_fields_with_model()``
-  * ``get_m2m_with_model()``
-  * ``init_name_map()``
-  * ``get_all_related_objects()``
-  * ``get_all_related_objects_with_model()``
-  * ``get_all_related_many_to_many_objects()``
-  * ``get_all_related_m2m_objects_with_model()``
-  * ``_fill_fields_cache()``
-  * ``_fill_m2m_cache()``
-  * ``_fill_related_many_to_many_cache()``
+* ``get_field()``
+* ``get_field_by_name()``
+* ``get_all_field_names()``
+* ``get_fields_with_model()``
+* ``get_concrete_fields_with_model()``
+* ``get_m2m_with_model()``
+* ``init_name_map()``
+* ``get_all_related_objects()``
+* ``get_all_related_objects_with_model()``
+* ``get_all_related_many_to_many_objects()``
+* ``get_all_related_m2m_objects_with_model()``
+* ``_fill_fields_cache()``
+* ``_fill_m2m_cache()``
+* ``_fill_related_many_to_many_cache()``
 
 Loading ``cycle`` and ``firstof`` template tags from ``future`` library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
