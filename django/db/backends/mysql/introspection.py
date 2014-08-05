@@ -32,6 +32,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         FIELD_TYPE.VAR_STRING: 'CharField',
     }
 
+    def get_field_type(self, data_type, description):
+        """
+        Hook for a database backend to use the cursor description to
+        match a Django field type to a database column.
+        """
+        if data_type == FIELD_TYPE.STRING:  # != FIELD_TYPE.VAR_STRING
+            params = {}
+            params['min_length'] = params['max_length'] = int(description[3])
+            return self.data_types_reverse[data_type], params
+        return self.data_types_reverse[data_type]
+
     def get_table_list(self, cursor):
         "Returns a list of table names in the current database."
         cursor.execute("SHOW TABLES")

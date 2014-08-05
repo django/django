@@ -32,6 +32,14 @@ class DatabaseCreation(BaseDatabaseCreation):
         'TimeField': 'time',
     }
 
+    def db_type(self, internal_type, data):
+        """see Field.db_type()"""
+        if internal_type in ('CharField',):
+            # check for fixed-length string
+            if data['min_length'] and data['min_length'] == data['max_length']:
+                return 'char(%(max_length)s)' % data
+        return self.data_types[internal_type] % data
+
     def sql_table_creation_suffix(self):
         suffix = []
         test_settings = self.connection.settings_dict['TEST']

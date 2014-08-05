@@ -35,6 +35,10 @@ class BaseDatabaseCreation(object):
     def __init__(self, connection):
         self.connection = connection
 
+    def db_type(self, internal_type, data):
+        """see Field.db_type()"""
+        return self.data_types[internal_type] % data
+
     @cached_property
     def _nodb_connection(self):
         """
