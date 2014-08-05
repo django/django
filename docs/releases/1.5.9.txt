@@ -1,0 +1,7 @@
+==========================
+Django 1.5.9 release notes
+==========================
+
+*Under development*
+
+Django 1.5.9 fixes several security issues in 1.5.8.

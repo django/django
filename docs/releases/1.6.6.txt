@@ -4,7 +4,7 @@ Django 1.6.6 release notes
 
 *Under development*
 
-Django 1.6.6 fixes several bugs in 1.6.5.
+Django 1.6.6 fixes several security issues and bugs in 1.6.5.
 
 Bugfixes
 ========
