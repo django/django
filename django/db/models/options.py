@@ -31,10 +31,10 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save', 'default_related_name')
 
-
-IMMUTABLE_WARNING = "get_fields return type should never be mutated. If you want \
-to manipulate get_fields return type should never be mutated. If you want to \
-manipulate this list for your own use, make a copy first"
+IMMUTABLE_WARNING = (
+    "get_fields() return type should never be mutated. If you want "
+    "to manipulate this list for your own use, make a copy first"
+)
 
 
 @lru_cache(maxsize=None)

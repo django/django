@@ -20,6 +20,8 @@ Options can be used for:
 * Retrieving all field instances names of a model
 * Retrieving a single field by name
 
+.. _model-meta-field-types:
+
 Field Types
 ===========
 
@@ -86,6 +88,8 @@ database column. they are model fields such as
 and ``object_id`` to keep track of what model type and id is set to ``item``, but
 ``item`` itself does not have a concrete presence on the database.  In this case,
 ``item`` is a virtual field.
+
+.. _model-meta-field-filters:
 
 Field Filters
 =============

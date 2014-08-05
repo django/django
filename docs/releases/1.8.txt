@@ -23,13 +23,47 @@ Like Django 1.7, Django 1.8 requires Python 2.7 or above, though we
 What's new in Django 1.8
 ========================
 
-* Added the new Model._meta API in the :class:`~django.db.models.options.Options`
-  class. The API is formally maintained, documented and can be used for public use.
-  The new API is componsed of 2 main endpoints:
-  :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
-  and :meth:`Options.get_field() <django.db.models.options.Options.get_field()>`.
-  The new API contains several fast-access cached properties that are documented
-  in :doc:`Options </ref/models/meta>`.
+Model._meta API
+~~~~~~~~~~~~~~~
+
+Django now has an official API for Model._meta API in the :class:`~django.db.models.options.Options`
+class. The API is formally maintained, documented and can be used for public use.
+
+Django also has formalized the documentation for :ref:`field types <model-meta-field-types>` and
+:ref:`field filters <model-meta-field-filters>`.
+
+The new API is componsed of 3 main endpoints:
+
+* :meth:`Options.get_field() <django.db.models.options.Options.get_field()>` is used to retrieve a
+  field by name. This endpoint replaces: 
+
+  * ``get_field()``
+  * ``get_field_by_name()``
+
+* :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>` is used to retrieve
+  a list of fields given a specific filter criteria. This endpoint replaces:
+
+  * ``get_fields_with_model()``
+  * ``get_concrete_fields_with_model()``
+  * ``get_m2m_with_model()``
+  * ``init_name_map()``
+  * ``get_all_related_objects()``
+  * ``get_all_related_objects_with_model()``
+  * ``get_all_related_many_to_many_objects()``
+  * ``get_all_related_m2m_objects_with_model()``
+
+* :attr:`Options.field_names <django.db.models.options.Options.field_names>` is used to retrieve
+  a list of all fields names. This endpoint replaces:
+
+  * ``get_all_field_names()``
+
+* The following cache warming functions have also been removed:
+
+  * ``_fill_fields_cache()``
+  * ``_fill_m2m_cache()``
+  * ``_fill_related_many_to_many_cache()``
+
+All the documentation of this API can be found in :doc:`here </ref/models/meta>`.
 
 Minor features
 ~~~~~~~~~~~~~~
@@ -435,12 +469,26 @@ Miscellaneous
 Features deprecated in 1.8
 ==========================
 
-``django.db.models.options.Options``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-A series of methods in :class:`~django.db.models.options.Options` have been
-deprecated in favor of newer ones. Each deprecated method is specified in
-:ref:`the deprecation timeline <deprecation-removed-in-2.0>`, it will be backwards-compatible till
-release 2.0 and will raise a ``DeprecationWarning``.
+Selected methods in ``django.db.models.options.Options``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following methods in :class:`~django.db.models.options.Options` have been
+deprecated in favor of newer ones, each method will be removed in Django 2.0.
+
+  * ``get_field()``
+  * ``get_field_by_name()``
+  * ``get_all_field_names()``
+  * ``get_fields_with_model()``
+  * ``get_concrete_fields_with_model()``
+  * ``get_m2m_with_model()``
+  * ``init_name_map()``
+  * ``get_all_related_objects()``
+  * ``get_all_related_objects_with_model()``
+  * ``get_all_related_many_to_many_objects()``
+  * ``get_all_related_m2m_objects_with_model()``
+  * ``_fill_fields_cache()``
+  * ``_fill_m2m_cache()``
+  * ``_fill_related_many_to_many_cache()``
 
 Loading ``cycle`` and ``firstof`` template tags from ``future`` library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
