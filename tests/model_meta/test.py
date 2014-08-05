@@ -1,11 +1,12 @@
 from django import test
 
+from django.apps import apps
 from django.db.models import FieldDoesNotExist
 from django.db.models.fields import related, CharField, Field
-from django.db.models.options import IMMUTABLE_WARNING
+from django.db.models.options import IMMUTABLE_WARNING, EMPTY_RELATION_TREE
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
-from .models import BasePerson, Person
+from .models import Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating
 from .results import TEST_RESULTS
 
 
@@ -197,3 +198,33 @@ class GetFieldByNameTests(OptionsBaseTests):
             Person._meta.get_field,
             **{'field_name': 'm2m_base', 'm2m': False}
         )
+
+
+class RelationTreeTests(test.TestCase):
+    all_models = (Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating)
+
+    def setUp(self):
+        apps.clear_cache()
+
+    def test_clear_cache_clears_relation_tree(self):
+        apps.clear_cache()
+        self.assertTrue(all('relation_tree' not in m._meta.__dict__
+                            for m in self.all_models))
+
+    def test_first_relation_tree_access_populates_all(self):
+        # On first access, relation tree should have populated cache.
+        self.assertTrue(self.all_models[0]._meta.relation_tree)
+
+        # AbstractPerson does not have any relations, so relation_tree
+        # should just return an EMPTY_RELATION_TREE.
+        self.assertEquals(
+            AbstractPerson._meta.relation_tree,
+            EMPTY_RELATION_TREE
+        )
+
+        # All the other models should already have their relation tree
+        # in the internal __dict__ .
+        all_models_but_abstractperson = (m for m in self.all_models
+                                         if m is not AbstractPerson)
+        self.assertTrue(all('relation_tree' in m._meta.__dict__
+                            for m in all_models_but_abstractperson))
