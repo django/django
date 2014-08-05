@@ -78,7 +78,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         # TODO: remove when SQLite < 3.7.15 is sufficiently old.
         # 3.7.13 ships in Debian stable as of 2014-03-21.
-        return name.split('.')[-1].strip('"')
+        if self.connection.Database.sqlite_version_info < (3, 7, 15):
+            return name.split('.')[-1].strip('"')
+        else:
+            return name
 
     def get_relations(self, cursor, table_name):
         """
