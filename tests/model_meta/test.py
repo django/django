@@ -228,3 +228,35 @@ class RelationTreeTests(test.TestCase):
                                          if m is not AbstractPerson)
         self.assertTrue(all('relation_tree' in m._meta.__dict__
                             for m in all_models_but_abstractperson))
+
+    def test_relations_related_objects(self):
+
+        # Testing non hidden related objects
+        self.assertEqual(
+            sorted([field.related_query_name() for field in Relation._meta.relation_tree.related_objects
+                   if not field.related.field.rel.is_hidden()]),
+            sorted(['fk_abstract_rel', 'fo_abstract_rel', 'fk_base_rel', 'fo_base_rel', 'fk_abstract_rel',
+                   'fo_abstract_rel', 'fk_base_rel', 'fo_base_rel', 'fk_concrete_rel', 'fo_concrete_rel',
+                   'fk_abstract_rel', 'fo_abstract_rel', 'fk_base_rel', 'fo_base_rel', 'fk_concrete_rel',
+                   'fo_concrete_rel'])
+        )
+
+        # Testing hidden related objects
+        self.assertEqual(
+            sorted([field.related_query_name() for field in BasePerson._meta.relation_tree.related_objects]),
+            sorted(['BasePerson_friends_base+', 'BasePerson_friends_base+', 'BasePerson_m2m_base+',
+                   'BasePerson_following_base+', 'BasePerson_following_base+', 'BasePerson_m2m_abstract+',
+                   'BasePerson_friends_abstract+', 'BasePerson_friends_abstract+', 'BasePerson_following_abstract+',
+                   'BasePerson_following_abstract+', 'person', 'person', 'Relating_basepeople+', 'Relating_basepeople_hidden+',
+                   'relating_baseperson', '+'])
+        )
+        self.assertEqual([field.related_query_name() for field in AbstractPerson._meta.relation_tree.related_objects], [])
+
+    def test_relations_related_m2m(self):
+        self.assertEqual(
+            sorted([field.related_query_name() for field in Relation._meta.relation_tree.related_m2m
+                   if not field.related.field.rel.is_hidden()]),
+            sorted(['m2m_abstract_rel', 'm2m_base_rel', 'm2m_abstract_rel', 'm2m_base_rel', 'm2m_concrete_rel',
+                   'm2m_abstract_rel', 'm2m_base_rel', 'm2m_concrete_rel'])
+        )
+        self.assertEqual([field.related_query_name() for field in AbstractPerson._meta.relation_tree.related_m2m], [])
