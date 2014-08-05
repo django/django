@@ -249,6 +249,13 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
+    def test_sqlclear_builtin_with_settings(self):
+        "default: django-admin builtin commands succeed if settings are provided as argument"
+        args = ['sqlclear', '--settings=test_project.settings', 'admin_scripts']
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, 'App has not tables in the database. Nothing to do')
+
     def test_builtin_with_environment(self):
         "default: django-admin builtin commands succeed if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
