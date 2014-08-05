@@ -1267,6 +1267,13 @@ class BaseDatabaseIntrospection(object):
         """
         return name
 
+    def column_name_converter(self, name):
+        """Apply a conversion to the column name for the purposes of comparison.
+
+        The default column name converter is for case sensitive comparison.
+        """
+        return self.table_name_converter(name)
+
     def table_names(self, cursor=None):
         """
         Returns a list of names of all tables that exist in the database.
