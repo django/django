@@ -154,7 +154,7 @@ Django-specific markup
 Besides the `Sphinx built-in markup`__, Django's docs defines some extra
 description units:
 
-__ http://sphinx-doc.org/markup/desc.html
+__ http://sphinx-doc.org/markup/
 
 * Settings::
 
@@ -318,10 +318,6 @@ look better:
   to help do this work.
 
   This will probably be a continuing, never-ending project.
-
-* Add `info field lists`__ where appropriate.
-
-  __ http://sphinx-doc.org/markup/desc.html#info-field-lists
 
 * Whenever possible, use links. So, use ``:setting:`ADMINS``` instead
   of ````ADMINS````.
