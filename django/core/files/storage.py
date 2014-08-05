@@ -75,7 +75,6 @@ class Storage(object):
         while self.exists(name):
             # file_ext includes the dot.
             name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
-
         return name
 
     def path(self, name):
