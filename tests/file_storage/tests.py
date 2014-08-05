@@ -404,7 +404,7 @@ class FileStorageTests(unittest.TestCase):
 
 
 class CustomStorage(FileSystemStorage):
-    def get_available_name(self, name):
+    def get_available_name(self, name, max_length=100):
         """
         Append numbers to duplicate files rather than underscores, like Trac.
         """
@@ -493,6 +493,25 @@ class FileFieldStorageTests(unittest.TestCase):
         self.assertEqual(
             [o.normal.name for o in objs],
             ["tests/multiple_files.txt", "tests/multiple_files_1.txt", "tests/multiple_files_2.txt"]
+        )
+        for o in objs:
+            o.delete()
+
+    def test_file_truncation(self):
+        # Multiple files with the same name and limited max_length get truncated
+        # before _N appended to them.
+        objs = [Storage() for i in range(5)]
+        for o in objs:
+            o.limited_length.save("multiple_files.txt", ContentFile("Same Content"))
+        self.assertEqual(
+            [o.limited_length.name for o in objs],
+            [
+                "tests/multiple_files.txt",
+                "tests/multiple_file.txt",
+                "tests/multiple_fil.txt",
+                "tests/multiple_fil_1.txt",
+                "tests/multiple_fil_2.txt"
+            ]
         )
         for o in objs:
             o.delete()
