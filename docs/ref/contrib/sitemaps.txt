@@ -470,7 +470,7 @@ generate a Google News compatible sitemap:
     {% endspaceless %}
     </urlset>
 
-.. _`Google news sitemaps`: https://support.google.com/webmasters/answer/74288?hl=en
+.. _`Google news sitemaps`: https://support.google.com/news/publisher/answer/74288?hl=en
 
 Pinging Google
 ==============

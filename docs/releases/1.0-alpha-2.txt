@@ -26,7 +26,7 @@ features have landed, including:
 ``django.contrib.gis`` (`GeoDjango`_)
     A project over a year in the making, this adds world-class GIS
     (`Geographic Information Systems`_) support to Django, in the form
-    of a ``contrib`` application.  `Its documentation`_ is currently
+    of a ``contrib`` application. Its documentation is currently
     being maintained externally, and will be merged into the main
     Django documentation prior to the final 1.0 release. Huge thanks
     go to Justin Bronn, Jeremy Dunck, Brett Hoerner and Travis Pinney
@@ -56,7 +56,6 @@ mapper -- is now significantly faster.
 
 .. _GeoDjango: http://geodjango.org/
 .. _Geographic Information Systems: http://en.wikipedia.org/wiki/Geographic_information_system
-.. _Its documentation: http://geodjango.org/docs/
 .. _Jython: http://www.jython.org/
 
 

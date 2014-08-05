@@ -1779,7 +1779,7 @@ Support for color-coded output from ``django-admin`` / ``manage.py``
 utilities on Windows by relying on the ANSICON application was added in Django
 1.7.
 
-.. _ANSICON: http://adoxa.hostmyway.net/ansicon/
+.. _ANSICON: http://adoxa.altervista.org/ansicon/
 
 Bash completion
 ---------------
