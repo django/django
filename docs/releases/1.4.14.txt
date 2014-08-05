@@ -1,0 +1,7 @@
+===========================
+Django 1.4.14 release notes
+===========================
+
+*Under development*
+
+Django 1.4.14 fixes several security issues in 1.4.13.
