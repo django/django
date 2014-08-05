@@ -256,6 +256,31 @@ precedence::
     <tr><th>Url:</th><td><input type="url" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
+Checking if form data has changed
+---------------------------------
+
+.. method:: Form.has_changed()
+
+Use the ``has_changed()`` method on your ``Form`` when you need to check if the
+form data has been changed from the initial data.
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(initial=data)
+    >>> f.has_changed()
+    False
+
+When the form is submitted, we reconstruct it and provide the original data
+so that the comparison can be done:
+
+    >>> f = ContactForm(request.POST, initial=data)
+    >>> f.has_changed()
+
+``has_changed()`` will be ``True`` if the data from ``request.POST`` differs
+from what was provided in :attr:`~Form.initial` or ``False`` otherwise.
+
 Accessing the fields from the form
 ----------------------------------
 
