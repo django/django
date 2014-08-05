@@ -60,7 +60,7 @@ In the command prompt, execute the following command: ``pip install django``.
 This will download and install Django.
 
 After the installation has completed, you can verify your Django installation
-by executing ``django-admin.py --version`` in the command prompt.
+by executing ``django-admin --version`` in the command prompt.
 
 .. versionchanged:: 1.7
 
@@ -73,7 +73,7 @@ with Django.
 Common pitfalls
 ===============
 
-* If ``django-admin.py`` only displays the help text no matter what arguments
+* If ``django-admin`` only displays the help text no matter what arguments
   it is given, there is probably a problem with the file association in
   Windows. Check if there is more than one environment variable set for
   running Python scripts in ``PATH``. This usually occurs when there is more
@@ -86,7 +86,3 @@ Common pitfalls
 
     set http_proxy=http://username:password@proxyserver:proxyport
     set https_proxy=https://username:password@proxyserver:proxyport
-
-* Executing ``django-admin.py`` opens up a text file. This is due to the text
-  editor being the default program for ``.py`` files. This must be changed
-  to the ``python.exe`` located in the folder where Python is installed.

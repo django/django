@@ -13,6 +13,7 @@ from django.db import connection
 from django.db.models.query import EmptyQuerySet
 from django.forms.models import (construct_instance, fields_for_model,
     model_to_dict, modelform_factory, ModelFormMetaclass)
+from django.template import Template, Context
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils._os import upath
 from django.utils import six
@@ -1391,6 +1392,13 @@ class ModelChoiceFieldTests(TestCase):
             f.clean(None)
         with self.assertRaises(ValidationError):
             f.clean(0)
+
+        # Invalid types that require TypeError to be caught (#22808).
+        with self.assertRaises(ValidationError):
+            f.clean([['fail']])
+        with self.assertRaises(ValidationError):
+            f.clean([{'foo': 'bar'}])
+
         self.assertEqual(f.clean(self.c2.id).name, "It's a test")
         self.assertEqual(f.clean(self.c3.id).name, 'Third')
 
@@ -1459,6 +1467,21 @@ class ModelChoiceFieldTests(TestCase):
         self.assertTrue(field1 is not ModelChoiceForm.base_fields['category'])
         self.assertTrue(field1.widget.choices.field is field1)
 
+    def test_modelchoicefield_22745(self):
+        """
+        #22745 -- Make sure that ModelChoiceField with RadioSelect widget
+        doesn't produce unnecessary db queries when accessing its BoundField's
+        attrs.
+        """
+        class ModelChoiceForm(forms.Form):
+            category = forms.ModelChoiceField(Category.objects.all(), widget=forms.RadioSelect)
+
+        form = ModelChoiceForm()
+        field = form['category']  # BoundField
+        template = Template('{{ field.name }}{{ field }}{{ field.help_text }}')
+        with self.assertNumQueries(1):
+            template.render(Context({'field': field}))
+
 
 class ModelMultipleChoiceFieldTests(TestCase):
     def setUp(self):
@@ -1494,6 +1517,12 @@ class ModelMultipleChoiceFieldTests(TestCase):
             f.clean('hello')
         with self.assertRaises(ValidationError):
             f.clean(['fail'])
+
+        # Invalid types that require TypeError to be caught (#22808).
+        with self.assertRaises(ValidationError):
+            f.clean([['fail']])
+        with self.assertRaises(ValidationError):
+            f.clean([{'foo': 'bar'}])
 
         # Add a Category object *after* the ModelMultipleChoiceField has already been
         # instantiated. This proves clean() checks the database during clean() rather
@@ -1590,6 +1619,21 @@ class ModelMultipleChoiceFieldTests(TestCase):
                                 'persons': [str(person2.pk)]})
         self.assertTrue(form.is_valid())
         self.assertTrue(form.has_changed())
+
+    def test_model_multiple_choice_field_22745(self):
+        """
+        #22745 -- Make sure that ModelMultipleChoiceField with
+        CheckboxSelectMultiple widget doesn't produce unnecessary db queries
+        when accessing its BoundField's attrs.
+        """
+        class ModelMultipleChoiceForm(forms.Form):
+            categories = forms.ModelMultipleChoiceField(Category.objects.all(), widget=forms.CheckboxSelectMultiple)
+
+        form = ModelMultipleChoiceForm()
+        field = form['categories']  # BoundField
+        template = Template('{{ field.name }}{{ field }}{{ field.help_text }}')
+        with self.assertNumQueries(1):
+            template.render(Context({'field': field}))
 
 
 class ModelOneToOneFieldTests(TestCase):

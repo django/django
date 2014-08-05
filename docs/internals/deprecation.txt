@@ -53,6 +53,8 @@ about each item can often be found in the release notes of two versions prior.
   * ``get_all_related_many_to_many_objects()``
   * ``get_all_related_m2m_objects_with_model()``
 
+* The ``error_message`` argument of ``django.forms.RegexField`` will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

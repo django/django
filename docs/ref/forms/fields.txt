@@ -299,7 +299,7 @@ as the rendered output.
 See the :ref:`format localization <format-localization>` documentation for
 more information.
 
-.. _built-in fields:
+.. _built-in-fields:
 
 Built-in ``Field`` classes
 --------------------------
@@ -427,7 +427,7 @@ For each field, we describe the default widget used if you don't specify
 
     If no ``input_formats`` argument is provided, the default input formats are::
 
-        ['%Y-%m-%d',       # '2006-10-25'
+        ['%Y-%m-%d',      # '2006-10-25'
         '%m/%d/%Y',       # '10/25/2006'
         '%m/%d/%y']       # '10/25/06'
 
@@ -649,7 +649,16 @@ For each field, we describe the default widget used if you don't specify
     When you use an ``ImageField`` on a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
 
+    .. versionchanged:: 1.8
+
+        After the field has been cleaned and validated, the ``UploadedFile``
+        object will have an additional ``image`` attribute containing the Pillow
+        `Image`_ instance used to check if the file was a valid image.
+        ``UploadedFile.content_type`` is also updated with the image's content
+        type as determined by Pillow.
+
 .. _Pillow: http://pillow.readthedocs.org/en/latest/
+.. _Image: https://pillow.readthedocs.org/en/latest/reference/Image.html
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
@@ -796,10 +805,13 @@ For each field, we describe the default widget used if you don't specify
     Also takes ``max_length`` and ``min_length``, which work just as they do for
     ``CharField``.
 
-    The optional argument ``error_message`` is also accepted for backwards
-    compatibility. The preferred way to provide an error message is to use the
-    ``error_messages`` argument, passing a dictionary with ``'invalid'`` as a key
-    and the error message as the value.
+    .. deprecated:: 1.8
+
+        The optional argument ``error_message`` is also accepted for backwards
+        compatibility but will be removed in Django 2.0. The preferred way to
+        provide an error message is to use the :attr:`~Field.error_messages`
+        argument, passing a dictionary with ``'invalid'`` as a key and the error
+        message as the value.
 
 ``SlugField``
 ~~~~~~~~~~~~~
@@ -945,12 +957,12 @@ Slightly complex built-in ``Field`` classes
                 def __init__(self, *args, **kwargs):
                     # Define one message for all fields.
                     error_messages = {
-                        'incomplete': 'Enter a country code and phone number.',
+                        'incomplete': 'Enter a country calling code and a phone number.',
                     }
                     # Or define a different message for each field.
                     fields = (
-                        CharField(error_messages={'incomplete': 'Enter a country code.'},
-                                  validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid country code.')]),
+                        CharField(error_messages={'incomplete': 'Enter a country calling code.'},
+                                  validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid country calling code.')]),
                         CharField(error_messages={'incomplete': 'Enter a phone number.'},
                                   validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid phone number.')]),
                         CharField(validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid extension.')],

@@ -256,8 +256,7 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
 class NoInlineDeletionTest(TestCase):
 
     def test_no_deletion(self):
-        fake_site = object()
-        inline = MediaPermanentInline(EpisodePermanent, fake_site)
+        inline = MediaPermanentInline(EpisodePermanent, admin_site)
         fake_request = object()
         formset = inline.get_formset(fake_request)
         self.assertFalse(formset.can_delete)

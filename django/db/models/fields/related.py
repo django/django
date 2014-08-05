@@ -2145,8 +2145,6 @@ class ManyToManyField(RelatedField):
             kwargs['db_table'] = self.db_table
         if self.rel.db_constraint is not True:
             kwargs['db_constraint'] = self.rel.db_constraint
-        if "help_text" in kwargs:
-            del kwargs['help_text']
         # Rel needs more work.
         if isinstance(self.rel.to, six.string_types):
             kwargs['to'] = self.rel.to
@@ -2266,7 +2264,7 @@ class ManyToManyField(RelatedField):
                     data = [choices_list[0][0]]
         return smart_text(data)
 
-    def contribute_to_class(self, cls, name):
+    def contribute_to_class(self, cls, name, **kwargs):
         # To support multiple relations to self, it's useful to have a non-None
         # related name on symmetrical relations for internal reasons. The
         # concept doesn't make a lot of sense externally ("you want me to
@@ -2276,7 +2274,7 @@ class ManyToManyField(RelatedField):
         if self.rel.symmetrical and (self.rel.to == "self" or self.rel.to == cls._meta.object_name):
             self.rel.related_name = "%s_rel_+" % name
 
-        super(ManyToManyField, self).contribute_to_class(cls, name)
+        super(ManyToManyField, self).contribute_to_class(cls, name, **kwargs)
 
         # The intermediate m2m model is not auto created if:
         #  1) There is a manually specified intermediate, or

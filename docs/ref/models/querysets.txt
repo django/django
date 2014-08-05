@@ -688,7 +688,7 @@ object. If it's ``None``, Django uses the :ref:`current time zone
     .. _pytz: http://pytz.sourceforge.net/
     .. _Time Zones: http://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
     .. _Choosing a Time Zone File: http://docs.oracle.com/cd/B19306_01/server.102/b14225/ch4datetime.htm#i1006667
-    .. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.5/en/mysql-tzinfo-to-sql.html
+    .. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
 none
 ~~~~
@@ -1714,7 +1714,7 @@ This has a number of caveats though:
 
 The ``batch_size`` parameter controls how many objects are created in single
 query. The default is to create all objects in one batch, except for SQLite
-where the default is such that at maximum 999 variables per query is used.
+where the default is such that at most 999 variables per query are used.
 
 count
 ~~~~~
@@ -2125,12 +2125,13 @@ Example::
     Blog.objects.get(name__iexact='beatles blog')
     Blog.objects.get(name__iexact=None)
 
-SQL equivalent::
+SQL equivalents::
 
     SELECT ... WHERE name ILIKE 'beatles blog';
+    SELECT ... WHERE name IS NULL;
 
-Note this will match ``'Beatles Blog'``, ``'beatles blog'``, ``'BeAtLes
-BLoG'``, etc.
+Note the first query will match ``'Beatles Blog'``, ``'beatles blog'``,
+``'BeAtLes BLoG'``, etc.
 
 .. admonition:: SQLite users
 
@@ -2580,8 +2581,7 @@ Note this is only available in MySQL and requires direct manipulation of the
 database to add the full-text index. By default Django uses BOOLEAN MODE for
 full text searches. See the `MySQL documentation`_ for additional details.
 
-.. _MySQL documentation: http://dev.mysql.com/doc/refman/5.1/en/fulltext-boolean.html
-
+.. _MySQL documentation: http://dev.mysql.com/doc/refman/5.6/en/fulltext-boolean.html
 
 .. fieldlookup:: regex
 

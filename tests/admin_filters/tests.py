@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.contrib.admin import (site, ModelAdmin, SimpleListFilter,
-    BooleanFieldListFilter, AllValuesFieldListFilter)
+    BooleanFieldListFilter, AllValuesFieldListFilter, RelatedOnlyFieldListFilter)
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -132,6 +132,15 @@ class BookAdminWithTupleBooleanFilter(BookAdmin):
 
 class BookAdminWithUnderscoreLookupAndTuple(BookAdmin):
     list_filter = ('year', ('author__email', AllValuesFieldListFilter), 'contributors', 'is_best_seller', 'date_registered', 'no')
+
+
+class BookAdminRelatedOnlyFilter(ModelAdmin):
+    list_filter = (
+        'year', 'is_best_seller', 'date_registered', 'no',
+        ('author', RelatedOnlyFieldListFilter),
+        ('contributors', RelatedOnlyFieldListFilter),
+    )
+    ordering = ('-id',)
 
 
 class DecadeFilterBookAdmin(ModelAdmin):
@@ -359,6 +368,14 @@ class ListFiltersTests(TestCase):
     def test_relatedfieldlistfilter_foreignkey(self):
         modeladmin = BookAdmin(Book, site)
 
+        request = self.request_factory.get('/')
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure that all users are present in the author's list filter
+        filterspec = changelist.get_filters(request)[0][1]
+        expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
+        self.assertEqual(filterspec.lookup_choices, expected)
+
         request = self.request_factory.get('/', {'author__isnull': 'True'})
         changelist = self.get_changelist(request, Book, modeladmin)
 
@@ -386,6 +403,14 @@ class ListFiltersTests(TestCase):
 
     def test_relatedfieldlistfilter_manytomany(self):
         modeladmin = BookAdmin(Book, site)
+
+        request = self.request_factory.get('/')
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure that all users are present in the contrib's list filter
+        filterspec = changelist.get_filters(request)[0][2]
+        expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
+        self.assertEqual(filterspec.lookup_choices, expected)
 
         request = self.request_factory.get('/', {'contributors__isnull': 'True'})
         changelist = self.get_changelist(request, Book, modeladmin)
@@ -463,6 +488,28 @@ class ListFiltersTests(TestCase):
         choice = select_by(filterspec.choices(changelist), "display", self.django_book.title)
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?books_contributed__id__exact=%d' % self.django_book.pk)
+
+    def test_relatedonlyfieldlistfilter_foreignkey(self):
+        modeladmin = BookAdminRelatedOnlyFilter(Book, site)
+
+        request = self.request_factory.get('/')
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure that only actual authors are present in author's list filter
+        filterspec = changelist.get_filters(request)[0][4]
+        expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob')]
+        self.assertEqual(filterspec.lookup_choices, expected)
+
+    def test_relatedonlyfieldlistfilter_manytomany(self):
+        modeladmin = BookAdminRelatedOnlyFilter(Book, site)
+
+        request = self.request_factory.get('/')
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure that only actual contributors are present in contrib's list filter
+        filterspec = changelist.get_filters(request)[0][5]
+        expected = [(self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
+        self.assertEqual(filterspec.lookup_choices, expected)
 
     def test_booleanfieldlistfilter(self):
         modeladmin = BookAdmin(Book, site)

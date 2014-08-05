@@ -1,6 +1,8 @@
-=================
-Django committers
-=================
+===========
+Django team
+===========
+
+.. _original-team-list:
 
 The original team
 =================
@@ -55,18 +57,15 @@ Journal-World`_ of Lawrence, Kansas, USA.
 .. _heroku: http://heroku.com/
 .. _Rdio: http://rdio.com
 
-Current developers
-==================
+.. _core-team-list:
 
-Currently, Django is led by a team of volunteers from around the globe.
-
-Core developers
----------------
+The current team
+================
 
 These are the folks who have a long history of contributions, a solid track
 record of being helpful on the mailing lists, and a proven desire to dedicate
-serious time to Django. In return, they've been granted the coveted commit bit,
-and have free rein to hack on all parts of Django.
+serious time to Django. In return, they've been invited to join the :ref:`core
+team <core-team>`.
 
 Malcolm Tredinnick
     Malcolm originally wanted to be a mathematician, somehow ended up a software
@@ -554,8 +553,8 @@ Baptiste Mispelon
     .. _Solid Links: http://solidlinks.nl/
     .. _Erik's Pony Checkup: http://ponycheckup.com/
 
-Developers Emeritus
-===================
+Past team members
+=================
 
 Georg "Hugo" Bauer
     Georg created Django's internationalization system, managed i18n

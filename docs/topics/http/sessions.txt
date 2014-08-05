@@ -20,7 +20,7 @@ To enable session functionality, do the following:
 
 * Edit the :setting:`MIDDLEWARE_CLASSES` setting and make sure
   it contains ``'django.contrib.sessions.middleware.SessionMiddleware'``.
-  The default ``settings.py`` created by ``django-admin.py startproject``
+  The default ``settings.py`` created by ``django-admin startproject``
   has ``SessionMiddleware`` activated.
 
 If you don't want to use sessions, you might as well remove the
@@ -124,7 +124,7 @@ and the :setting:`SECRET_KEY` setting.
 .. note::
 
     It's recommended to leave the :setting:`SESSION_COOKIE_HTTPONLY` setting
-    ``True`` to prevent tampering of the stored data from JavaScript.
+    on ``True`` to prevent access to the stored data from JavaScript.
 
 .. warning::
 

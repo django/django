@@ -75,6 +75,15 @@ Minor features
   :meth:`~django.contrib.admin.ModelAdmin.has_module_permission`
   method to allow limiting access to the module on the admin index page.
 
+* :class:`~django.contrib.admin.InlineModelAdmin` now has an attribute
+  :attr:`~django.contrib.admin.InlineModelAdmin.show_change_link` that
+  supports showing a link to an inline object's change form.
+
+* Use the new ``django.contrib.admin.RelatedOnlyFieldListFilter`` in
+  :attr:`ModelAdmin.list_filter <django.contrib.admin.ModelAdmin.list_filter>`
+  to limit the ``list_filter`` choices to foreign objects which are attached to
+  those from the ``ModelAdmin``.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -195,6 +204,12 @@ Forms
 * :class:`~django.forms.extras.widgets.SelectDateWidget` now accepts an
   :attr:`~django.forms.extras.widgets.SelectDateWidget.empty_label` argument, which will
   override the top list choice label when :class:`~django.forms.DateField` is not required.
+
+* After an :class:`~django.forms.ImageField` has been cleaned and validated, the
+  ``UploadedFile`` object will have an additional ``image`` attribute containing
+  the Pillow ``Image`` instance used to check if the file was a valid image. It
+  will also update ``UploadedFile.content_type`` with the image's content type
+  as determined by Pillow.
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
@@ -428,6 +443,50 @@ affected models (or add ``max_length=75`` if you wish to keep the length on
 your current fields). A migration for
 :attr:`django.contrib.auth.models.User.email` is included.
 
+Support for PostgreSQL versions older than 9.0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The end of upstream support periods was reached in July 2014 for PostgreSQL 8.4.
+As a consequence, Django 1.8 sets 9.0 as the minimum PostgreSQL version it
+officially supports.
+
+This also includes dropping support for PostGIS 1.3 and 1.4 as these versions
+are not supported on versions of PostgreSQL later than 8.4.
+
+Support for MySQL versions older than 5.5
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The end of upstream support periods was reached in January 2012 for MySQL 5.0
+and December 2013 for MySQL 5.1. As a consequence, Django 1.8 sets 5.5 as the
+minimum MySQL version it officially supports.
+
+Support for Oracle versions older than 11.1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The end of upstream support periods was reached in July 2010 for Oracle 9.2,
+January 2012 for Oracle 10.1, and July 2013 for Oracle 10.2. As a consequence,
+Django 1.8 sets 11.1 as the minimum Oracle version it officially supports.
+
+``AbstractUser.last_login`` allows null values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :attr:`AbstractUser.last_login <django.contrib.auth.models.User.last_login>`
+field now allows null values. Previously, it defaulted to the time when the user
+was created which was misleading if the user never logged in. Please run the
+database migration. If your custom user inherits from ``AbstractUser`` and you
+wish to set ``last_login`` to ``NULL`` for users who haven't logged in, you can
+run this query::
+
+    from django.db import models
+    from django.contrib.auth import get_user_model
+    from django.contrib.auth.models import AbstractBaseUser
+
+    UserModel = get_user_model()
+    if issubclass(UserModel, AbstractBaseUser):
+        UserModel._default_manager.filter(
+            last_login=models.F('date_joined')
+        ).update(last_login=None)
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -633,3 +692,9 @@ The function has been informally marked as "Deprecated" for some time. Replace
 It provided the :ttag:`lorem` template tag which is now included in the
 built-in tags. Simply remove ``'django.contrib.webdesign'`` from
 :setting:`INSTALLED_APPS` and ``{% load webdesign %}`` from your templates.
+
+``error_message`` argument to ``django.forms.RegexField``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It provided backwards compatibility for pre-1.0 code, but its functionality is
+redundant. Use ``Field.error_messages['invalid']`` instead.

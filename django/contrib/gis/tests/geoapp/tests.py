@@ -507,11 +507,7 @@ class GeoQuerySetTest(TestCase):
         houston_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"coordinates":[-95.363151,29.763374]}'
         victoria_json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.305196,48.462611]}'
         chicago_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
-        if postgis and connection.ops.spatial_version < (1, 4, 0):
-            pueblo_json = '{"type":"Point","coordinates":[-104.60925200,38.25500100]}'
-            houston_json = '{"type":"Point","crs":{"type":"EPSG","properties":{"EPSG":4326}},"coordinates":[-95.36315100,29.76337400]}'
-            victoria_json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.30519600,48.46261100]}'
-        elif spatialite:
+        if spatialite:
             victoria_json = '{"type":"Point","bbox":[-123.305196,48.462611,-123.305196,48.462611],"coordinates":[-123.305196,48.462611]}'
 
         # Precision argument should only be an integer
@@ -560,10 +556,8 @@ class GeoQuerySetTest(TestCase):
         for ptown in [ptown1, ptown2]:
             self.assertTrue(gml_regex.match(ptown.gml))
 
-        # PostGIS < 1.5 doesn't include dimension im GMLv3 output.
-        if postgis and connection.ops.spatial_version >= (1, 5, 0):
-            self.assertIn('<gml:pos srsDimension="2">',
-                          City.objects.gml(version=3).get(name='Pueblo').gml)
+        if postgis:
+            self.assertIn('<gml:pos srsDimension="2">', City.objects.gml(version=3).get(name='Pueblo').gml)
 
     def test_kml(self):
         "Testing KML output from the database using GeoQuerySet.kml()."
@@ -577,18 +571,11 @@ class GeoQuerySetTest(TestCase):
         qs = City.objects.all()
         self.assertRaises(TypeError, qs.kml, 'name')
 
-        # The reference KML depends on the version of PostGIS used
-        # (the output stopped including altitude in 1.3.3).
-        if connection.ops.spatial_version >= (1, 3, 3):
-            ref_kml = '<Point><coordinates>-104.609252,38.255001</coordinates></Point>'
-        else:
-            ref_kml = '<Point><coordinates>-104.609252,38.255001,0</coordinates></Point>'
-
         # Ensuring the KML is as expected.
         ptown1 = City.objects.kml(field_name='point', precision=9).get(name='Pueblo')
         ptown2 = City.objects.kml(precision=9).get(name='Pueblo')
         for ptown in [ptown1, ptown2]:
-            self.assertEqual(ref_kml, ptown.kml)
+            self.assertEqual('<Point><coordinates>-104.609252,38.255001</coordinates></Point>', ptown.kml)
 
     # Only PostGIS has support for the MakeLine aggregate.
     @no_mysql

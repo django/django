@@ -191,7 +191,7 @@ testing of Django applications:
 * **Exceptions:**
   :doc:`Overview <ref/exceptions>`
 
-* **django-admin.py and manage.py:**
+* **django-admin and manage.py:**
   :doc:`Overview <ref/django-admin>` |
   :doc:`Adding custom commands <howto/custom-management-commands>`
 
@@ -310,7 +310,9 @@ you can contribute:
 * **Community:**
   :doc:`How to get involved <internals/contributing/index>` |
   :doc:`The release process <internals/release-process>` |
-  :doc:`Team of committers <internals/committers>` |
+  :doc:`Team organization <internals/organization>` |
+  :doc:`Meet the team <internals/team>` |
+  :doc:`Current roles <internals/roles>` |
   :doc:`The Django source code repository <internals/git>` |
   :doc:`Security policies <internals/security>` |
   :doc:`Mailing lists <internals/mailing-lists>`

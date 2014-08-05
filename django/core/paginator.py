@@ -96,7 +96,7 @@ class Paginator(object):
         Returns a 1-based range of pages for iterating through within
         a template for loop.
         """
-        return six.moves.range(1, self.num_pages + 1)
+        return list(six.moves.range(1, self.num_pages + 1))
     page_range = property(_get_page_range)
 
 

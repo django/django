@@ -403,7 +403,7 @@ class BaseForm(object):
 
     def clean(self):
         """
-        Hook for doing any extra form-wide cleaning after Field.clean() been
+        Hook for doing any extra form-wide cleaning after Field.clean() has been
         called on every field. Any ValidationError raised by this method will
         not be associated with a particular field; it will have a special-case
         association with the field named '__all__'.
@@ -420,7 +420,7 @@ class BaseForm(object):
     def changed_data(self):
         if self._changed_data is None:
             self._changed_data = []
-            # XXX: For now we're asking the individual widgets whether or not the
+            # XXX: For now we're asking the individual fields whether or not the
             # data has changed. It would probably be more efficient to hash the
             # initial data, store it in a hidden field, and compare a hash of the
             # submitted data, but we'd need a way to easily get the string value
@@ -529,6 +529,10 @@ class BoundField(object):
         return len(list(self.__iter__()))
 
     def __getitem__(self, idx):
+        # Prevent unnecessary reevaluation when accessing BoundField's attrs
+        # from templates.
+        if not isinstance(idx, six.integer_types):
+            raise TypeError
         return list(self.__iter__())[idx]
 
     @property

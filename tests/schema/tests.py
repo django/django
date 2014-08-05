@@ -331,6 +331,48 @@ class SchemaTests(TransactionTestCase):
         self.assertEqual(columns['name'][0], "TextField")
         self.assertEqual(bool(columns['name'][1][6]), False)
 
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_alter_fk(self):
+        """
+        Tests altering of FKs
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        # Ensure the field is right to begin with
+        columns = self.column_classes(Book)
+        self.assertEqual(columns['author_id'][0], "IntegerField")
+        # Make sure the FK constraint is present
+        constraints = self.get_constraints(Book._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["author_id"] and details['foreign_key']:
+                self.assertEqual(details['foreign_key'], ('schema_author', 'id'))
+                break
+        else:
+            self.fail("No FK constraint for author_id found")
+        # Alter the FK
+        new_field = ForeignKey(Author, editable=False)
+        new_field.set_attributes_from_name("author")
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                Book,
+                Book._meta.get_field_by_name("author")[0],
+                new_field,
+                strict=True,
+            )
+        # Ensure the field is right afterwards
+        columns = self.column_classes(Book)
+        self.assertEqual(columns['author_id'][0], "IntegerField")
+        # Make sure the FK constraint is present
+        constraints = self.get_constraints(Book._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["author_id"] and details['foreign_key']:
+                self.assertEqual(details['foreign_key'], ('schema_author', 'id'))
+                break
+        else:
+            self.fail("No FK constraint for author_id found")
+
     def test_rename(self):
         """
         Tests simple altering of fields

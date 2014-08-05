@@ -300,7 +300,7 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
 def parse_django_admin_node(env, sig, signode):
     command = sig.split(' ')[0]
     env._django_curr_admin_command = command
-    title = "django-admin.py %s" % sig
+    title = "django-admin %s" % sig
     signode += addnodes.desc_name(title, title)
     return sig
 

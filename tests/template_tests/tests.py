@@ -110,13 +110,17 @@ class SomeClass:
             raise SomeOtherException
         raise KeyError
 
+    @property
     def silent_fail_attribute(self):
         raise SomeException
-    silent_fail_attribute = property(silent_fail_attribute)
 
+    @property
     def noisy_fail_attribute(self):
         raise SomeOtherException
-    noisy_fail_attribute = property(noisy_fail_attribute)
+
+    @property
+    def attribute_error_attribute(self):
+        raise AttributeError
 
 
 class OtherClass:
@@ -819,6 +823,9 @@ class TemplateTests(TestCase):
             # propagates
             'filter-syntax23': (r'1{{ var.noisy_fail_key }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)),
             'filter-syntax24': (r'1{{ var.noisy_fail_attribute }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)),
+
+            # #16383 - A @property that raises AttributeError should not fail loudly.
+            'filter-syntax25': ('{{ var.attribute_error_attribute }}', {"var": SomeClass()}, (AttributeError)),
 
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),

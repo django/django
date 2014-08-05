@@ -880,6 +880,20 @@ subclass::
                   ('is_staff', admin.BooleanFieldListFilter),
               )
 
+      .. versionadded:: 1.8
+
+      You can now limit the choices of a related model to the objects
+      involved in that relation using ``RelatedOnlyFieldListFilter``::
+
+          class BookAdmin(admin.ModelAdmin):
+              list_filter = (
+                  ('author', admin.RelatedOnlyFieldListFilter),
+              )
+
+      Assuming ``author`` is a ``ForeignKey`` to a ``User`` model, this will
+      limit the ``list_filter`` choices to the users who have written a book
+      instead of listing all users.
+
       .. note::
 
         The ``FieldListFilter`` API is considered internal and might be
@@ -2024,6 +2038,13 @@ The ``InlineModelAdmin`` class adds:
 
     Specifies whether or not inline objects can be deleted in the inline.
     Defaults to ``True``.
+
+.. attribute:: InlineModelAdmin.show_change_link
+
+    .. versionadded:: 1.8
+
+    Specifies whether or not inline objects that can be changed in the
+    admin have a link to the change form. Defaults to ``False``.
 
 .. method:: InlineModelAdmin.get_formset(request, obj=None, **kwargs)
 
