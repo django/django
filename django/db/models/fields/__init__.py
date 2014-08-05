@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, unicode_literals
 
 import collections
 import copy
@@ -1596,7 +1596,8 @@ class DurationField(six.with_metaclass(SubfieldBase, Field)):
         if isinstance(value, datetime.timedelta):
             return value
         if isinstance(value, six.integer_types):
-            value = str(value / 1000000.0)
+            # Need decimal to preserve precision on Py2.7
+            value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
         try:
             parsed = parse_duration(value)
         except ValueError:
