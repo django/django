@@ -207,7 +207,7 @@ class RelationTreeTests(test.TestCase):
         apps.clear_cache()
 
     def test_clear_cache_clears_relation_tree(self):
-        apps.clear_cache()
+        # the apps.clear_cache is setUp() should have deleted all trees.
         self.assertTrue(all('relation_tree' not in m._meta.__dict__
                             for m in self.all_models))
 
