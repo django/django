@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.utils import quote
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.text import get_text_list
 from django.utils.encoding import smart_text
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -53,6 +54,51 @@ class LogEntry(models.Model):
             return ugettext('Deleted "%(object)s."') % {'object': self.object_repr}
 
         return ugettext('LogEntry Object')
+
+    def get_change_message(self):
+        import re
+
+        obj = self.get_edited_object()
+
+        # helper that format-ifies the argument
+        formatify = lambda x: '%(' + x + ')s'
+        tokens = []
+
+        # Try to match the sentence to a change thing we can take apart
+        if self.change_message == '':
+            return self.change_message
+
+        # this only creates a nice message of the form
+        #    "Changed last_name, is_staff and is_superuser."
+        # and turns it into
+        #    "Changed last name, staff status and superuser status.
+        # except in the user's chosen language.
+        if re.match('Changed ((\w|\s|,|_)+)\.', self.change_message):
+            group = re.findall('Changed (.+)\.', self.change_message)[0]
+            for token in re.split(', | | and ', group):
+                if token != 'and':
+                    tokens.append(token)
+
+            format_tokens = map(formatify, tokens)
+            format_msg = ugettext('Changed %s.') % get_text_list(format_tokens, _('and'))
+
+            verbose_names = {}
+            for token in tokens:
+                # in case we don't find a better name
+                verbose_names[token] = ugettext(token)
+
+                if token in obj._meta.get_all_field_names():
+                    field = obj._meta.get_field_by_name(token)[0]
+
+                    if hasattr(field, 'verbose_name'):
+                        if hasattr(field.verbose_name, 'title'):
+                            verbose_names[token] = field.verbose_name.title().lower()
+                        else:
+                            verbose_names[token] = field.verbose_name
+
+            return format_msg % verbose_names
+        else:
+            return ugettext(self.change_message) 
 
     def is_addition(self):
         return self.action_flag == ADDITION
