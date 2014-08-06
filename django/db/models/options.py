@@ -425,7 +425,8 @@ class Options(object):
                 model.add_to_class('id', auto)
 
     def _expire_cache(self):
-        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',):
+        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',
+                          'related_objects', 'related_m2m'):
             try:
                 delattr(self, cache_key)
             except AttributeError:
@@ -629,7 +630,7 @@ class Options(object):
             fields = self._make_immutable_fields_list(fields.keys())
 
         # Store result into cache for later access
-        #self._get_fields_cache[cache_key] = fields
+        self._get_fields_cache[cache_key] = fields
         # In order to avoid list manipulation. Always
         # return a shallow copy of the results
         return fields
