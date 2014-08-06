@@ -64,8 +64,8 @@ Markdown
 --------
 
 The Python Markdown library supports options named "safe_mode" and
-"enable_attributes". Both relate to the security of the output. To enable both
-options in tandem, the markdown filter supports the "safe" argument::
+"enable_attributes". Both relate to the security of the output. To use the safe
+settings of both options, the markdown filter supports the "safe" argument::
 
     {{ markdown_content_var|markdown:"safe" }}
 
