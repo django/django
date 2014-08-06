@@ -1,4 +1,5 @@
 from importlib import import_module
+from itertools import chain
 import inspect
 import os
 import re
@@ -249,7 +250,7 @@ class ModelDetailView(BaseAdminDocsView):
                 })
 
         # Gather related objects
-        for rel in opts.get_fields(data=False, related_objects=True, related_m2m=True):
+        for rel in chain(opts.related_objects, opts.related_m2m):
             verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': rel.opts.app_label, 'object_name': rel.opts.object_name}
             accessor = rel.get_accessor_name()
             fields.append({

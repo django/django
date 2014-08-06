@@ -566,7 +566,7 @@ class BaseDatabaseSchemaEditor(object):
         # Drop incoming FK constraints if we're a primary key and things are going
         # to change.
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
-            for rel in new_field.model._meta.get_fields(data=False, related_objects=True):
+            for rel in new_field.model._meta.related_objects:
                 rel_fk_names = self._constraint_names(rel.model, [rel.field.column], foreign_key=True)
                 for fk_name in rel_fk_names:
                     self.execute(
@@ -696,7 +696,7 @@ class BaseDatabaseSchemaEditor(object):
         # referring to us.
         rels_to_update = []
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
-            rels_to_update.extend(new_field.model._meta.get_fields(data=False, related_objects=True))
+            rels_to_update.extend(new_field.model._meta.related_objects)
         # Changed to become primary key?
         # Note that we don't detect unsetting of a PK, as we assume another field
         # will always come along and replace it.
@@ -753,7 +753,7 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Rebuild FKs that pointed to us if we previously had to drop them
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
-            for rel in new_field.model._meta.get_fields(data=False, related_objects=True):
+            for rel in new_field.model._meta.related_objects:
                 self.execute(
                     self.sql_create_fk % {
                         "table": self.quote_name(rel.model._meta.db_table),

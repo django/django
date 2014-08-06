@@ -116,8 +116,8 @@ class RenameModel(Operation):
         # Get all of the related objects we need to repoint
         apps = state.render(skip_cache=True)
         model = apps.get_model(app_label, self.old_name)
-        related_objects = model._meta.get_fields(data=False, related_objects=True)
-        related_m2m_objects = model._meta.get_fields(data=False, related_m2m=True)
+        related_objects = model._meta.related_objects
+        related_m2m_objects = model._meta.related_m2m
         # Rename the model
         state.models[app_label, self.new_name.lower()] = state.models[app_label, self.old_name.lower()]
         state.models[app_label, self.new_name.lower()].name = self.new_name
@@ -153,8 +153,8 @@ class RenameModel(Operation):
                 new_model._meta.db_table,
             )
             # Alter the fields pointing to us
-            related_objects = old_model._meta.get_fields(data=False, related_objects=True)
-            related_m2m_objects = old_model._meta.get_fields(data=False, related_m2m=True)
+            related_objects = old_model._meta.related_objects
+            related_m2m_objects = old_model._meta.related_m2m
             for related_object in (related_objects + related_m2m_objects):
                 if related_object.model == old_model:
                     model = new_model

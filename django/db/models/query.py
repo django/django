@@ -1396,7 +1396,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
 
     reverse_related_fields = []
     if restricted:
-        for o in klass._meta.get_fields(data=False, related_objects=True):
+        for o in klass._meta.related_objects:
             if o.field.unique and select_related_descend(o.field, restricted, requested,
                                                          only_load.get(o.model), reverse=True):
                 next = requested[o.field.related_query_name()]

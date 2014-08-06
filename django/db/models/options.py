@@ -629,7 +629,7 @@ class Options(object):
             fields = self._make_immutable_fields_list(fields.keys())
 
         # Store result into cache for later access
-        self._get_fields_cache[cache_key] = fields
+        #self._get_fields_cache[cache_key] = fields
         # In order to avoid list manipulation. Always
         # return a shallow copy of the results
         return fields
@@ -637,6 +637,24 @@ class Options(object):
     ###########################################################################
     # Cached properties for fast access
     ###########################################################################
+
+    @cached_property
+    def related_objects(self):
+        """
+        Returns a list of all many to many fields on the model and
+        it's parents.
+        All hidden and proxy fields are omitted.
+        """
+        return self.get_fields(data=False, related_objects=True)
+
+    @cached_property
+    def related_m2m(self):
+        """
+        Returns a list of all many to many fields on the model and
+        it's parents.
+        All hidden and proxy fields are omitted.
+        """
+        return self.get_fields(data=False, related_m2m=True)
 
     @cached_property
     def many_to_many(self):
