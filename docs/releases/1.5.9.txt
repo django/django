@@ -47,3 +47,18 @@ and the ``RemoteUserBackend``, a change to the ``REMOTE_USER`` header between
 requests without an intervening logout could result in the prior user's session
 being co-opted by the subsequent user. The middleware now logs the user out on
 a failed login attempt.
+
+Data leakage via query string manipulation in ``contrib.admin``
+===============================================================
+
+In older versions of Django it was possible to reveal any field's data by
+modifying the "popup" and "to_field" parameters of the query string on an admin
+change form page. For example, requesting a URL like
+``/admin/auth/user/?pop=1&t=password`` and viewing the page's HTML allowed
+viewing the password hash of each user. While the admin requires users to have
+permissions to view the change form pages in the first place, this could leak
+data if you rely on users having access to view only certain fields on a model.
+
+To address the issue, an exception will now be raised if a ``to_field`` value
+that isn't a related field to a model that has been registered with the admin
+is specified.
