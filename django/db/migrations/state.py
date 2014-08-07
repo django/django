@@ -207,6 +207,8 @@ class ModelState(object):
                     options[name] = set(normalize_together(it))
                 else:
                     options[name] = model._meta.original_attrs[name]
+        # Force-convert all options to text_type (#23226)
+        options = cls.force_text_recursive(options)
         # If we're ignoring relationships, remove all field-listing model
         # options (that option basically just means "make a stub model")
         if exclude_rels:
@@ -249,6 +251,23 @@ class ModelState(object):
             options,
             bases,
         )
+
+    @classmethod
+    def force_text_recursive(cls, value):
+        if isinstance(value, six.string_types):
+            return six.text_type(value)
+        elif isinstance(value, list):
+            return [cls.force_text_recursive(x) for x in value]
+        elif isinstance(value, tuple):
+            return tuple(cls.force_text_recursive(x) for x in value)
+        elif isinstance(value, set):
+            return set(cls.force_text_recursive(x) for x in value)
+        elif isinstance(value, dict):
+            return dict(
+                (cls.force_text_recursive(k), cls.force_text_recursive(v))
+                for k, v in value.items()
+            )
+        return value
 
     def construct_fields(self):
         "Deep-clone the fields using deconstruction"
