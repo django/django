@@ -11,6 +11,7 @@ from django.contrib.admin import widgets, helpers
 from django.contrib.admin import validation
 from django.contrib.admin.checks import (BaseModelAdminChecks, ModelAdminChecks,
     InlineModelAdminChecks)
+from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.utils import (quote, unquote, flatten_fieldsets,
     get_deleted_objects, model_format_dict, NestedObjects,
     lookup_needs_distinct)
@@ -433,6 +434,24 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
             else:
                 valid_lookups.append(filter_item)
         return clean_lookup in valid_lookups
+
+    def to_field_allowed(self, request, to_field):
+        opts = self.model._meta
+
+        try:
+            field = opts.get_field(to_field)
+        except FieldDoesNotExist:
+            return False
+
+        # Make sure at least one of the models registered for this site
+        # references this field.
+        registered_models = self.admin_site._registry
+        for related_object in opts.get_all_related_objects():
+            if (related_object.model in registered_models and
+                    field in related_object.field.foreign_related_fields):
+                return True
+
+        return False
 
     def has_add_permission(self, request):
         """
@@ -1325,6 +1344,10 @@ class ModelAdmin(BaseModelAdmin):
     @transaction.atomic
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
 
+        to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
+        if to_field and not self.to_field_allowed(request, to_field):
+            raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
+
         model = self.model
         opts = model._meta
         add = object_id is None
@@ -1397,8 +1420,7 @@ class ModelAdmin(BaseModelAdmin):
             original=obj,
             is_popup=(IS_POPUP_VAR in request.POST or
                       IS_POPUP_VAR in request.GET),
-            to_field=request.POST.get(TO_FIELD_VAR,
-                                      request.GET.get(TO_FIELD_VAR)),
+            to_field=to_field,
             media=media,
             inline_admin_formsets=inline_formsets,
             errors=helpers.AdminErrorList(form, formsets),

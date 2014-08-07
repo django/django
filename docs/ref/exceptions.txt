@@ -56,6 +56,7 @@ SuspiciousOperation
 
     * DisallowedHost
     * DisallowedModelAdminLookup
+    * DisallowedModelAdminToField
     * DisallowedRedirect
     * InvalidSessionKey
     * SuspiciousFileOperation
