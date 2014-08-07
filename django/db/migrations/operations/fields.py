@@ -126,7 +126,7 @@ class AlterField(Operation):
             if from_field.rel and from_field.rel.to:
                 if isinstance(from_field.rel.to, six.string_types):
                     from_field.rel.to = to_field.rel.to
-                elif isinstance(to_field.rel.to, six.string_types):
+                elif to_field.rel and isinstance(to_field.rel.to, six.string_types):
                     to_field.rel.to = from_field.rel.to
             schema_editor.alter_field(from_model, from_field, to_field)
 
