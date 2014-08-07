@@ -1078,6 +1078,30 @@ class OperationTests(OperationTestBase):
             create_operation.database_forwards("test_alfk", editor, project_state, create_state)
             alter_operation.database_forwards("test_alfk", editor, create_state, alter_state)
 
+    def test_alter_fk_non_fk(self):
+        """
+        Tests that altering an FK to a non-FK works (#23244)
+        """
+        # Test the state alteration
+        operation = migrations.AlterField(
+            model_name="Rider",
+            name="pony",
+            field=models.FloatField(),
+        )
+        project_state, new_state = self.make_test_state("test_afknfk", operation, related_model=True)
+        # Test the database alteration
+        self.assertColumnExists("test_afknfk_rider", "pony_id")
+        self.assertColumnNotExists("test_afknfk_rider", "pony")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_afknfk", editor, project_state, new_state)
+        self.assertColumnExists("test_afknfk_rider", "pony")
+        self.assertColumnNotExists("test_afknfk_rider", "pony_id")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_afknfk", editor, new_state, project_state)
+        self.assertColumnExists("test_afknfk_rider", "pony_id")
+        self.assertColumnNotExists("test_afknfk_rider", "pony")
+
     @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql(self):
         """
@@ -1345,11 +1369,11 @@ class SwappableOperationTests(OperationTestBase):
         )
         project_state, new_state = self.make_test_state("test_adfligsw", operation)
         # Test the database alteration
-        self.assertTableNotExists("test_adfligsw_pont")
+        self.assertTableNotExists("test_adfligsw_pony")
         with connection.schema_editor() as editor:
             operation.database_forwards("test_adfligsw", editor, project_state, new_state)
-        self.assertTableNotExists("test_adfligsw_pont")
+        self.assertTableNotExists("test_adfligsw_pony")
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adfligsw", editor, new_state, project_state)
-        self.assertTableNotExists("test_adfligsw_pont")
+        self.assertTableNotExists("test_adfligsw_pony")
