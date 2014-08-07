@@ -89,10 +89,10 @@ class MigrationLoader(object):
                     six.moves.reload_module(module)
             self.migrated_apps.add(app_config.label)
             directory = os.path.dirname(module.__file__)
-            # Scan for .py[c|o] files
+            # Scan for .py files
             migration_names = set()
             for name in os.listdir(directory):
-                if name.endswith(".py") or name.endswith(".pyc") or name.endswith(".pyo"):
+                if name.endswith(".py"):
                     import_name = name.rsplit(".", 1)[0]
                     if import_name[0] not in "_.~":
                         migration_names.add(import_name)
