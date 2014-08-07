@@ -279,7 +279,9 @@ so that the comparison can be done:
     >>> f.has_changed()
 
 ``has_changed()`` will be ``True`` if the data from ``request.POST`` differs
-from what was provided in :attr:`~Form.initial` or ``False`` otherwise.
+from what was provided in :attr:`~Form.initial` or ``False`` otherwise. The
+result is computed by calling :meth:`Field.has_changed` for each field in the
+form.
 
 Accessing the fields from the form
 ----------------------------------
