@@ -185,7 +185,7 @@ class Field(object):
             return self.limit_choices_to()
         return self.limit_choices_to
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         """
         Return True if data differs from initial.
         """
@@ -629,7 +629,7 @@ class FileField(Field):
             return initial
         return data
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if data is None:
             return False
         return True
@@ -744,7 +744,7 @@ class BooleanField(Field):
         if not value and self.required:
             raise ValidationError(self.error_messages['required'], code='required')
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         # Sometimes data or initial could be None or '' which should be the
         # same thing as False.
         if initial == 'False':
@@ -779,7 +779,7 @@ class NullBooleanField(BooleanField):
     def validate(self, value):
         pass
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         # None (unknown) and False (No) are not the same
         if initial is not None:
             initial = bool(initial)
@@ -906,7 +906,7 @@ class MultipleChoiceField(ChoiceField):
                     params={'value': val},
                 )
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if initial is None:
             initial = []
         if data is None:
@@ -1084,14 +1084,14 @@ class MultiValueField(Field):
         """
         raise NotImplementedError('Subclasses must implement this method.')
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if initial is None:
             initial = ['' for x in range(0, len(data))]
         else:
             if not isinstance(initial, list):
                 initial = self.widget.decompress(initial)
         for field, initial, data in zip(self.fields, initial, data):
-            if field._has_changed(field.to_python(initial), data):
+            if field.has_changed(field.to_python(initial), data):
                 return True
         return False
 
