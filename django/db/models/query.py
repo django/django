@@ -358,7 +358,7 @@ class QuerySet(object):
         if self.query.can_filter():
             clone = clone.order_by()
         if (not clone.query.select_for_update or
-            connections[self.db].features.supports_select_for_update_with_limit):
+                connections[self.db].features.supports_select_for_update_with_limit):
             clone = clone[:MAX_GET_RESULTS + 1]
         num = len(clone)
         if num == 1:
