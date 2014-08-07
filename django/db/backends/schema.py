@@ -528,23 +528,6 @@ class BaseDatabaseSchemaEditor(object):
                         "name": constraint_name,
                     },
                 )
-        # Removed an index?
-        if old_field.db_index and not new_field.db_index and not old_field.unique and not (not new_field.unique and old_field.unique):
-            # Find the index for this field
-            index_names = self._constraint_names(model, [old_field.column], index=True)
-            if strict and len(index_names) != 1:
-                raise ValueError("Found wrong number (%s) of indexes for %s.%s" % (
-                    len(index_names),
-                    model._meta.db_table,
-                    old_field.column,
-                ))
-            for index_name in index_names:
-                self.execute(
-                    self.sql_delete_index % {
-                        "table": self.quote_name(model._meta.db_table),
-                        "name": index_name,
-                    }
-                )
         # Drop any FK constraints, we'll remake them later
         fks_dropped = set()
         if old_field.rel:
@@ -575,6 +558,23 @@ class BaseDatabaseSchemaEditor(object):
                             "name": fk_name,
                         }
                     )
+        # Removed an index?
+        if old_field.db_index and not new_field.db_index and not old_field.unique and not (not new_field.unique and old_field.unique):
+            # Find the index for this field
+            index_names = self._constraint_names(model, [old_field.column], index=True)
+            if strict and len(index_names) != 1:
+                raise ValueError("Found wrong number (%s) of indexes for %s.%s" % (
+                    len(index_names),
+                    model._meta.db_table,
+                    old_field.column,
+                ))
+            for index_name in index_names:
+                self.execute(
+                    self.sql_delete_index % {
+                        "table": self.quote_name(model._meta.db_table),
+                        "name": index_name,
+                    }
+                )
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
             constraint_names = self._constraint_names(model, [old_field.column], check=True)
