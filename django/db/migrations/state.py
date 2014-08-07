@@ -8,7 +8,7 @@ from django.db.models.fields.related import do_pending_lookups
 from django.db.models.fields.proxy import OrderWrt
 from django.conf import settings
 from django.utils import six
-from django.utils.encoding import force_text
+from django.utils.encoding import force_text, smart_text
 from django.utils.module_loading import import_string
 
 
@@ -255,7 +255,7 @@ class ModelState(object):
     @classmethod
     def force_text_recursive(cls, value):
         if isinstance(value, six.string_types):
-            return six.text_type(value)
+            return smart_text(value)
         elif isinstance(value, list):
             return [cls.force_text_recursive(x) for x in value]
         elif isinstance(value, tuple):
