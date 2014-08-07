@@ -1831,15 +1831,27 @@ Removes a space-separated list of [X]HTML tags from the output.
 
 For example::
 
-    {{ value|removetags:"b span"|safe }}
+    {{ value|removetags:"b span" }}
 
 If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
-output will be ``"Joel <button>is</button> a slug"``.
+unescaped output will be ``"Joel <button>is</button> a slug"``.
 
 Note that this filter is case-sensitive.
 
 If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"`` the
-output will be ``"<B>Joel</B> <button>is</button> a slug"``.
+unescaped output will be ``"<B>Joel</B> <button>is</button> a slug"``.
+
+.. admonition:: No safety guarantee
+
+    Note that ``removetags`` doesn't give any guarantee about its output being
+    HTML safe. In particular, it doesn't work recursively, so an input like
+    ``"<sc<script>ript>alert('XSS')</sc</script>ript>"`` won't be safe even if
+    you apply ``|removetags:"script"``. So if the input is user provided,
+    **NEVER** apply the ``safe`` filter to a ``removetags`` output. If you are
+    looking for something more robust, you can use the ``bleach`` Python
+    library, notably its `clean`_ method.
+
+.. _clean: http://bleach.readthedocs.org/en/latest/clean.html
 
 .. templatefilter:: rjust
 
@@ -1956,10 +1968,10 @@ output will be ``"Joel is a slug"``.
 .. admonition:: No safety guarantee
 
     Note that ``striptags`` doesn't give any guarantee about its output being
-    entirely HTML safe, particularly with non valid HTML input. So **NEVER**
-    apply the ``safe`` filter to a ``striptags`` output.
-    If you are looking for something more robust, you can use the ``bleach``
-    Python library, notably its `clean`_ method.
+    HTML safe, particularly with non valid HTML input. So **NEVER** apply the
+    ``safe`` filter to a ``striptags`` output. If you are looking for something
+    more robust, you can use the ``bleach`` Python library, notably its
+    `clean`_ method.
 
 .. _clean: http://bleach.readthedocs.org/en/latest/clean.html
 
