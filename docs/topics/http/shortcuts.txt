@@ -163,7 +163,7 @@ MIME type :mimetype:`application/xhtml+xml`::
     def my_view(request):
         # View code here...
         return render_to_response('myapp/index.html', {"foo": "bar"},
-            mimetype="application/xhtml+xml")
+            content_type="application/xhtml+xml")
 
 This example is equivalent to::
 
