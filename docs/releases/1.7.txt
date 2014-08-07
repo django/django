@@ -7,12 +7,14 @@ Welcome to Django 1.7!
 These release notes cover the `new features`_, as well as some `backwards
 incompatible changes`_ you'll want to be aware of when upgrading from Django
 1.6 or older versions. We've also dropped some features, which are detailed in
-:ref:`our deprecation plan <deprecation-removed-in-1.7>`, and we've `begun the
-deprecation process for some features`_.
+:ref:`our deprecation plan <deprecation-removed-in-1.7>`, we've `begun the
+deprecation process for some features`_, and some features have reached the
+end of their deprecation process and `have been removed`_.
 
 .. _`new features`: `What's new in Django 1.7`_
 .. _`backwards incompatible changes`: `Backwards incompatible changes in 1.7`_
 .. _`begun the deprecation process for some features`: `Features deprecated in 1.7`_
+.. _`have been removed`: `Features removed in 1.7`_
 
 Python compatibility
 ====================
@@ -1720,3 +1722,56 @@ FastCGI support
 
 FastCGI support via the ``runfcgi`` management command will be removed in
 Django 1.9. Please deploy your project using WSGI.
+
+.. removed-features-1.7:
+
+Features removed in 1.7
+=======================
+
+These features have reached the end of their
+:ref:`deprecation cycle <deprecation-removed-in-1.7>` and so have been
+removed in Django 1.7 (please see the
+:ref:`deprecation timeline <deprecation-removed-in-1.7>` for more details):
+
+
+* ``django.utils.simplejson`` is removed.
+
+* ``django.utils.itercompat.product`` is removed.
+
+* INSTALLED_APPS and TEMPLATE_DIRS are no longer corrected from a plain
+  string into a tuple.
+
+* :class:`~django.http.HttpResponse`,
+  :class:`~django.template.response.SimpleTemplateResponse`,
+  :class:`~django.template.response.TemplateResponse`,
+  :func:`~django.shortcuts.render_to_response`,
+  :func:`~django.contrib.sitemaps.views.index`, and
+  :func:`~django.contrib.sitemaps.views.sitemap` no longer take a ``mimetype``
+  argument
+
+* :class:`~django.http.HttpResponse` immediately consumes its content if it's
+  an iterator.
+
+* The ``AUTH_PROFILE_MODULE`` setting, and the ``get_profile()`` method on
+  the User model are removed.
+
+* The ``cleanup`` management command is removed.
+
+* The ``daily_cleanup.py`` script is removed.
+
+* :meth:`~django.db.models.query.QuerySet.select_related` no longer has a
+  ``depth`` keyword argument.
+
+* The ``get_warnings_state()``/``restore_warnings_state()``
+  functions from :mod:`django.test.utils` and the ``save_warnings_state()``/
+  ``restore_warnings_state()``
+  :ref:`django.test.*TestCase <django-testcase-subclasses>` are removed.
+
+* The ``check_for_test_cookie`` method in
+  :class:`~django.contrib.auth.forms.AuthenticationForm` is removed.
+
+* The version of :func:`django.contrib.auth.views.password_reset_confirm` that
+  supports base36 encoded user IDs
+  (``django.contrib.auth.views.password_reset_confirm_uidb36``) is removed.
+
+* The ``django.utils.encoding.StrAndUnicode`` mix-in is removed.
