@@ -443,7 +443,7 @@ class BaseForm(object):
                         # Always assume data has changed if validation fails.
                         self._changed_data.append(name)
                         continue
-                if field._has_changed(initial_value, data_value):
+                if field.has_changed(initial_value, data_value):
                     self._changed_data.append(name)
         return self._changed_data
 

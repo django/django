@@ -46,6 +46,9 @@ about each item can often be found in the release notes of two versions prior.
 
 * Support for string ``view`` arguments to ``url()`` will be removed.
 
+* The backward compatible shim  to rename ``django.forms.Form._has_changed()``
+  to ``has_changed()`` will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

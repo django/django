@@ -64,7 +64,7 @@ class ReadOnlyPasswordHashField(forms.Field):
         # render an input field.
         return initial
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         return False
 
 

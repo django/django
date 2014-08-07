@@ -299,6 +299,24 @@ as the rendered output.
 See the :ref:`format localization <format-localization>` documentation for
 more information.
 
+
+Checking if the field data has changed
+--------------------------------------
+
+``has_changed()``
+~~~~~~~~~~~~~~~~~~
+
+.. method:: Field.has_changed()
+
+.. versionchanged:: 1.8
+
+    This method was renamed from ``_has_changed()``.
+
+The ``has_changed()`` method is used to determine if the field value has changed
+from the initial value. Returns ``True`` or ``False``.
+
+See the :class:`Form.has_changed()` documentation for more information.
+
 .. _built-in-fields:
 
 Built-in ``Field`` classes

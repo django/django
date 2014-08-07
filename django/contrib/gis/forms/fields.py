@@ -81,7 +81,7 @@ class GeometryField(forms.Field):
 
         return geom
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         """ Compare geographic value of data with its initial value. """
 
         try:

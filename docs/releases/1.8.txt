@@ -676,3 +676,9 @@ An older (pre-1.0), more restrictive and verbose input format for the
 Using the new syntax, this becomes::
 
     ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``
+
+``django.forms.Field._has_changed()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rename this method to :meth:`~django.forms.Field.has_changed` by removing the
+leading underscore. The old name will still work until Django 2.0.
