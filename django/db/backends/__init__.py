@@ -666,6 +666,9 @@ class BaseDatabaseFeatures(object):
 
     uppercases_column_names = False
 
+    # Does the backend support "select for update" queries with limit (and offset)?
+    supports_select_for_update_with_limit = True
+
     def __init__(self, connection):
         self.connection = connection
 
@@ -1263,6 +1266,14 @@ class BaseDatabaseIntrospection(object):
         The default table name converter is for case sensitive comparison.
         """
         return name
+
+    def column_name_converter(self, name):
+        """
+        Apply a conversion to the column name for the purposes of comparison.
+
+        Uses table_name_converter() by default.
+        """
+        return self.table_name_converter(name)
 
     def table_names(self, cursor=None):
         """

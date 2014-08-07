@@ -66,7 +66,7 @@ class RawQuery(object):
     def get_columns(self):
         if self.cursor is None:
             self._execute_query()
-        converter = connections[self.using].introspection.table_name_converter
+        converter = connections[self.using].introspection.column_name_converter
         return [converter(column_meta[0])
                 for column_meta in self.cursor.description]
 

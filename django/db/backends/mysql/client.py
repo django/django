@@ -1,5 +1,4 @@
-import os
-import sys
+import subprocess
 
 from django.db.backends import BaseDatabaseClient
 
@@ -34,7 +33,4 @@ class DatabaseClient(BaseDatabaseClient):
         if db:
             args += [db]
 
-        if os.name == 'nt':
-            sys.exit(os.system(" ".join(args)))
-        else:
-            os.execvp(self.executable_name, args)
+        subprocess.call(args)

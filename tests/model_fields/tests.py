@@ -259,9 +259,6 @@ class BooleanFieldTests(unittest.TestCase):
         formfield with the blank option (#9640, #10549).
         """
         choices = [(1, 'Si'), (2, 'No')]
-        f = models.BooleanField(choices=choices, default=1, null=True)
-        self.assertEqual(f.formfield().choices, [('', '---------')] + choices)
-
         f = models.BooleanField(choices=choices, default=1, null=False)
         self.assertEqual(f.formfield().choices, choices)
 
