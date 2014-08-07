@@ -457,6 +457,9 @@ def create_generic_related_manager(superclass):
             )
         do_not_call_in_templates = True
 
+        def __str__(self):
+            return repr(self)
+
         def get_queryset(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
