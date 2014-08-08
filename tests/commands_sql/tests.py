@@ -73,7 +73,9 @@ class SQLCommandsRouterTestCase(TestCase):
         for sql_command in (sql_all, sql_create, sql_delete, sql_indexes, sql_destroy_indexes):
             if sql_command is sql_delete:
                 output = sql_command(app_config, no_style(), connections[DEFAULT_DB_ALIAS], close_connection=False)
+                self.assertEqual(len(output), 1,
+                    "%s command is not honoring routers" % sql_command.__name__)
             else:
                 output = sql_command(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
-            self.assertEqual(len(output), 0,
-                "%s command is not honoring routers" % sql_command.__name__)
+                self.assertEqual(len(output), 0,
+                    "%s command is not honoring routers" % sql_command.__name__)
