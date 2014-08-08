@@ -678,41 +678,44 @@ def unordered_list(value, autoescape=None):
             second_item = new_second_item
         return [first_item, second_item], old_style_list
 
-    def _helper(list_, tabs=1):
+    def walk_items(item_list):
+        item_iterator = iter(item_list)
+        for item in item_iterator:
+            try:
+                next_item = next(item_iterator)
+            except StopIteration:
+                next_item = None
+            if not isinstance(next_item, six.string_types):
+                try:
+                    iter(next_item)
+                except TypeError:
+                    pass
+                else:
+                    yield item, next_item
+                    continue
+            yield item, None
+            if next_item:
+                yield next_item, None
+
+    def list_formatter(item_list, tabs=1):
         indent = '\t' * tabs
         output = []
-
-        list_length = len(list_)
-        i = 0
-        while i < list_length:
-            title = list_[i]
+        for item, children in walk_items(item_list):
             sublist = ''
-            sublist_item = None
-            if isinstance(title, (list, tuple)):
-                sublist_item = title
-                title = ''
-            elif i < list_length - 1:
-                next_item = list_[i + 1]
-                if next_item and isinstance(next_item, (list, tuple)):
-                    # The next item is a sub-list.
-                    sublist_item = next_item
-                    # We've processed the next item now too.
-                    i += 1
-            if sublist_item:
-                sublist = _helper(sublist_item, tabs + 1)
-                sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (indent, sublist,
-                                                         indent, indent)
-            output.append('%s<li>%s%s</li>' % (indent,
-                    escaper(force_text(title)), sublist))
-            i += 1
+            if children:
+                sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (
+                    indent, list_formatter(children, tabs + 1), indent, indent)
+            output.append('%s<li>%s%s</li>' % (
+                indent, escaper(force_text(item)), sublist))
         return '\n'.join(output)
+
     value, converted = convert_old_style_list(value)
     if converted:
         warnings.warn(
             "The old style syntax in `unordered_list` is deprecated and will "
             "be removed in Django 2.0. Use the the new format instead.",
             RemovedInDjango20Warning)
-    return mark_safe(_helper(value))
+    return mark_safe(list_formatter(value))
 
 
 ###################

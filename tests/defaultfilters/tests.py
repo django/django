@@ -549,6 +549,12 @@ class DefaultFiltersTests(TestCase):
         b = ULItem('b')
         self.assertEqual(unordered_list([a, b]), '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
 
+        def item_generator():
+            yield a
+            yield b
+
+        self.assertEqual(unordered_list(item_generator()), '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
+
         # Old format for unordered lists should still work
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
