@@ -377,7 +377,32 @@ class Options(object):
         return [self._map_model(f) for f in
                 self.get_fields(data=False, m2m=True)]
 
-    def get_field(self, field_name, m2m=True, data=True, related_objects=False, related_m2m=False, virtual=True, **kwargs):
+    @cached_property
+    def concrete_fields_map(self):
+        res = {}
+
+        # call get_fields with export_name_map=true in order to have a field_instance -> names map
+        fields = self.get_fields(m2m=True, data=True, virtual=True, export_name_map=True)
+        for field, names in six.iteritems(fields):
+            # map each possible name for a field to its field instance
+            for name in names:
+                res[name] = field
+        return res
+
+    @cached_property
+    def all_fields_map(self):
+        res = {}
+
+        # call get_fields with export_name_map=true in order to have a field_instance -> names map
+        fields = self.get_fields(m2m=True, data=True, virtual=True, related_objects=True, related_m2m=True,
+                                 export_name_map=True)
+        for field, names in six.iteritems(fields):
+            # map each possible name for a field to its field instance
+            for name in names:
+                res[name] = field
+        return res
+
+    def get_field(self, field_name, include_related=False, **kwargs):
         """
         Returns a field instance given a field name. By default will only search in data and
         many to many fields. This can be changed by enabling or disabling field types using
@@ -390,38 +415,28 @@ class Options(object):
         - related_m2m:      a M2M relation from another model that points to the current model
         - virtual:          fields that do not necessarily have an entry on the database (like GenericForeignKey)
         """
+        field_map = self.all_fields_map if include_related else self.concrete_fields_map
+
         # NOTE: previous get_field API had a many_to_many key. This key
         # has now become m2m. In order to avoid breaking other's implementation
-        # we will catch the use of 'many_to_many' key and convert it to m2m.
-        try:
-            m2m = kwargs['many_to_many']
-        except KeyError:
-            pass
-        else:
-            warnings.warn(
-                "The 'many_to_many' argument on get_fields will be soon "
-                "deprecated. This parameter has changed in favor of "
-                "'m2m'. Please change your implementation accordingly.",
-                RemovedInDjango20Warning
-            )
+        # we will catch the use of 'many_to_many'.
+        #if 'many_to_many' in kwargs:
 
-        # Creates a cache key composed of all arguments
-        cache_key = (m2m, data, related_objects, related_m2m, virtual)
+            # If no many_to_many fields are wanted, create a new dictionary with
+            # without ManyToManyField instances.
+            #if kwargs['many_to_many'] is False:
+                #field_map = dict((name, field) for name, field in six.iteritems(field_map)
+                                 #if not isinstance(field, ManyToManyField))
 
-        try:
-            field_map = self._get_field_cache[cache_key]
-        except KeyError:
-            res = {}
+            # We always want to throw a warning if many_to_many is used regardless
+            # of if it alters the return type or not.
+            #warnings.warn(
+                #"The 'many_to_many' argument on get_fields will be soon "
+                #"deprecated. This parameter has changed in favor of "
+                #"'m2m'. Please change your implementation accordingly.",
+                #RemovedInDjango20Warning
+            #)
 
-            # Call get_fields with export_name_map=True in order to have a field_instance -> names map
-            for field, names in six.iteritems(self.get_fields(m2m=m2m, data=data,
-                  related_objects=related_objects, related_m2m=related_m2m,
-                  virtual=virtual, export_name_map=True)):
-                # Map each possible name for a field to its field instance
-                for name in names:
-                    res[name] = field
-
-            field_map = self._get_field_cache[cache_key] = res
         try:
             # Retreive field instance by name from cached or just-computer field map
             return field_map[field_name]
@@ -430,10 +445,7 @@ class Options(object):
 
     @raise_deprecation(suggested_alternative="get_field()")
     def get_field_by_name(self, name):
-        return self._map_model_details(self.get_field(
-            name, m2m=True, related_objects=True,
-            related_m2m=True, virtual=True,
-        ))
+        return self._map_model_details(self.get_field(name, include_related=True))
 
     @raise_deprecation(suggested_alternative="field_names")
     def get_all_field_names(self):
@@ -589,7 +601,8 @@ class Options(object):
             return EMPTY_RELATION_TREE
 
     def _expire_cache(self):
-        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',):
+        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',
+                          'concrete_fields_map', 'all_fields_map'):
             try:
                 delattr(self, cache_key)
             except AttributeError:
