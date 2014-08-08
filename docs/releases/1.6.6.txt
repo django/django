@@ -19,6 +19,26 @@ To remedy this, URL reversing now ensures that no URL starts with two slashes
 approach ensures that semantics stay the same, while making the URL relative to
 the domain and not to the scheme.
 
+File upload denial-of-service
+=============================
+
+Before this release, Django's file upload handing in its default configuration
+may degrade to producing a huge number of ``os.stat()`` system calls when a
+duplicate filename is uploaded. Since ``stat()`` may invoke IO, this may produce
+a huge data-dependent slowdown that slowly worsens over time. The net result is
+that given enough time, a user with the ability to upload files can cause poor
+performance in the upload handler, eventually causing it to become very slow
+simply by uploading 0-byte files. At this point, even a slow network connection
+and few HTTP requests would be all that is necessary to make a site unavailable.
+
+We've remedied the issue by changing the algorithm for generating file names
+if a file with the uploaded name already exists.
+:meth:`Storage.get_available_name()
+<django.core.files.storage.Storage.get_available_name>` now appends an
+underscore plus a random 7 character alphanumeric string (e.g. ``"_x3a1gho"``),
+rather than iterating through an underscore followed by a number (e.g. ``"_1"``,
+``"_2"``, etc.).
+
 Bugfixes
 ========
 

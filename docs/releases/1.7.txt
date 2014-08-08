@@ -588,6 +588,13 @@ File Uploads
   the client. Partially uploaded files are also closed as long as they are
   named ``file`` in the upload handler.
 
+* :meth:`Storage.get_available_name()
+  <django.core.files.storage.Storage.get_available_name>` now appends an
+  underscore plus a random 7 character alphanumeric string (e.g.
+  ``"_x3a1gho"``), rather than iterating through an underscore followed by a
+  number (e.g. ``"_1"``, ``"_2"``, etc.) to prevent a denial-of-service attack.
+  This change was also made in the 1.6.6, 1.5.9, and 1.4.14 security releases.
+
 Forms
 ^^^^^
 
