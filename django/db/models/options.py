@@ -32,8 +32,8 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'select_on_save', 'default_related_name')
 
 IMMUTABLE_WARNING = (
-    "get_fields() return type should never be mutated. If you want "
-    "to manipulate this list for your own use, make a copy first"
+    "The return type of get_fields() should never be mutated. If you want "
+    "to manipulate this list for your own use, make a copy first."
 )
 
 
@@ -481,7 +481,7 @@ class Options(object):
             for field, names in six.iteritems(self.get_fields(m2m=m2m, data=data,
                   related_objects=related_objects, related_m2m=related_m2m,
                   virtual=virtual, export_name_map=True)):
-                # Map each possible name for a field to it's field instance
+                # Map each possible name for a field to its field instance
                 for name in names:
                     res[name] = field
 
@@ -540,7 +540,7 @@ class Options(object):
                 for parent in self.parents:
                     for obj, query_name in six.iteritems(parent._meta.get_fields(data=False, related_m2m=True,
                                                          **options)):
-                        # In order for a related M2M object to be valid, it's creation
+                        # In order for a related M2M object to be valid, its creation
                         # counter must be > 0 and must be in the parent list
                         if not (obj.field.creation_counter < 0
                                 and obj.model not in self.get_parent_list()):
@@ -642,7 +642,7 @@ class Options(object):
     def many_to_many(self):
         """
         Returns a list of all many to many fields on the model and
-        it's parents.
+        its parents.
         All hidden and proxy fields are omitted.
         """
         return self.get_fields(data=False, m2m=True)
@@ -663,7 +663,7 @@ class Options(object):
     @cached_property
     def fields(self):
         """
-        Returns a list of all data fields on the model and it's parents.
+        Returns a list of all data fields on the model and its parents.
         All hidden and proxy fields are omitted.
         """
         return self.get_fields()
@@ -671,7 +671,7 @@ class Options(object):
     @cached_property
     def concrete_fields(self):
         """
-        Returns a list of all concrete data fields on the model and it's parents.
+        Returns a list of all concrete data fields on the model and its parents.
         All hidden and proxy fields are omitted.
         """
         return [f for f in self.fields if f.column is not None]
@@ -690,21 +690,22 @@ class Options(object):
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_fields_with_model(self):
-        return map(self._map_model, self.get_fields())
+        return [self._map_model(f) for f in self.get_fields()]
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_concrete_fields_with_model(self):
-        return map(self._map_model, self.concrete_fields)
+        return [self._map_model(f) for f in self.concrete_fields]
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_m2m_with_model(self):
-        return map(self._map_model, self.get_fields(data=False, m2m=True))
+        return [self._map_model(f) for f in
+                self.get_fields(data=False, m2m=True)]
 
     @raise_deprecation(suggested_alternative="get_field()")
     def get_field_by_name(self, name):
         return self._map_model_details(self.get_field(
             name, m2m=True, related_objects=True,
-            related_m2m=True, virtual=True
+            related_m2m=True, virtual=True,
         ))
 
     @raise_deprecation(suggested_alternative="field_names")
@@ -734,11 +735,12 @@ class Options(object):
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
                                            include_proxy_eq=False):
-        return map(self._map_model, self.get_all_related_objects(
-            local_only=local_only,
-            include_hidden=include_hidden,
-            include_proxy_eq=include_proxy_eq
-        ))
+        return [self._map_model(f) for f in
+                self.get_all_related_objects(
+                    local_only=local_only,
+                    include_hidden=include_hidden,
+                    include_proxy_eq=include_proxy_eq,
+                )]
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_many_to_many_objects(self, local_only=False):
@@ -746,4 +748,4 @@ class Options(object):
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_m2m_objects_with_model(self):
-        return list(map(self._map_model, self.get_fields(data=False, related_m2m=True)))
+        return [self._map_model(f) for f in self.get_fields(data=False, related_m2m=True)]

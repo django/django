@@ -183,7 +183,7 @@ class Collector(object):
         model = new_objs[0].__class__
 
         # Recursively collect concrete model's parent models, but not their
-        # related objects. These will be found by meta.get_new_fields
+        # related objects. These will be found by meta.get_fields
         concrete_model = model._meta.concrete_model
         for ptr in six.itervalues(concrete_model._meta.parents):
             if ptr:

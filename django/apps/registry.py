@@ -329,8 +329,10 @@ class Apps(object):
         be used in tests or when a new model is added.
         """
         if not self.ready:
-            raise AppRegistryNotReady("App registry isn't ready yet. relation tree \
-                                      cannot be flushed")
+            raise AppRegistryNotReady(
+                "App registry isn't ready yet. relation tree"
+                "cannot be flushed."
+            )
         for model in self.get_models(include_auto_created=True):
             try:
                 del model._meta.relation_tree
