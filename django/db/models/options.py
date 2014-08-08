@@ -25,7 +25,7 @@ RelationTree = namedtuple('RelationTree', ['related_objects', 'related_m2m'])
 EMPTY_RELATION_TREE = RelationTree(tuple(), tuple())
 
 IMMUTABLE_WARNING = (
-    "The return type of get_fields() should never be mutated. If you want "
+    "The return type of most Options API calls should never be mutated. If you want "
     "to manipulate this list for your own use, make a copy first."
 )
 
@@ -337,7 +337,7 @@ class Options(object):
         Returns a list of all data fields on the model and its parents.
         All hidden and proxy fields are omitted.
         """
-        return self.get_fields()
+        return self._make_immutable_fields_list(self.get_fields())
 
     @cached_property
     def concrete_fields(self):
@@ -345,7 +345,7 @@ class Options(object):
         Returns a list of all concrete data fields on the model and its parents.
         All hidden and proxy fields are omitted.
         """
-        return [f for f in self.fields if f.column is not None]
+        return self._make_immutable_fields_list(f for f in self.fields if f.column is not None)
 
     @cached_property
     def local_concrete_fields(self):
@@ -353,7 +353,7 @@ class Options(object):
         Returns a list of all concrete data fields on the model.
         All hidden and proxy fields are omitted.
         """
-        return [f for f in self.local_fields if f.column is not None]
+        return self._make_immutable_fields_list(f for f in self.local_fields if f.column is not None)
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_fields_with_model(self):
@@ -370,7 +370,7 @@ class Options(object):
         its parents.
         All hidden and proxy fields are omitted.
         """
-        return self.get_fields(data=False, m2m=True)
+        return self._make_immutable_fields_list(self.get_fields(data=False, m2m=True))
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_m2m_with_model(self):
@@ -750,4 +750,4 @@ class Options(object):
         for _, names in six.iteritems(self.get_fields(m2m=True, related_objects=True,
                                           related_m2m=True, virtual=True, export_name_map=True)):
             res.update(name for name in names if not name.endswith('+'))
-        return list(res)
+        return self._make_immutable_fields_list(res)
