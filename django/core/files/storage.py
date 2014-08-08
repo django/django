@@ -1,12 +1,12 @@
 import os
 import errno
-import itertools
 from datetime import datetime
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import locks, File
 from django.core.files.move import file_move_safe
+from django.utils.crypto import get_random_string
 from django.utils.encoding import force_text, filepath_to_uri
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
@@ -69,28 +69,12 @@ class Storage(object):
         """
         dir_name, file_name = os.path.split(name)
         file_root, file_ext = os.path.splitext(file_name)
-        # If the filename already exists, add an underscore and a number (before
-        # the file extension, if one exists) to the filename until the generated
-        # filename doesn't exist. Then check the new filename does not exceed
-        # max_length. If so, truncate original filename and start over.
-        count = itertools.count(1)
+        # If the filename already exists, add an underscore and a random 7
+        # character alphanumeric string (before the file extension, if one
+        # exists) to the filename until the generated filename doesn't exist.
         while self.exists(name):
             # file_ext includes the dot.
-            name = os.path.join(dir_name, "%s_%s%s" % (file_root, next(count), file_ext))
-            # Truncating file_root if max_length exceeded.
-            if len(name) > max_length:
-                file_root = file_root[:-1]
-                # Entire file_root was truncated down in attempt to find a unique
-                # filename. This typically indicates that max_length is too small
-                # and/or that big chunk of it is taken by dir_name and file_ext.
-                if not file_root:
-                    raise SuspiciousFileOperation(
-                        'Can not allocate a unique filename for "%s". Make sure '
-                        'that the file field allows sufficient max_length.' % name
-                    )
-                # resetting the counter.
-                count = itertools.count(1)
-                name = os.path.join(dir_name, file_root) + file_ext
+            name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
 
         return name
 
