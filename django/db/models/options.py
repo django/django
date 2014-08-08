@@ -560,10 +560,19 @@ class Options(object):
             # a data descriptor (such as @cached_property). This
             # means that the _meta.relation_tree is only called
             # if related_objects is not in __dict__.
-            model._meta.__dict__['relation_tree'] = RelationTree(
-                related_objects=tuple(related_objects_graph[model._meta]),
-                related_m2m=tuple(related_m2m_graph[model._meta]),
-            )
+            related_objects = tuple(related_objects_graph[model._meta])
+            related_m2m = tuple(related_m2m_graph[model._meta])
+
+            # If both related_objects and related_m2m are empty, it makes sense
+            # to set EMPTY_RELATION_TREE. This will avoid allocating multiple
+            # empty relation trees.
+            relation_tree = EMPTY_RELATION_TREE
+            if related_objects or related_m2m:
+                relation_tree = RelationTree(
+                    related_objects=related_objects,
+                    related_m2m=related_m2m
+                )
+            model._meta.__dict__['relation_tree'] = relation_tree
 
     @cached_property
     def relation_tree(self):
