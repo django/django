@@ -766,11 +766,11 @@ a quoted name as the value for ``db_table``::
 
     class LegacyModel(models.Model):
         class Meta:
-       	    db_table = '"name_left_in_lowercase"'
+            db_table = '"name_left_in_lowercase"'
 
     class ForeignModel(models.Model):
         class Meta:
-       	    db_table = '"OTHER_USER"."NAME_ONLY_SEEMS_OVER_30"'
+            db_table = '"OTHER_USER"."NAME_ONLY_SEEMS_OVER_30"'
 
 Quoted names can also be used with Django's other supported database
 backends; except for Oracle, however, the quotes have no effect.
