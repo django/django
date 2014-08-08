@@ -329,7 +329,7 @@ class DistanceTest(TestCase):
         area_sq_m = [5437908.90234375, 10183031.4389648, 11254471.0073242, 9881708.91772461]
         # Tolerance has to be lower for Oracle
         tol = 2
-        for i, z in enumerate(SouthTexasZipcode.objects.area()):
+        for i, z in enumerate(SouthTexasZipcode.objects.order_by('name').area()):
             self.assertAlmostEqual(area_sq_m[i], z.area.sq_m, tol)
 
     def test_length(self):
