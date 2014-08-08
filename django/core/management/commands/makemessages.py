@@ -360,7 +360,8 @@ class Command(BaseCommand):
             Check if the given path should be ignored or not.
             """
             filename = os.path.basename(path)
-            ignore = lambda pattern: fnmatch.fnmatchcase(filename, pattern)
+            ignore = lambda pattern: fnmatch.fnmatchcase(filename, pattern) or \
+                fnmatch.fnmatchcase(path, pattern)
             return any(ignore(pattern) for pattern in ignore_patterns)
 
         dir_suffix = '%s*' % os.sep
@@ -368,6 +369,7 @@ class Command(BaseCommand):
         all_files = []
         for dirpath, dirnames, filenames in os.walk(root, topdown=True, followlinks=self.symlinks):
             for dirname in dirnames[:]:
+
                 if is_ignored(os.path.normpath(os.path.join(dirpath, dirname)), norm_patterns):
                     dirnames.remove(dirname)
                     if self.verbosity > 1:

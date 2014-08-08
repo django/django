@@ -360,7 +360,7 @@ class JavascriptExtractorTests(ExtractorTests):
 
 class IgnoredExtractorTests(ExtractorTests):
 
-    def test_ignore_option(self):
+    def test_ignore_directory(self):
         os.chdir(self.test_dir)
         ignore_patterns = [
             os.path.join('ignore_dir', '*'),
@@ -371,12 +371,41 @@ class IgnoredExtractorTests(ExtractorTests):
             ignore_patterns=ignore_patterns, stdout=stdout)
         data = stdout.getvalue()
         self.assertTrue("ignoring directory ignore_dir" in data)
-        self.assertTrue("ignoring file xxx_ignored.html" in data)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
             self.assertMsgId('This literal should be included.', po_contents)
             self.assertNotMsgId('This should be ignored.', po_contents)
+
+    def test_ignore_subdirectory(self):
+        os.chdir(self.test_dir)
+        ignore_patterns = [
+            'templates/*/ignore.html',
+            'templates/subdir/*',
+        ]
+        stdout = StringIO()
+        management.call_command('makemessages', locale=[LOCALE], verbosity=2,
+            ignore_patterns=ignore_patterns, stdout=stdout)
+        data = stdout.getvalue()
+        self.assertTrue("ignoring directory subdir" in data)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = fp.read()
+            self.assertNotMsgId('This subdir should be ignored too.', po_contents)
+
+    def test_ignore_file_patterns(self):
+        os.chdir(self.test_dir)
+        ignore_patterns = [
+            'xxx_*',
+        ]
+        stdout = StringIO()
+        management.call_command('makemessages', locale=[LOCALE], verbosity=2,
+            ignore_patterns=ignore_patterns, stdout=stdout)
+        data = stdout.getvalue()
+        self.assertTrue("ignoring file xxx_ignored.html" in data)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = fp.read()
             self.assertNotMsgId('This should be ignored too.', po_contents)
 
     @override_settings(
