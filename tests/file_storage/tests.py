@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 import errno
 import os
+import random
+import re
 import shutil
 import sys
 import tempfile
@@ -15,6 +17,7 @@ try:
 except ImportError:
     import dummy_threading as threading
 
+import django.core.files.storage
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousOperation
 from django.core.files.base import File, ContentFile
@@ -710,3 +713,128 @@ class FileLikeObjectTestCase(LiveServerTestCase):
         remote_file = urlopen(self.live_server_url + '/')
         with self.storage.open(stored_filename) as stored_file:
             self.assertEqual(stored_file.read(), remote_file.read())
+
+
+class GetAvailableNameStorage(django.core.files.storage.Storage):
+    """
+    Dummy to allow controlling the result of exists().
+    """
+    def __init__(self, highest=10, base_exists=True):
+        self.highest = highest
+        self.base_exists = base_exists
+        self.exists_count = 0
+
+    def get_index(self, name):
+        match = re.match(r'.*_([0-9]+)\..*', name)
+        if match:
+            return int(match.group(1))
+
+    def index_exists(self, index):
+        return index <= self.highest
+
+    def exists(self, name):
+        self.exists_count += 1
+        index = self.get_index(name)
+        if index is None:
+            return self.base_exists
+        else:
+            return self.index_exists(index)
+
+
+class GetAvailableNameTest(unittest.TestCase):
+    """
+    Test get_available_name() logic and worst-case behavior (#23157).
+    """
+    def test_unique(self):
+        """
+        Ensure the original filename is returned if no duplicate names exist.
+        """
+        storage = GetAvailableNameStorage(base_exists=False)
+        self.assertEquals('foo.txt', storage.get_available_name('foo.txt'))
+        self.assertEquals(1, storage.exists_count)
+
+    def test_base_exists(self):
+        """
+        Ensure the initial duplicate name is generated correctly.
+        """
+        storage = GetAvailableNameStorage(highest=0)
+        self.assertEquals('foo_1.txt', storage.get_available_name('foo.txt'))
+        self.assertLess(storage.exists_count, 50)
+
+    def test_small_numbers(self):
+        """
+        Ensure sensible result if boundary detection does not loop.
+        """
+        for highest in range(16):
+            storage = GetAvailableNameStorage(highest)
+            got = storage.get_available_name('foo.txt')
+            self.assertEqual(highest + 1, storage.get_index(got))
+            self.assertLess(storage.exists_count, 50)
+
+    def test_exists_count(self):
+        """
+        Ensure number of calls to exists() never exceeds a sensible limit.
+        """
+        for highest in 10, 100, 1000, 10000, 100000, 1000000, 10000000:
+            storage = GetAvailableNameStorage(highest)
+            got = storage.get_available_name('foo.txt')
+            self.assertEquals(highest + 1, storage.get_index(got))
+            self.assertLess(storage.exists_count, 50)
+
+    def test_boundaries(self):
+        """
+        Ensure lbound/ubound detection does not suffer from off-by-one errors.
+        """
+        for highest in range(5, 51):
+            storage = GetAvailableNameStorage(highest)
+            got = storage.get_available_name('foo.txt')
+            self.assertEquals(highest + 1, storage.get_index(got))
+
+    def test_discontiguous_sequential(self):
+        """
+        Ensure an unallocated result is returned given a discontiguous range of
+        filenames. This may happen when some uploads have been deleted.
+        """
+        base = set(range(128))
+        for size in 1, 2, 3, 4:
+            for start in range(len(base)):
+                allocated = base.difference(range(start, start + size + 1))
+                storage = GetAvailableNameStorage()
+                storage.index_exists = lambda index: index in allocated
+                got = storage.get_available_name('foo.txt')
+                self.assertTrue(storage.get_index(got) not in allocated)
+                self.assertLess(storage.exists_count, 50)
+
+    def test_discontiguous_sparse(self):
+        """
+        Ensure an unallocated result is returned given an evenly distributed
+        sparse range of filenames. This may happen when some uploads have been
+        deleted.
+        """
+        base = set(range(128))
+        for stride in 2, 3, 4, 5, 6, 7, 8:
+            allocated = base.difference(range(0, len(base), stride))
+            storage = GetAvailableNameStorage()
+            storage.index_exists = lambda index: index in allocated
+            got = storage.get_available_name('foo.txt')
+            self.assertTrue(storage.get_index(got) not in allocated)
+            self.assertLess(storage.exists_count, 50)
+
+    def test_discontiguous_random(self):
+        """
+        Ensure an unallocated result is returned given a randomly distributed
+        range of filenames. This may happen when some uploads have been
+        deleted.
+        """
+        to_allocate = list(range(4096))
+        rnd = random.Random(0)
+        rnd.shuffle(to_allocate)
+        allocated = set()
+
+        while to_allocate:
+            allocated.add(to_allocate.pop())
+            storage = GetAvailableNameStorage()
+            storage.index_exists = lambda index: index in allocated
+            got = storage.get_available_name('foo.txt')
+            self.assertTrue(storage.get_index(got) not in allocated)
+            self.assertLess(storage.exists_count, 50)

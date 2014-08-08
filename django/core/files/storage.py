@@ -1,6 +1,5 @@
 import os
 import errno
-import itertools
 from datetime import datetime
 
 from django.conf import settings
@@ -62,22 +61,47 @@ class Storage(object):
         """
         return get_valid_filename(name)
 
+    def compose_filename(self, name, index):
+        """
+        Modify a filename to include a suffix based on the provided index, so
+        that given "/dir/hello.txt" and index 0, this method returns
+        "/dir/hello_0.txt".
+        """
+        dir_name, file_name = os.path.split(name)
+        file_root, file_ext = os.path.splitext(file_name)
+        return os.path.join(dir_name, "%s_%s%s" % (file_root, index, file_ext))
+
     def get_available_name(self, name):
         """
         Returns a filename that's free on the target storage system, and
         available for new content to be written to.
         """
-        dir_name, file_name = os.path.split(name)
-        file_root, file_ext = os.path.splitext(file_name)
-        # If the filename already exists, add an underscore and a number (before
-        # the file extension, if one exists) to the filename until the generated
-        # filename doesn't exist.
-        count = itertools.count(1)
-        while self.exists(name):
-            # file_ext includes the dot.
-            name = os.path.join(dir_name, "%s_%s%s" % (file_root, next(count), file_ext))
+        if not self.exists(name):
+            return name
 
-        return name
+        # Find a range containing at least one free index, then try to pick the
+        # lowest using bisection. If free/used indices are randomly mixed, the
+        # search will aways terminate on a free index, just not necessarily the
+        # lowest. 16 results in fairly few exists() calls in the usual case of
+        # there being few conflicts.
+        lbound = 1
+        ubound = 16
+        while self.exists(self.compose_filename(name, ubound)):
+            lbound = ubound + 1
+            ubound *= 2
+
+        while lbound < ubound:
+            mid = lbound + int((ubound - lbound) / 2)
+            if self.exists(self.compose_filename(name, mid)):
+                lbound = mid + 1
+            else:
+                ubound = mid - 1
+
+        path = self.compose_filename(name, lbound)
+        if not self.exists(path):
+            return path
+
+        return self.compose_filename(name, lbound + 1)
 
     def path(self, name):
         """
