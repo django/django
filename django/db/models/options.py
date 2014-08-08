@@ -581,9 +581,12 @@ class Options(object):
         try:
             return self.__dict__['relation_tree']
         except KeyError:
+            # It may happen, often when the registry is not ready, that
+            # a not yet registered model is queried. In this very rare
+            # case we simply return an EMPTY_RELATION_TREE.
+            # When the registry will be ready, cache will be flushed and
+            # this model will be computed properly.
             return EMPTY_RELATION_TREE
-
-
 
     def _expire_cache(self):
         for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',):
