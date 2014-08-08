@@ -4,6 +4,7 @@ import copy
 import inspect
 import sys
 from functools import update_wrapper
+from itertools import chain
 import warnings
 
 from django.apps import apps
@@ -173,9 +174,9 @@ class ModelBase(type):
             new_class.add_to_class(obj_name, obj)
 
         # All the fields of any type declared on this model
-        new_fields = (
-            new_class._meta.local_fields +
-            new_class._meta.local_many_to_many +
+        new_fields = chain(
+            new_class._meta.local_fields,
+            new_class._meta.local_many_to_many,
             new_class._meta.virtual_fields
         )
         field_names = set(f.name for f in new_fields)
@@ -197,6 +198,7 @@ class ModelBase(type):
                 raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
             new_class._meta.setup_proxy(base)
             new_class._meta.concrete_model = base._meta.concrete_model
+            base._meta.concrete_model._meta.proxied_children.append(new_class._meta)
         else:
             new_class._meta.concrete_model = new_class
 
@@ -558,7 +560,8 @@ class Model(six.with_metaclass(ModelBase)):
         and not use this method.
         """
         try:
-            field = self._meta.get_field_by_name(field_name)[0]
+            field = self._meta.get_field(field_name, m2m=True, related_objects=True,
+                                         related_m2m=True, virtual=True)
         except FieldDoesNotExist:
             return getattr(self, field_name)
         return getattr(self, field.attname)
@@ -1359,8 +1362,8 @@ class Model(six.with_metaclass(ModelBase)):
         errors = []
         for field_name in fields:
             try:
-                field = cls._meta.get_field(field_name,
-                    many_to_many=True)
+                field = cls._meta.get_field(field_name)
+                    
             except models.FieldDoesNotExist:
                 errors.append(
                     checks.Error(
@@ -1442,11 +1445,11 @@ class Model(six.with_metaclass(ModelBase)):
 
         for field_name in fields:
             try:
-                cls._meta.get_field(field_name, many_to_many=False)
+                cls._meta.get_field(field_name, m2m=False)
             except FieldDoesNotExist:
                 if field_name.endswith('_id'):
                     try:
-                        field = cls._meta.get_field(field_name[:-3], many_to_many=False)
+                        field = cls._meta.get_field(field_name[:-3], m2m=False)
                     except FieldDoesNotExist:
                         pass
                     else:

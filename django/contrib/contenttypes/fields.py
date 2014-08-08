@@ -30,9 +30,14 @@ class GenericForeignKey(object):
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
+
+        # Set model to cls (as it is not associated to anything)
+        # and parent_model to cls (because it belongs to cls)
         self.model = cls
+        self.parent_model = cls
+
         self.cache_attr = "_%s_cache" % name
-        cls._meta.add_virtual_field(self)
+        cls._meta.add_field(self, virtual=True)
 
         # Only run pre-initialization field assignment on non-abstract models
         if not cls._meta.abstract:
@@ -296,12 +301,12 @@ class GenericRelation(ForeignObject):
 
     def resolve_related_fields(self):
         self.to_fields = [self.model._meta.pk.name]
-        return [(self.rel.to._meta.get_field_by_name(self.object_id_field_name)[0],
+        return [(self.rel.to._meta.get_field(self.object_id_field_name, related_objects=True, related_m2m=True, virtual=True),
                  self.model._meta.pk)]
 
     def get_path_info(self):
         opts = self.rel.to._meta
-        target = opts.get_field_by_name(self.object_id_field_name)[0]
+        target = opts.get_field(self.object_id_field_name, related_objects=True, related_m2m=True, virtual=True)
         return [PathInfo(self.model._meta, opts, (target,), self.rel, True, False)]
 
     def get_reverse_path_info(self):
@@ -321,6 +326,7 @@ class GenericRelation(ForeignObject):
         super(GenericRelation, self).contribute_to_class(cls, name, **kwargs)
         # Save a reference to which model this class is on for future use
         self.model = cls
+        self.parent_model = cls
         # Add the descriptor for the relation
         setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self, self.for_concrete_model))
 
@@ -338,7 +344,7 @@ class GenericRelation(ForeignObject):
                                                  for_concrete_model=self.for_concrete_model)
 
     def get_extra_restriction(self, where_class, alias, remote_alias):
-        field = self.rel.to._meta.get_field_by_name(self.content_type_field_name)[0]
+        field = self.rel.to._meta.get_field(self.content_type_field_name)
         contenttype_pk = self.get_content_type().pk
         cond = where_class()
         lookup = field.get_lookup('exact')(Col(remote_alias, field, field), contenttype_pk)

@@ -7,7 +7,7 @@ from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.query_utils import Q
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import DateField, DateTimeField, FieldDoesNotExist
+from django.db.models.fields import Field, DateField, DateTimeField, FieldDoesNotExist
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, NO_RESULTS, SelectInfo
 from django.db.models.sql.datastructures import Date, DateTime
 from django.db.models.sql.query import Query
@@ -126,10 +126,12 @@ class UpdateQuery(Query):
         """
         values_seq = []
         for name, val in six.iteritems(values):
-            field, model, direct, m2m = self.get_meta().get_field_by_name(name)
-            if not direct or m2m:
+            field = self.get_meta().get_field(name, related_objects=True, related_m2m=True, virtual=True)
+            direct = isinstance(field, Field) or hasattr(field, 'for_concrete_model')
+            model = field.parent_model._meta.concrete_model
+            if not direct or hasattr(field, 'is_m2m'):
                 raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
-            if model:
+            if model is not self.get_meta().model:
                 self.add_related_update(model, field, val)
                 continue
             values_seq.append((field, model, val))

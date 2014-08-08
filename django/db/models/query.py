@@ -247,8 +247,9 @@ class QuerySet(object):
         # If only/defer clauses have been specified,
         # build the list of fields that are to be loaded.
         if only_load:
-            for field, model in self.model._meta.get_concrete_fields_with_model():
-                if model is None:
+            for field in self.model._meta.concrete_fields:
+                model = field.parent_model._meta.concrete_model
+                if model is self.model._meta.model:
                     model = self.model
                 try:
                     if field.name in only_load[model]:
@@ -797,7 +798,7 @@ class QuerySet(object):
 
         names = getattr(self, '_fields', None)
         if names is None:
-            names = set(self.model._meta.get_all_field_names())
+            names = self.model._meta.field_names
         for aggregate in kwargs:
             if aggregate in names:
                 raise ValueError("The annotation '%s' conflicts with a field on "
@@ -1342,7 +1343,8 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         skip = set()
         init_list = []
         # Build the list of fields that *haven't* been requested
-        for field, model in klass._meta.get_concrete_fields_with_model():
+        for field in klass._meta.concrete_fields:
+            model = field.parent_model._meta.concrete_model
             if field.name not in load_fields:
                 skip.add(field.attname)
             elif from_parent and issubclass(from_parent, model.__class__):
@@ -1394,7 +1396,7 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
 
     reverse_related_fields = []
     if restricted:
-        for o in klass._meta.get_all_related_objects():
+        for o in klass._meta.get_fields(data=False, related_objects=True):
             if o.field.unique and select_related_descend(o.field, restricted, requested,
                                                          only_load.get(o.model), reverse=True):
                 next = requested[o.field.related_query_name()]
@@ -1405,7 +1407,8 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
     if field_names:
         pk_idx = field_names.index(klass._meta.pk.attname)
     else:
-        pk_idx = klass._meta.pk_index()
+        meta = klass._meta
+        pk_idx = meta.concrete_fields.index(meta.pk)
 
     return klass, field_names, field_count, related_fields, reverse_related_fields, pk_idx
 
@@ -1498,7 +1501,10 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
     for f, klass_info in reverse_related_fields:
         # Transfer data from this object to childs.
         parent_data = []
-        for rel_field, rel_model in klass_info[0]._meta.get_fields_with_model():
+        for rel_field in klass_info[0]._meta.fields:
+            rel_model = rel_field.parent_model._meta.concrete_model
+            if rel_model == klass_info[0]._meta.model:
+                rel_model = None
             if rel_model is not None and isinstance(obj, rel_model):
                 parent_data.append((rel_field, getattr(obj, rel_field.attname)))
         # Recursively retrieve the data for the related object

@@ -258,7 +258,7 @@ class BaseDatabaseSchemaEditor(object):
                     self.deferred_sql.extend(autoinc_sql)
         # Add any unique_togethers
         for fields in model._meta.unique_together:
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [model._meta.get_field(field, related_objects=True, related_m2m=True, virtual=True).column for field in fields]
             column_sqls.append(self.sql_create_table_unique % {
                 "columns": ", ".join(self.quote_name(column) for column in columns),
             })
@@ -270,7 +270,7 @@ class BaseDatabaseSchemaEditor(object):
         self.execute(sql, params)
         # Add any index_togethers
         for fields in model._meta.index_together:
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [model._meta.get_field(field, related_objects=True, related_m2m=True, virtual=True).column for field in fields]
             self.execute(self.sql_create_index % {
                 "table": self.quote_name(model._meta.db_table),
                 "name": self._create_index_name(model, columns, suffix="_idx"),
@@ -306,7 +306,7 @@ class BaseDatabaseSchemaEditor(object):
         news = set(tuple(fields) for fields in new_unique_together)
         # Deleted uniques
         for fields in olds.difference(news):
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [model._meta.get_field(field, related_objects=True, related_m2m=True, virtual=True).column for field in fields]
             constraint_names = self._constraint_names(model, columns, unique=True)
             if len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
@@ -322,7 +322,7 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Created uniques
         for fields in news.difference(olds):
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [model._meta.get_field(field, related_objects=True, related_m2m=True, virtual=True).column for field in fields]
             self.execute(self.sql_create_unique % {
                 "table": self.quote_name(model._meta.db_table),
                 "name": self._create_index_name(model, columns, suffix="_uniq"),
@@ -339,7 +339,7 @@ class BaseDatabaseSchemaEditor(object):
         news = set(tuple(fields) for fields in new_index_together)
         # Deleted indexes
         for fields in olds.difference(news):
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [model._meta.get_field(field, related_objects=True, related_m2m=True, virtual=True).column for field in fields]
             constraint_names = self._constraint_names(model, list(columns), index=True)
             if len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
@@ -355,7 +355,7 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Created indexes
         for fields in news.difference(olds):
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
+            columns = [model._meta.get_field(field, related_objects=True, related_m2m=True, virtual=True).column for field in fields]
             self.execute(self.sql_create_index % {
                 "table": self.quote_name(model._meta.db_table),
                 "name": self._create_index_name(model, columns, suffix="_idx"),
@@ -549,7 +549,7 @@ class BaseDatabaseSchemaEditor(object):
         # Drop incoming FK constraints if we're a primary key and things are going
         # to change.
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
-            for rel in new_field.model._meta.get_all_related_objects():
+            for rel in new_field.model._meta.get_fields(data=False, related_objects=True):
                 rel_fk_names = self._constraint_names(rel.model, [rel.field.column], foreign_key=True)
                 for fk_name in rel_fk_names:
                     self.execute(
@@ -696,7 +696,7 @@ class BaseDatabaseSchemaEditor(object):
         # referring to us.
         rels_to_update = []
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
-            rels_to_update.extend(new_field.model._meta.get_all_related_objects())
+            rels_to_update.extend(new_field.model._meta.get_fields(data=False, related_objects=True))
         # Changed to become primary key?
         # Note that we don't detect unsetting of a PK, as we assume another field
         # will always come along and replace it.
@@ -724,7 +724,7 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
             # Update all referencing columns
-            rels_to_update.extend(new_field.model._meta.get_all_related_objects())
+            rels_to_update.extend(new_field.model._meta.get_fields(data=False, related_objects=True))
         # Handle our type alters on the other end of rels from the PK stuff above
         for rel in rels_to_update:
             rel_db_params = rel.field.db_parameters(connection=self.connection)
@@ -753,7 +753,7 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Rebuild FKs that pointed to us if we previously had to drop them
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
-            for rel in new_field.model._meta.get_all_related_objects():
+            for rel in new_field.model._meta.get_fields(data=False, related_objects=True):
                 self.execute(
                     self.sql_create_fk % {
                         "table": self.quote_name(rel.model._meta.db_table),
@@ -820,8 +820,8 @@ class BaseDatabaseSchemaEditor(object):
             new_field.rel.through,
             # We need the field that points to the target model, so we can tell alter_field to change it -
             # this is m2m_reverse_field_name() (as opposed to m2m_field_name, which points to our model)
-            old_field.rel.through._meta.get_field_by_name(old_field.m2m_reverse_field_name())[0],
-            new_field.rel.through._meta.get_field_by_name(new_field.m2m_reverse_field_name())[0],
+            old_field.rel.through._meta.get_field(old_field.m2m_reverse_field_name(), related_objects=True, related_m2m=True, virtual=True),
+            new_field.rel.through._meta.get_field(new_field.m2m_reverse_field_name(), related_objects=True, related_m2m=True, virtual=True),
         )
 
     def _create_index_name(self, model, column_names, suffix=""):

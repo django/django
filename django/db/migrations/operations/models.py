@@ -116,8 +116,8 @@ class RenameModel(Operation):
         # Get all of the related objects we need to repoint
         apps = state.render(skip_cache=True)
         model = apps.get_model(app_label, self.old_name)
-        related_objects = model._meta.get_all_related_objects()
-        related_m2m_objects = model._meta.get_all_related_many_to_many_objects()
+        related_objects = model._meta.get_fields(data=False, related_objects=True)
+        related_m2m_objects = model._meta.get_fields(data=False, related_m2m=True)
         # Rename the model
         state.models[app_label, self.new_name.lower()] = state.models[app_label, self.old_name.lower()]
         state.models[app_label, self.new_name.lower()].name = self.new_name
@@ -153,8 +153,8 @@ class RenameModel(Operation):
                 new_model._meta.db_table,
             )
             # Alter the fields pointing to us
-            related_objects = old_model._meta.get_all_related_objects()
-            related_m2m_objects = old_model._meta.get_all_related_many_to_many_objects()
+            related_objects = old_model._meta.get_fields(data=False, related_objects=True)
+            related_m2m_objects = old_model._meta.get_fields(data=False, related_m2m=True)
             for related_object in (related_objects + related_m2m_objects):
                 if related_object.model == old_model:
                     model = new_model
@@ -167,7 +167,7 @@ class RenameModel(Operation):
                     )
                 to_field = new_apps.get_model(
                     *related_key
-                )._meta.get_field_by_name(related_object.field.name)[0]
+                )._meta.get_field(related_object.field.name, related_objects=True, related_m2m=True, virtual=True)
                 schema_editor.alter_field(
                     model,
                     related_object.field,
@@ -322,11 +322,11 @@ class AlterOrderWithRespectTo(Operation):
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
             # Remove a field if we need to
             if from_model._meta.order_with_respect_to and not to_model._meta.order_with_respect_to:
-                schema_editor.remove_field(from_model, from_model._meta.get_field_by_name("_order")[0])
+                schema_editor.remove_field(from_model, from_model._meta.get_field("_order", related_objects=True, related_m2m=True, virtual=True))
             # Add a field if we need to (altering the column is untouched as
             # it's likely a rename)
             elif to_model._meta.order_with_respect_to and not from_model._meta.order_with_respect_to:
-                field = to_model._meta.get_field_by_name("_order")[0]
+                field = to_model._meta.get_field("_order", related_objects=True, related_m2m=True, virtual=True)
                 schema_editor.add_field(
                     from_model,
                     field,
