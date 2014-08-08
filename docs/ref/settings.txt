@@ -1317,6 +1317,21 @@ example, this will default to '/tmp' on \*nix-style operating systems.
 
 See :doc:`/topics/files` for details.
 
+.. setting:: FILE_UPLOAD_USETIME_DUPLICATE
+
+FILE_UPLOAD_USETIME_DUPLICATE
+-----------------------------
+
+.. versionadded:: 1.8
+
+Default: ``False``
+
+The mode to decide how to determine the new uploaded filename when a file with the same
+name already exists in the storage.
+
+If :setting:`FILE_UPLOAD_USETIME_DUPLICATE` is set to ``True``, then
+the current timestamp will be appended to the filename.
+
 .. setting:: FIRST_DAY_OF_WEEK
 
 FIRST_DAY_OF_WEEK
