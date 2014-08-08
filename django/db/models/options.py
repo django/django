@@ -24,17 +24,17 @@ RelationTree = namedtuple('RelationTree', ['related_objects', 'related_m2m'])
 
 EMPTY_RELATION_TREE = RelationTree(tuple(), tuple())
 
+IMMUTABLE_WARNING = (
+    "The return type of get_fields() should never be mutated. If you want "
+    "to manipulate this list for your own use, make a copy first."
+)
+
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save', 'default_related_name')
-
-IMMUTABLE_WARNING = (
-    "The return type of get_fields() should never be mutated. If you want "
-    "to manipulate this list for your own use, make a copy first."
-)
 
 
 @lru_cache(maxsize=None)
@@ -58,6 +58,26 @@ def _map_model_details(opts, link):
     return link, model, direct, m2m
 
 
+class raise_deprecation(object):
+
+    def __init__(self, suggested_alternative):
+        self.suggested_alternative = suggested_alternative
+
+    def __call__(self, fn):
+
+        def wrapper(*args, **kwargs):
+            warnings.warn(
+                "'%s is an unofficial API that has been deprecated. "
+                "You may be able to replace it with '%s'" % (
+                    fn.__name__,
+                    self.suggested_alternative,
+                ),
+                RemovedInDjango20Warning, stacklevel=2
+            )
+            return fn(*args, **kwargs)
+        return wrapper
+
+
 def normalize_together(option_together):
     """
     option_together can be either a tuple of tuples, or a single
@@ -78,26 +98,6 @@ def normalize_together(option_together):
         # If the value of option_together isn't valid, return it
         # verbatim; this will be picked up by the check framework later.
         return option_together
-
-
-class raise_deprecation(object):
-
-    def __init__(self, suggested_alternative):
-        self.suggested_alternative = suggested_alternative
-
-    def __call__(self, fn):
-
-        def wrapper(*args, **kwargs):
-            warnings.warn(
-                "'%s is an unofficial API that has been deprecated. "
-                "You may be able to replace it with '%s'" % (
-                    fn.__name__,
-                    self.suggested_alternative,
-                ),
-                RemovedInDjango20Warning, stacklevel=2
-            )
-            return fn(*args, **kwargs)
-        return wrapper
 
 
 @python_2_unicode_compatible
@@ -177,59 +177,6 @@ class Options(object):
     def installed(self):
         return self.app_config is not None
 
-    @property
-    def verbose_name_raw(self):
-        """
-        There are a few places where the untranslated verbose name is needed
-        (so that we get the same value regardless of currently active
-        locale).
-        """
-        lang = get_language()
-        deactivate_all()
-        raw = force_text(self.verbose_name)
-        activate(lang)
-        return raw
-
-    @property
-    def swapped(self):
-        """
-        Has this model been swapped out for another? If so, return the model
-        name of the replacement; otherwise, return None.
-
-        For historical reasons, model name lookups using get_model() are
-        case insensitive, so we make sure we are case insensitive here.
-        """
-        if self.swappable:
-            model_label = '%s.%s' % (self.app_label, self.model_name)
-            swapped_for = getattr(settings, self.swappable, None)
-            if swapped_for:
-                try:
-                    swapped_label, swapped_object = swapped_for.split('.')
-                except ValueError:
-                    # setting not in the format app_label.model_name
-                    # raising ImproperlyConfigured here causes problems with
-                    # test cleanup code - instead it is raised in get_user_model
-                    # or as part of validation.
-                    return swapped_for
-
-                if '%s.%s' % (swapped_label, swapped_object.lower()) not in (None, model_label):
-                    return swapped_for
-        return None
-
-    def setup_pk(self, field):
-        if not self.pk and field.primary_key:
-            self.pk = field
-            field.serialize = False
-
-    def setup_proxy(self, target):
-        """
-        Does the internal setup so that the current model is a proxy for
-        "target".
-        """
-        self.pk = target._meta.pk
-        self.proxy_for_model = target
-        self.db_table = target._meta.db_table
-
     def contribute_to_class(self, cls, name):
         from django.db import connection
         from django.db.backends.utils import truncate_name
@@ -285,118 +232,6 @@ class Options(object):
             self.db_table = "%s_%s" % (self.app_label, self.model_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
 
-    def _populate_directed_relation_graph(self):
-        """
-        This method is used by each model to find
-        related m2m and objects. As this method is very
-        expensive and is accessed frequently
-        (it looks up every field in a model,
-        in every app), it is computed on first access
-        and then is set as a property on every model.
-        """
-        related_objects_graph = defaultdict(list)
-        related_m2m_graph = defaultdict(list)
-
-        all_models = self.apps.get_models(include_auto_created=True)
-        for model in all_models:
-            for f in chain(model._meta.fields, model._meta.virtual_fields):
-                # Check if the field has a relation to another model
-                if hasattr(f, 'rel') and f.rel and f.has_class_relation:
-                    # Set options_instance -> field
-                    related_objects_graph[f.rel.to._meta].append(f)
-
-            if not model._meta.auto_created:
-                # Many to many relations are never auto-created
-                for f in model._meta.many_to_many:
-                    # Check if the field has a relation to another model
-                    if f.rel and not isinstance(f.rel.to, six.string_types):
-                        # Set options_instance -> field
-                        related_m2m_graph[f.rel.to._meta].append(f)
-
-        for model in all_models:
-            # Set the realtion_tree using the internal __dict__.
-            # In this way we avoid calling the cached property.
-            # In attribute lookup, __dict__ takes precedence over
-            # a data descriptor (such as @cached_property). This
-            # means that the _meta.relation_tree is only called
-            # if related_objects is not in __dict__.
-            model._meta.__dict__['relation_tree'] = RelationTree(
-                related_objects=tuple(related_objects_graph[model._meta]),
-                related_m2m=tuple(related_m2m_graph[model._meta]),
-            )
-
-    @cached_property
-    def relation_tree(self):
-        # If cache is not present, populate the cache
-        self._populate_directed_relation_graph()
-        try:
-            return self.__dict__['relation_tree']
-        except KeyError:
-            return EMPTY_RELATION_TREE
-
-    def add_field(self, field, virtual=False):
-        # Insert the given field in the order in which it was created, using
-        # the "creation_counter" attribute of the field.
-        # Move many-to-many related fields from self.fields into
-        # self.many_to_many.
-        if virtual:
-            self.virtual_fields.append(field)
-
-        elif field.rel and isinstance(field.rel, ManyToManyRel):
-            self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
-        else:
-            self.local_fields.insert(bisect(self.local_fields, field), field)
-            self.setup_pk(field)
-        self._expire_cache()
-
-    def get_base_chain(self, model):
-        """
-        Returns a list of parent classes leading to 'model' (order from closet
-        to most distant ancestor). This has to handle the case were 'model' is
-        a grandparent or even more distant relation.
-        """
-        if not self.parents:
-            return None
-        if model in self.parents:
-            return [model]
-        for parent in self.parents:
-            res = parent._meta.get_base_chain(model)
-            if res:
-                res.insert(0, parent)
-                return res
-        return None
-
-    def get_parent_list(self):
-        """
-        Returns a list of all the ancestor of this model as a list. Useful for
-        determining if something is an ancestor, regardless of lineage.
-        """
-        result = set()
-        for parent in self.parents:
-            result.add(parent)
-            result.update(parent._meta.get_parent_list())
-        return result
-
-    def get_ancestor_link(self, ancestor):
-        """
-        Returns the field on the current model which points to the given
-        "ancestor". This is possible an indirect link (a pointer to a parent
-        model, which points, eventually, to the ancestor). Used when
-        constructing table joins for model inheritance.
-
-        Returns None if the model isn't an ancestor of this one.
-        """
-        if ancestor in self.parents:
-            return self.parents[ancestor]
-        for parent in self.parents:
-            # Tries to get a link field from the immediate parent
-            parent_link = parent._meta.get_ancestor_link(ancestor)
-            if parent_link:
-                # In case of a proxied model, the first link
-                # of the chain to the ancestor is that parent
-                # links
-                return self.parents[parent] or parent_link
-
     def _prepare(self, model):
         if self.order_with_respect_to:
             self.order_with_respect_to = self.get_field(self.order_with_respect_to)
@@ -424,14 +259,34 @@ class Options(object):
                         auto_created=True)
                 model.add_to_class('id', auto)
 
-    def _expire_cache(self):
-        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',):
-            try:
-                delattr(self, cache_key)
-            except AttributeError:
-                pass
-        self._get_field_cache = {}
-        self._get_fields_cache = {}
+    def add_field(self, field, virtual=False):
+        # Insert the given field in the order in which it was created, using
+        # the "creation_counter" attribute of the field.
+        # Move many-to-many related fields from self.fields into
+        # self.many_to_many.
+        if virtual:
+            self.virtual_fields.append(field)
+
+        elif field.rel and isinstance(field.rel, ManyToManyRel):
+            self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
+        else:
+            self.local_fields.insert(bisect(self.local_fields, field), field)
+            self.setup_pk(field)
+        self._expire_cache()
+
+    def setup_pk(self, field):
+        if not self.pk and field.primary_key:
+            self.pk = field
+            field.serialize = False
+
+    def setup_proxy(self, target):
+        """
+        Does the internal setup so that the current model is a proxy for
+        "target".
+        """
+        self.pk = target._meta.pk
+        self.proxy_for_model = target
+        self.db_table = target._meta.db_table
 
     def __repr__(self):
         return '<Options for %s>' % self.object_name
@@ -439,7 +294,90 @@ class Options(object):
     def __str__(self):
         return "%s.%s" % (smart_text(self.app_label), smart_text(self.model_name))
 
-    ### PUBLICLY USABLE AND STABLE APIS GO BELOW THIS LINE ###
+    @property
+    def verbose_name_raw(self):
+        """
+        There are a few places where the untranslated verbose name is needed
+        (so that we get the same value regardless of currently active
+        locale).
+        """
+        lang = get_language()
+        deactivate_all()
+        raw = force_text(self.verbose_name)
+        activate(lang)
+        return raw
+
+    @property
+    def swapped(self):
+        """
+        Has this model been swapped out for another? If so, return the model
+        name of the replacement; otherwise, return None.
+
+        For historical reasons, model name lookups using get_model() are
+        case insensitive, so we make sure we are case insensitive here.
+        """
+        if self.swappable:
+            model_label = '%s.%s' % (self.app_label, self.model_name)
+            swapped_for = getattr(settings, self.swappable, None)
+            if swapped_for:
+                try:
+                    swapped_label, swapped_object = swapped_for.split('.')
+                except ValueError:
+                    # setting not in the format app_label.model_name
+                    # raising ImproperlyConfigured here causes problems with
+                    # test cleanup code - instead it is raised in get_user_model
+                    # or as part of validation.
+                    return swapped_for
+
+                if '%s.%s' % (swapped_label, swapped_object.lower()) not in (None, model_label):
+                    return swapped_for
+        return None
+
+    @cached_property
+    def fields(self):
+        """
+        Returns a list of all data fields on the model and its parents.
+        All hidden and proxy fields are omitted.
+        """
+        return self.get_fields()
+
+    @cached_property
+    def concrete_fields(self):
+        """
+        Returns a list of all concrete data fields on the model and its parents.
+        All hidden and proxy fields are omitted.
+        """
+        return [f for f in self.fields if f.column is not None]
+
+    @cached_property
+    def local_concrete_fields(self):
+        """
+        Returns a list of all concrete data fields on the model.
+        All hidden and proxy fields are omitted.
+        """
+        return [f for f in self.local_fields if f.column is not None]
+
+    @raise_deprecation(suggested_alternative="get_fields()")
+    def get_fields_with_model(self):
+        return [self._map_model(f) for f in self.get_fields()]
+
+    @raise_deprecation(suggested_alternative="get_fields()")
+    def get_concrete_fields_with_model(self):
+        return [self._map_model(f) for f in self.concrete_fields]
+
+    @cached_property
+    def many_to_many(self):
+        """
+        Returns a list of all many to many fields on the model and
+        its parents.
+        All hidden and proxy fields are omitted.
+        """
+        return self.get_fields(data=False, m2m=True)
+
+    @raise_deprecation(suggested_alternative="get_fields()")
+    def get_m2m_with_model(self):
+        return [self._map_model(f) for f in
+                self.get_fields(data=False, m2m=True)]
 
     def get_field(self, field_name, m2m=True, data=True, related_objects=False, related_m2m=False, virtual=True, **kwargs):
         """
@@ -491,6 +429,163 @@ class Options(object):
             return field_map[field_name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
+
+    @raise_deprecation(suggested_alternative="get_field()")
+    def get_field_by_name(self, name):
+        return self._map_model_details(self.get_field(
+            name, m2m=True, related_objects=True,
+            related_m2m=True, virtual=True,
+        ))
+
+    @raise_deprecation(suggested_alternative="field_names")
+    def get_all_field_names(self):
+        return self.field_names
+
+    @raise_deprecation(suggested_alternative="get_fields()")
+    def get_all_related_objects(self, local_only=False, include_hidden=False,
+                                include_proxy_eq=False):
+        include_parents = local_only is False
+        fields = self.get_fields(
+            data=False, related_objects=True,
+            include_parents=include_parents,
+            include_hidden=include_hidden,
+        )
+
+        if include_proxy_eq:
+            children = chain.from_iterable(c.relation_tree.related_objects
+                                           for c in self.concrete_model._meta.proxied_children
+                                           if c is not self)
+            relations = (f.related for f in children
+                         if include_hidden or not f.related.field.rel.is_hidden())
+            fields = chain(fields, relations)
+
+        return list(fields)
+
+    @raise_deprecation(suggested_alternative="get_fields()")
+    def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
+                                           include_proxy_eq=False):
+        return [self._map_model(f) for f in
+                self.get_all_related_objects(
+                    local_only=local_only,
+                    include_hidden=include_hidden,
+                    include_proxy_eq=include_proxy_eq,
+                )]
+
+    @raise_deprecation(suggested_alternative="get_fields()")
+    def get_all_related_many_to_many_objects(self, local_only=False):
+        return list(self.get_fields(data=False, related_m2m=True, include_parents=local_only is not True))
+
+    @raise_deprecation(suggested_alternative="get_fields()")
+    def get_all_related_m2m_objects_with_model(self):
+        return [self._map_model(f) for f in self.get_fields(data=False, related_m2m=True)]
+
+    def get_base_chain(self, model):
+        """
+        Returns a list of parent classes leading to 'model' (order from closet
+        to most distant ancestor). This has to handle the case were 'model' is
+        a grandparent or even more distant relation.
+        """
+        if not self.parents:
+            return None
+        if model in self.parents:
+            return [model]
+        for parent in self.parents:
+            res = parent._meta.get_base_chain(model)
+            if res:
+                res.insert(0, parent)
+                return res
+        return None
+
+    def get_parent_list(self):
+        """
+        Returns a list of all the ancestor of this model as a list. Useful for
+        determining if something is an ancestor, regardless of lineage.
+        """
+        result = set()
+        for parent in self.parents:
+            result.add(parent)
+            result.update(parent._meta.get_parent_list())
+        return result
+
+    def get_ancestor_link(self, ancestor):
+        """
+        Returns the field on the current model which points to the given
+        "ancestor". This is possible an indirect link (a pointer to a parent
+        model, which points, eventually, to the ancestor). Used when
+        constructing table joins for model inheritance.
+
+        Returns None if the model isn't an ancestor of this one.
+        """
+        if ancestor in self.parents:
+            return self.parents[ancestor]
+        for parent in self.parents:
+            # Tries to get a link field from the immediate parent
+            parent_link = parent._meta.get_ancestor_link(ancestor)
+            if parent_link:
+                # In case of a proxied model, the first link
+                # of the chain to the ancestor is that parent
+                # links
+                return self.parents[parent] or parent_link
+
+    def _populate_directed_relation_graph(self):
+        """
+        This method is used by each model to find
+        related m2m and objects. As this method is very
+        expensive and is accessed frequently
+        (it looks up every field in a model,
+        in every app), it is computed on first access
+        and then is set as a property on every model.
+        """
+        related_objects_graph = defaultdict(list)
+        related_m2m_graph = defaultdict(list)
+
+        all_models = self.apps.get_models(include_auto_created=True)
+        for model in all_models:
+            for f in chain(model._meta.fields, model._meta.virtual_fields):
+                # Check if the field has a relation to another model
+                if hasattr(f, 'rel') and f.rel and f.has_class_relation:
+                    # Set options_instance -> field
+                    related_objects_graph[f.rel.to._meta].append(f)
+
+            if not model._meta.auto_created:
+                # Many to many relations are never auto-created
+                for f in model._meta.many_to_many:
+                    # Check if the field has a relation to another model
+                    if f.rel and not isinstance(f.rel.to, six.string_types):
+                        # Set options_instance -> field
+                        related_m2m_graph[f.rel.to._meta].append(f)
+
+        for model in all_models:
+            # Set the realtion_tree using the internal __dict__.
+            # In this way we avoid calling the cached property.
+            # In attribute lookup, __dict__ takes precedence over
+            # a data descriptor (such as @cached_property). This
+            # means that the _meta.relation_tree is only called
+            # if related_objects is not in __dict__.
+            model._meta.__dict__['relation_tree'] = RelationTree(
+                related_objects=tuple(related_objects_graph[model._meta]),
+                related_m2m=tuple(related_m2m_graph[model._meta]),
+            )
+
+    @cached_property
+    def relation_tree(self):
+        # If cache is not present, populate the cache
+        self._populate_directed_relation_graph()
+        try:
+            return self.__dict__['relation_tree']
+        except KeyError:
+            return EMPTY_RELATION_TREE
+
+
+
+    def _expire_cache(self):
+        for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',):
+            try:
+                delattr(self, cache_key)
+            except AttributeError:
+                pass
+        self._get_field_cache = {}
+        self._get_fields_cache = {}
 
     def get_fields(self, m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False,
                    include_parents=True, include_hidden=False, **kwargs):
@@ -634,19 +729,6 @@ class Options(object):
         # return a shallow copy of the results
         return fields
 
-    ###########################################################################
-    # Cached properties for fast access
-    ###########################################################################
-
-    @cached_property
-    def many_to_many(self):
-        """
-        Returns a list of all many to many fields on the model and
-        its parents.
-        All hidden and proxy fields are omitted.
-        """
-        return self.get_fields(data=False, m2m=True)
-
     @cached_property
     def field_names(self):
         """
@@ -659,93 +741,3 @@ class Options(object):
                                           related_m2m=True, virtual=True, export_name_map=True)):
             res.update(name for name in names if not name.endswith('+'))
         return list(res)
-
-    @cached_property
-    def fields(self):
-        """
-        Returns a list of all data fields on the model and its parents.
-        All hidden and proxy fields are omitted.
-        """
-        return self.get_fields()
-
-    @cached_property
-    def concrete_fields(self):
-        """
-        Returns a list of all concrete data fields on the model and its parents.
-        All hidden and proxy fields are omitted.
-        """
-        return [f for f in self.fields if f.column is not None]
-
-    @cached_property
-    def local_concrete_fields(self):
-        """
-        Returns a list of all concrete data fields on the model.
-        All hidden and proxy fields are omitted.
-        """
-        return [f for f in self.local_fields if f.column is not None]
-
-    ###########################################################################
-    # Deprecated methods
-    ###########################################################################
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_fields_with_model(self):
-        return [self._map_model(f) for f in self.get_fields()]
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_concrete_fields_with_model(self):
-        return [self._map_model(f) for f in self.concrete_fields]
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_m2m_with_model(self):
-        return [self._map_model(f) for f in
-                self.get_fields(data=False, m2m=True)]
-
-    @raise_deprecation(suggested_alternative="get_field()")
-    def get_field_by_name(self, name):
-        return self._map_model_details(self.get_field(
-            name, m2m=True, related_objects=True,
-            related_m2m=True, virtual=True,
-        ))
-
-    @raise_deprecation(suggested_alternative="field_names")
-    def get_all_field_names(self):
-        return self.field_names
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_all_related_objects(self, local_only=False, include_hidden=False,
-                                include_proxy_eq=False):
-        include_parents = local_only is False
-        fields = self.get_fields(
-            data=False, related_objects=True,
-            include_parents=include_parents,
-            include_hidden=include_hidden,
-        )
-
-        if include_proxy_eq:
-            children = chain.from_iterable(c.relation_tree.related_objects
-                                           for c in self.concrete_model._meta.proxied_children
-                                           if c is not self)
-            relations = (f.related for f in children
-                         if include_hidden or not f.related.field.rel.is_hidden())
-            fields = chain(fields, relations)
-
-        return list(fields)
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
-                                           include_proxy_eq=False):
-        return [self._map_model(f) for f in
-                self.get_all_related_objects(
-                    local_only=local_only,
-                    include_hidden=include_hidden,
-                    include_proxy_eq=include_proxy_eq,
-                )]
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_all_related_many_to_many_objects(self, local_only=False):
-        return list(self.get_fields(data=False, related_m2m=True, include_parents=local_only is not True))
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_all_related_m2m_objects_with_model(self):
-        return [self._map_model(f) for f in self.get_fields(data=False, related_m2m=True)]
