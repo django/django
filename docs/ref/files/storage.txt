@@ -38,13 +38,13 @@ The FileSystemStorage Class
 
     .. attribute:: location
 
-	Absolute path to the directory that will hold the files.
+        Absolute path to the directory that will hold the files.
         Defaults to the value of your :setting:`MEDIA_ROOT` setting.
 
     .. attribute:: base_url
 
-	URL that serves the files stored at this location.
-	Defaults to the value of your :setting:`MEDIA_URL` setting.
+        URL that serves the files stored at this location.
+        Defaults to the value of your :setting:`MEDIA_URL` setting.
 
     .. attribute:: file_permissions_mode
 
