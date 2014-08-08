@@ -4,17 +4,7 @@ Running Django on Jython
 
 .. index:: Jython, Java, JVM
 
-As of January 2014, the latest release of `django-jython`_ supports Django 1.3
-which is no longer supported (receiving fixes or security updates) by the
-Django Project. We therefore recommend that you do not try to run Django on
-Jython at this time.
-
-The django-jython project is `seeking contributors`_ to help update its code for
-newer versions of Django. You can select an older version of this documentation
-to see the instructions we had for using Django with Jython. If django-jython
-is updated and please `file a ticket`_ and we'll be happy to update our
-documentation accordingly.
+`django-jython`_ supports Django 1.7. Please use that version of the
+documentation for details.
 
 .. _`django-jython`: http://code.google.com/p/django-jython/
-.. _`seeking contributors`: https://groups.google.com/d/topic/django-jython-dev/oZpKucQpz7I/discussion
-.. _`file a ticket`: https://code.djangoproject.com/newticket
