@@ -942,6 +942,17 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(AdminSeleniumWebDriverTestCas
             self.assertSelectOptions(to_box,
                         [str(self.peter.id), str(self.jason.id)])
 
+            # -----------------------------------------------------------------
+            # Check that pressing enter on a filtered option sends it properly
+            # to the 'to' box.
+            self.get_select_option(to_box, str(self.jason.id)).click()
+            self.selenium.find_element_by_css_selector(remove_link).click()
+            input.send_keys('ja')
+            self.assertSelectOptions(from_box, [str(self.jason.id)])
+            input.send_keys([Keys.ENTER])
+            self.assertSelectOptions(to_box, [str(self.peter.id), str(self.jason.id)])
+            input.send_keys([Keys.BACK_SPACE, Keys.BACK_SPACE])
+
         # Save and check that everything is properly stored in the database ---
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.wait_page_loaded()
