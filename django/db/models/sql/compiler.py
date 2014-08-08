@@ -117,7 +117,7 @@ class SQLCompiler(object):
 
         if self.query.distinct:
             result.append(self.connection.ops.distinct_sql(distinct_fields))
-        params.extend(o_params)
+
         result.append(', '.join(out_cols + self.ordering_aliases))
         params.extend(s_params)
         params.extend(self.ordering_params)
@@ -146,6 +146,7 @@ class SQLCompiler(object):
 
         if ordering:
             result.append('ORDER BY %s' % ', '.join(ordering))
+            params.extend(o_params)
 
         if with_limits:
             if self.query.high_mark is not None:
