@@ -86,5 +86,13 @@ the provided filename into account. The ``name`` argument passed to this method
 will have already cleaned to a filename valid for the storage system, according
 to the ``get_valid_name()`` method described above.
 
-The code provided on ``Storage`` simply appends ``"_1"``, ``"_2"``, etc. to the
-filename until it finds one that's available in the destination directory.
+.. versionchanged:: 1.4.14
+
+    If a file with ``name`` already exists, an underscore plus a random 7
+    character alphanumeric string is appended to the filename before the
+    extension.
+
+    Previously, an underscore followed by a number (e.g. ``"_1"``, ``"_2"``,
+    etc.) was appended to the filename until an avaible name in the destination
+    directory was found. A malicious user could exploit this deterministic
+    algorithm to create a denial-of-service attack.

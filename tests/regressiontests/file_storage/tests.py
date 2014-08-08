@@ -23,7 +23,7 @@ from django.core.files.images import get_image_dimensions
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import UploadedFile
 from django.test import SimpleTestCase
-from django.utils import unittest
+from django.utils import six, unittest
 
 # Try to import PIL in either of the two ways it can end up installed.
 # Checking for the existence of Image is enough for CPython, but
@@ -35,6 +35,9 @@ except ImportError:
         import Image, _imaging
     except ImportError:
         Image = None
+
+
+FILE_SUFFIX_REGEX = '[A-Za-z0-9]{7}'
 
 
 class GetStorageClassTests(SimpleTestCase):
@@ -417,10 +420,9 @@ class FileSaveRaceConditionTest(unittest.TestCase):
         self.thread.start()
         name = self.save_file('conflict')
         self.thread.join()
-        self.assertTrue(self.storage.exists('conflict'))
-        self.assertTrue(self.storage.exists('conflict_1'))
-        self.storage.delete('conflict')
-        self.storage.delete('conflict_1')
+        files = sorted(os.listdir(self.storage_dir))
+        self.assertEqual(files[0], 'conflict')
+        six.assertRegex(self, files[1], 'conflict_%s' % FILE_SUFFIX_REGEX)
 
 class FileStoragePermissions(unittest.TestCase):
     def setUp(self):
@@ -457,9 +459,10 @@ class FileStoragePathParsing(unittest.TestCase):
         self.storage.save('dotted.path/test', ContentFile("1"))
         self.storage.save('dotted.path/test', ContentFile("2"))
 
+        files = sorted(os.listdir(os.path.join(self.storage_dir, 'dotted.path')))
         self.assertFalse(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test')))
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test_1')))
+        self.assertEqual(files[0], 'test')
+        six.assertRegex(self, files[1], 'test_%s' % FILE_SUFFIX_REGEX)
 
     def test_first_character_dot(self):
         """
@@ -472,10 +475,12 @@ class FileStoragePathParsing(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test')))
         # Before 2.6, a leading dot was treated as an extension, and so
         # underscore gets added to beginning instead of end.
+        files = sorted(os.listdir(os.path.join(self.storage_dir, 'dotted.path')))
+        self.assertEqual(files[0], '.test')
         if sys.version_info < (2, 6):
-            self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/_1.test')))
+            six.assertRegex(self, files[1], '_%s.test' % FILE_SUFFIX_REGEX)
         else:
-            self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
+            six.assertRegex(self, files[1], '.test_%s' % FILE_SUFFIX_REGEX)
 
 class DimensionClosingBug(unittest.TestCase):
     """
