@@ -166,8 +166,6 @@ class Options(object):
             warning=IMMUTABLE_WARNING
         )
 
-    ### INTERNAL METHODS AND PROPERTIES GO BELOW THIS LINE ###
-
     @property
     def app_config(self):
         # Don't go through get_app_config to avoid triggering imports.
