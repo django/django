@@ -30,6 +30,9 @@ from django.utils._os import upath
 from .models import Storage, temp_storage, temp_storage_location
 
 
+FILE_SUFFIX_REGEX = '[A-Za-z0-9]{7}'
+
+
 class GetStorageClassTests(SimpleTestCase):
 
     def test_get_filesystem_storage(self):
@@ -457,14 +460,16 @@ class FileFieldStorageTests(unittest.TestCase):
         # Save another file with the same name.
         obj2 = Storage()
         obj2.normal.save("django_test.txt", ContentFile("more content"))
-        self.assertEqual(obj2.normal.name, "tests/django_test_1.txt")
+        obj2_name = obj2.normal.name
+        six.assertRegex(self, obj2_name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX)
         self.assertEqual(obj2.normal.size, 12)
         obj2.normal.close()
 
         # Deleting an object does not delete the file it uses.
         obj2.delete()
         obj2.normal.save("django_test.txt", ContentFile("more content"))
-        self.assertEqual(obj2.normal.name, "tests/django_test_2.txt")
+        self.assertNotEqual(obj2_name, obj2.normal.name)
+        six.assertRegex(self, obj2.normal.name, "tests/django_test_%s.txt" % FILE_SUFFIX_REGEX)
         obj2.normal.close()
 
     def test_filefield_read(self):
@@ -477,17 +482,18 @@ class FileFieldStorageTests(unittest.TestCase):
         self.assertEqual(list(obj.normal.chunks(chunk_size=2)), [b"co", b"nt", b"en", b"t"])
         obj.normal.close()
 
-    def test_file_numbering(self):
-        # Multiple files with the same name get _N appended to them.
-        objs = [Storage() for i in range(3)]
+    def test_duplicate_filename(self):
+        # Multiple files with the same name get _(7 random chars) appended to them.
+        objs = [Storage() for i in range(2)]
         for o in objs:
             o.normal.save("multiple_files.txt", ContentFile("Same Content"))
-        self.assertEqual(
-            [o.normal.name for o in objs],
-            ["tests/multiple_files.txt", "tests/multiple_files_1.txt", "tests/multiple_files_2.txt"]
-        )
-        for o in objs:
-            o.delete()
+        try:
+            names = [o.normal.name for o in objs]
+            self.assertEqual(names[0], "tests/multiple_files.txt")
+            six.assertRegex(self, names[1], "tests/multiple_files_%s.txt" % FILE_SUFFIX_REGEX)
+        finally:
+            for o in objs:
+                o.delete()
 
     def test_filefield_default(self):
         # Default values allow an object to access a single file.
@@ -579,10 +585,9 @@ class FileSaveRaceConditionTest(unittest.TestCase):
         self.thread.start()
         self.save_file('conflict')
         self.thread.join()
-        self.assertTrue(self.storage.exists('conflict'))
-        self.assertTrue(self.storage.exists('conflict_1'))
-        self.storage.delete('conflict')
-        self.storage.delete('conflict_1')
+        files = sorted(os.listdir(self.storage_dir))
+        self.assertEqual(files[0], 'conflict')
+        six.assertRegex(self, files[1], 'conflict_%s' % FILE_SUFFIX_REGEX)
 
 
 @unittest.skipIf(sys.platform.startswith('win'), "Windows only partially supports umasks and chmod.")
@@ -643,9 +648,10 @@ class FileStoragePathParsing(unittest.TestCase):
         self.storage.save('dotted.path/test', ContentFile("1"))
         self.storage.save('dotted.path/test', ContentFile("2"))
 
+        files = sorted(os.listdir(os.path.join(self.storage_dir, 'dotted.path')))
         self.assertFalse(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test')))
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/test_1')))
+        self.assertEqual(files[0], 'test')
+        six.assertRegex(self, files[1], 'test_%s' % FILE_SUFFIX_REGEX)
 
     def test_first_character_dot(self):
         """
@@ -655,8 +661,10 @@ class FileStoragePathParsing(unittest.TestCase):
         self.storage.save('dotted.path/.test', ContentFile("1"))
         self.storage.save('dotted.path/.test', ContentFile("2"))
 
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test')))
-        self.assertTrue(os.path.exists(os.path.join(self.storage_dir, 'dotted.path/.test_1')))
+        files = sorted(os.listdir(os.path.join(self.storage_dir, 'dotted.path')))
+        self.assertFalse(os.path.exists(os.path.join(self.storage_dir, 'dotted_.path')))
+        self.assertEqual(files[0], '.test')
+        six.assertRegex(self, files[1], '.test_%s' % FILE_SUFFIX_REGEX)
 
 
 class ContentFileStorageTestCase(unittest.TestCase):
