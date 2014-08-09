@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import re
+import warnings
 
 from django import forms
 from django.contrib.auth.models import User
@@ -532,5 +533,8 @@ class ReadOnlyPasswordHashTest(TestCase):
         self.assertIn(_("No password set."), html)
 
     def test_readonly_field_has_changed(self):
+        # Deprecated behaviour Field._has_changed
         field = ReadOnlyPasswordHashField()
-        self.assertFalse(field.has_changed('aaa', 'bbb'))
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            self.assertFalse(field._has_changed('aaa', 'bbb'))
