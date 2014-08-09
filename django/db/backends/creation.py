@@ -379,7 +379,6 @@ class BaseDatabaseCreation(object):
             verbosity=max(verbosity - 1, 0),
             interactive=False,
             database=self.connection.alias,
-            test_database=True,
             test_flush=True,
         )
 

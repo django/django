@@ -45,7 +45,6 @@ class Command(BaseCommand):
         self.interactive = options.get('interactive')
         self.show_traceback = options.get('traceback')
         self.load_initial_data = options.get('load_initial_data')
-        self.test_database = options.get('test_database', False)
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
