@@ -10,7 +10,7 @@ from django.db.transaction import atomic
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
     UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough,
-    AuthorWithEvenLongerName)
+    AuthorWithEvenLongerName, BookWeak)
 
 
 class SchemaTests(TransactionTestCase):
@@ -27,7 +27,8 @@ class SchemaTests(TransactionTestCase):
     models = [
         Author, AuthorWithM2M, Book, BookWithLongName, BookWithSlug,
         BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename, UniqueTest,
-        Thing, TagThrough, BookWithM2MThrough, AuthorWithEvenLongerName
+        Thing, TagThrough, BookWithM2MThrough, AuthorWithEvenLongerName,
+        BookWeak,
     ]
 
     # Utility functions
@@ -149,6 +150,94 @@ class SchemaTests(TransactionTestCase):
                 break
         else:
             self.fail("No FK constraint for author_id found")
+
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_fk_db_constraint(self):
+        "Tests that the db_constraint parameter is respected"
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+            editor.create_model(Author)
+            editor.create_model(BookWeak)
+        # Check that initial tables are there
+        list(Author.objects.all())
+        list(Tag.objects.all())
+        list(BookWeak.objects.all())
+        # Check that BookWeak doesn't have an FK constraint
+        constraints = self.get_constraints(BookWeak._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["author_id"] and details['foreign_key']:
+                self.fail("FK constraint for author_id found")
+        # Make a db_constraint=False FK
+        new_field = ForeignKey(Tag, db_constraint=False)
+        new_field.set_attributes_from_name("tag")
+        with connection.schema_editor() as editor:
+            editor.add_field(
+                Author,
+                new_field,
+            )
+        # Make sure no FK constraint is present
+        constraints = self.get_constraints(Author._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["tag_id"] and details['foreign_key']:
+                self.fail("FK constraint for tag_id found")
+        # Alter to one with a constraint
+        new_field_2 = ForeignKey(Tag)
+        new_field_2.set_attributes_from_name("tag")
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                Author,
+                new_field,
+                new_field_2,
+                strict=True,
+            )
+        # Make sure the new FK constraint is present
+        constraints = self.get_constraints(Author._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["tag_id"] and details['foreign_key']:
+                self.assertEqual(details['foreign_key'], ('schema_tag', 'id'))
+                break
+        else:
+            self.fail("No FK constraint for tag_id found")
+        # Alter to one without a constraint again
+        new_field_2 = ForeignKey(Tag)
+        new_field_2.set_attributes_from_name("tag")
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                Author,
+                new_field_2,
+                new_field,
+                strict=True,
+            )
+        # Make sure no FK constraint is present
+        constraints = self.get_constraints(Author._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["tag_id"] and details['foreign_key']:
+                self.fail("FK constraint for tag_id found")
+
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_m2m_db_constraint(self):
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+            editor.create_model(Author)
+        # Check that initial tables are there
+        list(Author.objects.all())
+        list(Tag.objects.all())
+        # Make a db_constraint=False FK
+        new_field = ManyToManyField("schema.Tag", related_name="authors", db_constraint=False)
+        new_field.contribute_to_class(Author, "tags")
+        # Add the field
+        with connection.schema_editor() as editor:
+            editor.add_field(
+                Author,
+                new_field,
+            )
+        # Make sure no FK constraint is present
+        constraints = self.get_constraints(new_field.rel.through._meta.db_table)
+        for name, details in constraints.items():
+            if details['columns'] == ["tag_id"] and details['foreign_key']:
+                self.fail("FK constraint for tag_id found")
 
     def test_add_field(self):
         """
