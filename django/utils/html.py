@@ -251,6 +251,7 @@ def smart_urlquote(url):
 
     return urlunsplit((scheme, netloc, path, query, fragment))
 
+
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
     Converts any URLs in text into clickable links.
@@ -268,11 +269,31 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
 
     If autoescape is True, the link text and URLs will be autoescaped.
     """
+    safe_input = isinstance(text, SafeData)
+
     def trim_url(x, limit=trim_url_limit):
         if limit is None or len(x) <= limit:
             return x
         return '%s...' % x[:max(0, limit - 3)]
-    safe_input = isinstance(text, SafeData)
+
+    def unescape(text, trail):
+        """
+        If input URL is HTML-escaped, unescape it so as we can safely feed it to
+        smart_urlquote. For example:
+        http://example.com?x=1&amp;y=&lt;2&gt; => http://example.com?x=1&y=<2>
+        """
+        if not safe_input:
+            return text, text, trail
+        unescaped = (text + trail).replace('&amp;', '&').replace('&lt;', '<'
+                                 ).replace('&gt;', '>').replace('&quot;', '"'
+                                 ).replace('&#39;', "'")
+        # ';' in trail can be either trailing punctuation or end-of-entity marker
+        if unescaped.endswith(';'):
+            return text, unescaped[:-1], trail
+        else:
+            text += trail
+            return text, unescaped, ''
+
     words = word_split_re.split(force_text(text))
     for i, word in enumerate(words):
         if '.' in word or '@' in word or ':' in word:
@@ -296,9 +317,11 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             url = None
             nofollow_attr = ' rel="nofollow"' if nofollow else ''
             if simple_url_re.match(middle):
-                url = smart_urlquote(middle)
+                middle, middle_unescaped, trail = unescape(middle, trail)
+                url = smart_urlquote(middle_unescaped)
             elif simple_url_2_re.match(middle):
-                url = smart_urlquote('http://%s' % middle)
+                middle, middle_unescaped, trail = unescape(middle, trail)
+                url = smart_urlquote('http://%s' % middle_unescaped)
             elif ':' not in middle and simple_email_re.match(middle):
                 local, domain = middle.rsplit('@', 1)
                 try:
@@ -313,7 +336,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                 trimmed = trim_url(middle)
                 if autoescape and not safe_input:
                     lead, trail = escape(lead), escape(trail)
-                    url, trimmed = escape(url), escape(trimmed)
+                    trimmed = escape(trimmed)
                 middle = '<a href="%s"%s>%s</a>' % (url, nofollow_attr, trimmed)
                 words[i] = mark_safe('%s%s%s' % (lead, middle, trail))
             else:
