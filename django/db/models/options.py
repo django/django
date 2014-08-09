@@ -750,4 +750,4 @@ class Options(object):
         for _, names in six.iteritems(self.get_fields(m2m=True, related_objects=True,
                                           related_m2m=True, virtual=True, export_name_map=True)):
             res.update(name for name in names if not name.endswith('+'))
-        return self._make_immutable_fields_list(res)
+        return res

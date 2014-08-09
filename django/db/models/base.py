@@ -1448,8 +1448,7 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Any field name that is not present in field_names
         # Does not exist.
-        all_field_names = set(cls._meta.field_names)
-        invalid_fields.extend(fields - all_field_names)
+        invalid_fields.extend(fields - cls._meta.field_names)
 
         # Any field that is a m2m field should not be allowed
         # ordering
