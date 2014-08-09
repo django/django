@@ -151,8 +151,16 @@ def get_filter_tests():
         'filter-upper01': ('{% autoescape off %}{{ a|upper }} {{ b|upper }}{% endautoescape %}', {"a": "a & b", "b": mark_safe("a &amp; b")}, "A & B A &AMP; B"),
         'filter-upper02': ('{{ a|upper }} {{ b|upper }}', {"a": "a & b", "b": mark_safe("a &amp; b")}, "A &amp; B A &amp;AMP; B"),
 
-        'filter-urlize01': ('{% autoescape off %}{{ a|urlize }} {{ b|urlize }}{% endautoescape %}', {"a": "http://example.com/?x=&y=", "b": mark_safe("http://example.com?x=&amp;y=")}, '<a href="http://example.com/?x=&y=" rel="nofollow">http://example.com/?x=&y=</a> <a href="http://example.com?x=&amp;y=" rel="nofollow">http://example.com?x=&amp;y=</a>'),
-        'filter-urlize02': ('{{ a|urlize }} {{ b|urlize }}', {"a": "http://example.com/?x=&y=", "b": mark_safe("http://example.com?x=&amp;y=")}, '<a href="http://example.com/?x=&amp;y=" rel="nofollow">http://example.com/?x=&amp;y=</a> <a href="http://example.com?x=&amp;y=" rel="nofollow">http://example.com?x=&amp;y=</a>'),
+        'filter-urlize01': (
+            '{% autoescape off %}{{ a|urlize }} {{ b|urlize }}{% endautoescape %}',
+            {"a": "http://example.com/?x=&y=", "b": mark_safe("http://example.com?x=&amp;y=&lt;2&gt;")},
+            '<a href="http://example.com/?x=&y=" rel="nofollow">http://example.com/?x=&y=</a> '
+            '<a href="http://example.com?x=&y=%3C2%3E" rel="nofollow">http://example.com?x=&amp;y=&lt;2&gt;</a>'),
+        'filter-urlize02': (
+            '{{ a|urlize }} {{ b|urlize }}',
+            {"a": "http://example.com/?x=&y=", "b": mark_safe("http://example.com?x=&amp;y=")},
+            '<a href="http://example.com/?x=&y=" rel="nofollow">http://example.com/?x=&amp;y=</a> '
+            '<a href="http://example.com?x=&y=" rel="nofollow">http://example.com?x=&amp;y=</a>'),
         'filter-urlize03': ('{% autoescape off %}{{ a|urlize }}{% endautoescape %}', {"a": mark_safe("a &amp; b")}, 'a &amp; b'),
         'filter-urlize04': ('{{ a|urlize }}', {"a": mark_safe("a &amp; b")}, 'a &amp; b'),
 
@@ -165,8 +173,16 @@ def get_filter_tests():
         'filter-urlize07': ('{{ a|urlize }}', {"a": "Email me at me@example.com"}, 'Email me at <a href="mailto:me@example.com">me@example.com</a>'),
         'filter-urlize08': ('{{ a|urlize }}', {"a": "Email me at <me@example.com>"}, 'Email me at &lt;<a href="mailto:me@example.com">me@example.com</a>&gt;'),
 
-        'filter-urlizetrunc01': ('{% autoescape off %}{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}{% endautoescape %}', {"a": '"Unsafe" http://example.com/x=&y=', "b": mark_safe('&quot;Safe&quot; http://example.com?x=&amp;y=')}, '"Unsafe" <a href="http://example.com/x=&y=" rel="nofollow">http:...</a> &quot;Safe&quot; <a href="http://example.com?x=&amp;y=" rel="nofollow">http:...</a>'),
-        'filter-urlizetrunc02': ('{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}', {"a": '"Unsafe" http://example.com/x=&y=', "b": mark_safe('&quot;Safe&quot; http://example.com?x=&amp;y=')}, '&quot;Unsafe&quot; <a href="http://example.com/x=&amp;y=" rel="nofollow">http:...</a> &quot;Safe&quot; <a href="http://example.com?x=&amp;y=" rel="nofollow">http:...</a>'),
+        'filter-urlizetrunc01': (
+            '{% autoescape off %}{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}{% endautoescape %}',
+            {"a": '"Unsafe" http://example.com/x=&y=', "b": mark_safe('&quot;Safe&quot; http://example.com?x=&amp;y=')},
+            '"Unsafe" <a href="http://example.com/x=&y=" rel="nofollow">http:...</a> '
+            '&quot;Safe&quot; <a href="http://example.com?x=&y=" rel="nofollow">http:...</a>'),
+        'filter-urlizetrunc02': (
+            '{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}',
+            {"a": '"Unsafe" http://example.com/x=&y=', "b": mark_safe('&quot;Safe&quot; http://example.com?x=&amp;y=')},
+            '&quot;Unsafe&quot; <a href="http://example.com/x=&y=" rel="nofollow">http:...</a> '
+            '&quot;Safe&quot; <a href="http://example.com?x=&y=" rel="nofollow">http:...</a>'),
 
         'filter-wordcount01': ('{% autoescape off %}{{ a|wordcount }} {{ b|wordcount }}{% endautoescape %}', {"a": "a & b", "b": mark_safe("a &amp; b")}, "3 3"),
         'filter-wordcount02': ('{{ a|wordcount }} {{ b|wordcount }}', {"a": "a & b", "b": mark_safe("a &amp; b")}, "3 3"),
