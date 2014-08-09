@@ -50,6 +50,15 @@ class Book(models.Model):
         apps = new_apps
 
 
+class BookWeak(models.Model):
+    author = models.ForeignKey(Author, db_constraint=False)
+    title = models.CharField(max_length=100, db_index=True)
+    pub_date = models.DateTimeField()
+
+    class Meta:
+        apps = new_apps
+
+
 class BookWithM2M(models.Model):
     author = models.ForeignKey(Author)
     title = models.CharField(max_length=100, db_index=True)
