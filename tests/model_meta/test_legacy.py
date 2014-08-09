@@ -182,8 +182,11 @@ class GetFieldByNameTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTest
         self.assertIsInstance(field_info[0], GenericRelation)
 
     def test_get_m2m_field_invalid(self):
-        self.assertRaises(
-            FieldDoesNotExist,
-            Person._meta.get_field,
-            **{'field_name': 'm2m_base', 'many_to_many': False}
-        )
+        with warnings.catch_warnings(record=True) as warning:
+            warnings.simplefilter("always")
+            self.assertRaises(
+                FieldDoesNotExist,
+                Person._meta.get_field,
+                **{'field_name': 'm2m_base', 'many_to_many': False}
+            )
+            self.assertEqual([RemovedInDjango20Warning], [w.message.__class__ for w in warning])
