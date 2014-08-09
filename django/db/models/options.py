@@ -420,22 +420,22 @@ class Options(object):
         # NOTE: previous get_field API had a many_to_many key. This key
         # has now become m2m. In order to avoid breaking other's implementation
         # we will catch the use of 'many_to_many'.
-        #if 'many_to_many' in kwargs:
+        if 'many_to_many' in kwargs:
 
             # If no many_to_many fields are wanted, create a new dictionary with
             # without ManyToManyField instances.
-            #if kwargs['many_to_many'] is False:
-                #field_map = dict((name, field) for name, field in six.iteritems(field_map)
-                                 #if not isinstance(field, ManyToManyField))
+            if kwargs['many_to_many'] is False:
+                field_map = dict((name, field) for name, field in six.iteritems(field_map)
+                                 if not isinstance(field, ManyToManyField))
 
             # We always want to throw a warning if many_to_many is used regardless
             # of if it alters the return type or not.
-            #warnings.warn(
-                #"The 'many_to_many' argument on get_fields will be soon "
-                #"deprecated. This parameter has changed in favor of "
-                #"'m2m'. Please change your implementation accordingly.",
-                #RemovedInDjango20Warning
-            #)
+            warnings.warn(
+                "The 'many_to_many' argument on get_fields will be soon "
+                "deprecated. This parameter has changed in favor of "
+                "'m2m'. Please change your implementation accordingly.",
+                RemovedInDjango20Warning
+            )
 
         try:
             # Retreive field instance by name from cached or just-computer field map
