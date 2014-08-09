@@ -15,14 +15,15 @@ class CommandTests(SimpleTestCase):
     def test_command(self):
         out = StringIO()
         management.call_command('dance', stdout=out)
-        self.assertEqual(out.getvalue(),
-            "I don't feel like dancing Rock'n'Roll.\n")
+        self.assertIn("I don't feel like dancing Rock'n'Roll.\n", out.getvalue())
 
     def test_command_style(self):
         out = StringIO()
         management.call_command('dance', style='Jive', stdout=out)
-        self.assertEqual(out.getvalue(),
-            "I don't feel like dancing Jive.\n")
+        self.assertIn("I don't feel like dancing Jive.\n", out.getvalue())
+        # Passing options as arguments also works (thanks argparse)
+        management.call_command('dance', '--style', 'Jive', stdout=out)
+        self.assertIn("I don't feel like dancing Jive.\n", out.getvalue())
 
     def test_language_preserved(self):
         out = StringIO()
@@ -75,6 +76,17 @@ class CommandTests(SimpleTestCase):
         finally:
             if current_path is not None:
                 os.environ['PATH'] = current_path
+
+    def test_call_command_option_parsing(self):
+        """
+        When passing the long option name to call_command, the available option
+        key is the option dest name (#22985).
+        """
+        out = StringIO()
+        management.call_command('dance', stdout=out, opt_3=True)
+        self.assertIn("option3", out.getvalue())
+        self.assertNotIn("opt_3", out.getvalue())
+        self.assertNotIn("opt-3", out.getvalue())
 
     def test_optparse_compatibility(self):
         """

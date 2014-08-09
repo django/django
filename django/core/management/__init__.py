@@ -102,8 +102,12 @@ def call_command(name, *args, **options):
     # Simulate argument parsing to get the option defaults (see #10080 for details).
     parser = command.create_parser('', name)
     if command.use_argparse:
+        # Use the `dest` option name from the parser option
+        opt_mapping = dict((sorted(s_opt.option_strings)[0].lstrip('-').replace('-', '_'), s_opt.dest)
+                            for s_opt in parser._actions if s_opt.option_strings)
+        arg_options = dict((opt_mapping.get(key, key), value) for key, value in options.items())
         defaults = parser.parse_args(args=args)
-        defaults = dict(defaults._get_kwargs(), **options)
+        defaults = dict(defaults._get_kwargs(), **arg_options)
     else:
         # Legacy optparse method
         defaults, _ = parser.parse_args(args=[])
