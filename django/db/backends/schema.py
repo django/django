@@ -228,7 +228,7 @@ class BaseDatabaseSchemaEditor(object):
                     }
                 )
             # FK
-            if field.rel:
+            if field.rel and field.db_constraint:
                 to_table = field.rel.to._meta.db_table
                 to_column = field.rel.to._meta.get_field(field.rel.field_name).column
                 if self.connection.features.supports_foreign_keys:
@@ -430,7 +430,7 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
         # Add any FK constraints later
-        if field.rel and self.connection.features.supports_foreign_keys:
+        if field.rel and self.connection.features.supports_foreign_keys and field.db_constraint:
             to_table = field.rel.to._meta.db_table
             to_column = field.rel.to._meta.get_field(field.rel.field_name).column
             self.deferred_sql.append(
@@ -530,7 +530,7 @@ class BaseDatabaseSchemaEditor(object):
                 )
         # Drop any FK constraints, we'll remake them later
         fks_dropped = set()
-        if old_field.rel:
+        if old_field.rel and old_field.db_constraint:
             fk_names = self._constraint_names(model, [old_field.column], foreign_key=True)
             if strict and len(fk_names) != 1:
                 raise ValueError("Found wrong number (%s) of foreign key constraints for %s.%s" % (
@@ -739,7 +739,9 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
         # Does it have a foreign key?
-        if new_field.rel and fks_dropped:
+        if new_field.rel and \
+           (fks_dropped or (old_field.rel and not old_field.db_constraint)) and \
+           new_field.db_constraint:
             to_table = new_field.rel.to._meta.db_table
             to_column = new_field.rel.get_related_field().column
             self.execute(
