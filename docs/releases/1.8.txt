@@ -196,6 +196,13 @@ Management Commands
 
 * :djadmin:`inspectdb` now outputs ``Meta.unique_together``.
 
+* When calling management commands from code through :ref:`call_command
+  <call-command>` and passing options, the option name can match the command
+  line option name (without the initial dashes) or the final option destination
+  variable name, but in either case, the resulting option received by the
+  command is now always the ``dest`` name specified in the command option
+  definition (as long as the command uses the new :py:mod:`argparse` module).
+
 Models
 ^^^^^^
 
