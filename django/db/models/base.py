@@ -1441,28 +1441,30 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Skip ordering on pk. This is always a valid order_by field
         # but is an alias and therefore won't be found by opts.get_field.
-        fields = (f for f in fields if f != 'pk')
+        fields = set(f for f in fields if f != 'pk')
 
-        for field_name in fields:
-            try:
-                cls._meta.get_field(field_name, m2m=False)
-            except FieldDoesNotExist:
-                if field_name.endswith('_id'):
-                    try:
-                        field = cls._meta.get_field(field_name[:-3], m2m=False)
-                    except FieldDoesNotExist:
-                        pass
-                    else:
-                        if field.attname == field_name:
-                            continue
-                errors.append(
-                    checks.Error(
-                        "'ordering' refers to the non-existent field '%s'." % field_name,
-                        hint=None,
-                        obj=cls,
-                        id='models.E015',
-                    )
+        # Check for invalid or non existing field ordering.
+        invalid_fields = []
+
+        # Any field name that is not present in field_names
+        # Does not exist.
+        all_field_names = set(cls._meta.field_names)
+        invalid_fields.extend(fields - all_field_names)
+
+        # Any field that is a m2m field should not be allowed
+        # ordering
+        m2m_field_names = set(f.name for f in cls._meta.get_fields(data=False, m2m=True))
+        invalid_fields.extend(fields & m2m_field_names)
+
+        for invalid_field in invalid_fields:
+            errors.append(
+                checks.Error(
+                    "'ordering' refers to the non-existent field '%s'." % invalid_field,
+                    hint=None,
+                    obj=cls,
+                    id='models.E015',
                 )
+            )
         return errors
 
     @classmethod
