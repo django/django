@@ -563,23 +563,25 @@ class Query(object):
         self.order_by = rhs.order_by[:] if rhs.order_by else self.order_by
         self.extra_order_by = rhs.extra_order_by or self.extra_order_by
 
-    def deferred_to_data(self, target, callback):
+    def _deferred_to_data(self, processor):
         """
-        Converts the self.deferred_loading data structure to an alternate data
-        structure, describing the field that *will* be loaded. This is used to
-        compute the columns to select from the database and also by the
-        QuerySet class to work out which fields are being initialized on each
-        model. Models that have all their fields included aren't mentioned in
-        the result, only those that have field restrictions in place.
+        Converts the self.deferred_loading to a dictionary describing the fields
+        that will be loaded. This can be used e.g. to compute the columns to select
+        from the database. Returns a dictionary of sets.
 
-        The "target" parameter is the instance that is populated (in place).
-        The "callback" is a function that is called whenever a (model, field)
-        pair need to be added to "target". It accepts three parameters:
-        "target", and the model and list of fields being added for that model.
+        The actual format of the dictionary (keys and values) is set
+        by the callback `processor`.
+
+        `processor` is called whenever a field of a given model is to be loaded.
+        It must accept three parameters: the dictionary to be returned, the model,
+        and a `set` of fields being loaded. It must return the modified dictionary.
         """
         field_names, defer = self.deferred_loading
         if not field_names:
-            return
+            return {}
+
+        data = {}
+
         orig_opts = self.get_meta()
         seen = {}
         must_include = {orig_opts.concrete_model: set([orig_opts.pk])}
@@ -626,7 +628,7 @@ class Query(object):
                 if model in workset:
                     workset[model].update(values)
             for model, values in six.iteritems(workset):
-                callback(target, model, values)
+                data = processor(data, model, values)
         else:
             for model, values in six.iteritems(must_include):
                 if model in seen:
@@ -643,18 +645,9 @@ class Query(object):
                 if model not in seen:
                     seen[model] = set()
             for model, values in six.iteritems(seen):
-                callback(target, model, values)
+                data = processor(data, model, values)
 
-    def deferred_to_columns_cb(self, target, model, fields):
-        """
-        Callback used by deferred_to_columns(). The "target" parameter should
-        be a set instance.
-        """
-        table = model._meta.db_table
-        if table not in target:
-            target[table] = set()
-        for field in fields:
-            target[table].add(field.column)
+        return data
 
     def table_alias(self, table_name, create=False):
         """
@@ -1833,28 +1826,44 @@ class Query(object):
 
     def get_loaded_field_names(self):
         """
-        If any fields are marked to be deferred, returns a dictionary mapping
-        models to a set of names in those fields that will be loaded. If a
-        model is not in the returned dictionary, none of its fields are
-        deferred.
-
-        If no fields are marked for deferral, returns an empty dictionary.
+        Returns a `dictionary` mapping models to `set`s of names of deferred fields
+        that will be loaded. If a model is not in the returned dictionary, none
+        of its fields are deferred.
         """
         # We cache this because we call this function multiple times
         # (compiler.fill_related_selections, query.iterator)
         try:
             return self._loaded_field_names_cache
         except AttributeError:
-            collection = {}
-            self.deferred_to_data(collection, self.get_loaded_field_names_cb)
-            self._loaded_field_names_cache = collection
-            return collection
+            def model_loaded_field_names(data_dict, model, fields):
+                """
+                Used to retrieve loaded field names of models.
+                """
+                data_dict[model] = set(f.name for f in fields)
+                return data_dict
 
-    def get_loaded_field_names_cb(self, target, model, fields):
+            self._loaded_field_names_cache = self._deferred_to_data(model_loaded_field_names)
+        return self._loaded_field_names_cache
+
+    def get_loaded_columns(self):
         """
-        Callback used by get_deferred_field_names().
+        Returns a `dictionary` mapping tables to `set`s of names of deferred fields
+        that will be loaded. If a table is not in the returned dictionary, none
+        of its fields are deferred.
         """
-        target[model] = set(f.name for f in fields)
+        def tables_deferred_columns(data_dict, model, fields):
+            """
+            Callback used to retrieve a dictionary with tables whose values are
+            sets of column names.
+            """
+            table = model._meta.db_table
+            if table not in data_dict:
+                data_dict[table] = set()
+            for field in fields:
+                data_dict[table].add(field.column)
+            return data_dict
+
+        return self._deferred_to_data(tables_deferred_columns)
 
     def set_aggregate_mask(self, names):
         "Set the mask of aggregates that will actually be returned by the SELECT"

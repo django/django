@@ -23,13 +23,16 @@ class SQLCompiler(object):
         self.query = query
         self.connection = connection
         self.using = using
-        self.quote_cache = {'*': '*'}
+
+        # cache of __call__
+        self._quote_cache = {'*': '*'}
+
         # When ordering a queryset with distinct on a column not part of the
         # select set, the ordering column needs to be added to the select
         # clause. This information is needed both in SQL construction and
         # masking away the ordering selects from the returned row.
-        self.ordering_aliases = []
-        self.ordering_params = []
+        self._ordering_aliases = []
+        self._ordering_params = []
 
     def pre_sql_setup(self):
         """
@@ -53,14 +56,15 @@ class SQLCompiler(object):
         for table names. This avoids problems with some SQL dialects that treat
         quoted strings specially (e.g. PostgreSQL).
         """
-        if name in self.quote_cache:
-            return self.quote_cache[name]
+        if name in self._quote_cache:
+            return self._quote_cache[name]
+
         if ((name in self.query.alias_map and name not in self.query.table_map) or
                 name in self.query.extra_select):
-            self.quote_cache[name] = name
-            return name
-        r = self.connection.ops.quote_name(name)
-        self.quote_cache[name] = r
+            r = name
+        else:
+            r = self.connection.ops.quote_name(name)
+        self._quote_cache[name] = r
         return r
 
     def quote_name_unless_alias(self, name):
@@ -118,9 +122,9 @@ class SQLCompiler(object):
         if self.query.distinct:
             result.append(self.connection.ops.distinct_sql(distinct_fields))
         params.extend(o_params)
-        result.append(', '.join(out_cols + self.ordering_aliases))
+        result.append(', '.join(out_cols + self._ordering_aliases))
         params.extend(s_params)
-        params.extend(self.ordering_params)
+        params.extend(self._ordering_params)
 
         result.append('FROM')
         result.extend(from_)
@@ -209,7 +213,7 @@ class SQLCompiler(object):
         else:
             col_aliases = set()
         if self.query.select:
-            only_load = self.deferred_to_columns()
+            only_load = self.query.get_loaded_columns()
             for col, _ in self.query.select:
                 if isinstance(col, (list, tuple)):
                     alias, column = col
@@ -289,7 +293,7 @@ class SQLCompiler(object):
         qn = self
         qn2 = self.connection.ops.quote_name
         aliases = set()
-        only_load = self.deferred_to_columns()
+        only_load = self.query.get_loaded_columns()
         if not start_alias:
             start_alias = self.query.get_initial_alias()
         # The 'seen_models' is used to optimize checking the needed parent
@@ -345,7 +349,7 @@ class SQLCompiler(object):
 
         for name in self.query.distinct_fields:
             parts = name.split(LOOKUP_SEP)
-            _, targets, alias, joins, path, _ = self._setup_joins(parts, opts, None)
+            _, targets, _, joins, path, _ = self._setup_joins(parts, opts, None)
             targets, alias, _ = self.query.trim_joins(targets, joins, path)
             for target in targets:
                 result.append("%s.%s" % (qn(alias), qn2(target.column)))
@@ -357,7 +361,7 @@ class SQLCompiler(object):
         "order by" clause, and the list of SQL elements that need to be added
         to the GROUP BY clause as a result of the ordering.
 
-        Also sets the ordering_aliases attribute on this instance to a list of
+        Also sets the _ordering_aliases attribute on this instance to a list of
         extra aliases needed in the select.
 
         Determining the ordering SQL can change the tables we need to include,
@@ -448,8 +452,8 @@ class SQLCompiler(object):
                 else:
                     result.append('%s %s' % (elt, order))
                 group_by.append(self.query.extra[col])
-        self.ordering_aliases = ordering_aliases
-        self.ordering_params = ordering_params
+        self._ordering_aliases = ordering_aliases
+        self._ordering_params = ordering_params
         return result, params, group_by
 
     def find_ordering_name(self, name, opts, alias=None, default_order='ASC',
@@ -679,16 +683,6 @@ class SQLCompiler(object):
                 self.fill_related_selections(model._meta, alias, cur_depth + 1,
                                              next, restricted)
 
-    def deferred_to_columns(self):
-        """
-        Converts the self.deferred_loading data structure to mapping of table
-        names to sets of column names which are to be loaded. Returns the
-        dictionary.
-        """
-        columns = {}
-        self.query.deferred_to_data(columns, self.query.deferred_to_columns_cb)
-        return columns
-
     def results_iter(self):
         """
         Returns an iterator over the results from executing this query.
@@ -725,7 +719,7 @@ class SQLCompiler(object):
 
                         # If the field was deferred, exclude it from being passed
                         # into `resolve_columns` because it wasn't selected.
-                        only_load = self.deferred_to_columns()
+                        only_load = self.query.get_loaded_columns()
                         if only_load:
                             fields = [f for f in fields if f.model._meta.db_table not in only_load or
                                       f.column in only_load[f.model._meta.db_table]]
@@ -764,8 +758,8 @@ class SQLCompiler(object):
         result_type is either MULTI (use fetchmany() to retrieve all rows),
         SINGLE (only retrieve a single row), or None. In this last case, the
         cursor is returned if any query is executed, since it's used by
-        subclasses such as InsertQuery). It's possible, however, that no query
-        is needed, as the filters describe an empty set. In that case, None is
+        subclasses such as InsertQuery. It's possible, however, that no interaction
+        is needed, as when the filters describe an empty set. In that case, None is
         returned, to avoid any unnecessary database interaction.
         """
         if not result_type:
@@ -793,8 +787,9 @@ class SQLCompiler(object):
             return cursor
         if result_type == SINGLE:
             try:
-                if self.ordering_aliases:
-                    return cursor.fetchone()[:-len(self.ordering_aliases)]
+                if self._ordering_aliases:
+                    # mask out alias used for ordering only.
+                    return cursor.fetchone()[:-len(self._ordering_aliases)]
                 return cursor.fetchone()
             finally:
                 # done with the cursor
@@ -804,8 +799,9 @@ class SQLCompiler(object):
             return
 
         # The MULTI case.
-        if self.ordering_aliases:
-            result = order_modified_iter(cursor, len(self.ordering_aliases),
+        if self._ordering_aliases:
+            # mask out alias used for ordering only.
+            result = order_modified_iter(cursor, len(self._ordering_aliases),
                     self.connection.features.empty_fetchmany_value)
         else:
             result = cursor_iter(cursor,
