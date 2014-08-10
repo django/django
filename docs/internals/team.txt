@@ -553,6 +553,21 @@ Baptiste Mispelon
     .. _Solid Links: http://solidlinks.nl/
     .. _Erik's Pony Checkup: http://ponycheckup.com/
 
+`Loïc Bistuer`_
+    Loïc studied telecommunications engineering and works as an independent
+    software developer and consultant.
+
+    He discovered Django in 2008 shortly before the 1.0 release and has been
+    hooked ever since. He contributes mostly to Django's ORM and Form
+    components. His main contributions include advanced query prefetching,
+    streamlining QuerySet and Manager to improve query reusability, and a
+    significant refactor of forms error handling.
+
+    Loïc is originally from the South of France and currently lives in
+    Bangkok, Thailand.
+
+    .. _Loïc Bistuer: https://github.com/loic
+
 Past team members
 =================
 
