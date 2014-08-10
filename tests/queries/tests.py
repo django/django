@@ -3441,6 +3441,10 @@ class RelatedLookupTypeTests(TestCase):
         # parent objects
         self.assertQuerysetEqual(ObjectC.objects.exclude(childobjecta=self.oa), out_c)
 
+        # test for refs. #23226
+        with self.assertNumQueries(0):
+            ObjectB.objects.filter(objecta__in=ObjectA.objects.all())
+
 
 class Ticket14056Tests(TestCase):
     def test_ticket_14056(self):
