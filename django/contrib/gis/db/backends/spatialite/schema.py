@@ -101,6 +101,18 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         else:
             super(SpatialiteSchemaEditor, self).add_field(model, field)
 
+    def remove_field(self, model, field):
+        from django.contrib.gis.db.models.fields import GeometryField
+        # NOTE: If the field is a geometry field, the table is just recreated,
+        # the parent's remove_field can't be used cause it will skip the
+        # recreation if the field does not have a database type. Geometry fields
+        # do not have a db type cause they are added and removed via stored
+        # procedures.
+        if isinstance(field, GeometryField):
+            self._remake_table(model, delete_fields=[field])
+        else:
+            super(SpatialiteSchemaEditor, self).remove_field(model, field)
+
     def alter_db_table(self, model, old_db_table, new_db_table):
         from django.contrib.gis.db.models.fields import GeometryField
         # Remove geometry-ness from temp table
