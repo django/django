@@ -6,11 +6,13 @@ import random as random_module
 from decimal import Decimal, InvalidOperation, Context, ROUND_HALF_UP
 from functools import wraps
 from pprint import pformat
+import warnings
 
 from django.template.base import Variable, Library, VariableDoesNotExist
 from django.conf import settings
 from django.utils import formats
 from django.utils.dateformat import format, time_format
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import (conditional_escape, escapejs,
     escape, urlize as _urlize, linebreaks, strip_tags, avoid_wrapping,
@@ -705,6 +707,11 @@ def unordered_list(value, autoescape=None):
             i += 1
         return '\n'.join(output)
     value, converted = convert_old_style_list(value)
+    if converted:
+        warnings.warn(
+            "The old style syntax in `unordered_list` is deprecated and will "
+            "be removed in Django 2.0. Use the the new format instead.",
+            RemovedInDjango20Warning)
     return mark_safe(_helper(value))
 
 

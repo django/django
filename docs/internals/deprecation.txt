@@ -42,6 +42,8 @@ about each item can often be found in the release notes of two versions prior.
 
 * The ``error_message`` argument of ``django.forms.RegexField`` will be removed.
 
+* The ``unordered_list`` filter will no longer support old style lists.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
