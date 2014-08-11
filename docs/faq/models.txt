@@ -75,7 +75,7 @@ like `Django non-rel`_
 You can also take a look on `the wiki page`_ which discusses some alternatives.
 
 .. _`Django non-rel`: http://django-nonrel.org/
-.. _`the wiki post`: https://code.djangoproject.com/wiki/NoSqlSupport
+.. _`the wiki page`: https://code.djangoproject.com/wiki/NoSqlSupport
 
 How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
 ------------------------------------------------------------------------------------------------------------------
