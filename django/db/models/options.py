@@ -404,16 +404,9 @@ class Options(object):
 
     def get_field(self, field_name, include_related=False, **kwargs):
         """
-        Returns a field instance given a field name. By default will only search in data and
-        many to many fields. This can be changed by enabling or disabling field types using
-        the flags available. Hidden or proxy fields cannot be retreived.
-
-        Fields can be any of the following:
-        - data:             any field that has an entry on the database
-        - m2m:              a ManyToManyField defined on the current model
-        - related_objects:  a one-to-many relation from another model that points to the current model
-        - related_m2m:      a M2M relation from another model that points to the current model
-        - virtual:          fields that do not necessarily have an entry on the database (like GenericForeignKey)
+        Returns a field instance given a field name. By default will only search in data,
+        many to many fields, and virtual fields. By setting the include_related flag, the
+        search is also extended to related objects and remated m2m.
         """
         field_map = self.all_fields_map if include_related else self.concrete_fields_map
 
@@ -431,9 +424,8 @@ class Options(object):
             # We always want to throw a warning if many_to_many is used regardless
             # of if it alters the return type or not.
             warnings.warn(
-                "The 'many_to_many' argument on get_fields will be soon "
-                "deprecated. This parameter has changed in favor of "
-                "'m2m'. Please change your implementation accordingly.",
+                "The 'many_to_many' argument on get_field will be soon "
+                "deprecated. Please change your implementation accordingly.",
                 RemovedInDjango20Warning
             )
 
