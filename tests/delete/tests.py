@@ -178,6 +178,30 @@ class DeletionTests(TestCase):
         self.assertNumQueries(5, s.delete)
         self.assertFalse(S.objects.exists())
 
+    def test_bulk_large(self):
+        from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
+        from django.db import connection
+        from math import ceil
+        TEST_RANGE = 2000
+
+        s = S.objects.create(r=R.objects.create())
+        for i in xrange(TEST_RANGE):
+            T.objects.create(s=s)
+
+        ops = connection.ops
+        batch_size = max(ops.bulk_batch_size(['pk'], xrange(TEST_RANGE)), 1)
+
+        # TEST_RANGE // batch_size (select related `T` instances)
+        # + 1 (select related `U` instances)
+        # + TEST_RANGE // GET_ITERATOR_CHUNK_SIZE (delete `T` instances in batches)
+        # + 1 (delete `s`)
+        expected_num_queries = ceil(TEST_RANGE // batch_size) + \
+                               ceil(TEST_RANGE // GET_ITERATOR_CHUNK_SIZE) + 2
+
+        self.assertNumQueries(expected_num_queries, s.delete)
+        self.assertFalse(S.objects.exists())
+        self.assertFalse(T.objects.exists())
+
     def test_instance_update(self):
         deleted = []
         related_setnull_sets = []
