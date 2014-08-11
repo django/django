@@ -53,14 +53,7 @@ class RemoteUserMiddleware(object):
             # authenticated remote-user, or return (leaving request.user set to
             # AnonymousUser by the AuthenticationMiddleware).
             if request.user.is_authenticated():
-                try:
-                    stored_backend = load_backend(request.session.get(
-                        auth.BACKEND_SESSION_KEY, ''))
-                    if isinstance(stored_backend, RemoteUserBackend):
-                        auth.logout(request)
-                except ImproperlyConfigured as e:
-                    # backend failed to load
-                    auth.logout(request)
+                self._remove_invalid_user(request)
             return
         # If the user is already authenticated and that user is the user we are
         # getting passed in the headers, then the correct user is already
@@ -68,6 +61,11 @@ class RemoteUserMiddleware(object):
         if request.user.is_authenticated():
             if request.user.get_username() == self.clean_username(username, request):
                 return
+            else:
+                # An authenticated user is associated with the request, but
+                # it does not match the authorized user in the header.
+                self._remove_invalid_user(request)
+
         # We are seeing this user for the first time in this session, attempt
         # to authenticate the user.
         user = auth.authenticate(remote_user=username)
@@ -89,3 +87,17 @@ class RemoteUserMiddleware(object):
         except AttributeError:  # Backend has no clean_username method.
             pass
         return username
+
+    def _remove_invalid_user(self, request):
+        """
+        Removes the current authenticated user in the request which is invalid
+        but only if the user is authenticated via the RemoteUserBackend.
+        """
+        try:
+            stored_backend = load_backend(request.session.get(auth.BACKEND_SESSION_KEY, ''))
+        except ImproperlyConfigured:
+            # backend failed to load
+            auth.logout(request)
+        else:
+            if isinstance(stored_backend, RemoteUserBackend):
+                auth.logout(request)
