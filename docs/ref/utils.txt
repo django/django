@@ -630,9 +630,12 @@ escaping HTML.
     If you are looking for a more robust solution, take a look at the `bleach`_
     Python library.
 
-    .. _bleach: https://pypi.python.org/pypi/bleach
-
 .. function:: remove_tags(value, tags)
+
+    .. deprecated:: 1.8
+
+        ``remove_tags()`` cannot guarantee HTML safe output and has been
+        deprecated due to security concerns. Consider using `bleach`_ instead.
 
     Removes a space-separated list of [X]HTML tag names from the output.
 
@@ -656,6 +659,7 @@ escaping HTML.
     the return value will be ``"<B>Joel</B> <button>is</button> a slug"``.
 
 .. _str.format: http://docs.python.org/library/stdtypes.html#str.format
+.. _bleach: https://pypi.python.org/pypi/bleach
 
 ``django.utils.http``
 =====================
