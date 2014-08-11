@@ -636,3 +636,15 @@ built-in tags. Simply remove ``'django.contrib.webdesign'`` from
 
 It provided backwards compatibility for pre-1.0 code, but its functionality is
 redundant. Use ``Field.error_messages['invalid']`` instead.
+
+Old :tfilter:`unordered_list` syntax
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An older (pre-1.0), more restrictive and verbose input format for the
+:tfilter:`unordered_list` template filter has been deprecated::
+
+    ``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``
+
+Using the new syntax, this becomes::
+
+    ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``
