@@ -49,6 +49,11 @@ about each item can often be found in the release notes of two versions prior.
 * The backward compatible shim  to rename ``django.forms.Form._has_changed()``
   to ``has_changed()`` will be removed.
 
+* The ``removetags`` template filter will be removed.
+
+* The ``remove_tags()`` and ``strip_entities()`` functions in
+  ``django.utils.html`` will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

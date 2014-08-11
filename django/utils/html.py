@@ -4,7 +4,9 @@ from __future__ import unicode_literals
 
 import re
 import sys
+import warnings
 
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, force_str
 from django.utils.functional import allow_lazy
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
@@ -177,6 +179,11 @@ strip_tags = allow_lazy(strip_tags)
 
 def remove_tags(html, tags):
     """Returns the given HTML with given tags removed."""
+    warnings.warn(
+        "django.utils.html.remove_tags() and the removetags template filter "
+        "are deprecated. Consider using the bleach library instead.",
+        RemovedInDjango20Warning, stacklevel=3
+    )
     tags = [re.escape(tag) for tag in tags.split()]
     tags_re = '(%s)' % '|'.join(tags)
     starttag_re = re.compile(r'<%s(/?>|(\s+[^>]*>))' % tags_re, re.U)
@@ -195,6 +202,10 @@ strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, six.text_type)
 
 def strip_entities(value):
     """Returns the given HTML with all entities (&something;) stripped."""
+    warnings.warn(
+        "django.utils.html.strip_entities() is deprecated.",
+        RemovedInDjango20Warning, stacklevel=2
+    )
     return re.sub(r'&(?:\w+|#\d+);', '', force_text(value))
 strip_entities = allow_lazy(strip_entities, six.text_type)
 
