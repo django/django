@@ -1101,11 +1101,22 @@ class Query(object):
         """
         Checks the type of object passed to query relations.
         """
+        from django.db.models.query import QuerySet
+
         if field.rel:
             # testing for iterable of models
             if hasattr(value, '__iter__'):
-                for v in value:
-                    self.check_query_object_type(v, opts)
+                if isinstance(value, QuerySet):
+                    model = value.model
+                    if not (model == opts.concrete_model
+                            or opts.concrete_model in model._meta.get_parent_list()
+                            or model in opts.get_parent_list()):
+                        raise ValueError(
+                            'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
+                            (model._meta.model_name, opts.object_name))
+                else:
+                    for v in value:
+                        self.check_query_object_type(v, opts)
             else:
                 # expecting single model instance here
                 self.check_query_object_type(value, opts)
