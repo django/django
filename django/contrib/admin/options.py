@@ -269,6 +269,24 @@ class BaseModelAdmin(object):
         clean_lookup = LOOKUP_SEP.join(parts)
         return clean_lookup in self.list_filter or clean_lookup == self.date_hierarchy
 
+    def to_field_allowed(self, request, to_field):
+        opts = self.model._meta
+
+        try:
+            field = opts.get_field(to_field)
+        except FieldDoesNotExist:
+            return False
+
+        # Make sure at least one of the models registered for this site
+        # references this field.
+        registered_models = self.admin_site._registry
+        for related_object in opts.get_all_related_objects():
+            if (related_object.model in registered_models and
+                    field == related_object.field.rel.get_related_field()):
+                return True
+
+        return False
+
     def has_add_permission(self, request):
         """
         Returns True if the given request has permission to add an object.

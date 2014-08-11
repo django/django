@@ -10,6 +10,7 @@ from django.utils.translation import ugettext, ugettext_lazy
 from django.utils.http import urlencode
 
 from django.contrib.admin import FieldListFilter
+from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.util import (quote, get_fields_from_path,
     lookup_needs_distinct, prepare_lookup_value)
@@ -56,7 +57,10 @@ class ChangeList(object):
             self.page_num = 0
         self.show_all = ALL_VAR in request.GET
         self.is_popup = IS_POPUP_VAR in request.GET
-        self.to_field = request.GET.get(TO_FIELD_VAR)
+        to_field = request.GET.get(TO_FIELD_VAR)
+        if to_field and not model_admin.to_field_allowed(request, to_field):
+            raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
+        self.to_field = to_field
         self.params = dict(request.GET.items())
         if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
