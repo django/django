@@ -2262,6 +2262,10 @@ contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
 Note: An older, more restrictive and verbose input format is also supported:
 ``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``,
 
+.. deprecated:: 2.0
+
+    Old style list conversion is deprecated and will be removed in Django 2.0
+
 .. templatefilter:: upper
 
 upper
