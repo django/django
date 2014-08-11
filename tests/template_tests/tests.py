@@ -590,6 +590,8 @@ class TemplateTests(TestCase):
                                             # Ignore deprecations of using the wrong number of variables with the 'for' tag.
                                             # and warnings for {% url %} reversing by dotted path
                                             warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaulttags")
+                                            # Ignore deprecations of old style unordered_list.
+                                            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaultfilters")
                                             output = self.render(test_template, vals)
                                     except ShouldNotExecuteException:
                                         failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))

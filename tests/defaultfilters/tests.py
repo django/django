@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 import unittest
+import warnings
 
 from django.template.defaultfilters import (
     add, addslashes, capfirst, center, cut, date, default, default_if_none,
@@ -549,20 +550,23 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(unordered_list([a, b]), '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>')
 
         # Old format for unordered lists should still work
-        self.assertEqual(unordered_list(['item 1', []]), '\t<li>item 1</li>')
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
 
-        self.assertEqual(unordered_list(['item 1', [['item 1.1', []]]]),
-            '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>')
+            self.assertEqual(unordered_list(['item 1', []]), '\t<li>item 1</li>')
 
-        self.assertEqual(unordered_list(['item 1', [['item 1.1', []],
-            ['item 1.2', []]]]), '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1'
-            '</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>')
+            self.assertEqual(unordered_list(['item 1', [['item 1.1', []]]]),
+                '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>')
 
-        self.assertEqual(unordered_list(['States', [['Kansas', [['Lawrence',
-            []], ['Topeka', []]]], ['Illinois', []]]]), '\t<li>States\n\t'
-            '<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>'
-            '\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>'
-            'Illinois</li>\n\t</ul>\n\t</li>')
+            self.assertEqual(unordered_list(['item 1', [['item 1.1', []],
+                ['item 1.2', []]]]), '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1'
+                '</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>')
+
+            self.assertEqual(unordered_list(['States', [['Kansas', [['Lawrence',
+                []], ['Topeka', []]]], ['Illinois', []]]]), '\t<li>States\n\t'
+                '<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>'
+                '\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>'
+                'Illinois</li>\n\t</ul>\n\t</li>')
 
     def test_add(self):
         self.assertEqual(add('1', '2'), 3)
