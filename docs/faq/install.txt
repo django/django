@@ -16,23 +16,22 @@ How do I get started?
 What are Django's prerequisites?
 --------------------------------
 
-Django requires Python, specifically Python 2.7 or 3.2 and above. No other
-Python libraries are required for basic Django usage.
+Django requires Python, specifically Python 2.7 or 3.2 and above. Other Python
+libraries may be required for some uses, but you'll receive an error about it
+as they're needed.
 
 For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
 own lightweight development server. For a production environment, Django follows
 the WSGI spec, :pep:`3333`, which means it can run on a variety of server
 platforms. See :doc:`Deploying Django </howto/deployment/index>` for some
-popular alternatives. Also, the `server arrangements wiki page`_ contains
-details for several deployment strategies.
+popular alternatives.
 
 If you want to use Django with a database, which is probably the case, you'll
 also need a database engine. PostgreSQL_ is recommended, because we're
 PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 
 .. _Python: http://www.python.org/
-.. _server arrangements wiki page: https://code.djangoproject.com/wiki/ServerArrangements
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/
@@ -47,12 +46,12 @@ Django version Python versions
 1.4            2.5, 2.6, 2.7
 1.5            2.6, 2.7 and 3.2, 3.3 (experimental)
 1.6            2.6, 2.7 and 3.2, 3.3
-**1.7**        **2.7** and **3.2, 3.3, 3.4**
+**1.7, 1.8**   **2.7** and **3.2, 3.3, 3.4**
 ============== ===============
 
 For a given series of Python versions, only the latest release is officially
-supported. For instance, at the time of writing (April 1st, 2014), the latest
-release in the 2.7 series is 2.7.6.
+supported. For instance, at the time of writing (August 1st, 2014), the latest
+release in the 2.7 series is 2.7.8.
 
 What Python version should I use with Django?
 ---------------------------------------------
@@ -74,13 +73,6 @@ You don't lose anything in Django by using an older release, but you don't take
 advantage of the improvements and optimizations in newer Python releases.
 Third-party applications for use with Django are, of course, free to set their
 own version requirements.
-
-Will Django run under shared hosting (like TextDrive or Dreamhost)?
--------------------------------------------------------------------
-
-See our `Django-friendly Web hosts`_ page.
-
-.. _`Django-friendly Web hosts`: https://code.djangoproject.com/wiki/DjangoFriendlyWebHosts
 
 Should I use the stable version or development version?
 -------------------------------------------------------
