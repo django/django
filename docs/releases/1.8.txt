@@ -682,3 +682,14 @@ Using the new syntax, this becomes::
 
 Rename this method to :meth:`~django.forms.Field.has_changed` by removing the
 leading underscore. The old name will still work until Django 2.0.
+
+``django.utils.html.remove_tags()`` and ``removetags`` template filter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.utils.html.remove_tags()`` as well as the template filter
+``removetags`` have been deprecated as they cannot guarantee safe output. Their
+existence is likely to lead to their use in security-sensitive contexts where
+they are not actually safe.
+
+The unused and undocumented ``django.utils.html.strip_entities()`` function has
+also been deprecated.
