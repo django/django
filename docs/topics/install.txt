@@ -56,14 +56,11 @@ installed.
 If you can't use mod_wsgi for some reason, fear not: Django supports many other
 deployment options. One is :doc:`uWSGI </howto/deployment/wsgi/uwsgi>`; it works
 very well with `nginx`_. Additionally, Django follows the WSGI spec
-(:pep:`3333`), which allows it to run on a variety of server platforms. See the
-`server-arrangements wiki page`_ for specific installation instructions for
-each platform.
+(:pep:`3333`), which allows it to run on a variety of server platforms.
 
 .. _Apache: http://httpd.apache.org/
 .. _nginx: http://nginx.org/
 .. _mod_wsgi: http://code.google.com/p/modwsgi/
-.. _server-arrangements wiki page: https://code.djangoproject.com/wiki/ServerArrangements
 
 .. _database-installation:
 
