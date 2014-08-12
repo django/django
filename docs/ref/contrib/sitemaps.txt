@@ -501,7 +501,7 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
 One useful way to call :func:`ping_google` is from a model's ``save()``
 method::
 
-   from django.contrib.sitemaps import ping_google
+    from django.contrib.sitemaps import ping_google
 
     class Entry(models.Model):
         # ...
