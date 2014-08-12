@@ -39,13 +39,13 @@ View
 
     **Example urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import MyView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^mine/$', MyView.as_view(), name='my-view'),
-        )
+        ]
 
     **Attributes**
 
@@ -131,13 +131,13 @@ TemplateView
 
     **Example urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import HomePageView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^$', HomePageView.as_view(), name='home'),
-        )
+        ]
 
     **Context**
 
@@ -192,17 +192,16 @@ RedirectView
 
     **Example urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         from django.views.generic.base import RedirectView
 
         from article.views import ArticleCounterRedirectView, ArticleDetail
 
-        urlpatterns = patterns('',
-
+        urlpatterns = [
             url(r'^counter/(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
             url(r'^details/(?P<pk>\d+)/$', ArticleDetail.as_view(), name='article-detail'),
             url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
-        )
+        ]
 
     **Attributes**
 

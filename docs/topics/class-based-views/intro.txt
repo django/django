@@ -89,12 +89,12 @@ request to a matching method if one is defined, or raises
 :class:`~django.http.HttpResponseNotAllowed` if not::
 
     # urls.py
-    from django.conf.urls import patterns
+    from django.conf.urls import url
     from myapp.views import MyView
 
-    urlpatterns = patterns('',
-        (r'^about/', MyView.as_view()),
-    )
+    urlpatterns = [
+        url(r'^about/', MyView.as_view()),
+    ]
 
 
 It is worth noting that what your method returns is identical to what you
@@ -129,9 +129,9 @@ You can override that in a subclass::
 Another option is to configure class attributes as keyword arguments to the
 :meth:`~django.views.generic.base.View.as_view` call in the URLconf::
 
-    urlpatterns = patterns('',
-        (r'^about/', GreetingView.as_view(greeting="G'day")),
-    )
+    urlpatterns = [
+        url(r'^about/', GreetingView.as_view(greeting="G'day")),
+    ]
 
 .. note::
 
@@ -268,10 +268,10 @@ The easiest place to do this is in the URLconf where you deploy your view::
 
     from .views import VoteView
 
-    urlpatterns = patterns('',
-        (r'^about/', login_required(TemplateView.as_view(template_name="secret.html"))),
-        (r'^vote/', permission_required('polls.can_vote')(VoteView.as_view())),
-    )
+    urlpatterns = [
+        url(r'^about/', login_required(TemplateView.as_view(template_name="secret.html"))),
+        url(r'^vote/', permission_required('polls.can_vote')(VoteView.as_view())),
+    ]
 
 This approach applies the decorator on a per-instance basis. If you
 want every instance of a view to be decorated, you need to take a

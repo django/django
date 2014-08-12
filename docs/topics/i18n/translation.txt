@@ -917,9 +917,9 @@ You hook it up like this::
         'packages': ('your.app.package',),
     }
 
-    urlpatterns = patterns('',
-        (r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
-    )
+    urlpatterns = [
+        url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    ]
 
 Each string in ``packages`` should be in Python dotted-package syntax (the
 same format as the strings in :setting:`INSTALLED_APPS`) and should refer to a
@@ -937,9 +937,9 @@ changed by altering the ``domain`` argument.
 
 You can make the view dynamic by putting the packages into the URL pattern::
 
-    urlpatterns = patterns('',
-        (r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
-    )
+    urlpatterns = [
+        url(r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
+    ]
 
 With this, you specify the packages as a list of package names delimited by '+'
 signs in the URL. This is especially useful if your pages use code from
@@ -1087,27 +1087,26 @@ Language prefix in URL patterns
 
 .. function:: i18n_patterns(prefix, pattern_description, ...)
 
-This function can be used in your root URLconf as a replacement for the normal
-:func:`django.conf.urls.patterns` function. Django will automatically
+This function can be used in your root URLconf and Django will automatically
 prepend the current active language code to all url patterns defined within
 :func:`~django.conf.urls.i18n.i18n_patterns`. Example URL patterns::
 
-    from django.conf.urls import patterns, include, url
+    from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
 
     from about import views as about_views
     from news import views as news_views
     from sitemap.views import sitemap
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^sitemap\.xml$', sitemap, name='sitemap_xml'),
-    )
+    ]
 
-    news_patterns = patterns('',
+    news_patterns = [
         url(r'^$', news_views.index, name='index'),
         url(r'^category/(?P<slug>[\w-]+)/$', news_views.category, name='category'),
         url(r'^(?P<slug>[\w-]+)/$', news_views.details, name='detail'),
-    )
+    ]
 
     urlpatterns += i18n_patterns('',
         url(r'^about/$', about_views.main, name='about'),
@@ -1150,7 +1149,7 @@ Translating URL patterns
 URL patterns can also be marked translatable using the
 :func:`~django.utils.translation.ugettext_lazy` function. Example::
 
-    from django.conf.urls import patterns, include, url
+    from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
     from django.utils.translation import ugettext_lazy as _
 
@@ -1158,15 +1157,15 @@ URL patterns can also be marked translatable using the
     from news import views as news_views
     from sitemaps.views import sitemap
 
-    urlpatterns = patterns(''
+    urlpatterns = [
         url(r'^sitemap\.xml$', sitemap, name='sitemap_xml'),
-    )
+    ]
 
-    news_patterns = patterns(''
+    news_patterns = [
         url(r'^$', news_views.index, name='index'),
         url(_(r'^category/(?P<slug>[\w-]+)/$'), news_views.category, name='category'),
         url(r'^(?P<slug>[\w-]+)/$', news_views.details, name='detail'),
-    )
+    ]
 
     urlpatterns += i18n_patterns('',
         url(_(r'^about/$'), about_views.main, name='about'),

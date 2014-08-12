@@ -37,11 +37,11 @@ To get started using the ``comments`` app, follow these steps:
 
    .. code-block:: python
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             ...
-            (r'^comments/', include('django.contrib.comments.urls')),
+            url(r'^comments/', include('django.contrib.comments.urls')),
             ...
-        )
+        ]
 
 #. Use the `comment template tags`_ below to embed comments in your
    templates.

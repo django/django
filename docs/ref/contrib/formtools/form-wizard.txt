@@ -251,14 +251,14 @@ deploy the new :class:`WizardView` object at a URL in the ``urls.py``. The
 wizard's ``as_view()`` method takes a list of your
 :class:`~django.forms.Form` classes as an argument during instantiation::
 
-    from django.conf.urls import patterns
+    from django.conf.urls import url
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard
 
-    urlpatterns = patterns('',
-        (r'^contact/$', ContactWizard.as_view([ContactForm1, ContactForm2])),
-    )
+    urlpatterns = [
+        url(r'^contact/$', ContactWizard.as_view([ContactForm1, ContactForm2])),
+    ]
 
 .. versionchanged:: 1.6
 
@@ -313,9 +313,9 @@ Here's what the view code might look like::
 
 The ``urls.py`` file would contain something like::
 
-    urlpatterns = patterns('',
-        (r'^checkout/$', OrderWizard.as_view(FORMS, condition_dict={'cc': pay_by_credit_card})),
-    )
+    urlpatterns = [
+        url(r'^checkout/$', OrderWizard.as_view(FORMS, condition_dict={'cc': pay_by_credit_card})),
+    ]
 
 .. versionchanged:: 1.6
 
@@ -686,18 +686,18 @@ We define our wizard in a ``views.py``::
 
 We need to add the ``ContactWizard`` to our ``urls.py`` file::
 
-    from django.conf.urls import patterns
+    from django.conf.urls import url
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard, show_message_form_condition
 
     contact_forms = [ContactForm1, ContactForm2]
 
-    urlpatterns = patterns('',
-        (r'^contact/$', ContactWizard.as_view(contact_forms,
+    urlpatterns = [
+        url(r'^contact/$', ContactWizard.as_view(contact_forms,
             condition_dict={'1': show_message_form_condition}
         )),
-    )
+    ]
 
 As you can see, we defined a ``show_message_form_condition`` next to our
 :class:`WizardView` subclass and added a ``condition_dict`` argument to the
@@ -739,7 +739,7 @@ The :meth:`~WizardView.as_view` method takes two additional arguments:
 This is an example of a ``urls.py`` for a contact wizard with two steps, step 1 named
 ``contactdata`` and step 2 named ``leavemessage``::
 
-    from django.conf.urls import url, patterns
+    from django.conf.urls import url
 
     from myapp.forms import ContactForm1, ContactForm2
     from myapp.views import ContactWizard
@@ -752,10 +752,10 @@ This is an example of a ``urls.py`` for a contact wizard with two steps, step 1 
     contact_wizard = ContactWizard.as_view(named_contact_forms,
         url_name='contact_step', done_step_name='finished')
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^contact/(?P<step>.+)/$', contact_wizard, name='contact_step'),
         url(r'^contact/$', contact_wizard, name='contact'),
-    )
+    ]
 
 Advanced ``NamedUrlWizardView`` methods
 =======================================

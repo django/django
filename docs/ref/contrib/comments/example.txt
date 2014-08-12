@@ -153,14 +153,14 @@ enable it in your project's ``urls.py``:
 
 .. code-block:: python
 
-  from django.conf.urls import patterns
+  from django.conf.urls import url
   from django.contrib.comments.feeds import LatestCommentFeed
 
-  urlpatterns = patterns('',
-  # ...
-      (r'^feeds/latest/$', LatestCommentFeed()),
-  # ...
-  )
+  urlpatterns = [
+      # ...
+      url(r'^feeds/latest/$', LatestCommentFeed()),
+      # ...
+  ]
 
 Now you should have the latest comment feeds being served off ``/feeds/latest/``.
 
