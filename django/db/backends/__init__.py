@@ -1190,20 +1190,13 @@ class BaseDatabaseOperations(object):
             second = timezone.make_aware(second, tz)
         return [first, second]
 
-    def convert_values(self, value, field):
+    def get_db_converters(self, internal_type):
+        """Get a list of functions needed to convert field data.
+
+        Some field types on some backends do not provide data in the correct
+        format, this is the hook for coverter functions.
         """
-        Coerce the value returned by the database backend into a consistent type
-        that is compatible with the field type.
-        """
-        if value is None or field is None:
-            return value
-        internal_type = field.get_internal_type()
-        if internal_type == 'FloatField':
-            return float(value)
-        elif (internal_type and (internal_type.endswith('IntegerField')
-                                 or internal_type == 'AutoField')):
-            return int(value)
-        return value
+        return []
 
     def check_aggregate_support(self, aggregate_func):
         """Check that the backend supports the provided aggregate

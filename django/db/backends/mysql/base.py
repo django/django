@@ -394,6 +394,17 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'POW(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
+    def get_db_converters(self, internal_type):
+        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+        if internal_type in ['BooleanField', 'NullBooleanField']:
+            converters.append(self.convert_booleanfield_value)
+        return converters
+
+    def convert_booleanfield_value(self, value, field):
+        if value in (0, 1):
+            value = bool(value)
+        return value
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
