@@ -317,77 +317,6 @@ and reconstructing the field::
     new_instance = MyField(*args, **kwargs)
     self.assertEqual(my_field_instance.some_attribute, new_instance.some_attribute)
 
-
-The ``SubfieldBase`` metaclass
-------------------------------
-
-.. class:: django.db.models.SubfieldBase
-
-As we indicated in the introduction_, field subclasses are often needed for
-two reasons: either to take advantage of a custom database column type, or to
-handle complex Python types. Obviously, a combination of the two is also
-possible. If you're only working with custom database column types and your
-model fields appear in Python as standard Python types direct from the
-database backend, you don't need to worry about this section.
-
-If you're handling custom Python types, such as our ``Hand`` class, we need to
-make sure that when Django initializes an instance of our model and assigns a
-database value to our custom field attribute, we convert that value into the
-appropriate Python object. The details of how this happens internally are a
-little complex, but the code you need to write in your ``Field`` class is
-simple: make sure your field subclass uses a special metaclass:
-
-For example, on Python 2::
-
-    class HandField(models.Field):
-
-        description = "A hand of cards (bridge style)"
-
-        __metaclass__ = models.SubfieldBase
-
-        def __init__(self, *args, **kwargs):
-            ...
-
-On Python 3, in lieu of setting the ``__metaclass__`` attribute, add
-``metaclass`` to the class definition::
-
-    class HandField(models.Field, metaclass=models.SubfieldBase):
-        ...
-
-If you want your code to work on Python 2 & 3, you can use
-:func:`six.with_metaclass`::
-
-    from django.utils.six import with_metaclass
-
-    class HandField(with_metaclass(models.SubfieldBase, models.Field)):
-        ...
-
-This ensures that the :meth:`.to_python` method will always be called when the
-attribute is initialized.
-
-``ModelForm``\s and custom fields
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you use :class:`~django.db.models.SubfieldBase`, :meth:`.to_python` will be
-called every time an instance of the field is assigned a value (in addition to
-its usual call when retrieving the value from the database). This means that
-whenever a value may be assigned to the field, you need to ensure that it will
-be of the correct datatype, or that you handle any exceptions.
-
-This is especially important if you use :doc:`ModelForms
-</topics/forms/modelforms>`. When saving a ModelForm, Django will use
-form values to instantiate model instances. However, if the cleaned
-form data can't be used as valid input to the field, the normal form
-validation process will break.
-
-Therefore, you must ensure that the form field used to represent your
-custom field performs whatever input validation and data cleaning is
-necessary to convert user-provided form input into a
-``to_python()``-compatible model field value. This may require writing a
-custom form field, and/or implementing the :meth:`.formfield` method on
-your field to return a form field class whose ``to_python()`` returns the
-correct datatype.
-
 Documenting your custom field
 -----------------------------
 
@@ -500,59 +429,79 @@ over this field. You are then responsible for creating the column in the right
 table in some other way, of course, but this gives you a way to tell Django to
 get out of the way.
 
-.. _converting-database-values-to-python-objects:
+.. _converting-values-to-python-objects:
 
-Converting database values to Python objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Converting values to Python objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionchanged:: 1.8
+
+    Historically, Django provided a metaclass called ``SubfieldBase`` which
+    always called :meth:`~Field.to_python` on assignment. This did not play
+    nicely with custom database transformations, aggregation, or values
+    queries, so it has been replaced with :meth:`~Field.from_db_value`.
 
 If your custom :class:`~Field` class deals with data structures that are more
-complex than strings, dates, integers or floats, then you'll need to override
-:meth:`~Field.to_python`. As a general rule, the method should deal gracefully
-with any of the following arguments:
+complex than strings, dates, integers, or floats, then you may need to override
+:meth:`~Field.from_db_value` and :meth:`~Field.to_python`.
+
+If present for the field subclass, ``from_db_value()`` will be called in all
+circumstances when the data is loaded from the database, including in
+aggregates and :meth:`~django.db.models.query.QuerySet.values` calls.
+
+``to_python()`` is called by deserialization and during the
+:meth:`~django.db.models.Model.clean` method used from forms.
+
+As a general rule, ``to_python()`` should deal gracefully with any of the
+following arguments:
 
 * An instance of the correct type (e.g., ``Hand`` in our ongoing example).
 
-* A string (e.g., from a deserializer).
+* A string
 
-* Whatever the database returns for the column type you're using.
+* ``None`` (if the field allows ``null=True``)
 
 In our ``HandField`` class, we're storing the data as a VARCHAR field in the
-database, so we need to be able to process strings and ``Hand`` instances in
-:meth:`.to_python`::
+database, so we need to be able to process strings and ``None`` in the
+``from_db_value()``. In ``to_python()``, we need to also handle ``Hand``
+instances::
 
     import re
 
+    from django.core.exceptions import ValidationError
+    from django.db import models
+
+    def parse_hand(hand_string):
+        """Takes a string of cards and splits into a full hand."""
+        p1 = re.compile('.{26}')
+        p2 = re.compile('..')
+        args = [p2.findall(x) for x in p1.findall(hand_string)]
+        if len(args) != 4:
+            raise ValidationError("Invalid input for a Hand instance")
+        return Hand(*args)
+
     class HandField(models.Field):
         # ...
+
+        def from_db_value(self, value, connection):
+            if value is None:
+                return value
+            return parse_hand(value)
 
         def to_python(self, value):
             if isinstance(value, Hand):
                 return value
 
-            # The string case.
-            p1 = re.compile('.{26}')
-            p2 = re.compile('..')
-            args = [p2.findall(x) for x in p1.findall(value)]
-            if len(args) != 4:
-                raise ValidationError("Invalid input for a Hand instance")
-            return Hand(*args)
+            if value is None:
+                return value
 
-Notice that we always return a ``Hand`` instance from this method. That's the
-Python object type we want to store in the model's attribute. If anything is
-going wrong during value conversion, you should raise a
-:exc:`~django.core.exceptions.ValidationError` exception.
+            return parse_hand(value)
 
-**Remember:** If your custom field needs the :meth:`~Field.to_python` method to be
-called when it is created, you should be using `The SubfieldBase metaclass`_
-mentioned earlier. Otherwise :meth:`~Field.to_python` won't be called
-automatically.
+Notice that we always return a ``Hand`` instance from these methods. That's the
+Python object type we want to store in the model's attribute.
 
-.. warning::
-
-    If your custom field allows ``null=True``, any field method that takes
-    ``value`` as an argument, like :meth:`~Field.to_python` and
-    :meth:`~Field.get_prep_value`, should handle the case when ``value`` is
-    ``None``.
+For ``to_python()``, if anything goes wrong during value conversion, you should
+raise a :exc:`~django.core.exceptions.ValidationError` exception.
 
 .. _converting-python-objects-to-query-values:
 

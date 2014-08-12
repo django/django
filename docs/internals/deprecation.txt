@@ -57,6 +57,8 @@ about each item can often be found in the release notes of two versions prior.
 * The ``is_admin_site`` argument to
   ``django.contrib.auth.views.password_reset()`` will be removed.
 
+* ``django.db.models.field.subclassing.SubfieldBase`` will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

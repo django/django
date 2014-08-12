@@ -250,49 +250,64 @@ WHEN (new.%(col_name)s IS NULL)
             sql = field_name    # Cast to DATE removes sub-second precision.
         return sql, []
 
-    def convert_values(self, value, field):
-        if isinstance(value, Database.LOB):
-            value = value.read()
-            if field and field.get_internal_type() == 'TextField':
-                value = force_text(value)
+    def get_db_converters(self, internal_type):
+        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+        if internal_type == 'TextField':
+            converters.append(self.convert_textfield_value)
+        elif internal_type == 'BinaryField':
+            converters.append(self.convert_binaryfield_value)
+        elif internal_type in ['BooleanField', 'NullBooleanField']:
+            converters.append(self.convert_booleanfield_value)
+        elif internal_type == 'DecimalField':
+            converters.append(self.convert_decimalfield_value)
+        elif internal_type == 'DateField':
+            converters.append(self.convert_datefield_value)
+        elif internal_type == 'TimeField':
+            converters.append(self.convert_timefield_value)
+        converters.append(self.convert_empty_values)
+        return converters
 
+    def convert_empty_values(self, value, field):
         # Oracle stores empty strings as null. We need to undo this in
         # order to adhere to the Django convention of using the empty
         # string instead of null, but only if the field accepts the
         # empty string.
-        if value is None and field and field.empty_strings_allowed:
+        if value is None and field.empty_strings_allowed:
+            value = ''
             if field.get_internal_type() == 'BinaryField':
                 value = b''
-            else:
-                value = ''
-        # Convert 1 or 0 to True or False
-        elif value in (1, 0) and field and field.get_internal_type() in ('BooleanField', 'NullBooleanField'):
+        return value
+
+    def convert_textfield_value(self, value, field):
+        if isinstance(value, Database.LOB):
+            value = force_text(value.read())
+        return value
+
+    def convert_binaryfield_value(self, value, field):
+        if isinstance(value, Database.LOB):
+            value = force_bytes(value.read())
+        return value
+
+    def convert_booleanfield_value(self, value, field):
+        if value in (1, 0):
             value = bool(value)
-        # Force floats to the correct type
-        elif value is not None and field and field.get_internal_type() == 'FloatField':
-            value = float(value)
-        # Convert floats to decimals
-        elif value is not None and field and field.get_internal_type() == 'DecimalField':
+        return value
+
+    def convert_decimalfield_value(self, value, field):
+        if value is not None:
             value = backend_utils.typecast_decimal(field.format_number(value))
-        # cx_Oracle always returns datetime.datetime objects for
-        # DATE and TIMESTAMP columns, but Django wants to see a
-        # python datetime.date, .time, or .datetime.  We use the type
-        # of the Field to determine which to cast to, but it's not
-        # always available.
-        # As a workaround, we cast to date if all the time-related
-        # values are 0, or to time if the date is 1/1/1900.
-        # This could be cleaned a bit by adding a method to the Field
-        # classes to normalize values from the database (the to_python
-        # method is used for validation and isn't what we want here).
-        elif isinstance(value, Database.Timestamp):
-            if field and field.get_internal_type() == 'DateTimeField':
-                pass
-            elif field and field.get_internal_type() == 'DateField':
-                value = value.date()
-            elif field and field.get_internal_type() == 'TimeField' or (value.year == 1900 and value.month == value.day == 1):
-                value = value.time()
-            elif value.hour == value.minute == value.second == value.microsecond == 0:
-                value = value.date()
+        return value
+
+    # cx_Oracle always returns datetime.datetime objects for
+    # DATE and TIMESTAMP columns, but Django wants to see a
+    # python datetime.date, .time, or .datetime.
+    def convert_datefield_value(self, value, field):
+        if isinstance(value, Database.Timestamp):
+            return value.date()
+
+    def convert_timefield_value(self, value, field):
+        if isinstance(value, Database.Timestamp):
+            value = value.time()
         return value
 
     def deferrable_sql(self):

@@ -13,9 +13,7 @@ from django.utils import six
 if HAS_GEOS:
     from django.contrib.gis.geos import (fromstr, GEOSGeometry,
         Point, LineString, LinearRing, Polygon, GeometryCollection)
-
-    from .models import Country, City, PennsylvaniaCity, State, Track
-    from .models import Feature, MinusOneSRID
+    from .models import Country, City, PennsylvaniaCity, State, Track, NonConcreteModel, Feature, MinusOneSRID
 
 
 def postgis_bug_version():
@@ -754,10 +752,5 @@ class GeoQuerySetTest(TestCase):
         self.assertEqual(None, qs.unionagg(field_name='point'))
 
     def test_non_concrete_field(self):
-        pkfield = City._meta.get_field_by_name('id')[0]
-        orig_pkfield_col = pkfield.column
-        pkfield.column = None
-        try:
-            list(City.objects.all())
-        finally:
-            pkfield.column = orig_pkfield_col
+        NonConcreteModel.objects.create(point=Point(0, 0), name='name')
+        list(NonConcreteModel.objects.all())

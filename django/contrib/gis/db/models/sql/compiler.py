@@ -1,12 +1,6 @@
-import datetime
-
-from django.conf import settings
-from django.db.backends.utils import truncate_name, typecast_date, typecast_timestamp
+from django.db.backends.utils import truncate_name
 from django.db.models.sql import compiler
-from django.db.models.sql.constants import MULTI
 from django.utils import six
-from django.utils.six.moves import zip, zip_longest
-from django.utils import timezone
 
 SQLCompiler = compiler.SQLCompiler
 
@@ -153,38 +147,13 @@ class GeoSQLCompiler(compiler.SQLCompiler):
                     col_aliases.add(field.column)
         return result, aliases
 
-    def resolve_columns(self, row, fields=()):
-        """
-        This routine is necessary so that distances and geometries returned
-        from extra selection SQL get resolved appropriately into Python
-        objects.
-        """
-        values = []
-        aliases = list(self.query.extra_select)
-
-        # Have to set a starting row number offset that is used for
-        # determining the correct starting row index -- needed for
-        # doing pagination with Oracle.
-        rn_offset = 0
-        if self.connection.ops.oracle:
-            if self.query.high_mark is not None or self.query.low_mark:
-                rn_offset = 1
-        index_start = rn_offset + len(aliases)
-
-        # Converting any extra selection values (e.g., geometries and
-        # distance objects added by GeoQuerySet methods).
-        values = [self.query.convert_values(v,
-                               self.query.extra_select_fields.get(a, None),
-                               self.connection)
-                  for v, a in zip(row[rn_offset:index_start], aliases)]
-        if self.connection.ops.oracle or getattr(self.query, 'geo_values', False):
-            # We resolve the rest of the columns if we're on Oracle or if
-            # the `geo_values` attribute is defined.
-            for value, field in zip_longest(row[index_start:], fields):
-                values.append(self.query.convert_values(value, field, self.connection))
-        else:
-            values.extend(row[index_start:])
-        return tuple(values)
+    def get_converters(self, fields):
+        converters = super(GeoSQLCompiler, self).get_converters(fields)
+        for i, alias in enumerate(self.query.extra_select):
+            field = self.query.extra_select_fields.get(alias)
+            if field:
+                converters[i] = ([], [field.from_db_value], field)
+        return converters
 
     #### Routines unique to GeoQuery ####
     def get_extra_select_format(self, alias):
@@ -268,55 +237,8 @@ class SQLAggregateCompiler(compiler.SQLAggregateCompiler, GeoSQLCompiler):
 
 
 class SQLDateCompiler(compiler.SQLDateCompiler, GeoSQLCompiler):
-    """
-    This is overridden for GeoDjango to properly cast date columns, since
-    `GeoQuery.resolve_columns` is used for spatial values.
-    See #14648, #16757.
-    """
-    def results_iter(self):
-        if self.connection.ops.oracle:
-            from django.db.models.fields import DateTimeField
-            fields = [DateTimeField()]
-        else:
-            needs_string_cast = self.connection.features.needs_datetime_string_cast
-
-        offset = len(self.query.extra_select)
-        for rows in self.execute_sql(MULTI):
-            for row in rows:
-                date = row[offset]
-                if self.connection.ops.oracle:
-                    date = self.resolve_columns(row, fields)[offset]
-                elif needs_string_cast:
-                    date = typecast_date(str(date))
-                if isinstance(date, datetime.datetime):
-                    date = date.date()
-                yield date
+    pass
 
 
 class SQLDateTimeCompiler(compiler.SQLDateTimeCompiler, GeoSQLCompiler):
-    """
-    This is overridden for GeoDjango to properly cast date columns, since
-    `GeoQuery.resolve_columns` is used for spatial values.
-    See #14648, #16757.
-    """
-    def results_iter(self):
-        if self.connection.ops.oracle:
-            from django.db.models.fields import DateTimeField
-            fields = [DateTimeField()]
-        else:
-            needs_string_cast = self.connection.features.needs_datetime_string_cast
-
-        offset = len(self.query.extra_select)
-        for rows in self.execute_sql(MULTI):
-            for row in rows:
-                datetime = row[offset]
-                if self.connection.ops.oracle:
-                    datetime = self.resolve_columns(row, fields)[offset]
-                elif needs_string_cast:
-                    datetime = typecast_timestamp(str(datetime))
-                # Datetimes are artificially returned in UTC on databases that
-                # don't support time zone. Restore the zone used in the query.
-                if settings.USE_TZ:
-                    datetime = datetime.replace(tzinfo=None)
-                    datetime = timezone.make_aware(datetime, self.query.tzinfo)
-                yield datetime
+    pass

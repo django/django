@@ -4,13 +4,15 @@ from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import no_oracle
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import override_settings
+from django.utils import timezone
 
 if HAS_GEOS:
     from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
     from django.contrib.gis.geometry.backend import Geometry
     from django.contrib.gis.geos import GEOSGeometry, Point, MultiPoint
 
-    from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
+    from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article, Event
 
 
 @skipUnlessDBFeature("gis_enabled")
@@ -182,6 +184,12 @@ class RelatedGeoModelTest(TestCase):
             self.assertIsInstance(t[1], Geometry)
             self.assertEqual(m.point, d['point'])
             self.assertEqual(m.point, t[1])
+
+    @override_settings(USE_TZ=True)
+    def test_07b_values(self):
+        "Testing values() and values_list() with aware datetime. See #21565."
+        Event.objects.create(name="foo", when=timezone.now())
+        list(Event.objects.values_list('when'))
 
     def test08_defer_only(self):
         "Testing defer() and only() on Geographic models."

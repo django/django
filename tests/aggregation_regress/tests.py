@@ -894,18 +894,6 @@ class AggregationTests(TestCase):
             lambda b: b.name
         )
 
-    def test_type_conversion(self):
-        # The database backend convert_values function should not try to covert
-        # CharFields to float. Refs #13844.
-        from django.db.models import CharField
-        from django.db import connection
-        testData = 'not_a_float_value'
-        testField = CharField()
-        self.assertEqual(
-            connection.ops.convert_values(testData, testField),
-            testData
-        )
-
     def test_annotate_joins(self):
         """
         Test that the base table's join isn't promoted to LOUTER. This could

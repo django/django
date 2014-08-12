@@ -1532,7 +1532,7 @@ Field API reference
     ``Field`` is an abstract class that represents a database table column.
     Django uses fields to create the database table (:meth:`db_type`), to map
     Python types to database (:meth:`get_prep_value`) and vice-versa
-    (:meth:`to_python`), and to apply :doc:`/ref/models/lookups`
+    (:meth:`from_db_value`), and to apply :doc:`/ref/models/lookups`
     (:meth:`get_prep_lookup`).
 
     A field is thus a fundamental piece in different Django APIs, notably,
@@ -1609,17 +1609,26 @@ Field API reference
 
         See :ref:`converting-query-values-to-database-values` for usage.
 
-    When loading data, :meth:`to_python` is used:
+    When loading data, :meth:`from_db_value` is used:
 
-    .. method:: to_python(value)
+    .. method:: from_db_value(value, connection)
 
-        Converts a value as returned by the database (or a serializer) to a
-        Python object. It is the reverse of :meth:`get_prep_value`.
+        .. versionadded:: 1.8
 
-        The default implementation returns ``value``, which is the common case
-        when the database backend already returns the correct Python type.
+        Converts a value as returned by the database to a Python object. It is
+        the reverse of :meth:`get_prep_value`.
 
-        See :ref:`converting-database-values-to-python-objects` for usage.
+        This method is not used for most built-in fields as the database
+        backend already returns the correct Python type, or the backend itself
+        does the conversion.
+
+        See :ref:`converting-values-to-python-objects` for usage.
+
+        .. note::
+        
+            For performance reasons, ``from_db_value`` is not implemented as a
+            no-op on fields which do not require it (all Django fields).
+            Consequently you may not call ``super`` in your definition.
 
     When saving, :meth:`pre_save` and :meth:`get_db_prep_save` are used:
 
@@ -1643,15 +1652,6 @@ Field API reference
         ``self.attname`` (this is set up by :class:`~django.db.models.Field`).
 
         See :ref:`preprocessing-values-before-saving` for usage.
-
-    Besides saving to the database, the field also needs to know how to
-    serialize its value (inverse of :meth:`to_python`):
-
-    .. method:: value_to_string(obj)
-
-        Converts ``obj`` to a string. Used to serialize the value of the field.
-
-        See :ref:`converting-model-field-to-serialization` for usage.
 
     When a lookup is used on a field, the value may need to be "prepared".
     Django exposes two methods for this:
@@ -1681,6 +1681,26 @@ Field API reference
         be used for the query is passed as ``connection``. In addition,
         ``prepared`` describes whether the value has already been prepared with
         :meth:`get_prep_lookup`.
+
+    Fields often receive their values as a different type, either from
+    serialization or from forms.
+    
+    .. method:: to_python(value)
+
+        Converts the value into the correct Python object. It acts as the
+        reverse of :meth:`value_to_string`, and is also called in
+        :meth:`~django.db.models.Model.clean`.
+
+        See :ref:`converting-values-to-python-objects` for usage.
+
+    Besides saving to the database, the field also needs to know how to
+    serialize its value:
+
+    .. method:: value_to_string(obj)
+
+        Converts ``obj`` to a string. Used to serialize the value of the field.
+
+        See :ref:`converting-model-field-to-serialization` for usage.
 
     When using :class:`model forms <django.forms.ModelForm>`, the ``Field``
     needs to know which form field it should be represented by:

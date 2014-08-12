@@ -1560,7 +1560,6 @@ class RawQuerySet(object):
         compiler = connections[db].ops.compiler('SQLCompiler')(
             self.query, connections[db], db
         )
-        need_resolv_columns = hasattr(compiler, 'resolve_columns')
 
         query = iter(self.query)
 
@@ -1578,11 +1577,11 @@ class RawQuerySet(object):
                 model_cls = deferred_class_factory(self.model, skip)
             else:
                 model_cls = self.model
-            if need_resolv_columns:
-                fields = [self.model_fields.get(c, None) for c in self.columns]
+            fields = [self.model_fields.get(c, None) for c in self.columns]
+            converters = compiler.get_converters(fields)
             for values in query:
-                if need_resolv_columns:
-                    values = compiler.resolve_columns(values, fields)
+                if converters:
+                    values = compiler.apply_converters(values, converters)
                 # Associate fields to values
                 model_init_values = [values[pos] for pos in model_init_pos]
                 instance = model_cls.from_db(db, model_init_names, model_init_values)
