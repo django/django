@@ -71,3 +71,8 @@ class Article(SimpleModel):
 class Book(SimpleModel):
     title = models.CharField(max_length=100)
     author = models.ForeignKey(Author, related_name='books', null=True)
+
+
+class Event(SimpleModel):
+    name = models.CharField(max_length=100)
+    when = models.DateTimeField()
