@@ -101,12 +101,13 @@ class Operation(object):
     def allowed_to_migrate(self, connection_alias, model):
         """
         Returns if we're allowed to migrate the model. Checks the router,
-        if it's a proxy, and if it's swapped out.
+        if it's a proxy, if it's managed, and if it's swapped out.
         """
         return (
             router.allow_migrate(connection_alias, model) and
             not model._meta.proxy and
-            not model._meta.swapped
+            not model._meta.swapped and
+            model._meta.managed
         )
 
     def __repr__(self):

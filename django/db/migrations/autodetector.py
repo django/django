@@ -108,11 +108,15 @@ class MigrationAutodetector(object):
         self.new_apps = self.to_state.render()
         self.old_model_keys = []
         self.old_proxy_keys = []
+        self.old_unmanaged_keys = []
         self.new_model_keys = []
         self.new_proxy_keys = []
+        self.new_unmanaged_keys = []
         for al, mn in sorted(self.from_state.models.keys()):
             model = self.old_apps.get_model(al, mn)
-            if model._meta.managed and al not in self.from_state.real_apps:
+            if not model._meta.managed:
+                self.old_unmanaged_keys.append((al, mn))
+            elif al not in self.from_state.real_apps:
                 if model._meta.proxy:
                     self.old_proxy_keys.append((al, mn))
                 else:
@@ -120,7 +124,9 @@ class MigrationAutodetector(object):
 
         for al, mn in sorted(self.to_state.models.keys()):
             model = self.new_apps.get_model(al, mn)
-            if model._meta.managed and (
+            if not model._meta.managed:
+                self.new_unmanaged_keys.append((al, mn))
+            elif (
                 al not in self.from_state.real_apps or
                 (convert_apps and al in convert_apps)
             ):
@@ -136,6 +142,8 @@ class MigrationAutodetector(object):
         # through models in the old state so we can make dependencies
         # from the through model deletion to the field that uses it.
         self.kept_model_keys = set(self.old_model_keys).intersection(self.new_model_keys)
+        self.kept_proxy_keys = set(self.old_proxy_keys).intersection(self.new_proxy_keys)
+        self.kept_unmanaged_keys = set(self.old_unmanaged_keys).intersection(self.new_unmanaged_keys)
         self.through_users = {}
         self.old_field_keys = set()
         self.new_field_keys = set()
@@ -164,6 +172,8 @@ class MigrationAutodetector(object):
         self.generate_created_models()
         self.generate_deleted_proxies()
         self.generate_created_proxies()
+        self.generate_deleted_unmanaged()
+        self.generate_created_unmanaged()
         self.generate_altered_options()
 
         # Generate field operations
@@ -539,17 +549,23 @@ class MigrationAutodetector(object):
                     ]
                 )
 
-    def generate_created_proxies(self):
+    def generate_created_proxies(self, unmanaged=False):
         """
         Makes CreateModel statements for proxy models.
         We use the same statements as that way there's less code duplication,
         but of course for proxy models we can skip all that pointless field
         stuff and just chuck out an operation.
         """
-        added_proxies = set(self.new_proxy_keys) - set(self.old_proxy_keys)
-        for app_label, model_name in sorted(added_proxies):
+        if unmanaged:
+            added = set(self.new_unmanaged_keys) - set(self.old_unmanaged_keys)
+        else:
+            added = set(self.new_proxy_keys) - set(self.old_proxy_keys)
+        for app_label, model_name in sorted(added):
             model_state = self.to_state.models[app_label, model_name]
-            assert model_state.options.get("proxy", False)
+            if unmanaged:
+                assert not model_state.options.get("managed", True)
+            else:
+                assert model_state.options.get("proxy", False)
             # Depend on the deletion of any possible non-proxy version of us
             dependencies = [
                 (app_label, model_name, None, False),
@@ -571,6 +587,15 @@ class MigrationAutodetector(object):
                 # Depend on the deletion of any possible non-proxy version of us
                 dependencies=dependencies,
             )
+
+    def generate_created_unmanaged(self):
+        """
+        Similar to generate_created_proxies but for unmanaged
+        (they are similar to us in that we need to supply them, but they don't
+        affect the DB)
+        """
+        # Just re-use the same code in *_proxies
+        self.generate_created_proxies(unmanaged=True)
 
     def generate_deleted_models(self):
         """
@@ -668,20 +693,32 @@ class MigrationAutodetector(object):
                 dependencies=list(set(dependencies)),
             )
 
-    def generate_deleted_proxies(self):
+    def generate_deleted_proxies(self, unmanaged=False):
         """
         Makes DeleteModel statements for proxy models.
         """
-        deleted_proxies = set(self.old_proxy_keys) - set(self.new_proxy_keys)
-        for app_label, model_name in sorted(deleted_proxies):
+        if unmanaged:
+            deleted = set(self.old_unmanaged_keys) - set(self.new_unmanaged_keys)
+        else:
+            deleted = set(self.old_proxy_keys) - set(self.new_proxy_keys)
+        for app_label, model_name in sorted(deleted):
             model_state = self.from_state.models[app_label, model_name]
-            assert model_state.options.get("proxy", False)
+            if unmanaged:
+                assert not model_state.options.get("managed", True)
+            else:
+                assert model_state.options.get("proxy", False)
             self.add_operation(
                 app_label,
                 operations.DeleteModel(
                     name=model_state.name,
                 ),
             )
+
+    def generate_deleted_unmanaged(self):
+        """
+        Makes DeleteModel statements for unmanaged models
+        """
+        self.generate_deleted_proxies(unmanaged=True)
 
     def generate_renamed_fields(self):
         """
@@ -852,7 +889,7 @@ class MigrationAutodetector(object):
         makes an operation to represent them in state changes (in case Python
         code in migrations needs them)
         """
-        models_to_check = self.kept_model_keys.union(set(self.new_proxy_keys).intersection(self.old_proxy_keys))
+        models_to_check = self.kept_model_keys.union(self.kept_proxy_keys).union(self.kept_unmanaged_keys)
         for app_label, model_name in sorted(models_to_check):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
