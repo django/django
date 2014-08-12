@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.contrib.auth import views as auth_views
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 
@@ -257,5 +258,5 @@ urlpatterns = [
         views.BookSigningDetail.as_view()),
 
     # Useful for testing redirects
-    url(r'^accounts/login/$', 'django.contrib.auth.views.login')
+    url(r'^accounts/login/$', auth_views.login)
 ]
