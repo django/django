@@ -186,10 +186,12 @@ example above::
 
     from django.conf.urls import patterns
 
+    from . import views
+
     urlpatterns = patterns('',
-        (r'^articles/(\d{4})/$', 'news.views.year_archive'),
-        (r'^articles/(\d{4})/(\d{2})/$', 'news.views.month_archive'),
-        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'news.views.article_detail'),
+        (r'^articles/(\d{4})/$', views.year_archive),
+        (r'^articles/(\d{4})/(\d{2})/$', views.month_archive),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', views.article_detail),
     )
 
 The code above maps URLs, as simple `regular expressions`_, to the location of
