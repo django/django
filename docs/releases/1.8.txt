@@ -196,6 +196,34 @@ Management Commands
 
 * :djadmin:`inspectdb` now outputs ``Meta.unique_together``.
 
+
+Command management options consistency
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Command management options are now being normalized, previously we had
+different naming for options passed on the builtin django command line and the
+ones passed when running ``call_command`` in a script.
+
+We depreciated the options on kwargs with different naming but kept the old
+options which will supported until Django 1.9.
+
+We also enforce a convention for future Django builtin command management,
+option's names need to be mirrored on CLI and through kwargs, if the option name
+contain a `-` it will be changed to `_` (i.e. --natural-foreign on CLI will be
+'natural-foreign' kwargs option)
+
+List of changed options::
+
+command        command line arg      option.dest                new option.dest
+--------------------------------------------------------------------------------
+dumpdata       --natural             use_natural_keys           natural
+dumpdata       --all                 use_base_manager           all
+dumpdata       --natural-foreign     use_natural_foreign_keys   natural_foreign
+dumpdata       --natural-primary     use_natural_primary_keys   natural_primary
+dumpdata       --pks                 primary_keys               pks
+...
+
+
 Models
 ^^^^^^
 

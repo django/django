@@ -28,16 +28,19 @@ class Command(BaseCommand):
         parser.add_argument('-e', '--exclude', dest='exclude', action='append', default=[],
             help='An app_label or app_label.ModelName to exclude '
                  '(use multiple --exclude to exclude multiple apps/models).')
+
         parser.add_argument('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
             help='Use natural keys if they are available (deprecated: use --natural-foreign instead).')
-        parser.add_argument('--natural-foreign', action='store_true', dest='use_natural_foreign_keys', default=False,
+        parser.add_argument('--natural-foreign', action='store_true', dest='natural_foreign', default=False,
             help='Use natural foreign keys if they are available.')
-        parser.add_argument('--natural-primary', action='store_true', dest='use_natural_primary_keys', default=False,
+        parser.add_argument('--natural-primary', action='store_true', dest='natural_primary', default=False,
             help='Use natural primary keys if they are available.')
-        parser.add_argument('-a', '--all', action='store_true', dest='use_base_manager', default=False,
+        #TODO: Find a better name than --all maybe --use-base-manager
+        #(could depreciate all in Django19 introduce use of --use-base-manager)
+        parser.add_argument('-a', '--all', action='store_true', dest='all', default=False,
             help="Use Django's base manager to dump all models stored in the database, "
                  "including those that would otherwise be filtered or modified by a custom manager.")
-        parser.add_argument('--pks', dest='primary_keys',
+        parser.add_argument('--pks', dest='pks',
             help="Only dump objects with given primary keys. "
                  "Accepts a comma separated list of keys. "
                  "This option will only work when you specify one model.")
@@ -51,19 +54,42 @@ class Command(BaseCommand):
         excludes = options.get('exclude')
         output = options.get('output')
         show_traceback = options.get('traceback')
+
         use_natural_keys = options.get('use_natural_keys')
+        # if supplying kwargs directly to call_command
+        use_natural_keys = options.get('natural', use_natural_keys)
         if use_natural_keys:
             warnings.warn("``--natural`` is deprecated; use ``--natural-foreign`` instead.",
                 RemovedInDjango19Warning)
+
+        if options.get('use_natural_foreign_keys') is not None:
+            warnings.warn("kwargs ``use_natural_foreign_keys`` is deprecated; use ``natural_foreign`` instead.",
+                RemovedInDjango19Warning)
         use_natural_foreign_keys = options.get('use_natural_foreign_keys') or use_natural_keys
-        use_natural_primary_keys = options.get('use_natural_primary_keys')
+        natural_foreign = options.get('natural_foreign', use_natural_foreign_keys)
+
+        if options.get('use_natural_primary_keys') is not None:
+            warnings.warn("kwargs ``use_natural_primary_keys`` is deprecated; use ``natural_primary`` instead.",
+                RemovedInDjango19Warning)
+        natural_primary = options.get('use_natural_primary_keys')
+        natural_primary = options.get('natural_primary', natural_primary)
+
+        if options.get('use_base_manager') is not None:
+            warnings.warn("kwargs ``use_base_manager`` is deprecated; use ``all`` instead.",
+                RemovedInDjango19Warning)
         use_base_manager = options.get('use_base_manager')
-        pks = options.get('primary_keys')
+        use_base_manager = options.get('all', use_base_manager)
+
+        if options.get('primary_keys') is not None:
+            warnings.warn("kwargs ``primary_keys`` is deprecated; use ``pks`` instead.",
+                RemovedInDjango19Warning)
+        primary_keys = options.get('primary_keys')
+        pks = options.get('pks', primary_keys)
 
         if pks:
-            primary_keys = pks.split(',')
+            pks_list = str(pks).split(',')
         else:
-            primary_keys = []
+            pks_list = []
 
         excluded_apps = set()
         excluded_models = set()
@@ -82,13 +108,13 @@ class Command(BaseCommand):
                 excluded_apps.add(app_config)
 
         if len(app_labels) == 0:
-            if primary_keys:
+            if pks_list:
                 raise CommandError("You can only use --pks option with one model")
             app_list = OrderedDict((app_config, None)
                 for app_config in apps.get_app_configs()
                 if app_config.models_module is not None and app_config not in excluded_apps)
         else:
-            if len(app_labels) > 1 and primary_keys:
+            if len(app_labels) > 1 and pks_list:
                 raise CommandError("You can only use --pks option with one model")
             app_list = OrderedDict()
             for label in app_labels:
@@ -114,7 +140,7 @@ class Command(BaseCommand):
                         if model not in app_list_value:
                             app_list_value.append(model)
                 except ValueError:
-                    if primary_keys:
+                    if pks_list:
                         raise CommandError("You can only use --pks option with one model")
                     # This is just an app - no model qualifier
                     app_label = label
@@ -148,8 +174,8 @@ class Command(BaseCommand):
                         objects = model._default_manager
 
                     queryset = objects.using(using).order_by(model._meta.pk.name)
-                    if primary_keys:
-                        queryset = queryset.filter(pk__in=primary_keys)
+                    if pks_list:
+                        queryset = queryset.filter(pk__in=pks_list)
                     for obj in queryset.iterator():
                         yield obj
 
@@ -158,8 +184,8 @@ class Command(BaseCommand):
             stream = open(output, 'w') if output else None
             try:
                 serializers.serialize(format, get_objects(), indent=indent,
-                        use_natural_foreign_keys=use_natural_foreign_keys,
-                        use_natural_primary_keys=use_natural_primary_keys,
+                        use_natural_foreign_keys=natural_foreign,
+                        use_natural_primary_keys=natural_primary,
                         stream=stream or self.stdout)
             finally:
                 if stream:
