@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core.management.base import CommandError, NoArgsCommand
 from django.core.management.utils import (handle_extensions, find_command,
     popen_wrapper)
-from django.utils.encoding import force_str
+from django.utils.encoding import force_str, force_text
 from django.utils.functional import total_ordering
 from django.utils import six
 from django.utils.text import get_text_list
@@ -132,11 +132,11 @@ class TranslatableFile(object):
                 # Remove '.py' suffix
                 if os.name == 'nt':
                     # Preserve '.\' prefix on Windows to respect gettext behavior
-                    old = '#: ' + work_file
-                    new = '#: ' + orig_file
+                    old = '#: ' + force_str(work_file)
+                    new = '#: ' + force_str(orig_file)
                 else:
-                    old = '#: ' + work_file[2:]
-                    new = '#: ' + orig_file[2:]
+                    old = '#: ' + force_str(work_file[2:])
+                    new = '#: ' + force_str(orig_file[2:])
                 msgs = msgs.replace(old, new)
             write_pot_file(potfile, msgs)
 
@@ -350,7 +350,7 @@ class Command(NoArgsCommand):
         dir_suffix = '%s*' % os.sep
         norm_patterns = [p[:-len(dir_suffix)] if p.endswith(dir_suffix) else p for p in self.ignore_patterns]
         all_files = []
-        for dirpath, dirnames, filenames in os.walk(root, topdown=True, followlinks=self.symlinks):
+        for dirpath, dirnames, filenames in os.walk(force_text(root), topdown=True, followlinks=self.symlinks):
             for dirname in dirnames[:]:
                 if is_ignored(os.path.normpath(os.path.join(dirpath, dirname)), norm_patterns):
                     dirnames.remove(dirname)
