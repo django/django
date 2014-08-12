@@ -25,9 +25,9 @@ a thread-safe operation).
 A class-based view is deployed into a URL pattern using the
 :meth:`~django.views.generic.base.View.as_view()` classmethod::
 
-    urlpatterns = patterns('',
-        (r'^view/$', MyView.as_view(size=42)),
-    )
+    urlpatterns = [
+        url(r'^view/$', MyView.as_view(size=42)),
+    ]
 
 .. admonition:: Thread safety with view arguments
 

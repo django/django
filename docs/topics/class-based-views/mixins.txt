@@ -256,13 +256,13 @@ mixin.
 We can hook this into our URLs easily enough::
 
     # urls.py
-    from django.conf.urls import patterns, url
+    from django.conf.urls import url
     from books.views import RecordInterest
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         #...
         url(r'^author/(?P<pk>\d+)/interest/$', RecordInterest.as_view(), name='author-interest'),
-    )
+    ]
 
 Note the ``pk`` named group, which
 :meth:`~django.views.generic.detail.SingleObjectMixin.get_object` uses

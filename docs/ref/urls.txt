@@ -9,13 +9,19 @@ patterns()
 
 .. function:: patterns(prefix, pattern_description, ...)
 
+.. note::
+    ``urlpatterns`` should be a plain list of :func:`django.conf.urls.url`
+    instances instead. ``patterns()`` will be removed in a future version
+    of Django.
+
 A function that takes a prefix, and an arbitrary number of URL patterns, and
 returns a list of URL patterns in the format Django needs.
 
 The first argument to ``patterns()`` is a string ``prefix``. See
 :ref:`The view prefix <urlpatterns-view-prefix>`.
 
-The remaining arguments should be tuples in this format::
+The remaining arguments should be :func:`django.conf.urls.url` instances or
+can be tuples in this format::
 
     (regular expression, Python callback function [, optional_dictionary [, optional_name]])
 
@@ -54,23 +60,21 @@ Helper function to return a URL pattern for serving files in debug mode::
     from django.conf import settings
     from django.conf.urls.static import static
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         # ... the rest of your URLconf goes here ...
-    ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 url()
 -----
 
 .. function:: url(regex, view, kwargs=None, name=None, prefix='')
 
-You can use the ``url()`` function, instead of a tuple, as an argument to
-``patterns()``. This is convenient if you want to specify a name without the
-optional extra arguments dictionary. For example::
+``urlpatterns`` should be a list of ``url()`` instances. For example::
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^index/$', index_view, name="main-view"),
         ...
-    )
+    ]
 
 This function takes five arguments, most of which are optional::
 
