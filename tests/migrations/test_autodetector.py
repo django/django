@@ -639,30 +639,28 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="AuthorProxy")
         self.assertOperationAttributes(changes, "testapp", 0, 1, name="AuthorProxy", options={})
 
-    def test_unmanaged_ignorance(self):
-        "Tests that the autodetector correctly ignores managed models"
+    def test_unmanaged(self):
+        "Tests that the autodetector correctly deals with managed models"
         # First, we test adding an unmanaged model
         before = self.make_project_state([self.author_empty])
         after = self.make_project_state([self.author_empty, self.author_unmanaged])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number of migrations?
-        self.assertEqual(len(changes), 0)
-
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="AuthorUnmanaged")
+        self.assertEqual(changes['testapp'][0].operations[0].options['managed'], False)
         # Now, we test turning an unmanaged model into a managed model
         before = self.make_project_state([self.author_empty, self.author_unmanaged])
         after = self.make_project_state([self.author_empty, self.author_unmanaged_managed])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number of migrations?
-        self.assertEqual(len(changes['testapp']), 1)
-        # Right number of actions?
-        migration = changes['testapp'][0]
-        self.assertEqual(len(migration.operations), 1)
-        # Right action?
-        action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "CreateModel")
-        self.assertEqual(action.name, "AuthorUnmanaged")
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["DeleteModel", "CreateModel"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="AuthorUnmanaged")
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="AuthorUnmanaged")
 
     @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
     def test_swappable(self):
