@@ -1102,7 +1102,7 @@ prepend the current active language code to all url patterns defined within
 
     from about import views as about_views
     from news import views as news_views
-    from sitemap.views imort sitemap
+    from sitemap.views import sitemap
 
     urlpatterns = [
         url(r'^sitemap\.xml$', sitemap, name='sitemap_xml'),
