@@ -160,6 +160,14 @@ Cache
 * The ``incr()`` method of the
   ``django.core.cache.backends.locmem.LocMemCache`` backend is now thread-safe.
 
+Database backends
+^^^^^^^^^^^^^^^^^
+
+* The MySQL backend no longer strips microseconds from ``datetime`` values as
+  MySQL 5.6.4 and up supports fractional seconds depending on the declaration
+  of the datetime field (when ``DATETIME`` includes fractional precision greater
+  than 0).
+
 Email
 ^^^^^
 
