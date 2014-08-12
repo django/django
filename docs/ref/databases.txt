@@ -496,11 +496,32 @@ for the field. This affects :class:`~django.db.models.CharField`,
 :class:`~django.db.models.SlugField` and
 :class:`~django.db.models.CommaSeparatedIntegerField`.
 
-DateTime fields
-~~~~~~~~~~~~~~~
+.. _mysql-fractional-seconds:
 
-MySQL does not store fractions of seconds. Fractions of seconds are truncated
-to zero when the time is stored.
+Fractional seconds support for Time and DateTime fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MySQL 5.6.4 and later can store fractional seconds, provided that the
+column definition includes a fractional indication (e.g. ``DATETIME(6)``).
+Earlier versions do not support them at all.
+
+Django will not upgrade existing columns to include fractional seconds if the
+database server supports it. If you want to enable them on an existing database,
+it's up to you to either manually update the column on the target database, by
+executing a command like::
+
+    ALTER TABLE `your_table` MODIFY `your_datetime_column` DATETIME(6)
+
+or using a :class:`~django.db.migrations.operations.RunSQL` operation in a
+:ref:`data migration <data-migrations>`.
+
+.. versionchanged:: 1.8
+
+    Previously, Django truncated fractional seconds from ``datetime`` and
+    ``time`` values when using the MySQL backend. Now it lets the database
+    decide whether it should drop that part of the value or not. By default, new
+    ``DateTimeField`` or ``TimeField`` columns are now created with fractional
+    seconds support on MySQL 5.6.4 or later.
 
 ``TIMESTAMP`` columns
 ~~~~~~~~~~~~~~~~~~~~~
