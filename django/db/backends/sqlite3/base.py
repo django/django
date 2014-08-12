@@ -263,27 +263,36 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         return six.text_type(value)
 
-    def convert_values(self, value, field):
-        """SQLite returns floats when it should be returning decimals,
-        and gets dates and datetimes wrong.
-        For consistency with other backends, coerce when required.
-        """
-        if value is None:
-            return None
-
-        internal_type = field.get_internal_type()
-        if internal_type == 'DecimalField':
-            return backend_utils.typecast_decimal(field.format_number(value))
-        elif internal_type and internal_type.endswith('IntegerField') or internal_type == 'AutoField':
-            return int(value)
+    def get_db_converters(self, internal_type):
+        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+        if internal_type == 'DateTimeField':
+            converters.append(self.convert_datetimefield_value)
         elif internal_type == 'DateField':
-            return parse_date(value)
-        elif internal_type == 'DateTimeField':
-            return parse_datetime_with_timezone_support(value)
+            converters.append(self.convert_datefield_value)
         elif internal_type == 'TimeField':
-            return parse_time(value)
+            converters.append(self.convert_timefield_value)
+        elif internal_type == 'DecimalField':
+            converters.append(self.convert_decimalfield_value)
+        return converters
 
-        # No field, or the field isn't known to be a decimal or integer
+    def convert_decimalfield_value(self, value, field):
+        if value is not None:
+            value = backend_utils.typecast_decimal(field.format_number(value))
+        return value
+
+    def convert_datefield_value(self, value, field):
+        if value is not None and not isinstance(value, datetime.date):
+            value = parse_date(value)
+        return value
+
+    def convert_datetimefield_value(self, value, field):
+        if value is not None and not isinstance(value, datetime.datetime):
+            value = parse_datetime_with_timezone_support(value)
+        return value
+
+    def convert_timefield_value(self, value, field):
+        if value is not None and not isinstance(value, datetime.time):
+            value = parse_time(value)
         return value
 
     def bulk_insert_sql(self, fields, num_values):

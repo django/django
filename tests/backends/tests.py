@@ -20,8 +20,6 @@ from django.db.backends.signals import connection_created
 from django.db.backends.postgresql_psycopg2 import version as pg_version
 from django.db.backends.utils import format_number, CursorWrapper
 from django.db.models import Sum, Avg, Variance, StdDev
-from django.db.models.fields import (AutoField, DateField, DateTimeField,
-    DecimalField, IntegerField, TimeField)
 from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
 from django.test import (TestCase, TransactionTestCase, override_settings,
@@ -132,16 +130,6 @@ class SQLiteTests(TestCase):
                 models.Item.objects.all().aggregate, aggregate('date'))
             self.assertRaises(NotImplementedError,
                 models.Item.objects.all().aggregate, aggregate('last_modified'))
-
-    def test_convert_values_to_handle_null_value(self):
-        from django.db.backends.sqlite3.base import DatabaseOperations
-        convert_values = DatabaseOperations(connection).convert_values
-        self.assertIsNone(convert_values(None, AutoField(primary_key=True)))
-        self.assertIsNone(convert_values(None, DateField()))
-        self.assertIsNone(convert_values(None, DateTimeField()))
-        self.assertIsNone(convert_values(None, DecimalField()))
-        self.assertIsNone(convert_values(None, IntegerField()))
-        self.assertIsNone(convert_values(None, TimeField()))
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', "Test only for PostgreSQL")
