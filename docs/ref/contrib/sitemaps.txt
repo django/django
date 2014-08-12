@@ -54,8 +54,10 @@ Initialization
 To activate sitemap generation on your Django site, add this line to your
 :doc:`URLconf </topics/http/urls>`::
 
-   url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
-       {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
+    from django.contrib.sitemaps.views import sitemap
+
+    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap')
 
 This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
 
@@ -277,6 +279,7 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
 
     from django.conf.urls import url
     from django.contrib.sitemaps import FlatPageSitemap, GenericSitemap
+    from django.contrib.sitemaps.views import sitemap
     from blog.models import Entry
 
     info_dict = {
@@ -294,8 +297,8 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
         # ...
 
         # the sitemap
-        url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
-            {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+        url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
+            name='django.contrib.sitemaps.views.sitemap'),
     ]
 
 .. _URLconf: ../url_dispatch/
@@ -311,7 +314,10 @@ the sitemap. For example::
 
     # sitemaps.py
     from django.contrib import sitemaps
+    from django.contrib.sitemaps.views import sitemap
     from django.core.urlresolvers import reverse
+
+    from . import views
 
     class StaticViewSitemap(sitemaps.Sitemap):
         priority = 0.5
@@ -332,12 +338,12 @@ the sitemap. For example::
     }
 
     urlpatterns = [
-        url(r'^$', 'views.main', name='main'),
-        url(r'^about/$', 'views.about', name='about'),
-        url(r'^license/$', 'views.license', name='license'),
+        url(r'^$', views.main, name='main'),
+        url(r'^about/$', views.about, name='about'),
+        url(r'^license/$', views.license, name='license'),
         # ...
-        url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
-            {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
+        url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
+            name='django.contrib.sitemaps.views.sitemap')
     ]
 
 

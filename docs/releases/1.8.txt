@@ -548,6 +548,13 @@ Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
         url('^other/$', views.otherview),
     ]
 
+Passing a string as ``view`` to :func:`~django.conf.urls.url`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Related to the previous item, referencing views as strings in the ``url()``
+function is deprecated. Pass the callable view as described in the previous
+section instead.
+
 ``django.test.SimpleTestCase.urls``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -580,8 +587,10 @@ for reversing instead.
 If you are using :mod:`django.contrib.sitemaps`, add the ``name`` argument to
 the ``url`` that references :func:`django.contrib.sitemaps.views.sitemap`::
 
-    url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
-        {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
+    from django.contrib.sitemaps.views import sitemap
+
+    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap')
 
 to ensure compatibility when reversing by Python path is removed in Django 2.0.
 

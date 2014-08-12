@@ -44,6 +44,8 @@ about each item can often be found in the release notes of two versions prior.
 
 * The ``unordered_list`` filter will no longer support old style lists.
 
+* Support for string ``view`` arguments to ``url()`` will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
