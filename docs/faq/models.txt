@@ -65,6 +65,18 @@ uniqueness at that level. Single-column primary keys are needed for things such
 as the admin interface to work; e.g., you need a simple way of being able to
 specify an object to edit or delete.
 
+Does Django support NoSQL databases?
+------------------------------------
+
+NoSQL databases are not officially supported by Django itself. There are, however,
+a number of side project and forks which allow NoSQL functionality in Django,
+like `Django non-rel`_
+
+You can also take a look on `the wiki page`_ which discusses some alternatives.
+
+.. _`Django non-rel`: http://django-nonrel.org/
+.. _`the wiki page`: https://code.djangoproject.com/wiki/NoSqlSupport
+
 How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
 ------------------------------------------------------------------------------------------------------------------
 
