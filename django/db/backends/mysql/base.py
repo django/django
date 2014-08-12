@@ -364,8 +364,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             else:
                 raise ValueError("MySQL backend does not support timezone-aware datetimes when USE_TZ is False.")
 
-        # MySQL doesn't support microseconds
-        return six.text_type(value.replace(microsecond=0))
+        return six.text_type(value)
 
     def value_to_db_time(self, value):
         if value is None:
@@ -375,13 +374,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if timezone.is_aware(value):
             raise ValueError("MySQL backend does not support timezone-aware times.")
 
-        # MySQL doesn't support microseconds
-        return six.text_type(value.replace(microsecond=0))
-
-    def year_lookup_bounds_for_datetime_field(self, value):
-        # Again, no microseconds
-        first, second = super(DatabaseOperations, self).year_lookup_bounds_for_datetime_field(value)
-        return [first.replace(microsecond=0), second.replace(microsecond=0)]
+        return six.text_type(value)
 
     def max_name_length(self):
         return 64
