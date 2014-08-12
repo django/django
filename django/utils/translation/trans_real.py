@@ -14,7 +14,7 @@ from django.core.exceptions import AppRegistryNotReady
 from django.dispatch import receiver
 from django.test.signals import setting_changed
 from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str, force_text
 from django.utils._os import upath
 from django.utils.safestring import mark_safe, SafeData
 from django.utils import six, lru_cache
@@ -723,7 +723,7 @@ def templatize(src, origin=None):
                     comment_lineno_cache = t.lineno
             else:
                 out.write(blankout(t.contents, 'X'))
-    return out.getvalue()
+    return force_str(out.getvalue())
 
 
 def parse_accept_lang_header(lang_string):
