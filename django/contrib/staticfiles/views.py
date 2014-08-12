@@ -21,7 +21,9 @@ def serve(request, path, insecure=False, **kwargs):
 
     To use, put a URL pattern such as::
 
-        (r'^(?P<path>.*)$', 'django.contrib.staticfiles.views.serve')
+        from django.contrib.staticfiles import views
+
+        url(r'^(?P<path>.*)$', views.serve)
 
     in your URLconf.
 

@@ -2,12 +2,15 @@ import warnings
 
 from django.conf.urls import patterns, url, include
 
-from .views import empty_view, empty_view_partial, empty_view_wrapped, absolute_kwargs_view
+from .views import (
+    absolute_kwargs_view, defaults_view, empty_view, empty_view_partial,
+    empty_view_wrapped, nested_view,
+)
 
 
 other_patterns = [
     url(r'non_path_include/$', empty_view, name='non_path_include'),
-    url(r'nested_path/$', 'urlpatterns_reverse.views.nested_view'),
+    url(r'nested_path/$', nested_view),
 ]
 
 # test deprecated patterns() function. convert to list of urls() in Django 2.0
@@ -68,8 +71,8 @@ with warnings.catch_warnings(record=True):
         url(r'absolute_arg_view/$', absolute_kwargs_view),
 
         # Tests for #13154. Mixed syntax to test both ways of defining URLs.
-        url(r'defaults_view1/(?P<arg1>[0-9]+)/', 'urlpatterns_reverse.views.defaults_view', {'arg2': 1}, name='defaults'),
-        (r'defaults_view2/(?P<arg1>[0-9]+)/', 'urlpatterns_reverse.views.defaults_view', {'arg2': 2}, 'defaults'),
+        url(r'defaults_view1/(?P<arg1>[0-9]+)/', defaults_view, {'arg2': 1}, name='defaults'),
+        (r'defaults_view2/(?P<arg1>[0-9]+)/', defaults_view, {'arg2': 2}, 'defaults'),
 
         url('^includes/', include(other_patterns)),
     )

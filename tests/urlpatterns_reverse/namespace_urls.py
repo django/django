@@ -10,9 +10,9 @@ class URLObject(object):
 
     def urls(self):
         return ([
-            url(r'^inner/$', 'urlpatterns_reverse.views.empty_view', name='urlobject-view'),
-            url(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', 'urlpatterns_reverse.views.empty_view', name='urlobject-view'),
-            url(r'^inner/\+\\\$\*/$', 'urlpatterns_reverse.views.empty_view', name='urlobject-special-view'),
+            url(r'^inner/$', views.empty_view, name='urlobject-view'),
+            url(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),
+            url(r'^inner/\+\\\$\*/$', views.empty_view, name='urlobject-special-view'),
         ], self.app_name, self.namespace)
     urls = property(urls)
 

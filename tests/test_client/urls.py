@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
 
 from . import views
@@ -32,6 +33,6 @@ urlpatterns = [
     url(r'^mass_mail_sending_view/$', views.mass_mail_sending_view),
     url(r'^django_project_redirect/$', views.django_project_redirect),
 
-    url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'login.html'}),
-    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout'),
+    url(r'^accounts/login/$', auth_views.login, {'template_name': 'login.html'}),
+    url(r'^accounts/logout/$', auth_views.logout),
 ]

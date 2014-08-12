@@ -5,6 +5,7 @@ from django.conf.urls import patterns, url
 from django.core.urlresolvers import LocaleRegexURLResolver
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.views.i18n import set_language
 
 
 def i18n_patterns(prefix, *args):
@@ -30,5 +31,5 @@ def i18n_patterns(prefix, *args):
 
 
 urlpatterns = [
-    url(r'^setlang/$', 'django.views.i18n.set_language', name='set_language'),
+    url(r'^setlang/$', set_language, name='set_language'),
 ]
