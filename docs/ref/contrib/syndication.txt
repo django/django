@@ -217,7 +217,7 @@ The police beat feeds could be accessible via URLs like this:
 
 These can be matched with a :doc:`URLconf </topics/http/urls>` line such as::
 
-    (r'^beats/(?P<beat_id>[0-9]+)/rss/$', BeatFeed()),
+    url(r'^beats/(?P<beat_id>[0-9]+)/rss/$', BeatFeed()),
 
 Like a view, the arguments in the URL are passed to the ``get_object()``
 method along with the request object.

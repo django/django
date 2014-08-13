@@ -1476,7 +1476,7 @@ Make sure that the following item is in your
 
 Activate this view by adding the following line to your URLconf::
 
-    (r'^i18n/', include('django.conf.urls.i18n')),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
 
 (Note that this example makes the view available at ``/i18n/setlang/``.)
 

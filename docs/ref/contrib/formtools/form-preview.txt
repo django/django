@@ -77,7 +77,7 @@ How to use ``FormPreview``
 
    ...and add the following line to the appropriate model in your URLconf::
 
-       (r'^post/$', SomeModelFormPreview(SomeModelForm)),
+       url(r'^post/$', SomeModelFormPreview(SomeModelForm)),
 
    where ``SomeModelForm`` is a Form or ModelForm class for the model.
 
