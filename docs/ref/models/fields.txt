@@ -544,7 +544,8 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
 
 .. class:: EmailField([max_length=254, **options])
 
-A :class:`CharField` that checks that the value is a valid email address.
+A :class:`CharField` that checks that the value is a valid email address. It
+uses :class:`~django.core.validators.EmailValidator` to validate the input.
 
 .. versionchanged:: 1.8
 
