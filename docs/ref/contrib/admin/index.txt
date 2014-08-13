@@ -1456,7 +1456,7 @@ templates used by the :class:`ModelAdmin` views:
 
     Notice the wrapped view in the fifth line above::
 
-        (r'^my_view/$', self.admin_site.admin_view(self.my_view))
+        url(r'^my_view/$', self.admin_site.admin_view(self.my_view))
 
     This wrapping will protect ``self.my_view`` from unauthorized access and
     will apply the ``django.views.decorators.cache.never_cache`` decorator to
@@ -1466,7 +1466,7 @@ templates used by the :class:`ModelAdmin` views:
     performed, you can pass a ``cacheable=True`` argument to
     ``AdminSite.admin_view()``::
 
-        (r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
+        url(r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
 
 .. method:: ModelAdmin.get_form(request, obj=None, **kwargs)
 
