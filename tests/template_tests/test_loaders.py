@@ -148,17 +148,17 @@ class CachedLoader(TestCase):
 )
 class RenderToStringTest(TestCase):
     def test_basic(self):
-        self.assertEqual(loader.render_to_string('test_context.html'), 'obj:')
+        self.assertEqual(loader.render_to_string('test_context.html'), 'obj:\n')
 
     def test_basic_context(self):
         self.assertEqual(loader.render_to_string('test_context.html',
-                                                 {'obj': 'test'}), 'obj:test')
+                                                 {'obj': 'test'}), 'obj:test\n')
 
     def test_existing_context_kept_clean(self):
         context = Context({'obj': 'before'})
         output = loader.render_to_string('test_context.html', {'obj': 'after'},
                                          context_instance=context)
-        self.assertEqual(output, 'obj:after')
+        self.assertEqual(output, 'obj:after\n')
         self.assertEqual(context['obj'], 'before')
 
     def test_empty_list(self):
