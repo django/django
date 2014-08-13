@@ -302,6 +302,52 @@ class ExceptionReporterTests(TestCase):
         self.assertIn('<h2>Request information</h2>', html)
         self.assertIn('<p>Request data not supplied</p>', html)
 
+    def test_non_utf8_values_handling(self):
+        "Non-UTF-8 exceptions/values should not make the output generation choke."
+        try:
+            class NonUtf8Output(Exception):
+                def __repr__(self):
+                    return b'EXC\xe9EXC'
+            somevar = b'VAL\xe9VAL'  # NOQA
+            raise NonUtf8Output()
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn('VAL\\xe9VAL', html)
+        self.assertIn('EXC\\xe9EXC', html)
+
+    def test_unprintable_values_handling(self):
+        "Unprintable values should not make the output generation choke."
+        try:
+            class OomOutput(object):
+                def __repr__(self):
+                    raise MemoryError('OOM')
+            oomvalue = OomOutput()  # NOQA
+            raise ValueError()
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn('<td class="code"><pre>Error in formatting', html)
+
+    def test_too_large_values_handling(self):
+        "Large values should not create a large HTML."
+        large = 32 * 1024 * 1024
+        repr_of_str_adds = len(repr(''))
+        try:
+            class LargeOutput(object):
+                def __repr__(self):
+                    return repr('A' * large)
+            largevalue = LargeOutput()  # NOQA
+            raise ValueError()
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertEqual(len(html) // 1024 // 1024, 0)  # still fit in 1MB
+        self.assertIn('&lt;trimmed %d bytes string&gt;' % (large + repr_of_str_adds,), html)
+
     @skipIf(six.PY2, 'Bug manifests on PY3 only')
     def test_unfrozen_importlib(self):
         """
