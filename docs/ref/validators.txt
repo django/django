@@ -105,6 +105,35 @@ to, or in lieu of custom ``field.clean()`` methods.
         :exc:`TypeError` is raised.
         Defaults to `0`.
 
+``EmailValidator``
+------------------
+
+.. class:: EmailValidator([message=None, code=None, whitelist=None])
+
+    :param message: If not ``None``, overrides :attr:`.message`.
+    :param code: If not ``None``, overrides :attr:`code`.
+    :param whitelist: If not ``None``, overrides :attr:`whitelist`.
+
+    .. attribute:: message
+
+        The error message used by
+        :exc:`~django.core.exceptions.ValidationError` if validation fails.
+        Defaults to ``"Enter a valid email address"``.
+
+    .. attribute:: code
+
+        The error code used by :exc:`~django.core.exceptions.ValidationError`
+        if validation fails. Defaults to ``"invalid"``.
+
+    .. attribute:: whitelist
+
+        Whitelist of email domains to allow. By default, a regular expression
+        (the ``domain_regex`` attribute) is used to validate whatever appears
+        after the @ sign. However, if that string appears in the whitelist, this
+        validation is bypassed. If not provided, the default whitelist is
+        ``['localhost']``. Other domains that don't contain a dot won't pass
+        validation, so you'd need to whitelist them as necessary.
+
 ``URLValidator``
 ----------------
 .. class:: URLValidator([schemes=None, regex=None, message=None, code=None])
@@ -130,8 +159,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 ------------------
 .. data:: validate_email
 
-    An ``EmailValidator`` instance that ensures a value looks like an
-    email address.
+    An :class:`EmailValidator` instance without any customizations.
 
 ``validate_slug``
 -----------------
