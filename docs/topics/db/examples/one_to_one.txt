@@ -21,8 +21,8 @@ In this example, a ``Place`` optionally can be a ``Restaurant``:
 
     class Restaurant(models.Model):
         place = models.OneToOneField(Place, primary_key=True)
-        serves_hot_dogs = models.BooleanField()
-        serves_pizza = models.BooleanField()
+        serves_hot_dogs = models.BooleanField(default=False)
+        serves_pizza = models.BooleanField(default=False)
 
         def __str__(self):              # __unicode__ on Python 2
             return "%s the restaurant" % self.place.name
