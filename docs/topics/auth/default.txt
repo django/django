@@ -476,9 +476,11 @@ The login_required decorator
     Note that if you don't specify the ``login_url`` parameter, you'll need to
     ensure that the :setting:`settings.LOGIN_URL <LOGIN_URL>` and your login
     view are properly associated. For example, using the defaults, add the
-    following line to your URLconf::
+    following lines to your URLconf::
 
-        (r'^accounts/login/$', 'django.contrib.auth.views.login'),
+        from django.contrib.auth import views as auth_views
+
+        url(r'^accounts/login/$', auth_views.login),
 
     The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts view function
     names and :ref:`named URL patterns <naming-url-patterns>`. This allows you
@@ -752,7 +754,7 @@ patterns.
     the view in your URLconf. For example, this URLconf line would use
     :file:`myapp/login.html` instead::
 
-        (r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'myapp/login.html'}),
+        url(r'^accounts/login/$', auth_views.login, {'template_name': 'myapp/login.html'}),
 
     You can also specify the name of the ``GET`` field which contains the URL
     to redirect to after login by passing ``redirect_field_name`` to the view.
