@@ -309,7 +309,17 @@ class ExceptionReporter(object):
         frames = self.get_traceback_frames()
         for i, frame in enumerate(frames):
             if 'vars' in frame:
-                frame['vars'] = [(k, force_escape(pprint(v))) for k, v in frame['vars']]
+                vars = []
+                for k, v in frame['vars']:
+                    v = pprint(v)
+                    # The force_escape filter assume unicode, make sure that works
+                    if isinstance(v, six.binary_type):
+                        v = v.decode('utf-8', 'replace')  # don't choke on non-utf-8 input
+                    # You may be looking at large blobs of data, trim it
+                    if len(v) > 4096:
+                        v = '%s... <trimmed %d bytes string>' % (v[0:4096], len(v))
+                    vars.append((k, force_escape(v)))
+                frame['vars'] = vars
             frames[i] = frame
 
         unicode_hint = ''
