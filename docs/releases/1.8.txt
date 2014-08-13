@@ -492,6 +492,11 @@ Miscellaneous
   ``'username'``, using the the ``'unique'`` key in its
   :attr:`~django.forms.Field.error_messages` argument.
 
+* ``AdminSite`` no longer takes an ``app_name`` argument and its ``app_name``
+  attribute has been removed. The application name is always ``admin`` (as
+  opposed to the instance name which you can still customize using
+  ``AdminSite(name="...")``.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
