@@ -1451,7 +1451,7 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Any field that is a m2m field should not be allowed
         # ordering
-        m2m_field_names = set(f.name for f in cls._meta.get_fields(data=False, m2m=True))
+        m2m_field_names = set(f.name for f in cls._meta.many_to_many)
         invalid_fields.extend(fields & m2m_field_names)
 
         for invalid_field in invalid_fields:
