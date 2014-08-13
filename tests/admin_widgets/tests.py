@@ -1126,7 +1126,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Click the Add User button to add new
         self.selenium.find_element_by_id('add_id_user').click()
         self.selenium.switch_to.window('id_user')
-        self.wait_page_loaded()
+        self.wait_for('#id_password')
         password_field = self.selenium.find_element_by_id('id_password')
         password_field.send_keys('password')
 
