@@ -32,6 +32,13 @@
     {% endif %}
 {% else %}
     <p>{% blocktrans %}Are you sure you want to delete the selected {{ objects_name }}? All of the following objects and their related items will be deleted:{% endblocktrans %}</p>
+    <h2>{% trans "Summary" %}</h2>
+    <ul>
+        {% for model_name, object_count in model_count.items %}
+        <li>{{ model_name }}: {{ object_count }}</li>
+        {% endfor %}
+    </ul>
+    <h2>{% trans "Objects" %}</h2>
     {% for deletable_object in deletable_objects %}
         <ul>{{ deletable_object|unordered_list }}</ul>
     {% endfor %}

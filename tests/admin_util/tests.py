@@ -4,9 +4,10 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.models import User
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import (display_for_field, flatten,
-    flatten_fieldsets, label_for_field, lookup_field, NestedObjects)
+    flatten_fieldsets, label_for_field, lookup_field, NestedObjects, map_nested_list)
 from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.contrib.sites.models import Site
 from django.db import models, DEFAULT_DB_ALIAS
@@ -24,11 +25,14 @@ class NestedObjectsTests(TestCase):
     Tests for ``NestedObject`` utility collection.
     """
     def setUp(self):
-        self.n = NestedObjects(using=DEFAULT_DB_ALIAS)
+        self.n = NestedObjects(User.objects.create(), using=DEFAULT_DB_ALIAS)
         self.objs = [Count.objects.create(num=i) for i in range(5)]
 
     def _check(self, target):
-        self.assertEqual(self.n.nested(lambda obj: obj.num), target)
+        self.assertEqual(
+            map_nested_list(lambda obj: obj.num, self.n.as_nested_list()),
+            target
+        )
 
     def _connect(self, i, j):
         self.objs[i].parent = self.objs[j]
@@ -66,19 +70,20 @@ class NestedObjectsTests(TestCase):
         self._connect(2, 0)
         # 1 query to fetch all children of 0 (1 and 2)
         # 1 query to fetch all children of 1 and 2 (none)
+        # 2 queries to check for permissions of 2 objects
         # Should not require additional queries to populate the nested graph.
-        self.assertNumQueries(2, self._collect, 0)
+        self.assertNumQueries(4, self._collect, 0)
 
     def test_on_delete_do_nothing(self):
         """
         Check that the nested collector doesn't query for DO_NOTHING objects.
         """
-        n = NestedObjects(using=DEFAULT_DB_ALIAS)
         objs = [Event.objects.create()]
         EventGuide.objects.create(event=objs[0])
-        with self.assertNumQueries(2):
-            # One for Location, one for Guest, and no query for EventGuide
-            n.collect(objs)
+        with self.assertNumQueries(4):
+            # One for Location, one for Guest, two for permissions,
+            # and no query for EventGuide
+            self.n.collect(objs)
 
     def test_relation_on_abstract(self):
         """
@@ -86,9 +91,8 @@ class NestedObjectsTests(TestCase):
         (AttributeError) on the special notation for relations on abstract
         models (related_name that contains %(app_label)s and/or %(class)s).
         """
-        n = NestedObjects(using=DEFAULT_DB_ALIAS)
         Car.objects.create()
-        n.collect([Vehicle.objects.first()])
+        self.n.collect([Vehicle.objects.first()])
 
 
 class UtilTests(SimpleTestCase):

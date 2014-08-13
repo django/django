@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+from collections import defaultdict
 
 from django.contrib.auth import get_permission_codename
 from django.db import models
@@ -105,18 +106,34 @@ def flatten_fieldsets(fieldsets):
     return field_names
 
 
+def map_nested_list(func, ls):
+    if isinstance(ls, (tuple, list)):
+        return [map_nested_list(func, x) for x in ls]
+    else:
+        return func(ls)
+
+
 def get_deleted_objects(objs, opts, user, admin_site, using):
     """
     Find all objects related to ``objs`` that should also be deleted. ``objs``
     must be a homogeneous iterable of objects (e.g. a QuerySet).
 
-    Returns a nested list of strings suitable for display in the
-    template with the ``unordered_list`` filter.
+    Returns a 4-tuple (deleted_objects, model_count, perms_needed, protected) where
+
+    * deleted_objects is a nested list of strings suitable for display in the
+      template with the ``unordered_list`` filter.
+    * model_count is a map from "model name" to the "number of objects of that
+      type involved in the deletion", e.g. {'User': 3, 'Group': 5}
+    * perms_needed is a list of model names that hinder the deletion because of
+      lacking permissions
+    * protected is a list of objects that hinder the deletion because their
+      deletion strategy is set to PROTECTED in the model definition.
 
     """
-    collector = NestedObjects(using=using)
+    collector = NestedObjects(user, using=using)
     collector.collect(objs)
-    perms_needed = set()
+    if collector.perms_needed:
+        return [], {}, collector.perms_needed, []
 
     def format_callback(obj):
         has_admin = obj.__class__ in admin_site._registry
@@ -126,6 +143,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
                                    force_text(obj))
 
         if has_admin:
+            # Display a link to the admin page.
             try:
                 admin_url = reverse('%s:%s_%s_change'
                                     % (admin_site.name,
@@ -136,11 +154,6 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
                 # Change url doesn't exist -- don't display link to edit
                 return no_edit_link
 
-            p = '%s.%s' % (opts.app_label,
-                           get_permission_codename('delete', opts))
-            if not user.has_perm(p):
-                perms_needed.add(opts.verbose_name)
-            # Display a link to the admin page.
             return format_html('{0}: <a href="{1}">{2}</a>',
                                capfirst(opts.verbose_name),
                                admin_url,
@@ -150,24 +163,32 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
             # admin or is edited inline.
             return no_edit_link
 
-    to_delete = collector.nested(format_callback)
+    if collector.protected:
+        return [], {}, [], map(format_callback, collector.protected)
 
-    protected = [format_callback(obj) for obj in collector.protected]
-
-    return to_delete, perms_needed, protected
+    to_delete = map_nested_list(format_callback, collector.as_nested_list())
+    return to_delete, collector.model_count, [], []
 
 
 class NestedObjects(Collector):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, *args, **kwargs):
         super(NestedObjects, self).__init__(*args, **kwargs)
-        self.edges = {}  # {from_instance: [to_instances]}
+        self.user = user
+        self.edges = {} # {from_instance: [to_instances]}
         self.protected = set()
+        self.perms_needed = set()
+        self.model_count = defaultdict(int)
 
     def add_edge(self, source, target):
         self.edges.setdefault(source, []).append(target)
 
     def collect(self, objs, source=None, source_attr=None, **kwargs):
         for obj in objs:
+            opts = obj._meta
+            codename = get_permission_codename('delete', opts)
+            if not self.user.has_perm("%s.%s" % (opts.app_label, codename)):
+                self.perms_needed.add(opts.verbose_name)
+
             if source_attr and not source_attr.endswith('+'):
                 related_name = source_attr % {
                     'class': source._meta.model_name,
@@ -176,6 +197,7 @@ class NestedObjects(Collector):
                 self.add_edge(getattr(obj, related_name), obj)
             else:
                 self.add_edge(None, obj)
+            self.model_count[opts.verbose_name] += 1
         try:
             return super(NestedObjects, self).collect(objs, source_attr=source_attr, **kwargs)
         except models.ProtectedError as e:
@@ -185,22 +207,19 @@ class NestedObjects(Collector):
         qs = super(NestedObjects, self).related_objects(related, objs)
         return qs.select_related(related.field.name)
 
-    def _nested(self, obj, seen, format_callback):
+    def _as_nested_list(self, obj, seen):
         if obj in seen:
             return []
         seen.add(obj)
         children = []
         for child in self.edges.get(obj, ()):
-            children.extend(self._nested(child, seen, format_callback))
-        if format_callback:
-            ret = [format_callback(obj)]
-        else:
-            ret = [obj]
+            children.extend(self._as_nested_list(child, seen))
         if children:
-            ret.append(children)
-        return ret
+            return [obj, children]
+        else:
+            return [obj]
 
-    def nested(self, format_callback=None):
+    def as_nested_list(self):
         """
         Return the graph as a nested list.
 
@@ -208,7 +227,7 @@ class NestedObjects(Collector):
         seen = set()
         roots = []
         for root in self.edges.get(None, ()):
-            roots.extend(self._nested(root, seen, format_callback))
+            roots.extend(self._as_nested_list(root, seen))
         return roots
 
     def can_fast_delete(self, *args, **kwargs):
