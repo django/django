@@ -560,19 +560,22 @@ Adding a deconstruct() method
 
 You can let Django serialize your own custom class instances by giving the class
 a ``deconstruct()`` method. It takes no arguments, and should return a tuple
-of three things: ``(path, args, kwargs)``. Note this return value is different
-from the ``deconstruct()`` method :ref:`for custom fields
-<custom-field-deconstruct-method>` which returns a tuple of four items.
+of three things ``(path, args, kwargs)``:
 
-``path`` should be the Python path to the class, with the class name included as the
-last part (for example, ``myapp.custom_things.MyClass``). If your class is not
-available at the top level of a module it is not serializable.
+* ``path`` should be the Python path to the class, with the class name included
+  as the last part (for example, ``myapp.custom_things.MyClass``). If your
+  class is not available at the top level of a module it is not serializable.
 
-``args`` should be a list of positional arguments to pass to your class'
-``__init__`` method. Everything in this list should itself be serializable.
+* ``args`` should be a list of positional arguments to pass to your class'
+  ``__init__`` method. Everything in this list should itself be serializable.
 
-``kwargs`` should be a dict of keyword arguments to pass to your class'
-``__init__`` method. Every value should itself be serializable.
+* ``kwargs`` should be a dict of keyword arguments to pass to your class'
+  ``__init__`` method. Every value should itself be serializable.
+
+.. note::
+    This return value is different from the ``deconstruct()`` method
+    :ref:`for custom fields <custom-field-deconstruct-method>` which returns a
+    tuple of four items.
 
 Django will write out the value as an instantiation of your class with the
 given arguments, similar to the way it writes out references to Django fields.
