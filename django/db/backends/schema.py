@@ -193,6 +193,18 @@ class BaseDatabaseSchemaEditor(object):
         """
         raise NotImplementedError()
 
+    def unique_together_indexes(self, model):
+        """Returns fields that will already have an index by virtue of being
+        the first field in a unique_together constraint.
+
+        Override to disable by returning an empty iterable"""
+        indexed = set()
+        for field_names in model._meta.unique_together:
+            name = field_names[0]
+            field = model._meta.get_field_by_name(name)[0]
+            indexed.add(field)
+        return indexed
+
     # Actions
 
     def create_model(self, model):
@@ -203,6 +215,8 @@ class BaseDatabaseSchemaEditor(object):
         # Create column SQL, add FK deferreds if needed
         column_sqls = []
         params = []
+
+        already_indexed = self.unique_together_indexes(model)
         for field in model._meta.local_fields:
             # SQL
             definition, extra_params = self.column_sql(model, field)
@@ -218,7 +232,7 @@ class BaseDatabaseSchemaEditor(object):
                 definition += " %s" % col_type_suffix
             params.extend(extra_params)
             # Indexes
-            if field.db_index and not field.unique:
+            if field.db_index and not (field.unique or field in already_indexed):
                 self.deferred_sql.append(
                     self.sql_create_index % {
                         "name": self._create_index_name(model, [field.column], suffix=""),

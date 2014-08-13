@@ -767,6 +767,15 @@ class SchemaTests(TransactionTestCase):
         self.assertRaises(IntegrityError, UniqueTest.objects.create, year=2012, slug="foo")
         UniqueTest.objects.all().delete()
 
+    def test_unique_together_indexes(self):
+        """
+        Get the fields that do not need another index
+        """
+        with connection.schema_editor() as editor:
+            fields = editor.unique_together_indexes(UniqueTest)
+        expected = set([UniqueTest._meta.get_field_by_name("year")[0]])
+        self.assertSequenceEqual(fields, expected)
+
     def test_index_together(self):
         """
         Tests removing and adding index_together constraints on a model.
