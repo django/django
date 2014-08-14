@@ -648,7 +648,7 @@ class DateTimePickerSeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.admin_login(username='super', password='secret', login_url='/')
 
         # Enter test data
-        member = models.Member.objects.create(name='Bob', birthdate=datetime(1984, 05, 15), gender='M')
+        member = models.Member.objects.create(name='Bob', birthdate=datetime(1984, 5, 15), gender='M')
 
         # Get month names translations for every locales
         month_string = 'January February March April May June July August September October November December'
