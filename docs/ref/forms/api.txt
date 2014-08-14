@@ -945,7 +945,7 @@ form data)::
 Constructing an unbound form is the same as always -- just omit both
 form data *and* file data::
 
-    # Unbound form with a image field
+    # Unbound form with an image field
     >>> f = ContactFormWithMugshot()
 
 Testing for multipart forms
