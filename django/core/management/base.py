@@ -380,7 +380,7 @@ class BaseCommand(object):
         if options.get('no_color'):
             self.style = no_style()
             self.stderr = OutputWrapper(options.get('stderr', sys.stderr))
-            os.environ["DJANGO_COLORS"] = "nocolor"
+            os.environ[str("DJANGO_COLORS")] = str("nocolor")
         else:
             self.stderr = OutputWrapper(options.get('stderr', sys.stderr), self.style.ERROR)
 
