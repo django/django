@@ -656,8 +656,6 @@ Methods
     specified, it is formed by the :setting:`DEFAULT_CONTENT_TYPE` and
     :setting:`DEFAULT_CHARSET` settings, by default: "`text/html; charset=utf-8`".
 
-    Historically, this parameter was called ``mimetype`` (now deprecated).
-
     ``status`` is the `HTTP status code`_ for the response.
 
     .. versionadded:: 1.6
