@@ -1,7 +1,7 @@
 "This is the locale selecting middleware that will look at accept headers"
 
 from django.conf import settings
-from django.core.urlresolvers import (is_valid_path, get_resolver,
+from django.core.urlresolvers import (is_valid_path, get_resolver, get_script_prefix,
                                       LocaleRegexURLResolver)
 from django.http import HttpResponseRedirect
 from django.utils.cache import patch_vary_headers
@@ -45,9 +45,18 @@ class LocaleMiddleware(object):
                 path_valid = is_valid_path("%s/" % language_path, urlconf)
 
             if path_valid:
-                language_url = "%s://%s/%s%s" % (
-                    request.scheme, request.get_host(), language,
-                    request.get_full_path())
+                script_prefix = get_script_prefix()
+                language_url = "%s://%s%s" % (
+                    request.scheme,
+                    request.get_host(),
+                    # insert language after the script prefix and before the
+                    # rest of the URL
+                    request.get_full_path().replace(
+                        script_prefix,
+                        '%s%s/' % (script_prefix, language),
+                        1
+                    )
+                )
                 return self.response_redirect_class(language_url)
 
         if not (self.is_language_prefix_patterns_used()

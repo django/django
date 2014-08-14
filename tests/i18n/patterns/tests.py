@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import os
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse, clear_url_caches
+from django.core.urlresolvers import reverse, clear_url_caches, set_script_prefix
 from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
 from django.test import TestCase, override_settings
@@ -288,6 +288,25 @@ class URLResponseTests(URLTestCaseBase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['content-language'], 'pt-br')
         self.assertEqual(response.context['LANGUAGE_CODE'], 'pt-br')
+
+
+class URLRedirectWithScriptAliasTests(URLTestCaseBase):
+    """
+    #21579 - LocaleMiddleware should respect the script prefix.
+    """
+    def setUp(self):
+        super(URLRedirectWithScriptAliasTests, self).setUp()
+        self.script_prefix = '/script_prefix'
+        set_script_prefix(self.script_prefix)
+
+    def tearDown(self):
+        super(URLRedirectWithScriptAliasTests, self).tearDown()
+        # reset script prefix
+        set_script_prefix('')
+
+    def test_language_prefix_with_script_prefix(self):
+        response = self.client.get('/prefixed/', HTTP_ACCEPT_LANGUAGE='en', SCRIPT_NAME=self.script_prefix)
+        self.assertRedirects(response, '%s/en/prefixed/' % self.script_prefix, target_status_code=404)
 
 
 class URLTagTests(URLTestCaseBase):
