@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from collections import defaultdict
 import datetime
 import decimal
+from collections import defaultdict
 
 from django.contrib.auth import get_permission_codename
 from django.db import models
