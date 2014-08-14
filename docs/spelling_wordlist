@@ -151,6 +151,7 @@ dictsortreversed
 diff
 diffsettings
 dirmod
+Disqus
 distro
 divisibleby
 django
@@ -286,6 +287,7 @@ init
 inline
 inlines
 inspectdb
+Instagram
 intcomma
 internet
 intranet
@@ -309,6 +311,7 @@ iTunes
 ize
 Jannis
 javascript
+Jinja
 jQuery
 JServ
 Julien
@@ -344,6 +347,7 @@ localflavors
 localhost
 localizable
 localtime
+Loïc
 lorem
 lt
 lte
@@ -434,6 +438,7 @@ PIL
 pingback
 pingbacks
 Pinney
+Pinterest
 plaintext
 plugin
 plugins
@@ -504,7 +509,7 @@ reraise
 reST
 reStructuredText
 reupload
-Reusability
+reusability
 revalidate
 rhs
 rjust
@@ -530,6 +535,7 @@ serializability
 serializable
 serializer
 serializers
+servlet
 sessionid
 setuptools
 sha
