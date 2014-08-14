@@ -126,12 +126,32 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         The optional ``schemes`` attribute was added.
 
-``validate_email``
+``EmailValidator``
 ------------------
-.. data:: validate_email
 
-    An ``EmailValidator`` instance that ensures a value looks like an
-    email address.
+.. class:: EmailValidator([message=None, code=None, whitelist=None])
+
+    :param message: If not ``None``, overrides :attr:`.message`.
+    :param code: If not ``None``, overrides :attr:`code`.
+    :param whitelist: If not ``None``, overrides :attr:`whitelist`.
+
+    .. attribute:: message
+
+        The error message used by
+        :exc:`~django.core.exceptions.ValidationError` if validation fails.
+        Defaults to ``"Enter a valid email address"``.
+
+    .. attribute:: code
+
+        The error code used by :exc:`~django.core.exceptions.ValidationError`
+        if validation fails. Defaults to ``"invalid"``.
+
+    .. attribute:: whitelist
+
+        Whitelist of email domains to validate against. By default, a regular
+        expression ``domain_regex`` is used to validate the email domains,
+        using the whitelist allows to bypass this validation. If not provided,
+        the default whitelist is ``['localhost']``.
 
 ``validate_slug``
 -----------------
