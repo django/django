@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Jeong Seongtae <magno79@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-16 08:51+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-05-20 12:20+0200\n"
+"PO-Revision-Date: 2014-06-10 10:53+0000\n"
+"Last-Translator: Jeong Seongtae <magno79@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/django/language/"
 "ko/)\n"
 "MIME-Version: 1.0\n"
@@ -17,246 +18,246 @@ msgstr ""
 "Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin.py:41
+#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "개인정보"
 
-#: admin.py:42
+#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "권한"
 
-#: admin.py:44
+#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "중요한 일정"
 
-#: admin.py:126
+#: contrib/auth/admin.py:134
 msgid "Password changed successfully."
 msgstr "비밀번호가 변경되었습니다."
 
-#: admin.py:136
+#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "비밀번호 변경: %s"
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: contrib/auth/apps.py:10
+msgid "Authentication and Authorization"
+msgstr "인증 및 권한"
+
+#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
+#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
-msgstr ""
+msgstr "비밀번호가 설정되지 않습니다."
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
+#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
+msgstr "잘못된 비밀번호 포맷이거나 알 수 없는 해싱 알고리즘 입니다."
 
-#: forms.py:67
+#: contrib/auth/forms.py:76
 msgid "A user with that username already exists."
 msgstr "해당 사용자명은 이미 존재합니다."
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
+#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "비밀번호가 일치하지 않습니다."
 
-#: forms.py:70 forms.py:115
+#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
 msgid "Username"
 msgstr "사용자명"
 
-#: forms.py:72 forms.py:116
+#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
+#: contrib/auth/models.py:368
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "필수항목입니다. 30자 이내로 입력하세요. (알파벳, 숫자, @/./+/-/_만 가능)"
 
-#: forms.py:75 forms.py:119
+#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "알파벳, 숫자 및 @/./+/-/_만 가능합니다."
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
+#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "비밀번호"
 
-#: forms.py:79
+#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "비밀번호 확인"
 
-#: forms.py:81
+#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "확인을 위해 위와 동일한 비밀번호를 입력하세요. "
 
-#: forms.py:122
+#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
+"원 비밀번호는 저장되지 않으므로, 사용자의 비밀번호를 볼 수 있는 방법은 없습니"
+"다, 하지만 <a href=\"password/\">이 양식</a>을 사용하여 비밀번호를 변경할 수 "
+"있습니다."
 
-#: forms.py:151
+#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"올바른 %(username)s와/과 비밀번호를 입력하십시오. 두 필드 모두 대문자와 소문"
+"자를 구별합니다."
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"사용하시는 브라우저가 쿠키를 허용하지 않습니다.로그인하기 위해서는 쿠키 사용"
-"이 필요합니다."
-
-#: forms.py:155
+#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "이 계정은 유효하지 않습니다."
 
-#: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr ""
-
-#: forms.py:211
+#: contrib/auth/forms.py:231
 msgid "Email"
-msgstr ""
+msgstr "이메일"
 
-#: forms.py:271
+#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "새 비밀번호:"
 
-#: forms.py:273
+#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "새 비밀번호 확인:"
 
-#: forms.py:302
+#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "기존 비밀번호를 잘못 입력하셨습니다. 다시 입력해 주세요."
 
-#: forms.py:305
+#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "기존 비밀번호:"
 
-#: forms.py:333
+#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "비밀번호 (확인)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
+#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
+#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
+#: contrib/auth/hashers.py:511
 msgid "algorithm"
-msgstr ""
+msgstr "알고리즘"
 
-#: hashers.py:242
+#: contrib/auth/hashers.py:253
 msgid "iterations"
-msgstr ""
+msgstr "반복"
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
+#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
+#: contrib/auth/hashers.py:512
 msgid "salt"
-msgstr ""
+msgstr "솔트"
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
+#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
+#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
-msgstr ""
+msgstr "해시"
 
-#: hashers.py:293
+#: contrib/auth/hashers.py:336
 msgid "work factor"
-msgstr ""
+msgstr "워크 팩터"
 
-#: hashers.py:295
+#: contrib/auth/hashers.py:338
 msgid "checksum"
-msgstr ""
+msgstr "체크섬"
 
-#: models.py:72 models.py:121
+#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "이름"
 
-#: models.py:74
+#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "코드명"
 
-#: models.py:78
+#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "허가"
 
-#: models.py:79 models.py:123
+#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "허가"
 
-#: models.py:128
+#: contrib/auth/models.py:119
 msgid "group"
 msgstr "그룹"
 
-#: models.py:129 models.py:301
+#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "그룹"
 
-#: models.py:200
+#: contrib/auth/models.py:192
 msgid "password"
 msgstr "비밀번호"
 
-#: models.py:201
+#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "마지막 로그인"
 
-#: models.py:298
+#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "최상위 사용자 권한"
 
-#: models.py:299
+#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "해당 사용자에게 모든 권한을 허가합니다."
 
-#: models.py:302
+#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
 msgstr ""
+"이 사용자가 속한 그룹. 사용자는 그/그녀의 각 그룹에 부여된 모든 권한을 얻을 "
+"것입니다."
 
-#: models.py:306
+#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "사용자 권한"
 
-#: models.py:377
+#: contrib/auth/models.py:300
+msgid "Specific permissions for this user."
+msgstr "이 사용자를 위한 특정 권한."
+
+#: contrib/auth/models.py:367
 msgid "username"
 msgstr "사용자명"
 
-#: models.py:378
-msgid ""
-"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
-"필수항목입니다. 30자 이내로 입력하세요. (알파벳, 숫자, @/./+/-/_만 가능)"
-
-#: models.py:381
+#: contrib/auth/models.py:371
 msgid "Enter a valid username."
-msgstr ""
+msgstr "올바른 사용자명을 입력하세요."
 
-#: models.py:383
+#: contrib/auth/models.py:373
 msgid "first name"
 msgstr "이름"
 
-#: models.py:384
+#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "성"
 
-#: models.py:385
+#: contrib/auth/models.py:375
 msgid "email address"
-msgstr ""
+msgstr "이메일 주소"
 
-#: models.py:386
+#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "스태프 권한"
 
-#: models.py:387
+#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "사용자가 관리사이트에 로그인이 가능한지를 나타냅니다."
 
-#: models.py:389
+#: contrib/auth/models.py:379
 msgid "active"
 msgstr "활성"
 
-#: models.py:390
+#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -264,23 +265,55 @@ msgstr ""
 "사용자가 'Django 관리'에 로그인이 가능한지를 나타냅니다.계정을 삭제하는 대신 "
 "이것을 선택 해제하세요."
 
-#: models.py:392
+#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "등록일"
 
-#: models.py:400
+#: contrib/auth/models.py:390
 msgid "user"
 msgstr "사용자"
 
-#: models.py:401
+#: contrib/auth/models.py:391
 msgid "users"
 msgstr "사용자(들)"
 
-#: views.py:94
+#: contrib/auth/templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "%(site_name)s의 비밀번호 재설정"
+
+#: contrib/auth/tests/test_forms.py:387
+msgid "Enter a valid email address."
+msgstr "올바른 이메일 주소를 입력하세요."
+
+#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "로그 아웃"
 
-#: templates/registration/password_reset_subject.txt:2
-#, python-format
-msgid "Password reset on %(site_name)s"
-msgstr ""
+#: contrib/auth/views.py:169
+msgid "Password reset"
+msgstr "비밀번호 초기화"
+
+#: contrib/auth/views.py:181
+msgid "Password reset successful"
+msgstr "비밀번호가 초기화되었습니다."
+
+#: contrib/auth/views.py:216
+msgid "Enter new password"
+msgstr "새 비밀번호 입력"
+
+#: contrib/auth/views.py:227
+msgid "Password reset unsuccessful"
+msgstr "비밀번호 초기화를 실패하였습니다."
+
+#: contrib/auth/views.py:244
+msgid "Password reset complete"
+msgstr "비밀번호가 초기화 완료"
+
+#: contrib/auth/views.py:278
+msgid "Password change"
+msgstr "비밀번호 변경"
+
+#: contrib/auth/views.py:291
+msgid "Password change successful"
+msgstr "비밀번호를 변경하였습니다."

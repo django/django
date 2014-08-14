@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Alexander Hansen <alexander.l.hansen@gmail.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Jon <jonklo@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:49+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-07-28 11:22+0000\n"
+"Last-Translator: Jon <jonklo@gmail.com>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -17,18 +19,26 @@ msgstr ""
 "Language: nb\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:39
+#: contrib/sites/apps.py:8
+msgid "Sites"
+msgstr "Nettsteder"
+
+#: contrib/sites/models.py:30
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "Domenenavnet kan ikke inneholde mellomrom."
+
+#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "domenenavn"
 
-#: models.py:40
+#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "visningsnavn"
 
-#: models.py:45
+#: contrib/sites/models.py:74
 msgid "site"
 msgstr "nettsted"
 
-#: models.py:46
+#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "nettsteder"

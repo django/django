@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Vlada Macek <macek@sandbox.cz>, 2011-2012.
+# Jan Munclinger <jan.munclinger@gmail.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Vlada Macek <macek@sandbox.cz>, 2013-2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-17 13:06+0000\n"
+"POT-Creation-Date: 2014-05-20 12:20+0200\n"
+"PO-Revision-Date: 2014-06-23 09:17+0000\n"
 "Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/projects/p/django/language/"
 "cs/)\n"
@@ -18,72 +19,81 @@ msgstr ""
 "Language: cs\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: admin.py:41
+#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Osobní údaje"
 
-#: admin.py:42
+#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Oprávnění"
 
-#: admin.py:44
+#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Důležitá data"
 
-#: admin.py:126
+#: contrib/auth/admin.py:134
 msgid "Password changed successfully."
 msgstr "Změna hesla byla úspěšná."
 
-#: admin.py:136
+#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Heslo pro uživatele %s: změnit"
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: contrib/auth/apps.py:10
+msgid "Authentication and Authorization"
+msgstr "Autentizace a autorizace"
+
+#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
+#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Heslo nenastaveno."
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
+#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Neplatný formát hesla nebo neplatný hashovací algoritmus."
 
-#: forms.py:67
+#: contrib/auth/forms.py:76
 msgid "A user with that username already exists."
 msgstr "Uživatel s tímto jménem již existuje."
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
+#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Hesla se neshodují."
 
-#: forms.py:70 forms.py:115
+#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
 msgid "Username"
 msgstr "Uživatelské jméno"
 
-#: forms.py:72 forms.py:116
+#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
+#: contrib/auth/models.py:368
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Požadováno. 30 znaků nebo méně. Pouze písmena bez diakritiky (háčků a "
 "čárek), číslice a znaky @/./+/-/_."
 
-#: forms.py:75 forms.py:119
+#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 "Hodnota může obsahovat pouze písmena bez diakritiky (háčků a čárek), číslice "
 "a znaky @/./+/-/_."
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
+#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Heslo"
 
-#: forms.py:79
+#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Potvrzení hesla"
 
-#: forms.py:81
+#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Pro ověření vložte stejné heslo znovu."
 
-#: forms.py:122
+#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -92,7 +102,7 @@ msgstr ""
 "Hesla se neukládají přímo a tak je nelze zobrazit. Je ale možné je změnit "
 "pomocí <a href=\"password/\">tohoto formuláře</a>."
 
-#: forms.py:151
+#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -101,126 +111,109 @@ msgstr ""
 "Zadejte správnou hodnotu pole %(username)s a heslo. Pozor, obě pole mohou "
 "rozlišovat malá a velká písmena."
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Váš prohlížeč zřejmě nemá povoleno přijímat cookies, které jsou ale potřeba "
-"pro přihlášení."
-
-#: forms.py:155
+#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Tento účet je neaktivní."
 
-#: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"S touto e-mailovou adresou není spojen žádný účet. Určitě jste registrován"
-"(a)?"
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr ""
-"Uživatelský účet spojený s touto e-mailovou adresou nemůže obnovovat heslo."
-
-#: forms.py:211
+#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "E-mail"
 
-#: forms.py:271
+#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Nové heslo"
 
-#: forms.py:273
+#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Potvrzení nového hesla"
 
-#: forms.py:302
+#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Vaše současné heslo nebylo vloženo správně. Zkuste to znovu."
 
-#: forms.py:305
+#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Současné heslo"
 
-#: forms.py:333
+#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Heslo (znovu)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
+#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
+#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
+#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algoritmus"
 
-#: hashers.py:242
+#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "iterace"
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
+#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
+#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "hodnota salt"
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
+#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
+#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "hash"
 
-#: hashers.py:293
+#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "faktor práce"
 
-#: hashers.py:295
+#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "kontrolní součet"
 
-#: models.py:72 models.py:121
+#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "název"
 
-#: models.py:74
+#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "kódový název"
 
-#: models.py:78
+#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "oprávnění"
 
-#: models.py:79 models.py:123
+#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "oprávnění"
 
-#: models.py:128
+#: contrib/auth/models.py:119
 msgid "group"
 msgstr "skupina"
 
-#: models.py:129 models.py:301
+#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "skupiny"
 
-#: models.py:200
+#: contrib/auth/models.py:192
 msgid "password"
 msgstr "heslo"
 
-#: models.py:201
+#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "poslední přihlášení"
 
-#: models.py:298
+#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "superuživatel"
 
-#: models.py:299
+#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
 "Určuje, že uživatel má veškerá oprávnění bez jejich explicitního přiřazení."
 
-#: models.py:302
+#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
@@ -228,50 +221,47 @@ msgstr ""
 "Skupiny, do kterých tento uživatel patří. Uživatel dostane všechna oprávnění "
 "udělená každé z jeho skupin."
 
-#: models.py:306
+#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "uživatelská oprávnění"
 
-#: models.py:377
+#: contrib/auth/models.py:300
+msgid "Specific permissions for this user."
+msgstr "Konkrétní oprávnění tohoto uživatele."
+
+#: contrib/auth/models.py:367
 msgid "username"
 msgstr "uživatelské jméno"
 
-#: models.py:378
-msgid ""
-"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
-"Požadováno. 30 znaků nebo méně. Pouze písmena bez diakritiky (háčků a "
-"čárek), číslice a znaky @/./+/-/_."
-
-#: models.py:381
+#: contrib/auth/models.py:371
 msgid "Enter a valid username."
 msgstr "Zadejte platné uživatelské jméno"
 
-#: models.py:383
+#: contrib/auth/models.py:373
 msgid "first name"
 msgstr "křestní jméno"
 
-#: models.py:384
+#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "příjmení"
 
-#: models.py:385
+#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "e-mailová adresa"
 
-#: models.py:386
+#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "administrační přístup"
 
-#: models.py:387
+#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Určuje, zda se uživatel může přihlásit do správy tohoto webu."
 
-#: models.py:389
+#: contrib/auth/models.py:379
 msgid "active"
 msgstr "aktivní"
 
-#: models.py:390
+#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -279,23 +269,55 @@ msgstr ""
 "Určuje, zda bude uživatel považován za aktivního. Použijte tuto možnost "
 "místo odstranění účtů."
 
-#: models.py:392
+#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "datum registrace"
 
-#: models.py:400
+#: contrib/auth/models.py:390
 msgid "user"
 msgstr "uživatel"
 
-#: models.py:401
+#: contrib/auth/models.py:391
 msgid "users"
 msgstr "uživatelé"
 
-#: views.py:94
-msgid "Logged out"
-msgstr "Odhlášeno"
-
-#: templates/registration/password_reset_subject.txt:2
+#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Obnovení hesla na webu %(site_name)s"
+
+#: contrib/auth/tests/test_forms.py:387
+msgid "Enter a valid email address."
+msgstr "Zadejte platnou e-mailovou adresu."
+
+#: contrib/auth/views.py:92
+msgid "Logged out"
+msgstr "Odhlášeno"
+
+#: contrib/auth/views.py:169
+msgid "Password reset"
+msgstr "Obnovení hesla"
+
+#: contrib/auth/views.py:181
+msgid "Password reset successful"
+msgstr "Obnovení hesla bylo úspěšné"
+
+#: contrib/auth/views.py:216
+msgid "Enter new password"
+msgstr "Zadejte nové heslo"
+
+#: contrib/auth/views.py:227
+msgid "Password reset unsuccessful"
+msgstr "Obnovení hesla bylo neúspěšné"
+
+#: contrib/auth/views.py:244
+msgid "Password reset complete"
+msgstr "Heslo bylo obnoveno"
+
+#: contrib/auth/views.py:278
+msgid "Password change"
+msgstr "Změna hesla"
+
+#: contrib/auth/views.py:291
+msgid "Password change successful"
+msgstr "Změna hesla byla úspěšná"

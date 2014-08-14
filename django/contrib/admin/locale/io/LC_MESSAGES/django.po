@@ -1,0 +1,862 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Viko Bartero <inactive+tergrundo@transifex.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:18+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Ido (http://www.transifex.com/projects/p/django/language/"
+"io/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: io\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: contrib/admin/actions.py:50
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s eliminesis sucesoze."
+
+#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "Onu ne povas eliminar %(name)s"
+
+#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
+msgid "Are you sure?"
+msgstr "Ka vu esas certa?"
+
+#: contrib/admin/actions.py:84
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Eliminar selektita %(verbose_name_plural)s"
+
+#: contrib/admin/apps.py:11
+msgid "Administration"
+msgstr ""
+
+#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
+#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
+#: contrib/admin/filters.py:387
+msgid "All"
+msgstr "Omni"
+
+#: contrib/admin/filters.py:240
+msgid "Yes"
+msgstr "Yes"
+
+#: contrib/admin/filters.py:241
+msgid "No"
+msgstr "No"
+
+#: contrib/admin/filters.py:255
+msgid "Unknown"
+msgstr "Nekonocato"
+
+#: contrib/admin/filters.py:315
+msgid "Any date"
+msgstr "Irga dato"
+
+#: contrib/admin/filters.py:316
+msgid "Today"
+msgstr "Hodie"
+
+#: contrib/admin/filters.py:320
+msgid "Past 7 days"
+msgstr "7 antea dii"
+
+#: contrib/admin/filters.py:324
+msgid "This month"
+msgstr "Ca monato"
+
+#: contrib/admin/filters.py:328
+msgid "This year"
+msgstr "Ca yaro"
+
+#: contrib/admin/forms.py:14
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Skribez la korekta %(username)s e pasvorto di kelka staff account. Remarkez "
+"ke both feldi darfas rikonocar miniskulo e mayuskulo."
+
+#: contrib/admin/helpers.py:23
+msgid "Action:"
+msgstr "Ago:"
+
+#: contrib/admin/models.py:25
+msgid "action time"
+msgstr "horo dil ago"
+
+#: contrib/admin/models.py:28
+msgid "object id"
+msgstr "id dil objekto"
+
+#: contrib/admin/models.py:29
+msgid "object repr"
+msgstr "repr dil objekto"
+
+#: contrib/admin/models.py:30
+msgid "action flag"
+msgstr "flago dil ago"
+
+#: contrib/admin/models.py:31
+msgid "change message"
+msgstr "chanjar mesajo"
+
+#: contrib/admin/models.py:36
+msgid "log entry"
+msgstr "logo informo"
+
+#: contrib/admin/models.py:37
+msgid "log entries"
+msgstr "logo informi"
+
+#: contrib/admin/models.py:46
+#, python-format
+msgid "Added \"%(object)s\"."
+msgstr "\"%(object)s\" agregesis."
+
+#: contrib/admin/models.py:48
+#, python-format
+msgid "Changed \"%(object)s\" - %(changes)s"
+msgstr "\"%(object)s\" chanjesis - %(changes)s"
+
+#: contrib/admin/models.py:53
+#, python-format
+msgid "Deleted \"%(object)s.\""
+msgstr "\"%(object)s\" eliminesis."
+
+#: contrib/admin/models.py:55
+msgid "LogEntry Object"
+msgstr "LogEntry Objekto"
+
+#: contrib/admin/options.py:230 contrib/admin/options.py:259
+msgid "None"
+msgstr "Nula"
+
+#: contrib/admin/options.py:956
+#, python-format
+msgid "Changed %s."
+msgstr "%s chanjesis."
+
+#: contrib/admin/options.py:956 contrib/admin/options.py:966
+#: contrib/admin/options.py:1808
+msgid "and"
+msgstr "e"
+
+#: contrib/admin/options.py:961
+#, python-format
+msgid "Added %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" agregesis."
+
+#: contrib/admin/options.py:965
+#, python-format
+msgid "Changed %(list)s for %(name)s \"%(object)s\"."
+msgstr "%(list)s chanjesis por la %(name)s \"%(object)s\"."
+
+#: contrib/admin/options.py:970
+#, python-format
+msgid "Deleted %(name)s \"%(object)s\"."
+msgstr "%(name)s \"%(object)s\" eliminesis."
+
+#: contrib/admin/options.py:974
+msgid "No fields changed."
+msgstr "Nula feldo chanjesis."
+
+#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr ""
+"La %(name)s \"%(obj)s\" agregesis sucesoze. Vu povas modifikar ol altrafoye "
+"infre."
+
+#: contrib/admin/options.py:1109
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may add another "
+"%(name)s below."
+msgstr ""
+"La %(name)s \"%(obj)s\" agregesis sucesoze. Vu povas agregar altra %(name)s "
+"infre."
+
+#: contrib/admin/options.py:1116
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "La %(name)s \"%(obj)s\" agregesis sucesoze."
+
+#: contrib/admin/options.py:1131
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"below."
+msgstr ""
+"La %(name)s \"%(obj)s\" chanjesis sucesoze. Vu povas modifikar ol altrafoye "
+"infre."
+
+#: contrib/admin/options.py:1148
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
+"%(name)s below."
+msgstr ""
+"La %(name)s \"%(obj)s\" chanjesis sucesoze. Vu povas agregar altra %(name)s "
+"infre."
+
+#: contrib/admin/options.py:1157
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "La %(name)s \"%(obj)s\" chanjesis sucesoze."
+
+#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Onu devas selektar la objekti por aplikar oli irga ago. Nula objekto "
+"chanjesis."
+
+#: contrib/admin/options.py:1259
+msgid "No action selected."
+msgstr "Nula ago selektesis."
+
+#: contrib/admin/options.py:1271
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "La %(name)s \"%(obj)s\" eliminesis  sucesoze."
+
+#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "La %(name)s objekto kun precipua klefo %(key)r ne existas."
+
+#: contrib/admin/options.py:1398
+#, python-format
+msgid "Add %s"
+msgstr "Agregar %s"
+
+#: contrib/admin/options.py:1398
+#, python-format
+msgid "Change %s"
+msgstr "Chanjar %s"
+
+#: contrib/admin/options.py:1460
+msgid "Database error"
+msgstr "Eroro del datumaro"
+
+#: contrib/admin/options.py:1523
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s chanjesis sucesoze."
+msgstr[1] "%(count)s %(name)s chanjesis sucesoze."
+
+#: contrib/admin/options.py:1550
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s selektita"
+msgstr[1] "La %(total_count)s selektita"
+
+#: contrib/admin/options.py:1556
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "Selektita 0 di %(cnt)s"
+
+#: contrib/admin/options.py:1655
+#, python-format
+msgid "Change history: %s"
+msgstr "Modifikuro historio: %s"
+
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: contrib/admin/options.py:1802
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#: contrib/admin/options.py:1809
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"Por eliminar %(class_name)s %(instance)s on mustas eliminar la sequanta "
+"protektita objekti relatita: %(related_objects)s"
+
+#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
+msgid "Django site admin"
+msgstr "Django situo admin"
+
+#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
+msgid "Django administration"
+msgstr "Django administreyo"
+
+#: contrib/admin/sites.py:42
+msgid "Site administration"
+msgstr "Administrayo dil ret-situo"
+
+#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
+#: contrib/admin/templates/registration/password_reset_complete.html:18
+#: contrib/admin/tests.py:113
+msgid "Log in"
+msgstr "Startar sesiono"
+
+#: contrib/admin/sites.py:472
+#, python-format
+msgid "%(app)s administration"
+msgstr ""
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "La pagino ne renkontresis"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Pardonez, ma la demandita pagino ne renkontresis."
+
+#: contrib/admin/templates/admin/500.html:6
+#: contrib/admin/templates/admin/app_index.html:9
+#: contrib/admin/templates/admin/auth/user/change_password.html:13
+#: contrib/admin/templates/admin/base.html:50
+#: contrib/admin/templates/admin/change_form.html:18
+#: contrib/admin/templates/admin/change_list.html:40
+#: contrib/admin/templates/admin/delete_confirmation.html:8
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
+#: contrib/admin/templates/admin/invalid_setup.html:6
+#: contrib/admin/templates/admin/object_history.html:6
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_form.html:7
+#: contrib/admin/templates/registration/password_reset_complete.html:6
+#: contrib/admin/templates/registration/password_reset_confirm.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:6
+msgid "Home"
+msgstr "Hemo"
+
+#: contrib/admin/templates/admin/500.html:7
+msgid "Server error"
+msgstr "Eroro del servilo"
+
+#: contrib/admin/templates/admin/500.html:11
+msgid "Server error (500)"
+msgstr "Eroro del servilo (500)"
+
+#: contrib/admin/templates/admin/500.html:14
+msgid "Server Error <em>(500)</em>"
+msgstr "Eroro del servilo <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:15
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Eroro eventis. Ico informesis per e-posto a la administranti dil ret-situo e "
+"la eroro esos korektigata balde. Danko pro vua pacienteso."
+
+#: contrib/admin/templates/admin/actions.html:4
+msgid "Run the selected action"
+msgstr "Exekutar la selektita ago"
+
+#: contrib/admin/templates/admin/actions.html:4
+msgid "Go"
+msgstr "Irar"
+
+#: contrib/admin/templates/admin/actions.html:11
+msgid "Click here to select the objects across all pages"
+msgstr "Kliktez hike por selektar la objekti di omna pagini"
+
+#: contrib/admin/templates/admin/actions.html:11
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Selektar omna %(total_count)s %(module_name)s"
+
+#: contrib/admin/templates/admin/actions.html:13
+msgid "Clear selection"
+msgstr "Desfacar selekto"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Unesme, skribez uzer-nomo ed pasvorto. Pos, vu povos modifikar altra uzer-"
+"selekto."
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr "Skribez uzer-nomo ed pasvorto."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:17
+#: contrib/admin/templates/admin/auth/user/change_password.html:51
+#: contrib/admin/templates/admin/base.html:39
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "Change password"
+msgstr "Chanjar pasvorto"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:27
+#: contrib/admin/templates/admin/change_form.html:47
+#: contrib/admin/templates/admin/change_list.html:67
+#: contrib/admin/templates/admin/login.html:17
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Please correct the error below."
+msgstr "Korektigez la eroro infre."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:27
+#: contrib/admin/templates/admin/change_form.html:47
+#: contrib/admin/templates/admin/change_list.html:67
+#: contrib/admin/templates/admin/login.html:17
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Please correct the errors below."
+msgstr "Korektigez la erori infre."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:31
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Skribez nova pasvorto por la uzero <strong>%(username)s</strong>."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:38
+msgid "Password"
+msgstr "Pasvorto"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:44
+#: contrib/admin/templates/registration/password_change_form.html:42
+msgid "Password (again)"
+msgstr "Pasvorto (altra foyo)"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:45
+msgid "Enter the same password as above, for verification."
+msgstr "Skribez la sama pasvorto por verifikar."
+
+#: contrib/admin/templates/admin/base.html:30
+msgid "Welcome,"
+msgstr "Bonvenez,"
+
+#: contrib/admin/templates/admin/base.html:36
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "Documentation"
+msgstr "Dokumento"
+
+#: contrib/admin/templates/admin/base.html:41
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "Log out"
+msgstr "Klozar sesiono"
+
+#: contrib/admin/templates/admin/change_form.html:21
+#: contrib/admin/templates/admin/index.html:31
+msgid "Add"
+msgstr "Agregar"
+
+#: contrib/admin/templates/admin/change_form.html:33
+#: contrib/admin/templates/admin/object_history.html:10
+msgid "History"
+msgstr "Historio"
+
+#: contrib/admin/templates/admin/change_form.html:35
+#: contrib/admin/templates/admin/edit_inline/stacked.html:9
+#: contrib/admin/templates/admin/edit_inline/tabular.html:30
+msgid "View on site"
+msgstr "Vidar en la ret-situo"
+
+#: contrib/admin/templates/admin/change_list.html:58
+#, python-format
+msgid "Add %(name)s"
+msgstr "Agregar %(name)s"
+
+#: contrib/admin/templates/admin/change_list.html:78
+msgid "Filter"
+msgstr "Filtrar"
+
+#: contrib/admin/templates/admin/change_list_results.html:17
+msgid "Remove from sorting"
+msgstr "Eskartar de klasifiko"
+
+#: contrib/admin/templates/admin/change_list_results.html:18
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Precedo dil klasifiko: %(priority_number)s"
+
+#: contrib/admin/templates/admin/change_list_results.html:19
+msgid "Toggle sorting"
+msgstr "Aktivar/desaktivar klasifiko"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:12
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Delete"
+msgstr "Eliminar"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:19
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Eliminar la %(object_name)s '%(escaped_object)s' eliminos relatita objekti, "
+"ma vua account ne havas permiso por eliminar la sequanta objekti:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:27
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"Eliminar la %(object_name)s '%(escaped_object)s' eliminus la sequanta "
+"protektita objekti relatita:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:35
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Ka vu volas eliminar la %(object_name)s \"%(escaped_object)s\"? Omna "
+"sequanta objekti relatita eliminesos:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:40
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
+msgid "Yes, I'm sure"
+msgstr "Yes, me esas certa"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
+msgid "Delete multiple objects"
+msgstr "Eliminar multopla objekti"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"Eliminar la selektita %(objects_name)s eliminos relatita objekti, ma vua "
+"account ne havas permiso por eliminar la sequanta objekti:"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"Eliminar la selektita %(objects_name)s eliminos la sequanta protektita "
+"objekti relatita:"
+
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"Ka vu volas eliminar la selektita %(objects_name)s? Omna sequanta objekti ed "
+"olia relatita objekti eliminesos:"
+
+#: contrib/admin/templates/admin/edit_inline/stacked.html:26
+#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Remove"
+msgstr "Eliminar"
+
+#: contrib/admin/templates/admin/edit_inline/stacked.html:27
+#: contrib/admin/templates/admin/edit_inline/tabular.html:77
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Agregar altra %(verbose_name)s"
+
+#: contrib/admin/templates/admin/edit_inline/tabular.html:17
+msgid "Delete?"
+msgstr "Ka eliminar?"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "Per %(filter_title)s "
+
+#: contrib/admin/templates/admin/index.html:20
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modeli en la %(name)s apliko"
+
+#: contrib/admin/templates/admin/index.html:37
+msgid "Change"
+msgstr "Modifikar"
+
+#: contrib/admin/templates/admin/index.html:47
+msgid "You don't have permission to edit anything."
+msgstr "Vu ne havas permiso por facar modifiki."
+
+#: contrib/admin/templates/admin/index.html:55
+msgid "Recent Actions"
+msgstr "Recenta agi"
+
+#: contrib/admin/templates/admin/index.html:56
+msgid "My Actions"
+msgstr "Mea agi"
+
+#: contrib/admin/templates/admin/index.html:60
+msgid "None available"
+msgstr "Nulo disponebla"
+
+#: contrib/admin/templates/admin/index.html:74
+msgid "Unknown content"
+msgstr "Nekonocata kontenajo"
+
+#: contrib/admin/templates/admin/invalid_setup.html:12
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Vua datumaro instaluro esas defektiva. Verifikez ke la datumaro tabeli "
+"kreadesis e ke la uzero havas permiso por lektar la datumaro."
+
+#: contrib/admin/templates/admin/login.html:37
+msgid "Password:"
+msgstr "Pasvorto:"
+
+#: contrib/admin/templates/admin/login.html:43
+msgid "Forgotten your password or username?"
+msgstr "Ka vu obliviis vua pasvorto od uzer-nomo?"
+
+#: contrib/admin/templates/admin/object_history.html:22
+msgid "Date/time"
+msgstr "Dato/horo"
+
+#: contrib/admin/templates/admin/object_history.html:23
+msgid "User"
+msgstr "Uzero"
+
+#: contrib/admin/templates/admin/object_history.html:24
+msgid "Action"
+msgstr "Ago"
+
+#: contrib/admin/templates/admin/object_history.html:38
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Ica objekto ne havas chanjo-historio. Olu forsan ne agregesis per ica "
+"administrala ret-situo."
+
+#: contrib/admin/templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "Montrar omni"
+
+#: contrib/admin/templates/admin/pagination.html:11
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Save"
+msgstr "Salvar"
+
+#: contrib/admin/templates/admin/search_form.html:7
+msgid "Search"
+msgstr "Serchar"
+
+#: contrib/admin/templates/admin/search_form.html:9
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s resulto"
+msgstr[1] "%(counter)s resulti"
+
+#: contrib/admin/templates/admin/search_form.html:9
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s totala"
+
+#: contrib/admin/templates/admin/submit_line.html:8
+msgid "Save as new"
+msgstr "Salvar kom nova"
+
+#: contrib/admin/templates/admin/submit_line.html:9
+msgid "Save and add another"
+msgstr "Salvar ed agregar altra"
+
+#: contrib/admin/templates/admin/submit_line.html:10
+msgid "Save and continue editing"
+msgstr "Salvar e durar la modifiko"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Danko pro vua spensita tempo en la ret-situo hodie."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Ristartar sesiono"
+
+#: contrib/admin/templates/registration/password_change_done.html:7
+#: contrib/admin/templates/registration/password_change_form.html:8
+msgid "Password change"
+msgstr "Pasvorto chanjo"
+
+#: contrib/admin/templates/registration/password_change_done.html:14
+msgid "Your password was changed."
+msgstr "Vua pasvorto chanjesis."
+
+#: contrib/admin/templates/registration/password_change_form.html:26
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Por kauciono, skribez vua anta pasvorto e pos skribez vua nova pasvorto "
+"dufoye por verifikar ke olu skribesis korekte."
+
+#: contrib/admin/templates/registration/password_change_form.html:32
+msgid "Old password"
+msgstr "Antea pasvorto"
+
+#: contrib/admin/templates/registration/password_change_form.html:37
+msgid "New password"
+msgstr "Nova pasvorto"
+
+#: contrib/admin/templates/registration/password_change_form.html:48
+#: contrib/admin/templates/registration/password_reset_confirm.html:24
+msgid "Change my password"
+msgstr "Modifikar mea pasvorto"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:7
+#: contrib/admin/templates/registration/password_reset_done.html:7
+#: contrib/admin/templates/registration/password_reset_form.html:7
+msgid "Password reset"
+msgstr "Pasvorto chanjo"
+
+#: contrib/admin/templates/registration/password_reset_complete.html:16
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "Vua pasvorto chanjesis. Vu darfas startar sesiono nun."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:7
+msgid "Password reset confirmation"
+msgstr "Pasvorto chanjo konfirmo"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:17
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Skribez vua nova pasvorto dufoye por verifikar ke olu skribesis korekte."
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:21
+msgid "New password:"
+msgstr "Nova pasvorto:"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:23
+msgid "Confirm password:"
+msgstr "Konfirmez pasvorto:"
+
+#: contrib/admin/templates/registration/password_reset_confirm.html:29
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"La link por chanjar pasvorto ne esis valida, forsan pro ke olu ja uzesis. "
+"Demandez nova pasvorto chanjo."
+
+#: contrib/admin/templates/registration/password_reset_done.html:15
+msgid ""
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
+msgstr ""
+"Ni sendis e-posto mesajo a vu kun instrucioni por chanjar vua pasvorto. Olu "
+"devus arivar balde."
+
+#: contrib/admin/templates/registration/password_reset_done.html:17
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Se vu ne recevas mesajo, verifikez ke vu skribis la sama e-posto adreso "
+"uzita por vua registro e lektez vua spam mesaji."
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Vu esas recevanta ica mesajo pro ke vu demandis pasvorto chanjo por vua "
+"uzero account che %(site_name)s."
+
+#: contrib/admin/templates/registration/password_reset_email.html:4
+msgid "Please go to the following page and choose a new password:"
+msgstr "Irez al sequanta pagino e selektez nova pasvorto:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:8
+msgid "Your username, in case you've forgotten:"
+msgstr "Vua uzernomo, se vu obliviis olu:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:10
+msgid "Thanks for using our site!"
+msgstr "Danko pro uzar nia ret-situo!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:12
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "La equipo di %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_form.html:15
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll email "
+"instructions for setting a new one."
+msgstr ""
+"Ka vu obliviis vua pasvorto? Skribez vua e-posto adreso infre e ni sendos "
+"instrucioni por kreadar nova pasvorto."
+
+#: contrib/admin/templates/registration/password_reset_form.html:19
+msgid "Email address:"
+msgstr "E-postala adreso:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:19
+msgid "Reset my password"
+msgstr "Chanjar mea pasvorto"
+
+#: contrib/admin/templatetags/admin_list.py:379
+msgid "All dates"
+msgstr "Omna dati"
+
+#: contrib/admin/views/main.py:34
+msgid "(None)"
+msgstr "(Nula)"
+
+#: contrib/admin/views/main.py:107
+#, python-format
+msgid "Select %s"
+msgstr "Selektar %s"
+
+#: contrib/admin/views/main.py:109
+#, python-format
+msgid "Select %s to change"
+msgstr "Selektar %s por chanjar"
+
+#: contrib/admin/widgets.py:91
+msgid "Date:"
+msgstr "Dato:"
+
+#: contrib/admin/widgets.py:92
+msgid "Time:"
+msgstr "Horo:"
+
+#: contrib/admin/widgets.py:176
+msgid "Lookup"
+msgstr "Serchado"
+
+#: contrib/admin/widgets.py:280
+msgid "Add Another"
+msgstr "Agregar altro"
+
+#: contrib/admin/widgets.py:333
+msgid "Currently:"
+msgstr "Aktuale"
+
+#: contrib/admin/widgets.py:334
+msgid "Change:"
+msgstr "Chanjo:"

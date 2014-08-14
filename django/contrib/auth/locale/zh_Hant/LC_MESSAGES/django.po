@@ -1,0 +1,314 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# ilay <ilay@ilay.tw>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# tcc <tcchou@tcchou.org>, 2011
+# Yeh-Yung <yyc1217@gmail.com>, 2013
+# Yeh-Yung <yyc1217@gmail.com>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-20 12:20+0200\n"
+"PO-Revision-Date: 2014-05-21 09:39+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
+"language/zh_TW/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: contrib/auth/admin.py:44
+msgid "Personal info"
+msgstr "個人資訊"
+
+#: contrib/auth/admin.py:45
+msgid "Permissions"
+msgstr "權限"
+
+#: contrib/auth/admin.py:47
+msgid "Important dates"
+msgstr "重要日期"
+
+#: contrib/auth/admin.py:134
+msgid "Password changed successfully."
+msgstr "密碼修改成功"
+
+#: contrib/auth/admin.py:145
+#, python-format
+msgid "Change password: %s"
+msgstr "修改密碼: %s"
+
+#: contrib/auth/apps.py:10
+msgid "Authentication and Authorization"
+msgstr ""
+
+#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
+#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
+msgid "No password set."
+msgstr "無設定密碼。"
+
+#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
+#: contrib/auth/tests/test_forms.py:332
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "無效的密碼格式或不知名的雜湊演算法。"
+
+#: contrib/auth/forms.py:76
+msgid "A user with that username already exists."
+msgstr "一個相同名稱的使用者已經存在。"
+
+#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
+#: contrib/auth/forms.py:349
+msgid "The two password fields didn't match."
+msgstr "兩個密碼欄位不相符。"
+
+#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
+msgid "Username"
+msgstr "使用者名稱"
+
+#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
+#: contrib/auth/models.py:368
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "必要的。30 個字或更少, 只包含字母、數字和 @/./+/-/_。"
+
+#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "這資料值只能包含字母、數字和 @/./+/-/_ 字元。"
+
+#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
+#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
+msgid "Password"
+msgstr "密碼"
+
+#: contrib/auth/forms.py:88
+msgid "Password confirmation"
+msgstr "密碼確認"
+
+#: contrib/auth/forms.py:90
+msgid "Enter the same password as above, for verification."
+msgstr "為檢查用，請輸入與上面相同的密碼。"
+
+#: contrib/auth/forms.py:136
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+"原始密碼尚未儲存，因此無法存取此帳號的密碼，但你可以透過<a href=\"password/"
+"\">這個表單</a>來變更密碼。"
+
+#: contrib/auth/forms.py:166
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr "輸入正確的 %(username)s 和密碼。請注意兩者皆區分大小寫。"
+
+#: contrib/auth/forms.py:168
+msgid "This account is inactive."
+msgstr "這個帳戶未啟用"
+
+#: contrib/auth/forms.py:231
+msgid "Email"
+msgstr "電子信箱"
+
+#: contrib/auth/forms.py:287
+msgid "New password"
+msgstr "新密碼"
+
+#: contrib/auth/forms.py:289
+msgid "New password confirmation"
+msgstr "新密碼確認"
+
+#: contrib/auth/forms.py:320
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "你的舊密碼不正確。請重新輸入。"
+
+#: contrib/auth/forms.py:323
+msgid "Old password"
+msgstr "舊密碼"
+
+#: contrib/auth/forms.py:353
+msgid "Password (again)"
+msgstr "密碼(重複)"
+
+#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
+#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
+#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
+#: contrib/auth/hashers.py:511
+msgid "algorithm"
+msgstr "演算法"
+
+#: contrib/auth/hashers.py:253
+msgid "iterations"
+msgstr "迭代"
+
+#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
+#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
+#: contrib/auth/hashers.py:512
+msgid "salt"
+msgstr "隨機值"
+
+#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
+#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
+#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
+msgid "hash"
+msgstr "哈希碼"
+
+#: contrib/auth/hashers.py:336
+msgid "work factor"
+msgstr "作用因素"
+
+#: contrib/auth/hashers.py:338
+msgid "checksum"
+msgstr "校驗"
+
+#: contrib/auth/models.py:63 contrib/auth/models.py:112
+msgid "name"
+msgstr "名稱"
+
+#: contrib/auth/models.py:65
+msgid "codename"
+msgstr "代碼"
+
+#: contrib/auth/models.py:69
+msgid "permission"
+msgstr "權限"
+
+#: contrib/auth/models.py:70 contrib/auth/models.py:114
+msgid "permissions"
+msgstr "權限"
+
+#: contrib/auth/models.py:119
+msgid "group"
+msgstr "群組"
+
+#: contrib/auth/models.py:120 contrib/auth/models.py:293
+msgid "groups"
+msgstr "群組"
+
+#: contrib/auth/models.py:192
+msgid "password"
+msgstr "密碼"
+
+#: contrib/auth/models.py:193
+msgid "last login"
+msgstr "上次登入"
+
+#: contrib/auth/models.py:290
+msgid "superuser status"
+msgstr "超級使用者狀態"
+
+#: contrib/auth/models.py:291
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "指定是否使用者可以登入到這個管理網站"
+
+#: contrib/auth/models.py:294
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
+msgstr "此為帳號可加入的群組。其所屬的群組將授予該帳號對應的權限。"
+
+#: contrib/auth/models.py:299
+msgid "user permissions"
+msgstr "使用者權限"
+
+#: contrib/auth/models.py:300
+msgid "Specific permissions for this user."
+msgstr ""
+
+#: contrib/auth/models.py:367
+msgid "username"
+msgstr "使用者名稱"
+
+#: contrib/auth/models.py:371
+msgid "Enter a valid username."
+msgstr "輸入有效帳號。"
+
+#: contrib/auth/models.py:373
+msgid "first name"
+msgstr "名字"
+
+#: contrib/auth/models.py:374
+msgid "last name"
+msgstr "姓氏"
+
+#: contrib/auth/models.py:375
+msgid "email address"
+msgstr "電子信箱"
+
+#: contrib/auth/models.py:376
+msgid "staff status"
+msgstr "工作人員狀態"
+
+#: contrib/auth/models.py:377
+msgid "Designates whether the user can log into this admin site."
+msgstr "指定是否使用者可以登入此管理網站。"
+
+#: contrib/auth/models.py:379
+msgid "active"
+msgstr "有效"
+
+#: contrib/auth/models.py:380
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr "指定使用者是否有效。請取消選擇而不是刪除帳號。"
+
+#: contrib/auth/models.py:382
+msgid "date joined"
+msgstr "加入日期"
+
+#: contrib/auth/models.py:390
+msgid "user"
+msgstr "使用者"
+
+#: contrib/auth/models.py:391
+msgid "users"
+msgstr "使用者"
+
+#: contrib/auth/templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "在 %(site_name)s 進行密碼重置"
+
+#: contrib/auth/tests/test_forms.py:387
+msgid "Enter a valid email address."
+msgstr "輸入有效的電子郵件地址。"
+
+#: contrib/auth/views.py:92
+msgid "Logged out"
+msgstr "登出"
+
+#: contrib/auth/views.py:169
+msgid "Password reset"
+msgstr ""
+
+#: contrib/auth/views.py:181
+msgid "Password reset successful"
+msgstr ""
+
+#: contrib/auth/views.py:216
+msgid "Enter new password"
+msgstr ""
+
+#: contrib/auth/views.py:227
+msgid "Password reset unsuccessful"
+msgstr ""
+
+#: contrib/auth/views.py:244
+msgid "Password reset complete"
+msgstr ""
+
+#: contrib/auth/views.py:278
+msgid "Password change"
+msgstr ""
+
+#: contrib/auth/views.py:291
+msgid "Password change successful"
+msgstr ""

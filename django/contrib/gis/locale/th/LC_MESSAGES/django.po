@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Kowit Charoenratchatabhan <kowito@gmail.com>, 2012.
-# Vichai Vongvorakul <vongvichai@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2012
+# Vichai Vongvorakul <vongvichai@gmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-09 04:19+0000\n"
-"Last-Translator: Kowit Charoenratchatabhan <kowit.s.c@gmail.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:45+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Thai (http://www.transifex.com/projects/p/django/language/"
 "th/)\n"
 "MIME-Version: 1.0\n"
@@ -19,76 +19,80 @@ msgstr ""
 "Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: views.py:9
-msgid "No feeds are registered."
-msgstr "ไม่มีฟีดที่ลงทะเบียน"
+#: contrib/gis/apps.py:8
+msgid "GIS"
+msgstr ""
 
-#: views.py:19
-#, python-format
-msgid "Slug %r isn't registered."
-msgstr "Slug %r ไม่ได้ลงทะเบียน"
-
-#: db/models/fields.py:51
+#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "เขตข้อมูล GIS ฐาน -- แผนที่ไปยังประเภท OpenGIS เรขาคณิตจำเพาะ"
 
-#: db/models/fields.py:271
+#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "จุด"
 
-#: db/models/fields.py:275
+#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "สายสตริง"
 
-#: db/models/fields.py:279
+#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "รูปหลายเหลี่ยม"
 
-#: db/models/fields.py:283
+#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "หลาย ๆ จุด"
 
-#: db/models/fields.py:287
+#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "สตริงหลายบรรทัด"
 
-#: db/models/fields.py:291
+#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "รูปหลายเหลี่ยมหลายรูป"
 
-#: db/models/fields.py:295
+#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "คอลเลกชันรูปทรงเรขาคณิต"
 
-#: forms/fields.py:19
+#: contrib/gis/forms/fields.py:22
 msgid "No geometry value provided."
 msgstr "ไม่พบข้อมูลพิกัด"
 
-#: forms/fields.py:20
+#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "ค่าพิกัดผิดพลาด "
 
-#: forms/fields.py:21
+#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "ขนิดข้อมูลพิกัดผิดพลาด"
 
-#: forms/fields.py:22
+#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr "ข้อผิดพลาดที่เกิดขึ้นเมื่อการเปลี่ยนรูปทรงเรขาคณิตที่ SRID ของเขตข้อมูลฟอร์มเรขาคณิต"
 
-#: sitemaps/views.py:46
+#: contrib/gis/sitemaps/views.py:56
 #, python-format
 msgid "No sitemap available for section: %r"
 msgstr "ไม่มีแผนผังไซต์บริการสำหรับส่วน: %r"
 
-#: sitemaps/views.py:60
+#: contrib/gis/sitemaps/views.py:70
 #, python-format
 msgid "Page %s empty"
 msgstr "หน้า %s ที่ว่างเปล่า"
 
-#: sitemaps/views.py:62
+#: contrib/gis/sitemaps/views.py:72
 #, python-format
 msgid "No page '%s'"
 msgstr "ไม่มีหน้า '%s'"
+
+#: contrib/gis/views.py:10
+msgid "No feeds are registered."
+msgstr "ไม่มีฟีดที่ลงทะเบียน"
+
+#: contrib/gis/views.py:16
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Slug %r ไม่ได้ลงทะเบียน"

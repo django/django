@@ -1,0 +1,42 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:43+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"language/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: contrib/sites/apps.py:8
+msgid "Sites"
+msgstr ""
+
+#: contrib/sites/models.py:30
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "域名不能包含任何空格或制表符。"
+
+#: contrib/sites/models.py:67
+msgid "domain name"
+msgstr "域名"
+
+#: contrib/sites/models.py:69
+msgid "display name"
+msgstr "显示名称"
+
+#: contrib/sites/models.py:74
+msgid "site"
+msgstr "站点"
+
+#: contrib/sites/models.py:75
+msgid "sites"
+msgstr "站点"

@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Panos Laganakos <panos.laganakos@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-08-17 09:38+0000\n"
+"Last-Translator: Panos Laganakos <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
 "el/)\n"
 "MIME-Version: 1.0\n"
@@ -17,11 +18,15 @@ msgstr ""
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:9
+#: contrib/redirects/apps.py:8
+msgid "Redirects"
+msgstr "Ανακατευθύνσεις"
+
+#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "ανακατεύθυνση από"
 
-#: models.py:10
+#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -29,11 +34,11 @@ msgstr ""
 "Αυτό πρέπει να είναι ένα απόλυτο μονοπάτι, με εξαίρεση το όνομα χώρου. "
 "Παράδειγμα: '/events/search/'."
 
-#: models.py:11
+#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "ανακατεύθυνση προς"
 
-#: models.py:12
+#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -41,10 +46,10 @@ msgstr ""
 "Αυτό πρέπει να είναι ένα απόλυτο μονοπάτι (όπως παραπάνω), ή ένα πλήρες URL "
 "που αρχίζει με 'http://'."
 
-#: models.py:15
+#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "ανακατεύθυνση"
 
-#: models.py:16
+#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "ανακατευθύνσεις"

@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Ramiro Morales <cramm0@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-07-28 13:11+0000\n"
+"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/projects/p/"
 "django/language/es_AR/)\n"
 "MIME-Version: 1.0\n"
@@ -17,11 +18,15 @@ msgstr ""
 "Language: es_AR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:9
+#: contrib/redirects/apps.py:8
+msgid "Redirects"
+msgstr "Redirecciones"
+
+#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "redirigir desde"
 
-#: models.py:10
+#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -29,11 +34,11 @@ msgstr ""
 "Esta ruta debe ser absoluta, excluyendo el nombre de dominio. Ejemplo: '/"
 "events/search/'."
 
-#: models.py:11
+#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "redirigir a"
 
-#: models.py:12
+#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -41,10 +46,10 @@ msgstr ""
 "Esto puede ser bien una ruta absoluta (como arriba) o una URL completa que "
 "empiece con 'http://'."
 
-#: models.py:15
+#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "redirección"
 
-#: models.py:16
+#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "redirecciones"

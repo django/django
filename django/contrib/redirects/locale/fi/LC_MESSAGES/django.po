@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Klaus Dahlén <klaus.dahlen@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-06-09 08:50+0000\n"
+"Last-Translator: Klaus Dahlén <klaus.dahlen@gmail.com>\n"
 "Language-Team: Finnish (http://www.transifex.com/projects/p/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -17,11 +18,15 @@ msgstr ""
 "Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:9
+#: contrib/redirects/apps.py:8
+msgid "Redirects"
+msgstr "Edelleenohjaukset"
+
+#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "ohjaa osoitteesta"
 
-#: models.py:10
+#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -29,11 +34,11 @@ msgstr ""
 "Tässä on käytettävä absoluuttista polkua ilman verkkotunnusta. Esimerkki: '/"
 "tapahtumat/haku/'."
 
-#: models.py:11
+#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "ohjaa osoitteeseen"
 
-#: models.py:12
+#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -41,10 +46,10 @@ msgstr ""
 "Tässä on käytettävä joko absoluuttista polkua (kuten yllä) tai täydellistä "
 "'http://'-alkuista URL-osoitetta."
 
-#: models.py:15
+#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "edelleenohjaus"
 
-#: models.py:16
+#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "edelleenohjaukset"

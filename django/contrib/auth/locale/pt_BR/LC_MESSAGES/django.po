@@ -1,89 +1,103 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <dudanogueira@gmail.com>, 2012.
-# Guilherme Gondim <semente+transifex@taurinus.org>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Sandro  <sandrossv@hotmail.com>, 2011.
+# Allisson Azevedo <allisson@gmail.com>, 2014
+# dudanogueira <dudanogueira@gmail.com>, 2012
+# dudanogueira <dudanogueira@gmail.com>, 2014
+# Eduardo Carvalho <eduardocereto@gmail.com>, 2013
+# Elyézer Rezende <elyezermr@gmail.com>, 2013
+# gilberto dos santos alves <gsavix@gmail.com>, 2013
+# Guilherme Gondim <semente@taurinus.org>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Sandro <sandrossv@hotmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-17 12:33+0000\n"
-"Last-Translator: dudanogueira <dudanogueira@gmail.com>\n"
-"Language-Team: Portuguese (Brazil) <django-l10n-portuguese@googlegroups."
-"com>\n"
+"POT-Creation-Date: 2014-05-20 12:20+0200\n"
+"PO-Revision-Date: 2014-06-27 14:23+0000\n"
+"Last-Translator: Allisson Azevedo <allisson@gmail.com>\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
+"django/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: admin.py:41
+#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Informações pessoais"
 
-#: admin.py:42
+#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Permissões"
 
-#: admin.py:44
+#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Datas importantes"
 
-#: admin.py:126
+#: contrib/auth/admin.py:134
 msgid "Password changed successfully."
 msgstr "Senha modificada com sucesso."
 
-#: admin.py:136
+#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Alterar senha: %s"
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: contrib/auth/apps.py:10
+msgid "Authentication and Authorization"
+msgstr "Autenticação e Autorização"
+
+#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
+#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Nenhuma senha definida."
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
+#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Formato de senha inválido ou algoritmo de hash desconhecido."
 
-#: forms.py:67
+#: contrib/auth/forms.py:76
 msgid "A user with that username already exists."
 msgstr "Um usuário com este nome de usuário já existe."
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
+#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Os dois campos de senha não combinam."
 
-#: forms.py:70 forms.py:115
+#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
 msgid "Username"
 msgstr "Usuário"
 
-#: forms.py:72 forms.py:116
+#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
+#: contrib/auth/models.py:368
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Obrigatório. 30 caracteres ou menos. Somente letras, dígitos e @/./+/-/_."
 
-#: forms.py:75 forms.py:119
+#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr ""
 "Este valor deve conter apenas letras, números e os caracteres @/./+/-/_."
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
+#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Senha"
 
-#: forms.py:79
+#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Confirmação de senha"
 
-#: forms.py:81
+#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Informe a mesma senha digitada acima, para verificação."
 
-#: forms.py:122
+#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -93,7 +107,7 @@ msgstr ""
 "a senha do usuário, mas você pode alterá-la usando <a href=\"password/"
 "\">este formulário</a> ."
 
-#: forms.py:151
+#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -102,121 +116,103 @@ msgstr ""
 "Por favor, entre com um %(username)s  e senha corretos. Note que ambos os "
 "campos diferenciam maiúsculas e minúsculas."
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Seu navegador Web não parece estar com os cookies habilitados. Cookies são "
-"requeridos para acessar."
-
-#: forms.py:155
+#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Esta conta está inativa."
 
-#: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Este endereço de email não possui nenhuma conta associada. Você tem certeza "
-"que se registrou?"
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr ""
-"A conta de usuário associada à este email não permite a redefinição de senha."
-
-#: forms.py:211
+#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "Email"
 
-#: forms.py:271
+#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Nova senha"
 
-#: forms.py:273
+#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Confirmação da nova senha"
 
-#: forms.py:302
+#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
-"A senha antiga foi digitada incorretamente. Por favor, informe a senha "
-"novamente."
+"A senha antiga foi digitada incorretamente. Por favor, informe-a novamente."
 
-#: forms.py:305
+#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Senha antiga"
 
-#: forms.py:333
+#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Senha (novamente)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
+#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
+#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
+#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algoritmo"
 
-#: hashers.py:242
+#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "iterações"
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
+#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
+#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "salt"
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
+#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
+#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "hash"
 
-#: hashers.py:293
+#: contrib/auth/hashers.py:336
 msgid "work factor"
-msgstr "work factor"
+msgstr "fator de trabalho"
 
-#: hashers.py:295
+#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "checksum"
 
-#: models.py:72 models.py:121
+#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "nome"
 
-#: models.py:74
+#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "apelido"
 
-#: models.py:78
+#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "permissão"
 
-#: models.py:79 models.py:123
+#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "permissões"
 
-#: models.py:128
+#: contrib/auth/models.py:119
 msgid "group"
 msgstr "grupo"
 
-#: models.py:129 models.py:301
+#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "grupos"
 
-#: models.py:200
+#: contrib/auth/models.py:192
 msgid "password"
 msgstr "senha"
 
-#: models.py:201
+#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "último login"
 
-#: models.py:298
+#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "status de superusuário"
 
-#: models.py:299
+#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -224,58 +220,55 @@ msgstr ""
 "Indica que este usuário tem todas as permissões sem atribuí-las "
 "explicitamente."
 
-#: models.py:302
+#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
 msgstr ""
 "Os grupos que este usuário pertence. Um usuário terá todas as permissões "
-"concedidas a cada um de seus dos grupos."
+"concedidas a cada um de seus grupos."
 
-#: models.py:306
+#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "permissões do usuário"
 
-#: models.py:377
+#: contrib/auth/models.py:300
+msgid "Specific permissions for this user."
+msgstr "Permissões específicas para este usuário."
+
+#: contrib/auth/models.py:367
 msgid "username"
 msgstr "usuário"
 
-#: models.py:378
-msgid ""
-"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
-"Obrigatório. 30 caracteres ou menos. Letras, números e os caracteres @/./+/-/"
-"_"
-
-#: models.py:381
+#: contrib/auth/models.py:371
 msgid "Enter a valid username."
-msgstr "Informe um usuário válido."
+msgstr "Informe um nome de usuário válido."
 
-#: models.py:383
+#: contrib/auth/models.py:373
 msgid "first name"
 msgstr "primeiro nome"
 
-#: models.py:384
+#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "último nome"
 
-#: models.py:385
+#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "endereço de email"
 
-#: models.py:386
+#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "membro da equipe"
 
-#: models.py:387
+#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Indica que usuário consegue acessar este site de administração."
 
-#: models.py:389
+#: contrib/auth/models.py:379
 msgid "active"
 msgstr "ativo"
 
-#: models.py:390
+#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -283,23 +276,55 @@ msgstr ""
 "Indica que o usuário será tratado como ativo. Ao invés de excluir contas de "
 "usuário, desmarque isso."
 
-#: models.py:392
+#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "data de registro"
 
-#: models.py:400
+#: contrib/auth/models.py:390
 msgid "user"
 msgstr "usuário"
 
-#: models.py:401
+#: contrib/auth/models.py:391
 msgid "users"
 msgstr "usuários"
 
-#: views.py:94
-msgid "Logged out"
-msgstr "Sessão encerrada"
-
-#: templates/registration/password_reset_subject.txt:2
+#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Redefinição de senha em %(site_name)s "
+
+#: contrib/auth/tests/test_forms.py:387
+msgid "Enter a valid email address."
+msgstr "Informe um endereço de email válido."
+
+#: contrib/auth/views.py:92
+msgid "Logged out"
+msgstr "Sessão encerrada"
+
+#: contrib/auth/views.py:169
+msgid "Password reset"
+msgstr "Redefinição de senha"
+
+#: contrib/auth/views.py:181
+msgid "Password reset successful"
+msgstr "Redefinição de senha bem sucedida"
+
+#: contrib/auth/views.py:216
+msgid "Enter new password"
+msgstr "Digite a nova senha"
+
+#: contrib/auth/views.py:227
+msgid "Password reset unsuccessful"
+msgstr "Redefinição de senha sem sucesso"
+
+#: contrib/auth/views.py:244
+msgid "Password reset complete"
+msgstr "Redefinição de senha completa"
+
+#: contrib/auth/views.py:278
+msgid "Password change"
+msgstr "Alteração de Senha"
+
+#: contrib/auth/views.py:291
+msgid "Password change successful"
+msgstr "Mudança de senha bem sucedida"

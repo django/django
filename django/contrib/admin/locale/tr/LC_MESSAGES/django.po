@@ -1,185 +1,190 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Translators:
-# Caner Başaran <basaran.caner@gmail.com>, 2012.
-#   <cihadgundogdu@gmail.com>, 2012.
-# Gökmen Görgen <gokmen@alageek.com>, 2012-2013.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Metin Amiroff <amiroff@gmail.com>, 2011-2012.
-# Murat Sahin <martinamca@gmail.com>, 2011.
+# Caner Başaran <basaran.caner@gmail.com>, 2013
+# cihad <cihadgundogdu@gmail.com>, 2012
+# cihad <cihadgundogdu@gmail.com>, 2014
+# Cihan Okyay <cihan.okyay@linux.org.tr>, 2014
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Mesut Can Gürle <mesutcang@gmail.com>, 2013
+# Murat Sahin <martinamca@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-02-24 17:30+0000\n"
-"Last-Translator: Gökmen Görgen <gokmen@alageek.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-08-14 17:13+0000\n"
+"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: tr\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: actions.py:48
+#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d adet %(items)s başarıyla silindi."
 
-#: actions.py:60 options.py:1347
+#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s silinemedi"
 
-#: actions.py:62 options.py:1349
+#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "Emin misiniz?"
 
-#: actions.py:83
+#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Seçili %(verbose_name_plural)s nesnelerini sil"
 
-#: filters.py:101 filters.py:197 filters.py:237 filters.py:274 filters.py:380
+#: contrib/admin/apps.py:11
+msgid "Administration"
+msgstr "Yönetim"
+
+#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
+#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
+#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "Tümü"
 
-#: filters.py:238
+#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "Evet"
 
-#: filters.py:239
+#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "Hayır"
 
-#: filters.py:253
+#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "Bilinmiyor"
 
-#: filters.py:308
+#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "Herhangi bir tarih"
 
-#: filters.py:309
+#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "Bugün"
 
-#: filters.py:313
+#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "Son 7 gün"
 
-#: filters.py:317
+#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "Bu ay"
 
-#: filters.py:321
+#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "Bu yıl"
 
-#: forms.py:9
+#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Lütfen yönetici hesabı için %(username)s ve parolanızı doğru giriniz. İkisi "
+"de küçük harfe duyarlıdır."
 
-#: forms.py:19
-msgid "Please log in again, because your session has expired."
-msgstr "Oturumunuzun süresi geçti. Lütfen tekrar giriş yapın."
-
-#: helpers.py:23
+#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "İşlem:"
 
-#: models.py:24
+#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "işlem zamanı"
 
-#: models.py:27
+#: contrib/admin/models.py:28
 msgid "object id"
 msgstr "nesne no"
 
-#: models.py:28
+#: contrib/admin/models.py:29
 msgid "object repr"
 msgstr "nesne kodu"
 
-#: models.py:29
+#: contrib/admin/models.py:30
 msgid "action flag"
 msgstr "işlem adı"
 
-#: models.py:30
+#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "mesajı değiştir"
 
-#: models.py:35
+#: contrib/admin/models.py:36
 msgid "log entry"
 msgstr "log girdisi"
 
-#: models.py:36
+#: contrib/admin/models.py:37
 msgid "log entries"
 msgstr "log girdileri"
 
-#: models.py:45
+#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "\"%(object)s\" eklendi."
 
-#: models.py:47
+#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "\"%(object)s\" değiştirildi - %(changes)s"
 
-#: models.py:52
+#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s\" silindi."
 
-#: models.py:54
+#: contrib/admin/models.py:55
 msgid "LogEntry Object"
 msgstr "LogEntry Nesnesi"
 
-#: options.py:156 options.py:172
+#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "Hiç biri"
 
-#: options.py:684
+#: contrib/admin/options.py:956
 #, python-format
 msgid "Changed %s."
 msgstr "%s değiştirildi."
 
-#: options.py:684 options.py:694
+#: contrib/admin/options.py:956 contrib/admin/options.py:966
+#: contrib/admin/options.py:1808
 msgid "and"
 msgstr "ve"
 
-#: options.py:689
+#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" eklenmiştir."
 
-#: options.py:693
+#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(list)s %(name)s \"%(object)s\" ile değiştirildi."
 
-#: options.py:698
+#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" silinmiştir."
 
-#: options.py:702
+#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "Hiçbir alan değiştirilmedi."
 
-#: options.py:807 options.py:860
+#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "\"%(obj)s\" isimli %(name)s eklendi. Aşağıda tekrar düzenleyebilirsiniz."
 
-#: options.py:835
+#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -188,12 +193,12 @@ msgstr ""
 "%(name)s \"%(obj)s\" başarıyla eklendi. Aşağıda başka %(name)s "
 "ekleyebilirsiniz."
 
-#: options.py:839
+#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "\"%(obj)s\" isimli %(name)s eklendi."
 
-#: options.py:853
+#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -202,7 +207,7 @@ msgstr ""
 "%(name)s \"%(obj)s\" başarıyla değiştirildi. Aşağıda tekrar "
 "düzenleyebilirsiniz."
 
-#: options.py:867
+#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -211,12 +216,12 @@ msgstr ""
 "%(name)s \"%(obj)s\" başarıyla değiştirildi. Aşağıda başka %(name)s "
 "ekleyebilirsiniz."
 
-#: options.py:873
+#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "\"%(obj)s\" isimli %(name)s değiştirildi."
 
-#: options.py:951 options.py:1211
+#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -224,133 +229,137 @@ msgstr ""
 "İşlemlerin uygulanabilmesi için bir veya daha fazla nesne seçilmelidir. "
 "Herhangi bir değişiklik gerçekleştirilmedi."
 
-#: options.py:970
+#: contrib/admin/options.py:1259
 msgid "No action selected."
 msgstr "İşlem seçimi yapılmamış. Lütfen bir işlem seçiniz."
 
-#: options.py:1050
-#, python-format
-msgid "Add %s"
-msgstr "%s ekle"
-
-#: options.py:1074 options.py:1319
-#, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(key)r birincil anahtarına sahip %(name)s nesnesi mevcut değil."
-
-#: options.py:1140
-#, python-format
-msgid "Change %s"
-msgstr "%s değiştir"
-
-#: options.py:1190
-msgid "Database error"
-msgstr "Veritabanı hatası"
-
-#: options.py:1253
-#, python-format
-msgid "%(count)s %(name)s was changed successfully."
-msgid_plural "%(count)s %(name)s were changed successfully."
-msgstr[0] "%(count)s adet %(name)s başarıyla değiştirildi."
-
-#: options.py:1280
-#, python-format
-msgid "%(total_count)s selected"
-msgid_plural "All %(total_count)s selected"
-msgstr[0] "Toplam %(total_count)s nesne seçili"
-
-#: options.py:1285
-#, python-format
-msgid "0 of %(cnt)s selected"
-msgstr "%(cnt)s nesne arasından seçim yapılmamış"
-
-#: options.py:1335
+#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "\"%(obj)s\" isimli %(name)s silindi."
 
-#: options.py:1382
+#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(key)r birincil anahtarına sahip %(name)s nesnesi mevcut değil."
+
+#: contrib/admin/options.py:1398
+#, python-format
+msgid "Add %s"
+msgstr "%s ekle"
+
+#: contrib/admin/options.py:1398
+#, python-format
+msgid "Change %s"
+msgstr "%s değiştir"
+
+#: contrib/admin/options.py:1460
+msgid "Database error"
+msgstr "Veritabanı hatası"
+
+#: contrib/admin/options.py:1523
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s adet %(name)s başarıyla değiştirildi."
+msgstr[1] "%(count)s adet %(name)s başarıyla değiştirildi."
+
+#: contrib/admin/options.py:1550
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "Toplam %(total_count)s nesne seçili"
+msgstr[1] "Toplam %(total_count)s nesne seçili"
+
+#: contrib/admin/options.py:1556
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "%(cnt)s nesne arasından seçim yapılmamış"
+
+#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
 msgstr "%s için değişiklik geçmişi:"
 
-#: sites.py:322 tests.py:57 templates/admin/login.html:48
-#: templates/registration/password_reset_complete.html:19
-#: views/decorators.py:24
-msgid "Log in"
-msgstr "Giriş yap"
+#. Translators: Model verbose name and instance representation, suitable to be
+#. an item in a list
+#: contrib/admin/options.py:1802
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
 
-#: sites.py:388
+#: contrib/admin/options.py:1809
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+
+#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
+msgid "Django site admin"
+msgstr "Django site yöneticisi"
+
+#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
+msgid "Django administration"
+msgstr "Django yönetimi"
+
+#: contrib/admin/sites.py:42
 msgid "Site administration"
 msgstr "Site yönetimi"
 
-#: sites.py:440
+#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
+#: contrib/admin/templates/registration/password_reset_complete.html:18
+#: contrib/admin/tests.py:113
+msgid "Log in"
+msgstr "Giriş yap"
+
+#: contrib/admin/sites.py:472
 #, python-format
-msgid "%s administration"
-msgstr "%s yönetimi"
+msgid "%(app)s administration"
+msgstr "%(app)s yönetimi"
 
-#: widgets.py:90
-msgid "Date:"
-msgstr "Tarih:"
-
-#: widgets.py:91
-msgid "Time:"
-msgstr "Saat:"
-
-#: widgets.py:165
-msgid "Lookup"
-msgstr "Arama"
-
-#: widgets.py:271
-msgid "Add Another"
-msgstr "Yenisini Ekle"
-
-#: widgets.py:316
-msgid "Currently:"
-msgstr "Şu anda:"
-
-#: widgets.py:317
-msgid "Change:"
-msgstr "Değiştirin:"
-
-#: templates/admin/404.html:4 templates/admin/404.html.py:8
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Sayfa bulunamadı"
 
-#: templates/admin/404.html:10
+#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Üzgünüz, aradığınız sayfa bulunamadı."
 
-#: templates/admin/500.html:6 templates/admin/app_index.html:7
-#: templates/admin/base.html:47 templates/admin/change_form.html:19
-#: templates/admin/change_list.html:41
-#: templates/admin/delete_confirmation.html:7
-#: templates/admin/delete_selected_confirmation.html:7
-#: templates/admin/invalid_setup.html:6 templates/admin/object_history.html:7
-#: templates/admin/auth/user/change_password.html:13
-#: templates/registration/logged_out.html:4
-#: templates/registration/password_change_done.html:6
-#: templates/registration/password_change_form.html:7
-#: templates/registration/password_reset_complete.html:6
-#: templates/registration/password_reset_confirm.html:6
-#: templates/registration/password_reset_done.html:6
-#: templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/admin/500.html:6
+#: contrib/admin/templates/admin/app_index.html:9
+#: contrib/admin/templates/admin/auth/user/change_password.html:13
+#: contrib/admin/templates/admin/base.html:50
+#: contrib/admin/templates/admin/change_form.html:18
+#: contrib/admin/templates/admin/change_list.html:40
+#: contrib/admin/templates/admin/delete_confirmation.html:8
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
+#: contrib/admin/templates/admin/invalid_setup.html:6
+#: contrib/admin/templates/admin/object_history.html:6
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_form.html:7
+#: contrib/admin/templates/registration/password_reset_complete.html:6
+#: contrib/admin/templates/registration/password_reset_confirm.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Anasayfa"
 
-#: templates/admin/500.html:7
+#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "Sunucu hatası"
 
-#: templates/admin/500.html:11
+#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Sunucu hatası (500)"
 
-#: templates/admin/500.html:14
+#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Sunucu Hatası <em>(500)</em>"
 
-#: templates/admin/500.html:15
+#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
@@ -358,114 +367,141 @@ msgstr ""
 "Bir hata oluştu. Site yöneticilerine e-posta ile rapor edildi ve kısa süre "
 "içinde düzeltilecek. Sabrınız için teşekkür ederiz."
 
-#: templates/admin/actions.html:4
+#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "Seçili işlemi uygula"
 
-#: templates/admin/actions.html:4
+#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
 msgstr "Git"
 
-#: templates/admin/actions.html:11
+#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "Tüm sayfalardaki nesneleri seçmek için buraya tıklayınız"
 
-#: templates/admin/actions.html:11
+#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Tüm %(total_count)s %(module_name)s nesnelerini seç"
 
-#: templates/admin/actions.html:13
+#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "Seçimi kaldır"
 
-#: templates/admin/app_index.html:10 templates/admin/index.html:21
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Önce bir kullanıcı adı ve şifre girin. Daha sonra daha fazla bilgi "
+"girebilirsiniz."
 
-#: templates/admin/base.html:28
-msgid "Welcome,"
-msgstr "Hoşgeldiniz,"
+#: contrib/admin/templates/admin/auth/user/add_form.html:8
+msgid "Enter a username and password."
+msgstr "Kullanıcı adı ve şifre girin."
 
-#: templates/admin/base.html:33
-#: templates/registration/password_change_done.html:3
-#: templates/registration/password_change_form.html:4
-msgid "Documentation"
-msgstr "Dokümantasyon"
-
-#: templates/admin/base.html:36
-#: templates/admin/auth/user/change_password.html:17
-#: templates/admin/auth/user/change_password.html:51
-#: templates/registration/password_change_done.html:3
-#: templates/registration/password_change_form.html:4
+#: contrib/admin/templates/admin/auth/user/change_password.html:17
+#: contrib/admin/templates/admin/auth/user/change_password.html:51
+#: contrib/admin/templates/admin/base.html:39
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Şifre değiştir"
 
-#: templates/admin/base.html:38
-#: templates/registration/password_change_done.html:3
-#: templates/registration/password_change_form.html:4
+#: contrib/admin/templates/admin/auth/user/change_password.html:27
+#: contrib/admin/templates/admin/change_form.html:47
+#: contrib/admin/templates/admin/change_list.html:67
+#: contrib/admin/templates/admin/login.html:17
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Please correct the error below."
+msgstr "Lütfen aşağıdaki hataları düzeltin."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:27
+#: contrib/admin/templates/admin/change_form.html:47
+#: contrib/admin/templates/admin/change_list.html:67
+#: contrib/admin/templates/admin/login.html:17
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Please correct the errors below."
+msgstr "Lütfen aşağıdaki hataları düzeltin."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:31
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "<strong>%(username)s</strong> için yeni şifre girin."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:38
+msgid "Password"
+msgstr "Şifre"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:44
+#: contrib/admin/templates/registration/password_change_form.html:42
+msgid "Password (again)"
+msgstr "Şifre (tekrar)"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:45
+msgid "Enter the same password as above, for verification."
+msgstr "Onaylamak için, yukarıdaki şifrenin aynısını girin."
+
+#: contrib/admin/templates/admin/base.html:30
+msgid "Welcome,"
+msgstr "Hoşgeldiniz,"
+
+#: contrib/admin/templates/admin/base.html:36
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "Documentation"
+msgstr "Dokümantasyon"
+
+#: contrib/admin/templates/admin/base.html:41
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Çık"
 
-#: templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django site yöneticisi"
-
-#: templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Django yönetimi"
-
-#: templates/admin/change_form.html:22 templates/admin/index.html:33
+#: contrib/admin/templates/admin/change_form.html:21
+#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "Yeni"
 
-#: templates/admin/change_form.html:32 templates/admin/object_history.html:11
+#: contrib/admin/templates/admin/change_form.html:33
+#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Geçmiş"
 
-#: templates/admin/change_form.html:33
-#: templates/admin/edit_inline/stacked.html:9
-#: templates/admin/edit_inline/tabular.html:30
+#: contrib/admin/templates/admin/change_form.html:35
+#: contrib/admin/templates/admin/edit_inline/stacked.html:9
+#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Sitede görüntüle"
 
-#: templates/admin/change_form.html:44 templates/admin/change_list.html:67
-#: templates/admin/login.html:17
-#: templates/admin/auth/user/change_password.html:27
-#: templates/registration/password_change_form.html:20
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Lütfen aşağıdaki hataları düzeltin."
-
-#: templates/admin/change_list.html:58
+#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Yeni %(name)s"
 
-#: templates/admin/change_list.html:78
+#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Filtrele"
 
-#: templates/admin/change_list_results.html:17
+#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "Sıralamadan çıkar"
 
-#: templates/admin/change_list_results.html:18
+#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "Sıralama önceliği: %(priority_number)s"
 
-#: templates/admin/change_list_results.html:19
+#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "Sıralama tercihi"
 
-#: templates/admin/delete_confirmation.html:11
-#: templates/admin/submit_line.html:4
+#: contrib/admin/templates/admin/delete_confirmation.html:12
+#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "Sil"
 
-#: templates/admin/delete_confirmation.html:18
+#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -476,7 +512,7 @@ msgstr ""
 "nesnelerin silinmesini gerektiriyor, ancak aşağıdaki nesneleri silme "
 "yetkiniz yok."
 
-#: templates/admin/delete_confirmation.html:26
+#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -485,7 +521,7 @@ msgstr ""
 "%(object_name)s '%(escaped_object)s' silinmesi aşağıda gösterilen ilişkili "
 "nesnelerin de silinmesini gerektirir:"
 
-#: templates/admin/delete_confirmation.html:34
+#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -494,16 +530,16 @@ msgstr ""
 "\"%(escaped_object)s\" isimli %(object_name)s nesnesini silmek "
 "istediğinizden emin misiniz? Aşağıdaki bağlantılı öğeler silinecek:"
 
-#: templates/admin/delete_confirmation.html:39
-#: templates/admin/delete_selected_confirmation.html:44
+#: contrib/admin/templates/admin/delete_confirmation.html:40
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
 msgid "Yes, I'm sure"
 msgstr "Evet, eminim"
 
-#: templates/admin/delete_selected_confirmation.html:10
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
 msgid "Delete multiple objects"
 msgstr "Birden fazla nesneyi sil"
 
-#: templates/admin/delete_selected_confirmation.html:17
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -513,7 +549,7 @@ msgstr ""
 "Seçili %(objects_name)s nesnelerinin silinmesi hesabınızın silme yetkisine "
 "sahip olmadığı aşağıda gösterilen nesnelerin de silinmesini gerektirir:"
 
-#: templates/admin/delete_selected_confirmation.html:25
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -522,7 +558,7 @@ msgstr ""
 "Seçili %(objects_name)s nesnelerinin silinmesi aşağıda gösterilen ilişkili "
 "nesnelerin silinmesini de gerektirir:"
 
-#: templates/admin/delete_selected_confirmation.html:33
+#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -531,41 +567,56 @@ msgstr ""
 "Seçili %(objects_name)s nesnelerini silmek istediğinizden emin misiniz? "
 "Aşağıda gösterilen tüm nesneler ve ilişkili kalemler silinecektir:"
 
-#: templates/admin/filter.html:2
+#: contrib/admin/templates/admin/edit_inline/stacked.html:26
+#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Remove"
+msgstr "Sil"
+
+#: contrib/admin/templates/admin/edit_inline/stacked.html:27
+#: contrib/admin/templates/admin/edit_inline/tabular.html:77
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Yeni bir %(verbose_name)s ekle"
+
+#: contrib/admin/templates/admin/edit_inline/tabular.html:17
+msgid "Delete?"
+msgstr "Silinsin Mi?"
+
+#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr " %(filter_title)s filtresi"
 
-#: templates/admin/index.html:20
+#: contrib/admin/templates/admin/index.html:20
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "%(name)s uygulamasındaki modeller"
 
-#: templates/admin/index.html:39
+#: contrib/admin/templates/admin/index.html:37
 msgid "Change"
 msgstr "Düzenle"
 
-#: templates/admin/index.html:49
+#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
 msgstr "Düzenleme yapmaya yetkiniz yok."
 
-#: templates/admin/index.html:57
+#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "İşlem Geçmişi"
 
-#: templates/admin/index.html:58
+#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "İşlemlerim"
 
-#: templates/admin/index.html:62
+#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "İşlem geçmişi bulunamadı"
 
-#: templates/admin/index.html:76
+#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "Bilinmeyen içerik"
 
-#: templates/admin/invalid_setup.html:12
+#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -575,27 +626,27 @@ msgstr ""
 "tablolarının kurulu olduğundan ve veritabanının ilgili kullanıcı tarafından "
 "okunabilir olduğundan emin olun."
 
-#: templates/admin/login.html:37
+#: contrib/admin/templates/admin/login.html:37
 msgid "Password:"
 msgstr "Şifre:"
 
-#: templates/admin/login.html:44
+#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "Kullanıcı adını veya parolanı mı unuttun?"
 
-#: templates/admin/object_history.html:23
+#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Tarih/saat"
 
-#: templates/admin/object_history.html:24
+#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Kullanıcı"
 
-#: templates/admin/object_history.html:25
+#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "İşlem"
 
-#: templates/admin/object_history.html:39
+#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -603,111 +654,61 @@ msgstr ""
 "Bu nesnenin işlem geçmişi yok. Muhtemelen yönetici sayfası dışında bir "
 "yerden eklendi."
 
-#: templates/admin/pagination.html:10
+#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Tümünü göster"
 
-#: templates/admin/pagination.html:11 templates/admin/submit_line.html:3
+#: contrib/admin/templates/admin/pagination.html:11
+#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "Kaydet"
 
-#: templates/admin/search_form.html:7
+#: contrib/admin/templates/admin/search_form.html:7
 msgid "Search"
 msgstr "Ara"
 
-#: templates/admin/search_form.html:9
+#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s sonuç"
+msgstr[1] "%(counter)s sonuç"
 
-#: templates/admin/search_form.html:9
+#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "toplam %(full_result_count)s"
 
-#: templates/admin/submit_line.html:5
+#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "Yeni olarak kaydet"
 
-#: templates/admin/submit_line.html:6
+#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "Kaydet ve yenisini ekle"
 
-#: templates/admin/submit_line.html:7
+#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "Kaydet ve düzenlemeye devam et"
 
-#: templates/admin/auth/user/add_form.html:6
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr ""
-"Önce bir kullanıcı adı ve şifre girin. Daha sonra daha fazla bilgi "
-"girebilirsiniz."
-
-#: templates/admin/auth/user/add_form.html:8
-msgid "Enter a username and password."
-msgstr "Kullanıcı adı ve şifre girin."
-
-#: templates/admin/auth/user/change_password.html:31
-#, python-format
-msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "<strong>%(username)s</strong> için yeni şifre girin."
-
-#: templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "Şifre"
-
-#: templates/admin/auth/user/change_password.html:44
-#: templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "Şifre (tekrar)"
-
-#: templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "Onaylamak için, yukarıdaki şifrenin aynısını girin."
-
-#: templates/admin/edit_inline/stacked.html:26
-#: templates/admin/edit_inline/tabular.html:76
-msgid "Remove"
-msgstr "Sil"
-
-#: templates/admin/edit_inline/stacked.html:27
-#: templates/admin/edit_inline/tabular.html:75
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Yeni bir %(verbose_name)s ekle"
-
-#: templates/admin/edit_inline/tabular.html:17
-msgid "Delete?"
-msgstr "Silinsin Mi?"
-
-#: templates/registration/logged_out.html:8
+#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Web sitesinde bugün geçirdiğiniz zaman için teşekkür ederiz."
 
-#: templates/registration/logged_out.html:10
+#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Tekrar giriş yap"
 
-#: templates/registration/password_change_done.html:7
-#: templates/registration/password_change_form.html:8
-#: templates/registration/password_change_form.html:12
-#: templates/registration/password_change_form.html:24
+#: contrib/admin/templates/registration/password_change_done.html:7
+#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "Şifre değişimi"
 
-#: templates/registration/password_change_done.html:11
-#: templates/registration/password_change_done.html:15
-msgid "Password change successful"
-msgstr "Şifre değişimi başarılı"
-
-#: templates/registration/password_change_done.html:17
+#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "Şifreniz değiştirildi."
 
-#: templates/registration/password_change_form.html:26
+#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -715,65 +716,49 @@ msgstr ""
 "Güvenliğiniz için, lütfen eski şifrenizi girin, sonra yeni şifrenizi iki "
 "kere girerek doğru yazdığınızdan emin olun."
 
-#: templates/registration/password_change_form.html:32
+#: contrib/admin/templates/registration/password_change_form.html:32
 msgid "Old password"
 msgstr "Eski şifre"
 
-#: templates/registration/password_change_form.html:37
+#: contrib/admin/templates/registration/password_change_form.html:37
 msgid "New password"
 msgstr "Yeni şifre"
 
-#: templates/registration/password_change_form.html:48
-#: templates/registration/password_reset_confirm.html:26
+#: contrib/admin/templates/registration/password_change_form.html:48
+#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "Şifremi değiştir"
 
-#: templates/registration/password_reset_complete.html:7
-#: templates/registration/password_reset_confirm.html:11
-#: templates/registration/password_reset_done.html:7
-#: templates/registration/password_reset_form.html:7
-#: templates/registration/password_reset_form.html:11
-#: templates/registration/password_reset_form.html:15
+#: contrib/admin/templates/registration/password_reset_complete.html:7
+#: contrib/admin/templates/registration/password_reset_done.html:7
+#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "Şifreyi sıfırla"
 
-#: templates/registration/password_reset_complete.html:11
-#: templates/registration/password_reset_complete.html:15
-msgid "Password reset complete"
-msgstr "Şifre sıfırlama tamamlandı"
-
-#: templates/registration/password_reset_complete.html:17
+#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Şifreniz atanmıştır. Şimdi sisteme giriş yapabilirsiniz."
 
-#: templates/registration/password_reset_confirm.html:7
+#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Şifre sıfırlama onayı"
 
-#: templates/registration/password_reset_confirm.html:17
-msgid "Enter new password"
-msgstr "Yeni şifreyi girin"
-
-#: templates/registration/password_reset_confirm.html:19
+#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
 "Lütfen yeni şifrenizi iki kere girin, böylece doğru yazdığınızdan emin olun."
 
-#: templates/registration/password_reset_confirm.html:23
+#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "Yeni şifre:"
 
-#: templates/registration/password_reset_confirm.html:25
+#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "Şifreyi onayla:"
 
-#: templates/registration/password_reset_confirm.html:31
-msgid "Password reset unsuccessful"
-msgstr "Şifre sıfırlaması başarısız oldu"
-
-#: templates/registration/password_reset_confirm.html:33
+#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -782,20 +767,23 @@ msgstr ""
 "kullanılmış olduğu içindir. Lütfen yeni bir şifre sıfırlama talebinde "
 "bulunun."
 
-#: templates/registration/password_reset_done.html:11
-#: templates/registration/password_reset_done.html:15
-msgid "Password reset successful"
-msgstr "Şifre başarıyla sıfırlandı"
-
-#: templates/registration/password_reset_done.html:17
+#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
 msgstr ""
-"Şifrenizin ayarlanması ile ilgili talimatlar belirtmiş olduğunuz email "
+"Şifrenizin ayarlanması ile ilgili talimatlar, belirtmiş olduğunuz e-posta "
 "adresine gönderildi. Yakın zamanda ulaşması beklenir."
 
-#: templates/registration/password_reset_email.html:2
+#: contrib/admin/templates/registration/password_reset_done.html:17
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Eğer bir e-posta almadıysanız, lütfen kayıt olurken kullandığınız e-posta "
+"adresini girdiğinizden emin olun. Spam klasörünü kontrol edin."
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -804,24 +792,24 @@ msgstr ""
 "Bu postayı %(site_name)s sitesindeki kullanıcı hesabınıza ait şifrenizi "
 "sıfırlama talebinde bulunduğunuz için alıyorsunuz."
 
-#: templates/registration/password_reset_email.html:4
+#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Lütfen bu sayfaya gidip yeni şifre seçin:"
 
-#: templates/registration/password_reset_email.html:8
+#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Unutma ihtimaline karşı, kullanıcı adınız:"
 
-#: templates/registration/password_reset_email.html:10
+#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Sitemizi kullandığınız için teşekkürler!"
 
-#: templates/registration/password_reset_email.html:12
+#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s Ekibi"
 
-#: templates/registration/password_reset_form.html:17
+#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -829,28 +817,52 @@ msgstr ""
 "Şifrenizi mi unuttunuz? Aşağıdaki alana e-posta adresinizi girin, yeni "
 "şifreniz için gereken talimatları göndereceğiz."
 
-#: templates/registration/password_reset_form.html:21
+#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "E-posta adresi:"
 
-#: templates/registration/password_reset_form.html:21
+#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "Şifremi sıfırla"
 
-#: templatetags/admin_list.py:344
+#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "Tüm tarihler"
 
-#: views/main.py:33
+#: contrib/admin/views/main.py:34
 msgid "(None)"
 msgstr "(Yok)"
 
-#: views/main.py:76
+#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
 msgstr "%s seç"
 
-#: views/main.py:78
+#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
 msgstr "Değiştirilecek %s nesnesini seçin"
+
+#: contrib/admin/widgets.py:91
+msgid "Date:"
+msgstr "Tarih:"
+
+#: contrib/admin/widgets.py:92
+msgid "Time:"
+msgstr "Saat:"
+
+#: contrib/admin/widgets.py:176
+msgid "Lookup"
+msgstr "Arama"
+
+#: contrib/admin/widgets.py:280
+msgid "Add Another"
+msgstr "Yenisini Ekle"
+
+#: contrib/admin/widgets.py:333
+msgid "Currently:"
+msgstr "Şu anda:"
+
+#: contrib/admin/widgets.py:334
+msgid "Change:"
+msgstr "Değiştirin:"

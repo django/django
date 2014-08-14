@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012.
+# Delgermurun Purevkhuuu <info@delgermurun.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Zorig <zorig_ezd@yahoo.com>, 2013-2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-18 02:26+0000\n"
-"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
+"POT-Creation-Date: 2014-05-20 12:20+0200\n"
+"PO-Revision-Date: 2014-08-10 10:38+0000\n"
+"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -18,70 +19,79 @@ msgstr ""
 "Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: admin.py:41
+#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Хувийн мэдээлэл"
 
-#: admin.py:42
+#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Эрхүүд"
 
-#: admin.py:44
+#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Чухал огноо"
 
-#: admin.py:126
+#: contrib/auth/admin.py:134
 msgid "Password changed successfully."
 msgstr "Нууц үг амжилттай өөрчлөгдлөө."
 
-#: admin.py:136
+#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Нууц үг өөрчлөх: %s"
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: contrib/auth/apps.py:10
+msgid "Authentication and Authorization"
+msgstr "Нэвтрэлт ба Зөвшөөрөл"
+
+#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
+#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Нууц үг тохируулаагүй."
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
+#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Нууц үгийн буруу формат эсвэл үл мэдэгдэх хаш алгоритм байна."
 
-#: forms.py:67
+#: contrib/auth/forms.py:76
 msgid "A user with that username already exists."
 msgstr "Ийм хэрэглэгчийн нэртэй хэрэглэгч өмнө нь бүртгүүлсэн байна."
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
+#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Хоёр нууц үг зөрж байна."
 
-#: forms.py:70 forms.py:115
+#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
 msgid "Username"
 msgstr "Хэрэглэгчийн нэр"
 
-#: forms.py:72 forms.py:116
+#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
+#: contrib/auth/models.py:368
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Заавал. 30 ба түүнээс бага үсэгтэй. Зөвхөн латин үсэг, тоо болон @/./+/-/_ "
 "тэмдэгтүүдийг зөвшөөрнө."
 
-#: forms.py:75 forms.py:119
+#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "Энэ утга дотор зөвхөн үсэг, тоо болон @/./+/-/_ тэмдэгтүүд байж болно."
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
+#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Нууц үг "
 
-#: forms.py:79
+#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Нууц үгийн баталгаа"
 
-#: forms.py:81
+#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Батлахын тулд дээрх нууц үгээ ахин хийнэ үү."
 
-#: forms.py:122
+#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -91,7 +101,7 @@ msgstr ""
 "боломжгүй юм. Гэхдээ та нууц үгийг <a href=\"password/\">цонхоор</a> өөрчлөх "
 "боломжтой."
 
-#: forms.py:151
+#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -100,125 +110,108 @@ msgstr ""
 "Зөв %(username)s, нууц үг оруулна уу. Том жижиг үсэг ялгаатай болхын "
 "анхаарна уу."
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-"Та вэб хөтчөө cookie ажиллахаар тохируулаагүй юм шиг байна. Нэвтрэхэд cookie "
-"шаардлагатай байдаг."
-
-#: forms.py:155
+#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Энэ бүртгэл идэвхгүй байна."
 
-#: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-"Энэ цахим шуудангийн хаягаар бүртгүүлсэн хэрэглэгчийн бүртгэл байхгүй байна. "
-"Та бүртгүүлсэн гэдэгтээ итгэлтэй байна уу?"
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr ""
-"Энэ цахим хаягаар бүртгүүлсэн хэрэглэгчийн нууц үгийг сэргээх боломжгүй."
-
-#: forms.py:211
+#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "Цахим хаяг"
 
-#: forms.py:271
+#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Шинэ нууц үг"
 
-#: forms.py:273
+#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Шинэ нууц үгийн баталгаа"
 
-#: forms.py:302
+#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Хуучин нууц үгээ буруу оруулсан байна. Ахин оруулна уу."
 
-#: forms.py:305
+#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Хуучин нууц үг"
 
-#: forms.py:333
+#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Нууц үг (ахиад)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
+#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
+#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
+#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "Алгоритм"
 
-#: hashers.py:242
+#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "давталтууд"
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
+#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
+#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "давс"
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
+#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
+#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "хаш"
 
-#: hashers.py:293
+#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "ажлын байгуулагч"
 
-#: hashers.py:295
+#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "checksum"
 
-#: models.py:72 models.py:121
+#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "нэр"
 
-#: models.py:74
+#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "Код"
 
-#: models.py:78
+#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "зөвшөөрөл"
 
-#: models.py:79 models.py:123
+#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "зөвшөөрлүүд"
 
-#: models.py:128
+#: contrib/auth/models.py:119
 msgid "group"
 msgstr "бүлэг "
 
-#: models.py:129 models.py:301
+#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "бүлгүүд"
 
-#: models.py:200
+#: contrib/auth/models.py:192
 msgid "password"
 msgstr "нууц үг"
 
-#: models.py:201
+#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "сүүлд нэвтэрсэн"
 
-#: models.py:298
+#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "Удирдлагын төлөв"
 
-#: models.py:299
+#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "Энэ хэрэглэгчид бүх зөвшөөрөл байгааг ил тод харуулалгүй тодорхойлно. "
 
-#: models.py:302
+#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
@@ -226,51 +219,48 @@ msgstr ""
 "Бүлэгүүд энэ хэрэглэгчийнхээс тусдаа. Хэрэглэгчид нь сонгосон бүлэгт "
 "олгогдсон бүх эрх зөвшөөрөгдөх болно."
 
-#: models.py:306
+#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "хэрэглэгчийн эрхүүд"
 
-#: models.py:377
+#: contrib/auth/models.py:300
+msgid "Specific permissions for this user."
+msgstr "Хэрэглэгчид тодорхойлж өгсөн эрх"
+
+#: contrib/auth/models.py:367
 msgid "username"
 msgstr "хэрэглэгчийн нэр"
 
-#: models.py:378
-msgid ""
-"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
-"Заавал. 30 болон түүнээс бага тэмдэгт. Үсэг, тоо болон @/./+/-/_ тэмдэгтүүд "
-"ашиглана уу."
-
-#: models.py:381
+#: contrib/auth/models.py:371
 msgid "Enter a valid username."
 msgstr "Зөв нэвтрэх нэр оруулна уу."
 
-#: models.py:383
+#: contrib/auth/models.py:373
 msgid "first name"
 msgstr "нэр"
 
-#: models.py:384
+#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "овог"
 
-#: models.py:385
+#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "цахим хаяг"
 
-#: models.py:386
+#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "Хэрэглэгчдийн төлөв"
 
-#: models.py:387
+#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 "Уг удирдлагын сайт руу хэрэглэгч нэвтрэх боломжтой эсэхийг тодорхойлно."
 
-#: models.py:389
+#: contrib/auth/models.py:379
 msgid "active"
 msgstr "идэвхтэй"
 
-#: models.py:390
+#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -278,23 +268,55 @@ msgstr ""
 "Энэ хэрэглэгчийг идэвхтэй болгох эсэхийг тодорхойлно. Бүртгэлийг нь устгахын "
 "оронд сонгохгүй байхад л хангалттай."
 
-#: models.py:392
+#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "бүртгүүлсэн огноо"
 
-#: models.py:400
+#: contrib/auth/models.py:390
 msgid "user"
 msgstr "хэрэглэгч "
 
-#: models.py:401
+#: contrib/auth/models.py:391
 msgid "users"
 msgstr "хэрэглэгчид"
 
-#: views.py:94
-msgid "Logged out"
-msgstr "Гарсан"
-
-#: templates/registration/password_reset_subject.txt:2
+#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s cайт дээрх нууц үг сэргээлт"
+
+#: contrib/auth/tests/test_forms.py:387
+msgid "Enter a valid email address."
+msgstr "Зөв нэвтрэх нэр оруулна уу."
+
+#: contrib/auth/views.py:92
+msgid "Logged out"
+msgstr "Гарсан"
+
+#: contrib/auth/views.py:169
+msgid "Password reset"
+msgstr "Нууц үг шинэчилэх"
+
+#: contrib/auth/views.py:181
+msgid "Password reset successful"
+msgstr "Нууц үг шинэчилэх амжилттай боллоо"
+
+#: contrib/auth/views.py:216
+msgid "Enter new password"
+msgstr "Шинэ нууц үг оруулах"
+
+#: contrib/auth/views.py:227
+msgid "Password reset unsuccessful"
+msgstr "Нууц үг шинэчилэх амжилтгүй боллоо"
+
+#: contrib/auth/views.py:244
+msgid "Password reset complete"
+msgstr "Нууц үг шинэчилэх явц дууслаа"
+
+#: contrib/auth/views.py:278
+msgid "Password change"
+msgstr "Нууц үгийн өөрчлөлт"
+
+#: contrib/auth/views.py:291
+msgid "Password change successful"
+msgstr "Нууц үгийн өөрчлөлт амжилттай"

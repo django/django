@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ali Nikneshan <ali@nikneshan.com>, 2011, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Ali Nikneshan <ali@nikneshan.com>, 2011-2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Reza Mohammadi <reza@teeleh.ir>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-10-18 10:56+0000\n"
-"Last-Translator: Ali Nikneshan <ali@nikneshan.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-07-22 18:41+0000\n"
+"Last-Translator: Reza Mohammadi <reza@teeleh.ir>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -18,57 +19,61 @@ msgstr ""
 "Language: fa\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin.py:10
+#: contrib/flatpages/admin.py:11
 msgid "Advanced options"
 msgstr "گزینه‌های پیشرفته"
 
-#: forms.py:7 models.py:11
+#: contrib/flatpages/apps.py:8
+msgid "Flat Pages"
+msgstr "صفحات تخت"
+
+#: contrib/flatpages/forms.py:8 contrib/flatpages/models.py:12
 msgid "URL"
 msgstr "نشانی اینترنتی"
 
-#: forms.py:8
+#: contrib/flatpages/forms.py:9
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "مثال: '/about/contact/'. مطمئن شوید که اسلش را هم در ابتدا و هم در انتها "
 "گذاشته‌اید."
 
-#: forms.py:10
+#: contrib/flatpages/forms.py:11
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr "این مقدار فقط باید حاوی حروف، اعداد، خط زیر، خط تیره و یا اسلش باشد."
 
-#: forms.py:19
+#: contrib/flatpages/forms.py:22
 msgid "URL is missing a leading slash."
 msgstr "در آدرس اسلش آغازین فراموش شده است."
 
-#: forms.py:23
+#: contrib/flatpages/forms.py:29
 msgid "URL is missing a trailing slash."
 msgstr "در آدرس اسلش پایانی فراموش شده است."
 
-#: forms.py:38
+#: contrib/flatpages/forms.py:46
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
 msgstr "صفحه تخت با آدرس %(url)s برای سایت %(site)s وجود دارد "
 
-#: models.py:12
+#: contrib/flatpages/models.py:13
 msgid "title"
 msgstr "عنوان"
 
-#: models.py:13
+#: contrib/flatpages/models.py:14
 msgid "content"
 msgstr "محتوا"
 
-#: models.py:14
+#: contrib/flatpages/models.py:15
 msgid "enable comments"
 msgstr "فعال کردن نظرات"
 
-#: models.py:15
+#: contrib/flatpages/models.py:16
 msgid "template name"
 msgstr "نام قالب"
 
-#: models.py:16
+#: contrib/flatpages/models.py:17
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -76,24 +81,24 @@ msgstr ""
 "مثال: 'flatpages/contact_page.html'. اگر این مشخص نشود، سیستم از 'flatpages/"
 "default.html' استفاده خواهد کرد."
 
-#: models.py:17
+#: contrib/flatpages/models.py:18
 msgid "registration required"
 msgstr "عضویت لازم است"
 
-#: models.py:17
+#: contrib/flatpages/models.py:19
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "اگر این انتخاب شود، فقط کاربران وارد شده خواهند توانست این صفحه را مشاهده "
 "نمایند."
 
-#: models.py:22
+#: contrib/flatpages/models.py:25
 msgid "flat page"
 msgstr "صفحه تخت"
 
-#: models.py:23
+#: contrib/flatpages/models.py:26
 msgid "flat pages"
 msgstr "صفحات تخت"
 
-#: tests/forms.py:97
+#: contrib/flatpages/tests/test_forms.py:98
 msgid "This field is required."
 msgstr "این فیلد لازم است."

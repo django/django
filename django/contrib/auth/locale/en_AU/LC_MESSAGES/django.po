@@ -1,0 +1,319 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Tom Fifield <tom@openstack.org>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-20 12:20+0200\n"
+"PO-Revision-Date: 2014-05-21 09:39+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: English (Australia) (http://www.transifex.com/projects/p/"
+"django/language/en_AU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_AU\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: contrib/auth/admin.py:44
+msgid "Personal info"
+msgstr "Personal info"
+
+#: contrib/auth/admin.py:45
+msgid "Permissions"
+msgstr "Permissions"
+
+#: contrib/auth/admin.py:47
+msgid "Important dates"
+msgstr "Important dates"
+
+#: contrib/auth/admin.py:134
+msgid "Password changed successfully."
+msgstr "Password changed successfully."
+
+#: contrib/auth/admin.py:145
+#, python-format
+msgid "Change password: %s"
+msgstr "Change password: %s"
+
+#: contrib/auth/apps.py:10
+msgid "Authentication and Authorization"
+msgstr ""
+
+#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
+#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
+msgid "No password set."
+msgstr "No password set."
+
+#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
+#: contrib/auth/tests/test_forms.py:332
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Invalid password format or unknown hashing algorithm."
+
+#: contrib/auth/forms.py:76
+msgid "A user with that username already exists."
+msgstr "A user with that username already exists."
+
+#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
+#: contrib/auth/forms.py:349
+msgid "The two password fields didn't match."
+msgstr "The two password fields didn't match."
+
+#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
+msgid "Username"
+msgstr "Username"
+
+#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
+#: contrib/auth/models.py:368
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+
+#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr "This value may contain only letters, numbers and @/./+/-/_ characters."
+
+#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
+#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
+msgid "Password"
+msgstr "Password"
+
+#: contrib/auth/forms.py:88
+msgid "Password confirmation"
+msgstr "Password confirmation"
+
+#: contrib/auth/forms.py:90
+msgid "Enter the same password as above, for verification."
+msgstr "Enter the same password as above, for verification."
+
+#: contrib/auth/forms.py:136
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+
+#: contrib/auth/forms.py:166
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+
+#: contrib/auth/forms.py:168
+msgid "This account is inactive."
+msgstr "This account is inactive."
+
+#: contrib/auth/forms.py:231
+msgid "Email"
+msgstr "Email"
+
+#: contrib/auth/forms.py:287
+msgid "New password"
+msgstr "New password"
+
+#: contrib/auth/forms.py:289
+msgid "New password confirmation"
+msgstr "New password confirmation"
+
+#: contrib/auth/forms.py:320
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Your old password was entered incorrectly. Please enter it again."
+
+#: contrib/auth/forms.py:323
+msgid "Old password"
+msgstr "Old password"
+
+#: contrib/auth/forms.py:353
+msgid "Password (again)"
+msgstr "Password (again)"
+
+#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
+#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
+#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
+#: contrib/auth/hashers.py:511
+msgid "algorithm"
+msgstr "algorithm"
+
+#: contrib/auth/hashers.py:253
+msgid "iterations"
+msgstr "iterations"
+
+#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
+#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
+#: contrib/auth/hashers.py:512
+msgid "salt"
+msgstr "salt"
+
+#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
+#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
+#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
+msgid "hash"
+msgstr "hash"
+
+#: contrib/auth/hashers.py:336
+msgid "work factor"
+msgstr "work factor"
+
+#: contrib/auth/hashers.py:338
+msgid "checksum"
+msgstr "checksum"
+
+#: contrib/auth/models.py:63 contrib/auth/models.py:112
+msgid "name"
+msgstr "name"
+
+#: contrib/auth/models.py:65
+msgid "codename"
+msgstr "codename"
+
+#: contrib/auth/models.py:69
+msgid "permission"
+msgstr "permission"
+
+#: contrib/auth/models.py:70 contrib/auth/models.py:114
+msgid "permissions"
+msgstr "permissions"
+
+#: contrib/auth/models.py:119
+msgid "group"
+msgstr "group"
+
+#: contrib/auth/models.py:120 contrib/auth/models.py:293
+msgid "groups"
+msgstr "groups"
+
+#: contrib/auth/models.py:192
+msgid "password"
+msgstr "password"
+
+#: contrib/auth/models.py:193
+msgid "last login"
+msgstr "last login"
+
+#: contrib/auth/models.py:290
+msgid "superuser status"
+msgstr "superuser status"
+
+#: contrib/auth/models.py:291
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+
+#: contrib/auth/models.py:294
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
+msgstr ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
+
+#: contrib/auth/models.py:299
+msgid "user permissions"
+msgstr "user permissions"
+
+#: contrib/auth/models.py:300
+msgid "Specific permissions for this user."
+msgstr ""
+
+#: contrib/auth/models.py:367
+msgid "username"
+msgstr "username"
+
+#: contrib/auth/models.py:371
+msgid "Enter a valid username."
+msgstr "Enter a valid username."
+
+#: contrib/auth/models.py:373
+msgid "first name"
+msgstr "first name"
+
+#: contrib/auth/models.py:374
+msgid "last name"
+msgstr "last name"
+
+#: contrib/auth/models.py:375
+msgid "email address"
+msgstr "email address"
+
+#: contrib/auth/models.py:376
+msgid "staff status"
+msgstr "staff status"
+
+#: contrib/auth/models.py:377
+msgid "Designates whether the user can log into this admin site."
+msgstr "Designates whether the user can log into this admin site."
+
+#: contrib/auth/models.py:379
+msgid "active"
+msgstr "active"
+
+#: contrib/auth/models.py:380
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+
+#: contrib/auth/models.py:382
+msgid "date joined"
+msgstr "date joined"
+
+#: contrib/auth/models.py:390
+msgid "user"
+msgstr "user"
+
+#: contrib/auth/models.py:391
+msgid "users"
+msgstr "users"
+
+#: contrib/auth/templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Password reset on %(site_name)s"
+
+#: contrib/auth/tests/test_forms.py:387
+msgid "Enter a valid email address."
+msgstr "Enter a valid email address."
+
+#: contrib/auth/views.py:92
+msgid "Logged out"
+msgstr "Logged out"
+
+#: contrib/auth/views.py:169
+msgid "Password reset"
+msgstr ""
+
+#: contrib/auth/views.py:181
+msgid "Password reset successful"
+msgstr ""
+
+#: contrib/auth/views.py:216
+msgid "Enter new password"
+msgstr ""
+
+#: contrib/auth/views.py:227
+msgid "Password reset unsuccessful"
+msgstr ""
+
+#: contrib/auth/views.py:244
+msgid "Password reset complete"
+msgstr ""
+
+#: contrib/auth/views.py:278
+msgid "Password change"
+msgstr ""
+
+#: contrib/auth/views.py:291
+msgid "Password change successful"
+msgstr ""

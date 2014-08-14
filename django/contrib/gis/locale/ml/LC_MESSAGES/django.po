@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Rajeesh Nair <rajeeshrnair@gmail.com>, 2011, 2012.
+# Aby Thomas <abyzthomas@gmail.com>, 2014
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Rajeesh Nair <rajeeshrnair@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-04-17 19:18+0000\n"
-"Last-Translator: Rajeesh Nair <rajeeshrnair@gmail.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-07-25 18:39+0000\n"
+"Last-Translator: Aby Thomas <abyzthomas@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
 "MIME-Version: 1.0\n"
@@ -18,79 +19,83 @@ msgstr ""
 "Language: ml\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:9
-msgid "No feeds are registered."
-msgstr " ഫീഡുകളൊന്നും രജിസ്റ്റര്‍ ചെയ്തിട്ടില്ല."
+#: contrib/gis/apps.py:8
+msgid "GIS"
+msgstr "ജി.ഐ.എസ്"
 
-#: views.py:19
-#, python-format
-msgid "Slug %r isn't registered."
-msgstr "%r എന്ന സ്ലഗ് രജിസ്റ്റര്‍ ചെയ്തിട്ടില്ല."
-
-#: db/models/fields.py:51
+#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "അടിസ്ഥാന ജി.ഐ.എസ് കളം (ഫീല്‍ഡ്) -- ഓപ്പണ്‍ ജി.ഐ.എസ് നിര്‍ദേശിച്ച തരം ജ്യാമിതീയ രൂപത്തെ "
 "സൂചിപ്പിക്കാന്‍"
 
-#: db/models/fields.py:271
+#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "ബിന്ദു"
 
-#: db/models/fields.py:275
+#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "രേഖാ സ്ട്രിങ്ങ്"
 
-#: db/models/fields.py:279
+#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "ബഹുഭുജം"
 
-#: db/models/fields.py:283
+#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "ബഹുബിന്ദു"
 
-#: db/models/fields.py:287
+#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "ബഹു രേഖാ സ്ട്രിങ്ങ്"
 
-#: db/models/fields.py:291
+#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "ബഹു ബഹുഭുജം"
 
-#: db/models/fields.py:295
+#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "ജ്യാമിതി ശേഖരം"
 
-#: forms/fields.py:19
+#: contrib/gis/forms/fields.py:22
 msgid "No geometry value provided."
 msgstr "ജ്യാമിതീയ മൂല്യമൊന്നും തന്നിട്ടില്ല."
 
-#: forms/fields.py:20
+#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "തെറ്റായ ജ്യാമിതീയ മൂല്യം."
 
-#: forms/fields.py:21
+#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "തെറ്റായ തരം ജ്യാമിതി."
 
-#: forms/fields.py:22
+#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
 "ജ്യാമിതീയ രൂപത്തെ ജ്യാമിതി കളത്തിന്റെ SRID-ലേക്കു മാറ്റുമ്പോള്‍ എന്തോ തകരാറു സംഭവിച്ചിട്ടുണ്ട്."
 
-#: sitemaps/views.py:46
+#: contrib/gis/sitemaps/views.py:56
 #, python-format
 msgid "No sitemap available for section: %r"
 msgstr "%r എന്ന വിഭാഗത്തിനു സൈറ്റ്മാപ്പൊന്നും ലഭ്യമല്ല."
 
-#: sitemaps/views.py:60
+#: contrib/gis/sitemaps/views.py:70
 #, python-format
 msgid "Page %s empty"
 msgstr "പേജ്  %s കാലിയാണ്"
 
-#: sitemaps/views.py:62
+#: contrib/gis/sitemaps/views.py:72
 #, python-format
 msgid "No page '%s'"
 msgstr "'%s' എന്ന പേജില്ല."
+
+#: contrib/gis/views.py:10
+msgid "No feeds are registered."
+msgstr " ഫീഡുകളൊന്നും രജിസ്റ്റര്‍ ചെയ്തിട്ടില്ല."
+
+#: contrib/gis/views.py:16
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "%r എന്ന സ്ലഗ് രജിസ്റ്റര്‍ ചെയ്തിട്ടില്ല."

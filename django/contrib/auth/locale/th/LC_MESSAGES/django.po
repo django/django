@@ -1,15 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Kowit Charoenratchatabhan <kowito@gmail.com>, 2012-2013.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2013-03-04 22:30+0000\n"
+"POT-Creation-Date: 2014-05-20 12:20+0200\n"
+"PO-Revision-Date: 2014-07-21 20:36+0000\n"
 "Last-Translator: Kowit Charoenratchatabhan <kowit.s.c@gmail.com>\n"
 "Language-Team: Thai (http://www.transifex.com/projects/p/django/language/"
 "th/)\n"
@@ -19,69 +18,78 @@ msgstr ""
 "Language: th\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: admin.py:41
+#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "ข้อมูลส่วนตัว"
 
-#: admin.py:42
+#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "สิทธิ์"
 
-#: admin.py:44
+#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "วันที่ที่สำคัญ"
 
-#: admin.py:126
+#: contrib/auth/admin.py:134
 msgid "Password changed successfully."
 msgstr "เปลี่ยนรหัสผ่านสำเร็จแล้ว"
 
-#: admin.py:136
+#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "เปลี่ยนรหัสผ่าน: %s "
 
-#: forms.py:31 tests/forms.py:251 tests/forms.py:256 tests/forms.py:384
+#: contrib/auth/apps.py:10
+msgid "Authentication and Authorization"
+msgstr "การตรวจสอบและอนุมัติ"
+
+#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
+#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "ไม่ได้ตั้งค่ารหัสผ่าน"
 
-#: forms.py:37 tests/forms.py:261 tests/forms.py:267
+#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
+#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "รูปแบบรหัสผ่านไม่ถูกต้อง หรือไม่รู้จักแฮชอัลกอริทึมนี้"
 
-#: forms.py:67
+#: contrib/auth/forms.py:76
 msgid "A user with that username already exists."
 msgstr "ชื่อผู้ใช้นั้นได้ถูกใช้ไปแล้ว"
 
-#: forms.py:68 forms.py:269 forms.py:329
+#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
+#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "รหัสผ่านไม่ตรงกัน"
 
-#: forms.py:70 forms.py:115
+#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
 msgid "Username"
 msgstr "ชื่อผู้ใช้"
 
-#: forms.py:72 forms.py:116
+#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
+#: contrib/auth/models.py:368
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "จำเป็น ต้องการไม่เกิน 30 ตัวอักษร ต้องเป็นตัวอักษรตัวเลขและเครื่องหมาย @/./+/-/_ เท่านั้น"
 
-#: forms.py:75 forms.py:119
+#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
 msgstr "ค่านี้ต้องเป็นตัวอักษรตัวเลขและเครื่องหมาย @/./+/-/_ เท่านั้น"
 
-#: forms.py:77 forms.py:121 forms.py:148 forms.py:331
+#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
+#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "รหัสผ่าน"
 
-#: forms.py:79
+#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "ยืนยันรหัสผ่าน"
 
-#: forms.py:81
+#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "ใส่รหัสผ่านเหมือนด้านบน เพื่อตรวจสอบความถูกต้อง"
 
-#: forms.py:122
+#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -90,196 +98,215 @@ msgstr ""
 "รหัสผ่านที่ดิบจะไม่เก็บไว้ เพื่อไม่ให้มีวิธีการดูรหัสผ่านของผู้ใช้นี้ แต่คุณสามารถเปลี่ยนรหัสผ่านโดยใช้ <a "
 "href=\"password/\">แบบฟอร์มนี้</a> ."
 
-#: forms.py:151
+#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr "กรุณาใส่  %(username)s  และรหัสผ่านที่ถูกต้อง มีการแยกแยะตัวพิมพ์ใหญ่-เล็ก"
 
-#: forms.py:153
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr "เว็บเบราเซอร์ของคุณไม่สามารถใช้งานระบบคุกกี้ได้ จำเป็นต้องใช้ระบบคุกกี้ในการเข้าสู่ระบบ"
-
-#: forms.py:155
+#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "บัญชีนี้ไม่ทำงาน"
 
-#: forms.py:206
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr "อีเมลนี้ไม่ตรงกับบัญชีใดๆในระบบ คุณแน่ใจหรือว่าคุณได้ลงทะเบียนแล้ว"
-
-#: forms.py:208 tests/forms.py:374
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr "บัญชีผู้ใช้ที่เกี่ยวข้องกับที่อยู่อีเมล์นี้ไม่สามารถตั้งค่ารหัสผ่าน"
-
-#: forms.py:211
+#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "อีเมล"
 
-#: forms.py:271
+#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "รหัสผ่านใหม่"
 
-#: forms.py:273
+#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "ยืนยันการตั้งรหัสผ่านใหม่"
 
-#: forms.py:302
+#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "ใส่รหัสผ่านเก่าผิด กรุณาใส่รหัสผ่านอีกครั้ง"
 
-#: forms.py:305
+#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "รหัสผ่านเก่า"
 
-#: forms.py:333
+#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "รหัสผ่าน (อีกครั้ง)"
 
-#: hashers.py:241 hashers.py:292 hashers.py:321 hashers.py:349 hashers.py:378
-#: hashers.py:412
+#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
+#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
+#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
+#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algorithm"
 
-#: hashers.py:242
+#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "iterations"
 
-#: hashers.py:243 hashers.py:294 hashers.py:322 hashers.py:350 hashers.py:413
+#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
+#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
+#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "salt"
 
-#: hashers.py:244 hashers.py:323 hashers.py:351 hashers.py:379 hashers.py:414
+#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
+#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
+#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "hash"
 
-#: hashers.py:293
+#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "ปัจจัยการทำงาน"
 
-#: hashers.py:295
+#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "checksum"
 
-#: models.py:72 models.py:121
+#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "ชื่อ"
 
-#: models.py:74
+#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "รหัสชื่อ"
 
-#: models.py:78
+#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "สิทธิ์"
 
-#: models.py:79 models.py:123
+#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "สิทธิ์"
 
-#: models.py:128
+#: contrib/auth/models.py:119
 msgid "group"
 msgstr "กลุ่ม"
 
-#: models.py:129 models.py:301
+#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "กลุ่ม"
 
-#: models.py:200
+#: contrib/auth/models.py:192
 msgid "password"
 msgstr "รหัสผ่าน"
 
-#: models.py:201
+#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "เข้าสู่ระบบครั้งสุดท้าย"
 
-#: models.py:298
+#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "สถานะผู้ใช้พิเศษ"
 
-#: models.py:299
+#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "กำหนดสิทธิ์ทุกอย่างให้ผู้ใช้ โดยไม่ต้องการมอบหมายอย่างเป็นทางการ"
 
-#: models.py:302
+#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
 msgstr "กลุ่มที่ผู้ใช้อยู่ ผู้ใช้จะได้รับสิทธิ์ทั้งหมดที่กลุ่มของเขาได้รับ"
 
-#: models.py:306
+#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "สิทธิ์ของผู้ใช้"
 
-#: models.py:377
+#: contrib/auth/models.py:300
+msgid "Specific permissions for this user."
+msgstr "สิทธิ์ที่เฉพาะเจาะจงสำหรับผู้ใช้นี้"
+
+#: contrib/auth/models.py:367
 msgid "username"
 msgstr "ชื่อผู้ใช้"
 
-#: models.py:378
-msgid ""
-"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr "จำเป็น ต้องการไม่เกิน 30 ตัวอักษร ต้องเป็นตัวอักษรตัวเลขและตัวอักษร @/./+/-/_"
-
-#: models.py:381
+#: contrib/auth/models.py:371
 msgid "Enter a valid username."
 msgstr "กรุณาใส่ชื่อผู้ใช้ที่ถูกต้อง"
 
-#: models.py:383
+#: contrib/auth/models.py:373
 msgid "first name"
 msgstr "ชื่อ"
 
-#: models.py:384
+#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "นามสกุล"
 
-#: models.py:385
+#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "ที่อยู่อีเมล"
 
-#: models.py:386
+#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "สถานะของพนักงาน"
 
-#: models.py:387
+#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "กำหนดผู้ที่จะเข้ามาใช้งานในส่วนของผู้ดูแลระบบ"
 
-#: models.py:389
+#: contrib/auth/models.py:379
 msgid "active"
 msgstr "ใช้งานได้"
 
-#: models.py:390
+#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr "กำหนดให้ผู้ใช้มีสถานะที่สามารถเข้ามาใช้งานได้ เลือกออกแทนที่จะลบชื่อผู้ใช้ทิ้งไป "
 
-#: models.py:392
+#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "วันที่เข้าร่วม"
 
-#: models.py:400
+#: contrib/auth/models.py:390
 msgid "user"
 msgstr "ผู้ใช้"
 
-#: models.py:401
+#: contrib/auth/models.py:391
 msgid "users"
 msgstr "ผู้ใช้"
 
-#: views.py:94
-msgid "Logged out"
-msgstr "ออกจากระบบ"
-
-#: templates/registration/password_reset_subject.txt:2
+#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "รีเซ็ตรหัสผ่านบน %(site_name)s"
+
+#: contrib/auth/tests/test_forms.py:387
+msgid "Enter a valid email address."
+msgstr "กรุณาใส่ชื่อผู้ใช้ที่ถูกต้อง"
+
+#: contrib/auth/views.py:92
+msgid "Logged out"
+msgstr "ออกจากระบบ"
+
+#: contrib/auth/views.py:169
+msgid "Password reset"
+msgstr "รีเซ็ตรหัสผ่าน"
+
+#: contrib/auth/views.py:181
+msgid "Password reset successful"
+msgstr "รีเซ็ตรหัสผ่านสำเร็จ"
+
+#: contrib/auth/views.py:216
+msgid "Enter new password"
+msgstr "ป้อนรหัสผ่านใหม่"
+
+#: contrib/auth/views.py:227
+msgid "Password reset unsuccessful"
+msgstr "ตั้งรหัสผ่านใหม่ไม่สำเร็จ"
+
+#: contrib/auth/views.py:244
+msgid "Password reset complete"
+msgstr "รีเซ็ตรหัสผ่านเสร็จสมบูรณ์"
+
+#: contrib/auth/views.py:278
+msgid "Password change"
+msgstr "เปลี่ยนรหัสผ่าน"
+
+#: contrib/auth/views.py:291
+msgid "Password change successful"
+msgstr "เปลี่ยนรหัสผ่านสำเร็จ"

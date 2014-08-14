@@ -1,0 +1,41 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:41+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Luxembourgish (http://www.transifex.com/projects/p/django/"
+"language/lb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: lb\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: contrib/sessions/apps.py:8
+msgid "Sessions"
+msgstr ""
+
+#: contrib/sessions/models.py:38
+msgid "session key"
+msgstr ""
+
+#: contrib/sessions/models.py:40
+msgid "session data"
+msgstr ""
+
+#: contrib/sessions/models.py:41
+msgid "expire date"
+msgstr ""
+
+#: contrib/sessions/models.py:46
+msgid "session"
+msgstr ""
+
+#: contrib/sessions/models.py:47
+msgid "sessions"
+msgstr ""

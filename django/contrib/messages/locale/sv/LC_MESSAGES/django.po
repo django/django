@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Andreas Pelme <andreas@pelme.se>, 2011.
+# Andreas Pelme <andreas@pelme.se>, 2011
+# JLinden, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:16+0000\n"
-"Last-Translator: Andreas Pelme <andreas@pelme.se>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-06-20 21:32+0000\n"
+"Last-Translator: JLinden\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +18,10 @@ msgstr ""
 "Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: tests/base.py:101
+#: contrib/messages/apps.py:8
+msgid "Messages"
+msgstr "Meddelanden"
+
+#: contrib/messages/tests/base.py:105
 msgid "lazy message"
 msgstr "\"lazy\"-meddelande"

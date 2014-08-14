@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-22 09:28+0200\n"
-"PO-Revision-Date: 2012-10-22 08:46+0000\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:38+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
@@ -18,96 +19,49 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
 "11) ? 2 : 3;\n"
 
-#: views.py:58 views.py:60 views.py:62
-msgid "tag:"
+#: contrib/admindocs/apps.py:8
+msgid "Administrative Documentation"
 msgstr ""
 
-#: views.py:93 views.py:95 views.py:97
-msgid "filter:"
-msgstr ""
-
-#: views.py:156 views.py:158 views.py:160
-msgid "view:"
-msgstr ""
-
-#: views.py:188
-#, python-format
-msgid "App %r not found"
-msgstr ""
-
-#: views.py:195
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr ""
-
-#: views.py:207
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr ""
-
-#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
-#: views.py:264
-msgid "model:"
-msgstr ""
-
-#: views.py:222 views.py:254
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr ""
-
-#: views.py:226 views.py:259
-#, python-format
-msgid "all %s"
-msgstr ""
-
-#: views.py:231 views.py:264
-#, python-format
-msgid "number of %s"
-msgstr ""
-
-#: views.py:269
-#, python-format
-msgid "Fields on %s objects"
-msgstr ""
-
-#: views.py:361
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr ""
-
-#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
-#: templates/admin_doc/missing_docutils.html:6
-#: templates/admin_doc/model_detail.html:14
-#: templates/admin_doc/model_index.html:8
-#: templates/admin_doc/template_detail.html:6
-#: templates/admin_doc/template_filter_index.html:7
-#: templates/admin_doc/template_tag_index.html:7
-#: templates/admin_doc/view_detail.html:6
-#: templates/admin_doc/view_index.html:7
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:6
+#: contrib/admindocs/templates/admin_doc/index.html:6
+#: contrib/admindocs/templates/admin_doc/missing_docutils.html:6
+#: contrib/admindocs/templates/admin_doc/model_detail.html:14
+#: contrib/admindocs/templates/admin_doc/model_index.html:8
+#: contrib/admindocs/templates/admin_doc/template_detail.html:6
+#: contrib/admindocs/templates/admin_doc/template_filter_index.html:7
+#: contrib/admindocs/templates/admin_doc/template_tag_index.html:7
+#: contrib/admindocs/templates/admin_doc/view_detail.html:6
+#: contrib/admindocs/templates/admin_doc/view_index.html:7
 msgid "Home"
-msgstr "Adref"
+msgstr "Hafan"
 
-#: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
-#: templates/admin_doc/missing_docutils.html:7
-#: templates/admin_doc/model_detail.html:15
-#: templates/admin_doc/model_index.html:9
-#: templates/admin_doc/template_detail.html:7
-#: templates/admin_doc/template_filter_index.html:8
-#: templates/admin_doc/template_tag_index.html:8
-#: templates/admin_doc/view_detail.html:7
-#: templates/admin_doc/view_index.html:8
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:7
+#: contrib/admindocs/templates/admin_doc/index.html:7
+#: contrib/admindocs/templates/admin_doc/index.html:10
+#: contrib/admindocs/templates/admin_doc/index.html:14
+#: contrib/admindocs/templates/admin_doc/missing_docutils.html:7
+#: contrib/admindocs/templates/admin_doc/missing_docutils.html:14
+#: contrib/admindocs/templates/admin_doc/model_detail.html:15
+#: contrib/admindocs/templates/admin_doc/model_index.html:9
+#: contrib/admindocs/templates/admin_doc/template_detail.html:7
+#: contrib/admindocs/templates/admin_doc/template_filter_index.html:8
+#: contrib/admindocs/templates/admin_doc/template_tag_index.html:8
+#: contrib/admindocs/templates/admin_doc/view_detail.html:7
+#: contrib/admindocs/templates/admin_doc/view_index.html:8
 msgid "Documentation"
 msgstr "Dogfennaeth"
 
-#: templates/admin_doc/bookmarklets.html:8
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
+#: contrib/admindocs/templates/admin_doc/index.html:29
 msgid "Bookmarklets"
-msgstr "Dalennau gofnod"
+msgstr "Nodau tudalen"
 
-#: templates/admin_doc/bookmarklets.html:11
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
-msgstr "Dogfennaeth dalennau gofnod"
+msgstr "Nodau tudalen dogfennaeth"
 
-#: templates/admin_doc/bookmarklets.html:15
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -117,74 +71,350 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
+"\n"
+"<p class=\"help\">I osod nodau tudalen llusgwch y ddolen i'ch bar offer\n"
+"nod tudalen, neu de-gliciwch y ddolen a'i ychwanegu i'ch nodau tualen.\n"
+"Nawr gallwch ddewis y nod tudaln o unrhyw dudalen ar y wefan. Noder fod\n"
+"rhai o'r nodau tudalen angen i chi edrych ar y wefan o gyfrifiadur sydd "
+"wedi \n"
+"ei ddynodi fel \"mewnol\" (siaradwch gyda'ch gweinyddwr os nad ydych yn\n"
+"siwr os ydy'ch cyfrifiadur yn \"fewnol\").</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:25
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
-msgstr "Dogfennaeth er mwyn y dudalen yma"
+msgstr "Dogfennaeth y dudalen hon"
 
-#: templates/admin_doc/bookmarklets.html:26
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
+"Cymerir chi o unrhyw dudalen i'r dogfennaeth am yr olwg sy'n creu'r dudalen "
+"hwnnw."
 
-#: templates/admin_doc/bookmarklets.html:28
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "Dangos ID gwrthrych"
 
-#: templates/admin_doc/bookmarklets.html:29
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
-"Yn dangos y fath-cynnwys a'r ID unigryw ar gyfer tudalennau sy'n "
-"cynrychioligwrthrych sengl."
+"Dangosa'r math cynnwys a'r ID unigryw ar gyfer tudalennau sy'n cynrychioli "
+"gwrthrych unigol."
 
-#: templates/admin_doc/bookmarklets.html:31
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
-msgstr "Golygu'r gwrthrych yma (ffenestr cyfoes)"
+msgstr "Golygu'r gwrthrych yma (ffenestr cyfredol)"
 
-#: templates/admin_doc/bookmarklets.html:32
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
-"Yn neidio i'r dudalen weinyddiad ar gyfer tudalennau sy'n cynrychioli "
-"gwrthrych sengl."
+"Neidia i'r dudalen weinyddol ar gyfer tudalennau sy'n cynrychioli gwrthrych "
+"unigol."
 
-#: templates/admin_doc/bookmarklets.html:34
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "Golygu'r gwrthrych yma (ffenestr newydd)"
 
-#: templates/admin_doc/bookmarklets.html:35
+#: contrib/admindocs/templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
-msgstr "Fel uwchben, ond yn agor y dudalen weinyddiad mewn ffenestr newydd."
+msgstr "Fel uchod, ond yn agor y dudalen weinyddu mewn ffenest newydd."
 
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-msgid "Models"
-msgstr ""
-
-#: templates/admin_doc/template_detail.html:8
-msgid "Templates"
-msgstr ""
-
-#: templates/admin_doc/template_filter_index.html:9
-msgid "Filters"
-msgstr ""
-
-#: templates/admin_doc/template_tag_index.html:9
+#: contrib/admindocs/templates/admin_doc/index.html:17
+#: contrib/admindocs/templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
-msgstr ""
+msgstr "Tagiau"
 
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
+#: contrib/admindocs/templates/admin_doc/index.html:18
+msgid "List of all the template tags and their functions."
+msgstr "Rhestr o holl dagiau'r templad a'u swyddogaeth."
+
+#: contrib/admindocs/templates/admin_doc/index.html:20
+#: contrib/admindocs/templates/admin_doc/template_filter_index.html:9
+msgid "Filters"
+msgstr "Hidlau"
+
+#: contrib/admindocs/templates/admin_doc/index.html:21
+msgid ""
+"Filters are actions which can be applied to variables in a template to alter "
+"the output."
+msgstr ""
+"Gweithredoedd yw hidlau sy'n gallu cael eu gosod ar newidynnau mewn templad "
+"i newid yr allbwm."
+
+#: contrib/admindocs/templates/admin_doc/index.html:23
+#: contrib/admindocs/templates/admin_doc/model_detail.html:16
+#: contrib/admindocs/templates/admin_doc/model_index.html:10
+#: contrib/admindocs/templates/admin_doc/model_index.html:14
+msgid "Models"
+msgstr "Modelau"
+
+#: contrib/admindocs/templates/admin_doc/index.html:24
+msgid ""
+"Models are descriptions of all the objects in the system and their "
+"associated fields. Each model has a list of fields which can be accessed as "
+"template variables"
+msgstr ""
+"Mae modelau yn disgrifio pob gwrthrych yn y system a'u meysydd "
+"cysylltiedig.  Mae gan bob model restr o feysydd y gellir eu defnyddio fel "
+"newidynnau templad"
+
+#: contrib/admindocs/templates/admin_doc/index.html:26
+#: contrib/admindocs/templates/admin_doc/view_detail.html:8
+#: contrib/admindocs/templates/admin_doc/view_index.html:9
+#: contrib/admindocs/templates/admin_doc/view_index.html:12
 msgid "Views"
+msgstr "Golygon"
+
+#: contrib/admindocs/templates/admin_doc/index.html:27
+msgid ""
+"Each page on the public site is generated by a view. The view defines which "
+"template is used to generate the page and which objects are available to "
+"that template."
+msgstr ""
+"Mae pob tudalen ar y wefan gyhoeddus yn cael eu creu gan olwg.  Mae'r golwg "
+"yn diffunio pa templad i'w ddefnyddio i gynhyrchu'r dudalen a pa wrthrychau "
+"sydd ar gael i'r templad."
+
+#: contrib/admindocs/templates/admin_doc/index.html:30
+msgid "Tools for your browser to quickly access admin functionality."
+msgstr ""
+"Offer ar gyfer eich porwr i gael mynediad cyflym i swyddogaethau gweinyddwr."
+
+#: contrib/admindocs/templates/admin_doc/missing_docutils.html:10
+msgid "Please install docutils"
+msgstr "Gosodwch docutils"
+
+#: contrib/admindocs/templates/admin_doc/missing_docutils.html:17
+#, python-format
+msgid ""
+"The admin documentation system requires Python's <a href=\"%(link)s"
+"\">docutils</a> library."
+msgstr ""
+"Mae'r system dogfennaeth gweinyddol angen llyfrgell <a href=\"%(link)s"
+"\">docutils</a> Python."
+
+#: contrib/admindocs/templates/admin_doc/missing_docutils.html:19
+#, python-format
+msgid ""
+"Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
+msgstr "Gofynnwch i'r gweinyddwr i osod <a href=\"%(link)s\">docutils</a>."
+
+#: contrib/admindocs/templates/admin_doc/model_detail.html:21
+#, python-format
+msgid "Model: %(name)s"
+msgstr "Model: %(name)s"
+
+#: contrib/admindocs/templates/admin_doc/model_detail.html:35
+msgid "Field"
+msgstr "Maes"
+
+#: contrib/admindocs/templates/admin_doc/model_detail.html:36
+msgid "Type"
+msgstr "Math"
+
+#: contrib/admindocs/templates/admin_doc/model_detail.html:37
+msgid "Description"
+msgstr "Disgrifiad"
+
+#: contrib/admindocs/templates/admin_doc/model_detail.html:52
+msgid "Back to Model Documentation"
 msgstr ""
 
-#: tests/__init__.py:23
+#: contrib/admindocs/templates/admin_doc/model_index.html:18
+msgid "Model documentation"
+msgstr "Dogfennaeth model"
+
+#: contrib/admindocs/templates/admin_doc/model_index.html:43
+msgid "Model groups"
+msgstr "Grwpiau model"
+
+#: contrib/admindocs/templates/admin_doc/template_detail.html:8
+msgid "Templates"
+msgstr "Templadau"
+
+#: contrib/admindocs/templates/admin_doc/template_detail.html:13
+#, python-format
+msgid "Template: %(name)s"
+msgstr "Templad: %(name)s"
+
+#: contrib/admindocs/templates/admin_doc/template_detail.html:16
+#, python-format
+msgid "Template: \"%(name)s\""
+msgstr "Templad: \"%(name)s\""
+
+#: contrib/admindocs/templates/admin_doc/template_detail.html:18
+#, python-format
+msgid "Search path for template \"%(name)s\":"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/template_detail.html:21
+msgid "(does not exist)"
+msgstr "(nid yw'n bodoli)"
+
+#: contrib/admindocs/templates/admin_doc/template_detail.html:25
+msgid "Back to Documentation"
+msgstr "Nôl i Dogfennaeth"
+
+#: contrib/admindocs/templates/admin_doc/template_filter_index.html:12
+msgid "Template filters"
+msgstr "Hidlau templadau"
+
+#: contrib/admindocs/templates/admin_doc/template_filter_index.html:16
+msgid "Template filter documentation"
+msgstr "Dogfennaeth hidlau templadau"
+
+#: contrib/admindocs/templates/admin_doc/template_filter_index.html:22
+#: contrib/admindocs/templates/admin_doc/template_filter_index.html:43
+msgid "Built-in filters"
+msgstr "Hidlau mewnol"
+
+#: contrib/admindocs/templates/admin_doc/template_filter_index.html:23
+#, python-format
+msgid ""
+"To use these filters, put <code>%(code)s</code> in your template before "
+"using the filter."
+msgstr ""
+"I ddefnyddio'r hildau, rhowch <code>%(code)s</code> yn eich templad cyn "
+"defnyddio'r hidl."
+
+#: contrib/admindocs/templates/admin_doc/template_tag_index.html:12
+msgid "Template tags"
+msgstr "Tagiau templadau"
+
+#: contrib/admindocs/templates/admin_doc/template_tag_index.html:16
+msgid "Template tag documentation"
+msgstr "Dogfennaeth tag templad"
+
+#: contrib/admindocs/templates/admin_doc/template_tag_index.html:22
+#: contrib/admindocs/templates/admin_doc/template_tag_index.html:43
+msgid "Built-in tags"
+msgstr "Tagiau mewnol"
+
+#: contrib/admindocs/templates/admin_doc/template_tag_index.html:23
+#, python-format
+msgid ""
+"To use these tags, put <code>%(code)s</code> in your template before using "
+"the tag."
+msgstr ""
+"I ddefnyddio'r tagiau rhowch <code>%(code)s</code> yn eich templad cyn "
+"defnyddio'r tag."
+
+#: contrib/admindocs/templates/admin_doc/view_detail.html:12
+#, python-format
+msgid "View: %(name)s"
+msgstr "Golwg: %(name)s"
+
+#: contrib/admindocs/templates/admin_doc/view_detail.html:23
+msgid "Context:"
+msgstr "Cyd-destun:"
+
+#: contrib/admindocs/templates/admin_doc/view_detail.html:28
+msgid "Templates:"
+msgstr "Templadau:"
+
+#: contrib/admindocs/templates/admin_doc/view_detail.html:32
+msgid "Back to Views Documentation"
+msgstr "Nôl i Ddogfennaeth Golygon"
+
+#: contrib/admindocs/templates/admin_doc/view_index.html:16
+msgid "View documentation"
+msgstr "Dogfennaeth golygon"
+
+#: contrib/admindocs/templates/admin_doc/view_index.html:22
+msgid "Jump to namespace"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/view_index.html:27
+msgid "Empty namespace"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/view_index.html:40
+#, python-format
+msgid "Views by namespace %(name)s"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/view_index.html:42
+msgid "Views by empty namespace"
+msgstr ""
+
+#: contrib/admindocs/templates/admin_doc/view_index.html:49
+#, python-format
+msgid ""
+"\n"
+"    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
+"code>.\n"
+msgstr ""
+
+#: contrib/admindocs/tests/test_fields.py:32
 msgid "Boolean (Either True or False)"
-msgstr ""
+msgstr "Booleaidd (Unai 'True' neu 'False')"
 
-#: tests/__init__.py:33
+#: contrib/admindocs/tests/test_fields.py:42
 #, python-format
 msgid "Field of type: %(field_type)s"
+msgstr "Maes o'r math: %(field_type)s"
+
+#: contrib/admindocs/views.py:76 contrib/admindocs/views.py:78
+#: contrib/admindocs/views.py:80
+msgid "tag:"
+msgstr "tag:"
+
+#: contrib/admindocs/views.py:109 contrib/admindocs/views.py:111
+#: contrib/admindocs/views.py:113
+msgid "filter:"
+msgstr "hidl:"
+
+#: contrib/admindocs/views.py:160 contrib/admindocs/views.py:162
+#: contrib/admindocs/views.py:164
+msgid "view:"
+msgstr "golwg:"
+
+#: contrib/admindocs/views.py:191
+#, python-format
+msgid "App %(app_label)r not found"
 msgstr ""
+
+#: contrib/admindocs/views.py:195
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "Ni darganfyddwyd model %(model_name)r yn ap %(app_label)r"
+
+#: contrib/admindocs/views.py:208
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "y gwrthrych `%(app_label)s.%(data_type)s`  cysylltiedig"
+
+#: contrib/admindocs/views.py:212 contrib/admindocs/views.py:232
+#: contrib/admindocs/views.py:237 contrib/admindocs/views.py:251
+#: contrib/admindocs/views.py:265 contrib/admindocs/views.py:270
+msgid "model:"
+msgstr "model:"
+
+#: contrib/admindocs/views.py:228 contrib/admindocs/views.py:260
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "gwrthrychau `%(app_label)s.%(object_name)s` cysylltiedig"
+
+#: contrib/admindocs/views.py:232 contrib/admindocs/views.py:265
+#, python-format
+msgid "all %s"
+msgstr "pob %s"
+
+#: contrib/admindocs/views.py:237 contrib/admindocs/views.py:270
+#, python-format
+msgid "number of %s"
+msgstr "nifer o %s"
+
+#. Translators: %s is an object type name
+#: contrib/admindocs/views.py:275
+#, python-format
+msgid "Attributes on %s objects"
+msgstr "Priodoleddau gwrthrych %s"
+
+#: contrib/admindocs/views.py:369
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "nid yw %s yn ymweld i fod yn wrthrych urlpattern"
