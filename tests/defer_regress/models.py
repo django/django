@@ -102,5 +102,5 @@ class Base(models.Model):
     text = models.TextField()
 
 
-class Derrived(Base):
+class Derived(Base):
     other_text = models.TextField()

@@ -1506,8 +1506,8 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
         # Transfer data from this object to childs.
         parent_data = []
         for rel_field, rel_model in klass_info[0]._meta.get_fields_with_model():
-            if rel_model is not None and isinstance(obj, rel_model)\
-                    and rel_field.attname in obj.__dict__:
+            if (rel_model is not None and isinstance(obj, rel_model)
+                    and rel_field.attname in obj.__dict__):
                 parent_data.append((rel_field, getattr(obj, rel_field.attname)))
         # Recursively retrieve the data for the related object
         cached_row = get_cached_row(row, index_end, using, klass_info,
