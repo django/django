@@ -204,6 +204,31 @@ String.prototype.pad_left = function(pad_length, pad_string) {
     return new_string;
 }
 
+String.prototype.strptime = function(format) {
+    var split_format = format.split(/[.\-/]/);
+    var date = this.split(/[.\-/]/);
+    var i = 0;
+    while (i < split_format.length) {
+        switch (split_format[i]) {
+            case "%d":
+                var day = date[i];
+                break;
+            case "%m":
+                var month = date[i] - 1;
+                break;
+            case "%Y":
+                var year = date[i];
+                break;
+            case "%y":
+                var year = date[i];
+                break;
+        }
+        ++i;
+    };
+    result = new Date(year, month, day);
+    return result;
+}
+
 // ----------------------------------------------------------------------------
 // Get the computed style for and element
 // ----------------------------------------------------------------------------
