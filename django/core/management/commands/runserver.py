@@ -12,6 +12,7 @@ from django.core.servers.basehttp import run, get_internal_wsgi_application
 from django.db import connections, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
 from django.utils import autoreload
+from django.utils.encoding import get_system_encoding
 from django.utils import six
 from django.core.exceptions import ImproperlyConfigured
 
@@ -106,7 +107,7 @@ class Command(BaseCommand):
             pass
         now = datetime.now().strftime('%B %d, %Y - %X')
         if six.PY2:
-            now = now.decode('utf-8')
+            now = now.decode(get_system_encoding())
         self.stdout.write((
             "%(started_at)s\n"
             "Django version %(version)s, using settings %(settings)r\n"

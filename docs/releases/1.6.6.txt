@@ -33,3 +33,6 @@ Bugfixes
 
 * Restored bug fix for sending unicode email with Python 2.6.5 and below
   (`#19107 <https://code.djangoproject.com/ticket/19107>`_).
+
+* Prevented ``UnicodeDecodeError`` in ``runserver`` with non-UTF-8 and
+  non-English locale (`#23265 <https://code.djangoproject.com/ticket/23265>`_).
