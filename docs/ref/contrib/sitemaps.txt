@@ -49,7 +49,7 @@ loader can find the default templates.)
 Initialization
 ==============
 
-.. function:: views.sitemap(request, sitemaps, section=None, template_name='sitemap.xml', mimetype='application/xml')
+.. function:: views.sitemap(request, sitemaps, section=None, template_name='sitemap.xml', content_type='application/xml')
 
 To activate sitemap generation on your Django site, add this line to your
 :doc:`URLconf </topics/http/urls>`::
@@ -285,7 +285,7 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using both::
 Creating a sitemap index
 ========================
 
-.. function:: views.index(request, sitemaps, template_name='sitemap_index.xml', mimetype='application/xml', sitemap_url_name='django.contrib.sitemaps.views.sitemap')
+.. function:: views.index(request, sitemaps, template_name='sitemap_index.xml', content_type='application/xml', sitemap_url_name='django.contrib.sitemaps.views.sitemap')
 
 The sitemap framework also has the ability to create a sitemap index that
 references individual sitemap files, one per each section defined in your
