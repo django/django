@@ -11,6 +11,7 @@ import socket
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import run, get_internal_wsgi_application
 from django.utils import autoreload
+from django.utils.encoding import get_system_encoding
 from django.utils import six
 
 naiveip_re = re.compile(r"""^(?:
@@ -101,7 +102,7 @@ class Command(BaseCommand):
         self.validate(display_num_errors=True)
         now = datetime.now().strftime('%B %d, %Y - %X')
         if six.PY2:
-            now = now.decode('utf-8')
+            now = now.decode(get_system_encoding())
 
         self.stdout.write((
             "%(started_at)s\n"
