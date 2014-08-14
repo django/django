@@ -396,7 +396,7 @@ to implement "contact me" functionality on a personal Web site:
         subject = forms.CharField(max_length=100)
         message = forms.CharField(widget=forms.Textarea)
         sender = forms.EmailField()
-        cc_myself = forms.BooleanField(required=False)
+        cc_myself = forms.BooleanField(default=False, required=False)
 
 Our earlier form used a single field, ``your_name``, a :class:`CharField`. In
 this case, our form has four fields: ``subject``, ``message``, ``sender`` and
