@@ -233,7 +233,7 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
     ...     message = forms.CharField()
     ...     sender = forms.EmailField(help_text='A valid email address, please.')
-    ...     cc_myself = forms.BooleanField(required=False)
+    ...     cc_myself = forms.BooleanField(default=False, required=False)
     >>> f = HelpTextContactForm(auto_id=False)
     >>> print(f.as_table())
     <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /><br /><span class="helptext">100 characters max.</span></td></tr>
