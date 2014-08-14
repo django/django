@@ -1394,16 +1394,23 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
 
     reverse_related_fields = []
     if restricted:
-        for o in klass._meta.get_all_related_objects():
+        model = klass._meta.proxy_for_model if klass._meta.proxy else klass
+        for o in model._meta.get_all_related_objects():
             if o.field.unique and select_related_descend(o.field, restricted, requested,
                                                          only_load.get(o.model), reverse=True):
                 next = requested[o.field.related_query_name()]
-                parent = klass if issubclass(o.model, klass) else None
+                parent = model if issubclass(o.model, model) else None
                 klass_info = get_klass_info(o.model, max_depth=max_depth, cur_depth=cur_depth + 1,
                                             requested=next, only_load=only_load, from_parent=parent)
                 reverse_related_fields.append((o.field, klass_info))
     if field_names:
-        pk_idx = field_names.index(klass._meta.pk.attname)
+        try:
+            pk_idx = field_names.index(klass._meta.pk.attname)
+        except ValueError:
+            field_names.append(klass._meta.pk.attname)
+            pk_idx = len(field_names) - 1
+            field_count += 1
+            field_names[pk_idx]
     else:
         pk_idx = klass._meta.pk_index()
 
@@ -1499,7 +1506,8 @@ def get_cached_row(row, index_start, using, klass_info, offset=0,
         # Transfer data from this object to childs.
         parent_data = []
         for rel_field, rel_model in klass_info[0]._meta.get_fields_with_model():
-            if rel_model is not None and isinstance(obj, rel_model):
+            if rel_model is not None and isinstance(obj, rel_model)\
+                    and rel_field.attname in obj.__dict__:
                 parent_data.append((rel_field, getattr(obj, rel_field.attname)))
         # Recursively retrieve the data for the related object
         cached_row = get_cached_row(row, index_end, using, klass_info,

@@ -12,7 +12,7 @@ from django.test import TestCase, override_settings
 from .models import (
     ResolveThis, Item, RelatedItem, Child, Leaf, Proxy, SimpleItem, Feature,
     ItemAndSimpleItem, OneToOneItem, SpecialFeature, Location, Request,
-    ProxyRelated,
+    ProxyRelated, Base, Derrived,
 )
 
 
@@ -144,6 +144,14 @@ class DeferRegressionTest(TestCase):
         self.assertIsInstance(
             list(SimpleItem.objects.annotate(Count('feature')).only('name')),
             list)
+
+    def test_ticket_23270(self):
+        Derrived.objects.create(text="foo", other_text="bar")
+
+        with self.assertNumQueries(1):
+            obj = Base.objects.select_related("derrived").defer("text")[0]
+            self.assertIsInstance(obj.derrived, Derrived)
+            self.assertNotIn("text", obj.__dict__)
 
     def test_only_and_defer_usage_on_proxy_models(self):
         # Regression for #15790 - only() broken for proxy models
