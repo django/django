@@ -148,8 +148,10 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     .. attribute:: whitelist
 
-        Whitelist of email domain to validate against. If not provided, the default
-        list is ``['localhost']``.
+        Whitelist of email domains to validate against. By default, a regular
+        expression ``domain_regex`` is used to validate the email domains,
+        using the whitelist list allow to bypass this validation. If not
+        provided, the default whitelist is ``['localhost']``.
 
 ``validate_slug``
 -----------------
