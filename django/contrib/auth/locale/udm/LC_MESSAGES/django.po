@@ -1,0 +1,307 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-20 12:20+0200\n"
+"PO-Revision-Date: 2014-05-21 09:39+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Udmurt (http://www.transifex.com/projects/p/django/language/"
+"udm/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: udm\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: contrib/auth/admin.py:44
+msgid "Personal info"
+msgstr ""
+
+#: contrib/auth/admin.py:45
+msgid "Permissions"
+msgstr ""
+
+#: contrib/auth/admin.py:47
+msgid "Important dates"
+msgstr ""
+
+#: contrib/auth/admin.py:134
+msgid "Password changed successfully."
+msgstr ""
+
+#: contrib/auth/admin.py:145
+#, python-format
+msgid "Change password: %s"
+msgstr ""
+
+#: contrib/auth/apps.py:10
+msgid "Authentication and Authorization"
+msgstr ""
+
+#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
+#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
+msgid "No password set."
+msgstr ""
+
+#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
+#: contrib/auth/tests/test_forms.py:332
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr ""
+
+#: contrib/auth/forms.py:76
+msgid "A user with that username already exists."
+msgstr ""
+
+#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
+#: contrib/auth/forms.py:349
+msgid "The two password fields didn't match."
+msgstr ""
+
+#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
+msgid "Username"
+msgstr ""
+
+#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
+#: contrib/auth/models.py:368
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+
+#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
+msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
+msgstr ""
+
+#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
+#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
+msgid "Password"
+msgstr ""
+
+#: contrib/auth/forms.py:88
+msgid "Password confirmation"
+msgstr ""
+
+#: contrib/auth/forms.py:90
+msgid "Enter the same password as above, for verification."
+msgstr ""
+
+#: contrib/auth/forms.py:136
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+
+#: contrib/auth/forms.py:166
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+
+#: contrib/auth/forms.py:168
+msgid "This account is inactive."
+msgstr ""
+
+#: contrib/auth/forms.py:231
+msgid "Email"
+msgstr ""
+
+#: contrib/auth/forms.py:287
+msgid "New password"
+msgstr ""
+
+#: contrib/auth/forms.py:289
+msgid "New password confirmation"
+msgstr ""
+
+#: contrib/auth/forms.py:320
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+
+#: contrib/auth/forms.py:323
+msgid "Old password"
+msgstr ""
+
+#: contrib/auth/forms.py:353
+msgid "Password (again)"
+msgstr ""
+
+#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
+#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
+#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
+#: contrib/auth/hashers.py:511
+msgid "algorithm"
+msgstr ""
+
+#: contrib/auth/hashers.py:253
+msgid "iterations"
+msgstr ""
+
+#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
+#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
+#: contrib/auth/hashers.py:512
+msgid "salt"
+msgstr ""
+
+#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
+#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
+#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
+msgid "hash"
+msgstr ""
+
+#: contrib/auth/hashers.py:336
+msgid "work factor"
+msgstr ""
+
+#: contrib/auth/hashers.py:338
+msgid "checksum"
+msgstr ""
+
+#: contrib/auth/models.py:63 contrib/auth/models.py:112
+msgid "name"
+msgstr ""
+
+#: contrib/auth/models.py:65
+msgid "codename"
+msgstr ""
+
+#: contrib/auth/models.py:69
+msgid "permission"
+msgstr ""
+
+#: contrib/auth/models.py:70 contrib/auth/models.py:114
+msgid "permissions"
+msgstr ""
+
+#: contrib/auth/models.py:119
+msgid "group"
+msgstr ""
+
+#: contrib/auth/models.py:120 contrib/auth/models.py:293
+msgid "groups"
+msgstr ""
+
+#: contrib/auth/models.py:192
+msgid "password"
+msgstr ""
+
+#: contrib/auth/models.py:193
+msgid "last login"
+msgstr ""
+
+#: contrib/auth/models.py:290
+msgid "superuser status"
+msgstr ""
+
+#: contrib/auth/models.py:291
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+
+#: contrib/auth/models.py:294
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of his/her group."
+msgstr ""
+
+#: contrib/auth/models.py:299
+msgid "user permissions"
+msgstr ""
+
+#: contrib/auth/models.py:300
+msgid "Specific permissions for this user."
+msgstr ""
+
+#: contrib/auth/models.py:367
+msgid "username"
+msgstr ""
+
+#: contrib/auth/models.py:371
+msgid "Enter a valid username."
+msgstr ""
+
+#: contrib/auth/models.py:373
+msgid "first name"
+msgstr ""
+
+#: contrib/auth/models.py:374
+msgid "last name"
+msgstr ""
+
+#: contrib/auth/models.py:375
+msgid "email address"
+msgstr ""
+
+#: contrib/auth/models.py:376
+msgid "staff status"
+msgstr ""
+
+#: contrib/auth/models.py:377
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+#: contrib/auth/models.py:379
+msgid "active"
+msgstr ""
+
+#: contrib/auth/models.py:380
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+
+#: contrib/auth/models.py:382
+msgid "date joined"
+msgstr ""
+
+#: contrib/auth/models.py:390
+msgid "user"
+msgstr ""
+
+#: contrib/auth/models.py:391
+msgid "users"
+msgstr ""
+
+#: contrib/auth/templates/registration/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr ""
+
+#: contrib/auth/tests/test_forms.py:387
+msgid "Enter a valid email address."
+msgstr ""
+
+#: contrib/auth/views.py:92
+msgid "Logged out"
+msgstr ""
+
+#: contrib/auth/views.py:169
+msgid "Password reset"
+msgstr ""
+
+#: contrib/auth/views.py:181
+msgid "Password reset successful"
+msgstr ""
+
+#: contrib/auth/views.py:216
+msgid "Enter new password"
+msgstr ""
+
+#: contrib/auth/views.py:227
+msgid "Password reset unsuccessful"
+msgstr ""
+
+#: contrib/auth/views.py:244
+msgid "Password reset complete"
+msgstr ""
+
+#: contrib/auth/views.py:278
+msgid "Password change"
+msgstr ""
+
+#: contrib/auth/views.py:291
+msgid "Password change successful"
+msgstr ""

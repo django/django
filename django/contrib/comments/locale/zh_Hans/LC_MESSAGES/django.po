@@ -1,0 +1,303 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Lele Long <schemacs@gmail.com>, 2011
+# Xiang Yu <bupt.aswmtjdsj@gmail.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:44+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"language/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: contrib/comments/admin.py:25
+msgid "Content"
+msgstr "内容"
+
+#: contrib/comments/admin.py:28
+msgid "Metadata"
+msgstr "元数据"
+
+#: contrib/comments/admin.py:55
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "%d 个评论已被成功标记"
+
+#: contrib/comments/admin.py:57
+msgid "Flag selected comments"
+msgstr "标记选中的评论"
+
+#: contrib/comments/admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "%d 个评论已被成功批准"
+
+#: contrib/comments/admin.py:63
+msgid "Approve selected comments"
+msgstr "批准选中的评论"
+
+#: contrib/comments/admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "%d 个评论已被成功移除"
+
+#: contrib/comments/admin.py:69
+msgid "Remove selected comments"
+msgstr "移除选中的评论"
+
+#: contrib/comments/apps.py:8
+msgid "Comments"
+msgstr ""
+
+#: contrib/comments/feeds.py:14
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s的评论"
+
+#: contrib/comments/feeds.py:20
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "%(site_name)s的最新评论"
+
+#: contrib/comments/forms.py:96
+msgid "Name"
+msgstr "名称"
+
+#: contrib/comments/forms.py:97
+msgid "Email address"
+msgstr "Email 地址"
+
+#: contrib/comments/forms.py:98
+msgid "URL"
+msgstr "URL"
+
+#: contrib/comments/forms.py:99
+msgid "Comment"
+msgstr "评论"
+
+#: contrib/comments/forms.py:177
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "注意言论！%s 不允许在这里出现。"
+
+#: contrib/comments/forms.py:181
+#: contrib/comments/templates/comments/preview.html:16
+msgid "and"
+msgstr "和"
+
+#: contrib/comments/forms.py:186
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "如果你在该字段中输入任何内容，那么你的评论就会被视为垃圾评论。"
+
+#: contrib/comments/models.py:23
+msgid "content type"
+msgstr "内容类型"
+
+#: contrib/comments/models.py:25
+msgid "object ID"
+msgstr "对象ID"
+
+#: contrib/comments/models.py:53 contrib/comments/models.py:177
+msgid "user"
+msgstr "用户"
+
+#: contrib/comments/models.py:55
+msgid "user's name"
+msgstr "用户名"
+
+#: contrib/comments/models.py:56
+msgid "user's email address"
+msgstr "用户的 email 地址"
+
+#: contrib/comments/models.py:57
+msgid "user's URL"
+msgstr "用户的网址"
+
+#: contrib/comments/models.py:59 contrib/comments/models.py:79
+#: contrib/comments/models.py:178
+msgid "comment"
+msgstr "评论"
+
+#: contrib/comments/models.py:62
+msgid "date/time submitted"
+msgstr "提交日期/时间"
+
+#: contrib/comments/models.py:63
+msgid "IP address"
+msgstr "IP 地址"
+
+#: contrib/comments/models.py:64
+msgid "is public"
+msgstr "公开"
+
+#: contrib/comments/models.py:65
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "取消选中此复选框，可隐藏该条评论。"
+
+#: contrib/comments/models.py:67
+msgid "is removed"
+msgstr "已删除"
+
+#: contrib/comments/models.py:68
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"若评论内容不妥，则选中这个复选框。该评论将被一条\"此评论已经被删除\"的消息所"
+"替换。"
+
+#: contrib/comments/models.py:80
+msgid "comments"
+msgstr "评论"
+
+#: contrib/comments/models.py:124
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr "此评论由一位验证用户发表，因此该用户名是只读的。"
+
+#: contrib/comments/models.py:134
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr "此评论由一位验证用户发表，因此该 email 是只读的。"
+
+#: contrib/comments/models.py:160
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"由 %(user)s 在 %(date)s 张贴\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: contrib/comments/models.py:179
+msgid "flag"
+msgstr "标记"
+
+#: contrib/comments/models.py:180
+msgid "date"
+msgstr "标记时间"
+
+#: contrib/comments/models.py:190
+msgid "comment flag"
+msgstr "评论标记"
+
+#: contrib/comments/models.py:191
+msgid "comment flags"
+msgstr "评论标记"
+
+#: contrib/comments/templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "批准评论"
+
+#: contrib/comments/templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "真的要公开该评论？"
+
+#: contrib/comments/templates/comments/approve.html:12
+msgid "Approve"
+msgstr "批准"
+
+#: contrib/comments/templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "感谢批准"
+
+#: contrib/comments/templates/comments/approved.html:7
+#: contrib/comments/templates/comments/deleted.html:7
+#: contrib/comments/templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "感谢花费时间改善本站点的讨论质量。"
+
+#: contrib/comments/templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "删除评论"
+
+#: contrib/comments/templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "真的要删除该评论？"
+
+#: contrib/comments/templates/comments/delete.html:12
+msgid "Remove"
+msgstr "删除"
+
+#: contrib/comments/templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "感谢删除"
+
+#: contrib/comments/templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "标记该评论"
+
+#: contrib/comments/templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "确定要标记该评论？"
+
+#: contrib/comments/templates/comments/flag.html:12
+msgid "Flag"
+msgstr "标记"
+
+#: contrib/comments/templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "感谢标记"
+
+#: contrib/comments/templates/comments/form.html:17
+#: contrib/comments/templates/comments/preview.html:32
+msgid "Post"
+msgstr "发表"
+
+#: contrib/comments/templates/comments/form.html:18
+#: contrib/comments/templates/comments/preview.html:33
+msgid "Preview"
+msgstr "预览"
+
+#: contrib/comments/templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "感谢评论"
+
+#: contrib/comments/templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "感谢您的评论"
+
+#: contrib/comments/templates/comments/preview.html:4
+#: contrib/comments/templates/comments/preview.html:13
+msgid "Preview your comment"
+msgstr "预览您的评论"
+
+#: contrib/comments/templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgstr "请修正如下错误"
+
+#: contrib/comments/templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "请改正下列错误"
+
+#: contrib/comments/templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "发表您的评论"
+
+#: contrib/comments/templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "或进行修改"
