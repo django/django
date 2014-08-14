@@ -1,0 +1,95 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:41+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Luxembourgish (http://www.transifex.com/projects/p/django/"
+"language/lb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: lb\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: contrib/flatpages/admin.py:11
+msgid "Advanced options"
+msgstr ""
+
+#: contrib/flatpages/apps.py:8
+msgid "Flat Pages"
+msgstr ""
+
+#: contrib/flatpages/forms.py:8 contrib/flatpages/models.py:12
+msgid "URL"
+msgstr "URL"
+
+#: contrib/flatpages/forms.py:9
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+
+#: contrib/flatpages/forms.py:11
+msgid ""
+"This value must contain only letters, numbers, dots, underscores, dashes, "
+"slashes or tildes."
+msgstr ""
+
+#: contrib/flatpages/forms.py:22
+msgid "URL is missing a leading slash."
+msgstr ""
+
+#: contrib/flatpages/forms.py:29
+msgid "URL is missing a trailing slash."
+msgstr ""
+
+#: contrib/flatpages/forms.py:46
+#, python-format
+msgid "Flatpage with url %(url)s already exists for site %(site)s"
+msgstr ""
+
+#: contrib/flatpages/models.py:13
+msgid "title"
+msgstr ""
+
+#: contrib/flatpages/models.py:14
+msgid "content"
+msgstr ""
+
+#: contrib/flatpages/models.py:15
+msgid "enable comments"
+msgstr ""
+
+#: contrib/flatpages/models.py:16
+msgid "template name"
+msgstr ""
+
+#: contrib/flatpages/models.py:17
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+
+#: contrib/flatpages/models.py:18
+msgid "registration required"
+msgstr ""
+
+#: contrib/flatpages/models.py:19
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+
+#: contrib/flatpages/models.py:25
+msgid "flat page"
+msgstr ""
+
+#: contrib/flatpages/models.py:26
+msgid "flat pages"
+msgstr ""
+
+#: contrib/flatpages/tests/test_forms.py:98
+msgid "This field is required."
+msgstr ""

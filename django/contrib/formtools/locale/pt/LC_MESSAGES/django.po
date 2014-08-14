@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Nuno Mariz <nmariz@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Nuno Mariz <nmariz@gmail.com>, 2012-2013
+# Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-07 09:40+0000\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-08-04 09:01+0000\n"
 "Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/django/"
 "language/pt/)\n"
@@ -18,22 +19,22 @@ msgstr ""
 "Language: pt\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: templates/formtools/wizard/wizard_form.html:15
+#: contrib/formtools/apps.py:8
+msgid "Form Tools"
+msgstr "Ferramentas de Formulários"
+
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
 msgstr "primeiro passo"
 
-#: templates/formtools/wizard/wizard_form.html:16
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:16
 msgid "prev step"
 msgstr "passo anterior"
 
-#: templates/formtools/wizard/wizard_form.html:18
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:18
 msgid "submit"
 msgstr "submeter"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Pedimos desculpa, mas o seu formulário expirou. Por favor continue a "
-"preencher o formulário a partir desta página."
+#: contrib/formtools/wizard/views.py:276
+msgid "ManagementForm data is missing or has been tampered."
+msgstr "Os dados do ManagementForm estão em falta ou foram adulterados."
