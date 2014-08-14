@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import cgi
 import codecs
 import logging
+import re
 import sys
 from io import BytesIO
 from threading import Lock
@@ -15,9 +16,10 @@ from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
 from django.utils import datastructures
 from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_str, force_text, force_bytes
 from django.utils.functional import cached_property
 from django.utils import six
+from django.utils.six.moves.urllib.parse import quote
 
 # For backwards compatibility -- lots of code uses this in the wild!
 from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT  # NOQA
@@ -206,8 +208,7 @@ def get_path_info(environ):
     """
     path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '/')
 
-    # It'd be better to implement URI-to-IRI decoding, see #19508.
-    return path_info.decode(UTF_8)
+    return get_path(path_info)
 
 
 def get_script_name(environ):
@@ -236,8 +237,7 @@ def get_script_name(environ):
     else:
         script_name = get_bytes_from_wsgi(environ, 'SCRIPT_NAME', '')
 
-    # It'd be better to implement URI-to-IRI decoding, see #19508.
-    return script_name.decode(UTF_8)
+    return get_path(script_name)
 
 
 def get_bytes_from_wsgi(environ, key, default):
@@ -264,3 +264,19 @@ def get_str_from_wsgi(environ, key, default):
     value = environ.get(str(key), str(default))
     # Same comment as above
     return value if six.PY2 else value.encode(ISO_8859_1).decode(UTF_8)
+
+
+def get_path(path):
+    try:
+        return path.decode(UTF_8)
+    except UnicodeDecodeError as e:
+        first = path[:e.start]
+        last = path[e.start + 1:]
+        # Invalid utf-8 should remain URL-encoded.
+        # Refs. #19508
+        mid = re.findall(b"[^\x00-\x7f]", path[e.start:])[0]
+        val = quote(force_bytes(mid), safe=b"/#%[]=:;$&()+,!?*@'~")
+        if six.PY3:
+            val = val.encode(UTF_8)
+        path = first + val + last
+        return get_path(path)

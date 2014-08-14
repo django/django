@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
+
 
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
 from django.core.signals import request_started, request_finished
@@ -39,7 +39,7 @@ class HandlerTests(TestCase):
         environ['PATH_INFO'] = b'\xed' if six.PY2 else '\xed'
         handler = WSGIHandler()
         response = handler(environ, lambda *a, **k: None)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
 
     def test_non_ascii_query_string(self):
         """Test that non-ASCII query strings are properly decoded (#20530)."""
@@ -129,3 +129,44 @@ class HandlerSuspiciousOpsTest(TestCase):
     def test_suspiciousop_in_view_returns_400(self):
         response = self.client.get('/suspicious/')
         self.assertEqual(response.status_code, 400)
+
+
+@override_settings(ROOT_URLCONF='handlers.urls')
+class HandlerNotFoundTest(TestCase):
+
+    def test_invalid_urls(self):
+        response = self.client.get('~%A9helloworld')
+        self.assertEqual(response.status_code, 404)
+
+        response = self.client.get('d%aao%aaw%aan%aal%aao%aaa%aad%aa/')
+        self.assertEqual(response.status_code, 404)
+
+        response = self.client.get('/%E2%99%E2%99%A5/')
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_path(self):
+        """
+        Check if get_path() is working fine.
+        """
+        from django.utils.six.moves.urllib.parse import unquote
+        from django.core.handlers.wsgi import get_path
+        if six.PY3:
+            from urllib.parse import unquote_to_bytes as unquote
+
+        self.assertEqual(get_path(unquote('~%A9helloworld'.encode('utf-8'))), '~%A9helloworld')
+        self.assertEqual(get_path(unquote('d%aao%aaw%aan%aal%aao%aaa%aad%aa/'.encode('utf-8'))), 'd%AAo%AAw%AAn%AAl%AAo%AAa%AAd%AA/')
+        self.assertEqual(get_path(unquote('/%E2%99%E2%99%A5/'.encode('utf-8'))), '/%E2%99\u2665/')
+        self.assertEqual(get_path(unquote('/%E2%99%A5'.encode('utf-8'))), '/\u2665')
+        self.assertEqual(get_path(unquote('/%E2%98%80%E2%99%A5/'.encode('utf-8'))), '/\u2600\u2665/')
+        self.assertEqual(get_path(unquote('/%E2%98%8E%E2%A9%E2%99%A5/'.encode('utf-8'))), '/\u260e%E2%A9\u2665/')
+        self.assertEqual(get_path(unquote('/%2F%25?q=%C3%B6&x=%3D%25#%25'.encode('utf-8'))), '//%?q=\xf6&x==%#%')
+        self.assertEqual(get_path(unquote('/%E2%98%90%E2%98%9A%E2%98%A3'.encode('utf-8'))), '/\u2610\u261a\u2623')
+        self.assertEqual(get_path(unquote('/%E2%99%BF%99☃%E2%99%A3%E2%98%BD%A9'.encode('utf-8'))), '/\u267f%99\u2603\u2663\u263d%A9')
+        self.assertEqual(get_path(unquote('/%E2%98%90/fred?utf8=%E2%9C%93'.encode('utf-8'))), '/\u2610/fred?utf8=\u2713')
+        self.assertEqual(get_path(unquote('/%A7%25%10%98%25'.encode('utf-8'))), '/%A7%\x10%98%')
+        self.assertEqual(get_path(unquote('/\xe2\x98\x90/fred?utf8=\xe2\x9c\x93'.encode('utf-8'))), '/\xe2\x98\x90/fred?utf8=\xe2\x9c\x93')
+        self.assertEqual(get_path(unquote('/üsername'.encode('utf-8'))), '/\xfcsername')
+        self.assertEqual(get_path(unquote('/üser:pässword@☃'.encode('utf-8'))), '/\xfcser:p\xe4ssword@\u2603')
+        self.assertEqual(get_path(unquote('/%3Fmeh?foo=%26%A9'.encode('utf-8'))), '/?meh?foo=&%A9')
+        self.assertEqual(get_path(unquote('/%E2%A8%87%87%A5%E2%A8%A0'.encode('utf-8'))), '/\u2a07%87%A5\u2a20')
+        self.assertEqual(get_path(unquote('/你好'.encode('utf-8'))), '/\u4f60\u597d')
