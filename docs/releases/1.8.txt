@@ -44,6 +44,10 @@ Minor features
   to limit the ``list_filter`` choices to foreign objects which are attached to
   those from the ``ModelAdmin``.
 
+* The :meth:`ModelAdmin.delete_view()
+  <django.contrib.admin.ModelAdmin.delete_view>` displays a summary of objects
+  to be deleted on the deletion confirmation page.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
