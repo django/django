@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# eallik <eallik@gmail.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# madisvain <madisvain@gmail.com>, 2011.
+# eallik <eallik@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Janno Liivak <jannolii@gmail.com>, 2013-2014
+# madisvain <madisvain@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-08 12:32+0000\n"
-"Last-Translator: madisvain <madisvain@gmail.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-06-20 21:19+0000\n"
+"Last-Translator: Janno Liivak <jannolii@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -19,76 +20,80 @@ msgstr ""
 "Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:9
-msgid "No feeds are registered."
-msgstr ""
+#: contrib/gis/apps.py:8
+msgid "GIS"
+msgstr "GIS"
 
-#: views.py:19
-#, python-format
-msgid "Slug %r isn't registered."
-msgstr ""
-
-#: db/models/fields.py:51
+#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "Baas GIS väli -- ühildub OpenGIS Spetsifikatsiooni Geomeetria tüübiga."
 
-#: db/models/fields.py:271
+#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Punkt"
 
-#: db/models/fields.py:275
+#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
-msgstr ""
+msgstr "Üherea tekst"
 
-#: db/models/fields.py:279
+#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Polügon"
 
-#: db/models/fields.py:283
+#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Multi-punkt"
 
-#: db/models/fields.py:287
+#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Mitmerealine string"
 
-#: db/models/fields.py:291
+#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Multi-polügon"
 
-#: db/models/fields.py:295
+#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Geomeetriakogum"
 
-#: forms/fields.py:19
+#: contrib/gis/forms/fields.py:22
 msgid "No geometry value provided."
 msgstr "Geomeetriline väärtus puudub."
 
-#: forms/fields.py:20
+#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Vigane geomeetriline väärtus."
 
-#: forms/fields.py:21
+#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Vigane geomeetriline tüüp."
 
-#: forms/fields.py:22
+#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr "Geomeetria teisendamisel geomeetria vormivälja SRID-ks tekkis viga."
 
-#: sitemaps/views.py:46
+#: contrib/gis/sitemaps/views.py:56
 #, python-format
 msgid "No sitemap available for section: %r"
-msgstr ""
+msgstr "Sektsioonil %r puudub saidikaart"
 
-#: sitemaps/views.py:60
+#: contrib/gis/sitemaps/views.py:70
 #, python-format
 msgid "Page %s empty"
-msgstr ""
+msgstr "Leht %s on tühi"
 
-#: sitemaps/views.py:62
+#: contrib/gis/sitemaps/views.py:72
 #, python-format
 msgid "No page '%s'"
-msgstr ""
+msgstr "Puudub leht '%s'"
+
+#: contrib/gis/views.py:10
+msgid "No feeds are registered."
+msgstr "Ühtegi voogu pole registreeritud."
+
+#: contrib/gis/views.py:16
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Nälk %r ei ole registreeritud."

@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jacara <baskhuujacara@gmail.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011, 2012.
-# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011.
+# Jacara <baskhuujacara@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Zorig <zorig_ezd@yahoo.com>, 2014
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012
+# Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-11 05:35+0000\n"
-"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-08-10 10:44+0000\n"
+"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -20,62 +21,57 @@ msgstr ""
 "Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:9
-msgid "No feeds are registered."
-msgstr "Бүртгэгдсэн feeds байхгүй байна."
+#: contrib/gis/apps.py:8
+msgid "GIS"
+msgstr "Газар зүйн мэдээлэл"
 
-#: views.py:19
-#, python-format
-msgid "Slug %r isn't registered."
-msgstr "%r слаг бүгтгэгдээгүй байна"
-
-#: db/models/fields.py:51
+#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Үндсэн GIS талбар -- OpenGIS газрын зургын Геометрын дүрсны онцгой төрөлтэй "
 "байна."
 
-#: db/models/fields.py:271
+#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Цэг"
 
-#: db/models/fields.py:275
+#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Тэмдэгт мөр"
 
-#: db/models/fields.py:279
+#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Олон өнцөгт"
 
-#: db/models/fields.py:283
+#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Олон цэг"
 
-#: db/models/fields.py:287
+#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Олон мөр бүхий тэмтэгт мөр"
 
-#: db/models/fields.py:291
+#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Олон өнцөгтийн олонлог"
 
-#: db/models/fields.py:295
+#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Дүрсний цуглуулга"
 
-#: forms/fields.py:19
+#: contrib/gis/forms/fields.py:22
 msgid "No geometry value provided."
 msgstr "Дүрс оруулаагүй байна."
 
-#: forms/fields.py:20
+#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Буруу дүрс байна."
 
-#: forms/fields.py:21
+#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Дүрсийн төрөл буруу байна."
 
-#: forms/fields.py:22
+#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -83,17 +79,26 @@ msgstr ""
 "An error occurred when transforming the geometry to the SRID дүрсний форм "
 "талбарын SRID утгыг хөрвүүлэхэд алдаа гарлаа."
 
-#: sitemaps/views.py:46
+#: contrib/gis/sitemaps/views.py:56
 #, python-format
 msgid "No sitemap available for section: %r"
 msgstr "Энэ хэсэгт Sitemap алга: %r"
 
-#: sitemaps/views.py:60
+#: contrib/gis/sitemaps/views.py:70
 #, python-format
 msgid "Page %s empty"
 msgstr "%s хуудас хоосон"
 
-#: sitemaps/views.py:62
+#: contrib/gis/sitemaps/views.py:72
 #, python-format
 msgid "No page '%s'"
 msgstr "'%s' хуудас байхгүй"
+
+#: contrib/gis/views.py:10
+msgid "No feeds are registered."
+msgstr "Бүртгэгдсэн feeds байхгүй байна."
+
+#: contrib/gis/views.py:16
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "%r слаг бүгтгэгдээгүй байна"

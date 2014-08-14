@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Christian Joergensen <christian@gmta.info>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Christian Joergensen <christian@gmta.info>, 2012
+# Erik Wognsen <r4mses@gmail.com>, 2013-2014
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-02-14 13:42+0000\n"
-"Last-Translator: Christian Joergensen <christian@gmta.info>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-08-18 08:38+0000\n"
+"Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/projects/p/django/language/"
 "da/)\n"
 "MIME-Version: 1.0\n"
@@ -18,22 +19,22 @@ msgstr ""
 "Language: da\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: templates/formtools/wizard/wizard_form.html:15
+#: contrib/formtools/apps.py:8
+msgid "Form Tools"
+msgstr "Formularværktøjer"
+
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
 msgstr "første skridt"
 
-#: templates/formtools/wizard/wizard_form.html:16
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:16
 msgid "prev step"
 msgstr "forrige skridt"
 
-#: templates/formtools/wizard/wizard_form.html:18
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:18
 msgid "submit"
 msgstr "send"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Tiden er udløbet - vi beklager. Vær venlig at fortsætte med at udfylde "
-"formularen på denne side."
+#: contrib/formtools/wizard/views.py:276
+msgid "ManagementForm data is missing or has been tampered."
+msgstr "ManagementForm-data mangler eller er blevet manipuleret."

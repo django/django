@@ -1,0 +1,98 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# ilay <ilay@ilay.tw>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# quantum9876 <quantum9876@gmail.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:45+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
+"language/zh_TW/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: contrib/gis/apps.py:8
+msgid "GIS"
+msgstr ""
+
+#: contrib/gis/db/models/fields.py:56
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr "將基本的 GIS 平面以OpenGIS  Specification Geometry type對應。"
+
+#: contrib/gis/db/models/fields.py:298
+msgid "Point"
+msgstr "Point 類別"
+
+#: contrib/gis/db/models/fields.py:304
+msgid "Line string"
+msgstr "Line string 類別"
+
+#: contrib/gis/db/models/fields.py:310
+msgid "Polygon"
+msgstr "Polygon 類別"
+
+#: contrib/gis/db/models/fields.py:316
+msgid "Multi-point"
+msgstr "Multi-point 類別"
+
+#: contrib/gis/db/models/fields.py:322
+msgid "Multi-line string"
+msgstr "Multi-line string 類別"
+
+#: contrib/gis/db/models/fields.py:328
+msgid "Multi polygon"
+msgstr "Multi polygon 類別"
+
+#: contrib/gis/db/models/fields.py:334
+msgid "Geometry collection"
+msgstr "Geometry collection (幾何型別之叢集) 類別"
+
+#: contrib/gis/forms/fields.py:22
+msgid "No geometry value provided."
+msgstr "沒有幾何資訊。"
+
+#: contrib/gis/forms/fields.py:23
+msgid "Invalid geometry value."
+msgstr "無效的幾何參數。"
+
+#: contrib/gis/forms/fields.py:24
+msgid "Invalid geometry type."
+msgstr "無效的幾何類型。"
+
+#: contrib/gis/forms/fields.py:25
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr "當把目前地理資訊-GIS，轉成空間參考識別碼-SRID時發生錯誤。"
+
+#: contrib/gis/sitemaps/views.py:56
+#, python-format
+msgid "No sitemap available for section: %r"
+msgstr "區域 %r 無可用的網站地圖"
+
+#: contrib/gis/sitemaps/views.py:70
+#, python-format
+msgid "Page %s empty"
+msgstr "頁面 %s 為空"
+
+#: contrib/gis/sitemaps/views.py:72
+#, python-format
+msgid "No page '%s'"
+msgstr "無此頁面 '%s'"
+
+#: contrib/gis/views.py:10
+msgid "No feeds are registered."
+msgstr "沒有已註冊的 feed。"
+
+#: contrib/gis/views.py:16
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "嵌入式語法 %r 尚未註冊。"

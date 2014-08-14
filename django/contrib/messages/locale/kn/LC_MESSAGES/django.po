@@ -3,11 +3,11 @@
 # Translators:
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2011-01-19 15:38+0000\n"
-"Last-Translator: Django team\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:45+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Kannada (http://www.transifex.com/projects/p/django/language/"
 "kn/)\n"
 "MIME-Version: 1.0\n"
@@ -16,6 +16,10 @@ msgstr ""
 "Language: kn\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: tests/base.py:101
+#: contrib/messages/apps.py:8
+msgid "Messages"
+msgstr ""
+
+#: contrib/messages/tests/base.py:105
 msgid "lazy message"
 msgstr ""

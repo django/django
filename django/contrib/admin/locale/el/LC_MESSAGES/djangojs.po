@@ -1,16 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Dimitris Glezos <glezos@indifex.com>, 2011.
-# glogiotatidis <seadog@sealabs.net>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Dimitris Glezos <glezos@transifex.com>, 2011
+# glogiotatidis <seadog@sealabs.net>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# nikolas demiridis <nikolas@demiridis.gr>, 2014
+# Panos Laganakos <panos.laganakos@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
-"Last-Translator: Dimitris Glezos <glezos@transifex.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-08-17 09:25+0000\n"
+"Last-Translator: Panos Laganakos <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
 "el/)\n"
 "MIME-Version: 1.0\n"
@@ -19,162 +21,188 @@ msgstr ""
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: static/admin/js/SelectFilter2.js:45
+#: contrib/admin/static/admin/js/SelectFilter2.js:45
 #, c-format
 msgid "Available %s"
 msgstr "Διαθέσιμο %s"
 
-#: static/admin/js/SelectFilter2.js:46
+#: contrib/admin/static/admin/js/SelectFilter2.js:46
 #, c-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"Αυτή είναι η λίστα των διαθέσιμων %s. Μπορείτε να επιλέξετε κάποια, από το "
+"παρακάτω πεδίο και πατώντας το βέλος \"Επιλογή\" μεταξύ των δύο πεδίων."
 
-#: static/admin/js/SelectFilter2.js:53
+#: contrib/admin/static/admin/js/SelectFilter2.js:53
 #, c-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
+"Πληκτρολογήστε σε αυτό το πεδίο για να φιλτράρετε τη λίστα των διαθέσιμων %s."
 
-#: static/admin/js/SelectFilter2.js:57
+#: contrib/admin/static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Φίλτρο"
 
-#: static/admin/js/SelectFilter2.js:61
+#: contrib/admin/static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
-msgstr "Επιλογή Όλων"
+msgstr "Επιλογή όλων"
 
-#: static/admin/js/SelectFilter2.js:61
+#: contrib/admin/static/admin/js/SelectFilter2.js:61
 #, c-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "Πατήστε για επιλογή όλων των %s με τη μία."
 
-#: static/admin/js/SelectFilter2.js:67
+#: contrib/admin/static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "Επιλογή"
 
-#: static/admin/js/SelectFilter2.js:69
+#: contrib/admin/static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "Αφαίρεση"
 
-#: static/admin/js/SelectFilter2.js:75
+#: contrib/admin/static/admin/js/SelectFilter2.js:75
 #, c-format
 msgid "Chosen %s"
-msgstr "Επιλεχθέντα %s"
+msgstr "Επιλέχθηκε %s"
 
-#: static/admin/js/SelectFilter2.js:76
+#: contrib/admin/static/admin/js/SelectFilter2.js:76
 #, c-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"Αυτή είναι η λίστα των επιλεγμένων %s. Μπορείτε να αφαιρέσετε μερικά "
+"επιλέγοντας τα απο το κουτί παρακάτω και μετά κάνοντας κλίκ στο βελάκι "
+"\"Αφαίρεση\" ανάμεσα στα δύο κουτιά."
 
-#: static/admin/js/SelectFilter2.js:80
+#: contrib/admin/static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr ""
+msgstr "Αφαίρεση όλων"
 
-#: static/admin/js/SelectFilter2.js:80
+#: contrib/admin/static/admin/js/SelectFilter2.js:80
 #, c-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "Κλίκ για να αφαιρεθούν όλα τα επιλεγμένα %s αμέσως."
 
-#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
+#: contrib/admin/static/admin/js/actions.js:22
+#: contrib/admin/static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "%(sel)s από %(cnt)s επιλέγηκε"
-msgstr[1] "%(sel)s από %(cnt)s επιλέγηκαν"
+msgstr[0] "%(sel)s από %(cnt)s επιλεγμένα"
+msgstr[1] "%(sel)s από %(cnt)s επιλεγμένα"
 
-#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
+#: contrib/admin/static/admin/js/actions.js:114
+#: contrib/admin/static/admin/js/actions.min.js:4
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
-"Έχετε μη αποθηκευμένες αλλαγές σε επιμέρους επεξεργάσημα πεδία. Εάν "
-"εκτελέσετε μια ενέργεια, οι αλλαγές σας θα χαθούν."
+"Έχετε μη αποθηκευμένες αλλαγές σε μεμονωμένα επεξεργάσιμα πεδία. Άν "
+"εκτελέσετε μια ενέργεια, οι μη αποθηκευμένες αλλάγες θα χαθούν"
 
-#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
+#: contrib/admin/static/admin/js/actions.js:126
+#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
-"Έχετε επιλέξει μια ενέργεια, αλλά ακόμη δεν έχετε αποθηκεύσει τις αλλαγές "
-"επιμέρους πεδίων. Παρακαλώ επιλέξτε ΟΚ για να αποθηκεύσετε. Θα χρειαστεί να "
-"επαναλάβετε την ενέργεια."
+"Έχετε επιλέξει μια ενέργεια, αλλά δεν έχετε αποθηκεύσει τις αλλαγές στα "
+"εκάστωτε πεδία ακόμα. Παρακαλώ πατήστε ΟΚ για να τις αποθηκεύσετε. Θα "
+"χρειαστεί να εκτελέσετε ξανά την ενέργεια."
 
-#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
+#: contrib/admin/static/admin/js/actions.js:128
+#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Έχετε επιλέξει μια ενέργεια και δεν έχετε κάνει καμία αλλαγή σε επιμέρους "
-"πεδία. Πιθανώς ψάχνετε για το κουμπί Go και όχι το κουμπί Αποθήκευση."
+"Έχετε επιλέξει μια ενέργεια, και δεν έχετε κάνει καμία αλλαγή στα εκάστωτε "
+"πεδία. Πιθανών θέλετε το κουμπί Go αντί του κουμπιού Αποθήκευσης."
 
-#: static/admin/js/calendar.js:26
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:79
+#, c-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Σημείωση: Είστε %s ώρα μπροστά από την ώρα του εξυπηρετητή."
+msgstr[1] "Σημείωση: Είστε %s ώρες μπροστά από την ώρα του εξυπηρετητή."
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:87
+#, c-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Σημείωση: Είστε %s ώρα πίσω από την ώρα του εξυπηρετητή"
+msgstr[1] "Σημείωση: Είστε %s ώρες πίσω από την ώρα του εξυπηρετητή."
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:114
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149
+msgid "Now"
+msgstr "Τώρα"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:118
+msgid "Clock"
+msgstr "Ρολόι"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:146
+msgid "Choose a time"
+msgstr "Επιλέξτε χρόνο"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:150
+msgid "Midnight"
+msgstr "Μεσάνυχτα"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:151
+msgid "6 a.m."
+msgstr "6 π.μ."
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:152
+msgid "Noon"
+msgstr "Μεσημέρι"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:156
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:276
+msgid "Cancel"
+msgstr "Ακύρωση"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:216
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:269
+msgid "Today"
+msgstr "Σήμερα"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:220
+msgid "Calendar"
+msgstr "Ημερολόγιο"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:267
+msgid "Yesterday"
+msgstr "Χθές"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:271
+msgid "Tomorrow"
+msgstr "Αύριο"
+
+#: contrib/admin/static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
 "Ιανουάριος Φεβρουάριος Μάρτιος Απρίλιος Μάιος Ιούνιος Ιούλιος Αύγουστος "
-"Σεπτέμβριος Οκτώβριος Νοέμβριος Δεκέμβριος"
+"Σεπτέμβρης Οκτώβριος Νοέμβριος Δεκέμβριος"
 
-#: static/admin/js/calendar.js:27
+#: contrib/admin/static/admin/js/calendar.js:9
 msgid "S M T W T F S"
 msgstr "Κ Δ Τ Τ Π Π Σ"
 
-#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
-#: static/admin/js/collapse.min.js:1
+#: contrib/admin/static/admin/js/collapse.js:8
+#: contrib/admin/static/admin/js/collapse.js:19
+#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Show"
-msgstr "Εμφάνιση"
+msgstr "Προβολή"
 
-#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
+#: contrib/admin/static/admin/js/collapse.js:16
+#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Απόκρυψη"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:49
-#: static/admin/js/admin/DateTimeShortcuts.js:85
-msgid "Now"
-msgstr "Τώρα"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:53
-msgid "Clock"
-msgstr "Ρολόι"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:81
-msgid "Choose a time"
-msgstr "Διαλέξτε ώρα"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:86
-msgid "Midnight"
-msgstr "Μεσάνυχτα"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:87
-msgid "6 a.m."
-msgstr "6 π.μ."
-
-#: static/admin/js/admin/DateTimeShortcuts.js:88
-msgid "Noon"
-msgstr "Μεσημέρι"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:92
-#: static/admin/js/admin/DateTimeShortcuts.js:204
-msgid "Cancel"
-msgstr "Άκυρο"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:144
-#: static/admin/js/admin/DateTimeShortcuts.js:197
-msgid "Today"
-msgstr "Σήμερα"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:148
-msgid "Calendar"
-msgstr "Ημερολόγιο"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:195
-msgid "Yesterday"
-msgstr "Χθες"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:199
-msgid "Tomorrow"
-msgstr "Αύριο"
