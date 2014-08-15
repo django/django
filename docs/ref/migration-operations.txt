@@ -194,6 +194,25 @@ operation that adds that field and so will try to run it again).
 
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
+Here's an example of using ``RunSQL`` to create a initial table with some
+objects (to be noted that the datatype works for SQLite)::
+
+    # -*- coding: utf-8 -*-
+    from django.db import models, migrations
+
+    class Migration(migrations.Migration):
+
+        dependencies = []
+
+        operations = [
+            migrations.RunSQL(
+                "ALTER TABLE ip_range ADD COLUMN label TEXT;",
+                "ALTER TABLE ip_range DROP COLUMN label TEXT;",
+                state_operations=[migrations.AddField("IPRange", "label", models.CharField(max_length=255))],
+            )
+        ]
+
+
 RunPython
 ---------
 
