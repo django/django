@@ -1139,7 +1139,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_runsql")
         # Create the operation
         operation = migrations.RunSQL(
-            # Use a multi-line string with a commment to test splitting on SQLite and MySQL respectively
+            # Use a multi-line string with a comment to test splitting on SQLite and MySQL respectively
             "CREATE TABLE i_love_ponies (id int, special_thing int);\n"
             "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 42); -- this is magic!\n"
             "INSERT INTO i_love_ponies (id, special_thing) VALUES (2, 51);\n",
