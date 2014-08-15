@@ -206,10 +206,9 @@ objects (to be noted that the datatype works for SQLite)::
 
         operations = [
             migrations.RunSQL(
-                "CREATE TABLE foo_newtable (id INTEGER, name TEXT);\n"
-                "INSERT INTO foo_newtable (id, name) VALUES (1, 'joe');",
-                "DROP TABLE foo_newtable",
-                state_operations=[migrations.CreateModel("NewTable", [("id", models.AutoField(primary_key=True))])],
+                "ALTER TABLE ip_range ADD COLUMN label TEXT;",
+                "ALTER TABLE ip_range DROP COLUMN label TEXT;",
+                state_operations=[migrations.AddField("IPRange", "label", models.CharField(max_length=255))],
             )
         ]
 
