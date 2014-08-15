@@ -347,8 +347,17 @@ class Command(NoArgsCommand):
                 fnmatch.fnmatchcase(path, pattern))
             return any(ignore(pattern) for pattern in ignore_patterns)
 
-        dir_suffix = '%s*' % os.sep
-        norm_patterns = [p[:-len(dir_suffix)] if p.endswith(dir_suffix) else p for p in self.ignore_patterns]
+        ignore_patterns = [os.path.normcase(p) for p in self.ignore_patterns]
+        dir_suffixes = {'%s*' % path_sep for path_sep in {'/', os.sep}}
+        norm_patterns = []
+        for p in ignore_patterns:
+            for dir_suffix in dir_suffixes:
+                if p.endswith(dir_suffix):
+                    norm_patterns.append(p[:-len(dir_suffix)])
+                    break
+            else:
+                norm_patterns.append(p)
+
         all_files = []
         for dirpath, dirnames, filenames in os.walk(force_text(root), topdown=True, followlinks=self.symlinks):
             for dirname in dirnames[:]:
