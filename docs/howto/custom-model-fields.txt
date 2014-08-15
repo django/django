@@ -595,7 +595,7 @@ passed as the ``connection`` parameter. This allows you to use
 backend-specific conversion logic if it is required.
 
 For example, Django uses the following method for its
-:class:``~models.BinaryField``::
+:class:`BinaryField`::
 
     def get_db_prep_value(self, value, connection, prepared=False):
         value = super(BinaryField, self).get_db_prep_value(value, connection, prepared)
