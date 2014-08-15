@@ -219,8 +219,10 @@ model::
         # if we directly import it, it'll be the wrong version
         Country = apps.get_model("myapp", "Country")
         db_alias = schema_editor.connection.alias
-        Country.objects.create(name="USA", code="us", using=db_alias)
-        Country.objects.create(name="France", code="fr", using=db_alias)
+        Country.objects.using(db_alias).bulk_create([
+            Country(name="USA", code="us"),
+            Country(name="France", code="fr"),
+        ])
 
     class Migration(migrations.Migration):
 
