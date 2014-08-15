@@ -236,7 +236,9 @@ information about logging configuration dictionaries. However, to give
 you a taste of what is possible, here are a couple examples.
 
 First, here's a simple configuration which writes all request logging from the
-:ref:`django-request-logger` logger to a local file::
+:ref:`django-request-logger` logger to a local file:
+
+.. code-block:: python
 
     LOGGING = {
         'version': 1,
@@ -261,7 +263,9 @@ If you use this example, be sure to change the ``'filename'`` path to a
 location that's writable by the user that's running the Django application.
 
 Second, here's an example of a fairly complex logging setup, configured using
-:func:`logging.config.dictConfig`::
+:func:`logging.config.dictConfig`:
+
+.. code-block:: python
 
     LOGGING = {
         'version': 1,
@@ -481,13 +485,16 @@ a ``SuspiciousOperation`` will not be logged to the ``django.request`` logger,
 but only to the ``django.security`` logger.
 
 To silence a particular type of SuspiciousOperation, you can override that
-specific logger following this example::
+specific logger following this example:
 
-        'loggers': {
-            'django.security.DisallowedHost': {
-                'handlers': ['null'],
-                'propagate': False,
-            },
+.. code-block:: python
+
+    'loggers': {
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
+    },
 
 Handlers
 --------
@@ -511,7 +518,9 @@ Python logging module.
     containing the full content of the debug Web page that would have been
     produced if :setting:`DEBUG` were ``True``. To set this value in your
     configuration, include it in the handler definition for
-    ``django.utils.log.AdminEmailHandler``, like this::
+    ``django.utils.log.AdminEmailHandler``, like this:
+
+    .. code-block:: python
 
         'handlers': {
             'mail_admins': {
@@ -533,7 +542,9 @@ Python logging module.
 
     By setting the ``email_backend`` argument of ``AdminEmailHandler``, the
     :ref:`email backend <topic-email-backends>` that is being used by the
-    handler can be overridden, like this::
+    handler can be overridden, like this:
+
+    .. code-block:: python
 
         'handlers': {
             'mail_admins': {
@@ -557,25 +568,29 @@ logging module.
 
 .. class:: CallbackFilter(callback)
 
-   This filter accepts a callback function (which should accept a single
-   argument, the record to be logged), and calls it for each record that passes
-   through the filter. Handling of that record will not proceed if the callback
-   returns False.
+    This filter accepts a callback function (which should accept a single
+    argument, the record to be logged), and calls it for each record that
+    passes through the filter. Handling of that record will not proceed if the
+    callback returns False.
 
-   For instance, to filter out :exc:`~django.http.UnreadablePostError`
-   (raised when a user cancels an upload) from the admin emails, you would
-   create a filter function::
+    For instance, to filter out :exc:`~django.http.UnreadablePostError`
+    (raised when a user cancels an upload) from the admin emails, you would
+    create a filter function:
 
-    from django.http import UnreadablePostError
+    .. code-block:: python
 
-    def skip_unreadable_post(record):
-        if record.exc_info:
-            exc_type, exc_value = record.exc_info[:2]
-            if isinstance(exc_value, UnreadablePostError):
-                return False
-        return True
+        from django.http import UnreadablePostError
 
-   and then add it to your logging config::
+        def skip_unreadable_post(record):
+            if record.exc_info:
+                exc_type, exc_value = record.exc_info[:2]
+                if isinstance(exc_value, UnreadablePostError):
+                    return False
+            return True
+
+    and then add it to your logging config:
+
+    .. code-block:: python
 
         'filters': {
             'skip_unreadable_posts': {
@@ -593,13 +608,15 @@ logging module.
 
 .. class:: RequireDebugFalse()
 
-   This filter will only pass on records when settings.DEBUG is False.
+    This filter will only pass on records when settings.DEBUG is False.
 
-   This filter is used as follows in the default :setting:`LOGGING`
-   configuration to ensure that the :class:`AdminEmailHandler` only sends error
-   emails to admins when :setting:`DEBUG` is ``False``::
+    This filter is used as follows in the default :setting:`LOGGING`
+    configuration to ensure that the :class:`AdminEmailHandler` only sends
+    error emails to admins when :setting:`DEBUG` is ``False``:
 
-       'filters': {
+    .. code-block:: python
+
+        'filters': {
             'require_debug_false': {
                 '()': 'django.utils.log.RequireDebugFalse',
             }
@@ -614,8 +631,8 @@ logging module.
 
 .. class:: RequireDebugTrue()
 
-   This filter is similar to :class:`RequireDebugFalse`, except that records are
-   passed only when :setting:`DEBUG` is ``True``.
+    This filter is similar to :class:`RequireDebugFalse`, except that records are
+    passed only when :setting:`DEBUG` is ``True``.
 
 .. _default-logging-configuration:
 
