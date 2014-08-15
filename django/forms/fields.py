@@ -25,7 +25,7 @@ from django.forms.widgets import (
 from django.utils import formats
 from django.utils.encoding import smart_text, force_str, force_text
 from django.utils.ipv6 import clean_ipv6_address
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning, RenameMethodsBase
 from django.utils import six
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
@@ -44,6 +44,10 @@ __all__ = (
     'SlugField', 'TypedChoiceField', 'TypedMultipleChoiceField'
 )
 
+class FieldMethods(RenameMethodsBase):
+    renamed_methods = (
+        ('_has_changed', 'has_changed', RemovedInDjango19Warning),
+    )
 
 class Field(object):
     widget = TextInput  # Default widget to use when rendering this type of Field.
@@ -185,7 +189,7 @@ class Field(object):
             return self.limit_choices_to()
         return self.limit_choices_to
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         """
         Return True if data differs from initial.
         """
@@ -629,7 +633,7 @@ class FileField(Field):
             return initial
         return data
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if data is None:
             return False
         return True
@@ -744,7 +748,7 @@ class BooleanField(Field):
         if not value and self.required:
             raise ValidationError(self.error_messages['required'], code='required')
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         # Sometimes data or initial could be None or '' which should be the
         # same thing as False.
         if initial == 'False':
@@ -779,7 +783,7 @@ class NullBooleanField(BooleanField):
     def validate(self, value):
         pass
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         # None (unknown) and False (No) are not the same
         if initial is not None:
             initial = bool(initial)
@@ -906,7 +910,7 @@ class MultipleChoiceField(ChoiceField):
                     params={'value': val},
                 )
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if initial is None:
             initial = []
         if data is None:
@@ -1084,14 +1088,14 @@ class MultiValueField(Field):
         """
         raise NotImplementedError('Subclasses must implement this method.')
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         if initial is None:
             initial = ['' for x in range(0, len(data))]
         else:
             if not isinstance(initial, list):
                 initial = self.widget.decompress(initial)
         for field, initial, data in zip(self.fields, initial, data):
-            if field._has_changed(field.to_python(initial), data):
+            if field.has_changed(field.to_python(initial), data):
                 return True
         return False
 
