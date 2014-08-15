@@ -443,22 +443,20 @@ class FormsExtraTestCase(TestCase, AssertFormErrorsMixin):
         self.assertFormErrors(['This field is required.'], f.clean, ['some text', ['JP']])
 
         # test with no initial data
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertTrue(f._has_changed(None, ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
+        self.assertTrue(f.has_changed(None, ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
 
-            # test when the data is the same as initial
-            self.assertFalse(f._has_changed('some text,JP,2007-04-25 06:24:00',
-                ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
+        # test when the data is the same as initial
+        self.assertFalse(f.has_changed('some text,JP,2007-04-25 06:24:00',
+            ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
 
-            # test when the first widget's data has changed
-            self.assertTrue(f._has_changed('some text,JP,2007-04-25 06:24:00',
-                ['other text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
+        # test when the first widget's data has changed
+        self.assertTrue(f.has_changed('some text,JP,2007-04-25 06:24:00',
+            ['other text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
 
-            # test when the last widget's data has changed. this ensures that it is not
-            # short circuiting while testing the widgets.
-            self.assertTrue(f._has_changed('some text,JP,2007-04-25 06:24:00',
-                ['some text', ['J', 'P'], ['2009-04-25', '11:44:00']]))
+        # test when the last widget's data has changed. this ensures that it is not
+        # short circuiting while testing the widgets.
+        self.assertTrue(f.has_changed('some text,JP,2007-04-25 06:24:00',
+            ['some text', ['J', 'P'], ['2009-04-25', '11:44:00']]))
 
         class ComplexFieldForm(Form):
             field1 = ComplexField(widget=w)
@@ -804,9 +802,8 @@ class FormsExtraL10NTestCase(TestCase):
         self.assertEqual(w.value_from_datadict({'date_year': '1899', 'date_month': '8', 'date_day': '13'}, {}, 'date'), '13-08-1899')
 
     def test_l10n_date_changed(self):
-        # Deprecated behaviour Field._has_changed
         """
-        Ensure that DateField._has_changed() with SelectDateWidget works
+        Ensure that DateField.has_changed() with SelectDateWidget works
         correctly with a localized date format.
         Refs #17165.
         """
@@ -816,18 +813,14 @@ class FormsExtraL10NTestCase(TestCase):
             'mydate_month': '4',
             'mydate_day': '1',
         }, initial={'mydate': datetime.date(2008, 4, 1)})
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(b._has_changed())
+        self.assertFalse(b.has_changed())
 
         b = GetDate({
             'mydate_year': '2008',
             'mydate_month': '4',
             'mydate_day': '2',
         }, initial={'mydate': datetime.date(2008, 4, 1)})
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertTrue(b._has_changed())
+        self.assertTrue(b.has_changed())
 
         # With Field.show_hidden_initial=True ------------------------
         b = GetDateShowHiddenInitial({
@@ -836,9 +829,7 @@ class FormsExtraL10NTestCase(TestCase):
             'mydate_day': '1',
             'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 1))
         }, initial={'mydate': datetime.date(2008, 4, 1)})
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(b._has_changed())
+        self.assertFalse(b.has_changed())
 
         b = GetDateShowHiddenInitial({
             'mydate_year': '2008',
@@ -846,9 +837,7 @@ class FormsExtraL10NTestCase(TestCase):
             'mydate_day': '22',
             'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 1))
         }, initial={'mydate': datetime.date(2008, 4, 1)})
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertTrue(b._has_changed())
+        self.assertTrue(b.has_changed())
 
         b = GetDateShowHiddenInitial({
             'mydate_year': '2008',
@@ -856,9 +845,7 @@ class FormsExtraL10NTestCase(TestCase):
             'mydate_day': '22',
             'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 1))
         }, initial={'mydate': datetime.date(2008, 4, 22)})
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertTrue(b._has_changed())
+        self.assertTrue(b.has_changed())
 
         b = GetDateShowHiddenInitial({
             'mydate_year': '2008',
@@ -866,9 +853,7 @@ class FormsExtraL10NTestCase(TestCase):
             'mydate_day': '22',
             'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 22))
         }, initial={'mydate': datetime.date(2008, 4, 1)})
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(b._has_changed())
+        self.assertFalse(b.has_changed())
 
     def test_l10n_invalid_date_in(self):
         # Invalid dates shouldn't be allowed

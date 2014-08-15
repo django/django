@@ -313,19 +313,14 @@ class FieldsTests(SimpleTestCase):
         self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" />')
 
     def test_floatfield_changed(self):
-        # Deprecated behaviour Field._has_changed
         f = FloatField()
         n = 4.35
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(f._has_changed(n, '4.3500'))
+        self.assertFalse(f.has_changed(n, '4.3500'))
 
         with translation.override('fr'), self.settings(USE_L10N=True):
             f = FloatField(localize=True)
             localized_n = formats.localize_input(n)  # -> '4,35' in French
-            with warnings.catch_warnings(record=True):
-                warnings.simplefilter("always")
-                self.assertFalse(f._has_changed(n, localized_n))
+            self.assertFalse(f.has_changed(n, localized_n))
 
     # DecimalField ################################################################
 
@@ -431,20 +426,15 @@ class FieldsTests(SimpleTestCase):
         self.assertWidgetRendersTo(f, '<input id="id_f" name="f" type="text" />')
 
     def test_decimalfield_changed(self):
-        # Deprecated behaviour Field._has_changed
         f = DecimalField(max_digits=2, decimal_places=2)
         d = Decimal("0.1")
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(f._has_changed(d, '0.10'))
-            self.assertTrue(f._has_changed(d, '0.101'))
+        self.assertFalse(f.has_changed(d, '0.10'))
+        self.assertTrue(f.has_changed(d, '0.101'))
 
         with translation.override('fr'), self.settings(USE_L10N=True):
             f = DecimalField(max_digits=2, decimal_places=2, localize=True)
             localized_d = formats.localize_input(d)  # -> '0,1' in French
-            with warnings.catch_warnings(record=True):
-                warnings.simplefilter("always")
-                self.assertFalse(f._has_changed(d, localized_d))
+            self.assertFalse(f.has_changed(d, localized_d))
 
     # DateField ###################################################################
 
@@ -500,10 +490,11 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid date.'", f.clean, 'a\x00b')
 
     def test_datefield_changed(self):
-        # Deprecated behaviour Field._has_changed
         format = '%d/%m/%Y'
         f = DateField(input_formats=[format])
         d = datetime.date(2007, 9, 17)
+        self.assertFalse(f.has_changed(d, '17/09/2007'))
+        # Test for deprecated behavior _has_changed
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             self.assertFalse(f._has_changed(d, '17/09/2007'))
@@ -545,15 +536,12 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid time.'", f.clean, '   ')
 
     def test_timefield_changed(self):
-        # Deprecated behaviour Field._has_changed
         t1 = datetime.time(12, 51, 34, 482548)
         t2 = datetime.time(12, 51)
         f = TimeField(input_formats=['%H:%M', '%H:%M %p'])
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertTrue(f._has_changed(t1, '12:51'))
-            self.assertFalse(f._has_changed(t2, '12:51'))
-            self.assertFalse(f._has_changed(t2, '12:51 PM'))
+        self.assertTrue(f.has_changed(t1, '12:51'))
+        self.assertFalse(f.has_changed(t2, '12:51'))
+        self.assertFalse(f.has_changed(t2, '12:51 PM'))
 
     # DateTimeField ###############################################################
 
@@ -615,13 +603,10 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(datetime.datetime(2006, 10, 25, 14, 30, 45, 200), f.clean('2006.10.25 14:30:45.0002'))
 
     def test_datetimefield_changed(self):
-        # Deprecated behaviour Field._has_changed
         format = '%Y %m %d %I:%M %p'
         f = DateTimeField(input_formats=[format])
         d = datetime.datetime(2006, 9, 17, 14, 30, 0)
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(f._has_changed(d, '2006 09 17 2:30 PM'))
+        self.assertFalse(f.has_changed(d, '2006 09 17 2:30 PM'))
 
     # RegexField ##################################################################
 
@@ -749,29 +734,26 @@ class FieldsTests(SimpleTestCase):
                          type(f.clean(SimpleUploadedFile('name', b''))))
 
     def test_filefield_changed(self):
-        # Deprecated behavior Field._has_changed
         '''
-        Test for the behavior of _has_changed for FileField. The value of data will
+        Test for the behavior of has_changed for FileField. The value of data will
         more than likely come from request.FILES. The value of initial data will
         likely be a filename stored in the database. Since its value is of no use to
         a FileField it is ignored.
         '''
         f = FileField()
 
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            # No file was uploaded and no initial data.
-            self.assertFalse(f._has_changed('', None))
+        # No file was uploaded and no initial data.
+        self.assertFalse(f.has_changed('', None))
 
-            # A file was uploaded and no initial data.
-            self.assertTrue(f._has_changed('', {'filename': 'resume.txt', 'content': 'My resume'}))
+        # A file was uploaded and no initial data.
+        self.assertTrue(f.has_changed('', {'filename': 'resume.txt', 'content': 'My resume'}))
 
-            # A file was not uploaded, but there is initial data
-            self.assertFalse(f._has_changed('resume.txt', None))
+        # A file was not uploaded, but there is initial data
+        self.assertFalse(f.has_changed('resume.txt', None))
 
-            # A file was uploaded and there is initial data (file identity is not dealt
-            # with here)
-            self.assertTrue(f._has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'}))
+        # A file was uploaded and there is initial data (file identity is not dealt
+        # with here)
+        self.assertTrue(f.has_changed('resume.txt', {'filename': 'resume.txt', 'content': 'My resume'}))
 
     # ImageField ##################################################################
 
@@ -934,19 +916,16 @@ class FieldsTests(SimpleTestCase):
         self.assertIsInstance(pickle.loads(pickle.dumps(BooleanField())), BooleanField)
 
     def test_booleanfield_changed(self):
-        # Deprecated behavior Field._has_changed
         f = BooleanField()
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(f._has_changed(None, None))
-            self.assertFalse(f._has_changed(None, ''))
-            self.assertFalse(f._has_changed('', None))
-            self.assertFalse(f._has_changed('', ''))
-            self.assertTrue(f._has_changed(False, 'on'))
-            self.assertFalse(f._has_changed(True, 'on'))
-            self.assertTrue(f._has_changed(True, ''))
-            # Initial value may have mutated to a string due to show_hidden_initial (#19537)
-            self.assertTrue(f._has_changed('False', 'on'))
+        self.assertFalse(f.has_changed(None, None))
+        self.assertFalse(f.has_changed(None, ''))
+        self.assertFalse(f.has_changed('', None))
+        self.assertFalse(f.has_changed('', ''))
+        self.assertTrue(f.has_changed(False, 'on'))
+        self.assertFalse(f.has_changed(True, 'on'))
+        self.assertTrue(f.has_changed(True, ''))
+        # Initial value may have mutated to a string due to show_hidden_initial (#19537)
+        self.assertTrue(f.has_changed('False', 'on'))
 
     # ChoiceField #################################################################
 
@@ -1019,13 +998,10 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(None, f.clean(''))
 
     def test_typedchoicefield_has_changed(self):
-        # Deprecated behavior Field._has_changed
         # has_changed should not trigger required validation
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(f._has_changed(None, ''))
-            self.assertFalse(f._has_changed(1, '1'))
+        self.assertFalse(f.has_changed(None, ''))
+        self.assertFalse(f.has_changed(1, '1'))
 
     def test_typedchoicefield_special_coerce(self):
         """
@@ -1092,17 +1068,14 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(None, f.cleaned_data['nullbool2'])
 
     def test_nullbooleanfield_changed(self):
-        # Deprecated behavior Field._has_changed
         f = NullBooleanField()
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertTrue(f._has_changed(False, None))
-            self.assertTrue(f._has_changed(None, False))
-            self.assertFalse(f._has_changed(None, None))
-            self.assertFalse(f._has_changed(False, False))
-            self.assertTrue(f._has_changed(True, False))
-            self.assertTrue(f._has_changed(True, None))
-            self.assertTrue(f._has_changed(True, False))
+        self.assertTrue(f.has_changed(False, None))
+        self.assertTrue(f.has_changed(None, False))
+        self.assertFalse(f.has_changed(None, None))
+        self.assertFalse(f.has_changed(False, False))
+        self.assertTrue(f.has_changed(True, False))
+        self.assertTrue(f.has_changed(True, None))
+        self.assertTrue(f.has_changed(True, False))
 
     # MultipleChoiceField #########################################################
 
@@ -1146,17 +1119,14 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Select a valid choice. 6 is not one of the available choices.'", f.clean, ['1', '6'])
 
     def test_multiplechoicefield_changed(self):
-        # Deprecated behavior Field._has_changed
         f = MultipleChoiceField(choices=[('1', 'One'), ('2', 'Two'), ('3', 'Three')])
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(f._has_changed(None, None))
-            self.assertFalse(f._has_changed([], None))
-            self.assertTrue(f._has_changed(None, ['1']))
-            self.assertFalse(f._has_changed([1, 2], ['1', '2']))
-            self.assertFalse(f._has_changed([2, 1], ['1', '2']))
-            self.assertTrue(f._has_changed([1, 2], ['1']))
-            self.assertTrue(f._has_changed([1, 2], ['1', '3']))
+        self.assertFalse(f.has_changed(None, None))
+        self.assertFalse(f.has_changed([], None))
+        self.assertTrue(f.has_changed(None, ['1']))
+        self.assertFalse(f.has_changed([1, 2], ['1', '2']))
+        self.assertFalse(f.has_changed([2, 1], ['1', '2']))
+        self.assertTrue(f.has_changed([1, 2], ['1']))
+        self.assertTrue(f.has_changed([1, 2], ['1', '3']))
 
     # TypedMultipleChoiceField ############################################################
     # TypedMultipleChoiceField is just like MultipleChoiceField, except that coerced types
@@ -1201,12 +1171,9 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(None, f.clean([]))
 
     def test_typedmultiplechoicefield_has_changed(self):
-        # Deprecated behaviour Field._has_changed
         # has_changed should not trigger required validation
         f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=True)
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(f._has_changed(None, ''))
+        self.assertFalse(f.has_changed(None, ''))
 
     def test_typedmultiplechoicefield_special_coerce(self):
         """
@@ -1370,11 +1337,8 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid date.'", f.clean, ['', '07:30'])
 
     def test_splitdatetimefield_changed(self):
-        # Deprecated behaviour Field._has_changed
         f = SplitDateTimeField(input_date_formats=['%d/%m/%Y'])
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            self.assertFalse(f._has_changed(['11/01/2012', '09:18:15'], ['11/01/2012', '09:18:15']))
-            self.assertTrue(f._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['2008-05-06', '12:40:00']))
-            self.assertFalse(f._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:40']))
-            self.assertTrue(f._has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:41']))
+        self.assertFalse(f.has_changed(['11/01/2012', '09:18:15'], ['11/01/2012', '09:18:15']))
+        self.assertTrue(f.has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['2008-05-06', '12:40:00']))
+        self.assertFalse(f.has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:40']))
+        self.assertTrue(f.has_changed(datetime.datetime(2008, 5, 6, 12, 40, 00), ['06/05/2008', '12:41']))
