@@ -181,9 +181,7 @@ features of database backends that Django doesn't support directly, like
 partial indexes.
 
 ``sql``, and ``reverse_sql`` if provided, should be strings of SQL to run on
-the database. On most database backends (all but PostgreSQL), Django will
-split the SQL into individual statements prior to executing them. This
-requires installing the sqlparse_ Python library.
+the database.
 
 The ``state_operations`` argument is so you can supply operations that are
 equivalent to the SQL in terms of project state; for example, if you are
@@ -192,7 +190,34 @@ operation here so that the autodetector still has an up-to-date state of the
 model (otherwise, when you next run ``makemigrations``, it won't see any
 operation that adds that field and so will try to run it again).
 
-.. _sqlparse: https://pypi.python.org/pypi/sqlparse
+.. note::
+
+  On most database backends (all but PostgreSQL), Django will split the SQL
+  into individual statements prior to executing them. This requires
+  installing the sqlparse_ Python library.
+
+  .. _sqlparse: https://pypi.python.org/pypi/sqlparse
+
+
+Here's an example of using ``RunSQL`` to create a initial table with some
+objects (to be noted that the datatype works for SQLite)::
+
+    # -*- coding: utf-8 -*-
+    from django.db import models, migrations
+
+    class Migration(migrations.Migration):
+
+        dependencies = []
+
+        operations = [
+            migrations.RunSQL(
+                "CREATE TABLE foo_newtable (id INTEGER, name TEXT);\n"
+                "INSERT INTO foo_newtable (id, name) VALUES (1, 'joe');",
+                "DROP TABLE foo_newtable",
+                state_operations=[migrations.CreateModel("NewTable", [("id", models.AutoField(primary_key=True))])],
+            )
+        ]
+
 
 RunPython
 ---------
