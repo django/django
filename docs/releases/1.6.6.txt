@@ -36,3 +36,7 @@ Bugfixes
 
 * Prevented ``UnicodeDecodeError`` in ``runserver`` with non-UTF-8 and
   non-English locale (`#23265 <https://code.djangoproject.com/ticket/23265>`_).
+
+* Fixed JavaScript errors while editing multi-geometry objects in the OpenLayers
+  widget (`#23137 <https://code.djangoproject.com/ticket/23137>`_,
+  `#23293 <https://code.djangoproject.com/ticket/23293>`_).
