@@ -122,6 +122,7 @@ ListView
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_orphans` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_paginate_orphans`]
 * :attr:`~django.views.generic.list.MultipleObjectMixin.paginator_class`
 * :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset`]
+* :attr:`~django.views.generic.list.MultipleObjectMixin.ordering` [:meth:`~django.views.generic.list.MultipleObjectMixin.get_ordering`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.template_name` [:meth:`~django.views.generic.base.TemplateResponseMixin.get_template_names`]
 * :attr:`~django.views.generic.list.MultipleObjectTemplateResponseMixin.template_name_suffix`
