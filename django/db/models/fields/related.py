@@ -1383,6 +1383,14 @@ class ForeignObject(RelatedField):
         name, path, args, kwargs = super(ForeignObject, self).deconstruct()
         kwargs['from_fields'] = self.from_fields
         kwargs['to_fields'] = self.to_fields
+        if self.rel.related_name is not None:
+            kwargs['related_name'] = self.rel.related_name
+        if self.rel.related_query_name is not None:
+            kwargs['related_query_name'] = self.rel.related_query_name
+        if self.rel.on_delete != CASCADE:
+            kwargs['on_delete'] = self.rel.on_delete
+        if self.rel.parent_link:
+            kwargs['parent_link'] = self.rel.parent_link
         # Work out string form of "to"
         if isinstance(self.rel.to, six.string_types):
             kwargs['to'] = self.rel.to
@@ -1670,8 +1678,6 @@ class ForeignKey(ForeignObject):
             kwargs['db_index'] = False
         if self.db_constraint is not True:
             kwargs['db_constraint'] = self.db_constraint
-        if self.rel.on_delete is not CASCADE:
-            kwargs['on_delete'] = self.rel.on_delete
         # Rel needs more work.
         to_meta = getattr(self.rel.to, "_meta", None)
         if self.rel.field_name and (not to_meta or (to_meta.pk and self.rel.field_name != to_meta.pk.name)):
@@ -2142,6 +2148,10 @@ class ManyToManyField(RelatedField):
             kwargs['db_table'] = self.db_table
         if self.rel.db_constraint is not True:
             kwargs['db_constraint'] = self.rel.db_constraint
+        if self.rel.related_name is not None:
+            kwargs['related_name'] = self.rel.related_name
+        if self.rel.related_query_name is not None:
+            kwargs['related_query_name'] = self.rel.related_query_name
         # Rel needs more work.
         if isinstance(self.rel.to, six.string_types):
             kwargs['to'] = self.rel.to
