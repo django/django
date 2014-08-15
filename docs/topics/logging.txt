@@ -413,7 +413,7 @@ requirements of logging in Web server environment.
 Loggers
 -------
 
-Django provides four built-in loggers.
+Django provides several built-in loggers.
 
 ``django``
 ~~~~~~~~~~
@@ -488,6 +488,15 @@ specific logger following this example::
                 'handlers': ['null'],
                 'propagate': False,
             },
+
+``django.db.backends.schema``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.7
+
+Logs the SQL queries that are executed during schema changes to the database by
+the :doc:`migrations framework </topics/migrations>`. Note that it won't log the
+queries executed by :class:`~django.db.migrations.operations.RunPython`.
 
 Handlers
 --------
