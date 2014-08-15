@@ -483,11 +483,21 @@ but only to the ``django.security`` logger.
 To silence a particular type of SuspiciousOperation, you can override that
 specific logger following this example::
 
-        'loggers': {
-            'django.security.DisallowedHost': {
-                'handlers': ['null'],
-                'propagate': False,
-            },
+    'loggers': {
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
+    },
+
+``django.db.backends.schema``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.7
+
+Logs the SQL queries that are executed during schema changes to the database by
+the :ref:`migrations <data-migrations>` framework. Note that it won't log the
+schema change executed by :class:`~django.db.migrations.operations.RunPython`.
 
 ``django.db.backends.schema``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
