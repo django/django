@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import logging
 import re
 from functools import partial
 from importlib import import_module
@@ -144,6 +145,7 @@ class Template(object):
         return self.nodelist.render(context)
 
     def render(self, context):
+        context.template_name = self.name
         "Display stage -- can be called many times"
         context.render_context.push()
         try:
@@ -802,6 +804,13 @@ class Variable(object):
                             else:
                                 raise
         except Exception as e:
+            logger = logging.getLogger('django.template')
+
+            template_name = "Unknown"
+            if hasattr(context, "template_name"):
+                template_name = context.template_name
+            logger.warning("%s - %s" % (template_name, e))
+
             if getattr(e, 'silent_variable_failure', False):
                 current = settings.TEMPLATE_STRING_IF_INVALID
             else:

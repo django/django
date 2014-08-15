@@ -179,6 +179,11 @@ class AdminScriptTestCase(unittest.TestCase):
 
         return self.run_test('./manage.py', args, settings_file)
 
+    def assertTemplateLogHandlerMissingOutput(self, stream):
+        message = 'No handlers could be found for logger "django.template"'
+        stream = force_text(stream)
+        self.assertTrue(message in stream, "'%s' does not match actual output text '%s'" % (message, stream))
+
     def assertNoOutput(self, stream):
         "Utility assertion: assert that the given stream is empty"
         self.assertEqual(len(stream), 0, "Stream should be empty: actually contains '%s'" % stream)
@@ -1708,7 +1713,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.addCleanup(shutil.rmtree, testproject_dir, True)
 
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(err)
+        self.assertTemplateLogHandlerMissingOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
 
@@ -1720,7 +1725,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.addCleanup(shutil.rmtree, testproject_dir, True)
 
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(err)
+        self.assertTemplateLogHandlerMissingOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
 
@@ -1783,7 +1788,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.addCleanup(shutil.rmtree, testproject_dir, True)
 
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(err)
+        self.assertTemplateLogHandlerMissingOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
         base_path = os.path.join(testproject_dir, 'additional_dir')
@@ -1801,7 +1806,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         os.mkdir(testproject_dir)
         self.addCleanup(shutil.rmtree, testproject_dir)
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(err)
+        self.assertTemplateLogHandlerMissingOutput(err)
         test_manage_py = os.path.join(testproject_dir, 'manage.py')
         with open(test_manage_py, 'r') as fp:
             content = force_text(fp.read())
@@ -1846,7 +1851,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.addCleanup(shutil.rmtree, testproject_dir, True)
 
         out, err = self.run_django_admin(args)
-        self.assertNoOutput(err)
+        self.assertTemplateLogHandlerMissingOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         path = os.path.join(testproject_dir, 'ticket-18091-non-ascii-template.txt')
         with codecs.open(path, 'r', encoding='utf-8') as f:

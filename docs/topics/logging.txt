@@ -413,7 +413,7 @@ requirements of logging in Web server environment.
 Loggers
 -------
 
-Django provides four built-in loggers.
+Django provides five built-in loggers.
 
 ``django``
 ~~~~~~~~~~
@@ -437,6 +437,15 @@ Messages to this logger have the following extra context:
 
 * ``request``: The request object that generated the logging
   message.
+
+.. _django-template-logger:
+
+``django.template``
+~~~~~~~~~~~~~~~~~~
+
+Log messages related to the rendering of templates. missing
+variables are raised as ``WARNING`` messages. By default this logger uses
+the null handler.
 
 ``django.db.backends``
 ~~~~~~~~~~~~~~~~~~~~~~

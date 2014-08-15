@@ -53,6 +53,11 @@ DEFAULT_LOGGING = {
             'level': 'ERROR',
             'propagate': False,
         },
+        'django.template':{
+            'handlers':['null'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
         'django.security': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',

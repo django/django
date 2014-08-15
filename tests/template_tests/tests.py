@@ -13,7 +13,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core import urlresolvers
 from django.template import (base as template_base, loader, Context,
-    RequestContext, Template, TemplateSyntaxError)
+    RequestContext, Template, TemplateSyntaxError, Variable, VariableDoesNotExist)
 from django.template.loaders import app_directories, filesystem, cached
 from django.test import RequestFactory, TestCase
 from django.test.utils import (override_settings, override_template_loaders,
@@ -1956,3 +1956,70 @@ class SSITests(TestCase):
         with override_settings(ALLOWED_INCLUDE_ROOTS=(self.ssi_dir,)):
             for path in disallowed_paths:
                 self.assertEqual(self.render_ssi(path), '')
+
+
+class VariableResolveLoggingTests(unittest.TestCase):
+    def setUp(self):
+        import logging
+        from logging import Handler
+
+        class TestHandler(Handler):
+            def __init__(self):
+                super(TestHandler, self).__init__()
+                from django.utils.six import StringIO
+                self.log_record = None
+
+            def emit(self, record):
+                self.log_record = record
+
+        self.test_handler = TestHandler()
+        self.logger = logging.getLogger('django.template')
+        self.original_level = self.logger.level
+        self.logger.addHandler(self.test_handler)
+        self.logger.setLevel(logging.WARNING)
+
+    def tearDown(self):
+        self.logger.removeHandler(self.test_handler)
+        self.logger.level = self.original_level
+
+    def test_log_on_variable_does_not_exist_silent(self):
+        class TestObject(object):
+            class SilentDoesNotExist(Exception):
+                silent_variable_failure = True
+
+            @property
+            def template_name(self):
+                return "template"
+
+            @property
+            def article(self):
+                raise TestObject.SilentDoesNotExist("Attribute does not exist.")
+
+            def __iter__(self):
+                return iter([attr for attr in dir(TestObject) if attr[:2] != "__"])
+
+        c = TestObject()
+        Variable('article').resolve(c)
+        self.assertEqual(self.test_handler.log_record.msg,
+                         'template - Attribute does not exist.')
+
+    def test_log_on_variable_does_not_exist_not_silent(self):
+        c = {'article': {'section':u'News'}}
+
+        with self.assertRaises(VariableDoesNotExist):
+            Variable('article.author').resolve(c)
+
+        self.assertEqual(self.test_handler.log_record.msg,
+                         'Unknown - Failed lookup for key [author] in u"{u\'section\': u\'News\'}"')
+
+    def test_no_log_when_variable_exists(self):
+        c = {'article': {'section':u'News'}}
+        Variable('article.section').resolve(c)
+        self.assertIsNone(self.test_handler.log_record)
+
+    def test_default_null_handler_for_template_logging(self):
+        from logging import NullHandler
+        self.logger.removeHandler(self.test_handler)
+
+        self.assertEqual(len(self.logger.handlers), 1)
+        self.assertEqual(type(self.logger.handlers[0]), NullHandler)
