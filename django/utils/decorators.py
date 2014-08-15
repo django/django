@@ -8,7 +8,7 @@ from django.utils import six
 class classonlymethod(classmethod):
     def __get__(self, instance, owner):
         if instance is not None:
-            raise AttributeError("This method is available only on the view class.")
+            raise AttributeError("This method is available only on the class, not on instances.")
         return super(classonlymethod, self).__get__(instance, owner)
 
 
