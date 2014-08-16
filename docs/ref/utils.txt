@@ -164,8 +164,8 @@ The functions defined in this module share the following properties:
 
     Parses a string and returns a :class:`datetime.timedelta`.
 
-    Expects data in the format `"DD HH:MM:SS.uuuuuu"` or as specified by
-    ISO 8601 (e.g. `P4DT1H15M20S` which is equivalent to `4 1:15:20`).
+    Expects data in the format ``"DD HH:MM:SS.uuuuuu"`` or as specified by ISO
+    8601 (e.g. ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``).
 
 ``django.utils.decorators``
 ===========================
