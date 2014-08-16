@@ -285,6 +285,7 @@ This command should produce the following output:
 
 .. code-block:: sql
 
+    BEGIN;
     CREATE TABLE "world_worldborder" (
         "id" serial NOT NULL PRIMARY KEY,
         "name" varchar(50) NOT NULL,
@@ -302,6 +303,7 @@ This command should produce the following output:
     )
     ;
     CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" );
+    COMMIT;
 
 .. note::
 
