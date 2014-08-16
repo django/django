@@ -249,13 +249,6 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
 
-    def test_sqlclear_builtin_with_settings(self):
-        "default: django-admin builtin commands succeed if settings are provided as argument"
-        args = ['sqlclear', '--settings=test_project.settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
-        self.assertNoOutput(err)
-        self.assertOutput(out, 'App has not tables in the database. Nothing to do.')
-
     def test_builtin_with_environment(self):
         "default: django-admin builtin commands succeed if settings are provided in the environment"
         args = ['sqlall', 'admin_scripts']
@@ -304,7 +297,8 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
     contains the test application specified using a full path.
     """
     def setUp(self):
-        self.write_settings('settings.py', ['django.contrib.auth', 'django.contrib.contenttypes', 'admin_scripts'])
+        self.write_settings('settings.py', ['django.contrib.auth', 'django.contrib.contenttypes',
+                                            'admin_scripts', 'admin_scripts.complex_app'])
 
     def tearDown(self):
         self.remove_settings('settings.py')
@@ -322,6 +316,13 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, 'CREATE TABLE')
+
+    def test_sqlclear_builtin_with_settings(self):
+        "fulldefault: django-admin builtin commands succeed if a setting file is provided"
+        args = ['sqlclear', '--settings=test_project.settings', 'complex_app']
+        out, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        self.assertOutput(out, 'App has not tables in the database. Nothing to do.')
 
     def test_builtin_with_environment(self):
         "fulldefault: django-admin builtin commands succeed if the environment contains settings"
