@@ -480,6 +480,7 @@ readability):
 
 .. code-block:: sql
 
+    BEGIN;
     CREATE TABLE polls_question (
         "id" serial NOT NULL PRIMARY KEY,
         "question_text" varchar(200) NOT NULL,
@@ -500,6 +501,7 @@ readability):
         FOREIGN KEY ("question_id")
         REFERENCES "polls_question" ("id")
         DEFERRABLE INITIALLY DEFERRED;
+    COMMIT;
 
 
 Note the following:

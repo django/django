@@ -1136,6 +1136,8 @@ Prints the SQL for the named migration. This requires an active database
 connection, which it will use to resolve constraint names; this means you must
 generate the SQL against a copy of the database you wish to later apply it on.
 
+Note that ``sqlmigrate`` doesn't colorize its output.
+
 The :djadminopt:`--database` option can be used to specify the database for
 which to generate the SQL.
 
