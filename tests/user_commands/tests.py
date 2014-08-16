@@ -134,6 +134,11 @@ class CommandTests(SimpleTestCase):
         with self.assertRaises(CommandError):
             management.call_command('hal', stdout=out)
 
+    def test_output_transaction(self):
+        out = StringIO()
+        management.call_command('transaction', stdout=out, no_color=True)
+        self.assertEqual(out.getvalue(), 'BEGIN;\nHello!\n\nCOMMIT;\n')
+
 
 class UtilsTests(SimpleTestCase):
 
