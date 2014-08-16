@@ -2,17 +2,17 @@ from unittest import skipUnless
 
 from django.forms import ValidationError
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.tests.utils import HAS_SPATIALREFSYS
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.test import SimpleTestCase
 from django.utils import six
 from django.utils.html import escape
 
-if HAS_SPATIALREFSYS:
+if HAS_SPATIAL_DB:
     from django.contrib.gis import forms
     from django.contrib.gis.geos import GEOSGeometry
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIALREFSYS, "GeometryFieldTest needs gdal support and a spatial database")
+@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GeometryFieldTest needs gdal support and a spatial database")
 class GeometryFieldTest(SimpleTestCase):
 
     def test_init(self):
@@ -90,7 +90,7 @@ class GeometryFieldTest(SimpleTestCase):
         self.assertFalse(form.has_changed())
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
+@skipUnless(HAS_GDAL and HAS_SPATIAL_DB,
     "SpecializedFieldTest needs gdal support and a spatial database")
 class SpecializedFieldTest(SimpleTestCase):
     def setUp(self):
@@ -258,7 +258,7 @@ class SpecializedFieldTest(SimpleTestCase):
             self.assertFalse(GeometryForm(data={'g': invalid.wkt}).is_valid())
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
+@skipUnless(HAS_GDAL and HAS_SPATIAL_DB,
     "OSMWidgetTest needs gdal support and a spatial database")
 class OSMWidgetTest(SimpleTestCase):
     def setUp(self):
@@ -300,7 +300,7 @@ class OSMWidgetTest(SimpleTestCase):
                 rendered)
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
+@skipUnless(HAS_GDAL and HAS_SPATIAL_DB,
     "CustomGeometryWidgetTest needs gdal support and a spatial database")
 class CustomGeometryWidgetTest(SimpleTestCase):
 
