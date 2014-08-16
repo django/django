@@ -74,6 +74,11 @@ class CommandTests(SimpleTestCase):
             if current_path is not None:
                 os.environ['PATH'] = current_path
 
+    def test_output_transaction(self):
+        out = StringIO()
+        management.call_command('transaction', stdout=out, no_color=True)
+        self.assertEqual(out.getvalue(), 'BEGIN;\nHello!\n\nCOMMIT;\n')
+
 
 class UtilsTests(SimpleTestCase):
 

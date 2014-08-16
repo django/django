@@ -19,6 +19,14 @@ class Command(BaseCommand):
     )
 
     help = "Prints the SQL statements for the named migration."
+    output_transaction = True
+
+    def execute(self, *args, **options):
+        # sqlmigrate doesn't support coloring its output but we need to force
+        # no_color=True so that the BEGIN/COMMIT statements added by
+        # output_transaction don't get colored either.
+        options['no_color'] = True
+        return super(Command, self).execute(*args, **options)
 
     def handle(self, *args, **options):
 
@@ -50,5 +58,4 @@ class Command(BaseCommand):
         # for it
         plan = [(executor.loader.graph.nodes[targets[0]], options.get("backwards", False))]
         sql_statements = executor.collect_sql(plan)
-        for statement in sql_statements:
-            self.stdout.write(statement)
+        return '\n'.join(sql_statements)

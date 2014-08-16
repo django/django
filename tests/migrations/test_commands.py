@@ -93,6 +93,13 @@ class MigrateTests(MigrationTestBase):
         """
         Makes sure that sqlmigrate does something.
         """
+        # Make sure the output is wrapped in a transaction
+        stdout = six.StringIO()
+        call_command("sqlmigrate", "migrations", "0001", stdout=stdout)
+        output = stdout.getvalue().lower()
+        self.assertIn("begin;", output)
+        self.assertIn("commit;", output)
+
         # Test forwards. All the databases agree on CREATE TABLE, at least.
         stdout = six.StringIO()
         call_command("sqlmigrate", "migrations", "0001", stdout=stdout)
