@@ -107,6 +107,11 @@ def call_command(name, *args, **options):
                            for s_opt in parser._actions if s_opt.option_strings)
         arg_options = dict((opt_mapping.get(key, key), value) for key, value in options.items())
         defaults = parser.parse_args(args=args)
+        # Move positional args out of options to mimic legacy optparse
+        if 'args' in defaults:
+            args = defaults.args
+        else:
+            args = ()
         defaults = dict(defaults._get_kwargs(), **arg_options)
     else:
         # Legacy optparse method
