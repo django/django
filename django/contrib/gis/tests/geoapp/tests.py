@@ -8,9 +8,8 @@ from django.db import connection
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import (
-    HAS_SPATIAL_DB, no_mysql, no_oracle, no_spatialite,
-    mysql, oracle, postgis, spatialite)
-from django.test import TestCase
+    no_mysql, no_oracle, no_spatialite, mysql, oracle, postgis, spatialite)
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
 if HAS_GEOS:
@@ -28,7 +27,7 @@ def postgis_bug_version():
     return spatial_version and (2, 0, 0) <= spatial_version <= (2, 0, 1)
 
 
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@skipUnlessDBFeature("gis_enabled")
 class GeoModelTest(TestCase):
     fixtures = ['initial']
 
@@ -205,7 +204,7 @@ class GeoModelTest(TestCase):
         self.assertIsInstance(cities2[0].point, Point)
 
 
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@skipUnlessDBFeature("gis_enabled")
 class GeoLookupTest(TestCase):
     fixtures = ['initial']
 
@@ -397,7 +396,7 @@ class GeoLookupTest(TestCase):
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
 
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@skipUnlessDBFeature("gis_enabled")
 class GeoQuerySetTest(TestCase):
     fixtures = ['initial']
 

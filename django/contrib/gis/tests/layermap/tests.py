@@ -8,10 +8,10 @@ import unittest
 from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql
+from django.contrib.gis.tests.utils import mysql
 from django.db import router
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils._os import upath
 
 if HAS_GDAL:
@@ -36,7 +36,8 @@ NUMS = [1, 2, 1, 19, 1]  # Number of polygons for each.
 STATES = ['Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado']
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
+@skipUnless(HAS_GDAL, "LayerMapTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class LayerMapTest(TestCase):
 
     def test_init(self):
@@ -319,7 +320,8 @@ class OtherRouter(object):
         return True
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
+@skipUnless(HAS_GDAL, "LayerMapRouterTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class LayerMapRouterTest(TestCase):
 
     def setUp(self):

@@ -5,10 +5,9 @@ from unittest import skipUnless
 
 from django.core.management import call_command
 from django.db import connections
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.test_data import TEST_DATA
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.utils.six import StringIO
 
 if HAS_GDAL:
@@ -18,7 +17,8 @@ if HAS_GDAL:
     from .models import AllOGRFields
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
+@skipUnless(HAS_GDAL, "InspectDbTests needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class InspectDbTests(TestCase):
     def test_geom_columns(self):
         """
@@ -34,7 +34,8 @@ class InspectDbTests(TestCase):
         self.assertIn('objects = models.GeoManager()', output)
 
 
-@skipUnless(HAS_GDAL and HAS_SPATIAL_DB, "GDAL and spatial db are required.")
+@skipUnless(HAS_GDAL, "OGRInspectTest needs GDAL support")
+@skipUnlessDBFeature("gis_enabled")
 class OGRInspectTest(TestCase):
     maxDiff = 1024
 

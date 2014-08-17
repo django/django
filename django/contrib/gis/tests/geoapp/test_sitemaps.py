@@ -8,9 +8,10 @@ import zipfile
 
 from django.conf import settings
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.contrib.sites.models import Site
-from django.test import TestCase, modify_settings, override_settings
+from django.test import (
+    TestCase, modify_settings, override_settings, skipUnlessDBFeature
+)
 from django.utils.deprecation import RemovedInDjango20Warning
 
 if HAS_GEOS:
@@ -19,7 +20,7 @@ if HAS_GEOS:
 
 @modify_settings(INSTALLED_APPS={'append': ['django.contrib.sites', 'django.contrib.sitemaps']})
 @override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoapp.urls')
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@skipUnlessDBFeature("gis_enabled")
 class GeoSitemapTest(TestCase):
 
     def setUp(self):

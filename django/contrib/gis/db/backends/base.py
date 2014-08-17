@@ -9,6 +9,10 @@ from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
 
+class BaseSpatialFeatures(object):
+    gis_enabled = True
+
+
 class BaseSpatialOperations(object):
     """
     This module holds the base `BaseSpatialBackend` object, which is

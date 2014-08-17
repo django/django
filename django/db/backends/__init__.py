@@ -474,6 +474,7 @@ class BaseDatabaseWrapper(object):
 
 
 class BaseDatabaseFeatures(object):
+    gis_enabled = False
     allows_group_by_pk = False
     # True if django.db.backends.utils.typecast_timestamp is used on values
     # returned from dates() calls.

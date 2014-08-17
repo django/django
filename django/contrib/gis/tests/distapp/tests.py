@@ -7,23 +7,24 @@ from django.db.models import Q
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D  # alias for Distance
 from django.contrib.gis.tests.utils import (
-    HAS_SPATIAL_DB, mysql, oracle, postgis, spatialite, no_oracle, no_spatialite
+    mysql, oracle, postgis, spatialite, no_oracle, no_spatialite
 )
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
-if HAS_GEOS and HAS_SPATIAL_DB:
+if HAS_GEOS:
     from django.contrib.gis.geos import GEOSGeometry, LineString
 
     from .models import (AustraliaCity, Interstate, SouthTexasInterstate,
         SouthTexasCity, SouthTexasCityFt, CensusZipcode, SouthTexasZipcode)
 
 
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB and not mysql,
-    "Geos and spatial db (not mysql) are required.")
+@skipUnless(HAS_GEOS and not mysql,
+    "GEOS and spatial db (not mysql) are required.")
+@skipUnlessDBFeature("gis_enabled")
 class DistanceTest(TestCase):
     fixtures = ['initial']
 
-    if HAS_GEOS and HAS_SPATIAL_DB:
+    if HAS_GEOS:
         # A point we are testing distances with -- using a WGS84
         # coordinate that'll be implicitly transformed to that to
         # the coordinate system of the field, EPSG:32140 (Texas South Central

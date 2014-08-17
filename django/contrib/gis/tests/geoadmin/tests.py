@@ -1,19 +1,16 @@
 from __future__ import unicode_literals
 
-from unittest import skipUnless
-
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, skipUnlessDBFeature
 
-if HAS_GEOS and HAS_SPATIAL_DB:
+if HAS_GEOS:
     from django.contrib.gis import admin
     from django.contrib.gis.geos import Point
 
     from .models import City
 
 
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@skipUnlessDBFeature("gis_enabled")
 @override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoadmin.urls')
 class GeoAdminTest(TestCase):
 
