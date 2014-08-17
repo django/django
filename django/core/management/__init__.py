@@ -76,17 +76,21 @@ def get_commands():
     return commands
 
 
-def call_command(name, *args, **options):
+def exec_command(name, args=None, options=None):
     """
     Calls the given command, with the given options and args/kwargs.
 
     This is the primary API you should use for calling specific commands.
 
     Some examples:
-        call_command('syncdb')
-        call_command('shell', plain=True)
-        call_command('sqlall', 'myapp')
+        exec_command('syncdb')
+        exec_command('shell', options={'plain':True})
+        exec_command('sqlall', ['myapp'])
     """
+
+    args = [] if args is None else args
+    options = {} if options is None else options
+
     # Load the command object.
     try:
         app_name = get_commands()[name]
@@ -114,6 +118,25 @@ def call_command(name, *args, **options):
         defaults = dict(defaults.__dict__, **options)
 
     return command.execute(*args, **defaults)
+
+
+def call_command(name, *args, **options):
+    """
+    Calls the given command, with the given options and args/kwargs.
+
+    This is the primary API you should use for calling specific commands.
+
+    Some examples:
+        call_command('syncdb')
+        call_command('shell', plain=True)
+        call_command('sqlall', 'myapp')
+    """
+    # a wrapper for exec_command
+    return exec_command(
+        name=name,
+        args=args,
+        options=options,
+    )
 
 
 class ManagementUtility(object):
