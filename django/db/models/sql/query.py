@@ -7,7 +7,7 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 
-from collections import OrderedDict
+from collections import Mapping, OrderedDict
 import copy
 import warnings
 
@@ -83,7 +83,11 @@ class RawQuery(object):
         return iter(result)
 
     def __repr__(self):
-        return "<RawQuery: %r>" % (self.sql % tuple(self.params))
+        return "<RawQuery: %s>" % self
+
+    def __str__(self):
+        _type = dict if isinstance(self.params, Mapping) else tuple
+        return self.sql % _type(self.params)
 
     def _execute_query(self):
         self.cursor = connections[self.using].cursor()
