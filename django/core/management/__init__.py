@@ -108,6 +108,8 @@ def call_command(name, *args, **options):
         arg_options = dict((opt_mapping.get(key, key), value) for key, value in options.items())
         defaults = parser.parse_args(args=args)
         defaults = dict(defaults._get_kwargs(), **arg_options)
+        # Move positional args out of options to mimic legacy optparse
+        args = defaults.pop('args', ())
     else:
         # Legacy optparse method
         defaults, _ = parser.parse_args(args=[])

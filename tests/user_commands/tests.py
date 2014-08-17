@@ -108,6 +108,32 @@ class CommandTests(SimpleTestCase):
             sys.stdout, sys.stderr = old_stdout, old_stderr
         self.assertEqual(output, "All right, let's dance Rock'n'Roll.\n")
 
+    def test_calling_an_help_command_should_exit_with_systemexit_exception(self):
+        out = StringIO()
+        with self.assertRaises(SystemExit):
+            management.call_command('hal', "--help", stdout=out)
+        self.assertIn("", out.getvalue())
+
+    def test_calling_a_command_with_only_empty_parameter_should_ends_gracefully(self):
+        out = StringIO()
+        management.call_command('hal', "--empty", stdout=out)
+        self.assertIn("Dave, I can't do that.\n", out.getvalue())
+
+    def test_calling_command_with_app_labels_and_parameters_should_be_ok(self):
+        out = StringIO()
+        management.call_command('hal', 'myapp', "--verbosity", "3", stdout=out)
+        self.assertIn("Dave, my mind is going. I can feel it. I can feel it.\n", out.getvalue())
+
+    def test_calling_command_with_parameters_and_app_labels_at_the_end_should_be_ok(self):
+        out = StringIO()
+        management.call_command('hal', "--verbosity", "3", "myapp", stdout=out)
+        self.assertIn("Dave, my mind is going. I can feel it. I can feel it.\n", out.getvalue())
+
+    def test_calling_a_command_with_no_app_labels_and_parameters_should_raise_a_command_error(self):
+        out = StringIO()
+        with self.assertRaises(CommandError):
+            management.call_command('hal', stdout=out)
+
 
 class UtilsTests(SimpleTestCase):
 
