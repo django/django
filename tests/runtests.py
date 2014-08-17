@@ -60,13 +60,12 @@ ALWAYS_MIDDLEWARE_CLASSES = (
 
 
 def get_test_modules():
-    from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
     modules = []
     discovery_paths = [
         (None, RUNTESTS_DIR),
         (CONTRIB_MODULE_PATH, CONTRIB_DIR)
     ]
-    if HAS_SPATIAL_DB:
+    if connection.features.gis_enabled:
         discovery_paths.append(
             ('django.contrib.gis.tests', os.path.join(CONTRIB_DIR, 'gis', 'tests'))
         )
