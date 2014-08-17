@@ -149,6 +149,22 @@ class RawQueryTests(TestCase):
         self.assertEqual(len(results), 1)
         self.assertIsInstance(repr(qset), str)
 
+    def test_query_representation(self):
+        """
+        Test representation of raw query with parameters
+        """
+        query = "SELECT * FROM raw_query_author WHERE last_name = %(last)s"
+        params = {'last': 'foo'}
+        qset = Author.objects.raw(query, params)
+        self.assertEqual(repr(qset), "<RawQuerySet: SELECT * FROM raw_query_author WHERE last_name = foo>")
+        self.assertEqual(repr(qset.query), "<RawQuery: SELECT * FROM raw_query_author WHERE last_name = foo>")
+
+        query = "SELECT * FROM raw_query_author WHERE last_name = %s"
+        params = {'foo'}
+        qset = Author.objects.raw(query, params)
+        self.assertEqual(repr(qset), "<RawQuerySet: SELECT * FROM raw_query_author WHERE last_name = foo>")
+        self.assertEqual(repr(qset.query), "<RawQuery: SELECT * FROM raw_query_author WHERE last_name = foo>")
+
     def test_many_to_many(self):
         """
         Test of a simple raw query against a model containing a m2m field
