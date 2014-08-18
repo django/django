@@ -260,9 +260,7 @@ list::
     :func:`~django.views.decorators.csrf.csrf_protect` on the function that
     actually processes the request.  Note that this means that the handlers may
     start receiving the file upload before the CSRF checks have been done.
-    Example code:
-
-    .. code-block:: python
+    Example code::
 
         from django.views.decorators.csrf import csrf_exempt, csrf_protect
 

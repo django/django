@@ -695,9 +695,7 @@ via the :djadminopt:`--liveserver` option, for example:
 
 Another way of changing the default server address is by setting the
 `DJANGO_LIVE_TEST_SERVER_ADDRESS` environment variable somewhere in your
-code (for example, in a :ref:`custom test runner<topics-testing-test_runner>`):
-
-.. code-block:: python
+code (for example, in a :ref:`custom test runner<topics-testing-test_runner>`)::
 
     import os
     os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8082'
@@ -727,9 +725,7 @@ Python path:
    pip install selenium
 
 Then, add a ``LiveServerTestCase``-based test to your app's tests module
-(for example: ``myapp/tests.py``). The code for this test may look as follows:
-
-.. code-block:: python
+(for example: ``myapp/tests.py``). The code for this test may look as follows::
 
     from django.test import LiveServerTestCase
     from selenium.webdriver.firefox.webdriver import WebDriver
@@ -805,9 +801,7 @@ out the `full reference`_ for more details.
     need to check that a response is received by Selenium and that the next
     page is loaded before proceeding with further test execution.
     Do this, for example, by making Selenium wait until the ``<body>`` HTML tag
-    is found in the response (requires Selenium > 2.13):
-
-    .. code-block:: python
+    is found in the response (requires Selenium > 2.13)::
 
         def test_login(self):
             from selenium.webdriver.support.wait import WebDriverWait

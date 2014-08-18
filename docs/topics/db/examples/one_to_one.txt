@@ -2,13 +2,9 @@
 One-to-one relationships
 ########################
 
-.. highlight:: pycon
-
 To define a one-to-one relationship, use :ref:`ref-onetoone`.
 
-In this example, a ``Place`` optionally can be a ``Restaurant``:
-
-.. code-block:: python
+In this example, a ``Place`` optionally can be a ``Restaurant``::
 
     from django.db import models
 
@@ -36,6 +32,8 @@ In this example, a ``Place`` optionally can be a ``Restaurant``:
 
 What follows are examples of operations that can be performed using the Python
 API facilities.
+
+.. highlight:: pycon
 
 Create a couple of Places::
 
