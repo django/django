@@ -362,17 +362,17 @@ If you want your code to work on Python 2 & 3, you can use
     class HandField(with_metaclass(models.SubfieldBase, models.Field)):
         ...
 
-This ensures that the :meth:`.to_python` method, documented below, will always
-be called when the attribute is initialized.
+This ensures that the :meth:`.to_python` method will always be called when the
+attribute is initialized.
 
-ModelForms and custom fields
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``ModelForm``\s and custom fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you use :class:`~django.db.models.SubfieldBase`, :meth:`.to_python`
-will be called every time an instance of the field is assigned a
-value. This means that whenever a value may be assigned to the field,
-you need to ensure that it will be of the correct datatype, or that
-you handle any exceptions.
+If you use :class:`~django.db.models.SubfieldBase`, :meth:`.to_python` will be
+called every time an instance of the field is assigned a value (in addition to
+its usual call when retrieving the value from the database). This means that
+whenever a value may be assigned to the field, you need to ensure that it will
+be of the correct datatype, or that you handle any exceptions.
 
 This is especially important if you use :doc:`ModelForms
 </topics/forms/modelforms>`. When saving a ModelForm, Django will use
