@@ -600,10 +600,12 @@ the Python import path to your :file:`mysite/settings.py` file.
 
     If you'd rather not use :file:`manage.py`, no problem. Just set the
     :envvar:`DJANGO_SETTINGS_MODULE` environment variable to
-    ``mysite.settings``, start a plain Python shell, and set up Django::
+    ``mysite.settings``, start a plain Python shell, and set up Django:
 
-    >>> import django
-    >>> django.setup()
+    .. code-block:: pycon
+
+        >>> import django
+        >>> django.setup()
 
     If this raises an :exc:`AttributeError`, you're probably using
     a version of Django that doesn't match this tutorial version. You'll want

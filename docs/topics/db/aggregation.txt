@@ -12,7 +12,7 @@ collection of objects. This topic guide describes the ways that aggregate values
 can be generated and returned using Django queries.
 
 Throughout this guide, we'll refer to the following models. These models are
-used to track the inventory for a series of online bookstores:
+used to track the inventory for a series of online bookstores::
 
 .. _queryset-model-example:
 

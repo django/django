@@ -24,9 +24,7 @@ the alias of ``default`` when no other database has been selected.
 
 The following is an example ``settings.py`` snippet defining two
 databases -- a default PostgreSQL database and a MySQL database called
-``users``:
-
-.. code-block:: python
+``users``::
 
     DATABASES = {
         'default': {

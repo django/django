@@ -256,9 +256,7 @@ behavior of magic method lookups was changed with Python 2.7 and cursors were
 no longer usable as context managers.
 
 Django 1.7 allows a cursor to be used as a context manager that is a shortcut
-for the following, instead of backend specific behavior.
-
-.. code-block:: python
+for the following, instead of backend specific behavior::
 
     c = connection.cursor()
     try:

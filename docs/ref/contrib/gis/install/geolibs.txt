@@ -149,9 +149,7 @@ If using a binary package of GEOS (e.g., on Ubuntu), you may need to :ref:`binut
 If your GEOS library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GEOS_LIBRARY_PATH`
 setting may be added to your Django settings file with the full path to the
-GEOS C library.  For example:
-
-.. code-block:: python
+GEOS C library.  For example::
 
     GEOS_LIBRARY_PATH = '/home/bob/local/lib/libgeos_c.so'
 
@@ -237,7 +235,7 @@ Can't find GDAL library
 When GeoDjango can't find the GDAL library, the ``HAS_GDAL`` flag
 will be false:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> from django.contrib.gis import gdal
     >>> gdal.HAS_GDAL
@@ -254,9 +252,7 @@ The solution is to properly configure your :ref:`libsettings` *or* set
 If your GDAL library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GDAL_LIBRARY_PATH`
 setting may be added to your Django settings file with the full path to
-the GDAL library.  For example:
-
-.. code-block:: python
+the GDAL library.  For example::
 
     GDAL_LIBRARY_PATH = '/home/sue/local/lib/libgdal.so'
 

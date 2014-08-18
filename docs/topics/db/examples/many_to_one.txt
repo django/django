@@ -2,11 +2,7 @@
 Many-to-one relationships
 #########################
 
-.. highlight:: pycon
-
-To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
-
-.. code-block:: python
+To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`::
 
     from django.db import models
 
@@ -31,6 +27,8 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
 
 What follows are examples of operations that can be performed using the Python
 API facilities.
+
+.. highlight:: pycon
 
 Create a few Reporters::
 

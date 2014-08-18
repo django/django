@@ -2567,9 +2567,7 @@ Adding a password-reset feature
 -------------------------------
 
 You can add a password-reset feature to the admin site by adding a few lines to
-your URLconf. Specifically, add these four patterns:
-
-.. code-block:: python
+your URLconf. Specifically, add these four patterns::
 
     from django.contrib.auth import views as auth_views
 

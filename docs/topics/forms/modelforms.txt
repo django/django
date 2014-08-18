@@ -851,7 +851,9 @@ Saving objects in the formset
 -----------------------------
 
 As with a ``ModelForm``, you can save the data as a model object. This is done
-with the formset's ``save()`` method::
+with the formset's ``save()`` method:
+
+.. code-block:: python
 
     # Create a formset instance with POST data.
     >>> formset = AuthorFormSet(request.POST)
@@ -869,7 +871,9 @@ excluded), these fields will not be set by the ``save()`` method. You can find
 more information about this restriction, which also holds for regular
 ``ModelForms``, in `Selecting the fields to use`_.
 
-Pass ``commit=False`` to return the unsaved model instances::
+Pass ``commit=False`` to return the unsaved model instances:
+
+.. code-block:: python
 
     # don't save to the database
     >>> instances = formset.save(commit=False)

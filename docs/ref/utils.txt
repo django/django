@@ -432,9 +432,7 @@ Atom1Feed
 
     Consider a typical case, where a view might need to call a model's method
     to perform some computation, before placing the model instance into the
-    context, where the template might invoke the method once more:
-
-    .. code-block:: python
+    context, where the template might invoke the method once more::
 
         # the model
         class Person(models.Model):
@@ -446,8 +444,12 @@ Atom1Feed
 
         # in the view:
         if person.friends():
+            ...
 
-        # in the template:
+    And in the template you would have:
+
+    .. code-block:: html+django
+
         {% for friend in person.friends %}
 
     Here, ``friends()`` will be called twice. Since the instance ``person`` in
@@ -467,6 +469,7 @@ Atom1Feed
 
         # in the view:
         if person.friends:
+            ...
 
     The cached value can be treated like an ordinary attribute of the instance::
 
@@ -573,18 +576,14 @@ escaping HTML.
     because it applies escaping to all arguments - just like the Template system
     applies escaping by default.
 
-    So, instead of writing:
-
-    .. code-block:: python
+    So, instead of writing::
 
         mark_safe("%s <b>%s</b> %s" % (some_html,
                                         escape(some_text),
                                         escape(some_other_text),
                                         ))
 
-    you should instead use:
-
-    .. code-block:: python
+    You should instead use::
 
         format_html("{0} <b>{1}</b> {2}",
                     mark_safe(some_html), some_text, some_other_text)
