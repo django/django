@@ -76,6 +76,7 @@ class HttpUtilTests(TestCase):
         host is not in ALLOWED_HOSTS. Issue #20472
         """
         request = HttpRequest()
+
         def bomb():
             self.assertTrue(False)
         request.get_host = bomb
