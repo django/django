@@ -44,6 +44,10 @@ Minor features
   to limit the ``list_filter`` choices to foreign objects which are attached to
   those from the ``ModelAdmin``.
 
+* The :meth:`ModelAdmin.delete_view()
+  <django.contrib.admin.ModelAdmin.delete_view>` displays a summary of objects
+  to be deleted on the deletion confirmation page.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -170,6 +174,15 @@ Forms
   the Pillow ``Image`` instance used to check if the file was a valid image. It
   will also update ``UploadedFile.content_type`` with the image's content type
   as determined by Pillow.
+
+Generic Views
+^^^^^^^^^^^^^
+
+* Generic views that use :class:`~django.views.generic.list.MultipleObjectMixin`
+  may now specify the ordering applied to the
+  :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` by setting
+  :attr:`~django.views.generic.list.MultipleObjectMixin.ordering` or overriding
+  :meth:`~django.views.generic.list.MultipleObjectMixin.get_ordering()`.
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
@@ -672,3 +685,20 @@ An older (pre-1.0), more restrictive and verbose input format for the
 Using the new syntax, this becomes::
 
     ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``
+
+``django.forms.Field._has_changed()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rename this method to :meth:`~django.forms.Field.has_changed` by removing the
+leading underscore. The old name will still work until Django 2.0.
+
+``django.utils.html.remove_tags()`` and ``removetags`` template filter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.utils.html.remove_tags()`` as well as the template filter
+``removetags`` have been deprecated as they cannot guarantee safe output. Their
+existence is likely to lead to their use in security-sensitive contexts where
+they are not actually safe.
+
+The unused and undocumented ``django.utils.html.strip_entities()`` function has
+also been deprecated.

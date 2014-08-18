@@ -533,4 +533,4 @@ class ReadOnlyPasswordHashTest(TestCase):
 
     def test_readonly_field_has_changed(self):
         field = ReadOnlyPasswordHashField()
-        self.assertFalse(field._has_changed('aaa', 'bbb'))
+        self.assertFalse(field.has_changed('aaa', 'bbb'))

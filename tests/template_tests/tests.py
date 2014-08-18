@@ -590,7 +590,8 @@ class TemplateTests(TestCase):
                                             # Ignore deprecations of using the wrong number of variables with the 'for' tag.
                                             # and warnings for {% url %} reversing by dotted path
                                             warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaulttags")
-                                            # Ignore deprecations of old style unordered_list.
+                                            # Ignore deprecations of old style unordered_list
+                                            # and removetags.
                                             warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaultfilters")
                                             output = self.render(test_template, vals)
                                     except ShouldNotExecuteException:

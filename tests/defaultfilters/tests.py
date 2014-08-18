@@ -433,9 +433,13 @@ class DefaultFiltersTests(TestCase):
                          'line 1<br />line 2')
 
     def test_removetags(self):
-        self.assertEqual(removetags('some <b>html</b> with <script>alert'
-            '("You smell")</script> disallowed <img /> tags', 'script img'),
-            'some <b>html</b> with alert("You smell") disallowed  tags')
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            self.assertEqual(removetags('some <b>html</b> with <script>alert'
+                '("You smell")</script> disallowed <img /> tags', 'script img'),
+                'some <b>html</b> with alert("You smell") disallowed  tags')
+
+    def test_striptags(self):
         self.assertEqual(striptags('some <b>html</b> with <script>alert'
             '("You smell")</script> disallowed <img /> tags'),
             'some html with alert("You smell") disallowed  tags')
@@ -713,7 +717,9 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(escape(123), '123')
         self.assertEqual(linebreaks_filter(123), '<p>123</p>')
         self.assertEqual(linebreaksbr(123), '123')
-        self.assertEqual(removetags(123, 'a'), '123')
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            self.assertEqual(removetags(123, 'a'), '123')
         self.assertEqual(striptags(123), '123')
 
 

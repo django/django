@@ -1918,6 +1918,13 @@ If ``value`` is the list ``['a', 'b', 'c', 'd']``, the output could be ``"b"``.
 removetags
 ^^^^^^^^^^
 
+.. deprecated:: 1.8
+
+    ``removetags`` cannot guarantee HTML safe output and has been deprecated due
+    to security concerns. Consider using `bleach`_ instead.
+
+.. _bleach: http://bleach.readthedocs.org/en/latest/
+
 Removes a space-separated list of [X]HTML tags from the output.
 
 For example::
