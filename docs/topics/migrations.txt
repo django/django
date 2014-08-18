@@ -26,7 +26,7 @@ important enough that support was brought into core Django.
 Two Commands
 ------------
 
-There are two commands which you will use to interact with migrations
+There are several commands which you will use to interact with migrations
 and Django's handling of database schema:
 
 * :djadmin:`migrate`, which is responsible for applying migrations, as well as
@@ -34,6 +34,8 @@ and Django's handling of database schema:
 
 * :djadmin:`makemigrations`, which is responsible for creating new migrations
   based on the changes you have made to your models.
+
+* :djadmin:`sqlmigrate`, which displays the SQL statements for a migration.
 
 It's worth noting that migrations are created and run on a per-app basis.
 In particular, it's possible to have apps that *do not use migrations* (these
