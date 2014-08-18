@@ -108,12 +108,6 @@ class CommandTests(SimpleTestCase):
             sys.stdout, sys.stderr = old_stdout, old_stderr
         self.assertEqual(output, "All right, let's dance Rock'n'Roll.\n")
 
-    def test_calling_an_help_command_should_exit_with_systemexit_exception(self):
-        out = StringIO()
-        with self.assertRaises(SystemExit):
-            management.call_command('hal', "--help", stdout=out)
-        self.assertIn("", out.getvalue())
-
     def test_calling_a_command_with_only_empty_parameter_should_ends_gracefully(self):
         out = StringIO()
         management.call_command('hal', "--empty", stdout=out)
