@@ -337,7 +337,7 @@ class Options(object):
         Returns a list of all data fields on the model and its parents.
         All hidden and proxy fields are omitted.
         """
-        return self._make_immutable_fields_list(self.get_fields())
+        return self._make_immutable_fields_list(self.get_fields(cache_results=False))
 
     @cached_property
     def concrete_fields(self):
@@ -370,7 +370,8 @@ class Options(object):
         its parents.
         All hidden and proxy fields are omitted.
         """
-        return self._make_immutable_fields_list(self.get_fields(data=False, m2m=True))
+        return self._make_immutable_fields_list(self.get_fields(data=False, m2m=True,
+                                                cache_results=False))
 
     @cached_property
     def related_m2m(self):
@@ -379,7 +380,7 @@ class Options(object):
         it's parents.
         All hidden and proxy fields are omitted.
         """
-        return self.get_fields(data=False, related_m2m=True)
+        return self.get_fields(data=False, related_m2m=True, cache_results=False)
 
     @cached_property
     def related_objects(self):
@@ -388,12 +389,11 @@ class Options(object):
         it's parents.
         All hidden and proxy fields are omitted.
         """
-        return self.get_fields(data=False, related_objects=True)
+        return self.get_fields(data=False, related_objects=True, cache_results=False)
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_m2m_with_model(self):
-        return [self._map_model(f) for f in
-                self.get_fields(data=False, m2m=True)]
+        return [self._map_model(f) for f in self.many_to_many]
 
     @cached_property
     def concrete_fields_map(self):
@@ -640,6 +640,7 @@ class Options(object):
         """
 
         # Creates a cache key composed of all arguments
+        cache_results = kwargs.get('cache_results', True)
         export_name_map = kwargs.get('export_name_map', False)
         cache_key = (m2m, data, related_m2m, related_objects, virtual,
                      include_parents, include_hidden, export_name_map)
@@ -659,6 +660,7 @@ class Options(object):
             'include_parents': include_parents,
             'include_hidden': include_hidden,
             'export_name_map': True,
+            'cache_results': cache_results
         }
 
         if related_m2m:
@@ -757,7 +759,8 @@ class Options(object):
             fields = self._make_immutable_fields_list(fields.keys())
 
         # Store result into cache for later access
-        self._get_fields_cache[cache_key] = fields
+        if cache_results:
+            self._get_fields_cache[cache_key] = fields
         # In order to avoid list manipulation. Always
         # return a shallow copy of the results
         return fields

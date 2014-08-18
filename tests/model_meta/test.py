@@ -253,3 +253,25 @@ class RelationTreeTests(test.TestCase):
                    'm2m_abstract_rel', 'm2m_base_rel', 'm2m_concrete_rel'])
         )
         self.assertEqual([field.related_query_name() for field in AbstractPerson._meta.relation_tree.related_m2m], [])
+
+    def test_no_cache_option(self):
+
+        # Expire all get_fields cache
+        related_models = [Person, BasePerson, AbstractPerson]
+        for model in related_models:
+            model._meta._expire_cache()
+
+        for model in related_models:
+            self.assertEquals(0, len(model._meta._get_fields_cache.keys()))
+
+        # Make an API call with cache_results=False, it should not store
+        # results on any of the children.
+        # Any call to related_* will trigger the relation tree cache warming,
+        # that recursively calls get_fields().
+        Person._meta.get_fields(
+            pure_m2m=True, pure_data=True, pure_virtual=True,
+            relation_data=True, relation_m2m=True, relation_virtual=True,
+            cache_results=False)
+        for model in related_models:
+            for c in model._meta._get_fields_cache.keys():
+                self.assertEquals(0, len(model._meta._get_fields_cache.keys()))
