@@ -15,9 +15,11 @@ processing.
 Basic Forms
 -----------
 
-Given a simple contact form::
+Given a simple contact form:
 
-    # forms.py
+.. snippet::
+    :filename: forms.py
+
     from django import forms
 
     class ContactForm(forms.Form):
@@ -28,9 +30,11 @@ Given a simple contact form::
             # send email using the self.cleaned_data dictionary
             pass
 
-The view can be constructed using a ``FormView``::
+The view can be constructed using a ``FormView``:
 
-    # views.py
+.. snippet::
+    :filename: views.py
+
     from myapp.forms import ContactForm
     from django.views.generic.edit import FormView
 
@@ -91,11 +95,12 @@ add extra validation) simply set
 First we need to add :meth:`~django.db.models.Model.get_absolute_url()` to our
 ``Author`` class:
 
-.. code-block:: python
+.. snippet::
+    :filename: models.py
 
-    # models.py
     from django.core.urlresolvers import reverse
     from django.db import models
+
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
@@ -105,12 +110,15 @@ First we need to add :meth:`~django.db.models.Model.get_absolute_url()` to our
 
 Then we can use :class:`CreateView` and friends to do the actual
 work. Notice how we're just configuring the generic class-based views
-here; we don't have to write any logic ourselves::
+here; we don't have to write any logic ourselves:
 
-    # views.py
+.. snippet::
+    :filename: views.py
+
     from django.views.generic.edit import CreateView, UpdateView, DeleteView
     from django.core.urlresolvers import reverse_lazy
     from myapp.models import Author
+
 
     class AuthorCreate(CreateView):
         model = Author
@@ -138,11 +146,14 @@ an :exc:`~django.core.exceptions.ImproperlyConfigured` exception if it's not.
     Omitting the ``fields`` attribute was previously allowed and resulted in a
     form with all of the model's fields.
 
-Finally, we hook these new views into the URLconf::
+Finally, we hook these new views into the URLconf:
 
-    # urls.py
+.. snippet::
+    :filename: urls.py
+
     from django.conf.urls import url
     from myapp.views import AuthorCreate, AuthorUpdate, AuthorDelete
+
 
     urlpatterns = [
         # ...
@@ -177,11 +188,14 @@ Models and request.user
 
 To track the user that created an object using a :class:`CreateView`,
 you can use a custom :class:`~django.forms.ModelForm` to do this. First, add
-the foreign key relation to the model::
+the foreign key relation to the model:
 
-    # models.py
+.. snippet::
+    :filename: models.py
+
     from django.contrib.auth.models import User
     from django.db import models
+
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
@@ -191,9 +205,11 @@ the foreign key relation to the model::
 
 In the view, ensure that you don't include ``created_by`` in the list of fields
 to edit, and override
-:meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` to add the user::
+:meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` to add the user:
 
-    # views.py
+.. snippet::
+    :filename: views.py
+
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
@@ -221,6 +237,7 @@ works for AJAX requests as well as 'normal' form POSTs::
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
+
     class AjaxableResponseMixin(object):
         """
         Mixin to add AJAX support to a form.
@@ -245,6 +262,7 @@ works for AJAX requests as well as 'normal' form POSTs::
                 return JsonResponse(data)
             else:
                 return response
+
 
     class AuthorCreate(AjaxableResponseMixin, CreateView):
         model = Author

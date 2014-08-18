@@ -120,12 +120,11 @@ Alternatively, you can use a :func:`receiver` decorator:
 
     :param signal: A signal or a list of signals to connect a function to.
 
-Here's how you connect with the decorator:
-
-.. code-block:: python
+Here's how you connect with the decorator::
 
     from django.core.signals import request_finished
     from django.dispatch import receiver
+
 
     @receiver(request_finished)
     def my_callback(sender, **kwargs):
@@ -167,13 +166,12 @@ when one *specific* model is saved.
 In these cases, you can register to receive signals sent only by particular
 senders. In the case of :data:`django.db.models.signals.pre_save`, the sender
 will be the model class being saved, so you can indicate that you only want
-signals sent by some model:
-
-.. code-block:: python
+signals sent by some model::
 
     from django.db.models.signals import pre_save
     from django.dispatch import receiver
     from myapp.models import MyModel
+
 
     @receiver(pre_save, sender=MyModel)
     def my_handler(sender, **kwargs):

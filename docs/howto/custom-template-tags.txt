@@ -163,9 +163,7 @@ Template filters that expect strings
 
 If you're writing a template filter that only expects a string as the first
 argument, you should use the decorator ``stringfilter``. This will
-convert an object to its string value before being passed to your function:
-
-.. code-block:: python
+convert an object to its string value before being passed to your function::
 
     from django import template
     from django.template.defaultfilters import stringfilter
@@ -302,15 +300,14 @@ Template filter code falls into one of two situations:
    effect and ``False`` otherwise.
 
    For example, let's write a filter that emphasizes the first character of
-   a string:
-
-   .. code-block:: python
+   a string::
 
       from django import template
       from django.utils.html import conditional_escape
       from django.utils.safestring import mark_safe
 
       register = template.Library()
+
 
       @register.filter(needs_autoescape=True)
       def initial_letter_filter(text, autoescape=None):
@@ -376,9 +373,7 @@ Filters and time zones
 
 If you write a custom filter that operates on :class:`~datetime.datetime`
 objects, you'll usually register it with the ``expects_localtime`` flag set to
-``True``:
-
-.. code-block:: python
+``True``::
 
     @register.filter(expects_localtime=True)
     def businesshours(value):
@@ -432,11 +427,11 @@ anything else. In our case, let's say the tag should be used like this:
     <p>The time is {% current_time "%Y-%m-%d %I:%M %p" %}.</p>
 
 The parser for this function should grab the parameter and create a ``Node``
-object:
-
-.. code-block:: python
+object::
 
     from django import template
+
+
     def do_current_time(parser, token):
         try:
             # split_contents() knows not to split quoted strings.
@@ -487,9 +482,7 @@ Writing the renderer
 The second step in writing custom tags is to define a ``Node`` subclass that
 has a ``render()`` method.
 
-Continuing the above example, we need to define ``CurrentTimeNode``:
-
-.. code-block:: python
+Continuing the above example, we need to define ``CurrentTimeNode``::
 
     import datetime
     from django import template
@@ -585,9 +578,7 @@ it's rendered:
         </tr>
     {% endfor %}
 
-A naive implementation of ``CycleNode`` might look something like this:
-
-.. code-block:: python
+A naive implementation of ``CycleNode`` might look something like this::
 
     import itertools
     from django import template
@@ -619,9 +610,7 @@ with the ``context`` of the template that is currently being rendered. The
 ``render_context`` behaves like a Python dictionary, and should be used to
 store ``Node`` state between invocations of the ``render`` method.
 
-Let's refactor our ``CycleNode`` implementation to use the ``render_context``:
-
-.. code-block:: python
+Let's refactor our ``CycleNode`` implementation to use the ``render_context``::
 
     class CycleNode(template.Node):
         def __init__(self, cyclevars):
@@ -706,9 +695,7 @@ Initially, ``token.split_contents()`` will return three values:
    ``split_contents()`` will include the leading and trailing quotes for
    string literals like this.
 
-Now your tag should begin to look like this:
-
-.. code-block:: python
+Now your tag should begin to look like this::
 
     from django import template
 
@@ -728,9 +715,7 @@ accomplished by using the ``Variable()`` class in ``django.template``.
 
 To use the ``Variable`` class, simply instantiate it with the name of the
 variable to be resolved, and then call ``variable.resolve(context)``. So,
-for example:
-
-.. code-block:: python
+for example::
 
     class FormatTimeNode(template.Node):
         def __init__(self, date_to_be_formatted, format_string):
@@ -766,9 +751,7 @@ To ease the creation of these types of tags, Django provides a helper function,
 arguments, wraps it in a ``render`` function and the other necessary bits
 mentioned above and registers it with the template system.
 
-Our earlier ``current_time`` function could thus be written like this:
-
-.. code-block:: python
+Our earlier ``current_time`` function could thus be written like this::
 
     import datetime
     from django import template
@@ -798,9 +781,7 @@ A few things to note about the ``simple_tag`` helper function:
   current value of the variable, not the variable itself.
 
 If your template tag needs to access the current context, you can use the
-``takes_context`` argument when registering your tag:
-
-.. code-block:: python
+``takes_context`` argument when registering your tag::
 
     # The first argument *must* be called "context" here.
     def current_time(context, format_string):
@@ -809,9 +790,7 @@ If your template tag needs to access the current context, you can use the
 
     register.simple_tag(takes_context=True)(current_time)
 
-Or, using decorator syntax:
-
-.. code-block:: python
+Or, using decorator syntax::
 
     @register.simple_tag(takes_context=True)
     def current_time(context, format_string):
@@ -821,9 +800,7 @@ Or, using decorator syntax:
 For more information on how the ``takes_context`` option works, see the section
 on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
 
-If you need to rename your tag, you can provide a custom name for it:
-
-.. code-block:: python
+If you need to rename your tag, you can provide a custom name for it::
 
     register.simple_tag(lambda x: x - 1, name='minusone')
 
@@ -946,9 +923,7 @@ will have one argument -- the template context as of when the tag was called.
 
 For example, say you're writing an inclusion tag that will always be used in a
 context that contains ``home_link`` and ``home_title`` variables that point
-back to the main page. Here's what the Python function would look like:
-
-.. code-block:: python
+back to the main page. Here's what the Python function would look like::
 
     # The first argument *must* be called "context" here.
     def jump_link(context):
@@ -1014,9 +989,7 @@ template authors can reuse the values that your template tags create.
 To set a variable in the context, just use dictionary assignment on the context
 object in the ``render()`` method. Here's an updated version of
 ``CurrentTimeNode`` that sets a template variable ``current_time`` instead of
-outputting it:
-
-.. code-block:: python
+outputting it::
 
     import datetime
     from django import template
@@ -1058,9 +1031,7 @@ like so:
     <p>The current time is {{ my_current_time }}.</p>
 
 To do that, you'll need to refactor both the compilation function and ``Node``
-class, like so:
-
-.. code-block:: python
+class, like so::
 
     class CurrentTimeNode3(template.Node):
         def __init__(self, format_string, var_name):
@@ -1104,9 +1075,7 @@ a helper function, ``assignment_tag``. This function works the same way as
 stores the tag's result in a specified context variable instead of directly
 outputting it.
 
-Our earlier ``current_time`` function could thus be written like this:
-
-.. code-block:: python
+Our earlier ``current_time`` function could thus be written like this::
 
     def get_current_time(format_string):
         return datetime.datetime.now().strftime(format_string)
@@ -1130,9 +1099,7 @@ followed by the variable name, and output it yourself where you see fit:
     <p>The time is {{ the_time }}.</p>
 
 If your template tag needs to access the current context, you can use the
-``takes_context`` argument when registering your tag:
-
-.. code-block:: python
+``takes_context`` argument when registering your tag::
 
     # The first argument *must* be called "context" here.
     def get_current_time(context, format_string):
@@ -1141,9 +1108,7 @@ If your template tag needs to access the current context, you can use the
 
     register.assignment_tag(takes_context=True)(get_current_time)
 
-Or, using decorator syntax:
-
-.. code-block:: python
+Or, using decorator syntax::
 
     @register.assignment_tag(takes_context=True)
     def get_current_time(context, format_string):
@@ -1182,9 +1147,7 @@ Template tags can work in tandem. For instance, the standard
 To create a template tag such as this, use ``parser.parse()`` in your
 compilation function.
 
-Here's how a simplified ``{% comment %}`` tag might be implemented:
-
-.. code-block:: python
+Here's how a simplified ``{% comment %}`` tag might be implemented::
 
     def do_comment(parser, token):
         nodelist = parser.parse(('endcomment',))
@@ -1237,9 +1200,7 @@ Usage:
     {% upper %}This will appear in uppercase, {{ your_name }}.{% endupper %}
 
 As in the previous example, we'll use ``parser.parse()``. But this time, we
-pass the resulting ``nodelist`` to the ``Node``:
-
-.. code-block:: python
+pass the resulting ``nodelist`` to the ``Node``::
 
     def do_upper(parser, token):
         nodelist = parser.parse(('endupper',))
