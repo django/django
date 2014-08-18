@@ -112,7 +112,8 @@ def sql_delete(app_config, style, connection, close_connection=True):
         if cursor and close_connection:
             cursor.close()
             connection.close()
-
+    if output == []:
+        output.append('-- App has not tables in the database. Nothing to do.')
     return output[::-1]  # Reverse it, to deal with table dependencies.
 
 
