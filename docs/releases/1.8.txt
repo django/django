@@ -708,3 +708,8 @@ they are not actually safe.
 
 The unused and undocumented ``django.utils.html.strip_entities()`` function has
 also been deprecated.
+
+``is_admin_site`` argument to ``django.contrib.auth.views.password_reset()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's a legacy option that should no longer be necessary.

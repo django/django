@@ -984,6 +984,11 @@ patterns.
 
         ``html_email_template_name`` was added.
 
+    .. deprecated:: 1.8
+
+        The ``is_admin_site`` argument is deprecated and will be removed in
+        Django 2.0.
+
     **Template context:**
 
     * ``form``: The form (see ``password_reset_form`` above) for resetting
