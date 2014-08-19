@@ -562,7 +562,7 @@ Selector and checkbox widgets
     .. code-block:: html
 
         <ul>
-          <li><input type='radio' ...></li>
+          <li><input type='radio' name='...'></li>
           ...
         </ul>
 
@@ -658,7 +658,7 @@ the widget.
     .. code-block:: html
 
         <ul>
-          <li><input type='checkbox' ...></li>
+          <li><input type='checkbox' name='...' ></li>
           ...
         </ul>
 

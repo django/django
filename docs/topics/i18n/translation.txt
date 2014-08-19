@@ -1326,7 +1326,9 @@ For example, if your Django app contained a translation string for the text
     _("Welcome to my site.")
 
 ...then :djadmin:`django-admin.py makemessages <makemessages>` will have created
-a ``.po`` file containing the following snippet -- a message::
+a ``.po`` file containing the following snippet -- a message:
+
+.. code-block:: po
 
     #: path/to/python/module.py:23
     msgid "Welcome to my site."
