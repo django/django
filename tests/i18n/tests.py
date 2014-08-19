@@ -73,6 +73,25 @@ class TranslationTests(TestCase):
         finally:
             deactivate()
 
+    def test_override_decorator(self):
+        activate('de')
+
+        @translation.override('pl')
+        def func_pl():
+            self.assertEqual(get_language(), 'pl')
+
+        @translation.override(None)
+        def func_none():
+            self.assertEqual(get_language(), settings.LANGUAGE_CODE)
+
+        try:
+            func_pl()
+            self.assertEqual(get_language(), 'de')
+            func_none()
+            self.assertEqual(get_language(), 'de')
+        finally:
+            deactivate()
+
     def test_lazy_objects(self):
         """
         Format string interpolation should work with *_lazy objects.
