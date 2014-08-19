@@ -15,9 +15,11 @@ from wsgiref import simple_server
 from wsgiref.util import FileWrapper   # NOQA: for backwards compatibility
 
 from django.core.exceptions import ImproperlyConfigured
+from django.core.handlers.wsgi import ISO_8859_1
 from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
 from django.utils import six
+from django.utils.encoding import uri_to_iri
 from django.utils.module_loading import import_string
 from django.utils.six.moves import socketserver
 
@@ -106,6 +108,17 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
             msg = self.style.HTTP_SERVER_ERROR(msg)
 
         sys.stderr.write(msg)
+
+    def get_environ(self):
+        env = super(WSGIRequestHandler, self).get_environ()
+        if '?' in self.path:
+            path, query = self.path.split('?', 1)
+        else:
+            path, query = self.path, ''
+        path = uri_to_iri(path)
+        # WSGI requires latin-1 decoded strings.
+        env['PATH_INFO'] = path if six.PY2 else path.decode(ISO_8859_1)
+        return env
 
 
 def run(addr, port, wsgi_handler, ipv6=False, threading=False):
