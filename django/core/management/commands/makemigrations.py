@@ -28,6 +28,8 @@ class Command(BaseCommand):
             help="Create an empty migration.")
         parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.')
+        parser.add_argument('-n', '--name', action='store', dest='name', default=None,
+            help="Use this name for migration file(s).")
 
     def handle(self, *app_labels, **options):
 
@@ -36,6 +38,7 @@ class Command(BaseCommand):
         self.dry_run = options.get('dry_run', False)
         self.merge = options.get('merge', False)
         self.empty = options.get('empty', False)
+        self.migration_name = options.get('name', None)
 
         # Make sure the app they asked for exists
         app_labels = set(app_labels)
@@ -98,7 +101,11 @@ class Command(BaseCommand):
                 (app, [Migration("custom", app)])
                 for app in app_labels
             )
-            changes = autodetector.arrange_for_graph(changes, loader.graph)
+            changes = autodetector.arrange_for_graph(
+                changes=changes,
+                graph=loader.graph,
+                migration_name=self.migration_name,
+            )
             self.write_migration_files(changes)
             return
 
@@ -107,6 +114,7 @@ class Command(BaseCommand):
             graph=loader.graph,
             trim_to_apps=app_labels or None,
             convert_apps=app_labels or None,
+            migration_name=self.migration_name,
         )
 
         # No changes? Tell them.

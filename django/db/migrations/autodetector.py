@@ -31,14 +31,14 @@ class MigrationAutodetector(object):
         self.to_state = to_state
         self.questioner = questioner or MigrationQuestioner()
 
-    def changes(self, graph, trim_to_apps=None, convert_apps=None):
+    def changes(self, graph, trim_to_apps=None, convert_apps=None, migration_name=None):
         """
         Main entry point to produce a list of appliable changes.
         Takes a graph to base names on and an optional set of apps
         to try and restrict to (restriction is not guaranteed)
         """
         changes = self._detect_changes(convert_apps, graph)
-        changes = self.arrange_for_graph(changes, graph)
+        changes = self.arrange_for_graph(changes, graph, migration_name)
         if trim_to_apps:
             changes = self._trim_to_apps(changes, trim_to_apps)
         return changes
@@ -951,7 +951,7 @@ class MigrationAutodetector(object):
                     dependencies=dependencies,
                 )
 
-    def arrange_for_graph(self, changes, graph):
+    def arrange_for_graph(self, changes, graph, migration_name=None):
         """
         Takes in a result from changes() and a MigrationGraph,
         and fixes the names and dependencies of the changes so they
@@ -985,11 +985,11 @@ class MigrationAutodetector(object):
                 if i == 0 and app_leaf:
                     migration.dependencies.append(app_leaf)
                 if i == 0 and not app_leaf:
-                    new_name = "0001_initial"
+                    new_name = "0001_%s" % migration_name if migration_name else "0001_initial"
                 else:
                     new_name = "%04i_%s" % (
                         next_number,
-                        self.suggest_name(migration.operations)[:100],
+                        migration_name or self.suggest_name(migration.operations)[:100],
                     )
                 name_map[(app_label, migration.name)] = (app_label, new_name)
                 next_number += 1

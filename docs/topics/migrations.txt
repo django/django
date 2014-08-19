@@ -309,6 +309,13 @@ Note that this only works given two things:
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
 
+.. versionadded:: 1.8
+
+If you want to give the migration(s) a meaningful name instead of a generated one,
+you can use the :djadminopt:`--name` option::
+
+    $ python manage.py makemigrations --name changed_my_model your_app_label
+
 .. _historical-models:
 
 Historical models
