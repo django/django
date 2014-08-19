@@ -1065,19 +1065,27 @@ as in the above example. However, this uses up the name that is the
 default :attr:`~django.db.models.ForeignKey.related_name` value for
 :class:`~django.db.models.ForeignKey` and
 :class:`~django.db.models.ManyToManyField` relations.  If you
-are putting those types of relations on a subclass of another model,
-you **must** specify the
-:attr:`~django.db.models.ForeignKey.related_name` attribute on each
-such field. If you forget, Django will raise an error when you run
-:djadmin:`check` or :djadmin:`migrate`.
+are putting those types of relations on a subclass of the parent model, you
+**must** specify the :attr:`~django.db.models.ForeignKey.related_name`
+attribute on each such field. If you forget, Django will raise a validation
+error.
 
 For example, using the above ``Place`` class again, let's create another
 subclass with a :class:`~django.db.models.ManyToManyField`::
 
     class Supplier(Place):
-        # Must specify related_name on all relations.
-        customers = models.ManyToManyField(Restaurant, related_name='provider')
+        customers = models.ManyToManyField(Place)
 
+This results in the error::
+
+    Reverse query name for 'Supplier.customers' clashes with reverse query
+    name for 'Supplier.place_ptr'.
+
+    HINT: Add or change a related_name argument to the definition for
+    'Supplier.customers' or 'Supplier.place_ptr'.
+
+Adding ``related_name`` to the ``customers`` field as follows would resolve the
+error: ``models.ManyToManyField(Place, related_name='provider')``.
 
 Specifying the parent link field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
