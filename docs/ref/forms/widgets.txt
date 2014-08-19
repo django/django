@@ -198,7 +198,7 @@ foundation for custom widgets.
         A dictionary containing HTML attributes to be set on the rendered
         widget.
 
-        .. code-block:: python
+        .. code-block:: pycon
 
             >>> from django import forms
             >>> name = forms.TextInput(attrs={'size': 10, 'title': 'Your name',})
@@ -772,9 +772,7 @@ Composite widgets
         An optional dict of months to use in the "months" select box.
 
         The keys of the dict correspond to the month number (1-indexed) and
-        the values are the displayed months.
-
-        .. code-block:: python
+        the values are the displayed months::
 
             MONTHS = {
                 1:_('jan'), 2:_('feb'), 3:_('mar'), 4:_('apr'),

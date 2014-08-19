@@ -94,7 +94,7 @@ whose username matches the current system user.
 You can also change a password programmatically, using
 :meth:`~django.contrib.auth.models.User.set_password()`:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> from django.contrib.auth.models import User
     >>> u = User.objects.get(username='john')
@@ -182,9 +182,7 @@ customize permissions for different object instances of the same type.
 fields: ``groups`` and ``user_permissions``.
 :class:`~django.contrib.auth.models.User` objects can access their related
 objects in the same way as any other :doc:`Django model
-</topics/db/models>`:
-
-.. code-block:: python
+</topics/db/models>`::
 
     myuser.groups = [group_list]
     myuser.groups.add(group, group, ...)

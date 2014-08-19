@@ -316,15 +316,13 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. admonition:: Implementing a constructor in a subclass
 
-  If you implement ``__init__`` in your subclass of :class:`BaseCommand`,
-  you must call :class:`BaseCommand`’s ``__init__``.
+    If you implement ``__init__`` in your subclass of :class:`BaseCommand`,
+    you must call :class:`BaseCommand`’s ``__init__``::
 
-  .. code-block:: python
-
-    class Command(BaseCommand):
-        def __init__(self, *args, **kwargs):
-            super(Command, self).__init__(*args, **kwargs)
-            # ...
+        class Command(BaseCommand):
+            def __init__(self, *args, **kwargs):
+                super(Command, self).__init__(*args, **kwargs)
+                # ...
 
 .. method:: BaseCommand.add_arguments(parser)
 

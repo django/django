@@ -695,9 +695,7 @@ via the :djadminopt:`--liveserver` option, for example:
 
 Another way of changing the default server address is by setting the
 `DJANGO_LIVE_TEST_SERVER_ADDRESS` environment variable somewhere in your
-code (for example, in a :ref:`custom test runner<topics-testing-test_runner>`):
-
-.. code-block:: python
+code (for example, in a :ref:`custom test runner<topics-testing-test_runner>`)::
 
     import os
     os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8082'

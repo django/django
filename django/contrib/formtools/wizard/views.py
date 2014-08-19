@@ -540,9 +540,7 @@ class WizardView(TemplateView):
          * all extra data stored in the storage backend
          * `wizard` - a dictionary representation of the wizard instance
 
-        Example:
-
-        .. code-block:: python
+        Example::
 
             class MyWizard(WizardView):
                 def get_context_data(self, form, **kwargs):

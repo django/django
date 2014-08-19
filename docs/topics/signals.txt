@@ -77,9 +77,7 @@ Receiver functions
 ------------------
 
 First, we need to define a receiver function. A receiver can be any Python
-function or method:
-
-.. code-block:: python
+function or method::
 
     def my_callback(sender, **kwargs):
         print("Request finished!")
@@ -106,9 +104,7 @@ Connecting receiver functions
 -----------------------------
 
 There are two ways you can connect a receiver to a signal. You can take the
-manual connect route:
-
-.. code-block:: python
+manual connect route::
 
     from django.core.signals import request_finished
 
@@ -198,9 +194,7 @@ send an email whenever a model is saved), pass a unique identifier as
 the ``dispatch_uid`` argument to identify your receiver function. This
 identifier will usually be a string, although any hashable object will
 suffice. The end result is that your receiver function will only be
-bound to the signal once for each unique ``dispatch_uid`` value.
-
-.. code-block:: python
+bound to the signal once for each unique ``dispatch_uid`` value::
 
     from django.core.signals import request_finished
 
@@ -222,9 +216,7 @@ All signals are :class:`django.dispatch.Signal` instances. The
 to listeners. This is purely documentational, however, as there is nothing that
 checks that the signal actually provides these arguments to its listeners.
 
-For example:
-
-.. code-block:: python
+For example::
 
     import django.dispatch
 
@@ -248,9 +240,7 @@ To send a signal, call either :meth:`Signal.send` or :meth:`Signal.send_robust`.
 You must provide the ``sender`` argument (which is a class most of the time),
 and may provide as many other keyword arguments as you like.
 
-For example, here's how sending our ``pizza_done`` signal might look:
-
-.. code-block:: python
+For example, here's how sending our ``pizza_done`` signal might look::
 
     class PizzaStore(object):
         ...

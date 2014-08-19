@@ -679,7 +679,7 @@ to the ``cache`` template tag; ``vary_on`` is a list of all additional arguments
 passed to the tag. This function can be useful for invalidating or overwriting
 a cached item, for example:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> from django.core.cache import cache
     >>> from django.core.cache.utils import make_template_fragment_key

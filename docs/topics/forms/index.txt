@@ -226,8 +226,6 @@ The :class:`Form` class
 We already know what we want our HTML form to look like. Our starting point for
 it in Django is this::
 
-.. code-block:: python
-
     from django import forms
 
     class NameForm(forms.Form):
@@ -385,9 +383,7 @@ More on fields
 --------------
 
 Consider a more useful form than our minimal example above, which we could use
-to implement "contact me" functionality on a personal Web site:
-
-.. code-block:: python
+to implement "contact me" functionality on a personal Web site::
 
     from django import forms
 
