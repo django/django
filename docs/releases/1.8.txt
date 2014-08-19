@@ -240,6 +240,8 @@ Models
   Django uses whenever objects are loaded using the ORM. The method allows
   customizing model loading behavior.
 
+* Supported "datetime.time" in migrations.
+
 Signals
 ^^^^^^^
 

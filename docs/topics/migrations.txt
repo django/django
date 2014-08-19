@@ -7,6 +7,8 @@ Migrations
 
 .. versionadded:: 1.7
 
+.. versionchanged:: 1.8
+
 Migrations are Django's way of propagating changes you make to your models
 (adding a field, deleting a model, etc.) into your database schema. They're
 designed to be mostly automatic, but you'll need to know when to make
@@ -524,7 +526,7 @@ Django can serialize the following:
 
 - ``int``, ``long``, ``float``, ``bool``, ``str``, ``unicode``, ``bytes``, ``None``
 - ``list``, ``set``, ``tuple``, ``dict``
-- ``datetime.date`` and ``datetime.datetime`` instances
+- ``datetime.date``, ``datetime.time``, ``datetime.datetime`` instances
 - ``decimal.Decimal`` instances
 - Any Django field
 - Any function or method reference (e.g. ``datetime.datetime.today``)
