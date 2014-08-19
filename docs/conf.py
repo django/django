@@ -31,7 +31,12 @@ needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ["djangodocs", "sphinx.ext.intersphinx", "sphinx.ext.viewcode"]
+extensions = [
+    "djangodocs",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
+    "ticket_role",
+]
 
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = []
@@ -308,3 +313,6 @@ epub_copyright = '2010, Django Software Foundation'
 
 # Allow duplicate toc entries.
 #epub_tocdup = True
+
+# -- ticket options ------------------------------------------------------------
+ticket_url = 'https://code.djangoproject.com/ticket/%s'
