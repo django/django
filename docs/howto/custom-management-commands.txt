@@ -159,7 +159,7 @@ support code::
     from django.utils import translation
 
     class Command(BaseCommand):
-        # ...
+        ...
         can_import_settings = True
 
         def handle(self, *args, **options):
@@ -168,9 +168,8 @@ support code::
             translation.activate('ru')
 
             # Or you can activate the LANGUAGE_CODE # chosen in the settings:
-            #
-            #from django.conf import settings
-            #translation.activate(settings.LANGUAGE_CODE)
+            from django.conf import settings
+            translation.activate(settings.LANGUAGE_CODE)
 
             # Your command logic here
             ...

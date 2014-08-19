@@ -57,14 +57,11 @@ tags/filters for the given Python module name, not the name of the app.
 To be a valid tag library, the module must contain a module-level variable
 named ``register`` that is a ``template.Library`` instance, in which all the
 tags and filters are registered. So, near the top of your module, put the
-following:
-
-.. code-block:: python
+following::
 
     from django import template
 
     register = template.Library()
-
 
 .. admonition:: Behind the scenes
 
@@ -94,9 +91,7 @@ reasonable fallback value to return. In case of input that represents a clear
 bug in a template, raising an exception may still be better than silent failure
 which hides the bug.
 
-Here's an example filter definition:
-
-.. code-block:: python
+Here's an example filter definition::
 
     def cut(value, arg):
         """Removes all values of arg from the given string"""
@@ -109,9 +104,7 @@ And here's an example of how that filter would be used:
     {{ somevariable|cut:"0" }}
 
 Most filters don't take arguments. In this case, just leave the argument out of
-your function. Example:
-
-.. code-block:: python
+your function. Example::
 
     def lower(value): # Only one argument.
         """Converts a string into all lowercase"""
@@ -123,9 +116,7 @@ Registering custom filters
 .. method:: django.template.Library.filter()
 
 Once you've written your filter definition, you need to register it with
-your ``Library`` instance, to make it available to Django's template language:
-
-.. code-block:: python
+your ``Library`` instance, to make it available to Django's template language::
 
     register.filter('cut', cut)
     register.filter('lower', lower)
@@ -136,9 +127,7 @@ The ``Library.filter()`` method takes two arguments:
 2. The compilation function -- a Python function (not the name of the
    function as a string).
 
-You can use ``register.filter()`` as a decorator instead:
-
-.. code-block:: python
+You can use ``register.filter()`` as a decorator instead::
 
     @register.filter(name='cut')
     def cut(value, arg):
@@ -199,9 +188,7 @@ passed around inside the template code:
 
   Internally, these strings are of type ``SafeBytes`` or ``SafeText``.
   They share a common base class of ``SafeData``, so you can test
-  for them using code like:
-
-  .. code-block:: python
+  for them using code like::
 
       if isinstance(value, SafeData):
           # Do something with the "safe" string.
@@ -222,9 +209,7 @@ Template filter code falls into one of two situations:
    ``'``, ``"`` or ``&``) into the result that were not already present. In
    this case, you can let Django take care of all the auto-escaping
    handling for you. All you need to do is set the ``is_safe`` flag to ``True``
-   when you register your filter function, like so:
-
-   .. code-block:: python
+   when you register your filter function, like so::
 
        @register.filter(is_safe=True)
        def myfilter(value):
@@ -246,9 +231,7 @@ Template filter code falls into one of two situations:
    For example, suppose you have a filter that adds the string ``xx`` to
    the end of any input. Since this introduces no dangerous HTML characters
    to the result (aside from any that were already present), you should
-   mark your filter with ``is_safe``:
-
-   .. code-block:: python
+   mark your filter with ``is_safe``::
 
        @register.filter(is_safe=True)
        def add_xx(value):
@@ -307,7 +290,6 @@ Template filter code falls into one of two situations:
       from django.utils.safestring import mark_safe
 
       register = template.Library()
-
 
       @register.filter(needs_autoescape=True)
       def initial_letter_filter(text, autoescape=None):
@@ -431,7 +413,6 @@ object::
 
     from django import template
 
-
     def do_current_time(parser, token):
         try:
             # split_contents() knows not to split quoted strings.
@@ -490,6 +471,7 @@ Continuing the above example, we need to define ``CurrentTimeNode``::
     class CurrentTimeNode(template.Node):
         def __init__(self, format_string):
             self.format_string = format_string
+
         def render(self, context):
             return datetime.datetime.now().strftime(self.format_string)
 
@@ -529,9 +511,7 @@ as such.
 Also, if your template tag creates a new context for performing some
 sub-rendering, set the auto-escape attribute to the current context's value.
 The ``__init__`` method for the ``Context`` class takes a parameter called
-``autoescape`` that you can use for this purpose. For example:
-
-.. code-block:: python
+``autoescape`` that you can use for this purpose. For example::
 
     from django.template import Context
 
@@ -541,9 +521,7 @@ The ``__init__`` method for the ``Context`` class takes a parameter called
         # ... Do something with new_context ...
 
 This is not a very common situation, but it's useful if you're rendering a
-template yourself. For example:
-
-.. code-block:: python
+template yourself. For example::
 
     def render(self, context):
         t = template.loader.get_template('small_fragment.html')
@@ -586,6 +564,7 @@ A naive implementation of ``CycleNode`` might look something like this::
     class CycleNode(template.Node):
         def __init__(self, cyclevars):
             self.cycle_iter = itertools.cycle(cyclevars)
+
         def render(self, context):
             return next(self.cycle_iter)
 
@@ -615,6 +594,7 @@ Let's refactor our ``CycleNode`` implementation to use the ``render_context``::
     class CycleNode(template.Node):
         def __init__(self, cyclevars):
             self.cyclevars = cyclevars
+
         def render(self, context):
             if self not in context.render_context:
                 context.render_context[self] = itertools.cycle(self.cyclevars)
@@ -641,9 +621,7 @@ Registering the tag
 ~~~~~~~~~~~~~~~~~~~
 
 Finally, register the tag with your module's ``Library`` instance, as explained
-in "Writing custom template filters" above. Example:
-
-.. code-block:: python
+in "Writing custom template filters" above. Example::
 
     register.tag('current_time', do_current_time)
 
@@ -654,9 +632,7 @@ The ``tag()`` method takes two arguments:
 2. The compilation function -- a Python function (not the name of the
    function as a string).
 
-As with filter registration, it is also possible to use this as a decorator:
-
-.. code-block:: python
+As with filter registration, it is also possible to use this as a decorator::
 
     @register.tag(name="current_time")
     def do_current_time(parser, token):
@@ -763,9 +739,7 @@ Our earlier ``current_time`` function could thus be written like this::
 
     register.simple_tag(current_time)
 
-The decorator syntax also works:
-
-.. code-block:: python
+The decorator syntax also works::
 
     @register.simple_tag
     def current_time(format_string):
@@ -809,9 +783,7 @@ If you need to rename your tag, you can provide a custom name for it::
         return value - 2
 
 ``simple_tag`` functions may accept any number of positional or keyword
-arguments. For example:
-
-.. code-block:: python
+arguments. For example::
 
     @register.simple_tag
     def my_tag(a, b, *args, **kwargs):
@@ -865,9 +837,7 @@ created in the :ref:`tutorials <creating-models>`. We'll use the tag like this:
 First, define the function that takes the argument and produces a dictionary of
 data for the result. The important point here is we only need to return a
 dictionary, not anything more complex. This will be used as a template context
-for the template fragment. Example:
-
-.. code-block:: python
+for the template fragment. Example::
 
     def show_results(poll):
         choices = poll.choice_set.all()
@@ -888,25 +858,19 @@ designer. Following our example, the template is very simple:
 Now, create and register the inclusion tag by calling the ``inclusion_tag()``
 method on a ``Library`` object. Following our example, if the above template is
 in a file called ``results.html`` in a directory that's searched by the
-template loader, we'd register the tag like this:
-
-.. code-block:: python
+template loader, we'd register the tag like this::
 
     # Here, register is a django.template.Library instance, as before
     register.inclusion_tag('results.html')(show_results)
 
 Alternatively it is possible to register the inclusion tag using a
-:class:`django.template.Template` instance:
-
-.. code-block:: python
+:class:`django.template.Template` instance::
 
     from django.template.loader import get_template
     t = get_template('results.html')
     register.inclusion_tag(t)(show_results)
 
-As always, decorator syntax works as well, so we could have written:
-
-.. code-block:: python
+As always, decorator syntax works as well, so we could have written::
 
     @register.inclusion_tag('results.html')
     def show_results(poll):
@@ -959,9 +923,7 @@ The ``takes_context`` parameter defaults to ``False``. When it's set to
 only difference between this case and the previous ``inclusion_tag`` example.
 
 ``inclusion_tag`` functions may accept any number of positional or keyword
-arguments. For example:
-
-.. code-block:: python
+arguments. For example::
 
     @register.inclusion_tag('my_template.html')
     def my_tag(a, b, *args, **kwargs):
@@ -1033,6 +995,8 @@ like so:
 To do that, you'll need to refactor both the compilation function and ``Node``
 class, like so::
 
+    import re
+
     class CurrentTimeNode3(template.Node):
         def __init__(self, format_string, var_name):
             self.format_string = format_string
@@ -1041,7 +1005,6 @@ class, like so::
             context[self.var_name] = datetime.datetime.now().strftime(self.format_string)
             return ''
 
-    import re
     def do_current_time(parser, token):
         # This version uses a regular expression to parse tag contents.
         try:
@@ -1082,9 +1045,7 @@ Our earlier ``current_time`` function could thus be written like this::
 
     register.assignment_tag(get_current_time)
 
-The decorator syntax also works:
-
-.. code-block:: python
+The decorator syntax also works::
 
     @register.assignment_tag
     def get_current_time(format_string):
@@ -1119,9 +1080,7 @@ For more information on how the ``takes_context`` option works, see the section
 on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
 
 ``assignment_tag`` functions may accept any number of positional or keyword
-arguments. For example:
-
-.. code-block:: python
+arguments. For example::
 
     @register.assignment_tag
     def my_tag(a, b, *args, **kwargs):
