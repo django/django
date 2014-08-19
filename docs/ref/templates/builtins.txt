@@ -108,7 +108,7 @@ Variables included in the cycle will be escaped.  You can disable auto-escaping
 with::
 
     {% for o in some_list %}
-        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}
+        <tr class="{% autoescape off %}{% cycle rowvalue1 rowvalue2 %}{% endautoescape %}">
             ...
         </tr>
     {% endfor %}

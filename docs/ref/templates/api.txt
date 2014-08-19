@@ -320,7 +320,7 @@ If you ``pop()`` too much, it'll raise
     >>> c.pop()
     Traceback (most recent call last):
     ...
-    django.template.ContextPopException
+    ContextPopException
 
 .. versionadded:: 1.7
 
