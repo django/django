@@ -83,6 +83,9 @@ Minor features
 * Compatibility shims for ``SpatialRefSys`` and ``GeometryColumns`` changed in
   Django 1.2 have been removed.
 
+* The Spatialite backend now supports ``Collect`` and ``Extent`` aggregates
+  when the database version is 3.0 or later.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
