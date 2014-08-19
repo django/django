@@ -2,6 +2,7 @@ import os
 import sys
 import warnings
 
+from django.db import connection
 from django.core import management
 from django.core.management import CommandError
 from django.core.management.utils import find_command, popen_wrapper
@@ -131,7 +132,9 @@ class CommandTests(SimpleTestCase):
     def test_output_transaction(self):
         out = StringIO()
         management.call_command('transaction', stdout=out, no_color=True)
-        self.assertEqual(out.getvalue(), 'BEGIN;\nHello!\n\nCOMMIT;\n')
+        output = out.getvalue().strip()
+        self.assertTrue(output.startswith(connection.ops.start_transaction_sql()))
+        self.assertTrue(output.endswith(connection.ops.end_transaction_sql()))
 
 
 class UtilsTests(SimpleTestCase):
