@@ -10,36 +10,31 @@ Bugfixes
 ========
 
 * Corrected email and URL validation to reject a trailing dash
-  (`#22579 <http://code.djangoproject.com/ticket/22579>`_).
+  (:ticket:`22579`).
 
-* Prevented indexes on PostgreSQL virtual fields
-  (`#22514 <http://code.djangoproject.com/ticket/22514>`_).
+* Prevented indexes on PostgreSQL virtual fields (:ticket:`22514`).
 
 * Prevented edge case where values of FK fields could be initialized with a
   wrong value when an inline model formset is created for a relationship
-  defined to point to a field other than the PK
-  (`#13794 <https://code.djangoproject.com/ticket/13794>`_).
+  defined to point to a field other than the PK (:ticket:`13794`).
 
 * Restored ``pre_delete``  signals for ``GenericRelation`` cascade deletion
-  (`#22998 <https://code.djangoproject.com/ticket/22998>`_).
+  (:ticket:`22998`).
 
 * Fixed transaction handling when specifying non-default database in
-  ``createcachetable`` and ``flush``
-  (`#23089 <https://code.djangoproject.com/ticket/23089>`_).
+  ``createcachetable`` and ``flush`` (:ticket:`23089`).
 
 * Fixed the "ORA-01843: not a valid month" errors when using Unicode
-  with older versions of Oracle server
-  (`#20292 <https://code.djangoproject.com/ticket/20292>`_).
+  with older versions of Oracle server (:ticket:`20292`).
 
 * Restored bug fix for sending unicode email with Python 2.6.5 and below
-  (`#19107 <https://code.djangoproject.com/ticket/19107>`_).
+  (:ticket:`19107`).
 
 * Prevented ``UnicodeDecodeError`` in ``runserver`` with non-UTF-8 and
-  non-English locale (`#23265 <https://code.djangoproject.com/ticket/23265>`_).
+  non-English locale (:ticket:`23265`).
 
 * Fixed JavaScript errors while editing multi-geometry objects in the OpenLayers
-  widget (`#23137 <https://code.djangoproject.com/ticket/23137>`_,
-  `#23293 <https://code.djangoproject.com/ticket/23293>`_).
+  widget (:ticket:`23137`, :ticket:`23293`).
 
 * Prevented a crash on Python 3 with query strings containing unencoded
-  non-ASCII characters (`#22996 <http://code.djangoproject.com/ticket/22996>`_).
+  non-ASCII characters (:ticket:`22996`).
