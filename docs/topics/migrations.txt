@@ -524,7 +524,7 @@ Django can serialize the following:
 
 - ``int``, ``long``, ``float``, ``bool``, ``str``, ``unicode``, ``bytes``, ``None``
 - ``list``, ``set``, ``tuple``, ``dict``
-- ``datetime.date`` and ``datetime.datetime`` instances
+- ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
 - ``decimal.Decimal`` instances
 - Any Django field
 - Any function or method reference (e.g. ``datetime.datetime.today``)
