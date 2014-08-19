@@ -31,7 +31,12 @@ needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ["djangodocs", "sphinx.ext.intersphinx", "sphinx.ext.viewcode"]
+extensions = [
+    "djangodocs",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
+    "ticket_role",
+]
 
 # Spelling check needs an additional module that is not installed by default.
 # Add it only if spelling check is requested so docs can be generated without it.
@@ -349,3 +354,6 @@ epub_cover = ('', 'epub-cover.html')
 
 # If false, no index is generated.
 #epub_use_index = True
+
+# -- ticket options ------------------------------------------------------------
+ticket_url = 'https://code.djangoproject.com/ticket/%s'

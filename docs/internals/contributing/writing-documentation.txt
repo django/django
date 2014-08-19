@@ -192,6 +192,10 @@ __ http://sphinx-doc.org/markup/
 
   To link, use ``:djadminopt:`--traceback```.
 
+* Links to Trac tickets (typically reserved for minor release notes)::
+
+        :ticket:`12345`
+
 .. _documenting-new-features:
 
 Documenting new features
