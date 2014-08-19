@@ -11,6 +11,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 class BaseSpatialFeatures(object):
     gis_enabled = True
+    has_spatialrefsys_table = True
 
 
 class BaseSpatialOperations(object):

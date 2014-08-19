@@ -9,7 +9,7 @@ from django.contrib.gis.db.backends.mysql.operations import MySQLOperations
 
 
 class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
-    pass
+    has_spatialrefsys_table = False
 
 
 class DatabaseWrapper(MySQLDatabaseWrapper):
