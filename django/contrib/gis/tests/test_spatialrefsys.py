@@ -1,9 +1,10 @@
 import unittest
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.tests.utils import (no_mysql, oracle, postgis,
-    spatialite, HAS_SPATIALREFSYS, SpatialRefSys)
+from django.contrib.gis.tests.utils import (oracle, postgis, spatialite,
+    SpatialRefSys)
 from django.db import connection
+from django.test import skipUnlessDBFeature
 from django.utils import six
 
 
@@ -34,11 +35,10 @@ test_srs = ({'srid': 4326,
             )
 
 
-@unittest.skipUnless(HAS_GDAL and HAS_SPATIALREFSYS,
-    "SpatialRefSysTest needs gdal support and a spatial database")
+@unittest.skipUnless(HAS_GDAL, "SpatialRefSysTest needs gdal support")
+@skipUnlessDBFeature("has_spatialrefsys_table")
 class SpatialRefSysTest(unittest.TestCase):
 
-    @no_mysql
     def test_retrieve(self):
         """
         Test retrieval of SpatialRefSys model objects.
@@ -61,7 +61,6 @@ class SpatialRefSysTest(unittest.TestCase):
                 self.assertTrue(srs.wkt.startswith(sd['srtext']))
                 six.assertRegex(self, srs.proj4text, sd['proj4_re'])
 
-    @no_mysql
     def test_osr(self):
         """
         Test getting OSR objects from SpatialRefSys model objects.
@@ -85,7 +84,6 @@ class SpatialRefSysTest(unittest.TestCase):
                 if not spatialite or connection.ops.spatial_version[0] >= 4:
                     self.assertTrue(srs.wkt.startswith(sd['srtext']))
 
-    @no_mysql
     def test_ellipsoid(self):
         """
         Test the ellipsoid property.
@@ -102,7 +100,6 @@ class SpatialRefSysTest(unittest.TestCase):
             for i in range(3):
                 self.assertAlmostEqual(ellps1[i], ellps2[i], prec[i])
 
-    @no_mysql
     def test_add_entry(self):
         """
         Test adding a new entry in the SpatialRefSys model using the

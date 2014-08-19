@@ -980,7 +980,7 @@ def skipIfDBFeature(feature):
     """
     Skip a test if a database has the named feature
     """
-    return _deferredSkip(lambda: getattr(connection.features, feature),
+    return _deferredSkip(lambda: getattr(connection.features, feature, False),
                          "Database has feature %s" % feature)
 
 
@@ -988,7 +988,7 @@ def skipUnlessDBFeature(feature):
     """
     Skip a test unless a database has the named feature
     """
-    return _deferredSkip(lambda: not getattr(connection.features, feature),
+    return _deferredSkip(lambda: not getattr(connection.features, feature, False),
                          "Database doesn't support feature %s" % feature)
 
 
