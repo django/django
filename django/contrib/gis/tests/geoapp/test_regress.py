@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import no_mysql, no_spatialite
 from django.contrib.gis.shortcuts import render_to_kmz
 from django.db.models import Count, Min
 from django.test import TestCase, skipUnlessDBFeature
@@ -39,8 +38,7 @@ class GeoRegressionTests(TestCase):
         }]
         render_to_kmz('gis/kml/placemarks.kml', {'places': places})
 
-    @no_spatialite
-    @no_mysql
+    @skipUnlessDBFeature("supports_extent_aggr")
     def test_extent(self):
         "Testing `extent` on a table with a single point. See #11827."
         pnt = City.objects.get(name='Pueblo').point
