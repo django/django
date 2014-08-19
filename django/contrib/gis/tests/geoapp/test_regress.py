@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
-from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import no_mysql, no_spatialite
