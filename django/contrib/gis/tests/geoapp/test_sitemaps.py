@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from io import BytesIO
-from unittest import skipUnless
 from xml.dom import minidom
 import warnings
 import zipfile

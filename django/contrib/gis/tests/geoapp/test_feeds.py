@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from unittest import skipUnless
 from xml.dom import minidom
 
 from django.conf import settings
