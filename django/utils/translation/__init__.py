@@ -3,6 +3,7 @@ Internationalization support.
 """
 from __future__ import unicode_literals
 import re
+from django.utils.decorators import ContextDecorator
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils import six
@@ -149,7 +150,7 @@ def deactivate():
     return _trans.deactivate()
 
 
-class override(object):
+class override(ContextDecorator):
     def __init__(self, language, deactivate=False):
         self.language = language
         self.deactivate = deactivate
