@@ -450,12 +450,14 @@ class Options(object):
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_objects(self, local_only=False, include_hidden=False,
                                 include_proxy_eq=False):
+
         include_parents = local_only is False
         fields = self.get_fields(
             data=False, related_objects=True,
             include_parents=include_parents,
             include_hidden=include_hidden,
         )
+        fields = [obj for obj in fields if not isinstance(obj.field, ManyToManyField)]
 
         if include_proxy_eq:
             children = chain.from_iterable(c.relation_tree.related_objects
