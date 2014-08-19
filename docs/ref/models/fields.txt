@@ -210,7 +210,8 @@ a dictionary as the default, use a ``lambda`` as follows::
 .. attribute:: Field.editable
 
 If ``False``, the field will not be displayed in the admin or any other
-:class:`~django.forms.ModelForm`. Default is ``True``.
+:class:`~django.forms.ModelForm`. They are also skipped during :ref:`model
+validation <validating-objects>`. Default is ``True``.
 
 ``error_messages``
 ------------------
