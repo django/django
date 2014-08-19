@@ -560,6 +560,7 @@ management form inside the template. Let's look at a sample view::
     from django.shortcuts import render_to_response
     from myapp.forms import ArticleForm
 
+
     def manage_articles(request):
         ArticleFormSet = formset_factory(ArticleForm)
         if request.method == 'POST':
@@ -636,6 +637,7 @@ a look at how this might be accomplished::
     from django.forms.formsets import formset_factory
     from django.shortcuts import render_to_response
     from myapp.forms import ArticleForm, BookForm
+
 
     def manage_articles(request):
         ArticleFormSet = formset_factory(ArticleForm)
