@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D  # alias for Distance
 from django.contrib.gis.tests.utils import (
-    mysql, oracle, postgis, spatialite, no_oracle, no_spatialite
+    mysql, oracle, postgis, spatialite, no_oracle
 )
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -50,7 +50,7 @@ class DistanceTest(TestCase):
         self.assertEqual(1, Interstate.objects.count())
         self.assertEqual(1, SouthTexasInterstate.objects.count())
 
-    @no_spatialite
+    @skipUnlessDBFeature("has_dwithin_lookup")
     def test_dwithin(self):
         """
         Test the `dwithin` lookup type.
@@ -139,7 +139,7 @@ class DistanceTest(TestCase):
                 self.assertAlmostEqual(m_distances[i], c.distance.m, tol)
                 self.assertAlmostEqual(ft_distances[i], c.distance.survey_ft, tol)
 
-    @no_spatialite
+    @skipUnlessDBFeature("supports_distance_geodetic")
     def test_distance_geodetic(self):
         """
         Test the `distance` GeoQuerySet method on geodetic coordinate systems.
@@ -354,7 +354,7 @@ class DistanceTest(TestCase):
         i10 = SouthTexasInterstate.objects.length().get(name='I-10')
         self.assertAlmostEqual(len_m2, i10.length.m, 2)
 
-    @no_spatialite
+    @skipUnlessDBFeature("has_perimeter_method")
     def test_perimeter(self):
         """
         Test the `perimeter` GeoQuerySet method.
