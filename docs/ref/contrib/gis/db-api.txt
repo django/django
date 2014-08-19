@@ -270,11 +270,11 @@ Method                                PostGIS  Oracle  SpatiaLite
 ====================================  =======  ======  ==========
 :meth:`GeoQuerySet.area`              X        X       X
 :meth:`GeoQuerySet.centroid`          X        X       X
-:meth:`GeoQuerySet.collect`           X
+:meth:`GeoQuerySet.collect`           X                (from v3.0)
 :meth:`GeoQuerySet.difference`        X        X       X
 :meth:`GeoQuerySet.distance`          X        X       X
 :meth:`GeoQuerySet.envelope`          X                X
-:meth:`GeoQuerySet.extent`            X        X
+:meth:`GeoQuerySet.extent`            X        X       (from v3.0)
 :meth:`GeoQuerySet.extent3d`          X
 :meth:`GeoQuerySet.force_rhr`         X
 :meth:`GeoQuerySet.geohash`           X

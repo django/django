@@ -65,17 +65,25 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
     name = 'spatialite'
     spatialite = True
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
-    valid_aggregates = {'Extent', 'Union'}
+
+    @property
+    def valid_aggregates(self):
+        if self.spatial_version >= 3:
+            return {'Collect', 'Extent', 'Union'}
+        else:
+            return {'Union'}
 
     Adapter = SpatiaLiteAdapter
     Adaptor = Adapter  # Backwards-compatibility alias.
 
     area = 'Area'
     centroid = 'Centroid'
+    collect = 'Collect'
     contained = 'MbrWithin'
     difference = 'Difference'
     distance = 'Distance'
     envelope = 'Envelope'
+    extent = 'Extent'
     intersection = 'Intersection'
     length = 'GLength'  # OpenGis defines Length, but this conflicts with an SQLite reserved keyword
     num_geom = 'NumGeometries'
@@ -179,6 +187,15 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         super(SpatiaLiteOperations, self).check_aggregate_support(aggregate)
         agg_name = aggregate.__class__.__name__
         return agg_name in self.valid_aggregates
+
+    def convert_extent(self, box):
+        """
+        Convert the polygon data received from Spatialite to min/max values.
+        """
+        shell = Geometry(box).shell
+        xmin, ymin = shell[0][:2]
+        xmax, ymax = shell[2][:2]
+        return (xmin, ymin, xmax, ymax)
 
     def convert_geom(self, wkt, geo_field):
         """

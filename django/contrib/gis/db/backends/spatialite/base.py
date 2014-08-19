@@ -16,7 +16,9 @@ from django.utils import six
 
 
 class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
-    pass
+    supports_distance_geodetic = False
+    # SpatiaLite can only count vertices in LineStrings
+    supports_num_points_poly = False
 
 
 class DatabaseWrapper(SQLiteDatabaseWrapper):

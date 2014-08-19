@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import mysql, no_mysql, no_oracle, no_spatialite
+from django.contrib.gis.tests.utils import mysql, no_mysql, no_oracle
 from django.test import TestCase, skipUnlessDBFeature
 
 if HAS_GEOS:
@@ -60,8 +60,7 @@ class RelatedGeoModelTest(TestCase):
             qs = list(City.objects.filter(name=name).transform(srid, field_name='location__point'))
             check_pnt(GEOSGeometry(wkt, srid), qs[0].location.point)
 
-    @no_mysql
-    @no_spatialite
+    @skipUnlessDBFeature("supports_extent_aggr")
     def test04a_related_extent_aggregate(self):
         "Testing the `extent` GeoQuerySet aggregates on related geographic models."
         # This combines the Extent and Union aggregates into one query
@@ -265,9 +264,7 @@ class RelatedGeoModelTest(TestCase):
         # Should be `None`, and not a 'dummy' model.
         self.assertEqual(None, b.author)
 
-    @no_mysql
-    @no_oracle
-    @no_spatialite
+    @skipUnlessDBFeature("supports_collect_aggr")
     def test14_collect(self):
         "Testing the `collect` GeoQuerySet method and `Collect` aggregate."
         # Reference query:

@@ -29,9 +29,6 @@ def no_mysql(func):
     return no_backend(func, 'mysql')
 
 
-def no_spatialite(func):
-    return no_backend(func, 'spatialite')
-
 # Shortcut booleans to omit only portions of tests.
 _default_db = settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'].rsplit('.')[-1]
 oracle = _default_db == 'oracle'

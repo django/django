@@ -10,6 +10,7 @@ from django.contrib.gis.db.backends.mysql.operations import MySQLOperations
 
 class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     has_spatialrefsys_table = False
+    supports_num_points_poly = False
 
 
 class DatabaseWrapper(MySQLDatabaseWrapper):
