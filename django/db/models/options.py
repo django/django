@@ -372,6 +372,24 @@ class Options(object):
         """
         return self._make_immutable_fields_list(self.get_fields(data=False, m2m=True))
 
+    @cached_property
+    def related_m2m(self):
+        """
+        Returns a list of all many to many fields on the model and
+        it's parents.
+        All hidden and proxy fields are omitted.
+        """
+        return self.get_fields(data=False, related_m2m=True)
+
+    @cached_property
+    def related_objects(self):
+        """
+        Returns a list of all many to many fields on the model and
+        it's parents.
+        All hidden and proxy fields are omitted.
+        """
+        return self.get_fields(data=False, related_objects=True)
+
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_m2m_with_model(self):
         return [self._map_model(f) for f in
@@ -594,7 +612,7 @@ class Options(object):
 
     def _expire_cache(self):
         for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',
-                          'concrete_fields_map', 'all_fields_map'):
+                          'related_objects', 'related_m2m', 'concrete_fields_map', 'all_fields_map'):
             try:
                 delattr(self, cache_key)
             except AttributeError:
