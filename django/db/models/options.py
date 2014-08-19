@@ -374,22 +374,8 @@ class Options(object):
                                                 cache_results=False))
 
     @cached_property
-    def related_m2m(self):
-        """
-        Returns a list of all many to many fields on the model and
-        it's parents.
-        All hidden and proxy fields are omitted.
-        """
-        return self.get_fields(data=False, related_m2m=True, cache_results=False)
-
-    @cached_property
-    def related_objects(self):
-        """
-        Returns a list of all many to many fields on the model and
-        it's parents.
-        All hidden and proxy fields are omitted.
-        """
-        return self.get_fields(data=False, related_objects=True, cache_results=False)
+    def all_related(self):
+        return self.get_fields(data=False, related_objects=True, related_m2m=True, cache_results=False)
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_m2m_with_model(self):

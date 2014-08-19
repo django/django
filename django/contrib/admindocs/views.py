@@ -250,7 +250,7 @@ class ModelDetailView(BaseAdminDocsView):
                 })
 
         # Gather related objects
-        for rel in chain(opts.related_objects, opts.related_m2m):
+        for rel in opts.all_related:
             verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': rel.opts.app_label, 'object_name': rel.opts.object_name}
             accessor = rel.get_accessor_name()
             fields.append({
