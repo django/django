@@ -228,6 +228,9 @@ Management Commands
 * The :djadmin:`dbshell` command now supports MySQL's optional SSL certificate
   authority setting (``--ssl-ca``).
 
+* The :djadminopt:`--name` option for :djadmin:`makemigrations` allows you to
+  to give the migration(s) a custom name instead of a generated one.
+
 Models
 ^^^^^^
 
