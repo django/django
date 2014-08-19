@@ -18,6 +18,7 @@ from django.template import Template, loader, TemplateDoesNotExist
 from django.template.loaders import cached
 from django.test.signals import template_rendered, setting_changed
 from django.utils import six
+from django.utils.decorators import ContextDecorator
 from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
@@ -146,7 +147,7 @@ def get_runner(settings, test_runner_class=None):
     return test_runner
 
 
-class override_template_loaders(object):
+class override_template_loaders(ContextDecorator):
     """
     Acts as a function decorator, context manager or start/end manager and
     override the template loaders. It could be used in the following ways:
@@ -173,13 +174,6 @@ class override_template_loaders(object):
 
     def __exit__(self, type, value, traceback):
         loader.template_source_loaders = self.old_loaders
-
-    def __call__(self, test_func):
-        @wraps(test_func)
-        def inner(*args, **kwargs):
-            with self:
-                return test_func(*args, **kwargs)
-        return inner
 
     @classmethod
     def override(cls, *loaders):
