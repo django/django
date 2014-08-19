@@ -31,7 +31,7 @@ protect the following:
 
 .. code-block:: html+django
 
-    <style class={{ var }}>...</style>
+    <style class="{{ var }}">...</style>
 
 If ``var`` is set to ``'class1 onmouseover=javascript:func()'``, this can result
 in unauthorized JavaScript execution, depending on how the browser renders
