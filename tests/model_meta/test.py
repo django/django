@@ -123,35 +123,6 @@ class RelatedObjectsTests(OptionsBaseTests):
             )
 
 
-class RelatedM2MTests(OptionsBaseTests):
-
-    def test_related_m2m_with_model(self):
-        result_key = 'get_all_related_many_to_many_with_model'
-        for model, expected in TEST_RESULTS[result_key].items():
-            objects = [(field, self._model(model, field))
-                       for field in model._meta.get_fields(data=False, related_m2m=True)]
-            self.assertEqual(self._map_related_query_names(objects), expected)
-
-    def test_related_m2m_local_only(self):
-        result_key = 'get_all_related_many_to_many_local'
-        for model, expected in TEST_RESULTS[result_key].items():
-            objects = model._meta.get_fields(data=False, related_m2m=True, include_parents=False)
-            self.assertEqual([o.field.related_query_name()
-                              for o in objects], expected)
-
-    def test_related_m2m_asymmetrical(self):
-        m2m = Person._meta.get_fields(data=False, m2m=True)
-        self.assertTrue('following_base' in [f.attname for f in m2m])
-        related_m2m = Person._meta.get_fields(data=False, related_m2m=True)
-        self.assertTrue('followers_base' in [o.field.related_query_name() for o in related_m2m])
-
-    def test_related_m2m_symmetrical(self):
-        m2m = Person._meta.get_fields(data=False, m2m=True)
-        self.assertTrue('friends_base' in [f.attname for f in m2m])
-        related_m2m = Person._meta.get_fields(data=False, related_m2m=True)
-        self.assertIn('friends_inherited_rel_+', [o.field.related_query_name() for o in related_m2m])
-
-
 class VirtualFieldsTests(OptionsBaseTests):
 
     def test_virtual_fields(self):

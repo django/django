@@ -646,7 +646,7 @@ class MigrationAutodetector(object):
                     related_object.field.name,
                     "alter",
                 ))
-            for related_object in model._meta.get_fields(data=False, related_m2m=True):
+            for related_object in model._meta.all_related:
                 dependencies.append((
                     related_object.model._meta.app_label,
                     related_object.model._meta.object_name,

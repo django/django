@@ -198,10 +198,14 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
+
+            from django.db.models.fields.related import ManyToManyRel
+            hidden_fk_fields = (related for
+                                related in model._meta.get_fields(data=False, related_objects=True, include_hidden=True)
+                                if not isinstance(related.field.rel, ManyToManyRel))
             related_opts = chain(
-                model._meta.get_fields(data=False, related_objects=True,
-                                       include_hidden=True),
-                get_related_objects_on_proxies(model._meta)
+                get_related_objects_on_proxies(model._meta),
+                hidden_fk_fields
             )
             for related in related_opts:
                 field = related.field

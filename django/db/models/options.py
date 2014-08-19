@@ -20,9 +20,9 @@ from django.utils.lru_cache import lru_cache
 from django.utils.text import camel_case_to_spaces
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
-RelationTree = namedtuple('RelationTree', ['related_objects', 'related_m2m'])
+RelationTree = namedtuple('RelationTree', ['related_objects'])
 
-EMPTY_RELATION_TREE = RelationTree(tuple(), tuple())
+EMPTY_RELATION_TREE = RelationTree(tuple())
 
 IMMUTABLE_WARNING = (
     "The return type of most Options API calls should never be mutated. If you want "
@@ -375,7 +375,7 @@ class Options(object):
 
     @cached_property
     def all_related(self):
-        return self.get_fields(data=False, related_objects=True, related_m2m=True, cache_results=False)
+        return self.get_fields(data=False, related_objects=True, cache_results=False)
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_m2m_with_model(self):
@@ -398,7 +398,7 @@ class Options(object):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = self.get_fields(m2m=True, data=True, virtual=True, related_objects=True, related_m2m=True,
+        fields = self.get_fields(m2m=True, data=True, virtual=True, related_objects=True,
                                  export_name_map=True)
         for field, names in six.iteritems(fields):
             # map each possible name for a field to its field instance
@@ -479,11 +479,14 @@ class Options(object):
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_many_to_many_objects(self, local_only=False):
-        return list(self.get_fields(data=False, related_m2m=True, include_parents=local_only is not True))
+        fields = self.get_fields(data=False, related_objects=True,
+                        include_parents=local_only is not True, include_hidden=True)
+        return [obj for obj in fields if isinstance(obj.field, ManyToManyField)]
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_m2m_objects_with_model(self):
-        return [self._map_model(f) for f in self.get_fields(data=False, related_m2m=True)]
+        fields = self.get_fields(data=False, related_objects=True, include_hidden=True)
+        return [self._map_model(obj) for obj in fields if isinstance(obj.field, ManyToManyField)]
 
     def get_base_chain(self, model):
         """
@@ -543,7 +546,6 @@ class Options(object):
         and then is set as a property on every model.
         """
         related_objects_graph = defaultdict(list)
-        related_m2m_graph = defaultdict(list)
 
         all_models = self.apps.get_models(include_auto_created=True)
         for model in all_models:
@@ -559,7 +561,7 @@ class Options(object):
                     # Check if the field has a relation to another model
                     if f.rel and not isinstance(f.rel.to, six.string_types):
                         # Set options_instance -> field
-                        related_m2m_graph[f.rel.to._meta].append(f)
+                        related_objects_graph[f.rel.to._meta].append(f)
 
         for model in all_models:
             # Set the realtion_tree using the internal __dict__.
@@ -569,16 +571,14 @@ class Options(object):
             # means that the _meta.relation_tree is only called
             # if related_objects is not in __dict__.
             related_objects = tuple(related_objects_graph[model._meta])
-            related_m2m = tuple(related_m2m_graph[model._meta])
 
             # If both related_objects and related_m2m are empty, it makes sense
             # to set EMPTY_RELATION_TREE. This will avoid allocating multiple
             # empty relation trees.
             relation_tree = EMPTY_RELATION_TREE
-            if related_objects or related_m2m:
+            if related_objects:
                 relation_tree = RelationTree(
-                    related_objects=related_objects,
-                    related_m2m=related_m2m
+                    related_objects=related_objects
                 )
             model._meta.__dict__['relation_tree'] = relation_tree
 
@@ -598,7 +598,7 @@ class Options(object):
 
     def _expire_cache(self):
         for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',
-                          'related_objects', 'related_m2m', 'concrete_fields_map', 'all_fields_map'):
+                          'related_objects', 'concrete_fields_map', 'all_fields_map'):
             try:
                 delattr(self, cache_key)
             except AttributeError:
@@ -606,7 +606,7 @@ class Options(object):
         self._get_field_cache = {}
         self._get_fields_cache = {}
 
-    def get_fields(self, m2m=False, data=True, related_m2m=False, related_objects=False, virtual=False,
+    def get_fields(self, m2m=False, data=True, related_objects=False, virtual=False,
                    include_parents=True, include_hidden=False, **kwargs):
         """
         Returns a list of fields associated to the model. By default will only search in data.
@@ -626,9 +626,12 @@ class Options(object):
         """
 
         # Creates a cache key composed of all arguments
+        if kwargs.get('related_m2m', None):
+            import ipdb; ipdb.set_trace()
+
         cache_results = kwargs.get('cache_results', True)
         export_name_map = kwargs.get('export_name_map', False)
-        cache_key = (m2m, data, related_m2m, related_objects, virtual,
+        cache_key = (m2m, data, related_objects, virtual,
                      include_parents, include_hidden, export_name_map)
 
         try:
@@ -649,28 +652,6 @@ class Options(object):
             'cache_results': cache_results
         }
 
-        if related_m2m:
-            if include_parents:
-                # Recursively call get_fields on each parent, with the same options provided
-                # in this call
-                for parent in self.parents:
-                    for obj, query_name in six.iteritems(parent._meta.get_fields(data=False, related_m2m=True,
-                                                         **options)):
-                        # In order for a related M2M object to be valid, its creation
-                        # counter must be > 0 and must be in the parent list
-                        if not (obj.field.creation_counter < 0
-                                and obj.model not in self.get_parent_list()):
-                            fields[obj] = query_name
-
-            # Tree is computer once and cached until apps cache is expired. It is composed of
-            # {options_instance: [field_pointing_to_options_model, field_pointing_to_options, ..]}
-            # If the model is a proxy model, then we also add the concrete model.
-            model_fields = self.relation_tree.related_m2m
-            field_list = model_fields if not self.proxy else chain(model_fields,
-                                                                   self.concrete_model._meta.relation_tree.related_m2m)
-            for f in field_list:
-                fields[f.related] = {f.related_query_name()}
-
         if related_objects:
             if include_parents:
                 parent_list = self.get_parent_list()
@@ -678,17 +659,26 @@ class Options(object):
                 # in this call
                 for parent in self.parents:
                     for obj, query_name in six.iteritems(parent._meta.get_fields(data=False, related_objects=True,
-                                                         **dict(options, include_hidden=True))):
-                        if not ((obj.field.creation_counter < 0
-                                or obj.field.rel.parent_link)
-                                and obj.model not in parent_list):
-                            if include_hidden or not obj.field.rel.is_hidden():
-                                # If hidden fields should be included or the relation
-                                # is not intentionally hidden, add to the fields dict
+                                                         **options)):
+
+                        is_m2m_rel = isinstance(obj.field.rel, ManyToManyRel)
+                        if is_m2m_rel:
+                            # In order for a related M2M object to be valid, its creation
+                            # counter must be > 0 and must be in the parent list
+                            if not (obj.field.creation_counter < 0
+                                    and obj.model not in parent_list):
                                 fields[obj] = query_name
+                        else:
+                            if not ((obj.field.creation_counter < 0
+                                    or obj.field.rel.parent_link)
+                                    and obj.model not in parent_list):
+                                if include_hidden or not obj.field.rel.is_hidden():
+                                    # If hidden fields should be included or the relation
+                                    # is not intentionally hidden, add to the fields dict
+                                    fields[obj] = query_name
 
             # Tree is computer once and cached until apps cache is expired. It is composed of
-            # {options_instance : [field_pointing_to_options_model, field_pointing_to_options, ..]}
+            # {options_instance: [field_pointing_to_options_model, field_pointing_to_options, ..]}
             # If the model is a proxy model, then we also add the concrete model.
             model_fields = self.relation_tree.related_objects
             all_fields = model_fields if not self.proxy else chain(model_fields,
@@ -760,6 +750,6 @@ class Options(object):
         """
         res = set()
         for _, names in six.iteritems(self.get_fields(m2m=True, related_objects=True,
-                                          related_m2m=True, virtual=True, export_name_map=True)):
+                                      virtual=True, export_name_map=True)):
             res.update(name for name in names if not name.endswith('+'))
         return res
