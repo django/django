@@ -54,7 +54,7 @@ def DO_NOTHING(collector, field, sub_objs, using):
 
 def get_related_objects_on_proxies(opts):
     return (f.related for f in chain.from_iterable(
-            c.relation_tree.all_related for c in opts.concrete_model._meta.proxied_children
+            c.relation_tree.related_objects for c in opts.concrete_model._meta.proxied_children
             if c is not opts))
 
 
