@@ -12,6 +12,45 @@ from django.utils.encoding import python_2_unicode_compatible
 class BaseSpatialFeatures(object):
     gis_enabled = True
     has_spatialrefsys_table = True
+    supports_distance_geodetic = True
+    supports_left_right_lookups = False
+    supports_num_points_poly = True
+
+    @property
+    def has_dwithin_lookup(self):
+        return 'dwithin' in self.connection.ops.distance_functions
+
+    @property
+    def has_force_rhr_method(self):
+        return bool(self.connection.ops.force_rhr)
+
+    @property
+    def has_geohash_method(self):
+        return bool(self.connection.ops.geohash)
+
+    @property
+    def has_make_line_method(self):
+        return bool(self.connection.ops.make_line)
+
+    @property
+    def has_perimeter_method(self):
+        return bool(self.connection.ops.perimeter)
+
+    @property
+    def has_reverse_method(self):
+        return bool(self.connection.ops.reverse)
+
+    @property
+    def has_snap_to_grid_method(self):
+        return bool(self.connection.ops.snap_to_grid)
+
+    @property
+    def supports_collect_aggr(self):
+        return 'Collect' in self.connection.ops.valid_aggregates
+
+    @property
+    def supports_extent_aggr(self):
+        return 'Extent' in self.connection.ops.valid_aggregates
 
 
 class BaseSpatialOperations(object):
