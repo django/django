@@ -134,7 +134,7 @@ class WSGIRequest(http.HttpRequest):
             # The WSGI spec says 'QUERY_STRING' may be absent.
             raw_query_string = self.environ.get('QUERY_STRING', str(''))
             if six.PY3:
-                raw_query_string = raw_query_string.encode('iso-8859-1').decode('utf-8')
+                raw_query_string = raw_query_string.encode('iso-8859-1')
             self._get = http.QueryDict(raw_query_string, encoding=self._encoding)
         return self._get
 
