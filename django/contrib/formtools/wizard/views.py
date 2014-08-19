@@ -270,7 +270,7 @@ class WizardView(TemplateView):
             return self.render_goto_step(wizard_goto_step)
 
         # Check if form was refreshed
-        management_form = ManagementForm(self.request.POST, prefix=self.prefix)
+        management_form = ManagementForm(self.request.POST, prefix=self.prefix, form_list=self.form_list)
         if not management_form.is_valid():
             raise ValidationError(
                 _('ManagementForm data is missing or has been tampered.'),
