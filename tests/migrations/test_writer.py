@@ -95,6 +95,7 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(datetime.datetime.today)
         self.assertSerializedEqual(datetime.date.today())
         self.assertSerializedEqual(datetime.date.today)
+        self.assertSerializedEqual(datetime.datetime.now().time())
         with self.assertRaises(ValueError):
             self.assertSerializedEqual(datetime.datetime(2012, 1, 1, 1, 1, tzinfo=get_default_timezone()))
         safe_date = datetime_safe.date(2014, 3, 31)
