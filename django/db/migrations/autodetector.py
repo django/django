@@ -286,7 +286,7 @@ class MigrationAutodetector(object):
                 if not chop_mode:
                     chop_mode = True
                 else:
-                    raise ValueError("Cannot resolve operation dependencies")
+                    raise ValueError("Cannot resolve operation dependencies: %r" % self.generated_operations)
             num_ops = new_num_ops
 
         # OK, add in internal dependencies among the migrations
@@ -361,10 +361,13 @@ class MigrationAutodetector(object):
         else:
             raise ValueError("Can't handle dependency %r" % (dependency, ))
 
-    def add_operation(self, app_label, operation, dependencies=None):
+    def add_operation(self, app_label, operation, dependencies=None, beginning=False):
         # Dependencies are (app_label, model_name, field_name, create/delete as True/False)
         operation._auto_deps = dependencies or []
-        self.generated_operations.setdefault(app_label, []).append(operation)
+        if beginning:
+            self.generated_operations.setdefault(app_label, []).insert(0, operation)
+        else:
+            self.generated_operations.setdefault(app_label, []).append(operation)
 
     def swappable_first_key(self, item):
         """
@@ -429,7 +432,7 @@ class MigrationAutodetector(object):
         that might be deferred (e.g. unique_together, index_together)
         """
         added_models = set(self.new_model_keys) - set(self.old_model_keys)
-        for app_label, model_name in sorted(added_models, key=self.swappable_first_key):
+        for app_label, model_name in sorted(added_models, key=self.swappable_first_key, reverse=True):
             model_state = self.to_state.models[app_label, model_name]
             # Gather related fields
             related_fields = {}
@@ -481,6 +484,7 @@ class MigrationAutodetector(object):
                     bases=model_state.bases,
                 ),
                 dependencies=dependencies,
+                beginning=True,
             )
             # Generate operations for each related field
             for name, field in sorted(related_fields.items()):
