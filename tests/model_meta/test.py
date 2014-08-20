@@ -117,8 +117,6 @@ class RelatedObjectsTests(OptionsBaseTests):
         for model, expected in TEST_RESULTS[result_key].items():
             objects = [(field, self._model(model, field))
                        for field in model._meta.get_fields(data=False, related_objects=True, include_hidden=True, include_parents=False)]
-            if sorted(self._map_names(objects), key=self.key_name) != sorted(expected, key=self.key_name):
-                print(sorted(self._map_names(objects), key=self.key_name), model)
             self.assertEqual(
                 sorted(self._map_names(objects), key=self.key_name),
                 sorted(expected, key=self.key_name)
@@ -198,23 +196,28 @@ class RelationTreeTests(test.TestCase):
     def test_relations_related_objects(self):
 
         # Testing non hidden related objects
+
         self.assertEqual(
             sorted([field.related_query_name() for field in Relation._meta.relation_tree.related_objects
                    if not field.related.field.rel.is_hidden()]),
-            sorted(['fk_abstract_rel', 'fo_abstract_rel', 'fk_base_rel', 'fo_base_rel', 'fk_abstract_rel',
-                   'fo_abstract_rel', 'fk_base_rel', 'fo_base_rel', 'fk_concrete_rel', 'fo_concrete_rel',
-                   'fk_abstract_rel', 'fo_abstract_rel', 'fk_base_rel', 'fo_base_rel', 'fk_concrete_rel',
-                   'fo_concrete_rel'])
+            sorted(['fk_abstract_rel', 'fk_abstract_rel', 'fk_abstract_rel', 'fk_base_rel', 'fk_base_rel',
+                    'fk_base_rel', 'fk_concrete_rel', 'fk_concrete_rel', 'fo_abstract_rel', 'fo_abstract_rel',
+                    'fo_abstract_rel', 'fo_base_rel', 'fo_base_rel', 'fo_base_rel', 'fo_concrete_rel',
+                    'fo_concrete_rel', 'm2m_abstract_rel', 'm2m_abstract_rel', 'm2m_abstract_rel',
+                    'm2m_base_rel', 'm2m_base_rel', 'm2m_base_rel', 'm2m_concrete_rel', 'm2m_concrete_rel'])
         )
 
         # Testing hidden related objects
         self.assertEqual(
             sorted([field.related_query_name() for field in BasePerson._meta.relation_tree.related_objects]),
-            sorted(['BasePerson_friends_base+', 'BasePerson_friends_base+', 'BasePerson_m2m_base+',
-                   'BasePerson_following_base+', 'BasePerson_following_base+', 'BasePerson_m2m_abstract+',
-                   'BasePerson_friends_abstract+', 'BasePerson_friends_abstract+', 'BasePerson_following_abstract+',
-                   'BasePerson_following_abstract+', 'person', 'person', 'Relating_basepeople+', 'Relating_basepeople_hidden+',
-                   'relating_baseperson', '+'])
+            sorted(['+', '+', u'BasePerson_following_abstract+', u'BasePerson_following_abstract+',
+                    u'BasePerson_following_base+', u'BasePerson_following_base+', u'BasePerson_friends_abstract+',
+                    u'BasePerson_friends_abstract+', u'BasePerson_friends_base+', u'BasePerson_friends_base+',
+                    u'BasePerson_m2m_abstract+', u'BasePerson_m2m_base+', u'Relating_basepeople+',
+                    u'Relating_basepeople_hidden+', 'followers_abstract', 'followers_abstract', 'followers_abstract',
+                    'followers_base', 'followers_base', 'followers_base', u'friends_abstract_rel_+', u'friends_abstract_rel_+',
+                    u'friends_abstract_rel_+', u'friends_base_rel_+', u'friends_base_rel_+', u'friends_base_rel_+', 'person',
+                    'person', 'relating_basepeople', 'relating_baseperson'])
         )
         self.assertEqual([field.related_query_name() for field in AbstractPerson._meta.relation_tree.related_objects], [])
 
