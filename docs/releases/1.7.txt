@@ -1423,7 +1423,7 @@ Miscellaneous
   databases, use the :djadminopt:`--database` flag to get SQL for those
   models (previously they would always be included in the output).
 
-* Decoding the query string from URLs now fallbacks to the ISO-8859-1 encoding
+* Decoding the query string from URLs now falls back to the ISO-8859-1 encoding
   when the input is not valid UTF-8.
 
 .. _deprecated-features-1.7:
