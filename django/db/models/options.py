@@ -384,7 +384,12 @@ class Options(object):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = self.get_fields(m2m=True, data=True, virtual=True, export_name_map=True)
+        fields = self.get_fields(m2m=True, data=True, export_name_map=True)
+        fields.update(
+            (field, {field.name, field.attname})
+            for field in self.virtual_fields
+            if hasattr(field, 'related')
+        )
         for field, names in six.iteritems(fields):
             # map each possible name for a field to its field instance
             for name in names:
@@ -396,8 +401,12 @@ class Options(object):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = self.get_fields(m2m=True, data=True, virtual=True, related_objects=True,
-                                 export_name_map=True)
+        fields = self.get_fields(m2m=True, data=True, related_objects=True, export_name_map=True)
+        fields.update(
+            (field, {field.name, field.attname})
+            for field in self.virtual_fields
+            if hasattr(field, 'related')
+        )
         for field, names in six.iteritems(fields):
             # map each possible name for a field to its field instance
             for name in names:
@@ -604,7 +613,7 @@ class Options(object):
         self._get_field_cache = {}
         self._get_fields_cache = {}
 
-    def get_fields(self, m2m=False, data=True, related_objects=False, virtual=False,
+    def get_fields(self, m2m=False, data=True, related_objects=False,
                    include_parents=True, include_hidden=False, **kwargs):
         """
         Returns a list of fields associated to the model. By default will only search in data.
@@ -624,12 +633,9 @@ class Options(object):
         """
 
         # Creates a cache key composed of all arguments
-        if kwargs.get('related_m2m', None):
-            import ipdb; ipdb.set_trace()
-
         cache_results = kwargs.get('cache_results', True)
         export_name_map = kwargs.get('export_name_map', False)
-        cache_key = (m2m, data, related_objects, virtual,
+        cache_key = (m2m, data, related_objects,
                      include_parents, include_hidden, export_name_map)
 
         try:
@@ -706,25 +712,6 @@ class Options(object):
                 for field in self.local_fields
             )
 
-        if virtual:
-            # Virtual fields to not need to recursively search parents.
-            if export_name_map:
-                # If we are exporting a map (ex. called by get_field) we do not
-                # want to include GenericForeignKeys, but only GenericRelations
-                # (Ref. #22994).
-                fields.update(
-                    (field, {field.name, field.attname})
-                    for field in self.virtual_fields
-                    if hasattr(field, 'related')
-                )
-            else:
-                # If we are just listing fields (no map export), we include all
-                # virtual fields.
-                fields.update(
-                    (field, {field.name})
-                    for field in self.virtual_fields
-                )
-
         if not export_name_map:
             # By default, fields contains field instances as keys and all possible names
             # if the field instance as values. when get_fields is called, we only want to
@@ -746,7 +733,12 @@ class Options(object):
         All hidden and proxy fields are omitted.
         """
         res = set()
-        for _, names in six.iteritems(self.get_fields(m2m=True, related_objects=True,
-                                      virtual=True, export_name_map=True)):
+        fields = self.get_fields(m2m=True, related_objects=True, export_name_map=True)
+        fields.update(
+            (field, {field.name, field.attname})
+            for field in self.virtual_fields
+            if hasattr(field, 'related')
+        )
+        for _, names in six.iteritems(fields):
             res.update(name for name in names if not name.endswith('+'))
         return res
