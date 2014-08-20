@@ -198,7 +198,7 @@ class RelationTreeTests(test.TestCase):
         # Testing non hidden related objects
 
         self.assertEqual(
-            sorted([field.related_query_name() for field in Relation._meta.relation_tree.related_objects
+            sorted([field.related_query_name() for field in Relation._meta.relation_tree
                    if not field.related.field.rel.is_hidden()]),
             sorted(['fk_abstract_rel', 'fk_abstract_rel', 'fk_abstract_rel', 'fk_base_rel', 'fk_base_rel',
                     'fk_base_rel', 'fk_concrete_rel', 'fk_concrete_rel', 'fo_abstract_rel', 'fo_abstract_rel',
@@ -209,17 +209,17 @@ class RelationTreeTests(test.TestCase):
 
         # Testing hidden related objects
         self.assertEqual(
-            sorted([field.related_query_name() for field in BasePerson._meta.relation_tree.related_objects]),
-            sorted(['+', '+', u'BasePerson_following_abstract+', u'BasePerson_following_abstract+',
-                    u'BasePerson_following_base+', u'BasePerson_following_base+', u'BasePerson_friends_abstract+',
-                    u'BasePerson_friends_abstract+', u'BasePerson_friends_base+', u'BasePerson_friends_base+',
-                    u'BasePerson_m2m_abstract+', u'BasePerson_m2m_base+', u'Relating_basepeople+',
-                    u'Relating_basepeople_hidden+', 'followers_abstract', 'followers_abstract', 'followers_abstract',
-                    'followers_base', 'followers_base', 'followers_base', u'friends_abstract_rel_+', u'friends_abstract_rel_+',
-                    u'friends_abstract_rel_+', u'friends_base_rel_+', u'friends_base_rel_+', u'friends_base_rel_+', 'person',
+            sorted([field.related_query_name() for field in BasePerson._meta.relation_tree]),
+            sorted(['+', '+', 'BasePerson_following_abstract+', 'BasePerson_following_abstract+',
+                    'BasePerson_following_base+', 'BasePerson_following_base+', 'BasePerson_friends_abstract+',
+                    'BasePerson_friends_abstract+', 'BasePerson_friends_base+', 'BasePerson_friends_base+',
+                    'BasePerson_m2m_abstract+', 'BasePerson_m2m_base+', 'Relating_basepeople+',
+                    'Relating_basepeople_hidden+', 'followers_abstract', 'followers_abstract', 'followers_abstract',
+                    'followers_base', 'followers_base', 'followers_base', 'friends_abstract_rel_+', 'friends_abstract_rel_+',
+                    'friends_abstract_rel_+', 'friends_base_rel_+', 'friends_base_rel_+', 'friends_base_rel_+', 'person',
                     'person', 'relating_basepeople', 'relating_baseperson'])
         )
-        self.assertEqual([field.related_query_name() for field in AbstractPerson._meta.relation_tree.related_objects], [])
+        self.assertEqual([field.related_query_name() for field in AbstractPerson._meta.relation_tree], [])
 
     def test_no_cache_option(self):
 

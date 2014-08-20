@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from bisect import bisect
-from collections import OrderedDict, namedtuple, defaultdict
+from collections import OrderedDict, defaultdict
 from functools import partial
 from itertools import chain
 import warnings
@@ -20,9 +20,7 @@ from django.utils.lru_cache import lru_cache
 from django.utils.text import camel_case_to_spaces
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 
-RelationTree = namedtuple('RelationTree', ['related_objects'])
-
-EMPTY_RELATION_TREE = RelationTree(tuple())
+EMPTY_RELATION_TREE = tuple()
 
 IMMUTABLE_WARNING = (
     "The return type of most Options API calls should never be mutated. If you want "
@@ -374,7 +372,7 @@ class Options(object):
                                                 cache_results=False))
 
     @cached_property
-    def all_related(self):
+    def related_objects(self):
         return self.get_fields(data=False, related_objects=True, cache_results=False)
 
     @raise_deprecation(suggested_alternative="get_fields()")
@@ -460,7 +458,7 @@ class Options(object):
         fields = [obj for obj in fields if not isinstance(obj.field, ManyToManyField)]
 
         if include_proxy_eq:
-            children = chain.from_iterable(c.relation_tree.related_objects
+            children = chain.from_iterable(c.relation_tree
                                            for c in self.concrete_model._meta.proxied_children
                                            if c is not self)
             relations = (f.related for f in children
@@ -572,16 +570,14 @@ class Options(object):
             # a data descriptor (such as @cached_property). This
             # means that the _meta.relation_tree is only called
             # if related_objects is not in __dict__.
-            related_objects = tuple(related_objects_graph[model._meta])
+            related_objects = related_objects_graph[model._meta]
 
             # If both related_objects and related_m2m are empty, it makes sense
             # to set EMPTY_RELATION_TREE. This will avoid allocating multiple
             # empty relation trees.
             relation_tree = EMPTY_RELATION_TREE
             if related_objects:
-                relation_tree = RelationTree(
-                    related_objects=related_objects
-                )
+                relation_tree = related_objects
             model._meta.__dict__['relation_tree'] = relation_tree
 
     @cached_property
@@ -663,8 +659,7 @@ class Options(object):
                     for obj, query_name in six.iteritems(parent._meta.get_fields(data=False, related_objects=True,
                                                          **options)):
 
-                        is_m2m_rel = isinstance(obj.field.rel, ManyToManyRel)
-                        if is_m2m_rel:
+                        if isinstance(obj.field.rel, ManyToManyRel):
                             # In order for a related M2M object to be valid, its creation
                             # counter must be > 0 and must be in the parent list
                             if not (obj.field.creation_counter < 0
@@ -682,9 +677,9 @@ class Options(object):
             # Tree is computer once and cached until apps cache is expired. It is composed of
             # {options_instance: [field_pointing_to_options_model, field_pointing_to_options, ..]}
             # If the model is a proxy model, then we also add the concrete model.
-            model_fields = self.relation_tree.related_objects
+            model_fields = self.relation_tree
             all_fields = model_fields if not self.proxy else chain(model_fields,
-                                                                   self.concrete_model._meta.relation_tree.related_objects)
+                                                                   self.concrete_model._meta.relation_tree)
             for f in all_fields:
                 if include_hidden or not f.related.field.rel.is_hidden():
                     # If hidden fields should be included or the relation

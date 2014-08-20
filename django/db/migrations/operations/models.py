@@ -121,7 +121,7 @@ class RenameModel(Operation):
         state.models[app_label, self.new_name.lower()].name = self.new_name
         del state.models[app_label, self.old_name.lower()]
         # Repoint the FKs and M2Ms pointing to us
-        for related_object in model._meta.all_related:
+        for related_object in model._meta.related_objects:
             # Use the new related key for self referential related objects.
             if related_object.model == model:
                 related_key = (app_label, self.new_name.lower())
@@ -151,7 +151,7 @@ class RenameModel(Operation):
                 new_model._meta.db_table,
             )
             # Alter the fields pointing to us
-            for related_object in (old_model._meta.all_related):
+            for related_object in (old_model._meta.related_objects):
                 if related_object.model == old_model:
                     model = new_model
                     related_key = (app_label, self.new_name.lower())
