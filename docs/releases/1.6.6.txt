@@ -2,7 +2,7 @@
 Django 1.6.6 release notes
 ==========================
 
-*Under development*
+*August 20, 2014*
 
 Django 1.6.6 fixes several security issues and bugs in 1.6.5.
 
