@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.test import TestCase, override_settings
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.questioner import MigrationQuestioner
@@ -1103,3 +1104,84 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'a', 0, ["CreateModel", "CreateModel"])
         self.assertOperationTypes(changes, 'a', 1, ["AddField"])
         self.assertOperationTypes(changes, 'b', 0, ["CreateModel", "CreateModel"])
+
+    @override_settings(AUTH_USER_MODEL="a.Tenant")
+    def test_circular_dependency_swappable(self):
+        """
+        Tests that the dependency resolver knows to explicitly resolve
+        swappable models (#23322)
+        """
+        tenant = ModelState("a", "Tenant", [
+            ("id", models.AutoField(primary_key=True)),
+            ("primary_address", models.ForeignKey("b.Address"))],
+            bases=(AbstractBaseUser, )
+        )
+        address = ModelState("b", "Address", [
+            ("id", models.AutoField(primary_key=True)),
+            ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL)),
+        ])
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([address, tenant])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'a', 2)
+        self.assertNumberMigrations(changes, 'b', 1)
+        self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
+        self.assertOperationTypes(changes, 'a', 1, ["AddField"])
+        self.assertOperationTypes(changes, 'b', 0, ["CreateModel"])
+        self.assertEqual(changes['a'][0].dependencies, [])
+        self.assertEqual(set(changes['a'][1].dependencies), set([('a', 'auto_1'), ('b', 'auto_1')]))
+        self.assertEqual(changes['b'][0].dependencies, [('__setting__', 'AUTH_USER_MODEL')])
+
+    @override_settings(AUTH_USER_MODEL="b.Tenant")
+    def test_circular_dependency_swappable2(self):
+        """
+        Tests that the dependency resolver knows to explicitly resolve
+        swappable models but with the swappable not being the first migrated
+        model (#23322)
+        """
+        address = ModelState("a", "Address", [
+            ("id", models.AutoField(primary_key=True)),
+            ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL)),
+        ])
+        tenant = ModelState("b", "Tenant", [
+            ("id", models.AutoField(primary_key=True)),
+            ("primary_address", models.ForeignKey("a.Address"))],
+            bases=(AbstractBaseUser, )
+        )
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([address, tenant])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'a', 2)
+        self.assertNumberMigrations(changes, 'b', 1)
+        self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
+        self.assertOperationTypes(changes, 'a', 1, ["AddField"])
+        self.assertOperationTypes(changes, 'b', 0, ["CreateModel"])
+        self.assertEqual(changes['a'][0].dependencies, [])
+        self.assertEqual(set(changes['a'][1].dependencies), set([('__setting__', 'AUTH_USER_MODEL'), ('a', 'auto_1')]))
+        self.assertEqual(changes['b'][0].dependencies, [('a', 'auto_1')])
+
+    @override_settings(AUTH_USER_MODEL="a.Person")
+    def test_circular_dependency_swappable_self(self):
+        """
+        Tests that the dependency resolver knows to explicitly resolve
+        swappable models (#23322)
+        """
+        person = ModelState("a", "Person", [
+            ("id", models.AutoField(primary_key=True)),
+            ("parent1", models.ForeignKey(settings.AUTH_USER_MODEL, related_name='children'))
+        ])
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([person])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertNumberMigrations(changes, 'a', 1)
+        self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
+        self.assertEqual(changes['a'][0].dependencies, [])

@@ -237,9 +237,17 @@ class MigrationAutodetector(object):
                     deps_satisfied = True
                     operation_dependencies = set()
                     for dep in operation._auto_deps:
+                        is_swappable_dep = False
                         if dep[0] == "__setting__":
-                            operation_dependencies.add((dep[0], dep[1]))
-                        elif dep[0] != app_label:
+                            # We need to temporarily resolve the swappable dependency to prevent
+                            # circular references. While keeping the dependency checks on the
+                            # resolved model we still add the swappable dependencies.
+                            # See #23322
+                            resolved_app_label, resolved_object_name = getattr(settings, dep[1]).split('.')
+                            original_dep = dep
+                            dep = (resolved_app_label, resolved_object_name.lower(), dep[2], dep[3])
+                            is_swappable_dep = True
+                        if dep[0] != app_label and dep[0] != "__setting__":
                             # External app dependency. See if it's not yet
                             # satisfied.
                             for other_operation in self.generated_operations.get(dep[0], []):
@@ -249,7 +257,9 @@ class MigrationAutodetector(object):
                             if not deps_satisfied:
                                 break
                             else:
-                                if self.migrations.get(dep[0], None):
+                                if is_swappable_dep:
+                                    operation_dependencies.add((original_dep[0], original_dep[1]))
+                                elif dep[0] in self.migrations:
                                     operation_dependencies.add((dep[0], self.migrations[dep[0]][-1].name))
                                 else:
                                     # If we can't find the other app, we add a first/last dependency,
