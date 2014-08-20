@@ -218,15 +218,6 @@ class RelationTreeTests(test.TestCase):
         )
         self.assertEqual([field.related_query_name() for field in AbstractPerson._meta.relation_tree.related_objects], [])
 
-    def test_relations_related_m2m(self):
-        self.assertEqual(
-            sorted([field.related_query_name() for field in Relation._meta.relation_tree.related_m2m
-                   if not field.related.field.rel.is_hidden()]),
-            sorted(['m2m_abstract_rel', 'm2m_base_rel', 'm2m_abstract_rel', 'm2m_base_rel', 'm2m_concrete_rel',
-                   'm2m_abstract_rel', 'm2m_base_rel', 'm2m_concrete_rel'])
-        )
-        self.assertEqual([field.related_query_name() for field in AbstractPerson._meta.relation_tree.related_m2m], [])
-
     def test_no_cache_option(self):
 
         # Expire all get_fields cache
