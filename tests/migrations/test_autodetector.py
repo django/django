@@ -1087,7 +1087,7 @@ class AutodetectorTests(TestCase):
         ])
         apackage = ModelState("b", "APackage", [
             ("id", models.AutoField(primary_key=True)),
-            ("person", models.ForeignKey("a.person")),
+            ("person", models.ForeignKey("a.Person")),
         ])
         country = ModelState("b", "DeliveryCountry", [
             ("id", models.AutoField(primary_key=True)),
