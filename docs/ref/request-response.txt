@@ -788,6 +788,10 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     domain (e.g. ``'/search/'``). See :class:`HttpResponse` for other optional
     constructor arguments. Note that this returns an HTTP status code 302.
 
+    Option ``strict_host`` will check the host is one of the ``ALLOWED_HOSTS``.
+    Useful for making sure a redirect will remain only within the website.
+    Default=False
+
     .. attribute:: HttpResponseRedirect.url
 
         This read-only attribute represents the URL the response will redirect

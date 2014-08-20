@@ -418,6 +418,9 @@ class HttpResponseRedirectBase(HttpResponse):
         parsed = urlparse(force_text(redirect_to))
         if parsed.scheme and parsed.scheme not in self.allowed_schemes:
             raise DisallowedRedirect("Unsafe redirect to URL with protocol '%s'" % parsed.scheme)
+        if kwargs.get('strict_host', False) and not settings.DEBUG \
+           and parsed.netloc and parsed.netloc not in settings.ALLOWED_HOSTS:
+            raise SuspiciousOperation("Unsafe redirect to URL with host '%s'" % parsed.netloc)
         super(HttpResponseRedirectBase, self).__init__(*args, **kwargs)
         self['Location'] = iri_to_uri(redirect_to)
 
