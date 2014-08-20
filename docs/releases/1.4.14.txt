@@ -2,7 +2,7 @@
 Django 1.4.14 release notes
 ===========================
 
-*Under development*
+*August 20, 2014*
 
 Django 1.4.14 fixes several security issues in 1.4.13.
 
