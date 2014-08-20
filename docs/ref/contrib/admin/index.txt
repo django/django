@@ -2512,6 +2512,7 @@ own ``AdminSite`` instance since you will likely be importing all the per-app
 put ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
 ``'django.contrib.admin'`` in your :setting:`INSTALLED_APPS` setting.
 
+.. _multiple-admin-sites:
 
 Multiple admin sites in the same URLconf
 ----------------------------------------

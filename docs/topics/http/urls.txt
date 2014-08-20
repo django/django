@@ -743,11 +743,21 @@ URL namespaces
 Introduction
 ------------
 
-When you need to deploy multiple instances of a single application, it can be
-helpful to be able to differentiate between instances. This is especially
-important when using :ref:`named URL patterns <naming-url-patterns>`, since
-multiple instances of a single application will share named URLs. Namespaces
-provide a way to tell these named URLs apart.
+URL namespaces allow you to uniquely reverse :ref:`named URL patterns
+<naming-url-patterns>` even if different applications use the same URL names.
+It's a good practice for third-party apps to always use namespaced URLs (as we
+did in the tutorial). Similarly, it also allows you to reverse URLs if multiple
+instances of an application are deployed. In other words, since multiple
+instances of a single application will share named URLs, namespaces provide a
+way to tell these named URLs apart.
+
+Django applications that make proper use of URL namespacing can be deployed more
+than once for a particular site. For example :mod:`django.contrib.admin` has an
+:class:`~django.contrib.admin.AdminSite` class which allows you to easily
+:ref:`deploy more than once instance of the admin <multiple-admin-sites>`.
+In a later example, we'll discuss the idea of deploying the polls application
+from the tutorial in two different locations so we can serve the same
+functionality to two different audiences (authors and publishers).
 
 A URL namespace comes in two parts, both of which are strings:
 
@@ -763,44 +773,43 @@ A URL namespace comes in two parts, both of which are strings:
     This identifies a specific instance of an application. Instance namespaces
     should be unique across your entire project. However, an instance namespace
     can be the same as the application namespace. This is used to specify a
-    default instance of an application. For example, the default Django Admin
+    default instance of an application. For example, the default Django admin
     instance has an instance namespace of ``'admin'``.
 
 Namespaced URLs are specified using the ``':'`` operator. For example, the main
 index page of the admin application is referenced using ``'admin:index'``. This
 indicates a namespace of ``'admin'``, and a named URL of ``'index'``.
 
-Namespaces can also be nested. The named URL ``'foo:bar:whiz'`` would look for
-a pattern named ``'whiz'`` in the namespace ``'bar'`` that is itself defined
-within the top-level namespace ``'foo'``.
+Namespaces can also be nested. The named URL ``'sports:polls:index'`` would
+look for a pattern named ``'index'`` in the namespace ``'polls'`` that is itself
+defined within the top-level namespace ``'sports'``.
 
 .. _topics-http-reversing-url-namespaces:
 
 Reversing namespaced URLs
 -------------------------
 
-When given a namespaced URL (e.g. ``'myapp:index'``) to resolve, Django splits
-the fully qualified name into parts, and then tries the following lookup:
+When given a namespaced URL (e.g. ``'polls:index'``) to resolve, Django splits
+the fully qualified name into parts and then tries the following lookup:
 
 1. First, Django looks for a matching :term:`application namespace` (in this
-   example, ``'myapp'``). This will yield a list of instances of that
+   example, ``'polls'``). This will yield a list of instances of that
    application.
 
 2. If there is a *current* application defined, Django finds and returns
    the URL resolver for that instance. The *current* application can be
    specified as an attribute on the template context - applications that
    expect to have multiple deployments should set the ``current_app``
-   attribute on any ``Context`` or ``RequestContext`` that is used to
-   render a template.
+   attribute on any :class:`~django.template.Context` or
+   :class:`~django.template.RequestContext` that is used to render a template.
 
    The current application can also be specified manually as an argument
-   to the :func:`django.core.urlresolvers.reverse` function.
+   to the :func:`~django.core.urlresolvers.reverse` function.
 
 3. If there is no current application. Django looks for a default
    application instance. The default application instance is the instance
    that has an :term:`instance namespace` matching the :term:`application
-   namespace` (in this example, an instance of the ``myapp`` called
-   ``'myapp'``).
+   namespace` (in this example, an instance of ``polls`` called ``'polls'``).
 
 4. If there is no default application instance, Django will pick the last
    deployed instance of the application, whatever its instance name may be.
@@ -817,37 +826,73 @@ Example
 ~~~~~~~
 
 To show this resolution strategy in action, consider an example of two instances
-of ``myapp``: one called ``'foo'``, and one called ``'bar'``. ``myapp`` has a
-main index page with a URL named ``'index'``. Using this setup, the following
-lookups are possible:
+of the ``polls`` application from the tutorial: one called ``'author-polls'``
+and one called ``'publisher-polls'``. Assume we have enhanced that application
+so that it takes the instance namespace into consideration when creating and
+displaying polls.
 
-* If one of the instances is current - say, if we were rendering a utility page
-  in the instance ``'bar'`` - ``'myapp:index'`` will resolve to the index page
-  of the instance ``'bar'``.
+.. snippet::
+    :filename: urls.py
+
+    from django.conf.urls import include, url
+
+    urlpatterns = [
+        url(r'^author-polls/', include('polls.urls', namespace='author-polls', app_name='polls')),
+        url(r'^publisher-polls/', include('polls.urls', namespace='publisher-polls', app_name='polls')),
+    ]
+
+.. snippet::
+    :filename: polls/urls.py
+
+    from django.conf.urls import url
+
+    from . import views
+
+    urlpatterns = [
+        url(r'^$', views.IndexView.as_view(), name='index'),
+        url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
+        ...
+    ]
+
+Using this setup, the following lookups are possible:
+
+* If one of the instances is current - say, if we were rendering the detail page
+  in the instance ``'author-polls'`` - ``'polls:index'`` will resolve to the
+  index page of the ``'author-polls'`` instance; i.e. both of the following will
+  result in ``"/author-polls/"``.
+
+  In the method of a class-based view::
+
+    reverse('polls:index', current_app=self.request.resolver_match.namespace)
+
+  and in the template:
+
+  .. code-block:: html+django
+
+    {% url 'polls:index' %}
+
+  Note that reversing in the template requires the ``current_app`` be added as
+  an attribute to the template context like this::
+
+    def render_to_response(self, context, **response_kwargs):
+        response_kwargs['current_app'] = self.request.resolver_match.namespace
+        return super(DetailView, self).render_to_response(context, **response_kwargs)
 
 * If there is no current instance - say, if we were rendering a page
-  somewhere else on the site - ``'myapp:index'`` will resolve to the last
-  registered instance of ``myapp``. Since there is no default instance,
-  the last instance of ``myapp`` that is registered will be used. This could
-  be ``'foo'`` or ``'bar'``, depending on the order they are introduced into the
-  urlpatterns of the project.
+  somewhere else on the site - ``'polls:index'`` will resolve to the last
+  registered instance of ``polls``. Since there is no default instance
+  (instance namespace of ``'polls'``), the last instance of ``polls`` that is
+  registered will be used. This would be ``'publisher-polls'`` since it's
+  declared last in the ``urlpatterns``.
 
-* ``'foo:index'`` will always resolve to the index page of the instance
-  ``'foo'``.
+* ``'author-polls:index'`` will always resolve to the index page of the instance
+  ``'author-polls'`` (and likewise for ``'publisher-polls'``) .
 
-If there was also a default instance - i.e., an instance named ``'myapp'`` - the
-following would happen:
-
-* If one of the instances is current - say, if we were rendering a utility page
-  in the instance ``'bar'`` - ``'myapp:index'`` will resolve to the index page
-  of the instance ``'bar'``.
-
-* If there is no current instance - say, if we were rendering a page somewhere
-  else on the site - ``'myapp:index'`` will resolve to the index page of the
-  default instance.
-
-* ``'foo:index'`` will again resolve to the index page of the instance
-  ``'foo'``.
+If there were also a default instance - i.e., an instance named ``'polls'`` -
+the only change from above would be in the case where there is no current
+instance (the second item in the list above). In this case ``'polls:index'``
+would resolve to the index page of the default instance instead of the instance
+declared last in ``urlpatterns``.
 
 .. _namespaces-and-include:
 
@@ -858,17 +903,17 @@ URL namespaces of included URLconfs can be specified in two ways.
 
 Firstly, you can provide the :term:`application <application namespace>` and
 :term:`instance <instance namespace>` namespaces as arguments to
-:func:`django.conf.urls.include()` when you construct your URL patterns. For
+:func:`~django.conf.urls.include()` when you construct your URL patterns. For
 example,::
 
-    url(r'^help/', include('apps.help.urls', namespace='foo', app_name='bar')),
+    url(r'^polls/', include('polls.urls', namespace='author-polls', app_name='polls')),
 
-This will include the URLs defined in ``apps.help.urls`` into the
-:term:`application namespace` ``'bar'``, with the :term:`instance namespace`
-``'foo'``.
+This will include the URLs defined in ``polls.urls`` into the
+:term:`application namespace` ``'polls'``, with the :term:`instance namespace`
+``'author-polls'``.
 
 Secondly, you can include an object that contains embedded namespace data. If
-you ``include()`` an object as returned by :func:`~django.conf.urls.patterns`,
+you ``include()`` a list of :func:`~django.conf.urls.url` instances,
 the URLs contained in that object will be added to the global namespace.
 However, you can also ``include()`` a 3-tuple containing::
 
@@ -876,28 +921,29 @@ However, you can also ``include()`` a 3-tuple containing::
 
 For example::
 
-    from django.conf.urls import include, patterns, url
+    from django.conf.urls import include, url
 
-    from app.helps import views
+    from . import views
 
-    help_patterns = patterns('',
-        url(r'^basic/$', views.views.basic),
-        url(r'^advanced/$', views.views.advanced),
-    )
+    polls_patterns = [
+        url(r'^$', views.IndexView.as_view(), name='index'),
+        url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
+    ]
 
-    url(r'^help/', include((help_patterns, 'bar', 'foo'))),
+    url(r'^polls/', include((polls_patterns, 'polls', 'author-polls'))),
 
 This will include the nominated URL patterns into the given application and
 instance namespace.
 
-For example, the Django Admin is deployed as instances of
+For example, the Django admin is deployed as instances of
 :class:`~django.contrib.admin.AdminSite`.  ``AdminSite`` objects have a ``urls``
 attribute: A 3-tuple that contains all the patterns in the corresponding admin
 site, plus the application namespace ``'admin'``, and the name of the admin
 instance. It is this ``urls`` attribute that you ``include()`` into your
-projects ``urlpatterns`` when you deploy an Admin instance.
+projects ``urlpatterns`` when you deploy an admin instance.
 
 Be sure to pass a tuple to ``include()``. If you simply pass three arguments:
-``include(help_patterns, 'bar', 'foo')``, Django won't throw an error but due
-to the signature of ``include()``, ``'bar'`` will be the instance namespace and
-``'foo'`` will be the application namespace instead of vice versa.
+``include(polls_patterns, 'polls', 'author-polls')``, Django won't throw an
+error but due to the signature of ``include()``, ``'polls'`` will be the
+instance namespace and ``'author-polls'`` will be the application namespace
+instead of vice versa.
