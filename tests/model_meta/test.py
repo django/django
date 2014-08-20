@@ -117,6 +117,8 @@ class RelatedObjectsTests(OptionsBaseTests):
         for model, expected in TEST_RESULTS[result_key].items():
             objects = [(field, self._model(model, field))
                        for field in model._meta.get_fields(data=False, related_objects=True, include_hidden=True, include_parents=False)]
+            if sorted(self._map_names(objects), key=self.key_name) != sorted(expected, key=self.key_name):
+                print(sorted(self._map_names(objects), key=self.key_name), model)
             self.assertEqual(
                 sorted(self._map_names(objects), key=self.key_name),
                 sorted(expected, key=self.key_name)
