@@ -2,7 +2,7 @@
 Django 1.5.9 release notes
 ==========================
 
-*Under development*
+*August 20, 2014*
 
 Django 1.5.9 fixes several security issues in 1.5.8.
 
