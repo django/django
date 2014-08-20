@@ -309,6 +309,11 @@ Note that this only works given two things:
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
 
+If you want to give migration(s) a meaningful name instead of a generated one,
+you can use the ``--name/-n`` option::
+
+    $ python manage.py makemigrations -n changed_my_model your_app_label
+
 .. _historical-models:
 
 Historical models

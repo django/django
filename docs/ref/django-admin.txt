@@ -668,6 +668,10 @@ written.
 
 The ``--merge`` option enables fixing of migration conflicts.
 
+.. django-admin-option:: --name, -n
+
+The ``--name`` option give migration(s) a custom name instead of a generated one.
+
 migrate [<app_label> [<migrationname>]]
 ---------------------------------------
 

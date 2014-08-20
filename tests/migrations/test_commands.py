@@ -175,6 +175,11 @@ class MakeMigrationsTests(MigrationTestBase):
                        "test_migrations_path_doesnt_exist"))
         except OSError:
             pass
+        try:
+            self._rmrf(os.path.join(self.test_dir,
+                       "test_migrations_path_with_custom_name_doesnt_exist"))
+        except OSError:
+            pass
 
         os.chdir(self._cwd)
 
@@ -546,3 +551,61 @@ class MakeMigrationsTests(MigrationTestBase):
             questioner.input = old_input
             if os.path.exists(merge_file):
                 os.remove(merge_file)
+
+    def call_makemigrations_command(self, *args, **kwargs):
+        from django.core.management.commands.makemigrations import Command
+        command = Command()
+        command.execute(*args, **kwargs)
+
+    @override_system_checks([])
+    def test_makemigrations_can_create_an_empty_migration_with_custom_name(self):
+        """
+        Makes sure that makemigrations properly constructs an empty migration.
+        """
+        migration_name = "my_initial_migration"
+        with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
+            try:
+                self.call_makemigrations_command("migrations", empty=True, verbosity=0, name=migration_name)
+            except CommandError:
+                self.fail("Makemigrations errored in creating empty migration with custom name for a proper app.")
+
+        initial_file = os.path.join(self.migration_dir, '0001_%s.py' % migration_name)
+
+        # Check for existing 0001_initial.py file in migration folder
+        self.assertTrue(os.path.exists(initial_file))
+
+        with codecs.open(initial_file, 'r', encoding='utf-8') as fp:
+            content = fp.read()
+            self.assertTrue('# -*- coding: utf-8 -*-' in content)
+
+            # Remove all whitespace to check for empty dependencies and operations
+            content = content.replace(' ', '')
+            self.assertIn('dependencies=[\n]', content)
+            self.assertIn('operations=[\n]', content)
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_path_with_custom_name_doesnt_exist.foo.bar"})
+    def test_makemigrations_migrations_modules_path_not_exist_when(self):
+        """
+        Ticket #22682 -- Makemigrations fails when specifying custom location
+        for migration files (using MIGRATION_MODULES) if the custom path
+        doesn't already exist.
+        """
+
+        class SillyModel(models.Model):
+            silly_field = models.BooleanField(default=False)
+
+            class Meta:
+                app_label = "migrations"
+
+        migration_name = "my_initial_migration"
+        stdout = six.StringIO()
+        self.call_makemigrations_command("migrations", name=migration_name, verbosity=1, stdout=stdout)
+
+        # Command output indicates the migration is created.
+        self.assertIn(" - Create model SillyModel", stdout.getvalue())
+
+        # Migrations file is actually created in the expected path.
+        self.assertTrue(os.path.isfile(os.path.join(self.test_dir,
+                       "test_migrations_path_with_custom_name_doesnt_exist", "foo", "bar",
+                       "0001_%s.py" % migration_name)))
