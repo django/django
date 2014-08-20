@@ -169,6 +169,29 @@ class AutodetectorTests(TestCase):
         self.assertEqual(changes["otherapp"][0].name, "0002_pony_stable")
         self.assertEqual(changes["otherapp"][0].dependencies, [("otherapp", "0001_initial")])
 
+    def test_arrange_for_graph_with_custom_migration_name(self):
+        "Tests custom naming of migrations for graph matching."
+        # Make a fake graph
+        graph = MigrationGraph()
+        graph.add_node(("testapp", "0001_initial"), None)
+        graph.add_node(("testapp", "0002_foobar"), None)
+        graph.add_node(("otherapp", "0001_initial"), None)
+        graph.add_dependency(("testapp", "0002_foobar"), ("testapp", "0001_initial"))
+        graph.add_dependency(("testapp", "0002_foobar"), ("otherapp", "0001_initial"))
+        # Use project state to make a new migration change set
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Run through arrange_for_graph
+        migration_name = 'custom_name'
+        changes = autodetector.arrange_for_graph(changes, graph, migration_name)
+        # Make sure there's a new name, deps match, etc.
+        self.assertEqual(changes["testapp"][0].name, "0003_%s" % migration_name)
+        self.assertEqual(changes["testapp"][0].dependencies, [("testapp", "0002_foobar")])
+        self.assertEqual(changes["otherapp"][0].name, "0002_%s" % migration_name)
+        self.assertEqual(changes["otherapp"][0].dependencies, [("otherapp", "0001_initial")])
+
     def test_trim_apps(self):
         "Tests that trim does not remove dependencies but does remove unwanted apps"
         # Use project state to make a new migration change set
@@ -184,6 +207,25 @@ class AutodetectorTests(TestCase):
         # Make sure there's the right set of migrations
         self.assertEqual(changes["testapp"][0].name, "0001_initial")
         self.assertEqual(changes["otherapp"][0].name, "0001_initial")
+        self.assertNotIn("thirdapp", changes)
+
+    def test_trim_apps_with_custom_migration_name(self):
+        "Tests that trim does not remove dependencies but does remove unwanted apps"
+        # Use project state to make a new migration change set
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable, self.third_thing])
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner(defaults={"ask_initial": True}))
+        changes = autodetector._detect_changes()
+        # Run through arrange_for_graph
+        graph = MigrationGraph()
+        migration_name = 'custom_migration_name'
+        initial_name = "0001_%s" % migration_name
+        changes = autodetector.arrange_for_graph(changes, graph, migration_name)
+        changes["testapp"][0].dependencies.append(("otherapp", initial_name))
+        changes = autodetector._trim_to_apps(changes, set(["testapp"]))
+        # Make sure there's the right set of migrations
+        self.assertEqual(changes["testapp"][0].name, initial_name)
+        self.assertEqual(changes["otherapp"][0].name, initial_name)
         self.assertNotIn("thirdapp", changes)
 
     def test_new_model(self):
