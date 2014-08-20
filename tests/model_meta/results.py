@@ -191,7 +191,7 @@ TEST_RESULTS = {
             None,
         ],
     },
-    'get_all_related_objects_with_model': {
+    'get_all_related_objects_with_model_legacy': {
         Person: (
             ('relating_baseperson', BasePerson),
             ('relating_person', None),
@@ -209,7 +209,7 @@ TEST_RESULTS = {
             ('fo_concrete_rel', None),
         ),
     },
-    'get_all_related_objects_with_model_local': {
+    'get_all_related_objects_with_model_local_legacy': {
         Person: (
             ('relating_person', None),
         ),
@@ -226,7 +226,7 @@ TEST_RESULTS = {
             ('fo_concrete_rel', None),
         ),
     },
-    'get_all_related_objects_with_model_hidden': {
+    'get_all_related_objects_with_model_hidden_legacy': {
         BasePerson: (
             ('model_meta:baseperson_friends_base', None),
             ('model_meta:baseperson_friends_base', None),
@@ -289,7 +289,7 @@ TEST_RESULTS = {
             ('model_meta:proxyperson', None),
         ),
     },
-    'get_all_related_objects_with_model_hidden_local': {
+    'get_all_related_objects_with_model_hidden_local_legacy': {
         BasePerson: (
             ('model_meta:baseperson_friends_base', None),
             ('model_meta:baseperson_friends_base', None),
@@ -338,7 +338,7 @@ TEST_RESULTS = {
             ('model_meta:proxyperson', None),
         ),
     },
-    'get_all_related_objects_with_model_proxy': {
+    'get_all_related_objects_with_model_proxy_legacy': {
         BasePerson: (
             ('person', None),
             ('relating_baseperson', None),
@@ -353,7 +353,7 @@ TEST_RESULTS = {
             ('fk_concrete_rel', None), ('fo_concrete_rel', None),
         ),
     },
-    'get_all_related_objects_with_model_proxy_hidden': {
+    'get_all_related_objects_with_model_proxy_hidden_legacy': {
         BasePerson: (
             ('model_meta:baseperson_friends_base', None),
             ('model_meta:baseperson_friends_base', None),
@@ -418,7 +418,7 @@ TEST_RESULTS = {
             ('model_meta:proxyperson', None),
         ),
     },
-    'get_all_related_many_to_many_with_model': {
+    'get_all_related_many_to_many_with_model_legacy': {
         BasePerson: (
             ('friends_abstract_rel_+', None),
             ('followers_abstract', None),
@@ -445,7 +445,7 @@ TEST_RESULTS = {
             ('m2m_concrete_rel', None),
         ),
     },
-    'get_all_related_many_to_many_local': {
+    'get_all_related_many_to_many_local_legacy': {
         BasePerson: [
             'friends_abstract_rel_+',
             'followers_abstract',

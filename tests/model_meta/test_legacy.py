@@ -66,19 +66,19 @@ class RelatedObjectsTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTest
         self.key_name = lambda r: r[0]
 
     def test_related_objects(self):
-        result_key = 'get_all_related_objects_with_model'
+        result_key = 'get_all_related_objects_with_model_legacy'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model()
             self.assertEqual(self._map_rq_names(objects), expected)
 
     def test_related_objects_local(self):
-        result_key = 'get_all_related_objects_with_model_local'
+        result_key = 'get_all_related_objects_with_model_local_legacy'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(local_only=True)
             self.assertEqual(self._map_rq_names(objects), expected)
 
     def test_related_objects_include_hidden(self):
-        result_key = 'get_all_related_objects_with_model_hidden'
+        result_key = 'get_all_related_objects_with_model_hidden_legacy'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(include_hidden=True)
             self.assertEqual(
@@ -87,7 +87,7 @@ class RelatedObjectsTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTest
             )
 
     def test_related_objects_include_hidden_local_only(self):
-        result_key = 'get_all_related_objects_with_model_hidden_local'
+        result_key = 'get_all_related_objects_with_model_hidden_local_legacy'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_hidden=True, local_only=True)
@@ -97,14 +97,14 @@ class RelatedObjectsTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTest
             )
 
     def test_related_objects_proxy(self):
-        result_key = 'get_all_related_objects_with_model_proxy'
+        result_key = 'get_all_related_objects_with_model_proxy_legacy'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_proxy_eq=True)
             self.assertEqual(self._map_rq_names(objects), expected)
 
     def test_related_objects_proxy_hidden(self):
-        result_key = 'get_all_related_objects_with_model_proxy_hidden'
+        result_key = 'get_all_related_objects_with_model_proxy_hidden_legacy'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_proxy_eq=True, include_hidden=True)
@@ -117,13 +117,13 @@ class RelatedObjectsTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTest
 class RelatedM2MTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTests):
 
     def test_related_m2m_with_model(self):
-        result_key = 'get_all_related_many_to_many_with_model'
+        result_key = 'get_all_related_many_to_many_with_model_legacy'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_m2m_objects_with_model()
             self.assertEqual(self._map_rq_names(objects), expected)
 
     def test_related_m2m_local_only(self):
-        result_key = 'get_all_related_many_to_many_local'
+        result_key = 'get_all_related_many_to_many_local_legacy'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_many_to_many_objects(local_only=True)
             self.assertEqual([o.field.related_query_name() for o in objects], expected)
