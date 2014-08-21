@@ -119,6 +119,12 @@ class TestUtilsHttp(unittest.TestCase):
                      '/url%20with%20spaces/'):
             self.assertTrue(http.is_safe_url(good_url, host='testserver'), "%s should be allowed" % good_url)
 
+    def test_urlsafe_base64_roundtrip(self):
+        bytestring = b'foo'
+        encoded = http.urlsafe_base64_encode(bytestring)
+        decoded = http.urlsafe_base64_decode(encoded)
+        self.assertEqual(bytestring, decoded)
+
 
 class ETagProcessingTests(unittest.TestCase):
     def test_parsing(self):
