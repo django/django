@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import mysql, no_mysql, no_oracle
+from django.contrib.gis.tests.utils import mysql, no_oracle
 from django.test import TestCase, skipUnlessDBFeature
 
 if HAS_GEOS:
@@ -36,7 +36,7 @@ class RelatedGeoModelTest(TestCase):
                 self.assertEqual(st, c.state)
                 self.assertEqual(Point(lon, lat), c.location.point)
 
-    @no_mysql
+    @skipUnlessDBFeature("has_transform_method")
     def test03_transform_related(self):
         "Testing the `transform` GeoQuerySet method on related geographic models."
         # All the transformations are to state plane coordinate systems using
@@ -80,7 +80,7 @@ class RelatedGeoModelTest(TestCase):
             for ref_val, e_val in zip(ref, e):
                 self.assertAlmostEqual(ref_val, e_val, tol)
 
-    @no_mysql
+    @skipUnlessDBFeature("has_unionagg_method")
     def test04b_related_union_aggregate(self):
         "Testing the `unionagg` GeoQuerySet aggregates on related geographic models."
         # This combines the Extent and Union aggregates into one query
