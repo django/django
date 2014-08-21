@@ -26,7 +26,7 @@ class Command(BaseCommand):
         parser.add_argument('app_label', nargs='?',
             help='App label of an application to synchronize the state.')
         parser.add_argument('migration_name', nargs='?',
-            help='Database state will be brought to the state after that migration.')
+            help='Database state will be brought to the state after that migration. Use the name "zero" to unapply all migrations.')
         parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.')
         parser.add_argument('--no-initial-data', action='store_false', dest='load_initial_data', default=True,
