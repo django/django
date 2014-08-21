@@ -2,6 +2,7 @@
 Base/mixin classes for the spatial backend database operations and the
 `<Backend>SpatialRefSys` model.
 """
+from functools import partial
 import re
 
 from django.contrib.gis import gdal
@@ -15,42 +16,38 @@ class BaseSpatialFeatures(object):
     # Does the database contain a SpatialRefSys model to store SRID information?
     has_spatialrefsys_table = True
 
+    # Does the database support SRID transform operations?
+    supports_transform = True
+    # Do geometric relationship operations operate on real shapes (or only on bounding boxes)?
+    supports_real_shape_operations = True
+    # Can geometry fields be null?
+    supports_null_geometries = True
     # Can the `distance` GeoQuerySet method be applied on geodetic coordinate systems?
     supports_distance_geodetic = True
-    # Does the database supports `left` and `right` lookups?
-    supports_left_right_lookups = False
     # Is the database able to count vertices on polygons (with `num_points`)?
     supports_num_points_poly = True
 
-    # The following properties indicate if the database GIS extensions support
-    # certain methods (dwithin, force_rhr, geohash, ...)
+    # The following properties indicate if the database backend support
+    # certain lookups (dwithin, left and right, relate, ...)
+    supports_left_right_lookups = False
+
+    @property
+    def supports_relate_lookup(self):
+        return 'relate' in self.connection.ops.geometry_functions
+
     @property
     def has_dwithin_lookup(self):
         return 'dwithin' in self.connection.ops.distance_functions
 
-    @property
-    def has_force_rhr_method(self):
-        return bool(self.connection.ops.force_rhr)
-
-    @property
-    def has_geohash_method(self):
-        return bool(self.connection.ops.geohash)
-
-    @property
-    def has_make_line_method(self):
-        return bool(self.connection.ops.make_line)
-
-    @property
-    def has_perimeter_method(self):
-        return bool(self.connection.ops.perimeter)
-
-    @property
-    def has_reverse_method(self):
-        return bool(self.connection.ops.reverse)
-
-    @property
-    def has_snap_to_grid_method(self):
-        return bool(self.connection.ops.snap_to_grid)
+    # For each of those methods, the class will have a property named
+    # `has_<name>_method` (defined in __init__) which accesses connection.ops
+    # to determine GIS method availability.
+    geoqueryset_methods = (
+        'centroid', 'difference', 'envelope', 'force_rhr', 'geohash', 'gml',
+        'intersection', 'kml', 'num_geom', 'perimeter', 'point_on_surface',
+        'reverse', 'scale', 'snap_to_grid', 'svg', 'sym_difference',
+        'transform', 'translate', 'union', 'unionagg',
+    )
 
     # Specifies whether the Collect and Extent aggregates are supported by the database
     @property
@@ -60,6 +57,20 @@ class BaseSpatialFeatures(object):
     @property
     def supports_extent_aggr(self):
         return 'Extent' in self.connection.ops.valid_aggregates
+
+    @property
+    def supports_make_line_aggr(self):
+        return 'MakeLine' in self.connection.ops.valid_aggregates
+
+    def __init__(self, *args):
+        super(BaseSpatialFeatures, self).__init__(*args)
+        for method in self.geoqueryset_methods:
+            # Add dynamically properties for each GQS method, e.g. has_force_rhr_method, etc.
+            setattr(self.__class__, 'has_%s_method' % method,
+                    property(partial(BaseSpatialFeatures.has_ops_method, method=method)))
+
+    def has_ops_method(self, method):
+        return getattr(self.connection.ops, method, False)
 
 
 class BaseSpatialOperations(object):
