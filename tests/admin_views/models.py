@@ -822,3 +822,20 @@ class Worker(models.Model):
     work_at = models.ForeignKey(Restaurant)
     name = models.CharField(max_length=50)
     surname = models.CharField(max_length=50)
+
+
+# Models for #23329
+class ReferencedByParent(models.Model):
+    pass
+
+
+class ParentWithFK(models.Model):
+    fk = models.ForeignKey(ReferencedByParent)
+
+
+class ChildOfReferer(ParentWithFK):
+    pass
+
+
+class M2MReference(models.Model):
+    ref = models.ManyToManyField('self')
