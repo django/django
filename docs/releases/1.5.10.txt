@@ -1,0 +1,13 @@
+===========================
+Django 1.5.10 release notes
+===========================
+
+*Under development*
+
+Django 1.5.10 fixes a regression in the 1.5.9 security release.
+
+Bugfixes
+========
+
+* Allowed inherited and m2m fields to be referenced in the admin
+  (`#22486 <http://code.djangoproject.com/ticket/23329>`_)
