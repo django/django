@@ -11,11 +11,19 @@ from django.utils.encoding import python_2_unicode_compatible
 
 class BaseSpatialFeatures(object):
     gis_enabled = True
+
+    # Does the database contains a SpatialRefSys model to store SRID information?
     has_spatialrefsys_table = True
+
+    # Can the `distance` GeoQuerySet method be applied on geodetic coordinate systems?
     supports_distance_geodetic = True
+    # Does the database supports `left` and `right` lookups?
     supports_left_right_lookups = False
+    # Is the database able to count vertices on polygons (with `num_points`)?
     supports_num_points_poly = True
 
+    # Following properties tells if the database GIS extensions supports certain methods
+    # (dwithin, force_rhr, geohash, make_line, perimeter, reverse, snap_to_grid)
     @property
     def has_dwithin_lookup(self):
         return 'dwithin' in self.connection.ops.distance_functions
@@ -44,6 +52,7 @@ class BaseSpatialFeatures(object):
     def has_snap_to_grid_method(self):
         return bool(self.connection.ops.snap_to_grid)
 
+    # Specifies whether the Collect and Extent aggregates are supported by the database
     @property
     def supports_collect_aggr(self):
         return 'Collect' in self.connection.ops.valid_aggregates
