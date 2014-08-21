@@ -385,7 +385,8 @@ class Options(object):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = self.get_fields(m2m=True, data=True, export_name_map=True)
+        fields = self.get_fields(m2m=True, data=True,
+                                 export_name_map=True, cache_results=False)
         fields.update(
             (field, {field.name, field.attname})
             for field in self.virtual_fields
@@ -401,7 +402,7 @@ class Options(object):
     def all_fields_map(self):
         res = {}
         for field, names in six.iteritems(self.get_fields(data=False, related_objects=True,
-                                          export_name_map=True)):
+                                          export_name_map=True, cache_results=False)):
             # map each possible name for a field to its field instance
             for name in names:
                 res[name] = field
@@ -462,7 +463,7 @@ class Options(object):
             include_parents=include_parents,
             include_hidden=include_hidden,
         )
-        fields = [obj for obj in fields if not isinstance(obj.field, ManyToManyField)]
+        fields = (obj for obj in fields if not isinstance(obj.field, ManyToManyField))
 
         if include_proxy_eq:
             children = chain.from_iterable(c.relation_tree
