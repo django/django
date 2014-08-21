@@ -2,12 +2,11 @@ from __future__ import unicode_literals
 
 import re
 import unittest
-from unittest import skipUnless
 
 from django.db import connection
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import mysql, oracle, postgis, spatialite
+from django.contrib.gis.tests.utils import oracle, postgis, spatialite
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
@@ -142,11 +141,12 @@ class GeoModelTest(TestCase):
 
         # If the GeometryField SRID is -1, then we shouldn't perform any
         # transformation if the SRID of the input geometry is different.
-        # SpatiaLite does not support missing SRID values.
-        if not spatialite:
-            m1 = MinusOneSRID(geom=Point(17, 23, srid=4326))
-            m1.save()
-            self.assertEqual(-1, m1.geom.srid)
+        if spatialite and connection.ops.spatial_version < 3:
+            # SpatiaLite < 3 does not support missing SRID values.
+            return
+        m1 = MinusOneSRID(geom=Point(17, 23, srid=4326))
+        m1.save()
+        self.assertEqual(-1, m1.geom.srid)
 
     def test_createnull(self):
         "Testing creating a model instance and the geometry being None"
@@ -223,7 +223,7 @@ class GeoLookupTest(TestCase):
         # Seeing what cities are in Texas, should get Houston and Dallas,
         #  and Oklahoma City because 'contained' only checks on the
         #  _bounding box_ of the Geometries.
-        if not oracle:
+        if connection.features.supports_contained_lookup:
             qs = City.objects.filter(point__contained=texas.mpoly)
             self.assertEqual(3, qs.count())
             cities = ['Houston', 'Dallas', 'Oklahoma City']
@@ -245,23 +245,22 @@ class GeoLookupTest(TestCase):
         self.assertEqual('New Zealand', nz.name)
 
         # Spatialite 2.3 thinks that Lawrence is in Puerto Rico (a NULL geometry).
-        if not spatialite:
+        if not (spatialite and connection.ops.spatial_version < 3):
             ks = State.objects.get(poly__contains=lawrence.point)
             self.assertEqual('Kansas', ks.name)
 
         # Pueblo and Oklahoma City (even though OK City is within the bounding box of Texas)
         # are not contained in Texas or New Zealand.
-        self.assertEqual(0, len(Country.objects.filter(mpoly__contains=pueblo.point)))  # Query w/GEOSGeometry object
-        self.assertEqual((mysql and 1) or 0,
-                         len(Country.objects.filter(mpoly__contains=okcity.point.wkt)))  # Qeury w/WKT
+        self.assertEqual(len(Country.objects.filter(mpoly__contains=pueblo.point)), 0)  # Query w/GEOSGeometry object
+        self.assertEqual(len(Country.objects.filter(mpoly__contains=okcity.point.wkt)),
+                         0 if connection.features.supports_real_shape_operations else 1)  # Query w/WKT
 
         # OK City is contained w/in bounding box of Texas.
-        if not oracle:
+        if connection.features.supports_bbcontains_lookup:
             qs = Country.objects.filter(mpoly__bbcontains=okcity.point)
             self.assertEqual(1, len(qs))
             self.assertEqual('Texas', qs[0].name)
 
-    # Only PostGIS has `left` and `right` lookup types.
     @skipUnlessDBFeature("supports_left_right_lookups")
     def test_left_right_lookups(self):
         "Testing the 'left' and 'right' lookup types."
@@ -409,10 +408,9 @@ class GeoQuerySetTest(TestCase):
         for s in qs:
             self.assertEqual(True, s.poly.centroid.equals_exact(s.centroid, tol))
 
-    @skipUnlessDBFeature("has_difference_method")
-    @skipUnlessDBFeature("has_intersection_method")
-    @skipUnlessDBFeature("has_sym_difference_method")
-    @skipUnlessDBFeature("has_union_method")
+    @skipUnlessDBFeature(
+        "has_difference_method", "has_intersection_method",
+        "has_sym_difference_method", "has_union_method")
     def test_diff_intersection_union(self):
         "Testing the `difference`, `intersection`, `sym_difference`, and `union` GeoQuerySet methods."
         geom = Point(5, 23)
@@ -610,7 +608,7 @@ class GeoQuerySetTest(TestCase):
                    'Texas': fromstr('POINT (-103.002434 36.500397)', srid=4326),
                    }
 
-        elif postgis or spatialite:
+        else:
             # Using GEOSGeometry to compute the reference point on surface values
             # -- since PostGIS also uses GEOS these should be the same.
             ref = {'New Zealand': Country.objects.get(name='New Zealand').mpoly.point_on_surface,
