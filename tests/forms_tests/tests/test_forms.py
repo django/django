@@ -2338,3 +2338,27 @@ class FormsTestCase(TestCase):
 <tr><th><label for="id_first_name">First name:</label></th><td><input id="id_first_name" name="first_name" type="text" value="John" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><input id="id_last_name" name="last_name" type="text" value="Lennon" /></td></tr>"""
         )
+
+    def test_baseform_repr(self):
+        """
+        Test for baseForm method __repr__
+        """
+        p = Person()
+        self.assertEqual(repr(p), "<Person bound=False, valid=Unknown, fields=(first_name;last_name;birthday)>")
+        p = Person({'first_name': 'John', 'last_name': 'Lennon', 'birthday': '1940-10-9'})
+        self.assertEqual(repr(p), "<Person bound=True, valid=Unknown, fields=(first_name;last_name;birthday)>")
+        p.is_valid()
+        self.assertEqual(repr(p), "<Person bound=True, valid=True, fields=(first_name;last_name;birthday)>")
+        p = Person({'first_name': 'John', 'last_name': 'Lennon', 'birthday': 'fakedate'})
+        p.is_valid()
+        self.assertEqual(repr(p), "<Person bound=True, valid=False, fields=(first_name;last_name;birthday)>")
+
+    def test_baseform_repr_dont_trigger_validation(self):
+        """
+        Test to verify that __repr__ method don't trigger the validation
+        """
+        p = Person({'first_name': 'John', 'last_name': 'Lennon', 'birthday': 'fakedate'})
+        repr(p)
+        self.assertRaises(AttributeError, lambda: p.cleaned_data)
+        self.assertFalse(p.is_valid())
+        self.assertEqual(p.cleaned_data, {'first_name': 'John', 'last_name': 'Lennon'})
