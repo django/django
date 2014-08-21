@@ -7,8 +7,7 @@ from unittest import skipUnless
 from django.db import connection
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import (
-    no_mysql, no_oracle, mysql, oracle, postgis, spatialite)
+from django.contrib.gis.tests.utils import mysql, oracle, postgis, spatialite
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
@@ -104,7 +103,7 @@ class GeoModelTest(TestCase):
         self.assertEqual(ply, State.objects.get(name='NullState').poly)
         ns.delete()
 
-    @no_mysql
+    @skipUnlessDBFeature("supports_transform")
     def test_lookup_insert_transform(self):
         "Testing automatic transform for lookups and inserts."
         # San Antonio in 'WGS84' (SRID 4326)
@@ -176,7 +175,7 @@ class GeoModelTest(TestCase):
         self.assertEqual(True, isinstance(f_4.geom, GeometryCollection))
         self.assertEqual(f_3.geom, f_4.geom[2])
 
-    @no_mysql
+    @skipUnlessDBFeature("supports_transform")
     def test_inherited_geofields(self):
         "Test GeoQuerySet methods on inherited Geometry fields."
         # Creating a Pennsylvanian city.
@@ -205,16 +204,16 @@ class GeoModelTest(TestCase):
 class GeoLookupTest(TestCase):
     fixtures = ['initial']
 
-    @no_mysql
     def test_disjoint_lookup(self):
         "Testing the `disjoint` lookup type."
         ptown = City.objects.get(name='Pueblo')
         qs1 = City.objects.filter(point__disjoint=ptown.point)
         self.assertEqual(7, qs1.count())
 
-        qs2 = State.objects.filter(poly__disjoint=ptown.point)
-        self.assertEqual(1, qs2.count())
-        self.assertEqual('Kansas', qs2[0].name)
+        if connection.features.supports_real_shape_operations:
+            qs2 = State.objects.filter(poly__disjoint=ptown.point)
+            self.assertEqual(1, qs2.count())
+            self.assertEqual('Kansas', qs2[0].name)
 
     def test_contains_contained_lookups(self):
         "Testing the 'contained', 'contains', and 'bbcontains' lookup types."
@@ -317,7 +316,7 @@ class GeoLookupTest(TestCase):
         for c in [c1, c2, c3]:
             self.assertEqual('Houston', c.name)
 
-    @no_mysql
+    @skipUnlessDBFeature("supports_null_geometries")
     def test_null_geometries(self):
         "Testing NULL geometry support, and the `isnull` lookup type."
         # Creating a state with a NULL boundary.
@@ -347,7 +346,7 @@ class GeoLookupTest(TestCase):
         State.objects.filter(name='Northern Mariana Islands').update(poly=None)
         self.assertEqual(None, State.objects.get(name='Northern Mariana Islands').poly)
 
-    @no_mysql
+    @skipUnlessDBFeature("supports_relate_lookup")
     def test_relate_lookup(self):
         "Testing the 'relate' lookup type."
         # To make things more interesting, we will have our Texas reference point in
@@ -397,7 +396,7 @@ class GeoQuerySetTest(TestCase):
 
     # Please keep the tests in GeoQuerySet method's alphabetic order
 
-    @no_mysql
+    @skipUnlessDBFeature("has_centroid_method")
     def test_centroid(self):
         "Testing the `centroid` GeoQuerySet method."
         qs = State.objects.exclude(poly__isnull=True).centroid()
@@ -410,7 +409,10 @@ class GeoQuerySetTest(TestCase):
         for s in qs:
             self.assertEqual(True, s.poly.centroid.equals_exact(s.centroid, tol))
 
-    @no_mysql
+    @skipUnlessDBFeature("has_difference_method")
+    @skipUnlessDBFeature("has_intersection_method")
+    @skipUnlessDBFeature("has_sym_difference_method")
+    @skipUnlessDBFeature("has_union_method")
     def test_diff_intersection_union(self):
         "Testing the `difference`, `intersection`, `sym_difference`, and `union` GeoQuerySet methods."
         geom = Point(5, 23)
@@ -439,7 +441,7 @@ class GeoQuerySetTest(TestCase):
                 self.assertSetEqual(set(g.wkt for g in c.mpoly.union(geom)),
                                     set(g.wkt for g in c.union))
 
-    @skipUnless(getattr(connection.ops, 'envelope', False), 'Database does not support envelope operation')
+    @skipUnlessDBFeature("has_envelope_method")
     def test_envelope(self):
         "Testing the `envelope` GeoQuerySet method."
         countries = Country.objects.all().envelope()
@@ -520,12 +522,9 @@ class GeoQuerySetTest(TestCase):
         # Finally, we set every available keyword.
         self.assertEqual(chicago_json, City.objects.geojson(bbox=True, crs=True, precision=5).get(name='Chicago').geojson)
 
+    @skipUnlessDBFeature("has_gml_method")
     def test_gml(self):
         "Testing GML output from the database using GeoQuerySet.gml()."
-        if mysql or (spatialite and not connection.ops.gml):
-            self.assertRaises(NotImplementedError, Country.objects.all().gml, field_name='mpoly')
-            return
-
         # Should throw a TypeError when tyring to obtain GML from a
         # non-geometry field.
         qs = City.objects.all()
@@ -548,13 +547,9 @@ class GeoQuerySetTest(TestCase):
         if postgis:
             self.assertIn('<gml:pos srsDimension="2">', City.objects.gml(version=3).get(name='Pueblo').gml)
 
+    @skipUnlessDBFeature("has_kml_method")
     def test_kml(self):
         "Testing KML output from the database using GeoQuerySet.kml()."
-        # Only PostGIS and Spatialite (>=2.4.0-RC4) support KML serialization
-        if not (postgis or (spatialite and connection.ops.kml)):
-            self.assertRaises(NotImplementedError, State.objects.all().kml, field_name='poly')
-            return
-
         # Should throw a TypeError when trying to obtain KML from a
         #  non-geometry field.
         qs = City.objects.all()
@@ -567,7 +562,7 @@ class GeoQuerySetTest(TestCase):
             self.assertEqual('<Point><coordinates>-104.609252,38.255001</coordinates></Point>', ptown.kml)
 
     # Only PostGIS has support for the MakeLine aggregate.
-    @skipUnlessDBFeature("has_make_line_method")
+    @skipUnlessDBFeature("supports_make_line_aggr")
     def test_make_line(self):
         "Testing the `make_line` GeoQuerySet method."
         # Ensuring that a `TypeError` is raised on models without PointFields.
@@ -578,7 +573,7 @@ class GeoQuerySetTest(TestCase):
         ref_line = GEOSGeometry('LINESTRING(-95.363151 29.763374,-96.801611 32.782057,-97.521157 34.464642,174.783117 -41.315268,-104.609252 38.255001,-95.23506 38.971823,-87.650175 41.850385,-123.305196 48.462611)', srid=4326)
         self.assertEqual(ref_line, City.objects.make_line())
 
-    @no_mysql
+    @skipUnlessDBFeature("has_num_geom_method")
     def test_num_geom(self):
         "Testing the `num_geom` GeoQuerySet method."
         # Both 'countries' only have two geometries.
@@ -605,7 +600,7 @@ class GeoQuerySetTest(TestCase):
             for c in City.objects.num_points():
                 self.assertEqual(1, c.num_points)
 
-    @no_mysql
+    @skipUnlessDBFeature("has_point_on_surface_method")
     def test_point_on_surface(self):
         "Testing the `point_on_surface` GeoQuerySet method."
         # Reference values.
@@ -641,8 +636,7 @@ class GeoQuerySetTest(TestCase):
         if oracle:
             self.assertRaises(TypeError, State.objects.reverse_geom)
 
-    @no_mysql
-    @no_oracle
+    @skipUnlessDBFeature("has_scale_method")
     def test_scale(self):
         "Testing the `scale` GeoQuerySet method."
         xfac, yfac = 2, 3
@@ -692,11 +686,9 @@ class GeoQuerySetTest(TestCase):
         ref = fromstr('MULTIPOLYGON(((12.4 43.87,12.45 43.87,12.45 44.1,12.5 44.1,12.5 43.87,12.45 43.87,12.4 43.87)))')
         self.assertTrue(ref.equals_exact(Country.objects.snap_to_grid(0.05, 0.23, 0.5, 0.17).get(name='San Marino').snap_to_grid, tol))
 
+    @skipUnlessDBFeature("has_svg_method")
     def test_svg(self):
         "Testing SVG output using GeoQuerySet.svg()."
-        if mysql or oracle:
-            self.assertRaises(NotImplementedError, City.objects.svg)
-            return
 
         self.assertRaises(TypeError, City.objects.svg, precision='foo')
         # SELECT AsSVG(geoapp_city.point, 0, 8) FROM geoapp_city WHERE name = 'Pueblo';
@@ -707,7 +699,7 @@ class GeoQuerySetTest(TestCase):
         self.assertEqual(svg1, City.objects.svg().get(name='Pueblo').svg)
         self.assertEqual(svg2, City.objects.svg(relative=5).get(name='Pueblo').svg)
 
-    @no_mysql
+    @skipUnlessDBFeature("has_transform_method")
     def test_transform(self):
         "Testing the transform() GeoQuerySet method."
         # Pre-transformed points for Houston and Pueblo.
@@ -730,8 +722,7 @@ class GeoQuerySetTest(TestCase):
             self.assertAlmostEqual(ptown.x, p.point.x, prec)
             self.assertAlmostEqual(ptown.y, p.point.y, prec)
 
-    @no_mysql
-    @no_oracle
+    @skipUnlessDBFeature("has_translate_method")
     def test_translate(self):
         "Testing the `translate` GeoQuerySet method."
         xfac, yfac = 5, -23
@@ -744,7 +735,7 @@ class GeoQuerySetTest(TestCase):
                         self.assertAlmostEqual(c1[0] + xfac, c2[0], 5)
                         self.assertAlmostEqual(c1[1] + yfac, c2[1], 5)
 
-    @no_mysql
+    @skipUnlessDBFeature("has_unionagg_method")
     def test_unionagg(self):
         "Testing the `unionagg` (aggregate union) GeoQuerySet method."
         tx = Country.objects.get(name='Texas').mpoly
