@@ -607,3 +607,21 @@ class UnorderedObject(models.Model):
     """
     name = models.CharField(max_length=255)
     bool = models.BooleanField(default=True)
+
+
+# Models for #23329
+class ReferencedByParent(models.Model):
+    pass
+
+
+class ParentWithFK(models.Model):
+    fk = models.ForeignKey(ReferencedByParent)
+
+
+class ChildOfReferer(ParentWithFK):
+    pass
+
+
+class M2MReference(models.Model):
+    ref = models.ManyToManyField('self')
+

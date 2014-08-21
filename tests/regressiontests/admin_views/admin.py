@@ -27,7 +27,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
-    RelatedPrepopulated)
+    RelatedPrepopulated, ReferencedByParent, ChildOfReferer, M2MReference)
 
 
 def callable_year(dt_value):
@@ -616,6 +616,9 @@ site.register(OtherStory, OtherStoryAdmin)
 site.register(Report, ReportAdmin)
 site.register(MainPrepopulated, MainPrepopulatedAdmin)
 site.register(UnorderedObject, UnorderedObjectAdmin)
+site.register(ReferencedByParent)
+site.register(ChildOfReferer)
+site.register(M2MReference)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
