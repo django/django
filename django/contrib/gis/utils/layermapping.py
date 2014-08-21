@@ -103,10 +103,10 @@ class LayerMapping(object):
 
         # Getting the geometry column associated with the model (an
         # exception will be raised if there is no geometry column).
-        if self.spatial_backend.mysql:
-            transform = False
-        else:
+        if connections[self.using].features.supports_transform:
             self.geo_field = self.geometry_field()
+        else:
+            transform = False
 
         # Checking the source spatial reference system, and getting
         # the coordinate transformation object (unless the `transform`

@@ -6,8 +6,7 @@ from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import postgis
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils._os import upath
 
 if HAS_GEOS:
@@ -62,7 +61,8 @@ bbox_data = (
 )
 
 
-@skipUnless(HAS_GEOS and HAS_GDAL and postgis, "Geos, GDAL and postgis are required.")
+@skipUnless(HAS_GDAL, "GDAL is required for Geo3DTest.")
+@skipUnlessDBFeature("gis_enabled", "supports_3d_functions")
 class Geo3DTest(TestCase):
     """
     Only a subset of the PostGIS routines are 3D-enabled, and this TestCase
@@ -70,7 +70,7 @@ class Geo3DTest(TestCase):
     available within GeoDjango.  For more information, see the PostGIS docs
     on the routines that support 3D:
 
-    http://postgis.refractions.net/documentation/manual-1.5/ch08.html#PostGIS_3D_Functions
+    http://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
     """
 
     def _load_interstate_data(self):

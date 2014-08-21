@@ -631,8 +631,8 @@ class GeoQuerySet(QuerySet):
                 u, unit_name, s = get_srid_info(self.query.transformed_srid, connection)
                 geodetic = unit_name.lower() in geo_field.geodetic_units
 
-            if backend.spatialite and geodetic:
-                raise ValueError('SQLite does not support linear distance calculations on geodetic coordinate systems.')
+            if geodetic and not connection.features.supports_distance_geodetic:
+                raise ValueError('This database does not support linear distance calculations on geodetic coordinate systems.')
 
             if distance:
                 if self.query.transformed_srid:
@@ -690,8 +690,8 @@ class GeoQuerySet(QuerySet):
                     # works on 3D geometries.
                     procedure_fmt += ",'%(spheroid)s'"
                     procedure_args.update({'function': backend.length_spheroid, 'spheroid': params[1]})
-                elif geom_3d and backend.postgis:
-                    # Use 3D variants of perimeter and length routines on PostGIS.
+                elif geom_3d and connection.features.supports_3d_functions:
+                    # Use 3D variants of perimeter and length routines on supported backends.
                     if perimeter:
                         procedure_args.update({'function': backend.perimeter3d})
                     elif length:
