@@ -21,14 +21,6 @@ def no_oracle(func):
     return no_backend(func, 'oracle')
 
 
-def no_postgis(func):
-    return no_backend(func, 'postgis')
-
-
-def no_mysql(func):
-    return no_backend(func, 'mysql')
-
-
 # Shortcut booleans to omit only portions of tests.
 _default_db = settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'].rsplit('.')[-1]
 oracle = _default_db == 'oracle'
