@@ -1,7 +1,8 @@
 from __future__ import unicode_literals
 
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import mysql, no_oracle
+from django.contrib.gis.tests.utils import no_oracle
+from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 
 if HAS_GEOS:
@@ -146,7 +147,7 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('P2', qs[0].name)
 
-        if not mysql:
+        if connection.features.supports_transform:
             # This time center2 is in a different coordinate system and needs
             # to be wrapped in transformation SQL.
             qs = Parcel.objects.filter(center2__within=F('border1'))
@@ -159,7 +160,7 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('P1', qs[0].name)
 
-        if not mysql:
+        if connection.features.supports_transform:
             # This time the city column should be wrapped in transformation SQL.
             qs = Parcel.objects.filter(border2__contains=F('city__location__point'))
             self.assertEqual(1, len(qs))

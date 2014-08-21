@@ -1,4 +1,5 @@
 from django.contrib.gis.db import models
+from django.contrib.gis.tests.utils import gisfield_may_be_null
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -38,7 +39,7 @@ class CensusZipcode(NamedModel):
 
 class SouthTexasZipcode(NamedModel):
     "Model for a few South Texas ZIP codes."
-    poly = models.PolygonField(srid=32140, null=True)
+    poly = models.PolygonField(srid=32140, null=gisfield_may_be_null)
 
 
 class Interstate(NamedModel):

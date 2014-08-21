@@ -16,6 +16,9 @@ class BaseSpatialFeatures(object):
     # Does the database contain a SpatialRefSys model to store SRID information?
     has_spatialrefsys_table = True
 
+    # Reference implementation of 3D functions is:
+    # http://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
+    supports_3d_functions = False
     # Does the database support SRID transform operations?
     supports_transform = True
     # Do geometric relationship operations operate on real shapes (or only on bounding boxes)?
@@ -29,24 +32,34 @@ class BaseSpatialFeatures(object):
 
     # The following properties indicate if the database backend support
     # certain lookups (dwithin, left and right, relate, ...)
+    supports_distances_lookups = True
     supports_left_right_lookups = False
 
     @property
-    def supports_relate_lookup(self):
-        return 'relate' in self.connection.ops.geometry_functions
+    def supports_bbcontains_lookup(self):
+        return 'bbcontains' in self.connection.ops.gis_terms
 
     @property
-    def has_dwithin_lookup(self):
+    def supports_contained_lookup(self):
+        return 'contained' in self.connection.ops.gis_terms
+
+    @property
+    def supports_dwithin_lookup(self):
         return 'dwithin' in self.connection.ops.distance_functions
+
+    @property
+    def supports_relate_lookup(self):
+        return 'relate' in self.connection.ops.gis_terms
 
     # For each of those methods, the class will have a property named
     # `has_<name>_method` (defined in __init__) which accesses connection.ops
     # to determine GIS method availability.
     geoqueryset_methods = (
-        'centroid', 'difference', 'envelope', 'force_rhr', 'geohash', 'gml',
-        'intersection', 'kml', 'num_geom', 'perimeter', 'point_on_surface',
-        'reverse', 'scale', 'snap_to_grid', 'svg', 'sym_difference',
-        'transform', 'translate', 'union', 'unionagg',
+        'area', 'centroid', 'difference', 'distance', 'distance_spheroid',
+        'envelope', 'force_rhr', 'geohash', 'gml', 'intersection', 'kml',
+        'length', 'num_geom', 'perimeter', 'point_on_surface', 'reverse',
+        'scale', 'snap_to_grid', 'svg', 'sym_difference', 'transform',
+        'translate', 'union', 'unionagg',
     )
 
     # Specifies whether the Collect and Extent aggregates are supported by the database

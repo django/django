@@ -11,6 +11,7 @@ from django.contrib.gis.db.backends.postgis.schema import PostGISSchemaEditor
 
 
 class DatabaseFeatures(BaseSpatialFeatures, Psycopg2DatabaseFeatures):
+    supports_3d_functions = True
     supports_left_right_lookups = True
 
 

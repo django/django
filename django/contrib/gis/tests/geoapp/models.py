@@ -1,9 +1,6 @@
 from django.contrib.gis.db import models
-from django.contrib.gis.tests.utils import mysql
+from django.contrib.gis.tests.utils import gisfield_may_be_null
 from django.utils.encoding import python_2_unicode_compatible
-
-# MySQL spatial indices can't handle NULL geometries.
-null_flag = not mysql
 
 
 @python_2_unicode_compatible
@@ -42,7 +39,7 @@ class PennsylvaniaCity(City):
 
 
 class State(NamedModel):
-    poly = models.PolygonField(null=null_flag)  # Allowing NULL geometries here.
+    poly = models.PolygonField(null=gisfield_may_be_null)  # Allowing NULL geometries here.
 
 
 class Track(NamedModel):
