@@ -444,11 +444,13 @@ class BaseModelAdmin(six.with_metaclass(RenameBaseModelAdminMethods)):
             return False
 
         # Make sure at least one of the models registered for this site
-        # references this field.
+        # references this field through a FK or a M2M relationship.
         registered_models = self.admin_site._registry
-        for related_object in opts.get_all_related_objects():
-            if (related_object.model in registered_models and
-                    field in related_object.field.foreign_related_fields):
+        for related_object in (opts.get_all_related_objects() +
+                               opts.get_all_related_many_to_many_objects()):
+            related_model = related_object.model
+            if (any(issubclass(model, related_model) for model in registered_models) and
+                    related_object.field.rel.get_related_field() == field):
                 return True
 
         return False
