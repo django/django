@@ -28,7 +28,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
     RelatedPrepopulated, UndeletableObject, UserMessenger, Simple, Choice,
-    ShortMessage, Telegram)
+    ShortMessage, Telegram, ReferencedByParent, ChildOfReferer, M2MReference)
 
 
 def callable_year(dt_value):
@@ -703,6 +703,9 @@ site.register(Report, ReportAdmin)
 site.register(MainPrepopulated, MainPrepopulatedAdmin)
 site.register(UnorderedObject, UnorderedObjectAdmin)
 site.register(UndeletableObject, UndeletableObjectAdmin)
+site.register(ReferencedByParent)
+site.register(ChildOfReferer)
+site.register(M2MReference)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
