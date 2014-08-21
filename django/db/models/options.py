@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from copy import copy
 from bisect import bisect
 from collections import OrderedDict, defaultdict
 from functools import partial
@@ -399,18 +400,15 @@ class Options(object):
     @cached_property
     def all_fields_map(self):
         res = {}
-
-        # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = self.get_fields(m2m=True, data=True, related_objects=True, export_name_map=True)
-        fields.update(
-            (field, {field.name, field.attname})
-            for field in self.virtual_fields
-            if hasattr(field, 'related')
-        )
-        for field, names in six.iteritems(fields):
+        for field, names in six.iteritems(self.get_fields(data=False, related_objects=True,
+                                          export_name_map=True)):
             # map each possible name for a field to its field instance
             for name in names:
                 res[name] = field
+
+        # Add all concrete fields map. Irder of insertion is important here, all concrete
+        # fields should always override related objects.
+        res.update(self.concrete_fields_map)
         return res
 
     def get_field(self, field_name, include_related=False, **kwargs):
