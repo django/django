@@ -670,10 +670,9 @@ class Options(object):
                             if not (obj.field.creation_counter < 0
                                     and obj.model not in parent_list):
                                 fields[obj] = query_name
-                        else:
-                            if not ((obj.field.creation_counter < 0
-                                    or obj.field.rel.parent_link)
-                                    and obj.model not in parent_list):
+                        elif not ((obj.field.creation_counter < 0
+                                  or obj.field.rel.parent_link)
+                                  and obj.model not in parent_list):
                                 if include_hidden or not obj.field.rel.is_hidden():
                                     # If hidden fields should be included or the relation
                                     # is not intentionally hidden, add to the fields dict
