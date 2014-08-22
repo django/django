@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.contrib.auth import views as auth_views
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 
@@ -120,6 +121,11 @@ urlpatterns = [
         views.BookArchive.as_view(date_list_period='month')),
     url(r'^dates/booksignings/$',
         views.BookSigningArchive.as_view()),
+    url(r'^dates/books/sortedbyname/$',
+        views.BookArchive.as_view(ordering='name')),
+    url(r'^dates/books/sortedbynamedec/$',
+        views.BookArchive.as_view(ordering='-name')),
+
 
     # ListView
     url(r'^list/dict/$',
@@ -158,6 +164,10 @@ urlpatterns = [
         views.AuthorList.as_view(paginate_by=30, page_kwarg='pagina')),
     url(r'^list/authors/paginated/custom_constructor/$',
         views.AuthorListCustomPaginator.as_view()),
+    url(r'^list/books/sorted/$',
+        views.BookList.as_view(ordering='name')),
+    url(r'^list/books/sortedbypagesandnamedec/$',
+        views.BookList.as_view(ordering=('pages', '-name'))),
 
     # YearArchiveView
     # Mixing keyword and positional captures below is intentional; the views
@@ -172,6 +182,10 @@ urlpatterns = [
         views.BookYearArchive.as_view(allow_future=True)),
     url(r'^dates/books/(?P<year>[0-9]{4})/paginated/$',
         views.BookYearArchive.as_view(make_object_list=True, paginate_by=30)),
+    url(r'^dates/books/(?P<year>\d{4})/sortedbyname/$',
+        views.BookYearArchive.as_view(make_object_list=True, ordering='name')),
+    url(r'^dates/books/(?P<year>\d{4})/sortedbypageandnamedec/$',
+        views.BookYearArchive.as_view(make_object_list=True, ordering=('pages', '-name'))),
     url(r'^dates/books/no_year/$',
         views.BookYearArchive.as_view()),
     url(r'^dates/books/(?P<year>[0-9]{4})/reverse/$',
@@ -257,5 +271,5 @@ urlpatterns = [
         views.BookSigningDetail.as_view()),
 
     # Useful for testing redirects
-    url(r'^accounts/login/$', 'django.contrib.auth.views.login')
+    url(r'^accounts/login/$', auth_views.login)
 ]

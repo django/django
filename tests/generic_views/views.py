@@ -57,6 +57,10 @@ class AuthorList(generic.ListView):
     queryset = Author.objects.all()
 
 
+class BookList(generic.ListView):
+    model = Book
+
+
 class CustomPaginator(Paginator):
     def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
         super(CustomPaginator, self).__init__(

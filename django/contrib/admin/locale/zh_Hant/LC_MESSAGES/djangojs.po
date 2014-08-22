@@ -1,0 +1,196 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# ilay <ilay@ilay.tw>, 2012
+# mail6543210 <mail6543210@yahoo.com.tw>, 2013
+# tcc <tcchou@tcchou.org>, 2011
+# Yeh-Yung <yyc1217@gmail.com>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:41+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
+"language/zh_TW/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:45
+#, c-format
+msgid "Available %s"
+msgstr "可用 %s"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"可用的 %s 列表。你可以在下方的方框內選擇後，點擊兩個方框中的\"選取\"箭頭以選"
+"取。"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "輸入到這個方框以過濾可用的 %s 列表。"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:57
+msgid "Filter"
+msgstr "過濾器"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:61
+msgid "Choose all"
+msgstr "全選"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr "點擊以一次選取所有的 %s"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr "選取"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:69
+msgid "Remove"
+msgstr "移除"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:75
+#, c-format
+msgid "Chosen %s"
+msgstr "%s 被選"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"選取的 %s 列表。你可以在下方的方框內選擇後，點擊兩個方框中的\"移除\"箭頭以移"
+"除。"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr "全部移除"
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr "點擊以一次移除所有選取的 %s"
+
+#: contrib/admin/static/admin/js/actions.js:22
+#: contrib/admin/static/admin/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(cnt)s 中 %(sel)s 個被選"
+
+#: contrib/admin/static/admin/js/actions.js:114
+#: contrib/admin/static/admin/js/actions.min.js:4
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr "你尚未儲存一個可編輯欄位的變更。如果你執行動作, 未儲存的變更將會遺失。"
+
+#: contrib/admin/static/admin/js/actions.js:126
+#: contrib/admin/static/admin/js/actions.min.js:5
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+"你已選了一個動作, 但有一個可編輯欄位的變更尚未儲存。請點選 OK 進行儲存。你需"
+"要重新執行該動作。"
+
+#: contrib/admin/static/admin/js/actions.js:128
+#: contrib/admin/static/admin/js/actions.min.js:5
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"你已選了一個動作, 但沒有任何改變。你可能動到 '去' 按鈕, 而不是 '儲存' 按鈕。"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:79
+#, c-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:87
+#, c-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:114
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149
+msgid "Now"
+msgstr "現在"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:118
+msgid "Clock"
+msgstr "時鐘"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:146
+msgid "Choose a time"
+msgstr "選擇一個時間"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:150
+msgid "Midnight"
+msgstr "午夜"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:151
+msgid "6 a.m."
+msgstr "上午 6 點"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:152
+msgid "Noon"
+msgstr "中午"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:156
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:276
+msgid "Cancel"
+msgstr "取消"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:216
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:269
+msgid "Today"
+msgstr "今天"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:220
+msgid "Calendar"
+msgstr "日曆"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:267
+msgid "Yesterday"
+msgstr "昨天"
+
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:271
+msgid "Tomorrow"
+msgstr "明天"
+
+#: contrib/admin/static/admin/js/calendar.js:8
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr "一月 二月 三月 四月 五月 六月 七月 八月 九月 十月 十一月 十二月"
+
+#: contrib/admin/static/admin/js/calendar.js:9
+msgid "S M T W T F S"
+msgstr "日 一 二 三 四 五 六"
+
+#: contrib/admin/static/admin/js/collapse.js:8
+#: contrib/admin/static/admin/js/collapse.js:19
+#: contrib/admin/static/admin/js/collapse.min.js:1
+msgid "Show"
+msgstr "顯示"
+
+#: contrib/admin/static/admin/js/collapse.js:16
+#: contrib/admin/static/admin/js/collapse.min.js:1
+msgid "Hide"
+msgstr "隱藏"

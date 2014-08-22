@@ -172,6 +172,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # For explicit "through" M2M fields, do nothing
         # For everything else, remake.
         else:
+            # It might not actually have a column behind it
+            if field.db_parameters(connection=self.connection)['type'] is None:
+                return
             self._remake_table(model, delete_fields=[field])
 
     def _alter_field(self, model, old_field, new_field, old_type, new_type, old_db_params, new_db_params, strict=False):

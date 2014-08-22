@@ -359,13 +359,13 @@ MapWidget.prototype.getControls = function(layer) {
     this.controls = [new OpenLayers.Control.Navigation()];
     if (!this.options.modifiable && layer.features.length)
         return;
-    if (this.options.geom_name.indexOf('LineString') >= 0 || this.options.geom_name == 'Unknown') {
+    if (this.options.geom_name.indexOf('LineString') >= 0 || this.options.geom_name == 'GeometryCollection' || this.options.geom_name == 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Path, {'displayClass': 'olControlDrawFeaturePath'}));
     }
-    if (this.options.geom_name.indexOf('Polygon') >= 0 || this.options.geom_name == 'Unknown') {
+    if (this.options.geom_name.indexOf('Polygon') >= 0 || this.options.geom_name == 'GeometryCollection' || this.options.geom_name == 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Polygon, {'displayClass': 'olControlDrawFeaturePolygon'}));
     }
-    if (this.options.geom_name.indexOf('Point') >= 0 || this.options.geom_name == 'Unknown') {
+    if (this.options.geom_name.indexOf('Point') >= 0 || this.options.geom_name == 'GeometryCollection' || this.options.geom_name == 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Point, {'displayClass': 'olControlDrawFeaturePoint'}));
     }
     if (this.options.modifiable) {

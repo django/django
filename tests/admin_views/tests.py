@@ -18,6 +18,7 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import LogEntry, DELETION
+from django.contrib.admin.options import TO_FIELD_VAR
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
@@ -597,6 +598,36 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertContains(response, 'employee__person_ptr__exact')
         response = self.client.get("/test_admin/admin/admin_views/workhour/?employee__person_ptr__exact=%d" % e1.pk)
         self.assertEqual(response.status_code, 200)
+
+    def test_disallowed_to_field(self):
+        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+            response = self.client.get("/test_admin/admin/admin_views/section/", {TO_FIELD_VAR: 'missing_field'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(calls), 1)
+
+        # Specifying a field that is not refered by any other model registered
+        # to this admin site should raise an exception.
+        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+            response = self.client.get("/test_admin/admin/admin_views/section/", {TO_FIELD_VAR: 'name'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(calls), 1)
+
+        # Specifying a field referenced by another model should be allowed.
+        response = self.client.get("/test_admin/admin/admin_views/section/", {TO_FIELD_VAR: 'id'})
+        self.assertEqual(response.status_code, 200)
+
+        # We also want to prevent the add and change view from leaking a
+        # disallowed field value.
+        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+            response = self.client.post("/test_admin/admin/admin_views/section/add/", {TO_FIELD_VAR: 'name'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(calls), 1)
+
+        section = Section.objects.create()
+        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+            response = self.client.post("/test_admin/admin/admin_views/section/%d/" % section.pk, {TO_FIELD_VAR: 'name'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(calls), 1)
 
     def test_allowed_filtering_15103(self):
         """
@@ -1425,10 +1456,15 @@ class AdminViewPermissionsTest(TestCase):
         self.client.get('/test_admin/admin/')
         self.client.post(login_url, self.deleteuser_login)
         response = self.client.get('/test_admin/admin/admin_views/section/1/delete/')
+        self.assertContains(response, "<h2>Summary</h2>")
+        self.assertContains(response, "<li>Articles: 3</li>")
         # test response contains link to related Article
         self.assertContains(response, "admin_views/article/1/")
 
         response = self.client.get('/test_admin/admin/admin_views/article/1/delete/')
+        self.assertContains(response, "admin_views/article/1/")
+        self.assertContains(response, "<h2>Summary</h2>")
+        self.assertContains(response, "<li>Articles: 1</li>")
         self.assertEqual(response.status_code, 200)
         post = self.client.post('/test_admin/admin/admin_views/article/1/delete/', delete_dict)
         self.assertRedirects(post, '/test_admin/admin/')
@@ -2373,10 +2409,9 @@ class AdminSearchTest(TestCase):
         """Ensure that the to_field GET parameter is preserved when a search
         is performed. Refs #10918.
         """
-        from django.contrib.admin.views.main import TO_FIELD_VAR
-        response = self.client.get('/test_admin/admin/auth/user/?q=joe&%s=username' % TO_FIELD_VAR)
+        response = self.client.get('/test_admin/admin/auth/user/?q=joe&%s=id' % TO_FIELD_VAR)
         self.assertContains(response, "\n1 user\n")
-        self.assertContains(response, '<input type="hidden" name="_to_field" value="username"/>', html=True)
+        self.assertContains(response, '<input type="hidden" name="%s" value="id"/>' % TO_FIELD_VAR, html=True)
 
     def test_exact_matches(self):
         response = self.client.get('/test_admin/admin/admin_views/recommendation/?q=bar')
@@ -2547,6 +2582,9 @@ class AdminActionsTest(TestCase):
         confirmation = self.client.post('/test_admin/admin/admin_views/subscriber/', action_data)
         self.assertIsInstance(confirmation, TemplateResponse)
         self.assertContains(confirmation, "Are you sure you want to delete the selected subscribers?")
+        self.assertContains(confirmation, "<h2>Summary</h2>")
+        self.assertContains(confirmation, "<li>Subscribers: 3</li>")
+        self.assertContains(confirmation, "<li>External subscribers: 1</li>")
         self.assertContains(confirmation, ACTION_CHECKBOX_NAME, count=2)
         self.client.post('/test_admin/admin/admin_views/subscriber/', delete_confirmation_data)
         self.assertEqual(Subscriber.objects.count(), 0)

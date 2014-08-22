@@ -228,7 +228,7 @@ class BaseDatabaseSchemaEditor(object):
                     }
                 )
             # FK
-            if field.rel:
+            if field.rel and field.db_constraint:
                 to_table = field.rel.to._meta.db_table
                 to_column = field.rel.to._meta.get_field(field.rel.field_name).column
                 if self.connection.features.supports_foreign_keys:
@@ -430,7 +430,7 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
         # Add any FK constraints later
-        if field.rel and self.connection.features.supports_foreign_keys:
+        if field.rel and self.connection.features.supports_foreign_keys and field.db_constraint:
             to_table = field.rel.to._meta.db_table
             to_column = field.rel.to._meta.get_field(field.rel.field_name).column
             self.deferred_sql.append(
@@ -528,26 +528,9 @@ class BaseDatabaseSchemaEditor(object):
                         "name": constraint_name,
                     },
                 )
-        # Removed an index?
-        if old_field.db_index and not new_field.db_index and not old_field.unique and not (not new_field.unique and old_field.unique):
-            # Find the index for this field
-            index_names = self._constraint_names(model, [old_field.column], index=True)
-            if strict and len(index_names) != 1:
-                raise ValueError("Found wrong number (%s) of indexes for %s.%s" % (
-                    len(index_names),
-                    model._meta.db_table,
-                    old_field.column,
-                ))
-            for index_name in index_names:
-                self.execute(
-                    self.sql_delete_index % {
-                        "table": self.quote_name(model._meta.db_table),
-                        "name": index_name,
-                    }
-                )
         # Drop any FK constraints, we'll remake them later
         fks_dropped = set()
-        if old_field.rel:
+        if old_field.rel and old_field.db_constraint:
             fk_names = self._constraint_names(model, [old_field.column], foreign_key=True)
             if strict and len(fk_names) != 1:
                 raise ValueError("Found wrong number (%s) of foreign key constraints for %s.%s" % (
@@ -575,6 +558,23 @@ class BaseDatabaseSchemaEditor(object):
                             "name": fk_name,
                         }
                     )
+        # Removed an index?
+        if old_field.db_index and not new_field.db_index and not old_field.unique and not (not new_field.unique and old_field.unique):
+            # Find the index for this field
+            index_names = self._constraint_names(model, [old_field.column], index=True)
+            if strict and len(index_names) != 1:
+                raise ValueError("Found wrong number (%s) of indexes for %s.%s" % (
+                    len(index_names),
+                    model._meta.db_table,
+                    old_field.column,
+                ))
+            for index_name in index_names:
+                self.execute(
+                    self.sql_delete_index % {
+                        "table": self.quote_name(model._meta.db_table),
+                        "name": index_name,
+                    }
+                )
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
             constraint_names = self._constraint_names(model, [old_field.column], check=True)
@@ -739,7 +739,9 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
         # Does it have a foreign key?
-        if new_field.rel and fks_dropped:
+        if new_field.rel and \
+           (fks_dropped or (old_field.rel and not old_field.db_constraint)) and \
+           new_field.db_constraint:
             to_table = new_field.rel.to._meta.db_table
             to_column = new_field.rel.get_related_field().column
             self.execute(

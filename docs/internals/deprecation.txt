@@ -55,6 +55,18 @@ about each item can often be found in the release notes of two versions prior.
 
 * The ``error_message`` argument of ``django.forms.RegexField`` will be removed.
 
+* The ``unordered_list`` filter will no longer support old style lists.
+
+* Support for string ``view`` arguments to ``url()`` will be removed.
+
+* The backward compatible shim  to rename ``django.forms.Form._has_changed()``
+  to ``has_changed()`` will be removed.
+
+* The ``removetags`` template filter will be removed.
+
+* The ``remove_tags()`` and ``strip_entities()`` functions in
+  ``django.utils.html`` will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9
@@ -330,6 +342,10 @@ details on these changes.
   :setting:`PASSWORD_RESET_TIMEOUT_DAYS`, this change will have no effect. If
   not, then any password reset links generated before you upgrade to Django 1.7
   won't work after the upgrade.
+
+* The ``django.utils.encoding.StrAndUnicode`` mix-in will be removed.
+  Define a ``__str__`` method and apply the
+  :func:`~django.utils.encoding.python_2_unicode_compatible` decorator instead.
 
 .. _deprecation-removed-in-1.6:
 

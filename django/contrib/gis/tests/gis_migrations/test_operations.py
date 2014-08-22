@@ -1,14 +1,11 @@
 from __future__ import unicode_literals
 
-from unittest import skipUnless
-
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB
 from django.db import connection, migrations, models
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
-from django.test import TransactionTestCase
+from django.test import skipUnlessDBFeature, TransactionTestCase
 
-if HAS_SPATIAL_DB:
+if connection.features.gis_enabled:
     from django.contrib.gis.db.models import fields
     try:
         GeometryColumns = connection.ops.geometry_columns()
@@ -17,7 +14,7 @@ if HAS_SPATIAL_DB:
         HAS_GEOMETRY_COLUMNS = False
 
 
-@skipUnless(HAS_SPATIAL_DB, "Spatial db is required.")
+@skipUnlessDBFeature("gis_enabled")
 class OperationTests(TransactionTestCase):
     available_apps = ["django.contrib.gis.tests.gis_migrations"]
 

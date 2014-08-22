@@ -326,6 +326,35 @@ class OperationTests(OperationTestBase):
         self.assertTableNotExists("test_crprmo_proxypony")
         self.assertTableExists("test_crprmo_pony")
 
+    def test_create_unmanaged_model(self):
+        """
+        Tests that CreateModel ignores unmanaged models.
+        """
+        project_state = self.set_up_test_model("test_crummo")
+        # Test the state alteration
+        operation = migrations.CreateModel(
+            "UnmanagedPony",
+            [],
+            options={"proxy": True},
+            bases=("test_crummo.Pony", ),
+        )
+        self.assertEqual(operation.describe(), "Create proxy model UnmanagedPony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_crummo", new_state)
+        self.assertIn(("test_crummo", "unmanagedpony"), new_state.models)
+        # Test the database alteration
+        self.assertTableNotExists("test_crummo_unmanagedpony")
+        self.assertTableExists("test_crummo_pony")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_crummo", editor, project_state, new_state)
+        self.assertTableNotExists("test_crummo_unmanagedpony")
+        self.assertTableExists("test_crummo_pony")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_crummo", editor, new_state, project_state)
+        self.assertTableNotExists("test_crummo_unmanagedpony")
+        self.assertTableExists("test_crummo_pony")
+
     def test_delete_model(self):
         """
         Tests the DeleteModel operation.
@@ -1078,6 +1107,30 @@ class OperationTests(OperationTestBase):
             create_operation.database_forwards("test_alfk", editor, project_state, create_state)
             alter_operation.database_forwards("test_alfk", editor, create_state, alter_state)
 
+    def test_alter_fk_non_fk(self):
+        """
+        Tests that altering an FK to a non-FK works (#23244)
+        """
+        # Test the state alteration
+        operation = migrations.AlterField(
+            model_name="Rider",
+            name="pony",
+            field=models.FloatField(),
+        )
+        project_state, new_state = self.make_test_state("test_afknfk", operation, related_model=True)
+        # Test the database alteration
+        self.assertColumnExists("test_afknfk_rider", "pony_id")
+        self.assertColumnNotExists("test_afknfk_rider", "pony")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_afknfk", editor, project_state, new_state)
+        self.assertColumnExists("test_afknfk_rider", "pony")
+        self.assertColumnNotExists("test_afknfk_rider", "pony_id")
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_afknfk", editor, new_state, project_state)
+        self.assertColumnExists("test_afknfk_rider", "pony_id")
+        self.assertColumnNotExists("test_afknfk_rider", "pony")
+
     @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql(self):
         """
@@ -1086,7 +1139,7 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_runsql")
         # Create the operation
         operation = migrations.RunSQL(
-            # Use a multi-line string with a commment to test splitting on SQLite and MySQL respectively
+            # Use a multi-line string with a comment to test splitting on SQLite and MySQL respectively
             "CREATE TABLE i_love_ponies (id int, special_thing int);\n"
             "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 42); -- this is magic!\n"
             "INSERT INTO i_love_ponies (id, special_thing) VALUES (2, 51);\n",
@@ -1345,11 +1398,11 @@ class SwappableOperationTests(OperationTestBase):
         )
         project_state, new_state = self.make_test_state("test_adfligsw", operation)
         # Test the database alteration
-        self.assertTableNotExists("test_adfligsw_pont")
+        self.assertTableNotExists("test_adfligsw_pony")
         with connection.schema_editor() as editor:
             operation.database_forwards("test_adfligsw", editor, project_state, new_state)
-        self.assertTableNotExists("test_adfligsw_pont")
+        self.assertTableNotExists("test_adfligsw_pony")
         # And test reversal
         with connection.schema_editor() as editor:
             operation.database_backwards("test_adfligsw", editor, new_state, project_state)
-        self.assertTableNotExists("test_adfligsw_pont")
+        self.assertTableNotExists("test_adfligsw_pony")

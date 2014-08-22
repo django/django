@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Bashar Al-Abdulhadi, 2014
+# Eyad Toma <d.eyad.t@gmail.com>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:48+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 13:18+0000\n"
+"Last-Translator: Bashar Al-Abdulhadi\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/django/language/"
 "ar/)\n"
 "MIME-Version: 1.0\n"
@@ -18,18 +20,26 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: models.py:39
+#: contrib/sites/apps.py:8
+msgid "Sites"
+msgstr "المواقع"
+
+#: contrib/sites/models.py:30
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "اسم النطاق يجب أن لا يحتوي على فراغات أو فراغات طويلة tabs."
+
+#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "اسم النطاق"
 
-#: models.py:40
+#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "اسم العرض"
 
-#: models.py:45
+#: contrib/sites/models.py:74
 msgid "site"
 msgstr "موقع"
 
-#: models.py:46
+#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "المواقع"

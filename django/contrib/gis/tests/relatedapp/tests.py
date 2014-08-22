@@ -1,10 +1,8 @@
 from __future__ import unicode_literals
 
-from unittest import skipUnless
-
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql, no_mysql, no_oracle, no_spatialite
-from django.test import TestCase
+from django.contrib.gis.tests.utils import mysql, no_mysql, no_oracle, no_spatialite
+from django.test import TestCase, skipUnlessDBFeature
 
 if HAS_GEOS:
     from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
@@ -14,8 +12,9 @@ if HAS_GEOS:
     from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
 
 
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@skipUnlessDBFeature("gis_enabled")
 class RelatedGeoModelTest(TestCase):
+    fixtures = ['initial']
 
     def test02_select_related(self):
         "Testing `select_related` on geographic models (see #7126)."
@@ -284,7 +283,7 @@ class RelatedGeoModelTest(TestCase):
             # Even though Dallas and Ft. Worth share same point, Collect doesn't
             # consolidate -- that's why 4 points in MultiPoint.
             self.assertEqual(4, len(coll))
-            self.assertEqual(ref_geom, coll)
+            self.assertTrue(ref_geom.equals(coll))
 
     def test15_invalid_select_related(self):
         "Testing doing select_related on the related name manager of a unique FK. See #13934."

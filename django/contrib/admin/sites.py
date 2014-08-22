@@ -49,10 +49,9 @@ class AdminSite(object):
     password_change_template = None
     password_change_done_template = None
 
-    def __init__(self, name='admin', app_name='admin'):
+    def __init__(self, name='admin'):
         self._registry = {}  # model_class class -> admin_class instance
         self.name = name
-        self.app_name = app_name
         self._actions = {'delete_selected': actions.delete_selected}
         self._global_actions = self._actions.copy()
 
@@ -263,7 +262,7 @@ class AdminSite(object):
 
     @property
     def urls(self):
-        return self.get_urls(), self.app_name, self.name
+        return self.get_urls(), 'admin', self.name
 
     def each_context(self):
         """

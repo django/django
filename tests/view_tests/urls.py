@@ -3,7 +3,7 @@ from os import path
 
 from django.conf.urls import url, include
 from django.utils._os import upath
-from django.views import defaults, i18n
+from django.views import defaults, i18n, static
 
 from . import views
 
@@ -71,7 +71,7 @@ urlpatterns = [
     url(r'^jsi18n_template/$', views.jsi18n),
 
     # Static views
-    url(r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': media_dir}),
+    url(r'^site_media/(?P<path>.*)$', static.serve, {'document_root': media_dir}),
 ]
 
 urlpatterns += [

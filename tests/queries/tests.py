@@ -2130,6 +2130,26 @@ class ValuesQuerysetTests(BaseQuerysetTest):
             order_by=['value_minus_one'])
         qs = qs.values('num')
 
+    def test_extra_select_params_values_order_in_extra(self):
+        # testing for 23259 issue
+        qs = Number.objects.extra(
+            select={'value_plus_x': 'num+%s'},
+            select_params=[1],
+            order_by=['value_plus_x'])
+        qs = qs.filter(num=72)
+        qs = qs.values('num')
+        self.assertQuerysetEqual(qs, [{'num': 72}], self.identity)
+
+    def test_extra_multiple_select_params_values_order_by(self):
+        # testing for 23259 issue
+        qs = Number.objects.extra(select=OrderedDict([('value_plus_x', 'num+%s'),
+                                                     ('value_minus_x', 'num-%s')]),
+                                  select_params=(72, 72))
+        qs = qs.order_by('value_minus_x')
+        qs = qs.filter(num=1)
+        qs = qs.values('num')
+        self.assertQuerysetEqual(qs, [], self.identity)
+
     def test_extra_values_list(self):
         # testing for ticket 14930 issues
         qs = Number.objects.extra(select={'value_plus_one': 'num+1'})
@@ -3440,6 +3460,10 @@ class RelatedLookupTypeTests(TestCase):
 
         # parent objects
         self.assertQuerysetEqual(ObjectC.objects.exclude(childobjecta=self.oa), out_c)
+
+        # Test for #23226
+        with self.assertNumQueries(0):
+            ObjectB.objects.filter(objecta__in=ObjectA.objects.all())
 
 
 class Ticket14056Tests(TestCase):

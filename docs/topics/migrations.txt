@@ -26,7 +26,7 @@ important enough that support was brought into core Django.
 Two Commands
 ------------
 
-There are two commands which you will use to interact with migrations
+There are several commands which you will use to interact with migrations
 and Django's handling of database schema:
 
 * :djadmin:`migrate`, which is responsible for applying migrations, as well as
@@ -34,6 +34,8 @@ and Django's handling of database schema:
 
 * :djadmin:`makemigrations`, which is responsible for creating new migrations
   based on the changes you have made to your models.
+
+* :djadmin:`sqlmigrate`, which displays the SQL statements for a migration.
 
 It's worth noting that migrations are created and run on a per-app basis.
 In particular, it's possible to have apps that *do not use migrations* (these
@@ -481,11 +483,16 @@ work::
     you can delete them.
 
 Note that model interdependencies in Django can get very complex, and squashing
-may occasionally result in an optimized migration that doesn't work or is
-impossible to run. When this occurs, you can re-try with ``--no-optimize``, but
-please `file a bug report <https://code.djangoproject.com/newticket>`_ either
-way detailing the models and their relationships so we can improve the
-optimizer to handle your case.
+may result in migrations that do not run; either mis-optimized (in which case
+you can try again with ``--no-optimize``, though you should also report an issue),
+or with a ``CircularDependencyError``, in which case you can manually resolve it.
+
+To manually resolve a ``CircularDependencyError``, break out one of
+the ForeignKeys in the circular dependency loop into a separate
+migration, and move the dependency on the other app with it. If you're unsure,
+see how makemigrations deals with the problem when asked to create brand
+new migrations from your models. In a future release of Django, squashmigrations
+will be updated to attempt to resolve these errors itself.
 
 Once you've squashed your migration, you should then commit it alongside the
 migrations it replaces and distribute this change to all running instances
@@ -522,7 +529,7 @@ Django can serialize the following:
 
 - ``int``, ``long``, ``float``, ``bool``, ``str``, ``unicode``, ``bytes``, ``None``
 - ``list``, ``set``, ``tuple``, ``dict``
-- ``datetime.date`` and ``datetime.datetime`` instances
+- ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
 - ``decimal.Decimal`` instances
 - Any Django field
 - Any function or method reference (e.g. ``datetime.datetime.today``)
@@ -560,19 +567,22 @@ Adding a deconstruct() method
 
 You can let Django serialize your own custom class instances by giving the class
 a ``deconstruct()`` method. It takes no arguments, and should return a tuple
-of three things: ``(path, args, kwargs)``. Note this return value is different
-from the ``deconstruct()`` method :ref:`for custom fields
-<custom-field-deconstruct-method>` which returns a tuple of four items.
+of three things ``(path, args, kwargs)``:
 
-``path`` should be the Python path to the class, with the class name included as the
-last part (for example, ``myapp.custom_things.MyClass``). If your class is not
-available at the top level of a module it is not serializable.
+* ``path`` should be the Python path to the class, with the class name included
+  as the last part (for example, ``myapp.custom_things.MyClass``). If your
+  class is not available at the top level of a module it is not serializable.
 
-``args`` should be a list of positional arguments to pass to your class'
-``__init__`` method. Everything in this list should itself be serializable.
+* ``args`` should be a list of positional arguments to pass to your class'
+  ``__init__`` method. Everything in this list should itself be serializable.
 
-``kwargs`` should be a dict of keyword arguments to pass to your class'
-``__init__`` method. Every value should itself be serializable.
+* ``kwargs`` should be a dict of keyword arguments to pass to your class'
+  ``__init__`` method. Every value should itself be serializable.
+
+.. note::
+    This return value is different from the ``deconstruct()`` method
+    :ref:`for custom fields <custom-field-deconstruct-method>` which returns a
+    tuple of four items.
 
 Django will write out the value as an instantiation of your class with the
 given arguments, similar to the way it writes out references to Django fields.

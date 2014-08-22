@@ -3,11 +3,11 @@
 # Translators:
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-03-09 19:39+0000\n"
-"Last-Translator: machaku <bmachaku@gmail.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:41+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -16,22 +16,26 @@ msgstr ""
 "Language: sw\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:38
+#: contrib/sessions/apps.py:8
+msgid "Sessions"
+msgstr ""
+
+#: contrib/sessions/models.py:38
 msgid "session key"
 msgstr "ufunguo wa kipindi"
 
-#: models.py:40
+#: contrib/sessions/models.py:40
 msgid "session data"
 msgstr "data za kipindi"
 
-#: models.py:41
+#: contrib/sessions/models.py:41
 msgid "expire date"
 msgstr "tarehe ya mwisho ya matumizi"
 
-#: models.py:46
+#: contrib/sessions/models.py:46
 msgid "session"
 msgstr "kipindi"
 
-#: models.py:47
+#: contrib/sessions/models.py:47
 msgid "sessions"
 msgstr "vipindi"

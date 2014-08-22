@@ -1040,7 +1040,7 @@ Client-side caching will save bandwidth and make your site load faster. If
 you're using ETags (:setting:`USE_ETAGS = True <USE_ETAGS>`), you're already
 covered. Otherwise, you can apply :ref:`conditional decorators
 <conditional-decorators>`. In the following example, the cache is invalidated
-whenever your restart your application server.
+whenever you restart your application server.
 
 .. code-block:: python
 
@@ -1049,6 +1049,7 @@ whenever your restart your application server.
     from django.views.i18n import javascript_catalog
 
     last_modified_date = timezone.now()
+
     @last_modified(lambda req, **kw: last_modified_date)
     def cached_javascript_catalog(request, domain='djangojs', packages=None):
         return javascript_catalog(request, domain, packages)
@@ -1100,21 +1101,24 @@ prepend the current active language code to all url patterns defined within
     from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
 
+    from about import views as about_views
+    from news import views as news_views
+    from sitemap.views import sitemap
+
     urlpatterns = [
-        url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml'),
+        url(r'^sitemap\.xml$', sitemap, name='sitemap_xml'),
     ]
 
     news_patterns = [
-        url(r'^$', 'news.views.index', name='index'),
-        url(r'^category/(?P<slug>[\w-]+)/$', 'news.views.category', name='category'),
-        url(r'^(?P<slug>[\w-]+)/$', 'news.views.details', name='detail'),
+        url(r'^$', news_views.index, name='index'),
+        url(r'^category/(?P<slug>[\w-]+)/$', news_views.category, name='category'),
+        url(r'^(?P<slug>[\w-]+)/$', news_views.details, name='detail'),
     ]
 
     urlpatterns += i18n_patterns(
-        url(r'^about/$', 'about.view', name='about'),
+        url(r'^about/$', about_views.main, name='about'),
         url(r'^news/', include(news_patterns, namespace='news')),
     )
-
 
 After defining these URL patterns, Django will automatically add the
 language prefix to the URL patterns that were added by the ``i18n_patterns``
@@ -1155,21 +1159,24 @@ URL patterns can also be marked translatable using the
     from django.conf.urls.i18n import i18n_patterns
     from django.utils.translation import ugettext_lazy as _
 
+    from about import views as about_views
+    from news import views as news_views
+    from sitemaps.views import sitemap
+
     urlpatterns = [
-        url(r'^sitemap\.xml$', 'sitemap.view', name='sitemap_xml'),
+        url(r'^sitemap\.xml$', sitemap, name='sitemap_xml'),
     ]
 
     news_patterns = [
-        url(r'^$', 'news.views.index', name='index'),
-        url(_(r'^category/(?P<slug>[\w-]+)/$'), 'news.views.category', name='category'),
-        url(r'^(?P<slug>[\w-]+)/$', 'news.views.details', name='detail'),
+        url(r'^$', news_views.index, name='index'),
+        url(_(r'^category/(?P<slug>[\w-]+)/$'), news_views.category, name='category'),
+        url(r'^(?P<slug>[\w-]+)/$', news_views.details, name='detail'),
     ]
 
     urlpatterns += i18n_patterns(
-        url(_(r'^about/$'), 'about.view', name='about'),
+        url(_(r'^about/$'), about_views.main, name='about'),
         url(_(r'^news/'), include(news_patterns, namespace='news')),
     )
-
 
 After you've created the translations, the
 :func:`~django.core.urlresolvers.reverse` function will return the URL in the
@@ -1323,7 +1330,9 @@ For example, if your Django app contained a translation string for the text
     _("Welcome to my site.")
 
 ...then :djadmin:`django-admin makemessages <makemessages>` will have created
-a ``.po`` file containing the following snippet -- a message::
+a ``.po`` file containing the following snippet -- a message:
+
+.. code-block:: po
 
     #: path/to/python/module.py:23
     msgid "Welcome to my site."
@@ -1470,7 +1479,7 @@ Make sure that the following item is in your
 
 Activate this view by adding the following line to your URLconf::
 
-    (r'^i18n/', include('django.conf.urls.i18n')),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
 
 (Note that this example makes the view available at ``/i18n/setlang/``.)
 

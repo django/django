@@ -1456,7 +1456,7 @@ templates used by the :class:`ModelAdmin` views:
 
     Notice the wrapped view in the fifth line above::
 
-        (r'^my_view/$', self.admin_site.admin_view(self.my_view))
+        url(r'^my_view/$', self.admin_site.admin_view(self.my_view))
 
     This wrapping will protect ``self.my_view`` from unauthorized access and
     will apply the ``django.views.decorators.cache.never_cache`` decorator to
@@ -1466,7 +1466,7 @@ templates used by the :class:`ModelAdmin` views:
     performed, you can pass a ``cacheable=True`` argument to
     ``AdminSite.admin_view()``::
 
-        (r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
+        url(r'^my_view/$', self.admin_site.admin_view(self.my_view, cacheable=True))
 
 .. method:: ModelAdmin.get_form(request, obj=None, **kwargs)
 
@@ -2567,14 +2567,14 @@ Adding a password-reset feature
 -------------------------------
 
 You can add a password-reset feature to the admin site by adding a few lines to
-your URLconf. Specifically, add these four patterns:
+your URLconf. Specifically, add these four patterns::
 
-.. code-block:: python
+    from django.contrib.auth import views as auth_views
 
-    url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset', name='admin_password_reset'),
-    url(r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done', name='password_reset_done'),
-    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm', name='password_reset_confirm'),
-    url(r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete', name='password_reset_complete'),
+    url(r'^admin/password_reset/$', auth_views.password_reset, name='admin_password_reset'),
+    url(r'^admin/password_reset/done/$', auth_views.password_reset_done, name='password_reset_done'),
+    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$', auth_views.password_reset_confirm, name='password_reset_confirm'),
+    url(r'^reset/done/$', auth_views.password_reset_complete, name='password_reset_complete'),
 
 (This assumes you've added the admin at ``admin/`` and requires that you put
 the URLs starting with ``^admin/`` before the line that includes the admin app

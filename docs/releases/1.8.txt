@@ -84,6 +84,10 @@ Minor features
   to limit the ``list_filter`` choices to foreign objects which are attached to
   those from the ``ModelAdmin``.
 
+* The :meth:`ModelAdmin.delete_view()
+  <django.contrib.admin.ModelAdmin.delete_view>` displays a summary of objects
+  to be deleted on the deletion confirmation page.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -211,6 +215,15 @@ Forms
   will also update ``UploadedFile.content_type`` with the image's content type
   as determined by Pillow.
 
+Generic Views
+^^^^^^^^^^^^^
+
+* Generic views that use :class:`~django.views.generic.list.MultipleObjectMixin`
+  may now specify the ordering applied to the
+  :attr:`~django.views.generic.list.MultipleObjectMixin.queryset` by setting
+  :attr:`~django.views.generic.list.MultipleObjectMixin.ordering` or overriding
+  :meth:`~django.views.generic.list.MultipleObjectMixin.get_ordering()`.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -235,6 +248,16 @@ Management Commands
 * :djadmin:`runserver` now uses daemon threads for faster reloading.
 
 * :djadmin:`inspectdb` now outputs ``Meta.unique_together``.
+
+* When calling management commands from code through :ref:`call_command
+  <call-command>` and passing options, the option name can match the command
+  line option name (without the initial dashes) or the final option destination
+  variable name, but in either case, the resulting option received by the
+  command is now always the ``dest`` name specified in the command option
+  definition (as long as the command uses the new :py:mod:`argparse` module).
+
+* The :djadmin:`dbshell` command now supports MySQL's optional SSL certificate
+  authority setting (``--ssl-ca``).
 
 Models
 ^^^^^^
@@ -296,6 +319,9 @@ Requests and Responses
   This brings this class into line with the documentation and with
   ``WSGIRequest``.
 
+* The :attr:`HttpResponse.charset <django.http.HttpResponse.charset>` attribute
+  was added.
+
 Tests
 ^^^^^
 
@@ -344,8 +370,8 @@ This has one backwards incompatible side effect, signal handlers triggered from
 these methods are now executed within the method's transaction and any
 exception in a signal handler will prevent the whole operation.
 
-Unassigning unsaved objects to relations raises an error
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Assigning unsaved objects to relations raises an error
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Assigning unsaved objects to a :class:`~django.db.models.ForeignKey`,
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, and
@@ -523,6 +549,11 @@ Miscellaneous
   ``'username'``, using the the ``'unique'`` key in its
   :attr:`~django.forms.Field.error_messages` argument.
 
+* ``AdminSite`` no longer takes an ``app_name`` argument and its ``app_name``
+  attribute has been removed. The application name is always ``admin`` (as
+  opposed to the instance name which you can still customize using
+  ``AdminSite(name="...")``.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
@@ -610,6 +641,13 @@ Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
         url('^other/$', views.otherview),
     ]
 
+Passing a string as ``view`` to :func:`~django.conf.urls.url`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Related to the previous item, referencing views as strings in the ``url()``
+function is deprecated. Pass the callable view as described in the previous
+section instead.
+
 ``django.test.SimpleTestCase.urls``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -642,8 +680,10 @@ for reversing instead.
 If you are using :mod:`django.contrib.sitemaps`, add the ``name`` argument to
 the ``url`` that references :func:`django.contrib.sitemaps.views.sitemap`::
 
-    url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap',
-        {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
+    from django.contrib.sitemaps.views import sitemap
+
+    url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap')
 
 to ensure compatibility when reversing by Python path is removed in Django 2.0.
 
@@ -698,3 +738,32 @@ built-in tags. Simply remove ``'django.contrib.webdesign'`` from
 
 It provided backwards compatibility for pre-1.0 code, but its functionality is
 redundant. Use ``Field.error_messages['invalid']`` instead.
+
+Old :tfilter:`unordered_list` syntax
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An older (pre-1.0), more restrictive and verbose input format for the
+:tfilter:`unordered_list` template filter has been deprecated::
+
+    ``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``
+
+Using the new syntax, this becomes::
+
+    ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``
+
+``django.forms.Field._has_changed()``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Rename this method to :meth:`~django.forms.Field.has_changed` by removing the
+leading underscore. The old name will still work until Django 2.0.
+
+``django.utils.html.remove_tags()`` and ``removetags`` template filter
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``django.utils.html.remove_tags()`` as well as the template filter
+``removetags`` have been deprecated as they cannot guarantee safe output. Their
+existence is likely to lead to their use in security-sensitive contexts where
+they are not actually safe.
+
+The unused and undocumented ``django.utils.html.strip_entities()`` function has
+also been deprecated.

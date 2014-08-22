@@ -6,7 +6,7 @@ import os
 import shutil
 
 from django.apps import apps
-from django.db import models
+from django.db import connection, models
 from django.core.management import call_command, CommandError
 from django.db.migrations import questioner
 from django.test import override_settings, override_system_checks
@@ -93,6 +93,13 @@ class MigrateTests(MigrationTestBase):
         """
         Makes sure that sqlmigrate does something.
         """
+        # Make sure the output is wrapped in a transaction
+        stdout = six.StringIO()
+        call_command("sqlmigrate", "migrations", "0001", stdout=stdout)
+        output = stdout.getvalue()
+        self.assertIn(connection.ops.start_transaction_sql(), output)
+        self.assertIn(connection.ops.end_transaction_sql(), output)
+
         # Test forwards. All the databases agree on CREATE TABLE, at least.
         stdout = six.StringIO()
         call_command("sqlmigrate", "migrations", "0001", stdout=stdout)

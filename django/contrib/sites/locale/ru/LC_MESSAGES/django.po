@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Eugene MechanisM <contact@mechanism.name>, 2013
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Алексей Борискин <sun.void@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:49+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-06-15 17:39+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -18,18 +20,26 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: models.py:39
+#: contrib/sites/apps.py:8
+msgid "Sites"
+msgstr "Сайты"
+
+#: contrib/sites/models.py:30
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "Доменное имя не может содержать пробелы или табуляцию."
+
+#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "доменное имя"
 
-#: models.py:40
+#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "выводимое имя"
 
-#: models.py:45
+#: contrib/sites/models.py:74
 msgid "site"
 msgstr "сайт"
 
-#: models.py:46
+#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "сайты"

@@ -15,5 +15,5 @@ urlpatterns = [
 
     # Unicode strings are permitted everywhere.
     url(r'^Юникод/(\w+)/$', views.client2, name="метка_оператора"),
-    url(r'^Юникод/(?P<tag>\S+)/$', 'template_tests.views.client2', name="метка_оператора_2"),
+    url(r'^Юникод/(?P<tag>\S+)/$', views.client2, name="метка_оператора_2"),
 ]

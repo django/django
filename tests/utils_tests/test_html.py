@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 import os
 from unittest import TestCase
+import warnings
 
 from django.utils import html, safestring
 from django.utils._os import upath
@@ -124,7 +125,9 @@ class TestUtilsHtml(TestCase):
         # Strings that should come out untouched.
         values = ("&", "&a", "&a", "a&#a")
         for value in values:
-            self.check_output(f, value)
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                self.check_output(f, value)
         # Valid entities that should be stripped from the patterns.
         entities = ("&#1;", "&#12;", "&a;", "&fdasdfasdfasdf;")
         patterns = (
@@ -135,7 +138,9 @@ class TestUtilsHtml(TestCase):
         )
         for entity in entities:
             for in_pattern, output in patterns:
-                self.check_output(f, in_pattern % {'entity': entity}, output)
+                with warnings.catch_warnings(record=True):
+                    warnings.simplefilter("always")
+                    self.check_output(f, in_pattern % {'entity': entity}, output)
 
     def test_escapejs(self):
         f = html.escapejs
@@ -156,7 +161,9 @@ class TestUtilsHtml(TestCase):
             ("<a>x</a> <p><b>y</b></p>", "a b", "x <p>y</p>"),
         )
         for value, tags, output in items:
-            self.assertEqual(f(value, tags), output)
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                self.assertEqual(f(value, tags), output)
 
     def test_smart_urlquote(self):
         quote = html.smart_urlquote

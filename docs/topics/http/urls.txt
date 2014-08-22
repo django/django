@@ -74,11 +74,13 @@ Here's a sample URLconf::
 
     from django.conf.urls import url
 
+    from . import views
+
     urlpatterns = [
-        url(r'^articles/2003/$', 'news.views.special_case_2003'),
-        url(r'^articles/([0-9]{4})/$', 'news.views.year_archive'),
-        url(r'^articles/([0-9]{4})/([0-9]{2})/$', 'news.views.month_archive'),
-        url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', 'news.views.article_detail'),
+        url(r'^articles/2003/$', views.special_case_2003),
+        url(r'^articles/([0-9]{4})/$', views.year_archive),
+        url(r'^articles/([0-9]{4})/([0-9]{2})/$', views.month_archive),
+        url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', views.article_detail),
     ]
 
 Notes:
@@ -96,7 +98,7 @@ Example requests:
 
 * A request to ``/articles/2005/03/`` would match the third entry in the
   list. Django would call the function
-  ``news.views.month_archive(request, '2005', '03')``.
+  ``views.month_archive(request, '2005', '03')``.
 
 * ``/articles/2005/3/`` would not match any URL patterns, because the
   third entry in the list requires two digits for the month.
@@ -110,7 +112,7 @@ Example requests:
   pattern requires that the URL end with a slash.
 
 * ``/articles/2003/03/03/`` would match the final pattern. Django would call
-  the function ``news.views.article_detail(request, '2003', '03', '03')``.
+  the function ``views.article_detail(request, '2003', '03', '03')``.
 
 .. _Dive Into Python's explanation: http://www.diveintopython.net/regular_expressions/street_addresses.html#re.matching.2.3
 
@@ -131,11 +133,13 @@ Here's the above example URLconf, rewritten to use named groups::
 
     from django.conf.urls import url
 
+    from . import views
+
     urlpatterns = [
-        url(r'^articles/2003/$', 'news.views.special_case_2003'),
-        url(r'^articles/(?P<year>[0-9]{4})/$', 'news.views.year_archive'),
-        url(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$', 'news.views.month_archive'),
-        url(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<day>[0-9]{2})/$', 'news.views.article_detail'),
+        url(r'^articles/2003/$', views.special_case_2003),
+        url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
+        url(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$', views.month_archive),
+        url(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<day>[0-9]{2})/$', views.article_detail),
     ]
 
 This accomplishes exactly the same thing as the previous example, with one
@@ -143,11 +147,11 @@ subtle difference: The captured values are passed to view functions as keyword
 arguments rather than positional arguments. For example:
 
 * A request to ``/articles/2005/03/`` would call the function
-  ``news.views.month_archive(request, year='2005', month='03')``, instead
-  of ``news.views.month_archive(request, '2005', '03')``.
+  ``views.month_archive(request, year='2005', month='03')``, instead
+  of ``views.month_archive(request, '2005', '03')``.
 
 * A request to ``/articles/2003/03/03/`` would call the function
-  ``news.views.article_detail(request, year='2003', month='03', day='03')``.
+  ``views.article_detail(request, year='2003', month='03', day='03')``.
 
 In practice, this means your URLconfs are slightly more explicit and less prone
 to argument-order bugs -- and you can reorder the arguments in your views'
@@ -191,9 +195,9 @@ Each captured argument is sent to the view as a plain Python string, regardless
 of what sort of match the regular expression makes. For example, in this
 URLconf line::
 
-    url(r'^articles/(?P<year>[0-9]{4})/$', 'news.views.year_archive'),
+    url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
 
-...the ``year`` argument to ``news.views.year_archive()`` will be a string, not
+...the ``year`` argument to ``views.year_archive()`` will be a string, not
 an integer, even though the ``[0-9]{4}`` will only match integer strings.
 
 Specifying defaults for view arguments
@@ -205,9 +209,11 @@ Here's an example URLconf and view::
     # URLconf
     from django.conf.urls import url
 
+    from . import views
+
     urlpatterns = [
-        url(r'^blog/$', 'blog.views.page'),
-        url(r'^blog/page(?P<num>[0-9]+)/$', 'blog.views.page'),
+        url(r'^blog/$', views.page),
+        url(r'^blog/page(?P<num>[0-9]+)/$', views.page),
     ]
 
     # View (in blog/views.py)
@@ -216,7 +222,7 @@ Here's an example URLconf and view::
         ...
 
 In the above example, both URL patterns point to the same view --
-``blog.views.page`` -- but the first pattern doesn't capture anything from the
+``views.page`` -- but the first pattern doesn't capture anything from the
 URL. If the first pattern matches, the ``page()`` function will use its
 default argument for ``num``, ``"1"``. If the second pattern matches,
 ``page()`` will use whatever ``num`` value was captured by the regex.
@@ -290,13 +296,16 @@ Another possibility is to include additional URL patterns by using a list of
 
     from django.conf.urls import include, url
 
+    from apps.main import views as main_views
+    from credit import views as credit_views
+
     extra_patterns = [
-        url(r'^reports/(?P<id>[0-9]+)/$', 'credit.views.report'),
-        url(r'^charge/$', 'credit.views.charge'),
+        url(r'^reports/(?P<id>[0-9]+)/$', credit_views.report),
+        url(r'^charge/$', credit_views.charge),
     ]
 
     urlpatterns = [
-        url(r'^$', 'apps.main.views.homepage'),
+        url(r'^$', main_views.homepage),
         url(r'^help/', include('apps.help.urls')),
         url(r'^credit/', include(extra_patterns)),
     ]
@@ -381,7 +390,7 @@ For example::
     ]
 
 In this example, for a request to ``/blog/2005/``, Django will call
-``blog.views.year_archive(request, year='2005', foo='bar')``.
+``views.year_archive(request, year='2005', foo='bar')``.
 
 This technique is used in the
 :doc:`syndication framework </ref/contrib/syndication>` to pass metadata and
@@ -444,60 +453,6 @@ URLconf, regardless of whether the line's view actually accepts those options
 as valid. For this reason, this technique is only useful if you're certain that
 every view in the included URLconf accepts the extra options you're passing.
 
-Passing callable objects instead of strings
-===========================================
-
-Some developers find it more natural to pass the actual Python function object
-rather than a string containing the path to its module. This alternative is
-supported -- you can pass any callable object as the view.
-
-For example, given this URLconf in "string" notation::
-
-    from django.conf.urls import url
-
-    urlpatterns = [
-        url(r'^archive/$', 'mysite.views.archive'),
-        url(r'^about/$', 'mysite.views.about'),
-        url(r'^contact/$', 'mysite.views.contact'),
-    ]
-
-You can accomplish the same thing by passing objects rather than strings. Just
-be sure to import the objects::
-
-    from django.conf.urls import url
-    from mysite.views import archive, about, contact
-
-    urlpatterns = [
-        url(r'^archive/$', archive),
-        url(r'^about/$', about),
-        url(r'^contact/$', contact),
-    ]
-
-The following example is functionally identical. It's just a bit more compact
-because it imports the module that contains the views, rather than importing
-each view individually::
-
-    from django.conf.urls import url
-    from mysite import views
-
-    urlpatterns = [
-        url(r'^archive/$', views.archive),
-        url(r'^about/$', views.about),
-        url(r'^contact/$', views.contact),
-    ]
-
-The style you use is up to you.
-
-Note that :doc:`class based views</topics/class-based-views/index>` must be
-imported::
-
-    from django.conf.urls import url
-    from mysite.views import ClassBasedView
-
-    urlpatterns = [
-        url(r'^myview/$', ClassBasedView.as_view()),
-    ]
-
 Reverse resolution of URLs
 ==========================
 
@@ -553,9 +508,11 @@ Consider again this URLconf entry::
 
     from django.conf.urls import url
 
+    from . import views
+
     urlpatterns = [
         #...
-        url(r'^articles/([0-9]{4})/$', 'news.views.year_archive', name='news-year-archive'),
+        url(r'^articles/([0-9]{4})/$', views.year_archive, name='news-year-archive'),
         #...
     ]
 
@@ -756,9 +713,11 @@ For example::
 
     from django.conf.urls import include, url
 
+    from app.helps import views
+
     help_patterns = [
-        url(r'^basic/$', 'apps.help.views.views.basic'),
-        url(r'^advanced/$', 'apps.help.views.views.advanced'),
+        url(r'^basic/$', views.basic),
+        url(r'^advanced/$', views.advanced),
     ]
 
     url(r'^help/', include((help_patterns, 'bar', 'foo'))),

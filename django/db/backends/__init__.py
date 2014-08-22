@@ -474,6 +474,7 @@ class BaseDatabaseWrapper(object):
 
 
 class BaseDatabaseFeatures(object):
+    gis_enabled = False
     allows_group_by_pk = False
     # True if django.db.backends.utils.typecast_timestamp is used on values
     # returned from dates() calls.
@@ -1266,6 +1267,14 @@ class BaseDatabaseIntrospection(object):
         The default table name converter is for case sensitive comparison.
         """
         return name
+
+    def column_name_converter(self, name):
+        """
+        Apply a conversion to the column name for the purposes of comparison.
+
+        Uses table_name_converter() by default.
+        """
+        return self.table_name_converter(name)
 
     def table_names(self, cursor=None):
         """

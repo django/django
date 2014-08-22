@@ -549,9 +549,10 @@ disabled. Here is an example template::
 
 The auto-escaping tag passes its effect onto templates that extend the
 current one as well as templates included via the :ttag:`include` tag,
-just like all block tags. For example::
+just like all block tags. For example:
 
-    # base.html
+.. snippet::
+    :filename: base.html
 
     {% autoescape off %}
     <h1>{% block title %}{% endblock %}</h1>
@@ -559,18 +560,18 @@ just like all block tags. For example::
     {% endblock %}
     {% endautoescape %}
 
-
-    # child.html
+.. snippet::
+    :filename: child.html
 
     {% extends "base.html" %}
-    {% block title %}This & that{% endblock %}
+    {% block title %}This &amp; that{% endblock %}
     {% block content %}{{ greeting }}{% endblock %}
 
 Because auto-escaping is turned off in the base template, it will also be
 turned off in the child template, resulting in the following rendered
 HTML when the ``greeting`` variable contains the string ``<b>Hello!</b>``::
 
-    <h1>This & that</h1>
+    <h1>This &amp; that</h1>
     <b>Hello!</b>
 
 Notes
@@ -606,9 +607,9 @@ This means you would write ::
 
     {{ data|default:"3 &lt; 2" }}
 
-...rather than ::
+...rather than::
 
-    {{ data|default:"3 < 2" }}  <-- Bad! Don't do this.
+    {{ data|default:"3 < 2" }}  {# Bad! Don't do this. #}
 
 This doesn't affect what happens to data coming from the variable itself.
 The variable's contents are still automatically escaped, if necessary, because
@@ -638,14 +639,18 @@ of all comments related to the current task with::
     {{ task.comment_set.all.count }}
 
 And of course you can easily access methods you've explicitly defined on your
-own models::
+own models:
 
-    # In model
+.. snippet::
+    :filename: models.py
+
     class Task(models.Model):
         def foo(self):
             return "bar"
 
-    # In template
+.. snippet::
+    :filename: template.html
+
     {{ task.foo }}
 
 Because Django intentionally limits the amount of logic processing available

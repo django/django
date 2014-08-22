@@ -360,35 +360,47 @@ class JavascriptExtractorTests(ExtractorTests):
 
 class IgnoredExtractorTests(ExtractorTests):
 
-    def test_ignore_option(self):
+    def _run_makemessages(self, **options):
         os.chdir(self.test_dir)
-        ignore_patterns = [
-            os.path.join('ignore_dir', '*'),
-            'xxx_*',
-        ]
         stdout = StringIO()
         management.call_command('makemessages', locale=[LOCALE], verbosity=2,
-            ignore_patterns=ignore_patterns, stdout=stdout)
+            stdout=stdout, **options)
         data = stdout.getvalue()
-        self.assertTrue("ignoring directory ignore_dir" in data)
-        self.assertTrue("ignoring file xxx_ignored.html" in data)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = fp.read()
-            self.assertMsgId('This literal should be included.', po_contents)
-            self.assertNotMsgId('This should be ignored.', po_contents)
-            self.assertNotMsgId('This should be ignored too.', po_contents)
+        return data, po_contents
+
+    def test_ignore_directory(self):
+        out, po_contents = self._run_makemessages(ignore_patterns=[
+            os.path.join('ignore_dir', '*'),
+        ])
+        self.assertTrue("ignoring directory ignore_dir" in out)
+        self.assertMsgId('This literal should be included.', po_contents)
+        self.assertNotMsgId('This should be ignored.', po_contents)
+
+    def test_ignore_subdirectory(self):
+        out, po_contents = self._run_makemessages(ignore_patterns=[
+            'templates/*/ignore.html',
+            'templates/subdir/*',
+        ])
+        self.assertTrue("ignoring directory subdir" in out)
+        self.assertNotMsgId('This subdir should be ignored too.', po_contents)
+
+    def test_ignore_file_patterns(self):
+        out, po_contents = self._run_makemessages(ignore_patterns=[
+            'xxx_*',
+        ])
+        self.assertTrue("ignoring file xxx_ignored.html" in out)
+        self.assertNotMsgId('This should be ignored too.', po_contents)
 
     @override_settings(
         STATIC_ROOT=os.path.join(this_directory, 'commands', 'static_root/'),
         MEDIA_ROOT=os.path.join(this_directory, 'commands', 'media_root/'))
     def test_media_static_dirs_ignored(self):
-        os.chdir(self.test_dir)
-        stdout = StringIO()
-        management.call_command('makemessages', locale=[LOCALE], verbosity=2, stdout=stdout)
-        data = stdout.getvalue()
-        self.assertIn("ignoring directory static_root", data)
-        self.assertIn("ignoring directory media_root", data)
+        out, _ = self._run_makemessages()
+        self.assertIn("ignoring directory static_root", out)
+        self.assertIn("ignoring directory media_root", out)
 
 
 class SymlinkExtractorTests(ExtractorTests):

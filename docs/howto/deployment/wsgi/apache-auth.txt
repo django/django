@@ -72,9 +72,7 @@ application :doc:`that is created by django-admin startproject
 
 Finally, edit your WSGI script ``mysite.wsgi`` to tie Apache's authentication
 to your site's authentication mechanisms by importing the ``check_password``
-function:
-
-.. code-block:: python
+function::
 
     import os
 

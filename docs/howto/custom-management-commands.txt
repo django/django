@@ -46,9 +46,7 @@ The ``closepoll.py`` module has only one requirement -- it must define a class
   or from Windows scheduled tasks control panel.
 
 To implement the command, edit ``polls/management/commands/closepoll.py`` to
-look like this:
-
-.. code-block:: python
+look like this::
 
     from django.core.management.base import BaseCommand, CommandError
     from polls.models import Poll
@@ -108,9 +106,7 @@ Accepting optional arguments
 
 The same ``closepoll`` could be easily modified to delete a given poll instead
 of closing it by accepting additional command line options. These custom
-options can be added in the :meth:`~BaseCommand.add_arguments` method like this:
-
-.. code-block:: python
+options can be added in the :meth:`~BaseCommand.add_arguments` method like this::
 
     class Command(BaseCommand):
         def add_arguments(self, parser):
@@ -157,9 +153,7 @@ require a system-neutral string language (for which we use 'en-us').
 If, for some reason, your custom management command needs to use a fixed locale
 different from 'en-us', you should manually activate and deactivate it in your
 :meth:`~BaseCommand.handle` method using the functions provided by the I18N
-support code:
-
-.. code-block:: python
+support code::
 
     from django.core.management.base import BaseCommand, CommandError
     from django.utils import translation
@@ -174,12 +168,11 @@ support code:
             translation.activate('ru')
 
             # Or you can activate the LANGUAGE_CODE # chosen in the settings:
-            #
-            #from django.conf import settings
-            #translation.activate(settings.LANGUAGE_CODE)
+            from django.conf import settings
+            translation.activate(settings.LANGUAGE_CODE)
 
             # Your command logic here
-            # ...
+            ...
 
             translation.deactivate()
 
@@ -323,15 +316,13 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
 .. admonition:: Implementing a constructor in a subclass
 
-  If you implement ``__init__`` in your subclass of :class:`BaseCommand`,
-  you must call :class:`BaseCommand`’s ``__init__``.
+    If you implement ``__init__`` in your subclass of :class:`BaseCommand`,
+    you must call :class:`BaseCommand`’s ``__init__``::
 
-  .. code-block:: python
-
-    class Command(BaseCommand):
-        def __init__(self, *args, **kwargs):
-            super(Command, self).__init__(*args, **kwargs)
-            # ...
+        class Command(BaseCommand):
+            def __init__(self, *args, **kwargs):
+                super(Command, self).__init__(*args, **kwargs)
+                # ...
 
 .. method:: BaseCommand.add_arguments(parser)
 

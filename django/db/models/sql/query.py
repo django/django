@@ -66,7 +66,7 @@ class RawQuery(object):
     def get_columns(self):
         if self.cursor is None:
             self._execute_query()
-        converter = connections[self.using].introspection.table_name_converter
+        converter = connections[self.using].introspection.column_name_converter
         return [converter(column_meta[0])
                 for column_meta in self.cursor.description]
 
@@ -1107,8 +1107,19 @@ class Query(object):
         if field.rel:
             # testing for iterable of models
             if hasattr(value, '__iter__'):
-                for v in value:
-                    self.check_query_object_type(v, opts)
+                # Check if the iterable has a model attribute, if so
+                # it is likely something like a QuerySet.
+                if hasattr(value, 'model') and hasattr(value.model, '_meta'):
+                    model = value.model
+                    if not (model == opts.concrete_model
+                            or opts.concrete_model in model._meta.get_parent_list()
+                            or model in opts.get_parent_list()):
+                        raise ValueError(
+                            'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
+                            (model._meta.model_name, opts.object_name))
+                else:
+                    for v in value:
+                        self.check_query_object_type(v, opts)
             else:
                 # expecting single model instance here
                 self.check_query_object_type(value, opts)

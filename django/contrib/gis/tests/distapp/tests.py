@@ -7,22 +7,24 @@ from django.db.models import Q
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D  # alias for Distance
 from django.contrib.gis.tests.utils import (
-    HAS_SPATIAL_DB, mysql, oracle, postgis, spatialite, no_oracle, no_spatialite
+    mysql, oracle, postgis, spatialite, no_oracle, no_spatialite
 )
-from django.test import TestCase
+from django.test import TestCase, skipUnlessDBFeature
 
-if HAS_GEOS and HAS_SPATIAL_DB:
+if HAS_GEOS:
     from django.contrib.gis.geos import GEOSGeometry, LineString
 
     from .models import (AustraliaCity, Interstate, SouthTexasInterstate,
         SouthTexasCity, SouthTexasCityFt, CensusZipcode, SouthTexasZipcode)
 
 
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB and not mysql,
-    "Geos and spatial db (not mysql) are required.")
+@skipUnless(HAS_GEOS and not mysql,
+    "GEOS and spatial db (not mysql) are required.")
+@skipUnlessDBFeature("gis_enabled")
 class DistanceTest(TestCase):
+    fixtures = ['initial']
 
-    if HAS_GEOS and HAS_SPATIAL_DB:
+    if HAS_GEOS:
         # A point we are testing distances with -- using a WGS84
         # coordinate that'll be implicitly transformed to that to
         # the coordinate system of the field, EPSG:32140 (Texas South Central
@@ -219,7 +221,7 @@ class DistanceTest(TestCase):
         ref_zips = ['77002', '77025', '77401']
 
         for buf in [buf1, buf2]:
-            qs = CensusZipcode.objects.exclude(name='77005').transform(32140).distance(buf)
+            qs = CensusZipcode.objects.exclude(name='77005').transform(32140).distance(buf).order_by('name')
             self.assertListEqual(ref_zips, self.get_names(qs))
             for i, z in enumerate(qs):
                 self.assertAlmostEqual(z.distance.m, dists_m[i], 5)
@@ -328,7 +330,7 @@ class DistanceTest(TestCase):
         area_sq_m = [5437908.90234375, 10183031.4389648, 11254471.0073242, 9881708.91772461]
         # Tolerance has to be lower for Oracle
         tol = 2
-        for i, z in enumerate(SouthTexasZipcode.objects.area()):
+        for i, z in enumerate(SouthTexasZipcode.objects.order_by('name').area()):
             self.assertAlmostEqual(area_sq_m[i], z.area.sq_m, tol)
 
     def test_length(self):
@@ -361,7 +363,7 @@ class DistanceTest(TestCase):
         # SELECT ST_Perimeter(distapp_southtexaszipcode.poly) FROM distapp_southtexaszipcode;
         perim_m = [18404.3550889361, 15627.2108551001, 20632.5588368978, 17094.5996143697]
         tol = 2 if oracle else 7
-        for i, z in enumerate(SouthTexasZipcode.objects.perimeter()):
+        for i, z in enumerate(SouthTexasZipcode.objects.order_by('name').perimeter()):
             self.assertAlmostEqual(perim_m[i], z.perimeter.m, tol)
 
         # Running on points; should return 0.
