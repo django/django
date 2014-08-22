@@ -230,7 +230,7 @@ class MigrationLoader(object):
                 if parent[0] != key[0] or parent[1] == '__first__':
                     # Ignore __first__ references to the same app (#22325)
                     continue
-                self.graph.add_dependency(key, parent)
+                self.graph.add_dependency(migration, key, parent)
         for key, migration in normal.items():
             for parent in migration.dependencies:
                 if parent[0] == key[0]:
@@ -238,11 +238,11 @@ class MigrationLoader(object):
                     continue
                 parent = self.check_key(parent, key[0])
                 if parent is not None:
-                    self.graph.add_dependency(key, parent)
+                    self.graph.add_dependency(migration, key, parent)
             for child in migration.run_before:
                 child = self.check_key(child, key[0])
                 if child is not None:
-                    self.graph.add_dependency(child, key)
+                    self.graph.add_dependency(migration, child, key)
 
     def detect_conflicts(self):
         """
