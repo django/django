@@ -407,6 +407,41 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
             if re.search(r'.+,\s*$', line):
                 self.assertEqual(line, line.rstrip())
 
+    def test_helpful_error_message(self):
+        """
+        Tests that the deserializer gives a helpful error message in the event
+        that there is an error.
+
+        #19820
+        """
+        test_string = """
+        [
+        {
+            "pk" : 1,
+            "model" : "serializers.fktocontenttype",
+            "fields" : {
+                "name" : "missing content type",
+                "content_type" : [
+                    "serializers",
+                    "doesnotexist"
+                ]
+            }
+        }
+        ]
+        """
+
+        with self.assertRaises(serializers.base.DeserializationError) as cm:
+            list(serializers.deserialize('json', test_string))
+
+        err_msg = str(cm.exception)
+        key = ["serializers", "doesnotexist"]
+
+        self.assertIn("serializers.fktocontenttype", err_msg,
+                      "Model name should be given")
+        self.assertIn("pk=1", err_msg, "PK should be given")
+        self.assertIn("%r" % key, err_msg,
+                      "The offending field value should be given")
+
 
 class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
     serializer_name = "json"
