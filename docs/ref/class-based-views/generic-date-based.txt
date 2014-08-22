@@ -63,7 +63,7 @@ ArchiveIndexView
       month or day using the attribute ``date_list_period``. This also applies
       to all subclass views.
 
-    **Example myapp/views.py**::
+    **Example myapp/urls.py**::
 
         from django.conf.urls import patterns, url
         from django.views.generic.dates import ArchiveIndexView
