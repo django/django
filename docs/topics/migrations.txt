@@ -483,11 +483,16 @@ work::
     you can delete them.
 
 Note that model interdependencies in Django can get very complex, and squashing
-may occasionally result in an optimized migration that doesn't work or is
-impossible to run. When this occurs, you can re-try with ``--no-optimize``, but
-please `file a bug report <https://code.djangoproject.com/newticket>`_ either
-way detailing the models and their relationships so we can improve the
-optimizer to handle your case.
+may result in migrations that do not run; either mis-optimized (in which case
+you can try again with ``--no-optimize``, though you should also report an issue),
+or with a ``CircularDependencyError``, in which case you can manually resolve it.
+
+To manually resolve a ``CircularDependencyError``, break out one of
+the ForeignKeys in the circular dependency loop into a separate
+migration, and move the dependency on the other app with it. If you're unsure,
+see how makemigrations deals with the problem when asked to create brand
+new migrations from your models. In a future release of Django, squashmigrations
+will be updated to attempt to resolve these errors itself.
 
 Once you've squashed your migration, you should then commit it alongside the
 migrations it replaces and distribute this change to all running instances
