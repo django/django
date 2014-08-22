@@ -50,14 +50,14 @@ class DataTests(OptionsBaseTests):
 
     def test_fields(self):
         for model, expected_result in TEST_RESULTS['fields'].items():
-            fields = model._meta.get_fields()
+            fields = model._meta.fields
             self.assertEqual([f.attname for f in fields], expected_result)
 
     def test_local_fields(self):
         is_data_field = lambda f: isinstance(f, Field) and not isinstance(f, related.ManyToManyField)
 
         for model, expected_result in TEST_RESULTS['local_fields'].items():
-            fields = model._meta.get_fields(include_parents=False)
+            fields = model._meta.local_fields
             self.assertEqual([f.attname for f in fields], expected_result)
             self.assertTrue(all([f.model is model for f in fields]))
             self.assertTrue(all([is_data_field(f) for f in fields]))
@@ -73,14 +73,14 @@ class M2MTests(OptionsBaseTests):
 
     def test_many_to_many(self):
         for model, expected_result in TEST_RESULTS['many_to_many'].items():
-            fields = model._meta.get_fields(data=False, m2m=True)
+            fields = model._meta.many_to_many
             self.assertEqual([f.attname for f in fields], expected_result)
             self.assertTrue(all([isinstance(f.rel, related.ManyToManyRel)
                                  for f in fields]))
 
     def test_many_to_many_with_model(self):
         for model, expected_result in TEST_RESULTS['many_to_many_with_model'].items():
-            models = [self._model(model, field) for field in model._meta.get_fields(data=False, m2m=True)]
+            models = [self._model(model, field) for field in model._meta.many_to_many]
             self.assertEqual(models, expected_result)
 
 

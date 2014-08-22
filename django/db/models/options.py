@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from copy import copy
 from bisect import bisect
 from collections import OrderedDict, defaultdict
 from functools import partial
@@ -336,7 +335,8 @@ class Options(object):
         Returns a list of all data fields on the model and its parents.
         All hidden and proxy fields are omitted.
         """
-        return self._make_immutable_fields_list(self.get_fields(cache_results=False))
+        return self._make_immutable_fields_list((f for f in self.get_fields()
+                                                if not isinstance(f, ManyToManyField)))
 
     @cached_property
     def concrete_fields(self):
@@ -369,8 +369,8 @@ class Options(object):
         its parents.
         All hidden and proxy fields are omitted.
         """
-        return self._make_immutable_fields_list(self.get_fields(data=False, m2m=True,
-                                                cache_results=False))
+        return self._make_immutable_fields_list((f for f in self.get_fields()
+                                                if isinstance(f, ManyToManyField)))
 
     @cached_property
     def related_objects(self):
@@ -385,7 +385,7 @@ class Options(object):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = self.get_fields(m2m=True, data=True,
+        fields = self.get_fields(data=True,
                                  export_name_map=True, cache_results=False)
         fields.update(
             (field, {field.name, field.attname})
@@ -612,7 +612,7 @@ class Options(object):
         self._get_field_cache = {}
         self._get_fields_cache = {}
 
-    def get_fields(self, m2m=False, data=True, related_objects=False,
+    def get_fields(self, data=True, related_objects=False,
                    include_parents=True, include_hidden=False, **kwargs):
         """
         Returns a list of fields associated to the model. By default will only search in data.
@@ -634,9 +634,11 @@ class Options(object):
         # Creates a cache key composed of all arguments
         cache_results = kwargs.get('cache_results', True)
         export_name_map = kwargs.get('export_name_map', False)
-        cache_key = (m2m, data, related_objects,
+        cache_key = (data, related_objects,
                      include_parents, include_hidden, export_name_map)
 
+        if 'm2m' in kwargs.keys():
+            import ipdb; ipdb.set_trace()
         try:
             # In order to avoid list manipulation. Always
             # return a shallow copy of the results
@@ -690,16 +692,6 @@ class Options(object):
                     # is not intentionally hidden, add to the fields dict
                     fields[f.related] = {f.related_query_name()}
 
-        if m2m:
-            if include_parents:
-                for parent in self.parents:
-                    # Extend the fields dict with all the m2m fields of each parent.
-                    fields.update(parent._meta.get_fields(data=False, m2m=True, **options))
-            fields.update(
-                (field, {field.name, field.attname})
-                for field in self.local_many_to_many
-            )
-
         if data:
             if include_parents:
                 for parent in self.parents:
@@ -707,7 +699,7 @@ class Options(object):
                     fields.update(parent._meta.get_fields(**options))
             fields.update(
                 (field, {field.name, field.attname})
-                for field in self.local_fields
+                for field in chain(self.local_fields, self.local_many_to_many)
             )
 
         if not export_name_map:
@@ -731,7 +723,7 @@ class Options(object):
         All hidden and proxy fields are omitted.
         """
         res = set()
-        fields = self.get_fields(m2m=True, related_objects=True, export_name_map=True)
+        fields = self.get_fields(related_objects=True, export_name_map=True)
         fields.update(
             (field, {field.name, field.attname})
             for field in self.virtual_fields
