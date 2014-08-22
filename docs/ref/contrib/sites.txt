@@ -19,7 +19,8 @@ The sites framework is mainly based on a simple model:
 
     A model for storing the ``domain`` and ``name`` attributes of a Web site.
     The :setting:`SITE_ID` setting specifies the database ID of the
-    :class:`~django.contrib.sites.models.Site` object associated with that
+    :class:`~django.contrib.sites.models.Site` object (accessible using
+    the automatically added ``id`` attribute) associated with that
     particular settings file.
 
     .. attribute:: domain
