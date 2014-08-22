@@ -1393,8 +1393,8 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
             related_fields.append((f, klass_info))
 
     reverse_related_fields = []
+    model = klass._meta.proxy_for_model if klass._meta.proxy else klass
     if restricted:
-        model = klass._meta.proxy_for_model if klass._meta.proxy else klass
         for o in model._meta.get_all_related_objects():
             if o.field.unique and select_related_descend(o.field, restricted, requested,
                                                          only_load.get(o.model), reverse=True):
@@ -1407,10 +1407,12 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         try:
             pk_idx = field_names.index(klass._meta.pk.attname)
         except ValueError:
-            field_names.append(klass._meta.pk.attname)
-            pk_idx = len(field_names) - 1
-            field_count += 1
-            field_names[pk_idx]
+            field_names = [klass._meta.pk.attname]
+            for field in klass._meta.fields:
+                if issubclass(field.model, model) and field.attname != klass._meta.pk.attname:
+                    field_names.append(field.attname)
+            pk_idx = field_names.index(klass._meta.pk.attname)
+            field_count = len(field_names)
     else:
         pk_idx = klass._meta.pk_index()
 
