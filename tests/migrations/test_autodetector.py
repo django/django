@@ -154,8 +154,8 @@ class AutodetectorTests(TestCase):
         graph.add_node(("testapp", "0001_initial"), None)
         graph.add_node(("testapp", "0002_foobar"), None)
         graph.add_node(("otherapp", "0001_initial"), None)
-        graph.add_dependency(("testapp", "0002_foobar"), ("testapp", "0001_initial"))
-        graph.add_dependency(("testapp", "0002_foobar"), ("otherapp", "0001_initial"))
+        graph.add_dependency("testapp.0002_foobar", ("testapp", "0002_foobar"), ("testapp", "0001_initial"))
+        graph.add_dependency("testapp.0002_foobar", ("testapp", "0002_foobar"), ("otherapp", "0001_initial"))
         # Use project state to make a new migration change set
         before = self.make_project_state([])
         after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable])
