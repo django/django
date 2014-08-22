@@ -102,7 +102,8 @@ should be aware too. In this mode, the example above becomes::
     lead to questionable usefulness".
 
     Django only supports naive time objects and will raise an exception if you
-    attempt to save an aware time object.
+    attempt to save an aware time object, as a timezone for a time with no
+    associated date does not make sense.
 
 .. _naive-datetime-objects:
 
