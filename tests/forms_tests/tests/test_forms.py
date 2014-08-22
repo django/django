@@ -2341,7 +2341,8 @@ class FormsTestCase(TestCase):
 
     def test_baseform_repr(self):
         """
-        Test for baseForm method __repr__
+        BaseForm.__repr__() should contain some basic information about the
+        form.
         """
         p = Person()
         self.assertEqual(repr(p), "<Person bound=False, valid=Unknown, fields=(first_name;last_name;birthday)>")
@@ -2355,7 +2356,7 @@ class FormsTestCase(TestCase):
 
     def test_baseform_repr_dont_trigger_validation(self):
         """
-        Test to verify that __repr__ method don't trigger the validation
+        BaseForm.__repr__() shouldn't trigger the form validation.
         """
         p = Person({'first_name': 'John', 'last_name': 'Lennon', 'birthday': 'fakedate'})
         repr(p)
