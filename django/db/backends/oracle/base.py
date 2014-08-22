@@ -725,13 +725,30 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return True
 
     @cached_property
-    def oracle_version(self):
+    def oracle_full_version(self):
         with self.temporary_connection():
-            version = self.connection.version
+            return self.connection.version
+
+    @cached_property
+    def oracle_version(self):
         try:
-            return int(version.split('.')[0])
+            return int(self.oracle_full_version.split('.')[0])
         except ValueError:
             return None
+
+    @cached_property
+    def version_has_default_introspection_bug(self):
+        """
+        Some versions of Oracle -- we've seen this on 11.2.0.1 and suspect
+        it goes back -- have a weird bug where, when an integer column is
+        defined with a default, its precision is later reported on introspection
+        as 0, regardless of the real precision. For Django introspection, this
+        means that such columns are reported as IntegerField even if they are
+        really BigIntegerField or BooleanField.
+
+        The bug is solved in Oracle 11.2.0.2 and up.
+        """
+        return self.oracle_full_version < '11.2.0.2'
 
 
 class OracleParam(object):
