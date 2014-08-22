@@ -85,13 +85,14 @@ def lazy(func, *resultclasses):
         called on the result of that function. The function is not evaluated
         until one of the methods on the result is called.
         """
-        __dispatch = None
+        __prepared = False
 
         def __init__(self, args, kw):
             self.__args = args
             self.__kw = kw
-            if self.__dispatch is None:
+            if not self.__prepared:
                 self.__prepare_class__()
+            self.__prepared = True
 
         def __reduce__(self):
             return (
@@ -101,18 +102,15 @@ def lazy(func, *resultclasses):
 
         @classmethod
         def __prepare_class__(cls):
-            cls.__dispatch = {}
             for resultclass in resultclasses:
-                cls.__dispatch[resultclass] = {}
-                for type_ in reversed(resultclass.mro()):
-                    for (k, v) in type_.__dict__.items():
-                        # All __promise__ return the same wrapper method, but
-                        # they also do setup, inserting the method into the
-                        # dispatch dict.
-                        meth = cls.__promise__(resultclass, k, v)
-                        if hasattr(cls, k):
+                for type_ in resultclass.mro():
+                    for method_name in type_.__dict__.keys():
+                        # All __promise__ return the same wrapper method, they
+                        # look up the correct implementation when called.
+                        if hasattr(cls, method_name):
                             continue
-                        setattr(cls, k, meth)
+                        meth = cls.__promise__(method_name)
+                        setattr(cls, method_name, meth)
             cls._delegate_bytes = bytes in resultclasses
             cls._delegate_text = six.text_type in resultclasses
             assert not (cls._delegate_bytes and cls._delegate_text), (
@@ -129,21 +127,13 @@ def lazy(func, *resultclasses):
                     cls.__str__ = cls.__bytes_cast
 
         @classmethod
-        def __promise__(cls, klass, funcname, method):
-            # Builds a wrapper around some magic method and registers that
-            # magic method for the given type and method name.
+        def __promise__(cls, method_name):
+            # Builds a wrapper around some magic method
             def __wrapper__(self, *args, **kw):
                 # Automatically triggers the evaluation of a lazy value and
                 # applies the given magic method of the result type.
                 res = func(*self.__args, **self.__kw)
-                for t in type(res).mro():
-                    if t in self.__dispatch:
-                        return self.__dispatch[t][funcname](res, *args, **kw)
-                raise TypeError("Lazy object returned unexpected type.")
-
-            if klass not in cls.__dispatch:
-                cls.__dispatch[klass] = {}
-            cls.__dispatch[klass][funcname] = method
+                return getattr(res, method_name)(*args, **kw)
             return __wrapper__
 
         def __text_cast(self):
