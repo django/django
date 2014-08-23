@@ -1098,7 +1098,7 @@ Aggregate Methods
 
 .. method:: GeoQuerySet.collect(**kwargs)
 
-*Availability*: PostGIS
+*Availability*: PostGIS, Spatialite (>=3.0)
 
 Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
 column. This is analogous to a simplified version of the :meth:`GeoQuerySet.unionagg` method,
@@ -1111,7 +1111,7 @@ dissolving boundaries.
 
 .. method:: GeoQuerySet.extent(**kwargs)
 
-*Availability*: PostGIS, Oracle
+*Availability*: PostGIS, Oracle, Spatialite (>=3.0)
 
 Returns the extent of the ``GeoQuerySet`` as a four-tuple, comprising the
 lower left coordinate and the upper right coordinate.
