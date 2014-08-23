@@ -4,6 +4,8 @@ import datetime
 import os
 import subprocess
 
+from django.utils.lru_cache import lru_cache
+
 
 def get_version(version=None):
     "Returns a PEP 386-compliant version number from VERSION."
@@ -50,6 +52,7 @@ def get_complete_version(version=None):
     return version
 
 
+@lru_cache()
 def get_git_changeset():
     """Returns a numeric identifier of the latest git changeset.
 
@@ -57,10 +60,6 @@ def get_git_changeset():
     This value isn't guaranteed to be unique, but collisions are very unlikely,
     so it's sufficient for generating the development version numbers.
     """
-    # FIXME: Replace with @lru_cache when we upgrade the docs server to PY2.7+.
-    if hasattr(get_git_changeset, 'cache'):
-        return get_git_changeset.cache
-
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     git_log = subprocess.Popen('git log --pretty=format:%ct --quiet -1 HEAD',
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -69,9 +68,5 @@ def get_git_changeset():
     try:
         timestamp = datetime.datetime.utcfromtimestamp(int(timestamp))
     except ValueError:
-        changeset = None
-    else:
-        changeset = timestamp.strftime('%Y%m%d%H%M%S')
-
-    get_git_changeset.cache = changeset
-    return changeset
+        return None
+    return timestamp.strftime('%Y%m%d%H%M%S')
