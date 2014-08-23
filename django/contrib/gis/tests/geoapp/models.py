@@ -1,5 +1,5 @@
 from django.contrib.gis.db import models
-from django.contrib.gis.tests.utils import mysql, spatialite
+from django.contrib.gis.tests.utils import mysql
 from django.utils.encoding import python_2_unicode_compatible
 
 # MySQL spatial indices can't handle NULL geometries.
@@ -58,15 +58,14 @@ class Truth(models.Model):
         app_label = 'geoapp'
 
 
-if not spatialite:
+class Feature(NamedModel):
+    geom = models.GeometryField()
 
-    class Feature(NamedModel):
-        geom = models.GeometryField()
 
-    class MinusOneSRID(models.Model):
-        geom = models.PointField(srid=-1)  # Minus one SRID.
+class MinusOneSRID(models.Model):
+    geom = models.PointField(srid=-1)  # Minus one SRID.
 
-        objects = models.GeoManager()
+    objects = models.GeoManager()
 
-        class Meta:
-            app_label = 'geoapp'
+    class Meta:
+        app_label = 'geoapp'
