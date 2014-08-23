@@ -133,3 +133,21 @@ class GraphTests(TestCase):
             CircularDependencyError,
             graph.forwards_plan, ("app_a", "0003"),
         )
+
+    def test_forwards_plan(self):
+        """
+        Tests for forwards_plan of nonexistent node.
+        """
+        # Build graph
+        graph = MigrationGraph()
+        with self.assertRaisesMessage(ValueError, "Node ('app_b', '0001') not a valid node") as ex:
+            graph.forwards_plan(("app_b", "0001"))
+
+    def test_backwards_plans(self):
+        """
+        Tests for backwards_plan of nonexistent node.
+        """
+        # Build graph
+        graph = MigrationGraph()
+        with self.assertRaisesMessage(ValueError, "Node ('app_b', '0001') not a valid node") as ex:
+            graph.backwards_plan(("app_b", "0001"))
