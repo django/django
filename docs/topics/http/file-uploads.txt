@@ -168,53 +168,8 @@ defaults" which can be customized as described in the next section.
 Changing upload handler behavior
 --------------------------------
 
-There are a few settings which control Django's file upload behavior:
-
-:setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
-    The maximum size, in bytes, for files that will be uploaded into memory.
-    Files larger than :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` will be
-    streamed to disk.
-
-    Defaults to 2.5 megabytes.
-
-:setting:`FILE_UPLOAD_TEMP_DIR`
-    The directory where uploaded files larger than
-    :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` will be stored.
-
-    Defaults to your system's standard temporary directory (i.e. ``/tmp`` on
-    most Unix-like systems).
-
-:setting:`FILE_UPLOAD_PERMISSIONS`
-    The numeric mode (i.e. ``0o644``) to set newly uploaded files to. For
-    more information about what these modes mean, see the documentation for
-    :func:`os.chmod`.
-
-    If this isn't given or is ``None``, you'll get operating-system
-    dependent behavior. On most platforms, temporary files will have a mode
-    of ``0o600``, and files saved from memory will be saved using the
-    system's standard umask.
-
-    For security reasons, these permissions aren't applied to the temporary
-    files that are stored in :setting:`FILE_UPLOAD_TEMP_DIR`.
-
-    .. warning::
-
-        If you're not familiar with file modes, please note that the leading
-        ``0`` is very important: it indicates an octal number, which is the
-        way that modes must be specified. If you try to use ``644``, you'll
-        get totally incorrect behavior.
-
-        **Always prefix the mode with a 0.**
-
-:setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`
-    The numeric mode to apply to directories created in the process of
-    uploading files. This value mirrors the functionality and caveats of
-    the :setting:`FILE_UPLOAD_PERMISSIONS` setting.
-
-:setting:`FILE_UPLOAD_HANDLERS`
-    The actual handlers for uploaded files. Changing this setting allows
-    complete customization -- even replacement -- of Django's upload
-    process.
+There are a few settings which control Django's file upload behavior. See
+:ref:`File Upload Settings <file-upload-settings>` for details.
 
 Modifying upload handlers on the fly
 ------------------------------------
