@@ -1,8 +1,8 @@
 .. _Generic views:
 
-=========================
-Class-based generic views
-=========================
+==================================
+Built-in Class-based generic views
+==================================
 
 Writing Web applications can be monotonous, because we repeat certain patterns
 again and again. Django tries to take away some of that monotony at the model

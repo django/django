@@ -1,6 +1,6 @@
-=====================
-Class-based views API
-=====================
+==============================
+Built-in Class-based views API
+==============================
 
 Class-based views API reference. For introductory material, see
 :doc:`/topics/class-based-views/index`.
