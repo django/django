@@ -48,6 +48,8 @@ Minor features
   <django.contrib.admin.ModelAdmin.delete_view>` displays a summary of objects
   to be deleted on the deletion confirmation page.
 
+* The jQuery library embedded in the admin has been upgraded to version 1.11.1.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
