@@ -169,8 +169,9 @@ OK, this is the fun part, where we actually push out a release!
 
    __ https://github.com/django/django/commit/18d920ea4839fb54f9d2a5dcb555b6a5666ee469
 
-#. For a version release, remove the ``UNDER DEVELOPMENT`` header at the top of
-   the release notes.
+#. For a major version release, remove the ``UNDER DEVELOPMENT`` header at the
+   top of the release notes and add the release date on the next line. For a
+   minor release, replace ``*Under Development*`` with the release date.
 
 #. If this is a pre-release package, update the "Development Status" trove
    classifier in ``setup.py`` to reflect this. Otherwise, make sure the
