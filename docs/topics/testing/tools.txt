@@ -1610,10 +1610,10 @@ features class. See ``django.db.backends.BaseDatabaseFeatures``
 class for a full list of database features that can be used as a basis
 for skipping tests.
 
-.. function:: skipIfDBFeature(feature_name_string)
+.. function:: skipIfDBFeature(*feature_name_strings)
 
-Skip the decorated test or ``TestCase`` if the named database feature is
-supported.
+Skip the decorated test or ``TestCase`` if all of the named database features
+are supported.
 
 For example, the following test will not be executed if the database
 supports transactions (e.g., it would *not* run under PostgreSQL, but
@@ -1628,10 +1628,14 @@ it would under MySQL with MyISAM tables)::
 
     ``skipIfDBFeature`` can now be used to decorate a ``TestCase`` class.
 
-.. function:: skipUnlessDBFeature(feature_name_string)
+.. versionchanged:: 1.8
 
-Skip the decorated test or ``TestCase`` if the named database feature is *not*
-supported.
+    ``skipIfDBFeature`` can accept multiple feature strings.
+
+.. function:: skipUnlessDBFeature(*feature_name_strings)
+
+Skip the decorated test or ``TestCase`` if any of the named database features
+are *not* supported.
 
 For example, the following test will only be executed if the database
 supports transactions (e.g., it would run under PostgreSQL, but *not*
@@ -1645,3 +1649,7 @@ under MySQL with MyISAM tables)::
 .. versionchanged:: 1.7
 
     ``skipUnlessDBFeature`` can now be used to decorate a ``TestCase`` class.
+
+.. versionchanged:: 1.8
+
+    ``skipUnlessDBFeature`` can accept multiple feature strings.
