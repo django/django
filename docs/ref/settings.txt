@@ -1272,7 +1272,10 @@ Default::
     ("django.core.files.uploadhandler.MemoryFileUploadHandler",
      "django.core.files.uploadhandler.TemporaryFileUploadHandler")
 
-A tuple of handlers to use for uploading. See :doc:`/topics/files` for details.
+A tuple of handlers to use for uploading. Changing this setting allows complete
+customization -- even replacement -- of Django's upload process.
+
+See :doc:`/topics/files` for details.
 
 .. setting:: FILE_UPLOAD_MAX_MEMORY_SIZE
 
@@ -1319,6 +1322,9 @@ dependent behavior. On most platforms, temporary files will have a mode
 of ``0o600``, and files saved from memory will be saved using the
 system's standard umask.
 
+For security reasons, these permissions aren't applied to the temporary files
+that are stored in :setting:`FILE_UPLOAD_TEMP_DIR`.
+
 This setting also determines the default permissions for collected static files
 when using the :djadmin:`collectstatic` management command. See
 :djadmin:`collectstatic` for details on overriding it.
@@ -1332,7 +1338,6 @@ when using the :djadmin:`collectstatic` management command. See
     way that modes must be specified. If you try to use ``644``, you'll
     get totally incorrect behavior.
 
-
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
 FILE_UPLOAD_TEMP_DIR
@@ -1340,9 +1345,11 @@ FILE_UPLOAD_TEMP_DIR
 
 Default: ``None``
 
-The directory to store data temporarily while uploading files. If ``None``,
-Django will use the standard temporary directory for the operating system. For
-example, this will default to '/tmp' on \*nix-style operating systems.
+The directory to store data (typically files larger than
+:setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`) temporarily while uploading files.
+If ``None``, Django will use the standard temporary directory for the operating
+system. For example, this will default to ``/tmp`` on \*nix-style operating
+systems.
 
 See :doc:`/topics/files` for details.
 
@@ -3044,6 +3051,8 @@ Error reporting
 * :setting:`MANAGERS`
 * :setting:`SEND_BROKEN_LINK_EMAILS`
 * :setting:`SILENCED_SYSTEM_CHECKS`
+
+.. _file-upload-settings:
 
 File uploads
 ------------
