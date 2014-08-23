@@ -9,7 +9,7 @@ from django.db.backends import utils
 from django.db.models import signals, Q
 from django.db.models.deletion import SET_NULL, SET_DEFAULT, CASCADE
 from django.db.models.fields import (AutoField, Field, IntegerField,
-    PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist)
+    PositiveIntegerField, PositiveSmallIntegerField, FieldDoesNotExist, NOT_PROVIDED)
 from django.db.models.lookups import IsNull
 from django.db.models.related import RelatedObject, PathInfo
 from django.db.models.query import QuerySet
@@ -1942,6 +1942,16 @@ class ManyToManyField(RelatedField):
                     id='fields.W341',
                 )
             )
+
+        if self.default != NOT_PROVIDED:
+            warnings.append(
+                checks.Warning(
+                    "ManyToManyField does not support default values.",
+                    hint=None,
+                    obj=self,
+                    id='fields.W342'
+                    )
+                )
 
         return warnings
 

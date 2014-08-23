@@ -61,11 +61,14 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
     def test_many_to_many_with_useless_options(self):
+        def all_models():
+            return Model.objects.all()
+
         class Model(models.Model):
             name = models.CharField(max_length=20)
 
         class ModelM2M(models.Model):
-            m2m = models.ManyToManyField(Model, null=True, validators=[''])
+            m2m = models.ManyToManyField(Model, null=True, validators=[''], default=all_models)
 
         errors = ModelM2M.check()
         field = ModelM2M._meta.get_field('m2m')
@@ -84,6 +87,14 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 hint=None,
                 obj=field,
                 id='fields.W341',
+            )
+        )
+        expected.append(
+            DjangoWarning(
+                'ManyToManyField does not support default values.',
+                hint=None,
+                obj=field,
+                id='fields.W342',
             )
         )
 

@@ -220,6 +220,11 @@ Note that ``lambda``\s cannot be used for field options like ``default``
 because they cannot be :ref:`serialized by migrations <migration-serializing>`.
 See that documentation for other caveats.
 
+.. versionadded:: 1.8
+
+This option is not valid for :class:`ManyToManyField` field type, and will
+produce a warning with the checks framework.
+
 ``editable``
 ------------
 
