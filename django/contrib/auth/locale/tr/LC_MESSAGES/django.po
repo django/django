@@ -38,12 +38,12 @@ msgstr "Önemli tarihler"
 
 #: contrib/auth/admin.py:134
 msgid "Password changed successfully."
-msgstr "Şifre başarı ile değiştirildi."
+msgstr "Parola başarı ile değiştirildi."
 
 #: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
-msgstr "Şifre değiştir: %s"
+msgstr "Parola değiştir: %s"
 
 #: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
@@ -52,12 +52,12 @@ msgstr ""
 #: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
 #: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
-msgstr "Şifre tanımlanmadı."
+msgstr "Parola tanımlanmadı."
 
 #: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
 #: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Yanlış şifre formatı veya bilinmeyen şifreleme algoritması."
+msgstr "Yanlış parola formatı veya bilinmeyen şifreleme algoritması."
 
 #: contrib/auth/forms.py:76
 msgid "A user with that username already exists."
@@ -66,7 +66,7 @@ msgstr "Bu isimde bir kullanıcı zaten mevcuttur."
 #: contrib/auth/forms.py:77 contrib/auth/forms.py:285
 #: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
-msgstr "İki şifre alanı uyuşmuyor."
+msgstr "İki parola alanı uyuşmuyor."
 
 #: contrib/auth/forms.py:79 contrib/auth/forms.py:129
 msgid "Username"
@@ -86,15 +86,15 @@ msgstr "Bu değer sadece harf, rakam ve @/./+/-/_ karakterlerini içerebilir."
 #: contrib/auth/forms.py:86 contrib/auth/forms.py:135
 #: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
-msgstr "Şifre"
+msgstr "Parola"
 
 #: contrib/auth/forms.py:88
 msgid "Password confirmation"
-msgstr "Şifre onayı"
+msgstr "Parola onayı"
 
 #: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
-msgstr "Onaylamak için, yukarıdaki şifrenin aynısını girin."
+msgstr "Onaylamak için, yukarıdaki parolanın aynısını girin."
 
 #: contrib/auth/forms.py:136
 msgid ""
@@ -102,8 +102,8 @@ msgid ""
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
-"Ham şifreler saklanmadığından kullanıcıların şifrelerini görmenin yolu "
-"yoktur, fakat <a href=\"password/\">buradaki form</a> aracılığıyla şifreyi "
+"Ham parolalar saklanmadığından kullanıcıların parolalarını görmenin yolu "
+"yoktur, fakat <a href=\"password/\">buradaki form</a> aracılığıyla parolayı "
 "değiştirebilirsiniz."
 
 #: contrib/auth/forms.py:166
@@ -125,23 +125,23 @@ msgstr "Eposta"
 
 #: contrib/auth/forms.py:287
 msgid "New password"
-msgstr "Yeni şifre"
+msgstr "Yeni parola"
 
 #: contrib/auth/forms.py:289
 msgid "New password confirmation"
-msgstr "Yeni şifre tekrarı"
+msgstr "Yeni parola tekrarı"
 
 #: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "Eski şifreniz hatalı. Lütfen tekrar girin."
+msgstr "Eski parolanız hatalı. Lütfen tekrar girin."
 
 #: contrib/auth/forms.py:323
 msgid "Old password"
-msgstr "Eski şifre"
+msgstr "Eski parola"
 
 #: contrib/auth/forms.py:353
 msgid "Password (again)"
-msgstr "Şifre (tekrar)"
+msgstr "Parola (tekrar)"
 
 #: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
 #: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
@@ -200,7 +200,7 @@ msgstr "gruplar"
 
 #: contrib/auth/models.py:192
 msgid "password"
-msgstr "şifre"
+msgstr "parola"
 
 #: contrib/auth/models.py:193
 msgid "last login"
@@ -301,28 +301,28 @@ msgstr "Çıkış yapıldı"
 
 #: contrib/auth/views.py:169
 msgid "Password reset"
-msgstr "Şifreyi sıfırla"
+msgstr "Parolayı sıfırla"
 
 #: contrib/auth/views.py:181
 msgid "Password reset successful"
-msgstr "Şifre sıfırlama başarılı"
+msgstr "Parola sıfırlama başarılı"
 
 #: contrib/auth/views.py:216
 msgid "Enter new password"
-msgstr "Yeni şifrenizi girin"
+msgstr "Yeni parolanızı girin"
 
 #: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
-msgstr "Şifre sıfırlaması başarısız oldu"
+msgstr "Parola sıfırlaması başarısız oldu"
 
 #: contrib/auth/views.py:244
 msgid "Password reset complete"
-msgstr "Şifre sıfırlama tamamlandı"
+msgstr "Parola sıfırlama tamamlandı"
 
 #: contrib/auth/views.py:278
 msgid "Password change"
-msgstr "Şifre değişimi"
+msgstr "Parola değişimi"
 
 #: contrib/auth/views.py:291
 msgid "Password change successful"
-msgstr "Şifre değişimi başarılı"
+msgstr "Parola değişimi başarılı"
