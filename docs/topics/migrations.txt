@@ -331,6 +331,10 @@ They will, however, have the same fields, relationships and ``Meta`` options
   when you access them in migrations, and you will NOT have any custom
   constructors or instance methods. Plan appropriately!
 
+References to functions in field options such as ``upload_to`` and
+``limit_choices_to`` are serialized in migrations, so the functions will need
+to be kept around for as long as there is a migration referencing them.
+
 In addition, the base classes of the model are just stored as pointers,
 so you must always keep base classes around for as long as there is a migration
 that contains a reference to them. On the plus side, methods and managers
