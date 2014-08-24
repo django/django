@@ -42,6 +42,8 @@ class Command(BaseCommand):
             help='Mark migrations as run without actually running them')
         parser.add_argument('--list', '-l', action='store_true', dest='list', default=False,
             help='Show a list of all known migrations and which are applied')
+        parser.add_argument('--show-plan', '-p', action='store_true', dest='show_plan', default=False,
+            help='Show all known migrations in the order they will be applied')
 
     def handle(self, *args, **options):
 
@@ -63,6 +65,10 @@ class Command(BaseCommand):
         # If they asked for a migration listing, quit main execution flow and show it
         if options.get("list", False):
             return self.show_migration_list(connection, [options['app_label']] if options['app_label'] else None)
+
+        # If they asked for a migration plan, quit main execution flow and show it
+        if options.get("show_plan", False):
+            return self.show_migration_plan(connection)
 
         # Work out which apps have migrations and which do not
         executor = MigrationExecutor(connection, self.migration_progress_callback)
@@ -397,3 +403,46 @@ class Command(BaseCommand):
             # If we didn't print anything, then a small message
             if not shown:
                 self.stdout.write(" (no migrations)", self.style.MIGRATE_FAILURE)
+
+    def show_migration_plan(self, connection):
+        """
+        Show all known migrations in the order they will be applied
+        """
+        # Load migrations from disk/DB
+        loader = MigrationLoader(connection)
+        graph = loader.graph
+        targets = graph.leaf_nodes()
+        plan = []
+        seen = set()
+
+        # Generate the plan
+        for target in targets:
+            for migration in graph.forwards_plan(target):
+                if migration not in seen:
+                    plan.append(graph.nodes[migration])
+                    seen.add(migration)
+
+        # Output
+        def print_deps(migration):
+            out = []
+            for dep in migration.dependencies:
+                if dep[1] == "__first__":
+                    roots = graph.root_nodes(dep[0])
+                    dep = roots[0] if roots else (dep[0], "__first__")
+                out.append("%s.%s" % dep)
+            if out:
+                return " ... (%s)" % ", ".join(out)
+            return ""
+
+        if self.verbosity >= 2:
+            for migration in plan:
+                if (migration.app_label, migration.name) in loader.applied_migrations:
+                    self.stdout.write("[X]  %s%s" % (migration, print_deps(migration)))
+                else:
+                    self.stdout.write("[ ]  %s%s" % (migration, print_deps(migration)))
+        else:
+            for migration in plan:
+                if (migration.app_label, migration.name) in loader.applied_migrations:
+                    self.stdout.write("[X]  %s" % migration)
+                else:
+                    self.stdout.write("[ ]  %s" % migration)
