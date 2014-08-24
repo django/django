@@ -1253,10 +1253,9 @@ To create or update a message file, run this command::
 
     django-admin.py makemessages -l de
 
-...where ``de`` is the language code for the message file you want to create.
-The language code, in this case, is in :term:`locale format<locale name>`. For
-example, it's ``pt_BR`` for Brazilian Portuguese and ``de_AT`` for Austrian
-German.
+...where ``de`` is the :term:`locale name` for the message file you want to
+create. For example, ``pt_BR`` for Brazilian Portuguese, ``de_AT`` for Austrian
+German or ``id`` for Indonesian.
 
 The script should be run from one of two places:
 
