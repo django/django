@@ -685,7 +685,10 @@ class Options(object):
             all_fields = model_fields if not self.proxy else chain(model_fields,
                                                                    self.concrete_model._meta.relation_tree)
             for f in all_fields:
-                if include_hidden or not f.related.field.rel.is_hidden():
+                if isinstance(f, ManyToManyField):
+                    fields[f.related] = {f.related_query_name()}
+
+                elif include_hidden or not f.related.field.rel.is_hidden():
                     # If hidden fields should be included or the relation
                     # is not intentionally hidden, add to the fields dict
                     fields[f.related] = {f.related_query_name()}
