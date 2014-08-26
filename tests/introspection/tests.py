@@ -59,7 +59,8 @@ class IntrospectionTests(TestCase):
             ['AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
              'CharField', 'CharField', 'CharField',
              'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
-             'BinaryField' if connection.features.can_introspect_binary_field else 'TextField']
+             'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
+             'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField']
         )
 
     # The following test fails on Oracle due to #17202 (can't correctly
@@ -80,7 +81,7 @@ class IntrospectionTests(TestCase):
         nullable_by_backend = connection.features.interprets_empty_strings_as_nulls
         self.assertEqual(
             [r[6] for r in desc],
-            [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True]
+            [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False]
         )
 
     # Regression test for #9991 - 'real' types in postgres
