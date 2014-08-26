@@ -50,6 +50,10 @@ Minor features
 
 * The jQuery library embedded in the admin has been upgraded to version 1.11.1.
 
+* You can now implement :attr:`~django.contrib.admin.AdminSite.site_url` on a
+  custom :class:`~django.contrib.admin.AdminSite` in order to display a direct link
+  to the frontend site.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
