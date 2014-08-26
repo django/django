@@ -832,6 +832,7 @@ class FunkyTagAdmin(admin.ModelAdmin):
 
 
 site = admin.AdminSite(name="admin")
+site.site_url = '/my-site-url/'
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
 site.register(Section, save_as=True, inlines=[ArticleInline])
