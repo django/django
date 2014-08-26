@@ -28,10 +28,6 @@ if os.name == 'nt':
         """
         Temporary file object constructor that supports reopening of the
         temporary file in Windows.
-
-        Note that __init__() does not support the 'delete' keyword argument in
-        Python 2.6+, or the 'delete', 'buffering', 'encoding', or 'newline'
-        keyword arguments in Python 3.0+.
         """
         def __init__(self, mode='w+b', bufsize=-1, suffix='', prefix='',
                 dir=None):
