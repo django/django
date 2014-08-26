@@ -374,6 +374,9 @@ class Options(object):
 
     @cached_property
     def related_objects(self):
+        # This property contains all related objects pointing to the current model.
+        # The related objects can come from a one-to-one, one-to-many, many-to-many
+        # field relation type.
         all_related_fields = self.get_fields(data=False, related_objects=True,
                                              include_hidden=True, cache_results=True)
         return [obj for obj in all_related_fields
