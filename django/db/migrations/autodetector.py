@@ -679,19 +679,13 @@ class MigrationAutodetector(object):
                     related_object.field.name,
                     False,
                 ))
-                dependencies.append((
-                    related_object.model._meta.app_label,
-                    related_object.model._meta.object_name,
-                    related_object.field.name,
-                    "alter",
-                ))
-            for related_object in model._meta.related_objects:
-                dependencies.append((
-                    related_object.model._meta.app_label,
-                    related_object.model._meta.object_name,
-                    related_object.field.name,
-                    False,
-                ))
+                if not isinstance(related_object.field, models.ManyToManyField):
+                    dependencies.append((
+                        related_object.model._meta.app_label,
+                        related_object.model._meta.object_name,
+                        related_object.field.name,
+                        "alter",
+                    ))
             for name, field in sorted(related_fields.items()):
                 dependencies.append((app_label, model_name, name, False))
             # We're referenced in another field's through=
