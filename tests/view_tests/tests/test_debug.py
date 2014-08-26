@@ -333,7 +333,7 @@ class ExceptionReporterTests(TestCase):
 
     def test_too_large_values_handling(self):
         "Large values should not create a large HTML."
-        large = 32 * 1024 * 1024
+        large = 256 * 1024
         repr_of_str_adds = len(repr(''))
         try:
             class LargeOutput(object):
@@ -345,7 +345,7 @@ class ExceptionReporterTests(TestCase):
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(None, exc_type, exc_value, tb)
         html = reporter.get_traceback_html()
-        self.assertEqual(len(html) // 1024 // 1024, 0)  # still fit in 1MB
+        self.assertEqual(len(html) // 1024 // 128, 0)  # still fit in 128Kb
         self.assertIn('&lt;trimmed %d bytes string&gt;' % (large + repr_of_str_adds,), html)
 
     @skipIf(six.PY2, 'Bug manifests on PY3 only')
