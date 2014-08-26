@@ -680,10 +680,9 @@ class Options(object):
                             fields[obj] = query_name
 
             # Tree is computer once and cached until apps cache is expired. It is composed of
-            # {options_instance: [field_pointing_to_options_model, field_pointing_to_options, ..]}
+            # a list of fields pointing to the current model from other models.
             # If the model is a proxy model, then we also add the concrete model.
-            model_fields = self.relation_tree
-            all_fields = model_fields if not self.proxy else chain(model_fields,
+            all_fields = self.relation_tree if not self.proxy else chain(self.relation_tree,
                                                                    self.concrete_model._meta.relation_tree)
             for f in all_fields:
                 # If hidden fields should be included or the relation
