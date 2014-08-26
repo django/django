@@ -233,8 +233,6 @@ class RelationTreeTests(test.TestCase):
 
         # Make an API call with cache_results=False, it should not store
         # results on any of the children.
-        # Any call to related_* will trigger the relation tree cache warming,
-        # that recursively calls get_fields().
         Person._meta.get_fields(
             pure_m2m=True, pure_data=True, pure_virtual=True,
             relation_data=True, relation_m2m=True, relation_virtual=True,
