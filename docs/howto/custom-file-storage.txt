@@ -90,7 +90,7 @@ to the ``get_valid_name()`` method described above.
     extension.
 
     Previously, an underscore followed by a number (e.g. ``"_1"``, ``"_2"``,
-    etc.) was appended to the filename until an avaible name in the destination
+    etc.) was appended to the filename until an available name in the destination
     directory was found. A malicious user could exploit this deterministic
     algorithm to create a denial-of-service attack. This change was also made
     in Django 1.4.14.
