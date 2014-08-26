@@ -525,6 +525,15 @@ respectively, a ``ValueError`` is raised rather than truncating data.
 MySQL does not store fractions of seconds. Fractions of seconds are truncated
 to zero when the time is stored.
 
+``TIMESTAMP`` columns
+~~~~~~~~~~~~~~~~~~~~~
+
+If you are using a legacy database that contains ``TIMESTAMP`` columns, you must
+set :setting:`USE_TZ = False <USE_TZ>` to avoid data corruption.
+:djadmin:`inspectdb` maps these columns to
+:class:`~django.db.models.DateTimeField` and if you enable timezone support,
+both MySQL and Django will attempt to convert the values from UTC to local time.
+
 Row locking with ``QuerySet.select_for_update()``
 -------------------------------------------------
 
