@@ -30,7 +30,7 @@ sample settings module that uses the SQLite database. To run the tests:
 
 .. code-block:: bash
 
-   $ git clone https://github.com:django/django.git django-repo
+   $ git clone https://github.com/django/django.git django-repo
    $ cd django-repo/tests
    $ PYTHONPATH=..:$PYTHONPATH ./runtests.py
 
