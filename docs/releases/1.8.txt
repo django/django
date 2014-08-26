@@ -341,6 +341,10 @@ Tests
 * Added the :attr:`~django.test.Response.resolver_match` attribute to test
   client responses.
 
+* Added several settings that allow customization of test tablespace parameters
+  for Oracle: :setting:`DATAFILE`, :setting:`DATAFILE_TMP`,
+  :setting:`DATAFILE_MAXSIZE` and :setting:`DATAFILE_TMP_MAXSIZE`.
+
 Validators
 ^^^^^^^^^^
 
@@ -568,6 +572,9 @@ Miscellaneous
 
 * Seconds have been removed from any locales that had them in ``TIME_FORMAT``,
   ``DATETIME_FORMAT``, or ``SHORT_DATETIME_FORMAT``.
+
+* The default maxsize of the Oracle test tablespace has increased from 200M
+  to 500M.
 
 .. _deprecated-features-1.8:
 
