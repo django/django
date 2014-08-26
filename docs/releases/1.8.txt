@@ -201,6 +201,8 @@ Internationalization
   reusable apps. It also allows overriding those custom formats in your main
   Django project.
 
+* Formats for the Welsh locale (``cy``) have been added.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
