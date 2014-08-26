@@ -641,7 +641,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
     >>> q.id
     1
 
-    # Access database columns via Python attributes.
+    # Access model field values via Python attributes.
     >>> q.question_text
     "What's new?"
     >>> q.pub_date
