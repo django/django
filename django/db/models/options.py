@@ -374,7 +374,8 @@ class Options(object):
 
     @cached_property
     def related_objects(self):
-        all_related_fields = self.get_fields(data=False, related_objects=True, include_hidden=True, cache_results=False)
+        all_related_fields = self.get_fields(data=False, related_objects=True,
+                                             include_hidden=True, cache_results=True)
         return [obj for obj in all_related_fields
                 if not obj.field.rel.is_hidden() or isinstance(obj.field, ManyToManyField)]
 
@@ -404,7 +405,7 @@ class Options(object):
     def all_fields_map(self):
         res = {}
         for obj, names in six.iteritems(self.get_fields(data=False, related_objects=True,
-                                          include_hidden=True, export_name_map=True, cache_results=False)):
+                                          include_hidden=True, export_name_map=True, cache_results=True)):
             if not obj.field.rel.is_hidden() or isinstance(obj.field, ManyToManyField):
 
                 # map each possible name for a field to its field instance
