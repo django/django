@@ -2445,6 +2445,13 @@ Templates can override or extend base admin templates as described in
     The text to put at the end of each admin page's ``<title>`` (a string). By
     default, this is "Django site admin".
 
+.. attribute:: AdminSite.site_url
+
+    .. versionadded:: 1.8
+
+    The URL for the "View site" link at the top of each admin page. By default,
+    ``site_url`` is ``/``. Set it to ``None`` to remove the link.
+
 .. attribute:: AdminSite.index_title
 
     .. versionadded:: 1.7

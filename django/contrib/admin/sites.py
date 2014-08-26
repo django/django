@@ -41,6 +41,9 @@ class AdminSite(object):
     # Text to put at the top of the admin index page.
     index_title = ugettext_lazy('Site administration')
 
+    # URL for the "View site" link at the top of each admin page.
+    site_url = '/'
+
     login_form = None
     index_template = None
     app_index_template = None
@@ -272,6 +275,7 @@ class AdminSite(object):
         return {
             'site_title': self.site_title,
             'site_header': self.site_header,
+            'site_url': self.site_url,
         }
 
     def password_change(self, request):
