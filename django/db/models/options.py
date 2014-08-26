@@ -374,7 +374,9 @@ class Options(object):
 
     @cached_property
     def related_objects(self):
-        return self.get_fields(data=False, related_objects=True, cache_results=False)
+        all_related_fields = self.get_fields(data=False, related_objects=True, include_hidden=True, cache_results=False)
+        return [obj for obj in all_related_fields
+                if not obj.field.rel.is_hidden() or isinstance(obj.field, ManyToManyField)]
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_m2m_with_model(self):
@@ -401,11 +403,13 @@ class Options(object):
     @cached_property
     def all_fields_map(self):
         res = {}
-        for field, names in six.iteritems(self.get_fields(data=False, related_objects=True,
-                                          export_name_map=True, cache_results=False)):
-            # map each possible name for a field to its field instance
-            for name in names:
-                res[name] = field
+        for obj, names in six.iteritems(self.get_fields(data=False, related_objects=True,
+                                          include_hidden=True, export_name_map=True, cache_results=False)):
+            if not obj.field.rel.is_hidden() or isinstance(obj.field, ManyToManyField):
+
+                # map each possible name for a field to its field instance
+                for name in names:
+                    res[name] = obj
 
         # Add all concrete fields map. Irder of insertion is important here, all concrete
         # fields should always override related objects.
@@ -669,7 +673,9 @@ class Options(object):
                             # counter must be > 0 and must be in the parent list
                             if not (obj.field.creation_counter < 0
                                     and obj.model not in parent_list):
-                                fields[obj] = query_name
+                                if include_hidden or not obj.field.rel.is_hidden():
+                                    fields[obj] = query_name
+
                         elif not ((obj.field.creation_counter < 0
                                   or obj.field.rel.parent_link)
                                   and obj.model not in parent_list):
@@ -686,7 +692,8 @@ class Options(object):
                                                                    self.concrete_model._meta.relation_tree)
             for f in all_fields:
                 if isinstance(f, ManyToManyField):
-                    fields[f.related] = {f.related_query_name()}
+                    if include_hidden or not f.related.field.rel.is_hidden():
+                        fields[f.related] = {f.related_query_name()}
 
                 elif include_hidden or not f.related.field.rel.is_hidden():
                     # If hidden fields should be included or the relation
