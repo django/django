@@ -268,6 +268,11 @@ will also be created after Django creates the test database. To set the
 correct name and domain for your project, you can use a :ref:`data migration
 <data-migrations>`.
 
+In order to serve different sites in production, you'd create a separate
+settings file with each ``SITE_ID`` (perhaps importing from a common settings
+file to avoid duplicating shared settings) and then specify the appropriate
+:envvar:`DJANGO_SETTINGS_MODULE` for each site.
+
 Caching the current ``Site`` object
 ===================================
 
