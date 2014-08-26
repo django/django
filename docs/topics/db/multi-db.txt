@@ -47,8 +47,11 @@ If the concept of a ``default`` database doesn't make sense in the context
 of your project, you need to be careful to always specify the database
 that you want to use. Django requires that a ``default`` database entry
 be defined, but the parameters dictionary can be left blank if it will not be
-used. The following is an example ``settings.py`` snippet defining two
-non-default databases, with the ``default`` entry intentionally left empty::
+used. You must setup :setting:`DATABASE_ROUTERS` for all of your apps' models,
+including those in any contrib and third-party apps you are using, so that no
+queries are routed to the default database in order to do this. The following
+is an example ``settings.py`` snippet defining two non-default databases, with
+the ``default`` entry intentionally left empty::
 
     DATABASES = {
         'default': {},
@@ -86,12 +89,6 @@ If you don't want every application to be synchronized onto a
 particular database, you can define a :ref:`database
 router<topics-db-multi-db-routing>` that implements a policy
 constraining the availability of particular models.
-
-Alternatively, if you want fine-grained control of synchronization,
-you can pipe all or part of the output of :djadmin:`sqlall` for a
-particular application directly into your database prompt, like this::
-
-    $ ./manage.py sqlall sales | ./manage.py dbshell
 
 Using other management commands
 -------------------------------
@@ -690,12 +687,11 @@ In addition, some objects are automatically created just after
   database).
 
 For common setups with multiple databases, it isn't useful to have these
-objects in more than one database. Common setups include master / slave and
-connecting to external databases. Therefore, it's recommended:
-
-- either to run :djadmin:`migrate` only for the default database;
-- or to write :ref:`database router<topics-db-multi-db-routing>` that allows
-  synchronizing these three models only to one database.
+objects in more than one database. Common setups include primary/replica and
+connecting to external databases. Therefore, it's recommended to write a
+:ref:`database router<topics-db-multi-db-routing>` that allows synchronizing
+these three models to only one database. Use the same approach for contrib
+and third-party apps that don't need their tables in multiple databases.
 
 .. warning::
 
