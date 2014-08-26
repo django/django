@@ -45,6 +45,11 @@ class GetFieldsTests(OptionsBaseTests):
                 fields += ["errors"]
             self.assertEquals(str(err.exception), IMMUTABLE_WARNING)
 
+    def test_get_fields_accepts_only_valid_kwargs(self):
+        with self.assertRaises(TypeError) as err:
+            Person._meta.get_fields(revese=True)
+        self.assertEquals(str(err.exception), "'revese' are invalid keyword arguments")
+
 
 class DataTests(OptionsBaseTests):
 
@@ -92,21 +97,21 @@ class RelatedObjectsTests(OptionsBaseTests):
         result_key = 'get_all_related_objects_with_model'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = [(field, self._model(model, field))
-                       for field in model._meta.get_fields(data=False, related_objects=True)]
+                       for field in model._meta.get_fields(forward=False, reverse=True)]
             self.assertEqual(self._map_related_query_names(objects), expected)
 
     def test_related_objects_local(self):
         result_key = 'get_all_related_objects_with_model_local'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = [(field, self._model(model, field))
-                       for field in model._meta.get_fields(data=False, related_objects=True, include_parents=False)]
+                       for field in model._meta.get_fields(forward=False, reverse=True, include_parents=False)]
             self.assertEqual(self._map_related_query_names(objects), expected)
 
     def test_related_objects_include_hidden(self):
         result_key = 'get_all_related_objects_with_model_hidden'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = [(field, self._model(model, field))
-                       for field in model._meta.get_fields(data=False, related_objects=True, include_hidden=True)]
+                       for field in model._meta.get_fields(forward=False, reverse=True, include_hidden=True)]
             self.assertEqual(
                 sorted(self._map_names(objects), key=self.key_name),
                 sorted(expected, key=self.key_name)
@@ -116,7 +121,7 @@ class RelatedObjectsTests(OptionsBaseTests):
         result_key = 'get_all_related_objects_with_model_hidden_local'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = [(field, self._model(model, field))
-                       for field in model._meta.get_fields(data=False, related_objects=True, include_hidden=True, include_parents=False)]
+                       for field in model._meta.get_fields(forward=False, reverse=True, include_hidden=True, include_parents=False)]
             self.assertEqual(
                 sorted(self._map_names(objects), key=self.key_name),
                 sorted(expected, key=self.key_name)
@@ -233,10 +238,7 @@ class RelationTreeTests(test.TestCase):
 
         # Make an API call with cache_results=False, it should not store
         # results on any of the children.
-        Person._meta.get_fields(
-            pure_m2m=True, pure_data=True, pure_virtual=True,
-            relation_data=True, relation_m2m=True, relation_virtual=True,
-            cache_results=False)
+        Person._meta.get_fields(cache_results=False)
         for model in related_models:
             for c in model._meta._get_fields_cache.keys():
                 self.assertEquals(0, len(model._meta._get_fields_cache.keys()))

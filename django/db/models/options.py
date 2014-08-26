@@ -377,7 +377,7 @@ class Options(object):
         # This property contains all related objects pointing to the current model.
         # The related objects can come from a one-to-one, one-to-many, many-to-many
         # field relation type.
-        all_related_fields = self.get_fields(data=False, related_objects=True,
+        all_related_fields = self.get_fields(forward=False, reverse=True,
                                              include_hidden=True, cache_results=True)
         return [obj for obj in all_related_fields
                 if not obj.field.rel.is_hidden() or isinstance(obj.field, ManyToManyField)]
@@ -391,8 +391,7 @@ class Options(object):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = self.get_fields(data=True,
-                                 export_name_map=True, cache_results=False)
+        fields = self.get_fields(forward=True, export_name_map=True, cache_results=False)
         fields.update(
             (field, {field.name, field.attname})
             for field in self.virtual_fields
@@ -407,8 +406,8 @@ class Options(object):
     @cached_property
     def all_fields_map(self):
         res = {}
-        for obj, names in six.iteritems(self.get_fields(data=False, related_objects=True,
-                                          include_hidden=True, export_name_map=True, cache_results=True)):
+        for obj, names in six.iteritems(self.get_fields(forward=False, reverse=True,
+                                        include_hidden=True, export_name_map=True, cache_results=True)):
             if not obj.field.rel.is_hidden() or isinstance(obj.field, ManyToManyField):
 
                 # map each possible name for a field to its field instance
@@ -467,7 +466,7 @@ class Options(object):
 
         include_parents = local_only is False
         fields = self.get_fields(
-            data=False, related_objects=True,
+            forward=False, reverse=True,
             include_parents=include_parents,
             include_hidden=include_hidden,
         )
@@ -495,13 +494,13 @@ class Options(object):
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_many_to_many_objects(self, local_only=False):
-        fields = self.get_fields(data=False, related_objects=True,
+        fields = self.get_fields(forward=False, reverse=True,
                         include_parents=local_only is not True, include_hidden=True)
         return [obj for obj in fields if isinstance(obj.field, ManyToManyField)]
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_all_related_m2m_objects_with_model(self):
-        fields = self.get_fields(data=False, related_objects=True, include_hidden=True)
+        fields = self.get_fields(forward=False, reverse=True, include_hidden=True)
         return [self._map_model(obj) for obj in fields if isinstance(obj.field, ManyToManyField)]
 
     def get_base_chain(self, model):
@@ -620,7 +619,7 @@ class Options(object):
         self._get_field_cache = {}
         self._get_fields_cache = {}
 
-    def get_fields(self, data=True, related_objects=False,
+    def get_fields(self, forward=True, reverse=False,
                    include_parents=True, include_hidden=False, **kwargs):
         """
         Returns a list of fields associated to the model. By default will only search in data.
@@ -640,11 +639,12 @@ class Options(object):
         """
 
         # Creates a cache key composed of all arguments
-        cache_results = kwargs.get('cache_results', True)
-        export_name_map = kwargs.get('export_name_map', False)
-        cache_key = (data, related_objects,
-                     include_parents, include_hidden, export_name_map)
+        cache_results = kwargs.pop('cache_results', True)
+        export_name_map = kwargs.pop('export_name_map', False)
+        if kwargs:
+            raise TypeError("%r are invalid keyword arguments" % ', '.join(kwargs.keys()))
 
+        cache_key = (forward, reverse, include_parents, include_hidden, export_name_map)
         try:
             # In order to avoid list manipulation. Always
             # return a shallow copy of the results
@@ -663,13 +663,13 @@ class Options(object):
             'cache_results': cache_results
         }
 
-        if related_objects:
+        if reverse:
             if include_parents:
                 parent_list = self.get_parent_list()
                 # Recursively call get_fields on each parent, with the same options provided
                 # in this call
                 for parent in self.parents:
-                    for obj, query_name in six.iteritems(parent._meta.get_fields(data=False, related_objects=True,
+                    for obj, query_name in six.iteritems(parent._meta.get_fields(forward=False, reverse=True,
                                                          **options)):
 
                         if isinstance(obj.field.rel, ManyToManyRel):
@@ -693,7 +693,7 @@ class Options(object):
                 if include_hidden or not f.related.field.rel.is_hidden():
                     fields[f.related] = {f.related_query_name()}
 
-        if data:
+        if forward:
             if include_parents:
                 for parent in self.parents:
                     # Extend the fields dict with all the m2m fields of each parent.
@@ -724,7 +724,7 @@ class Options(object):
         All hidden and proxy fields are omitted.
         """
         res = set()
-        fields = self.get_fields(related_objects=True, export_name_map=True)
+        fields = self.get_fields(reverse=True, export_name_map=True)
         fields.update(
             (field, {field.name, field.attname})
             for field in self.virtual_fields

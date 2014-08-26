@@ -142,7 +142,7 @@ class Collector(object):
         # Foreign keys pointing to this model, both from m2m and other
         # models.
         related_opts = chain(
-            opts.get_fields(data=False, related_objects=True, include_hidden=True),
+            opts.get_fields(forward=False, reverse=True, include_hidden=True),
             get_related_objects_on_proxies(opts)
         )
 
@@ -213,7 +213,7 @@ class Collector(object):
 
             from django.db.models.fields.related import ManyToManyRel
             hidden_fk_fields = (related for
-                                related in model._meta.get_fields(data=False, related_objects=True, include_hidden=True)
+                                related in model._meta.get_fields(forward=False, reverse=True, include_hidden=True)
                                 if not isinstance(related.field.rel, ManyToManyRel))
             related_opts = chain(
                 get_related_objects_on_proxies(model._meta),
