@@ -744,6 +744,15 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         color2_delete_log = LogEntry.objects.all()[0]
         self.assertEqual(color2_content_type, color2_delete_log.content_type)
 
+    def test_adminsite_display_site_url(self):
+        """
+        #13749 - Admin should display link to front-end site 'View site'
+        """
+        url = reverse('admin:index')
+        response = self.client.get(url)
+        self.assertEqual(response.context['site_url'], '/my-site-url/')
+        self.assertContains(response, '<a href="/my-site-url/">View site</a>')
+
 
 @override_settings(TEMPLATE_DIRS=ADMIN_VIEW_TEMPLATES_DIR)
 class AdminCustomTemplateTests(AdminViewBasicTestCase):
