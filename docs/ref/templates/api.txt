@@ -274,6 +274,31 @@ Builtin variables
 Every context contains ``True``, ``False`` and ``None``. As you would expect,
 these variables resolve to the corresponding Python objects.
 
+Limitations with string literals
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's template language has no way to escape the characters used for its own
+syntax. For example, the :ttag:`templatetag` tag is required if you need to
+output character sequences like ``{%`` and ``%}``.
+
+A similar issue exists if you want to include these sequences in template filter
+or tag arguments. For example, when parsing a block tag, Django's template
+parser looks for the first occurrence of ``%}`` after a ``{%``. This prevents
+the use of ``"%}"`` as a string literal. For example, a ``TemplateSyntaxError``
+will be raised for the following expressions::
+
+  {% include "template.html" tvar="Some string literal with %} in it." %}
+
+  {% with tvar="Some string literal with %} in it." %}{% endwith %}
+
+The same issue can be triggered by using a reserved sequence in filter
+arguments::
+
+  {{ some.variable|default:"}}" }}
+
+If you need to use strings with these sequences, store them in template
+variables or use a custom template tag or filter to workaround the limitation.
+
 Playing with Context objects
 ----------------------------
 
