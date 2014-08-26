@@ -741,7 +741,11 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The name of the tablespace that will be used when running tests. If not
-provided, Django will use ``'test_' + NAME``.
+provided, Django will use ``'test_' + USER``.
+
+.. versionchanged:: 1.8
+
+    Previously Django used ``'test_' + NAME`` if not provided.
 
 .. setting:: TEST_TBLSPACE_TMP
 
@@ -753,7 +757,73 @@ Default: ``None``
 This is an Oracle-specific setting.
 
 The name of the temporary tablespace that will be used when running tests. If
-not provided, Django will use ``'test_' + NAME + '_temp'``.
+not provided, Django will use ``'test_' + USER + '_temp'``.
+
+.. versionchanged:: 1.8
+
+    Previously Django used ``'test_' + NAME + '_temp'`` if not provided.
+
+.. setting:: DATAFILE
+
+DATAFILE
+^^^^^^^^
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+This is an Oracle-specific setting.
+
+The name of the datafile to use for the TBLSPACE. If not provided, Django will
+use ``TBLSPACE + '.dbf'``.
+
+.. setting:: DATAFILE_TMP
+
+DATAFILE_TMP
+^^^^^^^^^^^^
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+This is an Oracle-specific setting.
+
+The name of the datafile to use for the TBLSPACE_TMP. If not provided, Django
+will use ``TBLSPACE_TMP + '.dbf'``.
+
+.. setting:: DATAFILE_MAXSIZE
+
+DATAFILE_MAXSIZE
+^^^^^^^^^^^^^^^^
+
+.. versionadded:: 1.8
+
+Default: ``'500M'``
+
+.. versionchanged:: 1.8
+
+    The previous value was 200M and was not user customizable.
+
+This is an Oracle-specific setting.
+
+The maximum size that the DATAFILE is allowed to grow to.
+
+.. setting:: DATAFILE_TMP_MAXSIZE
+
+DATAFILE_TMP_MAXSIZE
+^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 1.8
+
+Default: ``'500M'``
+
+.. versionchanged:: 1.8
+
+    The previous value was 200M and was not user customizable.
+
+This is an Oracle-specific setting.
+
+The maximum size that the DATAFILE_TMP is allowed to grow to.
 
 .. setting:: OLD_TEST_CHARSET
 
