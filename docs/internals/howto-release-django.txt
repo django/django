@@ -194,13 +194,14 @@ OK, this is the fun part, where we actually push out a release!
 
         $ md5sum dist/Django-*
         $ sha1sum dist/Django-*
+        $ openssl dgst -sha256 dist/Django-*
 
 #. Create a "checksums" file containing the hashes and release information.
    Start with this template and insert the correct version, date, release URL
    and checksums::
 
-    This file contains MD5 and SHA1 checksums for the source-code tarball
-    of Django <<VERSION>>, released <<DATE>>.
+    This file contains MD5, SHA1, and SHA256 checksums for the source-code
+    tarball of Django <<VERSION>>, released <<DATE>>.
 
     To use this file, you will need a working install of PGP or other
     compatible public-key encryption software. You will also need to have
@@ -215,7 +216,7 @@ OK, this is the fun part, where we actually push out a release!
 
         gpg --verify <<THIS FILENAME>>
 
-    Once you have verified this file, you can use normal MD5 and SHA1
+    Once you have verified this file, you can use normal MD5, SHA1, or SHA256
     checksumming applications to generate the checksums of the Django
     package and compare them to the checksums listed below.
 
@@ -235,6 +236,11 @@ OK, this is the fun part, where we actually push out a release!
     ==============
 
     SHA1(<<RELEASE TAR.GZ FILENAME>>)= <<SHA1SUM>>
+
+    SHA256 checksum:
+    ================
+
+    SHA256(<<RELEASE TAR.GZ FILENAME>>)= <<SHA256SUM>>
 
 #. Sign the checksum file (``gpg --clearsign
    Django-<version>.checksum.txt``). This generates a signed document,
