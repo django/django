@@ -642,8 +642,6 @@ class Options(object):
         cache_key = (data, related_objects,
                      include_parents, include_hidden, export_name_map)
 
-        if 'm2m' in kwargs.keys():
-            import ipdb; ipdb.set_trace()
         try:
             # In order to avoid list manipulation. Always
             # return a shallow copy of the results
@@ -674,18 +672,12 @@ class Options(object):
                         if isinstance(obj.field.rel, ManyToManyRel):
                             # In order for a related M2M object to be valid, its creation
                             # counter must be > 0 and must be in the parent list
-                            if not (obj.field.creation_counter < 0
-                                    and obj.model not in parent_list):
-                                if include_hidden or not obj.field.rel.is_hidden():
-                                    fields[obj] = query_name
+                            if not (obj.field.creation_counter < 0 and obj.model not in parent_list):
+                                fields[obj] = query_name
 
-                        elif not ((obj.field.creation_counter < 0
-                                  or obj.field.rel.parent_link)
+                        elif not ((obj.field.creation_counter < 0 or obj.field.rel.parent_link)
                                   and obj.model not in parent_list):
-                                if include_hidden or not obj.field.rel.is_hidden():
-                                    # If hidden fields should be included or the relation
-                                    # is not intentionally hidden, add to the fields dict
-                                    fields[obj] = query_name
+                            fields[obj] = query_name
 
             # Tree is computer once and cached until apps cache is expired. It is composed of
             # {options_instance: [field_pointing_to_options_model, field_pointing_to_options, ..]}
@@ -694,13 +686,9 @@ class Options(object):
             all_fields = model_fields if not self.proxy else chain(model_fields,
                                                                    self.concrete_model._meta.relation_tree)
             for f in all_fields:
-                if isinstance(f, ManyToManyField):
-                    if include_hidden or not f.related.field.rel.is_hidden():
-                        fields[f.related] = {f.related_query_name()}
-
-                elif include_hidden or not f.related.field.rel.is_hidden():
-                    # If hidden fields should be included or the relation
-                    # is not intentionally hidden, add to the fields dict
+                # If hidden fields should be included or the relation
+                # is not intentionally hidden, add to the fields dict
+                if include_hidden or not f.related.field.rel.is_hidden():
                     fields[f.related] = {f.related_query_name()}
 
         if data:
