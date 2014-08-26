@@ -324,8 +324,8 @@ class QuerySet(object):
         If args is present the expression is passed as a kwarg using
         the Aggregate object's default alias.
         """
-        if self.query.distinct_fields:
-            raise NotImplementedError("aggregate() + distinct(fields) not implemented.")
+        if self.query.distinct:
+            raise NotImplementedError("aggregate() + distinct() not implemented.")
         for arg in args:
             kwargs[arg.default_alias] = arg
 
