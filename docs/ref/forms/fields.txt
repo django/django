@@ -1048,6 +1048,17 @@ model object (in the case of ``ModelChoiceField``) or multiple model
 objects (in the case of ``ModelMultipleChoiceField``) into the
 ``cleaned_data`` dictionary of the form.
 
+For more complex uses, you can specify ``queryset=None`` when declaring the
+form field and then populate the ``queryset`` in the form's ``__init__()``
+method::
+
+    class FooMultipleChoiceForm(forms.Form):
+        foo_select = forms.ModelMultipleChoiceField(queryset=None)
+
+        def __init__(self, *args, **kwargs):
+            super(FooMultipleChoiceForm, self).__init__(*args, **kwargs)
+            self.fields['foo_select'].queryset = ...
+
 ``ModelChoiceField``
 ~~~~~~~~~~~~~~~~~~~~
 
