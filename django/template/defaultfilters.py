@@ -969,4 +969,4 @@ def pprint(value):
     try:
         return pformat(value)
     except Exception as e:
-        return "Error in formatting: %s" % force_text(e, errors="replace")
+        return "Error in formatting: %s: %s" % (e.__class__.__name__, force_text(e, errors="replace"))
