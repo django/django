@@ -642,7 +642,7 @@ class Options(object):
         cache_results = kwargs.pop('cache_results', True)
         export_name_map = kwargs.pop('export_name_map', False)
         if kwargs:
-            raise TypeError("%r are invalid keyword arguments" % ', '.join(kwargs.keys()))
+            raise TypeError("'%s' are invalid keyword arguments" % ', '.join(kwargs.keys()))
 
         cache_key = (forward, reverse, include_parents, include_hidden, export_name_map)
         try:
