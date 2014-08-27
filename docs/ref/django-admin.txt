@@ -695,6 +695,9 @@ Unlike ``syncdb``, this command does not prompt you to create a superuser if
 one doesn't exist (assuming you are using :mod:`django.contrib.auth`). Use
 :djadmin:`createsuperuser` to do that if you wish.
 
+The :djadminopt:`--database` option can be used to specify the database to
+migrate.
+
 .. django-admin-option:: --fake
 
 The ``--fake`` option tells Django to mark the migrations as having been
