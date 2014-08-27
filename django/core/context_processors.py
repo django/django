@@ -35,12 +35,16 @@ def csrf(request):
 
 
 def debug(request):
-    "Returns context variables helpful for debugging."
+    """
+    Returns context variables helpful for debugging.
+    """
     context_extras = {}
     if settings.DEBUG and request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS:
         context_extras['debug'] = True
         from django.db import connection
-        context_extras['sql_queries'] = connection.queries
+        # Return a lazy reference that computes connection.queries on access,
+        # to ensure it contains queries triggered after this function runs.
+        context_extras['sql_queries'] = lazy(lambda: connection.queries, list)
     return context_extras
 
 

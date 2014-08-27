@@ -33,3 +33,33 @@ class RequestContextProcessorTests(TestCase):
         self.assertContains(response, url)
         response = self.client.post(url, {'path': '/blah/'})
         self.assertContains(response, url)
+
+
+@override_settings(ROOT_URLCONF='context_processors.urls', DEBUG=True, INTERNAL_IPS=('127.0.0.1',))
+class DebugContextProcessorTests(TestCase):
+    """
+    Tests for the ``django.core.context_processors.debug`` processor.
+    """
+
+    def test_debug(self):
+        url = '/debug/'
+        # We should have the debug flag in the template.
+        response = self.client.get(url)
+        self.assertContains(response, 'Have debug')
+
+        # And now we should not
+        with override_settings(DEBUG=False):
+            response = self.client.get(url)
+            self.assertNotContains(response, 'Have debug')
+
+    def test_sql_queries(self):
+        """
+        Test whether sql_queries represents the actual amount
+        of queries executed. (#23364)
+        """
+        url = '/debug/'
+        response = self.client.get(url)
+        self.assertContains(response, 'First query list: 0')
+        self.assertContains(response, 'Second query list: 1')
+        # Check we have not actually memoized connection.queries
+        self.assertContains(response, 'Third query list: 2')
