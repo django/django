@@ -555,7 +555,8 @@ If :setting:`TEMPLATE_CONTEXT_PROCESSORS` contains this processor, every
   you're in :setting:`DEBUG` mode.
 * ``sql_queries`` -- A list of ``{'sql': ..., 'time': ...}`` dictionaries,
   representing every SQL query that has happened so far during the request
-  and how long it took. The list is in order by query.
+  and how long it took. The list is in order by query and lazily generated
+  on access.
 
 django.core.context_processors.i18n
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
