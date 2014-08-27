@@ -6,8 +6,6 @@ you could make to your site's security configuration. It just runs a list of
 check functions. Each check function can return a set of warnings, or the
 empty set if it finds nothing to warn about.
 
-.. contents:: :local:
-
 When to run it
 --------------
 
@@ -18,60 +16,62 @@ environment variable, or by passing the ``--settings`` option::
 
     django-admin.py checksecure --settings=production_settings
 
-Or you could run it directly on a production or staging deployment to verify that the correct settings are in use.
+Or you could run it directly on a production or staging deployment to verify
+that the correct settings are in use.
 
 You could even make it part of your integration test suite, if you want. The
-:py:func:`djangosecure.check.run_checks` function runs all configured checks
-and returns the complete set of warnings; you could write a simple test that
-asserts that the returned value is empty.
+``django.contrib.secure.check.run_checks()`` function runs all configured
+checks and returns the complete set of warnings; you could write a simple test
+that asserts that the returned value is empty.
 
 .. _built-in-checks:
 
 Built-in checks
 ---------------
 
-The following check functions are built-in to django-secure, and will run by
-default:
+The following check functions are built-in to ``django.contrib.secure``, and
+will run by default:
 
-.. py:currentmodule:: djangosecure.check.djangosecure
+.. currentmodule:: djangosecure.check.djangosecure
 
-.. py:function:: check_security_middleware
+.. function:: check_security_middleware
 
    Warns if :doc:`middleware` is not in your ``MIDDLEWARE_CLASSES``.
 
-.. py:function:: check_sts
+.. function:: check_sts
 
    Warns if :ref:`SECURE_HSTS_SECONDS` is not set to a non-zero value.
 
-.. py:function:: check_sts_include_subdomains
+.. function:: check_sts_include_subdomains
 
    Warns if :ref:`SECURE_HSTS_INCLUDE_SUBDOMAINS` is not ``True``.
 
-.. py:function:: check_frame_deny
+.. function:: check_xframe_options_middleware
 
-   Warns if :ref:`SECURE_FRAME_DENY` is not ``True``.
+   Warns if :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` is
+   not in :setting:`MIDDLEWARE_CLASSES`.
 
-.. py:function:: check_content_type_nosniff
+.. function:: check_content_type_nosniff
 
    Warns if :ref:`SECURE_CONTENT_TYPE_NOSNIFF` is not ``True``.
 
-.. py:function:: check_xss_filter
+.. function:: check_xss_filter
 
    Warns if :ref:`SECURE_BROWSER_XSS_FILTER` is not ``True``.
 
-.. py:function:: check_ssl_redirect
+.. function:: check_ssl_redirect
 
    Warns if :ref:`SECURE_SSL_REDIRECT` is not ``True``.
 
-.. py:function:: check_secret_key
+.. function:: check_secret_key
 
    Warns if `SECRET_KEY`_ is empty, missing, or has a very low number of different characters.
 
 .. _SECRET_KEY: http://docs.djangoproject.com/en/stable/ref/settings/#secret-key
 
-.. py:currentmodule:: djangosecure.check.sessions
+.. currentmodule:: djangosecure.check.sessions
 
-.. py:function:: check_session_cookie_secure
+.. function:: check_session_cookie_secure
 
    Warns if you appear to be using Django's `session framework`_ and the
    `SESSION_COOKIE_SECURE`_ setting is not ``True``. This setting marks
@@ -86,7 +86,7 @@ default:
 .. _session framework: https://docs.djangoproject.com/en/stable/topics/http/sessions/
 .. _SESSION_COOKIE_SECURE: https://docs.djangoproject.com/en/stable/topics/http/sessions/#session-cookie-secure
 
-.. py:function:: check_session_cookie_httponly
+.. function:: check_session_cookie_httponly
 
    Warns if you appear to be using Django's `session framework`_ and the
    `SESSION_COOKIE_HTTPONLY`_ setting is not ``True``. This setting marks
@@ -97,12 +97,11 @@ default:
    excuse for leaving this off, either: if your code depends on reading session
    cookies from Javascript, you're probably doing it wrong.
 
-
 .. _SESSION_COOKIE_HTTPONLY: https://docs.djangoproject.com/en/stable/topics/http/sessions/#session-cookie-httponly
 
-.. py:currentmodule:: djangosecure.check.csrf
+.. currentmodule:: djangosecure.check.csrf
 
-.. py:function:: check_csrf_middleware
+.. function:: check_csrf_middleware
 
    Warns if you do not have Django's built-in `CSRF protection`_ enabled
    globally via the `CSRF view middleware`_. It's important to CSRF protect any
@@ -115,7 +114,6 @@ default:
 
 Suggestions for additional built-in checks (or better, patches implementing
 them) are welcome!
-
 
 Modifying the list of check functions
 -------------------------------------

@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from .util import boolean_check
+from .utils import boolean_check
 
 
 @boolean_check("CSRF_VIEW_MIDDLEWARE_NOT_INSTALLED")

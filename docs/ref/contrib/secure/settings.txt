@@ -1,9 +1,6 @@
 Settings Reference
 ==================
 
-.. contents:: :local:
-
-
 .. _SECURE_CHECKS:
 
 SECURE_CHECKS
@@ -27,7 +24,6 @@ Defaults to::
         "djangosecure.check.djangosecure.check_ssl_redirect",
     ]
 
-
 .. _SECURE_HSTS_SECONDS:
 
 SECURE_HSTS_SECONDS
@@ -38,7 +34,6 @@ If set to a non-zero integer value, causes :doc:`middleware` to set the
 already have that header.
 
 Defaults to ``0``.
-
 
 .. _SECURE_HSTS_INCLUDE_SUBDOMAINS:
 
@@ -53,7 +48,6 @@ Has no effect unless :ref:`SECURE_HSTS_SECONDS` is set to a non-zero value.
 Defaults to ``False`` (only for backwards compatibility; in most cases if HSTS
 is used it should be set to ``True``).
 
-
 .. _SECURE_CONTENT_TYPE_NOSNIFF:
 
 SECURE_CONTENT_TYPE_NOSNIFF
@@ -65,7 +59,6 @@ have that header.
 
 Defaults to ``False``.
 
-
 .. _SECURE_BROWSER_XSS_FILTER:
 
 SECURE_BROWSER_XSS_FILTER
@@ -76,38 +69,6 @@ If set to ``True``, causes :doc:`middleware` to set the
 have that header.
 
 Defaults to ``False``.
-
-
-.. _SECURE_PROXY_SSL_HEADER:
-
-SECURE_PROXY_SSL_HEADER
------------------------
-
-.. note::
-
-   This setting is `built-in to Django 1.4+`_.  The Django setting works
-   identically to this version.
-
-A tuple of ("header", "value"); if "header" is set to "value" in
-``request.META``, django-secure will tell Django to consider this a secure
-request. For example::
-
-    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTOCOL", "https")
-
-See :ref:`proxied-ssl` for more details.
-
-Defaults to ``None``.
-
-.. warning::
-
-   If you set this to a header that your proxy allows through from the request
-   unmodified (i.e. a header that can be spoofed), you are allowing an attacker
-   to pretend that any request is secure, even if it is not. Make sure you only
-   use a header that your proxy sets unconditionally, overriding any value from
-   the request.
-
-.. _built-in to Django 1.4+: https://docs.djangoproject.com/en/stable/ref/settings/#secure-proxy-ssl-header
-
 
 .. _SECURE_REDIRECT_EXEMPT:
 
@@ -121,7 +82,6 @@ effect).
 
 Defaults to ``[]``.
 
-
 .. _SECURE_SSL_HOST:
 
 SECURE_SSL_HOST
@@ -133,7 +93,6 @@ directed to this host rather than the originally-requested host
 setting has no effect.
 
 Defaults to ``None``.
-
 
 .. _SECURE_SSL_REDIRECT:
 
@@ -150,6 +109,6 @@ expression listed in :ref:`SECURE_REDIRECT_EXEMPT`).
    your site is running behind a proxy and can't tell which requests are secure
    and which are not. Your proxy likely sets a header to indicate secure
    requests; you can correct the problem by finding out what that header is and
-   configuring the :ref:`SECURE_PROXY_SSL_HEADER` setting accordingly.
+   configuring the :setting:`SECURE_PROXY_SSL_HEADER` setting accordingly.
 
 Defaults to ``False``.

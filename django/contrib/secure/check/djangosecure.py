@@ -1,13 +1,12 @@
 from django.conf import settings
 
 from ..conf import conf
-from .util import boolean_check
+from .utils import boolean_check
 
 
 @boolean_check("SECURITY_MIDDLEWARE_NOT_INSTALLED")
 def check_security_middleware():
-    return ("django.contrib.secure.middleware.SecurityMiddleware" in
-            settings.MIDDLEWARE_CLASSES)
+    return "django.contrib.secure.middleware.SecurityMiddleware" in settings.MIDDLEWARE_CLASSES
 
 check_security_middleware.messages = {
     "SECURITY_MIDDLEWARE_NOT_INSTALLED": (
@@ -17,6 +16,23 @@ check_security_middleware.messages = {
         "SECURE_BROWSER_XSS_FILTER and SECURE_SSL_REDIRECT settings "
         "will have no effect.")
     }
+
+
+@boolean_check("XFRAME_OPTIONS_MIDDLEWARE_NOT_INSTALLED")
+def check_xframe_options_middleware():
+    return "django.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE_CLASSES
+
+check_xframe_options_middleware.messages = {
+    "XFRAME_OPTIONS_MIDDLEWARE_NOT_INSTALLED": (
+        "You do not have "
+        "'django.middleware.clickjacking.XFrameOptionsMiddleware ' in your "
+        "MIDDLEWARE_CLASSES, so your pages will not be served with an "
+        "'x-frame-options' header. "
+        "Unless there is a good reason for your site to be served in a frame, "
+        "you should consider enabling this header "
+        "to help prevent clickjacking attacks."
+    )
+}
 
 
 @boolean_check("STRICT_TRANSPORT_SECURITY_NOT_ENABLED")

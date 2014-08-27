@@ -12,7 +12,7 @@ class Configuration(object):
         except AttributeError:
             if k in self.defaults:
                 return self.defaults[k]
-            raise ImproperlyConfigured("django-secure requires %s setting." % k)
+            raise ImproperlyConfigured("django.contrib.secure requires %s setting." % k)
 
 
 conf = Configuration(
@@ -23,7 +23,6 @@ conf = Configuration(
     SECURE_SSL_REDIRECT=False,
     SECURE_SSL_HOST=None,
     SECURE_REDIRECT_EXEMPT=[],
-    SECURE_PROXY_SSL_HEADER=None,
     SECURE_CHECKS=[
         "django.contrib.secure.check.csrf.check_csrf_middleware",
         "django.contrib.secure.check.sessions.check_session_cookie_secure",
@@ -31,7 +30,7 @@ conf = Configuration(
         "django.contrib.secure.check.djangosecure.check_security_middleware",
         "django.contrib.secure.check.djangosecure.check_sts",
         "django.contrib.secure.check.djangosecure.check_sts_include_subdomains",
-        "django.contrib.secure.check.djangosecure.check_frame_deny",
+        "django.contrib.secure.check.djangosecure.check_xframe_options_middleware",
         "django.contrib.secure.check.djangosecure.check_content_type_nosniff",
         "django.contrib.secure.check.djangosecure.check_xss_filter",
         "django.contrib.secure.check.djangosecure.check_ssl_redirect",

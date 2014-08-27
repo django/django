@@ -498,21 +498,20 @@ class CheckStrictTransportSecuritySubdomainsTest(TestCase):
         self.assertEqual(self.func(), set())
 
 
-# TODO: replace with XFrameOptionsMiddleware
-#class CheckFrameDenyTest(TestCase):
-#    @property
-#    def func(self):
-#        from .check.djangosecure import check_frame_deny
-#        return check_frame_deny
+class CheckXFrameOptionsMiddelwareTest(TestCase):
+    @property
+    def func(self):
+        from .check.djangosecure import check_xframe_options_middleware
+        return check_xframe_options_middleware
 
-#    @override_settings(SECURE_FRAME_DENY=False)
-#    def test_no_frame_deny(self):
-#        self.assertEqual(
-#            self.func(), set(["FRAME_DENY_NOT_ENABLED"]))
+    @override_settings(MIDDLEWARE_CLASSES=[])
+    def test_middleware_not_installed(self):
+        self.assertEqual(
+            self.func(), set(["XFRAME_OPTIONS_MIDDLEWARE_NOT_INSTALLED"]))
 
-#    @override_settings(SECURE_FRAME_DENY=True)
-#    def test_with_frame_deny(self):
-#        self.assertEqual(self.func(), set())
+    @override_settings(MIDDLEWARE_CLASSES=["django.middleware.clickjacking.XFrameOptionsMiddleware"])
+    def test_middleware_installed(self):
+        self.assertEqual(self.func(), set())
 
 
 class CheckContentTypeNosniffTest(TestCase):
@@ -614,7 +613,7 @@ class ConfTest(TestCase):
                     "django.contrib.secure.check.djangosecure.check_security_middleware",
                     "django.contrib.secure.check.djangosecure.check_sts",
                     "django.contrib.secure.check.djangosecure.check_sts_include_subdomains",
-                    "django.contrib.secure.check.djangosecure.check_frame_deny",
+                    "django.contrib.secure.check.djangosecure.check_xframe_options_middleware",
                     "django.contrib.secure.check.djangosecure.check_content_type_nosniff",
                     "django.contrib.secure.check.djangosecure.check_xss_filter",
                     "django.contrib.secure.check.djangosecure.check_ssl_redirect",
@@ -627,6 +626,5 @@ class ConfTest(TestCase):
                 "SECURE_SSL_REDIRECT": False,
                 "SECURE_SSL_HOST": None,
                 "SECURE_REDIRECT_EXEMPT": [],
-                "SECURE_PROXY_SSL_HEADER": None,
             }
         )
