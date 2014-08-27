@@ -12,7 +12,7 @@ YEAR_MONTH_FORMAT = 'F Y'               # 'October 2006'
 MONTH_DAY_FORMAT = 'j F'                # '25 October'
 SHORT_DATE_FORMAT = 'd/m/Y'             # '25/10/2006'
 SHORT_DATETIME_FORMAT = 'd/m/Y P'       # '25/10/2006 2:30 pm'
-FIRST_DAY_OF_WEEK = 0                   # Sunday
+FIRST_DAY_OF_WEEK = 1                   # Monday
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
