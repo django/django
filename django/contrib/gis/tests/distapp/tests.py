@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-from unittest import skipUnless
-
 from django.db import connection
 from django.db.models import Q
 from django.contrib.gis.geos import HAS_GEOS
