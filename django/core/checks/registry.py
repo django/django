@@ -13,6 +13,7 @@ class Tags(object):
     admin = 'admin'
     compatibility = 'compatibility'
     models = 'models'
+    secure = 'secure'
     signals = 'signals'
 
 
