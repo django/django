@@ -184,7 +184,7 @@ Django's Git repository:
 
   For example::
 
-    [1.3.x] Fixed #17028 - Changed diveintopython.org -> diveintopython.net.
+    [1.3.x] Fixed #17028 -- Changed diveintopython.org -> diveintopython.net.
 
     Backport of 80c0cbf1c97047daed2c5b41b296bbc56fe1d7e3 from master.
 
