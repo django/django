@@ -533,6 +533,9 @@ Miscellaneous
 * When a dictionary setting is overridden in user settings, both dictionaries
   are merged by default. See :ref:`dictionary-settings`.
 
+* For consistency with other major vendors, the ``en_GB`` locale now has Monday
+  as the first day of the week.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
