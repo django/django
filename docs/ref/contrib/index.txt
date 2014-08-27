@@ -33,6 +33,7 @@ those packages have.
    messages
    postgres/index
    redirects
+   secure/index
    sitemaps
    sites
    staticfiles

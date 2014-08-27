@@ -1,0 +1,19 @@
+==========================================
+Django's security configuration and checks
+==========================================
+
+.. module:: django.contrib.security
+   :synopsis: Django's security configuration and checks.
+
+``django.contrib.secure`` does not make your site secure. It does not audit
+code, or do intrusion detection, or really do anything particularly interesting
+or complicated. Rather, it's an automated low-hanging-fruit checklist. It helps
+you remember the stupid simple things that improve your site's security, reminds
+you to do those easy things, and makes them as easy as possible to do.
+
+.. toctree::
+   :maxdepth: 2
+
+   middleware
+   checksecure
+   settings
