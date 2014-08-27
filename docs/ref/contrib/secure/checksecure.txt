@@ -121,7 +121,7 @@ Modifying the list of check functions
 By default, all of the :ref:`built-in checks <built-in-checks>` are run when
 you run ``./manage.py checksecure``. However, some of these checks may not be
 appropriate for your particular deployment configuration. For instance, if you
-do your HTTP->HTTPS redirection in a loadbalancer, it'd be irritating for
+do your HTTP->HTTPS redirection in a load balancer, it'd be irritating for
 ``checksecure`` to constantly warn you about not having enabled
 :ref:`SECURE_SSL_REDIRECT`. You can customize the list of checks by setting the
 :ref:`SECURE_CHECKS` setting; you can just copy the default value and remove a

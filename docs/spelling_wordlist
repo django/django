@@ -572,6 +572,7 @@ sqlmigrate
 sqlsequencereset
 squashmigrations
 ssi
+SSL
 stacktrace
 startswith
 stateful
@@ -742,6 +743,7 @@ www
 xe
 xgettext
 xref
+XSS
 xxxxx
 yesno
 Zope

@@ -47,8 +47,8 @@ may still be vulnerable via an insecure connection to a subdomain.
 
 .. _x-content-type-options:
 
-X-Content-Type-Options: nosniff
--------------------------------
+``X-Content-Type-Options: nosniff``
+-----------------------------------
 
 Some browsers will try to guess the content types of the assets that they
 fetch, overriding the ``Content-Type`` header. While this can help display
@@ -72,8 +72,8 @@ is ``True``.
 
 .. _x-xss-protection:
 
-X-XSS-Protection: 1; mode=block
--------------------------------
+``X-XSS-Protection: 1; mode=block``
+-----------------------------------
 
 Some browsers have to ability to block content that appears to be an `XSS
 attack`_. They work by looking for Javascript content in the GET or POST
@@ -91,7 +91,7 @@ header. ``SecurityMiddleware`` will do this for all responses if the
 
 .. warning::
     The XSS filter does not prevent XSS attacks on your site, and you
-    should ensure that you are taking all other possible mesaures to
+    should ensure that you are taking all other possible measures to
     prevent XSS attacks. The most obvious of these is validating and
     sanitizing all input.
 
@@ -114,7 +114,7 @@ connections to HTTPS.
 .. note::
 
     For performance reasons, it's preferable to do these redirects outside of
-    Django, in a front-end loadbalancer or reverse-proxy server such as
+    Django, in a front-end load balancer or reverse-proxy server such as
     `nginx`_. In some deployment situations this isn't an option -
     :ref:`SECURE_SSL_REDIRECT` is intended for those cases.
 
