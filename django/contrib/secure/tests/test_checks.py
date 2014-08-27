@@ -1,321 +1,16 @@
 from django.conf import settings
 from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management import call_command
-from django.http import HttpResponse
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils.six import StringIO
 
-from .checks.sessions import add_session_cookie_message, add_httponly_message
-
-
-class SecurityMiddlewareTest(TestCase):
-    @property
-    def middleware(self):
-        from .middleware import SecurityMiddleware
-        return SecurityMiddleware()
-
-    @property
-    def secure_request_kwargs(self):
-        return {"wsgi.url_scheme": "https"}
-
-    def response(self, *args, **kwargs):
-        headers = kwargs.pop("headers", {})
-        response = HttpResponse(*args, **kwargs)
-        for k, v in headers.items():
-            response[k] = v
-        return response
-
-    def process_response(self, *args, **kwargs):
-        request_kwargs = {}
-        if kwargs.pop("secure", False):
-            request_kwargs.update(self.secure_request_kwargs)
-        request = (kwargs.pop("request", None) or
-                   self.request.get("/some/url", **request_kwargs))
-        ret = self.middleware.process_request(request)
-        if ret:
-            return ret
-        return self.middleware.process_response(
-            request, self.response(*args, **kwargs))
-
-    request = RequestFactory()
-
-    def process_request(self, method, *args, **kwargs):
-        if kwargs.pop("secure", False):
-            kwargs.update(self.secure_request_kwargs)
-        req = getattr(self.request, method.lower())(*args, **kwargs)
-        return self.middleware.process_request(req)
-
-    @override_settings(SECURE_HSTS_SECONDS=3600)
-    def test_sts_on(self):
-        """
-        With SECURE_HSTS_SECONDS=3600, the middleware adds
-        "strict-transport-security: max-age=3600" to the response.
-        """
-        self.assertEqual(
-            self.process_response(secure=True)["strict-transport-security"],
-            "max-age=3600")
-
-    @override_settings(SECURE_HSTS_SECONDS=3600)
-    def test_sts_already_present(self):
-        """
-        The middleware will not override a "strict-transport-security" header
-        already present in the response.
-
-        """
-        response = self.process_response(
-            secure=True,
-            headers={"strict-transport-security": "max-age=7200"})
-        self.assertEqual(response["strict-transport-security"], "max-age=7200")
-
-    @override_settings(SECURE_HSTS_SECONDS=3600)
-    def test_sts_only_if_secure(self):
-        """
-        The "strict-transport-security" header is not added to responses going
-        over an insecure connection.
-        """
-        self.assertNotIn("strict-transport-security", self.process_response(secure=False))
-
-    @override_settings(SECURE_HSTS_SECONDS=0)
-    def test_sts_off(self):
-        """
-        With SECURE_HSTS_SECONDS of 0, the middleware does not add a
-        "strict-transport-security" header to the response.
-        """
-        self.assertNotIn("strict-transport-security", self.process_response(secure=True))
-
-    @override_settings(
-        SECURE_HSTS_SECONDS=600, SECURE_HSTS_INCLUDE_SUBDOMAINS=True)
-    def test_sts_include_subdomains(self):
-        """
-        With SECURE_HSTS_SECONDS non-zero and SECURE_HSTS_INCLUDE_SUBDOMAINS
-        True, the middleware adds a "strict-transport-security" header with the
-        "includeSubDomains" tag to the response.
-        """
-        response = self.process_response(secure=True)
-        self.assertEqual(
-            response["strict-transport-security"],
-            "max-age=600; includeSubDomains",
-            )
-
-    @override_settings(
-        SECURE_HSTS_SECONDS=600, SECURE_HSTS_INCLUDE_SUBDOMAINS=False)
-    def test_sts_no_include_subdomains(self):
-        """
-        With SECURE_HSTS_SECONDS non-zero and SECURE_HSTS_INCLUDE_SUBDOMAINS
-        False, the middleware adds a "strict-transport-security" header without
-        the "includeSubDomains" tag to the response.
-        """
-        response = self.process_response(secure=True)
-        self.assertEqual(response["strict-transport-security"], "max-age=600")
-
-    @override_settings(SECURE_CONTENT_TYPE_NOSNIFF=True)
-    def test_content_type_on(self):
-        """
-        With SECURE_CONTENT_TYPE_NOSNIFF set to True, the middleware adds
-        "x-content-type-options: nosniff" header to the response.
-        """
-        self.assertEqual(self.process_response()["x-content-type-options"], "nosniff")
-
-    @override_settings(SECURE_CONTENT_TYPE_NO_SNIFF=True)
-    def test_content_type_already_present(self):
-        """
-        The middleware will not override an "x-content-type-options" header
-        already present in the response.
-        """
-        response = self.process_response(secure=True, headers={"x-content-type-options": "foo"})
-        self.assertEqual(response["x-content-type-options"], "foo")
-
-    @override_settings(SECURE_CONTENT_TYPE_NOSNIFF=False)
-    def test_content_type_off(self):
-        """
-        With SECURE_CONTENT_TYPE_NOSNIFF False, the middleware does not add an
-        "x-content-type-options" header to the response.
-        """
-        self.assertNotIn("x-content-type-options", self.process_response())
-
-    @override_settings(SECURE_BROWSER_XSS_FILTER=True)
-    def test_xss_filter_on(self):
-        """
-        With SECURE_BROWSER_XSS_FILTER set to True, the middleware adds
-        "s-xss-protection: 1; mode=block" header to the response.
-        """
-        self.assertEqual(
-            self.process_response()["x-xss-protection"],
-            "1; mode=block")
-
-    @override_settings(SECURE_BROWSER_XSS_FILTER=True)
-    def test_xss_filter_already_present(self):
-        """
-        The middleware will not override an "x-xss-protection" header
-        already present in the response.
-        """
-        response = self.process_response(secure=True, headers={"x-xss-protection": "foo"})
-        self.assertEqual(response["x-xss-protection"], "foo")
-
-    @override_settings(SECURE_BROWSER_XSS_FILTER=False)
-    def test_xss_filter_off(self):
-        """
-        With SECURE_BROWSER_XSS_FILTER set to False, the middleware does not add an
-        "x-xss-protection" header to the response.
-        """
-        self.assertFalse("x-xss-protection" in self.process_response())
-
-    @override_settings(SECURE_SSL_REDIRECT=True)
-    def test_ssl_redirect_on(self):
-        """
-        With SECURE_SSL_REDIRECT True, the middleware redirects any non-secure
-        requests to the https:// version of the same URL.
-        """
-        ret = self.process_request("get", "/some/url?query=string")
-        self.assertEqual(ret.status_code, 301)
-        self.assertEqual(
-            ret["Location"], "https://testserver/some/url?query=string")
-
-    @override_settings(SECURE_SSL_REDIRECT=True)
-    def test_no_redirect_ssl(self):
-        """
-        The middleware does not redirect secure requests.
-        """
-        ret = self.process_request("get", "/some/url", secure=True)
-        self.assertEqual(ret, None)
-
-    @override_settings(
-        SECURE_SSL_REDIRECT=True, SECURE_REDIRECT_EXEMPT=["^insecure/"])
-    def test_redirect_exempt(self):
-        """
-        The middleware does not redirect requests with URL path matching an
-        exempt pattern.
-        """
-        ret = self.process_request("get", "/insecure/page")
-        self.assertEqual(ret, None)
-
-    @override_settings(
-        SECURE_SSL_REDIRECT=True, SECURE_SSL_HOST="secure.example.com")
-    def test_redirect_ssl_host(self):
-        """
-        The middleware redirects to SECURE_SSL_HOST if given.
-        """
-        ret = self.process_request("get", "/some/url")
-        self.assertEqual(ret.status_code, 301)
-        self.assertEqual(ret["Location"], "https://secure.example.com/some/url")
-
-    @override_settings(SECURE_SSL_REDIRECT=False)
-    def test_ssl_redirect_off(self):
-        """
-        With SECURE_SSL_REDIRECT False, the middleware does no redirect.
-        """
-        ret = self.process_request("get", "/some/url")
-        self.assertEqual(ret, None)
-
-
-class ProxySecurityMiddlewareTest(SecurityMiddlewareTest):
-    """
-    Test that SecurityMiddleware behaves the same even if our "secure request"
-    indicator is a proxy header.
-    """
-    def setUp(self):
-        self.override = override_settings(
-            SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTOCOL", "https"))
-
-        self.override.enable()
-
-    def tearDown(self):
-        self.override.disable()
-
-    @property
-    def secure_request_kwargs(self):
-        return {"HTTP_X_FORWARDED_PROTOCOL": "https"}
-
-    def test_is_secure(self):
-        """
-        SecurityMiddleware patches request.is_secure() to report ``True`` even
-        with a proxy-header secure request.
-        """
-        request = self.request.get("/some/url", **self.secure_request_kwargs)
-        self.middleware.process_request(request)
-
-        self.assertEqual(request.is_secure(), True)
-
-
-def fake_test():
-    return set(["SOME_WARNING"])
-
-fake_test.messages = {
-    "SOME_WARNING": "This is the warning message."
-}
-
-
-def nomsg_test():
-    return set(["OTHER WARNING"])
-
-
-def passing_test():
-    return []
-
-
-class RunChecksTest(TestCase):
-    @property
-    def func(self):
-        from .checks import run_checks
-        return run_checks
-
-    @override_settings(
-        SECURE_CHECKS=[
-            "django.contrib.secure.tests.fake_test",
-            "django.contrib.secure.tests.nomsg_test"])
-    def test_returns_warnings(self):
-        self.assertEqual(self.func(), set(["SOME_WARNING", "OTHER WARNING"]))
-
-
-class CheckSettingsCommandTest(TestCase):
-    def call(self, **options):
-        stdout = options.setdefault("stdout", StringIO())
-        stderr = options.setdefault("stderr", StringIO())
-
-        call_command("checksecure", **options)
-
-        stderr.seek(0)
-        stdout.seek(0)
-
-        return stdout.read(), stderr.read()
-
-    @override_settings(SECURE_CHECKS=["django.contrib.secure.tests.fake_test"])
-    def test_prints_messages(self):
-        stdout, stderr = self.call()
-        self.assertIn("This is the warning message.", stderr)
-
-    @override_settings(SECURE_CHECKS=["django.contrib.secure.tests.nomsg_test"])
-    def test_prints_code_if_no_message(self):
-        stdout, stderr = self.call()
-        self.assertIn("OTHER WARNING", stderr)
-
-    @override_settings(SECURE_CHECKS=["django.contrib.secure.tests.fake_test"])
-    def test_prints_code_if_verbosity_0(self):
-        stdout, stderr = self.call(verbosity=0)
-        self.assertIn("SOME_WARNING", stderr)
-
-    @override_settings(SECURE_CHECKS=["django.contrib.secure.tests.fake_test"])
-    def test_prints_check_names(self):
-        stdout, stderr = self.call()
-        self.assertTrue("django.contrib.secure.tests.fake_test" in stdout)
-
-    @override_settings(SECURE_CHECKS=["django.contrib.secure.tests.fake_test"])
-    def test_no_verbosity(self):
-        stdout, stderr = self.call(verbosity=0)
-        self.assertEqual(stdout, "")
-
-    @override_settings(SECURE_CHECKS=["django.contrib.secure.tests.passing_test"])
-    def test_all_clear(self):
-        stdout, stderr = self.call()
-        self.assertIn("All clear!", stdout)
+from ..checks.sessions import add_session_cookie_message, add_httponly_message
 
 
 class CheckSessionCookieSecureTest(TestCase):
     @property
     def func(self):
-        from .checks.sessions import check_session_cookie_secure
+        from ..checks.sessions import check_session_cookie_secure
         return check_session_cookie_secure
 
     @override_settings(
@@ -397,7 +92,7 @@ class CheckSessionCookieSecureTest(TestCase):
 class CheckSessionCookieHttpOnlyTest(TestCase):
     @property
     def func(self):
-        from .checks.sessions import check_session_cookie_httponly
+        from ..checks.sessions import check_session_cookie_httponly
         return check_session_cookie_httponly
 
     @override_settings(
@@ -479,7 +174,7 @@ class CheckSessionCookieHttpOnlyTest(TestCase):
 class CheckCSRFMiddlewareTest(TestCase):
     @property
     def func(self):
-        from .checks.csrf import check_csrf_middleware
+        from ..checks.csrf import check_csrf_middleware
         return check_csrf_middleware
 
     @override_settings(MIDDLEWARE_CLASSES=[])
@@ -506,7 +201,7 @@ class CheckCSRFMiddlewareTest(TestCase):
 class CheckSecurityMiddlewareTest(TestCase):
     @property
     def func(self):
-        from .checks.base import check_security_middleware
+        from ..checks.base import check_security_middleware
         return check_security_middleware
 
     @override_settings(MIDDLEWARE_CLASSES=[])
@@ -533,7 +228,7 @@ class CheckSecurityMiddlewareTest(TestCase):
 class CheckStrictTransportSecurityTest(TestCase):
     @property
     def func(self):
-        from .checks.base import check_sts
+        from ..checks.base import check_sts
         return check_sts
 
     @override_settings(SECURE_HSTS_SECONDS=0)
@@ -558,7 +253,7 @@ class CheckStrictTransportSecurityTest(TestCase):
 class CheckStrictTransportSecuritySubdomainsTest(TestCase):
     @property
     def func(self):
-        from .checks.base import check_sts_include_subdomains
+        from ..checks.base import check_sts_include_subdomains
         return check_sts_include_subdomains
 
     @override_settings(SECURE_HSTS_INCLUDE_SUBDOMAINS=False)
@@ -582,7 +277,7 @@ class CheckStrictTransportSecuritySubdomainsTest(TestCase):
 class CheckXFrameOptionsMiddelwareTest(TestCase):
     @property
     def func(self):
-        from .checks.base import check_xframe_options_middleware
+        from ..checks.base import check_xframe_options_middleware
         return check_xframe_options_middleware
 
     @override_settings(MIDDLEWARE_CLASSES=[])
@@ -610,7 +305,7 @@ class CheckXFrameOptionsMiddelwareTest(TestCase):
 class CheckContentTypeNosniffTest(TestCase):
     @property
     def func(self):
-        from .checks.base import check_content_type_nosniff
+        from ..checks.base import check_content_type_nosniff
         return check_content_type_nosniff
 
     @override_settings(SECURE_CONTENT_TYPE_NOSNIFF=False)
@@ -636,7 +331,7 @@ class CheckContentTypeNosniffTest(TestCase):
 class CheckXssFilterTest(TestCase):
     @property
     def func(self):
-        from .checks.base import check_xss_filter
+        from ..checks.base import check_xss_filter
         return check_xss_filter
 
     @override_settings(SECURE_BROWSER_XSS_FILTER=False)
@@ -662,7 +357,7 @@ class CheckXssFilterTest(TestCase):
 class CheckSSLRedirectTest(TestCase):
     @property
     def func(self):
-        from .checks.base import check_ssl_redirect
+        from ..checks.base import check_ssl_redirect
         return check_ssl_redirect
 
     @override_settings(SECURE_SSL_REDIRECT=False)
@@ -688,7 +383,7 @@ class CheckSSLRedirectTest(TestCase):
 class CheckSecretKeyTest(TestCase):
     @property
     def func(self):
-        from .checks.base import check_secret_key
+        from ..checks.base import check_secret_key
         return check_secret_key
 
     @property
@@ -730,12 +425,12 @@ class ConfTest(TestCase):
         Accessing a setting without a default value raises in
         ImproperlyConfigured.
         """
-        from .conf import conf
+        from ..conf import conf
 
         self.assertRaises(ImproperlyConfigured, getattr, conf, "HAS_NO_DEFAULT")
 
     def test_defaults(self):
-        from .conf import conf
+        from ..conf import conf
 
         self.assertEqual(
             conf.defaults,
