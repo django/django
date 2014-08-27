@@ -1,5 +1,3 @@
-# TODO: rename to base.py or similar
-
 from django.conf import settings
 from django.core import checks
 

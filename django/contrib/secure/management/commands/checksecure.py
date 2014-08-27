@@ -3,7 +3,7 @@ import textwrap
 from django.core.management.base import NoArgsCommand
 from django.utils.termcolors import make_style
 
-from ...check import get_check
+from ...checks import get_check
 from ...conf import conf
 
 

@@ -7,7 +7,7 @@ from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils.six import StringIO
 
-from .check.sessions import add_session_cookie_message, add_httponly_message
+from .checks.sessions import add_session_cookie_message, add_httponly_message
 
 
 class SecurityMiddlewareTest(TestCase):
@@ -258,7 +258,7 @@ def passing_test():
 class RunChecksTest(TestCase):
     @property
     def func(self):
-        from .check import run_checks
+        from .checks import run_checks
         return run_checks
 
     @override_settings(
@@ -315,7 +315,7 @@ class CheckSettingsCommandTest(TestCase):
 class CheckSessionCookieSecureTest(TestCase):
     @property
     def func(self):
-        from .check.sessions import check_session_cookie_secure
+        from .checks.sessions import check_session_cookie_secure
         return check_session_cookie_secure
 
     @override_settings(
@@ -397,7 +397,7 @@ class CheckSessionCookieSecureTest(TestCase):
 class CheckSessionCookieHttpOnlyTest(TestCase):
     @property
     def func(self):
-        from .check.sessions import check_session_cookie_httponly
+        from .checks.sessions import check_session_cookie_httponly
         return check_session_cookie_httponly
 
     @override_settings(
@@ -479,7 +479,7 @@ class CheckSessionCookieHttpOnlyTest(TestCase):
 class CheckCSRFMiddlewareTest(TestCase):
     @property
     def func(self):
-        from .check.csrf import check_csrf_middleware
+        from .checks.csrf import check_csrf_middleware
         return check_csrf_middleware
 
     @override_settings(MIDDLEWARE_CLASSES=[])
@@ -506,7 +506,7 @@ class CheckCSRFMiddlewareTest(TestCase):
 class CheckSecurityMiddlewareTest(TestCase):
     @property
     def func(self):
-        from .check.djangosecure import check_security_middleware
+        from .checks.base import check_security_middleware
         return check_security_middleware
 
     @override_settings(MIDDLEWARE_CLASSES=[])
@@ -533,7 +533,7 @@ class CheckSecurityMiddlewareTest(TestCase):
 class CheckStrictTransportSecurityTest(TestCase):
     @property
     def func(self):
-        from .check.djangosecure import check_sts
+        from .checks.base import check_sts
         return check_sts
 
     @override_settings(SECURE_HSTS_SECONDS=0)
@@ -558,7 +558,7 @@ class CheckStrictTransportSecurityTest(TestCase):
 class CheckStrictTransportSecuritySubdomainsTest(TestCase):
     @property
     def func(self):
-        from .check.djangosecure import check_sts_include_subdomains
+        from .checks.base import check_sts_include_subdomains
         return check_sts_include_subdomains
 
     @override_settings(SECURE_HSTS_INCLUDE_SUBDOMAINS=False)
@@ -582,7 +582,7 @@ class CheckStrictTransportSecuritySubdomainsTest(TestCase):
 class CheckXFrameOptionsMiddelwareTest(TestCase):
     @property
     def func(self):
-        from .check.djangosecure import check_xframe_options_middleware
+        from .checks.base import check_xframe_options_middleware
         return check_xframe_options_middleware
 
     @override_settings(MIDDLEWARE_CLASSES=[])
@@ -610,7 +610,7 @@ class CheckXFrameOptionsMiddelwareTest(TestCase):
 class CheckContentTypeNosniffTest(TestCase):
     @property
     def func(self):
-        from .check.djangosecure import check_content_type_nosniff
+        from .checks.base import check_content_type_nosniff
         return check_content_type_nosniff
 
     @override_settings(SECURE_CONTENT_TYPE_NOSNIFF=False)
@@ -636,7 +636,7 @@ class CheckContentTypeNosniffTest(TestCase):
 class CheckXssFilterTest(TestCase):
     @property
     def func(self):
-        from .check.djangosecure import check_xss_filter
+        from .checks.base import check_xss_filter
         return check_xss_filter
 
     @override_settings(SECURE_BROWSER_XSS_FILTER=False)
@@ -662,7 +662,7 @@ class CheckXssFilterTest(TestCase):
 class CheckSSLRedirectTest(TestCase):
     @property
     def func(self):
-        from .check.djangosecure import check_ssl_redirect
+        from .checks.base import check_ssl_redirect
         return check_ssl_redirect
 
     @override_settings(SECURE_SSL_REDIRECT=False)
@@ -688,7 +688,7 @@ class CheckSSLRedirectTest(TestCase):
 class CheckSecretKeyTest(TestCase):
     @property
     def func(self):
-        from .check.djangosecure import check_secret_key
+        from .checks.base import check_secret_key
         return check_secret_key
 
     @property
@@ -741,17 +741,17 @@ class ConfTest(TestCase):
             conf.defaults,
             {
                 "SECURE_CHECKS": [
-                    "django.contrib.secure.check.csrf.check_csrf_middleware",
-                    "django.contrib.secure.check.sessions.check_session_cookie_secure",
-                    "django.contrib.secure.check.sessions.check_session_cookie_httponly",
-                    "django.contrib.secure.check.djangosecure.check_security_middleware",
-                    "django.contrib.secure.check.djangosecure.check_sts",
-                    "django.contrib.secure.check.djangosecure.check_sts_include_subdomains",
-                    "django.contrib.secure.check.djangosecure.check_xframe_options_middleware",
-                    "django.contrib.secure.check.djangosecure.check_content_type_nosniff",
-                    "django.contrib.secure.check.djangosecure.check_xss_filter",
-                    "django.contrib.secure.check.djangosecure.check_ssl_redirect",
-                    "django.contrib.secure.check.djangosecure.check_secret_key",
+                    "django.contrib.secure.checks.csrf.check_csrf_middleware",
+                    "django.contrib.secure.checks.sessions.check_session_cookie_secure",
+                    "django.contrib.secure.checks.sessions.check_session_cookie_httponly",
+                    "django.contrib.secure.checks.base.check_security_middleware",
+                    "django.contrib.secure.checks.base.check_sts",
+                    "django.contrib.secure.checks.base.check_sts_include_subdomains",
+                    "django.contrib.secure.checks.base.check_xframe_options_middleware",
+                    "django.contrib.secure.checks.base.check_content_type_nosniff",
+                    "django.contrib.secure.checks.base.check_xss_filter",
+                    "django.contrib.secure.checks.base.check_ssl_redirect",
+                    "django.contrib.secure.checks.base.check_secret_key",
                 ],
                 "SECURE_HSTS_SECONDS": 0,
                 "SECURE_HSTS_INCLUDE_SUBDOMAINS": False,
