@@ -622,17 +622,6 @@ STATICFILES_FINDERS = (
 # Migration module overrides for apps, by app label.
 MIGRATION_MODULES = {}
 
-#######################
-# SECURITY MIDDLEWARE #
-#######################
-SECURE_HSTS_SECONDS = 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_CONTENT_TYPE_NOSNIFF = False
-SECURE_BROWSER_XSS_FILTER = False
-SECURE_SSL_REDIRECT = False
-SECURE_SSL_HOST = None
-SECURE_REDIRECT_EXEMPT = []
-
 #################
 # SYSTEM CHECKS #
 #################
@@ -642,3 +631,16 @@ SECURE_REDIRECT_EXEMPT = []
 # serious issues like errors and criticals does not result in hiding the
 # message, but Django will not stop you from e.g. running server.
 SILENCED_SYSTEM_CHECKS = []
+
+#######################
+# SECURITY MIDDLEWARE #
+#######################
+SECURITY_MIDDLEWARE_CONFIG = {
+    'SECURE_HSTS_SECONDS': 0,
+    'SECURE_HSTS_INCLUDE_SUBDOMAINS': False,
+    'SECURE_CONTENT_TYPE_NOSNIFF': False,
+    'SECURE_BROWSER_XSS_FILTER': False,
+    'SECURE_SSL_REDIRECT': False,
+    'SECURE_SSL_HOST': None,
+    'SECURE_REDIRECT_EXEMPT': [],
+}

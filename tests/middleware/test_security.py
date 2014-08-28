@@ -40,7 +40,7 @@ class SecurityMiddlewareTest(TestCase):
         req = getattr(self.request, method.lower())(*args, **kwargs)
         return self.middleware.process_request(req)
 
-    @override_settings(SECURE_HSTS_SECONDS=3600)
+    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_HSTS_SECONDS': 3600})
     def test_sts_on(self):
         """
         With SECURE_HSTS_SECONDS=3600, the middleware adds
@@ -50,12 +50,11 @@ class SecurityMiddlewareTest(TestCase):
             self.process_response(secure=True)["strict-transport-security"],
             "max-age=3600")
 
-    @override_settings(SECURE_HSTS_SECONDS=3600)
+    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_HSTS_SECONDS': 3600})
     def test_sts_already_present(self):
         """
         The middleware will not override a "strict-transport-security" header
         already present in the response.
-
         """
         response = self.process_response(
             secure=True,
@@ -79,7 +78,8 @@ class SecurityMiddlewareTest(TestCase):
         self.assertNotIn("strict-transport-security", self.process_response(secure=True))
 
     @override_settings(
-        SECURE_HSTS_SECONDS=600, SECURE_HSTS_INCLUDE_SUBDOMAINS=True)
+        SECURITY_MIDDLEWARE_CONFIG={
+            'SECURE_HSTS_SECONDS': 600, 'SECURE_HSTS_INCLUDE_SUBDOMAINS': True})
     def test_sts_include_subdomains(self):
         """
         With SECURE_HSTS_SECONDS non-zero and SECURE_HSTS_INCLUDE_SUBDOMAINS
@@ -93,7 +93,11 @@ class SecurityMiddlewareTest(TestCase):
             )
 
     @override_settings(
-        SECURE_HSTS_SECONDS=600, SECURE_HSTS_INCLUDE_SUBDOMAINS=False)
+        SECURITY_MIDDLEWARE_CONFIG={
+            'SECURE_HSTS_SECONDS': 600,
+            'SECURE_HSTS_INCLUDE_SUBDOMAINS': False,
+        }
+    )
     def test_sts_no_include_subdomains(self):
         """
         With SECURE_HSTS_SECONDS non-zero and SECURE_HSTS_INCLUDE_SUBDOMAINS
@@ -103,7 +107,7 @@ class SecurityMiddlewareTest(TestCase):
         response = self.process_response(secure=True)
         self.assertEqual(response["strict-transport-security"], "max-age=600")
 
-    @override_settings(SECURE_CONTENT_TYPE_NOSNIFF=True)
+    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_CONTENT_TYPE_NOSNIFF': True})
     def test_content_type_on(self):
         """
         With SECURE_CONTENT_TYPE_NOSNIFF set to True, the middleware adds
@@ -111,7 +115,7 @@ class SecurityMiddlewareTest(TestCase):
         """
         self.assertEqual(self.process_response()["x-content-type-options"], "nosniff")
 
-    @override_settings(SECURE_CONTENT_TYPE_NO_SNIFF=True)
+    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_CONTENT_TYPE_NO_SNIFF': True})
     def test_content_type_already_present(self):
         """
         The middleware will not override an "x-content-type-options" header
@@ -120,7 +124,7 @@ class SecurityMiddlewareTest(TestCase):
         response = self.process_response(secure=True, headers={"x-content-type-options": "foo"})
         self.assertEqual(response["x-content-type-options"], "foo")
 
-    @override_settings(SECURE_CONTENT_TYPE_NOSNIFF=False)
+    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_CONTENT_TYPE_NOSNIFF': False})
     def test_content_type_off(self):
         """
         With SECURE_CONTENT_TYPE_NOSNIFF False, the middleware does not add an
@@ -128,7 +132,7 @@ class SecurityMiddlewareTest(TestCase):
         """
         self.assertNotIn("x-content-type-options", self.process_response())
 
-    @override_settings(SECURE_BROWSER_XSS_FILTER=True)
+    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_BROWSER_XSS_FILTER': True})
     def test_xss_filter_on(self):
         """
         With SECURE_BROWSER_XSS_FILTER set to True, the middleware adds
@@ -138,7 +142,7 @@ class SecurityMiddlewareTest(TestCase):
             self.process_response()["x-xss-protection"],
             "1; mode=block")
 
-    @override_settings(SECURE_BROWSER_XSS_FILTER=True)
+    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_BROWSER_XSS_FILTER': True})
     def test_xss_filter_already_present(self):
         """
         The middleware will not override an "x-xss-protection" header
@@ -155,7 +159,7 @@ class SecurityMiddlewareTest(TestCase):
         """
         self.assertFalse("x-xss-protection" in self.process_response())
 
-    @override_settings(SECURE_SSL_REDIRECT=True)
+    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_SSL_REDIRECT': True})
     def test_ssl_redirect_on(self):
         """
         With SECURE_SSL_REDIRECT True, the middleware redirects any non-secure
@@ -166,7 +170,7 @@ class SecurityMiddlewareTest(TestCase):
         self.assertEqual(
             ret["Location"], "https://testserver/some/url?query=string")
 
-    @override_settings(SECURE_SSL_REDIRECT=True)
+    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_SSL_REDIRECT': True})
     def test_no_redirect_ssl(self):
         """
         The middleware does not redirect secure requests.
@@ -175,7 +179,11 @@ class SecurityMiddlewareTest(TestCase):
         self.assertEqual(ret, None)
 
     @override_settings(
-        SECURE_SSL_REDIRECT=True, SECURE_REDIRECT_EXEMPT=["^insecure/"])
+        SECURITY_MIDDLEWARE_CONFIG={
+            'SECURE_SSL_REDIRECT': True,
+            'SECURE_REDIRECT_EXEMPT': ["^insecure/"],
+        }
+    )
     def test_redirect_exempt(self):
         """
         The middleware does not redirect requests with URL path matching an
@@ -185,7 +193,11 @@ class SecurityMiddlewareTest(TestCase):
         self.assertEqual(ret, None)
 
     @override_settings(
-        SECURE_SSL_REDIRECT=True, SECURE_SSL_HOST="secure.example.com")
+        SECURITY_MIDDLEWARE_CONFIG={
+            'SECURE_SSL_REDIRECT': True,
+            'SECURE_SSL_HOST': "secure.example.com",
+        }
+    )
     def test_redirect_ssl_host(self):
         """
         The middleware redirects to SECURE_SSL_HOST if given.
@@ -194,7 +206,7 @@ class SecurityMiddlewareTest(TestCase):
         self.assertEqual(ret.status_code, 301)
         self.assertEqual(ret["Location"], "https://secure.example.com/some/url")
 
-    @override_settings(SECURE_SSL_REDIRECT=False)
+    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_SSL_REDIRECT': False})
     def test_ssl_redirect_off(self):
         """
         With SECURE_SSL_REDIRECT False, the middleware does no redirect.

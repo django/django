@@ -7,24 +7,16 @@ from django.conf import settings
 
 class SecurityMiddleware(object):
     def __init__(self):
-        self.sts_seconds = settings.SECURE_HSTS_SECONDS
-        self.sts_include_subdomains = settings.SECURE_HSTS_INCLUDE_SUBDOMAINS
-        self.content_type_nosniff = settings.SECURE_CONTENT_TYPE_NOSNIFF
-        self.xss_filter = settings.SECURE_BROWSER_XSS_FILTER
-        self.redirect = settings.SECURE_SSL_REDIRECT
-        self.redirect_host = settings.SECURE_SSL_HOST
-        self.proxy_ssl_header = settings.SECURE_PROXY_SSL_HEADER
+        self.sts_seconds = settings.SECURITY_MIDDLEWARE_CONFIG['SECURE_HSTS_SECONDS']
+        self.sts_include_subdomains = settings.SECURITY_MIDDLEWARE_CONFIG['SECURE_HSTS_INCLUDE_SUBDOMAINS']
+        self.content_type_nosniff = settings.SECURITY_MIDDLEWARE_CONFIG['SECURE_CONTENT_TYPE_NOSNIFF']
+        self.xss_filter = settings.SECURITY_MIDDLEWARE_CONFIG['SECURE_BROWSER_XSS_FILTER']
+        self.redirect = settings.SECURITY_MIDDLEWARE_CONFIG['SECURE_SSL_REDIRECT']
+        self.redirect_host = settings.SECURITY_MIDDLEWARE_CONFIG['SECURE_SSL_HOST']
         self.redirect_exempt = [
-            re.compile(r) for r in settings.SECURE_REDIRECT_EXEMPT]
+            re.compile(r) for r in settings.SECURITY_MIDDLEWARE_CONFIG['SECURE_REDIRECT_EXEMPT']]
 
     def process_request(self, request):
-        if self.proxy_ssl_header and not request.is_secure():
-            header, value = self.proxy_ssl_header
-            if request.META.get(header, None) == value:
-                # We're only patching the current request; its secure status
-                # is not going to change.
-                request.is_secure = lambda: True
-
         path = request.path.lstrip("/")
         if (self.redirect and
                 not request.is_secure() and
