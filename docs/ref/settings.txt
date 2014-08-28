@@ -2742,6 +2742,11 @@ consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of client side script accessing the
 protected cookie data.
 
+Turning it on makes it less trivial for an attacker to escalate a cross-site
+scripting vulnerability into full hijacking of a user's session. There's not
+much excuse for leaving this off, either: if your code depends on reading
+session cookies from Javascript, you're probably doing it wrong.
+
 .. versionadded:: 1.7
 
 This setting also affects cookies set by :mod:`django.contrib.messages`.
@@ -2782,6 +2787,13 @@ Default: ``False``
 Whether to use a secure cookie for the session cookie. If this is set to
 ``True``, the cookie will be marked as "secure," which means browsers may
 ensure that the cookie is only sent under an HTTPS connection.
+
+Since it's trivial for a packet sniffer (e.g. `Firesheep`_) to hijack a user's
+session if the session cookie is sent unencrypted, there's really no good
+excuse not to have this on. (It will prevent you from using sessions on insecure
+requests; that's a good thing).
+
+_Firesheep: http://codebutler.com/firesheep
 
 .. versionadded:: 1.7
 

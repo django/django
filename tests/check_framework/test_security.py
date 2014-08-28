@@ -3,13 +3,13 @@ from django.core import checks
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from django.core.checks.secure.sessions import add_session_cookie_message, add_httponly_message
+from django.core.checks.security.sessions import add_session_cookie_message, add_httponly_message
 
 
 class CheckSessionCookieSecureTest(TestCase):
     @property
     def func(self):
-        from django.core.checks.secure.sessions import check_session_cookie_secure
+        from django.core.checks.security.sessions import check_session_cookie_secure
         return check_session_cookie_secure
 
     @override_settings(
@@ -29,7 +29,7 @@ class CheckSessionCookieSecureTest(TestCase):
                     "but you have not set SESSION_COOKIE_SECURE to True."
                 ),
                 hint=None,
-                id='secure.W010',
+                id='security.W010',
             )]
         )
 
@@ -53,7 +53,7 @@ class CheckSessionCookieSecureTest(TestCase):
                     "SESSION_COOKIE_SECURE to True.",
                 ),
                 hint=None,
-                id='secure.W011',
+                id='security.W011',
             )]
         )
 
@@ -72,7 +72,7 @@ class CheckSessionCookieSecureTest(TestCase):
             [checks.Warning(
                 add_session_cookie_message("SESSION_COOKIE_SECURE is not set to True."),
                 hint=None,
-                id='secure.W012',
+                id='security.W012',
             )]
         )
 
@@ -91,7 +91,7 @@ class CheckSessionCookieSecureTest(TestCase):
 class CheckSessionCookieHttpOnlyTest(TestCase):
     @property
     def func(self):
-        from django.core.checks.secure.sessions import check_session_cookie_httponly
+        from django.core.checks.security.sessions import check_session_cookie_httponly
         return check_session_cookie_httponly
 
     @override_settings(
@@ -111,7 +111,7 @@ class CheckSessionCookieHttpOnlyTest(TestCase):
                     "but you have not set SESSION_COOKIE_HTTPONLY to True."
                 ),
                 hint=None,
-                id='secure.W013',
+                id='security.W013',
             )]
         )
 
@@ -135,7 +135,7 @@ class CheckSessionCookieHttpOnlyTest(TestCase):
                     "SESSION_COOKIE_HTTPONLY to True."
                 ),
                 hint=None,
-                id='secure.W014',
+                id='security.W014',
             )]
         )
 
@@ -154,7 +154,7 @@ class CheckSessionCookieHttpOnlyTest(TestCase):
             [checks.Warning(
                 add_httponly_message("SESSION_COOKIE_HTTPONLY is not set to True."),
                 hint=None,
-                id='secure.W015',
+                id='security.W015',
             )]
         )
 
@@ -173,7 +173,7 @@ class CheckSessionCookieHttpOnlyTest(TestCase):
 class CheckCSRFMiddlewareTest(TestCase):
     @property
     def func(self):
-        from django.core.checks.secure.csrf import check_csrf_middleware
+        from django.core.checks.security.csrf import check_csrf_middleware
         return check_csrf_middleware
 
     @override_settings(MIDDLEWARE_CLASSES=[])
@@ -187,7 +187,7 @@ class CheckCSRFMiddlewareTest(TestCase):
                 "MIDDLEWARE_CLASSES). Enabling the middleware is the safest approach "
                 "to ensure you don't leave any holes.",
                 hint=None,
-                id='secure.W003',
+                id='security.W003',
             )]
         )
 
@@ -200,7 +200,7 @@ class CheckCSRFMiddlewareTest(TestCase):
 class CheckSecurityMiddlewareTest(TestCase):
     @property
     def func(self):
-        from django.core.checks.secure.base import check_security_middleware
+        from django.core.checks.security.base import check_security_middleware
         return check_security_middleware
 
     @override_settings(MIDDLEWARE_CLASSES=[])
@@ -214,7 +214,7 @@ class CheckSecurityMiddlewareTest(TestCase):
                 "SECURE_BROWSER_XSS_FILTER and SECURE_SSL_REDIRECT settings "
                 "will have no effect.",
                 hint=None,
-                id='secure.W001',
+                id='security.W001',
             )]
         )
 
@@ -227,7 +227,7 @@ class CheckSecurityMiddlewareTest(TestCase):
 class CheckStrictTransportSecurityTest(TestCase):
     @property
     def func(self):
-        from django.core.checks.secure.base import check_sts
+        from django.core.checks.security.base import check_sts
         return check_sts
 
     @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_HSTS_SECONDS': 0})
@@ -237,10 +237,9 @@ class CheckStrictTransportSecurityTest(TestCase):
             [checks.Warning(
                 "You have not set a value for the SECURE_HSTS_SECONDS setting. "
                 "If your entire site is served only over SSL, you may want to consider "
-                "setting a value and enabling HTTP Strict Transport Security "
-                "(see http://en.wikipedia.org/wiki/Strict_Transport_Security).",
+                "setting a value and enabling HTTP Strict Transport Security.",
                 hint=None,
-                id='secure.W004',
+                id='security.W004',
             )]
         )
 
@@ -252,7 +251,7 @@ class CheckStrictTransportSecurityTest(TestCase):
 class CheckStrictTransportSecuritySubdomainsTest(TestCase):
     @property
     def func(self):
-        from django.core.checks.secure.base import check_sts_include_subdomains
+        from django.core.checks.security.base import check_sts_include_subdomains
         return check_sts_include_subdomains
 
     @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_HSTS_INCLUDE_SUBDOMAINS': False})
@@ -264,7 +263,7 @@ class CheckStrictTransportSecuritySubdomainsTest(TestCase):
                 "Without this, your site is potentially vulnerable to attack "
                 "via an insecure connection to a subdomain.",
                 hint=None,
-                id='secure.W005',
+                id='security.W005',
             )]
         )
 
@@ -276,7 +275,7 @@ class CheckStrictTransportSecuritySubdomainsTest(TestCase):
 class CheckXFrameOptionsMiddelwareTest(TestCase):
     @property
     def func(self):
-        from django.core.checks.secure.base import check_xframe_options_middleware
+        from django.core.checks.security.base import check_xframe_options_middleware
         return check_xframe_options_middleware
 
     @override_settings(MIDDLEWARE_CLASSES=[])
@@ -285,13 +284,13 @@ class CheckXFrameOptionsMiddelwareTest(TestCase):
             self.func(None),
             [checks.Warning(
                 "You do not have "
-                "'django.middleware.clickjacking.XFrameOptionsMiddleware ' in your "
+                "'django.middleware.clickjacking.XFrameOptionsMiddleware' in your "
                 "MIDDLEWARE_CLASSES, so your pages will not be served with an "
                 "'x-frame-options' header. Unless there is a good reason for "
                 "your site to be served in a frame, you should consider "
                 "enabling this header to help prevent clickjacking attacks.",
                 hint=None,
-                id='secure.W002',
+                id='security.W002',
             )]
         )
 
@@ -303,7 +302,7 @@ class CheckXFrameOptionsMiddelwareTest(TestCase):
 class CheckContentTypeNosniffTest(TestCase):
     @property
     def func(self):
-        from django.core.checks.secure.base import check_content_type_nosniff
+        from django.core.checks.security.base import check_content_type_nosniff
         return check_content_type_nosniff
 
     @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_CONTENT_TYPE_NOSNIFF': False})
@@ -317,7 +316,7 @@ class CheckContentTypeNosniffTest(TestCase):
                 "You should consider enabling this header to prevent the "
                 "browser from identifying content types incorrectly.",
                 hint=None,
-                id='secure.W006',
+                id='security.W006',
             )]
         )
 
@@ -329,7 +328,7 @@ class CheckContentTypeNosniffTest(TestCase):
 class CheckXssFilterTest(TestCase):
     @property
     def func(self):
-        from django.core.checks.secure.base import check_xss_filter
+        from django.core.checks.security.base import check_xss_filter
         return check_xss_filter
 
     @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_BROWSER_XSS_FILTER': False})
@@ -343,7 +342,7 @@ class CheckXssFilterTest(TestCase):
                 "You should consider enabling this header to activate the "
                 "browser's XSS filtering and help prevent XSS attacks.",
                 hint=None,
-                id='secure.W007',
+                id='security.W007',
             )]
         )
 
@@ -355,21 +354,21 @@ class CheckXssFilterTest(TestCase):
 class CheckSSLRedirectTest(TestCase):
     @property
     def func(self):
-        from django.core.checks.secure.base import check_ssl_redirect
+        from django.core.checks.security.base import check_ssl_redirect
         return check_ssl_redirect
 
     @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_SSL_REDIRECT': False})
-    def test_no_sts(self):
+    def test_no_ssl_redirect(self):
         self.assertEqual(
             self.func(None),
             [checks.Warning(
                 "Your SECURE_SSL_REDIRECT setting is not set to True. "
                 "Unless your site should be available over both SSL and non-SSL "
-                "connections, you may want to either set this setting True "
-                "or configure a loadbalancer or reverse-proxy server "
+                "connections, you may want to either set this setting to True "
+                "or configure a load balancer or reverse-proxy server "
                 "to redirect all connections to HTTPS.",
                 hint=None,
-                id='secure.W008',
+                id='security.W008',
             )]
         )
 
@@ -381,18 +380,18 @@ class CheckSSLRedirectTest(TestCase):
 class CheckSecretKeyTest(TestCase):
     @property
     def func(self):
-        from django.core.checks.secure.base import check_secret_key
+        from django.core.checks.security.base import check_secret_key
         return check_secret_key
 
     @property
     def secret_key_error(self):
         return [checks.Warning(
-            "Your SECRET_KEY is either an empty string, non-existent, or has not "
-            "enough characters. Please generate a long and random SECRET_KEY, "
+            "Your SECRET_KEY is either an empty string, non-existent, or has very "
+            "few characters. Please generate a long and random SECRET_KEY, "
             "otherwise many of Django's security-critical features will be "
             "vulnerable to attack.",
             hint=None,
-            id='secure.W009',
+            id='security.W009',
         )]
 
     @override_settings(SECRET_KEY='awcetupav$#!^h9wTUAPCJWE&!T#``Ho;ta9w4tva')
