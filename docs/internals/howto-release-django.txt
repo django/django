@@ -87,7 +87,8 @@ any time leading up to the actual release:
    the release. We maintain a list of who gets these pre-notification emails in
    the private ``django-core`` repository. This email should be signed by the
    key you'll use for the release, and should include patches for each issue
-   being fixed.
+   being fixed. Also make sure to update the security issues archive; this will
+   be in ``docs/releases/security.txt``.
 
 #. If this is a major release, make sure the tests pass, then increase
    the default PBKDF2 iterations in
