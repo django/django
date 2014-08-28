@@ -94,7 +94,7 @@ def _empty(of_cls):
 
 @total_ordering
 @python_2_unicode_compatible
-class Field(RegisterLookupMixin):
+class Field(RegisterLookupMixin, ConcreteFlagMixin):
     """Base class for all field types"""
 
     # Designates whether empty strings fundamentally are allowed at the

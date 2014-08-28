@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 from django.utils.encoding import smart_text
-from django.db.models.fields import BLANK_CHOICE_DASH
+from django.db.models.fields import BLANK_CHOICE_DASH, ConcreteFlagMixin
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -11,7 +11,7 @@ PathInfo = namedtuple('PathInfo',
                       'm2m direct')
 
 
-class RelatedObject(object):
+class RelatedObject(ConcreteFlagMixin):
     def __init__(self, parent_model, model, field):
         self.parent_model = parent_model
         self.model = model
