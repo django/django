@@ -6,7 +6,7 @@ from django.test.utils import override_settings
 class SecurityMiddlewareTest(TestCase):
     @property
     def middleware(self):
-        from ..middleware import SecurityMiddleware
+        from django.middleware.security import SecurityMiddleware
         return SecurityMiddleware()
 
     @property

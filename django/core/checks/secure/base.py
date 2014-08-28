@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.core import checks
 
-from ..conf import conf
-
 
 def check_security_middleware(app_configs):
     passed_check = "django.contrib.secure.middleware.SecurityMiddleware" in settings.MIDDLEWARE_CLASSES
@@ -33,7 +31,7 @@ def check_xframe_options_middleware(app_configs):
 
 
 def check_sts(app_configs):
-    passed_check = bool(conf.SECURE_HSTS_SECONDS)
+    passed_check = bool(settings.SECURE_HSTS_SECONDS)
     return [] if passed_check else [checks.Warning(
         ("You have not set a value for the SECURE_HSTS_SECONDS setting. "
         "If your entire site is served only over SSL, you may want to consider "
@@ -45,7 +43,7 @@ def check_sts(app_configs):
 
 
 def check_sts_include_subdomains(app_configs):
-    passed_check = bool(conf.SECURE_HSTS_INCLUDE_SUBDOMAINS)
+    passed_check = bool(settings.SECURE_HSTS_INCLUDE_SUBDOMAINS)
     return [] if passed_check else [checks.Warning(
         ("You have not set the SECURE_HSTS_INCLUDE_SUBDOMAINS setting to True. "
         "Without this, your site is potentially vulnerable to attack "
@@ -56,7 +54,7 @@ def check_sts_include_subdomains(app_configs):
 
 
 def check_content_type_nosniff(app_configs):
-    passed_check = conf.SECURE_CONTENT_TYPE_NOSNIFF
+    passed_check = settings.SECURE_CONTENT_TYPE_NOSNIFF
     return [] if passed_check else [checks.Warning(
         ("Your SECURE_CONTENT_TYPE_NOSNIFF setting is not set to True, "
         "so your pages will not be served with an "
@@ -69,7 +67,7 @@ def check_content_type_nosniff(app_configs):
 
 
 def check_xss_filter(app_configs):
-    passed_check = conf.SECURE_BROWSER_XSS_FILTER is True
+    passed_check = settings.SECURE_BROWSER_XSS_FILTER is True
     return [] if passed_check else [checks.Warning(
         ("Your SECURE_BROWSER_XSS_FILTER setting is not set to True, "
         "so your pages will not be served with an "
@@ -82,7 +80,7 @@ def check_xss_filter(app_configs):
 
 
 def check_ssl_redirect(app_configs):
-    passed_check = bool(conf.SECURE_SSL_REDIRECT)
+    passed_check = bool(settings.SECURE_SSL_REDIRECT)
     return [] if passed_check else [checks.Warning(
         ("Your SECURE_SSL_REDIRECT setting is not set to True. "
         "Unless your site should be available over both SSL and non-SSL "
@@ -97,7 +95,7 @@ def check_ssl_redirect(app_configs):
 def check_secret_key(app_configs):
     passed_check = (
         getattr(settings, 'SECRET_KEY', None) and
-        len(set(conf.SECRET_KEY)) >= 5
+        len(set(settings.SECRET_KEY)) >= 5
     )
     return [] if passed_check else [checks.Warning(
         ("Your SECRET_KEY is either an empty string, non-existent, or has not "
