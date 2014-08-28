@@ -29,6 +29,10 @@ you're releasing the source code for your project, a common practice is to
 publish suitable settings for development, and to use a private settings
 module for production.
 
+Some of these checks can be automated using the :djadminopt:`--deploy`
+option of the :djadmin:`check` command, but it's still a good idea to read and
+understand this guide!
+
 Critical settings
 =================
 

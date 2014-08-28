@@ -146,7 +146,7 @@ Currently, the checks are simple improvements you could make to your site's
 security configuration.
 
 You can use this option in your local development environment. Since your local
-developement settings module may have many of your production settings, you will
+development settings module may have many of your production settings, you will
 probably want to point the ``check`` command at a different settings module,
 either by setting the ``DJANGO_SETTINGS_MODULE`` environment variable, or by
 passing the ``--settings`` option::

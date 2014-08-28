@@ -362,7 +362,7 @@ balancer, it'd be irritating to be constantly warned about not having enabled
 silence unneeded checks.
 
 The following check functions will be run if you use the
-`djadminopt:`--deploy` of the :djadmin:`check` command:
+:djadminopt:`--deploy` of the :djadmin:`check` command:
 
 * **security.W001**: You do not have
   :class:`django.middleware.security.SecurityMiddleware` in your
@@ -412,7 +412,7 @@ The following check functions will be run if you use the
 * **security.W008**: Your :setting:`SECURE_SSL_REDIRECT` setting is not set to
   ``True``. Unless your site should be available over both SSL and non-SSL
   connections, you may want to either set this setting to ``True`` or configure
-  a loadbalancer or reverse-proxy server  to redirect all connections to HTTPS.
+  a load balancer or reverse-proxy server  to redirect all connections to HTTPS.
 
 * **security.W009**: Your :setting:`SECRET_KEY` is either an empty string,
   non-existent, or has very few characters. Please generate a long and random

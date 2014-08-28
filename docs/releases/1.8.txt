@@ -23,7 +23,17 @@ Like Django 1.7, Django 1.8 requires Python 2.7 or above, though we
 What's new in Django 1.8
 ========================
 
-...
+Security enhancements
+~~~~~~~~~~~~~~~~~~~~~
+
+Several features of the django-secure_ third-party library have been
+integrated into Django. :class:`django.middleware.security.SecurityMiddleware`
+provides several security enhancements to the request/response cycle. The new
+:djadminopt:`--deploy` option of the :djadmin:`check` command allows you to
+check your production settings file for ways to increase the security of your
+site.
+
+.. _django-secure: https://pypi.python.org/pypi/django-secure
 
 Minor features
 ~~~~~~~~~~~~~~

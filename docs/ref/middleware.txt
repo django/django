@@ -155,6 +155,8 @@ Message middleware
 Enables cookie- and session-based message support. See the
 :doc:`messages documentation </ref/contrib/messages>`.
 
+.. _security-middleware:
+
 Security middleware
 -------------------
 
@@ -165,8 +167,10 @@ Security middleware
 
 .. class:: SecurityMiddleware
 
-The ``django.middleware.security.SecurityMiddleware`` performs several different
-tasks for you. Each one can be independently enabled or disabled with a setting.
+The ``django.middleware.security.SecurityMiddleware`` provides several security
+enhancements to the request/response cycle. Each one can be independently
+enabled or disabled with a setting in the :setting:`SECURITY_MIDDLEWARE_CONFIG`
+dictionary.
 
 .. _http-strict-transport-security:
 
