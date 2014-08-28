@@ -28,11 +28,13 @@ class SQLCommandsTestCase(TestCase):
         for statement in output:
             create_table = create_table_re.match(statement)
             if create_table:
-                tables.add(create_table.group('table'))
+                # Lower since Oracle's table names are upper cased.
+                tables.add(create_table.group('table').lower())
                 continue
             reference = reference_re.match(statement)
             if reference:
-                table = reference.group('table')
+                # Lower since Oracle's table names are upper cased.
+                table = reference.group('table').lower()
                 self.assertIn(
                     table, tables, "The table %s is referenced before its creation." % table
                 )
