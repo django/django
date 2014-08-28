@@ -854,6 +854,23 @@ TEST_TBLSPACE_TMP
     Use the :setting:`TBLSPACE_TMP <TEST_TBLSPACE_TMP>` entry in the
     :setting:`TEST <DATABASE-TEST>` dictionary.
 
+.. setting:: DATA_UPLOAD_MAX_MEMORY_SIZE
+
+DATA_UPLOAD_MAX_MEMORY_SIZE
+---------------------------
+
+.. versionadded:: 1.8
+
+Default: ``2621440`` (i.e. 2.5 MB).
+
+The maximum size (in bytes) that a request body may be before raising a
+:exc:`~django.core.exceptions.SuspiciousOperation` error. This value is applied
+when accessing ``request.body`` or ``request.POST`` and is calculated against
+the total request size excluding any file upload data. You can set it to
+``None`` to disable the check.
+
+See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
+
 .. setting:: DATABASE_ROUTERS
 
 DATABASE_ROUTERS
@@ -1257,6 +1274,8 @@ Default: ``2621440`` (i.e. 2.5 MB).
 
 The maximum size (in bytes) that an upload will be before it gets streamed to
 the file system. See :doc:`/topics/files` for details.
+
+See also :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`.
 
 .. setting:: FILE_UPLOAD_DIRECTORY_PERMISSIONS
 
