@@ -1339,7 +1339,7 @@ Miscellaneous
   (similarly to what one gets with :setting:`DEBUG = True <DEBUG>` at
   development-time) has been moved to a new class that lives in the
   ``staticfiles`` application (the one actually in charge of such feature):
-  :class:`django.contrib.staticfiles.testing.StaticLiveServerCase`. In other
+  :class:`django.contrib.staticfiles.testing.StaticLiveServerTestCase`. In other
   words, ``LiveServerTestCase`` itself is less powerful but at the same time
   has less magic.
 
