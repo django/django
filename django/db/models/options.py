@@ -344,7 +344,7 @@ class Options(object):
         Returns a list of all concrete data fields on the model and its parents.
         All hidden and proxy fields are omitted.
         """
-        return self._make_immutable_fields_list(f for f in self.fields if f.column is not None)
+        return self._make_immutable_fields_list(f for f in self.fields if f.concrete)
 
     @cached_property
     def local_concrete_fields(self):
@@ -352,7 +352,7 @@ class Options(object):
         Returns a list of all concrete data fields on the model.
         All hidden and proxy fields are omitted.
         """
-        return self._make_immutable_fields_list(f for f in self.local_fields if f.column is not None)
+        return self._make_immutable_fields_list(f for f in self.local_fields if f.concrete)
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_fields_with_model(self):
