@@ -487,7 +487,7 @@ files in app directories.
 Specialized test case to support 'live testing'
 -----------------------------------------------
 
-.. class:: testing.StaticLiveServerCase
+.. class:: testing.StaticLiveServerTestCase
 
 This unittest TestCase subclass extends :class:`django.test.LiveServerTestCase`.
 
@@ -504,5 +504,5 @@ transparently overlay at test execution-time the assets provided by the
 
 .. versionadded:: 1.7
 
-    ``StaticLiveServerCase`` is new in Django 1.7. Previously its functionality
-    was provided by :class:`django.test.LiveServerTestCase`.
+    ``StaticLiveServerTestCase`` is new in Django 1.7. Previously its
+    functionality was provided by :class:`django.test.LiveServerTestCase`.

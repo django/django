@@ -1,6 +1,6 @@
 """
 A subset of the tests in tests/servers/tests exercicing
-django.contrib.staticfiles.testing.StaticLiveServerCase instead of
+django.contrib.staticfiles.testing.StaticLiveServerTestCase instead of
 django.test.LiveServerTestCase.
 """
 
@@ -11,7 +11,7 @@ from django.test import override_settings
 from django.utils.six.moves.urllib.request import urlopen
 from django.utils._os import upath
 
-from django.contrib.staticfiles.testing import StaticLiveServerCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 
 TEST_ROOT = os.path.dirname(upath(__file__))
@@ -23,7 +23,7 @@ TEST_SETTINGS = {
 }
 
 
-class LiveServerBase(StaticLiveServerCase):
+class LiveServerBase(StaticLiveServerTestCase):
 
     available_apps = []
 
@@ -94,8 +94,8 @@ class StaticLiveServerView(LiveServerBase):
 
     def test_collectstatic_emulation(self):
         """
-        Test that StaticLiveServerCase use of staticfiles' serve() allows it to
-        discover app's static assets without having to collectstatic first.
+        Test that StaticLiveServerTestCase use of staticfiles' serve() allows it
+        to discover app's static assets without having to collectstatic first.
         """
         f = self.urlopen('/static/test/file.txt')
         self.assertEqual(f.read().rstrip(b'\r\n'), b'In app media directory.')

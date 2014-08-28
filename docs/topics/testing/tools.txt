@@ -773,9 +773,9 @@ out the `full reference`_ for more details.
 
     If you use the ``staticfiles`` app in your project and need to perform live
     testing then you might want to consider using the
-    :class:`~django.contrib.staticfiles.testing.StaticLiveServerCase` subclass
-    shipped with it instead because it's the one that implements the original
-    behavior now. See :ref:`the relevant documentation
+    :class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`
+    subclass shipped with it instead because it's the one that implements the
+    original behavior now. See :ref:`the relevant documentation
     <staticfiles-testing-support>` for more details.
 
 .. note::
