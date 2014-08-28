@@ -36,7 +36,7 @@ def sql_create(app_config, style, connection):
     # We trim models from the current app so that the sqlreset command does not
     # generate invalid SQL (leaving models out of known_models is harmless, so
     # we can be conservative).
-    app_models = app_config.get_models(include_auto_created=True)
+    app_models = list(app_config.get_models(include_auto_created=True))
     final_output = []
     tables = connection.introspection.table_names()
     known_models = set(model for model in connection.introspection.installed_models(tables) if model not in app_models)
