@@ -154,9 +154,9 @@ class override(ContextDecorator):
     def __init__(self, language, deactivate=False):
         self.language = language
         self.deactivate = deactivate
-        self.old_language = get_language()
 
     def __enter__(self):
+        self.old_language = get_language()
         if self.language is not None:
             activate(self.language)
         else:
