@@ -123,34 +123,4 @@ you run ``./manage.py checksecure``. However, some of these checks may not be
 appropriate for your particular deployment configuration. For instance, if you
 do your HTTP->HTTPS redirection in a load balancer, it'd be irritating for
 ``checksecure`` to constantly warn you about not having enabled
-:ref:`SECURE_SSL_REDIRECT`. You can customize the list of checks by setting the
-:ref:`SECURE_CHECKS` setting; you can just copy the default value and remove a
-check or two; you can also write your own :ref:`custom checks <custom-checks>`.
-
-.. _custom-checks:
-
-Writing custom check functions
-------------------------------
-
-A ``checksecure`` check function can be any Python function that takes no
-arguments and returns a Python iterable of warnings (an empty iterable if it
-finds nothing to warn about).
-
-Optionally, the function can have a ``messages`` attribute, which is a
-dictionary mapping short warning codes returned by the function (which will be
-displayed by ``checksecure`` if run with ``--verbosity=0``) to longer
-explanations which will be displayed by ``checksecure`` when running at its
-default verbosity level. For instance::
-
-    from django.conf import settings
-
-    def check_dont_let_the_bad_guys_in():
-        if settings.LET_THE_BAD_GUYS_IN:
-            return ["BAD_GUYS_LET_IN"]
-        return []
-
-    check_dont_let_the_bad_guys_in.messages = {
-        "BAD_GUYS_LET_IN": (
-            "Longer explanation of why it's a bad idea to let the bad guys in, "
-            "and how to correct the situation.")
-    }
+:ref:`SECURE_SSL_REDIRECT`. You can customize the list of checks by ...

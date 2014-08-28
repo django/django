@@ -208,7 +208,7 @@ class CheckSecurityMiddlewareTest(TestCase):
         self.assertEqual(
             self.func(None),
             [checks.Warning(
-                ("You do not have 'django.contrib.secure.middleware.SecurityMiddleware' "
+                ("You do not have 'django.middleware.security.SecurityMiddleware' "
                 "in your MIDDLEWARE_CLASSES so the SECURE_HSTS_SECONDS, "
                 "SECURE_CONTENT_TYPE_NOSNIFF, "
                 "SECURE_BROWSER_XSS_FILTER and SECURE_SSL_REDIRECT settings "
@@ -219,7 +219,7 @@ class CheckSecurityMiddlewareTest(TestCase):
         )
 
     @override_settings(
-        MIDDLEWARE_CLASSES=["django.contrib.secure.middleware.SecurityMiddleware"])
+        MIDDLEWARE_CLASSES=["django.middleware.security.SecurityMiddleware"])
     def test_with_security_middleware(self):
         self.assertEqual(self.func(None), [])
 

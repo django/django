@@ -622,7 +622,6 @@ STATICFILES_FINDERS = (
 # Migration module overrides for apps, by app label.
 MIGRATION_MODULES = {}
 
-
 #######################
 # SECURITY MIDDLEWARE #
 #######################
@@ -633,20 +632,6 @@ SECURE_BROWSER_XSS_FILTER = False
 SECURE_SSL_REDIRECT = False
 SECURE_SSL_HOST = None
 SECURE_REDIRECT_EXEMPT = []
-SECURE_CHECKS = [
-    "django.contrib.secure.checks.csrf.check_csrf_middleware",
-    "django.contrib.secure.checks.sessions.check_session_cookie_secure",
-    "django.contrib.secure.checks.sessions.check_session_cookie_httponly",
-    "django.contrib.secure.checks.base.check_security_middleware",
-    "django.contrib.secure.checks.base.check_sts",
-    "django.contrib.secure.checks.base.check_sts_include_subdomains",
-    "django.contrib.secure.checks.base.check_xframe_options_middleware",
-    "django.contrib.secure.checks.base.check_content_type_nosniff",
-    "django.contrib.secure.checks.base.check_xss_filter",
-    "django.contrib.secure.checks.base.check_ssl_redirect",
-    "django.contrib.secure.checks.base.check_secret_key",
-]
-
 
 #################
 # SYSTEM CHECKS #

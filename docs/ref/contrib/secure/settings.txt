@@ -1,29 +1,6 @@
 Settings Reference
 ==================
 
-.. _SECURE_CHECKS:
-
-SECURE_CHECKS
--------------
-
-A list of strings. Each string should be a Python dotted path to a function
-implementing a configuration check that will be run by the :doc:`checksecure
-management command <checksecure>`.
-
-Defaults to::
-
-    [
-        "djangosecure.check.csrf.check_csrf_middleware",
-        "djangosecure.check.sessions.check_session_cookie_secure",
-        "djangosecure.check.sessions.check_session_cookie_httponly",
-        "djangosecure.check.djangosecure.check_security_middleware",
-        "djangosecure.check.djangosecure.check_sts",
-        "djangosecure.check.djangosecure.check_frame_deny",
-        "djangosecure.check.djangosecure.check_content_type_nosniff",
-        "djangosecure.check.djangosecure.check_xss_filter",
-        "djangosecure.check.djangosecure.check_ssl_redirect",
-    ]
-
 .. _SECURE_HSTS_SECONDS:
 
 SECURE_HSTS_SECONDS

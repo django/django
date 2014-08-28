@@ -18,6 +18,8 @@ class Command(BaseCommand):
             help='Run only checks labeled with given tag.')
         parser.add_argument('--list-tags', action='store_true', dest='list_tags',
             help='List available tags.')
+        parser.add_argument('--deploy', action='store_true', dest='deploy',
+            help='Check deployment settings')
 
     def handle(self, *app_labels, **options):
         if options.get('list_tags'):
@@ -34,4 +36,9 @@ class Command(BaseCommand):
             invalid_tag = next(tag for tag in tags if not checks.tag_exists(tag))
             raise CommandError('There is no system check with the "%s" tag.' % invalid_tag)
 
-        self.check(app_configs=app_configs, tags=tags, display_num_errors=True)
+        self.check(
+            app_configs=app_configs,
+            tags=tags,
+            display_num_errors=True,
+            deployment_checks=options['deploy'],
+        )

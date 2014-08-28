@@ -1,9 +1,8 @@
 SecurityMiddleware
 ==================
 
-The ``django.contrib.secure.middleware.SecurityMiddleware`` performs several
-different tasks for you. Each one can be independently enabled or disabled with
-a setting.
+The ``django.middleware.security.SecurityMiddleware`` performs several different
+tasks for you. Each one can be independently enabled or disabled with a setting.
 
 .. contents:: :local:
 

@@ -10,6 +10,7 @@ from .registry import register, run_checks, tag_exists, Tags
 import django.core.checks.compatibility.django_1_6_0  # NOQA
 import django.core.checks.compatibility.django_1_7_0  # NOQA
 import django.core.checks.model_checks  # NOQA
+import django.core.checks.secure.base  # NOQA
 
 __all__ = [
     'CheckMessage',

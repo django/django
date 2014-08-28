@@ -21,8 +21,9 @@ class CheckRegistry(object):
 
     def __init__(self):
         self.registered_checks = []
+        self.deployment_checks = []
 
-    def register(self, *tags):
+    def register(self, *tags, **kwargs):
         """
         Decorator. Register given function `f` labeled with given `tags`. The
         function should receive **kwargs and return list of Errors and
@@ -37,24 +38,30 @@ class CheckRegistry(object):
                 return errors
 
         """
+        kwargs.setdefault('deploy', False)
 
         def inner(check):
             check.tags = tags
-            if check not in self.registered_checks:
+            if kwargs['deploy']:
+                if check not in self.deployment_checks:
+                    self.deployment_checks.append(check)
+            elif check not in self.registered_checks:
                 self.registered_checks.append(check)
             return check
 
         return inner
 
-    def run_checks(self, app_configs=None, tags=None):
+    def run_checks(self, app_configs=None, tags=None, deployment_checks=False):
         """ Run all registered checks and return list of Errors and Warnings.
         """
         errors = []
+        checks = list(self.registered_checks)
+        if deployment_checks:
+            checks.extend(self.deployment_checks)
+
         if tags is not None:
-            checks = [check for check in self.registered_checks
+            checks = [check for check in checks
                       if hasattr(check, 'tags') and set(check.tags) & set(tags)]
-        else:
-            checks = self.registered_checks
 
         for check in checks:
             new_errors = check(app_configs=app_configs)
