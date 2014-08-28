@@ -262,9 +262,9 @@ class override(object):
     """
     def __init__(self, timezone):
         self.timezone = timezone
-        self.old_timezone = getattr(_active, 'value', None)
 
     def __enter__(self):
+        self.old_timezone = getattr(_active, 'value', None)
         if self.timezone is None:
             deactivate()
         else:

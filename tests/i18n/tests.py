@@ -74,7 +74,6 @@ class TranslationTests(TestCase):
             deactivate()
 
     def test_override_decorator(self):
-        activate('de')
 
         @translation.override('pl')
         def func_pl():
@@ -85,10 +84,29 @@ class TranslationTests(TestCase):
             self.assertEqual(get_language(), settings.LANGUAGE_CODE)
 
         try:
+            activate('de')
             func_pl()
             self.assertEqual(get_language(), 'de')
             func_none()
             self.assertEqual(get_language(), 'de')
+        finally:
+            deactivate()
+
+    def test_override_exit(self):
+        """
+        Test that the language restored is the one used when the function was
+        called, not the one used when the decorator was initialized. refs #23381
+        """
+        activate('fr')
+        @translation.override('pl')
+        def func_pl():
+            pass
+        deactivate()
+
+        try:
+            activate('en')
+            func_pl()
+            self.assertEqual(get_language(), 'en')
         finally:
             deactivate()
 
