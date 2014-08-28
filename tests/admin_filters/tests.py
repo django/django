@@ -134,6 +134,18 @@ class BookAdminWithUnderscoreLookupAndTuple(BookAdmin):
     list_filter = ('year', ('author__email', AllValuesFieldListFilter), 'contributors', 'is_best_seller', 'date_registered', 'no')
 
 
+class BookAdminWithCustomQueryset(ModelAdmin):
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(BookAdminWithCustomQueryset, self).__init__(*args, **kwargs)
+
+    list_filter = ('year',)
+
+    def get_queryset(self, request):
+        return super(BookAdminWithCustomQueryset, self).get_queryset(request).filter(author=self.user)
+
+
 class BookAdminRelatedOnlyFilter(ModelAdmin):
     list_filter = (
         'year', 'is_best_seller', 'date_registered', 'no',
@@ -364,6 +376,22 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[2]['selected'], True)
         self.assertEqual(choices[2]['query_string'], '?year=2002')
+
+    def test_allvaluesfieldlistfilter_custom_qs(self):
+        # Make sure that correct filters are returned with custom querysets
+        modeladmin = BookAdminWithCustomQueryset(self.alfred, Book, site)
+        request = self.request_factory.get('/')
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        filterspec = changelist.get_filters(request)[0][0]
+        choices = list(filterspec.choices(changelist))
+        # Should have 'All', 1999 and 2009 options i.e. the subset of years of
+        # books written by alfred (which is the filtering criteria set by
+        # BookAdminWithCustomQueryset.get_queryset())
+        self.assertEqual(3, len(choices))
+        self.assertEqual(choices[0]['query_string'], '?')
+        self.assertEqual(choices[1]['query_string'], '?year=1999')
+        self.assertEqual(choices[2]['query_string'], '?year=2009')
 
     def test_relatedfieldlistfilter_foreignkey(self):
         modeladmin = BookAdmin(Book, site)
