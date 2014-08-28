@@ -450,52 +450,154 @@ Versions affected
 * Django 1.5 `(patch) <https://github.com/django/django/commit/22b74fa09d7ccbc8c52270d648a0da7f3f0fa2bc>`__
 
 
-April 21, 2014 - CVE-2014-2014-0472
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+April 21, 2014 - CVE-2014-0472
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`CVE-2014-0472 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0472&cid=2>`_: Unexpected code execution using ``reverse()``. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`_
-
-Versions affected
------------------
-
-* Django 1.4 `(patch <https://github.com/django/django/commit/c1a8c420fe4b27fb2caf5e46d23b5712fc0ac535>`_)
-
-* Django 1.5 `(patch <https://github.com/django/django/commit/2a5bcb69f42b84464b24b5c835dca6467b6aa7f1>`_)
-
-* Django 1.6 `(patch <https://github.com/django/django/commit/4352a50871e239ebcdf64eee6f0b88e714015c1b>`_)
-
-* Django 1.7 `(patch <https://github.com/django/django/commit/546740544d7f69254a67b06a3fc7fa0c43512958>`_)
-
-
-April 21, 2014 - CVE-2014-2014-0473
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`CVE-2014-0473 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0473&cid=2>`_: Caching of anonymous pages could reveal CSRF token. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`_
+`CVE-2014-0472 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0472&cid=2>`_: Unexpected code execution using ``reverse()``. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`__
 
 Versions affected
 -----------------
 
-* Django 1.4 `(patch <https://github.com/django/django/commit/1170f285ddd6a94a65f911a27788ba49ca08c0b0>`_)
+* Django 1.4 `(patch) <https://github.com/django/django/commit/c1a8c420fe4b27fb2caf5e46d23b5712fc0ac535>`__
 
-* Django 1.5 `(patch <https://github.com/django/django/commit/6872f42757d7ef6a97e0b6ec5db4d2615d8a2bd8>`_)
+* Django 1.5 `(patch) <https://github.com/django/django/commit/2a5bcb69f42b84464b24b5c835dca6467b6aa7f1>`__
 
-* Django 1.6 `(patch <https://github.com/django/django/commit/d63e20942f3024f24cb8cd85a49461ba8a9b6736>`_)
+* Django 1.6 `(patch) <https://github.com/django/django/commit/4352a50871e239ebcdf64eee6f0b88e714015c1b>`__
 
-* Django 1.7 `(patch <https://github.com/django/django/commit/380545bf85cbf17fc698d136815b7691f8d023ca>`_)
+* Django 1.7 `(patch) <https://github.com/django/django/commit/546740544d7f69254a67b06a3fc7fa0c43512958>`__
 
 
-April 21, 2014 - CVE-2014-2014-0472
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+April 21, 2014 - CVE-2014-0473
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`CVE-2014-0474 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0474&cid=2>`_: MySQL typecasting causes unexpected query results. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`_
+`CVE-2014-0473 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0473&cid=2>`_: Caching of anonymous pages could reveal CSRF token. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`__
 
 Versions affected
 -----------------
 
-* Django 1.4 `(patch <https://github.com/django/django/commit/aa80f498de6d687e613860933ac58433ab71ea4b>`_)
+* Django 1.4 `(patch) <https://github.com/django/django/commit/1170f285ddd6a94a65f911a27788ba49ca08c0b0>`__
 
-* Django 1.5 `(patch <https://github.com/django/django/commit/985434fb1d6bf2335bf96c6ebf91c3674f1f399f>`_)
+* Django 1.5 `(patch) <https://github.com/django/django/commit/6872f42757d7ef6a97e0b6ec5db4d2615d8a2bd8>`__
 
-* Django 1.6 `(patch <https://github.com/django/django/commit/5f0829a27e85d89ad8c433f5c6a7a7d17c9e9292>`_)
+* Django 1.6 `(patch) <https://github.com/django/django/commit/d63e20942f3024f24cb8cd85a49461ba8a9b6736>`__
 
-* Django 1.7 `(patch <https://github.com/django/django/commit/34526c2f56b863c2103655a0893ac801667e86ea>`_)
+* Django 1.7 `(patch) <https://github.com/django/django/commit/380545bf85cbf17fc698d136815b7691f8d023ca>`__
+
+
+April 21, 2014 - CVE-2014-0474
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2014-0474 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0474&cid=2>`_: MySQL typecasting causes unexpected query results. `Full description <https://www.djangoproject.com/weblog/2014/apr/21/security/>`__
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch) <https://github.com/django/django/commit/aa80f498de6d687e613860933ac58433ab71ea4b>`__
+
+* Django 1.5 `(patch) <https://github.com/django/django/commit/985434fb1d6bf2335bf96c6ebf91c3674f1f399f>`__
+
+* Django 1.6 `(patch) <https://github.com/django/django/commit/5f0829a27e85d89ad8c433f5c6a7a7d17c9e9292>`__
+
+* Django 1.7 `(patch) <https://github.com/django/django/commit/34526c2f56b863c2103655a0893ac801667e86ea>`__
+
+
+May 18, 2014 - CVE-2014-1418
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2014-1418 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-1418&cid=2>`_: Caches may be allowed to store and serve private data. `Full description <https://www.djangoproject.com/weblog/2014/may/14/security-releases-issued/>`__
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch) <https://github.com/django/django/commit/28e23306aa53bbbb8fb87db85f99d970b051026c>`__
+
+* Django 1.5 `(patch) <https://github.com/django/django/commit/4001ec8698f577b973c5a540801d8a0bbea1205b>`__
+
+* Django 1.6 `(patch) <https://github.com/django/django/commit/1abcf3a808b35abae5d425ed4d44cb6e886dc769>`__
+
+* Django 1.7 `(patch) <https://github.com/django/django/commit/7fef18ba9e5a8b47bc24b5bb259c8bf3d3879f2a>`__
+
+
+May 18, 2014 - CVE-2014-3730
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2014-3730 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-3730&cid=2>`_: Malformed URLs from user input incorrectly validated. `Full description <https://www.djangoproject.com/weblog/2014/may/14/security-releases-issued/>`__
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch) <https://github.com/django/django/commit/7feb54bbae3f637ab3c4dd4831d4385964f574df>`__
+
+* Django 1.5 `(patch) <https://github.com/django/django/commit/ad32c218850ad40972dcef57beb460f8c979dd6d>`__
+
+* Django 1.6 `(patch) <https://github.com/django/django/commit/601107524523bca02376a0ddc1a06c6fdb8f22f3>`__
+
+* Django 1.7 `(patch) <https://github.com/django/django/commit/e7b0cace455c2da24492660636bfd48c45a19cdf>`__
+
+
+August 20, 2014 - CVE-2014-0480
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2014-0480 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0480&cid=2>`_: reverse() can generate URLs pointing to other hosts. `Full description <https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch) <https://github.com/django/django/commit/c2fe73133b62a1d9e8f7a6b43966570b14618d7e>`__
+
+* Django 1.5 `(patch) <https://github.com/django/django/commit/45ac9d4fb087d21902469fc22643f5201d41a0cd>`__
+
+* Django 1.6 `(patch) <https://github.com/django/django/commit/da051da8df5e69944745072611351d4cfc6435d5>`__
+
+* Django 1.7 `(patch) <https://github.com/django/django/commit/bf650a2ee78c6d1f4544a875dcc777cf27fe93e9>`__
+
+
+August 20, 2014 - CVE-2014-0481
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2014-0481 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0481&cid=2>`_: File upload denial of service. `Full description <https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch) <https://github.com/django/django/commit/30042d475bf084c6723c6217a21598d9247a9c41>`__
+
+* Django 1.5 `(patch) <https://github.com/django/django/commit/26cd48e166ac4d84317c8ee6d63ac52a87e8da99>`__
+
+* Django 1.6 `(patch) <https://github.com/django/django/commit/dd0c3f4ee1a30c1a1e6055061c6ba6e58c6b54d1>`__
+
+* Django 1.7 `(patch) <https://github.com/django/django/commit/3123f8452cf49071be9110e277eea60ba0032216>`__
+
+
+August 20, 2014 - CVE-2014-0482
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2014-0482 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0482&cid=2>`_: RemoteUserMiddleware session hijacking. `Full description <https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch) <https://github.com/django/django/commit/c9e3b9949cd55f090591fbdc4a114fcb8368b6d9>`__
+
+* Django 1.5 `(patch) <https://github.com/django/django/commit/dd68f319b365f6cb38c5a6c106faf4f6142d7d88>`__
+
+* Django 1.6 `(patch) <https://github.com/django/django/commit/0268b855f9eab3377f2821164ef3e66037789e09>`__
+
+* Django 1.7 `(patch) <https://github.com/django/django/commit/1a45d059c70385fcd6f4a3955f3b4e4cc96d0150>`__
+
+
+August 20, 2014 - CVE-2014-0483
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2014-0483 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-0483&cid=2>`_: Data leakage via querystring manipulation in admin. `Full description <https://www.djangoproject.com/weblog/2014/aug/20/security/>`__
+
+Versions affected
+-----------------
+
+* Django 1.4 `(patch) <https://github.com/django/django/commit/027bd348642007617518379f8b02546abacaa6e0>`__
+
+* Django 1.5 `(patch) <https://github.com/django/django/commit/2a446c896e7c814661fb9c4f212b071b2a7fa446>`__
+
+* Django 1.6 `(patch) <https://github.com/django/django/commit/f7c494f2506250b8cb5923714360a3642ed63e0f>`__
+
+* Django 1.7 `(patch) <https://github.com/django/django/commit/2b31342cdf14fc20e07c43d258f1e7334ad664a6>`__
