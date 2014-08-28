@@ -350,10 +350,100 @@ The following checks are performed when a model contains a
 Secure
 ------
 
-The following checks are perform if ``contrib.security`` is in
-:setting:`INSTALLED_APPS`.
+The security checks do not make your site secure. They does not audit code,
+do intrusion detection, or doing anything particularly complex. Rather, they
+can be thought of as automating a low-hanging-fruit checklist. They help
+you remember the stupid simple things that improve your site's security.
 
-...
+Some of these checks may not be appropriate for your particular deployment
+configuration. For instance, if you do your HTTP->HTTPS redirection in a load
+balancer, it'd be irritating to be constantly warned about not having enabled
+:setting:`SECURE_SSL_REDIRECT`. Use :setting:`SILENCED_SYSTEM_CHECKS` as needed.
+
+# TODO: convert this list to the format of the others.
+
+The following check functions are built-in to ``django.contrib.secure``, and
+will run by default:
+
+.. currentmodule:: djangosecure.check.djangosecure
+
+.. function:: check_security_middleware
+
+   Warns if :doc:`middleware` is not in your ``MIDDLEWARE_CLASSES``.
+
+.. function:: check_sts
+
+   Warns if :setting:`SECURE_HSTS_SECONDS` is not set to a non-zero value.
+
+.. function:: check_sts_include_subdomains
+
+   Warns if :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` is not ``True``.
+
+.. function:: check_xframe_options_middleware
+
+   Warns if :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` is
+   not in :setting:`MIDDLEWARE_CLASSES`.
+
+.. function:: check_content_type_nosniff
+
+   Warns if :setting:`SECURE_CONTENT_TYPE_NOSNIFF` is not ``True``.
+
+.. function:: check_xss_filter
+
+   Warns if :setting:`SECURE_BROWSER_XSS_FILTER` is not ``True``.
+
+.. function:: check_ssl_redirect
+
+   Warns if :setting:`SECURE_SSL_REDIRECT` is not ``True``.
+
+.. function:: check_secret_key
+
+   Warns if `SECRET_KEY`_ is empty, missing, or has a very low number of different characters.
+
+.. _SECRET_KEY: http://docs.djangoproject.com/en/stable/ref/settings/#secret-key
+
+.. currentmodule:: djangosecure.check.sessions
+
+.. function:: check_session_cookie_secure
+
+   Warns if you appear to be using Django's `session framework`_ and the
+   `SESSION_COOKIE_SECURE`_ setting is not ``True``. This setting marks
+   Django's session cookie as a secure cookie, which instructs browsers not to
+   send it along with any insecure requests. Since it's trivial for a packet
+   sniffer (e.g. `Firesheep`_) to hijack a user's session if the session cookie
+   is sent unencrypted, there's really no good excuse not to have this on. (It
+   will prevent you from using sessions on insecure requests; that's a good
+   thing).
+
+.. _Firesheep: http://codebutler.com/firesheep
+.. _session framework: https://docs.djangoproject.com/en/stable/topics/http/sessions/
+.. _SESSION_COOKIE_SECURE: https://docs.djangoproject.com/en/stable/topics/http/sessions/#session-cookie-secure
+
+.. function:: check_session_cookie_httponly
+
+   Warns if you appear to be using Django's `session framework`_ and the
+   `SESSION_COOKIE_HTTPONLY`_ setting is not ``True``. This setting marks
+   Django's session cookie as "HTTPOnly", meaning (in supporting browsers) its
+   value can't be accessed from client-side scripts. Turning this on makes it
+   less trivial for an attacker to escalate a cross-site scripting
+   vulnerability into full hijacking of a user's session. There's not much
+   excuse for leaving this off, either: if your code depends on reading session
+   cookies from Javascript, you're probably doing it wrong.
+
+.. _SESSION_COOKIE_HTTPONLY: https://docs.djangoproject.com/en/stable/topics/http/sessions/#session-cookie-httponly
+
+.. currentmodule:: djangosecure.check.csrf
+
+.. function:: check_csrf_middleware
+
+   Warns if you do not have Django's built-in `CSRF protection`_ enabled
+   globally via the `CSRF view middleware`_. It's important to CSRF protect any
+   view that modifies server state; if you choose to do that piecemeal via the
+   `csrf_protect`_ view decorator instead, just disable this check.
+
+.. _CSRF protection: https://docs.djangoproject.com/en/stable/ref/contrib/csrf/
+.. _CSRF view middleware: https://docs.djangoproject.com/en/stable/ref/contrib/csrf/#how-to-use-it
+.. _csrf_protect: https://docs.djangoproject.com/en/stable/ref/contrib/csrf/#django.views.decorators.csrf.csrf_protect
 
 Sites
 -----

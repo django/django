@@ -2580,6 +2580,106 @@ to override. See :ref:`message-displaying` above for more details.
    according to the values in the above :ref:`constants table
    <message-level-constants>`.
 
+.. _security-middleware-settings:
+
+Settings Reference
+==================
+
+.. setting:: SECURE_HSTS_SECONDS
+
+SECURE_HSTS_SECONDS
+-------------------
+
+Default: ``0``
+
+If set to a non-zero integer value, causes the
+:class:`~django.middleware.security.SecurityMiddleware` to set the
+:ref:`http-strict-transport-security` header on all responses that do not
+already have that header.
+
+.. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
+
+SECURE_HSTS_INCLUDE_SUBDOMAINS
+------------------------------
+
+Default: ``False`` (only for backwards compatibility; in most cases if HSTS
+is used it should be set to ``True``).
+
+If ``True``, causes the
+:class:`~django.middleware.security.SecurityMiddleware` to add the
+``includeSubDomains`` tag to the :ref:`http-strict-transport-security` header.
+
+Has no effect unless :setting:`SECURE_HSTS_SECONDS` is set to a non-zero value.
+
+.. setting:: SECURE_CONTENT_TYPE_NOSNIFF
+
+SECURE_CONTENT_TYPE_NOSNIFF
+---------------------------
+
+Default: ``False``
+
+If set to ``True``, causes the
+:class:`~django.middleware.security.SecurityMiddleware` to set the
+:ref:`x-content-type-options` header on all responses that do not already
+have that header.
+
+.. setting:: SECURE_BROWSER_XSS_FILTER
+
+SECURE_BROWSER_XSS_FILTER
+-------------------------
+
+Default: ``False``
+
+If set to ``True``, causes the
+:class:`~django.middleware.security.SecurityMiddleware` to set the
+:ref:`x-xss-protection` header on all responses that do not already have that
+header.
+
+.. setting:: SECURE_REDIRECT_EXEMPT
+
+SECURE_REDIRECT_EXEMPT
+----------------------
+
+Default: ``[]``
+
+Should be a list of regular expressions. Any URL path matching a regular
+expression in this list will not be redirected to HTTPS, if
+:setting:`SECURE_SSL_REDIRECT` is ``True`` (if it is ``False`` this setting has
+no effect).
+
+.. setting:: SECURE_SSL_HOST
+
+SECURE_SSL_HOST
+---------------
+
+Default: ``None``
+
+If set to a string (e.g. ``secure.example.com``), all SSL redirects will be
+directed to this host rather than the originally-requested host
+(e.g. ``www.example.com``). If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
+setting has no effect.
+
+.. setting:: SECURE_SSL_REDIRECT
+
+SECURE_SSL_REDIRECT
+-------------------
+
+Default: ``False``.
+
+If set to ``True``, causes the
+:class:`~django.middleware.security.SecurityMiddleware` to
+:ref:`redirect <ssl-redirect>` all non-HTTPS requests to HTTPS (except for
+those URLs matching a regular expression listed in
+:setting:`SECURE_REDIRECT_EXEMPT`).
+
+.. note::
+
+   If turning this to ``True`` causes infinite redirects, it probably means
+   your site is running behind a proxy and can't tell which requests are secure
+   and which are not. Your proxy likely sets a header to indicate secure
+   requests; you can correct the problem by finding out what that header is and
+   configuring the :setting:`SECURE_PROXY_SSL_HEADER` setting accordingly.
+
 .. _settings-sessions:
 
 Sessions
