@@ -1075,12 +1075,12 @@ msgstr "жел"
 #: utils/dates.py:31
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr "Ақп."
+msgstr "Қаң."
 
 #: utils/dates.py:32
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr "Қаң."
+msgstr "Ақп."
 
 #: utils/dates.py:33
 msgctxt "abbrev. month"
