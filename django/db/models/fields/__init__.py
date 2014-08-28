@@ -34,13 +34,21 @@ from django.utils.itercompat import is_iterable
 # makes these strings unicode
 __all__ = [str(x) for x in (
     'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
-    'BooleanField', 'CharField', 'CommaSeparatedIntegerField', 'DateField',
-    'DateTimeField', 'DecimalField', 'EmailField', 'Empty', 'Field',
-    'FieldDoesNotExist', 'FilePathField', 'FloatField',
-    'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
+    'BooleanField', 'CharField', 'ConcreteFlagMixin',
+    'CommaSeparatedIntegerField', 'DateField', 'DateTimeField',
+    'DecimalField', 'EmailField', 'Empty', 'Field', 'FieldDoesNotExist',
+    'FilePathField', 'FloatField', 'GenericIPAddressField', 'IPAddressField',
+    'IntegerField', 'NOT_PROVIDED',
     'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
     'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
 )]
+
+
+class ConcreteFlagMixin(object):
+
+    @cached_property
+    def concrete(self):
+        return self.column is not None
 
 
 class Empty(object):
