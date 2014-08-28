@@ -1,5 +1,4 @@
 import datetime
-from itertools import chain
 
 from django.conf import settings
 from django.core.exceptions import FieldError
@@ -723,7 +722,7 @@ class SQLCompiler(object):
                             fields = self.query.get_meta().concrete_fields
                         else:
                             fields = []
-                        fields = chain(fields, (f.field for f in self.query.related_select_cols))
+                        fields = list(fields) + [f.field for f in self.query.related_select_cols]
 
                         # If the field was deferred, exclude it from being passed
                         # into `resolve_columns` because it wasn't selected.
