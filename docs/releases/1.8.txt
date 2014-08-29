@@ -129,11 +129,6 @@ Minor features
 
 * ...
 
-:mod:``django.utils.translation``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ``django.utils.translation.override`` is now usable as a function decorator.
-
 Cache
 ^^^^^
 
