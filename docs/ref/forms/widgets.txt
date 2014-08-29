@@ -217,7 +217,12 @@ foundation for custom widgets.
     .. method:: value_from_datadict(data, files, name)
 
         Given a dictionary of data and this widget's name, returns the value
-        of this widget. Returns ``None`` if a value wasn't provided.
+        of this widget. ``files`` may contain data coming from
+        :attr:`request.FILES <django.http.HttpRequest.FILES>`. Returns ``None``
+        if a value wasn't provided. Note also that ``value_from_datadict`` may
+        be called more than once during handling of form data, so if you
+        customize it and add expensive processing, you should implement some
+        caching mechanism yourself.
 
 .. class:: MultiWidget(widgets, attrs=None)
 
