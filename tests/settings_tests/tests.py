@@ -273,6 +273,63 @@ class SettingsTests(TestCase):
         self.assertRaises(ValueError, setattr, settings,
             'ALLOWED_INCLUDE_ROOTS', '/var/www/ssi/')
 
+    def test_dict_setting(self):
+        """
+        Test that dictionary-type settings can be "complemented", that is existing
+        setting keys/values are not overriden by user settings, but merged into the
+        existing dict.
+        """
+        s = LazySettings()  # Start with fresh settings from global_settings.py
+        # Simply overwriting the key
+        s.configure(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}})
+        self.assertEqual(s.CACHES['default']['BACKEND'],
+                         'django.core.cache.backends.dummy.DummyCache')
+
+        s = LazySettings()
+        # More complex overwriting
+        s.configure(CACHES={
+            'default': {'LOCATION': 'unique-snowflake'},
+            'temp': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}
+        })
+        self.assertDictEqual(s.CACHES, {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                'LOCATION': 'unique-snowflake'
+            },
+            'temp': {
+                'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+            }
+        })
+
+    def test_dict_setting_clear_defaults(self):
+        """
+        Test the ability to deactivate the merge feature of dictionary settings.
+        """
+        s = LazySettings()
+        s.configure(CACHES={
+            '_clear_defaults': True,
+            'temp': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}
+        })
+        self.assertDictEqual(s.CACHES, {
+            '_clear_defaults': True,
+            'temp': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}
+        })
+
+        # Also work on a subkey
+        s = LazySettings()
+        s.configure(CACHES={
+            'default': {
+                '_clear_defaults': True,
+                'LOCATION': 'unique-snowflake',
+            }
+        })
+        self.assertDictEqual(s.CACHES, {
+            'default': {
+                '_clear_defaults': True,
+                'LOCATION': 'unique-snowflake',
+            }
+        })
+
 
 class TestComplexSettingOverride(TestCase):
     def setUp(self):

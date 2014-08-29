@@ -530,6 +530,9 @@ Miscellaneous
   widget to allow more customization. The undocumented ``url_markup_template``
   attribute was removed in favor of ``template_with_initial``.
 
+* When a dictionary setting is overridden in user settings, both dictionaries
+  are merged by default. See :ref:`dictionary-settings`.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
