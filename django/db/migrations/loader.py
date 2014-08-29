@@ -49,7 +49,7 @@ class MigrationLoader(object):
 
     @classmethod
     def migrations_module(cls, app_label):
-        if app_label in settings.MIGRATION_MODULES:
+        if settings.MIGRATION_MODULES.get(app_label):
             return settings.MIGRATION_MODULES[app_label]
         else:
             app_package_name = apps.get_app_config(app_label).name
