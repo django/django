@@ -7,8 +7,12 @@ Working with forms
 .. admonition:: About this document
 
     This document provides an introduction to the basics of web forms and how
-    they are handled in Django. For a more detailed look at specific areas of
-    the forms API, see :doc:`/ref/forms/api`, :doc:`/ref/forms/fields`, and
+    they are handled in Django.
+
+.. seealso::
+
+    For a more detailed look at specific areas of the forms API, see
+    :doc:`/ref/forms/api`, :doc:`/ref/forms/fields`, and
     :doc:`/ref/forms/validation`.
 
 Unless you're planning to build Web sites and applications that do nothing but

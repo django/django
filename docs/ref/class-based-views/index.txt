@@ -2,8 +2,11 @@
 Built-in Class-based views API
 ==============================
 
-Class-based views API reference. For introductory material, see
-:doc:`/topics/class-based-views/index`.
+Class-based views API reference.
+
+.. seealso::
+
+  For introductory material, see :doc:`/topics/class-based-views/index`.
 
 .. toctree::
    :maxdepth: 3

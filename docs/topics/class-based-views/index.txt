@@ -8,8 +8,12 @@ an example of some classes which can be used as views. These allow you
 to structure your views and reuse code by harnessing inheritance and
 mixins. There are also some generic views for simple tasks which we'll
 get to later, but you may want to design your own structure of
-reusable views which suits your use case. For full details, see the
-:doc:`class-based views reference documentation</ref/class-based-views/index>`.
+reusable views which suits your use case.
+
+.. seealso::
+
+    For more details and api documentation, see the :doc:`class-based views
+    reference documentation</ref/class-based-views/index>`.
 
 .. toctree::
    :maxdepth: 1

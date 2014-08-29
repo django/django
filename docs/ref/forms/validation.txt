@@ -5,6 +5,9 @@
 Form and field validation
 =========================
 
+.. seealso::
+    For introductory material about forms, see :doc:`/topics/forms/index`.
+
 Form validation happens when the data is cleaned. If you want to customize
 this process, there are various places you can change, each one serving a
 different purpose. Three types of cleaning methods are run during form
