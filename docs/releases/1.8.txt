@@ -526,7 +526,7 @@ Miscellaneous
   opposed to the instance name which you can still customize using
   ``AdminSite(name="...")``.
 
-* Interal changes were made to the :class:`~django.forms.ClearableFileInput`
+* Internal changes were made to the :class:`~django.forms.ClearableFileInput`
   widget to allow more customization. The undocumented ``url_markup_template``
   attribute was removed in favor of ``template_with_initial``.
 
