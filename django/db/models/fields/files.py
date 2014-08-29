@@ -361,6 +361,10 @@ class ImageFileDescriptor(FileDescriptor):
 
 
 class ImageFieldFile(ImageFile, FieldFile):
+
+    def __getstate__(self):
+        return self.__dict__
+
     def delete(self, save=True):
         # Clear the image dimensions cache
         if hasattr(self, '_dimensions_cache'):

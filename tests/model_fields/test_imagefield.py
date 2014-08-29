@@ -166,11 +166,12 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
 
     def test_pickle(self):
         """
-        Tests that ImageField can be pickled, unpickled, and that the
-        image of the unpickled version is the same as the original.
+        Tests that ImageField and ImageFieldFile can be pickled, unpickled,
+        and that the image of the unpickled version is the same as the original.
         """
         import pickle
 
+        # Pickle the person (ImageField)
         p = Person(name="Joe")
         p.mugshot.save("mug", self.file1)
         dump = pickle.dumps(p)
@@ -180,6 +181,11 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
 
         loaded_p = pickle.loads(dump)
         self.assertEqual(p.mugshot, loaded_p.mugshot)
+
+        # Pickle the mugshot (ImageFieldFile)
+        dump = pickle.dumps(p.mugshot)
+        loaded_mugshot = pickle.loads(dump)
+        self.assertEqual(p.mugshot.url, loaded_mugshot.url)
 
 
 @skipIf(Image is None, "Pillow is required to test ImageField")
