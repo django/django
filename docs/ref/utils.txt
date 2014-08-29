@@ -1049,6 +1049,10 @@ For a complete discussion on the usage of the following see the
     is ``True``. If you pass ``None`` as the language argument, a
     ``NullTranslations()`` instance is activated within the context.
 
+    .. versionchanged:: 1.8
+
+        ``override`` is now usable as a function decorator.
+
 .. function:: get_language()
 
     Returns the currently selected language code.
