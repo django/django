@@ -98,6 +98,7 @@ class TranslationTests(TestCase):
         called, not the one used when the decorator was initialized. refs #23381
         """
         activate('fr')
+
         @translation.override('pl')
         def func_pl():
             pass
