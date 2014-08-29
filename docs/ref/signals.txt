@@ -589,6 +589,8 @@ Arguments sent with this signal:
 ``sender``
     The handler class -- e.g. ``django.core.handlers.wsgi.WsgiHandler`` -- that
     handled the request.
+``environ``
+    The ``environ`` dictionary provided to the request.
 
 request_finished
 ----------------

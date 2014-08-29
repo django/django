@@ -807,6 +807,10 @@ Signals
   ``'app_label.ModelName'`` form – just like related fields – to lazily
   reference their senders.
 
+* The ``environ`` argument was added to the
+  :data:`~django.core.signals.request_started` signal, containing the WSGI
+  environment structure from the request.
+
 Templates
 ^^^^^^^^^
 
