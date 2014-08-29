@@ -523,17 +523,16 @@ Baptiste Mispelon
 
     .. _M2BPO: http://www.m2bpo.fr
 
-`Daniele Procida`_
-    Daniele works at Cardiff University `School of Medicine`_. He unexpectedly
-    became a Django developer on 29th April 2009. Since then he has relied
-    daily on Django's documentation, which has been a constant companion to
-    him. More recently he has been able to contribute back to the project by
-    helping improve the documentation itself.
+Daniele Procida
+    Daniele unexpectedly became a Django developer on 29th April 2009. Since
+    then he has relied daily on Django's documentation, which has been a
+    constant companion to him. More recently he has been able to contribute
+    back to the project by helping improve the documentation itself.
 
-    He is the author of `Arkestra`_ and `Don't be afraid to commit`_.
+    He is the author of `Arkestra`_ and `Don't be afraid to commit`_. He lives
+    in Cardiff, Wales, and works for `Divio`_.
 
-    .. _Daniele Procida: http://medicine.cf.ac.uk/person/mr-daniele-marco-procida/
-    .. _School of Medicine: http://medicine.cf.ac.uk/
+    .. _Divio: http://divio.ch/
     .. _Arkestra: http://arkestra-project.org/
     .. _Don\'t be afraid to commit: https://dont-be-afraid-to-commit.readthedocs.org
 
