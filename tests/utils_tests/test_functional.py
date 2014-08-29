@@ -1,6 +1,6 @@
 import unittest
 
-from django.utils.functional import lazy, lazy_property, cached_property
+from django.utils.functional import lazy, lazy_property, cached_property, conditional_cached_property
 
 
 class FunctionalTestCase(unittest.TestCase):
@@ -75,6 +75,28 @@ class FunctionalTestCase(unittest.TestCase):
         # check that overriding name works
         self.assertEqual(a.other, 1)
         self.assertTrue(callable(a.other_value))
+
+    def test_conditional_cached_property(self):
+
+        class B(object):
+
+            @conditional_cached_property
+            def value(self):
+                return self.should_cache, (1, object())
+
+            def _other(self):
+                return self.should_cache, (1, object())
+
+            other = conditional_cached_property(_other, name='other')
+
+        b = B()
+        b.should_cache = False
+        self.assertNotEqual(b.value, b.value)
+        self.assertNotEqual(b.other, b.other)
+
+        b.should_cache = True
+        self.assertEqual(b.value, b.value)
+        self.assertEqual(b.other, b.other)
 
     def test_lazy_equality(self):
         """

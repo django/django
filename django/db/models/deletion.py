@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from itertools import chain
 from operator import attrgetter
 
 from django.db import connections, transaction, IntegrityError
@@ -49,6 +50,12 @@ def SET_DEFAULT(collector, field, sub_objs, using):
 
 def DO_NOTHING(collector, field, sub_objs, using):
     pass
+
+
+def get_related_objects_on_proxies(opts):
+    return (f.related for f in chain.from_iterable(
+            c.relation_tree.related_objects for c in opts.concrete_model._meta.proxied_children
+            if c is not opts))
 
 
 class Collector(object):
@@ -134,8 +141,12 @@ class Collector(object):
             return False
         # Foreign keys pointing to this model, both from m2m and other
         # models.
-        for related in opts.get_all_related_objects(
-                include_hidden=True, include_proxy_eq=True):
+        related_opts = chain(
+            opts.get_fields(data=False, related_objects=True, include_hidden=True),
+            get_related_objects_on_proxies(opts)
+        )
+
+        for related in related_opts:
             if related.field.rel.on_delete is not DO_NOTHING:
                 return False
         for field in model._meta.virtual_fields:
@@ -184,7 +195,7 @@ class Collector(object):
         model = new_objs[0].__class__
 
         # Recursively collect concrete model's parent models, but not their
-        # related objects. These will be found by meta.get_all_related_objects()
+        # related objects. These will be found by meta.get_fields
         concrete_model = model._meta.concrete_model
         for ptr in six.itervalues(concrete_model._meta.parents):
             if ptr:
@@ -199,8 +210,12 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
-            for related in model._meta.get_all_related_objects(
-                    include_hidden=True, include_proxy_eq=True):
+            related_opts = chain(
+                model._meta.get_fields(data=False, related_objects=True,
+                                       include_hidden=True),
+                get_related_objects_on_proxies(model._meta)
+            )
+            for related in related_opts:
                 field = related.field
                 if field.rel.on_delete == DO_NOTHING:
                     continue

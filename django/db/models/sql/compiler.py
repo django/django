@@ -298,7 +298,10 @@ class SQLCompiler(object):
         # be used by local fields.
         seen_models = {None: start_alias}
 
-        for field, model in opts.get_concrete_fields_with_model():
+        for field in opts.concrete_fields:
+            model = field.parent_model._meta.concrete_model
+            if model == opts.model:
+                model = None
             if from_parent and model is not None and issubclass(from_parent, model):
                 # Avoid loading data for already loaded parents.
                 continue
@@ -634,11 +637,8 @@ class SQLCompiler(object):
             else:
                 restricted = False
 
-        for f, model in opts.get_fields_with_model():
-            # The get_fields_with_model() returns None for fields that live
-            # in the field's local model. So, for those fields we want to use
-            # the f.model - that is the field's local model.
-            field_model = model or f.model
+        for f in opts.fields:
+            field_model = f.parent_model._meta.concrete_model
             if not select_related_descend(f, restricted, requested,
                                           only_load.get(field_model)):
                 continue
@@ -659,7 +659,7 @@ class SQLCompiler(object):
         if restricted:
             related_fields = [
                 (o.field, o.model)
-                for o in opts.get_all_related_objects()
+                for o in opts.get_fields(data=False, related_objects=True)
                 if o.field.unique
             ]
             for f, model in related_fields:

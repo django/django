@@ -4,6 +4,7 @@ import copy
 import inspect
 import sys
 from functools import update_wrapper
+from itertools import chain
 import warnings
 
 from django.apps import apps
@@ -173,9 +174,9 @@ class ModelBase(type):
             new_class.add_to_class(obj_name, obj)
 
         # All the fields of any type declared on this model
-        new_fields = (
-            new_class._meta.local_fields +
-            new_class._meta.local_many_to_many +
+        new_fields = chain(
+            new_class._meta.local_fields,
+            new_class._meta.local_many_to_many,
             new_class._meta.virtual_fields
         )
         field_names = set(f.name for f in new_fields)
@@ -197,6 +198,7 @@ class ModelBase(type):
                 raise TypeError("Proxy model '%s' has no non-abstract model base class." % name)
             new_class._meta.setup_proxy(base)
             new_class._meta.concrete_model = base._meta.concrete_model
+            base._meta.concrete_model._meta.proxied_children.append(new_class._meta)
         else:
             new_class._meta.concrete_model = new_class
 
@@ -558,7 +560,7 @@ class Model(six.with_metaclass(ModelBase)):
         and not use this method.
         """
         try:
-            field = self._meta.get_field_by_name(field_name)[0]
+            field = self._meta.get_field(field_name, include_related=True)
         except FieldDoesNotExist:
             return getattr(self, field_name)
         return getattr(self, field.attname)
@@ -1359,8 +1361,8 @@ class Model(six.with_metaclass(ModelBase)):
         errors = []
         for field_name in fields:
             try:
-                field = cls._meta.get_field(field_name,
-                    many_to_many=True)
+                field = cls._meta.get_field(field_name)
+                    
             except models.FieldDoesNotExist:
                 errors.append(
                     checks.Error(
@@ -1438,28 +1440,29 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Skip ordering on pk. This is always a valid order_by field
         # but is an alias and therefore won't be found by opts.get_field.
-        fields = (f for f in fields if f != 'pk')
+        fields = set(f for f in fields if f != 'pk')
 
-        for field_name in fields:
-            try:
-                cls._meta.get_field(field_name, many_to_many=False)
-            except FieldDoesNotExist:
-                if field_name.endswith('_id'):
-                    try:
-                        field = cls._meta.get_field(field_name[:-3], many_to_many=False)
-                    except FieldDoesNotExist:
-                        pass
-                    else:
-                        if field.attname == field_name:
-                            continue
-                errors.append(
-                    checks.Error(
-                        "'ordering' refers to the non-existent field '%s'." % field_name,
-                        hint=None,
-                        obj=cls,
-                        id='models.E015',
-                    )
+        # Check for invalid or non existing field ordering.
+        invalid_fields = []
+
+        # Any field name that is not present in field_names
+        # Does not exist.
+        invalid_fields.extend(fields - cls._meta.field_names)
+
+        # Any field that is a m2m field should not be allowed
+        # ordering
+        m2m_field_names = set(f.name for f in cls._meta.get_fields(data=False, m2m=True))
+        invalid_fields.extend(fields & m2m_field_names)
+
+        for invalid_field in invalid_fields:
+            errors.append(
+                checks.Error(
+                    "'ordering' refers to the non-existent field '%s'." % invalid_field,
+                    hint=None,
+                    obj=cls,
+                    id='models.E015',
                 )
+            )
         return errors
 
     @classmethod
