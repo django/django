@@ -13,7 +13,7 @@ from django.db.models import Count, F, Q
 from django.db.models.sql.where import WhereNode, EverythingNode, NothingNode
 from django.db.models.sql.datastructures import EmptyResultSet
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import str_prefix, CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext
 from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils import six
 
@@ -1846,12 +1846,12 @@ class RawQueriesTests(TestCase):
         query = "SELECT * FROM queries_note WHERE note = %s"
         params = ['n1']
         qs = Note.objects.raw(query, params=params)
-        self.assertEqual(repr(qs), str_prefix("<RawQuerySet: %(_)s'SELECT * FROM queries_note WHERE note = n1'>"))
+        self.assertEqual(repr(qs), "<RawQuerySet: SELECT * FROM queries_note WHERE note = n1>")
 
         query = "SELECT * FROM queries_note WHERE note = %s and misc = %s"
         params = ['n1', 'foo']
         qs = Note.objects.raw(query, params=params)
-        self.assertEqual(repr(qs), str_prefix("<RawQuerySet: %(_)s'SELECT * FROM queries_note WHERE note = n1 and misc = foo'>"))
+        self.assertEqual(repr(qs), "<RawQuerySet: SELECT * FROM queries_note WHERE note = n1 and misc = foo>")
 
 
 class GeneratorExpressionTests(TestCase):

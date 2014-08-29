@@ -1596,10 +1596,7 @@ class RawQuerySet(object):
                 self.query.cursor.close()
 
     def __repr__(self):
-        text = self.raw_query
-        if self.params:
-            text = text % (self.params if hasattr(self.params, 'keys') else tuple(self.params))
-        return "<RawQuerySet: %r>" % text
+        return "<RawQuerySet: %s>" % self.query
 
     def __getitem__(self, k):
         return list(self)[k]
