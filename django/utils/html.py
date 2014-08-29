@@ -214,7 +214,9 @@ def smart_urlquote(url):
     "Quotes a URL if it isn't already quoted."
     def unquote_quote(segment):
         segment = unquote(force_str(segment))
-        # See http://bugs.python.org/issue2637
+        # Tilde is part of RFC3986 Unreserved Characters
+        # http://tools.ietf.org/html/rfc3986#section-2.3
+        # See also http://bugs.python.org/issue16285
         segment = quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + str('~'))
         return force_text(segment)
 
@@ -231,8 +233,11 @@ def smart_urlquote(url):
         return unquote_quote(url)
 
     if query:
+        # Separately unquoting key/value, so as to not mix querystring separators
+        # included in query values. See #22267.
         query_parts = [(unquote(force_str(q[0])), unquote(force_str(q[1])))
                        for q in parse_qsl(query, keep_blank_values=True)]
+        # urlencode will take care of quoting
         query = urlencode(query_parts)
 
     path = unquote_quote(path)
@@ -266,10 +271,17 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
         return '%s...' % x[:max(0, limit - 3)]
 
     def unescape(text, trail):
+        """
+        If input URL is HTML-escaped, unescape it so as we can safely feed it to
+        smart_urlquote. For example:
+        http://example.com?x=1&amp;y=&lt;2&gt; => http://example.com?x=1&y=<2>
+        """
         if not safe_input:
             return text, text, trail
+        unescaped = (text + trail).replace('&amp;', '&').replace('&lt;', '<'
+                                 ).replace('&gt;', '>').replace('&quot;', '"'
+                                 ).replace('&#39;', "'")
         # ';' in trail can be either trailing punctuation or end-of-entity marker
-        unescaped = (text + trail).replace('&amp;', '&').replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&#39;', "'")
         if unescaped.endswith(';'):
             return text, unescaped[:-1], trail
         else:
