@@ -88,6 +88,7 @@ class Truncator(SimpleLazyObject):
             return text
         return '%s%s' % (text, truncate)
 
+    @allow_lazy
     def chars(self, num, truncate=None, html=False):
         """
         Returns the text truncated to be no longer than the specified number
@@ -134,6 +135,7 @@ class Truncator(SimpleLazyObject):
         # Return the original string since no truncation was necessary
         return text
 
+    @allow_lazy
     def words(self, num, truncate=None, html=False):
         """
         Truncates a string after a certain number of words. Takes an optional
@@ -144,19 +146,34 @@ class Truncator(SimpleLazyObject):
         if html:
             return self._truncate_html(length, truncate, self._wrapped, length, True)
         return self._text_words(length, truncate)
-    words = allow_lazy(words)
 
-    def _text_words(self, length, truncate):
+    word_re = re.compile(r'\S+')
+
+    def _text_words(self, max_words, ellipsis):
         """
         Truncates a string after a certain number of words.
 
-        Newlines in the string will be stripped.
+        Whitespace within the string will not be modified before the
+        truncation point.
+        maximum  is reached.
         """
-        words = self._wrapped.split()
-        if len(words) > length:
-            words = words[:length]
-            return self.add_truncation_text(' '.join(words), truncate)
-        return ' '.join(words)
+        if max_words < 1:
+            return u''
+
+        word_count = 0
+        truncation_point = None
+
+        for match in self.word_re.finditer(self._wrapped):
+            word_count += 1
+            if word_count == max_words:
+                truncation_point = match.end() 
+                break
+
+        if truncation_point is None:
+            return self._wrapped
+        else:
+            return self.add_truncation_text(self._wrapped[:truncation_point],
+                ellipsis)
 
     def _truncate_html(self, length, truncate, text, truncate_len, words):
         """

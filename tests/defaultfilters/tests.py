@@ -170,7 +170,23 @@ class DefaultFiltersTests(TestCase):
         self.assertEqual(
             truncatewords('A sentence with a few words in it',
             'not a number'), 'A sentence with a few words in it')
-
+        self.assertEqual(
+            truncatewords('Double-spaced  sentence  with  a  few  words', 2),
+            'Double-spaced  sentence ...')
+        self.assertEqual(
+            truncatewords('  Two leading spaces for this sentence', 3),
+            '  Two leading spaces ...')
+        self.assertEqual(
+            truncatewords('  Text with leading and trailing whitespace  ', 10),
+            '  Text with leading and trailing whitespace  ')
+        self.assertEqual(
+            truncatewords('  Text with leading and trailing whitespace  ', 6),
+            '  Text with leading and trailing whitespace ...')
+        self.assertEqual(
+            truncatewords('  Text with leading and trailing whitespace  ', 1),
+            '  Text ...')
+        self.assertEqual(truncatewords('  Text  ', 0), '')
+        
     def test_truncatewords_html(self):
         self.assertEqual(truncatewords_html(
             '<p>one <a href="#">two - three <br>four</a> five</p>', 0), '')
