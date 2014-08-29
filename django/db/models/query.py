@@ -536,12 +536,23 @@ class QuerySet(object):
         """
         Returns a dictionary mapping each of the given IDs to the object with
         that ID.
+
+        Some database backends (i.e. SQLite) have a certain limit for the
+        number of variables in query. Thus, we retrieve objects in batches and
+        add them to a list.
         """
         assert self.query.can_filter(), \
             "Cannot use 'limit' or 'offset' with in_bulk"
         if not id_list:
             return {}
-        qs = self.filter(pk__in=id_list).order_by()
+        ops = connections[self.db].ops
+        batch_size = max(ops.bulk_batch_size(['pk'], id_list), 1)
+
+        qs = []
+        id_list = list(id_list)
+        for batch in (id_list[i:i + batch_size]
+                      for i in range(0, len(id_list), batch_size)):
+            qs.extend(self.filter(pk__in=batch).order_by())
         return dict((obj._get_pk_val(), obj) for obj in qs)
 
     def delete(self):

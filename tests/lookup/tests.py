@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from math import ceil
+
 from datetime import datetime
 from operator import attrgetter
 from unittest import skipUnless
@@ -123,6 +125,22 @@ class LookupTests(TestCase):
         self.assertEqual(Article.objects.in_bulk(iter([])), {})
         self.assertRaises(TypeError, Article.objects.in_bulk)
         self.assertRaises(TypeError, Article.objects.in_bulk, headline__startswith='Blah')
+
+    def test_in_bulk_lots_of_ids(self):
+        TEST_RANGE = 2000
+
+        Author.objects.all().delete()
+        author_map = {}
+        authors = [Author() for i in range(TEST_RANGE)]
+        Author.objects.bulk_create(authors)
+        for a in Author.objects.all():
+            author_map[a.pk] = a
+
+        batch_size = max(connection.ops.bulk_batch_size(['pk'], range(TEST_RANGE)), 1)
+        expected_num_queries = ceil(TEST_RANGE // batch_size)
+
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(Author.objects.in_bulk(author_map.keys()), author_map)
 
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
