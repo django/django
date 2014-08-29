@@ -1332,12 +1332,12 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         init_list = []
         # Build the list of fields that *haven't* been requested
         for field, model in klass._meta.get_concrete_fields_with_model():
-            if field.name not in load_fields:
-                skip.add(field.attname)
-            elif from_parent and issubclass(from_parent, model.__class__):
+            if from_parent and model and issubclass(from_parent, model):
                 # Avoid loading fields already loaded for parent model for
                 # child models.
                 continue
+            elif field.name not in load_fields:
+                skip.add(field.attname)
             else:
                 init_list.append(field.attname)
         # Retrieve all the requested fields
