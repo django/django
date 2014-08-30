@@ -193,6 +193,17 @@ class TranslationTests(TestCase):
             with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
                 complex_context_deferred % {'name': 'Jim'}
 
+    @skipUnless(six.PY2, "PY3 doesn't distinct int and long types")
+    def test_ungettext_lazy_long(self):
+        """
+        Regression test for #22820: int and long should be treated alike in ungettext_lazy.
+        """
+        result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', 4)
+        self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
+        # Now with a long
+        result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', long(4))
+        self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
+
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
         trans_real._active = local()
