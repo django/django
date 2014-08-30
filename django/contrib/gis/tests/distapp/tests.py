@@ -182,12 +182,12 @@ class DistanceTest(TestCase):
 
         # Testing with spheroid distances first.
         hillsdale = AustraliaCity.objects.get(name='Hillsdale')
-        qs = AustraliaCity.objects.exclude(id=hillsdale.id).distance(hillsdale.point, spheroid=True)
+        qs = AustraliaCity.objects.exclude(id=hillsdale.id).distance(hillsdale.point, spheroid=True).order_by('id')
         for i, c in enumerate(qs):
             self.assertAlmostEqual(spheroid_distances[i], c.distance.m, tol)
         if postgis:
             # PostGIS uses sphere-only distances by default, testing these as well.
-            qs = AustraliaCity.objects.exclude(id=hillsdale.id).distance(hillsdale.point)
+            qs = AustraliaCity.objects.exclude(id=hillsdale.id).distance(hillsdale.point).order_by('id')
             for i, c in enumerate(qs):
                 self.assertAlmostEqual(sphere_distances[i], c.distance.m, tol)
 
