@@ -901,6 +901,10 @@ appropriate entities.
     ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
     on entry with :func:`deactivate()` instead.
 
+    .. versionchanged:: 1.8
+
+        ``override`` is now usable as a function decorator.
+
 .. function:: localtime(value, timezone=None)
 
     Converts an aware :class:`~datetime.datetime` to a different time zone,
