@@ -1118,6 +1118,70 @@ are not allowed to visit any page, systemwide. Use this for bad robots/crawlers.
 This is only used if ``CommonMiddleware`` is installed (see
 :doc:`/topics/http/middleware`).
 
+.. setting:: EMAIL
+
+EMAIL
+-----
+
+.. versionadded:: 1.8
+
+Default::
+
+    {
+        'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
+        'OPTIONS': {
+            'HOST': 'localhost',
+            'PORT': 25,
+            'USER': '',
+            'PASSWORD': '',
+            'USE_TLS': False,
+            'USE_SSL': False,
+        },
+    }
+
+A dictionary containing the settings needed to authenticate and send mail
+through the SMTP email backend. You may specify only the options you need to
+override in your settings (see :ref:`dictionary-settings`).
+
+If either of ``EMAIL['OPTIONS']['USER']`` or ``EMAIL['OPTIONS']['PASSWORD']`` is
+empty, Django won't attempt authentication.
+
+.. setting:: EMAIL-BACKEND
+
+BACKEND
+~~~~~~~
+
+Default: ``'django.core.mail.backends.smtp.EmailBackend'``
+
+The backend to use for sending emails. For the list of available backends see
+:doc:`/topics/email`.
+
+
+.. setting:: EMAIL-USE_TLS
+
+USE_TLS
+~~~~~~~
+
+Default: ``False``
+
+Whether to use a TLS (secure) connection when talking to the SMTP server.
+This is used for explicit TLS connections, generally on port 587. If you are
+experiencing hanging connections, see the implicit TLS setting
+:setting:`EMAIL['OPTIONS']['USE_SSL']<EMAIL-USE_SSL>` below.
+
+.. setting:: EMAIL-USE_SSL
+
+USE_SSL
+~~~~~~~
+
+Default: ``False``
+
+Whether to use an implicit TLS (secure) connection when talking to the SMTP
+server. In most email documentation this type of TLS connection is referred
+to as SSL. It is generally used on port 465. If you are experiencing problems,
+see the explicit TLS setting :setting:`EMAIL['OPTIONS']['USE_TLS']
+<EMAIL-USE_TLS>` above.
+
 .. setting:: EMAIL_BACKEND
 
 EMAIL_BACKEND
@@ -1144,7 +1208,7 @@ EMAIL_HOST
 
 .. deprecated:: 1.8
 
-    Use the ``HOST`` key in the :setting:`SMTP_CONFIG` dictionary.
+    Use the ``HOST`` key in the :setting:`EMAIL['OPTIONS'] <EMAIL>` dictionary.
 
 Default: ``'localhost'``
 
@@ -1159,7 +1223,7 @@ EMAIL_HOST_PASSWORD
 
 .. deprecated:: 1.8
 
-    Use the ``PASSWORD`` key in the :setting:`SMTP_CONFIG` dictionary.
+    Use the ``PASSWORD`` key in the :setting:`EMAIL['OPTIONS'] <EMAIL>` dictionary.
 
 Default: ``''`` (Empty string)
 
@@ -1177,7 +1241,7 @@ EMAIL_HOST_USER
 
 .. deprecated:: 1.8
 
-    Use the ``USER`` key in the :setting:`SMTP_CONFIG` dictionary.
+    Use the ``USER`` key in the :setting:`EMAIL['OPTIONS'] <EMAIL>` dictionary.
 
 Default: ``''`` (Empty string)
 
@@ -1193,7 +1257,7 @@ EMAIL_PORT
 
 .. deprecated:: 1.8
 
-    Use the ``PORT`` key in the :setting:`SMTP_CONFIG` dictionary.
+    Use the ``PORT`` key in the :setting:`EMAIL['OPTIONS`] <EMAIL>` dictionary.
 
 Default: ``25``
 
@@ -1217,7 +1281,7 @@ EMAIL_USE_TLS
 
 .. deprecated:: 1.8
 
-    Use the :setting:`USE_TLS` key in the :setting:`SMTP_CONFIG` dictionary.
+    Use the :setting:`USE_TLS` key in the :setting:`EMAIL['OPTIONS`] <EMAIL>` dictionary.
 
 Default: ``False``
 
@@ -1235,7 +1299,7 @@ EMAIL_USE_SSL
 
 .. deprecated:: 1.8
 
-    Use the :setting:`USE_SSL` key in the :setting:`SMTP_CONFIG` dictionary.
+    Use the :setting:`USE_SSL` key in the :setting:`EMAIL['OPTIONS`] <EMAIL>` dictionary.
 
 Default: ``False``
 
@@ -2033,55 +2097,6 @@ Silenced warnings will no longer be output to the console; silenced errors
 will still be printed, but will not prevent management commands from running.
 
 See also the :doc:`/ref/checks` documentation.
-
-.. setting:: SMTP_CONFIG
-
-SMTP_CONFIG
------------
-
-.. versionadded:: 1.8
-
-Default::
-
-    {
-        'HOST': 'localhost',
-        'PORT': 25,
-        'USER': '',
-        'PASSWORD': '',
-        'USE_TLS': False,
-        'USE_SSL': False,
-    }
-
-A dictionary containing the settings needed to authenticate and send mail
-through the SMTP email backend. You may specify only the options you need to
-override in your settings, as the default values are kept by Django.
-
-If either of ``SMTP_CONFIG['USER']`` or ``SMTP_CONFIG['PASSWORD']`` is empty,
-Django won't attempt authentication.
-
-.. setting:: USE_TLS
-
-USE_TLS
-~~~~~~~
-
-Default: ``False``
-
-Whether to use a TLS (secure) connection when talking to the SMTP server.
-This is used for explicit TLS connections, generally on port 587. If you are
-experiencing hanging connections, see the implicit TLS setting
-:setting:`SMTP_CONFIG['USE_SSL']<USE_SSL>` below.
-
-.. setting:: USE_SSL
-
-USE_SSL
-~~~~~~~
-
-Default: ``False``
-
-Whether to use an implicit TLS (secure) connection when talking to the SMTP
-server. In most email documentation this type of TLS connection is referred
-to as SSL. It is generally used on port 465. If you are experiencing problems,
-see the explicit TLS setting :setting:`SMTP_CONFIG['USE_TLS']<USE_TLS>` above.
 
 .. setting:: TEMPLATE_CONTEXT_PROCESSORS
 
@@ -2988,6 +3003,7 @@ Email
 * :setting:`ADMINS`
 * :setting:`DEFAULT_CHARSET`
 * :setting:`DEFAULT_FROM_EMAIL`
+* :setting:`EMAIL`
 * :setting:`EMAIL_BACKEND`
 * :setting:`EMAIL_FILE_PATH`
 * :setting:`EMAIL_HOST`
@@ -2998,7 +3014,6 @@ Email
 * :setting:`EMAIL_USE_TLS`
 * :setting:`MANAGERS`
 * :setting:`SERVER_EMAIL`
-* :setting:`SMTP_CONFIG`
 
 Error reporting
 ---------------

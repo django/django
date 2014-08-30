@@ -29,12 +29,12 @@ __all__ = [
 def get_connection(backend=None, fail_silently=False, **kwds):
     """Load an email backend and return an instance of it.
 
-    If backend is None (default) settings.EMAIL_BACKEND is used.
+    If backend is None (default) settings.EMAIL['BACKEND'] is used.
 
     Both fail_silently and other keyword arguments are used in the
     constructor of the backend.
     """
-    klass = import_string(backend or settings.EMAIL_BACKEND)
+    klass = import_string(backend or settings.EMAIL['BACKEND'])
     return klass(fail_silently=fail_silently, **kwds)
 
 
@@ -45,8 +45,8 @@ def send_mail(subject, message, from_email, recipient_list,
     Easy wrapper for sending a single message to a recipient list. All members
     of the recipient list will see the other recipients in the 'To' field.
 
-    If auth_user and auth_password are None, values from the SMTP_CONFIG setting
-    are used.
+    If auth_user and auth_password are None, values from the EMAIL['OPTIONS']
+    setting are used.
 
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.
@@ -70,7 +70,7 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=None,
 
     If from_email is None, the DEFAULT_FROM_EMAIL setting is used.
     If auth_user and auth_password are set, they're used to log in. Otherwise,
-    values from the SMTP_CONFIG setting are used.
+    values from the EMAIL['OPTIONS'] setting are used.
 
     Note: The API for this method is frozen. New code wanting to extend the
     functionality should use the EmailMessage class directly.

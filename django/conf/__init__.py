@@ -123,9 +123,9 @@ class Settings(BaseSettings):
                 if setting in obsolete_email_settings:
                     warnings.warn(
                         "EMAIL_* smtp-related settings are deprecated and should "
-                        "be now defined in the SMTP_CONFIG setting dict.",
+                        "be now defined in the EMAIL setting dict.",
                         RemovedInDjango20Warning)
-                    self.SMTP_CONFIG[obsolete_email_settings[setting]] = setting_value
+                    self.EMAIL['OPTIONS'][obsolete_email_settings[setting]] = setting_value
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
