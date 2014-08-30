@@ -100,13 +100,14 @@ def check_ssl_redirect(app_configs):
 def check_secret_key(app_configs):
     passed_check = (
         getattr(settings, 'SECRET_KEY', None) and
-        len(set(settings.SECRET_KEY)) >= 5
+        len(set(settings.SECRET_KEY)) >= 10 and  # at least 10 unique characters
+        len(settings.SECRET_KEY) >= 50  # at least 50 characters in length
     )
     return [] if passed_check else [Warning(
-        "Your SECRET_KEY is either an empty string, non-existent, or has very "
-        "few characters. Please generate a long and random SECRET_KEY, "
-        "otherwise many of Django's security-critical features will be "
-        "vulnerable to attack.",
+        "Your SECRET_KEY has less than 50 characters or less than 10 unique "
+        "characters. Please generate a long and random SECRET_KEY, otherwise "
+        "many of Django's security-critical features will be vulnerable to "
+        "attack.",
         hint=None,
         id='security.W009',
     )]

@@ -386,16 +386,18 @@ class CheckSecretKeyTest(TestCase):
     @property
     def secret_key_error(self):
         return [checks.Warning(
-            "Your SECRET_KEY is either an empty string, non-existent, or has very "
-            "few characters. Please generate a long and random SECRET_KEY, "
-            "otherwise many of Django's security-critical features will be "
-            "vulnerable to attack.",
+            "Your SECRET_KEY has less than 50 characters or less than 10 unique "
+            "characters. Please generate a long and random SECRET_KEY, otherwise "
+            "many of Django's security-critical features will be vulnerable to "
+            "attack.",
             hint=None,
             id='security.W009',
         )]
 
-    @override_settings(SECRET_KEY='awcetupav$#!^h9wTUAPCJWE&!T#``Ho;ta9w4tva')
+    @override_settings(SECRET_KEY=('abcdefghijklmnopqrstuvwx' * 2) + 'ab')
     def test_okay_secret_key(self):
+        self.assertEqual(len(settings.SECRET_KEY), 50)
+        self.assertGreater(len(set(settings.SECRET_KEY)), 10)
         self.assertEqual(self.func(None), [])
 
     @override_settings(SECRET_KEY='')
@@ -411,6 +413,13 @@ class CheckSecretKeyTest(TestCase):
     def test_none_secret_key(self):
         self.assertEqual(self.func(None), self.secret_key_error)
 
-    @override_settings(SECRET_KEY='bla bla')
+    @override_settings(SECRET_KEY=('abcdefghijklmnopqrstuvwx' * 2) + 'a')
+    def test_low_length_secret_key(self):
+        self.assertEqual(len(settings.SECRET_KEY), 49)
+        self.assertEqual(self.func(None), self.secret_key_error)
+
+    @override_settings(SECRET_KEY='abcd' * 20)
     def test_low_entropy_secret_key(self):
+        self.assertGreater(settings.SECRET_KEY, 50)
+        self.assertLess(len(set(settings.SECRET_KEY)), 10)
         self.assertEqual(self.func(None), self.secret_key_error)

@@ -414,8 +414,8 @@ The following check functions will be run if you use the
   connections, you may want to either set this setting to ``True`` or configure
   a load balancer or reverse-proxy server  to redirect all connections to HTTPS.
 
-* **security.W009**: Your :setting:`SECRET_KEY` is either an empty string,
-  non-existent, or has very few characters. Please generate a long and random
+* **security.W009**: Your :setting:`SECRET_KEY` has less than 50 characters or
+  less than 10 unique characters. Please generate a long and random
   ``SECRET_KEY``, otherwise many of Django's security-critical features will be
   vulnerable to attack.
 
