@@ -697,7 +697,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         super(FileBackendTests, self).setUp()
         self.tmp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
-        self._settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
+        self._settings_override = override_settings(EMAIL={'OPTIONS': {'FILE_PATH':self.tmp_dir}})
         self._settings_override.enable()
 
     def tearDown(self):

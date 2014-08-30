@@ -107,9 +107,13 @@ class Settings(BaseSettings):
 
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS", "LOCALE_PATHS")
         obsolete_email_settings = {
+            'EMAIL_BACKEND': 'BACKEND', 'DEFAULT_FROM_EMAIL': 'DEFAULT_FROM_ADDRESS',
+            'SERVER_EMAIL': 'SERVER_ADDRESS', 'EMAIL_SUBJECT_PREFIX': 'SUBJECT_PREFIX',
+            # OPTIONS:
             'EMAIL_HOST': 'HOST', 'EMAIL_PORT': 'PORT',
             'EMAIL_HOST_USER': 'USER', 'EMAIL_HOST_PASSWORD': 'PASSWORD',
             'EMAIL_USE_TLS': 'USE_TLS', 'EMAIL_USE_SSL': 'USE_SSL',
+            'EMAIL_FILE_PATH': 'FILE_PATH',
         }
         self._explicit_settings = set()
         for setting in dir(mod):
@@ -122,10 +126,13 @@ class Settings(BaseSettings):
                             "Please fix your settings." % setting)
                 if setting in obsolete_email_settings:
                     warnings.warn(
-                        "EMAIL_* smtp-related settings are deprecated and should "
-                        "be now defined in the EMAIL setting dict.",
+                        "EMAIL_*/*_EMAIL settings are deprecated and should be "
+                        "now defined in the EMAIL setting dictionary.",
                         RemovedInDjango20Warning)
-                    self.EMAIL['OPTIONS'][obsolete_email_settings[setting]] = setting_value
+                    if obsolete_email_settings[setting] in self.EMAIL:
+                        self.EMAIL[obsolete_email_settings[setting]] = setting_value
+                    else:
+                        self.EMAIL['OPTIONS'][obsolete_email_settings[setting]] = setting_value
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 

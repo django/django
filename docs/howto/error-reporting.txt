@@ -38,7 +38,8 @@ the HTTP request that caused the error.
 
 By default, Django will send email from root@localhost. However, some mail
 providers reject all email from this address. To use a different sender
-address, modify the :setting:`SERVER_EMAIL` setting.
+address, modify the :setting:`EMAIL['SERVER_ADDRESS'] <EMAIL-SERVER_ADDRESS>`
+setting.
 
 To activate this behavior, put the email addresses of the recipients in the
 :setting:`ADMINS` setting.

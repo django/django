@@ -1080,6 +1080,10 @@ specify a particular storage system. See :doc:`/topics/files`.
 DEFAULT_FROM_EMAIL
 ------------------
 
+.. deprecated:: 1.8
+
+    Use the ``DEFAULT_FROM_ADDRESS`` key in the :setting:`EMAIL` dictionary.
+
 Default: ``'webmaster@localhost'``
 
 Default email address to use for various automated correspondence from the
@@ -1129,6 +1133,9 @@ Default::
 
     {
         'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
+        'DEFAULT_FROM_ADDRESS': 'webmaster@localhost',
+        'SERVER_ADDRESS': 'root@localhost',
+        'SUBJECT_PREFIX': '[Django] ',
         'OPTIONS': {
             'HOST': 'localhost',
             'PORT': 25,
@@ -1156,6 +1163,54 @@ Default: ``'django.core.mail.backends.smtp.EmailBackend'``
 The backend to use for sending emails. For the list of available backends see
 :doc:`/topics/email`.
 
+.. setting:: EMAIL-DEFAULT_FROM_ADDRESS
+
+DEFAULT_FROM_ADDRESS
+~~~~~~~~~~~~~~~~~~~~
+
+Default: ``'webmaster@localhost'``
+
+Default email address to use for various automated correspondence from the
+site manager(s). This doesn't include error messages sent to :setting:`ADMINS`
+and :setting:`MANAGERS`; for that, see :setting:`EMAIL['SERVER_ADDRESS']
+<EMAIL-SERVER_ADDRESS>`.
+
+.. setting:: EMAIL-FILE_PATH
+
+FILE_PATH
+~~~~~~~~~
+
+Default: Not defined
+
+The directory used by the ``file`` email backend to store output files.
+
+.. setting:: EMAIL-SERVER_ADDRESS
+
+SERVER_ADDRESS
+~~~~~~~~~~~~~~
+
+Default: ``'root@localhost'``
+
+The email address that error messages come from, such as those sent to
+:setting:`ADMINS` and :setting:`MANAGERS`.
+
+.. admonition:: Why are my emails sent from a different address?
+
+    This address is used only for error messages. It is *not* the address that
+    regular email messages sent with :meth:`~django.core.mail.send_mail()`
+    come from; for that, see :setting:`EMAIL['DEFAULT_FROM_ADDRESS']
+    <EMAIL-DEFAULT_FROM_ADDRESS>`.
+
+.. setting:: EMAIL-SUBJECT_PREFIX
+
+SUBJECT_PREFIX
+~~~~~~~~~~~~~~
+
+Default: ``'[Django] '``
+
+Subject-line prefix for email messages sent with ``django.core.mail.mail_admins``
+or ``django.core.mail.mail_managers``. You'll probably want to include the
+trailing space.
 
 .. setting:: EMAIL-USE_TLS
 
@@ -1196,6 +1251,11 @@ The backend to use for sending emails. For the list of available backends see
 
 EMAIL_FILE_PATH
 ---------------
+
+.. deprecated:: 1.8
+
+    Use the ``FILE_PATH`` key in the :setting:`EMAIL['OPTIONS'] <EMAIL>`
+    dictionary.
 
 Default: Not defined
 
@@ -1267,6 +1327,10 @@ Port to use for the SMTP server defined in :setting:`EMAIL_HOST`.
 
 EMAIL_SUBJECT_PREFIX
 --------------------
+
+.. deprecated:: 1.8
+
+    Use the ``SUBJECT_PREFIX`` key in the :setting:`EMAIL` dictionary.
 
 Default: ``'[Django] '``
 
@@ -2031,6 +2095,10 @@ example, to define a YAML serializer, use::
 
 SERVER_EMAIL
 ------------
+
+.. deprecated:: 1.8
+
+    Use the ``SERVER_ADDRESS`` key in the :setting:`EMAIL` dictionary.
 
 Default: ``'root@localhost'``
 

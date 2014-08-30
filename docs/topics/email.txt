@@ -127,10 +127,11 @@ mail_admins()
 site admins, as defined in the :setting:`ADMINS` setting.
 
 ``mail_admins()`` prefixes the subject with the value of the
-:setting:`EMAIL_SUBJECT_PREFIX` setting, which is ``"[Django] "`` by default.
+:setting:`EMAIL['SUBJECT_PREFIX'] <EMAIL-SUBJECT_PREFIX>` setting, which is
+``"[Django] "`` by default.
 
 The "From:" header of the email will be the value of the
-:setting:`SERVER_EMAIL` setting.
+:setting:`EMAIL['SERVER_ADDRESS'] <EMAIL-SERVER_ADDRESS>` setting.
 
 This method exists for convenience and readability.
 
@@ -255,7 +256,8 @@ All parameters are optional and can be set at any time prior to calling the
 
 * ``from_email``: The sender's address. Both ``fred@example.com`` and
   ``Fred <fred@example.com>`` forms are legal. If omitted, the
-  :setting:`DEFAULT_FROM_EMAIL` setting is used.
+  :setting:`EMAIL['DEFAULT_FROM_ADDRESS'] <EMAIL-DEFAULT_FROM_ADDRESS>` setting
+  is used.
 
 * ``to``: A list or tuple of recipient addresses.
 
@@ -506,14 +508,18 @@ File backend
 
 The file backend writes emails to a file. A new file is created for each new
 session that is opened on this backend. The directory to which the files are
-written is either taken from the :setting:`EMAIL_FILE_PATH` setting or from
-the ``file_path`` keyword when creating a connection with
-:meth:`~django.core.mail.get_connection`.
+written is either taken from the :setting:`EMAIL['OPTIONS']['FILE_PATH']
+<EMAIL-FILE_PATH>` setting or from the ``file_path`` keyword when creating a
+connection with :meth:`~django.core.mail.get_connection`.
 
 To specify this backend, put the following in your settings::
 
-    EMAIL = {'BACKEND': 'django.core.mail.backends.filebased.EmailBackend'}
-    EMAIL_FILE_PATH = '/tmp/app-messages' # change this to a proper location
+    EMAIL = {
+        'BACKEND': 'django.core.mail.backends.filebased.EmailBackend'
+        'OPTIONS': {
+            FILE_PATH: '/tmp/app-messages' # change this to a proper location
+        }
+    }
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.

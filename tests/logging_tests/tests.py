@@ -179,11 +179,11 @@ class AdminEmailHandlerTest(TestCase):
 
     @override_settings(
         ADMINS=(('whatever admin', 'admin@example.com'),),
-        EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-'
+        EMAIL={'SUBJECT_PREFIX': '-SuperAwesomeSubject-'},
     )
     def test_accepts_args(self):
         """
-        Ensure that user-supplied arguments and the EMAIL_SUBJECT_PREFIX
+        Ensure that user-supplied arguments and the EMAIL['SUBJECT_PREFIX']
         setting are used to compose the email subject.
         Refs #16736.
         """
@@ -209,7 +209,7 @@ class AdminEmailHandlerTest(TestCase):
 
     @override_settings(
         ADMINS=(('whatever admin', 'admin@example.com'),),
-        EMAIL_SUBJECT_PREFIX='-SuperAwesomeSubject-',
+        EMAIL={'SUBJECT_PREFIX': '-SuperAwesomeSubject-'},
         INTERNAL_IPS=('127.0.0.1',),
     )
     def test_accepts_args_and_request(self):
@@ -244,7 +244,7 @@ class AdminEmailHandlerTest(TestCase):
 
     @override_settings(
         ADMINS=(('admin', 'admin@example.com'),),
-        EMAIL_SUBJECT_PREFIX='',
+        EMAIL={'SUBJECT_PREFIX': ''},
         DEBUG=False,
     )
     def test_subject_accepts_newlines(self):
@@ -267,7 +267,7 @@ class AdminEmailHandlerTest(TestCase):
 
     @override_settings(
         ADMINS=(('admin', 'admin@example.com'),),
-        EMAIL_SUBJECT_PREFIX='',
+        EMAIL={'SUBJECT_PREFIX': ''},
         DEBUG=False,
     )
     def test_truncate_subject(self):
