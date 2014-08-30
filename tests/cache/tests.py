@@ -921,7 +921,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.assertEqual(stdout.getvalue(),
             "Cache table 'test cache table' already exists.\n" * len([
                 k for k, v in settings.CACHES.items()
-                if v['BACKEND']=='django.core.cache.backends.db.DatabaseCache'])
+                if v['BACKEND'] == 'django.core.cache.backends.db.DatabaseCache'])
         )
 
     def test_createcachetable_with_table_argument(self):
