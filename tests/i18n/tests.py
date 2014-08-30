@@ -193,7 +193,7 @@ class TranslationTests(TestCase):
             with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
                 complex_context_deferred % {'name': 'Jim'}
 
-    @skipUnless(six.PY2, "PY3 doesn't distinct int and long types")
+    @skipUnless(six.PY2, "PY3 doesn't have distinct int and long types")
     def test_ungettext_lazy_long(self):
         """
         Regression test for #22820: int and long should be treated alike in ungettext_lazy.
