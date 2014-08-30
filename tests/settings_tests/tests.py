@@ -385,29 +385,29 @@ class SecureProxySslHeaderTest(TestCase):
     settings_module = settings
 
     def setUp(self):
-        self._original_setting = self.settings_module.SECURE_SECURE_PROXY_SSL_HEADER
+        self._original_setting = self.settings_module.SECURE_PROXY_SSL_HEADER
 
     def tearDown(self):
-        self.settings_module.SECURE_SECURE_PROXY_SSL_HEADER = self._original_setting
+        self.settings_module.SECURE_PROXY_SSL_HEADER = self._original_setting
 
     def test_none(self):
-        self.settings_module.SECURE_SECURE_PROXY_SSL_HEADER = None
+        self.settings_module.SECURE_PROXY_SSL_HEADER = None
         req = HttpRequest()
         self.assertEqual(req.is_secure(), False)
 
     def test_set_without_xheader(self):
-        self.settings_module.SECURE_SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+        self.settings_module.SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
         req = HttpRequest()
         self.assertEqual(req.is_secure(), False)
 
     def test_set_with_xheader_wrong(self):
-        self.settings_module.SECURE_SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+        self.settings_module.SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
         req = HttpRequest()
         req.META['HTTP_X_FORWARDED_PROTOCOL'] = 'wrongvalue'
         self.assertEqual(req.is_secure(), False)
 
     def test_set_with_xheader_right(self):
-        self.settings_module.SECURE_SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+        self.settings_module.SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
         req = HttpRequest()
         req.META['HTTP_X_FORWARDED_PROTOCOL'] = 'https'
         self.assertEqual(req.is_secure(), True)

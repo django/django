@@ -36,7 +36,7 @@ class CsrfViewTests(TestCase):
                                 status_code=403)
 
     @override_settings(
-        SECURE_SECURE_PROXY_SSL_HEADER=('HTTP_X_FORWARDED_PROTO', 'https')
+        SECURE_PROXY_SSL_HEADER=('HTTP_X_FORWARDED_PROTO', 'https')
     )
     def test_no_referer(self):
         """
