@@ -1173,7 +1173,7 @@ define the details of how the relation works.
             name = models.CharField(max_length=255)
 
         # That's now the name of the reverse filter
-        article_instance.filter(tag__name="important")
+        Article.objects.filter(tag__name="important")
 
 .. attribute:: ForeignKey.to_field
 
