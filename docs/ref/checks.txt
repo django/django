@@ -358,7 +358,7 @@ stupid simple things that improve your site's security.
 Some of these checks may not be appropriate for your particular deployment
 configuration. For instance, if you do your HTTP->HTTPS redirection in a load
 balancer, it'd be irritating to be constantly warned about not having enabled
-:setting:`SECURE_SSL_REDIRECT`. Use :setting:`SILENCED_SYSTEM_CHECKS` to
+:setting:`SSL_REDIRECT`. Use :setting:`SILENCED_SYSTEM_CHECKS` to
 silence unneeded checks.
 
 The following check functions will be run if you use the
@@ -366,9 +366,9 @@ The following check functions will be run if you use the
 
 * **security.W001**: You do not have
   :class:`django.middleware.security.SecurityMiddleware` in your
-  :setting:`MIDDLEWARE_CLASSES` so the :setting:`SECURE_HSTS_SECONDS`,
-  :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, :setting:`SECURE_BROWSER_XSS_FILTER`
-  and :setting:`SECURE_SSL_REDIRECT` settings will have no effect.
+  :setting:`MIDDLEWARE_CLASSES` so the :setting:`HSTS_SECONDS`,
+  :setting:`CONTENT_TYPE_NOSNIFF`, :setting:`BROWSER_XSS_FILTER`
+  and :setting:`SSL_REDIRECT` settings will have no effect.
 
 * **security.W002**: You do not have
   :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
@@ -389,27 +389,27 @@ The following check functions will be run if you use the
   just disable this check.
 
 * **security.W004**: You have not set a value for the
-  :setting:`SECURE_HSTS_SECONDS` setting. If your entire site is served only
+  :setting:`HSTS_SECONDS` setting. If your entire site is served only
   over SSL, you may want to consider setting a value and enabling HTTP Strict
   Transport Security.
 
 * **security.W005**: You have not set the
-  :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` setting to ``True``. Without this,
+  :setting:`HSTS_INCLUDE_SUBDOMAINS` setting to ``True``. Without this,
   your site is potentially vulnerable to attack via an insecure connection to a
   subdomain.
 
-* **security.W006**: Your :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting is not
+* **security.W006**: Your :setting:`CONTENT_TYPE_NOSNIFF` setting is not
   set to ``True``, so your pages will not be served with an
   ``'x-content-type-options: nosniff'`` header. You should consider enabling
   this header to prevent the browser from identifying content types incorrectly.
 
-* **security.W007**: Your :setting:`SECURE_BROWSER_XSS_FILTER` setting is not
+* **security.W007**: Your :setting:`BROWSER_XSS_FILTER` setting is not
   set to ``True``, so your pages will not be served with an
   ``'x-xss-protection: 1; mode=block'`` header. You should consider enabling
   this header to activate the browser's XSS filtering and help prevent XSS
   attacks.
 
-* **security.W008**: Your :setting:`SECURE_SSL_REDIRECT` setting is not set to
+* **security.W008**: Your :setting:`SSL_REDIRECT` setting is not set to
   ``True``. Unless your site should be available over both SSL and non-SSL
   connections, you may want to either set this setting to ``True`` or configure
   a load balancer or reverse-proxy server  to redirect all connections to HTTPS.

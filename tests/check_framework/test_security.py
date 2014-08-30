@@ -209,9 +209,9 @@ class CheckSecurityMiddlewareTest(TestCase):
             self.func(None),
             [checks.Warning(
                 "You do not have 'django.middleware.security.SecurityMiddleware' "
-                "in your MIDDLEWARE_CLASSES so the SECURE_HSTS_SECONDS, "
-                "SECURE_CONTENT_TYPE_NOSNIFF, "
-                "SECURE_BROWSER_XSS_FILTER and SECURE_SSL_REDIRECT settings "
+                "in your MIDDLEWARE_CLASSES so the HSTS_SECONDS, "
+                "CONTENT_TYPE_NOSNIFF, "
+                "BROWSER_XSS_FILTER and SSL_REDIRECT settings "
                 "will have no effect.",
                 hint=None,
                 id='security.W001',
@@ -230,12 +230,12 @@ class CheckStrictTransportSecurityTest(TestCase):
         from django.core.checks.security.base import check_sts
         return check_sts
 
-    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_HSTS_SECONDS': 0})
+    @override_settings(SECURITY_MIDDLEWARE={'HSTS_SECONDS': 0})
     def test_no_sts(self):
         self.assertEqual(
             self.func(None),
             [checks.Warning(
-                "You have not set a value for the SECURE_HSTS_SECONDS setting. "
+                "You have not set a value for the HSTS_SECONDS setting. "
                 "If your entire site is served only over SSL, you may want to consider "
                 "setting a value and enabling HTTP Strict Transport Security.",
                 hint=None,
@@ -243,7 +243,7 @@ class CheckStrictTransportSecurityTest(TestCase):
             )]
         )
 
-    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_HSTS_SECONDS': 3600})
+    @override_settings(SECURITY_MIDDLEWARE={'HSTS_SECONDS': 3600})
     def test_with_sts(self):
         self.assertEqual(self.func(None), [])
 
@@ -254,12 +254,12 @@ class CheckStrictTransportSecuritySubdomainsTest(TestCase):
         from django.core.checks.security.base import check_sts_include_subdomains
         return check_sts_include_subdomains
 
-    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_HSTS_INCLUDE_SUBDOMAINS': False})
+    @override_settings(SECURITY_MIDDLEWARE={'HSTS_INCLUDE_SUBDOMAINS': False})
     def test_no_sts_subdomains(self):
         self.assertEqual(
             self.func(None),
             [checks.Warning(
-                "You have not set the SECURE_HSTS_INCLUDE_SUBDOMAINS setting to True. "
+                "You have not set the HSTS_INCLUDE_SUBDOMAINS setting to True. "
                 "Without this, your site is potentially vulnerable to attack "
                 "via an insecure connection to a subdomain.",
                 hint=None,
@@ -267,7 +267,7 @@ class CheckStrictTransportSecuritySubdomainsTest(TestCase):
             )]
         )
 
-    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_HSTS_INCLUDE_SUBDOMAINS': True})
+    @override_settings(SECURITY_MIDDLEWARE={'HSTS_INCLUDE_SUBDOMAINS': True})
     def test_with_sts_subdomains(self):
         self.assertEqual(self.func(None), [])
 
@@ -305,12 +305,12 @@ class CheckContentTypeNosniffTest(TestCase):
         from django.core.checks.security.base import check_content_type_nosniff
         return check_content_type_nosniff
 
-    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_CONTENT_TYPE_NOSNIFF': False})
+    @override_settings(SECURITY_MIDDLEWARE={'CONTENT_TYPE_NOSNIFF': False})
     def test_no_content_type_nosniff(self):
         self.assertEqual(
             self.func(None),
             [checks.Warning(
-                "Your SECURE_CONTENT_TYPE_NOSNIFF setting is not set to True, "
+                "Your CONTENT_TYPE_NOSNIFF setting is not set to True, "
                 "so your pages will not be served with an "
                 "'x-content-type-options: nosniff' header. "
                 "You should consider enabling this header to prevent the "
@@ -320,7 +320,7 @@ class CheckContentTypeNosniffTest(TestCase):
             )]
         )
 
-    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_CONTENT_TYPE_NOSNIFF': True})
+    @override_settings(SECURITY_MIDDLEWARE={'CONTENT_TYPE_NOSNIFF': True})
     def test_with_content_type_nosniff(self):
         self.assertEqual(self.func(None), [])
 
@@ -331,12 +331,12 @@ class CheckXssFilterTest(TestCase):
         from django.core.checks.security.base import check_xss_filter
         return check_xss_filter
 
-    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_BROWSER_XSS_FILTER': False})
+    @override_settings(SECURITY_MIDDLEWARE={'BROWSER_XSS_FILTER': False})
     def test_no_xss_filter(self):
         self.assertEqual(
             self.func(None),
             [checks.Warning(
-                "Your SECURE_BROWSER_XSS_FILTER setting is not set to True, "
+                "Your BROWSER_XSS_FILTER setting is not set to True, "
                 "so your pages will not be served with an "
                 "'x-xss-protection: 1; mode=block' header. "
                 "You should consider enabling this header to activate the "
@@ -346,7 +346,7 @@ class CheckXssFilterTest(TestCase):
             )]
         )
 
-    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_BROWSER_XSS_FILTER': True})
+    @override_settings(SECURITY_MIDDLEWARE={'BROWSER_XSS_FILTER': True})
     def test_with_xss_filter(self):
         self.assertEqual(self.func(None), [])
 
@@ -357,12 +357,12 @@ class CheckSSLRedirectTest(TestCase):
         from django.core.checks.security.base import check_ssl_redirect
         return check_ssl_redirect
 
-    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_SSL_REDIRECT': False})
+    @override_settings(SECURITY_MIDDLEWARE={'SSL_REDIRECT': False})
     def test_no_ssl_redirect(self):
         self.assertEqual(
             self.func(None),
             [checks.Warning(
-                "Your SECURE_SSL_REDIRECT setting is not set to True. "
+                "Your SSL_REDIRECT setting is not set to True. "
                 "Unless your site should be available over both SSL and non-SSL "
                 "connections, you may want to either set this setting to True "
                 "or configure a load balancer or reverse-proxy server "
@@ -372,7 +372,7 @@ class CheckSSLRedirectTest(TestCase):
             )]
         )
 
-    @override_settings(SECURITY_MIDDLEWARE_CONFIG={'SECURE_SSL_REDIRECT': True})
+    @override_settings(SECURITY_MIDDLEWARE={'SSL_REDIRECT': True})
     def test_with_sts(self):
         self.assertEqual(self.func(None), [])
 
