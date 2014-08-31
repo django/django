@@ -68,9 +68,8 @@ and two items in your :setting:`MIDDLEWARE_CLASSES` setting:
    users with requests using sessions.
 
 With these settings in place, running the command ``manage.py migrate`` creates
-the necessary database tables for auth related models, creates permissions for
-any models defined in your installed apps, and prompts you to create
-a superuser account the first time you run it.
+the necessary database tables for auth related models and permissions for any
+models defined in your installed apps.
 
 Usage
 =====
