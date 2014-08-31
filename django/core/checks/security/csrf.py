@@ -14,3 +14,35 @@ def check_csrf_middleware(app_configs):
         hint=None,
         id='security.W003',
     )]
+
+
+@register(Tags.security, deploy=True)
+def check_csrf_cookie_secure(app_configs):
+    passed_check = (
+        "django.middleware.csrf.CsrfViewMiddleware" not in settings.MIDDLEWARE_CLASSES or
+        settings.CSRF_COOKIE_SECURE
+    )
+    return [] if passed_check else [Warning(
+        "You have 'django.middleware.csrf.CsrfViewMiddleware' in your "
+        "MIDDLEWARE_CLASSES, but you have not set CSRF_COOKIE_SECURE to True. "
+        "Using a secure-only CSRF cookie makes it more difficult for network "
+        "traffic sniffers to steal the CSRF token.",
+        hint=None,
+        id='security.W016',
+    )]
+
+
+@register(Tags.security, deploy=True)
+def check_csrf_cookie_httponly(app_configs):
+    passed_check = (
+        "django.middleware.csrf.CsrfViewMiddleware" not in settings.MIDDLEWARE_CLASSES or
+        settings.CSRF_COOKIE_HTTPONLY
+    )
+    return [] if passed_check else [Warning(
+        "You have 'django.middleware.csrf.CsrfViewMiddleware' in your "
+        "MIDDLEWARE_CLASSES, but you have not set CSRF_COOKIE_HTTPONLY to True. "
+        "Using an HttpOnly CSRF cookie makes it more difficult for cross-site "
+        "scripting attacks to steal the CSRF token.",
+        hint=None,
+        id='security.W017',
+    )]

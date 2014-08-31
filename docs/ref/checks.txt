@@ -453,6 +453,14 @@ The following check functions will be run if you use the
   Using an ``HttpOnly`` session cookie makes it more difficult for cross-site
   scripting attacks to hijack user sessions.
 
+* **security.W016**: :setting:`CSRF_COOKIE_SECURE` is not set to ``True``.
+  Using a secure-only CSRF cookie makes it more difficult for network traffic
+  sniffers to steal the CSRF token.
+
+* **security.W017**: :setting:`CSRF_COOKIE_HTTPONLY` is not set to ``True``.
+  Using an ``HttpOnly`` CSRF cookie makes it more difficult for cross-site
+  scripting attacks to steal the CSRF token.
+
 Sites
 -----
 

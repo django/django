@@ -197,6 +197,72 @@ class CheckCSRFMiddlewareTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
+class CheckCSRFCookieSecureTest(TestCase):
+    @property
+    def func(self):
+        from django.core.checks.security.csrf import check_csrf_cookie_secure
+        return check_csrf_cookie_secure
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.csrf.CsrfViewMiddleware"],
+        CSRF_COOKIE_SECURE=False)
+    def test_with_csrf_cookie_secure_false(self):
+        self.assertEqual(
+            self.func(None),
+            [checks.Warning(
+                "You have 'django.middleware.csrf.CsrfViewMiddleware' in your "
+                "MIDDLEWARE_CLASSES, but you have not set CSRF_COOKIE_SECURE to True. "
+                "Using a secure-only CSRF cookie makes it more difficult for network "
+                "traffic sniffers to steal the CSRF token.",
+                hint=None,
+                id='security.W016',
+            )]
+        )
+
+    @override_settings(MIDDLEWARE_CLASSES=[], CSRF_COOKIE_SECURE=True)
+    def test_with_csrf_cookie_secure_false_no_middleware(self):
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.csrf.CsrfViewMiddleware"],
+        CSRF_COOKIE_SECURE=True)
+    def test_with_csrf_cookie_secure_true(self):
+        self.assertEqual(self.func(None), [])
+
+
+class CheckCSRFCookieHttpOnlyTest(TestCase):
+    @property
+    def func(self):
+        from django.core.checks.security.csrf import check_csrf_cookie_httponly
+        return check_csrf_cookie_httponly
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.csrf.CsrfViewMiddleware"],
+        CSRF_COOKIE_HTTPONLY=False)
+    def test_with_csrf_cookie_httponly_false(self):
+        self.assertEqual(
+            self.func(None),
+            [checks.Warning(
+                "You have 'django.middleware.csrf.CsrfViewMiddleware' in your "
+                "MIDDLEWARE_CLASSES, but you have not set CSRF_COOKIE_HTTPONLY to True. "
+                "Using an HttpOnly CSRF cookie makes it more difficult for cross-site "
+                "scripting attacks to steal the CSRF token.",
+                hint=None,
+                id='security.W017',
+            )]
+        )
+
+    @override_settings(MIDDLEWARE_CLASSES=[], CSRF_COOKIE_HTTPONLY=True)
+    def test_with_csrf_cookie_httponly_false_no_middleware(self):
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.csrf.CsrfViewMiddleware"],
+        CSRF_COOKIE_HTTPONLY=True)
+    def test_with_csrf_cookie_httponly_true(self):
+        self.assertEqual(self.func(None), [])
+
+
 class CheckSecurityMiddlewareTest(TestCase):
     @property
     def func(self):
