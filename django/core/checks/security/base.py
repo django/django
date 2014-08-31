@@ -111,3 +111,13 @@ def check_secret_key(app_configs):
         hint=None,
         id='security.W009',
     )]
+
+
+@register(Tags.security, deploy=True)
+def check_debug(app_configs):
+    passed_check = not settings.DEBUG
+    return [] if passed_check else [Warning(
+        "You shouldn't have DEBUG set to True in deployment.",
+        hint=None,
+        id='security.W018',
+    )]

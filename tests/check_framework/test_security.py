@@ -489,3 +489,22 @@ class CheckSecretKeyTest(TestCase):
         self.assertGreater(settings.SECRET_KEY, 50)
         self.assertLess(len(set(settings.SECRET_KEY)), 10)
         self.assertEqual(self.func(None), self.secret_key_error)
+
+
+class CheckDebugTest(TestCase):
+    @property
+    def func(self):
+        from django.core.checks.security.base import check_debug
+        return check_debug
+
+    @override_settings(DEBUG=True)
+    def test_debug_true(self):
+        self.assertEqual(self.func(None), [checks.Warning(
+            "You shouldn't have DEBUG set to True in deployment.",
+            hint=None,
+            id='security.W018',
+        )])
+
+    @override_settings(DEBUG=False)
+    def test_debug_false(self):
+        self.assertEqual(self.func(None), [])
