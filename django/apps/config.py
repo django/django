@@ -1,5 +1,6 @@
 from importlib import import_module
 import os
+import types
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.utils.module_loading import module_has_submodule
@@ -80,44 +81,41 @@ class AppConfig(object):
         """
         Factory that creates an app config from an entry in INSTALLED_APPS.
         """
-        try:
-            # If import_module succeeds, entry is a path to an app module,
-            # which may specify an app config class with default_app_config.
-            # Otherwise, entry is a path to an app config class or an error.
+        mod_path, _, ending = entry.rpartition('.')
+
+        if not mod_path:
+            # single-level module
+            mod_path = ending
+
+        # Attempt to import mod_path by itself. If this fails, the exception
+        # should propagate up (nothing else can be done at that point).
+
+        module = import_module(mod_path)
+
+        obj = getattr(module, ending, None)
+
+        if not obj or isinstance(obj, types.ModuleType):
+            # Either the path ending is a module, or the given object doesn't
+            # exist. Either way we need to perform an import here to allow
+            # import-time exceptions to propagate
             module = import_module(entry)
 
-        except ImportError:
-            mod_path, _, cls_name = entry.rpartition('.')
-
-            # Raise the original exception when entry cannot be a path to an
-            # app config class.
-            if not mod_path:
-                raise
-
-        else:
-            try:
-                # If this works, the app module specifies an app config class.
-                entry = module.default_app_config
-            except AttributeError:
-                # Otherwise, it simply uses the default app config class.
+            if not hasattr(module, 'default_app_config'):
+                # This is a plain module entry, so create a default AppConfig
                 return cls(entry, module)
-            else:
-                mod_path, _, cls_name = entry.rpartition('.')
 
-        # If we're reaching this point, we must load the app config class
-        # located at <mod_path>.<cls_name>.
+            # otherwise, import the module path given in default_app_config
+            entry = module.default_app_config
+            mod_path, _, cls_name = entry.rpartition('.')
+            module = import_module(mod_path)
+        else:
+            # if it is an attribute, we can assume it's an AppConfig class
+            cls_name = ending
 
-        # Avoid django.utils.module_loading.import_by_path because it
-        # masks errors -- it reraises ImportError as ImproperlyConfigured.
-        mod = import_module(mod_path)
-        try:
-            cls = getattr(mod, cls_name)
-        except AttributeError:
-            # Emulate the error that "from <mod_path> import <cls_name>"
-            # would raise when <mod_path> exists but not <cls_name>, with
-            # more context (Python just says "cannot import name ...").
-            raise ImportError(
-                "cannot import name '%s' from '%s'" % (cls_name, mod_path))
+        # We now know that entry *should* be a <mod_path>.<cls_name>.
+        # At this point we should allow AttributeError to propagate as normal
+        # if the given class doesn't exist.
+        cls = getattr(module, cls_name)
 
         # Check for obvious errors. (This check prevents duck typing, but
         # it could be removed if it became a problem in practice.)

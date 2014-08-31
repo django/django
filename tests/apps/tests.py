@@ -35,6 +35,10 @@ SOME_INSTALLED_APPS_NAMES = [
     'django.contrib.auth',
 ] + SOME_INSTALLED_APPS[2:]
 
+EXCEPTION_RAISING_APPS = [
+    'apps.misbehaving_module'
+] + SOME_INSTALLED_APPS[2:]
+
 HERE = os.path.dirname(__file__)
 
 
@@ -199,6 +203,17 @@ class AppsTests(TestCase):
         with self.assertRaises(LookupError):
             apps.get_model("apps", "SouthPonies")
         self.assertEqual(new_apps.get_model("apps", "SouthPonies"), temp_model)
+
+    def test_importtime_exception_propagation(self):
+        """
+        Test for #22920. Make sure exceptions occuring during import time
+        propagate correctly
+        """
+        from apps import Trouble
+
+        with self.assertRaises(Trouble):
+            with self.settings(INSTALLED_APPS=EXCEPTION_RAISING_APPS):
+                pass
 
 
 class Stub(object):
