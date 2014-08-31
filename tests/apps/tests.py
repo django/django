@@ -166,6 +166,14 @@ class AppsTests(TestCase):
             with self.settings(INSTALLED_APPS=['apps.apps.RelabeledAppsConfig', 'apps']):
                 pass
 
+    def test_import_exception_is_not_masked(self):
+        """
+        App discovery should preserve stack traces. Regression test for #22920.
+        """
+        with six.assertRaisesRegex(self, ImportError, "Oops"):
+            with self.settings(INSTALLED_APPS=['apps.failing_app']):
+                pass
+
     def test_models_py(self):
         """
         Tests that the models in the models.py file were loaded correctly.
