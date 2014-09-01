@@ -72,6 +72,16 @@ urlpatterns = [
 
     # Static views
     url(r'^site_media/(?P<path>.*)$', static.serve, {'document_root': media_dir}),
+
+    # Sensitive views
+    url(r'^sensitive/non_sensitive/$', views.non_sensitive_view),
+    url(r'^sensitive/sensitive/$', views.sensitive_view),
+    url(r'^sensitive/paranoid/$', views.paranoid_view),
+    url(r'^sensitive/multivalue_dict_key/$', views.multivalue_dict_key_error),
+    url(r'^sensitive/custom_reporter_filter/$', views.custom_exception_reporter_filter_view),
+    url(r'^sensitive/sensitive_method/$', views.sensitive_method_view),
+    url(r'^sensitive/sensitive_args/$', views.sensitive_args_function_caller),
+    url(r'^sensitive/sensitive_kwargs/$', views.sensitive_kwargs_function_caller),
 ]
 
 urlpatterns += [

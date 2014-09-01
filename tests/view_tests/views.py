@@ -10,6 +10,7 @@ from django.core.urlresolvers import get_resolver
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import render_to_response, render
 from django.template import Context, RequestContext, TemplateDoesNotExist
+from django.utils.decorators import method_decorator
 from django.views.debug import technical_500_response, SafeExceptionReporterFilter
 from django.views.decorators.debug import (sensitive_post_parameters,
                                            sensitive_variables)
@@ -204,18 +205,18 @@ def send_log(request, exc_info):
     admin_email_handler.filters = orig_filters
 
 
+class SensitiveTestError(Exception):
+    # Exception for tests of sensitive views.
+    pass
+
+
 def non_sensitive_view(request):
     # Do not just use plain strings for the variables' values in the code
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
     cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
     sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
-    try:
-        raise Exception
-    except Exception:
-        exc_info = sys.exc_info()
-        send_log(request, exc_info)
-        return technical_500_response(request, *exc_info)
+    raise SensitiveTestError
 
 
 @sensitive_variables('sauce')
@@ -226,12 +227,7 @@ def sensitive_view(request):
     # is displayed in the exception report.
     cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
     sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
-    try:
-        raise Exception
-    except Exception:
-        exc_info = sys.exc_info()
-        send_log(request, exc_info)
-        return technical_500_response(request, *exc_info)
+    raise SensitiveTestError
 
 
 @sensitive_variables()
@@ -242,21 +238,11 @@ def paranoid_view(request):
     # is displayed in the exception report.
     cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
     sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
-    try:
-        raise Exception
-    except Exception:
-        exc_info = sys.exc_info()
-        send_log(request, exc_info)
-        return technical_500_response(request, *exc_info)
+    raise SensitiveTestError
 
 
 def sensitive_args_function_caller(request):
-    try:
-        sensitive_args_function(''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e']))
-    except Exception:
-        exc_info = sys.exc_info()
-        send_log(request, exc_info)
-        return technical_500_response(request, *exc_info)
+    sensitive_args_function(''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e']))
 
 
 @sensitive_variables('sauce')
@@ -265,16 +251,11 @@ def sensitive_args_function(sauce):
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
     cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
-    raise Exception
+    raise SensitiveTestError
 
 
 def sensitive_kwargs_function_caller(request):
-    try:
-        sensitive_kwargs_function(''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e']))
-    except Exception:
-        exc_info = sys.exc_info()
-        send_log(request, exc_info)
-        return technical_500_response(request, *exc_info)
+    sensitive_kwargs_function(''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e']))
 
 
 @sensitive_variables('sauce')
@@ -283,7 +264,7 @@ def sensitive_kwargs_function(sauce=None):
     # so that the tests don't return false positives when the function's source
     # is displayed in the exception report.
     cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
-    raise Exception
+    raise SensitiveTestError
 
 
 class UnsafeExceptionReporterFilter(SafeExceptionReporterFilter):
@@ -307,12 +288,7 @@ def custom_exception_reporter_filter_view(request):
     cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
     sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
     request.exception_reporter_filter = UnsafeExceptionReporterFilter()
-    try:
-        raise Exception
-    except Exception:
-        exc_info = sys.exc_info()
-        send_log(request, exc_info)
-        return technical_500_response(request, *exc_info)
+    raise SensitiveTestError
 
 
 class Klass(object):
@@ -324,12 +300,7 @@ class Klass(object):
         # source is displayed in the exception report.
         cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
         sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
-        try:
-            raise Exception
-        except Exception:
-            exc_info = sys.exc_info()
-            send_log(request, exc_info)
-            return technical_500_response(request, *exc_info)
+        raise SensitiveTestError
 
 
 def sensitive_method_view(request):
@@ -341,12 +312,7 @@ def sensitive_method_view(request):
 def multivalue_dict_key_error(request):
     cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
     sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
-    try:
-        request.POST['bar']
-    except Exception:
-        exc_info = sys.exc_info()
-        send_log(request, exc_info)
-        return technical_500_response(request, *exc_info)
+    request.POST['bar']
 
 
 def json_response_view(request):
