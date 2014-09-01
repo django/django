@@ -100,7 +100,7 @@ These methods are run in the order given above, one field at a time.  That is,
 for each field in the form (in the order they are declared in the form
 definition), the ``Field.clean()`` method (or its override) is run, then
 ``clean_<fieldname>()``. Finally, once those two methods are run for every
-field, the `:meth:`Form.clean()` method, or its override, is executed whether
+field, the :meth:`Form.clean()` method, or its override, is executed whether
 or not the previous methods have raised errors.
 
 Examples of each of these methods are provided below.
