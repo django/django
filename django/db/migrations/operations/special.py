@@ -24,7 +24,7 @@ class SeparateDatabaseAndState(Operation):
         for database_operation in self.database_operations:
             to_state = from_state.clone()
             database_operation.state_forwards(app_label, to_state)
-            database_operation.database_forwards(self, app_label, schema_editor, from_state, to_state)
+            database_operation.database_forwards(app_label, schema_editor, from_state, to_state)
             from_state = to_state
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -36,7 +36,7 @@ class SeparateDatabaseAndState(Operation):
                 dbop.state_forwards(app_label, to_state)
             from_state = base_state.clone()
             database_operation.state_forwards(app_label, from_state)
-            database_operation.database_backwards(self, app_label, schema_editor, from_state, to_state)
+            database_operation.database_backwards(app_label, schema_editor, from_state, to_state)
 
     def describe(self):
         return "Custom state/database change combination"
