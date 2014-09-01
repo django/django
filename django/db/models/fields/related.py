@@ -119,10 +119,6 @@ class RelatedField(Field):
             ]
         return []
 
-    @cached_property
-    def has_class_relation(self):
-        return not isinstance(getattr(self, 'rel', False).to, six.string_types) and self.generate_reverse_relation
-
     def _check_referencing_to_swapped_model(self):
         if (self.rel.to not in apps.get_models() and
                 not isinstance(self.rel.to, six.string_types) and
