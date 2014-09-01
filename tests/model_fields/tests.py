@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 from decimal import Decimal
+from functools import partial
 import unittest
 import warnings
 
@@ -17,9 +18,6 @@ from django.db.models.fields import (
     GenericIPAddressField, NOT_PROVIDED, NullBooleanField, PositiveIntegerField,
     PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
     TimeField, URLField)
-from django.db.models.fields.related import (
-    RelatedObject, ForeignKey, ManyToManyField, OneToOneField)
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
 from django.utils.functional import lazy
@@ -29,16 +27,7 @@ from .models import (
     BooleanModel, PrimaryKeyCharModel, DataModel, Document, RenamedField,
     DateTimeModel, VerboseNameField, FksToBooleans, FkToChar, FloatModel,
     SmallIntegerModel, IntegerModel, PositiveSmallIntegerModel, PositiveIntegerModel,
-    WhizIter, WhizIterEmpty)
-
-ALL_FIELDS = [
-    AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
-    CommaSeparatedIntegerField, DateField, DateTimeField, DecimalField,
-    EmailField, FilePathField, FloatField, IntegerField, IPAddressField,
-    GenericIPAddressField, NullBooleanField, PositiveIntegerField,
-    PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
-    TimeField, URLField, RelatedObject, ForeignKey, ManyToManyField, OneToOneField,
-    GenericForeignKey]
+    WhizIter, WhizIterEmpty, AllFieldsModel)
 
 
 class BasicFieldTests(test.TestCase):
@@ -668,8 +657,19 @@ class BinaryFieldTests(test.TestCase):
 
 
 class FieldFlagsTests(test.TestCase):
+
+    def setUp(self):
+        self.fields = AllFieldsModel._meta.fields
+
     def test_each_field_should_have_a_concrete_attribute(self):
-        self.assertTrue(all(hasattr(f, 'concrete') for f in ALL_FIELDS))
+        self.assertTrue(all(f.concrete.__class__ == bool
+                        for f in self.fields))
+
+    #def test_each_field_should_have_an_editable_attribute(self):
+        #for f in ALL_FIELDS:
+            #if not hasattr(f, 'editable'):
+                #import ipdb; ipdb.set_trace()
+        #self.assertTrue(all(hasattr(f, 'editable') for f in ALL_FIELDS))
 
 
 class GenericIPAddressFieldTests(test.TestCase):
