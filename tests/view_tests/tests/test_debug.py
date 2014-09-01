@@ -716,6 +716,21 @@ class ExceptionReporterFilterTests(TestCase, ExceptionReportTestMixin):
             self.verify_safe_email('/sensitive/sensitive_kwargs/',
                                    check_for_POST_params=False)
 
+    def test_sensitive_class_view(self):
+        """
+        Ensure that sensitive POST parameters can't be seen in the response
+        when using class based views.
+        Refs #22990.
+        """
+        text = 'SensitiveTestError at /sensitive/sensitive_class/'
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response('/sensitive/sensitive_class/', text)
+            self.verify_unsafe_email('/sensitive/sensitive_class/')
+
+        with self.settings(DEBUG=False):
+            self.verify_public_response('/sensitive/sensitive_class/', text)
+            self.verify_safe_email('/sensitive/sensitive_class/')
+
     def test_callable_settings(self):
         """
         Callable settings should not be evaluated in the debug page (#21345).

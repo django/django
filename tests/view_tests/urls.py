@@ -82,6 +82,7 @@ urlpatterns = [
     url(r'^sensitive/sensitive_method/$', views.sensitive_method_view),
     url(r'^sensitive/sensitive_args/$', views.sensitive_args_function_caller),
     url(r'^sensitive/sensitive_kwargs/$', views.sensitive_kwargs_function_caller),
+    url(r'^sensitive/sensitive_class/$', views.SensitiveClassView.as_view()),
 ]
 
 urlpatterns += [
