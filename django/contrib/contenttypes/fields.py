@@ -6,7 +6,7 @@ from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db import models, router, transaction, DEFAULT_DB_ALIAS
-from django.db.models import signals, FieldDoesNotExist, DO_NOTHING, ConcreteFlagMixin
+from django.db.models import signals, FieldDoesNotExist, DO_NOTHING, FieldFlagsMixin
 from django.db.models.base import ModelBase
 from django.db.models.fields.related import ForeignObject, ForeignObjectRel
 from django.db.models.related import PathInfo
@@ -16,7 +16,7 @@ from django.utils.encoding import smart_text, python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
-class GenericForeignKey(ConcreteFlagMixin):
+class GenericForeignKey(FieldFlagsMixin):
     """
     Provides a generic relation to any object through content-type/object-id
     fields.
@@ -26,7 +26,9 @@ class GenericForeignKey(ConcreteFlagMixin):
         self.ct_field = ct_field
         self.fk_field = fk_field
         self.for_concrete_model = for_concrete_model
+        self.generate_reverse_relation = False
         self.editable = False
+        self.rel = True
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name

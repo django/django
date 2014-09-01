@@ -34,7 +34,7 @@ from django.utils.itercompat import is_iterable
 # makes these strings unicode
 __all__ = [str(x) for x in (
     'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
-    'BooleanField', 'CharField', 'ConcreteFlagMixin',
+    'BooleanField', 'CharField', 'FieldFlagsMixin',
     'CommaSeparatedIntegerField', 'DateField', 'DateTimeField',
     'DecimalField', 'EmailField', 'Empty', 'Field', 'FieldDoesNotExist',
     'FilePathField', 'FloatField', 'GenericIPAddressField', 'IPAddressField',
@@ -44,11 +44,17 @@ __all__ = [str(x) for x in (
 )]
 
 
-class ConcreteFlagMixin(object):
+class FieldFlagsMixin(object):
+    column = None
+    rel = None
 
-    @cached_property
+    @property
     def concrete(self):
         return self.column is not None
+
+    @property
+    def has_relation(self):
+        return self.rel is not None
 
 
 class Empty(object):
@@ -94,7 +100,7 @@ def _empty(of_cls):
 
 @total_ordering
 @python_2_unicode_compatible
-class Field(RegisterLookupMixin, ConcreteFlagMixin):
+class Field(RegisterLookupMixin, FieldFlagsMixin):
     """Base class for all field types"""
 
     # Designates whether empty strings fundamentally are allowed at the

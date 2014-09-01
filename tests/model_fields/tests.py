@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import datetime
 from decimal import Decimal
-from functools import partial
 import unittest
 import warnings
 
@@ -659,22 +658,23 @@ class BinaryFieldTests(test.TestCase):
 class FieldFlagsTests(test.TestCase):
 
     def setUp(self):
-        self.fields = AllFieldsModel._meta.fields + AllFieldsModel._meta.virtual_fields
+        self.fields = list(AllFieldsModel._meta.fields) + \
+            list(AllFieldsModel._meta.virtual_fields)
 
     def test_each_field_should_have_a_concrete_attribute(self):
         self.assertTrue(all(f.concrete.__class__ == bool
                         for f in self.fields))
 
-    #def test_each_field_should_have_an_editable_attribute(self):
-        #self.assertTrue(all(f.concrete.__class__ == bool
-                        #for f in self.fields))
+    def test_each_field_should_have_an_editable_attribute(self):
+        self.assertTrue(all(f.editable.__class__ == bool
+                        for f in self.fields))
 
-    #def test_each_field_should_have_an_editable_attribute(self):
-        #for f in ALL_FIELDS:
-            #if not hasattr(f, 'editable'):
-                #import ipdb; ipdb.set_trace()
-        #self.assertTrue(all(hasattr(f, 'editable') for f in ALL_FIELDS))
-
+    def test_each_field_should_have_a_has_rel_attribute(self):
+        for f in self.fields:
+            if not isinstance(f.has_relation, bool):
+                import ipdb; ipdb.set_trace()
+        self.assertTrue(all(f.has_relation.__class__ == bool
+                        for f in self.fields))
 
 class GenericIPAddressFieldTests(test.TestCase):
     def test_genericipaddressfield_formfield_protocol(self):

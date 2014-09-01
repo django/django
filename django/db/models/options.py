@@ -566,7 +566,7 @@ class Options(object):
         for model in all_models:
             for f in chain(model._meta.fields, model._meta.virtual_fields):
                 # Check if the field has a relation to another model
-                if hasattr(f, 'rel') and f.rel and f.has_class_relation:
+                if f.has_relation and f.generate_reverse_relation:
                     # Set options_instance -> field
                     related_objects_graph[f.rel.to._meta].append(f)
 
@@ -574,7 +574,7 @@ class Options(object):
                 # Many to many relations are never auto-created
                 for f in model._meta.many_to_many:
                     # Check if the field has a relation to another model
-                    if f.rel and not isinstance(f.rel.to, six.string_types):
+                    if f.has_relation and not isinstance(f.rel.to, six.string_types):
                         # Set options_instance -> field
                         related_objects_graph[f.rel.to._meta].append(f)
 
