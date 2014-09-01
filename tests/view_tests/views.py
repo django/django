@@ -10,6 +10,7 @@ from django.core.urlresolvers import get_resolver
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, render_to_response
 from django.template import TemplateDoesNotExist
+from django.utils.decorators import method_decorator
 from django.views.debug import (
     SafeExceptionReporterFilter, technical_500_response,
 )
@@ -224,6 +225,18 @@ class Klass(object):
 
 def sensitive_method_view(request):
     return Klass().method(request)
+
+
+class SensitiveClassView(View):
+    @method_decorator(sensitive_post_parameters('bacon-key', 'sausage-key'))
+    @sensitive_variables('sauce')
+    def post(request, *args, **kwargs):
+        # Do not just use plain strings for the variables' values in the code
+        # so that the tests don't return false positives when the function's source
+        # is displayed in the exception report.
+        cooked_eggs = ''.join(['s', 'c', 'r', 'a', 'm', 'b', 'l', 'e', 'd'])  # NOQA
+        sauce = ''.join(['w', 'o', 'r', 'c', 'e', 's', 't', 'e', 'r', 's', 'h', 'i', 'r', 'e'])  # NOQA
+        raise SensitiveTestError
 
 
 @sensitive_variables('sauce')

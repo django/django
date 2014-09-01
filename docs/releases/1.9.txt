@@ -838,6 +838,10 @@ Miscellaneous
   whitespace by default. This can be disabled by setting the new
   :attr:`~django.forms.CharField.strip` argument to ``False``.
 
+* Error report filtering now sanitizes the POST parameters in every
+  representation of the request. This should prevent accidental leakage
+  of sensitive information in most places.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
