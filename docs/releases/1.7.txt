@@ -1,6 +1,8 @@
-============================================
-Django 1.7 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 1.7 release notes
+========================
+
+*September 2, 2014*
 
 Welcome to Django 1.7!
 
@@ -51,11 +53,11 @@ but a few of the key features are:
   to your models and make migrations for them.
 
   :data:`~django.db.models.signals.pre_syncdb` and
-  :data:`~django.db.models.signals.post_syncdb` have been replaced by
-  :data:`~django.db.models.signals.pre_migrate` and
-  :data:`~django.db.models.signals.post_migrate` respectively. These new
-  signals have slightly different arguments. Check the documentation for
-  details.
+  :data:`~django.db.models.signals.post_syncdb` have been deprecated,
+  to be replaced by :data:`~django.db.models.signals.pre_migrate` and
+  :data:`~django.db.models.signals.post_migrate` respectively. These
+  new signals have slightly different arguments. Check the
+  documentation for details.
 
 * The ``allow_syncdb`` method on database routers is now called ``allow_migrate``,
   but still performs the same function. Routers with ``allow_syncdb`` methods
@@ -123,8 +125,10 @@ Improvements thus far include:
 New method on Field subclasses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To help power both schema migrations and composite keys, the :class:`~django.db.models.Field` API now
-has a new required method: ``deconstruct()``.
+To help power both schema migrations and to enable easier addition of
+composite keys in future releases of Django, the
+:class:`~django.db.models.Field` API now has a new required method:
+``deconstruct()``.
 
 This method takes no arguments, and returns a tuple of four items:
 
@@ -255,8 +259,13 @@ specific backend's cursor defined the behavior of the context manager. The
 behavior of magic method lookups was changed with Python 2.7 and cursors were
 no longer usable as context managers.
 
-Django 1.7 allows a cursor to be used as a context manager that is a shortcut
-for the following, instead of backend specific behavior::
+Django 1.7 allows a cursor to be used as a context manager. That is,
+the following can be used::
+
+    with connection.cursor() as c:
+        c.execute(...)
+
+instead of::
 
     c = connection.cursor()
     try:
@@ -283,7 +292,7 @@ to ``DateField`` it is possible to filter on the transformed value, for
 example ``qs.filter(author__birthdate__year__lte=1981)``.
 
 For more information about both custom lookups and transforms refer to
-:doc:`custom lookups </howto/custom-lookups>` documentation.
+the :doc:`custom lookups </howto/custom-lookups>` documentation.
 
 Improvements to ``Form`` error handling
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
