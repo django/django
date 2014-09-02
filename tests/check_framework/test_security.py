@@ -3,6 +3,9 @@ from django.core import checks
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from django.core.checks.security.base import (
+    SECRET_KEY_MIN_LENGTH, SECRET_KEY_MIN_UNIQUE_CHARACTERS,
+)
 from django.core.checks.security.sessions import add_session_cookie_message, add_httponly_message
 
 
@@ -303,7 +306,9 @@ class CheckStrictTransportSecurityTest(TestCase):
             [checks.Warning(
                 "You have not set a value for the SECURE_HSTS_SECONDS setting. "
                 "If your entire site is served only over SSL, you may want to consider "
-                "setting a value and enabling HTTP Strict Transport Security.",
+                "setting a value and enabling HTTP Strict Transport Security. "
+                "Be sure to read the documentation first; enabling HSTS carelessly "
+                "can cause serious, irreversible problems.",
                 hint=None,
                 id='security.W004',
             )]
@@ -327,7 +332,9 @@ class CheckStrictTransportSecuritySubdomainsTest(TestCase):
             [checks.Warning(
                 "You have not set the SECURE_HSTS_INCLUDE_SUBDOMAINS setting to True. "
                 "Without this, your site is potentially vulnerable to attack "
-                "via an insecure connection to a subdomain.",
+                "via an insecure connection to a subdomain. Only set this to True if "
+                "you are certain that all subdomains of your domain should be served "
+                "exclusively via SSL.",
                 hint=None,
                 id='security.W005',
             )]
@@ -383,9 +390,9 @@ class CheckXFrameOptionsDenyTest(TestCase):
                 "You have "
                 "'django.middleware.clickjacking.XFrameOptionsMiddleware' in your "
                 "MIDDLEWARE_CLASSES, but X_FRAME_OPTIONS is not set to 'DENY'. "
-                "The default is 'SAMEORIGIN' and unless there is a good reason for "
+                "The default is 'SAMEORIGIN', but unless there is a good reason for "
                 "your site to serve other parts of itself in a frame, you should "
-                "change this.",
+                "change it to 'DENY'.",
                 hint=None,
                 id='security.W019',
             )]
@@ -499,8 +506,8 @@ class CheckSecretKeyTest(TestCase):
 
     @override_settings(SECRET_KEY=('abcdefghijklmnopqrstuvwx' * 2) + 'ab')
     def test_okay_secret_key(self):
-        self.assertEqual(len(settings.SECRET_KEY), 50)
-        self.assertGreater(len(set(settings.SECRET_KEY)), 10)
+        self.assertEqual(len(settings.SECRET_KEY), SECRET_KEY_MIN_LENGTH)
+        self.assertGreater(len(set(settings.SECRET_KEY)), SECRET_KEY_MIN_UNIQUE_CHARACTERS)
         self.assertEqual(self.func(None), [])
 
     @override_settings(SECRET_KEY='')
@@ -518,13 +525,13 @@ class CheckSecretKeyTest(TestCase):
 
     @override_settings(SECRET_KEY=('abcdefghijklmnopqrstuvwx' * 2) + 'a')
     def test_low_length_secret_key(self):
-        self.assertEqual(len(settings.SECRET_KEY), 49)
+        self.assertEqual(len(settings.SECRET_KEY), SECRET_KEY_MIN_LENGTH - 1)
         self.assertEqual(self.func(None), self.secret_key_error)
 
     @override_settings(SECRET_KEY='abcd' * 20)
     def test_low_entropy_secret_key(self):
-        self.assertGreater(settings.SECRET_KEY, 50)
-        self.assertLess(len(set(settings.SECRET_KEY)), 10)
+        self.assertGreater(len(settings.SECRET_KEY), SECRET_KEY_MIN_LENGTH)
+        self.assertLess(len(set(settings.SECRET_KEY)), SECRET_KEY_MIN_UNIQUE_CHARACTERS)
         self.assertEqual(self.func(None), self.secret_key_error)
 
 

@@ -271,10 +271,9 @@ header. ``SecurityMiddleware`` will do this for all responses if the
 :setting:`SECURE_BROWSER_XSS_FILTER` setting is ``True``.
 
 .. warning::
-    The XSS filter does not prevent XSS attacks on your site, and you
-    should ensure that you are taking all other possible measures to
-    prevent XSS attacks. The most obvious of these is validating and
-    sanitizing all input.
+    The XSS filter does not prevent XSS attacks on your site, and you should
+    ensure that you are also validating and sanitizing all input to prevent XSS
+    attacks.
 
 .. _XSS attack: http://en.wikipedia.org/wiki/Cross-site_scripting
 .. _X-XSS-Protection header: http://blogs.msdn.com/b/ie/archive/2008/07/02/ie8-security-part-iv-the-xss-filter.aspx

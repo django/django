@@ -1,6 +1,9 @@
 from django.conf import settings
 from .. import register, Tags, Warning
 
+SECRET_KEY_MIN_LENGTH = 50
+SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
+
 
 @register(Tags.security, deploy=True)
 def check_security_middleware(app_configs):
@@ -41,9 +44,9 @@ def check_xframe_deny(app_configs):
         "You have "
         "'django.middleware.clickjacking.XFrameOptionsMiddleware' in your "
         "MIDDLEWARE_CLASSES, but X_FRAME_OPTIONS is not set to 'DENY'. "
-        "The default is 'SAMEORIGIN' and unless there is a good reason for "
+        "The default is 'SAMEORIGIN', but unless there is a good reason for "
         "your site to serve other parts of itself in a frame, you should "
-        "change this.",
+        "change it to 'DENY'.",
         hint=None,
         id='security.W019',
     )]
@@ -55,7 +58,9 @@ def check_sts(app_configs):
     return [] if passed_check else [Warning(
         "You have not set a value for the SECURE_HSTS_SECONDS setting. "
         "If your entire site is served only over SSL, you may want to consider "
-        "setting a value and enabling HTTP Strict Transport Security.",
+        "setting a value and enabling HTTP Strict Transport Security. "
+        "Be sure to read the documentation first; enabling HSTS carelessly "
+        "can cause serious, irreversible problems.",
         hint=None,
         id='security.W004',
     )]
@@ -67,7 +72,9 @@ def check_sts_include_subdomains(app_configs):
     return [] if passed_check else [Warning(
         "You have not set the SECURE_HSTS_INCLUDE_SUBDOMAINS setting to True. "
         "Without this, your site is potentially vulnerable to attack "
-        "via an insecure connection to a subdomain.",
+        "via an insecure connection to a subdomain. Only set this to True if "
+        "you are certain that all subdomains of your domain should be served "
+        "exclusively via SSL.",
         hint=None,
         id='security.W005',
     )]
@@ -118,8 +125,8 @@ def check_ssl_redirect(app_configs):
 def check_secret_key(app_configs):
     passed_check = (
         getattr(settings, 'SECRET_KEY', None) and
-        len(set(settings.SECRET_KEY)) >= 10 and  # at least 10 unique characters
-        len(settings.SECRET_KEY) >= 50  # at least 50 characters in length
+        len(set(settings.SECRET_KEY)) >= SECRET_KEY_MIN_UNIQUE_CHARACTERS and
+        len(settings.SECRET_KEY) >= SECRET_KEY_MIN_LENGTH
     )
     return [] if passed_check else [Warning(
         "Your SECRET_KEY has less than 50 characters or less than 10 unique "

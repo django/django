@@ -351,9 +351,9 @@ Security
 --------
 
 The security checks do not make your site secure. They do not audit code, do
-intrusion detection, or doing anything particularly complex. Rather, they help
+intrusion detection, or do anything particularly complex. Rather, they help
 perform an automated, low-hanging-fruit checklist. They help you remember the
-stupid simple things that improve your site's security.
+simple things that improve your site's security.
 
 Some of these checks may not be appropriate for your particular deployment
 configuration. For instance, if you do your HTTP->HTTPS redirection in a load
@@ -361,8 +361,8 @@ balancer, it'd be irritating to be constantly warned about not having enabled
 :setting:`SECURE_SSL_REDIRECT`. Use :setting:`SILENCED_SYSTEM_CHECKS` to
 silence unneeded checks.
 
-The following check functions will be run if you use the
-:djadminopt:`--deploy` of the :djadmin:`check` command:
+The following check functions will be run if you use the :djadminopt:`--deploy`
+option of the :djadmin:`check` command:
 
 * **security.W001**: You do not have
   :class:`django.middleware.security.SecurityMiddleware` in your
@@ -383,11 +383,13 @@ The following check functions will be run if you use the
 * **security.W004**: You have not set a value for the
   :setting:`SECURE_HSTS_SECONDS` setting. If your entire site is served only
   over SSL, you may want to consider setting a value and enabling HTTP Strict
-  Transport Security.
+  Transport Security. Be sure to read the documentation first; enabling HSTS
+  carelessly can cause serious, irreversible problems.
 * **security.W005**: You have not set the
   :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` setting to ``True``. Without this,
   your site is potentially vulnerable to attack via an insecure connection to a
-  subdomain.
+  subdomain. Only set this to True if you are certain that all subdomains of
+  your domain should be served exclusively via SSL.
 * **security.W006**: Your :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting is not
   set to ``True``, so your pages will not be served with an
   ``'x-content-type-options: nosniff'`` header. You should consider enabling
@@ -444,9 +446,9 @@ The following check functions will be run if you use the
 * **security.W019**: You have
   :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
   :setting:`MIDDLEWARE_CLASSES`, but :setting:`X_FRAME_OPTIONS` is not set to
-  ``'DENY'``. The default is ``'SAMEORIGIN'`` and unless there is a good reason
+  ``'DENY'``. The default is ``'SAMEORIGIN'``, but unless there is a good reason
   for your site to serve other parts of itself in a frame, you should change
-  this.
+  it to ``'DENY'``.
 
 Sites
 -----
