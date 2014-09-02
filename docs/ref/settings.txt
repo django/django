@@ -357,6 +357,12 @@ Default: ``False``
 
 Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
 ``True``, client-side JavaScript will not to be able to access the CSRF cookie.
+
+This can help prevent malicious JavaScript from bypassing CSRF protection. If
+you enable this and need to send the value of the CSRF token with Ajax requests,
+your JavaScript will need to pull the value from a hidden CSRF token form input
+on the page instead of from the cookie.
+
 See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 
 .. setting:: CSRF_COOKIE_NAME
