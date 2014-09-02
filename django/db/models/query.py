@@ -1052,6 +1052,15 @@ class QuerySet(object):
         """
         return self.query.has_filters()
 
+    def is_compatible_query_object_type(self, opts):
+        model = self.model
+        return (
+            model == opts.concrete_model or
+            opts.concrete_model in model._meta.get_parent_list() or
+            model in opts.get_parent_list()
+        )
+    is_compatible_query_object_type.queryset_only = True
+
 
 class InstanceCheckMeta(type):
     def __instancecheck__(self, instance):
@@ -1208,6 +1217,13 @@ class ValuesQuerySet(QuerySet):
             raise TypeError('Cannot use a multi-field %s as a filter value.'
                     % self.__class__.__name__)
         return self
+
+    def is_compatible_query_object_type(self, opts):
+        """
+        ValueQuerySets do not need to be checked for compatibility.
+        We trust that users of ValueQuerySets know what they are doing.
+        """
+        return True
 
 
 class ValuesListQuerySet(ValuesQuerySet):
