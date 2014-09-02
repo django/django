@@ -250,9 +250,9 @@ are added to the migration's dependencies.
 
 Much like :class:`RunSQL`, ensure that if you change schema inside here you're
 either doing it outside the scope of the Django model system (e.g. triggers)
-or that you use a custom Operation to reflect your changes to the model
-state - otherwise, the versioned ORM and the autodetector will stop
-working correctly.
+or that you use :class:`SeparateDatabaseAndState` to add in operations that will
+reflect your changes to the model state - otherwise, the versioned ORM and
+the autodetector will stop working correctly.
 
 By default, ``RunPython`` will run its contents inside a transaction even
 on databases that do not support DDL transactions (for example, MySQL and
@@ -267,6 +267,18 @@ set ``atomic=False``.
     give them the current database alias (available from
     ``schema_editor.connection.alias``, where ``schema_editor`` is the second
     argument to your function).
+
+SeparateDatabaseAndState
+------------------------
+
+.. class:: SeparateDatabaseAndState(database_operations=None, state_operations=None)
+
+A highly specialized operation that let you mix and match the database
+(schema-changing) and state (autodetector-powering) aspects of operations.
+
+It accepts two list of operations, and when asked to apply state will use the
+state list, and when asked to apply changes to the database will use the database
+list. Do not use this operation unless you're very sure you know what you're doing.
 
 Writing your own
 ================
