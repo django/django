@@ -3487,6 +3487,14 @@ class RelatedLookupTypeTests(TestCase):
         with self.assertNumQueries(0):
             ObjectB.objects.filter(objecta__in=ObjectA.objects.all())
 
+    def test_values_queryset_lookup(self):
+        """
+        #23396 - Ensure ValueQuerySets are not checked for compatibility with the lookup field
+        """
+        self.assertQuerysetEqual(ObjectB.objects.filter(
+            objecta__in=ObjectB.objects.all().values_list('pk')
+        ).order_by('pk'), ['<ObjectB: ob>', '<ObjectB: pob>'])
+
 
 class Ticket14056Tests(TestCase):
     def test_ticket_14056(self):
