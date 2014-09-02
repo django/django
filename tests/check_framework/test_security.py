@@ -338,7 +338,7 @@ class CheckStrictTransportSecuritySubdomainsTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckXFrameOptionsMiddelwareTest(TestCase):
+class CheckXFrameOptionsMiddlewareTest(TestCase):
     @property
     def func(self):
         from django.core.checks.security.base import check_xframe_options_middleware
@@ -363,6 +363,43 @@ class CheckXFrameOptionsMiddelwareTest(TestCase):
 
     @override_settings(MIDDLEWARE_CLASSES=["django.middleware.clickjacking.XFrameOptionsMiddleware"])
     def test_middleware_installed(self):
+        self.assertEqual(self.func(None), [])
+
+
+class CheckXFrameOptionsDenyTest(TestCase):
+    @property
+    def func(self):
+        from django.core.checks.security.base import check_xframe_deny
+        return check_xframe_deny
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.clickjacking.XFrameOptionsMiddleware"],
+        X_FRAME_OPTIONS='SAMEORIGIN',
+    )
+    def test_x_frame_options_not_deny(self):
+        self.assertEqual(
+            self.func(None),
+            [checks.Warning(
+                "You have "
+                "'django.middleware.clickjacking.XFrameOptionsMiddleware' in your "
+                "MIDDLEWARE_CLASSES, but X_FRAME_OPTIONS is not set to 'DENY'. "
+                "The default is 'SAMEORIGIN' and unless there is a good reason for "
+                "your site to serve other parts of itself in a frame, you should "
+                "change this.",
+                hint=None,
+                id='security.W019',
+            )]
+        )
+
+    @override_settings(MIDDLEWARE_CLASSES=[], X_FRAME_OPTIONS='SAMEORIGIN')
+    def test_middleware_not_installed(self):
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.clickjacking.XFrameOptionsMiddleware"],
+        X_FRAME_OPTIONS='DENY',
+    )
+    def test_xframe_deny(self):
         self.assertEqual(self.func(None), [])
 
 

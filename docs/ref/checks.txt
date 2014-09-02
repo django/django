@@ -441,6 +441,12 @@ The following check functions will be run if you use the
   scripting attacks to steal the CSRF token.
 * **security.W018**: You shouldn't have :setting:`DEBUG` set to ``True`` in
   deployment.
+* **security.W019**: You have
+  :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
+  :setting:`MIDDLEWARE_CLASSES`, but :setting:`X_FRAME_OPTIONS` is not set to
+  ``'DENY'``. The default is ``'SAMEORIGIN'`` and unless there is a good reason
+  for your site to serve other parts of itself in a frame, you should change
+  this.
 
 Sites
 -----

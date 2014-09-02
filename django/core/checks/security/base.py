@@ -32,6 +32,24 @@ def check_xframe_options_middleware(app_configs):
 
 
 @register(Tags.security, deploy=True)
+def check_xframe_deny(app_configs):
+    passed_check = (
+        "django.middleware.clickjacking.XFrameOptionsMiddleware" not in settings.MIDDLEWARE_CLASSES
+        or settings.X_FRAME_OPTIONS == 'DENY'
+    )
+    return [] if passed_check else [Warning(
+        "You have "
+        "'django.middleware.clickjacking.XFrameOptionsMiddleware' in your "
+        "MIDDLEWARE_CLASSES, but X_FRAME_OPTIONS is not set to 'DENY'. "
+        "The default is 'SAMEORIGIN' and unless there is a good reason for "
+        "your site to serve other parts of itself in a frame, you should "
+        "change this.",
+        hint=None,
+        id='security.W019',
+    )]
+
+
+@register(Tags.security, deploy=True)
 def check_sts(app_configs):
     passed_check = bool(settings.SECURE_HSTS_SECONDS)
     return [] if passed_check else [Warning(
