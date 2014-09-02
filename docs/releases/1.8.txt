@@ -148,7 +148,8 @@ File Storage
 File Uploads
 ^^^^^^^^^^^^
 
-* ...
+* Base64 encoded files in multipart form data can now safely include
+  whitespace.
 
 Forms
 ^^^^^
