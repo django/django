@@ -52,7 +52,7 @@ copyright = 'Django Software Foundation and contributors'
 # built documents.
 #
 # The short X.Y version.
-version = '1.5.9'
+version = '1.5.10'
 # The full version, including alpha/beta/rc tags.
 release = version
 # The next version to be released
