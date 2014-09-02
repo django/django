@@ -276,6 +276,8 @@ like this::
 
 If we connected a handler like this::
 
+    from django.db.models.signals import m2m_changed
+
     def toppings_changed(sender, **kwargs):
         # Do something
         pass
