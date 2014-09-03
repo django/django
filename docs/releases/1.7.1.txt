@@ -1,0 +1,12 @@
+==========================
+Django 1.7.1 release notes
+==========================
+
+*Under development*
+
+Django 1.7.1 fixes several bugs in 1.7.
+
+Bugfixes
+========
+
+* Replace with actual issue (:ticket:`00000`).
