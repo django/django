@@ -45,8 +45,6 @@ __all__ = [str(x) for x in (
 
 
 class FieldFlagsMixin(object):
-    column = None
-    rel = None
 
     @property
     def concrete(self):

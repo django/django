@@ -29,6 +29,7 @@ class GenericForeignKey(FieldFlagsMixin):
         self.generate_reverse_relation = False
         self.editable = False
         self.rel = True
+        self.column = None
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
