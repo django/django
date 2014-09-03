@@ -11,7 +11,7 @@ PathInfo = namedtuple('PathInfo',
                       'm2m direct')
 
 
-class RelatedObject(FieldFlagsMixin):
+class RelatedObject(object):
     def __init__(self, parent_model, model, field):
         self.parent_model = parent_model
         self.model = model
