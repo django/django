@@ -616,7 +616,8 @@ If you already have pre-existing migrations created with
 `South <http://south.aeracode.org>`_, then the upgrade process to use
 ``django.db.migrations`` is quite simple:
 
-* Ensure all installs are fully up-to-date with their migrations
+* Ensure all installs are fully up-to-date with their migrations.
+* Remove ``'south'`` from :setting:`INSTALLED_APPS`.
 * Delete all your (numbered) migration files, but not the directory or
   ``__init__.py`` - make sure you remove the ``.pyc`` files too.
 * Run ``python manage.py makemigrations``. Django should see the empty
