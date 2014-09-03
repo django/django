@@ -602,7 +602,7 @@ the block of code it controls; when exiting the block, it commits or
 rollbacks, and switches back to auto mode.
 
 So :func:`commit_on_success` really has two effects: it changes the
-transaction state and it defines an transaction block. Nesting will give the
+transaction state and it defines a transaction block. Nesting will give the
 expected results in terms of transaction state, but not in terms of
 transaction semantics. Most often, the inner block will commit, breaking the
 atomicity of the outer block.
