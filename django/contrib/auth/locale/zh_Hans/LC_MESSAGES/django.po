@@ -7,6 +7,7 @@
 # pylemon <leeway1985@gmail.com>, 2012-2013
 # Ziang Song <songziang@gmail.com>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
+# WeizhongTu <tuweizhong@163.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -98,7 +99,7 @@ msgid ""
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
-"原始密码不会存储到数据库，因此没有办法看到这个用户的密码，但您可以使用<a "
+"原始密码不会存储到数据库，因此无法看到该用户的密码，但您可以使用<a "
 "href=\"password/\">这个表单</a>来更改密码。"
 
 #: contrib/auth/forms.py:166
@@ -106,7 +107,7 @@ msgstr ""
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
-msgstr "请输入一个正确的 %(username)s 和密码. 注意他们都是大区分大小写的."
+msgstr "请输入正确的%(username)s和密码。 注意他们可能都区分大小写的。"
 
 #: contrib/auth/forms.py:168
 msgid "This account is inactive."
@@ -259,7 +260,7 @@ msgstr "有效"
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "指明用户是否被认为活跃的。以反选代替删除帐号。"
+msgstr "指明用户是否激活。不勾选以代替删除帐号。"
 
 #: contrib/auth/models.py:382
 msgid "date joined"
@@ -288,28 +289,28 @@ msgstr "退出登录"
 
 #: contrib/auth/views.py:169
 msgid "Password reset"
-msgstr ""
+msgstr "密码重置"
 
 #: contrib/auth/views.py:181
 msgid "Password reset successful"
-msgstr ""
+msgstr "密码重置成功"
 
 #: contrib/auth/views.py:216
 msgid "Enter new password"
-msgstr ""
+msgstr "输入新密码"
 
 #: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "密码重置失败"
 
 #: contrib/auth/views.py:244
 msgid "Password reset complete"
-msgstr ""
+msgstr "密码重置完成"
 
 #: contrib/auth/views.py:278
 msgid "Password change"
-msgstr ""
+msgstr "密码修改"
 
 #: contrib/auth/views.py:291
 msgid "Password change successful"
-msgstr ""
+msgstr "密码修改成功"
