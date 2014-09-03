@@ -123,6 +123,8 @@ details on these changes.
 
 * Private attribute ``django.db.models.Field.related`` will be removed.
 
+* The ``--list`` option of the ``migrate`` management command will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

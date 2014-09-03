@@ -394,6 +394,9 @@ Management Commands
 * :djadmin:`makemigrations` now supports an :djadminopt:`--exit` option to
   exit with an error code if no migrations are created.
 
+* The new :djadmin:`showmigrations` command allows listing all migrations and
+  their dependencies in a project.
+
 Middleware
 ^^^^^^^^^^
 
@@ -1133,6 +1136,13 @@ arguments through ``argparse.add_argument()``. See
 The class :class:`~django.core.management.NoArgsCommand` is now deprecated and
 will be removed in Django 2.0. Use :class:`~django.core.management.BaseCommand`
 instead, which takes no arguments by default.
+
+Listing all migrations in a project
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``--list`` option of the :djadmin:`migrate` management command is
+deprecated and will be removed in Django 2.0. Use :djadmin:`showmigrations`
+instead.
 
 ``cache_choices`` option of ``ModelChoiceField`` and ``ModelMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
