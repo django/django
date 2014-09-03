@@ -2,7 +2,7 @@
 Django 1.6.7 release notes
 ==========================
 
-*Under development*
+*September 2, 2014*
 
 Django 1.6.7 fixes several bugs in 1.6.6, including a regression related to
 a security fix in that release.

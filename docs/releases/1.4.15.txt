@@ -2,7 +2,7 @@
 Django 1.4.15 release notes
 ===========================
 
-*Under development*
+*September 2, 2014*
 
 Django 1.4.15 fixes a regression in the 1.4.14 security release.
 
