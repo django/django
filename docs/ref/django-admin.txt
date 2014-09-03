@@ -142,9 +142,9 @@ List all available tags.
 The ``--deploy`` option activates some additional checks that are only relevant
 in a deployment setting.
 
-You can use this option in your local development environment. Since your local
-development settings module may not have many of your production settings, you
-will probably want to point the ``check`` command at a different settings
+You can use this option in your local development environment, but since your
+local development settings module may not have many of your production settings,
+you will probably want to point the ``check`` command at a different settings
 module, either by setting the ``DJANGO_SETTINGS_MODULE`` environment variable,
 or by passing the ``--settings`` option::
 

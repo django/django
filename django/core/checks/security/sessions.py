@@ -1,4 +1,5 @@
 from django.conf import settings
+
 from .. import register, Tags, Warning
 
 
@@ -99,4 +100,4 @@ def _session_middleware():
 
 
 def _session_app():
-    return ("django.contrib.sessions" in settings.INSTALLED_APPS)
+    return "django.contrib.sessions" in settings.INSTALLED_APPS

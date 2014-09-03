@@ -8,7 +8,7 @@ The system check framework is a set of static checks for validating Django
 projects. It detects common problems and provides hints for how to fix them.
 The framework is extensible so you can easily add your own checks.
 
-For details on how to add your own checks and integrate them with Django's
+For details on how to add your own checks and integrate them with Django`s
 system checks, see the :doc:`System check topic guide </topics/checks>`.
 
 Builtin tags
@@ -372,7 +372,7 @@ option of the :djadmin:`check` command:
 * **security.W002**: You do not have
   :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
   :setting:`MIDDLEWARE_CLASSES`, so your pages will not be served with an
-  'x-frame-options' header. Unless there is a good reason for your
+  ``'x-frame-options'`` header. Unless there is a good reason for your
   site to be served in a frame, you should consider enabling this
   header to help prevent clickjacking attacks.
 * **security.W003**: You don't appear to be using Django's built-in cross-site
@@ -382,13 +382,14 @@ option of the :djadmin:`check` command:
   approach to ensure you don't leave any holes.
 * **security.W004**: You have not set a value for the
   :setting:`SECURE_HSTS_SECONDS` setting. If your entire site is served only
-  over SSL, you may want to consider setting a value and enabling HTTP Strict
-  Transport Security. Be sure to read the documentation first; enabling HSTS
-  carelessly can cause serious, irreversible problems.
+  over SSL, you may want to consider setting a value and enabling :ref:`HTTP
+  Strict Transport Security <http-strict-transport-security>`. Be sure to read
+  the documentation first; enabling HSTS carelessly can cause serious,
+  irreversible problems.
 * **security.W005**: You have not set the
   :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` setting to ``True``. Without this,
   your site is potentially vulnerable to attack via an insecure connection to a
-  subdomain. Only set this to True if you are certain that all subdomains of
+  subdomain. Only set this to ``True`` if you are certain that all subdomains of
   your domain should be served exclusively via SSL.
 * **security.W006**: Your :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting is not
   set to ``True``, so your pages will not be served with an
@@ -404,7 +405,7 @@ option of the :djadmin:`check` command:
   connections, you may want to either set this setting to ``True`` or configure
   a load balancer or reverse-proxy server  to redirect all connections to HTTPS.
 * **security.W009**: Your :setting:`SECRET_KEY` has less than 50 characters or
-  less than 10 unique characters. Please generate a long and random
+  less than 5 unique characters. Please generate a long and random
   ``SECRET_KEY``, otherwise many of Django's security-critical features will be
   vulnerable to attack.
 * **security.W010**: You have :mod:`django.contrib.sessions` in your

@@ -78,10 +78,13 @@ W008 = Warning(
 )
 
 W009 = Warning(
-    "Your SECRET_KEY has less than 50 characters or less than 10 unique "
-    "characters. Please generate a long and random SECRET_KEY, otherwise "
-    "many of Django's security-critical features will be vulnerable to "
-    "attack.",
+    "Your SECRET_KEY has less than %(min_length)s characters or less than "
+    "%(min_unique_chars)s unique characters. Please generate a long and random "
+    "SECRET_KEY, otherwise many of Django's security-critical features will be "
+    "vulnerable to attack." % {
+        'min_length': SECRET_KEY_MIN_LENGTH,
+        'min_unique_chars': SECRET_KEY_MIN_UNIQUE_CHARACTERS,
+    },
     hint=None,
     id='security.W009',
 )
@@ -140,6 +143,7 @@ def check_sts_include_subdomains(app_configs, **kwargs):
     return [] if passed_check else [W005]
 
 
+@register(Tags.security, deploy=True)
 def check_content_type_nosniff(app_configs, **kwargs):
     passed_check = (
         not _security_middleware() or

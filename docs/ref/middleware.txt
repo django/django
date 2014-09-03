@@ -194,18 +194,19 @@ header`_. This reduces your exposure to some SSL-stripping man-in-the-middle
 you set the :setting:`SECURE_HSTS_SECONDS` setting to a non-zero integer value.
 
 When enabling HSTS, it's a good idea to first use a small value for testing,
-for example, :setting:`SECURE_HSTS_SECONDS=3600<SECURE_HSTS_SECONDS>` for one
+for example, :setting:`SECURE_HSTS_SECONDS = 3600<SECURE_HSTS_SECONDS>` for one
 hour. Each time a Web browser sees the HSTS header from your site, it will
-refuse to communicate non-securely (using HTTP) with your domain. Once you
-confirm that all assets are served securely on your site (i.e. HSTS didn't
-break anything), it's a good idea to increase this value (one year or 31536000
-seconds is common) so that infrequent visitors will be protected.
+refuse to communicate non-securely (using HTTP) with your domain for the given
+period of time. Once you confirm that all assets are served securely on your
+site (i.e. HSTS didn't break anything), it's a good idea to increase this value
+(31536000 seconds, i.e. 1 year, is common) so that infrequent visitors will be
+protected.
 
 Additionally, if you set the :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` setting
 to ``True``, ``SecurityMiddleware`` will add the ``includeSubDomains`` tag to
-the ``Strict-Transport-Security`` header. This is recommended (again, assuming
-all subdomains are served exclusively using HTTPS), otherwise your site may
-still be vulnerable via an insecure connection to a subdomain.
+the ``Strict-Transport-Security`` header. This is recommended (assuming all
+subdomains are served exclusively using HTTPS), otherwise your site may still
+be vulnerable via an insecure connection to a subdomain.
 
 .. warning::
     The HSTS policy applies to your entire domain, not just the URL of the
@@ -220,9 +221,9 @@ still be vulnerable via an insecure connection to a subdomain.
 
 .. note::
     If you are deployed behind a load-balancer or reverse-proxy server, and the
-    Strict-Transport-Security header is not being added to your responses, it
-    may be because Django doesn't realize when it's on a secure connection; you
-    may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
+    ``Strict-Transport-Security`` header is not being added to your responses,
+    it may be because Django doesn't realize that it's on a secure connection;
+    you may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
 .. _"Strict-Transport-Security" header: http://en.wikipedia.org/wiki/Strict_Transport_Security
 
@@ -243,7 +244,7 @@ the browser when you expected it to be something harmless.
 To learn more about this header and how the browser treats it, you can
 read about it on the `IE Security Blog`_.
 
-To prevent the browser from guessing the content type, and force it to
+To prevent the browser from guessing the content type and force it to
 always use the type provided in the ``Content-Type`` header, you can pass
 the ``X-Content-Type-Options: nosniff`` header.  ``SecurityMiddleware`` will
 do this for all responses if the :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting
@@ -295,8 +296,8 @@ connections to HTTPS.
 
     For performance reasons, it's preferable to do these redirects outside of
     Django, in a front-end load balancer or reverse-proxy server such as
-    `nginx`_. In some deployment situations this isn't an option -
-    :setting:`SECURE_SSL_REDIRECT` is intended for those cases.
+    `nginx`_. :setting:`SECURE_SSL_REDIRECT` is intended for the deployment
+    situations where this isn't an option.
 
 If the :setting:`SECURE_SSL_HOST` setting has a value, all redirects will be
 sent to that host instead of the originally-requested host.
@@ -306,7 +307,7 @@ not redirected to HTTPS, you can list regular expressions to match those URLs
 in the :setting:`SECURE_REDIRECT_EXEMPT` setting.
 
 .. note::
-    If you are deployed behind a load-balancer or reverse-proxy server, and
+    If you are deployed behind a load-balancer or reverse-proxy server and
     Django can't seem to tell when a request actually is already secure, you
     may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
