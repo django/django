@@ -5,6 +5,7 @@ from collections import OrderedDict
 from importlib import import_module
 import itertools
 import traceback
+import warnings
 
 from django.apps import apps
 from django.core.management import call_command
@@ -13,9 +14,10 @@ from django.core.management.color import no_style
 from django.core.management.sql import custom_sql_for_model, emit_post_migrate_signal, emit_pre_migrate_signal
 from django.db import connections, router, transaction, DEFAULT_DB_ALIAS
 from django.db.migrations.executor import MigrationExecutor
-from django.db.migrations.loader import MigrationLoader, AmbiguityError
+from django.db.migrations.loader import AmbiguityError
 from django.db.migrations.state import ProjectState
 from django.db.migrations.autodetector import MigrationAutodetector
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.module_loading import module_has_submodule
 
 
@@ -62,7 +64,20 @@ class Command(BaseCommand):
 
         # If they asked for a migration listing, quit main execution flow and show it
         if options.get("list", False):
-            return self.show_migration_list(connection, [options['app_label']] if options['app_label'] else None)
+            warnings.warn(
+                "The 'migrate --list' command is deprecated. Use 'showmigrations' instead.",
+                RemovedInDjango20Warning, stacklevel=2)
+            return call_command(
+                'showmigrations',
+                '--list',
+                app_labels=[options['app_label']] if options['app_label'] else None,
+                database=db,
+                no_color=options.get('no-color'),
+                settings=options.get('settings'),
+                stdout=options.get('stdout', self.stdout),
+                traceback=self.show_traceback,
+                verbosity=self.verbosity,
+            )
 
         # Hook for backends needing any database preparation
         connection.prepare_database()
@@ -325,44 +340,3 @@ class Command(BaseCommand):
                 )
 
         return created_models
-
-    def show_migration_list(self, connection, app_names=None):
-        """
-        Shows a list of all migrations on the system, or only those of
-        some named apps.
-        """
-        # Load migrations from disk/DB
-        loader = MigrationLoader(connection)
-        graph = loader.graph
-        # If we were passed a list of apps, validate it
-        if app_names:
-            invalid_apps = []
-            for app_name in app_names:
-                if app_name not in loader.migrated_apps:
-                    invalid_apps.append(app_name)
-            if invalid_apps:
-                raise CommandError("No migrations present for: %s" % (", ".join(invalid_apps)))
-        # Otherwise, show all apps in alphabetic order
-        else:
-            app_names = sorted(loader.migrated_apps)
-        # For each app, print its migrations in order from oldest (roots) to
-        # newest (leaves).
-        for app_name in app_names:
-            self.stdout.write(app_name, self.style.MIGRATE_LABEL)
-            shown = set()
-            for node in graph.leaf_nodes(app_name):
-                for plan_node in graph.forwards_plan(node):
-                    if plan_node not in shown and plan_node[0] == app_name:
-                        # Give it a nice title if it's a squashed one
-                        title = plan_node[1]
-                        if graph.nodes[plan_node].replaces:
-                            title += " (%s squashed migrations)" % len(graph.nodes[plan_node].replaces)
-                        # Mark it as applied/unapplied
-                        if plan_node in loader.applied_migrations:
-                            self.stdout.write(" [X] %s" % title)
-                        else:
-                            self.stdout.write(" [ ] %s" % title)
-                        shown.add(plan_node)
-            # If we didn't print anything, then a small message
-            if not shown:
-                self.stdout.write(" (no migrations)", self.style.MIGRATE_FAILURE)
