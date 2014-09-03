@@ -684,17 +684,21 @@ class FieldFlagsTests(test.TestCase):
         self.fields = list(AllFieldsModel._meta.fields) + \
             list(AllFieldsModel._meta.virtual_fields)
 
+        self.all_fields = self.fields + \
+            list(AllFieldsModel._meta.many_to_many) + \
+            list(AllFieldsModel._meta.virtual_fields)
+
     def test_each_field_should_have_a_concrete_attribute(self):
         self.assertTrue(all(f.concrete.__class__ == bool
                         for f in self.fields))
 
     def test_each_field_should_have_an_editable_attribute(self):
         self.assertTrue(all(f.editable.__class__ == bool
-                        for f in self.fields))
+                        for f in self.all_fields))
 
     def test_each_field_should_have_a_has_rel_attribute(self):
         self.assertTrue(all(f.has_relation.__class__ == bool
-                        for f in self.fields))
+                        for f in self.all_fields))
 
     def test_non_concrete_fields(self):
         for field in self.fields:
@@ -704,18 +708,25 @@ class FieldFlagsTests(test.TestCase):
                 self.assertTrue(field.concrete)
 
     def test_non_editable_fields(self):
-        for field in self.fields:
+        for field in self.all_fields:
             if type(field) in NON_EDITABLE_FIELDS:
                 self.assertFalse(field.editable)
             else:
                 self.assertTrue(field.editable)
 
     def test_related_fields(self):
-        for field in self.fields:
+        for field in self.all_fields:
             if type(field) in RELATION_FIELDS:
                 self.assertTrue(field.has_relation)
             else:
                 self.assertFalse(field.has_relation)
+
+    def test_field_with_multiple_values(self):
+        for field in self.all_fields:
+            if type(field) in HAS_MANY_VALUES:
+                self.assertTrue(field.has_many_values)
+            else:
+                self.assertFalse(field.has_many_values)
 
 
 class GenericIPAddressFieldTests(test.TestCase):
