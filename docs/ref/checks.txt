@@ -367,7 +367,7 @@ option of the :djadmin:`check` command:
 * **security.W001**: You do not have
   :class:`django.middleware.security.SecurityMiddleware` in your
   :setting:`MIDDLEWARE_CLASSES` so the :setting:`SECURE_HSTS_SECONDS`,
-  :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, :setting:`SECURE_BROWSER_XSS_FILTER`
+  :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, :setting:`SECURE_BROWSER_XSS_FILTER`,
   and :setting:`SECURE_SSL_REDIRECT` settings will have no effect.
 * **security.W002**: You do not have
   :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
