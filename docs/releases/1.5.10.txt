@@ -2,7 +2,7 @@
 Django 1.5.10 release notes
 ===========================
 
-*Under development*
+*September 2, 2014*
 
 Django 1.5.10 fixes a regression in the 1.5.9 security release.
 
