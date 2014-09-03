@@ -104,44 +104,65 @@ W019 = Warning(
 )
 
 
+def _security_middleware():
+    return "django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE_CLASSES
+
+
+def _xframe_middleware():
+    return "django.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE_CLASSES
+
+
 @register(Tags.security, deploy=True)
 def check_security_middleware(app_configs, **kwargs):
-    passed_check = "django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE_CLASSES
+    passed_check = _security_middleware()
     return [] if passed_check else [W001]
 
 
 @register(Tags.security, deploy=True)
 def check_xframe_options_middleware(app_configs, **kwargs):
-    passed_check = "django.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE_CLASSES
+    passed_check = _xframe_middleware()
     return [] if passed_check else [W002]
 
 
 @register(Tags.security, deploy=True)
 def check_sts(app_configs, **kwargs):
-    passed_check = bool(settings.SECURE_HSTS_SECONDS)
+    passed_check = not _security_middleware() or settings.SECURE_HSTS_SECONDS
     return [] if passed_check else [W004]
 
 
 @register(Tags.security, deploy=True)
 def check_sts_include_subdomains(app_configs, **kwargs):
-    passed_check = bool(settings.SECURE_HSTS_INCLUDE_SUBDOMAINS)
+    passed_check = (
+        not _security_middleware() or
+        not settings.SECURE_HSTS_SECONDS or
+        settings.SECURE_HSTS_INCLUDE_SUBDOMAINS is True
+    )
     return [] if passed_check else [W005]
 
 
 def check_content_type_nosniff(app_configs, **kwargs):
-    passed_check = settings.SECURE_CONTENT_TYPE_NOSNIFF
+    passed_check = (
+        not _security_middleware() or
+        settings.SECURE_CONTENT_TYPE_NOSNIFF is True
+    )
     return [] if passed_check else [W006]
 
 
 @register(Tags.security, deploy=True)
 def check_xss_filter(app_configs, **kwargs):
-    passed_check = settings.SECURE_BROWSER_XSS_FILTER is True
+    passed_check = (
+        not _security_middleware() or
+        settings.SECURE_BROWSER_XSS_FILTER is True
+    )
     return [] if passed_check else [W007]
 
 
 @register(Tags.security, deploy=True)
 def check_ssl_redirect(app_configs, **kwargs):
-    passed_check = bool(settings.SECURE_SSL_REDIRECT)
+    passed_check = (
+        not _security_middleware() or
+        settings.SECURE_SSL_REDIRECT is True
+    )
     return [] if passed_check else [W008]
 
 
@@ -164,7 +185,7 @@ def check_debug(app_configs, **kwargs):
 @register(Tags.security, deploy=True)
 def check_xframe_deny(app_configs, **kwargs):
     passed_check = (
-        "django.middleware.clickjacking.XFrameOptionsMiddleware" not in settings.MIDDLEWARE_CLASSES
-        or settings.X_FRAME_OPTIONS == 'DENY'
+        not _xframe_middleware() or
+        settings.X_FRAME_OPTIONS == 'DENY'
     )
     return [] if passed_check else [W019]

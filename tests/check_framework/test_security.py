@@ -215,14 +215,28 @@ class CheckStrictTransportSecurityTest(TestCase):
         from django.core.checks.security.base import check_sts
         return check_sts
 
-    @override_settings(SECURE_HSTS_SECONDS=0)
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.security.SecurityMiddleware"],
+        SECURE_HSTS_SECONDS=0)
     def test_no_sts(self):
         """
         Warn if SECURE_HSTS_SECONDS isn't > 0.
         """
         self.assertEqual(self.func(None), [base.W004])
 
-    @override_settings(SECURE_HSTS_SECONDS=3600)
+    @override_settings(
+        MIDDLEWARE_CLASSES=[],
+        SECURE_HSTS_SECONDS=0)
+    def test_no_sts_no_middlware(self):
+        """
+        Don't warn if SECURE_HSTS_SECONDS isn't > 0 and SecurityMiddleware isn't
+        installed.
+        """
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.security.SecurityMiddleware"],
+        SECURE_HSTS_SECONDS=3600)
     def test_with_sts(self):
         self.assertEqual(self.func(None), [])
 
@@ -233,14 +247,40 @@ class CheckStrictTransportSecuritySubdomainsTest(TestCase):
         from django.core.checks.security.base import check_sts_include_subdomains
         return check_sts_include_subdomains
 
-    @override_settings(SECURE_HSTS_INCLUDE_SUBDOMAINS=False)
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.security.SecurityMiddleware"],
+        SECURE_HSTS_INCLUDE_SUBDOMAINS=False,
+        SECURE_HSTS_SECONDS=3600)
     def test_no_sts_subdomains(self):
         """
-        Warn if SECURE_HSTS_INCLUDE_SUBDOMAINS isn't True
+        Warn if SECURE_HSTS_INCLUDE_SUBDOMAINS isn't True.
         """
         self.assertEqual(self.func(None), [base.W005])
 
-    @override_settings(SECURE_HSTS_INCLUDE_SUBDOMAINS=True)
+    @override_settings(
+        MIDDLEWARE_CLASSES=[],
+        SECURE_HSTS_INCLUDE_SUBDOMAINS=False,
+        SECURE_HSTS_SECONDS=3600)
+    def test_no_sts_subdomains_no_middlware(self):
+        """
+        Don't warn if SecurityMiddleware isn't installed.
+        """
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.security.SecurityMiddleware"],
+        SECURE_SSL_REDIRECT=False,
+        SECURE_HSTS_SECONDS=None)
+    def test_no_sts_subdomains_no_seconds(self):
+        """
+        Don't warn if SECURE_HSTS_SECONDS isn't set.
+        """
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.security.SecurityMiddleware"],
+        SECURE_HSTS_INCLUDE_SUBDOMAINS=True,
+        SECURE_HSTS_SECONDS=3600)
     def test_with_sts_subdomains(self):
         self.assertEqual(self.func(None), [])
 
@@ -302,14 +342,28 @@ class CheckContentTypeNosniffTest(TestCase):
         from django.core.checks.security.base import check_content_type_nosniff
         return check_content_type_nosniff
 
-    @override_settings(SECURE_CONTENT_TYPE_NOSNIFF=False)
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.security.SecurityMiddleware"],
+        SECURE_CONTENT_TYPE_NOSNIFF=False)
     def test_no_content_type_nosniff(self):
         """
         Warn if SECURE_CONTENT_TYPE_NOSNIFF isn't True.
         """
         self.assertEqual(self.func(None), [base.W006])
 
-    @override_settings(SECURE_CONTENT_TYPE_NOSNIFF=True)
+    @override_settings(
+        MIDDLEWARE_CLASSES=[],
+        SECURE_CONTENT_TYPE_NOSNIFF=False)
+    def test_no_content_type_nosniff_no_middleware(self):
+        """
+        Don't warn if SECURE_CONTENT_TYPE_NOSNIFF isn't True and
+        SecurityMiddleware isn't in MIDDLEWARE_CLASSES.
+        """
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.security.SecurityMiddleware"],
+        SECURE_CONTENT_TYPE_NOSNIFF=True)
     def test_with_content_type_nosniff(self):
         self.assertEqual(self.func(None), [])
 
@@ -320,14 +374,28 @@ class CheckXssFilterTest(TestCase):
         from django.core.checks.security.base import check_xss_filter
         return check_xss_filter
 
-    @override_settings(SECURE_BROWSER_XSS_FILTER=False)
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.security.SecurityMiddleware"],
+        SECURE_BROWSER_XSS_FILTER=False)
     def test_no_xss_filter(self):
         """
         Warn if SECURE_BROWSER_XSS_FILTER isn't True.
         """
         self.assertEqual(self.func(None), [base.W007])
 
-    @override_settings(SECURE_BROWSER_XSS_FILTER=True)
+    @override_settings(
+        MIDDLEWARE_CLASSES=[],
+        SECURE_BROWSER_XSS_FILTER=False)
+    def test_no_xss_filter_no_middleware(self):
+        """
+        Don't warn if SECURE_BROWSER_XSS_FILTER isn't True and
+        SecurityMiddleware isn't in MIDDLEWARE_CLASSES.
+        """
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.security.SecurityMiddleware"],
+        SECURE_BROWSER_XSS_FILTER=True)
     def test_with_xss_filter(self):
         self.assertEqual(self.func(None), [])
 
@@ -338,13 +406,28 @@ class CheckSSLRedirectTest(TestCase):
         from django.core.checks.security.base import check_ssl_redirect
         return check_ssl_redirect
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.security.SecurityMiddleware"],
+        SECURE_SSL_REDIRECT=False)
     def test_no_ssl_redirect(self):
         """
         Warn if SECURE_SSL_REDIRECT isn't True.
         """
         self.assertEqual(self.func(None), [base.W008])
 
-    @override_settings(SECURE_SSL_REDIRECT=True)
+    @override_settings(
+        MIDDLEWARE_CLASSES=[],
+        SECURE_SSL_REDIRECT=False)
+    def test_no_ssl_redirect_no_middlware(self):
+        """
+        Don't warn if SECURE_SSL_REDIRECT is False and SecurityMiddleware isn't
+        installed.
+        """
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE_CLASSES=["django.middleware.security.SecurityMiddleware"],
+        SECURE_SSL_REDIRECT=True)
     def test_with_ssl_redirect(self):
         self.assertEqual(self.func(None), [])
 

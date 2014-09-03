@@ -1,4 +1,5 @@
 from django.conf import settings
+
 from .. import register, Tags, Warning
 
 
@@ -31,16 +32,20 @@ W017 = Warning(
 )
 
 
+def _csrf_middleware():
+    return "django.middleware.csrf.CsrfViewMiddleware" in settings.MIDDLEWARE_CLASSES
+
+
 @register(Tags.security, deploy=True)
 def check_csrf_middleware(app_configs, **kwargs):
-    passed_check = "django.middleware.csrf.CsrfViewMiddleware" in settings.MIDDLEWARE_CLASSES
+    passed_check = _csrf_middleware()
     return [] if passed_check else [W003]
 
 
 @register(Tags.security, deploy=True)
 def check_csrf_cookie_secure(app_configs, **kwargs):
     passed_check = (
-        "django.middleware.csrf.CsrfViewMiddleware" not in settings.MIDDLEWARE_CLASSES or
+        not _csrf_middleware() or
         settings.CSRF_COOKIE_SECURE
     )
     return [] if passed_check else [W016]
@@ -49,7 +54,7 @@ def check_csrf_cookie_secure(app_configs, **kwargs):
 @register(Tags.security, deploy=True)
 def check_csrf_cookie_httponly(app_configs, **kwargs):
     passed_check = (
-        "django.middleware.csrf.CsrfViewMiddleware" not in settings.MIDDLEWARE_CLASSES or
+        not _csrf_middleware() or
         settings.CSRF_COOKIE_HTTPONLY
     )
     return [] if passed_check else [W017]
