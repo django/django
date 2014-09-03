@@ -51,6 +51,11 @@ RELATION_FIELDS = (
     GenericForeignKey,
 )
 
+HAS_MANY_VALUES = (
+    CommaSeparatedIntegerField,
+    ManyToManyField,
+)
+
 
 class BasicFieldTests(test.TestCase):
     def test_show_hidden_initial(self):
