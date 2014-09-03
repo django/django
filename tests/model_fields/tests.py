@@ -7,6 +7,7 @@ import warnings
 
 from django import test
 from django import forms
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction, models, IntegrityError
@@ -17,6 +18,10 @@ from django.db.models.fields import (
     GenericIPAddressField, NOT_PROVIDED, NullBooleanField, PositiveIntegerField,
     PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
     TimeField, URLField)
+
+from django.db.models.fields.related import (
+    ForeignObject, ForeignKey, OneToOneField, ManyToManyField,
+)
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
 from django.utils.functional import lazy
@@ -27,6 +32,24 @@ from .models import (
     DateTimeModel, VerboseNameField, FksToBooleans, FkToChar, FloatModel,
     SmallIntegerModel, IntegerModel, PositiveSmallIntegerModel, PositiveIntegerModel,
     WhizIter, WhizIterEmpty, AllFieldsModel)
+
+NON_CONCRETE_FIELDS = (
+    ForeignObject,
+    GenericForeignKey,
+)
+
+NON_EDITABLE_FIELDS = (
+    BinaryField,
+    GenericForeignKey,
+)
+
+RELATION_FIELDS = (
+    ForeignKey,
+    ForeignObject,
+    ManyToManyField,
+    OneToOneField,
+    GenericForeignKey,
+)
 
 
 class BasicFieldTests(test.TestCase):
@@ -670,11 +693,30 @@ class FieldFlagsTests(test.TestCase):
                         for f in self.fields))
 
     def test_each_field_should_have_a_has_rel_attribute(self):
-        for f in self.fields:
-            if not isinstance(f.has_relation, bool):
-                import ipdb; ipdb.set_trace()
         self.assertTrue(all(f.has_relation.__class__ == bool
                         for f in self.fields))
+
+    def test_non_concrete_fields(self):
+        for field in self.fields:
+            if type(field) in NON_CONCRETE_FIELDS:
+                self.assertFalse(field.concrete)
+            else:
+                self.assertTrue(field.concrete)
+
+    def test_non_editable_fields(self):
+        for field in self.fields:
+            if type(field) in NON_EDITABLE_FIELDS:
+                self.assertFalse(field.editable)
+            else:
+                self.assertTrue(field.editable)
+
+    def test_related_fields(self):
+        for field in self.fields:
+            if type(field) in RELATION_FIELDS:
+                self.assertTrue(field.has_relation)
+            else:
+                self.assertFalse(field.has_relation)
+
 
 class GenericIPAddressFieldTests(test.TestCase):
     def test_genericipaddressfield_formfield_protocol(self):
