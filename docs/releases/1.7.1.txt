@@ -51,3 +51,6 @@ Bugfixes
   a backwards or no-op migration (:ticket:`23474`).
 
 * Restored the ability to deepcopy ``F`` objects (:ticket:`23492`).
+
+* Formats for Welsh (``cy``) and several Chinese locales (``zh_CN``,
+  ``zh_Hans``, ``zh_Hant`` and ``zh_TW``) have been added.
