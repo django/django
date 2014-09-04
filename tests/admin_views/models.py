@@ -839,3 +839,16 @@ class ChildOfReferer(ParentWithFK):
 
 class M2MReference(models.Model):
     ref = models.ManyToManyField('self')
+
+
+# Models for #23431
+class ReferencedByInline(models.Model):
+    pass
+
+
+class InlineReference(models.Model):
+    fk = models.ForeignKey(ReferencedByInline, related_name='hidden+')
+
+
+class InlineReferer(models.Model):
+    refs = models.ManyToManyField(InlineReference)

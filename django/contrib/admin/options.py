@@ -439,6 +439,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         return clean_lookup in valid_lookups
 
     def to_field_allowed(self, request, to_field):
+        """
+        Returns True if the model associated with this admin should be
+        allowed to be referenced by the specified field.
+        """
         opts = self.model._meta
 
         try:
@@ -448,8 +452,13 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
 
         # Make sure at least one of the models registered for this site
         # references this field through a FK or a M2M relationship.
-        registered_models = self.admin_site._registry
-        for related_object in (opts.get_all_related_objects() +
+        registered_models = set()
+        for model, admin in self.admin_site._registry.items():
+            registered_models.add(model)
+            for inline in admin.inlines:
+                registered_models.add(inline.model)
+
+        for related_object in (opts.get_all_related_objects(include_hidden=True) +
                                opts.get_all_related_many_to_many_objects()):
             related_model = related_object.model
             if (any(issubclass(model, related_model) for model in registered_models) and

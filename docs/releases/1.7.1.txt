@@ -18,3 +18,5 @@ Bugfixes
   when not using migrations (:ticket:`23416`).
 
 * Fixed serialization of ``type`` objects in migrations (:ticket:`22951`).
+
+* Allowed inline and hidden references to admin fields (:ticket:`23431`).
