@@ -272,7 +272,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                                     self.admin_site, using=db)
             kwargs['help_text'] = ''
         elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
-            kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
+            kwargs['widget'] = widgets.FilteredSelectMultiple(
+                db_field.verbose_name,
+                db_field.name in self.filter_vertical
+            )
 
         if 'queryset' not in kwargs:
             queryset = self.get_field_queryset(db, db_field, request)
@@ -1131,7 +1134,10 @@ class ModelAdmin(BaseModelAdmin):
                                             (opts.app_label, opts.model_name),
                                             args=(quote(pk_value),),
                                             current_app=self.admin_site.name)
-            post_url_continue = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, post_url_continue)
+            post_url_continue = add_preserved_filters(
+                {'preserved_filters': preserved_filters, 'opts': opts},
+                post_url_continue
+            )
             return HttpResponseRedirect(post_url_continue)
 
         elif "_addanother" in request.POST:
@@ -1833,7 +1839,8 @@ class InlineModelAdmin(BaseModelAdmin):
                         objs = []
                         for p in collector.protected:
                             objs.append(
-                                # Translators: Model verbose name and instance representation, suitable to be an item in a list
+                                # Translators: Model verbose name and instance representation,
+                                # suitable to be an item in a list.
                                 _('%(class_name)s %(instance)s') % {
                                     'class_name': p._meta.verbose_name,
                                     'instance': p}

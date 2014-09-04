@@ -328,7 +328,10 @@ class ExceptionReporter(object):
             end = getattr(self.exc_value, 'end', None)
             if start is not None and end is not None:
                 unicode_str = self.exc_value.args[1]
-                unicode_hint = smart_text(unicode_str[max(start - 5, 0):min(end + 5, len(unicode_str))], 'ascii', errors='replace')
+                unicode_hint = smart_text(
+                    unicode_str[max(start - 5, 0):min(end + 5, len(unicode_str))],
+                    'ascii', errors='replace'
+                )
         from django import get_version
         c = {
             'is_email': self.is_email,
@@ -466,7 +469,9 @@ class ExceptionReporter(object):
             lineno = tb.tb_lineno - 1
             loader = tb.tb_frame.f_globals.get('__loader__')
             module_name = tb.tb_frame.f_globals.get('__name__') or ''
-            pre_context_lineno, pre_context, context_line, post_context = self._get_lines_from_file(filename, lineno, 7, loader, module_name)
+            pre_context_lineno, pre_context, context_line, post_context = self._get_lines_from_file(
+                filename, lineno, 7, loader, module_name,
+            )
             if pre_context_lineno is not None:
                 frames.append({
                     'tb': tb,
@@ -573,13 +578,14 @@ def default_urlconf(request):
 # always work even if the template loader is broken.
 #
 
-TECHNICAL_500_TEMPLATE = """
+TECHNICAL_500_TEMPLATE = ("""
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta name="robots" content="NONE,NOARCHIVE">
-  <title>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
+  <title>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}"""
+"""{% if request %} at {{ request.path_info|escape }}{% endif %}</title>
   <style type="text/css">
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
@@ -594,7 +600,10 @@ TECHNICAL_500_TEMPLATE = """
     code, pre { font-size: 100%; white-space: pre-wrap; }
     table { border:1px solid #ccc; border-collapse: collapse; width:100%; background:white; }
     tbody td, tbody th { vertical-align:top; padding:2px 3px; }
-    thead th { padding:1px 6px 1px 3px; background:#fefefe; text-align:left; font-weight:normal; font-size:11px; border:1px solid #ddd; }
+    thead th {
+      padding:1px 6px 1px 3px; background:#fefefe; text-align:left;
+      font-weight:normal; font-size:11px; border:1px solid #ddd;
+    }
     tbody th { width:12em; text-align:right; color:#666; padding-right:.5em; }
     table.vars { margin:5px 0 2px 40px; }
     table.vars td, table.req td { font-family:monospace; }
@@ -693,8 +702,11 @@ TECHNICAL_500_TEMPLATE = """
 </head>
 <body>
 <div id="summary">
-  <h1>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}{% if request %} at {{ request.path_info|escape }}{% endif %}</h1>
-  <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% else %}No exception message supplied{% endif %}</pre>
+  <h1>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}"""
+  """{% if request %} at {{ request.path_info|escape }}{% endif %}</h1>
+  <pre class="exception_value">"""
+ """{% if exception_value %}{{ exception_value|force_escape }}{% else %}No exception message supplied{% endif %}"""
+"""</pre>
   <table class="meta">
 {% if request %}
     <tr>
@@ -776,11 +788,17 @@ TECHNICAL_500_TEMPLATE = """
    <h2>Error during template rendering</h2>
    <p>In template <code>{{ template_info.name }}</code>, error at line <strong>{{ template_info.line }}</strong></p>
    <h3>{{ template_info.message }}</h3>
-   <table class="source{% if template_info.top %} cut-top{% endif %}{% ifnotequal template_info.bottom template_info.total %} cut-bottom{% endifnotequal %}">
+   <table class="source{% if template_info.top %} cut-top{% endif %}
+      {% ifnotequal template_info.bottom template_info.total %} cut-bottom{% endifnotequal %}">
    {% for source_line in template_info.source_lines %}
    {% ifequal source_line.0 template_info.line %}
-       <tr class="error"><th>{{ source_line.0 }}</th>
-       <td>{{ template_info.before }}<span class="specific">{{ template_info.during }}</span>{{ template_info.after }}</td></tr>
+   <tr class="error"><th>{{ source_line.0 }}</th>
+     <td>
+      {{ template_info.before }}
+      <span class="specific">{{ template_info.during }}</span>
+      {{ template_info.after }}
+      </td>
+   </tr>
    {% else %}
       <tr><th>{{ source_line.0 }}</th>
       <td>{{ source_line.1 }}</td></tr>
@@ -791,7 +809,9 @@ TECHNICAL_500_TEMPLATE = """
 {% endif %}
 {% if frames %}
 <div id="traceback">
-  <h2>Traceback <span class="commands">{% if not is_email %}<a href="#" onclick="return switchPastebinFriendly(this);">Switch to copy-and-paste view</a></span>{% endif %}</h2>
+  <h2>Traceback <span class="commands">{% if not is_email %}<a href="#" onclick="return switchPastebinFriendly(this);">
+    Switch to copy-and-paste view</a></span>{% endif %}
+  </h2>
   {% autoescape off %}
   <div id="browserTraceback">
     <ul class="traceback">
@@ -802,11 +822,21 @@ TECHNICAL_500_TEMPLATE = """
           {% if frame.context_line %}
             <div class="context" id="c{{ frame.id }}">
               {% if frame.pre_context and not is_email %}
-                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line|escape }}</pre></li>{% endfor %}</ol>
+                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">
+                {% for line in frame.pre_context %}
+                  <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line|escape }}</pre></li>
+                {% endfor %}
+                </ol>
               {% endif %}
-              <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ frame.context_line|escape }}</pre>{% if not is_email %} <span>...</span>{% endif %}</li></ol>
+              <ol start="{{ frame.lineno }}" class="context-line">
+                <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>
+            {{ frame.context_line|escape }}</pre>{% if not is_email %} <span>...</span>{% endif %}</li></ol>
               {% if frame.post_context and not is_email  %}
-                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line|escape }}</pre></li>{% endfor %}</ol>
+                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">
+                  {% for line in frame.post_context %}
+                  <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ line|escape }}</pre></li>
+                  {% endfor %}
+              </ol>
               {% endif %}
             </div>
           {% endif %}
@@ -845,7 +875,8 @@ TECHNICAL_500_TEMPLATE = """
 {% if not is_email %}
   <div id="pastebinTraceback" class="pastebin">
     <input type="hidden" name="language" value="PythonConsole">
-    <input type="hidden" name="title" value="{{ exception_type|escape }}{% if request %} at {{ request.path_info|escape }}{% endif %}">
+    <input type="hidden" name="title"
+      value="{{ exception_type|escape }}{% if request %} at {{ request.path_info|escape }}{% endif %}">
     <input type="hidden" name="source" value="Django Dpaste Agent">
     <input type="hidden" name="poster" value="Django">
     <textarea name="content" id="traceback_area" cols="140" rows="25">
@@ -872,7 +903,8 @@ Installed Middleware:
 {% endif %}{% if template_info %}
 Template error:
 In template {{ template_info.name }}, error at line {{ template_info.line }}
-   {{ template_info.message }}{% for source_line in template_info.source_lines %}{% ifequal source_line.0 template_info.line %}
+   {{ template_info.message }}{% for source_line in template_info.source_lines %}
+{% ifequal source_line.0 template_info.line %}
    {{ source_line.0 }} : {{ template_info.before }} {{ template_info.during }} {{ template_info.after }}
 {% else %}
    {{ source_line.0 }} : {{ source_line.1 }}
@@ -1036,7 +1068,7 @@ Exception Value: {{ exception_value|force_escape }}
 {% endif %}
 </body>
 </html>
-"""
+""")
 
 TECHNICAL_500_TEXT_TEMPLATE = """{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
 {% firstof exception_value 'No exception message supplied' %}
@@ -1062,7 +1094,8 @@ Installed Middleware:
 {% endif %}{% if template_info %}
 Template error:
 In template {{ template_info.name }}, error at line {{ template_info.line }}
-   {{ template_info.message }}{% for source_line in template_info.source_lines %}{% ifequal source_line.0 template_info.line %}
+   {{ template_info.message }}{% for source_line in template_info.source_lines %}
+{% ifequal source_line.0 template_info.line %}
    {{ source_line.0 }} : {{ template_info.before }} {{ template_info.during }} {{ template_info.after }}
 {% else %}
    {{ source_line.0 }} : {{ source_line.1 }}
@@ -1195,7 +1228,10 @@ DEFAULT_URLCONF_TEMPLATE = """
     h4 { margin:0 0 .5em 0; font-weight: normal; }
     table { border:1px solid #ccc; border-collapse: collapse; width:100%; background:white; }
     tbody td, tbody th { vertical-align:top; padding:2px 3px; }
-    thead th { padding:1px 6px 1px 3px; background:#fefefe; text-align:left; font-weight:normal; font-size:11px; border:1px solid #ddd; }
+    thead th {
+      padding:1px 6px 1px 3px; background:#fefefe; text-align:left;
+      font-weight:normal; font-size:11px; border:1px solid #ddd;
+    }
     tbody th { width:12em; text-align:right; color:#666; padding-right:.5em; }
     #summary { background: #e0ebff; }
     #summary h2 { font-weight: normal; color: #666; }

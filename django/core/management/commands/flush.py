@@ -73,7 +73,8 @@ Are you sure you want to do this?
                     "  * The database isn't running or isn't configured correctly.\n"
                     "  * At least one of the expected database tables doesn't exist.\n"
                     "  * The SQL was invalid.\n"
-                    "Hint: Look at the output of 'django-admin sqlflush'. That's the SQL this command wasn't able to run.\n"
+                    "Hint: Look at the output of 'django-admin sqlflush'. "
+                    "That's the SQL this command wasn't able to run.\n"
                     "The full error: %s") % (connection.settings_dict['NAME'], e)
                 six.reraise(CommandError, CommandError(new_msg), sys.exc_info()[2])
 

@@ -618,7 +618,10 @@ def templatize(src, origin=None):
                     filemsg = ''
                     if origin:
                         filemsg = 'file %s, ' % origin
-                    raise SyntaxError("Translation blocks must not include other block tags: %s (%sline %d)" % (t.contents, filemsg, t.lineno))
+                    raise SyntaxError(
+                        "Translation blocks must not include other block tags: "
+                        "%s (%sline %d)" % (t.contents, filemsg, t.lineno)
+                    )
             elif t.token_type == TOKEN_VAR:
                 if inplural:
                     plural.append('%%(%s)s' % t.contents)

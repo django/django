@@ -82,7 +82,10 @@ class DatabaseCreation(BaseDatabaseCreation):
                     return
                 sys.stderr.write("Got an error creating the test database: %s\n" % e)
                 if not autoclobber:
-                    confirm = input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_NAME)
+                    confirm = input(
+                        "It appears the test database, %s, already exists. "
+                        "Type 'yes' to delete it, or 'no' to cancel: " % TEST_NAME
+                    )
                 if autoclobber or confirm == 'yes':
                     try:
                         if verbosity >= 1:
@@ -104,7 +107,10 @@ class DatabaseCreation(BaseDatabaseCreation):
             except Exception as e:
                 sys.stderr.write("Got an error creating the test user: %s\n" % e)
                 if not autoclobber:
-                    confirm = input("It appears the test user, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_USER)
+                    confirm = input(
+                        "It appears the test user, %s, already exists. Type "
+                        "'yes' to delete it, or 'no' to cancel: " % TEST_USER
+                    )
                 if autoclobber or confirm == 'yes':
                     try:
                         if verbosity >= 1:
@@ -123,11 +129,14 @@ class DatabaseCreation(BaseDatabaseCreation):
         self.connection.close()  # done with main user -- test user and tablespaces created
 
         real_settings = settings.DATABASES[self.connection.alias]
-        real_settings['SAVED_USER'] = self.connection.settings_dict['SAVED_USER'] = self.connection.settings_dict['USER']
-        real_settings['SAVED_PASSWORD'] = self.connection.settings_dict['SAVED_PASSWORD'] = self.connection.settings_dict['PASSWORD']
+        real_settings['SAVED_USER'] = self.connection.settings_dict['SAVED_USER'] = \
+            self.connection.settings_dict['USER']
+        real_settings['SAVED_PASSWORD'] = self.connection.settings_dict['SAVED_PASSWORD'] = \
+            self.connection.settings_dict['PASSWORD']
         real_test_settings = real_settings['TEST']
         test_settings = self.connection.settings_dict['TEST']
-        real_test_settings['USER'] = real_settings['USER'] = test_settings['USER'] = self.connection.settings_dict['USER'] = TEST_USER
+        real_test_settings['USER'] = real_settings['USER'] = test_settings['USER'] = \
+            self.connection.settings_dict['USER'] = TEST_USER
         real_settings['PASSWORD'] = self.connection.settings_dict['PASSWORD'] = TEST_PASSWD
 
         return self.connection.settings_dict['NAME']

@@ -71,10 +71,12 @@ class Invalid(models.Model):
 
 
 # Mapping dictionaries for the models above.
-co_mapping = {'name': 'Name',
-              'state': {'name': 'State'},  # ForeignKey's use another mapping dictionary for the _related_ Model (State in this case).
-              'mpoly': 'MULTIPOLYGON',  # Will convert POLYGON features into MULTIPOLYGONS.
-              }
+co_mapping = {
+    'name': 'Name',
+    # ForeignKey's use another mapping dictionary for the _related_ Model (State in this case).
+    'state': {'name': 'State'},
+    'mpoly': 'MULTIPOLYGON',  # Will convert POLYGON features into MULTIPOLYGONS.
+}
 
 cofeat_mapping = {'name': 'Name',
                   'poly': 'POLYGON',

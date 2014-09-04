@@ -104,7 +104,10 @@ class GenericForeignKey(object):
                         "'%s.%s' is not a ForeignKey." % (
                             self.model._meta.object_name, self.ct_field
                         ),
-                        hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                        hint=(
+                            "GenericForeignKeys must use a ForeignKey to "
+                            "'contenttypes.ContentType' as the 'content_type' field."
+                        ),
                         obj=self,
                         id='contenttypes.E003',
                     )
@@ -115,7 +118,10 @@ class GenericForeignKey(object):
                         "'%s.%s' is not a ForeignKey to 'contenttypes.ContentType'." % (
                             self.model._meta.object_name, self.ct_field
                         ),
-                        hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                        hint=(
+                            "GenericForeignKeys must use a ForeignKey to "
+                            "'contenttypes.ContentType' as the 'content_type' field."
+                        ),
                         obj=self,
                         id='contenttypes.E004',
                     )

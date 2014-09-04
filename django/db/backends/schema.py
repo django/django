@@ -51,7 +51,10 @@ class BaseDatabaseSchemaEditor(object):
     sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s)"
     sql_delete_unique = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
-    sql_create_fk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
+    sql_create_fk = (
+        "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
+        "REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
+    )
     sql_create_inline_fk = None
     sql_delete_fk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
@@ -160,7 +163,10 @@ class BaseDatabaseSchemaEditor(object):
         """
         Only used for backends which have requires_literal_defaults feature
         """
-        raise NotImplementedError('subclasses of BaseDatabaseSchemaEditor for backends which have requires_literal_defaults must provide a prepare_default() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseSchemaEditor for backends which have '
+            'requires_literal_defaults must provide a prepare_default() method'
+        )
 
     def effective_default(self, field):
         """
@@ -234,7 +240,9 @@ class BaseDatabaseSchemaEditor(object):
                 if self.connection.features.supports_foreign_keys:
                     self.deferred_sql.append(
                         self.sql_create_fk % {
-                            "name": self._create_index_name(model, [field.column], suffix="_fk_%s_%s" % (to_table, to_column)),
+                            "name": self._create_index_name(
+                                model, [field.column], suffix="_fk_%s_%s" % (to_table, to_column)
+                            ),
                             "table": self.quote_name(model._meta.db_table),
                             "column": self.quote_name(field.column),
                             "to_table": self.quote_name(to_table),
@@ -491,24 +499,34 @@ class BaseDatabaseSchemaEditor(object):
         new_db_params = new_field.db_parameters(connection=self.connection)
         new_type = new_db_params['type']
         if (old_type is None and old_field.rel is None) or (new_type is None and new_field.rel is None):
-            raise ValueError("Cannot alter field %s into %s - they do not properly define db_type (are you using PostGIS 1.5 or badly-written custom fields?)" % (
-                old_field,
-                new_field,
-            ))
-        elif old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and old_field.rel.through._meta.auto_created and new_field.rel.through._meta.auto_created):
+            raise ValueError(
+                "Cannot alter field %s into %s - they do not properly define "
+                "db_type (are you using PostGIS 1.5 or badly-written custom "
+                "fields?)" % (old_field, new_field),
+            )
+        elif old_type is None and new_type is None and (
+                old_field.rel.through and new_field.rel.through and
+                old_field.rel.through._meta.auto_created and
+                new_field.rel.through._meta.auto_created):
             return self._alter_many_to_many(model, old_field, new_field, strict)
-        elif old_type is None and new_type is None and (old_field.rel.through and new_field.rel.through and not old_field.rel.through._meta.auto_created and not new_field.rel.through._meta.auto_created):
+        elif old_type is None and new_type is None and (
+                old_field.rel.through and new_field.rel.through and
+                not old_field.rel.through._meta.auto_created and
+                not new_field.rel.through._meta.auto_created):
             # Both sides have through models; this is a no-op.
             return
         elif old_type is None or new_type is None:
-            raise ValueError("Cannot alter field %s into %s - they are not compatible types (you cannot alter to or from M2M fields, or add or remove through= on M2M fields)" % (
-                old_field,
-                new_field,
-            ))
+            raise ValueError(
+                "Cannot alter field %s into %s - they are not compatible types "
+                "(you cannot alter to or from M2M fields, or add or remove "
+                "through= on M2M fields)" % (old_field, new_field)
+            )
 
-        self._alter_field(model, old_field, new_field, old_type, new_type, old_db_params, new_db_params, strict)
+        self._alter_field(model, old_field, new_field, old_type, new_type,
+                          old_db_params, new_db_params, strict)
 
-    def _alter_field(self, model, old_field, new_field, old_type, new_type, old_db_params, new_db_params, strict=False):
+    def _alter_field(self, model, old_field, new_field, old_type, new_type,
+                     old_db_params, new_db_params, strict=False):
         """Actually perform a "physical" (non-ManyToMany) field update."""
 
         # Has unique been removed?
@@ -559,7 +577,9 @@ class BaseDatabaseSchemaEditor(object):
                         }
                     )
         # Removed an index?
-        if old_field.db_index and not new_field.db_index and not old_field.unique and not (not new_field.unique and old_field.unique):
+        if (old_field.db_index and not new_field.db_index and
+                not old_field.unique and not
+                (not new_field.unique and old_field.unique)):
             # Find the index for this field
             index_names = self._constraint_names(model, [old_field.column], index=True)
             if strict and len(index_names) != 1:
@@ -683,7 +703,9 @@ class BaseDatabaseSchemaEditor(object):
                 }
             )
         # Added an index?
-        if not old_field.db_index and new_field.db_index and not new_field.unique and not (not old_field.unique and new_field.unique):
+        if (not old_field.db_index and new_field.db_index and
+                not new_field.unique and not
+                (not old_field.unique and new_field.unique)):
             self.execute(
                 self.sql_create_index % {
                     "table": self.quote_name(model._meta.db_table),
@@ -747,7 +769,9 @@ class BaseDatabaseSchemaEditor(object):
             self.execute(
                 self.sql_create_fk % {
                     "table": self.quote_name(model._meta.db_table),
-                    "name": self._create_index_name(model, [new_field.column], suffix="_fk_%s_%s" % (to_table, to_column)),
+                    "name": self._create_index_name(
+                        model, [new_field.column], suffix="_fk_%s_%s" % (to_table, to_column)
+                    ),
                     "column": self.quote_name(new_field.column),
                     "to_table": self.quote_name(to_table),
                     "to_column": self.quote_name(to_column),
@@ -816,7 +840,8 @@ class BaseDatabaseSchemaEditor(object):
         """
         # Rename the through table
         if old_field.rel.through._meta.db_table != new_field.rel.through._meta.db_table:
-            self.alter_db_table(old_field.rel.through, old_field.rel.through._meta.db_table, new_field.rel.through._meta.db_table)
+            self.alter_db_table(old_field.rel.through, old_field.rel.through._meta.db_table,
+                                new_field.rel.through._meta.db_table)
         # Repoint the FK to the other side
         self.alter_field(
             new_field.rel.through,
@@ -841,7 +866,9 @@ class BaseDatabaseSchemaEditor(object):
         index_unique_name = '_%x' % abs(hash((table_name, ','.join(column_names))))
         max_length = self.connection.ops.max_name_length() or 200
         # If the index name is too long, truncate it
-        index_name = ('%s_%s%s%s' % (table_name, column_names[0], index_unique_name, suffix)).replace('"', '').replace('.', '_')
+        index_name = ('%s_%s%s%s' % (
+            table_name, column_names[0], index_unique_name, suffix,
+        )).replace('"', '').replace('.', '_')
         if len(index_name) > max_length:
             part = ('_%s%s%s' % (column_names[0], index_unique_name, suffix))
             index_name = '%s%s' % (table_name[:(max_length - len(part))], part)
@@ -856,7 +883,9 @@ class BaseDatabaseSchemaEditor(object):
             index_name = "D%s" % index_name[:-1]
         return index_name
 
-    def _constraint_names(self, model, column_names=None, unique=None, primary_key=None, index=None, foreign_key=None, check=None):
+    def _constraint_names(self, model, column_names=None, unique=None,
+                          primary_key=None, index=None, foreign_key=None,
+                          check=None):
         """
         Returns all constraint names matching the columns and conditions
         """

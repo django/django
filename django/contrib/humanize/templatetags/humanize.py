@@ -150,7 +150,8 @@ def apnumber(value):
         return value
     if not 0 < value < 10:
         return value
-    return (_('one'), _('two'), _('three'), _('four'), _('five'), _('six'), _('seven'), _('eight'), _('nine'))[value - 1]
+    return (_('one'), _('two'), _('three'), _('four'), _('five'),
+            _('six'), _('seven'), _('eight'), _('nine'))[value - 1]
 
 
 # Perform the comparison in the default time zone when USE_TZ = True

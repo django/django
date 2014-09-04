@@ -62,7 +62,10 @@ class DatabaseCreation(BaseDatabaseCreation):
                 print("Destroying old test database '%s'..." % self.connection.alias)
             if os.access(test_database_name, os.F_OK):
                 if not autoclobber:
-                    confirm = input("Type 'yes' if you would like to try deleting the test database '%s', or 'no' to cancel: " % test_database_name)
+                    confirm = input(
+                        "Type 'yes' if you would like to try deleting the test "
+                        "database '%s', or 'no' to cancel: " % test_database_name
+                    )
                 if autoclobber or confirm == 'yes':
                     try:
                         os.remove(test_database_name)

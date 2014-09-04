@@ -233,7 +233,8 @@ class RelatedField(Field):
             if clash_field.get_accessor_name() == rel_query_name:
                 errors.append(
                     checks.Error(
-                        "Reverse query name for '%s' clashes with reverse query name for '%s'." % (field_name, clash_name),
+                        "Reverse query name for '%s' clashes with reverse query name for '%s'."
+                        % (field_name, clash_name),
                         hint=("Add or change a related_name argument "
                               "to the definition for '%s' or '%s'.") % (field_name, clash_name),
                         obj=self,
@@ -906,17 +907,23 @@ def create_many_related_manager(superclass, rel):
             queryset = queryset.extra(select=dict(
                 ('_prefetch_related_val_%s' % f.attname,
                 '%s.%s' % (qn(join_table), qn(f.column))) for f in fk.local_related_fields))
-            return (queryset,
-                    lambda result: tuple(getattr(result, '_prefetch_related_val_%s' % f.attname) for f in fk.local_related_fields),
-                    lambda inst: tuple(getattr(inst, f.attname) for f in fk.foreign_related_fields),
-                    False,
-                    self.prefetch_cache_name)
+            return (
+                queryset,
+                lambda result: tuple(
+                    getattr(result, '_prefetch_related_val_%s' % f.attname)
+                    for f in fk.local_related_fields
+                ),
+                lambda inst: tuple(getattr(inst, f.attname) for f in fk.foreign_related_fields),
+                False,
+                self.prefetch_cache_name,
+            )
 
         def add(self, *objs):
             if not rel.through._meta.auto_created:
                 opts = self.through._meta
                 raise AttributeError(
-                    "Cannot use add() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." %
+                    "Cannot use add() on a ManyToManyField which specifies an "
+                    "intermediary model. Use %s.%s's Manager instead." %
                     (opts.app_label, opts.object_name)
                 )
 
@@ -933,7 +940,8 @@ def create_many_related_manager(superclass, rel):
             if not rel.through._meta.auto_created:
                 opts = self.through._meta
                 raise AttributeError(
-                    "Cannot use remove() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." %
+                    "Cannot use remove() on a ManyToManyField which specifies "
+                    "an intermediary model. Use %s.%s's Manager instead." %
                     (opts.app_label, opts.object_name)
                 )
             self._remove_items(self.source_field_name, self.target_field_name, *objs)
@@ -960,7 +968,8 @@ def create_many_related_manager(superclass, rel):
             if not self.through._meta.auto_created:
                 opts = self.through._meta
                 raise AttributeError(
-                    "Cannot use create() on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." %
+                    "Cannot use create() on a ManyToManyField which specifies "
+                    "an intermediary model. Use %s.%s's Manager instead." %
                     (opts.app_label, opts.object_name)
                 )
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
@@ -1125,7 +1134,10 @@ class ManyRelatedObjectsDescriptor(object):
     def __set__(self, instance, value):
         if not self.related.field.rel.through._meta.auto_created:
             opts = self.related.field.rel.through._meta
-            raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
+            raise AttributeError(
+                "Cannot set values on a ManyToManyField which specifies an "
+                "intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name)
+            )
 
         # Force evaluation of `value` in case it's a queryset whose
         # value could be affected by `manager.clear()`. Refs #19816.
@@ -1185,7 +1197,10 @@ class ReverseManyRelatedObjectsDescriptor(object):
     def __set__(self, instance, value):
         if not self.field.rel.through._meta.auto_created:
             opts = self.field.rel.through._meta
-            raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model.  Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
+            raise AttributeError(
+                "Cannot set values on a ManyToManyField which specifies an "
+                "intermediary model.  Use %s.%s's Manager instead." % (opts.app_label, opts.object_name)
+            )
 
         # Force evaluation of `value` in case it's a queryset whose
         # value could be affected by `manager.clear()`. Refs #19816.
@@ -1204,7 +1219,9 @@ class ForeignObjectRel(object):
         try:
             to._meta
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, six.string_types), "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
+            assert isinstance(to, six.string_types), (
+                "'to' must be either a model, a model name or the string %r" % RECURSIVE_RELATIONSHIP_CONSTANT
+            )
 
         self.field = field
         self.to = to
@@ -1358,7 +1375,8 @@ class ForeignObject(RelatedField):
             model_name = self.rel.to.__name__
             return [
                 checks.Error(
-                    "None of the fields %s on model '%s' have a unique=True constraint." % (field_combination, model_name),
+                    "None of the fields %s on model '%s' have a unique=True constraint."
+                    % (field_combination, model_name),
                     hint=None,
                     obj=self,
                     id='fields.E310',
@@ -1403,7 +1421,11 @@ class ForeignObject(RelatedField):
             # If it's already a settings reference, error
             if hasattr(kwargs['to'], "setting_name"):
                 if kwargs['to'].setting_name != swappable_setting:
-                    raise ValueError("Cannot deconstruct a ForeignKey pointing to a model that is swapped in place of more than one model (%s and %s)" % (kwargs['to'].setting_name, swappable_setting))
+                    raise ValueError(
+                        "Cannot deconstruct a ForeignKey pointing to a model "
+                        "that is swapped in place of more than one model (%s and %s)"
+                        % (kwargs['to'].setting_name, swappable_setting)
+                    )
             # Set it
             from django.db.migrations.writer import SettingsReference
             kwargs['to'] = SettingsReference(
@@ -1617,7 +1639,13 @@ class ForeignKey(ForeignObject):
         try:
             to._meta.model_name
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, six.string_types), "%s(%r) is invalid. First parameter to ForeignKey must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
+            assert isinstance(to, six.string_types), (
+                "%s(%r) is invalid. First parameter to ForeignKey must be "
+                "either a model, a model name, or the string %r" % (
+                    self.__class__.__name__, to,
+                    RECURSIVE_RELATIONSHIP_CONSTANT,
+                )
+            )
         else:
             # For backwards compatibility purposes, we need to *try* and set
             # the to_field during FK construction. It won't be guaranteed to
@@ -1867,8 +1895,18 @@ def create_many_to_many_intermediary_model(field, klass):
     return type(str(name), (models.Model,), {
         'Meta': meta,
         '__module__': klass.__module__,
-        from_: models.ForeignKey(klass, related_name='%s+' % name, db_tablespace=field.db_tablespace, db_constraint=field.rel.db_constraint),
-        to: models.ForeignKey(to_model, related_name='%s+' % name, db_tablespace=field.db_tablespace, db_constraint=field.rel.db_constraint)
+        from_: models.ForeignKey(
+            klass,
+            related_name='%s+' % name,
+            db_tablespace=field.db_tablespace,
+            db_constraint=field.rel.db_constraint,
+        ),
+        to: models.ForeignKey(
+            to_model,
+            related_name='%s+' % name,
+            db_tablespace=field.db_tablespace,
+            db_constraint=field.rel.db_constraint,
+        )
     })
 
 
@@ -1879,8 +1917,13 @@ class ManyToManyField(RelatedField):
         try:
             to._meta
         except AttributeError:  # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
-            assert isinstance(to, six.string_types), "%s(%r) is invalid. First parameter to ManyToManyField must be either a model, a model name, or the string %r" % (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
-            # Class names must be ASCII in Python 2.x, so we forcibly coerce it here to break early if there's a problem.
+            assert isinstance(to, six.string_types), (
+                "%s(%r) is invalid. First parameter to ManyToManyField must be "
+                "either a model, a model name, or the string %r" %
+                (self.__class__.__name__, to, RECURSIVE_RELATIONSHIP_CONSTANT)
+            )
+            # Class names must be ASCII in Python 2.x, so we forcibly coerce it
+            # here to break early if there's a problem.
             to = str(to)
 
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
@@ -2169,7 +2212,11 @@ class ManyToManyField(RelatedField):
             # If it's already a settings reference, error
             if hasattr(kwargs['to'], "setting_name"):
                 if kwargs['to'].setting_name != swappable_setting:
-                    raise ValueError("Cannot deconstruct a ManyToManyField pointing to a model that is swapped in place of more than one model (%s and %s)" % (kwargs['to'].setting_name, swappable_setting))
+                    raise ValueError(
+                        "Cannot deconstruct a ManyToManyField pointing to a "
+                        "model that is swapped in place of more than one model "
+                        "(%s and %s)" % (kwargs['to'].setting_name, swappable_setting)
+                    )
             # Set it
             from django.db.migrations.writer import SettingsReference
             kwargs['to'] = SettingsReference(

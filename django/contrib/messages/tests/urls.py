@@ -72,6 +72,7 @@ urlpatterns = [
     url('^add/(debug|info|success|warning|error)/$', add, name='add_message'),
     url('^add/msg/$', ContactFormViewWithMsg.as_view(), name='add_success_msg'),
     url('^show/$', show, name='show_message'),
-    url('^template_response/add/(debug|info|success|warning|error)/$', add_template_response, name='add_template_response'),
+    url('^template_response/add/(debug|info|success|warning|error)/$',
+        add_template_response, name='add_template_response'),
     url('^template_response/show/$', show_template_response, name='show_template_response'),
 ]

@@ -393,7 +393,9 @@ class EmailMultiAlternatives(EmailMessage):
         bytestrings). The SafeMIMEText class will handle any necessary encoding
         conversions.
         """
-        super(EmailMultiAlternatives, self).__init__(subject, body, from_email, to, bcc, connection, attachments, headers, cc)
+        super(EmailMultiAlternatives, self).__init__(
+            subject, body, from_email, to, bcc, connection, attachments, headers, cc
+        )
         self.alternatives = alternatives or []
 
     def attach_alternative(self, content, mimetype):

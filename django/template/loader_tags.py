@@ -228,7 +228,10 @@ def do_include(parser, token):
     """
     bits = token.split_contents()
     if len(bits) < 2:
-        raise TemplateSyntaxError("%r tag takes at least one argument: the name of the template to be included." % bits[0])
+        raise TemplateSyntaxError(
+            "%r tag takes at least one argument: the name of the template to "
+            "be included." % bits[0]
+        )
     options = {}
     remaining_bits = bits[2:]
     while remaining_bits:

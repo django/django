@@ -459,18 +459,31 @@ MIDDLEWARE_CLASSES = (
 # SESSIONS #
 ############
 
-SESSION_CACHE_ALIAS = 'default'                         # Cache to store session data if using the cache session backend.
-SESSION_COOKIE_NAME = 'sessionid'                       # Cookie name. This can be whatever you want.
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2               # Age of cookie, in seconds (default: 2 weeks).
-SESSION_COOKIE_DOMAIN = None                            # A string like ".example.com", or None for standard domain cookie.
-SESSION_COOKIE_SECURE = False                           # Whether the session cookie should be secure (https:// only).
-SESSION_COOKIE_PATH = '/'                               # The path of the session cookie.
-SESSION_COOKIE_HTTPONLY = True                          # Whether to use the non-RFC standard httpOnly flag (IE, FF3+, others)
-SESSION_SAVE_EVERY_REQUEST = False                      # Whether to save the session data on every request.
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False                 # Whether a user's session cookie expires when the Web browser is closed.
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # The module to store session data
-SESSION_FILE_PATH = None                                # Directory to store session files if using the file session module. If None, the backend will use a sensible default.
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'  # class to serialize session data
+# Cache to store session data if using the cache session backend.
+SESSION_CACHE_ALIAS = 'default'
+# Cookie name. This can be whatever you want.
+SESSION_COOKIE_NAME = 'sessionid'
+# Age of cookie, in seconds (default: 2 weeks).
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2
+# A string like ".example.com", or None for standard domain cookie.
+SESSION_COOKIE_DOMAIN = None
+# Whether the session cookie should be secure (https:// only).
+SESSION_COOKIE_SECURE = False
+# The path of the session cookie.
+SESSION_COOKIE_PATH = '/'
+# Whether to use the non-RFC standard httpOnly flag (IE, FF3+, others)
+SESSION_COOKIE_HTTPONLY = True
+# Whether to save the session data on every request.
+SESSION_SAVE_EVERY_REQUEST = False
+# Whether a user's session cookie expires when the Web browser is closed.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+# The module to store session data
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+# Directory to store session files if using the file session module. If None,
+# the backend will use a sensible default.
+SESSION_FILE_PATH = None
+# class to serialize session data
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 #########
 # CACHE #

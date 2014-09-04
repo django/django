@@ -130,14 +130,18 @@ class ModelBase(type):
                 'DoesNotExist',
                 subclass_exception(
                     str('DoesNotExist'),
-                    tuple(x.DoesNotExist for x in parents if hasattr(x, '_meta') and not x._meta.abstract) or (ObjectDoesNotExist,),
+                    tuple(
+                        x.DoesNotExist for x in parents if hasattr(x, '_meta') and not x._meta.abstract
+                    ) or (ObjectDoesNotExist,),
                     module,
                     attached_to=new_class))
             new_class.add_to_class(
                 'MultipleObjectsReturned',
                 subclass_exception(
                     str('MultipleObjectsReturned'),
-                    tuple(x.MultipleObjectsReturned for x in parents if hasattr(x, '_meta') and not x._meta.abstract) or (MultipleObjectsReturned,),
+                    tuple(
+                        x.MultipleObjectsReturned for x in parents if hasattr(x, '_meta') and not x._meta.abstract
+                    ) or (MultipleObjectsReturned,),
                     module,
                     attached_to=new_class))
             if base_meta and not base_meta.abstract:
@@ -186,7 +190,10 @@ class ModelBase(type):
             for parent in [kls for kls in parents if hasattr(kls, '_meta')]:
                 if parent._meta.abstract:
                     if parent._meta.fields:
-                        raise TypeError("Abstract base class containing model fields not permitted for proxy model '%s'." % name)
+                        raise TypeError(
+                            "Abstract base class containing model fields not "
+                            "permitted for proxy model '%s'." % name
+                        )
                     else:
                         continue
                 if base is not None:
@@ -765,7 +772,10 @@ class Model(six.with_metaclass(ModelBase)):
 
     def delete(self, using=None):
         using = using or router.db_for_write(self.__class__, instance=self)
-        assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
+        assert self._get_pk_val() is not None, (
+            "%s object can't be deleted because its %s attribute is set to None." %
+            (self._meta.object_name, self._meta.pk.attname)
+        )
 
         collector = Collector(using=using)
         collector.collect([self])
@@ -785,7 +795,9 @@ class Model(six.with_metaclass(ModelBase)):
         param = force_text(getattr(self, field.attname))
         q = Q(**{'%s__%s' % (field.name, op): param})
         q = q | Q(**{field.name: param, 'pk__%s' % op: self.pk})
-        qs = self.__class__._default_manager.using(self._state.db).filter(**kwargs).filter(q).order_by('%s%s' % (order, field.name), '%spk' % order)
+        qs = self.__class__._default_manager.using(self._state.db).filter(**kwargs).filter(q).order_by(
+            '%s%s' % (order, field.name), '%spk' % order
+        )
         try:
             return qs[0]
         except IndexError:
@@ -1564,7 +1576,9 @@ def method_get_order(ordered_obj, self):
 ##############################################
 
 def get_absolute_url(opts, func, self, *args, **kwargs):
-    return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.model_name), func)(self, *args, **kwargs)
+    return settings.ABSOLUTE_URL_OVERRIDES.get(
+        '%s.%s' % (opts.app_label, opts.model_name), func
+    )(self, *args, **kwargs)
 
 
 ########

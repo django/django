@@ -102,12 +102,19 @@ def find_template_loader(loader):
         else:
             # Try loading module the old way - string is full path to callable
             if args:
-                raise ImproperlyConfigured("Error importing template source loader %s - can't pass arguments to function-based loader." % loader)
+                raise ImproperlyConfigured(
+                    "Error importing template source loader %s - can't pass "
+                    "arguments to function-based loader." % loader
+                )
             func = TemplateLoader
 
         if not func.is_usable:
             import warnings
-            warnings.warn("Your TEMPLATE_LOADERS setting includes %r, but your Python installation doesn't support that type of template loading. Consider removing that line from TEMPLATE_LOADERS." % loader)
+            warnings.warn(
+                "Your TEMPLATE_LOADERS setting includes %r, but your Python "
+                "installation doesn't support that type of template loading. "
+                "Consider removing that line from TEMPLATE_LOADERS." % loader
+            )
             return None
         else:
             return func

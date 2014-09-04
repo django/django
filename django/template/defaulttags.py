@@ -61,7 +61,11 @@ class CsrfTokenNode(Node):
             # It's very probable that the token is missing because of
             # misconfiguration, so we raise a warning
             if settings.DEBUG:
-                warnings.warn("A {% csrf_token %} was used in a template, but the context did not provide the value.  This is usually caused by not using RequestContext.")
+                warnings.warn(
+                    "A {% csrf_token %} was used in a template, but the context "
+                    "did not provide the value.  This is usually caused by not "
+                    "using RequestContext."
+                )
             return ''
 
 
@@ -254,7 +258,8 @@ class IfChangedNode(Node):
 
         if compare_to != state_frame[self]:
             state_frame[self] = compare_to
-            return nodelist_true_output or self.nodelist_true.render(context)  # render true block if not already rendered
+            # render true block if not already rendered
+            return nodelist_true_output or self.nodelist_true.render(context)
         elif self.nodelist_false:
             return self.nodelist_false.render(context)
         return ''

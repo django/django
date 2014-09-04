@@ -18,7 +18,9 @@ class AdminLogNode(template.Node):
             user_id = self.user
             if not user_id.isdigit():
                 user_id = context[self.user].pk
-            context[self.varname] = LogEntry.objects.filter(user__pk=user_id).select_related('content_type', 'user')[:int(self.limit)]
+            context[self.varname] = LogEntry.objects.filter(
+                user__pk=user_id,
+            ).select_related('content_type', 'user')[:int(self.limit)]
         return ''
 
 

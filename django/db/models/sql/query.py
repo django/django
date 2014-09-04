@@ -1390,7 +1390,9 @@ class Query(object):
                         targets = (final_field.rel.get_related_field(),)
                         opts = int_model._meta
                         path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
-                        cur_names_with_path[1].append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
+                        cur_names_with_path[1].append(
+                            PathInfo(final_field.model._meta, opts, targets, final_field, False, True)
+                        )
             if hasattr(field, 'get_path_info'):
                 pathinfos = field.get_path_info()
                 if not allow_many:

@@ -174,7 +174,8 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
 
     yield 'class %s(models.Model):' % model_name
 
-    for field_name, width, precision, field_type in zip(ogr_fields, layer.field_widths, layer.field_precisions, layer.field_types):
+    for field_name, width, precision, field_type in zip(
+            ogr_fields, layer.field_widths, layer.field_precisions, layer.field_types):
         # The model field name.
         mfield = field_name.lower()
         if mfield[-1:] == '_':
@@ -188,7 +189,9 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
             # may also be mapped to `DecimalField` if specified in the
             # `decimal` keyword.
             if field_name.lower() in decimal_fields:
-                yield '    %s = models.DecimalField(max_digits=%d, decimal_places=%d%s)' % (mfield, width, precision, kwargs_str)
+                yield '    %s = models.DecimalField(max_digits=%d, decimal_places=%d%s)' % (
+                    mfield, width, precision, kwargs_str
+                )
             else:
                 yield '    %s = models.FloatField(%s)' % (mfield, kwargs_str[2:])
         elif field_type is OFTInteger:

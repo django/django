@@ -23,7 +23,10 @@ Compiler library and Java version 6 or later."""
 
     compiler = os.path.expanduser(options.compiler)
     if not os.path.exists(compiler):
-        sys.exit("Google Closure compiler jar file %s not found. Please use the -c option to specify the path." % compiler)
+        sys.exit(
+            "Google Closure compiler jar file %s not found. Please use the -c "
+            "option to specify the path." % compiler
+        )
 
     if not options.file:
         if options.verbose:

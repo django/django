@@ -79,7 +79,9 @@ get_geom_count = int_output(lgdal.OGR_G_GetGeometryCount, [c_void_p])
 get_geom_name = const_string_output(lgdal.OGR_G_GetGeometryName, [c_void_p], decoding='ascii')
 get_geom_type = int_output(lgdal.OGR_G_GetGeometryType, [c_void_p])
 get_point_count = int_output(lgdal.OGR_G_GetPointCount, [c_void_p])
-get_point = void_output(lgdal.OGR_G_GetPoint, [c_void_p, c_int, POINTER(c_double), POINTER(c_double), POINTER(c_double)], errcheck=False)
+get_point = void_output(lgdal.OGR_G_GetPoint,
+    [c_void_p, c_int, POINTER(c_double), POINTER(c_double), POINTER(c_double)], errcheck=False
+)
 geom_close_rings = void_output(lgdal.OGR_G_CloseRings, [c_void_p], errcheck=False)
 
 # Topology routines.

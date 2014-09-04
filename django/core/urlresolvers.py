@@ -309,7 +309,14 @@ class RegexURLResolver(LocaleRegexProvider):
                     for name in pattern.reverse_dict:
                         for matches, pat, defaults in pattern.reverse_dict.getlist(name):
                             new_matches = normalize(parent_pat + pat)
-                            lookups.appendlist(name, (new_matches, p_pattern + pat, dict(defaults, **pattern.default_kwargs)))
+                            lookups.appendlist(
+                                name,
+                                (
+                                    new_matches,
+                                    p_pattern + pat,
+                                    dict(defaults, **pattern.default_kwargs),
+                                )
+                            )
                     for namespace, (prefix, sub_pattern) in pattern.namespace_dict.items():
                         namespaces[namespace] = (p_pattern + prefix, sub_pattern)
                     for app_name, namespace_list in pattern.app_dict.items():
@@ -365,7 +372,14 @@ class RegexURLResolver(LocaleRegexProvider):
                     if sub_match:
                         sub_match_dict = dict(match.groupdict(), **self.default_kwargs)
                         sub_match_dict.update(sub_match.kwargs)
-                        return ResolverMatch(sub_match.func, sub_match.args, sub_match_dict, sub_match.url_name, self.app_name or sub_match.app_name, [self.namespace] + sub_match.namespaces)
+                        return ResolverMatch(
+                            sub_match.func,
+                            sub_match.args,
+                            sub_match_dict,
+                            sub_match.url_name,
+                            self.app_name or sub_match.app_name,
+                            [self.namespace] + sub_match.namespaces
+                        )
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
         raise Resolver404({'path': path})
@@ -436,7 +450,8 @@ class RegexURLResolver(LocaleRegexProvider):
                         continue
                     candidate_subs = dict(zip(prefix_args + params, text_args))
                 else:
-                    if set(kwargs.keys()) | set(defaults.keys()) != set(params) | set(defaults.keys()) | set(prefix_args):
+                    if (set(kwargs.keys()) | set(defaults.keys()) != set(params) |
+                            set(defaults.keys()) | set(prefix_args)):
                         continue
                     matches = True
                     for k, v in defaults.items():

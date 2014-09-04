@@ -25,7 +25,10 @@ def ensure_default_manager(cls):
         # Create the default manager, if needed.
         try:
             cls._meta.get_field('objects')
-            raise ValueError("Model %s must specify a custom Manager, because it has a field named 'objects'" % cls.__name__)
+            raise ValueError(
+                "Model %s must specify a custom Manager, because it has a "
+                "field named 'objects'" % cls.__name__
+            )
         except FieldDoesNotExist:
             pass
         cls.add_to_class('objects', Manager())
@@ -44,7 +47,10 @@ def ensure_default_manager(cls):
                         getattr(base_class, "use_for_related_fields", False)):
                     cls.add_to_class('_base_manager', base_class())
                     return
-            raise AssertionError("Should never get here. Please report a bug, including your model and model manager setup.")
+            raise AssertionError(
+                "Should never get here. Please report a bug, including your "
+                "model and model manager setup."
+            )
 
 
 @python_2_unicode_compatible
@@ -118,7 +124,8 @@ class BaseManager(object):
         else:
             # if not model._meta.abstract and not model._meta.swapped:
             setattr(model, name, ManagerDescriptor(self))
-        if not getattr(model, '_default_manager', None) or self.creation_counter < model._default_manager.creation_counter:
+        if (not getattr(model, '_default_manager', None) or
+                self.creation_counter < model._default_manager.creation_counter):
             model._default_manager = self
         if model._meta.abstract or (self._inherited and not self.model._meta.proxy):
             model._meta.abstract_managers.append((self.creation_counter, name,

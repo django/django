@@ -643,7 +643,10 @@ class FileField(Field):
 
 class ImageField(FileField):
     default_error_messages = {
-        'invalid_image': _("Upload a valid image. The file you uploaded was either not an image or a corrupted image."),
+        'invalid_image': _(
+            "Upload a valid image. The file you uploaded was either not an "
+            "image or a corrupted image."
+        ),
     }
 
     def to_python(self, data):

@@ -423,7 +423,8 @@ class BaseDatabaseCreation(object):
         # Make a function to iteratively return every object
         def get_objects():
             for model in sort_dependencies(app_list):
-                if not model._meta.proxy and model._meta.managed and router.allow_migrate(self.connection.alias, model):
+                if (not model._meta.proxy and model._meta.managed and
+                        router.allow_migrate(self.connection.alias, model)):
                     queryset = model._default_manager.using(self.connection.alias).order_by(model._meta.pk.name)
                     for obj in queryset.iterator():
                         yield obj

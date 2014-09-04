@@ -114,7 +114,8 @@ def lazy(func, *resultclasses):
                         setattr(cls, k, meth)
             cls._delegate_bytes = bytes in resultclasses
             cls._delegate_text = six.text_type in resultclasses
-            assert not (cls._delegate_bytes and cls._delegate_text), "Cannot call lazy() with both bytes and text return types."
+            assert not (cls._delegate_bytes and cls._delegate_text), (
+                "Cannot call lazy() with both bytes and text return types.")
             if cls._delegate_text:
                 if six.PY3:
                     cls.__str__ = cls.__text_cast

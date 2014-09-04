@@ -39,7 +39,9 @@ reset_reading = void_output(lgdal.OGR_L_ResetReading, [c_void_p], errcheck=False
 test_capability = int_output(lgdal.OGR_L_TestCapability, [c_void_p, c_char_p])
 get_spatial_filter = geom_output(lgdal.OGR_L_GetSpatialFilter, [c_void_p])
 set_spatial_filter = void_output(lgdal.OGR_L_SetSpatialFilter, [c_void_p, c_void_p], errcheck=False)
-set_spatial_filter_rect = void_output(lgdal.OGR_L_SetSpatialFilterRect, [c_void_p, c_double, c_double, c_double, c_double], errcheck=False)
+set_spatial_filter_rect = void_output(lgdal.OGR_L_SetSpatialFilterRect,
+    [c_void_p, c_double, c_double, c_double, c_double], errcheck=False
+)
 
 ### Feature Definition Routines ###
 get_fd_geom_type = int_output(lgdal.OGR_FD_GetGeomType, [c_void_p])
@@ -56,7 +58,9 @@ get_feat_geom_ref = geom_output(lgdal.OGR_F_GetGeometryRef, [c_void_p])
 get_feat_field_count = int_output(lgdal.OGR_F_GetFieldCount, [c_void_p])
 get_feat_field_defn = voidptr_output(lgdal.OGR_F_GetFieldDefnRef, [c_void_p, c_int])
 get_fid = int_output(lgdal.OGR_F_GetFID, [c_void_p])
-get_field_as_datetime = int_output(lgdal.OGR_F_GetFieldAsDateTime, [c_void_p, c_int, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p])
+get_field_as_datetime = int_output(lgdal.OGR_F_GetFieldAsDateTime,
+    [c_void_p, c_int, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p, c_int_p]
+)
 get_field_as_double = double_output(lgdal.OGR_F_GetFieldAsDouble, [c_void_p, c_int])
 get_field_as_integer = int_output(lgdal.OGR_F_GetFieldAsInteger, [c_void_p, c_int])
 get_field_as_string = const_string_output(lgdal.OGR_F_GetFieldAsString, [c_void_p, c_int])

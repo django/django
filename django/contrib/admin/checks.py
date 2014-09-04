@@ -287,7 +287,8 @@ class BaseModelAdminChecks(object):
             if not (isinstance(field, models.ForeignKey) or field.choices):
                 return [
                     checks.Error(
-                        "The value of '%s' refers to '%s', which is not an instance of ForeignKey, and does not have a 'choices' definition." % (
+                        "The value of '%s' refers to '%s', which is not an "
+                        "instance of ForeignKey, and does not have a 'choices' definition." % (
                             label, field_name
                         ),
                         hint=None,
@@ -592,7 +593,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
             if field is None:
                 return [
                     checks.Error(
-                        "The value of '%s' refers to '%s', which is not a callable, an attribute of '%s', or an attribute or method on '%s.%s'." % (
+                        "The value of '%s' refers to '%s', which is not a "
+                        "callable, an attribute of '%s', or an attribute or method on '%s.%s'." % (
                             label, item, cls.__name__, model._meta.app_label, model._meta.object_name
                         ),
                         hint=None,
@@ -619,7 +621,8 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     # This is a deliberate repeat of E108; there's more than one path
                     # required to test this condition.
                     checks.Error(
-                        "The value of '%s' refers to '%s', which is not a callable, an attribute of '%s', or an attribute or method on '%s.%s'." % (
+                        "The value of '%s' refers to '%s', which is not a callable, "
+                        "an attribute of '%s', or an attribute or method on '%s.%s'." % (
                             label, item, cls.__name__, model._meta.app_label, model._meta.object_name
                         ),
                         hint=None,

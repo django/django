@@ -91,8 +91,13 @@ class Command(BaseCommand):
                     if default_username:
                         input_msg += " (leave blank to use '%s')" % default_username
                     username_rel = self.username_field.rel
-                    input_msg = force_str('%s%s: ' % (input_msg,
-                        ' (%s.%s)' % (username_rel.to._meta.object_name, username_rel.field_name) if username_rel else ''))
+                    input_msg = force_str('%s%s: ' % (
+                        input_msg,
+                        ' (%s.%s)' % (
+                            username_rel.to._meta.object_name,
+                            username_rel.field_name
+                        ) if username_rel else '')
+                    )
                     username = self.get_input_data(self.username_field, input_msg, default_username)
                     if not username:
                         continue

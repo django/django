@@ -73,7 +73,10 @@ class Command(BaseCommand):
                 "%s in %s" % (", ".join(names), app)
                 for app, names in conflicts.items()
             )
-            raise CommandError("Conflicting migrations detected (%s).\nTo fix them run 'python manage.py makemigrations --merge'" % name_str)
+            raise CommandError(
+                "Conflicting migrations detected (%s).\nTo fix them run "
+                "'python manage.py makemigrations --merge'" % name_str
+            )
 
         # If they want to merge and there's nothing to merge, then politely exit
         if self.merge and not conflicts:
@@ -162,7 +165,9 @@ class Command(BaseCommand):
                     # Alternatively, makemigrations --dry-run --verbosity 3
                     # will output the migrations to stdout rather than saving
                     # the file to the disk.
-                    self.stdout.write(self.style.MIGRATE_HEADING("Full migrations file '%s':" % writer.filename) + "\n")
+                    self.stdout.write(self.style.MIGRATE_HEADING(
+                        "Full migrations file '%s':" % writer.filename) + "\n"
+                    )
                     self.stdout.write("%s\n" % writer.as_string())
 
     def handle_merge(self, loader, conflicts):

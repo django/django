@@ -3,12 +3,18 @@ from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 
 
 class SpatialiteSchemaEditor(DatabaseSchemaEditor):
-    sql_add_geometry_column = "SELECT AddGeometryColumn(%(table)s, %(column)s, %(srid)s, %(geom_type)s, %(dim)s, %(null)s)"
+    sql_add_geometry_column = (
+        "SELECT AddGeometryColumn(%(table)s, %(column)s, %(srid)s, "
+        "%(geom_type)s, %(dim)s, %(null)s)"
+    )
     sql_add_spatial_index = "SELECT CreateSpatialIndex(%(table)s, %(column)s)"
     sql_drop_spatial_index = "DROP TABLE idx_%(table)s_%(column)s"
     sql_remove_geometry_metadata = "SELECT DiscardGeometryColumn(%(table)s, %(column)s)"
     sql_discard_geometry_columns = "DELETE FROM %(geom_table)s WHERE f_table_name = %(table)s"
-    sql_update_geometry_columns = "UPDATE %(geom_table)s SET f_table_name = %(new_table)s WHERE f_table_name = %(old_table)s"
+    sql_update_geometry_columns = (
+        "UPDATE %(geom_table)s SET f_table_name = %(new_table)s "
+        "WHERE f_table_name = %(old_table)s"
+    )
 
     geometry_tables = [
         "geometry_columns",

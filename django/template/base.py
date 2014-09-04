@@ -775,7 +775,8 @@ class Variable(object):
                         current = getattr(current, bit)
                     except (TypeError, AttributeError) as e:
                         # Reraise an AttributeError raised by a @property
-                        if isinstance(e, AttributeError) and not isinstance(current, BaseContext) and bit in dir(current):
+                        if (isinstance(e, AttributeError) and
+                                not isinstance(current, BaseContext) and bit in dir(current)):
                             raise
                         try:  # list-index lookup
                             current = current[int(bit)]

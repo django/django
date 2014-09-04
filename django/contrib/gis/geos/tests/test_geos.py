@@ -315,7 +315,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(ls, LineString(ls.tuple))  # tuple
             self.assertEqual(ls, LineString(*ls.tuple))  # as individual arguments
             self.assertEqual(ls, LineString([list(tup) for tup in ls.tuple]))  # as list
-            self.assertEqual(ls.wkt, LineString(*tuple(Point(tup) for tup in ls.tuple)).wkt)  # Point individual arguments
+            # Point individual arguments
+            self.assertEqual(ls.wkt, LineString(*tuple(Point(tup) for tup in ls.tuple)).wkt)
             if numpy:
                 self.assertEqual(ls, LineString(numpy.array(ls.tuple)))  # as numpy array
 
@@ -652,7 +653,10 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         # Test conversion from custom to a known srid
         c2w = gdal.CoordTransform(
-            gdal.SpatialReference('+proj=mill +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R_A +ellps=WGS84 +datum=WGS84 +units=m +no_defs'),
+            gdal.SpatialReference(
+                '+proj=mill +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R_A +ellps=WGS84 '
+                '+datum=WGS84 +units=m +no_defs'
+            ),
             gdal.SpatialReference(4326))
         new_pnt = pnt.transform(c2w, clone=True)
         self.assertEqual(new_pnt.srid, 4326)

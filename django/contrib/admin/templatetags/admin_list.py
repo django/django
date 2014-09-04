@@ -251,7 +251,10 @@ def items_for_result(cl, result, form):
                 link_or_text = format_html(
                     '<a href="{0}"{1}>{2}</a>',
                     url,
-                    format_html(' onclick="opener.dismissRelatedLookupPopup(window, &#39;{0}&#39;); return false;"', result_id) if cl.is_popup else '',
+                    format_html(
+                        ' onclick="opener.dismissRelatedLookupPopup(window, '
+                        '&#39;{0}&#39;); return false;"', result_id
+                    ) if cl.is_popup else '',
                     result_repr)
 
             yield format_html('<{0}{1}>{2}</{3}>',

@@ -111,12 +111,16 @@ class GeoModelTest(TestCase):
         if oracle:
             # San Antonio in 'Texas 4205, Southern Zone (1983, meters)' (SRID 41157)
             # Used the following Oracle SQL to get this value:
-            #  SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_CS.TRANSFORM(SDO_GEOMETRY('POINT (-98.493183 29.424170)', 4326), 41157)) FROM DUAL;
+            #  SELECT SDO_UTIL.TO_WKTGEOMETRY(
+            #    SDO_CS.TRANSFORM(SDO_GEOMETRY('POINT (-98.493183 29.424170)', 4326), 41157))
+            #  )
+            #  FROM DUAL;
             nad_wkt = 'POINT (300662.034646583 5416427.45974934)'
             nad_srid = 41157
         else:
             # San Antonio in 'NAD83(HARN) / Texas Centric Lambert Conformal' (SRID 3084)
-            nad_wkt = 'POINT (1645978.362408288754523 6276356.025927528738976)'  # Used ogr.py in gdal 1.4.1 for this transform
+            # Used ogr.py in gdal 1.4.1 for this transform
+            nad_wkt = 'POINT (1645978.362408288754523 6276356.025927528738976)'
             nad_srid = 3084
 
         # Constructing & querying with a point from a different SRID. Oracle
@@ -493,30 +497,49 @@ class GeoQuerySetTest(TestCase):
             return
 
         pueblo_json = '{"type":"Point","coordinates":[-104.609252,38.255001]}'
-        houston_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"coordinates":[-95.363151,29.763374]}'
-        victoria_json = '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],"coordinates":[-123.305196,48.462611]}'
-        chicago_json = '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
+        houston_json = (
+            '{"type":"Point","crs":{"type":"name","properties":'
+            '{"name":"EPSG:4326"}},"coordinates":[-95.363151,29.763374]}'
+        )
+        victoria_json = (
+            '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],'
+            '"coordinates":[-123.305196,48.462611]}'
+        )
+        chicago_json = (
+            '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},'
+            '"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
+        )
         if spatialite:
-            victoria_json = '{"type":"Point","bbox":[-123.305196,48.462611,-123.305196,48.462611],"coordinates":[-123.305196,48.462611]}'
+            victoria_json = (
+                '{"type":"Point","bbox":[-123.305196,48.462611,-123.305196,48.462611],'
+                '"coordinates":[-123.305196,48.462611]}'
+            )
 
         # Precision argument should only be an integer
         self.assertRaises(TypeError, City.objects.geojson, precision='foo')
 
         # Reference queries and values.
-        # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 0) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Pueblo';
+        # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 0)
+        # FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Pueblo';
         self.assertEqual(pueblo_json, City.objects.geojson().get(name='Pueblo').geojson)
 
-        # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 2) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Houston';
+        # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 2) FROM "geoapp_city"
+        # WHERE "geoapp_city"."name" = 'Houston';
         # This time we want to include the CRS by using the `crs` keyword.
         self.assertEqual(houston_json, City.objects.geojson(crs=True, model_att='json').get(name='Houston').json)
 
-        # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 1) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Houston';
+        # SELECT ST_AsGeoJson("geoapp_city"."point", 8, 1) FROM "geoapp_city"
+        # WHERE "geoapp_city"."name" = 'Houston';
         # This time we include the bounding box by using the `bbox` keyword.
         self.assertEqual(victoria_json, City.objects.geojson(bbox=True).get(name='Victoria').geojson)
 
-        # SELECT ST_AsGeoJson("geoapp_city"."point", 5, 3) FROM "geoapp_city" WHERE "geoapp_city"."name" = 'Chicago';
+        # SELECT ST_AsGeoJson("geoapp_city"."point", 5, 3) FROM "geoapp_city"
+        # WHERE "geoapp_city"."name" = 'Chicago';
         # Finally, we set every available keyword.
-        self.assertEqual(chicago_json, City.objects.geojson(bbox=True, crs=True, precision=5).get(name='Chicago').geojson)
+        self.assertEqual(
+            chicago_json,
+            City.objects.geojson(bbox=True, crs=True, precision=5).get(name='Chicago').geojson
+        )
 
     @skipUnlessDBFeature("has_gml_method")
     def test_gml(self):
@@ -530,12 +553,22 @@ class GeoQuerySetTest(TestCase):
 
         if oracle:
             # No precision parameter for Oracle :-/
-            gml_regex = re.compile(r'^<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml"><gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ </gml:coordinates></gml:Point>')
+            gml_regex = re.compile(
+                r'^<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml">'
+                r'<gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ '
+                r'</gml:coordinates></gml:Point>'
+            )
         elif spatialite and connection.ops.spatial_version < (3, 0, 0):
             # Spatialite before 3.0 has extra colon in SrsName
-            gml_regex = re.compile(r'^<gml:Point SrsName="EPSG::4326"><gml:coordinates decimal="\." cs="," ts=" ">-104.609251\d+,38.255001</gml:coordinates></gml:Point>')
+            gml_regex = re.compile(
+                r'^<gml:Point SrsName="EPSG::4326"><gml:coordinates decimal="\." '
+                r'cs="," ts=" ">-104.609251\d+,38.255001</gml:coordinates></gml:Point>'
+            )
         else:
-            gml_regex = re.compile(r'^<gml:Point srsName="EPSG:4326"><gml:coordinates>-104\.60925\d+,38\.255001</gml:coordinates></gml:Point>')
+            gml_regex = re.compile(
+                r'^<gml:Point srsName="EPSG:4326"><gml:coordinates>'
+                r'-104\.60925\d+,38\.255001</gml:coordinates></gml:Point>'
+            )
 
         for ptown in [ptown1, ptown2]:
             self.assertTrue(gml_regex.match(ptown.gml))
@@ -566,7 +599,12 @@ class GeoQuerySetTest(TestCase):
         self.assertRaises(TypeError, Country.objects.make_line)
         # Reference query:
         # SELECT AsText(ST_MakeLine(geoapp_city.point)) FROM geoapp_city;
-        ref_line = GEOSGeometry('LINESTRING(-95.363151 29.763374,-96.801611 32.782057,-97.521157 34.464642,174.783117 -41.315268,-104.609252 38.255001,-95.23506 38.971823,-87.650175 41.850385,-123.305196 48.462611)', srid=4326)
+        ref_line = GEOSGeometry(
+            'LINESTRING(-95.363151 29.763374,-96.801611 32.782057,'
+            '-97.521157 34.464642,174.783117 -41.315268,-104.609252 38.255001,'
+            '-95.23506 38.971823,-87.650175 41.850385,-123.305196 48.462611)',
+            srid=4326
+        )
         self.assertEqual(ref_line, City.objects.make_line())
 
     @skipUnlessDBFeature("has_num_geom_method")
@@ -601,7 +639,8 @@ class GeoQuerySetTest(TestCase):
         "Testing the `point_on_surface` GeoQuerySet method."
         # Reference values.
         if oracle:
-            # SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOM.SDO_POINTONSURFACE(GEOAPP_COUNTRY.MPOLY, 0.05)) FROM GEOAPP_COUNTRY;
+            # SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOM.SDO_POINTONSURFACE(GEOAPP_COUNTRY.MPOLY, 0.05))
+            # FROM GEOAPP_COUNTRY;
             ref = {'New Zealand': fromstr('POINT (174.616364 -36.100861)', srid=4326),
                    'Texas': fromstr('POINT (-103.002434 36.500397)', srid=4326),
                    }
@@ -670,17 +709,29 @@ class GeoQuerySetTest(TestCase):
         # to pass into GEOS `equals_exact`.
         tol = 0.000000001
 
-        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.1)) FROM "geoapp_country" WHERE "geoapp_country"."name" = 'San Marino';
+        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.1)) FROM "geoapp_country"
+        # WHERE "geoapp_country"."name" = 'San Marino';
         ref = fromstr('MULTIPOLYGON(((12.4 44,12.5 44,12.5 43.9,12.4 43.9,12.4 44)))')
         self.assertTrue(ref.equals_exact(Country.objects.snap_to_grid(0.1).get(name='San Marino').snap_to_grid, tol))
 
-        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.05, 0.23)) FROM "geoapp_country" WHERE "geoapp_country"."name" = 'San Marino';
+        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.05, 0.23)) FROM "geoapp_country"
+        # WHERE "geoapp_country"."name" = 'San Marino';
         ref = fromstr('MULTIPOLYGON(((12.4 43.93,12.45 43.93,12.5 43.93,12.45 43.93,12.4 43.93)))')
-        self.assertTrue(ref.equals_exact(Country.objects.snap_to_grid(0.05, 0.23).get(name='San Marino').snap_to_grid, tol))
+        self.assertTrue(
+            ref.equals_exact(Country.objects.snap_to_grid(0.05, 0.23).get(name='San Marino').snap_to_grid, tol)
+        )
 
-        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.5, 0.17, 0.05, 0.23)) FROM "geoapp_country" WHERE "geoapp_country"."name" = 'San Marino';
-        ref = fromstr('MULTIPOLYGON(((12.4 43.87,12.45 43.87,12.45 44.1,12.5 44.1,12.5 43.87,12.45 43.87,12.4 43.87)))')
-        self.assertTrue(ref.equals_exact(Country.objects.snap_to_grid(0.05, 0.23, 0.5, 0.17).get(name='San Marino').snap_to_grid, tol))
+        # SELECT AsText(ST_SnapToGrid("geoapp_country"."mpoly", 0.5, 0.17, 0.05, 0.23)) FROM "geoapp_country"
+        # WHERE "geoapp_country"."name" = 'San Marino';
+        ref = fromstr(
+            'MULTIPOLYGON(((12.4 43.87,12.45 43.87,12.45 44.1,12.5 44.1,12.5 43.87,12.45 43.87,12.4 43.87)))'
+        )
+        self.assertTrue(
+            ref.equals_exact(
+                Country.objects.snap_to_grid(0.05, 0.23, 0.5, 0.17).get(name='San Marino').snap_to_grid,
+                tol
+            )
+        )
 
     @skipUnlessDBFeature("has_svg_method")
     def test_svg(self):

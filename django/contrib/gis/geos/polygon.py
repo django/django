@@ -98,7 +98,8 @@ class Polygon(GEOSGeometry):
         else:
             return capi.geom_clone(g.ptr)
 
-    def _construct_ring(self, param, msg='Parameter must be a sequence of LinearRings or objects that can initialize to LinearRings'):
+    def _construct_ring(self, param, msg=(
+            'Parameter must be a sequence of LinearRings or objects that can initialize to LinearRings')):
         "Helper routine for trying to construct a ring from the given parameter."
         if isinstance(param, LinearRing):
             return param

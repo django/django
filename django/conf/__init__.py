@@ -99,7 +99,8 @@ class Settings(BaseSettings):
             mod = importlib.import_module(self.SETTINGS_MODULE)
         except ImportError as e:
             raise ImportError(
-                "Could not import settings '%s' (Is it on sys.path? Is there an import error in the settings file?): %s"
+                "Could not import settings '%s' (Is it on sys.path? Is there an "
+                "import error in the settings file?): %s"
                 % (self.SETTINGS_MODULE, e)
             )
 
