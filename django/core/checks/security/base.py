@@ -90,7 +90,7 @@ W009 = Warning(
 )
 
 W018 = Warning(
-    "You shouldn't have DEBUG set to True in deployment.",
+    "You should not have DEBUG set to True in deployment.",
     hint=None,
     id='security.W018',
 )

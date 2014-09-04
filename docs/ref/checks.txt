@@ -442,7 +442,7 @@ option of the :djadmin:`check` command:
 * **security.W017**: :setting:`CSRF_COOKIE_HTTPONLY` is not set to ``True``.
   Using an ``HttpOnly`` CSRF cookie makes it more difficult for cross-site
   scripting attacks to steal the CSRF token.
-* **security.W018**: You shouldn't have :setting:`DEBUG` set to ``True`` in
+* **security.W018**: You should not have :setting:`DEBUG` set to ``True`` in
   deployment.
 * **security.W019**: You have
   :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
