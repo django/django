@@ -12,6 +12,7 @@ from decimal import Decimal
 from django.db import models
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
+from django.contrib.contenttypes.models import ContentType
 
 
 @python_2_unicode_compatible
@@ -132,3 +133,12 @@ class Player(models.Model):
 
     def __str__(self):
         return '%s (%d) playing for %s' % (self.name, self.rank, self.team.to_string())
+
+
+@python_2_unicode_compatible
+class FkToContentType(models.Model):
+    name = models.CharField(max_length=50)
+    content_type = models.ForeignKey(ContentType)
+
+    def __str__(self):
+        return self.name

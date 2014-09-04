@@ -105,51 +105,52 @@ def Deserializer(object_list, **options):
 
         # Handle each field
         for (field_name, field_value) in six.iteritems(d["fields"]):
-
-            if ignore and field_name not in model_fields:
-                # skip fields no longer on model
-                continue
-
-            if isinstance(field_value, str):
-                field_value = smart_text(field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True)
-
-            field = Model._meta.get_field(field_name)
-
-            # Handle M2M relations
-            if field.rel and isinstance(field.rel, models.ManyToManyRel):
-                if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
-                    def m2m_convert(value):
-                        if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
-                            return field.rel.to._default_manager.db_manager(db).get_by_natural_key(*value).pk
-                        else:
-                            return smart_text(field.rel.to._meta.pk.to_python(value))
-                else:
-                    m2m_convert = lambda v: smart_text(field.rel.to._meta.pk.to_python(v))
-                m2m_data[field.name] = [m2m_convert(pk) for pk in field_value]
-
-            # Handle FK fields
-            elif field.rel and isinstance(field.rel, models.ManyToOneRel):
-                if field_value is not None:
+            try:
+                if ignore and field_name not in model_fields:
+                    # skip fields no longer on model
+                    continue
+    
+                if isinstance(field_value, str):
+                    field_value = smart_text(field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True)
+    
+                field = Model._meta.get_field(field_name)
+    
+                # Handle M2M relations
+                if field.rel and isinstance(field.rel, models.ManyToManyRel):
                     if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
-                        if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
-                            obj = field.rel.to._default_manager.db_manager(db).get_by_natural_key(*field_value)
-                            value = getattr(obj, field.rel.field_name)
-                            # If this is a natural foreign key to an object that
-                            # has a FK/O2O as the foreign key, use the FK value
-                            if field.rel.to._meta.pk.rel:
-                                value = value.pk
-                        else:
-                            value = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
-                        data[field.attname] = value
+                        def m2m_convert(value):
+                            if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
+                                return field.rel.to._default_manager.db_manager(db).get_by_natural_key(*value).pk
+                            else:
+                                return smart_text(field.rel.to._meta.pk.to_python(value))
                     else:
-                        data[field.attname] = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                        m2m_convert = lambda v: smart_text(field.rel.to._meta.pk.to_python(v))
+                    m2m_data[field.name] = [m2m_convert(pk) for pk in field_value]
+    
+                # Handle FK fields
+                elif field.rel and isinstance(field.rel, models.ManyToOneRel):
+                    if field_value is not None:
+                        if hasattr(field.rel.to._default_manager, 'get_by_natural_key'):
+                            if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
+                                obj = field.rel.to._default_manager.db_manager(db).get_by_natural_key(*field_value)
+                                value = getattr(obj, field.rel.field_name)
+                                # If this is a natural foreign key to an object that
+                                # has a FK/O2O as the foreign key, use the FK value
+                                if field.rel.to._meta.pk.rel:
+                                    value = value.pk
+                            else:
+                                value = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                            data[field.attname] = value
+                        else:
+                            data[field.attname] = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                    else:
+                        data[field.attname] = None
+    
+                # Handle all other fields
                 else:
-                    data[field.attname] = None
-
-            # Handle all other fields
-            else:
-                data[field.name] = field.to_python(field_value)
-
+                    data[field.name] = field.to_python(field_value)
+            except Exception as e:
+                raise Exception("%s: (%s:pk=%s) field_value was '%s'" % (e, d['model'], d.get('pk', None), field_value))
         obj = base.build_instance(Model, data, db)
         yield base.DeserializedObject(obj, m2m_data)
 
