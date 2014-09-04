@@ -8,3 +8,4 @@ class Comment(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=100, db_index=True)
     comments = models.ManyToManyField(Comment)
+    counter = models.PositiveIntegerField()

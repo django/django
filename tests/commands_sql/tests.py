@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import re
+import unittest
 
 from django.apps import apps
 from django.core.management.color import no_style
@@ -42,6 +43,18 @@ class SQLCommandsTestCase(TestCase):
         self.assertEqual(tables, {
             'commands_sql_comment', 'commands_sql_book', 'commands_sql_book_comments'
         })
+
+    @unittest.skipUnless('PositiveIntegerField' in connections[DEFAULT_DB_ALIAS].creation.data_type_check_constraints, 'Backend does not have checks.')
+    def test_sql_create_check(self):
+        """Regression test for #23416 -- Check that db_params['check'] is respected."""
+        app_config = apps.get_app_config('commands_sql')
+        output = sql_create(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
+        success = False
+        for statement in output:
+            if 'CHECK' in statement:
+                success = True
+        if not success:
+            self.fail("'CHECK' not found in ouput %s" % output)
 
     def test_sql_delete(self):
         app_config = apps.get_app_config('commands_sql')

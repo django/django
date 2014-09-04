@@ -13,3 +13,6 @@ Bugfixes
 
 * Fixed a ``UnicodeDecodeError`` when the ``flush`` error message contained
   Unicode characters (:ticket:`22882`).
+
+* Reinstated missing ``CHECK`` SQL clauses which were omitted on some backends
+  when not using migrations (:ticket:`23416`).
