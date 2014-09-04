@@ -336,7 +336,7 @@ class Options(object):
         All hidden and proxy fields are omitted.
         """
         return self._make_immutable_fields_list((f for f in self.get_fields()
-                                                if not isinstance(f, ManyToManyField)))
+                                                if not (f.has_many_values and f.has_relation)))
 
     @cached_property
     def concrete_fields(self):
@@ -370,7 +370,7 @@ class Options(object):
         All hidden and proxy fields are omitted.
         """
         return self._make_immutable_fields_list((f for f in self.get_fields()
-                                                if isinstance(f, ManyToManyField)))
+                                                if f.has_many_values and f.has_relation))
 
     @cached_property
     def related_objects(self):
@@ -379,8 +379,10 @@ class Options(object):
         # field relation type.
         all_related_fields = self.get_fields(forward=False, reverse=True,
                                              include_hidden=True, cache_results=True)
-        return [obj for obj in all_related_fields
-                if not obj.field.rel.is_hidden() or isinstance(obj.field, ManyToManyField)]
+        return self._make_immutable_fields_list(
+            obj for obj in all_related_fields
+            if not obj.field.rel.is_hidden() or obj.field.has_many_values
+        )
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_m2m_with_model(self):
