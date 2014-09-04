@@ -736,7 +736,7 @@ class MigrationAutodetector(object):
         for app_label, model_name, field_name in sorted(self.new_field_keys - self.old_field_keys):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
-            field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+            field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
             # Scan to see if this is actually a rename!
             field_dec = self.deep_deconstruct(field)
             for rem_app_label, rem_model_name, rem_field_name in sorted(self.old_field_keys - self.new_field_keys):
@@ -766,7 +766,7 @@ class MigrationAutodetector(object):
         Fields that have been added
         """
         for app_label, model_name, field_name in sorted(self.new_field_keys - self.old_field_keys):
-            field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
+            field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
             # Fields that are foreignkeys/m2ms depend on stuff
             dependencies = []
             if field.rel and field.rel.to:
