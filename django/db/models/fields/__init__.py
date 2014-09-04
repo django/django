@@ -13,7 +13,6 @@ from itertools import tee
 
 from django.apps import apps
 from django.db import connection
-from django.db.models.fields.subclassing import SubfieldBase
 from django.db.models.lookups import default_lookups, RegisterLookupMixin
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
@@ -1575,7 +1574,7 @@ class DecimalField(Field):
         return super(DecimalField, self).formfield(**defaults)
 
 
-class DurationField(six.with_metaclass(SubfieldBase, Field)):
+class DurationField(Field):
     """Stores timedelta objects.
 
     Uses interval on postgres, bigint of microseconds on other databases.
@@ -1595,9 +1594,6 @@ class DurationField(six.with_metaclass(SubfieldBase, Field)):
             return value
         if isinstance(value, datetime.timedelta):
             return value
-        if isinstance(value, six.integer_types):
-            # Need decimal to preserve precision on Py2.7
-            value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
         try:
             parsed = parse_duration(value)
         except ValueError:

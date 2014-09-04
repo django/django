@@ -62,6 +62,7 @@ from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.db.backends.oracle.schema import DatabaseSchemaEditor
 from django.db.utils import InterfaceError
 from django.utils import six, timezone
+from django.utils.dateparse import parse_duration
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
 
@@ -280,6 +281,8 @@ WHEN (new.%(col_name)s IS NULL)
             converters.append(self.convert_timefield_value)
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
+        elif internal_type == 'DurationField':
+            converters.append(self.convert_durationfield_value)
         converters.append(self.convert_empty_values)
         return converters
 
@@ -324,6 +327,12 @@ WHEN (new.%(col_name)s IS NULL)
     def convert_uuidfield_value(self, value, field):
         if value is not None:
             value = uuid.UUID(value)
+        return value
+
+    def convert_durationfield_value(self, value, field):
+        if value is not None:
+            value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
+            value = parse_duration(value)
         return value
 
     def deferrable_sql(self):

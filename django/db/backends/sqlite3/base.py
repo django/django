@@ -21,7 +21,7 @@ from django.db.backends.sqlite3.creation import DatabaseCreation
 from django.db.backends.sqlite3.introspection import DatabaseIntrospection
 from django.db.backends.sqlite3.schema import DatabaseSchemaEditor
 from django.db.models import fields, aggregates
-from django.utils.dateparse import parse_date, parse_datetime, parse_time
+from django.utils.dateparse import parse_date, parse_datetime, parse_time, parse_duration
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes
@@ -270,6 +270,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_datefield_value)
         elif internal_type == 'TimeField':
             converters.append(self.convert_timefield_value)
+        elif internal_type == 'DurationField':
+            converters.append(self.convert_durationfield_value)
         elif internal_type == 'DecimalField':
             converters.append(self.convert_decimalfield_value)
         elif internal_type == 'UUIDField':
@@ -282,6 +284,12 @@ class DatabaseOperations(BaseDatabaseOperations):
     def convert_datefield_value(self, value, field):
         if value is not None and not isinstance(value, datetime.date):
             value = parse_date(value)
+        return value
+
+    def convert_durationfield_value(self, value, field):
+        if value is not None:
+            value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
+            value = parse_duration(value)
         return value
 
     def convert_datetimefield_value(self, value, field):
