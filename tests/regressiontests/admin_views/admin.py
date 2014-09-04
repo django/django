@@ -27,7 +27,8 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     Album, Question, Answer, ComplexSortedPerson, PrePopulatedPostLargeSlug,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
-    RelatedPrepopulated, ReferencedByParent, ChildOfReferer, M2MReference)
+    RelatedPrepopulated, ReferencedByParent, ChildOfReferer, M2MReference,
+    ReferencedByInline, InlineReference, InlineReferer)
 
 
 def callable_year(dt_value):
@@ -570,6 +571,14 @@ class UnorderedObjectAdmin(admin.ModelAdmin):
 
 
 
+class InlineReferenceInline(admin.TabularInline):
+    model = InlineReference
+
+
+class InlineRefererAdmin(admin.ModelAdmin):
+    inlines = [InlineReferenceInline]
+
+
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
@@ -619,6 +628,8 @@ site.register(UnorderedObject, UnorderedObjectAdmin)
 site.register(ReferencedByParent)
 site.register(ChildOfReferer)
 site.register(M2MReference)
+site.register(ReferencedByInline)
+site.register(InlineReferer, InlineRefererAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
