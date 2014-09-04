@@ -745,5 +745,5 @@ will be removed in Django 2.0. Historically, it was used to handle fields where
 type conversion was needed when loading from the database, but it was not used
 in ``.values()`` calls or in aggregates. It has been replaced with
 :meth:`~django.db.models.Field.from_db_value`. Note that the new approach does
-not call the :meth:`~django.db.models.Fields.to_python`` method on assignment
+not call the :meth:`~django.db.models.Field.to_python` method on assignment
 as was the case with ``SubfieldBase``.
