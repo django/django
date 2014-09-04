@@ -1,0 +1,13 @@
+===========================
+Django 1.4.16 release notes
+===========================
+
+*Under development*
+
+Django 1.4.16 fixes a regression in the 1.4.14 security release.
+
+Bugfixes
+========
+
+* Allowed inline and hidden references to admin fields
+  (`#23431 <http://code.djangoproject.com/ticket/23431>`_).
