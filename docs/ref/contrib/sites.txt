@@ -19,7 +19,8 @@ The sites framework is mainly based on a simple model:
 
     A model for storing the ``domain`` and ``name`` attributes of a Web site.
     The :setting:`SITE_ID` setting specifies the database ID of the
-    :class:`~django.contrib.sites.models.Site` object associated with that
+    :class:`~django.contrib.sites.models.Site` object (accessible using
+    the automatically added ``id`` attribute) associated with that
     particular settings file.
 
     .. attribute:: domain
@@ -266,6 +267,11 @@ default site named ``example.com`` with the domain ``example.com``. This site
 will also be created after Django creates the test database. To set the
 correct name and domain for your project, you can use a :ref:`data migration
 <data-migrations>`.
+
+In order to serve different sites in production, you'd create a separate
+settings file with each ``SITE_ID`` (perhaps importing from a common settings
+file to avoid duplicating shared settings) and then specify the appropriate
+:envvar:`DJANGO_SETTINGS_MODULE` for each site.
 
 Caching the current ``Site`` object
 ===================================

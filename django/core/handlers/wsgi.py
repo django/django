@@ -176,7 +176,7 @@ class WSGIHandler(base.BaseHandler):
                     raise
 
         set_script_prefix(get_script_name(environ))
-        signals.request_started.send(sender=self.__class__)
+        signals.request_started.send(sender=self.__class__, environ=environ)
         try:
             request = self.request_class(environ)
         except UnicodeDecodeError:

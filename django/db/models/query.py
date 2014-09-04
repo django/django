@@ -1345,12 +1345,12 @@ def get_klass_info(klass, max_depth=0, cur_depth=0, requested=None,
         # Build the list of fields that *haven't* been requested
         for field in klass._meta.concrete_fields:
             model = field.parent_model._meta.concrete_model
-            if field.name not in load_fields:
-                skip.add(field.attname)
-            elif from_parent and issubclass(from_parent, model.__class__):
+            if from_parent and model and issubclass(from_parent, model):
                 # Avoid loading fields already loaded for parent model for
                 # child models.
                 continue
+            elif field.name not in load_fields:
+                skip.add(field.attname)
             else:
                 init_list.append(field.attname)
         # Retrieve all the requested fields
@@ -1566,7 +1566,6 @@ class RawQuerySet(object):
         compiler = connections[db].ops.compiler('SQLCompiler')(
             self.query, connections[db], db
         )
-        need_resolv_columns = hasattr(compiler, 'resolve_columns')
 
         query = iter(self.query)
 
@@ -1584,11 +1583,11 @@ class RawQuerySet(object):
                 model_cls = deferred_class_factory(self.model, skip)
             else:
                 model_cls = self.model
-            if need_resolv_columns:
-                fields = [self.model_fields.get(c, None) for c in self.columns]
+            fields = [self.model_fields.get(c, None) for c in self.columns]
+            converters = compiler.get_converters(fields)
             for values in query:
-                if need_resolv_columns:
-                    values = compiler.resolve_columns(values, fields)
+                if converters:
+                    values = compiler.apply_converters(values, converters)
                 # Associate fields to values
                 model_init_values = [values[pos] for pos in model_init_pos]
                 instance = model_cls.from_db(db, model_init_names, model_init_values)
@@ -1602,10 +1601,7 @@ class RawQuerySet(object):
                 self.query.cursor.close()
 
     def __repr__(self):
-        text = self.raw_query
-        if self.params:
-            text = text % (self.params if hasattr(self.params, 'keys') else tuple(self.params))
-        return "<RawQuerySet: %r>" % text
+        return "<RawQuerySet: %s>" % self.query
 
     def __getitem__(self, k):
         return list(self)[k]

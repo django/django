@@ -35,7 +35,8 @@ from .models import (Article, Chapter, Child, Parent, Picture, Widget,
     UnchangeableObject, UserMessenger, Simple, Choice, ShortMessage, Telegram,
     FilteredManager, EmptyModelHidden, EmptyModelVisible, EmptyModelMixin,
     State, City, Restaurant, Worker, ParentWithDependentChildren,
-    DependentChild, StumpJoke, FieldOverridePost, FunkyTag)
+    DependentChild, StumpJoke, FieldOverridePost, FunkyTag,
+    ReferencedByParent, ChildOfReferer, M2MReference)
 
 
 def callable_year(dt_value):
@@ -832,6 +833,7 @@ class FunkyTagAdmin(admin.ModelAdmin):
 
 
 site = admin.AdminSite(name="admin")
+site.site_url = '/my-site-url/'
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
 site.register(Section, save_as=True, inlines=[ArticleInline])
@@ -887,6 +889,9 @@ site.register(City, CityAdmin)
 site.register(Restaurant, RestaurantAdmin)
 site.register(Worker, WorkerAdmin)
 site.register(FunkyTag, FunkyTagAdmin)
+site.register(ReferencedByParent)
+site.register(ChildOfReferer)
+site.register(M2MReference)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

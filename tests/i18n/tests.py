@@ -73,6 +73,44 @@ class TranslationTests(TestCase):
         finally:
             deactivate()
 
+    def test_override_decorator(self):
+
+        @translation.override('pl')
+        def func_pl():
+            self.assertEqual(get_language(), 'pl')
+
+        @translation.override(None)
+        def func_none():
+            self.assertEqual(get_language(), settings.LANGUAGE_CODE)
+
+        try:
+            activate('de')
+            func_pl()
+            self.assertEqual(get_language(), 'de')
+            func_none()
+            self.assertEqual(get_language(), 'de')
+        finally:
+            deactivate()
+
+    def test_override_exit(self):
+        """
+        Test that the language restored is the one used when the function was
+        called, not the one used when the decorator was initialized. refs #23381
+        """
+        activate('fr')
+
+        @translation.override('pl')
+        def func_pl():
+            pass
+        deactivate()
+
+        try:
+            activate('en')
+            func_pl()
+            self.assertEqual(get_language(), 'en')
+        finally:
+            deactivate()
+
     def test_lazy_objects(self):
         """
         Format string interpolation should work with *_lazy objects.
@@ -154,6 +192,17 @@ class TranslationTests(TestCase):
             self.assertEqual(complex_context_deferred % {'name': 'Jim', 'num': 5}, 'Willkommen Jim, 5 guten Resultate')
             with six.assertRaisesRegex(self, KeyError, 'Your dictionary lacks key.*'):
                 complex_context_deferred % {'name': 'Jim'}
+
+    @skipUnless(six.PY2, "PY3 doesn't have distinct int and long types")
+    def test_ungettext_lazy_long(self):
+        """
+        Regression test for #22820: int and long should be treated alike in ungettext_lazy.
+        """
+        result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', 4)
+        self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
+        # Now with a long
+        result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', long(4))
+        self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):

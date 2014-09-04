@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import re
+
 from django.apps import apps
 from django.core.management.color import no_style
 from django.core.management.sql import (sql_create, sql_delete, sql_indexes,
@@ -19,11 +21,27 @@ class SQLCommandsTestCase(TestCase):
     def test_sql_create(self):
         app_config = apps.get_app_config('commands_sql')
         output = sql_create(app_config, no_style(), connections[DEFAULT_DB_ALIAS])
-        create_tables = [o for o in output if o.startswith('CREATE TABLE')]
-        self.assertEqual(len(create_tables), 3)
-        # Lower so that Oracle's upper case tbl names wont break
-        sql = create_tables[-1].lower()
-        six.assertRegex(self, sql, r'^create table .commands_sql_book.*')
+
+        tables = set()
+        create_table_re = re.compile(r'^create table .(?P<table>[\w_]+).*', re.IGNORECASE)
+        reference_re = re.compile(r'.* references .(?P<table>[\w_]+).*', re.IGNORECASE)
+        for statement in output:
+            create_table = create_table_re.match(statement)
+            if create_table:
+                # Lower since Oracle's table names are upper cased.
+                tables.add(create_table.group('table').lower())
+                continue
+            reference = reference_re.match(statement)
+            if reference:
+                # Lower since Oracle's table names are upper cased.
+                table = reference.group('table').lower()
+                self.assertIn(
+                    table, tables, "The table %s is referenced before its creation." % table
+                )
+
+        self.assertEqual(tables, {
+            'commands_sql_comment', 'commands_sql_book', 'commands_sql_book_comments'
+        })
 
     def test_sql_delete(self):
         app_config = apps.get_app_config('commands_sql')

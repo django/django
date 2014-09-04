@@ -49,7 +49,7 @@ class MigrationLoader(object):
 
     @classmethod
     def migrations_module(cls, app_label):
-        if app_label in settings.MIGRATION_MODULES:
+        if settings.MIGRATION_MODULES.get(app_label):
             return settings.MIGRATION_MODULES[app_label]
         else:
             app_package_name = apps.get_app_config(app_label).name
@@ -230,7 +230,7 @@ class MigrationLoader(object):
                 if parent[0] != key[0] or parent[1] == '__first__':
                     # Ignore __first__ references to the same app (#22325)
                     continue
-                self.graph.add_dependency(key, parent)
+                self.graph.add_dependency(migration, key, parent)
         for key, migration in normal.items():
             for parent in migration.dependencies:
                 if parent[0] == key[0]:
@@ -238,11 +238,11 @@ class MigrationLoader(object):
                     continue
                 parent = self.check_key(parent, key[0])
                 if parent is not None:
-                    self.graph.add_dependency(key, parent)
+                    self.graph.add_dependency(migration, key, parent)
             for child in migration.run_before:
                 child = self.check_key(child, key[0])
                 if child is not None:
-                    self.graph.add_dependency(child, key)
+                    self.graph.add_dependency(migration, child, key)
 
     def detect_conflicts(self):
         """

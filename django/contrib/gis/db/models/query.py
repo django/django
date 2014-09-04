@@ -1,5 +1,5 @@
 from django.db import connections
-from django.db.models.query import QuerySet, ValuesQuerySet, ValuesListQuerySet
+from django.db.models.query import QuerySet
 
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.db.models.fields import get_srid_info, PointField, LineStringField
@@ -17,19 +17,6 @@ class GeoQuerySet(QuerySet):
     def __init__(self, model=None, query=None, using=None, hints=None):
         super(GeoQuerySet, self).__init__(model=model, query=query, using=using, hints=hints)
         self.query = query or GeoQuery(self.model)
-
-    def values(self, *fields):
-        return self._clone(klass=GeoValuesQuerySet, setup=True, _fields=fields)
-
-    def values_list(self, *fields, **kwargs):
-        flat = kwargs.pop('flat', False)
-        if kwargs:
-            raise TypeError('Unexpected keyword arguments to values_list: %s'
-                    % (list(kwargs),))
-        if flat and len(fields) > 1:
-            raise TypeError("'flat' is not valid when values_list is called with more than one field.")
-        return self._clone(klass=GeoValuesListQuerySet, setup=True, flat=flat,
-                           _fields=fields)
 
     ### GeoQuerySet Methods ###
     def area(self, tolerance=0.05, **kwargs):
@@ -631,8 +618,8 @@ class GeoQuerySet(QuerySet):
                 u, unit_name, s = get_srid_info(self.query.transformed_srid, connection)
                 geodetic = unit_name.lower() in geo_field.geodetic_units
 
-            if backend.spatialite and geodetic:
-                raise ValueError('SQLite does not support linear distance calculations on geodetic coordinate systems.')
+            if geodetic and not connection.features.supports_distance_geodetic:
+                raise ValueError('This database does not support linear distance calculations on geodetic coordinate systems.')
 
             if distance:
                 if self.query.transformed_srid:
@@ -690,8 +677,8 @@ class GeoQuerySet(QuerySet):
                     # works on 3D geometries.
                     procedure_fmt += ",'%(spheroid)s'"
                     procedure_args.update({'function': backend.length_spheroid, 'spheroid': params[1]})
-                elif geom_3d and backend.postgis:
-                    # Use 3D variants of perimeter and length routines on PostGIS.
+                elif geom_3d and connection.features.supports_3d_functions:
+                    # Use 3D variants of perimeter and length routines on supported backends.
                     if perimeter:
                         procedure_args.update({'function': backend.perimeter3d})
                     elif length:
@@ -767,16 +754,3 @@ class GeoQuerySet(QuerySet):
             return self.query.get_compiler(self.db)._field_column(geo_field, parent_model._meta.db_table)
         else:
             return self.query.get_compiler(self.db)._field_column(geo_field)
-
-
-class GeoValuesQuerySet(ValuesQuerySet):
-    def __init__(self, *args, **kwargs):
-        super(GeoValuesQuerySet, self).__init__(*args, **kwargs)
-        # This flag tells `resolve_columns` to run the values through
-        # `convert_values`.  This ensures that Geometry objects instead
-        # of string values are returned with `values()` or `values_list()`.
-        self.query.geo_values = True
-
-
-class GeoValuesListQuerySet(GeoValuesQuerySet, ValuesListQuerySet):
-    pass

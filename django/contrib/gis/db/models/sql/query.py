@@ -5,9 +5,7 @@ from django.contrib.gis.db.models.constants import ALL_TERMS
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.lookups import GISLookup
 from django.contrib.gis.db.models.sql import aggregates as gis_aggregates
-from django.contrib.gis.db.models.sql.conversion import AreaField, DistanceField, GeomField
-from django.contrib.gis.geometry.backend import Geometry
-from django.contrib.gis.measure import Area, Distance
+from django.contrib.gis.db.models.sql.conversion import GeomField
 
 
 class GeoQuery(sql.Query):
@@ -37,32 +35,6 @@ class GeoQuery(sql.Query):
         obj.transformed_srid = self.transformed_srid
         obj.extra_select_fields = self.extra_select_fields.copy()
         return obj
-
-    def convert_values(self, value, field, connection):
-        """
-        Using the same routines that Oracle does we can convert our
-        extra selection objects into Geometry and Distance objects.
-        TODO: Make converted objects 'lazy' for less overhead.
-        """
-        if connection.ops.oracle:
-            # Running through Oracle's first.
-            value = super(GeoQuery, self).convert_values(value, field or GeomField(), connection)
-
-        if value is None:
-            # Output from spatial function is NULL (e.g., called
-            # function on a geometry field with NULL value).
-            pass
-        elif isinstance(field, DistanceField):
-            # Using the field's distance attribute, can instantiate
-            # `Distance` with the right context.
-            value = Distance(**{field.distance_att: value})
-        elif isinstance(field, AreaField):
-            value = Area(**{field.area_att: value})
-        elif isinstance(field, (GeomField, GeometryField)) and value:
-            value = Geometry(value)
-        elif field is not None:
-            return super(GeoQuery, self).convert_values(value, field, connection)
-        return value
 
     def get_aggregation(self, using, force_subq=False):
         # Remove any aggregates marked for reduction from the subquery

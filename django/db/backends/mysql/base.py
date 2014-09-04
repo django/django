@@ -178,6 +178,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_date_lookup_using_string = False
     can_introspect_binary_field = False
     can_introspect_boolean_field = False
+    can_introspect_small_integer_field = True
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
     allows_auto_pk_0 = False
@@ -392,6 +393,17 @@ class DatabaseOperations(BaseDatabaseOperations):
         if connector == '^':
             return 'POW(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+
+    def get_db_converters(self, internal_type):
+        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+        if internal_type in ['BooleanField', 'NullBooleanField']:
+            converters.append(self.convert_booleanfield_value)
+        return converters
+
+    def convert_booleanfield_value(self, value, field):
+        if value in (0, 1):
+            value = bool(value)
+        return value
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):

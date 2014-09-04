@@ -110,6 +110,32 @@ between the current settings file and Django's default settings.
 
 For more, see the :djadmin:`diffsettings` documentation.
 
+.. _dictionary-settings:
+
+Overriding dictionary settings
+------------------------------
+
+.. versionchanged:: 1.8
+
+When defining a dictionary-type setting which has a non-empty value (see
+:setting:`CACHES` for example), you do not have to redefine all its keys. You
+can just define the keys differing from the default, and Django will simply
+merge your setting value with the default value. For example, if you define
+:setting:`CACHES` so::
+
+    CACHES = {
+        'special': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': '127.0.0.1:11211',
+        }
+    }
+
+then ``CACHES['default']`` which is set by default in Django's global settings
+will still be defined, as well as the new ``'special'`` cache backend.
+
+If you want your setting to completely override the default value, you can add
+a ``_clear_defaults`` key with a ``True`` value to the dictionary.
+
 Using settings in Python code
 =============================
 

@@ -21,17 +21,6 @@ def no_oracle(func):
     return no_backend(func, 'oracle')
 
 
-def no_postgis(func):
-    return no_backend(func, 'postgis')
-
-
-def no_mysql(func):
-    return no_backend(func, 'mysql')
-
-
-def no_spatialite(func):
-    return no_backend(func, 'spatialite')
-
 # Shortcut booleans to omit only portions of tests.
 _default_db = settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE'].rsplit('.')[-1]
 oracle = _default_db == 'oracle'
@@ -39,7 +28,9 @@ postgis = _default_db == 'postgis'
 mysql = _default_db == 'mysql'
 spatialite = _default_db == 'spatialite'
 
-HAS_SPATIALREFSYS = True
+# MySQL spatial indices can't handle NULL geometries.
+gisfield_may_be_null = not mysql
+
 if oracle and 'gis' in settings.DATABASES[DEFAULT_DB_ALIAS]['ENGINE']:
     from django.contrib.gis.db.backends.oracle.models import OracleSpatialRefSys as SpatialRefSys
 elif postgis:
@@ -47,5 +38,4 @@ elif postgis:
 elif spatialite:
     from django.contrib.gis.db.backends.spatialite.models import SpatialiteSpatialRefSys as SpatialRefSys
 else:
-    HAS_SPATIALREFSYS = False
     SpatialRefSys = None

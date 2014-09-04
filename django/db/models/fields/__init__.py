@@ -572,6 +572,11 @@ class Field(RegisterLookupMixin, FieldFlagsMixin):
     def db_type_suffix(self, connection):
         return connection.creation.data_types_suffix.get(self.get_internal_type())
 
+    def get_db_converters(self, connection):
+        if hasattr(self, 'from_db_value'):
+            return [self.from_db_value]
+        return []
+
     @property
     def unique(self):
         return self._unique or self.primary_key

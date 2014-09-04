@@ -23,11 +23,11 @@ class GraphTests(TestCase):
         graph.add_node(("app_a", "0004"), None)
         graph.add_node(("app_b", "0001"), None)
         graph.add_node(("app_b", "0002"), None)
-        graph.add_dependency(("app_a", "0004"), ("app_a", "0003"))
-        graph.add_dependency(("app_a", "0003"), ("app_a", "0002"))
-        graph.add_dependency(("app_a", "0002"), ("app_a", "0001"))
-        graph.add_dependency(("app_a", "0003"), ("app_b", "0002"))
-        graph.add_dependency(("app_b", "0002"), ("app_b", "0001"))
+        graph.add_dependency("app_a.0004", ("app_a", "0004"), ("app_a", "0003"))
+        graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_a", "0002"))
+        graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
+        graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_b", "0002"))
+        graph.add_dependency("app_b.0002", ("app_b", "0002"), ("app_b", "0001"))
         # Test root migration case
         self.assertEqual(
             graph.forwards_plan(("app_a", "0001")),
@@ -78,15 +78,15 @@ class GraphTests(TestCase):
         graph.add_node(("app_b", "0002"), None)
         graph.add_node(("app_c", "0001"), None)
         graph.add_node(("app_c", "0002"), None)
-        graph.add_dependency(("app_a", "0004"), ("app_a", "0003"))
-        graph.add_dependency(("app_a", "0003"), ("app_a", "0002"))
-        graph.add_dependency(("app_a", "0002"), ("app_a", "0001"))
-        graph.add_dependency(("app_a", "0003"), ("app_b", "0002"))
-        graph.add_dependency(("app_b", "0002"), ("app_b", "0001"))
-        graph.add_dependency(("app_a", "0004"), ("app_c", "0002"))
-        graph.add_dependency(("app_c", "0002"), ("app_c", "0001"))
-        graph.add_dependency(("app_c", "0001"), ("app_b", "0001"))
-        graph.add_dependency(("app_c", "0002"), ("app_a", "0002"))
+        graph.add_dependency("app_a.0004", ("app_a", "0004"), ("app_a", "0003"))
+        graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_a", "0002"))
+        graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
+        graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_b", "0002"))
+        graph.add_dependency("app_b.0002", ("app_b", "0002"), ("app_b", "0001"))
+        graph.add_dependency("app_a.0004", ("app_a", "0004"), ("app_c", "0002"))
+        graph.add_dependency("app_c.0002", ("app_c", "0002"), ("app_c", "0001"))
+        graph.add_dependency("app_c.0001", ("app_c", "0001"), ("app_b", "0001"))
+        graph.add_dependency("app_c.0002", ("app_c", "0002"), ("app_a", "0002"))
         # Test branch C only
         self.assertEqual(
             graph.forwards_plan(("app_c", "0002")),
@@ -123,13 +123,51 @@ class GraphTests(TestCase):
         graph.add_node(("app_a", "0003"), None)
         graph.add_node(("app_b", "0001"), None)
         graph.add_node(("app_b", "0002"), None)
-        graph.add_dependency(("app_a", "0003"), ("app_a", "0002"))
-        graph.add_dependency(("app_a", "0002"), ("app_a", "0001"))
-        graph.add_dependency(("app_a", "0001"), ("app_b", "0002"))
-        graph.add_dependency(("app_b", "0002"), ("app_b", "0001"))
-        graph.add_dependency(("app_b", "0001"), ("app_a", "0003"))
+        graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_a", "0002"))
+        graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
+        graph.add_dependency("app_a.0001", ("app_a", "0001"), ("app_b", "0002"))
+        graph.add_dependency("app_b.0002", ("app_b", "0002"), ("app_b", "0001"))
+        graph.add_dependency("app_b.0001", ("app_b", "0001"), ("app_a", "0003"))
         # Test whole graph
         self.assertRaises(
             CircularDependencyError,
             graph.forwards_plan, ("app_a", "0003"),
         )
+
+    def test_plan_invalid_node(self):
+        """
+        Tests for forwards/backwards_plan of nonexistent node.
+        """
+        graph = MigrationGraph()
+        message = "Node ('app_b', '0001') not a valid node"
+
+        with self.assertRaisesMessage(ValueError, message):
+            graph.forwards_plan(("app_b", "0001"))
+
+        with self.assertRaisesMessage(ValueError, message):
+            graph.backwards_plan(("app_b", "0001"))
+
+    def test_missing_parent_nodes(self):
+        """
+        Tests for missing parent nodes.
+        """
+        # Build graph
+        graph = MigrationGraph()
+        graph.add_node(("app_a", "0001"), None)
+        graph.add_node(("app_a", "0002"), None)
+        graph.add_node(("app_a", "0003"), None)
+        graph.add_node(("app_b", "0001"), None)
+        graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_a", "0002"))
+        graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
+        with self.assertRaisesMessage(KeyError, "Migration app_a.0001 dependencies references nonexistent parent node ('app_b', '0002')"):
+            graph.add_dependency("app_a.0001", ("app_a", "0001"), ("app_b", "0002"))
+
+    def test_missing_child_nodes(self):
+        """
+        Tests for missing child nodes.
+        """
+        # Build graph
+        graph = MigrationGraph()
+        graph.add_node(("app_a", "0001"), None)
+        with self.assertRaisesMessage(KeyError, "Migration app_a.0002 dependencies references nonexistent child node ('app_a', '0002')"):
+            graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))

@@ -197,6 +197,11 @@ class GeometryField(Field):
         else:
             return geom
 
+    def from_db_value(self, value, connection):
+        if value is not None:
+            value = Geometry(value)
+        return value
+
     def get_srid(self, geom):
         """
         Returns the default SRID for the given geometry, taking into account

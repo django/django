@@ -50,6 +50,7 @@ LANGUAGE_CODE = 'en-us'
 LANGUAGES = (
     ('af', gettext_noop('Afrikaans')),
     ('ar', gettext_noop('Arabic')),
+    ('ast', gettext_noop('Asturian')),
     ('az', gettext_noop('Azerbaijani')),
     ('bg', gettext_noop('Bulgarian')),
     ('be', gettext_noop('Belarusian')),
@@ -85,6 +86,7 @@ LANGUAGES = (
     ('hu', gettext_noop('Hungarian')),
     ('ia', gettext_noop('Interlingua')),
     ('id', gettext_noop('Indonesian')),
+    ('io', gettext_noop('Ido')),
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
     ('ja', gettext_noop('Japanese')),
@@ -99,6 +101,7 @@ LANGUAGES = (
     ('mk', gettext_noop('Macedonian')),
     ('ml', gettext_noop('Malayalam')),
     ('mn', gettext_noop('Mongolian')),
+    ('mr', gettext_noop('Marathi')),
     ('my', gettext_noop('Burmese')),
     ('nb', gettext_noop('Norwegian Bokmal')),
     ('ne', gettext_noop('Nepali')),
