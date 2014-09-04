@@ -102,11 +102,13 @@ class DistanceTest(TestCase):
         lagrange = GEOSGeometry('POINT(-96.876369 29.905320)', 4326)
         # Reference distances in feet and in meters. Got these values from
         # using the provided raw SQL statements.
-        #  SELECT ST_Distance(point, ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 32140)) FROM distapp_southtexascity;
+        #  SELECT ST_Distance(point, ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 32140))
+        #  FROM distapp_southtexascity;
         m_distances = [147075.069813, 139630.198056, 140888.552826,
                        138809.684197, 158309.246259, 212183.594374,
                        70870.188967, 165337.758878, 139196.085105]
-        #  SELECT ST_Distance(point, ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 2278)) FROM distapp_southtexascityft;
+        #  SELECT ST_Distance(point, ST_Transform(ST_GeomFromText('POINT(-96.876369 29.905320)', 4326), 2278))
+        #  FROM distapp_southtexascityft;
         # Oracle 11 thinks this is not a projected coordinate system, so it's
         # not tested.
         ft_distances = [482528.79154625, 458103.408123001, 462231.860397575,
@@ -146,7 +148,8 @@ class DistanceTest(TestCase):
         ls = LineString(((150.902, -34.4245), (150.87, -34.5789)))
 
         # Reference query:
-        #  SELECT ST_distance_sphere(point, ST_GeomFromText('LINESTRING(150.9020 -34.4245,150.8700 -34.5789)', 4326)) FROM distapp_australiacity ORDER BY name;
+        #  SELECT ST_distance_sphere(point, ST_GeomFromText('LINESTRING(150.9020 -34.4245,150.8700 -34.5789)', 4326))
+        #  FROM distapp_australiacity ORDER BY name;
         distances = [1120954.92533513, 140575.720018241, 640396.662906304,
                      60580.9693849269, 972807.955955075, 568451.8357838,
                      40435.4335201384, 0, 68272.3896586844, 12375.0643697706, 0]
@@ -156,8 +159,10 @@ class DistanceTest(TestCase):
             self.assertAlmostEqual(distance, city.distance.m, 0)
 
         # Got the reference distances using the raw SQL statements:
-        #  SELECT ST_distance_spheroid(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326), 'SPHEROID["WGS 84",6378137.0,298.257223563]') FROM distapp_australiacity WHERE (NOT (id = 11));
-        #  SELECT ST_distance_sphere(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326)) FROM distapp_australiacity WHERE (NOT (id = 11));  st_distance_sphere
+        #  SELECT ST_distance_spheroid(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326),
+        #    'SPHEROID["WGS 84",6378137.0,298.257223563]') FROM distapp_australiacity WHERE (NOT (id = 11));
+        #  SELECT ST_distance_sphere(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326))
+        #  FROM distapp_australiacity WHERE (NOT (id = 11));  st_distance_sphere
         if connection.ops.postgis and connection.ops.proj_version_tuple() >= (4, 7, 0):
             # PROJ.4 versions 4.7+ have updated datums, and thus different
             # distance values.
@@ -204,7 +209,9 @@ class DistanceTest(TestCase):
         z = SouthTexasZipcode.objects.get(name='77005')
 
         # Reference query:
-        # SELECT ST_Distance(ST_Transform("distapp_censuszipcode"."poly", 32140), ST_GeomFromText('<buffer_wkt>', 32140)) FROM "distapp_censuszipcode";
+        # SELECT ST_Distance(ST_Transform("distapp_censuszipcode"."poly", 32140),
+        #   ST_GeomFromText('<buffer_wkt>', 32140))
+        # FROM "distapp_censuszipcode";
         dists_m = [3553.30384972258, 1243.18391525602, 2186.15439472242]
 
         # Having our buffer in the SRID of the transformation and of the field
@@ -230,14 +237,18 @@ class DistanceTest(TestCase):
         # Retrieving the cities within a 20km 'donut' w/a 7km radius 'hole'
         # (thus, Houston and Southside place will be excluded as tested in
         # the `test02_dwithin` above).
-        qs1 = SouthTexasCity.objects.filter(point__distance_gte=(self.stx_pnt, D(km=7))).filter(point__distance_lte=(self.stx_pnt, D(km=20)))
+        qs1 = SouthTexasCity.objects.filter(point__distance_gte=(self.stx_pnt, D(km=7))).filter(
+            point__distance_lte=(self.stx_pnt, D(km=20)),
+        )
 
         # Can't determine the units on SpatiaLite from PROJ.4 string, and
         # Oracle 11 incorrectly thinks it is not projected.
         if spatialite or oracle:
             dist_qs = (qs1,)
         else:
-            qs2 = SouthTexasCityFt.objects.filter(point__distance_gte=(self.stx_pnt, D(km=7))).filter(point__distance_lte=(self.stx_pnt, D(km=20)))
+            qs2 = SouthTexasCityFt.objects.filter(point__distance_gte=(self.stx_pnt, D(km=7))).filter(
+                point__distance_lte=(self.stx_pnt, D(km=20)),
+            )
             dist_qs = (qs1, qs2)
 
         for qs in dist_qs:
@@ -269,8 +280,8 @@ class DistanceTest(TestCase):
                          self.get_names(dist_qs))
 
         # Too many params (4 in this case) should raise a ValueError.
-        self.assertRaises(ValueError, len,
-                          AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)', D(km=100), 'spheroid', '4')))
+        queryset = AustraliaCity.objects.filter(point__distance_lte=('POINT(5 23)', D(km=100), 'spheroid', '4'))
+        self.assertRaises(ValueError, len, queryset)
 
         # Not enough params should raise a ValueError.
         self.assertRaises(ValueError, len,
@@ -325,7 +336,8 @@ class DistanceTest(TestCase):
         Test the `length` GeoQuerySet method.
         """
         # Reference query (should use `length_spheroid`).
-        # SELECT ST_length_spheroid(ST_GeomFromText('<wkt>', 4326) 'SPHEROID["WGS 84",6378137,298.257223563, AUTHORITY["EPSG","7030"]]');
+        # SELECT ST_length_spheroid(ST_GeomFromText('<wkt>', 4326) 'SPHEROID["WGS 84",6378137,298.257223563,
+        #   AUTHORITY["EPSG","7030"]]');
         len_m1 = 473504.769553813
         len_m2 = 4617.668
 

@@ -111,7 +111,9 @@ def Deserializer(object_list, **options):
                 continue
 
             if isinstance(field_value, str):
-                field_value = smart_text(field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True)
+                field_value = smart_text(
+                    field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True
+                )
 
             field = Model._meta.get_field(field_name)
 

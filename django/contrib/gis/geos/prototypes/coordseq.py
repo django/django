@@ -8,7 +8,10 @@ from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 def check_cs_ptr(result, func, cargs):
     "Error checking on routines that return Geometries."
     if not result:
-        raise GEOSException('Error encountered checking Coordinate Sequence returned from GEOS C function "%s".' % func.__name__)
+        raise GEOSException(
+            'Error encountered checking Coordinate Sequence returned from GEOS '
+            'C function "%s".' % func.__name__
+        )
     return result
 
 

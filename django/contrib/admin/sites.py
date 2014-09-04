@@ -239,9 +239,11 @@ class AdminSite(object):
             url(r'^login/$', self.login, name='login'),
             url(r'^logout/$', wrap(self.logout), name='logout'),
             url(r'^password_change/$', wrap(self.password_change, cacheable=True), name='password_change'),
-            url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True), name='password_change_done'),
+            url(r'^password_change/done/$', wrap(self.password_change_done, cacheable=True),
+                name='password_change_done'),
             url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
-            url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$', wrap(contenttype_views.shortcut), name='view_on_site'),
+            url(r'^r/(?P<content_type_id>\d+)/(?P<object_id>.+)/$', wrap(contenttype_views.shortcut),
+                name='view_on_site'),
         ]
 
         # Add in each model's views, and create a list of valid URLS for the
@@ -408,7 +410,11 @@ class AdminSite(object):
                         app_dict[app_label] = {
                             'name': apps.get_app_config(app_label).verbose_name,
                             'app_label': app_label,
-                            'app_url': reverse('admin:app_list', kwargs={'app_label': app_label}, current_app=self.name),
+                            'app_url': reverse(
+                                'admin:app_list',
+                                kwargs={'app_label': app_label},
+                                current_app=self.name,
+                            ),
                             'has_module_perms': has_module_perms,
                             'models': [model_dict],
                         }

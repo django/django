@@ -466,7 +466,10 @@ class BaseDatabaseWrapper(object):
         """
         Only required when autocommits_when_autocommit_is_off = True.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a _start_transaction_under_autocommit() method')
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseWrapper may require a '
+            '_start_transaction_under_autocommit() method'
+        )
 
     def schema_editor(self, *args, **kwargs):
         "Returns a new instance of this backend's SchemaEditor"
