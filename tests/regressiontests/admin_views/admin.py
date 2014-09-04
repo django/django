@@ -28,7 +28,8 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
     RelatedPrepopulated, UndeletableObject, UserMessenger, Simple, Choice,
-    ShortMessage, Telegram, ReferencedByParent, ChildOfReferer, M2MReference)
+    ShortMessage, Telegram, ReferencedByParent, ChildOfReferer, M2MReference,
+    ReferencedByInline, InlineReference, InlineReferer)
 
 
 def callable_year(dt_value):
@@ -654,6 +655,14 @@ class ChoiceList(admin.ModelAdmin):
     fields = ['choice']
 
 
+class InlineReferenceInline(admin.TabularInline):
+    model = InlineReference
+
+
+class InlineRefererAdmin(admin.ModelAdmin):
+    inlines = [InlineReferenceInline]
+
+
 site = admin.AdminSite(name="admin")
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
@@ -706,6 +715,8 @@ site.register(UndeletableObject, UndeletableObjectAdmin)
 site.register(ReferencedByParent)
 site.register(ChildOfReferer)
 site.register(M2MReference)
+site.register(ReferencedByInline)
+site.register(InlineReferer, InlineRefererAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
