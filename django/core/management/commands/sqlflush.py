@@ -6,7 +6,10 @@ from django.db import connections, DEFAULT_DB_ALIAS
 
 
 class Command(BaseCommand):
-    help = "Returns a list of the SQL statements required to return all tables in the database to the state they were in just after they were installed."
+    help = (
+        "Returns a list of the SQL statements required to return all tables in "
+        "the database to the state they were in just after they were installed."
+    )
 
     output_transaction = True
 

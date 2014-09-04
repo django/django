@@ -722,7 +722,10 @@ class SQLCompiler(object):
         for rows in self.execute_sql(MULTI):
             for row in rows:
                 if has_aggregate_select:
-                    loaded_fields = self.query.get_loaded_field_names().get(self.query.model, set()) or self.query.select
+                    loaded_fields = (
+                        self.query.get_loaded_field_names().get(self.query.model, set()) or
+                        self.query.select
+                    )
                     aggregate_start = len(self.query.extra_select) + len(loaded_fields)
                     aggregate_end = aggregate_start + len(self.query.aggregate_select)
                 if fields is None:
@@ -894,8 +897,10 @@ class SQLInsertCompiler(SQLCompiler):
         if has_fields:
             params = values = [
                 [
-                    f.get_db_prep_save(getattr(obj, f.attname) if self.query.raw else f.pre_save(obj, True), connection=self.connection)
-                    for f in fields
+                    f.get_db_prep_save(
+                        getattr(obj, f.attname) if self.query.raw else f.pre_save(obj, True),
+                        connection=self.connection
+                    ) for f in fields
                 ]
                 for obj in self.query.objs
             ]

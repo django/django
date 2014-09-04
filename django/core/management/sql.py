@@ -17,7 +17,10 @@ def check_for_migrations(app_config, connection):
     from django.db.migrations.loader import MigrationLoader
     loader = MigrationLoader(connection)
     if app_config.label in loader.migrated_apps:
-        raise CommandError("App '%s' has migrations. Only the sqlmigrate and sqlflush commands can be used when an app has migrations." % app_config.label)
+        raise CommandError(
+            "App '%s' has migrations. Only the sqlmigrate and sqlflush commands "
+            "can be used when an app has migrations." % app_config.label
+        )
 
 
 def sql_create(app_config, style, connection):
@@ -176,7 +179,11 @@ def sql_all(app_config, style, connection):
     check_for_migrations(app_config, connection)
 
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
-    return sql_create(app_config, style, connection) + sql_custom(app_config, style, connection) + sql_indexes(app_config, style, connection)
+    return (
+        sql_create(app_config, style, connection) +
+        sql_custom(app_config, style, connection) +
+        sql_indexes(app_config, style, connection)
+    )
 
 
 def _split_statements(content):

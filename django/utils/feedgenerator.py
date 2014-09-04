@@ -288,7 +288,8 @@ class Rss201rev2Feed(RssFeed):
         elif item["author_email"]:
             handler.addQuickElement("author", item["author_email"])
         elif item["author_name"]:
-            handler.addQuickElement("dc:creator", item["author_name"], {"xmlns:dc": "http://purl.org/dc/elements/1.1/"})
+            handler.addQuickElement("dc:creator", item["author_name"],
+                {"xmlns:dc": "http://purl.org/dc/elements/1.1/"})
 
         if item['pubdate'] is not None:
             handler.addQuickElement("pubDate", rfc2822_date(item['pubdate']))

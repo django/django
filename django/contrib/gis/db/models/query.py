@@ -619,7 +619,10 @@ class GeoQuerySet(QuerySet):
                 geodetic = unit_name.lower() in geo_field.geodetic_units
 
             if geodetic and not connection.features.supports_distance_geodetic:
-                raise ValueError('This database does not support linear distance calculations on geodetic coordinate systems.')
+                raise ValueError(
+                    'This database does not support linear distance '
+                    'calculations on geodetic coordinate systems.'
+                )
 
             if distance:
                 if self.query.transformed_srid:
@@ -661,7 +664,10 @@ class GeoQuerySet(QuerySet):
                         if not isinstance(geo_field, PointField):
                             raise ValueError('Spherical distance calculation only supported on PointFields.')
                         if not str(Geometry(six.memoryview(params[0].ewkb)).geom_type) == 'Point':
-                            raise ValueError('Spherical distance calculation only supported with Point Geometry parameters')
+                            raise ValueError(
+                                'Spherical distance calculation only supported with '
+                                'Point Geometry parameters'
+                            )
                     # The `function` procedure argument needs to be set differently for
                     # geodetic distance calculations.
                     if spheroid:

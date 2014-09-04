@@ -128,7 +128,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 kc.constraint_name,
                 kc.column_name,
                 c.constraint_type,
-                array(SELECT table_name::text || '.' || column_name::text FROM information_schema.constraint_column_usage WHERE constraint_name = kc.constraint_name)
+                array(SELECT table_name::text || '.' || column_name::text
+                      FROM information_schema.constraint_column_usage
+                      WHERE constraint_name = kc.constraint_name)
             FROM information_schema.key_column_usage AS kc
             JOIN information_schema.table_constraints AS c ON
                 kc.table_schema = c.table_schema AND
