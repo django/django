@@ -104,8 +104,8 @@ your application servers.
 
 If you haven't set up backups for your database, do it right now!
 
-:setting:`EMAIL_BACKEND` and related settings
----------------------------------------------
+:setting:`EMAIL`
+----------------
 
 If your site sends emails, these values need to be set correctly.
 

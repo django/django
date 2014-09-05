@@ -231,7 +231,7 @@ class EmailMessage(object):
             self.bcc = list(bcc)
         else:
             self.bcc = []
-        self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
+        self.from_email = from_email or settings.EMAIL['DEFAULT_FROM_ADDRESS']
         self.subject = subject
         self.body = body
         self.attachments = attachments or []

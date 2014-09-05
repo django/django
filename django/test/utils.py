@@ -102,8 +102,8 @@ def setup_test_environment():
     # Storing previous values in the settings module itself is problematic.
     # Store them in arbitrary (but related) modules instead. See #20636.
 
-    mail._original_email_backend = settings.EMAIL_BACKEND
-    settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+    mail._original_email_backend = settings.EMAIL['BACKEND']
+    settings.EMAIL['BACKEND'] = 'django.core.mail.backends.locmem.EmailBackend'
 
     request._original_allowed_hosts = settings.ALLOWED_HOSTS
     settings.ALLOWED_HOSTS = ['*']
@@ -123,7 +123,7 @@ def teardown_test_environment():
     Template._render = Template._original_render
     del Template._original_render
 
-    settings.EMAIL_BACKEND = mail._original_email_backend
+    settings.EMAIL['BACKEND'] = mail._original_email_backend
     del mail._original_email_backend
 
     settings.ALLOWED_HOSTS = request._original_allowed_hosts

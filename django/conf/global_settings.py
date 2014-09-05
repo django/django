@@ -168,32 +168,59 @@ DEFAULT_CHARSET = 'utf-8'
 # Encoding of files read from disk (template and initial SQL files).
 FILE_CHARSET = 'utf-8'
 
-# Email address that error messages come from.
-SERVER_EMAIL = 'root@localhost'
-
 # Database connection info. If left empty, will default to the dummy backend.
 DATABASES = {}
 
 # Classes used to implement DB routing behavior.
 DATABASE_ROUTERS = []
 
+# Default email address to use for various automated correspondence from
+# the site managers (deprecated, will be removed in Django 2.0).
+DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+
+# Subject-line prefix for email messages send with django.core.mail.mail_admins
+# or ...mail_managers.  Make sure to include the trailing space.
+# (deprecated, will be removed in Django 2.0)
+EMAIL_SUBJECT_PREFIX = '[Django] '
+
+# Email address that error messages come from (deprecated, will be removed in Django 2.0).
+SERVER_EMAIL = 'root@localhost'
+
 # The email backend to use. For possible shortcuts see django.core.mail.
 # The default is to use the SMTP backend.
 # Third-party backends can be specified by providing a Python path
 # to a module that defines an EmailBackend class.
+# Deprecated (replaced by EMAIL['BACKEND']), will be removed in Django 2.0
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-# Host for sending email.
+# Host for sending email (deprecated, will be removed in Django 2.0).
 EMAIL_HOST = 'localhost'
 
-# Port for sending email.
+# Port for sending email (deprecated, will be removed in Django 2.0).
 EMAIL_PORT = 25
 
 # Optional SMTP authentication information for EMAIL_HOST.
+# (deprecated, will be removed in Django 2.0)
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
+
+EMAIL = {
+    'BACKEND': EMAIL_BACKEND,
+    'DEFAULT_FROM_ADDRESS': DEFAULT_FROM_EMAIL,
+    'SERVER_ADDRESS': SERVER_EMAIL,
+    'SUBJECT_PREFIX': EMAIL_SUBJECT_PREFIX,
+    'OPTIONS': {
+        # SMTP configuration options
+        'HOST': EMAIL_HOST,
+        'PORT': EMAIL_PORT,
+        'USER': EMAIL_HOST_USER,
+        'PASSWORD': EMAIL_HOST_PASSWORD,
+        'USE_TLS': EMAIL_USE_TLS,
+        'USE_SSL': EMAIL_USE_SSL,
+    },
+}
 
 # List of strings representing installed apps.
 INSTALLED_APPS = ()
@@ -226,14 +253,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 # Output to use in template system for invalid (e.g. misspelled) variables.
 TEMPLATE_STRING_IF_INVALID = ''
-
-# Default email address to use for various automated correspondence from
-# the site managers.
-DEFAULT_FROM_EMAIL = 'webmaster@localhost'
-
-# Subject-line prefix for email messages send with django.core.mail.mail_admins
-# or ...mail_managers.  Make sure to include the trailing space.
-EMAIL_SUBJECT_PREFIX = '[Django] '
 
 # Whether to append trailing slashes to URLs.
 APPEND_SLASH = True

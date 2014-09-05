@@ -306,7 +306,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
     @override_settings(
-        EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+        EMAIL={'BACKEND': 'django.core.mail.backends.locmem.EmailBackend'},
         ADMINS=[('nobody', 'nobody@example.com')],
         MANAGERS=[('nobody', 'nobody@example.com')])
     def test_connection_arg(self):
@@ -434,7 +434,7 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
     email_backend = None
 
     def setUp(self):
-        self.settings_override = override_settings(EMAIL_BACKEND=self.email_backend)
+        self.settings_override = override_settings(EMAIL={'BACKEND': self.email_backend})
         self.settings_override.enable()
 
     def tearDown(self):
@@ -697,7 +697,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         super(FileBackendTests, self).setUp()
         self.tmp_dir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
-        self._settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
+        self._settings_override = override_settings(EMAIL={'OPTIONS': {'FILE_PATH':self.tmp_dir}})
         self._settings_override.enable()
 
     def tearDown(self):
@@ -857,8 +857,10 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
     def setUpClass(cls):
         cls.server = FakeSMTPServer(('127.0.0.1', 0), None)
         cls._settings_override = override_settings(
-            EMAIL_HOST="127.0.0.1",
-            EMAIL_PORT=cls.server.socket.getsockname()[1])
+            EMAIL={'OPTIONS':{
+                'HOST': "127.0.0.1",
+                'PORT': cls.server.socket.getsockname()[1],
+            }})
         cls._settings_override.enable()
         cls.server.start()
 
@@ -881,25 +883,28 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
     def get_mailbox_content(self):
         return self.server.get_sink()
 
-    @override_settings(
-        EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password")
+    @override_settings(EMAIL={'OPTIONS':{
+        'USER': "not empty username",
+        'PASSWORD': "not empty password",
+    }})
     def test_email_authentication_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertEqual(backend.username, 'not empty username')
         self.assertEqual(backend.password, 'not empty password')
 
-    @override_settings(
-        EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password")
+    @override_settings(EMAIL={'OPTIONS':{
+        'USER': "not empty username",
+        'PASSWORD': "not empty password",
+    }})
     def test_email_authentication_override_settings(self):
         backend = smtp.EmailBackend(username='username', password='password')
         self.assertEqual(backend.username, 'username')
         self.assertEqual(backend.password, 'password')
 
-    @override_settings(
-        EMAIL_HOST_USER="not empty username",
-        EMAIL_HOST_PASSWORD="not empty password")
+    @override_settings(EMAIL={'OPTIONS':{
+        'USER': "not empty username",
+        'PASSWORD': "not empty password",
+    }})
     def test_email_disabled_authentication(self):
         backend = smtp.EmailBackend(username='', password='')
         self.assertEqual(backend.username, '')
@@ -941,12 +946,12 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         except Exception as e:
             self.fail("close() unexpectedly raised an exception: %s" % e)
 
-    @override_settings(EMAIL_USE_TLS=True)
+    @override_settings(EMAIL={'OPTIONS':{'USE_TLS': True}})
     def test_email_tls_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_tls)
 
-    @override_settings(EMAIL_USE_TLS=True)
+    @override_settings(EMAIL={'OPTIONS':{'USE_TLS': True}})
     def test_email_tls_override_settings(self):
         backend = smtp.EmailBackend(use_tls=False)
         self.assertFalse(backend.use_tls)
@@ -955,12 +960,12 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         backend = smtp.EmailBackend()
         self.assertFalse(backend.use_tls)
 
-    @override_settings(EMAIL_USE_SSL=True)
+    @override_settings(EMAIL={'OPTIONS':{'USE_SSL': True}})
     def test_email_ssl_use_settings(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_ssl)
 
-    @override_settings(EMAIL_USE_SSL=True)
+    @override_settings(EMAIL={'OPTIONS':{'USE_SSL': True}})
     def test_email_ssl_override_settings(self):
         backend = smtp.EmailBackend(use_ssl=False)
         self.assertFalse(backend.use_ssl)
@@ -969,7 +974,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         backend = smtp.EmailBackend()
         self.assertFalse(backend.use_ssl)
 
-    @override_settings(EMAIL_USE_TLS=True)
+    @override_settings(EMAIL={'OPTIONS':{'USE_TLS': True}})
     def test_email_tls_attempts_starttls(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_tls)
@@ -979,7 +984,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SimpleTestCase):
         finally:
             backend.close()
 
-    @override_settings(EMAIL_USE_SSL=True)
+    @override_settings(EMAIL={'OPTIONS':{'USE_SSL': True}})
     def test_email_ssl_attempts_ssl_connection(self):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_ssl)

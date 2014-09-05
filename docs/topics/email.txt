@@ -24,11 +24,12 @@ In two lines::
         ['to@example.com'], fail_silently=False)
 
 Mail is sent using the SMTP host and port specified in the
-:setting:`EMAIL_HOST` and :setting:`EMAIL_PORT` settings. The
-:setting:`EMAIL_HOST_USER` and :setting:`EMAIL_HOST_PASSWORD` settings, if
-set, are used to authenticate to the SMTP server, and the
-:setting:`EMAIL_USE_TLS` and :setting:`EMAIL_USE_SSL` settings control whether
-a secure connection is used.
+:setting:`EMAIL['OPTIONS']['HOST']<EMAIL>` and :setting:`EMAIL['OPTIONS']['PORT']
+<EMAIL>` settings. The :setting:`EMAIL['OPTIONS']['USER']<EMAIL>` and
+:setting:`EMAIL['OPTIONS']['PASSWORD']<EMAIL>` settings, if set, are used to
+authenticate to the SMTP server, and the :setting:`EMAIL['OPTIONS']['USE_TLS']
+<EMAIL-USE_TLS>` and :setting:`EMAIL['OPTIONS']['USE_SSL']<EMAIL-USE_SSL>`
+settings control whether a secure connection is used.
 
 .. note::
 
@@ -58,10 +59,10 @@ are required.
   :exc:`~smtplib.SMTPException`.
 * ``auth_user``: The optional username to use to authenticate to the SMTP
   server. If this isn't provided, Django will use the value of the
-  :setting:`EMAIL_HOST_USER` setting.
+  :setting:`EMAIL['OPTIONS']['USER']<EMAIL>` setting.
 * ``auth_password``: The optional password to use to authenticate to the
   SMTP server. If this isn't provided, Django will use the value of the
-  :setting:`EMAIL_HOST_PASSWORD` setting.
+  :setting:`EMAIL['OPTIONS']['PASSWORD']<EMAIL>` setting.
 * ``connection``: The optional email backend to use to send the mail.
   If unspecified, an instance of the default backend will be used.
   See the documentation on :ref:`Email backends <topic-email-backends>`
@@ -126,10 +127,11 @@ mail_admins()
 site admins, as defined in the :setting:`ADMINS` setting.
 
 ``mail_admins()`` prefixes the subject with the value of the
-:setting:`EMAIL_SUBJECT_PREFIX` setting, which is ``"[Django] "`` by default.
+:setting:`EMAIL['SUBJECT_PREFIX'] <EMAIL-SUBJECT_PREFIX>` setting, which is
+``"[Django] "`` by default.
 
 The "From:" header of the email will be the value of the
-:setting:`SERVER_EMAIL` setting.
+:setting:`EMAIL['SERVER_ADDRESS'] <EMAIL-SERVER_ADDRESS>` setting.
 
 This method exists for convenience and readability.
 
@@ -254,7 +256,8 @@ All parameters are optional and can be set at any time prior to calling the
 
 * ``from_email``: The sender's address. Both ``fred@example.com`` and
   ``Fred <fred@example.com>`` forms are legal. If omitted, the
-  :setting:`DEFAULT_FROM_EMAIL` setting is used.
+  :setting:`EMAIL['DEFAULT_FROM_ADDRESS'] <EMAIL-DEFAULT_FROM_ADDRESS>` setting
+  is used.
 
 * ``to``: A list or tuple of recipient addresses.
 
@@ -424,8 +427,9 @@ instance of the email backend that you can use.
 .. function:: get_connection(backend=None, fail_silently=False, *args, **kwargs)
 
 By default, a call to ``get_connection()`` will return an instance of the
-email backend specified in :setting:`EMAIL_BACKEND`. If you specify the
-``backend`` argument, an instance of that backend will be instantiated.
+email backend specified in :setting:`EMAIL['BACKEND'] <EMAIL-BACKEND>`. If you
+specify the ``backend`` argument, an instance of that backend will be
+instantiated.
 
 The ``fail_silently`` argument controls how the backend should handle errors.
 If ``fail_silently`` is True, exceptions during the email sending process
@@ -448,14 +452,14 @@ SMTP backend
 
     This is the default backend. Email will be sent through a SMTP server.
     The server address and authentication credentials are set in the
-    :setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
-    :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS` and
-    :setting:`EMAIL_USE_SSL` settings in your settings file.
+    :setting:`EMAIL['OPTIONS']` setting (keys ``HOST``, ``PORT``, ``USER``,
+    ``PASSWORD``, :setting:`EMAIL-USE_TLS` and :setting:`EMAIL-USE_SSL`) in your
+    settings file.
 
     The SMTP backend is the default configuration inherited by Django. If you
     want to specify it explicitly, put the following in your settings::
 
-        EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+        EMAIL = {'BACKEND': 'django.core.mail.backends.smtp.EmailBackend'}
 
     Here is an attribute which doesn't have a corresponding setting like the
     others described above:
@@ -474,8 +478,8 @@ SMTP backend
                   kwargs.setdefault('timeout', 42)
                   super(MyEmailBackend, self).__init__(*args, **kwargs)
 
-        Then point the :setting:`EMAIL_BACKEND` setting at your custom backend as
-        described above.
+        Then point the :setting:`EMAIL['BACKEND'] <EMAIL-BACKEND>` setting at
+        your custom backend as described above.
 
         If unspecified, the default ``timeout`` will be the one provided by
         :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
@@ -492,7 +496,7 @@ providing the ``stream`` keyword argument when constructing the connection.
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    EMAIL = {'BACKEND': 'django.core.mail.backends.console.EmailBackend'}
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -504,14 +508,18 @@ File backend
 
 The file backend writes emails to a file. A new file is created for each new
 session that is opened on this backend. The directory to which the files are
-written is either taken from the :setting:`EMAIL_FILE_PATH` setting or from
-the ``file_path`` keyword when creating a connection with
-:meth:`~django.core.mail.get_connection`.
+written is either taken from the :setting:`EMAIL['OPTIONS']['FILE_PATH']
+<EMAIL-FILE_PATH>` setting or from the ``file_path`` keyword when creating a
+connection with :meth:`~django.core.mail.get_connection`.
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-    EMAIL_FILE_PATH = '/tmp/app-messages' # change this to a proper location
+    EMAIL = {
+        'BACKEND': 'django.core.mail.backends.filebased.EmailBackend'
+        'OPTIONS': {
+            FILE_PATH: '/tmp/app-messages' # change this to a proper location
+        }
+    }
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -529,7 +537,7 @@ be sent.
 
 To specify this backend, put the following in your settings::
 
-  EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+  EMAIL = {'BACKEND': 'django.core.mail.backends.locmem.EmailBackend'}
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development and testing.
@@ -542,7 +550,7 @@ Dummy backend
 As the name suggests the dummy backend does nothing with your messages. To
 specify this backend, put the following in your settings::
 
-   EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+   EMAIL = {'BACKEND': 'django.core.mail.backends.dummy.EmailBackend'}
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -553,8 +561,8 @@ Defining a custom email backend
 -------------------------------
 
 If you need to change how emails are sent you can write your own email
-backend. The :setting:`EMAIL_BACKEND` setting in your settings file is then
-the Python import path for your backend class.
+backend. The :setting:`EMAIL['BACKEND'] <EMAIL-BACKEND>` setting in your
+settings file is then the Python import path for your backend class.
 
 Custom email backends should subclass ``BaseEmailBackend`` that is located in
 the ``django.core.mail.backends.base`` module. A custom email backend must
@@ -648,9 +656,11 @@ anything. Python has a built-in way to accomplish this with a single command::
 
 This command will start a simple SMTP server listening on port 1025 of
 localhost. This server simply prints to standard output all email headers and
-the email body. You then only need to set the :setting:`EMAIL_HOST` and
-:setting:`EMAIL_PORT` accordingly. For a more detailed discussion of SMTP
-server options, see the Python documentation for the :mod:`smtpd` module.
+the email body. You then only need to set the
+:setting:`EMAIL['OPTIONS']['HOST']<EMAIL>` and
+:setting:`EMAIL['OPTIONS']['PORT']<EMAIL>` accordingly. For a more detailed
+discussion of SMTP server options, see the Python documentation for the
+:mod:`smtpd` module.
 
 For information about unit-testing the sending of emails in your application,
 see the :ref:`topics-testing-email` section of the testing documentation.

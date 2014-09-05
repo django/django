@@ -130,7 +130,7 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
         self.assertTrue("http://" in mail.outbox[0].body)
-        self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
+        self.assertEqual(settings.EMAIL['DEFAULT_FROM_ADDRESS'], mail.outbox[0].from_email)
         # optional multipart text/html email has been added.  Make sure original,
         # default functionality is 100% the same
         self.assertFalse(mail.outbox[0].message().is_multipart())
@@ -170,7 +170,7 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
         self.assertTrue("http://adminsite.com" in mail.outbox[0].body)
-        self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
+        self.assertEqual(settings.EMAIL['DEFAULT_FROM_ADDRESS'], mail.outbox[0].from_email)
 
     # Skip any 500 handler action (like sending more mail...)
     @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)

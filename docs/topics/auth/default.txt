@@ -967,7 +967,7 @@ patterns.
       password reset request.
 
     * ``from_email``: A valid email address. By default Django uses
-      the :setting:`DEFAULT_FROM_EMAIL`.
+      the :setting:`EMAIL['DEFAULT_FROM_ADDRESS']<EMAIL-DEFAULT_FROM_ADDRESS>`.
 
     * ``current_app``: A hint indicating which application contains the current
       view. See the :ref:`namespaced URL resolution strategy
