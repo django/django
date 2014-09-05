@@ -32,3 +32,9 @@ class HStoreExtension(CreateExtension):
         # extension is installed, a subsequent data migration would use the
         # same connection
         register_hstore_handler(schema_editor.connection)
+
+
+class UnaccentExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'unaccent'
