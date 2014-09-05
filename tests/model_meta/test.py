@@ -1,10 +1,10 @@
-from django import test
 
+from django import test
 from django.apps import apps
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.db.models import FieldDoesNotExist
 from django.db.models.fields import related, CharField, Field
 from django.db.models.options import IMMUTABLE_WARNING, EMPTY_RELATION_TREE
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 from .models import Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating
 from .results import TEST_RESULTS
@@ -64,14 +64,16 @@ class DataTests(OptionsBaseTests):
         for model, expected_result in TEST_RESULTS['local_fields'].items():
             fields = model._meta.local_fields
             self.assertEqual([f.attname for f in fields], expected_result)
-            self.assertTrue(all([f.model is model for f in fields]))
-            self.assertTrue(all([is_data_field(f) for f in fields]))
+            for f in fields:
+                self.assertEquals(f.model, model)
+                self.assertTrue(is_data_field(f))
 
     def test_local_concrete_fields(self):
         for model, expected_result in TEST_RESULTS['local_concrete_fields'].items():
             fields = model._meta.local_concrete_fields
             self.assertEqual([f.attname for f in fields], expected_result)
-            self.assertTrue(all([f.column is not None for f in fields]))
+            for f in fields:
+                self.assertTrue(f.column is not None)
 
 
 class M2MTests(OptionsBaseTests):
@@ -80,8 +82,8 @@ class M2MTests(OptionsBaseTests):
         for model, expected_result in TEST_RESULTS['many_to_many'].items():
             fields = model._meta.many_to_many
             self.assertEqual([f.attname for f in fields], expected_result)
-            self.assertTrue(all([isinstance(f.rel, related.ManyToManyRel)
-                                 for f in fields]))
+            for f in fields:
+                self.assertTrue(f.has_many_values and f.has_relation)
 
     def test_many_to_many_with_model(self):
         for model, expected_result in TEST_RESULTS['many_to_many_with_model'].items():
@@ -90,28 +92,33 @@ class M2MTests(OptionsBaseTests):
 
 
 class RelatedObjectsTests(OptionsBaseTests):
-    def setUp(self):
-        self.key_name = lambda r: r[0]
+    key_name = lambda self, r: r[0]
 
     def test_related_objects(self):
         result_key = 'get_all_related_objects_with_model'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = [(field, self._model(model, field))
-                       for field in model._meta.get_fields(forward=False, reverse=True)]
+            objects = [
+                (field, self._model(model, field))
+                for field in model._meta.get_fields(forward=False, reverse=True)
+            ]
             self.assertEqual(self._map_related_query_names(objects), expected)
 
     def test_related_objects_local(self):
         result_key = 'get_all_related_objects_with_model_local'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = [(field, self._model(model, field))
-                       for field in model._meta.get_fields(forward=False, reverse=True, include_parents=False)]
+            objects = [
+                (field, self._model(model, field))
+                for field in model._meta.get_fields(forward=False, reverse=True, include_parents=False)
+            ]
             self.assertEqual(self._map_related_query_names(objects), expected)
 
     def test_related_objects_include_hidden(self):
         result_key = 'get_all_related_objects_with_model_hidden'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = [(field, self._model(model, field))
-                       for field in model._meta.get_fields(forward=False, reverse=True, include_hidden=True)]
+            objects = [
+                (field, self._model(model, field))
+                for field in model._meta.get_fields(forward=False, reverse=True, include_hidden=True)
+            ]
             self.assertEqual(
                 sorted(self._map_names(objects), key=self.key_name),
                 sorted(expected, key=self.key_name)
@@ -120,8 +127,10 @@ class RelatedObjectsTests(OptionsBaseTests):
     def test_related_objects_include_hidden_local_only(self):
         result_key = 'get_all_related_objects_with_model_hidden_local'
         for model, expected in TEST_RESULTS[result_key].items():
-            objects = [(field, self._model(model, field))
-                       for field in model._meta.get_fields(forward=False, reverse=True, include_hidden=True, include_parents=False)]
+            objects = [
+                (field, self._model(model, field))
+                for field in model._meta.get_fields(forward=False, reverse=True, include_hidden=True, include_parents=False)
+            ]
             self.assertEqual(
                 sorted(self._map_names(objects), key=self.key_name),
                 sorted(expected, key=self.key_name)
@@ -177,8 +186,8 @@ class RelationTreeTests(test.TestCase):
 
     def test_clear_cache_clears_relation_tree(self):
         # the apps.clear_cache is setUp() should have deleted all trees.
-        self.assertTrue(all('relation_tree' not in m._meta.__dict__
-                            for m in self.all_models))
+        for m in self.all_models:
+            self.assertNotIn('relation_tree', m._meta.__dict__)
 
     def test_first_relation_tree_access_populates_all(self):
         # On first access, relation tree should have populated cache.
@@ -193,10 +202,9 @@ class RelationTreeTests(test.TestCase):
 
         # All the other models should already have their relation tree
         # in the internal __dict__ .
-        all_models_but_abstractperson = (m for m in self.all_models
-                                         if m is not AbstractPerson)
-        self.assertTrue(all('relation_tree' in m._meta.__dict__
-                            for m in all_models_but_abstractperson))
+        all_models_but_abstractperson = (m for m in self.all_models if m is not AbstractPerson)
+        for m in all_models_but_abstractperson:
+            self.assertIn('relation_tree', m._meta.__dict__)
 
     def test_relations_related_objects(self):
 
@@ -234,11 +242,11 @@ class RelationTreeTests(test.TestCase):
             model._meta._expire_cache()
 
         for model in related_models:
-            self.assertEquals(0, len(model._meta._get_fields_cache.keys()))
+            self.assertEqual(0, len(model._meta._get_fields_cache.keys()))
 
         # Make an API call with cache_results=False, it should not store
         # results on any of the children.
         Person._meta.get_fields(cache_results=False)
         for model in related_models:
             for c in model._meta._get_fields_cache.keys():
-                self.assertEquals(0, len(model._meta._get_fields_cache.keys()))
+                self.assertEqual(0, len(model._meta._get_fields_cache.keys()))

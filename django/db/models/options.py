@@ -23,7 +23,7 @@ from django.utils.translation import activate, deactivate_all, get_language, str
 EMPTY_RELATION_TREE = tuple()
 
 IMMUTABLE_WARNING = (
-    "The return type of most Options API calls should never be mutated. If you want "
+    "The return type of most Model._meta API calls should never be mutated. If you want "
     "to manipulate this list for your own use, make a copy first."
 )
 
@@ -423,9 +423,9 @@ class Options(object):
 
     def get_field(self, field_name, include_related=False, **kwargs):
         """
-        Returns a field instance given a field name. By default will only search in data,
-        many to many fields, and virtual fields. By setting the include_related flag, the
-        search is also extended to related objects and remated m2m.
+        Returns a field instance given a field name. By default will only search in forward
+        fields. By setting the include_related flag, the search is also extended to reverse
+        relations.
         """
         field_map = self.all_fields_map if include_related else self.concrete_fields_map
 
@@ -443,7 +443,7 @@ class Options(object):
             # We always want to throw a warning if many_to_many is used regardless
             # of if it alters the return type or not.
             warnings.warn(
-                "The 'many_to_many' argument on get_field will be soon "
+                "The 'many_to_many' argument on get_field() will be soon "
                 "deprecated. Please change your implementation accordingly.",
                 RemovedInDjango20Warning
             )
@@ -581,7 +581,7 @@ class Options(object):
                         related_objects_graph[f.rel.to._meta].append(f)
 
         for model in all_models:
-            # Set the realtion_tree using the internal __dict__.
+            # Set the relation_tree using the internal __dict__.
             # In this way we avoid calling the cached property.
             # In attribute lookup, __dict__ takes precedence over
             # a data descriptor (such as @cached_property). This

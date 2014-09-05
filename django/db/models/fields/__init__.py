@@ -467,7 +467,6 @@ class Field(RegisterLookupMixin, FieldFlagsMixin):
         # This method provides a way to delay their creation until required.
         return self.default_validators + self._validators
 
-
     def run_validators(self, value):
         if value in self.empty_values:
             return
@@ -1090,7 +1089,7 @@ class CommaSeparatedIntegerField(CharField):
     description = _("Comma-separated integers")
 
     def __init__(self, *args, **kwargs):
-        kwargs['has_many_values'] = kwargs.get('has_many_values', True)
+        kwargs['has_many_values'] = True
         return super(CommaSeparatedIntegerField, self).__init__(*args, **kwargs)
 
     def formfield(self, **kwargs):

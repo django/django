@@ -1,8 +1,8 @@
-from django import test
 import warnings
 
-from django.db.models.fields import related, CharField, Field, FieldDoesNotExist
+from django import test
 from django.contrib.contenttypes.fields import GenericRelation
+from django.db.models.fields import related, CharField, Field, FieldDoesNotExist
 from django.test.utils import IgnorePendingDeprecationWarningsMixin
 from django.utils.deprecation import RemovedInDjango20Warning
 
@@ -12,7 +12,7 @@ from .results import TEST_RESULTS
 
 class OptionsBaseTests(test.TestCase):
 
-    def _map_rq_names(self, res):
+    def _map_related_query_names(self, res):
         return tuple([(o.field.related_query_name(), m) for o, m in res])
 
     def _map_names(self, res):
@@ -60,22 +60,19 @@ class M2MTests(OptionsBaseTests):
 
 
 class RelatedObjectsTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTests):
-
-    def setUp(self):
-        super(RelatedObjectsTests, self).setUp()
-        self.key_name = lambda r: r[0]
+    key_name = lambda self, r: r[0]
 
     def test_related_objects(self):
         result_key = 'get_all_related_objects_with_model_legacy'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model()
-            self.assertEqual(self._map_rq_names(objects), expected)
+            self.assertEqual(self._map_related_query_names(objects), expected)
 
     def test_related_objects_local(self):
         result_key = 'get_all_related_objects_with_model_local_legacy'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(local_only=True)
-            self.assertEqual(self._map_rq_names(objects), expected)
+            self.assertEqual(self._map_related_query_names(objects), expected)
 
     def test_related_objects_include_hidden(self):
         result_key = 'get_all_related_objects_with_model_hidden_legacy'
@@ -101,7 +98,7 @@ class RelatedObjectsTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTest
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_objects_with_model(
                 include_proxy_eq=True)
-            self.assertEqual(self._map_rq_names(objects), expected)
+            self.assertEqual(self._map_related_query_names(objects), expected)
 
     def test_related_objects_proxy_hidden(self):
         result_key = 'get_all_related_objects_with_model_proxy_hidden_legacy'
@@ -120,7 +117,7 @@ class RelatedM2MTests(IgnorePendingDeprecationWarningsMixin, OptionsBaseTests):
         result_key = 'get_all_related_many_to_many_with_model_legacy'
         for model, expected in TEST_RESULTS[result_key].items():
             objects = model._meta.get_all_related_m2m_objects_with_model()
-            self.assertEqual(self._map_rq_names(objects), expected)
+            self.assertEqual(self._map_related_query_names(objects), expected)
 
     def test_related_m2m_local_only(self):
         result_key = 'get_all_related_many_to_many_local_legacy'

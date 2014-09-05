@@ -212,8 +212,7 @@ class RelatedField(Field):
         # Check clashes between accessors/reverse query names of `field` and
         # any other field accessor -- i. e. Model.foreign accessor clashes with
         # Model.m2m accessor.
-        potential_clashes = (r for r in rel_opts.related_objects
-                             if r.field is not self)
+        potential_clashes = (r for r in rel_opts.related_objects if r.field is not self)
         for clash_field in potential_clashes:
             clash_name = "%s.%s" % (  # i. e. "Model.m2m"
                 clash_field.model._meta.object_name,
@@ -1883,7 +1882,7 @@ class ManyToManyField(RelatedField):
             # Class names must be ASCII in Python 2.x, so we forcibly coerce it here to break early if there's a problem.
             to = str(to)
 
-        kwargs['has_many_values'] = kwargs.get('has_many_values', True)
+        kwargs['has_many_values'] = True
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
         kwargs['rel'] = ManyToManyRel(to,
             related_name=kwargs.pop('related_name', None),
