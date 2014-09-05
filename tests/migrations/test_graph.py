@@ -3,6 +3,7 @@ from django.db.migrations.graph import MigrationGraph, CircularDependencyError
 
 
 class GraphTests(TestCase):
+
     """
     Tests the digraph structure.
     """
@@ -28,6 +29,7 @@ class GraphTests(TestCase):
         graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
         graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_b", "0002"))
         graph.add_dependency("app_b.0002", ("app_b", "0002"), ("app_b", "0001"))
+
         # Test root migration case
         self.assertEqual(
             graph.forwards_plan(("app_a", "0001")),
@@ -38,10 +40,12 @@ class GraphTests(TestCase):
             graph.forwards_plan(("app_b", "0002")),
             [("app_b", "0001"), ("app_b", "0002")],
         )
+
         # Test whole graph
         self.assertEqual(
             graph.forwards_plan(("app_a", "0004")),
-            [('app_b', '0001'), ('app_b', '0002'), ('app_a', '0001'), ('app_a', '0002'), ('app_a', '0003'), ('app_a', '0004')],
+            [('app_b', '0001'), ('app_b', '0002'), ('app_a', '0001'),
+             ('app_a', '0002'), ('app_a', '0003'), ('app_a', '0004')],
         )
         # Test reverse to b:0002
         self.assertEqual(
@@ -68,6 +72,7 @@ class GraphTests(TestCase):
                       \          \       /
         app_c:         \ 0001 <-- 0002 <-
         """
+
         # Build graph
         graph = MigrationGraph()
         graph.add_node(("app_a", "0001"), None)
@@ -88,6 +93,7 @@ class GraphTests(TestCase):
         graph.add_dependency("app_c.0001", ("app_c", "0001"), ("app_b", "0001"))
         graph.add_dependency("app_c.0002", ("app_c", "0002"), ("app_a", "0002"))
         # Test branch C only
+
         self.assertEqual(
             graph.forwards_plan(("app_c", "0002")),
             [('app_b', '0001'), ('app_c', '0001'), ('app_a', '0001'), ('app_a', '0002'), ('app_c', '0002')],
@@ -95,12 +101,14 @@ class GraphTests(TestCase):
         # Test whole graph
         self.assertEqual(
             graph.forwards_plan(("app_a", "0004")),
-            [('app_b', '0001'), ('app_c', '0001'), ('app_a', '0001'), ('app_a', '0002'), ('app_c', '0002'), ('app_b', '0002'), ('app_a', '0003'), ('app_a', '0004')],
+            [('app_b', '0001'), ('app_c', '0001'), ('app_a', '0001'), ('app_a', '0002'),
+             ('app_c', '0002'), ('app_b', '0002'), ('app_a', '0003'), ('app_a', '0004')],
         )
         # Test reverse to b:0001
         self.assertEqual(
             graph.backwards_plan(("app_b", "0001")),
-            [('app_a', '0004'), ('app_c', '0002'), ('app_c', '0001'), ('app_a', '0003'), ('app_b', '0002'), ('app_b', '0001')],
+            [('app_a', '0004'), ('app_c', '0002'), ('app_c', '0001'),
+             ('app_a', '0003'), ('app_b', '0002'), ('app_b', '0001')],
         )
         # Test roots and leaves
         self.assertEqual(
@@ -161,6 +169,21 @@ class GraphTests(TestCase):
         graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
         with self.assertRaisesMessage(KeyError, "Migration app_a.0001 dependencies references nonexistent parent node ('app_b', '0002')"):
             graph.add_dependency("app_a.0001", ("app_a", "0001"), ("app_b", "0002"))
+
+    def test_dfs(self):
+        graph = MigrationGraph()
+        root = ("app_a", "1")
+        graph.add_node(root, None)
+        expected = [root]
+        for i in xrange(2, 1000):
+            parent = ("app_a", str(i - 1))
+            child = ("app_a", str(i))
+            graph.add_node(child, None)
+            graph.add_dependency(str(i), child, parent)
+            expected.append(child)
+
+        actual = graph.dfs(root, lambda x: graph.dependents.get(x, set()))
+        self.assertEqual(expected[::-1], actual)
 
     def test_missing_child_nodes(self):
         """
