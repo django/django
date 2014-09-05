@@ -522,7 +522,6 @@ class BaseCacheTests(object):
     def _perform_cull_test(self, cull_cache, initial_count, final_count):
         # Create initial cache key entries. This will overflow the cache,
         # causing a cull.
-        cull_cache.clear()
         for i in range(1, initial_count):
             cull_cache.set('cull%d' % i, 'value', 1000)
         count = 0
@@ -919,10 +918,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
             stdout=stdout
         )
         self.assertEqual(stdout.getvalue(),
-            "Cache table 'test cache table' already exists.\n" * len([
-                k for k, v in settings.CACHES.items()
-                if v['BACKEND'] == 'django.core.cache.backends.db.DatabaseCache'])
-        )
+            "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
 
     def test_createcachetable_with_table_argument(self):
         """

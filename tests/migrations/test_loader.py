@@ -81,10 +81,7 @@ class LoaderTests(TestCase):
         # Ensure we've included unmigrated apps in there too
         self.assertIn("basic", project_state.real_apps)
 
-    @override_settings(MIGRATION_MODULES={
-        "_clear_defaults": True,
-        "migrations": "migrations.test_migrations_unmigdep"
-    })
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_unmigdep"})
     def test_load_unmigrated_dependency(self):
         """
         Makes sure the loader can load migrations with a dependency on an unmigrated app.
