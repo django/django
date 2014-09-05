@@ -203,6 +203,21 @@ def iri_to_uri(iri):
         return iri
     return quote(force_bytes(iri), safe=b"/#%[]=:;$&()+,!?*@'~")
 
+def escape_uri_path(path):
+    """
+    Escape the unsafe characters from the path portion of a Uniform Resource
+    Identifier (URI).
+    """
+    # This are the "reserved" and "unreserved" characters specified in sections
+    # 2.2 and 2.3 of RFC 2396:
+    #   reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ","
+    #   unreserved  = alphanum | mark
+    #   mark        = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
+    # The list of safe characters here is constructed substracting ";", "=", and
+    # "?" according to the section 3.3 of RFC 2396.
+    # The reason of not subtracting and escaping "/" is that we are escaping
+    # the entire path, not a path segment.
+    return quote(force_bytes(path), safe=b"/:@&+$,-_.!~*'()")
 
 def filepath_to_uri(path):
     """Convert a file system path to a URI portion that is suitable for
