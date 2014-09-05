@@ -134,6 +134,21 @@ class GraphTests(TestCase):
             graph.forwards_plan, ("app_a", "0003"),
         )
 
+    def test_dfs(self):
+        graph = MigrationGraph()
+        root = ("app_a", "1")
+        graph.add_node(root, None)
+        expected = [root]
+        for i in xrange(2, 1000):
+            parent = ("app_a", str(i - 1))
+            child = ("app_a", str(i))
+            graph.add_node(child, None)
+            graph.add_dependency(str(i), child, parent)
+            expected.append(child)
+
+        actual = graph.dfs(root, lambda x: graph.dependents.get(x, set()))
+        self.assertEqual(expected[::-1], actual)
+
     def test_plan_invalid_node(self):
         """
         Tests for forwards/backwards_plan of nonexistent node.
