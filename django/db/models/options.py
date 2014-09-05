@@ -230,7 +230,7 @@ class Options(object):
 
     def _prepare(self, model):
         if self.order_with_respect_to:
-            self.order_with_respect_to = self.get_field(self.order_with_respect_to)
+            self.order_with_respect_to = self.get_field(self.order_with_respect_to, include_related=False)
             self.ordering = ('_order',)
             if not any(isinstance(field, OrderWrt) for field in model._meta.local_fields):
                 model.add_to_class('_order', OrderWrt())
