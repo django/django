@@ -360,6 +360,19 @@ class BooleanFieldTests(unittest.TestCase):
         self.assertIsNone(nb.nbfield)
         nb.save()           # no error
 
+    def test_blank_override(self):
+        """
+        Check that a BooleanField doesn't override 'blank' when
+        choices are used. (#23130)
+        """
+        # Ensure that when choices are specified, blank is not overridden
+        choices = [(True, "Special True"), (False, "Special False")]
+        f = models.BooleanField(choices=choices)
+        self.assertEqual(f.blank, False)
+        # Ensure that when choices are not specified, blank is overridden
+        f = models.BooleanField()
+        self.assertEqual(f.blank, True)
+
 
 class ChoicesTests(test.TestCase):
     def test_choices_and_field_display(self):
