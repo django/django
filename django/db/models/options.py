@@ -421,7 +421,7 @@ class Options(object):
         res.update(self.concrete_fields_map)
         return res
 
-    def get_field(self, field_name, include_related=False, **kwargs):
+    def get_field(self, field_name, include_related=True, **kwargs):
         """
         Returns a field instance given a field name. By default will only search in forward
         fields. By setting the include_related flag, the search is also extended to reverse
