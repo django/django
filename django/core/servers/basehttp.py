@@ -85,7 +85,13 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         return self.client_address[0]
 
     def log_message(self, format, *args):
-        msg = "[%s] %s\n" % (self.log_date_time_string(), format % args)
+
+        msg = "[%s]" % self.log_date_time_string()
+        try:
+            msg += "%s\n" % (format % args)
+        except UnicodeDecodeError:
+            # e.g. accessing the server via SSL on Python 2
+            msg += "\n"
 
         # Utilize terminal colors, if available
         if args[1][0] == '2':
@@ -100,6 +106,10 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         elif args[1] == '404':
             msg = self.style.HTTP_NOT_FOUND(msg)
         elif args[1][0] == '4':
+            # 0x16 = Handshake, 0x03 = SSL 3.0 or TLS 1.x
+            if args[0].startswith(str('\x16\x03')):
+                msg = ("You're accessing the developement server over HTTPS, "
+                    "but it only supports HTTP.\n")
             msg = self.style.HTTP_BAD_REQUEST(msg)
         else:
             # Any 5XX, or any other response
