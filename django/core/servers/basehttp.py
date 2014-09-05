@@ -18,6 +18,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
 from django.core.wsgi import get_wsgi_application
 from django.utils import six
+from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.six.moves import socketserver
 
@@ -85,7 +86,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         return self.client_address[0]
 
     def log_message(self, format, *args):
-        msg = "[%s] %s\n" % (self.log_date_time_string(), format % args)
+        msg = force_str("[%s] %s\n" % (self.log_date_time_string(), format % args))
 
         # Utilize terminal colors, if available
         if args[1][0] == '2':
