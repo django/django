@@ -1,23 +1,11 @@
 """
 Tests for field subclassing.
 """
-
-import warnings
-
 from django.db import models
 from django.utils.encoding import force_text
-from django.utils.deprecation import RemovedInDjango20Warning
 
 from .fields import Small, SmallField, SmallerField, JSONField
 from django.utils.encoding import python_2_unicode_compatible
-
-
-# Catch warning about subfieldbase  -- remove in Django 2.0
-warnings.filterwarnings(
-    'ignore',
-    'SubfieldBase has been deprecated. Use Field.from_db_value instead.',
-    RemovedInDjango20Warning
-)
 
 
 @python_2_unicode_compatible
