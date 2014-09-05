@@ -25,3 +25,11 @@ HStoreExtension
     A subclass of :class:`~django.contrib.postgres.operations.CreateExtension`
     which will install the ``hstore`` extension and also immediately set up the
     connection to interpret hstore data.
+
+UnaccentExtension
+-----------------
+
+.. class:: UnaccentExtension()
+
+    A subclass of :class:`~django.contrib.postgres.operations.CreateExtension`
+    which will install the ``unaccent`` extension.
