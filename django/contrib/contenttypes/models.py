@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.apps import apps
 from django.db import models
+from django.db.utils import OperationalError, ProgrammingError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_text, force_text
 from django.utils.encoding import python_2_unicode_compatible
@@ -42,14 +43,20 @@ class ContentTypeManager(models.Manager):
         try:
             ct = self._get_from_cache(opts)
         except KeyError:
-            # Load or create the ContentType entry. The smart_text() is
-            # needed around opts.verbose_name_raw because name_raw might be a
-            # django.utils.functional.__proxy__ object.
-            ct, created = self.get_or_create(
-                app_label=opts.app_label,
-                model=opts.model_name,
-                defaults={'name': smart_text(opts.verbose_name_raw)},
-            )
+            try:
+                ct, created = self.get_or_create(
+                    app_label=opts.app_label,
+                    model=opts.model_name,
+                    defaults={'name': smart_text(opts.verbose_name_raw)},
+                )
+            except (OperationalError, ProgrammingError):
+                # It's possible to migrate a single app before contenttypes,
+                # as it's not a required initial dependency (it's contrib!)
+                # Have a nice error for this.
+                raise RuntimeError(
+                    "Error creating new content types. Please make sure contenttypes" +
+                    " is migrated before trying to migrate apps individually."
+                )
             self._add_to_cache(self.db, ct)
 
         return ct
