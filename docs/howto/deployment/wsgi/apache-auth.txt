@@ -41,7 +41,7 @@ only authenticated users to be able to view:
     WSGIPythonPath /path/to/mysite.com
 
     WSGIProcessGroup %{GLOBAL}
-    WSGIApplicationGroup django
+    WSGIApplicationGroup %{GLOBAL}
 
     <Location "/secret">
         AuthType Basic
@@ -104,7 +104,7 @@ In this case, the Apache configuration should look like this:
     WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
 
     WSGIProcessGroup %{GLOBAL}
-    WSGIApplicationGroup django
+    WSGIApplicationGroup %{GLOBAL}
 
     <Location "/secret">
         AuthType Basic
