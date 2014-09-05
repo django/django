@@ -543,8 +543,8 @@ Django can serialize the following:
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
 - ``decimal.Decimal`` instances
 - Any Django field
-- Any function or method reference (e.g. ``datetime.datetime.today``)
-- Any class reference
+- Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
+- Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
 Django can serialize the following on Python 3 only:
@@ -553,6 +553,7 @@ Django can serialize the following on Python 3 only:
 
 Django cannot serialize:
 
+- Nested classes
 - Arbitrary class instances (e.g. ``MyClass(4.3, 5.7)``)
 - Lambdas
 
