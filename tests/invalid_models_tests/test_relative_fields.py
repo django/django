@@ -30,7 +30,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         class Model(models.Model):
             foreign_key = models.ForeignKey('Rel1')
 
-        field = Model._meta.get_field('foreign_key')
+        # Calling include_related=False because, as this is an invalid model
+        # a relation to Rel1 will not be found.
+        field = Model._meta.get_field('foreign_key', include_related=False)
         errors = field.check()
         expected = [
             Error(
@@ -47,7 +49,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         class Model(models.Model):
             m2m = models.ManyToManyField("Rel2")
 
-        field = Model._meta.get_field('m2m')
+        # Calling include_related=False because, as this is an invalid model
+        # a relation to Rel2 will not be found.
+        field = Model._meta.get_field('m2m', include_related=False)
         errors = field.check(from_model=Model)
         expected = [
             Error(
@@ -302,7 +306,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             class Meta:
                 abstract = True
 
-        field = Model._meta.get_field('foreign_key')
+        # Calling include_related=False because, as this is an invalid model
+        # a relation to AbstractModel will not be found.
+        field = Model._meta.get_field('foreign_key', include_related=False)
         errors = field.check()
         expected = [
             Error(
@@ -323,7 +329,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         class Model(models.Model):
             m2m = models.ManyToManyField('AbstractModel')
 
-        field = Model._meta.get_field('m2m')
+        # Calling include_related=False because, as this is an invalid model
+        # a relation to AbstractModel will not be found.
+        field = Model._meta.get_field('m2m', include_related=False)
         errors = field.check(from_model=Model)
         expected = [
             Error(

@@ -126,7 +126,7 @@ class UpdateQuery(Query):
         """
         values_seq = []
         for name, val in six.iteritems(values):
-            field = self.get_meta().get_field(name, include_related=True)
+            field = self.get_meta().get_field(name)
             direct = isinstance(field, Field) or hasattr(field, 'for_concrete_model')
             model = field.parent_model._meta.concrete_model
             if not direct or hasattr(field, 'is_m2m'):

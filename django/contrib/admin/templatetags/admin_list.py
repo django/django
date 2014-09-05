@@ -323,7 +323,7 @@ def date_hierarchy(cl):
     """
     if cl.date_hierarchy:
         field_name = cl.date_hierarchy
-        field = cl.opts.get_field(field_name, include_related=True)
+        field = cl.opts.get_field(field_name)
         dates_or_datetimes = 'datetimes' if isinstance(field, models.DateTimeField) else 'dates'
         year_field = '%s__year' % field_name
         month_field = '%s__month' % field_name

@@ -402,7 +402,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         rel_name = None
         for part in parts[:-1]:
             try:
-                field = model._meta.get_field(part, include_related=True)
+                field = model._meta.get_field(part)
             except FieldDoesNotExist:
                 # Lookups on non-existent fields are ok, since they're ignored
                 # later.

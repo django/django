@@ -24,7 +24,7 @@ def lookup_needs_distinct(opts, lookup_path):
     Returns True if 'distinct()' should be used to query the given lookup path.
     """
     field_name = lookup_path.split('__', 1)[0]
-    field = opts.get_field(field_name, include_related=True)
+    field = opts.get_field(field_name)
     if hasattr(field, 'get_path_info') and any(path.m2m for path in field.get_path_info()):
         return True
     return False
@@ -300,7 +300,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     """
     attr = None
     try:
-        field = model._meta.get_field(name, include_related=True)
+        field = model._meta.get_field(name)
         try:
             label = field.verbose_name
         except AttributeError:
@@ -348,7 +348,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
 def help_text_for_field(name, model):
     help_text = ""
     try:
-        field = model._meta.get_field(name, include_related=True)
+        field = model._meta.get_field(name)
     except models.FieldDoesNotExist:
         pass
     else:
@@ -423,7 +423,7 @@ def reverse_field_path(model, path):
     parent = model
     pieces = path.split(LOOKUP_SEP)
     for piece in pieces:
-        field = parent._meta.get_field(piece, include_related=True)
+        field = parent._meta.get_field(piece)
         direct = isinstance(field, models.Field) or hasattr(field, 'for_concrete_model')
         # skip trailing data field if extant:
         if len(reversed_path) == len(pieces) - 1:  # final iteration
@@ -457,7 +457,7 @@ def get_fields_from_path(model, path):
             parent = get_model_from_relation(fields[-1])
         else:
             parent = model
-        fields.append(parent._meta.get_field(piece, include_related=True))
+        fields.append(parent._meta.get_field(piece))
     return fields
 
 

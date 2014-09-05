@@ -201,8 +201,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 alter_fields=[(
                     # We need the field that points to the target model, so we can tell alter_field to change it -
                     # this is m2m_reverse_field_name() (as opposed to m2m_field_name, which points to our model)
-                    old_field.rel.through._meta.get_field(old_field.m2m_reverse_field_name(), include_related=True),
-                    new_field.rel.through._meta.get_field(new_field.m2m_reverse_field_name(), include_related=True),
+                    old_field.rel.through._meta.get_field(old_field.m2m_reverse_field_name()),
+                    new_field.rel.through._meta.get_field(new_field.m2m_reverse_field_name()),
                 )],
                 override_uniques=(new_field.m2m_field_name(), new_field.m2m_reverse_field_name()),
             )

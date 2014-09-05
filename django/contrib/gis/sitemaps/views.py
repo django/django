@@ -23,7 +23,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
 
     if field_name:
         try:
-            field = klass._meta.get_field(field_name, include_related=True)
+            field = klass._meta.get_field(field_name)
             if not isinstance(field, GeometryField):
                 raise FieldDoesNotExist
         except FieldDoesNotExist:

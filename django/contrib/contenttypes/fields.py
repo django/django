@@ -305,12 +305,11 @@ class GenericRelation(ForeignObject):
 
     def resolve_related_fields(self):
         self.to_fields = [self.model._meta.pk.name]
-        return [(self.rel.to._meta.get_field(self.object_id_field_name, include_related=True),
-                 self.model._meta.pk)]
+        return [(self.rel.to._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
 
     def get_path_info(self):
         opts = self.rel.to._meta
-        target = opts.get_field(self.object_id_field_name, include_related=True)
+        target = opts.get_field(self.object_id_field_name)
         return [PathInfo(self.model._meta, opts, (target,), self.rel, True, False)]
 
     def get_reverse_path_info(self):

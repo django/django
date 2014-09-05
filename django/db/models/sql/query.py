@@ -581,7 +581,7 @@ class Query(object):
             opts = orig_opts
             for name in parts[:-1]:
                 old_model = cur_model
-                source = opts.get_field(name, include_related=True)
+                source = opts.get_field(name)
                 if is_reverse_o2o(source):
                     cur_model = source.model
                 else:
@@ -593,7 +593,7 @@ class Query(object):
                 if not is_reverse_o2o(source):
                     must_include[old_model].add(source)
                 add_to_dict(must_include, cur_model, opts.pk)
-            field = opts.get_field(parts[-1], include_related=True)
+            field = opts.get_field(parts[-1])
             model = field.parent_model._meta.concrete_model
             if model == opts.model:
                 model = cur_model
@@ -1016,7 +1016,7 @@ class Query(object):
             # The simplest cases. No joins required -
             # just reference the provided column alias.
             field_name = field_list[0]
-            source = opts.get_field(field_name, include_related=True)
+            source = opts.get_field(field_name)
             col = field_name
         # We want to have the alias in SELECT clause even if mask is set.
         self.append_aggregate_mask([alias])
@@ -1371,7 +1371,7 @@ class Query(object):
             if name == 'pk':
                 name = opts.pk.name
             try:
-                field = opts.get_field(name, include_related=True)
+                field = opts.get_field(name)
                 model = field.parent_model._meta.concrete_model
             except FieldDoesNotExist:
                 # We didn't found the current field, so move position back

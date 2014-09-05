@@ -163,7 +163,7 @@ class RenameModel(Operation):
                     )
                 to_field = new_apps.get_model(
                     *related_key
-                )._meta.get_field(related_object.field.name, include_related=True)
+                )._meta.get_field(related_object.field.name)
                 schema_editor.alter_field(
                     model,
                     related_object.field,
@@ -318,11 +318,11 @@ class AlterOrderWithRespectTo(Operation):
         if self.allowed_to_migrate(schema_editor.connection.alias, to_model):
             # Remove a field if we need to
             if from_model._meta.order_with_respect_to and not to_model._meta.order_with_respect_to:
-                schema_editor.remove_field(from_model, from_model._meta.get_field("_order", include_related=True))
+                schema_editor.remove_field(from_model, from_model._meta.get_field("_order"))
             # Add a field if we need to (altering the column is untouched as
             # it's likely a rename)
             elif to_model._meta.order_with_respect_to and not from_model._meta.order_with_respect_to:
-                field = to_model._meta.get_field("_order", include_related=True)
+                field = to_model._meta.get_field("_order")
                 schema_editor.add_field(
                     from_model,
                     field,

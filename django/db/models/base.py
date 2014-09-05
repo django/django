@@ -560,7 +560,7 @@ class Model(six.with_metaclass(ModelBase)):
         and not use this method.
         """
         try:
-            field = self._meta.get_field(field_name, include_related=True)
+            field = self._meta.get_field(field_name)
         except FieldDoesNotExist:
             return getattr(self, field_name)
         return getattr(self, field.attname)
