@@ -38,8 +38,8 @@ security purposes, please see :doc:`our security policies <security>`.
 .. glossary::
 
   Major release
-    Major releases (1.5, 1.6, etc.) will happen roughly every nine months -- see
-    `release process`_, below for details. These releases will contain new
+    Major releases (A.B, A.B+1, etc.) will happen roughly every nine months --
+    see `release process`_, below for details. These releases will contain new
     features, improvements to existing features, and such.
 
     .. _internal-release-deprecation-policy:
@@ -63,8 +63,8 @@ security purposes, please see :doc:`our security policies <security>`.
     * Django 1.9 will remove the feature outright.
 
   Minor release
-    Minor releases (1.5.1, 1.6.2, 1.6.1, etc.) will be issued as needed, often to
-    fix security issues.
+    Minor releases (A.B.C, etc.) will be issued as needed, often to fix security
+    issues.
 
     These releases will be 100% compatible with the associated major release,
     unless this is impossible for security reasons or to prevent data loss.
@@ -107,20 +107,20 @@ varying levels:
   regressions is much less of a concern.
 
 As a concrete example, consider a moment in time halfway between the release of
-Django 1.6 and 1.7. At this point in time:
+Django 1.7 and 1.8. At this point in time:
 
-* Features will be added to development master, to be released as Django 1.7.
+* Features will be added to development master, to be released as Django 1.8.
 
-* Critical bug fixes will be applied to the ``stable/1.6.x`` branch, and
-  released as 1.6.1, 1.6.2, etc.
+* Critical bug fixes will be applied to the ``stable/1.7.x`` branch, and
+  released as 1.7.1, 1.7.2, etc.
 
 * Security fixes and bug fixes for data loss issues will be applied to
-  ``master`` and to the ``stable/1.6.x``, ``stable/1.5.x``, and
-  ``stable/1.4.x`` (LTS) branches. They will trigger the release of ``1.6.1``,
-  ``1.5.1``, ``1.4.1``, etc.
+  ``master`` and to the ``stable/1.7.x``, ``stable/1.6.x``, and
+  ``stable/1.4.x`` (LTS) branches. They will trigger the release of ``1.7.1``,
+  ``1.6.1``, ``1.4.1``, etc.
 
 * Documentation fixes will be applied to master, and, if easily backported, to
-  the ``1.6.x`` branch.
+  the ``1.7.x`` and ``1.6.x`` branches.
 
 .. _lts-releases:
 
@@ -141,8 +141,8 @@ The follow releases have been designated for long-term support:
 Release process
 ===============
 
-Django uses a time-based release schedule, with major (i.e. 1.6, 1.7, etc.)
-releases every nine months, or more, depending on features.
+Django uses a time-based release schedule, with major (i.e. 1.8, 1.9, 2.0,
+etc.) releases every nine months, or more, depending on features.
 
 After each release, and after a suitable cooling-off period of a few weeks, the
 core development team will examine the landscape and announce a timeline for the
@@ -211,10 +211,10 @@ in the ``A.B+1`` cycle.
 Bug-fix releases
 ----------------
 
-After a major release (e.g. 1.6), the previous release will go into bugfix
+After a major release (e.g. A.B), the previous release will go into bugfix
 mode.
 
-The branch for the previous major release (e.g. ``stable/1.5.x``) will include
+The branch for the previous major release (e.g. ``stable/A.B-1.x``) will include
 bugfixes. Critical bugs fixed on master must *also* be fixed on the bugfix
 branch; this means that commits need to cleanly separate bug fixes from feature
 additions. The developer who commits a fix to master will be responsible for
