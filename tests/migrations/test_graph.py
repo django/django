@@ -139,7 +139,7 @@ class GraphTests(TestCase):
         root = ("app_a", "1")
         graph.add_node(root, None)
         expected = [root]
-        for i in xrange(2, 1000):
+        for i in range(2, 1000):
             parent = ("app_a", str(i - 1))
             child = ("app_a", str(i))
             graph.add_node(child, None)
