@@ -1260,6 +1260,12 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     model should always point towards the swapped-in model - for example,
     if it is a profile model designed specifically for your custom user model.
 
+    Setting it to ``False`` does not mean you can reference a swappable model
+    even if it is swapped out - ``False`` just means that the migrations made
+    with this ForeignKey will always reference the exact model you specify
+    (so it will fail hard if the user tries to run with a User model you don't
+    support, for example).
+
     If in doubt, leave it to its default of ``True``.
 
 .. _ref-manytomany:
