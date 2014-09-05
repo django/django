@@ -339,12 +339,12 @@ The following checks are performed when a model contains a
 :class:`~django.contrib.contenttypes.fields.GenericRelation`:
 
 * **contenttypes.E001**: The ``GenericForeignKey`` object ID references the
-  non-existent field ``<field>``
+  non-existent field ``<field>``.
 * **contenttypes.E002**: The ``GenericForeignKey`` content type references the
-  non-existent field ``<field>``
+  non-existent field ``<field>``.
 * **contenttypes.E003**: ``<field>`` is not a ``ForeignKey``.
 * **contenttypes.E004**: ``<field>`` is not a ``ForeignKey`` to
-  ``contenttypes.ContentType``
+  ``contenttypes.ContentType``.
 
 Sites
 -----
