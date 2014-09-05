@@ -196,7 +196,7 @@ class ExecutorTests(MigrationTestBase):
     @override_settings(
         MIGRATION_MODULES={
             "migrations": "migrations.test_migrations_custom_user",
-            "auth": "django.contrib.auth.migrations",
+            "django.contrib.auth": "django.contrib.auth.migrations",
         },
         AUTH_USER_MODEL="migrations.Author",
     )
