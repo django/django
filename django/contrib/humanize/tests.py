@@ -239,3 +239,70 @@ class HumanizeTests(TestCase):
                         test_list, result_list_with_tz_support, 'naturaltime')
         finally:
             humanize.datetime = orig_humanize_datetime
+
+    def test_naturaltime_as_documented(self):
+        """
+        Run tests that verify the documented behavior of humanize.naturaltime.
+        https://code.djangoproject.com/ticket/23340
+
+        As documented:
+        Examples (when 'now' is 17 Feb 2007 16:30:00):
+
+            * ``17 Feb 2007 16:30:00`` becomes ``now``.
+            * ``17 Feb 2007 16:29:31`` becomes ``29 seconds ago``.
+            * ``17 Feb 2007 16:29:00`` becomes ``a minute ago``.
+            * ``17 Feb 2007 16:25:35`` becomes ``4 minutes ago``.
+            * ``17 Feb 2007 15:30:29`` becomes ``59 minutes ago``.
+            * ``17 Feb 2007 15:30:01`` becomes ``59 minutes ago``.
+            * ``17 Feb 2007 15:30:00`` becomes ``an hour ago``.
+            * ``17 Feb 2007 13:31:29`` becomes ``2 hours ago``.
+            * ``16 Feb 2007 13:31:29`` becomes ``1 day, 2 hours ago``.
+            * ``16 Feb 2007 13:30:01`` becomes ``1 day, 2 hours ago``.
+            * ``16 Feb 2007 13:30:00`` becomes ``1 day, 3 hours ago``.
+            * ``17 Feb 2007 16:30:30`` becomes ``30 seconds from now``.
+            * ``17 Feb 2007 16:30:29`` becomes ``29 seconds from now``.
+            * ``17 Feb 2007 16:31:00`` becomes ``a minute from now``.
+            * ``17 Feb 2007 16:34:35`` becomes ``4 minutes from now``.
+            * ``17 Feb 2007 17:30:29`` becomes ``an hour from now``.
+            * ``17 Feb 2007 18:31:29`` becomes ``2 hours from now``.
+            * ``18 Feb 2007 16:31:29`` becomes ``1 day from now``.
+            * ``26 Feb 2007 18:31:29`` becomes ``1 week, 2 days from now``.
+        """
+        time_format = '%d %b %Y %H:%M:%S'
+        documented_now = datetime.datetime.strptime('17 Feb 2007 16:30:00',
+                                                    time_format)
+
+        class DocumentedMockDateTime(datetime.datetime):
+            """Override Class for humanize.datetime  """
+            @classmethod
+            def now(cls, tz=None):
+                if tz is None or tz.utcoffset(documented_now) is None:
+                    return documented_now
+                else:
+                    return documented_now.replace(tzinfo=tz) + tz.utcoffset(now)
+
+        humanize.datetime = DocumentedMockDateTime
+        for test_time_string, expected_natural_time in (
+                ('17 Feb 2007 16:30:00', 'now', ),
+                ('17 Feb 2007 16:29:31', '29 seconds ago', ),
+                ('17 Feb 2007 16:29:00', 'a minute ago', ),
+                ('17 Feb 2007 16:25:35', '4 minutes ago', ),
+                ('17 Feb 2007 15:30:29', '59 minutes ago', ),
+                ('17 Feb 2007 15:30:01', '59 minutes ago', ),
+                ('17 Feb 2007 15:30:00', 'an hour ago', ),
+                ('17 Feb 2007 13:31:29', '2 hours ago', ),
+                ('16 Feb 2007 13:31:29', '1 day, 2 hours ago', ),
+                ('16 Feb 2007 13:30:01', '1 day, 2 hours ago', ),
+                ('16 Feb 2007 13:30:00', '1 day, 3 hours ago', ),
+                ('17 Feb 2007 16:30:30', '30 seconds from now', ),
+                ('17 Feb 2007 16:30:29', '29 seconds from now', ),
+                ('17 Feb 2007 16:31:00', 'a minute from now', ),
+                ('17 Feb 2007 16:34:35', '4 minutes from now', ),
+                ('17 Feb 2007 17:30:29', 'an hour from now', ),
+                ('17 Feb 2007 18:31:29', '2 hours from now', ),
+                ('18 Feb 2007 16:31:29', '1 day from now', ),
+                ('26 Feb 2007 18:31:29', '1 week, 2 days from now', ),
+                ):
+            test_time = datetime.datetime.strptime(test_time_string, time_format)
+            natural_time = humanize.naturaltime(test_time).replace(u'\xa0', u' ')
+            self.assertEqual(expected_natural_time, natural_time)
