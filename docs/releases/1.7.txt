@@ -1442,6 +1442,11 @@ Miscellaneous
 * Decoding the query string from URLs now falls back to the ISO-8859-1 encoding
   when the input is not valid UTF-8.
 
+* With the addition of the
+  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` to
+  the default project template, a database must be created before accessing
+  a page using :djadmin:`runserver`.
+
 .. _deprecated-features-1.7:
 
 Features deprecated in 1.7
