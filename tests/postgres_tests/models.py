@@ -24,3 +24,11 @@ class NestedIntegerArrayModel(models.Model):
 
 class HStoreModel(models.Model):
     field = HStoreField(blank=True, null=True)
+
+
+class CharFieldModel(models.Model):
+    field = models.CharField(max_length=16)
+
+
+class TextFieldModel(models.Model):
+    field = models.TextField()
