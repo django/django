@@ -45,9 +45,10 @@ New PostgreSQL specific functionality
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django now has a module with extensions for PostgreSQL specific features, such
-as :class:`~django.contrib.postgres.fields.ArrayField` and
-:class:`~django.contrib.postgres.fields.HStoreField`. A full breakdown of the
-features is available :doc:`in the documentation</ref/contrib/postgres/index>`.
+as :class:`~django.contrib.postgres.fields.ArrayField`,
+:class:`~django.contrib.postgres.fields.HStoreField`, and :lookup:`unaccent`
+lookup. A full breakdown of the features is available :doc:`in the
+documentation </ref/contrib/postgres/index>`.
 
 New data types
 ~~~~~~~~~~~~~~
