@@ -402,7 +402,7 @@ class ListFiltersTests(TestCase):
         # Make sure that all users are present in the author's list filter
         filterspec = changelist.get_filters(request)[0][1]
         expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
-        self.assertEqual(filterspec.lookup_choices, expected)
+        self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
 
         request = self.request_factory.get('/', {'author__isnull': 'True'})
         changelist = self.get_changelist(request, Book, modeladmin)
