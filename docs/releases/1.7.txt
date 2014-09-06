@@ -1020,6 +1020,22 @@ script with::
 
 Otherwise, you will hit an ``AppRegistryNotReady`` exception.
 
+WSGI scripts
+~~~~~~~~~~~~
+
+Until Django 1.3, the recommended way to create a WSGI application was::
+
+    import django.core.handlers.wsgi
+    application = django.core.handlers.wsgi.WSGIHandler()
+
+In Django 1.4, support for WSGI was improved and the API changed to::
+
+    from django.core.wsgi import get_wsgi_application
+    application = get_wsgi_application()
+
+If you're still using the former style in your WSGI script, you need to
+upgrade to the latter, or you will hit an ``AppRegistryNotReady`` exception.
+
 App registry consistency
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
