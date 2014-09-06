@@ -333,20 +333,13 @@ Tim Graham
     .. _Pixane: http://pixane.com
     .. _Skills: http://skillsapp.com
 
-`Paul McMillan`_
+Paul McMillan
     Paul found Django in 2008 while looking for a more
     structured approach to web programming. He stuck around after
     figuring out that the developers of Django had already invented
     many of the wheels he needed. His passion for breaking (and then
     fixing) things led to his current role working to maintain and
     improve the security of Django.
-
-    Paul works in Berkeley, California as a `web developer`_ and `security
-    consultant`_.
-
-    .. _Paul McMillan: http://subversivecode.com
-    .. _web developer: http://zerocoordinate.com
-    .. _security consultant: http://subversivecode.com/about
 
 `Julien Phalip`_
     Julien has a background in software engineering and human-computer
