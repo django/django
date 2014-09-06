@@ -16,3 +16,5 @@ Bugfixes
 
 * Reinstated missing ``CHECK`` SQL clauses which were omitted on some backends
   when not using migrations (:ticket:`23416`).
+
+* Fixed serialization of ``type`` objects in migrations (:ticket:`22951`).

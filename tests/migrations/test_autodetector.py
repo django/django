@@ -702,6 +702,31 @@ class AutodetectorTests(TestCase):
         changes = autodetector._detect_changes()
         self.assertEqual(changes, {})
 
+    def test_deconstruct_type(self):
+        """
+        #22951 -- Uninstanted classes with deconstruct are correctly returned
+        by deep_deconstruct during serialization.
+        """
+        author = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(
+                    max_length=200,
+                    # IntegerField intentionally not instantiated.
+                    default=models.IntegerField,
+                ))
+            ],
+        )
+        # Make state
+        before = self.make_project_state([])
+        after = self.make_project_state([author])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
+
     def test_replace_string_with_foreignkey(self):
         """
         Adding an FK in the same "spot" as a deleted CharField should work. (#22300).

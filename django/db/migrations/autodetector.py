@@ -49,7 +49,7 @@ class MigrationAutodetector(object):
         Used for full comparison for rename/alter; sometimes a single-level
         deconstruction will not compare correctly.
         """
-        if not hasattr(obj, 'deconstruct'):
+        if not hasattr(obj, 'deconstruct') or isinstance(obj, type):
             return obj
         deconstructed = obj.deconstruct()
         if isinstance(obj, models.Field):
