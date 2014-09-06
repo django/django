@@ -549,7 +549,7 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
 
 .. class:: DurationField([**options])
 
-A field for storing periods of time - modeled in python by
+A field for storing periods of time - modeled in Python by
 :class:`~python:datetime.timedelta`. When used on PostgreSQL, the data type
 used is an ``interval``, otherwise a ``bigint`` of microseconds is used.
 

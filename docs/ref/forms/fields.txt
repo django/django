@@ -555,7 +555,7 @@ For each field, we describe the default widget used if you don't specify
 
     * Default widget: :class:`TextInput`
     * Empty value: ``None``
-    * Normalises to: A Python :class:`~python:datetime.timedelta`.
+    * Normalizes to: A Python :class:`~python:datetime.timedelta`.
     * Validates that the given value is a string which can be converted into a
       ``timedelta``.
     * Error message keys: ``required``, ``invalid``.
