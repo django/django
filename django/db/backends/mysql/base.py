@@ -7,7 +7,6 @@ MySQLdb is supported for Python 2 only: http://sourceforge.net/projects/mysql-py
 from __future__ import unicode_literals
 
 import datetime
-import decimal
 import re
 import sys
 import uuid
@@ -46,7 +45,6 @@ from django.db.backends.mysql.introspection import DatabaseIntrospection
 from django.db.backends.mysql.validation import DatabaseValidation
 from django.utils.encoding import force_str, force_text
 from django.db.backends.mysql.schema import DatabaseSchemaEditor
-from django.utils.dateparse import parse_duration
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
 from django.utils import six
@@ -395,8 +393,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_booleanfield_value)
         if internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
-        elif internal_type == 'DurationField':
-            converters.append(self.convert_durationfield_value)
         return converters
 
     def convert_booleanfield_value(self, value, field):
@@ -407,12 +403,6 @@ class DatabaseOperations(BaseDatabaseOperations):
     def convert_uuidfield_value(self, value, field):
         if value is not None:
             value = uuid.UUID(value)
-        return value
-
-    def convert_durationfield_value(self, value, field):
-        if value is not None:
-            value = str(decimal.Decimal(value) / decimal.Decimal(1000000))
-            value = parse_duration(value)
         return value
 
 
