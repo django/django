@@ -7,7 +7,13 @@ Roles
 Technical board
 ===============
 
-The first technical board hasn't been elected yet.
+The technical board for the 1.8 release cycle is:
+
+* Aymeric Augustin
+* Andrew Godwin
+* Russell Keith-Magee
+* Jannis Leidel
+* Carl Meyer
 
 .. _committers:
 
