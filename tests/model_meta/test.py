@@ -43,12 +43,12 @@ class GetFieldsTests(OptionsBaseTests):
             fields = Person._meta.get_fields()
             with self.assertRaises(AttributeError) as err:
                 fields += ["errors"]
-            self.assertEquals(str(err.exception), IMMUTABLE_WARNING)
+            self.assertEqual(str(err.exception), IMMUTABLE_WARNING)
 
     def test_get_fields_accepts_only_valid_kwargs(self):
         with self.assertRaises(TypeError) as err:
             Person._meta.get_fields(revese=True)
-        self.assertEquals(str(err.exception), "'revese' are invalid keyword arguments")
+        self.assertEqual(str(err.exception), "'revese' are invalid keyword arguments")
 
 
 class DataTests(OptionsBaseTests):
@@ -65,7 +65,7 @@ class DataTests(OptionsBaseTests):
             fields = model._meta.local_fields
             self.assertEqual([f.attname for f in fields], expected_result)
             for f in fields:
-                self.assertEquals(f.model, model)
+                self.assertEqual(f.model, model)
                 self.assertTrue(is_data_field(f))
 
     def test_local_concrete_fields(self):
@@ -204,7 +204,7 @@ class RelationTreeTests(test.TestCase):
 
         # AbstractPerson does not have any relations, so relation_tree
         # should just return an EMPTY_RELATION_TREE.
-        self.assertEquals(
+        self.assertEqual(
             AbstractPerson._meta.relation_tree,
             EMPTY_RELATION_TREE
         )

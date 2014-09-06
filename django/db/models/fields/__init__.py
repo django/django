@@ -45,6 +45,10 @@ __all__ = [str(x) for x in (
 
 
 class FieldFlagsMixin(object):
+    """
+    Base mixin class for all field types. This allows required field flags to
+    be computed based on the internal attributes defined on the field instance.
+    """
 
     @property
     def concrete(self):
