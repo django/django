@@ -24,7 +24,7 @@ def ensure_default_manager(cls):
     if not getattr(cls, '_default_manager', None):
         # The apps registry will not be ready at this point. So
         # we cannot use get_field().
-        if any(f.name is 'objects' for f in cls._meta.get_fields()):
+        if any(f.name == 'objects' for f in cls._meta.get_fields()):
             raise ValueError("Model %s must specify a custom Manager, because it has a field named 'objects'" % cls.__name__)
 
         # Create the default manager, if needed.
