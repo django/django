@@ -261,7 +261,6 @@ class HumanizeTests(TransRealMixin, TestCase):
         )
 
         class DocumentedMockDateTime(datetime.datetime):
-            """Override Class for humanize.datetime  """
             @classmethod
             def now(cls, tz=None):
                 if tz is None or tz.utcoffset(documented_now) is None:
@@ -269,8 +268,12 @@ class HumanizeTests(TransRealMixin, TestCase):
                 else:
                     return documented_now.replace(tzinfo=tz) + tz.utcoffset(now)
 
+        orig_humanize_datetime = humanize.datetime
         humanize.datetime = DocumentedMockDateTime
-        for test_time_string, expected_natural_time in test_data:
-            test_time = datetime.datetime.strptime(test_time_string, time_format)
-            natural_time = humanize.naturaltime(test_time).replace('\xa0', ' ')
+        try:
+            for test_time_string, expected_natural_time in test_data:
+                test_time = datetime.datetime.strptime(test_time_string, time_format)
+                natural_time = humanize.naturaltime(test_time).replace('\xa0', ' ')
             self.assertEqual(expected_natural_time, natural_time)
+        finally:
+            humanize.datetime = orig_humanize_datetime
