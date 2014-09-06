@@ -5,7 +5,7 @@ import os
 import sys
 
 from django.apps import apps
-from django.utils import datetime_safe, six
+from django.utils import datetime_safe, six, timezone
 from django.utils.six.moves import input
 
 from .loader import MIGRATIONS_MODULE_NAME
@@ -108,7 +108,8 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 sys.exit(3)
             else:
                 print("Please enter the default value now, as valid Python")
-                print("The datetime module is available, so you can do e.g. datetime.date.today()")
+                print("The datetime and django.utils.timezone modules are "
+                      "available, so you can do e.g. timezone.now()")
                 while True:
                     if six.PY3:
                         # Six does not correctly abstract over the fact that
@@ -123,7 +124,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                         sys.exit(1)
                     else:
                         try:
-                            return eval(code, {}, {"datetime": datetime_safe})
+                            return eval(code, {}, {"datetime": datetime_safe, "timezone": timezone})
                         except (SyntaxError, NameError) as e:
                             print("Invalid input: %s" % e)
         return None

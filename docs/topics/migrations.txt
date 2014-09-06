@@ -543,11 +543,16 @@ Django can serialize the following:
 - ``int``, ``long``, ``float``, ``bool``, ``str``, ``unicode``, ``bytes``, ``None``
 - ``list``, ``set``, ``tuple``, ``dict``
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
+  (include those that are timezone-aware)
 - ``decimal.Decimal`` instances
 - Any Django field
 - Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
+
+.. versionchanged:: 1.8
+
+    Support for serializing timezone-aware datetimes was added.
 
 Django can serialize the following on Python 3 only:
 
