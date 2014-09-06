@@ -10,3 +10,6 @@ Bugfixes
 ========
 
 * Replace with actual issue (:ticket:`00000`).
+
+* Fixed a ``UnicodeDecodeError`` when the ``flush`` error message contained
+  Unicode characters (:ticket:`22882`).
