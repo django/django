@@ -754,8 +754,6 @@ class FieldFlagsTests(test.TestCase):
     def test_reverse_object_fields(self):
         for field in self.fields_and_reverse_objects:
             if type(field) in IS_REVERSE_OBJECT:
-                if not field.is_reverse_object:
-                    import ipdb; ipdb.set_trace()
                 self.assertTrue(field.is_reverse_object)
             else:
                 self.assertFalse(field.is_reverse_object)

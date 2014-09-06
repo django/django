@@ -628,7 +628,6 @@ class SchemaTests(TransactionTestCase):
         finally:
             # Cleanup through table separately
             with connection.schema_editor() as editor:
-                import ipdb; ipdb.set_trace()
                 editor.remove_field(BookWithM2M, BookWithM2M._meta.get_field("uniques"))
             # Cleanup model states
             BookWithM2M._meta.local_many_to_many.remove(new_field)
