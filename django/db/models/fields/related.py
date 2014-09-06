@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from itertools import chain
 from operator import attrgetter
 
 from django.apps import apps

@@ -400,36 +400,28 @@ class Options(object):
         return [self._map_model(f) for f in self.many_to_many]
 
     @cached_property
-    def concrete_fields_map(self):
+    def all_fields_map(self):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
-        fields = self.get_fields(forward=True, export_name_map=True, cache_results=False)
+        fields = self.get_fields(forward=True, reverse=True, export_name_map=True, cache_results=False)
         fields.update(
             (field, {field.name, field.attname})
             for field in self.virtual_fields
             if hasattr(field, 'related')
         )
-        for field, names in six.iteritems(fields):
+
+        for obj, names in six.iteritems(fields):
+
+            # Exclude any intentionally hidden related object.
+            if obj.is_reverse_object and hasattr(obj, 'field'):
+                if obj.field.rel.is_hidden() and not obj.field.has_many_values:
+                    continue
+
             # map each possible name for a field to its field instance
             for name in names:
-                res[name] = field
-        return res
+                res[name] = obj
 
-    @cached_property
-    def all_fields_map(self):
-        res = {}
-        for obj, names in six.iteritems(self.get_fields(forward=False, reverse=True,
-                                        include_hidden=True, export_name_map=True, cache_results=True)):
-            if not obj.field.rel.is_hidden() or isinstance(obj.field, ManyToManyField):
-
-                # map each possible name for a field to its field instance
-                for name in names:
-                    res[name] = obj
-
-        # Add all concrete fields map. Irder of insertion is important here, all concrete
-        # fields should always override related objects.
-        res.update(self.concrete_fields_map)
         return res
 
     def get_field(self, field_name, **kwargs):
