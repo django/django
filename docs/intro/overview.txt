@@ -23,8 +23,10 @@ code.
 
 The :doc:`data-model syntax </topics/db/models>` offers many rich ways of
 representing your models -- so far, it's been solving many years' worth of
-database-schema problems. Here's a quick example, which might be saved in
-the file ``mysite/news/models.py``::
+database-schema problems. Here's a quick example:
+
+.. snippet::
+    :filename: mysite/news/models.py
 
     from django.db import models
 
@@ -141,9 +143,10 @@ A dynamic admin interface: it's not just scaffolding -- it's the whole house
 Once your models are defined, Django can automatically create a professional,
 production ready :doc:`administrative interface </ref/contrib/admin/index>` --
 a Web site that lets authenticated users add, change and delete objects. It's
-as easy as registering your model in the admin site::
+as easy as registering your model in the admin site:
 
-    # In models.py...
+.. snippet::
+    :filename: mysite/news/models.py
 
     from django.db import models
 
@@ -153,11 +156,12 @@ as easy as registering your model in the admin site::
         content = models.TextField()
         reporter = models.ForeignKey(Reporter)
 
+.. snippet::
+    :filename: mysite/news/admin.py
 
-    # In admin.py in the same directory...
-
-    import models
     from django.contrib import admin
+
+    from . import models
 
     admin.site.register(models.Article)
 
@@ -182,7 +186,10 @@ mapping between URL patterns and Python callback functions. URLconfs also serve
 to decouple URLs from Python code.
 
 Here's what a URLconf might look like for the ``Reporter``/``Article``
-example above::
+example above:
+
+.. snippet::
+    :filename: mysite/news/urls.py
 
     from django.conf.urls import patterns
 
@@ -222,9 +229,14 @@ The rest is up to you.
 
 Generally, a view retrieves data according to the parameters, loads a template
 and renders the template with the retrieved data. Here's an example view for
-``year_archive`` from above::
+``year_archive`` from above:
+
+.. snippet::
+    :filename: mysite/news/views.py
 
     from django.shortcuts import render
+
+    from .models import Article
 
     def year_archive(request, year):
         a_list = Article.objects.filter(pub_date__year=year)
@@ -248,7 +260,8 @@ first directory, it checks the second, and so on.
 Let's say the ``news/year_archive.html`` template was found. Here's what that
 might look like:
 
-.. code-block:: html+django
+.. snippet:: html+django
+    :filename: mysite/news/templates/news/year_archive.html
 
     {% extends "base.html" %}
 
@@ -288,7 +301,8 @@ in templates: each template has to define only what's unique to that template.
 Here's what the "base.html" template, including the use of :doc:`static files
 </howto/static-files/index>`, might look like:
 
-.. code-block:: html+django
+.. snippet:: html+django
+    :filename: mysite/templates/base.html
 
     {% load staticfiles %}
     <html>
