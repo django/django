@@ -22,12 +22,12 @@ def ensure_default_manager(cls):
         setattr(cls, 'objects', SwappedManagerDescriptor(cls))
         return
     if not getattr(cls, '_default_manager', None):
-        # Create the default manager, if needed.
-        try:
-            cls._meta.get_field('objects', include_related=False)
+        # The apps registry will not be ready at this point. So
+        # we cannot use get_field().
+        if any(f.name is 'objects' for f in cls._meta.get_fields()):
             raise ValueError("Model %s must specify a custom Manager, because it has a field named 'objects'" % cls.__name__)
-        except FieldDoesNotExist:
-            pass
+
+        # Create the default manager, if needed.
         cls.add_to_class('objects', Manager())
         cls._base_manager = cls.objects
     elif not getattr(cls, '_base_manager', None):

@@ -8,6 +8,7 @@ import warnings
 
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import AppRegistryNotReady
 from django.db.models.fields.related import ManyToManyRel, ManyToManyField
 from django.db.models.fields import AutoField, FieldDoesNotExist, Field
 from django.db.models.fields.proxy import OrderWrt
@@ -230,7 +231,17 @@ class Options(object):
 
     def _prepare(self, model):
         if self.order_with_respect_to:
-            self.order_with_respect_to = self.get_field(self.order_with_respect_to, include_related=False)
+            # The apps registry will not be ready at this point. So
+            # we cannot use get_field().
+            query = self.order_with_respect_to
+            try:
+                self.order_with_respect_to = next(
+                    f for f in self.get_fields()
+                    if f.name is query or f.attname is query
+                )
+            except StopIteration:
+                raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, query))
+
             self.ordering = ('_order',)
             if not any(isinstance(field, OrderWrt) for field in model._meta.local_fields):
                 model.add_to_class('_order', OrderWrt())
@@ -421,13 +432,19 @@ class Options(object):
         res.update(self.concrete_fields_map)
         return res
 
-    def get_field(self, field_name, include_related=True, **kwargs):
+    def get_field(self, field_name, **kwargs):
         """
         Returns a field instance given a field name. By default will only search in forward
         fields. By setting the include_related flag, the search is also extended to reverse
         relations.
         """
-        field_map = self.all_fields_map if include_related else self.concrete_fields_map
+        if not apps.ready:
+            raise AppRegistryNotReady(
+                "The Apps registry is still not ready, this means get_field() is not able "
+                "to find related objects that point to this model."
+            )
+
+        field_map = self.all_fields_map if apps.ready else self.concrete_fields_map
 
         # NOTE: previous get_field API had a many_to_many key. This key
         # has now become m2m. In order to avoid breaking other's implementation

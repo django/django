@@ -1,7 +1,7 @@
-
 from django import test
 from django.apps import apps
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.core.exceptions import AppRegistryNotReady
 from django.db.models import FieldDoesNotExist
 from django.db.models.fields import related, CharField, Field
 from django.db.models.options import IMMUTABLE_WARNING, EMPTY_RELATION_TREE
@@ -158,24 +158,33 @@ class GetFieldByNameTests(OptionsBaseTests):
         self.assertIsInstance(field_info[0], related.ManyToManyField)
 
     def test_get_related_object(self):
-        field_info = self._details(Person, Person._meta.get_field('relating_baseperson', include_related=True))
+        field_info = self._details(Person, Person._meta.get_field('relating_baseperson'))
         self.assertEqual(field_info[1:], (BasePerson, False, False))
         self.assertIsInstance(field_info[0], related.RelatedObject)
 
     def test_get_related_m2m(self):
-        field_info = self._details(Person, Person._meta.get_field('relating_people', include_related=True))
+        field_info = self._details(Person, Person._meta.get_field('relating_people'))
         self.assertEqual(field_info[1:], (None, False, True))
         self.assertIsInstance(field_info[0], related.RelatedObject)
 
     def test_get_generic_foreign_key(self):
         # For historic reasons generic foreign keys aren't available.
         with self.assertRaises(FieldDoesNotExist):
-            Person._meta.get_field('content_object_base', virtual=True)
+            Person._meta.get_field('content_object_base')
 
     def test_get_generic_relation(self):
         field_info = self._details(Person, Person._meta.get_field('generic_relation_base'))
         self.assertEqual(field_info[1:], (None, True, False))
         self.assertIsInstance(field_info[0], GenericRelation)
+
+    def test_get_field_raises_warning_if_apps_not_ready(self):
+        # If apps registry is not ready, get_field() searches
+        # over only forward fields.
+        opts = Person._meta
+        opts.apps.ready = False
+        with self.assertRaises(AppRegistryNotReady) as err:
+            opts.get_field('data_abstract')
+        opts.apps.ready = True
 
 
 class RelationTreeTests(test.TestCase):
