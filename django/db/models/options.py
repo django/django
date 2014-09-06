@@ -400,7 +400,7 @@ class Options(object):
         return [self._map_model(f) for f in self.many_to_many]
 
     @cached_property
-    def all_fields_map(self):
+    def fields_map(self):
         res = {}
 
         # call get_fields with export_name_map=true in order to have a field_instance -> names map
@@ -436,8 +436,7 @@ class Options(object):
                 "to find related objects that point to this model."
             )
 
-        field_map = self.all_fields_map if apps.ready else self.concrete_fields_map
-
+        fields_map = self.fields_map
         # NOTE: previous get_field API had a many_to_many key. This key
         # has now become m2m. In order to avoid breaking other's implementation
         # we will catch the use of 'many_to_many'.
@@ -446,7 +445,7 @@ class Options(object):
             # If no many_to_many fields are wanted, create a new dictionary with
             # without ManyToManyField instances.
             if kwargs['many_to_many'] is False:
-                field_map = dict((name, field) for name, field in six.iteritems(field_map)
+                fields_map = dict((name, field) for name, field in six.iteritems(fields_map)
                                  if not isinstance(field, ManyToManyField))
 
             # We always want to throw a warning if many_to_many is used regardless
@@ -459,7 +458,7 @@ class Options(object):
 
         try:
             # Retreive field instance by name from cached or just-computer field map
-            return field_map[field_name]
+            return fields_map[field_name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
 
