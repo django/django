@@ -167,8 +167,8 @@ to be experienced but there's no formal seniority requirement. Its current
 composition is published :ref:`here <technical-board-list>`.
 
 A new board is elected after each major release of Django. The election
-process is managed by the outgoing technical board. The first election is
-bootstrapped by the retiring BDFLs. The election process works as follows:
+process is managed by a returns officer nominated by the outgoing technical
+board. The election process works as follows:
 
 1. Candidates advertise their application for the technical board to the team.
 
