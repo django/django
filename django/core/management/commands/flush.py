@@ -9,6 +9,7 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.core.management.sql import sql_flush, emit_post_migrate_signal
+from django.utils.encoding import force_str
 from django.utils.six.moves import input
 from django.utils import six
 
@@ -77,7 +78,7 @@ Are you sure you want to do this?
                     "  * The SQL was invalid.\n"
                     "Hint: Look at the output of 'django-admin sqlflush'. "
                     "That's the SQL this command wasn't able to run.\n"
-                    "The full error: %s") % (connection.settings_dict['NAME'], e)
+                    "The full error: %s") % (connection.settings_dict['NAME'], force_str(e))
                 six.reraise(CommandError, CommandError(new_msg), sys.exc_info()[2])
 
             if not inhibit_post_migrate:

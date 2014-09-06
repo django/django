@@ -373,7 +373,7 @@ class BaseCommand(object):
 
             # self.stderr is not guaranteed to be set here
             stderr = getattr(self, 'stderr', OutputWrapper(sys.stderr, self.style.ERROR))
-            stderr.write('%s: %s' % (e.__class__.__name__, e))
+            stderr.write('%s: %s' % (e.__class__.__name__, force_str(e)))
             sys.exit(1)
 
     def execute(self, *args, **options):
