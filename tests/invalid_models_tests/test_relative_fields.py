@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
+from django.db.models.fields import FieldDoesNotExist
 from django.test.utils import override_settings
 from django.test.testcases import skipIfDBFeature
 
@@ -10,6 +11,13 @@ from .base import IsolatedModelsTestCase
 
 
 class RelativeFieldTests(IsolatedModelsTestCase):
+
+    def _get_forward_field(self, model, name):
+        fields = model._meta.get_fields()
+        try:
+            return next(f for f in fields if f.name == name)
+        except StopIteration:
+            raise FieldDoesNotExist('%s has no field named %r' % (model.object_name, name))
 
     def test_valid_foreign_key_without_accessor(self):
         class Target(models.Model):
@@ -19,7 +27,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         class Model(models.Model):
             field = models.ForeignKey(Target, related_name='+')
 
-        field = Model._meta.get_field('field')
+        field = self._get_forward_field(Model, 'field')
         errors = field.check()
         self.assertEqual(errors, [])
 
@@ -32,7 +40,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         # Calling include_related=False because, as this is an invalid model
         # a relation to Rel1 will not be found.
-        field = Model._meta.get_field('foreign_key', include_related=False)
+        field = self._get_forward_field(Model, 'foreign_key')
         errors = field.check()
         expected = [
             Error(
@@ -51,7 +59,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         # Calling include_related=False because, as this is an invalid model
         # a relation to Rel2 will not be found.
-        field = Model._meta.get_field('m2m', include_related=False)
+        field = self._get_forward_field(Model, 'm2m')
         errors = field.check(from_model=Model)
         expected = [
             Error(
@@ -308,7 +316,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         # Calling include_related=False because, as this is an invalid model
         # a relation to AbstractModel will not be found.
-        field = Model._meta.get_field('foreign_key', include_related=False)
+        field = self._get_forward_field(Model, 'foreign_key')
         errors = field.check()
         expected = [
             Error(
@@ -331,7 +339,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         # Calling include_related=False because, as this is an invalid model
         # a relation to AbstractModel will not be found.
-        field = Model._meta.get_field('m2m', include_related=False)
+        field = self._get_forward_field(Model, 'm2m')
         errors = field.check(from_model=Model)
         expected = [
             Error(
