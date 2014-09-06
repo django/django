@@ -521,7 +521,6 @@ class DateTimeField(BaseTemporalField):
 
 
 class DurationField(Field):
-    widget = TextInput
     default_error_messages = {
         'invalid': _('Enter a valid duration.'),
     }
