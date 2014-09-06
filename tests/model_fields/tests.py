@@ -704,6 +704,9 @@ class FieldFlagsTests(test.TestCase):
             list(AllFieldsModel._meta.many_to_many) + \
             list(AllFieldsModel._meta.virtual_fields)
 
+        self.fields_and_reverse_objects = self.all_fields + \
+            list(AllFieldsModel._meta.related_objects)
+
     def test_each_field_should_have_a_concrete_attribute(self):
         self.assertTrue(all(f.concrete.__class__ == bool
                         for f in self.fields))
@@ -716,9 +719,9 @@ class FieldFlagsTests(test.TestCase):
         self.assertTrue(all(f.has_relation.__class__ == bool
                         for f in self.all_fields))
 
-    def test_each_field_should_have_is_reverse_object(self):
+    def test_each_object_should_have_is_reverse_object(self):
         self.assertTrue(all(f.is_reverse_object.__class__ == bool
-                        for f in self.all_fields))
+                        for f in self.fields_and_reverse_objects))
 
     def test_non_concrete_fields(self):
         for field in self.fields:
@@ -749,7 +752,7 @@ class FieldFlagsTests(test.TestCase):
                 self.assertFalse(field.has_many_values)
 
     def test_reverse_object_fields(self):
-        for field in self.all_fields:
+        for field in self.fields_and_reverse_objects:
             if type(field) in IS_REVERSE_OBJECT:
                 if not field.is_reverse_object:
                     import ipdb; ipdb.set_trace()
