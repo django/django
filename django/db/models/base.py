@@ -1362,7 +1362,6 @@ class Model(six.with_metaclass(ModelBase)):
         for field_name in fields:
             try:
                 field = cls._meta.get_field(field_name)
-                    
             except models.FieldDoesNotExist:
                 errors.append(
                     checks.Error(
@@ -1445,12 +1444,10 @@ class Model(six.with_metaclass(ModelBase)):
         # Check for invalid or non existing field ordering.
         invalid_fields = []
 
-        # Any field name that is not present in field_names
-        # Does not exist.
+        # Any field name that is not present in field_names does not exist.
         invalid_fields.extend(fields - cls._meta.field_names)
 
-        # Any field that is a m2m field should not be allowed
-        # ordering
+        # Any field that is a m2m field should not be allowed ordering
         m2m_field_names = set(f.name for f in cls._meta.many_to_many)
         invalid_fields.extend(fields & m2m_field_names)
 

@@ -23,47 +23,41 @@ Like Django 1.7, Django 1.8 requires Python 2.7 or above, though we
 What's new in Django 1.8
 ========================
 
-Model._meta API
-~~~~~~~~~~~~~~~
+``Model._meta`` API
+~~~~~~~~~~~~~~~~~~~
 
-Django now has an official API for Model._meta API in the :class:`~django.db.models.options.Options`
-class. The API is formally maintained, documented and can be used for public use.
-
-Django also has formalized the documentation for :ref:`field types <model-meta-field-types>` and
+Django now has an official API for ``Model._meta`` in the
+:class:`~django.db.models.options.Options` class, as well as formalized
+documentation for :ref:`field types <model-meta-field-types>` and
 :ref:`field filters <model-meta-field-filters>`.
 
-The new API is componsed of 3 main endpoints:
+The new API is composed of 3 main endpoints:
 
-* :meth:`Options.get_field() <django.db.models.options.Options.get_field()>` is used to retrieve a
-  field by name. This endpoint replaces: 
+* :meth:`Options.get_field() <django.db.models.options.Options.get_field()>`
+  retrieves a field by name. This endpoint replaces:
 
-  * ``get_field()``
   * ``get_field_by_name()``
 
-* :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>` is used to retrieve
-  a list of fields given a specific filter criteria. This endpoint replaces:
+* :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
+  retrieves   a list of fields given a specific filter criteria. This endpoint
+  replaces:
 
   * ``get_fields_with_model()``
   * ``get_concrete_fields_with_model()``
   * ``get_m2m_with_model()``
-  * ``init_name_map()``
   * ``get_all_related_objects()``
   * ``get_all_related_objects_with_model()``
   * ``get_all_related_many_to_many_objects()``
   * ``get_all_related_m2m_objects_with_model()``
 
-* :attr:`Options.field_names <django.db.models.options.Options.field_names>` is used to retrieve
-  a list of all fields names. This endpoint replaces:
+* FIXME: add details about the properties?
+
+* :attr:`Options.field_names <django.db.models.options.Options.field_names>`
+  retrieves all the field names of a model. This endpoint replaces:
 
   * ``get_all_field_names()``
 
-* The following cache warming functions have also been removed:
-
-  * ``_fill_fields_cache()``
-  * ``_fill_m2m_cache()``
-  * ``_fill_related_many_to_many_cache()``
-
-All the documentation of this API can be found in :doc:`here </ref/models/meta>`.
+More details can be found in the :doc:`/ref/models/meta` docs.
 
 Minor features
 ~~~~~~~~~~~~~~
@@ -273,7 +267,6 @@ Management Commands
 
 Models
 ^^^^^^
-
 
 * Django now logs at most 9000 queries in ``connections.queries``, in order
   to prevent excessive memory usage in long-running processes in debug mode.
@@ -588,23 +581,20 @@ Features deprecated in 1.8
 Selected methods in ``django.db.models.options.Options``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following methods in :class:`~django.db.models.options.Options` have been
-deprecated in favor of newer ones, each method will be removed in Django 2.0.
+The following undocumented methods in the ``Model._meta`` API (from the
+:class:`django.db.models.options.Options` class) have been deprecated and will
+be removed in in Django 2.0. Use the methods and properties documented in
+:doc:`/ref/models/meta` instead.
 
-* ``get_field()``
 * ``get_field_by_name()``
 * ``get_all_field_names()``
 * ``get_fields_with_model()``
 * ``get_concrete_fields_with_model()``
 * ``get_m2m_with_model()``
-* ``init_name_map()``
 * ``get_all_related_objects()``
 * ``get_all_related_objects_with_model()``
 * ``get_all_related_many_to_many_objects()``
 * ``get_all_related_m2m_objects_with_model()``
-* ``_fill_fields_cache()``
-* ``_fill_m2m_cache()``
-* ``_fill_related_many_to_many_cache()``
 
 Loading ``cycle`` and ``firstof`` template tags from ``future`` library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

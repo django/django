@@ -656,8 +656,8 @@ class Options(object):
 
         cache_key = (forward, reverse, include_parents, include_hidden, export_name_map)
         try:
-            # In order to avoid list manipulation. Always
-            # return a shallow copy of the results
+            # In order to avoid list manipulation. Always return a shallow copy
+            # of the results
             return self._get_fields_cache[cache_key]
         except KeyError:
             pass
@@ -670,7 +670,7 @@ class Options(object):
             'include_parents': include_parents,
             'include_hidden': include_hidden,
             'export_name_map': True,
-            'cache_results': cache_results
+            'cache_results': cache_results,
         }
 
         if reverse:
