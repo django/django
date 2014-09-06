@@ -166,3 +166,13 @@ def resolve_url(to, *args, **kwargs):
 
     # Finally, fall back and assume it's a URL
     return to
+
+def get_object_or_none(classmodel, **kwargs):
+
+    """
+    A simple function that return none, case does exists object in data base. Is very useful when you working of forms
+    """
+    try:
+        return classmodel.objects.get(**kwargs)
+    except classmodel.DoesNotExist:
+        return None
