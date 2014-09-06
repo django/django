@@ -2164,6 +2164,13 @@ class ValuesQuerysetTests(BaseQuerysetTest):
         qs = qs.values_list('num', flat=True)
         self.assertQuerysetEqual(qs, [72], self.identity)
 
+    def test_field_error_values_list(self):
+        # see #23443
+        with self.assertRaisesMessage(FieldError,
+                "Cannot resolve keyword %r into field."
+                " Join on 'name' not permitted." % 'foo'):
+            Tag.objects.values_list('name__foo')
+
 
 class QuerySetSupportsPythonIdioms(TestCase):
 
