@@ -258,7 +258,7 @@ class BaseDatabaseSchemaEditor(object):
                     self.deferred_sql.extend(autoinc_sql)
         # Add any unique_togethers
         for fields in model._meta.unique_together:
-            columns = [model._meta.get_field(field) for field in fields]
+            columns = [model._meta.get_field(field).column for field in fields]
             column_sqls.append(self.sql_create_table_unique % {
                 "columns": ", ".join(self.quote_name(column) for column in columns),
             })
@@ -270,7 +270,7 @@ class BaseDatabaseSchemaEditor(object):
         self.execute(sql, params)
         # Add any index_togethers
         for fields in model._meta.index_together:
-            columns = [model._meta.get_field(field) for field in fields]
+            columns = [model._meta.get_field(field).column for field in fields]
             self.execute(self.sql_create_index % {
                 "table": self.quote_name(model._meta.db_table),
                 "name": self._create_index_name(model, columns, suffix="_idx"),
@@ -339,7 +339,7 @@ class BaseDatabaseSchemaEditor(object):
         news = set(tuple(fields) for fields in new_index_together)
         # Deleted indexes
         for fields in olds.difference(news):
-            columns = [model._meta.get_field(field) for field in fields]
+            columns = [model._meta.get_field(field).column for field in fields]
             constraint_names = self._constraint_names(model, list(columns), index=True)
             if len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
