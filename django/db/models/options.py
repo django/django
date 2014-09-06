@@ -237,7 +237,7 @@ class Options(object):
             try:
                 self.order_with_respect_to = next(
                     f for f in self.get_fields()
-                    if f.name is query or f.attname is query
+                    if f.name == query or f.attname == query
                 )
             except StopIteration:
                 raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, query))
