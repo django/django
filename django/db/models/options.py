@@ -413,7 +413,6 @@ class Options(object):
         )
 
         for obj, names in six.iteritems(fields):
-
             # Exclude any intentionally hidden related object.
             if obj.is_reverse_object and hasattr(obj, 'field'):
                 if obj.field.rel.is_hidden() and not obj.field.has_many_values:
@@ -622,7 +621,7 @@ class Options(object):
 
     def _expire_cache(self):
         for cache_key in ('fields', 'concrete_fields', 'local_concrete_fields', 'field_names',
-                          'related_objects', 'concrete_fields_map', 'all_fields_map'):
+                          'related_objects', 'fields_map',):
             try:
                 delattr(self, cache_key)
             except AttributeError:
