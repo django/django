@@ -8,7 +8,7 @@ except ImportError:
     Image = None
 
 from django.core.files.storage import FileSystemStorage
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields.related import (
     ForeignObject, ForeignKey, ManyToManyField, OneToOneField)
@@ -338,5 +338,7 @@ class AllFieldsModel(models.Model):
     object_id = models.PositiveIntegerField()
     content_type = models.ForeignKey(ContentType)
     gfk = GenericForeignKey()
+    gr = GenericRelation(DataModel)
+
 
 ###############################################################################

@@ -7,7 +7,9 @@ import warnings
 
 from django import test
 from django import forms
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation
+)
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction, models, IntegrityError
@@ -21,6 +23,7 @@ from django.db.models.fields import (
 
 from django.db.models.fields.related import (
     ForeignObject, ForeignKey, OneToOneField, ManyToManyField,
+    RelatedObject
 )
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
@@ -36,11 +39,13 @@ from .models import (
 NON_CONCRETE_FIELDS = (
     ForeignObject,
     GenericForeignKey,
+    GenericRelation,
 )
 
 NON_EDITABLE_FIELDS = (
     BinaryField,
     GenericForeignKey,
+    GenericRelation,
 )
 
 RELATION_FIELDS = (
@@ -49,11 +54,17 @@ RELATION_FIELDS = (
     ManyToManyField,
     OneToOneField,
     GenericForeignKey,
+    GenericRelation,
 )
 
 HAS_MANY_VALUES = (
     CommaSeparatedIntegerField,
     ManyToManyField,
+)
+
+IS_REVERSE_OBJECT = (
+    RelatedObject,
+    GenericRelation,
 )
 
 
@@ -705,6 +716,10 @@ class FieldFlagsTests(test.TestCase):
         self.assertTrue(all(f.has_relation.__class__ == bool
                         for f in self.all_fields))
 
+    def test_each_field_should_have_is_reverse_object(self):
+        self.assertTrue(all(f.is_reverse_object.__class__ == bool
+                        for f in self.all_fields))
+
     def test_non_concrete_fields(self):
         for field in self.fields:
             if type(field) in NON_CONCRETE_FIELDS:
@@ -732,6 +747,15 @@ class FieldFlagsTests(test.TestCase):
                 self.assertTrue(field.has_many_values)
             else:
                 self.assertFalse(field.has_many_values)
+
+    def test_reverse_object_fields(self):
+        for field in self.all_fields:
+            if type(field) in IS_REVERSE_OBJECT:
+                if not field.is_reverse_object:
+                    import ipdb; ipdb.set_trace()
+                self.assertTrue(field.is_reverse_object)
+            else:
+                self.assertFalse(field.is_reverse_object)
 
 
 class GenericIPAddressFieldTests(test.TestCase):

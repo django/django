@@ -21,6 +21,8 @@ class GenericForeignKey(FieldFlagsMixin):
     Provides a generic relation to any object through content-type/object-id
     fields.
     """
+    editable = False
+    is_reverse_object = False
 
     def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
         self.ct_field = ct_field
@@ -245,6 +247,7 @@ class GenericForeignKey(FieldFlagsMixin):
 
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
+    is_reverse_object = True
 
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)

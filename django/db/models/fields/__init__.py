@@ -124,6 +124,7 @@ class Field(RegisterLookupMixin, FieldFlagsMixin):
                              "%(date_field_label)s %(lookup_type)s."),
     }
     class_lookups = default_lookups.copy()
+    is_reverse_object = False
 
     # Generic field type description, usually overridden by subclasses
     def _description(self):
