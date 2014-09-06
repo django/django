@@ -272,18 +272,6 @@ Ramiro Morales
 
     Ramiro lives in Córdoba, Argentina.
 
-`Gabriel Hurley`_
-    Gabriel has been working with Django since 2008, shortly after the 1.0
-    release. Convinced by his business partner that Python and Django were the
-    right direction for the company, he couldn't have been more happy with the
-    decision. His contributions range across many areas in Django, but years of
-    copy-editing and an eye for detail lead him to be particularly at home
-    while working on Django's documentation.
-
-    Gabriel works as a web developer in Berkeley, CA, USA.
-
-    .. _gabriel hurley: http://strikeawe.com/
-
 `Chris Beaven`_
     Chris has been submitting patches and suggesting crazy ideas for Django
     since early 2006. An advocate for community involvement and a long-term
@@ -570,3 +558,15 @@ Robert Wittams
     Alex lives in San Francisco, CA, USA.
 
     .. _Alex Gaynor: http://alexgaynor.net
+
+`Gabriel Hurley`_
+    Gabriel has been working with Django since 2008, shortly after the 1.0
+    release. Convinced by his business partner that Python and Django were the
+    right direction for the company, he couldn't have been more happy with the
+    decision. His contributions range across many areas in Django, but years of
+    copy-editing and an eye for detail lead him to be particularly at home
+    while working on Django's documentation.
+
+    Gabriel works as a developer in the SF Bay Area, CA, USA.
+
+    .. _gabriel hurley: http://strikeawe.com/
