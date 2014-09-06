@@ -16,6 +16,7 @@ from django.db.migrations.loader import MigrationLoader
 from django.utils import datetime_safe, six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
+from django.utils.timezone import utc
 
 
 COMPILED_REGEX_TYPE = type(re.compile(''))
@@ -164,6 +165,29 @@ class MigrationWriter(object):
 
         return (MIGRATION_TEMPLATE % items).encode("utf8")
 
+    @staticmethod
+    def serialize_datetime(value):
+        """
+        Return a serialized version of a datetime object that is valid, executable python code.
+        This is an exact copy of datetime.datetime's repr implementation but enforces timezone-aware
+        values to utc with an 'executable' utc representation of tzinfo.
+        """
+        if value.tzinfo is not None and value.tzinfo != utc:
+            value = value.astimezone(utc)
+
+        L = [value.year, value.month, value.day,  # These are never zero
+             value.hour, value.minute, value.second, value.microsecond]
+        if L[-1] == 0:
+            del L[-1]
+        if L[-1] == 0:
+            del L[-1]
+        s = ", ".join(map(str, L))
+        s = "%s(%s)" % ('datetime.' + value.__class__.__name__, s)
+        if value.tzinfo is not None:
+            assert s[-1:] == ")"
+            s = s[:-1] + ", tzinfo=utc)"
+        return s
+
     @property
     def filename(self):
         return "%s.py" % self.migration.name
@@ -267,12 +291,11 @@ class MigrationWriter(object):
             return "{%s}" % (", ".join("%s: %s" % (k, v) for k, v in strings)), imports
         # Datetimes
         elif isinstance(value, datetime.datetime):
+            value_repr = cls.serialize_datetime(value)
+            imports = ["import datetime"]
             if value.tzinfo is not None:
-                raise ValueError("Cannot serialize datetime values with timezones. Either use a callable value for default or remove the timezone.")
-            value_repr = repr(value)
-            if isinstance(value, datetime_safe.datetime):
-                value_repr = "datetime.%s" % value_repr
-            return value_repr, set(["import datetime"])
+                imports.append("from django.utils.timezone import utc")
+            return value_repr, set(imports)
         # Dates
         elif isinstance(value, datetime.date):
             value_repr = repr(value)
