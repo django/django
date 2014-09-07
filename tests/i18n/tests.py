@@ -345,6 +345,16 @@ class TranslationTests(TestCase):
         """
         self.assertEqual('django', six.text_type(string_concat("dja", "ngo")))
 
+    def test_empty_value(self):
+        """
+        Empty value must stay empty after being translated (#23196).
+        """
+        with translation.override('de'):
+            self.assertEqual("", ugettext(""))
+            self.assertEqual(b"", gettext(b""))
+            s = mark_safe("")
+            self.assertEqual(s, ugettext(s))
+
     def test_safe_status(self):
         """
         Translating a string requiring no auto-escaping shouldn't change the "safe" status.
