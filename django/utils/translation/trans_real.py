@@ -292,15 +292,22 @@ def do_translate(message, translation_function):
 
     # str() is allowing a bytestring message to remain bytestring on Python 2
     eol_message = message.replace(str('\r\n'), str('\n')).replace(str('\r'), str('\n'))
-    t = getattr(_active, "value", None)
-    if t is not None:
-        result = getattr(t, translation_function)(eol_message)
+
+    if len(eol_message) == 0:
+        # Returns empty value of corresponding type if empty message given
+        # Instead of metadata what is default GNU gettext behavior
+        result = type(message)("")
+
     else:
-        if _default is None:
-            _default = translation(settings.LANGUAGE_CODE)
-        result = getattr(_default, translation_function)(eol_message)
+
+        _default = _default or translation(settings.LANGUAGE_CODE)
+        translation_object = getattr(_active, "value", _default)
+
+        result = getattr(translation_object, translation_function)(eol_message)
+
     if isinstance(message, SafeData):
         return mark_safe(result)
+
     return result
 
 
