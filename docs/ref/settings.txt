@@ -2806,8 +2806,8 @@ ensure that the cookie is only sent under an HTTPS connection.
 
 Since it's trivial for a packet sniffer (e.g. `Firesheep`_) to hijack a user's
 session if the session cookie is sent unencrypted, there's really no good
-excuse not to have this on. It will prevent you from using sessions on insecure
-requests; that's a good thing.
+excuse to leave this off. It will prevent you from using sessions on insecure
+requests and that's a good thing.
 
 .. _Firesheep: http://codebutler.com/firesheep
 

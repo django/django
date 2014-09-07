@@ -250,6 +250,11 @@ the ``X-Content-Type-Options: nosniff`` header.  ``SecurityMiddleware`` will
 do this for all responses if the :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting
 is ``True``.
 
+Note that if Django isn't involved in serving user-uploaded files, this
+setting won't help you. For example, if your :setting:`MEDIA_URL` is served
+directly by your frontend Web server (nginx, Apache, etc.) then you'd want to
+set this header there.
+
 .. _IE Security Blog: http://blogs.msdn.com/b/ie/archive/2008/09/02/ie8-security-part-vi-beta-2-update.aspx
 
 .. _x-xss-protection:
@@ -272,9 +277,10 @@ header. ``SecurityMiddleware`` will do this for all responses if the
 :setting:`SECURE_BROWSER_XSS_FILTER` setting is ``True``.
 
 .. warning::
-    The XSS filter does not prevent XSS attacks on your site, and you should
-    ensure that you are also validating and sanitizing all input to prevent XSS
-    attacks.
+    The browser XSS filter is a useful defense measure, but must not be
+    relied upon exclusively. It cannot detect all XSS attacks and not all
+    browsers support the header. Ensure you are still :ref:`validating and
+    sanitizing <cross-site-scripting>` all input to prevent XSS attacks.
 
 .. _XSS attack: http://en.wikipedia.org/wiki/Cross-site_scripting
 .. _X-XSS-Protection header: http://blogs.msdn.com/b/ie/archive/2008/07/02/ie8-security-part-iv-the-xss-filter.aspx
