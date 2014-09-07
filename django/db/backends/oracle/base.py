@@ -772,9 +772,9 @@ class OracleParam(object):
         # Oracle doesn't recognize True and False correctly in Python 3.
         # The conversion done below works both in 2 and 3.
         if param is True:
-            param = "1"
+            param = 1
         elif param is False:
-            param = "0"
+            param = 0
         if hasattr(param, 'bind_parameter'):
             self.force_bytes = param.bind_parameter(cursor)
         elif isinstance(param, Database.Binary):
