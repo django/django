@@ -226,7 +226,7 @@ backends are ``sqlite``, ``postgresql``, ``oracle`` and ``mysql``.
 How Django determines the lookups and transforms which are used
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In some cases you may which to dynamically change which ``Transform`` or
+In some cases you may wish to dynamically change which ``Transform`` or
 ``Lookup`` is returned based on the name passed in, rather than fixing it. As
 an example, you could have a field which stores coordinates or an arbitrary
 dimension, and wish to allow a syntax like ``.filter(coords__x7=4)`` to return
