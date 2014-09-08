@@ -20,3 +20,6 @@ Bugfixes
 * Fixed serialization of ``type`` objects in migrations (:ticket:`22951`).
 
 * Allowed inline and hidden references to admin fields (:ticket:`23431`).
+
+* The ``@deconstructible`` decorator now fails with a ``ValueError`` if the
+  decorated object cannot automatically be imported (:ticket:`23418`).
