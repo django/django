@@ -70,3 +70,6 @@ Bugfixes
 
 * Made the :setting:`SERIALIZE <TEST_SERIALIZE>` entry in the
   :setting:`TEST <DATABASE-TEST>` dictionary usable (:ticket:`23421`).
+
+* Fixed bug in migrations that prevented foreign key constraints to unmanaged
+  models with a custom primary key (:ticket:`23415`).

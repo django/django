@@ -33,6 +33,7 @@ class AutodetectorTests(TestCase):
     author_name_deconstructable_2 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=DeconstructableObject()))])
     author_name_deconstructable_3 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=models.IntegerField()))])
     author_name_deconstructable_4 = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default=models.IntegerField()))])
+    author_custom_pk = ModelState("testapp", "Author", [("pk_field", models.IntegerField(primary_key=True))])
     author_with_book = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
     author_with_book_order_wrt = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))], options={"order_with_respect_to": "book"})
     author_renamed_with_book = ModelState("testapp", "Writer", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200)), ("book", models.ForeignKey("otherapp.Book"))])
@@ -46,6 +47,10 @@ class AutodetectorTests(TestCase):
     author_proxy_proxy = ModelState("testapp", "AAuthorProxyProxy", [], {"proxy": True}, ("testapp.authorproxy", ))
     author_unmanaged = ModelState("testapp", "AuthorUnmanaged", [], {"managed": False}, ("testapp.author", ))
     author_unmanaged_managed = ModelState("testapp", "AuthorUnmanaged", [], {}, ("testapp.author", ))
+    author_unmanaged_default_pk = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))])
+    author_unmanaged_custom_pk = ModelState("testapp", "Author", [
+        ("pk_field", models.IntegerField(primary_key=True)),
+    ])
     author_with_m2m = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher")),
@@ -671,6 +676,24 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="AuthorProxy")
         self.assertOperationAttributes(changes, "testapp", 0, 1, name="AuthorProxy", options={})
 
+    def test_proxy_custom_pk(self):
+        "#23415 - The autodetector must correctly deal with custom FK on proxy models."
+        # First, we test the default pk field name
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_empty, self.author_proxy_third, self.book_proxy_fk])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # The field name the FK on the book model points to
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].rel.field_name, 'id')
+
+        # Now, we test the custom pk field name
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_custom_pk, self.author_proxy_third, self.book_proxy_fk])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # The field name the FK on the book model points to
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].rel.field_name, 'pk_field')
+
     def test_unmanaged(self):
         "Tests that the autodetector correctly deals with managed models"
         # First, we test adding an unmanaged model
@@ -693,6 +716,24 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["DeleteModel", "CreateModel"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="AuthorUnmanaged")
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="AuthorUnmanaged")
+
+    def test_unmanaged_custom_pk(self):
+        "#23415 - The autodetector must correctly deal with custom FK on unmanaged models."
+        # First, we test the default pk field name
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_unmanaged_default_pk, self.book])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # The field name the FK on the book model points to
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].rel.field_name, 'id')
+
+        # Now, we test the custom pk field name
+        before = self.make_project_state([])
+        after = self.make_project_state([self.author_unmanaged_custom_pk, self.book])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # The field name the FK on the book model points to
+        self.assertEqual(changes['otherapp'][0].operations[0].fields[2][1].rel.field_name, 'pk_field')
 
     @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
     def test_swappable(self):
