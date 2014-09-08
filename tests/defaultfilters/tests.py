@@ -21,6 +21,7 @@ from django.test import TestCase
 from django.utils import six
 from django.utils import translation
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.html import urlize as _urlize
 from django.utils.safestring import mark_safe, SafeData
 
 
@@ -369,6 +370,39 @@ class DefaultFiltersTests(TestCase):
         # Check urlize copes with commas following URLs in quotes - see #20364
         self.assertEqual(urlize('Email us at "hi@example.com", or phone us at +xx.yy'),
             'Email us at "<a href="mailto:hi@example.com">hi@example.com</a>", or phone us at +xx.yy')
+
+    def test_urlize_implementation(self):
+        # Check urlize adds and escapes extra attributes appropriately.
+        self.assertEqual(_urlize('http://www.example.com',
+                                 autoescape=True,
+                                 extra_attrs={'onclick': "alert('hello')"}),
+                         '<a href="http://www.example.com" onclick="alert(&#39;hello&#39;)">http://www.example.com</a>')
+        self.assertEqual(_urlize('http://www.example.com',
+                                 autoescape=True,
+                                 extra_attrs={'onclick': mark_safe("alert('hello')")}),
+                         '''<a href="http://www.example.com" onclick="alert('hello')">http://www.example.com</a>''')
+        self.assertEqual(_urlize('http://www.example.com',
+                                 autoescape=True,
+                                 extra_attrs={'<malicious"key>': ''}),
+                         '''<a href="http://www.example.com" &lt;malicious&quot;key&gt;="">http://www.example.com</a>''')
+        self.assertEqual(_urlize('http://www.example.com',
+                                 autoescape=False,
+                                 extra_attrs={'onclick': 'alert("Hi!")'}),
+                         '''<a href="http://www.example.com" onclick="alert("Hi!")">http://www.example.com</a>''')
+
+        # Check urlize adds the 'rel' attribute appropriately.
+        self.assertEqual(_urlize('http://example.com', nofollow=True),
+                         '<a href="http://example.com" rel="nofollow">http://example.com</a>')
+        self.assertEqual(_urlize('http://example.com',
+                                 nofollow=True,
+                                 extra_attrs={'rel': 'yesfollow'}),
+                         '<a href="http://example.com" rel="nofollow">http://example.com</a>')
+        self.assertEqual(_urlize('http://example.com', extra_attrs={'rel': 'noreferrer'}),
+                         '<a href="http://example.com" rel="noreferrer">http://example.com</a>')
+        self.assertEqual(_urlize('hi@example.com', nofollow=True),
+                         '<a href="mailto:hi@example.com">hi@example.com</a>')
+        self.assertEqual(_urlize('hi@example.com', extra_attrs={'rel': 'help'}),
+                         '<a href="mailto:hi@example.com">hi@example.com</a>')
 
     def test_wordcount(self):
         self.assertEqual(wordcount(''), 0)

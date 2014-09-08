@@ -129,6 +129,14 @@ Minor features
 
 * ...
 
+:mod:`django.utils.html`
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+* :func:`~django.utils.html.urlize` can now accept arbitrary attribute-value
+  pairs for inclusion in the links it creates.
+
+* ...
+
 Cache
 ^^^^^
 

@@ -238,7 +238,7 @@ def smart_urlquote(url):
     return force_text(url)
 
 
-def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
+def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False, extra_attrs=None):
     """
     Converts any URLs in text into clickable links.
 
@@ -254,11 +254,20 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     If nofollow is True, the links will get a rel="nofollow" attribute.
 
     If autoescape is True, the link text and URLs will be autoescaped.
+
+    If given, extra_attrs should be a dictionary whose keys represent
+    link attributes and whose values represent the values of
+    the link attributes. The attribute-value pairs from the extra_attrs
+    dictionary will be applied to each link (with the exception of
+    the 'rel' attribute to email links) found in the given text.
     """
     def trim_url(x, limit=trim_url_limit):
         if limit is None or len(x) <= limit:
             return x
         return '%s...' % x[:max(0, limit - 3)]
+
+    extra_attrs = extra_attrs if extra_attrs else {}
+
     safe_input = isinstance(text, SafeData)
     words = word_split_re.split(force_text(text))
     for i, word in enumerate(words):
@@ -281,7 +290,8 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
 
             # Make URL we want to point to.
             url = None
-            nofollow_attr = ' rel="nofollow"' if nofollow else ''
+            if nofollow:
+                extra_attrs.update({'rel': 'nofollow'})
             if simple_url_re.match(middle):
                 url = smart_urlquote(middle)
             elif simple_url_2_re.match(middle):
@@ -293,15 +303,30 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                 except UnicodeError:
                     continue
                 url = 'mailto:%s@%s' % (local, domain)
-                nofollow_attr = ''
+                if 'rel' in extra_attrs:
+                    del extra_attrs['rel']
 
             # Make link.
             if url:
+                # Build string of extra attributes.
+                extra_attrs_string = ''
+                if extra_attrs:
+                    extra_attrs_strings = []
+                    for attr_key, attr_value in extra_attrs.items():
+                        # escape attribute key and possibly attribute value
+                        # to avoid injecting malicious code.
+                        if autoescape and not isinstance(attr_value, SafeData):
+                            attr_value = escape(attr_value)
+                        extra_attrs_strings.append('%s="%s"' % (escape(attr_key), attr_value))
+                    extra_attrs_string = ' '.join(extra_attrs_strings)
+
                 trimmed = trim_url(middle)
                 if autoescape and not safe_input:
                     lead, trail = escape(lead), escape(trail)
                     url, trimmed = escape(url), escape(trimmed)
-                middle = '<a href="%s"%s>%s</a>' % (url, nofollow_attr, trimmed)
+                if extra_attrs_string:
+                    extra_attrs_string = ' ' + extra_attrs_string
+                middle = '<a href="%s"%s>%s</a>' % (url, extra_attrs_string, trimmed)
                 words[i] = mark_safe('%s%s%s' % (lead, middle, trail))
             else:
                 if safe_input:
