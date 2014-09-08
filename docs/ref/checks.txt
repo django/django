@@ -154,6 +154,8 @@ Related Fields
 * **fields.E339**: ``<model>.<field name>`` is not a foreign key to ``<model>``.
 * **fields.W340**: ``null`` has no effect on ``ManyToManyField``.
 * **fields.W341**: ``ManyToManyField`` does not support ``validators``.
+* **fields.W342**: Setting ``unique=True`` on a ``ForeignKey`` has the same
+  effect as using a ``OneToOneField``.
 
 Signals
 ~~~~~~~

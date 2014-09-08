@@ -8,6 +8,7 @@ import warnings
 from django import test
 from django import forms
 from django.core import validators
+from django.core import checks
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction, models, IntegrityError
 from django.db.models.fields import (
@@ -20,6 +21,7 @@ from django.db.models.fields import (
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six
 from django.utils.functional import lazy
+from django.test.utils import override_settings
 
 from .models import (
     Foo, Bar, Whiz, BigD, BigS, BigIntegerModel, Post, NullBooleanModel,
@@ -180,6 +182,22 @@ class ForeignKeyTests(test.TestCase):
         fk_model_empty = FkToChar.objects.create(out=char_model_empty)
         fk_model_empty = FkToChar.objects.select_related('out').get(id=fk_model_empty.pk)
         self.assertEqual(fk_model_empty.out, char_model_empty)
+
+    @override_settings(INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'model_fields'])
+    def test_warning_when_unique_true_on_fk(self):
+        class FKUniqueTrue(models.Model):
+            fk_field = models.ForeignKey(Foo, unique=True)
+
+        expected_warnings = [
+            checks.Warning(
+                'Setting unique=True on a ForeignKey has the same effect as using a OneToOneField.',
+                hint='ForeignKey(unique=True) is usually better served by a OneToOneField.',
+                obj=FKUniqueTrue.fk_field.field,
+                id='fields.W342',
+            )
+        ]
+        warnings = checks.run_checks()
+        self.assertEqual(warnings, expected_warnings)
 
 
 class DateTimeFieldTests(unittest.TestCase):

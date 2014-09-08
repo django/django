@@ -105,6 +105,7 @@ class IsolatedModelsTestCase(TestCase):
         apps.clear_cache()
 
 
+@override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])  # ForeignKey(unique=True)
 class GenericForeignKeyTests(IsolatedModelsTestCase):
 
     def test_str(self):
@@ -202,6 +203,7 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    @override_settings(INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'contenttypes_tests'])
     def test_generic_foreign_key_checks_are_performed(self):
         class MyGenericForeignKey(GenericForeignKey):
             def check(self, **kwargs):

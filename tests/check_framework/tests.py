@@ -8,7 +8,6 @@ from django.apps import apps
 from django.conf import settings
 from django.core import checks
 from django.core.checks import Error, Warning
-from django.core.checks.model_checks import check_all_models
 from django.core.checks.registry import CheckRegistry
 from django.core.checks.compatibility.django_1_7_0 import check_1_7_compatibility
 from django.core.management.base import CommandError
@@ -303,7 +302,10 @@ class CheckFrameworkReservedNamesTests(TestCase):
             del self.current_models[model]
         apps.clear_cache()
 
-    @override_settings(SILENCED_SYSTEM_CHECKS=['models.E020'])
+    @override_settings(
+        SILENCED_SYSTEM_CHECKS=['models.E20', 'fields.W342'],  # ForeignKey(unique=True)
+        INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'check_framework']
+    )
     def test_model_check_method_not_shadowed(self):
         class ModelWithAttributeCalledCheck(models.Model):
             check = 42
@@ -318,6 +320,7 @@ class CheckFrameworkReservedNamesTests(TestCase):
             check = models.ForeignKey(ModelWithRelatedManagerCalledCheck)
             article = models.ForeignKey(ModelWithRelatedManagerCalledCheck, related_name='check')
 
+        errors = checks.run_checks()
         expected = [
             Error(
                 "The 'ModelWithAttributeCalledCheck.check()' class method is "
@@ -341,5 +344,4 @@ class CheckFrameworkReservedNamesTests(TestCase):
                 id='models.E020'
             ),
         ]
-
-        self.assertEqual(check_all_models(), expected)
+        self.assertEqual(errors, expected)
