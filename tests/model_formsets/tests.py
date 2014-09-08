@@ -805,6 +805,12 @@ class ModelFormsetTest(TestCase):
         formset = AuthorBooksFormSet(data, instance=author, queryset=custom_qs)
         self.assertTrue(formset.is_valid())
 
+    def test_inline_formsets_with_wrong_fk_name(self):
+        """ Regression for #23451 """
+        message = "fk_name 'title' is not a ForeignKey to 'model_formsets.Author'."
+        with self.assertRaisesMessage(ValueError, message):
+            inlineformset_factory(Author, Book, fields="__all__", fk_name='title')
+
     def test_custom_pk(self):
         # We need to ensure that it is displayed
 
