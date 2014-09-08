@@ -1710,6 +1710,7 @@ class ForeignKey(ForeignObject):
     def check(self, **kwargs):
         errors = super(ForeignKey, self).check(**kwargs)
         errors.extend(self._check_on_delete())
+        errors.extend(self._check_unique())
         return errors
 
     def _check_on_delete(self):
@@ -1734,6 +1735,21 @@ class ForeignKey(ForeignObject):
             ]
         else:
             return []
+
+    def _check_unique(self, **kwargs):
+        warnings = []
+
+        if self.unique:
+            warnings.append(
+                checks.Warning(
+                    'Setting unique=True on a ForeignKey has the same effect as using a OneToOneField.',
+                    hint='Change the field type from ForeignKey to OneToOneField, and remove unique=True.',
+                    obj=self,
+                    id='fields.W342',
+                )
+            )
+
+        return warnings
 
     def deconstruct(self):
         name, path, args, kwargs = super(ForeignKey, self).deconstruct()
