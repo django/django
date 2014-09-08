@@ -182,7 +182,7 @@ Use generic views: Less code is better
 ======================================
 
 The ``detail()`` (from :doc:`Tutorial 3 </intro/tutorial03>`) and ``results()``
-views are stupidly simple -- and, as mentioned above, redundant. The ``index()``
+views are very simple -- and, as mentioned above, redundant. The ``index()``
 view (also from Tutorial 3), which displays a list of polls, is similar.
 
 These views represent a common case of basic Web development: getting data from
