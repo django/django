@@ -189,8 +189,7 @@ def int_to_base36(i):
     """
     Converts an integer to a base36 string
     """
-    digits = "0123456789abcdefghijklmnopqrstuvwxyz"
-    factor = 0
+    char_set = '0123456789abcdefghijklmnopqrstuvwxyz'
     if i < 0:
         raise ValueError("Negative base36 conversion input.")
     if six.PY2:
@@ -198,20 +197,13 @@ def int_to_base36(i):
             raise TypeError("Non-integer base36 conversion input.")
         if i > sys.maxint:
             raise ValueError("Base36 conversion input too large.")
-    # Find starting factor
-    while True:
-        factor += 1
-        if i < 36 ** factor:
-            factor -= 1
-            break
-    base36 = []
-    # Construct base36 representation
-    while factor >= 0:
-        j = 36 ** factor
-        base36.append(digits[i // j])
-        i = i % j
-        factor -= 1
-    return ''.join(base36)
+    if i < 36:
+        return char_set[i]
+    b36 = ''
+    while i != 0:
+        i, n = divmod(i, 36)
+        b36 = char_set[n] + b36
+    return b36
 
 
 def urlsafe_base64_encode(s):
