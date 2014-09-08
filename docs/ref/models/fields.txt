@@ -1522,7 +1522,7 @@ accepted by :class:`ForeignKey`, plus one extra argument:
 .. attribute:: OneToOneField.parent_link
 
     When ``True`` and used in a model which inherits from another
-    (concrete) model, indicates that this field should be used as the
+    :term:`concrete model`, indicates that this field should be used as the
     link back to the parent class, rather than the extra
     ``OneToOneField`` which would normally be implicitly created by
     subclassing.
@@ -1631,7 +1631,7 @@ Field API reference
         See :ref:`converting-values-to-python-objects` for usage.
 
         .. note::
-        
+
             For performance reasons, ``from_db_value`` is not implemented as a
             no-op on fields which do not require it (all Django fields).
             Consequently you may not call ``super`` in your definition.
@@ -1690,7 +1690,7 @@ Field API reference
 
     Fields often receive their values as a different type, either from
     serialization or from forms.
-    
+
     .. method:: to_python(value)
 
         Converts the value into the correct Python object. It acts as the
