@@ -366,18 +366,18 @@ class TrailingSlashURLTests(TestCase):
         If the value ends in more than one slash, presume they know what
         they're doing.
         """
-        self.settings_module.MEDIA_URL = '/stupid//'
-        self.assertEqual('/stupid//', self.settings_module.MEDIA_URL)
+        self.settings_module.MEDIA_URL = '/wrong//'
+        self.assertEqual('/wrong//', self.settings_module.MEDIA_URL)
 
-        self.settings_module.MEDIA_URL = 'http://media.foo.com/stupid//'
-        self.assertEqual('http://media.foo.com/stupid//',
+        self.settings_module.MEDIA_URL = 'http://media.foo.com/wrong//'
+        self.assertEqual('http://media.foo.com/wrong//',
                          self.settings_module.MEDIA_URL)
 
-        self.settings_module.STATIC_URL = '/stupid//'
-        self.assertEqual('/stupid//', self.settings_module.STATIC_URL)
+        self.settings_module.STATIC_URL = '/wrong//'
+        self.assertEqual('/wrong//', self.settings_module.STATIC_URL)
 
-        self.settings_module.STATIC_URL = 'http://static.foo.com/stupid//'
-        self.assertEqual('http://static.foo.com/stupid//',
+        self.settings_module.STATIC_URL = 'http://static.foo.com/wrong//'
+        self.assertEqual('http://static.foo.com/wrong//',
                          self.settings_module.STATIC_URL)
 
 
