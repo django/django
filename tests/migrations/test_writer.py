@@ -167,9 +167,17 @@ class WriterTests(TestCase):
         self.assertEqual(string, "django.core.validators.EmailValidator(message='hello')")
         self.serialize_round_trip(validator)
 
-        validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
+        validator = deconstructible(path="migrations.test_writer.EmailValidator")(EmailValidator)(message="hello")
         string = MigrationWriter.serialize(validator)[0]
-        self.assertEqual(string, "custom.EmailValidator(message='hello')")
+        self.assertEqual(string, "migrations.test_writer.EmailValidator(message='hello')")
+
+        validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
+        with self.assertRaisesMessage(ImportError, "No module named 'custom'"):
+            MigrationWriter.serialize(validator)
+
+        validator = deconstructible(path="django.core.validators.EmailValidator2")(EmailValidator)(message="hello")
+        with self.assertRaisesMessage(ValueError, "Could not find object EmailValidator2 in django.core.validators."):
+            MigrationWriter.serialize(validator)
 
     def test_serialize_empty_nonempty_tuple(self):
         """
