@@ -1,5 +1,6 @@
 from importlib import import_module
 
+
 def deconstructible(*args, **kwargs):
     """
     Class decorator that allow the decorated class to be serialized
