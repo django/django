@@ -23,3 +23,6 @@ Bugfixes
 
 * The ``@deconstructible`` decorator now fails with a ``ValueError`` if the
   decorated object cannot automatically be imported (:ticket:`23418`).
+
+* Fixed a typo in an ``inlineformset_factory()`` error message that caused a
+  crash (:ticket:`23451`).
