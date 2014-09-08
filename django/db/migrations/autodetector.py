@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 import re
 import datetime
 
+from itertools import chain
+
 from django.utils import six
 from django.db import models
 from django.conf import settings
@@ -172,8 +174,6 @@ class MigrationAutodetector(object):
         self.generate_created_models()
         self.generate_deleted_proxies()
         self.generate_created_proxies()
-        self.generate_deleted_unmanaged()
-        self.generate_created_unmanaged()
         self.generate_altered_options()
 
         # Generate field operations
@@ -434,20 +434,27 @@ class MigrationAutodetector(object):
 
     def generate_created_models(self):
         """
-        Find all new models and make creation operations for them,
-        and separate operations to create any foreign key or M2M relationships
-        (we'll optimise these back in later if we can)
+        Find all new models (both managed and unmanaged) and make create
+        operations for them as well as separate operations to create any
+        foreign key or M2M relationships (we'll optimize these back in later
+        if we can).
 
         We also defer any model options that refer to collections of fields
-        that might be deferred (e.g. unique_together, index_together)
+        that might be deferred (e.g. unique_together, index_together).
         """
         added_models = set(self.new_model_keys) - set(self.old_model_keys)
-        for app_label, model_name in sorted(added_models, key=self.swappable_first_key, reverse=True):
+        added_unmanaged_models = set(self.new_unmanaged_keys) - set(self.old_unmanaged_keys)
+        models = chain(
+            sorted(added_models, key=self.swappable_first_key, reverse=True),
+            sorted(added_unmanaged_models, key=self.swappable_first_key, reverse=True)
+        )
+        for app_label, model_name in models:
             model_state = self.to_state.models[app_label, model_name]
+            model_opts = self.new_apps.get_model(app_label, model_name)._meta
             # Gather related fields
             related_fields = {}
             primary_key_rel = None
-            for field in self.new_apps.get_model(app_label, model_name)._meta.local_fields:
+            for field in model_opts.local_fields:
                 if field.rel:
                     if field.rel.to:
                         if field.primary_key:
@@ -458,7 +465,7 @@ class MigrationAutodetector(object):
                     # we can treat lack of through as auto_created=True, though.
                     if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
                         related_fields[field.name] = field
-            for field in self.new_apps.get_model(app_label, model_name)._meta.local_many_to_many:
+            for field in model_opts.local_many_to_many:
                 if field.rel.to:
                     related_fields[field.name] = field
                 if getattr(field.rel, "through", None) and not field.rel.through._meta.auto_created:
@@ -496,6 +503,11 @@ class MigrationAutodetector(object):
                 dependencies=dependencies,
                 beginning=True,
             )
+
+            # Don't add operations which modify the database for unmanaged models
+            if not model_opts.managed:
+                continue
+
             # Generate operations for each related field
             for name, field in sorted(related_fields.items()):
                 # Account for FKs to swappable models
@@ -563,23 +575,17 @@ class MigrationAutodetector(object):
                     ]
                 )
 
-    def generate_created_proxies(self, unmanaged=False):
+    def generate_created_proxies(self):
         """
         Makes CreateModel statements for proxy models.
         We use the same statements as that way there's less code duplication,
         but of course for proxy models we can skip all that pointless field
         stuff and just chuck out an operation.
         """
-        if unmanaged:
-            added = set(self.new_unmanaged_keys) - set(self.old_unmanaged_keys)
-        else:
-            added = set(self.new_proxy_keys) - set(self.old_proxy_keys)
+        added = set(self.new_proxy_keys) - set(self.old_proxy_keys)
         for app_label, model_name in sorted(added):
             model_state = self.to_state.models[app_label, model_name]
-            if unmanaged:
-                assert not model_state.options.get("managed", True)
-            else:
-                assert model_state.options.get("proxy", False)
+            assert model_state.options.get("proxy", False)
             # Depend on the deletion of any possible non-proxy version of us
             dependencies = [
                 (app_label, model_name, None, False),
@@ -602,28 +608,32 @@ class MigrationAutodetector(object):
                 dependencies=dependencies,
             )
 
-    def generate_created_unmanaged(self):
-        """
-        Similar to generate_created_proxies but for unmanaged
-        (they are similar to us in that we need to supply them, but they don't
-        affect the DB)
-        """
-        # Just re-use the same code in *_proxies
-        self.generate_created_proxies(unmanaged=True)
-
     def generate_deleted_models(self):
         """
-        Find all deleted models and make creation operations for them,
-        and separate operations to delete any foreign key or M2M relationships
-        (we'll optimise these back in later if we can)
+        Find all deleted models (managed and unmanaged) and make delete
+        operations for them as well as separate operations to delete any
+        foreign key or M2M relationships (we'll optimize these back in later
+        if we can).
 
         We also bring forward removal of any model options that refer to
-        collections of fields - the inverse of generate_created_models.
+        collections of fields - the inverse of generate_created_models().
         """
         deleted_models = set(self.old_model_keys) - set(self.new_model_keys)
-        for app_label, model_name in sorted(deleted_models):
+        deleted_unmanaged_models = set(self.old_unmanaged_keys) - set(self.new_unmanaged_keys)
+        models = chain(sorted(deleted_models), sorted(deleted_unmanaged_models))
+        for app_label, model_name in models:
             model_state = self.from_state.models[app_label, model_name]
             model = self.old_apps.get_model(app_label, model_name)
+            if not model._meta.managed:
+                self.add_operation(
+                    app_label,
+                    operations.DeleteModel(
+                        name=model_state.name,
+                    ),
+                )
+                # Skip here, no need to handle fields for unmanaged models
+                continue
+
             # Gather related fields
             related_fields = {}
             for field in model._meta.local_fields:
@@ -707,32 +717,20 @@ class MigrationAutodetector(object):
                 dependencies=list(set(dependencies)),
             )
 
-    def generate_deleted_proxies(self, unmanaged=False):
+    def generate_deleted_proxies(self):
         """
         Makes DeleteModel statements for proxy models.
         """
-        if unmanaged:
-            deleted = set(self.old_unmanaged_keys) - set(self.new_unmanaged_keys)
-        else:
-            deleted = set(self.old_proxy_keys) - set(self.new_proxy_keys)
+        deleted = set(self.old_proxy_keys) - set(self.new_proxy_keys)
         for app_label, model_name in sorted(deleted):
             model_state = self.from_state.models[app_label, model_name]
-            if unmanaged:
-                assert not model_state.options.get("managed", True)
-            else:
-                assert model_state.options.get("proxy", False)
+            assert model_state.options.get("proxy", False)
             self.add_operation(
                 app_label,
                 operations.DeleteModel(
                     name=model_state.name,
                 ),
             )
-
-    def generate_deleted_unmanaged(self):
-        """
-        Makes DeleteModel statements for unmanaged models
-        """
-        self.generate_deleted_proxies(unmanaged=True)
 
     def generate_renamed_fields(self):
         """
