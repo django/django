@@ -333,12 +333,13 @@ class MigrationWriter(object):
             module = import_module(module_name)
             if not hasattr(module, value.__name__):
                 raise ValueError(
-                    "Could not find function %s in %s.\nPlease note that "
-                    "due to Python 2 limitations, you cannot serialize "
-                    "unbound method functions (e.g. a method declared\n"
-                    "and used in the same class body). Please move the "
-                    "function into the main module body to use migrations.\n"
-                    "For more information, see https://docs.djangoproject.com/en/1.7/topics/migrations/#serializing-values"
+                    "Could not find function %s in %s.\n"
+                    "Please note that due to Python 2 limitations, you cannot "
+                    "serialize unbound method functions (e.g. a method "
+                    "declared and used in the same class body). Please move "
+                    "the function into the main module body to use migrations.\n"
+                    "For more information, see "
+                    "https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values"
                     % (value.__name__, module_name))
             return "%s.%s" % (module_name, value.__name__), set(["import %s" % module_name])
         # Classes
