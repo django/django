@@ -7,7 +7,7 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 
-from collections import OrderedDict
+from collections import Mapping, OrderedDict
 import copy
 import warnings
 
@@ -54,15 +54,6 @@ class RawQuery(object):
     def clone(self, using):
         return RawQuery(self.sql, using, params=self.params)
 
-    def convert_values(self, value, field, connection):
-        """Convert the database-returned value into a type that is consistent
-        across database backends.
-
-        By default, this defers to the underlying backend operations, but
-        it can be overridden by Query classes for specific backends.
-        """
-        return connection.ops.convert_values(value, field)
-
     def get_columns(self):
         if self.cursor is None:
             self._execute_query()
@@ -83,7 +74,11 @@ class RawQuery(object):
         return iter(result)
 
     def __repr__(self):
-        return "<RawQuery: %r>" % (self.sql % tuple(self.params))
+        return "<RawQuery: %s>" % self
+
+    def __str__(self):
+        _type = dict if isinstance(self.params, Mapping) else tuple
+        return self.sql % _type(self.params)
 
     def _execute_query(self):
         self.cursor = connections[self.using].cursor()
@@ -304,15 +299,6 @@ class Query(object):
             obj._setup_query()
         return obj
 
-    def convert_values(self, value, field, connection):
-        """Convert the database-returned value into a type that is consistent
-        across database backends.
-
-        By default, this defers to the underlying backend operations, but
-        it can be overridden by Query classes for specific backends.
-        """
-        return connection.ops.convert_values(value, field)
-
     def resolve_aggregate(self, value, aggregate, connection):
         """Resolve the value of aggregates returned by the database to
         consistent (and reasonable) types.
@@ -333,7 +319,13 @@ class Query(object):
             return float(value)
         else:
             # Return value depends on the type of the field being processed.
-            return self.convert_values(value, aggregate.field, connection)
+            backend_converters = connection.ops.get_db_converters(aggregate.field.get_internal_type())
+            field_converters = aggregate.field.get_db_converters(connection)
+            for converter in backend_converters:
+                value = converter(value, aggregate.field)
+            for converter in field_converters:
+                value = converter(value, connection)
+            return value
 
     def get_aggregation(self, using, force_subq=False):
         """
@@ -1398,7 +1390,9 @@ class Query(object):
                         targets = (final_field.rel.get_related_field(),)
                         opts = int_model._meta
                         path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
-                        cur_names_with_path[1].append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
+                        cur_names_with_path[1].append(
+                            PathInfo(final_field.model._meta, opts, targets, final_field, False, True)
+                        )
             if hasattr(field, 'get_path_info'):
                 pathinfos = field.get_path_info()
                 if not allow_many:

@@ -1106,8 +1106,10 @@ method::
     .. attribute:: to_field_name
 
         This optional argument is used to specify the field to use as the value
-        of the choices in the field's widget. By default it is set to ``None``,
-        in which case the primary key of each object will be used. For example::
+        of the choices in the field's widget. Be sure it's a unique field for
+        the model, otherwise the selected value could match more than one
+        object. By default it is set to ``None``, in which case the primary key
+        of each object will be used. For example::
 
             # No custom to_field_name
             field1 = forms.ModelChoiceField(queryset=...)

@@ -5,7 +5,10 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    help = "Can be run as a cronjob or directly to clean out expired sessions (only with the database backend at the moment)."
+    help = (
+        "Can be run as a cronjob or directly to clean out expired sessions "
+        "(only with the database backend at the moment)."
+    )
 
     def handle(self, **options):
         engine = import_module(settings.SESSION_ENGINE)

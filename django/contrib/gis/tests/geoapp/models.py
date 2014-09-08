@@ -66,3 +66,18 @@ class MinusOneSRID(models.Model):
 
     class Meta:
         app_label = 'geoapp'
+
+
+class NonConcreteField(models.IntegerField):
+
+    def db_type(self, connection):
+        return None
+
+    def get_attname_column(self):
+        attname, column = super(NonConcreteField, self).get_attname_column()
+        return attname, None
+
+
+class NonConcreteModel(NamedModel):
+    non_concrete = NonConcreteField()
+    point = models.PointField(geography=True)

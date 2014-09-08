@@ -15,7 +15,7 @@ the ``WHERE`` clause of a database query. To learn how to *use* lookups, see
 :doc:`/howto/custom-lookups`.
 
 The lookup API has two components: a :class:`~lookups.RegisterLookupMixin` class
-that registers lookups, and the `Query Expression API <query-expression>`_, a
+that registers lookups, and the :ref:`Query Expression API <query-expression>`, a
 set of methods that a class has to implement to be registrable as a lookup.
 
 Django has two base classes that follow the query expression API and from where
@@ -65,8 +65,8 @@ register lookups on itself. The two prominent examples are
         has the registered transform named ``transform_name``, returning the first
         match.
 
-For a class to be a lookup, it must follow the `Query Expression API
-<query-expression>`_. :class:`~Lookup` and :class:`~Transform` naturally
+For a class to be a lookup, it must follow the :ref:`Query Expression API
+<query-expression>`. :class:`~Lookup` and :class:`~Transform` naturally
 follow this API.
 
 .. _query-expression:
@@ -126,13 +126,13 @@ Transform reference
     The notation to use a ``Transform`` in an lookup expression is
     ``<expression>__<transformation>`` (e.g. ``date__year``).
 
-    This class follows the `Query Expression API <query-expression>`_, which
+    This class follows the :ref:`Query Expression API <query-expression>`, which
     implies that you can use ``<expression>__<transform1>__<transform2>``.
 
     .. attribute:: lhs
 
         The left-hand side - what is being transformed. It must follow the
-        `Query Expression API <query-expression>`_.
+        :ref:`Query Expression API <query-expression>`.
 
     .. attribute:: lookup_name
 
@@ -171,14 +171,14 @@ Lookup reference
     The notation to use a lookup in an expression is
     ``<lhs>__<lookup_name>=<rhs>``.
 
-    This class doesn't follow the `Query Expression API <query-expression>`_
+    This class doesn't follow the :ref:`Query Expression API <query-expression>`
     since it has ``=<rhs>`` on its construction: lookups are always the end of
     a lookup expression.
 
     .. attribute:: lhs
 
         The left-hand side - what is being looked up. The object must follow
-        the `Query Expression API <query-expression>`_.
+        the :ref:`Query Expression API <query-expression>`.
 
     .. attribute:: rhs
 

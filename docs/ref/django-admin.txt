@@ -683,6 +683,13 @@ written.
 
 The ``--merge`` option enables fixing of migration conflicts.
 
+.. django-admin-option:: --name, -n
+
+.. versionadded:: 1.8
+
+The ``--name`` option allows you to give the migration(s) a custom name instead
+of a generated one.
+
 migrate [<app_label> [<migrationname>]]
 ---------------------------------------
 
@@ -709,6 +716,9 @@ The behavior of this command changes depending on the arguments provided:
 Unlike ``syncdb``, this command does not prompt you to create a superuser if
 one doesn't exist (assuming you are using :mod:`django.contrib.auth`). Use
 :djadmin:`createsuperuser` to do that if you wish.
+
+The :djadminopt:`--database` option can be used to specify the database to
+migrate.
 
 .. django-admin-option:: --fake
 

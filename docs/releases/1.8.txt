@@ -50,6 +50,10 @@ Minor features
 
 * The jQuery library embedded in the admin has been upgraded to version 1.11.1.
 
+* You can now specify :attr:`AdminSite.site_url
+  <django.contrib.admin.AdminSite.site_url>` in order to display a link to the
+  front-end site.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -224,6 +228,9 @@ Management Commands
 * The :djadmin:`dbshell` command now supports MySQL's optional SSL certificate
   authority setting (``--ssl-ca``).
 
+* The :djadminopt:`--name` option for :djadmin:`makemigrations` allows you to
+  to give the migration(s) a custom name instead of a generated one.
+
 Models
 ^^^^^^
 
@@ -251,6 +258,10 @@ Signals
 * Exceptions from the ``(receiver, exception)`` tuples returned by
   :meth:`Signal.send_robust() <django.dispatch.Signal.send_robust>` now have
   their traceback attached as a ``__traceback__`` attribute.
+
+* The ``environ`` argument, which contains the WSGI environment structure from
+  the request, was added to the :data:`~django.core.signals.request_started`
+  signal.
 
 Templates
 ^^^^^^^^^
@@ -518,6 +529,13 @@ Miscellaneous
   opposed to the instance name which you can still customize using
   ``AdminSite(name="...")``.
 
+* Internal changes were made to the :class:`~django.forms.ClearableFileInput`
+  widget to allow more customization. The undocumented ``url_markup_template``
+  attribute was removed in favor of ``template_with_initial``.
+
+* For consistency with other major vendors, the ``en_GB`` locale now has Monday
+  as the first day of the week.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
@@ -715,3 +733,14 @@ also been deprecated.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It's a legacy option that should no longer be necessary.
+
+``SubfieldBase``
+~~~~~~~~~~~~~~~~
+
+``django.db.models.fields.subclassing.SubfieldBase`` has been deprecated and
+will be removed in Django 2.0. Historically, it was used to handle fields where
+type conversion was needed when loading from the database, but it was not used
+in ``.values()`` calls or in aggregates. It has been replaced with
+:meth:`~django.db.models.Field.from_db_value`. Note that the new approach does
+not call the :meth:`~django.db.models.Field.to_python` method on assignment
+as was the case with ``SubfieldBase``.

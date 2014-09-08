@@ -77,7 +77,10 @@ class BaseDatabaseCreation(object):
         pending_references = {}
         qn = self.connection.ops.quote_name
         for f in opts.local_fields:
-            col_type = f.db_type(connection=self.connection)
+            db_params = f.db_parameters(connection=self.connection)
+            col_type = db_params['type']
+            if db_params['check']:
+                col_type = '%s CHECK (%s)' % (col_type, db_params['check'])
             col_type_suffix = f.db_type_suffix(connection=self.connection)
             tablespace = f.db_tablespace or opts.db_tablespace
             if col_type is None:
@@ -423,7 +426,8 @@ class BaseDatabaseCreation(object):
         # Make a function to iteratively return every object
         def get_objects():
             for model in sort_dependencies(app_list):
-                if not model._meta.proxy and model._meta.managed and router.allow_migrate(self.connection.alias, model):
+                if (not model._meta.proxy and model._meta.managed and
+                        router.allow_migrate(self.connection.alias, model)):
                     queryset = model._default_manager.using(self.connection.alias).order_by(model._meta.pk.name)
                     for obj in queryset.iterator():
                         yield obj

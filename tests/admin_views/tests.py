@@ -616,6 +616,15 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get("/test_admin/admin/admin_views/section/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
+        # Specifying a field referenced by another model though a m2m should be allowed.
+        response = self.client.get("/test_admin/admin/admin_views/m2mreference/", {TO_FIELD_VAR: 'id'})
+        self.assertEqual(response.status_code, 200)
+
+        # Specifying a field that is not refered by any other model directly registered
+        # to this admin site but registered through inheritance should be allowed.
+        response = self.client.get("/test_admin/admin/admin_views/referencedbyparent/", {TO_FIELD_VAR: 'id'})
+        self.assertEqual(response.status_code, 200)
+
         # We also want to prevent the add and change view from leaking a
         # disallowed field value.
         with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
@@ -743,6 +752,15 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
         color2_delete_log = LogEntry.objects.all()[0]
         self.assertEqual(color2_content_type, color2_delete_log.content_type)
+
+    def test_adminsite_display_site_url(self):
+        """
+        #13749 - Admin should display link to front-end site 'View site'
+        """
+        url = reverse('admin:index')
+        response = self.client.get(url)
+        self.assertEqual(response.context['site_url'], '/my-site-url/')
+        self.assertContains(response, '<a href="/my-site-url/">View site</a>')
 
 
 @override_settings(TEMPLATE_DIRS=ADMIN_VIEW_TEMPLATES_DIR)

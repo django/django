@@ -3,6 +3,7 @@ Internationalization support.
 """
 from __future__ import unicode_literals
 import re
+from django.utils.decorators import ContextDecorator
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils import six
@@ -100,7 +101,7 @@ pgettext_lazy = lazy(pgettext, six.text_type)
 
 
 def lazy_number(func, resultclass, number=None, **kwargs):
-    if isinstance(number, int):
+    if isinstance(number, six.integer_types):
         kwargs['number'] = number
         proxy = lazy(func, resultclass)(**kwargs)
     else:
@@ -149,13 +150,13 @@ def deactivate():
     return _trans.deactivate()
 
 
-class override(object):
+class override(ContextDecorator):
     def __init__(self, language, deactivate=False):
         self.language = language
         self.deactivate = deactivate
-        self.old_language = get_language()
 
     def __enter__(self):
+        self.old_language = get_language()
         if self.language is not None:
             activate(self.language)
         else:

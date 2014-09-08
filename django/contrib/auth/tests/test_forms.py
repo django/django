@@ -519,7 +519,10 @@ class PasswordResetFormTest(TestCase):
         self.assertEqual(message.get_payload(1).get_content_type(), 'text/html')
         self.assertEqual(message.get_all('to'), [email])
         self.assertTrue(re.match(r'^http://example.com/reset/[\w/-]+', message.get_payload(0).get_payload()))
-        self.assertTrue(re.match(r'^<html><a href="http://example.com/reset/[\w/-]+/">Link</a></html>$', message.get_payload(1).get_payload()))
+        self.assertTrue(
+            re.match(r'^<html><a href="http://example.com/reset/[\w/-]+/">Link</a></html>$',
+            message.get_payload(1).get_payload())
+        )
 
 
 class ReadOnlyPasswordHashTest(TestCase):

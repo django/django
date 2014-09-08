@@ -178,6 +178,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_date_lookup_using_string = False
     can_introspect_binary_field = False
     can_introspect_boolean_field = False
+    can_introspect_small_integer_field = True
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
     allows_auto_pk_0 = False
@@ -393,6 +394,17 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'POW(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
 
+    def get_db_converters(self, internal_type):
+        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+        if internal_type in ['BooleanField', 'NullBooleanField']:
+            converters.append(self.convert_booleanfield_value)
+        return converters
+
+    def convert_booleanfield_value(self, value, field):
+        if value in (0, 1):
+            value = bool(value)
+        return value
+
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
@@ -501,15 +513,18 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def check_constraints(self, table_names=None):
         """
-        Checks each table name in `table_names` for rows with invalid foreign key references. This method is
-        intended to be used in conjunction with `disable_constraint_checking()` and `enable_constraint_checking()`, to
-        determine if rows with invalid references were entered while constraint checks were off.
+        Checks each table name in `table_names` for rows with invalid foreign
+        key references. This method is intended to be used in conjunction with
+        `disable_constraint_checking()` and `enable_constraint_checking()`, to
+        determine if rows with invalid references were entered while constraint
+        checks were off.
 
-        Raises an IntegrityError on the first invalid foreign key reference encountered (if any) and provides
-        detailed information about the invalid reference in the error message.
+        Raises an IntegrityError on the first invalid foreign key reference
+        encountered (if any) and provides detailed information about the
+        invalid reference in the error message.
 
-        Backends can override this method if they can more directly apply constraint checking (e.g. via "SET CONSTRAINTS
-        ALL IMMEDIATE")
+        Backends can override this method if they can more directly apply
+        constraint checking (e.g. via "SET CONSTRAINTS ALL IMMEDIATE")
         """
         cursor = self.cursor()
         if table_names is None:

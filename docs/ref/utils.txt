@@ -901,6 +901,10 @@ appropriate entities.
     ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
     on entry with :func:`deactivate()` instead.
 
+    .. versionchanged:: 1.8
+
+        ``override`` is now usable as a function decorator.
+
 .. function:: localtime(value, timezone=None)
 
     Converts an aware :class:`~datetime.datetime` to a different time zone,
@@ -1048,6 +1052,10 @@ For a complete discussion on the usage of the following see the
     :func:`django.utils.translation.deactivate` if the ``deactivate`` argument
     is ``True``. If you pass ``None`` as the language argument, a
     ``NullTranslations()`` instance is activated within the context.
+
+    .. versionchanged:: 1.8
+
+        ``override`` is now usable as a function decorator.
 
 .. function:: get_language()
 

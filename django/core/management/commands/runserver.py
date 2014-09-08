@@ -157,7 +157,9 @@ class Command(BaseCommand):
         executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
         plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
         if plan:
-            self.stdout.write(self.style.NOTICE("\nYou have unapplied migrations; your app may not work properly until they are applied."))
+            self.stdout.write(self.style.NOTICE(
+                "\nYou have unapplied migrations; your app may not work properly until they are applied."
+            ))
             self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
 
 # Kept for backward compatibility

@@ -87,13 +87,6 @@ Let's look at what :djadmin:`startproject` created::
             urls.py
             wsgi.py
 
-.. admonition:: Doesn't match what you see?
-
-    The default project layout recently changed. If you're seeing a "flat"
-    layout (with no inner :file:`mysite/` directory), you're probably using
-    a version of Django that doesn't match this tutorial version.  You'll
-    want to either switch to the older tutorial or the newer Django version.
-
 These files are:
 
 * The outer :file:`mysite/` root directory is just a container for your

@@ -4,13 +4,15 @@ from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import no_oracle
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import override_settings
+from django.utils import timezone
 
 if HAS_GEOS:
     from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
     from django.contrib.gis.geometry.backend import Geometry
     from django.contrib.gis.geos import GEOSGeometry, Point, MultiPoint
 
-    from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
+    from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article, Event
 
 
 @skipUnlessDBFeature("gis_enabled")
@@ -102,7 +104,9 @@ class RelatedGeoModelTest(TestCase):
         ref_u2 = MultiPoint(p2, p3, srid=4326)
 
         u1 = City.objects.unionagg(field_name='location__point')
-        u2 = City.objects.exclude(name__in=('Roswell', 'Houston', 'Dallas', 'Fort Worth')).unionagg(field_name='location__point')
+        u2 = City.objects.exclude(
+            name__in=('Roswell', 'Houston', 'Dallas', 'Fort Worth'),
+        ).unionagg(field_name='location__point')
         u3 = aggs['location__point__union']
         self.assertEqual(type(u1), MultiPoint)
         self.assertEqual(type(u3), MultiPoint)
@@ -122,7 +126,11 @@ class RelatedGeoModelTest(TestCase):
         "Testing F() expressions on GeometryFields."
         # Constructing a dummy parcel border and getting the City instance for
         # assigning the FK.
-        b1 = GEOSGeometry('POLYGON((-97.501205 33.052520,-97.501205 33.052576,-97.501150 33.052576,-97.501150 33.052520,-97.501205 33.052520))', srid=4326)
+        b1 = GEOSGeometry(
+            'POLYGON((-97.501205 33.052520,-97.501205 33.052576,'
+            '-97.501150 33.052576,-97.501150 33.052520,-97.501205 33.052520))',
+            srid=4326
+        )
         pcity = City.objects.get(name='Aurora')
 
         # First parcel has incorrect center point that is equal to the City;
@@ -182,6 +190,12 @@ class RelatedGeoModelTest(TestCase):
             self.assertIsInstance(t[1], Geometry)
             self.assertEqual(m.point, d['point'])
             self.assertEqual(m.point, t[1])
+
+    @override_settings(USE_TZ=True)
+    def test_07b_values(self):
+        "Testing values() and values_list() with aware datetime. See #21565."
+        Event.objects.create(name="foo", when=timezone.now())
+        list(Event.objects.values_list('when'))
 
     def test08_defer_only(self):
         "Testing defer() and only() on Geographic models."
@@ -272,7 +286,10 @@ class RelatedGeoModelTest(TestCase):
         # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN
         #    "relatedapp_location" ON ("relatedapp_city"."location_id" = "relatedapp_location"."id")
         #    WHERE "relatedapp_city"."state" = 'TX';
-        ref_geom = GEOSGeometry('MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,-95.363151 29.763374,-96.801611 32.782057)')
+        ref_geom = GEOSGeometry(
+            'MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,'
+            '-95.363151 29.763374,-96.801611 32.782057)'
+        )
 
         c1 = City.objects.filter(state='TX').collect(field_name='location__point')
         c2 = City.objects.filter(state='TX').aggregate(Collect('location__point'))['location__point__collect']

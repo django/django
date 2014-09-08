@@ -16,6 +16,7 @@ except ImportError:
 
 from django.conf import settings
 from django.utils import six
+from django.utils.decorators import ContextDecorator
 
 __all__ = [
     'utc', 'get_fixed_timezone',
@@ -248,7 +249,7 @@ def deactivate():
         del _active.value
 
 
-class override(object):
+class override(ContextDecorator):
     """
     Temporarily set the time zone for the current thread.
 
@@ -262,9 +263,9 @@ class override(object):
     """
     def __init__(self, timezone):
         self.timezone = timezone
-        self.old_timezone = getattr(_active, 'value', None)
 
     def __enter__(self):
+        self.old_timezone = getattr(_active, 'value', None)
         if self.timezone is None:
             deactivate()
         else:

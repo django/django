@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.apps import apps
 from django.db import models
+from django.db.utils import OperationalError, ProgrammingError
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_text, force_text
 from django.utils.encoding import python_2_unicode_compatible
@@ -50,6 +51,11 @@ class ContentTypeManager(models.Manager):
             # We start with get() and not get_or_create() in order to use
             # the db_for_read (see #20401).
             ct = self.get(app_label=opts.app_label, model=opts.model_name)
+        except (OperationalError, ProgrammingError):
+            # It's possible to migrate a single app before contenttypes,
+            # as it's not a required initial dependency (it's contrib!)
+            # Have a nice error for this.
+            raise RuntimeError("Error creating new content types. Please make sure contenttypes is migrated before trying to migrate apps individually.")
         except self.model.DoesNotExist:
             # Not found in the database; we proceed to create it.  This time we
             # use get_or_create to take care of any race conditions.
