@@ -1210,6 +1210,13 @@ class Library(object):
             params, varargs, varkw, defaults = getargspec(func)
 
             class InclusionNode(TagHelperNode):
+                # Prevent injecting nodes from included template into
+                # the nodes of the template in which this tag is located.
+                # This injection can lead to "maximum recursion depth exceeded"
+                # when `django.template.loaders.cached.Loader` is used and
+                # there is specific recursion logic in templates.
+                # See #23441 for details.
+                child_nodelists = ()
 
                 def render(self, context):
                     resolved_args, resolved_kwargs = self.get_resolved_arguments(context)

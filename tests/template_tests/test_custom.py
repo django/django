@@ -256,6 +256,14 @@ class CustomTagTests(TestCase):
         c.current_app = 'advanced'
         self.assertEqual(t.render(c).strip(), 'advanced')
 
+    def test_23441_inclusion_tag_not_inject_nodes_after_render(self):
+        t = template.Template('{% load custom %}{% inclusion_no_params %}')
+
+        self.assertEqual(0, len(t.nodelist.get_nodes_by_type(template.VariableNode)))
+
+        t.render(template.Context({}))
+        self.assertEqual(0, len(t.nodelist.get_nodes_by_type(template.VariableNode)))
+
     def test_15070_use_l10n(self):
         """
         Test that inclusion tag passes down `use_l10n` of context to the
