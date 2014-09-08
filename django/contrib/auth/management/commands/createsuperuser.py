@@ -76,8 +76,8 @@ class Command(BaseCommand):
 
         else:
             # Prompt for username/password, and any other required fields.
-            # Enclose this whole thing in a try/except to trap for a
-            # keyboard interrupt and exit gracefully.
+            # Enclose this whole thing in a try/except to catch
+            # KeyboardInterrupt and exit gracefully.
             default_username = get_default_username()
             try:
 
