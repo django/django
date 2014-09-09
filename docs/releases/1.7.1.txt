@@ -26,3 +26,8 @@ Bugfixes
 
 * Fixed a typo in an ``inlineformset_factory()`` error message that caused a
   crash (:ticket:`23451`).
+
+* Restored the ability to use :setting:`ABSOLUTE_URL_OVERRIDES` with the
+  ``'auth.User'`` model (:ticket:`11775`). As a side effect, the setting now
+  adds a ``get_absolute_url()`` method to any model that appears in
+  ``ABSOLUTE_URL_OVERRIDES`` but doesn't define ``get_absolute_url()``.
