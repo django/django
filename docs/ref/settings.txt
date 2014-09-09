@@ -28,7 +28,7 @@ ABSOLUTE_URL_OVERRIDES
 Default: ``{}`` (Empty dictionary)
 
 A dictionary mapping ``"app_label.model_name"`` strings to functions that take
-a model object and return its URL. This is a way of overriding
+a model object and return its URL. This is a way of inserting or overriding
 ``get_absolute_url()`` methods on a per-installation basis. Example::
 
     ABSOLUTE_URL_OVERRIDES = {
@@ -38,6 +38,11 @@ a model object and return its URL. This is a way of overriding
 
 Note that the model name used in this setting should be all lower-case, regardless
 of the case of the actual model class name.
+
+.. versionchanged:: 1.7.1
+
+    ``ABSOLUTE_URL_OVERRIDES`` now works on models that don't declare
+    ``get_absolute_url()``.
 
 .. setting:: ADMINS
 

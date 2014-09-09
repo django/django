@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import copy
 import sys
-from functools import update_wrapper
 import warnings
 
 from django.apps import apps
@@ -336,9 +335,11 @@ class ModelBase(type):
         if cls.__doc__ is None:
             cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join(f.attname for f in opts.fields))
 
-        if hasattr(cls, 'get_absolute_url'):
-            cls.get_absolute_url = update_wrapper(curry(get_absolute_url, opts, cls.get_absolute_url),
-                                                  cls.get_absolute_url)
+        get_absolute_url_override = settings.ABSOLUTE_URL_OVERRIDES.get(
+            '%s.%s' % (opts.app_label, opts.model_name)
+        )
+        if get_absolute_url_override:
+            setattr(cls, 'get_absolute_url', get_absolute_url_override)
 
         signals.class_prepared.send(sender=cls)
 
@@ -1441,14 +1442,6 @@ def method_get_order(ordered_obj, self):
     pk_name = ordered_obj._meta.pk.name
     return [r[pk_name] for r in
             ordered_obj.objects.filter(**{order_name: rel_val}).values(pk_name)]
-
-
-##############################################
-# HELPER FUNCTIONS (CURRIED MODEL FUNCTIONS) #
-##############################################
-
-def get_absolute_url(opts, func, self, *args, **kwargs):
-    return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.model_name), func)(self, *args, **kwargs)
 
 
 ########
