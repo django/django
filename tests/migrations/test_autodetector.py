@@ -529,6 +529,50 @@ class AutodetectorTests(TestCase):
         # Right number of migrations?
         self.assertEqual(len(changes), 0)
 
+    def test_empty_foo_together(self):
+        "#23452 - Empty unique/index_togther shouldn't generate a migration."
+        # Explicitly testing for not specified, since this is the case after
+        # a CreateModel operation w/o any definition on the original model
+        model_state_not_secified = ModelState("a", "model",
+            [("id", models.AutoField(primary_key=True))]
+        )
+        # Explicitly testing for None, since this was the issue in #23452 after
+        # a AlterFooTogether operation with e.g. () as value
+        model_state_none = ModelState("a", "model",
+            [("id", models.AutoField(primary_key=True))],
+            {"unique_together": None, "index_together": None}
+        )
+        # Explicitly testing for the empty set, since we now always have sets.
+        # During removal (('col1', 'col2'),) --> () this becomes set([])
+        model_state_empty = ModelState("a", "model",
+            [("id", models.AutoField(primary_key=True))],
+            {"unique_together": set(), "index_together": set()}
+        )
+
+        def test(from_state, to_state, msg):
+            before = self.make_project_state([from_state])
+            after = self.make_project_state([to_state])
+            autodetector = MigrationAutodetector(before, after)
+            changes = autodetector._detect_changes()
+            if len(changes) > 0:
+                ops = ', '.join(o.__class__.__name__ for o in changes['a'][0].operations)
+                self.fail('Created operation(s) %s from %s' % (ops, msg))
+
+        tests = (
+            (model_state_not_secified, model_state_not_secified, '"not specified" to "not specified"'),
+            (model_state_not_secified, model_state_none, '"not specified" to "None"'),
+            (model_state_not_secified, model_state_empty, '"not specified" to "empty"'),
+            (model_state_none, model_state_not_secified, '"None" to "not specified"'),
+            (model_state_none, model_state_none, '"None" to "None"'),
+            (model_state_none, model_state_empty, '"None" to "empty"'),
+            (model_state_empty, model_state_not_secified, '"empty" to "not specified"'),
+            (model_state_empty, model_state_none, '"empty" to "None"'),
+            (model_state_empty, model_state_empty, '"empty" to "empty"'),
+        )
+
+        for t in tests:
+            test(*t)
+
     def test_unique_together_ordering(self):
         "Tests that unique_together also triggers on ordering changes"
         # Make state
@@ -582,7 +626,7 @@ class AutodetectorTests(TestCase):
         # Right actions?
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AlterIndexTogether")
-        self.assertEqual(action.index_together, None)
+        self.assertEqual(action.index_together, set())
 
     def test_remove_unique_together(self):
         author_unique_together = ModelState("testapp", "Author", [
@@ -601,7 +645,7 @@ class AutodetectorTests(TestCase):
         # Right actions?
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
-        self.assertEqual(action.unique_together, None)
+        self.assertEqual(action.unique_together, set())
 
     def test_proxy(self):
         "Tests that the autodetector correctly deals with proxy models"
