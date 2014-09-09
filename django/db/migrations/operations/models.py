@@ -233,9 +233,7 @@ class AlterUniqueTogether(Operation):
     def __init__(self, name, unique_together):
         self.name = name
         unique_together = normalize_together(unique_together)
-        # need None rather than an empty set to prevent infinite migrations
-        # after removing unique_together from a model
-        self.unique_together = set(tuple(cons) for cons in unique_together) or None
+        self.unique_together = set(tuple(cons) for cons in unique_together)
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]
@@ -273,9 +271,7 @@ class AlterIndexTogether(Operation):
     def __init__(self, name, index_together):
         self.name = name
         index_together = normalize_together(index_together)
-        # need None rather than an empty set to prevent infinite migrations
-        # after removing unique_together from a model
-        self.index_together = set(tuple(cons) for cons in index_together) or None
+        self.index_together = set(tuple(cons) for cons in index_together)
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.name.lower()]

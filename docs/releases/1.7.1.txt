@@ -31,3 +31,6 @@ Bugfixes
   ``'auth.User'`` model (:ticket:`11775`). As a side effect, the setting now
   adds a ``get_absolute_url()`` method to any model that appears in
   ``ABSOLUTE_URL_OVERRIDES`` but doesn't define ``get_absolute_url()``.
+
+* Empty ``index_together`` or ``unique_together`` model options no longer
+  results in infinite migrations (:ticket:`23452`).
