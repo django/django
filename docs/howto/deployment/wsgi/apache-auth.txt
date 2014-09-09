@@ -28,9 +28,17 @@ version >= 2.2 and mod_wsgi >= 2.0. For example, you could:
 Authentication with mod_wsgi
 ============================
 
+.. note::
+
+    The use of ``WSGIApplicationGroup %{GLOBAL}`` in the configurations below
+    presumes that your Apache instance is running only one Django application.
+    If you are running more than Django application, please refer to the
+    `Defining Application Groups`_ section of the mod_wsgi docs for more
+    information about this setting.
+
 Make sure that mod_wsgi is installed and activated and that you have
-followed the steps to setup
-:doc:`Apache with mod_wsgi </howto/deployment/wsgi/modwsgi>`
+followed the steps to setup :doc:`Apache with mod_wsgi
+</howto/deployment/wsgi/modwsgi>`.
 
 Next, edit your Apache configuration to add a location that you want
 only authenticated users to be able to view:
@@ -41,7 +49,7 @@ only authenticated users to be able to view:
     WSGIPythonPath /path/to/mysite.com
 
     WSGIProcessGroup %{GLOBAL}
-    WSGIApplicationGroup django
+    WSGIApplicationGroup %{GLOBAL}
 
     <Location "/secret">
         AuthType Basic
@@ -91,6 +99,7 @@ Requests beginning with ``/secret/`` will now require a user to authenticate.
 The mod_wsgi `access control mechanisms documentation`_ provides additional
 details and information about alternative methods of authentication.
 
+.. _Defining Application Groups: https://code.google.com/p/modwsgi/wiki/ConfigurationGuidelines#Defining_Application_Groups
 .. _access control mechanisms documentation: http://code.google.com/p/modwsgi/wiki/AccessControlMechanisms
 
 Authorization with mod_wsgi and Django groups
@@ -106,7 +115,7 @@ In this case, the Apache configuration should look like this:
     WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
 
     WSGIProcessGroup %{GLOBAL}
-    WSGIApplicationGroup django
+    WSGIApplicationGroup %{GLOBAL}
 
     <Location "/secret">
         AuthType Basic
