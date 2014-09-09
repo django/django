@@ -64,7 +64,7 @@ class ReadOnlyPasswordHashField(forms.Field):
         # render an input field.
         return initial
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         return False
 
 
@@ -74,16 +74,8 @@ class UserCreationForm(forms.ModelForm):
     password.
     """
     error_messages = {
-        'duplicate_username': _("A user with that username already exists."),
         'password_mismatch': _("The two password fields didn't match."),
     }
-    username = forms.RegexField(label=_("Username"), max_length=30,
-        regex=r'^[\w.@+-]+$',
-        help_text=_("Required. 30 characters or fewer. Letters, digits and "
-                    "@/./+/-/_ only."),
-        error_messages={
-            'invalid': _("This value may contain only letters, numbers and "
-                         "@/./+/-/_ characters.")})
     password1 = forms.CharField(label=_("Password"),
         widget=forms.PasswordInput)
     password2 = forms.CharField(label=_("Password confirmation"),
@@ -93,19 +85,6 @@ class UserCreationForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ("username",)
-
-    def clean_username(self):
-        # Since User.username is unique, this check is redundant,
-        # but it sets a nicer error message than the ORM. See #13147.
-        username = self.cleaned_data["username"]
-        try:
-            User._default_manager.get(username=username)
-        except User.DoesNotExist:
-            return username
-        raise forms.ValidationError(
-            self.error_messages['duplicate_username'],
-            code='duplicate_username',
-        )
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -126,13 +105,6 @@ class UserCreationForm(forms.ModelForm):
 
 
 class UserChangeForm(forms.ModelForm):
-    username = forms.RegexField(
-        label=_("Username"), max_length=30, regex=r"^[\w.@+-]+$",
-        help_text=_("Required. 30 characters or fewer. Letters, digits and "
-                    "@/./+/-/_ only."),
-        error_messages={
-            'invalid': _("This value may contain only letters, numbers and "
-                         "@/./+/-/_ characters.")})
     password = ReadOnlyPasswordHashField(label=_("Password"),
         help_text=_("Raw passwords are not stored, so there is no way to see "
                     "this user's password, but you can change the password "
@@ -248,6 +220,18 @@ class PasswordResetForm(forms.Form):
 
         email_message.send()
 
+    def get_users(self, email):
+        """Given an email, return matching user(s) who should receive a reset.
+
+        This allows subclasses to more easily customize the default policies
+        that prevent inactive users and users with unusable passwords from
+        resetting their password.
+
+        """
+        active_users = get_user_model()._default_manager.filter(
+            email__iexact=email, is_active=True)
+        return (u for u in active_users if u.has_usable_password())
+
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',
              email_template_name='registration/password_reset_email.html',
@@ -257,15 +241,8 @@ class PasswordResetForm(forms.Form):
         Generates a one-use only link for resetting password and sends to the
         user.
         """
-        UserModel = get_user_model()
         email = self.cleaned_data["email"]
-        active_users = UserModel._default_manager.filter(
-            email__iexact=email, is_active=True)
-        for user in active_users:
-            # Make sure that no email is sent to a user that actually has
-            # a password marked as unusable
-            if not user.has_usable_password():
-                continue
+        for user in self.get_users(email):
             if not domain_override:
                 current_site = get_current_site(request)
                 site_name = current_site.name
@@ -289,8 +266,8 @@ class PasswordResetForm(forms.Form):
 
 class SetPasswordForm(forms.Form):
     """
-    A form that lets a user change set his/her password without entering the
-    old password
+    A form that lets a user change set their password without entering the old
+    password
     """
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
@@ -324,8 +301,8 @@ class SetPasswordForm(forms.Form):
 
 class PasswordChangeForm(SetPasswordForm):
     """
-    A form that lets a user change his/her password by entering
-    their old password.
+    A form that lets a user change their password by entering their old
+    password.
     """
     error_messages = dict(SetPasswordForm.error_messages, **{
         'password_incorrect': _("Your old password was entered incorrectly. "

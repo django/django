@@ -10,6 +10,7 @@ import warnings
 
 from django import template
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.core import urlresolvers
 from django.template import (base as template_base, loader, Context,
     RequestContext, Template, TemplateSyntaxError)
@@ -109,13 +110,17 @@ class SomeClass:
             raise SomeOtherException
         raise KeyError
 
+    @property
     def silent_fail_attribute(self):
         raise SomeException
-    silent_fail_attribute = property(silent_fail_attribute)
 
+    @property
     def noisy_fail_attribute(self):
         raise SomeOtherException
-    noisy_fail_attribute = property(noisy_fail_attribute)
+
+    @property
+    def attribute_error_attribute(self):
+        raise AttributeError
 
 
 class OtherClass:
@@ -499,6 +504,15 @@ class TemplateRegressionTests(TestCase):
         with self.assertRaises(urlresolvers.NoReverseMatch):
             t.render(Context({}))
 
+    def test_debug_tag_non_ascii(self):
+        """
+        Test non-ASCII model representation in debug output (#23060).
+        """
+        Group.objects.create(name="清風")
+        c1 = Context({"objs": Group.objects.all()})
+        t1 = Template('{% debug %}')
+        self.assertIn("清風", t1.render(c1))
+
 
 # Set ALLOWED_INCLUDE_ROOTS so that ssi works.
 @override_settings(MEDIA_URL="/media/", STATIC_URL="/static/",
@@ -576,6 +590,9 @@ class TemplateTests(TestCase):
                                             # Ignore deprecations of using the wrong number of variables with the 'for' tag.
                                             # and warnings for {% url %} reversing by dotted path
                                             warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaulttags")
+                                            # Ignore deprecations of old style unordered_list
+                                            # and removetags.
+                                            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, module="django.template.defaultfilters")
                                             output = self.render(test_template, vals)
                                     except ShouldNotExecuteException:
                                         failures.append("Template test (Cached='%s', TEMPLATE_STRING_IF_INVALID='%s', TEMPLATE_DEBUG=%s): %s -- FAILED. Template rendering invoked method that shouldn't have been invoked." % (is_cached, invalid_str, template_debug, name))
@@ -810,6 +827,9 @@ class TemplateTests(TestCase):
             'filter-syntax23': (r'1{{ var.noisy_fail_key }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)),
             'filter-syntax24': (r'1{{ var.noisy_fail_attribute }}2', {"var": SomeClass()}, (SomeOtherException, SomeOtherException)),
 
+            # #16383 - A @property that raises AttributeError should not fail loudly.
+            'filter-syntax25': ('{{ var.attribute_error_attribute }}', {"var": SomeClass()}, (AttributeError)),
+
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),
             'comment-syntax02': ("{# this is hidden #}hello{# foo #}", {}, "hello"),
@@ -880,6 +900,9 @@ class TemplateTests(TestCase):
 
             # Raise exception for custom tags used in child with {% load %} tag in parent, not in child
             'exception04': ("{% extends 'inheritance17' %}{% block first %}{% echo 400 %}5678{% endblock %}", {}, template.TemplateSyntaxError),
+
+            # Raise exception for block.super used in base template
+            'exception05': ("{% block first %}{{ block.super }}{% endblock %}", {}, template.TemplateSyntaxError),
 
             ### FILTER TAG ############################################################
             'filter01': ('{% filter upper %}{% endfilter %}', {}, ''),
@@ -1351,6 +1374,8 @@ class TemplateTests(TestCase):
             'load11': ("{% load subpackage.echo_invalid %}", {}, template.TemplateSyntaxError),
             'load12': ("{% load subpackage.missing %}", {}, template.TemplateSyntaxError),
 
+            'lorem1': ("{% lorem 3 w %}", {}, "lorem ipsum dolor"),
+
             ### I18N ##################################################################
 
             # {% spaceless %} tag
@@ -1673,12 +1698,12 @@ class TemplateTests(TestCase):
             'url08': ('{% url "метка_оператора" v %}', {'v': 'Ω'}, '/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
             'url09': ('{% url "метка_оператора_2" tag=v %}', {'v': 'Ω'}, '/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
             'url10': ('{% url "template_tests.views.client_action" id=client.id action="two words" %}', {'client': {'id': 1}}, '/client/1/two%20words/'),
-            'url11': ('{% url "template_tests.views.client_action" id=client.id action="==" %}', {'client': {'id': 1}}, '/client/1/%3D%3D/'),
-            'url12': ('{% url "template_tests.views.client_action" id=client.id action="," %}', {'client': {'id': 1}}, '/client/1/%2C/'),
+            'url11': ('{% url "template_tests.views.client_action" id=client.id action="==" %}', {'client': {'id': 1}}, '/client/1/==/'),
+            'url12': ('{% url "template_tests.views.client_action" id=client.id action="!$&\'()*+,;=~:@," %}', {'client': {'id': 1}}, '/client/1/!$&\'()*+,;=~:@,/'),
             'url13': ('{% url "template_tests.views.client_action" id=client.id action=arg|join:"-" %}', {'client': {'id': 1}, 'arg': ['a', 'b']}, '/client/1/a-b/'),
             'url14': ('{% url "template_tests.views.client_action" client.id arg|join:"-" %}', {'client': {'id': 1}, 'arg': ['a', 'b']}, '/client/1/a-b/'),
             'url15': ('{% url "template_tests.views.client_action" 12 "test" %}', {}, '/client/12/test/'),
-            'url18': ('{% url "template_tests.views.client" "1,2" %}', {}, '/client/1%2C2/'),
+            'url18': ('{% url "template_tests.views.client" "1,2" %}', {}, '/client/1,2/'),
 
             'url19': ('{% url named_url client.id %}', {'named_url': 'template_tests.views.client', 'client': {'id': 1}}, '/client/1/'),
             'url20': ('{% url url_name_in_var client.id %}', {'url_name_in_var': 'named.client', 'client': {'id': 1}}, '/named-client/1/'),

@@ -299,7 +299,25 @@ as the rendered output.
 See the :ref:`format localization <format-localization>` documentation for
 more information.
 
-.. _built-in fields:
+
+Checking if the field data has changed
+--------------------------------------
+
+``has_changed()``
+~~~~~~~~~~~~~~~~~~
+
+.. method:: Field.has_changed()
+
+.. versionchanged:: 1.8
+
+    This method was renamed from ``_has_changed()``.
+
+The ``has_changed()`` method is used to determine if the field value has changed
+from the initial value. Returns ``True`` or ``False``.
+
+See the :class:`Form.has_changed()` documentation for more information.
+
+.. _built-in-fields:
 
 Built-in ``Field`` classes
 --------------------------
@@ -427,7 +445,7 @@ For each field, we describe the default widget used if you don't specify
 
     If no ``input_formats`` argument is provided, the default input formats are::
 
-        ['%Y-%m-%d',       # '2006-10-25'
+        ['%Y-%m-%d',      # '2006-10-25'
         '%m/%d/%Y',       # '10/25/2006'
         '%m/%d/%y']       # '10/25/06'
 
@@ -649,7 +667,16 @@ For each field, we describe the default widget used if you don't specify
     When you use an ``ImageField`` on a form, you must also remember to
     :ref:`bind the file data to the form <binding-uploaded-files>`.
 
+    .. versionchanged:: 1.8
+
+        After the field has been cleaned and validated, the ``UploadedFile``
+        object will have an additional ``image`` attribute containing the Pillow
+        `Image`_ instance used to check if the file was a valid image.
+        ``UploadedFile.content_type`` is also updated with the image's content
+        type as determined by Pillow.
+
 .. _Pillow: http://pillow.readthedocs.org/en/latest/
+.. _Image: https://pillow.readthedocs.org/en/latest/reference/Image.html
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
@@ -796,10 +823,13 @@ For each field, we describe the default widget used if you don't specify
     Also takes ``max_length`` and ``min_length``, which work just as they do for
     ``CharField``.
 
-    The optional argument ``error_message`` is also accepted for backwards
-    compatibility. The preferred way to provide an error message is to use the
-    ``error_messages`` argument, passing a dictionary with ``'invalid'`` as a key
-    and the error message as the value.
+    .. deprecated:: 1.8
+
+        The optional argument ``error_message`` is also accepted for backwards
+        compatibility but will be removed in Django 2.0. The preferred way to
+        provide an error message is to use the :attr:`~Field.error_messages`
+        argument, passing a dictionary with ``'invalid'`` as a key and the error
+        message as the value.
 
 ``SlugField``
 ~~~~~~~~~~~~~
@@ -945,12 +975,12 @@ Slightly complex built-in ``Field`` classes
                 def __init__(self, *args, **kwargs):
                     # Define one message for all fields.
                     error_messages = {
-                        'incomplete': 'Enter a country code and phone number.',
+                        'incomplete': 'Enter a country calling code and a phone number.',
                     }
                     # Or define a different message for each field.
                     fields = (
-                        CharField(error_messages={'incomplete': 'Enter a country code.'},
-                                  validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid country code.')]),
+                        CharField(error_messages={'incomplete': 'Enter a country calling code.'},
+                                  validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid country calling code.')]),
                         CharField(error_messages={'incomplete': 'Enter a phone number.'},
                                   validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid phone number.')]),
                         CharField(validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid extension.')],
@@ -1018,6 +1048,17 @@ model object (in the case of ``ModelChoiceField``) or multiple model
 objects (in the case of ``ModelMultipleChoiceField``) into the
 ``cleaned_data`` dictionary of the form.
 
+For more complex uses, you can specify ``queryset=None`` when declaring the
+form field and then populate the ``queryset`` in the form's ``__init__()``
+method::
+
+    class FooMultipleChoiceForm(forms.Form):
+        foo_select = forms.ModelMultipleChoiceField(queryset=None)
+
+        def __init__(self, *args, **kwargs):
+            super(FooMultipleChoiceForm, self).__init__(*args, **kwargs)
+            self.fields['foo_select'].queryset = ...
+
 ``ModelChoiceField``
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -1065,8 +1106,10 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
     .. attribute:: to_field_name
 
         This optional argument is used to specify the field to use as the value
-        of the choices in the field's widget. By default it is set to ``None``,
-        in which case the primary key of each object will be used. For example::
+        of the choices in the field's widget. Be sure it's a unique field for
+        the model, otherwise the selected value could match more than one
+        object. By default it is set to ``None``, in which case the primary key
+        of each object will be used. For example::
 
             # No custom to_field_name
             field1 = forms.ModelChoiceField(queryset=...)

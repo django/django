@@ -221,9 +221,13 @@ def sanitize_separators(value):
             parts.append(decimals)
         if settings.USE_THOUSAND_SEPARATOR:
             thousand_sep = get_format('THOUSAND_SEPARATOR')
-            for replacement in set([
-                    thousand_sep, unicodedata.normalize('NFKD', thousand_sep)]):
-                value = value.replace(replacement, '')
+            if thousand_sep == '.' and value.count('.') == 1 and len(value.split('.')[-1]) != 3:
+                # Special case where we suspect a dot meant decimal separator (see #22171)
+                pass
+            else:
+                for replacement in set([
+                        thousand_sep, unicodedata.normalize('NFKD', thousand_sep)]):
+                    value = value.replace(replacement, '')
         parts.append(value)
         value = '.'.join(reversed(parts))
     return value

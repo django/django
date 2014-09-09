@@ -423,7 +423,7 @@ Atom1Feed
 .. module:: django.utils.functional
     :synopsis: Functional programming tools.
 
-.. class:: cached_property(object)
+.. class:: cached_property(object, name)
 
     The ``@cached_property`` decorator caches the result of a method with a
     single ``self`` argument as a property. The cached result will persist
@@ -432,9 +432,7 @@ Atom1Feed
 
     Consider a typical case, where a view might need to call a model's method
     to perform some computation, before placing the model instance into the
-    context, where the template might invoke the method once more:
-
-    .. code-block:: python
+    context, where the template might invoke the method once more::
 
         # the model
         class Person(models.Model):
@@ -446,8 +444,12 @@ Atom1Feed
 
         # in the view:
         if person.friends():
+            ...
 
-        # in the template:
+    And in the template you would have:
+
+    .. code-block:: html+django
+
         {% for friend in person.friends %}
 
     Here, ``friends()`` will be called twice. Since the instance ``person`` in
@@ -467,6 +469,7 @@ Atom1Feed
 
         # in the view:
         if person.friends:
+            ...
 
     The cached value can be treated like an ordinary attribute of the instance::
 
@@ -482,6 +485,24 @@ Atom1Feed
     based on ``datetime.now()``, or simply if a change were saved to the
     database by some other process in the brief interval between subsequent
     invocations of a method on the same instance.
+
+    .. versionadded:: 1.8
+
+    You can use the ``name`` argument to make cached properties of other
+    methods. For example, if you had an expensive ``get_friends()`` method and
+    wanted to allow calling it without retrieving the cached value, you could
+    write::
+
+        friends = cached_property(get_friends, name='friends')
+
+    While ``person.get_friends()`` will recompute the friends on each call, the
+    value of the cached property will persist until you delete it as described
+    above::
+
+        x = person.friends         # calls first time
+        y = person.get_friends()   # calls again
+        z = person.friends         # does not call
+        x is z                     # is True
 
 .. function:: allow_lazy(func, *resultclasses)
 
@@ -555,18 +576,14 @@ escaping HTML.
     because it applies escaping to all arguments - just like the Template system
     applies escaping by default.
 
-    So, instead of writing:
-
-    .. code-block:: python
+    So, instead of writing::
 
         mark_safe("%s <b>%s</b> %s" % (some_html,
                                         escape(some_text),
                                         escape(some_other_text),
                                         ))
 
-    you should instead use:
-
-    .. code-block:: python
+    You should instead use::
 
         format_html("{0} <b>{1}</b> {2}",
                     mark_safe(some_html), some_text, some_other_text)
@@ -597,7 +614,8 @@ escaping HTML.
 
     Tries to remove anything that looks like an HTML tag from the string, that
     is anything contained within ``<>``.
-    Absolutely NO guaranty is provided about the resulting string being entirely
+
+    Absolutely NO guarantee is provided about the resulting string being
     HTML safe. So NEVER mark safe the result of a ``strip_tag`` call without
     escaping it first, for example with :func:`~django.utils.html.escape`.
 
@@ -611,11 +629,21 @@ escaping HTML.
     If you are looking for a more robust solution, take a look at the `bleach`_
     Python library.
 
-    .. _bleach: https://pypi.python.org/pypi/bleach
-
 .. function:: remove_tags(value, tags)
 
+    .. deprecated:: 1.8
+
+        ``remove_tags()`` cannot guarantee HTML safe output and has been
+        deprecated due to security concerns. Consider using `bleach`_ instead.
+
     Removes a space-separated list of [X]HTML tag names from the output.
+
+    Absolutely NO guarantee is provided about the resulting string being HTML
+    safe. In particular, it doesn't work recursively, so the output of
+    ``remove_tags("<sc<script>ript>alert('XSS')</sc</script>ript>", "script")``
+    won't remove the "nested" script tags. So if the ``value`` is untrusted,
+    NEVER mark safe the result of a ``remove_tags()`` call without escaping it
+    first, for example with :func:`~django.utils.html.escape`.
 
     For example::
 
@@ -630,6 +658,7 @@ escaping HTML.
     the return value will be ``"<B>Joel</B> <button>is</button> a slug"``.
 
 .. _str.format: http://docs.python.org/library/stdtypes.html#str.format
+.. _bleach: https://pypi.python.org/pypi/bleach
 
 ``django.utils.http``
 =====================
@@ -811,6 +840,124 @@ appropriate entities.
     If ``value`` is ``"Joel is a slug"``, the output will be
     ``"joel-is-a-slug"``.
 
+.. _time-zone-selection-functions:
+
+``django.utils.timezone``
+=========================
+
+.. module:: django.utils.timezone
+    :synopsis: Timezone support.
+
+.. data:: utc
+
+    :class:`~datetime.tzinfo` instance that represents UTC.
+
+.. function:: get_fixed_timezone(offset)
+
+    .. versionadded:: 1.7
+
+    Returns a :class:`~datetime.tzinfo` instance that represents a time zone
+    with a fixed offset from UTC.
+
+    ``offset`` is a :class:`datetime.timedelta` or an integer number of
+    minutes. Use positive values for time zones east of UTC and negative
+    values for west of UTC.
+
+.. function:: get_default_timezone()
+
+    Returns a :class:`~datetime.tzinfo` instance that represents the
+    :ref:`default time zone <default-current-time-zone>`.
+
+.. function:: get_default_timezone_name()
+
+    Returns the name of the :ref:`default time zone
+    <default-current-time-zone>`.
+
+.. function:: get_current_timezone()
+
+    Returns a :class:`~datetime.tzinfo` instance that represents the
+    :ref:`current time zone <default-current-time-zone>`.
+
+.. function:: get_current_timezone_name()
+
+    Returns the name of the :ref:`current time zone
+    <default-current-time-zone>`.
+
+.. function:: activate(timezone)
+
+    Sets the :ref:`current time zone <default-current-time-zone>`. The
+    ``timezone`` argument must be an instance of a :class:`~datetime.tzinfo`
+    subclass or, if pytz_ is available, a time zone name.
+
+.. function:: deactivate()
+
+    Unsets the :ref:`current time zone <default-current-time-zone>`.
+
+.. function:: override(timezone)
+
+    This is a Python context manager that sets the :ref:`current time zone
+    <default-current-time-zone>` on entry with :func:`activate()`, and restores
+    the previously active time zone on exit. If the ``timezone`` argument is
+    ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
+    on entry with :func:`deactivate()` instead.
+
+    .. versionchanged:: 1.8
+
+        ``override`` is now usable as a function decorator.
+
+.. function:: localtime(value, timezone=None)
+
+    Converts an aware :class:`~datetime.datetime` to a different time zone,
+    by default the :ref:`current time zone <default-current-time-zone>`.
+
+    This function doesn't work on naive datetimes; use :func:`make_aware`
+    instead.
+
+.. function:: now()
+
+    Returns a :class:`~datetime.datetime` that represents the
+    current point in time. Exactly what's returned depends on the value of
+    :setting:`USE_TZ`:
+
+    * If :setting:`USE_TZ` is ``False``, this will be a
+      :ref:`naive <naive_vs_aware_datetimes>` datetime (i.e. a datetime
+      without an associated timezone) that represents the current time
+      in the system's local timezone.
+
+    * If :setting:`USE_TZ` is ``True``, this will be an
+      :ref:`aware <naive_vs_aware_datetimes>` datetime representing the
+      current time in UTC. Note that :func:`now` will always return
+      times in UTC regardless of the value of :setting:`TIME_ZONE`;
+      you can use :func:`localtime` to convert to a time in the current
+      time zone.
+
+.. function:: is_aware(value)
+
+    Returns ``True`` if ``value`` is aware, ``False`` if it is naive. This
+    function assumes that ``value`` is a :class:`~datetime.datetime`.
+
+.. function:: is_naive(value)
+
+    Returns ``True`` if ``value`` is naive, ``False`` if it is aware. This
+    function assumes that ``value`` is a :class:`~datetime.datetime`.
+
+.. function:: make_aware(value, timezone)
+
+    Returns an aware :class:`~datetime.datetime` that represents the same
+    point in time as ``value`` in ``timezone``, ``value`` being a naive
+    :class:`~datetime.datetime`.
+
+    This function can raise an exception if ``value`` doesn't exist or is
+    ambiguous because of DST transitions.
+
+.. function:: make_naive(value, timezone)
+
+    Returns an naive :class:`~datetime.datetime` that represents in
+    ``timezone``  the same point in time as ``value``, ``value`` being an
+    aware :class:`~datetime.datetime`
+
+.. _pytz: http://pytz.sourceforge.net/
+
 ``django.utils.translation``
 ============================
 
@@ -906,6 +1053,10 @@ For a complete discussion on the usage of the following see the
     is ``True``. If you pass ``None`` as the language argument, a
     ``NullTranslations()`` instance is activated within the context.
 
+    .. versionchanged:: 1.8
+
+        ``override`` is now usable as a function decorator.
+
 .. function:: get_language()
 
     Returns the currently selected language code.
@@ -942,120 +1093,6 @@ For a complete discussion on the usage of the following see the
 
     Session key under which the active language for the current session is
     stored.
-
-.. _time-zone-selection-functions:
-
-``django.utils.timezone``
-=========================
-
-.. module:: django.utils.timezone
-    :synopsis: Timezone support.
-
-.. data:: utc
-
-    :class:`~datetime.tzinfo` instance that represents UTC.
-
-.. function:: get_fixed_timezone(offset)
-
-    .. versionadded:: 1.7
-
-    Returns a :class:`~datetime.tzinfo` instance that represents a time zone
-    with a fixed offset from UTC.
-
-    ``offset`` is a :class:`datetime.timedelta` or an integer number of
-    minutes. Use positive values for time zones east of UTC and negative
-    values for west of UTC.
-
-.. function:: get_default_timezone()
-
-    Returns a :class:`~datetime.tzinfo` instance that represents the
-    :ref:`default time zone <default-current-time-zone>`.
-
-.. function:: get_default_timezone_name()
-
-    Returns the name of the :ref:`default time zone
-    <default-current-time-zone>`.
-
-.. function:: get_current_timezone()
-
-    Returns a :class:`~datetime.tzinfo` instance that represents the
-    :ref:`current time zone <default-current-time-zone>`.
-
-.. function:: get_current_timezone_name()
-
-    Returns the name of the :ref:`current time zone
-    <default-current-time-zone>`.
-
-.. function:: activate(timezone)
-
-    Sets the :ref:`current time zone <default-current-time-zone>`. The
-    ``timezone`` argument must be an instance of a :class:`~datetime.tzinfo`
-    subclass or, if pytz_ is available, a time zone name.
-
-.. function:: deactivate()
-
-    Unsets the :ref:`current time zone <default-current-time-zone>`.
-
-.. function:: override(timezone)
-
-    This is a Python context manager that sets the :ref:`current time zone
-    <default-current-time-zone>` on entry with :func:`activate()`, and restores
-    the previously active time zone on exit. If the ``timezone`` argument is
-    ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
-    on entry with :func:`deactivate()` instead.
-
-.. function:: localtime(value, timezone=None)
-
-    Converts an aware :class:`~datetime.datetime` to a different time zone,
-    by default the :ref:`current time zone <default-current-time-zone>`.
-
-    This function doesn't work on naive datetimes; use :func:`make_aware`
-    instead.
-
-.. function:: now()
-
-    Returns a :class:`~datetime.datetime` that represents the
-    current point in time. Exactly what's returned depends on the value of
-    :setting:`USE_TZ`:
-
-    * If :setting:`USE_TZ` is ``False``, this will be a
-      :ref:`naive <naive_vs_aware_datetimes>` datetime (i.e. a datetime
-      without an associated timezone) that represents the current time
-      in the system's local timezone.
-
-    * If :setting:`USE_TZ` is ``True``, this will be an
-      :ref:`aware <naive_vs_aware_datetimes>` datetime representing the
-      current time in UTC. Note that :func:`now` will always return
-      times in UTC regardless of the value of :setting:`TIME_ZONE`;
-      you can use :func:`localtime` to convert to a time in the current
-      time zone.
-
-.. function:: is_aware(value)
-
-    Returns ``True`` if ``value`` is aware, ``False`` if it is naive. This
-    function assumes that ``value`` is a :class:`~datetime.datetime`.
-
-.. function:: is_naive(value)
-
-    Returns ``True`` if ``value`` is naive, ``False`` if it is aware. This
-    function assumes that ``value`` is a :class:`~datetime.datetime`.
-
-.. function:: make_aware(value, timezone)
-
-    Returns an aware :class:`~datetime.datetime` that represents the same
-    point in time as ``value`` in ``timezone``, ``value`` being a naive
-    :class:`~datetime.datetime`.
-
-    This function can raise an exception if ``value`` doesn't exist or is
-    ambiguous because of DST transitions.
-
-.. function:: make_naive(value, timezone)
-
-    Returns an naive :class:`~datetime.datetime` that represents in
-    ``timezone``  the same point in time as ``value``, ``value`` being an
-    aware :class:`~datetime.datetime`
-
-.. _pytz: http://pytz.sourceforge.net/
 
 ``django.utils.tzinfo``
 =======================

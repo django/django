@@ -204,8 +204,8 @@ Attributes
 
 The :meth:`Paginator.page` method raises an exception if the requested page is
 invalid (i.e., not an integer) or contains no objects. Generally, it's enough
-to trap the ``InvalidPage`` exception, but if you'd like more granularity, you
-can trap either of the following exceptions:
+to catch the ``InvalidPage`` exception, but if you'd like more granularity,
+you can catch either of the following exceptions:
 
 .. exception:: PageNotAnInteger
 

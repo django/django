@@ -30,7 +30,7 @@ class DigitsInColumnName(models.Model):
     leading_digits = models.CharField(max_length=11, db_column='45extra')
 
 
-class SpecialColumnName(models.Model):
+class SpecialName(models.Model):
     field = models.IntegerField(db_column='field')
     # Underscores
     field_field_0 = models.IntegerField(db_column='Field_')
@@ -39,6 +39,9 @@ class SpecialColumnName(models.Model):
     # Other chars
     prc_x = models.IntegerField(db_column='prc(%) x')
     non_ascii = models.IntegerField(db_column='tamaño')
+
+    class Meta:
+        db_table = "inspectdb_special.table name"
 
 
 class ColumnTypes(models.Model):
@@ -67,3 +70,11 @@ class ColumnTypes(models.Model):
     text_field = models.TextField()
     time_field = models.TimeField()
     url_field = models.URLField()
+
+
+class UniqueTogether(models.Model):
+    field1 = models.IntegerField()
+    field2 = models.CharField(max_length=10)
+
+    class Meta:
+        unique_together = ('field1', 'field2')

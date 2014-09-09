@@ -10,7 +10,7 @@ from binascii import Error as BinasciiError
 from email.utils import formatdate
 
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_str, force_text
+from django.utils.encoding import force_bytes, force_str, force_text
 from django.utils.functional import allow_lazy
 from django.utils import six
 from django.utils.six.moves.urllib.parse import (
@@ -29,6 +29,9 @@ __T = r'(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})'
 RFC1123_DATE = re.compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
 RFC850_DATE = re.compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
 ASCTIME_DATE = re.compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
+
+RFC3986_GENDELIMS = str(":/?#[]@")
+RFC3986_SUBDELIMS = str("!$&'()*+,;=")
 
 
 def urlquote(url, safe='/'):
@@ -224,7 +227,7 @@ def urlsafe_base64_decode(s):
     Decodes a base64 encoded string, adding back any trailing equal signs that
     might have been stripped.
     """
-    s = s.encode('utf-8')  # base64encode should only return ASCII.
+    s = force_bytes(s)
     try:
         return base64.urlsafe_b64decode(s.ljust(len(s) + len(s) % 4, b'='))
     except (LookupError, BinasciiError) as e:

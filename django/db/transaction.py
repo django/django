@@ -1,9 +1,7 @@
-from functools import wraps
-
 from django.db import (
     connections, DEFAULT_DB_ALIAS,
     DatabaseError, Error, ProgrammingError)
-from django.utils.decorators import available_attrs
+from django.utils.decorators import ContextDecorator
 
 
 class TransactionManagementError(ProgrammingError):
@@ -109,7 +107,7 @@ def set_rollback(rollback, using=None):
 # Decorators / context managers #
 #################################
 
-class Atomic(object):
+class Atomic(ContextDecorator):
     """
     This class guarantees the atomic execution of a given block.
 
@@ -219,6 +217,9 @@ class Atomic(object):
                         except DatabaseError:
                             try:
                                 connection.savepoint_rollback(sid)
+                                # The savepoint won't be reused. Release it to
+                                # minimize overhead for the database server.
+                                connection.savepoint_commit(sid)
                             except Error:
                                 # If rolling back to a savepoint fails, mark for
                                 # rollback at a higher level and avoid shadowing
@@ -249,6 +250,9 @@ class Atomic(object):
                     else:
                         try:
                             connection.savepoint_rollback(sid)
+                            # The savepoint won't be reused. Release it to
+                            # minimize overhead for the database server.
+                            connection.savepoint_commit(sid)
                         except Error:
                             # If rolling back to a savepoint fails, mark for
                             # rollback at a higher level and avoid shadowing
@@ -278,13 +282,6 @@ class Atomic(object):
                     connection.connection = None
                 else:
                     connection.in_atomic_block = False
-
-    def __call__(self, func):
-        @wraps(func, assigned=available_attrs(func))
-        def inner(*args, **kwargs):
-            with self:
-                return func(*args, **kwargs)
-        return inner
 
 
 def atomic(using=None, savepoint=True):

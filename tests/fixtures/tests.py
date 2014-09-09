@@ -69,6 +69,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
     def test_initial_data(self):
         # migrate introduces 1 initial data object from initial_data.json.
+        # this behavior is deprecated and will be removed in Django 1.9
         self.assertQuerysetEqual(Book.objects.all(), [
             '<Book: Achieving self-awareness of Python programs>'
         ])

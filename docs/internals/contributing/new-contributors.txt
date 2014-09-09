@@ -102,8 +102,8 @@ some advice to make your work on Django more useful and rewarding.
   Sometimes it can be scary to put your opinion out to the world and say "this
   ticket is correct" or "this patch needs work", but it's the only way the
   project moves forward. The contributions of the broad Django community
-  ultimately have a much greater impact than that of the core developers. We
-  can't do it without YOU!
+  ultimately have a much greater impact than that of the core team. We can't
+  do it without **you**!
 
 * **Err on the side of caution when marking things Ready For Check-in**
 
@@ -138,10 +138,10 @@ FAQ
    I do to get it committed?**
 
    First off, it's not personal. Django is entirely developed by volunteers
-   (even the core developers), and sometimes folks just don't have time. The
-   best thing to do is to send a gentle reminder to the |django-developers|
-   mailing list asking for review on the ticket, or to bring it up in the
-   #django-dev IRC channel.
+   (even the core team), and sometimes folks just don't have time. The best
+   thing to do is to send a gentle reminder to the |django-developers| mailing
+   list asking for review on the ticket, or to bring it up in the #django-dev
+   IRC channel.
 
 2. **I'm sure my ticket is absolutely 100% perfect, can I mark it as RFC
    myself?**

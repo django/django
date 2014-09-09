@@ -171,7 +171,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update = True
     has_select_for_update_nowait = False
     supports_forward_references = False
-    supports_long_model_names = False
     # XXX MySQL DB-API drivers currently fail on binary data on Python 3.
     supports_binary_field = six.PY2
     supports_microsecond_precision = False
@@ -179,12 +178,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_date_lookup_using_string = False
     can_introspect_binary_field = False
     can_introspect_boolean_field = False
+    can_introspect_small_integer_field = True
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
     allows_auto_pk_0 = False
     uses_savepoints = True
+    can_release_savepoints = True
     atomic_transactions = False
-    supports_check_constraints = False
+    supports_column_check_constraints = False
 
     def __init__(self, connection):
         super(DatabaseFeatures, self).__init__(connection)
@@ -341,22 +342,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return []
 
-    def sequence_reset_by_name_sql(self, style, sequences):
-        # Truncate already resets the AUTO_INCREMENT field from
-        # MySQL version 5.0.13 onwards. Refs #16961.
-        if self.connection.mysql_version < (5, 0, 13):
-            return [
-                "%s %s %s %s %s;" % (
-                    style.SQL_KEYWORD('ALTER'),
-                    style.SQL_KEYWORD('TABLE'),
-                    style.SQL_TABLE(self.quote_name(sequence['table'])),
-                    style.SQL_KEYWORD('AUTO_INCREMENT'),
-                    style.SQL_FIELD('= 1'),
-                ) for sequence in sequences
-            ]
-        else:
-            return []
-
     def validate_autopk_value(self, value):
         # MySQLism: zero in AUTO_INCREMENT field does not work. Refs #17653.
         if value == 0:
@@ -408,6 +393,17 @@ class DatabaseOperations(BaseDatabaseOperations):
         if connector == '^':
             return 'POW(%s)' % ','.join(sub_expressions)
         return super(DatabaseOperations, self).combine_expression(connector, sub_expressions)
+
+    def get_db_converters(self, internal_type):
+        converters = super(DatabaseOperations, self).get_db_converters(internal_type)
+        if internal_type in ['BooleanField', 'NullBooleanField']:
+            converters.append(self.convert_booleanfield_value)
+        return converters
+
+    def convert_booleanfield_value(self, value, field):
+        if value in (0, 1):
+            value = bool(value)
+        return value
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
@@ -517,15 +513,18 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def check_constraints(self, table_names=None):
         """
-        Checks each table name in `table_names` for rows with invalid foreign key references. This method is
-        intended to be used in conjunction with `disable_constraint_checking()` and `enable_constraint_checking()`, to
-        determine if rows with invalid references were entered while constraint checks were off.
+        Checks each table name in `table_names` for rows with invalid foreign
+        key references. This method is intended to be used in conjunction with
+        `disable_constraint_checking()` and `enable_constraint_checking()`, to
+        determine if rows with invalid references were entered while constraint
+        checks were off.
 
-        Raises an IntegrityError on the first invalid foreign key reference encountered (if any) and provides
-        detailed information about the invalid reference in the error message.
+        Raises an IntegrityError on the first invalid foreign key reference
+        encountered (if any) and provides detailed information about the
+        invalid reference in the error message.
 
-        Backends can override this method if they can more directly apply constraint checking (e.g. via "SET CONSTRAINTS
-        ALL IMMEDIATE")
+        Backends can override this method if they can more directly apply
+        constraint checking (e.g. via "SET CONSTRAINTS ALL IMMEDIATE")
         """
         cursor = self.cursor()
         if table_names is None:

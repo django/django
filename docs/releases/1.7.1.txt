@@ -1,0 +1,28 @@
+==========================
+Django 1.7.1 release notes
+==========================
+
+*Under development*
+
+Django 1.7.1 fixes several bugs in 1.7.
+
+Bugfixes
+========
+
+* Replace with actual issue (:ticket:`00000`).
+
+* Fixed a ``UnicodeDecodeError`` when the ``flush`` error message contained
+  Unicode characters (:ticket:`22882`).
+
+* Reinstated missing ``CHECK`` SQL clauses which were omitted on some backends
+  when not using migrations (:ticket:`23416`).
+
+* Fixed serialization of ``type`` objects in migrations (:ticket:`22951`).
+
+* Allowed inline and hidden references to admin fields (:ticket:`23431`).
+
+* The ``@deconstructible`` decorator now fails with a ``ValueError`` if the
+  decorated object cannot automatically be imported (:ticket:`23418`).
+
+* Fixed a typo in an ``inlineformset_factory()`` error message that caused a
+  crash (:ticket:`23451`).

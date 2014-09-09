@@ -25,23 +25,26 @@ class PostGISIntrospection(DatabaseIntrospection):
         identification integers for the PostGIS geometry and/or
         geography types (if supported).
         """
-        cursor = self.connection.cursor()
+        field_types = [
+            ('geometry', 'GeometryField'),
+            # The value for the geography type is actually a tuple
+            # to pass in the `geography=True` keyword to the field
+            # definition.
+            ('geography', ('GeometryField', {'geography': True})),
+        ]
+        postgis_types = {}
+
         # The OID integers associated with the geometry type may
         # be different across versions; hence, this is why we have
         # to query the PostgreSQL pg_type table corresponding to the
         # PostGIS custom data types.
         oid_sql = 'SELECT "oid" FROM "pg_type" WHERE "typname" = %s'
+        cursor = self.connection.cursor()
         try:
-            cursor.execute(oid_sql, ('geometry',))
-            GEOM_TYPE = cursor.fetchone()[0]
-            postgis_types = {GEOM_TYPE: 'GeometryField'}
-            if self.connection.ops.geography:
-                cursor.execute(oid_sql, ('geography',))
-                GEOG_TYPE = cursor.fetchone()[0]
-                # The value for the geography type is actually a tuple
-                # to pass in the `geography=True` keyword to the field
-                # definition.
-                postgis_types[GEOG_TYPE] = ('GeometryField', {'geography': True})
+            for field_type in field_types:
+                cursor.execute(oid_sql, (field_type[0],))
+                for result in cursor.fetchall():
+                    postgis_types[result[0]] = field_type[1]
         finally:
             cursor.close()
 
@@ -77,12 +80,11 @@ class PostGISIntrospection(DatabaseIntrospection):
                 if not row:
                     raise GeoIntrospectionError
             except GeoIntrospectionError:
-                if self.connection.ops.geography:
-                    cursor.execute('SELECT "coord_dimension", "srid", "type" '
-                                   'FROM "geography_columns" '
-                                   'WHERE "f_table_name"=%s AND "f_geography_column"=%s',
-                                   (table_name, geo_col))
-                    row = cursor.fetchone()
+                cursor.execute('SELECT "coord_dimension", "srid", "type" '
+                               'FROM "geography_columns" '
+                               'WHERE "f_table_name"=%s AND "f_geography_column"=%s',
+                               (table_name, geo_col))
+                row = cursor.fetchone()
 
             if not row:
                 raise Exception('Could not find a geometry or geography column for "%s"."%s"' %

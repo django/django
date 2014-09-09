@@ -1,21 +1,23 @@
 from __future__ import unicode_literals
 
-from unittest import skipUnless
-
 from django.contrib.gis.geos import HAS_GEOS
-from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql, no_mysql, no_oracle, no_spatialite
-from django.test import TestCase
+from django.contrib.gis.tests.utils import no_oracle
+from django.db import connection
+from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import override_settings
+from django.utils import timezone
 
 if HAS_GEOS:
     from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
     from django.contrib.gis.geometry.backend import Geometry
     from django.contrib.gis.geos import GEOSGeometry, Point, MultiPoint
 
-    from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article
+    from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article, Event
 
 
-@skipUnless(HAS_GEOS and HAS_SPATIAL_DB, "Geos and spatial db are required.")
+@skipUnlessDBFeature("gis_enabled")
 class RelatedGeoModelTest(TestCase):
+    fixtures = ['initial']
 
     def test02_select_related(self):
         "Testing `select_related` on geographic models (see #7126)."
@@ -37,7 +39,7 @@ class RelatedGeoModelTest(TestCase):
                 self.assertEqual(st, c.state)
                 self.assertEqual(Point(lon, lat), c.location.point)
 
-    @no_mysql
+    @skipUnlessDBFeature("has_transform_method")
     def test03_transform_related(self):
         "Testing the `transform` GeoQuerySet method on related geographic models."
         # All the transformations are to state plane coordinate systems using
@@ -61,8 +63,7 @@ class RelatedGeoModelTest(TestCase):
             qs = list(City.objects.filter(name=name).transform(srid, field_name='location__point'))
             check_pnt(GEOSGeometry(wkt, srid), qs[0].location.point)
 
-    @no_mysql
-    @no_spatialite
+    @skipUnlessDBFeature("supports_extent_aggr")
     def test04a_related_extent_aggregate(self):
         "Testing the `extent` GeoQuerySet aggregates on related geographic models."
         # This combines the Extent and Union aggregates into one query
@@ -82,7 +83,7 @@ class RelatedGeoModelTest(TestCase):
             for ref_val, e_val in zip(ref, e):
                 self.assertAlmostEqual(ref_val, e_val, tol)
 
-    @no_mysql
+    @skipUnlessDBFeature("has_unionagg_method")
     def test04b_related_union_aggregate(self):
         "Testing the `unionagg` GeoQuerySet aggregates on related geographic models."
         # This combines the Extent and Union aggregates into one query
@@ -103,7 +104,9 @@ class RelatedGeoModelTest(TestCase):
         ref_u2 = MultiPoint(p2, p3, srid=4326)
 
         u1 = City.objects.unionagg(field_name='location__point')
-        u2 = City.objects.exclude(name__in=('Roswell', 'Houston', 'Dallas', 'Fort Worth')).unionagg(field_name='location__point')
+        u2 = City.objects.exclude(
+            name__in=('Roswell', 'Houston', 'Dallas', 'Fort Worth'),
+        ).unionagg(field_name='location__point')
         u3 = aggs['location__point__union']
         self.assertEqual(type(u1), MultiPoint)
         self.assertEqual(type(u3), MultiPoint)
@@ -123,7 +126,11 @@ class RelatedGeoModelTest(TestCase):
         "Testing F() expressions on GeometryFields."
         # Constructing a dummy parcel border and getting the City instance for
         # assigning the FK.
-        b1 = GEOSGeometry('POLYGON((-97.501205 33.052520,-97.501205 33.052576,-97.501150 33.052576,-97.501150 33.052520,-97.501205 33.052520))', srid=4326)
+        b1 = GEOSGeometry(
+            'POLYGON((-97.501205 33.052520,-97.501205 33.052576,'
+            '-97.501150 33.052576,-97.501150 33.052520,-97.501205 33.052520))',
+            srid=4326
+        )
         pcity = City.objects.get(name='Aurora')
 
         # First parcel has incorrect center point that is equal to the City;
@@ -148,7 +155,7 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('P2', qs[0].name)
 
-        if not mysql:
+        if connection.features.supports_transform:
             # This time center2 is in a different coordinate system and needs
             # to be wrapped in transformation SQL.
             qs = Parcel.objects.filter(center2__within=F('border1'))
@@ -161,7 +168,7 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(qs))
         self.assertEqual('P1', qs[0].name)
 
-        if not mysql:
+        if connection.features.supports_transform:
             # This time the city column should be wrapped in transformation SQL.
             qs = Parcel.objects.filter(border2__contains=F('city__location__point'))
             self.assertEqual(1, len(qs))
@@ -183,6 +190,12 @@ class RelatedGeoModelTest(TestCase):
             self.assertIsInstance(t[1], Geometry)
             self.assertEqual(m.point, d['point'])
             self.assertEqual(m.point, t[1])
+
+    @override_settings(USE_TZ=True)
+    def test_07b_values(self):
+        "Testing values() and values_list() with aware datetime. See #21565."
+        Event.objects.create(name="foo", when=timezone.now())
+        list(Event.objects.values_list('when'))
 
     def test08_defer_only(self):
         "Testing defer() and only() on Geographic models."
@@ -266,16 +279,17 @@ class RelatedGeoModelTest(TestCase):
         # Should be `None`, and not a 'dummy' model.
         self.assertEqual(None, b.author)
 
-    @no_mysql
-    @no_oracle
-    @no_spatialite
+    @skipUnlessDBFeature("supports_collect_aggr")
     def test14_collect(self):
         "Testing the `collect` GeoQuerySet method and `Collect` aggregate."
         # Reference query:
         # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN
         #    "relatedapp_location" ON ("relatedapp_city"."location_id" = "relatedapp_location"."id")
         #    WHERE "relatedapp_city"."state" = 'TX';
-        ref_geom = GEOSGeometry('MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,-95.363151 29.763374,-96.801611 32.782057)')
+        ref_geom = GEOSGeometry(
+            'MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,'
+            '-95.363151 29.763374,-96.801611 32.782057)'
+        )
 
         c1 = City.objects.filter(state='TX').collect(field_name='location__point')
         c2 = City.objects.filter(state='TX').aggregate(Collect('location__point'))['location__point__collect']
@@ -284,7 +298,7 @@ class RelatedGeoModelTest(TestCase):
             # Even though Dallas and Ft. Worth share same point, Collect doesn't
             # consolidate -- that's why 4 points in MultiPoint.
             self.assertEqual(4, len(coll))
-            self.assertEqual(ref_geom, coll)
+            self.assertTrue(ref_geom.equals(coll))
 
     def test15_invalid_select_related(self):
         "Testing doing select_related on the related name manager of a unique FK. See #13934."

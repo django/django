@@ -9,8 +9,8 @@ from django.contrib.auth import models, management
 from django.contrib.auth.checks import check_user_model
 from django.contrib.auth.management import create_permissions
 from django.contrib.auth.management.commands import changepassword, createsuperuser
-from django.contrib.auth.models import User
-from django.contrib.auth.tests.custom_user import CustomUser
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.tests.custom_user import CustomUser, CustomUserWithFK, Email
 from django.contrib.auth.tests.utils import skipIfCustomUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
@@ -121,7 +121,10 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         command.execute(username="joe", stdout=self.stdout)
         command_output = self.stdout.getvalue().strip()
 
-        self.assertEqual(command_output, "Changing password for user 'joe'\nPassword changed successfully for user 'joe'")
+        self.assertEqual(
+            command_output,
+            "Changing password for user 'joe'\nPassword changed successfully for user 'joe'"
+        )
         self.assertTrue(models.User.objects.get(username="joe").check_password("not qwerty"))
 
     def test_that_max_tries_exits_1(self):
@@ -349,6 +352,67 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         )
         self.assertIs(command.stdin, sys.stdin)
 
+    @override_settings(AUTH_USER_MODEL='auth.CustomUserWithFK')
+    def test_fields_with_fk(self):
+        new_io = six.StringIO()
+        group = Group.objects.create(name='mygroup')
+        email = Email.objects.create(email='mymail@gmail.com')
+        call_command(
+            'createsuperuser',
+            interactive=False,
+            username=email.pk,
+            email=email.email,
+            group=group.pk,
+            stdout=new_io,
+            skip_checks=True,
+        )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, 'Superuser created successfully.')
+        u = CustomUserWithFK._default_manager.get(email=email)
+        self.assertEqual(u.username, email)
+        self.assertEqual(u.group, group)
+
+        non_existent_email = 'mymail2@gmail.com'
+        with self.assertRaisesMessage(CommandError,
+                'email instance with email %r does not exist.' % non_existent_email):
+            call_command(
+                'createsuperuser',
+                interactive=False,
+                username=email.pk,
+                email=non_existent_email,
+                stdout=new_io,
+                skip_checks=True,
+            )
+
+    @override_settings(AUTH_USER_MODEL='auth.CustomUserWithFK')
+    def test_fields_with_fk_interactive(self):
+        new_io = six.StringIO()
+        group = Group.objects.create(name='mygroup')
+        email = Email.objects.create(email='mymail@gmail.com')
+
+        @mock_inputs({
+            'password': 'nopasswd',
+            'username (email.id)': email.pk,
+            'email (email.email)': email.email,
+            'group (group.id)': group.pk,
+        })
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdout=new_io,
+                stdin=MockTTY(),
+                skip_checks=True,
+            )
+
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, 'Superuser created successfully.')
+            u = CustomUserWithFK._default_manager.get(email=email)
+            self.assertEqual(u.username, email)
+            self.assertEqual(u.group, group)
+
+        test(self)
+
 
 class CustomUserModelValidationTestCase(TestCase):
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
@@ -503,8 +567,8 @@ class PermissionTestCase(TestCase):
 
         permission_content_type = ContentType.objects.get_by_natural_key('auth', 'permission')
         models.Permission.objects.filter(content_type=permission_content_type).delete()
-        models.Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control"
+        models.Permission._meta.verbose_name = "some ridiculously long verbose name that is out of control" * 5
 
         six.assertRaisesRegex(self, exceptions.ValidationError,
-            "The verbose_name of permission is longer than 39 characters",
+            "The verbose_name of permission is longer than 244 characters",
             create_permissions, auth_app_config, verbosity=0)

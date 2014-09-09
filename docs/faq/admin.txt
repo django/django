@@ -13,12 +13,6 @@ things:
   "http://www.example.com/admin/" in your browser, in "myproject.settings" you
   should set :setting:`SESSION_COOKIE_DOMAIN` = 'www.example.com'.
 
-* Some browsers (Firefox?) don't like to accept cookies from domains that
-  don't have dots in them. If you're running the admin site on "localhost"
-  or another domain that doesn't have a dot in it, try going to
-  "localhost.localdomain" or "127.0.0.1". And set
-  :setting:`SESSION_COOKIE_DOMAIN` accordingly.
-
 I can't log in. When I enter a valid username and password, it brings up the login page again, with a "Please enter a correct username and password" error.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 

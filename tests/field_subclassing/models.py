@@ -1,7 +1,6 @@
 """
 Tests for field subclassing.
 """
-
 from django.db import models
 from django.utils.encoding import force_text
 

@@ -12,6 +12,11 @@ class DjangoRuntimeWarning(RuntimeWarning):
     pass
 
 
+class AppRegistryNotReady(Exception):
+    """The django.apps registry is not populated yet"""
+    pass
+
+
 class ObjectDoesNotExist(Exception):
     """The requested object does not exist"""
     silent_variable_failure = True
@@ -137,13 +142,10 @@ class ValidationError(Exception):
 
     def update_error_dict(self, error_dict):
         if hasattr(self, 'error_dict'):
-            if error_dict:
-                for field, errors in self.error_dict.items():
-                    error_dict.setdefault(field, []).extend(errors)
-            else:
-                error_dict = self.error_dict
+            for field, error_list in self.error_dict.items():
+                error_dict.setdefault(field, []).extend(error_list)
         else:
-            error_dict[NON_FIELD_ERRORS] = self.error_list
+            error_dict.setdefault(NON_FIELD_ERRORS, []).extend(self.error_list)
         return error_dict
 
     def __iter__(self):

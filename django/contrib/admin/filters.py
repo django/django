@@ -8,6 +8,7 @@ certain test -- e.g. being a DateField or ForeignKey.
 import datetime
 
 from django.db import models
+from django.db.models.fields.related import ManyToManyField
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.encoding import smart_text, force_text
 from django.utils.translation import ugettext_lazy as _
@@ -169,7 +170,7 @@ class RelatedFieldListFilter(FieldListFilter):
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg)
         self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
-        self.lookup_choices = field.get_choices(include_blank=False)
+        self.lookup_choices = self.field_choices(field, request, model_admin)
         super(RelatedFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
         if hasattr(field, 'verbose_name'):
@@ -190,6 +191,9 @@ class RelatedFieldListFilter(FieldListFilter):
     def expected_parameters(self):
         return [self.lookup_kwarg, self.lookup_kwarg_isnull]
 
+    def field_choices(self, field, request, model_admin):
+        return field.get_choices(include_blank=False)
+
     def choices(self, cl):
         from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
         yield {
@@ -207,8 +211,8 @@ class RelatedFieldListFilter(FieldListFilter):
                 'display': val,
             }
         if (isinstance(self.field, models.related.RelatedObject) and
-                self.field.field.null or hasattr(self.field, 'rel') and
-                self.field.null):
+                (self.field.field.null or isinstance(self.field.field, ManyToManyField)) or
+                hasattr(self.field, 'rel') and (self.field.null or isinstance(self.field, ManyToManyField))):
             yield {
                 'selected': bool(self.lookup_val_isnull),
                 'query_string': cl.get_query_string({
@@ -360,7 +364,12 @@ class AllValuesFieldListFilter(FieldListFilter):
         self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull,
                                                  None)
         parent_model, reverse_path = reverse_field_path(model, field_path)
-        queryset = parent_model._default_manager.all()
+        # Obey parent ModelAdmin queryset when deciding which options to show
+        if model == parent_model:
+            queryset = model_admin.get_queryset(request)
+        else:
+            queryset = parent_model._default_manager.all()
+
         # optional feature: limit choices base on existing relationships
         # queryset = queryset.complex_filter(
         #    {'%s__isnull' % reverse_path: False})
@@ -409,3 +418,9 @@ class AllValuesFieldListFilter(FieldListFilter):
             }
 
 FieldListFilter.register(lambda f: True, AllValuesFieldListFilter)
+
+
+class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
+    def field_choices(self, field, request, model_admin):
+        limit_choices_to = {'pk__in': set(model_admin.get_queryset(request).values_list(field.name, flat=True))}
+        return field.get_choices(include_blank=False, limit_choices_to=limit_choices_to)

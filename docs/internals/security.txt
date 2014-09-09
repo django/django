@@ -19,21 +19,20 @@ Reporting security issues
 **Short version: please report security issues by emailing
 security@djangoproject.com**.
 
-Most normal bugs in Django are reported to `our public Trac
-instance`_, but due to the sensitive nature of security issues, we ask
-that they **not** be publicly reported in this fashion.
+Most normal bugs in Django are reported to `our public Trac instance`_, but
+due to the sensitive nature of security issues, we ask that they **not** be
+publicly reported in this fashion.
 
-Instead, if you believe you've found something in Django which has
-security implications, please send a description of the issue via
-email to ``security@djangoproject.com``. Mail sent to that address
-reaches a subset of the core development team, who can forward
-security issues into the private committers' mailing list for broader
-discussion if needed.
+Instead, if you believe you've found something in Django which has security
+implications, please send a description of the issue via email to
+``security@djangoproject.com``. Mail sent to that address reaches a
+:ref:`subset of the core team <security-team-list>`, who can forward security
+issues into the private committers' mailing list for broader discussion if
+needed.
 
-Once you've submitted an issue via email, you should receive an
-acknowledgment from a member of the Django development team within 48
-hours, and depending on the action to be taken, you may receive
-further followup emails.
+Once you've submitted an issue via email, you should receive an acknowledgment
+from a member of the security team within 48 hours, and depending on the
+action to be taken, you may receive further followup emails.
 
 .. note::
 
@@ -223,7 +222,9 @@ discretion of the Django development team, and that this privilege can
 be revoked at any time, with or without explanation.
 
 If you are added to the notification list, security-related emails
-will be sent to you by Django's release manager, and all notification
-emails will be signed with the same key used to sign Django releases;
-that key has the ID ``0x3684C0C08C8B2AE1``, and is available from most
-commonly-used keyservers.
+will be sent to you by Django's release team, and all notification
+emails will be signed with a key authorized to issue Django
+releases. The list of authorized keys is in `the Django releasers
+file`_.
+
+.. _the Django releasers file: https://www.djangoproject.com/m/pgp/django-releasers.txt

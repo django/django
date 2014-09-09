@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core import checks
 from django.core.exceptions import (ObjectDoesNotExist,
     MultipleObjectsReturned, FieldError, ValidationError, NON_FIELD_ERRORS)
-from django.db import (router, transaction, DatabaseError,
+from django.db import (router, connections, transaction, DatabaseError,
     DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY)
 from django.db.models.deletion import Collector
 from django.db.models.fields import AutoField, FieldDoesNotExist
@@ -130,14 +130,18 @@ class ModelBase(type):
                 'DoesNotExist',
                 subclass_exception(
                     str('DoesNotExist'),
-                    tuple(x.DoesNotExist for x in parents if hasattr(x, '_meta') and not x._meta.abstract) or (ObjectDoesNotExist,),
+                    tuple(
+                        x.DoesNotExist for x in parents if hasattr(x, '_meta') and not x._meta.abstract
+                    ) or (ObjectDoesNotExist,),
                     module,
                     attached_to=new_class))
             new_class.add_to_class(
                 'MultipleObjectsReturned',
                 subclass_exception(
                     str('MultipleObjectsReturned'),
-                    tuple(x.MultipleObjectsReturned for x in parents if hasattr(x, '_meta') and not x._meta.abstract) or (MultipleObjectsReturned,),
+                    tuple(
+                        x.MultipleObjectsReturned for x in parents if hasattr(x, '_meta') and not x._meta.abstract
+                    ) or (MultipleObjectsReturned,),
                     module,
                     attached_to=new_class))
             if base_meta and not base_meta.abstract:
@@ -186,7 +190,10 @@ class ModelBase(type):
             for parent in [kls for kls in parents if hasattr(kls, '_meta')]:
                 if parent._meta.abstract:
                     if parent._meta.fields:
-                        raise TypeError("Abstract base class containing model fields not permitted for proxy model '%s'." % name)
+                        raise TypeError(
+                            "Abstract base class containing model fields not "
+                            "permitted for proxy model '%s'." % name
+                        )
                     else:
                         continue
                 if base is not None:
@@ -457,6 +464,16 @@ class Model(six.with_metaclass(ModelBase)):
                 raise TypeError("'%s' is an invalid keyword argument for this function" % list(kwargs)[0])
         super(Model, self).__init__()
         signals.post_init.send(sender=self.__class__, instance=self)
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        if cls._deferred:
+            new = cls(**dict(zip(field_names, values)))
+        else:
+            new = cls(*values)
+        new._state.adding = False
+        new._state.db = db
+        return new
 
     def __repr__(self):
         try:
@@ -755,7 +772,10 @@ class Model(six.with_metaclass(ModelBase)):
 
     def delete(self, using=None):
         using = using or router.db_for_write(self.__class__, instance=self)
-        assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
+        assert self._get_pk_val() is not None, (
+            "%s object can't be deleted because its %s attribute is set to None." %
+            (self._meta.object_name, self._meta.pk.attname)
+        )
 
         collector = Collector(using=using)
         collector.collect([self])
@@ -775,7 +795,9 @@ class Model(six.with_metaclass(ModelBase)):
         param = force_text(getattr(self, field.attname))
         q = Q(**{'%s__%s' % (field.name, op): param})
         q = q | Q(**{field.name: param, 'pk__%s' % op: self.pk})
-        qs = self.__class__._default_manager.using(self._state.db).filter(**kwargs).filter(q).order_by('%s%s' % (order, field.name), '%spk' % order)
+        qs = self.__class__._default_manager.using(self._state.db).filter(**kwargs).filter(q).order_by(
+            '%s%s' % (order, field.name), '%spk' % order
+        )
         try:
             return qs[0]
         except IndexError:
@@ -1068,6 +1090,7 @@ class Model(six.with_metaclass(ModelBase)):
         if not cls._meta.swapped:
             errors.extend(cls._check_fields(**kwargs))
             errors.extend(cls._check_m2m_through_same_relationship())
+            errors.extend(cls._check_long_column_names())
             clash_errors = cls._check_id_field() + cls._check_field_name_clashes()
             errors.extend(clash_errors)
             # If there are field name clashes, hide consequent column name
@@ -1451,6 +1474,76 @@ class Model(six.with_metaclass(ModelBase)):
                 )
         return errors
 
+    @classmethod
+    def _check_long_column_names(cls):
+        """
+        Check that any auto-generated column names are shorter than the limits
+        for each database in which the model will be created.
+        """
+        errors = []
+        allowed_len = None
+        db_alias = None
+
+        # Find the minimum max allowed length among all specified db_aliases.
+        for db in settings.DATABASES.keys():
+            # skip databases where the model won't be created
+            if not router.allow_migrate(db, cls):
+                continue
+            connection = connections[db]
+            max_name_length = connection.ops.max_name_length()
+            if max_name_length is None or connection.features.truncates_names:
+                continue
+            else:
+                if allowed_len is None:
+                    allowed_len = max_name_length
+                    db_alias = db
+                elif max_name_length < allowed_len:
+                    allowed_len = max_name_length
+                    db_alias = db
+
+        if allowed_len is None:
+            return errors
+
+        for f in cls._meta.local_fields:
+            _, column_name = f.get_attname_column()
+
+            # Check if auto-generated name for the field is too long
+            # for the database.
+            if (f.db_column is None and column_name is not None
+                    and len(column_name) > allowed_len):
+                errors.append(
+                    checks.Error(
+                        'Autogenerated column name too long for field "%s". '
+                        'Maximum length is "%s" for database "%s".'
+                        % (column_name, allowed_len, db_alias),
+                        hint="Set the column name manually using 'db_column'.",
+                        obj=cls,
+                        id='models.E018',
+                    )
+                )
+
+        for f in cls._meta.local_many_to_many:
+            # Check if auto-generated name for the M2M field is too long
+            # for the database.
+            for m2m in f.rel.through._meta.local_fields:
+                _, rel_name = m2m.get_attname_column()
+                if (m2m.db_column is None and rel_name is not None
+                        and len(rel_name) > allowed_len):
+                    errors.append(
+                        checks.Error(
+                            'Autogenerated column name too long for M2M field '
+                            '"%s". Maximum length is "%s" for database "%s".'
+                            % (rel_name, allowed_len, db_alias),
+                            hint=("Use 'through' to create a separate model "
+                                "for M2M and then set column_name using "
+                                "'db_column'."),
+                            obj=cls,
+                            id='models.E019',
+                        )
+                    )
+
+        return errors
+
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
@@ -1483,7 +1576,9 @@ def method_get_order(ordered_obj, self):
 ##############################################
 
 def get_absolute_url(opts, func, self, *args, **kwargs):
-    return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.model_name), func)(self, *args, **kwargs)
+    return settings.ABSOLUTE_URL_OVERRIDES.get(
+        '%s.%s' % (opts.app_label, opts.model_name), func
+    )(self, *args, **kwargs)
 
 
 ########

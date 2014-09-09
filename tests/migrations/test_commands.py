@@ -6,7 +6,7 @@ import os
 import shutil
 
 from django.apps import apps
-from django.db import models
+from django.db import connection, models
 from django.core.management import call_command, CommandError
 from django.db.migrations import questioner
 from django.test import override_settings, override_system_checks
@@ -93,14 +93,28 @@ class MigrateTests(MigrationTestBase):
         """
         Makes sure that sqlmigrate does something.
         """
+        # Make sure the output is wrapped in a transaction
+        stdout = six.StringIO()
+        call_command("sqlmigrate", "migrations", "0001", stdout=stdout)
+        output = stdout.getvalue()
+        self.assertIn(connection.ops.start_transaction_sql(), output)
+        self.assertIn(connection.ops.end_transaction_sql(), output)
+
         # Test forwards. All the databases agree on CREATE TABLE, at least.
         stdout = six.StringIO()
         call_command("sqlmigrate", "migrations", "0001", stdout=stdout)
         self.assertIn("create table", stdout.getvalue().lower())
+
+        # Cannot generate the reverse SQL unless we've applied the migration.
+        call_command("migrate", "migrations", verbosity=0)
+
         # And backwards is a DROP TABLE
         stdout = six.StringIO()
         call_command("sqlmigrate", "migrations", "0001", stdout=stdout, backwards=True)
         self.assertIn("drop table", stdout.getvalue().lower())
+
+        # Cleanup by unmigrating everything
+        call_command("migrate", "migrations", "zero", verbosity=0)
 
     @override_system_checks([])
     @override_settings(
@@ -230,19 +244,6 @@ class MakeMigrationsTests(MigrationTestBase):
         """
         with self.assertRaises(CommandError):
             call_command("makemigrations")
-
-    @override_system_checks([])
-    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
-    def test_makemigrations_merge_basic(self):
-        """
-        Makes sure that makemigrations doesn't error if you ask for
-        merge mode with a conflict present. Doesn't test writing of the merge
-        file, as that requires temp directories.
-        """
-        try:
-            call_command("makemigrations", merge=True, verbosity=0)
-        except CommandError:
-            self.fail("Makemigrations errored in merge mode with conflicts")
 
     @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
@@ -386,13 +387,18 @@ class MakeMigrationsTests(MigrationTestBase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_makemigrations_handle_merge(self):
         """
-        Makes sure that makemigrations properly merges the conflicting migrations.
+        Makes sure that makemigrations properly merges the conflicting migrations with --noinput.
         """
         stdout = six.StringIO()
-        call_command("makemigrations", "migrations", merge=True, stdout=stdout)
+        call_command("makemigrations", "migrations", merge=True, interactive=False, stdout=stdout)
         self.assertIn("Merging migrations", stdout.getvalue())
         self.assertIn("Branch 0002_second", stdout.getvalue())
         self.assertIn("Branch 0002_conflicting_second", stdout.getvalue())
+        merge_file = os.path.join(self.test_dir, 'test_migrations_conflict', '0003_merge.py')
+        self.assertTrue(os.path.exists(merge_file))
+        os.remove(merge_file)
+        self.assertFalse(os.path.exists(merge_file))
+        self.assertIn("Created new merge migration", stdout.getvalue())
 
     @override_system_checks([])
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_default"})
@@ -469,3 +475,105 @@ class MakeMigrationsTests(MigrationTestBase):
         self.assertTrue(os.path.isfile(os.path.join(self.test_dir,
                        "test_migrations_path_doesnt_exist", "foo", "bar",
                        "0001_initial.py")))
+
+    @override_system_checks([])
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
+    def test_makemigrations_interactive_by_default(self):
+        """
+        Makes sure that the user is prompted to merge by default if there are
+        conflicts and merge is True. Answer negative to differentiate it from
+        behavior when --noinput is specified.
+        """
+        # Monkeypatch interactive questioner to auto reject
+        old_input = questioner.input
+        questioner.input = lambda _: "N"
+        stdout = six.StringIO()
+        merge_file = os.path.join(self.test_dir, 'test_migrations_conflict', '0003_merge.py')
+        try:
+            call_command("makemigrations", "migrations", merge=True, stdout=stdout)
+            # This will fail if interactive is False by default
+            self.assertFalse(os.path.exists(merge_file))
+        except CommandError:
+            self.fail("Makemigrations failed while running interactive questioner")
+        finally:
+            questioner.input = old_input
+            if os.path.exists(merge_file):
+                os.remove(merge_file)
+        self.assertNotIn("Created new merge migration", stdout.getvalue())
+
+    @override_system_checks([])
+    @override_settings(
+        MIGRATION_MODULES={"migrations": "migrations.test_migrations_no_changes"},
+        INSTALLED_APPS=[
+            "migrations",
+            "migrations.migrations_test_apps.unspecified_app_with_conflict"])
+    def test_makemigrations_unspecified_app_with_conflict_no_merge(self):
+        """
+        Makes sure that makemigrations does not raise a CommandError when an
+        unspecified app has conflicting migrations.
+        """
+        try:
+            call_command("makemigrations", "migrations", merge=False, verbosity=0)
+        except CommandError:
+            self.fail("Makemigrations fails resolving conflicts in an unspecified app")
+
+    @override_system_checks([])
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.migrated_app",
+            "migrations.migrations_test_apps.unspecified_app_with_conflict"])
+    def test_makemigrations_unspecified_app_with_conflict_merge(self):
+        """
+        Makes sure that makemigrations does not create a merge for an
+        unspecified app even if it has conflicting migrations.
+        """
+        # Monkeypatch interactive questioner to auto accept
+        old_input = questioner.input
+        questioner.input = lambda _: "y"
+        stdout = six.StringIO()
+        merge_file = os.path.join(self.test_dir,
+                                  'migrations_test_apps',
+                                  'unspecified_app_with_conflict',
+                                  'migrations',
+                                  '0003_merge.py')
+        try:
+            call_command("makemigrations", "migrated_app", merge=True, interactive=True, stdout=stdout)
+            self.assertFalse(os.path.exists(merge_file))
+            self.assertIn("No conflicts detected to merge.", stdout.getvalue())
+        except CommandError:
+            self.fail("Makemigrations fails resolving conflicts in an unspecified app")
+        finally:
+            questioner.input = old_input
+            if os.path.exists(merge_file):
+                os.remove(merge_file)
+
+    @override_system_checks([])
+    def test_makemigrations_with_custom_name(self):
+        """
+        Makes sure that makemigrations generate a custom migration.
+        """
+        def cmd(migration_count, migration_name, *args):
+            with override_settings(MIGRATION_MODULES={"migrations": self.migration_pkg}):
+                try:
+                    call_command("makemigrations", "migrations", "--verbosity", "0", "--name", migration_name, *args)
+                except CommandError:
+                    self.fail("Makemigrations errored in creating empty migration with custom name for a proper app.")
+            migration_file = os.path.join(self.migration_dir, "%s_%s.py" % (migration_count, migration_name))
+            # Check for existing migration file in migration folder
+            self.assertTrue(os.path.exists(migration_file))
+            with codecs.open(migration_file, "r", encoding="utf-8") as fp:
+                content = fp.read()
+                self.assertTrue("# -*- coding: utf-8 -*-" in content)
+                content = content.replace(" ", "")
+            return content
+
+        # generate an initial migration
+        migration_name_0001 = "my_initial_migration"
+        content = cmd("0001", migration_name_0001)
+        self.assertIn("dependencies=[\n]", content)
+
+        # generate an empty migration
+        migration_name_0002 = "my_custom_migration"
+        content = cmd("0002", migration_name_0002, "--empty")
+        self.assertIn("dependencies=[\n('migrations','0001_%s'),\n]" % migration_name_0001, content)
+        self.assertIn("operations=[\n]", content)

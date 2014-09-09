@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 
 import datetime
 import os
+import re
 import tokenize
 import unittest
+import warnings
 
 from django.core.validators import RegexValidator, EmailValidator
 from django.db import models, migrations
@@ -15,6 +17,9 @@ from django.utils import datetime_safe, six
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import get_default_timezone
+
+import custom_migration_operations.operations
+import custom_migration_operations.more_operations
 
 
 class TestModel1(object):
@@ -90,6 +95,7 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(datetime.datetime.today)
         self.assertSerializedEqual(datetime.date.today())
         self.assertSerializedEqual(datetime.date.today)
+        self.assertSerializedEqual(datetime.datetime.now().time())
         with self.assertRaises(ValueError):
             self.assertSerializedEqual(datetime.datetime(2012, 1, 1, 1, 1, tzinfo=get_default_timezone()))
         safe_date = datetime_safe.date(2014, 3, 31)
@@ -100,18 +106,6 @@ class WriterTests(TestCase):
         string, imports = MigrationWriter.serialize(safe_datetime)
         self.assertEqual(string, repr(datetime.datetime(2014, 3, 31, 16, 4, 31)))
         self.assertEqual(imports, {'import datetime'})
-        # Classes
-        validator = RegexValidator(message="hello")
-        string, imports = MigrationWriter.serialize(validator)
-        self.assertEqual(string, "django.core.validators.RegexValidator(message='hello')")
-        self.serialize_round_trip(validator)
-        validator = EmailValidator(message="hello")  # Test with a subclass.
-        string, imports = MigrationWriter.serialize(validator)
-        self.assertEqual(string, "django.core.validators.EmailValidator(message='hello')")
-        self.serialize_round_trip(validator)
-        validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
-        string, imports = MigrationWriter.serialize(validator)
-        self.assertEqual(string, "custom.EmailValidator(message='hello')")
         # Django fields
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
         self.assertSerializedFieldEqual(models.TextField(null=True, blank=True))
@@ -131,6 +125,59 @@ class WriterTests(TestCase):
                 set(),
             )
         )
+
+    def test_serialize_compiled_regex(self):
+        """
+        Make sure compiled regex can be serialized.
+        """
+        regex = re.compile(r'^\w+$', re.U)
+        self.assertSerializedEqual(regex)
+
+    def test_serialize_class_based_validators(self):
+        """
+        Ticket #22943: Test serialization of class-based validators, including
+        compiled regexes.
+        """
+        validator = RegexValidator(message="hello")
+        string = MigrationWriter.serialize(validator)[0]
+        self.assertEqual(string, "django.core.validators.RegexValidator(message='hello')")
+        self.serialize_round_trip(validator)
+
+        # Test with a compiled regex.
+        validator = RegexValidator(regex=re.compile(r'^\w+$', re.U))
+        string = MigrationWriter.serialize(validator)[0]
+        self.assertEqual(string, "django.core.validators.RegexValidator(regex=re.compile('^\\\\w+$', 32))")
+        self.serialize_round_trip(validator)
+
+        # Test a string regex with flag
+        validator = RegexValidator(r'^[0-9]+$', flags=re.U)
+        string = MigrationWriter.serialize(validator)[0]
+        self.assertEqual(string, "django.core.validators.RegexValidator('^[0-9]+$', flags=32)")
+        self.serialize_round_trip(validator)
+
+        # Test message and code
+        validator = RegexValidator('^[-a-zA-Z0-9_]+$', 'Invalid', 'invalid')
+        string = MigrationWriter.serialize(validator)[0]
+        self.assertEqual(string, "django.core.validators.RegexValidator('^[-a-zA-Z0-9_]+$', 'Invalid', 'invalid')")
+        self.serialize_round_trip(validator)
+
+        # Test with a subclass.
+        validator = EmailValidator(message="hello")
+        string = MigrationWriter.serialize(validator)[0]
+        self.assertEqual(string, "django.core.validators.EmailValidator(message='hello')")
+        self.serialize_round_trip(validator)
+
+        validator = deconstructible(path="migrations.test_writer.EmailValidator")(EmailValidator)(message="hello")
+        string = MigrationWriter.serialize(validator)[0]
+        self.assertEqual(string, "migrations.test_writer.EmailValidator(message='hello')")
+
+        validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
+        with six.assertRaisesRegex(self, ImportError, "No module named '?custom'?"):
+            MigrationWriter.serialize(validator)
+
+        validator = deconstructible(path="django.core.validators.EmailValidator2")(EmailValidator)(message="hello")
+        with self.assertRaisesMessage(ValueError, "Could not find object EmailValidator2 in django.core.validators."):
+            MigrationWriter.serialize(validator)
 
     def test_serialize_empty_nonempty_tuple(self):
         """
@@ -162,6 +209,19 @@ class WriterTests(TestCase):
                 return "somewhere dynamic"
             thing = models.FileField(upload_to=upload_to)
         with self.assertRaises(ValueError):
+            self.serialize_round_trip(TestModel2.thing)
+
+    def test_serialize_local_function_reference_message(self):
+        """
+        Make sure user is seeing which module/function is the issue
+        """
+        class TestModel2(object):
+            def upload_to(self):
+                return "somewhere dynamic"
+            thing = models.FileField(upload_to=upload_to)
+
+        with six.assertRaisesRegex(self, ValueError,
+                '^Could not find function upload_to in migrations.test_writer'):
             self.serialize_round_trip(TestModel2.thing)
 
     def test_simple_migration(self):
@@ -212,6 +272,7 @@ class WriterTests(TestCase):
         test_apps = [
             'migrations.migrations_test_apps.normal',
             'migrations.migrations_test_apps.with_package_model',
+            'migrations.migrations_test_apps.without_init_file',
         ]
 
         base_dir = os.path.dirname(os.path.dirname(__file__))
@@ -221,4 +282,28 @@ class WriterTests(TestCase):
                 migration = migrations.Migration('0001_initial', app.split('.')[-1])
                 expected_path = os.path.join(base_dir, *(app.split('.') + ['migrations', '0001_initial.py']))
                 writer = MigrationWriter(migration)
-                self.assertEqual(writer.path, expected_path)
+                # Silence warning on Python 2: Not importing directory
+                # 'tests/migrations/migrations_test_apps/without_init_file/migrations':
+                # missing __init__.py
+                with warnings.catch_warnings():
+                    warnings.filterwarnings("ignore", category=ImportWarning)
+                    self.assertEqual(writer.path, expected_path)
+
+    def test_custom_operation(self):
+        migration = type(str("Migration"), (migrations.Migration,), {
+            "operations": [
+                custom_migration_operations.operations.TestOperation(),
+                custom_migration_operations.operations.CreateModel(),
+                migrations.CreateModel("MyModel", (), {}, (models.Model,)),
+                custom_migration_operations.more_operations.TestOperation()
+            ],
+            "dependencies": []
+        })
+        writer = MigrationWriter(migration)
+        output = writer.as_string()
+        result = self.safe_exec(output)
+        self.assertIn("custom_migration_operations", result)
+        self.assertNotEqual(
+            result['custom_migration_operations'].operations.TestOperation,
+            result['custom_migration_operations'].more_operations.TestOperation
+        )

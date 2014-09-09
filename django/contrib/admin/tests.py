@@ -1,12 +1,12 @@
 import os
 from unittest import SkipTest
 
-from django.contrib.staticfiles.testing import StaticLiveServerCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 
 
-class AdminSeleniumWebDriverTestCase(StaticLiveServerCase):
+class AdminSeleniumWebDriverTestCase(StaticLiveServerTestCase):
 
     available_apps = [
         'django.contrib.admin',

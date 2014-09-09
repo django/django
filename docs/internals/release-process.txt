@@ -11,23 +11,19 @@ Since version 1.0, Django's release numbering works as follows:
 
 * Versions are numbered in the form ``A.B`` or ``A.B.C``.
 
-* ``A`` is the *major version* number, which is only incremented for major
-  changes to Django, and these changes are not necessarily
-  backwards-compatible. That is, code you wrote for Django 1.6 may break
-  when we release Django 2.0.
+* ``A.B`` is the *major version* number. Each version will be mostly backwards
+  compatible with the previous release. Exceptions to this rule will be listed
+  in the release notes. When ``B == 9``, the next major release will be
+  ``A+1.0``. For example, Django 2.0 will follow Django 1.9. There won't be
+  anything special about "dot zero" releases.
 
-* ``B`` is the *minor version* number, which is incremented for large yet
-  backwards compatible changes.  Code written for Django 1.6 will continue
-  to work under Django 1.7. Exceptions to this rule will be listed in the
-  release notes.
+* ``C`` is the *minor version* number, which is incremented for bug and
+  security fixes. A new minor release will be 100% backwards-compatible with
+  the previous minor release. The only exception is when a security or data loss
+  issue can't be fixed without breaking backwards-compatibility. If this
+  happens, the release notes will provide detailed upgrade instructions.
 
-* ``C`` is the *micro version* number, which is incremented for bug and
-  security fixes. A new micro-release will be 100% backwards-compatible with
-  the previous micro-release. The only exception is when a security issue
-  can't be fixed without breaking backwards-compatibility. If this happens,
-  the release notes will provide detailed upgrade instructions.
-
-* Before a new minor release, we'll make alpha, beta, and release candidate
+* Before a new major release, we'll make alpha, beta, and release candidate
   releases. These are of the form ``A.B alpha/beta/rc N``, which means the
   ``Nth`` alpha/beta/release candidate of version ``A.B``.
 
@@ -42,17 +38,13 @@ security purposes, please see :doc:`our security policies <security>`.
 .. glossary::
 
   Major release
-    Major releases (1.0, 2.0, etc.) will happen very infrequently (think "years",
-    not "months"), and may represent major, sweeping changes to Django.
-
-  Minor release
-    Minor release (1.5, 1.6, etc.) will happen roughly every nine months -- see
-    `release process`_, below for details. These releases will contain new
+    Major releases (A.B, A.B+1, etc.) will happen roughly every nine months --
+    see `release process`_, below for details. These releases will contain new
     features, improvements to existing features, and such.
 
     .. _internal-release-deprecation-policy:
 
-    A minor release may deprecate certain features from previous releases. If a
+    A major release may deprecate certain features from previous releases. If a
     feature is deprecated in version ``A.B``, it will continue to work in versions
     ``A.B`` and  ``A.B+1`` but raise warnings. It will be removed in version
     ``A.B+2``.
@@ -70,13 +62,14 @@ security purposes, please see :doc:`our security policies <security>`.
 
     * Django 1.9 will remove the feature outright.
 
-  Micro release
-    Micro releases (1.5.1, 1.6.2, 1.6.1, etc.) will be issued as needed, often to
-    fix security issues.
+  Minor release
+    Minor releases (A.B.C, etc.) will be issued as needed, often to fix security
+    issues.
 
-    These releases will be 100% compatible with the associated minor release, unless
-    this is impossible for security reasons. So the answer to "should I upgrade to
-    the latest micro release?" will always be "yes."
+    These releases will be 100% compatible with the associated major release,
+    unless this is impossible for security reasons or to prevent data loss.
+    So the answer to "should I upgrade to the latest minor release?" will always
+    be "yes."
 
 .. _backwards-compatibility-policy:
 
@@ -89,27 +82,24 @@ varying levels:
 * The current development master will get new features and bug fixes
   requiring major refactoring.
 
-* Patches applied to the master branch must also be applied to the last minor
-  release, to be released as the next micro release, when they fix critical
+* Patches applied to the master branch must also be applied to the last major
+  release, to be released as the next minor release, when they fix critical
   problems:
 
   * Security issues.
 
-  * Data-loss bugs.
+  * Data loss bugs.
 
   * Crashing bugs.
 
   * Major functionality bugs in newly-introduced features.
 
-  The rule of thumb is that fixes will be backported to the last minor release
+  The rule of thumb is that fixes will be backported to the last major release
   for bugs that would have prevented a release in the first place (release
   blockers).
 
-* Security fixes will be applied to the current master and the previous two
-  minor releases.
-
-* Committers may choose to backport bugfixes at their own discretion,
-  provided they do not introduce backwards incompatibilities.
+* Security fixes and data loss bugs will be applied to the current master, the
+  last two major releases, and the current :ref:`LTS release <lts-releases>`.
 
 * Documentation fixes generally will be more freely backported to the last
   release branch. That's because it's highly advantageous to have the docs for
@@ -117,19 +107,20 @@ varying levels:
   regressions is much less of a concern.
 
 As a concrete example, consider a moment in time halfway between the release of
-Django 1.6 and 1.7. At this point in time:
+Django 1.7 and 1.8. At this point in time:
 
-* Features will be added to development master, to be released as Django 1.7.
+* Features will be added to development master, to be released as Django 1.8.
 
-* Critical bug fixes will be applied to the ``stable/1.6.x`` branch, and
-  released as 1.6.1, 1.6.2, etc.
+* Critical bug fixes will be applied to the ``stable/1.7.x`` branch, and
+  released as 1.7.1, 1.7.2, etc.
 
-* Security fixes will be applied to ``master``, to the ``stable/1.6.x``
-  branch, and to the ``stable/1.5.x`` branch. They will trigger the release of
-  ``1.6.1``, ``1.5.1``, etc.
+* Security fixes and bug fixes for data loss issues will be applied to
+  ``master`` and to the ``stable/1.7.x``, ``stable/1.6.x``, and
+  ``stable/1.4.x`` (LTS) branches. They will trigger the release of ``1.7.1``,
+  ``1.6.1``, ``1.4.1``, etc.
 
 * Documentation fixes will be applied to master, and, if easily backported, to
-  the ``1.6.x`` branch. Bugfixes may also be backported.
+  the ``1.7.x`` and ``1.6.x`` branches.
 
 .. _lts-releases:
 
@@ -137,9 +128,9 @@ Long-term support (LTS) releases
 ================================
 
 Additionally, the Django team will occasionally designate certain releases
-to be "Long-term support" (LTS) releases. LTS releases will get security fixes
-applied for a guaranteed period of time, typically 3+ years, regardless of
-the pace of releases afterwards.
+to be "Long-term support" (LTS) releases. LTS releases will get security and
+data loss fixes applied for a guaranteed period of time, typically 3+ years,
+regardless of the pace of releases afterwards.
 
 The follow releases have been designated for long-term support:
 
@@ -150,14 +141,14 @@ The follow releases have been designated for long-term support:
 Release process
 ===============
 
-Django uses a time-based release schedule, with minor (i.e. 1.6, 1.7, etc.)
-releases every nine months, or more, depending on features.
+Django uses a time-based release schedule, with major (i.e. 1.8, 1.9, 2.0,
+etc.) releases every nine months, or more, depending on features.
 
-After each release, and after a suitable cooling-off period of a few weeks, the
-core development team will examine the landscape and announce a timeline for the
-next release. Most releases will be scheduled in the 6-9 month range, but if we
-have bigger features to development we might schedule a longer period to allow
-for more ambitious work.
+After each release, and after a suitable cooling-off period of a few weeks,
+core developers will examine the landscape and announce a timeline for the
+next release. Most releases will be scheduled in the 6-9 month range, but if
+we have bigger features to development we might schedule a longer period to
+allow for more ambitious work.
 
 Release cycle
 -------------
@@ -220,32 +211,11 @@ in the ``A.B+1`` cycle.
 Bug-fix releases
 ----------------
 
-After a minor release (e.g. 1.6), the previous release will go into bugfix
+After a major release (e.g. A.B), the previous release will go into bugfix
 mode.
 
-A branch will be created of the form ``stable/1.5.x`` to track bugfixes to the
-previous release. Critical bugs fixed on master must *also* be fixed on the
-bugfix branch; this means that commits need to cleanly separate bug fixes from
-feature additions. The developer who commits a fix to master will be
-responsible for also applying the fix to the current bugfix branch.
-
-How this all fits together
---------------------------
-
-Let's look at a hypothetical example for how this all first together. Imagine,
-if you will, a point about halfway between 1.5 and 1.6. At this point,
-development will be happening in a bunch of places:
-
-* On master, development towards 1.6 proceeds with small additions, bugs
-  fixes, etc. being checked in daily.
-
-* On the branch ``stable/1.5.x``, fixes for critical bugs found in
-  the 1.5 release are checked in as needed. At some point, this branch will
-  be released as "1.5.1", "1.5.2", etc.
-
-* On the branch ``stable/1.4.x``, security fixes are made if
-  needed and released as "1.4.2", "1.4.3", etc.
-
-* Development of major features is done in branches in forks of the main
-  repository. These branches will be merged into ``master`` before "1.6
-  alpha 1".
+The branch for the previous major release (e.g. ``stable/A.B-1.x``) will include
+bugfixes. Critical bugs fixed on master must *also* be fixed on the bugfix
+branch; this means that commits need to cleanly separate bug fixes from feature
+additions. The developer who commits a fix to master will be responsible for
+also applying the fix to the current bugfix branch.

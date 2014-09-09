@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Bashar Al-Abdulhadi, 2014
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 13:24+0000\n"
+"Last-Translator: Bashar Al-Abdulhadi\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/django/language/"
 "ar/)\n"
 "MIME-Version: 1.0\n"
@@ -18,21 +19,25 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: models.py:9
+#: contrib/redirects/apps.py:8
+msgid "Redirects"
+msgstr "إعادات التوجيه"
+
+#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "إعادة التوجيه من"
 
-#: models.py:10
+#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr "يجب أن يكون هذا مساراً مطلقاً وبدون اسم النطاق. مثال: '/events/search/'."
 
-#: models.py:11
+#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "إعادة التوجيه إلى"
 
-#: models.py:12
+#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -40,10 +45,10 @@ msgstr ""
 "يجب أن يكون هذا مسارا مطلقا (كما هو أعلاه) أو عنوانا كاملا يبدأ بالمقطع "
 "'http://'."
 
-#: models.py:15
+#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "إعادة التوجيه"
 
-#: models.py:16
+#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "إعادات التوجيه"

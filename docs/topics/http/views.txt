@@ -15,9 +15,7 @@ application directory.
 A simple view
 =============
 
-Here's a view that returns the current date and time, as an HTML document:
-
-.. code-block:: python
+Here's a view that returns the current date and time, as an HTML document::
 
     from django.http import HttpResponse
     import datetime

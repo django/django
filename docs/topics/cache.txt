@@ -296,8 +296,9 @@ Local-memory caching
 This is the default cache if another is not specified in your settings file. If
 you want the speed advantages of in-memory caching but don't have the capability
 of running Memcached, consider the local-memory cache backend. This cache is
-multi-process and thread-safe. To use it, set :setting:`BACKEND <CACHES-BACKEND>`
-to ``"django.core.cache.backends.locmem.LocMemCache"``. For example::
+per-process (see below) and thread-safe. To use it, set :setting:`BACKEND
+<CACHES-BACKEND>` to ``"django.core.cache.backends.locmem.LocMemCache"``. For
+example::
 
     CACHES = {
         'default': {
@@ -464,14 +465,14 @@ Then, add the following required settings to your Django settings file:
   the site, or some other string that is unique to this Django instance, to
   prevent key collisions. Use an empty string if you don't care.
 
-The cache middleware caches GET and HEAD responses with status 200, where the request
-and response headers allow. Responses to requests for the same URL with different
-query parameters are considered to be unique pages and are cached separately.
-The cache middleware expects that a HEAD request is answered with the same
-response headers as the corresponding GET request; in which case it can return
-a cached GET response for HEAD request.
+``FetchFromCacheMiddleware`` caches GET and HEAD responses with status 200,
+where the request and response headers allow. Responses to requests for the same
+URL with different query parameters are considered to be unique pages and are
+cached separately. This middleware expects that a HEAD request is answered with
+the same response headers as the corresponding GET request; in which case it can
+return a cached GET response for HEAD request.
 
-Additionally, the cache middleware automatically sets a few headers in each
+Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in each
 :class:`~django.http.HttpResponse`:
 
 * Sets the ``Last-Modified`` header to the current date/time when a fresh
@@ -678,7 +679,7 @@ to the ``cache`` template tag; ``vary_on`` is a list of all additional arguments
 passed to the tag. This function can be useful for invalidating or overwriting
 a cached item, for example:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> from django.core.cache import cache
     >>> from django.core.cache.utils import make_template_fragment_key

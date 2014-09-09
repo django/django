@@ -3,9 +3,10 @@ import re
 from django.conf import settings
 from django.conf.urls import url
 from django.core.exceptions import ImproperlyConfigured
+from django.views.static import serve
 
 
-def static(prefix, view='django.views.static.serve', **kwargs):
+def static(prefix, view=serve, **kwargs):
     """
     Helper function to return a URL pattern for serving files in debug mode.
 

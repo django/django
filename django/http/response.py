@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 import json
+import re
 import sys
 import time
 from email.header import Header
@@ -13,7 +14,7 @@ from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import six, timezone
-from django.utils.encoding import force_bytes, force_text, iri_to_uri
+from django.utils.encoding import force_bytes, force_text, force_str, iri_to_uri
 from django.utils.http import cookie_date
 from django.utils.six.moves import map
 from django.utils.six.moves.urllib.parse import urlparse
@@ -42,6 +43,7 @@ REASON_PHRASES = {
     305: 'USE PROXY',
     306: 'RESERVED',
     307: 'TEMPORARY REDIRECT',
+    308: 'PERMANENT REDIRECT',
     400: 'BAD REQUEST',
     401: 'UNAUTHORIZED',
     402: 'PAYMENT REQUIRED',
@@ -82,6 +84,9 @@ REASON_PHRASES = {
 }
 
 
+_charset_from_content_type_re = re.compile(r';\s*charset=(?P<charset>[^\s;]+)', re.I)
+
+
 class BadHeaderError(ValueError):
     pass
 
@@ -97,19 +102,15 @@ class HttpResponseBase(six.Iterator):
     status_code = 200
     reason_phrase = None        # Use default reason phrase for status code.
 
-    def __init__(self, content_type=None, status=None, reason=None):
+    def __init__(self, content_type=None, status=None, reason=None, charset=None):
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value. Both the name of the header and its value are ASCII strings.
         self._headers = {}
-        self._charset = settings.DEFAULT_CHARSET
         self._closable_objects = []
         # This parameter is set by the handler. It's necessary to preserve the
         # historical behavior of request_finished.
         self._handler_class = None
-        if not content_type:
-            content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
-                    self._charset)
         self.cookies = SimpleCookie()
         if status is not None:
             self.status_code = status
@@ -118,7 +119,26 @@ class HttpResponseBase(six.Iterator):
         elif self.reason_phrase is None:
             self.reason_phrase = REASON_PHRASES.get(self.status_code,
                                                     'UNKNOWN STATUS CODE')
+        self._charset = charset
+        if content_type is None:
+            content_type = '%s; charset=%s' % (settings.DEFAULT_CONTENT_TYPE,
+                                               self.charset)
         self['Content-Type'] = content_type
+
+    @property
+    def charset(self):
+        if self._charset is not None:
+            return self._charset
+        content_type = self.get('Content-Type', '')
+        matched = _charset_from_content_type_re.search(content_type)
+        if matched:
+            # Extract the charset and strip its double quotes
+            return matched.group('charset').replace('"', '')
+        return settings.DEFAULT_CHARSET
+
+    @charset.setter
+    def charset(self, value):
+        self._charset = value
 
     def serialize_headers(self):
         """HTTP headers as a bytestring."""
@@ -220,6 +240,7 @@ class HttpResponseBase(six.Iterator):
         If it is a ``datetime.datetime`` object then ``max_age`` will be calculated.
 
         """
+        value = force_str(value)
         self.cookies[key] = value
         if expires is not None:
             if isinstance(expires, datetime.datetime):
@@ -276,10 +297,10 @@ class HttpResponseBase(six.Iterator):
         if isinstance(value, bytes):
             return bytes(value)
         if isinstance(value, six.text_type):
-            return bytes(value.encode(self._charset))
+            return bytes(value.encode(self.charset))
 
         # Handle non-string types (#16494)
-        return force_bytes(value, self._charset)
+        return force_bytes(value, self.charset)
 
     # These methods partially implement the file-like object interface.
     # See http://docs.python.org/lib/bltin-file-objects.html

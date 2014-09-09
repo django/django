@@ -35,10 +35,9 @@ older versions of Django and install a newer one.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    to |django-users| or drop by `#django on irc.freenode.net`__ to chat
-    with other Django users who might be able to help.
-
-__ irc://irc.freenode.net/django
+    to |django-users| or drop by `#django on irc.freenode.net
+    <irc://irc.freenode.net/django>`_ to chat with other Django users who might
+    be able to help.
 
 Creating a project
 ==================
@@ -54,10 +53,10 @@ code, then run the following command:
 
 .. code-block:: bash
 
-   $ django-admin.py startproject mysite
+   $ django-admin startproject mysite
 
 This will create a ``mysite`` directory in your current directory. If it didn't
-work, see :ref:`troubleshooting-django-admin-py`.
+work, see :ref:`troubleshooting-django-admin`.
 
 .. note::
 
@@ -87,13 +86,6 @@ Let's look at what :djadmin:`startproject` created::
             settings.py
             urls.py
             wsgi.py
-
-.. admonition:: Doesn't match what you see?
-
-    The default project layout recently changed. If you're seeing a "flat"
-    layout (with no inner :file:`mysite/` directory), you're probably using
-    a version of Django that doesn't match this tutorial version.  You'll
-    want to either switch to the older tutorial or the newer Django version.
 
 These files are:
 
@@ -481,6 +473,7 @@ readability):
 
 .. code-block:: sql
 
+    BEGIN;
     CREATE TABLE polls_question (
         "id" serial NOT NULL PRIMARY KEY,
         "question_text" varchar(200) NOT NULL,
@@ -501,6 +494,7 @@ readability):
         FOREIGN KEY ("question_id")
         REFERENCES "polls_question" ("id")
         DEFERRABLE INITIALLY DEFERRED;
+    COMMIT;
 
 
 Note the following:
@@ -578,7 +572,7 @@ you'll commit migrations to your version control system and ship them with
 your app; they not only make your development easier, they're also useable by
 other developers and in production.
 
-Read the :doc:`django-admin.py documentation </ref/django-admin>` for full
+Read the :doc:`django-admin documentation </ref/django-admin>` for full
 information on what the ``manage.py`` utility can do.
 
 Playing with the API
@@ -599,10 +593,12 @@ the Python import path to your :file:`mysite/settings.py` file.
 
     If you'd rather not use :file:`manage.py`, no problem. Just set the
     :envvar:`DJANGO_SETTINGS_MODULE` environment variable to
-    ``mysite.settings``, start a plain Python shell, and set up Django::
+    ``mysite.settings``, start a plain Python shell, and set up Django:
 
-    >>> import django
-    >>> django.setup()
+    .. code-block:: pycon
+
+        >>> import django
+        >>> django.setup()
 
     If this raises an :exc:`AttributeError`, you're probably using
     a version of Django that doesn't match this tutorial version. You'll want
@@ -612,7 +608,7 @@ the Python import path to your :file:`mysite/settings.py` file.
     or ensure that directory is on the Python path, so that ``import mysite``
     works.
 
-    For more information on all of this, see the :doc:`django-admin.py
+    For more information on all of this, see the :doc:`django-admin
     documentation </ref/django-admin>`.
 
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
@@ -640,7 +636,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
     >>> q.id
     1
 
-    # Access database columns via Python attributes.
+    # Access model field values via Python attributes.
     >>> q.question_text
     "What's new?"
     >>> q.pub_date
@@ -705,8 +701,11 @@ demonstration:
     :filename: polls/models.py
 
     import datetime
+
+    from django.db import models
     from django.utils import timezone
-    # ...
+
+
     class Question(models.Model):
         # ...
         def was_published_recently(self):

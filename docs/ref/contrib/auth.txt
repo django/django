@@ -81,8 +81,12 @@ Fields
 
     .. attribute:: last_login
 
-        A datetime of the user's last login. Is set to the current date/time by
-        default.
+        A datetime of the user's last login.
+
+        .. versionchanged:: 1.8
+
+            This field will be ``null`` if the user has never logged in.
+            Previously it was set to the current date/time by default.
 
     .. attribute:: date_joined
 
@@ -168,7 +172,7 @@ Methods
 
     .. method:: get_group_permissions(obj=None)
 
-        Returns a set of permission strings that the user has, through his/her
+        Returns a set of permission strings that the user has, through their
         groups.
 
         If ``obj`` is passed in, only returns the group permissions for
@@ -296,18 +300,20 @@ Fields
 :class:`~django.contrib.auth.models.Permission` objects have the following
 fields:
 
-.. attribute:: name
+.. class:: models.Permission
 
-    Required. 50 characters or fewer. Example: ``'Can vote'``.
+    .. attribute:: name
 
-.. attribute:: content_type
+        Required. 50 characters or fewer. Example: ``'Can vote'``.
 
-    Required. A reference to the ``django_content_type`` database table, which
-    contains a record for each installed Django model.
+    .. attribute:: content_type
 
-.. attribute:: codename
+        Required. A reference to the ``django_content_type`` database table,
+        which contains a record for each installed model.
 
-    Required. 100 characters or fewer. Example: ``'can_vote'``.
+    .. attribute:: codename
+
+        Required. 100 characters or fewer. Example: ``'can_vote'``.
 
 Methods
 -------
@@ -325,19 +331,21 @@ Fields
 
 :class:`~django.contrib.auth.models.Group` objects have the following fields:
 
-.. attribute:: name
+.. class:: models.Group
 
-    Required. 80 characters or fewer. Any characters are permitted. Example:
-    ``'Awesome Users'``.
+    .. attribute:: name
 
-.. attribute:: permissions
+        Required. 80 characters or fewer. Any characters are permitted. Example:
+        ``'Awesome Users'``.
 
-    Many-to-many field to :class:`~django.contrib.auth.models.Permission`::
+    .. attribute:: permissions
 
-        group.permissions = [permission_list]
-        group.permissions.add(permission, permission, ...)
-        group.permissions.remove(permission, permission, ...)
-        group.permissions.clear()
+        Many-to-many field to :class:`~django.contrib.auth.models.Permission`::
+
+            group.permissions = [permission_list]
+            group.permissions.add(permission, permission, ...)
+            group.permissions.remove(permission, permission, ...)
+            group.permissions.clear()
 
 .. _topics-auth-signals:
 
@@ -446,27 +454,29 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         .. versionadded:: 1.8
 
         Returns the set of permission strings the ``user_obj`` has from their
-        own user permissions. Returns an empty set if the user
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous`.
+        own user permissions. Returns an empty set if
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
+        :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
 
     .. method:: get_group_permissions(user_obj, obj=None)
 
         Returns the set of permission strings the ``user_obj`` has from the
-        permissions of the groups they belong. Returns an empty set if the user
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous`.
+        permissions of the groups they belong. Returns an empty set if
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
+        :attr:`~django.contrib.auth.models.CustomUser.is_active`  is ``False``.
 
     .. method:: get_all_permissions(user_obj, obj=None)
 
-        Returns the set of permission strings the ``user_obj`` has, including
-        both user permissions and groups permissions. Returns an empty set if
-        the user
-        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous`.
+        Returns the set of permission strings the ``user_obj`` has, including both
+        user permissions and group permissions. Returns an empty set if
+        :meth:`~django.contrib.auth.models.AbstractBaseUser.is_anonymous` or
+        :attr:`~django.contrib.auth.models.CustomUser.is_active` is ``False``.
 
     .. method:: has_perm(user_obj, perm, obj=None)
 
         Uses :meth:`get_all_permissions` to check if ``user_obj`` has the
         permission string ``perm``. Returns ``False`` if the user is not
-        :meth:`~django.contrib.auth.models.CustomUser.is_active`.
+        :attr:`~django.contrib.auth.models.CustomUser.is_active`.
 
     .. method:: has_module_perms(self, user_obj, app_label)
 

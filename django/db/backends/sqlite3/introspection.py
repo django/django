@@ -68,6 +68,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return [FieldInfo(info['name'], info['type'], None, info['size'], None, None,
                  info['null_ok']) for info in self._table_info(cursor, table_name)]
 
+    def column_name_converter(self, name):
+        """
+        SQLite will in some cases, e.g. when returning columns from views and
+        subselects, return column names in 'alias."column"' format instead of
+        simply 'column'.
+
+        Affects SQLite < 3.7.15, fixed by http://www.sqlite.org/src/info/5526e0aa3c
+        """
+        # TODO: remove when SQLite < 3.7.15 is sufficiently old.
+        # 3.7.13 ships in Debian stable as of 2014-03-21.
+        if self.connection.Database.sqlite_version_info < (3, 7, 15):
+            return name.split('.')[-1].strip('"')
+        else:
+            return name
+
     def get_relations(self, cursor, table_name):
         """
         Returns a dictionary of {field_index: (field_index_other_table, other_table)}

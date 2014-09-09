@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Yorgos Pagles <y.pagles@gmail.com>, 2011, 2012.
+# Panos Laganakos <panos.laganakos@gmail.com>, 2014
+# Yorgos Pagles <y.pagles@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-07 14:57+0000\n"
-"Last-Translator: Yorgos Pagles <y.pagles@gmail.com>\n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-08-17 09:46+0000\n"
+"Last-Translator: Panos Laganakos <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
 "el/)\n"
 "MIME-Version: 1.0\n"
@@ -17,22 +18,22 @@ msgstr ""
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: templates/formtools/wizard/wizard_form.html:15
+#: contrib/formtools/apps.py:8
+msgid "Form Tools"
+msgstr "Eργαλεία Φόρμας"
+
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
 msgstr "πρώτο βήμα"
 
-#: templates/formtools/wizard/wizard_form.html:16
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:16
 msgid "prev step"
 msgstr "επόμενο βήμα"
 
-#: templates/formtools/wizard/wizard_form.html:18
+#: contrib/formtools/templates/formtools/wizard/wizard_form.html:18
 msgid "submit"
 msgstr "αποδοχή"
 
-#: wizard/legacy.py:159
-msgid ""
-"We apologize, but your form has expired. Please continue filling out the "
-"form from this page."
-msgstr ""
-"Το περιθώριο για την συμπλήρωση της φόρμας έχει λήξει. Παρακαλούμε συνεχίστε "
-"τη συμπλήρωση της φόρμας από την τρέχουσα σελίδα."
+#: contrib/formtools/wizard/views.py:276
+msgid "ManagementForm data is missing or has been tampered."
+msgstr "Tα δεδομένα της ManagementForm λείπουν ή έχουν αλλοιωθεί."

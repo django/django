@@ -6,6 +6,10 @@ Glossary
 
 .. glossary::
 
+    concrete model
+        A non-abstract (:attr:`abstract=False
+        <django.db.models.Options.abstract>`) model.
+
     field
         An attribute on a :term:`model`; a given field usually maps directly to
         a single database column.

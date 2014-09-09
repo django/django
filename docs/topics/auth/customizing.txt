@@ -389,7 +389,24 @@ use as your User model.
 
    Changing this setting after you have tables created is not supported
    by :djadmin:`makemigrations` and will result in you having to manually
-   write a set of migrations to fix your schema.
+   fix your schema, port your data from the old user table, and possibly
+   manually reapply some migrations.
+
+.. warning::
+
+   Due to limitations of Django's dynamic dependency feature for swappable
+   models, you must ensure that the model referenced by :setting:`AUTH_USER_MODEL`
+   is created in the first migration of its app (usually called ``0001_initial``);
+   otherwise, you will have dependency issues.
+
+   In addition, you may run into a CircularDependencyError when running your
+   migrations as Django won't be able to automatically break the dependency
+   loop due to the dynamic dependency. If you see this error, you should
+   break the loop by moving the models depended on by your User model
+   into a second migration (you can try making two normal models that
+   have a ForeignKey to each other and seeing how ``makemigrations`` resolves that
+   circular dependency if you want to see how it's usually done)
+
 
 Referencing the User model
 --------------------------
@@ -435,6 +452,8 @@ different User model.
     Generally speaking, you should reference the User model with the
     :setting:`AUTH_USER_MODEL` setting in code that is executed at import
     time. ``get_user_model()`` only works once Django has imported all models.
+
+.. _specifying-custom-user-model:
 
 Specifying a custom User model
 ------------------------------
@@ -491,6 +510,15 @@ password resets. You must then provide some key implementation details:
                 ...
                 USERNAME_FIELD = 'identifier'
 
+        .. versionadded:: 1.8
+
+        :attr:`USERNAME_FIELD` now supports
+        :class:`~django.db.models.ForeignKey`\s. Since there is no way to pass
+        model instances during the :djadmin:`createsuperuser` prompt, expect the
+        user to enter the value of :attr:`~django.db.models.ForeignKey.to_field`
+        value (the :attr:`~django.db.models.Field.primary_key` by default) of an
+        existing instance.
+
     .. attribute:: REQUIRED_FIELDS
 
         A list of the field names that will be prompted for when creating a
@@ -498,8 +526,7 @@ password resets. You must then provide some key implementation details:
         will be prompted to supply a value for each of these fields. It must
         include any field for which :attr:`~django.db.models.Field.blank` is
         ``False`` or undefined and may include additional fields you want
-        prompted for when a user is created interactively. However, it will not
-        work for :class:`~django.db.models.ForeignKey` fields.
+        prompted for when a user is created interactively.
         ``REQUIRED_FIELDS`` has no effect in other parts of Django, like
         creating a user in the admin.
 
@@ -518,6 +545,15 @@ password resets. You must then provide some key implementation details:
             ``REQUIRED_FIELDS`` must contain all required fields on your
             ``User`` model, but should *not* contain the ``USERNAME_FIELD`` or
             ``password`` as these fields will always be prompted for.
+
+        .. versionadded:: 1.8
+
+        :attr:`REQUIRED_FIELDS` now supports
+        :class:`~django.db.models.ForeignKey`\s. Since there is no way to pass
+        model instances during the :djadmin:`createsuperuser` prompt, expect the
+        user to enter the value of :attr:`~django.db.models.ForeignKey.to_field`
+        value (the :attr:`~django.db.models.Field.primary_key` by default) of an
+        existing instance.
 
     .. attribute:: is_active
 
@@ -672,10 +708,12 @@ Extending Django's default User
 -------------------------------
 
 If you're entirely happy with Django's :class:`~django.contrib.auth.models.User`
-model and you just want to add some additional profile information, you can
+model and you just want to add some additional profile information, you could
 simply subclass ``django.contrib.auth.models.AbstractUser`` and add your
-custom profile fields. This class provides the full implementation of the
-default :class:`~django.contrib.auth.models.User` as an :ref:`abstract model
+custom profile fields, although we'd recommend a separate model as described in
+the "Model design considerations" note of :ref:`specifying-custom-user-model`.
+``AbstractUser`` provides the full implementation of the default
+:class:`~django.contrib.auth.models.User` as an :ref:`abstract model
 <abstract-base-classes>`.
 
 .. _custom-users-and-the-built-in-auth-forms:
@@ -785,7 +823,7 @@ methods and attributes:
 
     .. method:: models.PermissionsMixin.get_group_permissions(obj=None)
 
-        Returns a set of permission strings that the user has, through his/her
+        Returns a set of permission strings that the user has, through their
         groups.
 
         If ``obj`` is passed in, only returns the group permissions for

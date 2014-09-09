@@ -355,6 +355,10 @@ class GenericRelationsTests(TestCase):
         self.assertFalse(created)
         self.assertEqual(tag.content_object.id, diamond.id)
 
+    def test_query_content_type(self):
+        with six.assertRaisesRegex(self, FieldError, "^Cannot resolve keyword 'content_object' into field."):
+            TaggedItem.objects.get(content_object='')
+
 
 class CustomWidget(forms.TextInput):
     pass

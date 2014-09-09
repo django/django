@@ -71,6 +71,12 @@ should consider its data immutable, whether it has data or not.
 Using forms to validate data
 ----------------------------
 
+.. method:: Form.clean()
+
+Implement a ``clean()`` method on your ``Form`` when you must add custom
+validation for fields that are interdependent. See
+:ref:`validating-fields-with-clean` for example usage.
+
 .. method:: Form.is_valid()
 
 The primary task of a :class:`Form` object is to validate data. With a bound
@@ -250,6 +256,33 @@ precedence::
     <tr><th>Url:</th><td><input type="url" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
+Checking if form data has changed
+---------------------------------
+
+.. method:: Form.has_changed()
+
+Use the ``has_changed()`` method on your ``Form`` when you need to check if the
+form data has been changed from the initial data.
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(initial=data)
+    >>> f.has_changed()
+    False
+
+When the form is submitted, we reconstruct it and provide the original data
+so that the comparison can be done:
+
+    >>> f = ContactForm(request.POST, initial=data)
+    >>> f.has_changed()
+
+``has_changed()`` will be ``True`` if the data from ``request.POST`` differs
+from what was provided in :attr:`~Form.initial` or ``False`` otherwise. The
+result is computed by calling :meth:`Field.has_changed` for each field in the
+form.
+
 Accessing the fields from the form
 ----------------------------------
 
@@ -376,6 +409,8 @@ You can write code to perform validation for particular form fields (based on
 their name) or for the form as a whole (considering combinations of various
 fields). More information about this is in :doc:`/ref/forms/validation`.
 
+.. _ref-forms-api-outputting-html:
+
 Outputting forms as HTML
 ------------------------
 
@@ -491,6 +526,8 @@ it calls its ``as_table()`` method behind the scenes::
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" /></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+
+.. _ref-forms-api-styling-form-rows:
 
 Styling required or erroneous form rows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -910,7 +947,7 @@ form data)::
 Constructing an unbound form is the same as always -- just omit both
 form data *and* file data::
 
-    # Unbound form with a image field
+    # Unbound form with an image field
     >>> f = ContactFormWithMugshot()
 
 Testing for multipart forms

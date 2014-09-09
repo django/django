@@ -1,0 +1,311 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Xwybylty Soslan <soslanx@gmail.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:46+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Ossetic (http://www.transifex.com/projects/p/django/language/"
+"os/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: os\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: contrib/humanize/apps.py:8
+msgid "Humanize"
+msgstr ""
+
+#: contrib/humanize/templatetags/humanize.py:30
+msgid "th"
+msgstr "-ӕм"
+
+#: contrib/humanize/templatetags/humanize.py:30
+msgid "st"
+msgstr "-аг"
+
+#: contrib/humanize/templatetags/humanize.py:30
+msgid "nd"
+msgstr "-аг"
+
+#: contrib/humanize/templatetags/humanize.py:30
+msgid "rd"
+msgstr "-аг"
+
+#: contrib/humanize/templatetags/humanize.py:61
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f милуан"
+msgstr[1] "%(value).1f милуан"
+
+#: contrib/humanize/templatetags/humanize.py:62
+#, python-format
+msgid "%(value)s million"
+msgid_plural "%(value)s million"
+msgstr[0] "%(value)s милуан"
+msgstr[1] "%(value)s милуан"
+
+#: contrib/humanize/templatetags/humanize.py:65
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f биллон"
+msgstr[1] "%(value).1f биллион"
+
+#: contrib/humanize/templatetags/humanize.py:66
+#, python-format
+msgid "%(value)s billion"
+msgid_plural "%(value)s billion"
+msgstr[0] "%(value)s биллион"
+msgstr[1] "%(value)s биллион"
+
+#: contrib/humanize/templatetags/humanize.py:69
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f триллион"
+msgstr[1] "%(value).1f триллион"
+
+#: contrib/humanize/templatetags/humanize.py:70
+#, python-format
+msgid "%(value)s trillion"
+msgid_plural "%(value)s trillion"
+msgstr[0] "%(value)s триллион"
+msgstr[1] "%(value)s триллион"
+
+#: contrib/humanize/templatetags/humanize.py:73
+#, python-format
+msgid "%(value).1f quadrillion"
+msgid_plural "%(value).1f quadrillion"
+msgstr[0] "%(value).1f къуадриллион"
+msgstr[1] "%(value).1f къуадриллион"
+
+#: contrib/humanize/templatetags/humanize.py:74
+#, python-format
+msgid "%(value)s quadrillion"
+msgid_plural "%(value)s quadrillion"
+msgstr[0] "%(value)s къуадриллион"
+msgstr[1] "%(value)s къуадриллион"
+
+#: contrib/humanize/templatetags/humanize.py:77
+#, python-format
+msgid "%(value).1f quintillion"
+msgid_plural "%(value).1f quintillion"
+msgstr[0] "%(value).1f къуинтиллион"
+msgstr[1] "%(value).1f къуинтиллион"
+
+#: contrib/humanize/templatetags/humanize.py:78
+#, python-format
+msgid "%(value)s quintillion"
+msgid_plural "%(value)s quintillion"
+msgstr[0] "%(value)s къуинтиллион"
+msgstr[1] "%(value)s къуинтиллион"
+
+#: contrib/humanize/templatetags/humanize.py:81
+#, python-format
+msgid "%(value).1f sextillion"
+msgid_plural "%(value).1f sextillion"
+msgstr[0] "%(value).1f секстиллион"
+msgstr[1] "%(value).1f секстиллион"
+
+#: contrib/humanize/templatetags/humanize.py:82
+#, python-format
+msgid "%(value)s sextillion"
+msgid_plural "%(value)s sextillion"
+msgstr[0] "%(value)s секстиллион"
+msgstr[1] "%(value)s секстиллион"
+
+#: contrib/humanize/templatetags/humanize.py:85
+#, python-format
+msgid "%(value).1f septillion"
+msgid_plural "%(value).1f septillion"
+msgstr[0] "%(value).1f септиллион"
+msgstr[1] "%(value).1f септиллион"
+
+#: contrib/humanize/templatetags/humanize.py:86
+#, python-format
+msgid "%(value)s septillion"
+msgid_plural "%(value)s septillion"
+msgstr[0] "%(value)s септиллион"
+msgstr[1] "%(value)s септиллион"
+
+#: contrib/humanize/templatetags/humanize.py:89
+#, python-format
+msgid "%(value).1f octillion"
+msgid_plural "%(value).1f octillion"
+msgstr[0] "%(value).1f октиллион"
+msgstr[1] "%(value).1f октиллион"
+
+#: contrib/humanize/templatetags/humanize.py:90
+#, python-format
+msgid "%(value)s octillion"
+msgid_plural "%(value)s octillion"
+msgstr[0] "%(value)s октиллион"
+msgstr[1] "%(value)s октиллион"
+
+#: contrib/humanize/templatetags/humanize.py:93
+#, python-format
+msgid "%(value).1f nonillion"
+msgid_plural "%(value).1f nonillion"
+msgstr[0] "%(value).1f нониллион"
+msgstr[1] "%(value).1f нониллион"
+
+#: contrib/humanize/templatetags/humanize.py:94
+#, python-format
+msgid "%(value)s nonillion"
+msgid_plural "%(value)s nonillion"
+msgstr[0] "%(value)s нониллион"
+msgstr[1] "%(value)s нониллион"
+
+#: contrib/humanize/templatetags/humanize.py:97
+#, python-format
+msgid "%(value).1f decillion"
+msgid_plural "%(value).1f decillion"
+msgstr[0] "%(value).1f дециллион"
+msgstr[1] "%(value).1f дециллион"
+
+#: contrib/humanize/templatetags/humanize.py:98
+#, python-format
+msgid "%(value)s decillion"
+msgid_plural "%(value)s decillion"
+msgstr[0] "%(value)s дециллион"
+msgstr[1] "%(value)s дециллион"
+
+#: contrib/humanize/templatetags/humanize.py:101
+#, python-format
+msgid "%(value).1f googol"
+msgid_plural "%(value).1f googol"
+msgstr[0] "%(value).1f гугол"
+msgstr[1] "%(value).1f гугол"
+
+#: contrib/humanize/templatetags/humanize.py:102
+#, python-format
+msgid "%(value)s googol"
+msgid_plural "%(value)s googol"
+msgstr[0] "%(value)s гугол"
+msgstr[1] "%(value)s гугол"
+
+#: contrib/humanize/templatetags/humanize.py:153
+msgid "one"
+msgstr "иу"
+
+#: contrib/humanize/templatetags/humanize.py:153
+msgid "two"
+msgstr "дыууӕ"
+
+#: contrib/humanize/templatetags/humanize.py:153
+msgid "three"
+msgstr "ӕртӕ"
+
+#: contrib/humanize/templatetags/humanize.py:153
+msgid "four"
+msgstr "цыппар"
+
+#: contrib/humanize/templatetags/humanize.py:153
+msgid "five"
+msgstr "фондз"
+
+#: contrib/humanize/templatetags/humanize.py:153
+msgid "six"
+msgstr "ӕхсӕз"
+
+#: contrib/humanize/templatetags/humanize.py:153
+msgid "seven"
+msgstr "авд"
+
+#: contrib/humanize/templatetags/humanize.py:153
+msgid "eight"
+msgstr "аст"
+
+#: contrib/humanize/templatetags/humanize.py:153
+msgid "nine"
+msgstr "фараст"
+
+#: contrib/humanize/templatetags/humanize.py:177 contrib/humanize/tests.py:145
+msgid "today"
+msgstr "абон"
+
+#: contrib/humanize/templatetags/humanize.py:179 contrib/humanize/tests.py:145
+msgid "tomorrow"
+msgstr "сом"
+
+#: contrib/humanize/templatetags/humanize.py:181 contrib/humanize/tests.py:145
+msgid "yesterday"
+msgstr "знон"
+
+#: contrib/humanize/templatetags/humanize.py:201
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s ago"
+msgstr "%(delta)s раздӕр"
+
+#: contrib/humanize/templatetags/humanize.py:204
+#: contrib/humanize/templatetags/humanize.py:232
+msgid "now"
+msgstr "ныр"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: contrib/humanize/templatetags/humanize.py:209
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: contrib/humanize/templatetags/humanize.py:216
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: contrib/humanize/templatetags/humanize.py:223
+#, python-format
+msgid "an hour ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:229
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s from now"
+msgstr "%(delta)s енырӕй"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: contrib/humanize/templatetags/humanize.py:237
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: contrib/humanize/templatetags/humanize.py:244
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#: contrib/humanize/templatetags/humanize.py:251
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] ""
+msgstr[1] ""

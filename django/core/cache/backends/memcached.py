@@ -49,7 +49,7 @@ class BaseMemcachedCache(six.with_metaclass(BaseMemcachedCacheMethods, BaseCache
         way. Call this function to obtain a safe value for your timeout.
         """
         if timeout == DEFAULT_TIMEOUT:
-            return self.default_timeout
+            timeout = self.default_timeout
 
         if timeout is None:
             # Using 0 in memcache sets a non-expiring timeout.

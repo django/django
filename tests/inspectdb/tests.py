@@ -54,7 +54,7 @@ class InspectDBTestCase(TestCase):
         assertFieldType('date_time_field', "models.DateTimeField()")
         if (connection.features.can_introspect_max_length and
                 not connection.features.interprets_empty_strings_as_nulls):
-            assertFieldType('email_field', "models.CharField(max_length=75)")
+            assertFieldType('email_field', "models.CharField(max_length=254)")
             assertFieldType('file_field', "models.CharField(max_length=100)")
             assertFieldType('file_path_field', "models.CharField(max_length=100)")
         if connection.features.can_introspect_ip_address_field:
@@ -179,7 +179,9 @@ class InspectDBTestCase(TestCase):
         unsuitable for Python identifiers
         """
         out = StringIO()
-        call_command('inspectdb', stdout=out)
+        call_command('inspectdb',
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
+                     stdout=out)
         output = out.getvalue()
         base_name = 'Field' if not connection.features.uppercases_column_names else 'field'
         self.assertIn("field = models.IntegerField()", output)
@@ -193,6 +195,18 @@ class InspectDBTestCase(TestCase):
         else:
             self.assertIn("tama_o = models.IntegerField(db_column='tama\\xf1o')", output)
 
+    def test_table_name_introspection(self):
+        """
+        Introspection of table names containing special characters,
+        unsuitable for Python identifiers
+        """
+        out = StringIO()
+        call_command('inspectdb',
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_'),
+                     stdout=out)
+        output = out.getvalue()
+        self.assertIn("class InspectdbSpecialTableName(models.Model):", output)
+
     def test_managed_models(self):
         """Test that by default the command generates models with `Meta.managed = False` (#14305)"""
         out = StringIO()
@@ -202,6 +216,14 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         self.longMessage = False
         self.assertIn("        managed = False", output, msg='inspectdb should generate unmanaged models.')
+
+    def test_unique_together_meta(self):
+        out = StringIO()
+        call_command('inspectdb',
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_uniquetogether'),
+                     stdout=out)
+        output = out.getvalue()
+        self.assertIn("        unique_together = (('field1', 'field2'),)", output, msg='inspectdb should generate unique_together.')
 
     @skipUnless(connection.vendor == 'sqlite',
                 "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")

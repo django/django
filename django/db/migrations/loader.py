@@ -39,10 +39,11 @@ class MigrationLoader(object):
     in memory.
     """
 
-    def __init__(self, connection, load=True):
+    def __init__(self, connection, load=True, ignore_no_migrations=False):
         self.connection = connection
         self.disk_migrations = None
         self.applied_migrations = None
+        self.ignore_no_migrations = ignore_no_migrations
         if load:
             self.build_graph()
 
@@ -88,10 +89,10 @@ class MigrationLoader(object):
                     six.moves.reload_module(module)
             self.migrated_apps.add(app_config.label)
             directory = os.path.dirname(module.__file__)
-            # Scan for .py[c|o] files
+            # Scan for .py files
             migration_names = set()
             for name in os.listdir(directory):
-                if name.endswith(".py") or name.endswith(".pyc") or name.endswith(".pyo"):
+                if name.endswith(".py"):
                     import_name = name.rsplit(".", 1)[0]
                     if import_name[0] not in "_.~":
                         migration_names.add(import_name)
@@ -154,9 +155,12 @@ class MigrationLoader(object):
                 if key[1] == "__first__":
                     return list(self.graph.root_nodes(key[0]))[0]
                 else:
-                    return list(self.graph.root_nodes(key[0]))[-1]
+                    return list(self.graph.leaf_nodes(key[0]))[0]
             except IndexError:
-                raise ValueError("Dependency on app with no migrations: %s" % key[0])
+                if self.ignore_no_migrations:
+                    return None
+                else:
+                    raise ValueError("Dependency on app with no migrations: %s" % key[0])
         raise ValueError("Dependency on unknown app: %s" % key[0])
 
     def build_graph(self):
@@ -219,15 +223,26 @@ class MigrationLoader(object):
         self.graph = MigrationGraph()
         for key, migration in normal.items():
             self.graph.add_node(key, migration)
+        # Add all internal dependencies first to ensure __first__ dependencies
+        # find the correct root node.
         for key, migration in normal.items():
             for parent in migration.dependencies:
+                if parent[0] != key[0] or parent[1] == '__first__':
+                    # Ignore __first__ references to the same app (#22325)
+                    continue
+                self.graph.add_dependency(migration, key, parent)
+        for key, migration in normal.items():
+            for parent in migration.dependencies:
+                if parent[0] == key[0]:
+                    # Internal dependencies already added.
+                    continue
                 parent = self.check_key(parent, key[0])
                 if parent is not None:
-                    self.graph.add_dependency(key, parent)
+                    self.graph.add_dependency(migration, key, parent)
             for child in migration.run_before:
                 child = self.check_key(child, key[0])
                 if child is not None:
-                    self.graph.add_dependency(child, key)
+                    self.graph.add_dependency(migration, child, key)
 
     def detect_conflicts(self):
         """

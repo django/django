@@ -63,7 +63,7 @@ class Inventory(models.Model):
 
 class Event(models.Model):
     main_band = models.ForeignKey(Band, limit_choices_to=models.Q(pk__gt=0), related_name='events_main_band_at')
-    supporting_bands = models.ManyToManyField(Band, null=True, blank=True, related_name='events_supporting_band_at')
+    supporting_bands = models.ManyToManyField(Band, blank=True, related_name='events_supporting_band_at')
     start_date = models.DateField(blank=True, null=True)
     start_time = models.TimeField(blank=True, null=True)
     description = models.TextField(blank=True)

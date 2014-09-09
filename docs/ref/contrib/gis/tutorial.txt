@@ -81,12 +81,12 @@ to create a :ref:`SpatiaLite database <create_spatialite_db>`.
 Create a New Project
 ------------------------
 
-Use the standard ``django-admin.py`` script to create a project called
+Use the standard ``django-admin`` script to create a project called
 ``geodjango``:
 
 .. code-block:: bash
 
-    $ django-admin.py startproject geodjango
+    $ django-admin startproject geodjango
 
 This will initialize a new project. Now, create a ``world`` Django application
 within the ``geodjango`` project:
@@ -265,10 +265,21 @@ Run ``migrate``
 ---------------
 
 After defining your model, you need to sync it with the database. First,
-let's look at the SQL that will generate the table for the
-``WorldBorder`` model::
+create a database migration:
 
-    $ python manage.py sqlall world
+.. code-block:: bash
+
+    $ python manage.py makemigrations
+    Migrations for 'world':
+      0001_initial.py:
+        - Create model WorldBorder
+
+Let's look at the SQL that will generate the table for the ``WorldBorder``
+model:
+
+.. code-block:: bash
+
+    $ python manage.py sqlmigrate world 0001
 
 This command should produce the following output:
 
@@ -300,14 +311,17 @@ This command should produce the following output:
     column is added through a separate ``SELECT AddGeometryColumn(...)``
     statement.
 
-If this looks correct, run :djadmin:`migrate` to create this table in the database::
+If this looks correct, run :djadmin:`migrate` to create this table in the
+database:
+
+.. code-block:: bash
 
     $ python manage.py migrate
-    Creating table world_worldborder
-    Installing custom SQL for world.WorldBorder model
-
-The :djadmin:`migrate` command may also prompt you to create an admin user.
-Either do so now, or later by running ``django-admin.py createsuperuser``.
+    Operations to perform:
+      Apply all migrations: admin, world, contenttypes, auth, sessions
+    Running migrations:
+      ...
+      Applying world.0001_initial... OK
 
 Importing Spatial Data
 ======================
@@ -737,16 +751,22 @@ Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
         url(r'^admin/', include(admin.site.urls)),
     ]
 
-Start up the Django development server:
+Create an admin user:
+
+.. code-block:: bash
+
+    $ python manage.py createsuperuser
+
+Next, start up the Django development server:
 
 .. code-block:: bash
 
     $ python manage.py runserver
 
-Finally, browse to ``http://localhost:8000/admin/``, and log in with the admin
-user created after running :djadmin:`migrate`. Browse to any of the ``WorldBorder``
-entries -- the borders may be edited by clicking on a polygon and dragging
-the vertexes to the desired position.
+Finally, browse to ``http://localhost:8000/admin/``, and log in with the user
+you just created. Browse to any of the ``WorldBorder`` entries -- the borders
+may be edited by clicking on a polygon and dragging the vertexes to the desired
+position.
 
 .. _OpenLayers: http://openlayers.org/
 .. _Open Street Map: http://www.openstreetmap.org/
@@ -766,13 +786,15 @@ available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
 
 First, there are some important requirements:
 
-* :class:`~django.contrib.gis.admin.OSMGeoAdmin` requires that the
-  :ref:`spherical mercator projection be added <addgoogleprojection>`
-  to the ``spatial_ref_sys`` table (PostGIS 1.3 and below, only).
+* :class:`~django.contrib.gis.admin.OSMGeoAdmin` requires that
+  :ref:`GDAL <ref-gdal>` is installed. If you are running GDAL 1.6 (uncommon)
+  you will also need to add the :ref:`spherical mercator projection
+  <addgoogleprojection>`  to the ``spatial_ref_sys`` table.
+
 * The PROJ.4 datum shifting files must be installed (see the
   :ref:`PROJ.4 installation instructions <proj4>` for more details).
 
-If you meet these requirements, then just substitute the ``OSMGeoAdmin``
+If you meet this requirement, then just substitute the ``OSMGeoAdmin``
 option class in your ``admin.py`` file::
 
     admin.site.register(WorldBorder, admin.OSMGeoAdmin)

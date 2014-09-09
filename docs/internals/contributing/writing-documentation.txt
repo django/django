@@ -154,7 +154,7 @@ Django-specific markup
 Besides the `Sphinx built-in markup`__, Django's docs defines some extra
 description units:
 
-__ http://sphinx-doc.org/markup/desc.html
+__ http://sphinx-doc.org/markup/
 
 * Settings::
 
@@ -191,6 +191,10 @@ __ http://sphinx-doc.org/markup/desc.html
         .. django-admin-option:: --traceback
 
   To link, use ``:djadminopt:`--traceback```.
+
+* Links to Trac tickets (typically reserved for minor release notes)::
+
+        :ticket:`12345`
 
 .. _documenting-new-features:
 
@@ -319,10 +323,6 @@ look better:
 
   This will probably be a continuing, never-ending project.
 
-* Add `info field lists`__ where appropriate.
-
-  __ http://sphinx-doc.org/markup/desc.html#info-field-lists
-
 * Whenever possible, use links. So, use ``:setting:`ADMINS``` instead
   of ````ADMINS````.
 
@@ -374,3 +374,9 @@ one of the following:
 * Find synonyms that the spell checker recognizes.
 * If, and only if, you are sure the word you are using is correct - add it
   to ``docs/spelling_wordlist`` (please keep the list in alphabetical order).
+
+Translating documentation
+-------------------------
+
+See :ref:`Localizing the Django documentation <translating-documentation>` if
+you'd like to help translate the documentation into another language.

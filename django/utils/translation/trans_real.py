@@ -11,6 +11,8 @@ import warnings
 
 from django.apps import apps
 from django.conf import settings
+from django.conf.locale import LANG_INFO
+from django.core.exceptions import AppRegistryNotReady
 from django.dispatch import receiver
 from django.test.signals import setting_changed
 from django.utils.deprecation import RemovedInDjango19Warning
@@ -20,7 +22,6 @@ from django.utils.safestring import mark_safe, SafeData
 from django.utils import six, lru_cache
 from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning, trim_whitespace, LANGUAGE_SESSION_KEY
-
 
 # Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.
@@ -50,12 +51,10 @@ language_code_re = re.compile(r'^[a-z]{1,8}(?:-[a-z0-9]{1,8})*$', re.IGNORECASE)
 language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
 
 # some browsers use deprecated locales. refs #18419
-_BROWSERS_DEPRECATED_LOCALES = {
+_DJANGO_DEPRECATED_LOCALES = {
     'zh-cn': 'zh-hans',
     'zh-tw': 'zh-hant',
 }
-
-_DJANGO_DEPRECATED_LOCALES = _BROWSERS_DEPRECATED_LOCALES
 
 
 @receiver(setting_changed)
@@ -160,7 +159,14 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _add_installed_apps_translations(self):
         """Merges translations from each installed app."""
-        for app_config in reversed(list(apps.get_app_configs())):
+        try:
+            app_configs = reversed(list(apps.get_app_configs()))
+        except AppRegistryNotReady:
+            raise AppRegistryNotReady(
+                "The translation infrastructure cannot be initialized before the "
+                "apps registry is ready. Check that you don't make non-lazy "
+                "gettext calls at import time.")
+        for app_config in app_configs:
             localedir = os.path.join(app_config.path, 'locale')
             translation = self._new_gnu_trans(localedir)
             self.merge(translation)
@@ -173,7 +179,11 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _add_fallback(self):
         """Sets the GNUTranslations() fallback with the default language."""
-        if self.__language == settings.LANGUAGE_CODE:
+        # Don't set a fallback for the default language or for
+        # en-us (as it's empty, so it'll ALWAYS fall back to the default
+        # language; found this as part of #21498, as we set en-us for
+        # management commands)
+        if self.__language == settings.LANGUAGE_CODE or self.__language == "en-us":
             return
         default_translation = translation(settings.LANGUAGE_CODE)
         self.add_fallback(default_translation)
@@ -417,13 +427,16 @@ def get_supported_language_variant(lang_code, strict=False):
     if _supported is None:
         _supported = OrderedDict(settings.LANGUAGES)
     if lang_code:
-        # some browsers use deprecated language codes -- #18419
-        replacement = _BROWSERS_DEPRECATED_LOCALES.get(lang_code)
-        if lang_code not in _supported and replacement in _supported:
-            return replacement
-        # if fr-ca is not supported, try fr.
+        # If 'fr-ca' is not supported, try special fallback or language-only 'fr'.
+        possible_lang_codes = [lang_code]
+        try:
+            possible_lang_codes.extend(LANG_INFO[lang_code]['fallback'])
+        except KeyError:
+            pass
         generic_lang_code = lang_code.split('-')[0]
-        for code in (lang_code, generic_lang_code):
+        possible_lang_codes.append(generic_lang_code)
+
+        for code in possible_lang_codes:
             if code in _supported and check_for_language(code):
                 return code
         if not strict:
@@ -605,7 +618,10 @@ def templatize(src, origin=None):
                     filemsg = ''
                     if origin:
                         filemsg = 'file %s, ' % origin
-                    raise SyntaxError("Translation blocks must not include other block tags: %s (%sline %d)" % (t.contents, filemsg, t.lineno))
+                    raise SyntaxError(
+                        "Translation blocks must not include other block tags: "
+                        "%s (%sline %d)" % (t.contents, filemsg, t.lineno)
+                    )
             elif t.token_type == TOKEN_VAR:
                 if inplural:
                     plural.append('%%(%s)s' % t.contents)

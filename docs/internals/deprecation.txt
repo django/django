@@ -28,15 +28,36 @@ about each item can often be found in the release notes of two versions prior.
 * The ``DatabaseCreation`` class on each database backend will be removed,
   and all table/schema editing will be moved to be via ``SchemaEditor`` instead.
 
-* The legacy method of syncing apps without migrations will be removed,
-  and migrations will become compulsory for all apps. This includes automatic
-  loading of fixtures and support for initial SQL data.
-
 * The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
   Python path will be removed.
 
 * Support for :py:mod:`optparse` will be dropped for custom management commands
   (replaced by :py:mod:`argparse`).
+
+* The class :class:`~django.core.management.NoArgsCommand` will be removed. Use
+  :class:`~django.core.management.BaseCommand` instead, which takes no arguments
+  by default.
+
+* ``django.template.resolve_variable`` will be removed.
+
+* The ``error_message`` argument of ``django.forms.RegexField`` will be removed.
+
+* The ``unordered_list`` filter will no longer support old style lists.
+
+* Support for string ``view`` arguments to ``url()`` will be removed.
+
+* The backward compatible shim  to rename ``django.forms.Form._has_changed()``
+  to ``has_changed()`` will be removed.
+
+* The ``removetags`` template filter will be removed.
+
+* The ``remove_tags()`` and ``strip_entities()`` functions in
+  ``django.utils.html`` will be removed.
+
+* The ``is_admin_site`` argument to
+  ``django.contrib.auth.views.password_reset()`` will be removed.
+
+* ``django.db.models.field.subclassing.SubfieldBase`` will be removed.
 
 .. _deprecation-removed-in-1.9:
 
@@ -61,6 +82,10 @@ details on these changes.
 
 * ``allow_syncdb`` on database routers will no longer automatically become
   ``allow_migrate``.
+
+* The legacy method of syncing apps without migrations will be removed,
+  and migrations will become compulsory for all apps. This includes automatic
+  loading of ``initial_data`` fixtures and support for initial SQL data.
 
 * All models will need to be defined inside an installed application or
   declare an explicit :attr:`~django.db.models.Options.app_label`.
@@ -149,6 +174,9 @@ details on these changes.
 
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, will no longer be supported.
+
+* The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
+  :class:`~django.forms.ModelMultipleChoiceField` will be removed.
 
 .. _deprecation-removed-in-1.8:
 
@@ -306,6 +334,10 @@ details on these changes.
   :setting:`PASSWORD_RESET_TIMEOUT_DAYS`, this change will have no effect. If
   not, then any password reset links generated before you upgrade to Django 1.7
   won't work after the upgrade.
+
+* The ``django.utils.encoding.StrAndUnicode`` mix-in will be removed.
+  Define a ``__str__`` method and apply the
+  :func:`~django.utils.encoding.python_2_unicode_compatible` decorator instead.
 
 .. _deprecation-removed-in-1.6:
 

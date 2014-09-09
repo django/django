@@ -428,3 +428,44 @@ class CsrfViewMiddlewareTest(TestCase):
             resp2 = CsrfViewMiddleware().process_response(req, resp)
             max_age = resp2.cookies.get('csrfcookie').get('max-age')
             self.assertEqual(max_age, '')
+
+    def test_post_data_read_failure(self):
+        """
+        #20128 -- IOErrors during POST data reading should be caught and
+        treated as if the POST data wasn't there.
+        """
+        class CsrfPostRequest(HttpRequest):
+            """
+            HttpRequest that can raise an IOError when accessing POST data
+            """
+            def __init__(self, token, raise_error):
+                super(CsrfPostRequest, self).__init__()
+                self.method = 'POST'
+
+                self.raise_error = False
+                self.COOKIES[settings.CSRF_COOKIE_NAME] = token
+                self.POST['csrfmiddlewaretoken'] = token
+                self.raise_error = raise_error
+
+            def _load_post_and_files(self):
+                raise IOError('error reading input data')
+
+            def _get_post(self):
+                if self.raise_error:
+                    self._load_post_and_files()
+                return self._post
+
+            def _set_post(self, post):
+                self._post = post
+
+            POST = property(_get_post, _set_post)
+
+        token = 'ABC'
+
+        req = CsrfPostRequest(token, raise_error=False)
+        resp = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(resp, None)
+
+        req = CsrfPostRequest(token, raise_error=True)
+        resp = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertEqual(resp.status_code, 403)

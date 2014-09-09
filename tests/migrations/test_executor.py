@@ -1,10 +1,12 @@
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
-from django.test import override_settings
+from django.test import modify_settings, override_settings
+from django.apps.registry import apps as global_apps
 
 from .test_base import MigrationTestBase
 
 
+@modify_settings(INSTALLED_APPS={'append': 'migrations2'})
 class ExecutorTests(MigrationTestBase):
     """
     Tests the migration executor (full end-to-end running).
@@ -13,7 +15,7 @@ class ExecutorTests(MigrationTestBase):
     test failures first, as they may be propagating into here.
     """
 
-    available_apps = ["migrations", "django.contrib.sessions"]
+    available_apps = ["migrations", "migrations2", "django.contrib.auth", "django.contrib.contenttypes"]
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_run(self):
@@ -94,7 +96,10 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_book")
 
-    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations", "sessions": "migrations.test_migrations_2"})
+    @override_settings(MIGRATION_MODULES={
+        "migrations": "migrations.test_migrations",
+        "migrations2": "migrations2.test_migrations_2",
+    })
     def test_empty_plan(self):
         """
         Tests that re-planning a full migration of a fully-migrated set doesn't
@@ -106,27 +111,34 @@ class ExecutorTests(MigrationTestBase):
         were being unmigrated.
         """
         # Make the initial plan, check it
-        # We use 'sessions' here as the second app as it's always present
-        # in INSTALLED_APPS, so we can happily assign it test migrations.
         executor = MigrationExecutor(connection)
-        plan = executor.migration_plan([("migrations", "0002_second"), ("sessions", "0001_initial")])
+        plan = executor.migration_plan([
+            ("migrations", "0002_second"),
+            ("migrations2", "0001_initial"),
+        ])
         self.assertEqual(
             plan,
             [
                 (executor.loader.graph.nodes["migrations", "0001_initial"], False),
                 (executor.loader.graph.nodes["migrations", "0002_second"], False),
-                (executor.loader.graph.nodes["sessions", "0001_initial"], False),
+                (executor.loader.graph.nodes["migrations2", "0001_initial"], False),
             ],
         )
         # Fake-apply all migrations
-        executor.migrate([("migrations", "0002_second"), ("sessions", "0001_initial")], fake=True)
+        executor.migrate([
+            ("migrations", "0002_second"),
+            ("migrations2", "0001_initial")
+        ], fake=True)
         # Rebuild the graph to reflect the new DB state
         executor.loader.build_graph()
         # Now plan a second time and make sure it's empty
-        plan = executor.migration_plan([("migrations", "0002_second"), ("sessions", "0001_initial")])
+        plan = executor.migration_plan([
+            ("migrations", "0002_second"),
+            ("migrations2", "0001_initial"),
+        ])
         self.assertEqual(plan, [])
         # Erase all the fake records
-        executor.recorder.record_unapplied("sessions", "0001_initial")
+        executor.recorder.record_unapplied("migrations2", "0001_initial")
         executor.recorder.record_unapplied("migrations", "0002_second")
         executor.recorder.record_unapplied("migrations", "0001_initial")
 
@@ -144,6 +156,12 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
         # Run it normally
+        self.assertEqual(
+            executor.migration_plan([("migrations", "0001_initial")]),
+            [
+                (executor.loader.graph.nodes["migrations", "0001_initial"], False),
+            ],
+        )
         executor.migrate([("migrations", "0001_initial")])
         # Are the tables there now?
         self.assertTableExists("migrations_author")
@@ -160,15 +178,26 @@ class ExecutorTests(MigrationTestBase):
         # Make sure that was faked
         self.assertEqual(state["faked"], True)
         # Finally, migrate forwards; this should fake-apply our initial migration
+        executor.loader.build_graph()
+        self.assertEqual(
+            executor.migration_plan([("migrations", "0001_initial")]),
+            [
+                (executor.loader.graph.nodes["migrations", "0001_initial"], False),
+            ],
+        )
         executor.migrate([("migrations", "0001_initial")])
         self.assertEqual(state["faked"], True)
         # And migrate back to clean up the database
+        executor.loader.build_graph()
         executor.migrate([("migrations", None)])
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
 
     @override_settings(
-        MIGRATION_MODULES={"migrations": "migrations.test_migrations_custom_user"},
+        MIGRATION_MODULES={
+            "migrations": "migrations.test_migrations_custom_user",
+            "django.contrib.auth": "django.contrib.auth.migrations",
+        },
         AUTH_USER_MODEL="migrations.Author",
     )
     def test_custom_user(self):
@@ -183,6 +212,20 @@ class ExecutorTests(MigrationTestBase):
         executor.migrate([("migrations", "0001_initial")])
         self.assertTableExists("migrations_author")
         self.assertTableExists("migrations_tribble")
+        # Make sure the soft-application detection works (#23093)
+        # Change get_table_list to not return auth_user during this as
+        # it wouldn't be there in a normal run, and ensure migrations.Author
+        # exists in the global app registry temporarily.
+        old_get_table_list = connection.introspection.get_table_list
+        connection.introspection.get_table_list = lambda c: [x for x in old_get_table_list(c) if x != "auth_user"]
+        migrations_apps = executor.loader.project_state(("migrations", "0001_initial")).render()
+        global_apps.get_app_config("migrations").models["author"] = migrations_apps.get_model("migrations", "author")
+        try:
+            migration = executor.loader.get_migration("auth", "0001_initial")
+            self.assertEqual(executor.detect_soft_applied(migration), True)
+        finally:
+            connection.introspection.get_table_list = old_get_table_list
+            del global_apps.get_app_config("migrations").models["author"]
         # And migrate back to clean up the database
         executor.loader.build_graph()
         executor.migrate([("migrations", None)])
