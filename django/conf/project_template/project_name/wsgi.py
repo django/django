@@ -8,6 +8,8 @@ https://docs.djangoproject.com/en/{{ docs_version }}/howto/deployment/wsgi/
 """
 
 import os
+import sys
+sys.dont_write_bytecode = True
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{{ project_name }}.settings")
 
 from django.core.wsgi import get_wsgi_application
