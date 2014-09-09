@@ -82,6 +82,21 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/lastmod/sitemap.xml')
         self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
 
+    def test_sitemap_last_modified_date(self):
+        """
+        The Last-Modified header should be support dates (without time).
+        """
+        response = self.client.get('/lastmod/date-sitemap.xml')
+        self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 00:00:00 GMT')
+
+    def test_sitemap_last_modified_tz(self):
+        """
+        The Last-Modified header should be converted from timezone aware dates
+        to GMT.
+        """
+        response = self.client.get('/lastmod/tz-sitemap.xml')
+        self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 15:00:00 GMT')
+
     def test_sitemap_last_modified_missing(self):
         "Tests that Last-Modified header is missing when sitemap has no lastmod"
         response = self.client.get('/generic/sitemap.xml')

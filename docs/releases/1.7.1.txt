@@ -40,3 +40,6 @@ Bugfixes
 
 * Empty ``index_together`` or ``unique_together`` model options no longer
   results in infinite migrations (:ticket:`23452`).
+
+* Fixed crash in ``contrib.sitemaps`` if ``lastmod`` returned a ``date`` rather
+  than a ``datetime`` (:ticket:`23403`).
