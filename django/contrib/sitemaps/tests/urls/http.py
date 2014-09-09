@@ -1,8 +1,9 @@
-from datetime import datetime
+from datetime import date, datetime
 from django.conf.urls import url
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib.sitemaps import Sitemap, GenericSitemap, FlatPageSitemap, views
 from django.http import HttpResponse
+from django.utils import timezone
 from django.views.decorators.cache import cache_page
 
 from django.contrib.sitemaps.tests.base import I18nTestModel, TestModel
@@ -53,6 +54,14 @@ class FixedLastmodMixedSitemap(Sitemap):
         return [o1, o2]
 
 
+class DateSiteMap(SimpleSitemap):
+    lastmod = date(2013, 3, 13)
+
+
+class TimezoneSiteMap(SimpleSitemap):
+    lastmod = datetime(2013, 3, 13, 10, 0, 0, tzinfo=timezone.get_fixed_timezone(-300))
+
+
 def testmodelview(request, id):
     return HttpResponse()
 
@@ -99,6 +108,10 @@ urlpatterns = [
     url(r'^empty/sitemap\.xml$', views.sitemap, {'sitemaps': empty_sitemaps}),
     url(r'^lastmod/sitemap\.xml$', views.sitemap, {'sitemaps': fixed_lastmod_sitemaps}),
     url(r'^lastmod-mixed/sitemap\.xml$', views.sitemap, {'sitemaps': fixed_lastmod__mixed_sitemaps}),
+    url(r'^lastmod/date-sitemap.xml$', views.sitemap,
+        {'sitemaps': {'date-sitemap': DateSiteMap}}),
+    url(r'^lastmod/tz-sitemap.xml$', views.sitemap,
+        {'sitemaps': {'tz-sitemap': TimezoneSiteMap}}),
     url(r'^generic/sitemap\.xml$', views.sitemap, {'sitemaps': generic_sitemaps}),
     url(r'^flatpages/sitemap\.xml$', views.sitemap, {'sitemaps': flatpage_sitemaps}),
     url(r'^cached/index\.xml$', cache_page(1)(views.index),

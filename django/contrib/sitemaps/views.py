@@ -1,4 +1,5 @@
 from calendar import timegm
+import datetime
 from functools import wraps
 
 from django.contrib.sites.shortcuts import get_current_site
@@ -74,6 +75,11 @@ def sitemap(request, sitemaps, section=None,
     if hasattr(site, 'latest_lastmod'):
         # if latest_lastmod is defined for site, set header so as
         # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
+        lastmod = site.latest_lastmod
         response['Last-Modified'] = http_date(
-            timegm(site.latest_lastmod.utctimetuple()))
+            timegm(
+                lastmod.utctimetuple() if isinstance(lastmod, datetime.datetime)
+                else lastmod.timetuple()
+            )
+        )
     return response
