@@ -139,6 +139,14 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         sys.stderr.write(msg)
 
     def get_environ(self):
+        # Strip all headers with underscores in the name before constructing
+        # the WSGI environ. This prevents header-spoofing based on ambiguity
+        # between underscores and dashes both normalized to underscores in WSGI
+        # env vars. Nginx and Apache 2.4+ both do this as well.
+        for k, v in self.headers.items():
+            if '_' in k:
+                del self.headers[k]
+
         env = super(WSGIRequestHandler, self).get_environ()
 
         path = self.path
