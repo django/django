@@ -283,6 +283,6 @@ class HumanizeTests(TestCase):
             for test_time_string, expected_natural_time in test_data:
                 test_time = datetime.datetime.strptime(test_time_string, time_format)
                 natural_time = humanize.naturaltime(test_time).replace('\xa0', ' ')
-            self.assertEqual(expected_natural_time, natural_time)
+                self.assertEqual(expected_natural_time, natural_time)
         finally:
             humanize.datetime = orig_humanize_datetime
