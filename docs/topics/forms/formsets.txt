@@ -105,7 +105,7 @@ gives you the ability to limit the number of forms the formset will display::
 If the value of ``max_num`` is greater than the number of existing items in the
 initial data, up to ``extra`` additional blank forms will be added to the
 formset, so long as the total number of forms does not exceed ``max_num``. For
-example, if ``extra=2`` and ``max_num=2`` and the formset is initalized with
+example, if ``extra=2`` and ``max_num=2`` and the formset is initialized with
 one ``initial`` item, a form for the initial item and one blank form will be
 displayed.
 
