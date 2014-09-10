@@ -37,9 +37,9 @@ class MigrationGraph(object):
 
     def add_dependency(self, migration, child, parent):
         if child not in self.nodes:
-            raise KeyError("Migration %s dependencies references nonexistent child node %r" % (migration, child))
+            raise KeyError("Migration %s dependencies reference nonexistent child node %r" % (migration, child))
         if parent not in self.nodes:
-            raise KeyError("Migration %s dependencies references nonexistent parent node %r" % (migration, parent))
+            raise KeyError("Migration %s dependencies reference nonexistent parent node %r" % (migration, parent))
         self.dependencies.setdefault(child, set()).add(parent)
         self.dependents.setdefault(parent, set()).add(child)
 
