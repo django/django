@@ -284,9 +284,9 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
         """
         if not safe_input:
             return text, text, trail
-        unescaped = (text + trail).replace('&amp;', '&').replace('&lt;', '<'
-                                 ).replace('&gt;', '>').replace('&quot;', '"'
-                                 ).replace('&#39;', "'")
+        unescaped = (text + trail).replace(
+            '&amp;', '&').replace('&lt;', '<').replace(
+            '&gt;', '>').replace('&quot;', '"').replace('&#39;', "'")
         # ';' in trail can be either trailing punctuation or end-of-entity marker
         if unescaped.endswith(';'):
             return text, unescaped[:-1], trail
