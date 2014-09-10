@@ -9,7 +9,10 @@ Django 1.7.1 fixes several bugs in 1.7.
 Bugfixes
 ========
 
-* Replace with actual issue (:ticket:`00000`).
+* Added a more helpful error message if you try to migrate an app without first
+  creating the ``contenttypes`` table (:ticket:`22411`).
+
+* Modified migrations dependency algorithm to avoid possible infinite recursion.
 
 * Fixed a ``UnicodeDecodeError`` when the ``flush`` error message contained
   Unicode characters (:ticket:`22882`).
@@ -31,6 +34,9 @@ Bugfixes
   ``'auth.User'`` model (:ticket:`11775`). As a side effect, the setting now
   adds a ``get_absolute_url()`` method to any model that appears in
   ``ABSOLUTE_URL_OVERRIDES`` but doesn't define ``get_absolute_url()``.
+
+* Avoided masking some `ImportError` exceptions during application loading
+  (:ticket:`22920`).
 
 * Empty ``index_together`` or ``unique_together`` model options no longer
   results in infinite migrations (:ticket:`23452`).
