@@ -1,14 +1,18 @@
+# -*- coding: utf-8 -*-
+
 import os
 import shutil
 import stat
 import sys
 import unittest
+import gettext as gettext_module
 
 from django.core.management import call_command, CommandError, execute_from_command_line
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase
 from django.test import override_settings
 from django.utils import translation
+from django.utils.translation import gettext
 from django.utils._os import upath
 from django.utils.six import StringIO
 
@@ -188,3 +192,29 @@ class CompilationErrorHandling(MessageCompilationTests):
     def test_error_reported_by_msgfmt(self):
         with self.assertRaises(CommandError):
             call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+
+
+class FuzzyTranslationTest(MessageCompilationTests):
+
+    LOCALE='ru'
+    MO_FILE='locale/%s/LC_MESSAGES/django.mo' % LOCALE
+
+    def setUp(self):
+        super(FuzzyTranslationTest, self).setUp()
+        self.addCleanup(self.rmfile, os.path.join(test_dir, self.MO_FILE))
+        gettext_module._translations = {}  ## flush cache or test will be useless
+
+    @override_settings(LOCALE_PATHS=(os.path.join(test_dir, 'locale'),))
+    def test_nofuzzy_compiling(self):
+        call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+        with translation.override(self.LOCALE):
+            self.assertEqual('Ленин', gettext('Lenin'))
+            self.assertEqual('Vodka', gettext('Vodka'))
+
+    @override_settings(LOCALE_PATHS=(os.path.join(test_dir, 'locale'),))
+    def test_fuzzy_compiling(self):
+        call_command('compilemessages', fuzzy=True, locale=[self.LOCALE], stdout=StringIO())
+        with translation.override(self.LOCALE):
+            self.assertEqual('Ленин', gettext('Lenin'))
+            self.assertEqual('Водка', gettext('Vodka'))
+
