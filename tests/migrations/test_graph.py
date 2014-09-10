@@ -174,7 +174,8 @@ class GraphTests(TestCase):
         graph.add_node(("app_b", "0001"), None)
         graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_a", "0002"))
         graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
-        with self.assertRaisesMessage(KeyError, "Migration app_a.0001 dependencies references nonexistent parent node ('app_b', '0002')"):
+        msg = "Migration app_a.0001 dependencies reference nonexistent parent node ('app_b', '0002')"
+        with self.assertRaisesMessage(KeyError, msg):
             graph.add_dependency("app_a.0001", ("app_a", "0001"), ("app_b", "0002"))
 
     def test_missing_child_nodes(self):
@@ -184,5 +185,6 @@ class GraphTests(TestCase):
         # Build graph
         graph = MigrationGraph()
         graph.add_node(("app_a", "0001"), None)
-        with self.assertRaisesMessage(KeyError, "Migration app_a.0002 dependencies references nonexistent child node ('app_a', '0002')"):
+        msg = "Migration app_a.0002 dependencies reference nonexistent child node ('app_a', '0002')"
+        with self.assertRaisesMessage(KeyError, msg):
             graph.add_dependency("app_a.0002", ("app_a", "0002"), ("app_a", "0001"))
