@@ -389,7 +389,7 @@ The actual sending of an email is handled by the email backend.
 
 The email backend class has the following methods:
 
-* ``open()`` instantiates an long-lived email-sending connection.
+* ``open()`` instantiates a long-lived email-sending connection.
 
 * ``close()`` closes the current email-sending connection.
 
