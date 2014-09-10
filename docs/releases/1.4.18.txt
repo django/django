@@ -7,6 +7,30 @@ Django 1.4.18 release notes
 Django 1.4.18 fixes several security issues in 1.4.17 as well as a regression
 on Python 2.5 in the 1.4.17 release.
 
+WSGI header spoofing via underscore/dash conflation
+===================================================
+
+When HTTP headers are placed into the WSGI environ, they are normalized by
+converting to uppercase, converting all dashes to underscores, and prepending
+`HTTP_`. For instance, a header ``X-Auth-User`` would become
+``HTTP_X_AUTH_USER`` in the WSGI environ (and thus also in Django's
+``request.META`` dictionary).
+
+Unfortunately, this means that the WSGI environ cannot distinguish between
+headers containing dashes and headers containing underscores: ``X-Auth-User``
+and ``X-Auth_User`` both become ``HTTP_X_AUTH_USER``. This means that if a
+header is used in a security-sensitive way (for instance, passing
+authentication information along from a front-end proxy), even if the proxy
+carefully strips any incoming value for ``X-Auth-User``, an attacker may be
+able to provide an ``X-Auth_User`` header (with underscore) and bypass this
+protection.
+
+In order to prevent such attacks, both Nginx and Apache 2.4+ strip all headers
+containing underscores from incoming requests by default. Django's built-in
+development server now does the same. Django's development server is not
+recommended for production use, but matching the behavior of common production
+servers reduces the surface area for behavior changes during deployment.
+
 Bugfixes
 ========
 
