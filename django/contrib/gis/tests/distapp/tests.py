@@ -117,13 +117,13 @@ class DistanceTest(TestCase):
 
         # Testing using different variations of parameters and using models
         # with different projected coordinate systems.
-        dist1 = SouthTexasCity.objects.distance(lagrange, field_name='point')
-        dist2 = SouthTexasCity.objects.distance(lagrange)  # Using GEOSGeometry parameter
+        dist1 = SouthTexasCity.objects.distance(lagrange, field_name='point').order_by('id')
+        dist2 = SouthTexasCity.objects.distance(lagrange).order_by('id')  # Using GEOSGeometry parameter
         if spatialite or oracle:
             dist_qs = [dist1, dist2]
         else:
-            dist3 = SouthTexasCityFt.objects.distance(lagrange.ewkt)  # Using EWKT string parameter.
-            dist4 = SouthTexasCityFt.objects.distance(lagrange)
+            dist3 = SouthTexasCityFt.objects.distance(lagrange.ewkt).order_by('id')  # Using EWKT string parameter.
+            dist4 = SouthTexasCityFt.objects.distance(lagrange).order_by('id')
             dist_qs = [dist1, dist2, dist3, dist4]
 
         # Original query done on PostGIS, have to adjust AlmostEqual tolerance
