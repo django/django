@@ -1774,7 +1774,8 @@ class Query(object):
                 entry_params = []
                 pos = entry.find("%s")
                 while pos != -1:
-                    entry_params.append(next(param_iter))
+                    if pos == 0 or entry[pos - 1] != '%':
+                        entry_params.append(next(param_iter))
                     pos = entry.find("%s", pos + 2)
                 select_pairs[name] = (entry, entry_params)
             # This is order preserving, since self.extra_select is an OrderedDict.
