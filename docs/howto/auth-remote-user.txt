@@ -64,6 +64,22 @@ If your authentication mechanism uses a custom HTTP header and not
     class CustomHeaderMiddleware(RemoteUserMiddleware):
         header = 'HTTP_AUTHUSER'
 
+.. warning::
+
+    Be very careful if using a ``RemoteUserMiddleware`` subclass with a custom
+    HTTP header. You must be sure that your front-end web server always sets or
+    strips that header based on the appropriate authentication checks, never
+    permitting an end-user to submit a fake (or "spoofed") header value. Since
+    the HTTP headers ``X-Auth-User`` and ``X-Auth_User`` (for example) both
+    normalize to the ``HTTP_X_AUTH_USER`` key in ``request.META``, you must
+    also check that your web server doesn't allow a spoofed header using
+    underscores in place of dashes.
+
+    This warning doesn't apply to ``RemoteUserMiddleware`` in its default
+    configuration with ``header = 'REMOTE_USER'``, since a key that doesn't
+    start with ``HTTP_`` in ``request.META`` can only be set by your WSGI
+    server, not directly from an HTTP request header.
+
 If you need more control, you can create your own authentication backend
 that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and
 override one or more of its attributes and methods.
