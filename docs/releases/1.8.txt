@@ -281,6 +281,9 @@ Models
   Django uses whenever objects are loaded using the ORM. The method allows
   customizing model loading behavior.
 
+* ``extra(select={...})`` now allows you to escape a literal ``%s`` sequence
+  using ``%%s``.
+
 Signals
 ^^^^^^^
 
