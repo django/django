@@ -38,7 +38,7 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
 
 @lru_cache(maxsize=None)
 def _map_model(opts, link):
-    direct = isinstance(link, Field) or hasattr(link, 'for_concrete_model')
+    direct = not link.is_reverse_object or hasattr(link, 'for_concrete_model')
     model = link.model if direct else link.parent_model._meta.concrete_model
     if model == opts.model:
         model = None
@@ -47,7 +47,7 @@ def _map_model(opts, link):
 
 @lru_cache(maxsize=None)
 def _map_model_details(opts, link):
-    direct = isinstance(link, Field) or hasattr(link, 'for_concrete_model')
+    direct = not link.is_reverse_object or hasattr(link, 'for_concrete_model')
     model = link.model if direct else link.parent_model._meta.concrete_model
     if model == opts.model:
         model = None

@@ -300,8 +300,12 @@ class SQLCompiler(object):
 
         for field in opts.concrete_fields:
             model = field.parent_model._meta.concrete_model
+
+            # A proxy model will have a different model and concrete_model. We
+            # will assign None if the field belongs to this model.
             if model == opts.model:
                 model = None
+
             if from_parent and model is not None and issubclass(from_parent, model):
                 # Avoid loading data for already loaded parents.
                 continue

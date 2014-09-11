@@ -60,28 +60,6 @@ class cached_property(object):
         return res
 
 
-class conditional_cached_property(cached_property):
-    """
-    Decorator similar to ``cached_property`` with the only exception
-    that the property is cached only if a certain condition is satisfied.
-    This decorator expects 2 return types: the first one is the condition to
-    satisfy, and the other being the content to cache.
-    This decorator is useful if caching should only be done after
-    specific conditions are met.
-
-    Optional ``name`` argument allows you to make cached properties of other
-    methods. (e.g.  url = conditional_cached_property(get_absolute_url, name='url') )
-    """
-
-    def __get__(self, instance, type=None):
-        if instance is None:
-            return self
-        should_cache, res = self.func(instance)
-        if should_cache:
-            instance.__dict__[self.name] = res
-        return res
-
-
 class Promise(object):
     """
     This is just a base class for the proxy class created in

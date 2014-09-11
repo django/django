@@ -424,14 +424,15 @@ def reverse_field_path(model, path):
     pieces = path.split(LOOKUP_SEP)
     for piece in pieces:
         field = parent._meta.get_field(piece)
-        direct = isinstance(field, models.Field) or hasattr(field, 'for_concrete_model')
         # skip trailing data field if extant:
         if len(reversed_path) == len(pieces) - 1:  # final iteration
             try:
                 get_model_from_relation(field)
             except NotRelationField:
                 break
-        if direct:
+
+        # Field should point to another model
+        if not field.is_reverse_object and field.has_relation:
             related_name = field.related_query_name()
             parent = field.rel.to
         else:
