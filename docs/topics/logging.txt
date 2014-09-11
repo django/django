@@ -114,7 +114,10 @@ Formatters
 Ultimately, a log record needs to be rendered as text. Formatters
 describe the exact format of that text. A formatter usually consists
 of a Python formatting string; however, you can also write custom
-formatters to implement specific formatting behavior.
+formatters to implement specific formatting behavior. Different
+`LogRecord attributes`_ can be used to format the output.
+
+.. LogRecord attributes: https://docs.python.org/library/logging.html#logrecord-attributes
 
 Using logging
 =============
