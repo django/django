@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 # The *_FORMAT strings use the Django date format syntax,
 # see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 DATE_FORMAT = r'j \d\e F \d\e Y'
-TIME_FORMAT = 'H:i:s'
+TIME_FORMAT = 'H:i'
 DATETIME_FORMAT = r'j \d\e F \d\e Y \á\s H:i'
 YEAR_MONTH_FORMAT = r'F \d\e Y'
 MONTH_DAY_FORMAT = r'j \d\e F'
