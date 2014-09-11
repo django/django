@@ -182,7 +182,7 @@ class GetFieldByNameTests(OptionsBaseTests):
         # over only forward fields.
         opts = Person._meta
         opts.apps.ready = False
-        with self.assertRaises(AppRegistryNotReady) as err:
+        with self.assertRaises(AppRegistryNotReady):
             opts.get_field('data_abstract')
         opts.apps.ready = True
 
@@ -196,16 +196,16 @@ class RelationTreeTests(test.TestCase):
     def test_clear_cache_clears_relation_tree(self):
         # the apps.clear_cache is setUp() should have deleted all trees.
         for m in self.all_models:
-            self.assertNotIn('relation_tree', m._meta.__dict__)
+            self.assertNotIn('_relation_tree', m._meta.__dict__)
 
     def test_first_relation_tree_access_populates_all(self):
         # On first access, relation tree should have populated cache.
-        self.assertTrue(self.all_models[0]._meta.relation_tree)
+        self.assertTrue(self.all_models[0]._meta._relation_tree)
 
         # AbstractPerson does not have any relations, so relation_tree
         # should just return an EMPTY_RELATION_TREE.
         self.assertEqual(
-            AbstractPerson._meta.relation_tree,
+            AbstractPerson._meta._relation_tree,
             EMPTY_RELATION_TREE
         )
 
@@ -213,14 +213,14 @@ class RelationTreeTests(test.TestCase):
         # in the internal __dict__ .
         all_models_but_abstractperson = (m for m in self.all_models if m is not AbstractPerson)
         for m in all_models_but_abstractperson:
-            self.assertIn('relation_tree', m._meta.__dict__)
+            self.assertIn('_relation_tree', m._meta.__dict__)
 
     def test_relations_related_objects(self):
 
         # Testing non hidden related objects
 
         self.assertEqual(
-            sorted([field.related_query_name() for field in Relation._meta.relation_tree
+            sorted([field.related_query_name() for field in Relation._meta._relation_tree
                    if not field.related.field.rel.is_hidden()]),
             sorted(['fk_abstract_rel', 'fk_abstract_rel', 'fk_abstract_rel', 'fk_base_rel', 'fk_base_rel',
                     'fk_base_rel', 'fk_concrete_rel', 'fk_concrete_rel', 'fo_abstract_rel', 'fo_abstract_rel',
@@ -231,7 +231,7 @@ class RelationTreeTests(test.TestCase):
 
         # Testing hidden related objects
         self.assertEqual(
-            sorted([field.related_query_name() for field in BasePerson._meta.relation_tree]),
+            sorted([field.related_query_name() for field in BasePerson._meta._relation_tree]),
             sorted(['+', '+', 'BasePerson_following_abstract+', 'BasePerson_following_abstract+',
                     'BasePerson_following_base+', 'BasePerson_following_base+', 'BasePerson_friends_abstract+',
                     'BasePerson_friends_abstract+', 'BasePerson_friends_base+', 'BasePerson_friends_base+',
@@ -241,7 +241,7 @@ class RelationTreeTests(test.TestCase):
                     'friends_abstract_rel_+', 'friends_base_rel_+', 'friends_base_rel_+', 'friends_base_rel_+', 'person',
                     'person', 'relating_basepeople', 'relating_baseperson'])
         )
-        self.assertEqual([field.related_query_name() for field in AbstractPerson._meta.relation_tree], [])
+        self.assertEqual([field.related_query_name() for field in AbstractPerson._meta._relation_tree], [])
 
     def test_no_cache_option(self):
 

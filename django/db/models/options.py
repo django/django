@@ -483,7 +483,7 @@ class Options(object):
         fields = (obj for obj in fields if not isinstance(obj.field, ManyToManyField))
 
         if include_proxy_eq:
-            children = chain.from_iterable(c.relation_tree
+            children = chain.from_iterable(c._relation_tree
                                            for c in self.concrete_model._meta.proxied_children
                                            if c is not self)
             relations = (f.related for f in children
@@ -593,7 +593,7 @@ class Options(object):
             # In this way we avoid calling the cached property.
             # In attribute lookup, __dict__ takes precedence over
             # a data descriptor (such as @cached_property). This
-            # means that the _meta.relation_tree is only called
+            # means that the _meta._relation_tree is only called
             # if related_objects is not in __dict__.
             related_objects = related_objects_graph[model._meta]
 
@@ -603,14 +603,14 @@ class Options(object):
             relation_tree = EMPTY_RELATION_TREE
             if related_objects:
                 relation_tree = related_objects
-            model._meta.__dict__['relation_tree'] = relation_tree
+            model._meta.__dict__['_relation_tree'] = relation_tree
 
     @cached_property
-    def relation_tree(self):
+    def _relation_tree(self):
         # If cache is not present, populate the cache
         self._populate_directed_relation_graph()
         try:
-            return self.__dict__['relation_tree']
+            return self.__dict__['_relation_tree']
         except KeyError:
             # It may happen, often when the registry is not ready, that
             # a not yet registered model is queried. In this very rare
@@ -695,8 +695,8 @@ class Options(object):
             # Tree is computer once and cached until apps cache is expired. It is composed of
             # a list of fields pointing to the current model from other models.
             # If the model is a proxy model, then we also add the concrete model.
-            all_fields = self.relation_tree if not self.proxy else chain(self.relation_tree,
-                                                                   self.concrete_model._meta.relation_tree)
+            all_fields = self._relation_tree if not self.proxy else chain(self._relation_tree,
+                                                                   self.concrete_model._meta._relation_tree)
             for f in all_fields:
                 # If hidden fields should be included or the relation
                 # is not intentionally hidden, add to the fields dict

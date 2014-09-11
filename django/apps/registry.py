@@ -335,7 +335,7 @@ class Apps(object):
             )
         for model in self.get_models(include_auto_created=True):
             try:
-                del model._meta.relation_tree
+                del model._meta._relation_tree
             except AttributeError:
                 pass
 
