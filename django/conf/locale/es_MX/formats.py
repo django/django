@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 
 DATE_FORMAT = r'j \d\e F \d\e Y'
-TIME_FORMAT = 'H:i:s'
+TIME_FORMAT = 'H:i'
 DATETIME_FORMAT = r'j \d\e F \d\e Y \a \l\a\s H:i'
 YEAR_MONTH_FORMAT = r'F \d\e Y'
 MONTH_DAY_FORMAT = r'j \d\e F'

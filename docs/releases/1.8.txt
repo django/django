@@ -556,6 +556,9 @@ Miscellaneous
 * For consistency with other major vendors, the ``en_GB`` locale now has Monday
   as the first day of the week.
 
+* Seconds have been removed from any locales that had them in ``TIME_FORMAT``,
+  ``DATETIME_FORMAT``, or ``SHORT_DATETIME_FORMAT``.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
