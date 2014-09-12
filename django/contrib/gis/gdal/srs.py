@@ -97,7 +97,7 @@ class SpatialReference(GDALBase):
 
     def __del__(self):
         "Destroys this spatial reference."
-        if self._ptr:
+        if self._ptr and capi:
             capi.release_srs(self._ptr)
 
     def __getitem__(self, target):
