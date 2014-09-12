@@ -124,6 +124,7 @@ class AppConfigStub(AppConfig):
     path = ''
 
     def __init__(self, label):
+        self.label = label
         super(AppConfigStub, self).__init__(label, None)
 
     def import_models(self, all_models):
