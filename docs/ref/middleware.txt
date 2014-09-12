@@ -160,12 +160,19 @@ Enables cookie- and session-based message support. See the
 Security middleware
 -------------------
 
-.. versionadded:: 1.8
-
 .. module:: django.middleware.security
     :synopsis: Security middleware.
 
+.. warning::
+    If your deployment situation allows, it's usually a good idea to have your
+    front-end Web server perform the functionality provided by the
+    ``SecurityMiddleware``. That way, if there are requests that aren't served
+    by Django (such as static media or user-uploaded files), they will have
+    the same protections as requests to your Django application.
+
 .. class:: SecurityMiddleware
+
+.. versionadded:: 1.8
 
 The ``django.middleware.security.SecurityMiddleware`` provides several security
 enhancements to the request/response cycle. Each one can be independently
@@ -199,8 +206,8 @@ hour. Each time a Web browser sees the HSTS header from your site, it will
 refuse to communicate non-securely (using HTTP) with your domain for the given
 period of time. Once you confirm that all assets are served securely on your
 site (i.e. HSTS didn't break anything), it's a good idea to increase this value
-(31536000 seconds, i.e. 1 year, is common) so that infrequent visitors will be
-protected.
+so that infrequent visitors will be protected (31536000 seconds, i.e. 1 year,
+is common).
 
 Additionally, if you set the :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` setting
 to ``True``, ``SecurityMiddleware`` will add the ``includeSubDomains`` tag to
@@ -213,7 +220,6 @@ be vulnerable via an insecure connection to a subdomain.
     response that you set the header on. Therefore, you should only use it if
     your entire domain is served via HTTPS only.
 
-.. warning::
     Browsers properly respecting the HSTS header will refuse to allow users to
     bypass warnings and connect to a site with an expired, self-signed, or
     otherwise invalid SSL certificate. If you use HSTS, make sure your
@@ -252,7 +258,7 @@ is ``True``.
 
 Note that if Django isn't involved in serving user-uploaded files, this
 setting won't help you. For example, if your :setting:`MEDIA_URL` is served
-directly by your frontend Web server (nginx, Apache, etc.) then you'd want to
+directly by your front-end Web server (nginx, Apache, etc.) then you'd want to
 set this header there.
 
 .. _IE Security Blog: http://blogs.msdn.com/b/ie/archive/2008/09/02/ie8-security-part-vi-beta-2-update.aspx
@@ -262,11 +268,10 @@ set this header there.
 ``X-XSS-Protection: 1; mode=block``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some browsers have to ability to block content that appears to be an `XSS
+Some browsers have the ability to block content that appears to be an `XSS
 attack`_. They work by looking for Javascript content in the GET or POST
-parameters of a page. If the Javascript is replayed in the server's
-response the page is blocked from rendering and a error page is shown
-instead.
+parameters of a page. If the Javascript is replayed in the server's response,
+the page is blocked from rendering and an error page is shown instead.
 
 The `X-XSS-Protection header`_ is used to control the operation of the
 XSS filter.

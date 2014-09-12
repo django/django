@@ -21,7 +21,8 @@ class SecurityMiddleware(object):
                         for pattern in self.redirect_exempt)):
             host = self.redirect_host or request.get_host()
             return HttpResponsePermanentRedirect(
-                "https://%s%s" % (host, request.get_full_path()))
+                "https://%s%s" % (host, request.get_full_path())
+            )
 
     def process_response(self, request, response):
         if (self.sts_seconds and request.is_secure() and
