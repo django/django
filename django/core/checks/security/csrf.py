@@ -9,7 +9,6 @@ W003 = Warning(
     "('django.middleware.csrf.CsrfViewMiddleware' is not in your "
     "MIDDLEWARE_CLASSES). Enabling the middleware is the safest approach "
     "to ensure you don't leave any holes.",
-    hint=None,
     id='security.W003',
 )
 
@@ -18,7 +17,6 @@ W016 = Warning(
     "MIDDLEWARE_CLASSES, but you have not set CSRF_COOKIE_SECURE to True. "
     "Using a secure-only CSRF cookie makes it more difficult for network "
     "traffic sniffers to steal the CSRF token.",
-    hint=None,
     id='security.W016',
 )
 
@@ -27,7 +25,6 @@ W017 = Warning(
     "MIDDLEWARE_CLASSES, but you have not set CSRF_COOKIE_HTTPONLY to True. "
     "Using an HttpOnly CSRF cookie makes it more difficult for cross-site "
     "scripting attacks to steal the CSRF token.",
-    hint=None,
     id='security.W017',
 )
 

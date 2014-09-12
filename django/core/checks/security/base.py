@@ -12,7 +12,6 @@ W001 = Warning(
     "SECURE_CONTENT_TYPE_NOSNIFF, "
     "SECURE_BROWSER_XSS_FILTER, and SECURE_SSL_REDIRECT settings "
     "will have no effect.",
-    hint=None,
     id='security.W001',
 )
 
@@ -23,7 +22,6 @@ W002 = Warning(
     "'x-frame-options' header. Unless there is a good reason for your "
     "site to be served in a frame, you should consider enabling this "
     "header to help prevent clickjacking attacks.",
-    hint=None,
     id='security.W002',
 )
 
@@ -33,7 +31,6 @@ W004 = Warning(
     "setting a value and enabling HTTP Strict Transport Security. "
     "Be sure to read the documentation first; enabling HSTS carelessly "
     "can cause serious, irreversible problems.",
-    hint=None,
     id='security.W004',
 )
 
@@ -43,7 +40,6 @@ W005 = Warning(
     "via an insecure connection to a subdomain. Only set this to True if "
     "you are certain that all subdomains of your domain should be served "
     "exclusively via SSL.",
-    hint=None,
     id='security.W005',
 )
 
@@ -53,7 +49,6 @@ W006 = Warning(
     "'x-content-type-options: nosniff' header. "
     "You should consider enabling this header to prevent the "
     "browser from identifying content types incorrectly.",
-    hint=None,
     id='security.W006',
 )
 
@@ -63,7 +58,6 @@ W007 = Warning(
     "'x-xss-protection: 1; mode=block' header. "
     "You should consider enabling this header to activate the "
     "browser's XSS filtering and help prevent XSS attacks.",
-    hint=None,
     id='security.W007',
 )
 
@@ -73,7 +67,6 @@ W008 = Warning(
     "connections, you may want to either set this setting True "
     "or configure a load balancer or reverse-proxy server "
     "to redirect all connections to HTTPS.",
-    hint=None,
     id='security.W008',
 )
 
@@ -85,13 +78,11 @@ W009 = Warning(
         'min_length': SECRET_KEY_MIN_LENGTH,
         'min_unique_chars': SECRET_KEY_MIN_UNIQUE_CHARACTERS,
     },
-    hint=None,
     id='security.W009',
 )
 
 W018 = Warning(
     "You should not have DEBUG set to True in deployment.",
-    hint=None,
     id='security.W018',
 )
 
@@ -102,7 +93,6 @@ W019 = Warning(
     "The default is 'SAMEORIGIN', but unless there is a good reason for "
     "your site to serve other parts of itself in a frame, you should "
     "change it to 'DENY'.",
-    hint=None,
     id='security.W019',
 )
 
