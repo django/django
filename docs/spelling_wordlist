@@ -203,6 +203,7 @@ filesizeformat
 filesystem
 filesystems
 findstatic
+Firesheep
 firstof
 fk
 flatpage
@@ -572,6 +573,7 @@ sqlmigrate
 sqlsequencereset
 squashmigrations
 ssi
+SSL
 stacktrace
 startswith
 stateful
@@ -742,6 +744,7 @@ www
 xe
 xgettext
 xref
+XSS
 xxxxx
 yesno
 Zope
