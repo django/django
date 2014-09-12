@@ -342,7 +342,7 @@ class CoordTransform(GDALBase):
 
     def __del__(self):
         "Deletes this Coordinate Transformation object."
-        if self._ptr:
+        if self._ptr and capi:
             capi.destroy_ct(self._ptr)
 
     def __str__(self):
