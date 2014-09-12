@@ -20,6 +20,7 @@ Django's system checks are organized using the following tags:
 * ``signals``: Checks on signal declarations and handler registrations.
 * ``admin``: Checks of any admin site declarations.
 * ``compatibility``: Flagging potential problems with version upgrades.
+* ``security``: Checks security related configuration.
 
 Some checks may be registered with multiple tags.
 
@@ -345,6 +346,110 @@ The following checks are performed when a model contains a
 * **contenttypes.E003**: ``<field>`` is not a ``ForeignKey``.
 * **contenttypes.E004**: ``<field>`` is not a ``ForeignKey`` to
   ``contenttypes.ContentType``.
+
+Security
+--------
+
+The security checks do not make your site secure. They do not audit code, do
+intrusion detection, or do anything particularly complex. Rather, they help
+perform an automated, low-hanging-fruit checklist. They help you remember the
+simple things that improve your site's security.
+
+Some of these checks may not be appropriate for your particular deployment
+configuration. For instance, if you do your HTTP to HTTPS redirection in a load
+balancer, it'd be irritating to be constantly warned about not having enabled
+:setting:`SECURE_SSL_REDIRECT`. Use :setting:`SILENCED_SYSTEM_CHECKS` to
+silence unneeded checks.
+
+The following checks will be run if you use the :djadminopt:`--deploy` option
+of the :djadmin:`check` command:
+
+* **security.W001**: You do not have
+  :class:`django.middleware.security.SecurityMiddleware` in your
+  :setting:`MIDDLEWARE_CLASSES` so the :setting:`SECURE_HSTS_SECONDS`,
+  :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, :setting:`SECURE_BROWSER_XSS_FILTER`,
+  and :setting:`SECURE_SSL_REDIRECT` settings will have no effect.
+* **security.W002**: You do not have
+  :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
+  :setting:`MIDDLEWARE_CLASSES`, so your pages will not be served with an
+  ``'x-frame-options'`` header. Unless there is a good reason for your
+  site to be served in a frame, you should consider enabling this
+  header to help prevent clickjacking attacks.
+* **security.W003**: You don't appear to be using Django's built-in cross-site
+  request forgery protection via the middleware
+  (:class:`django.middleware.csrf.CsrfViewMiddleware` is not in your
+  :setting:`MIDDLEWARE_CLASSES`). Enabling the middleware is the safest
+  approach to ensure you don't leave any holes.
+* **security.W004**: You have not set a value for the
+  :setting:`SECURE_HSTS_SECONDS` setting. If your entire site is served only
+  over SSL, you may want to consider setting a value and enabling :ref:`HTTP
+  Strict Transport Security <http-strict-transport-security>`. Be sure to read
+  the documentation first; enabling HSTS carelessly can cause serious,
+  irreversible problems.
+* **security.W005**: You have not set the
+  :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` setting to ``True``. Without this,
+  your site is potentially vulnerable to attack via an insecure connection to a
+  subdomain. Only set this to ``True`` if you are certain that all subdomains of
+  your domain should be served exclusively via SSL.
+* **security.W006**: Your :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting is not
+  set to ``True``, so your pages will not be served with an
+  ``'x-content-type-options: nosniff'`` header. You should consider enabling
+  this header to prevent the browser from identifying content types incorrectly.
+* **security.W007**: Your :setting:`SECURE_BROWSER_XSS_FILTER` setting is not
+  set to ``True``, so your pages will not be served with an
+  ``'x-xss-protection: 1; mode=block'`` header. You should consider enabling
+  this header to activate the browser's XSS filtering and help prevent XSS
+  attacks.
+* **security.W008**: Your :setting:`SECURE_SSL_REDIRECT` setting is not set to
+  ``True``. Unless your site should be available over both SSL and non-SSL
+  connections, you may want to either set this setting to ``True`` or configure
+  a load balancer or reverse-proxy server  to redirect all connections to HTTPS.
+* **security.W009**: Your :setting:`SECRET_KEY` has less than 50 characters or
+  less than 5 unique characters. Please generate a long and random
+  ``SECRET_KEY``, otherwise many of Django's security-critical features will be
+  vulnerable to attack.
+* **security.W010**: You have :mod:`django.contrib.sessions` in your
+  :setting:`INSTALLED_APPS` but you have not set
+  :setting:`SESSION_COOKIE_SECURE` to ``True``. Using a secure-only session
+  cookie makes it more difficult for network traffic sniffers to hijack user
+  sessions.
+* **security.W011**: You have
+  :class:`django.contrib.sessions.middleware.SessionMiddleware` in your
+  :setting:`MIDDLEWARE_CLASSES`, but you have not set
+  :setting:`SESSION_COOKIE_SECURE` to ``True``. Using a secure-only session
+  cookie makes it more difficult for network traffic sniffers to hijack user
+  sessions.
+* **security.W012**: :setting:`SESSION_COOKIE_SECURE` is not set to ``True``.
+  Using a secure-only session cookie makes it more difficult for network traffic
+  sniffers to hijack user sessions.
+* **security.W013**: You have :mod:`django.contrib.sessions` in your
+  :setting:`INSTALLED_APPS`, but you have not set
+  :setting:`SESSION_COOKIE_HTTPONLY` to ``True``. Using an ``HttpOnly`` session
+  cookie makes it more difficult for cross-site scripting attacks to hijack user
+  sessions.
+* **security.W014**: You have
+  :class:`django.contrib.sessions.middleware.SessionMiddleware` in your
+  :setting:`MIDDLEWARE_CLASSES`, but you have not set
+  :setting:`SESSION_COOKIE_HTTPONLY` to ``True``. Using an ``HttpOnly`` session
+  cookie makes it more difficult for cross-site scripting attacks to hijack user
+  sessions.
+* **security.W015**: :setting:`SESSION_COOKIE_HTTPONLY` is not set to ``True``.
+  Using an ``HttpOnly`` session cookie makes it more difficult for cross-site
+  scripting attacks to hijack user sessions.
+* **security.W016**: :setting:`CSRF_COOKIE_SECURE` is not set to ``True``.
+  Using a secure-only CSRF cookie makes it more difficult for network traffic
+  sniffers to steal the CSRF token.
+* **security.W017**: :setting:`CSRF_COOKIE_HTTPONLY` is not set to ``True``.
+  Using an ``HttpOnly`` CSRF cookie makes it more difficult for cross-site
+  scripting attacks to steal the CSRF token.
+* **security.W018**: You should not have :setting:`DEBUG` set to ``True`` in
+  deployment.
+* **security.W019**: You have
+  :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
+  :setting:`MIDDLEWARE_CLASSES`, but :setting:`X_FRAME_OPTIONS` is not set to
+  ``'DENY'``. The default is ``'SAMEORIGIN'``, but unless there is a good reason
+  for your site to serve other parts of itself in a frame, you should change
+  it to ``'DENY'``.
 
 Sites
 -----
