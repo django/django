@@ -96,7 +96,7 @@ class DataSource(GDALBase):
 
     def __del__(self):
         "Destroys this DataStructure object."
-        if self._ptr:
+        if self._ptr and capi:
             capi.destroy_ds(self._ptr)
 
     def __iter__(self):

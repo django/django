@@ -12,7 +12,7 @@ class GEOSContextHandle(object):
         self.ptr = lgeos.initGEOS_r(notice_h, error_h)
 
     def __del__(self):
-        if self.ptr:
+        if self.ptr and lgeos:
             lgeos.finishGEOS_r(self.ptr)
 
 
