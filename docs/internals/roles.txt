@@ -57,3 +57,14 @@ The current releasers are:
 
 - James Bennett
 - Jacob Kaplan-Moss
+
+Ops team
+========
+
+The ops team maintains Django's infrastucture like the Django Project server,
+Trac instance, and continuous integration infrastructure.
+
+- Florian Apolloner
+- Aymeric Augustin
+- Tim Graham
+- Jannis Leidel
