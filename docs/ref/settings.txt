@@ -357,6 +357,12 @@ Default: ``False``
 
 Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
 ``True``, client-side JavaScript will not to be able to access the CSRF cookie.
+
+This can help prevent malicious JavaScript from bypassing CSRF protection. If
+you enable this and need to send the value of the CSRF token with Ajax requests,
+your JavaScript will need to pull the value from a hidden CSRF token form input
+on the page instead of from the cookie.
+
 See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 
 .. setting:: CSRF_COOKIE_NAME
@@ -1902,6 +1908,67 @@ Django will refuse to start if :setting:`SECRET_KEY` is not set.
     security protections, and can lead to privilege escalation and remote code
     execution vulnerabilities.
 
+.. setting:: SECURE_BROWSER_XSS_FILTER
+
+SECURE_BROWSER_XSS_FILTER
+-------------------------
+
+.. versionadded:: 1.8
+
+Default: ``False``
+
+If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` sets
+the :ref:`x-xss-protection` header on all responses that do not already have it.
+
+.. setting:: SECURE_CONTENT_TYPE_NOSNIFF
+
+SECURE_CONTENT_TYPE_NOSNIFF
+---------------------------
+
+.. versionadded:: 1.8
+
+Default: ``False``
+
+If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
+sets the :ref:`x-content-type-options` header on all responses that do not
+already have it.
+
+.. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
+
+SECURE_HSTS_INCLUDE_SUBDOMAINS
+------------------------------
+
+.. versionadded:: 1.8
+
+Default: ``False``
+
+If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` adds
+the ``includeSubDomains`` tag to the :ref:`http-strict-transport-security`
+header. It has no effect unless :setting:`SECURE_HSTS_SECONDS` is set to a
+non-zero value.
+
+.. warning::
+    Setting this incorrectly can irreversibly (for some time) break your site.
+    Read the :ref:`http-strict-transport-security` documentation first.
+
+.. setting:: SECURE_HSTS_SECONDS
+
+SECURE_HSTS_SECONDS
+-------------------
+
+.. versionadded:: 1.8
+
+Default: ``0``
+
+If set to a non-zero integer value, the
+:class:`~django.middleware.security.SecurityMiddleware` sets the
+:ref:`http-strict-transport-security` header on all responses that do not
+already have it.
+
+.. warning::
+    Setting this incorrectly can irreversibly (for some time) break your site.
+    Read the :ref:`http-strict-transport-security` documentation first.
+
 .. setting:: SECURE_PROXY_SSL_HEADER
 
 SECURE_PROXY_SSL_HEADER
@@ -1962,6 +2029,55 @@ available in ``request.META``.)
 
     If any of those are not true, you should keep this setting set to ``None``
     and find another way of determining HTTPS, perhaps via custom middleware.
+
+.. setting:: SECURE_REDIRECT_EXEMPT
+
+SECURE_REDIRECT_EXEMPT
+----------------------
+
+.. versionadded:: 1.8
+
+Default: ``[]``
+
+If a URL path matches a regular expression in this list, the request will not be
+redirected to HTTPS. If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
+setting has no effect.
+
+.. setting:: SECURE_SSL_HOST
+
+SECURE_SSL_HOST
+---------------
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+If a string (e.g. ``secure.example.com``), all SSL redirects will be directed
+to this host rather than the originally-requested host
+(e.g. ``www.example.com``). If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
+setting has no effect.
+
+.. setting:: SECURE_SSL_REDIRECT
+
+SECURE_SSL_REDIRECT
+-------------------
+
+.. versionadded:: 1.8
+
+Default: ``False``.
+
+If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
+:ref:`redirects <ssl-redirect>` all non-HTTPS requests to HTTPS (except for
+those URLs matching a regular expression listed in
+:setting:`SECURE_REDIRECT_EXEMPT`).
+
+.. note::
+
+   If turning this to ``True`` causes infinite redirects, it probably means
+   your site is running behind a proxy and can't tell which requests are secure
+   and which are not. Your proxy likely sets a header to indicate secure
+   requests; you can correct the problem by finding out what that header is and
+   configuring the :setting:`SECURE_PROXY_SSL_HEADER` setting accordingly.
 
 .. setting:: SERIALIZATION_MODULES
 
@@ -2642,6 +2758,11 @@ consistently by all browsers. However, when it is honored, it can be a
 useful way to mitigate the risk of client side script accessing the
 protected cookie data.
 
+Turning it on makes it less trivial for an attacker to escalate a cross-site
+scripting vulnerability into full hijacking of a user's session. There's not
+much excuse for leaving this off, either: if your code depends on reading
+session cookies from Javascript, you're probably doing it wrong.
+
 .. versionadded:: 1.7
 
 This setting also affects cookies set by :mod:`django.contrib.messages`.
@@ -2682,6 +2803,13 @@ Default: ``False``
 Whether to use a secure cookie for the session cookie. If this is set to
 ``True``, the cookie will be marked as "secure," which means browsers may
 ensure that the cookie is only sent under an HTTPS connection.
+
+Since it's trivial for a packet sniffer (e.g. `Firesheep`_) to hijack a user's
+session if the session cookie is sent unencrypted, there's really no good
+excuse to leave this off. It will prevent you from using sessions on insecure
+requests and that's a good thing.
+
+.. _Firesheep: http://codebutler.com/firesheep
 
 .. versionadded:: 1.7
 
@@ -3023,7 +3151,16 @@ HTTP
 * :setting:`FORCE_SCRIPT_NAME`
 * :setting:`INTERNAL_IPS`
 * :setting:`MIDDLEWARE_CLASSES`
-* :setting:`SECURE_PROXY_SSL_HEADER`
+* Security
+
+  * :setting:`SECURE_BROWSER_XSS_FILTER`
+  * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
+  * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
+  * :setting:`SECURE_HSTS_SECONDS`
+  * :setting:`SECURE_PROXY_SSL_HEADER`
+  * :setting:`SECURE_REDIRECT_EXEMPT`
+  * :setting:`SECURE_SSL_HOST`
+  * :setting:`SECURE_SSL_REDIRECT`
 * :setting:`SIGNING_BACKEND`
 * :setting:`USE_ETAGS`
 * :setting:`USE_X_FORWARDED_HOST`

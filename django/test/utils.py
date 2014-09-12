@@ -359,7 +359,7 @@ class modify_settings(override_settings):
         super(modify_settings, self).enable()
 
 
-def override_system_checks(new_checks):
+def override_system_checks(new_checks, deployment_checks=None):
     """ Acts as a decorator. Overrides list of registered system checks.
     Useful when you override `INSTALLED_APPS`, e.g. if you exclude `auth` app,
     you also need to exclude its system checks. """
@@ -371,10 +371,14 @@ def override_system_checks(new_checks):
         def inner(*args, **kwargs):
             old_checks = registry.registered_checks
             registry.registered_checks = new_checks
+            old_deployment_checks = registry.deployment_checks
+            if deployment_checks is not None:
+                registry.deployment_checks = deployment_checks
             try:
                 return test_func(*args, **kwargs)
             finally:
                 registry.registered_checks = old_checks
+                registry.deployment_checks = old_deployment_checks
         return inner
     return outer
 

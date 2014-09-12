@@ -13,6 +13,7 @@ class Tags(object):
     admin = 'admin'
     compatibility = 'compatibility'
     models = 'models'
+    security = 'security'
     signals = 'signals'
 
 
@@ -20,8 +21,9 @@ class CheckRegistry(object):
 
     def __init__(self):
         self.registered_checks = []
+        self.deployment_checks = []
 
-    def register(self, *tags):
+    def register(self, *tags, **kwargs):
         """
         Decorator. Register given function `f` labeled with given `tags`. The
         function should receive **kwargs and return list of Errors and
@@ -36,24 +38,28 @@ class CheckRegistry(object):
                 return errors
 
         """
+        kwargs.setdefault('deploy', False)
 
         def inner(check):
             check.tags = tags
-            if check not in self.registered_checks:
+            if kwargs['deploy']:
+                if check not in self.deployment_checks:
+                    self.deployment_checks.append(check)
+            elif check not in self.registered_checks:
                 self.registered_checks.append(check)
             return check
 
         return inner
 
-    def run_checks(self, app_configs=None, tags=None):
+    def run_checks(self, app_configs=None, tags=None, include_deployment_checks=False):
         """ Run all registered checks and return list of Errors and Warnings.
         """
         errors = []
+        checks = self.get_checks(include_deployment_checks)
+
         if tags is not None:
-            checks = [check for check in self.registered_checks
+            checks = [check for check in checks
                       if hasattr(check, 'tags') and set(check.tags) & set(tags)]
-        else:
-            checks = self.registered_checks
 
         for check in checks:
             new_errors = check(app_configs=app_configs)
@@ -63,11 +69,17 @@ class CheckRegistry(object):
             errors.extend(new_errors)
         return errors
 
-    def tag_exists(self, tag):
-        return tag in self.tags_available()
+    def tag_exists(self, tag, include_deployment_checks=False):
+        return tag in self.tags_available(include_deployment_checks)
 
-    def tags_available(self):
-        return set(chain(*[check.tags for check in self.registered_checks if hasattr(check, 'tags')]))
+    def tags_available(self, deployment_checks=False):
+        return set(chain(*[check.tags for check in self.get_checks(deployment_checks) if hasattr(check, 'tags')]))
+
+    def get_checks(self, include_deployment_checks=False):
+        checks = list(self.registered_checks)
+        if include_deployment_checks:
+            checks.extend(self.deployment_checks)
+        return checks
 
 
 registry = CheckRegistry()

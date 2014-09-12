@@ -135,6 +135,25 @@ to perform only security and compatibility checks, you would run::
 
 List all available tags.
 
+.. django-admin-option:: --deploy
+
+.. versionadded:: 1.8
+
+The ``--deploy`` option activates some additional checks that are only relevant
+in a deployment setting.
+
+You can use this option in your local development environment, but since your
+local development settings module may not have many of your production settings,
+you will probably want to point the ``check`` command at a different settings
+module, either by setting the ``DJANGO_SETTINGS_MODULE`` environment variable,
+or by passing the ``--settings`` option::
+
+    python manage.py check --deploy --settings=production_settings
+
+Or you could run it directly on a production or staging deployment to verify
+that the correct settings are in use (omitting ``--settings``). You could even
+make it part of your integration test suite.
+
 compilemessages
 ---------------
 
