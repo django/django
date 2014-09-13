@@ -24,7 +24,7 @@ class EmailBackend(BaseEmailBackend):
         self.password = settings.EMAIL_HOST_PASSWORD if password is None else password
         self.use_tls = settings.EMAIL_USE_TLS if use_tls is None else use_tls
         self.use_ssl = settings.EMAIL_USE_SSL if use_ssl is None else use_ssl
-        self.timeout = timeout
+        self.timeout = settings.EMAIL_TIMEOUT if timeout is None else timeout
         self.ssl_keyfile = settings.EMAIL_SSL_KEYFILE if ssl_keyfile is None else ssl_keyfile
         self.ssl_certfile = settings.EMAIL_SSL_CERTFILE if ssl_certfile is None else ssl_certfile
         if self.use_ssl and self.use_tls:
