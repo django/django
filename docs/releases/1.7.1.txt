@@ -43,3 +43,6 @@ Bugfixes
 
 * Fixed crash in ``contrib.sitemaps`` if ``lastmod`` returned a ``date`` rather
   than a ``datetime`` (:ticket:`23403`).
+
+* Allowed migrations to work with ``app_label``\s that have the same last
+  part (e.g. ``django.contrib.auth`` and ``vendor.auth``) (:ticket:`23483`).
