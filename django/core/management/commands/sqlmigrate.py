@@ -19,6 +19,7 @@ class Command(BaseCommand):
     )
 
     help = "Prints the SQL statements for the named migration."
+    args = "[app_label] [migration_name]"
     output_transaction = True
 
     def execute(self, *args, **options):
