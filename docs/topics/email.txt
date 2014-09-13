@@ -451,8 +451,9 @@ SMTP backend
     The server address and authentication credentials are set in the
     :setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
     :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS`,
-    :setting:`EMAIL_USE_SSL`, :setting:`EMAIL_SSL_CERTFILE` and
-    :setting:`EMAIL_SSL_KEYFILE` settings in your settings file.
+    :setting:`EMAIL_USE_SSL`, :setting:`EMAIL_TIMEOUT`,
+    :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE` settings
+    in your settings file.
 
     The SMTP backend is the default configuration inherited by Django. If you
     want to specify it explicitly, put the following in your settings::
@@ -484,8 +485,8 @@ SMTP backend
 
     .. versionchanged:: 1.8
 
-        The ``ssl_keyfile`` and ``ssl_certfile`` parameters and
-        corresponding settings were added.
+        The ``timeout``, ``ssl_keyfile``, and ``ssl_certfile`` parameters
+        and corresponding settings were added.
 
 .. _topic-email-console-backend:
 
