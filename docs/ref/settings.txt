@@ -1266,6 +1266,18 @@ connection. Please refer to the documentation of Python's
 :func:`python:ssl.wrap_socket` function for details on how the certificate chain
 file and private key file are handled.
 
+.. setting:: EMAIL_TIMEOUT
+
+EMAIL_TIMEOUT
+-------------
+
+.. versionadded:: 1.8
+
+Default: ``None``
+
+Specifies a timeout in seconds for blocking operations like the connection
+attempt.
+
 .. setting:: FILE_CHARSET
 
 FILE_CHARSET
@@ -3089,6 +3101,7 @@ Email
 * :setting:`EMAIL_SSL_CERTFILE`
 * :setting:`EMAIL_SSL_KEYFILE`
 * :setting:`EMAIL_SUBJECT_PREFIX`
+* :setting*`EMAIL_TIMEOUT`
 * :setting:`EMAIL_USE_TLS`
 * :setting:`MANAGERS`
 * :setting:`SERVER_EMAIL`

@@ -451,41 +451,27 @@ SMTP backend
     The server address and authentication credentials are set in the
     :setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
     :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS`,
-    :setting:`EMAIL_USE_SSL`, :setting:`EMAIL_SSL_CERTFILE` and
-    :setting:`EMAIL_SSL_KEYFILE` settings in your settings file.
+    :setting:`EMAIL_USE_SSL`, :setting:`EMAIL_TIMEOUT`,
+    :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE` settings
+    in your settings file.
 
     The SMTP backend is the default configuration inherited by Django. If you
     want to specify it explicitly, put the following in your settings::
 
         EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-    Here is an attribute which doesn't have a corresponding setting like the
-    others described above:
+    .. versionadded:: 1.7
 
-    .. attribute:: timeout
-
-        .. versionadded:: 1.7
-
-        This backend contains a ``timeout`` parameter, which can be set with
-        the following sample code::
-
-            from django.core.mail.backends import smtp
-
-            class MyEmailBackend(smtp.EmailBackend):
-              def __init__(self, *args, **kwargs):
-                  kwargs.setdefault('timeout', 42)
-                  super(MyEmailBackend, self).__init__(*args, **kwargs)
-
-        Then point the :setting:`EMAIL_BACKEND` setting at your custom backend as
-        described above.
-
-        If unspecified, the default ``timeout`` will be the one provided by
-        :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
+        The ``timeout`` parameter was added. If unspecified, the default
+        ``timeout`` will be the one provided by
+        :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no
+        timeout).
 
     .. versionchanged:: 1.8
 
-        The ``ssl_keyfile`` and ``ssl_certfile`` parameters and
-        corresponding settings were added.
+        The ``ssl_keyfile``, and ``ssl_certfile`` parameters and corresponding
+        settings were added. The ability to customize ``timeout`` using
+        a setting (:setting:`EMAIL_TIMEOUT`) was added.
 
 .. _topic-email-console-backend:
 

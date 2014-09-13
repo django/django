@@ -196,6 +196,7 @@ EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
 EMAIL_SSL_CERTFILE = None
 EMAIL_SSL_KEYFILE = None
+EMAIL_TIMEOUT = None
 
 # List of strings representing installed apps.
 INSTALLED_APPS = ()
