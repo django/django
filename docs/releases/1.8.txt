@@ -225,6 +225,12 @@ Generic Views
   :attr:`~django.views.generic.list.MultipleObjectMixin.ordering` or overriding
   :meth:`~django.views.generic.list.MultipleObjectMixin.get_ordering()`.
 
+* The new :attr:`SingleObjectMixin.query_pk_and_slug
+  <django.views.generic.detail.SingleObjectMixin.query_pk_and_slug>`
+  attribute allows changing the behavior of
+  :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
+  so that it'll perform its lookup using both the primary key and the slug.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
