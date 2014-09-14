@@ -306,6 +306,11 @@ Models
 * :doc:`Custom Lookups</howto/custom-lookups>` can now be registered using
   a decorator pattern.
 
+* The new :attr:`Transform.bilateral <django.db.models.Transform.bilateral>`
+  attribute allows creating bilateral transformations. These transformations
+  are applied to both ``lhs`` and ``rhs`` when used in a lookup expression,
+  providing opportunities for more sophisticated lookups.
+
 Signals
 ^^^^^^^
 
