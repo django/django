@@ -1,8 +1,10 @@
 import hashlib
 import sys
 import time
+import warnings
 
 from django.conf import settings
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
 from django.utils.six.moves import input
 from django.utils.six import StringIO
@@ -192,6 +194,9 @@ class BaseDatabaseCreation(object):
         """
         Returns the CREATE INDEX SQL statements for a single model.
         """
+        warnings.warn("DatabaseCreation.sql_indexes_for_model is deprecated, "
+                      "use the equivalent method of the schema editor instead.",
+                      RemovedInDjango20Warning)
         if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from django.apps import apps
 from django.conf import settings
 from django.db import connection
-from django.core.management.color import no_style
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models.tablespaces import (Article, ArticleRef, Authors, Reviewers,
@@ -11,13 +10,13 @@ from .models.tablespaces import (Article, ArticleRef, Authors, Reviewers,
 
 
 def sql_for_table(model):
-    return '\n'.join(connection.creation.sql_create_model(model,
-                                                          no_style())[0])
+    with connection.schema_editor(collect_sql=True) as editor:
+        editor.create_model(model)
+    return editor.collected_sql[0]
 
 
 def sql_for_index(model):
-    return '\n'.join(connection.creation.sql_indexes_for_model(model,
-                                                               no_style()))
+    return '\n'.join(connection.schema_editor()._model_indexes_sql(model))
 
 
 # We can't test the DEFAULT_TABLESPACE and DEFAULT_INDEX_TABLESPACE settings

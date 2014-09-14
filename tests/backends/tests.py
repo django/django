@@ -111,9 +111,10 @@ class SQLiteTests(TestCase):
         Check that auto_increment fields are created with the AUTOINCREMENT
         keyword in order to be monotonically increasing. Refs #10164.
         """
-        statements = connection.creation.sql_create_model(models.Square,
-            style=no_style())
-        match = re.search('"id" ([^,]+),', statements[0][0])
+        with connection.schema_editor(collect_sql=True) as editor:
+            editor.create_model(models.Square)
+            statements = editor.collected_sql
+        match = re.search('"id" ([^,]+),', statements[0])
         self.assertIsNotNone(match)
         self.assertEqual('integer NOT NULL PRIMARY KEY AUTOINCREMENT',
             match.group(1), "Wrong SQL used to create an auto-increment "
