@@ -225,14 +225,12 @@ class Command(BaseCommand):
         try:
             # Get a list of already installed *models* so that references work right.
             tables = connection.introspection.table_names(cursor)
-            seen_models = connection.introspection.installed_models(tables)
             created_models = set()
-            pending_references = {}
 
             # Build the manifest of apps and models that are to be synchronized
             all_models = [
                 (app_config.label,
-                    router.get_migratable_models(app_config, connection.alias, include_auto_created=True))
+                    router.get_migratable_models(app_config, connection.alias, include_auto_created=False))
                 for app_config in apps.get_app_configs()
                 if app_config.models_module is not None and app_config.label in app_labels
             ]
@@ -256,34 +254,27 @@ class Command(BaseCommand):
             if self.verbosity >= 1:
                 self.stdout.write("  Creating tables...\n")
             with transaction.atomic(using=connection.alias, savepoint=connection.features.can_rollback_ddl):
+                deferred_sql = []
                 for app_name, model_list in manifest.items():
                     for model in model_list:
-                        # Create the model's database table, if it doesn't already exist.
+                        if model._meta.proxy or not model._meta.managed:
+                            continue
                         if self.verbosity >= 3:
                             self.stdout.write(
                                 "    Processing %s.%s model\n" % (app_name, model._meta.object_name)
                             )
-                        sql, references = connection.creation.sql_create_model(model, no_style(), seen_models)
-                        seen_models.add(model)
+                        with connection.schema_editor() as editor:
+                            if self.verbosity >= 1:
+                                self.stdout.write("    Creating table %s\n" % model._meta.db_table)
+                            editor.create_model(model)
+                            deferred_sql.extend(editor.deferred_sql)
+                            editor.deferred_sql = []
                         created_models.add(model)
-                        for refto, refs in references.items():
-                            pending_references.setdefault(refto, []).extend(refs)
-                            if refto in seen_models:
-                                sql.extend(
-                                    connection.creation.sql_for_pending_references(
-                                        refto, no_style(), pending_references,
-                                    )
-                                )
-                        sql.extend(
-                            connection.creation.sql_for_pending_references(
-                                model, no_style(), pending_references
-                            )
-                        )
-                        if self.verbosity >= 1 and sql:
-                            self.stdout.write("    Creating table %s\n" % model._meta.db_table)
-                        for statement in sql:
-                            cursor.execute(statement)
-                        tables.append(connection.introspection.table_name_converter(model._meta.db_table))
+
+                if self.verbosity >= 1:
+                    self.stdout.write("    Running deferred SQL...\n")
+                for statement in deferred_sql:
+                    cursor.execute(statement)
         finally:
             cursor.close()
 
@@ -320,31 +311,6 @@ class Command(BaseCommand):
                                 self.stdout.write(
                                     "    No custom SQL for %s.%s model\n" %
                                     (app_name, model._meta.object_name)
-                                )
-
-            if self.verbosity >= 1:
-                self.stdout.write("  Installing indexes...\n")
-
-            # Install SQL indices for all newly created models
-            for app_name, model_list in manifest.items():
-                for model in model_list:
-                    if model in created_models:
-                        index_sql = connection.creation.sql_indexes_for_model(model, no_style())
-                        if index_sql:
-                            if self.verbosity >= 2:
-                                self.stdout.write(
-                                    "    Installing index for %s.%s model\n" %
-                                    (app_name, model._meta.object_name)
-                                )
-                            savepoint = connection.features.can_rollback_ddl
-                            try:
-                                with transaction.atomic(using=connection.alias, savepoint=savepoint):
-                                    for sql in index_sql:
-                                        cursor.execute(sql)
-                            except Exception as e:
-                                self.stderr.write(
-                                    "    Failed to install index for %s.%s model: %s\n" %
-                                    (app_name, model._meta.object_name, e)
                                 )
         finally:
             cursor.close()
