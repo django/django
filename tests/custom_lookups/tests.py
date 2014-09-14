@@ -17,7 +17,7 @@ class Div3Lookup(models.Lookup):
         lhs, params = self.process_lhs(qn, connection)
         rhs, rhs_params = self.process_rhs(qn, connection)
         params.extend(rhs_params)
-        return '%s %%%% 3 = %s' % (lhs, rhs), params
+        return '(%s) %%%% 3 = %s' % (lhs, rhs), params
 
     def as_oracle(self, qn, connection):
         lhs, params = self.process_lhs(qn, connection)
@@ -31,11 +31,31 @@ class Div3Transform(models.Transform):
 
     def as_sql(self, qn, connection):
         lhs, lhs_params = qn.compile(self.lhs)
-        return '%s %%%% 3' % (lhs,), lhs_params
+        return '(%s) %%%% 3' % lhs, lhs_params
 
     def as_oracle(self, qn, connection):
         lhs, lhs_params = qn.compile(self.lhs)
         return 'mod(%s, 3)' % lhs, lhs_params
+
+class Div3BilateralTransform(Div3Transform):
+    bilateral = True
+
+
+class Mult3BilateralTransform(models.Transform):
+    bilateral = True
+    lookup_name = 'mult3'
+
+    def as_sql(self, qn, connection):
+        lhs, lhs_params = qn.compile(self.lhs)
+        return '3 * (%s)' % lhs, lhs_params
+
+class UpperBilateralTransform(models.Transform):
+    bilateral = True
+    lookup_name = 'upper'
+
+    def as_sql(self, qn, connection):
+        lhs, lhs_params = qn.compile(self.lhs)
+        return 'UPPER(%s)' % lhs, lhs_params
 
 
 class YearTransform(models.Transform):
@@ -225,8 +245,110 @@ class LookupTests(TestCase):
             self.assertQuerysetEqual(
                 baseqs.filter(age__div3__in=[0, 2]),
                 [a2, a3], lambda x: x)
+            self.assertQuerysetEqual(
+                baseqs.filter(age__div3__in=[2, 4]),
+                [a2], lambda x: x)
+            self.assertQuerysetEqual(
+                baseqs.filter(age__div3__gte=3),
+                [], lambda x: x)
+            self.assertQuerysetEqual(
+                baseqs.filter(age__div3__range=(1, 2)),
+                [a1, a2, a4], lambda x: x)
         finally:
             models.IntegerField._unregister_lookup(Div3Transform)
+
+
+class BilateralTransformTests(TestCase):
+
+    def test_bilateral_upper(self):
+        models.CharField.register_lookup(UpperBilateralTransform)
+        try:
+            Author.objects.bulk_create([
+                Author(name='Doe'),
+                Author(name='doe'),
+                Author(name='Foo'),
+            ])
+            self.assertQuerysetEqual(
+                Author.objects.filter(name__upper='doe'),
+                ["<Author: Doe>", "<Author: doe>"], ordered=False)
+        finally:
+            models.CharField._unregister_lookup(UpperBilateralTransform)
+
+    def test_bilateral_inner_qs(self):
+        models.CharField.register_lookup(UpperBilateralTransform)
+        try:
+            with self.assertRaises(NotImplementedError):
+                Author.objects.filter(name__upper__in=Author.objects.values_list('name'))
+        finally:
+            models.CharField._unregister_lookup(UpperBilateralTransform)
+
+    def test_div3_bilateral_extract(self):
+        models.IntegerField.register_lookup(Div3BilateralTransform)
+        try:
+            a1 = Author.objects.create(name='a1', age=1)
+            a2 = Author.objects.create(name='a2', age=2)
+            a3 = Author.objects.create(name='a3', age=3)
+            a4 = Author.objects.create(name='a4', age=4)
+            baseqs = Author.objects.order_by('name')
+            self.assertQuerysetEqual(
+                baseqs.filter(age__div3=2),
+                [a2], lambda x: x)
+            self.assertQuerysetEqual(
+                baseqs.filter(age__div3__lte=3),
+                [a3], lambda x: x)
+            self.assertQuerysetEqual(
+                baseqs.filter(age__div3__in=[0, 2]),
+                [a2, a3], lambda x: x)
+            self.assertQuerysetEqual(
+                baseqs.filter(age__div3__in=[2, 4]),
+                [a1, a2, a4], lambda x: x)
+            self.assertQuerysetEqual(
+                baseqs.filter(age__div3__gte=3),
+                [a1, a2, a3, a4], lambda x: x)
+            self.assertQuerysetEqual(
+                baseqs.filter(age__div3__range=(1, 2)),
+                [a1, a2, a4], lambda x: x)
+        finally:
+            models.IntegerField._unregister_lookup(Div3BilateralTransform)
+
+    def test_bilateral_order(self):
+        models.IntegerField.register_lookup(Mult3BilateralTransform)
+        models.IntegerField.register_lookup(Div3BilateralTransform)
+        try:
+            a1 = Author.objects.create(name='a1', age=1)
+            a2 = Author.objects.create(name='a2', age=2)
+            a3 = Author.objects.create(name='a3', age=3)
+            a4 = Author.objects.create(name='a4', age=4)
+            baseqs = Author.objects.order_by('name')
+
+            self.assertQuerysetEqual(
+                baseqs.filter(age__mult3__div3=42),
+                # mult3__div3 always leads to 0
+                [a1, a2, a3, a4], lambda x: x)
+            self.assertQuerysetEqual(
+                baseqs.filter(age__div3__mult3=42),
+                [a3], lambda x: x)
+        finally:
+            models.IntegerField._unregister_lookup(Mult3BilateralTransform)
+            models.IntegerField._unregister_lookup(Div3BilateralTransform)
+
+    def test_bilateral_fexpr(self):
+        models.IntegerField.register_lookup(Mult3BilateralTransform)
+        try:
+            a1 = Author.objects.create(name='a1', age=1, average_rating=3.2)
+            a2 = Author.objects.create(name='a2', age=2, average_rating=0.5)
+            a3 = Author.objects.create(name='a3', age=3, average_rating=1.5)
+            a4 = Author.objects.create(name='a4', age=4)
+            baseqs = Author.objects.order_by('name')
+            self.assertQuerysetEqual(
+                baseqs.filter(age__mult3=models.F('age')),
+                [a1, a2, a3, a4], lambda x: x)
+            self.assertQuerysetEqual(
+                # Same as age >= average_rating
+                baseqs.filter(age__mult3__gte=models.F('average_rating')),
+                [a2, a3], lambda x: x)
+        finally:
+            models.IntegerField._unregister_lookup(Mult3BilateralTransform)
 
 
 class YearLteTests(TestCase):

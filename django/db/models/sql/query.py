@@ -1111,18 +1111,21 @@ class Query(object):
 
     def build_lookup(self, lookups, lhs, rhs):
         lookups = lookups[:]
+        bilaterals = []
         while lookups:
             lookup = lookups[0]
             if len(lookups) == 1:
                 final_lookup = lhs.get_lookup(lookup)
                 if final_lookup:
-                    return final_lookup(lhs, rhs)
+                    return final_lookup(lhs, rhs, bilaterals)
                 # We didn't find a lookup, so we are going to try get_transform
                 # + get_lookup('exact').
                 lookups.append('exact')
             next = lhs.get_transform(lookup)
             if next:
                 lhs = next(lhs, lookups)
+                if getattr(next, 'bilateral', False):
+                    bilaterals.append((next, lookups))
             else:
                 raise FieldError(
                     "Unsupported lookup '%s' for %s or join on the field not "

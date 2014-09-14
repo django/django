@@ -129,6 +129,15 @@ Transform reference
     This class follows the :ref:`Query Expression API <query-expression>`, which
     implies that you can use ``<expression>__<transform1>__<transform2>``.
 
+    .. attribute:: bilateral
+
+        .. versionadded:: 1.8
+
+        A boolean indicating whether this transformation should apply to both
+        ``lhs`` and ``rhs``. Bilateral transformations will be applied to ``rhs`` in
+        the same order as they appear in the lookup expression. By default it is set
+        to ``False``. For example usage, see :doc:`/howto/custom-lookups`.
+
     .. attribute:: lhs
 
         The left-hand side - what is being transformed. It must follow the
