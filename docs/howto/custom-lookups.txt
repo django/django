@@ -127,7 +127,7 @@ function ``ABS()`` to transform the value before comparison::
           lhs, params = qn.compile(self.lhs)
           return "ABS(%s)" % lhs, params
 
-Next, lets register it for ``IntegerField``::
+Next, let's register it for ``IntegerField``::
 
   from django.db.models import IntegerField
   IntegerField.register_lookup(AbsoluteValue)
@@ -144,9 +144,7 @@ SQL::
 
     SELECT ... WHERE ABS("experiments"."change") < 27
 
-Subclasses of ``Transform`` usually only operate on the left-hand side of the
-expression. Further lookups will work on the transformed value. Note that in
-this case where there is no other lookup specified, Django interprets
+Note that in case there is no other lookup specified, Django interprets
 ``change__abs=27`` as ``change__abs__exact=27``.
 
 When looking for which lookups are allowable after the ``Transform`` has been
@@ -197,7 +195,7 @@ Notice also that  as both sides are used multiple times in the query the params
 need to contain ``lhs_params`` and ``rhs_params`` multiple times.
 
 The final query does the inversion (``27`` to ``-27``) directly in the
-database. The reason for doing this is that if the self.rhs is something else
+database. The reason for doing this is that if the ``self.rhs`` is something else
 than a plain integer value (for example an ``F()`` reference) we can't do the
 transformations in Python.
 
@@ -207,6 +205,46 @@ transformations in Python.
     do so as you can make use of the indexes. However with PostgreSQL you may
     want to add an index on ``abs(change)`` which would allow these queries to
     be very efficient.
+
+A bilateral transformer example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``AbsoluteValue`` example we discussed previously is a transformation which
+applies to the left-hand side of the lookup. There may be some cases where you
+want the transformation to be applied to both the left-hand side and the
+right-hand side. For instance, if you want to filter a queryset based on the
+equality of the left and right-hand side insensitively to some SQL function.
+
+Let's examine the simple example of case-insensitive transformation here. This
+transformation isn't very useful in practice as Django already comes with a bunch
+of built-in case-insensitive lookups, but it will be a nice demonstration of
+bilateral transformations in a database-agnostic way.
+
+We define an ``UpperCase`` transformer which uses the SQL function ``UPPER()`` to
+transform the values before comparison. We define
+:attr:`bilateral = True <django.db.models.Transform.bilateral>` to indicate that
+this transformation should apply to both ``lhs`` and ``rhs``::
+
+  from django.db.models import Transform
+
+  class UpperCase(Transform):
+      lookup_name = 'upper'
+      bilateral = True
+
+      def as_sql(self, qn, connection):
+          lhs, params = qn.compile(self.lhs)
+          return "UPPER(%s)" % lhs, params
+
+Next, let's register it::
+
+  from django.db.models import CharField, TextField
+  CharField.register_lookup(UpperCase)
+  TextField.register_lookup(UpperCase)
+
+Now, the queryset ``Author.objects.filter(name__upper="doe")`` will generate a case
+insensitive query like this::
+
+    SELECT ... WHERE UPPER("author"."name") = UPPER('doe')
 
 Writing alternative implementations for existing lookups
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
