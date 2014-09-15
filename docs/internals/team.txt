@@ -230,15 +230,6 @@ Karen Tracey
 
     .. _James Tauber: http://jtauber.com/
 
-`Simon Meers`_
-    Simon discovered Django 0.96 during his Computer Science PhD research and
-    has been developing with it full-time ever since. His core code
-    contributions are mostly in Django's admin application.
-
-    Simon works as a freelance developer based in Wollongong, Australia.
-
-    .. _Simon Meers: http://simonmeers.com/
-
 `Andrew Godwin`_
     Andrew is a freelance Python developer and tinkerer, and has been
     developing against Django since 2007. He graduated from Oxford University
@@ -558,6 +549,15 @@ Robert Wittams
     Alex lives in San Francisco, CA, USA.
 
     .. _Alex Gaynor: http://alexgaynor.net
+
+`Simon Meers`_
+    Simon discovered Django 0.96 during his Computer Science PhD research and
+    has been developing with it full-time ever since. His core code
+    contributions are mostly in Django's admin application.
+
+    Simon works as a freelance developer based in Wollongong, Australia.
+
+    .. _Simon Meers: http://simonmeers.com/
 
 `Gabriel Hurley`_
     Gabriel has been working with Django since 2008, shortly after the 1.0
