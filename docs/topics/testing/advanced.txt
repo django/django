@@ -525,8 +525,14 @@ can be useful during testing.
     ``serialize`` determines if Django serializes the database into an
     in-memory JSON string before running tests (used to restore the database
     state between tests if you don't have transactions). You can set this to
-    False to significantly speed up creation time if you know you don't need
-    data persistence outside of test fixtures.
+    ``False`` to speed up creation time if you don't have any test classes
+    with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
+
+    .. versionadded:: 1.7.1
+
+        If you are using the default test runner, you can control this with the
+        the :setting:`SERIALIZE <TEST_SERIALIZE>` entry in the
+        :setting:`TEST <DATABASE-TEST>` dictionary
 
     ``keepdb`` determines if the test run should use an existing
     database, or create a new one. If ``True``, the existing

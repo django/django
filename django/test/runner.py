@@ -301,7 +301,7 @@ def setup_databases(verbosity, interactive, keepdb=False, **kwargs):
                     verbosity,
                     autoclobber=not interactive,
                     keepdb=keepdb,
-                    serialize=connection.settings_dict.get("TEST_SERIALIZE", True),
+                    serialize=connection.settings_dict.get("TEST", {}).get("SERIALIZE", True),
                 )
                 destroy = True
             else:
