@@ -1,3 +1,5 @@
+from importlib import import_module
+from django.conf import settings
 from django.contrib.messages import constants
 from django.contrib.messages.tests.base import BaseTests
 from django.contrib.messages.storage.base import Message
@@ -23,6 +25,10 @@ def stored_session_messages_count(storage):
 
 class SessionTest(BaseTests, TestCase):
     storage_class = SessionStorage
+
+    def setUp(self):
+        super(SessionTest, self).setUp()
+        self.client.create_session()
 
     def get_request(self):
         self.session = {}

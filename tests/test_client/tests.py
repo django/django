@@ -21,7 +21,9 @@ rather than the HTML rendered to the end-user.
 
 """
 from __future__ import unicode_literals
+from importlib import import_module
 
+from django.conf import settings
 from django.core import mail
 from django.test import Client, TestCase, RequestFactory
 from django.test import override_settings
@@ -463,8 +465,24 @@ class ClientTest(TestCase):
         response = self.client.get('/django_project_redirect/')
         self.assertRedirects(response, 'https://www.djangoproject.com/', fetch_redirect_response=False)
 
+    def test_create_session(self):
+        "Verify that a session has been created for the client."
+        session = self.client.create_session()
+
+        # Check that the session exists in the configured session store
+        engine = import_module(settings.SESSION_ENGINE)
+        store = engine.SessionStore()
+        self.assertTrue(store.exists(session.session_key))
+
+        # check that the session cookie was set correctly
+        self.assertIn(settings.SESSION_COOKIE_NAME, self.client.cookies)
+        cookie = self.client.cookies[settings.SESSION_COOKIE_NAME]
+        self.assertEqual(cookie.value, session.session_key)
+
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
+        self.client.create_session()
+
         # Session value isn't set initially
         try:
             self.client.session['tobacconist']

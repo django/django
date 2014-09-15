@@ -285,7 +285,10 @@ class SessionBase(object):
         key = self.session_key
         self.create()
         self._session_cache = data
-        self.delete(key)
+
+        # don't accidentally delete the freshly generated session_key
+        if key:
+            self.delete(key)
 
     # Methods that child classes must implement.
 

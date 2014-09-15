@@ -402,6 +402,20 @@ class Client(RequestFactory):
         return {}
     session = property(_session)
 
+    def create_session(self):
+        """
+        Helper method to create a session in tests that depend on an already
+        existing session they can rely upon rather than creating a session
+        within the test itself.
+        """
+        if apps.is_installed('django.contrib.sessions'):
+            engine = import_module(settings.SESSION_ENGINE)
+            session = engine.SessionStore()
+            session.create()
+            self.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
+            return session
+        return {}
+
     def request(self, **request):
         """
         The master request method. Composes the environment dictionary

@@ -790,8 +790,7 @@ class LogoutTest(AuthViewsTestCase):
     def test_logout_preserve_language(self):
         """Check that language stored in session is preserved after logout"""
         # Create a new session with language
-        engine = import_module(settings.SESSION_ENGINE)
-        session = engine.SessionStore()
+        session = self.client.create_session()
         session[LANGUAGE_SESSION_KEY] = 'pl'
         session.save()
         self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key

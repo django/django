@@ -1024,6 +1024,8 @@ class SessionTests(TestCase):
 
     def test_session(self):
         "The session isn't lost if a user logs in"
+        self.client.create_session()
+
         # The session doesn't exist to start.
         response = self.client.get('/check_session/')
         self.assertEqual(response.status_code, 200)

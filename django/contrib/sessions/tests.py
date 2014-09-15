@@ -8,6 +8,7 @@ import unittest
 import warnings
 
 from django.conf import settings
+from django.contrib.auth import logout
 from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 from django.contrib.sessions.backends.cache import SessionStore as CacheSession
 from django.contrib.sessions.backends.cached_db import SessionStore as CacheDBSession
@@ -330,7 +331,7 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         in normal way
         """
         self.session['x'] = 1
-        self.session.save()
+        self.session.create()
 
         s = Session.objects.get(session_key=self.session.session_key)
 
@@ -342,7 +343,7 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         """
         # Create a session
         self.session['y'] = 1
-        self.session.save()
+        self.session.create()
 
         s = Session.objects.get(session_key=self.session.session_key)
         # Change it
@@ -361,13 +362,13 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         # One object in the future
         self.session['foo'] = 'bar'
         self.session.set_expiry(3600)
-        self.session.save()
+        self.session.create()
 
         # One object in the past
         other_session = self.backend()
         other_session['foo'] = 'bar'
         other_session.set_expiry(-3600)
-        other_session.save()
+        other_session.create()
 
         # Two sessions are in the database before clearsessions...
         self.assertEqual(2, Session.objects.count())
@@ -606,6 +607,37 @@ class SessionMiddlewareTests(unittest.TestCase):
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
+    def test_not_recreated_after_logout(self):
+        """
+        Test that logged out sessions are not resurrected by concurrent requests as described in #21608.
+        """
+        request = RequestFactory().get('/')
+        response = HttpResponse('Session test')
+        middleware = SessionMiddleware()
+
+        # Create a session from cookie
+        request.COOKIES[settings.SESSION_COOKIE_NAME] = 'abc'
+        # Start processing the first ("slow") request.
+        middleware.process_request(request)
+        request.session.save()
+        self.assertTrue(Session.objects.filter(session_key=request.session.session_key).exists())
+
+        # Start a concurrent second ("fast") request while the first is still running.
+        request2 = RequestFactory().get('/')
+        request2.COOKIES[settings.SESSION_COOKIE_NAME] = request.session.session_key
+        middleware.process_request(request2)
+        request2.session.save()
+        self.assertTrue(Session.objects.filter(session_key=request2.session.session_key).exists())
+        self.assertEqual(request.session.session_key, request2.session.session_key)
+
+        # Logout in the second ("fast") request and finish it before the first
+        logout(request2)
+        self.assertNotEqual(request.session.session_key, request2.session.session_key)
+        middleware.process_response(request2, response)
+
+        # finish the first ("slow") request
+        middleware.process_response(request, response)
+        self.assertFalse(Session.objects.filter(session_key=request.session.session_key).exists())
 
 class CookieSessionTests(SessionTestsMixin, TestCase):
 

@@ -21,6 +21,9 @@ from ..urls import locale_dir
 class I18NTests(TestCase):
     """ Tests django views in django/views/i18n.py """
 
+    def setUp(self):
+        self.client.create_session()
+
     def test_setlang(self):
         """
         The set_language view can be used to change the session language.
