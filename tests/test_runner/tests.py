@@ -7,9 +7,10 @@ from optparse import make_option
 import types
 import unittest
 
+from django import db
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
-from django import db
+from django.db.backends.dummy.base import DatabaseCreation
 from django.test import runner, TestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.testcases import connections_support_transactions
 from django.test.utils import (
@@ -339,38 +340,72 @@ class AliasedDefaultTestSetupTest(unittest.TestCase):
             db.connections = old_db_connections
 
 
-class AliasedDatabaseTeardownTest(unittest.TestCase):
+class SetupDatabasesTests(unittest.TestCase):
+
+    def setUp(self):
+        self._old_db_connections = db.connections
+        self._old_destroy_test_db = DatabaseCreation.destroy_test_db
+        self._old_create_test_db = DatabaseCreation.create_test_db
+        self.runner_instance = runner.DiscoverRunner(verbosity=0)
+
+    def tearDown(self):
+        DatabaseCreation.create_test_db = self._old_create_test_db
+        DatabaseCreation.destroy_test_db = self._old_destroy_test_db
+        db.connections = self._old_db_connections
+
     def test_setup_aliased_databases(self):
-        from django.db.backends.dummy.base import DatabaseCreation
+        destroyed_names = []
+        DatabaseCreation.destroy_test_db = (
+            lambda self, old_database_name, verbosity=1, keepdb=False, serialize=True:
+            destroyed_names.append(old_database_name)
+        )
+        DatabaseCreation.create_test_db = (
+            lambda self, verbosity=1, autoclobber=False, keepdb=False, serialize=True:
+            self._get_test_db_name()
+        )
 
-        runner_instance = runner.DiscoverRunner(verbosity=0)
-        old_db_connections = db.connections
-        old_destroy_test_db = DatabaseCreation.destroy_test_db
-        old_create_test_db = DatabaseCreation.create_test_db
-        try:
-            destroyed_names = []
-            DatabaseCreation.destroy_test_db = lambda self, old_database_name, verbosity=1, serialize=True: destroyed_names.append(old_database_name)
-            DatabaseCreation.create_test_db = lambda self, verbosity=1, autoclobber=False, serialize=True: self._get_test_db_name()
+        db.connections = db.ConnectionHandler({
+            'default': {
+                'ENGINE': 'django.db.backends.dummy',
+                'NAME': 'dbname',
+            },
+            'other': {
+                'ENGINE': 'django.db.backends.dummy',
+                'NAME': 'dbname',
+            }
+        })
 
-            db.connections = db.ConnectionHandler({
-                'default': {
-                    'ENGINE': 'django.db.backends.dummy',
-                    'NAME': 'dbname',
-                },
-                'other': {
-                    'ENGINE': 'django.db.backends.dummy',
-                    'NAME': 'dbname',
-                }
-            })
+        old_config = self.runner_instance.setup_databases()
+        self.runner_instance.teardown_databases(old_config)
 
-            old_config = runner_instance.setup_databases()
-            runner_instance.teardown_databases(old_config)
+        self.assertEqual(destroyed_names.count('dbname'), 1)
 
-            self.assertEqual(destroyed_names.count('dbname'), 1)
-        finally:
-            DatabaseCreation.create_test_db = old_create_test_db
-            DatabaseCreation.destroy_test_db = old_destroy_test_db
-            db.connections = old_db_connections
+    def test_serialization(self):
+        serialize = []
+        DatabaseCreation.create_test_db = (
+            lambda *args, **kwargs: serialize.append(kwargs.get('serialize'))
+        )
+        db.connections = db.ConnectionHandler({
+            'default': {
+                'ENGINE': 'django.db.backends.dummy',
+            },
+        })
+        self.runner_instance.setup_databases()
+        self.assertEqual(serialize, [True])
+
+    def test_serialized_off(self):
+        serialize = []
+        DatabaseCreation.create_test_db = (
+            lambda *args, **kwargs: serialize.append(kwargs.get('serialize'))
+        )
+        db.connections = db.ConnectionHandler({
+            'default': {
+                'ENGINE': 'django.db.backends.dummy',
+                'TEST': {'SERIALIZE': False},
+            },
+        })
+        self.runner_instance.setup_databases()
+        self.assertEqual(serialize, [False])
 
 
 class DeprecationDisplayTest(AdminScriptTestCase):

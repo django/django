@@ -296,7 +296,7 @@ def setup_databases(verbosity, interactive, **kwargs):
                 test_db_name = connection.creation.create_test_db(
                     verbosity,
                     autoclobber=not interactive,
-                    serialize=connection.settings_dict.get("TEST_SERIALIZE", True),
+                    serialize=connection.settings_dict.get("TEST", {}).get("SERIALIZE", True),
                 )
                 destroy = True
             else:
