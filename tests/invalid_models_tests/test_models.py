@@ -646,15 +646,20 @@ class OtherModelTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+
+class ManyToManyTests(IsolatedModelsTestCase):
+
     def test_two_m2m_through_same_relationship(self):
         class Person(models.Model):
             pass
 
         class Group(models.Model):
-            primary = models.ManyToManyField(Person,
-                through="Membership", related_name="primary")
-            secondary = models.ManyToManyField(Person, through="Membership",
-                related_name="secondary")
+            primary = models.ManyToManyField(
+                Person, through="Membership", related_name="primary"
+            )
+            secondary = models.ManyToManyField(
+                Person, through="Membership", related_name="secondary"
+            )
 
         class Membership(models.Model):
             person = models.ForeignKey(Person)
@@ -668,6 +673,33 @@ class OtherModelTests(IsolatedModelsTestCase):
                 hint=None,
                 obj=Group,
                 id='models.E003',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_m2m_table_name_clash(self):
+        foo_table = 'myapp_foo'
+        bar_table = 'myapp_bar'
+        rel_table = bar_table
+
+        class Foo(models.Model):
+            bar = models.ManyToManyField('Bar', db_table=rel_table)
+
+            class Meta:
+                db_table = foo_table
+
+        class Bar(models.Model):
+            class Meta:
+                db_table = bar_table
+
+        errors = Foo.check()
+        expected = [
+            Error(
+                "Field is using a table that has already been registered by "
+                "<class 'invalid_models_tests.test_models.Bar'>.",
+                hint=None,
+                obj=Foo._meta.get_field('bar'),
+                id='fields.E340',
             )
         ]
         self.assertEqual(errors, expected)
