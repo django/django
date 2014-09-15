@@ -46,3 +46,6 @@ Bugfixes
 
 * Allowed migrations to work with ``app_label``\s that have the same last
   part (e.g. ``django.contrib.auth`` and ``vendor.auth``) (:ticket:`23483`).
+
+* Fixed bug in migrations that could cause unexpected data loss when executing
+  a backwards or no-op migration (:ticket:`23474`).
