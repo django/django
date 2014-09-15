@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import calendar
 import json
 import re
 import sys
@@ -251,9 +252,9 @@ class HttpResponseBase(six.Iterator):
                 # time gets lost between converting to a timedelta and
                 # then the date string).
                 delta = delta + datetime.timedelta(seconds=1)
-                # Just set max_age - the max_age logic will set expires.
-                expires = None
                 max_age = max(0, delta.days * 86400 + delta.seconds)
+                expires = cookie_date(calendar.timegm(expires.timetuple()))
+                self.cookies[key]['expires'] = expires
             else:
                 self.cookies[key]['expires'] = expires
         if max_age is not None:
