@@ -61,7 +61,7 @@ The current releasers are:
 Ops team
 ========
 
-The ops team maintains Django's infrastucture like the Django Project server,
+The ops team maintains Django's infrastructure like the Django Project server,
 Trac instance, and continuous integration infrastructure.
 
 - Florian Apolloner
