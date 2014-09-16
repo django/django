@@ -635,7 +635,7 @@ class BaseDatabaseSchemaEditor(object):
             self.execute(
                 self.sql_create_pk % {
                     "table": self.quote_name(model._meta.db_table),
-                    "name": self._create_index_name(model, [new_field.column], suffix="_pk"),
+                    "name": self.quote_name(self._create_index_name(model, [new_field.column], suffix="_pk")),
                     "columns": self.quote_name(new_field.column),
                 }
             )
@@ -668,7 +668,7 @@ class BaseDatabaseSchemaEditor(object):
             self.execute(
                 self.sql_create_check % {
                     "table": self.quote_name(model._meta.db_table),
-                    "name": self._create_index_name(model, [new_field.column], suffix="_check"),
+                    "name": self.quote_name(self._create_index_name(model, [new_field.column], suffix="_check")),
                     "column": self.quote_name(new_field.column),
                     "check": new_db_params['check'],
                 }
@@ -761,7 +761,7 @@ class BaseDatabaseSchemaEditor(object):
         columns = [field.column for field in fields]
         return self.sql_create_index % {
             "table": self.quote_name(model._meta.db_table),
-            "name": self._create_index_name(model, columns, suffix=suffix),
+            "name": self.quote_name(self._create_index_name(model, columns, suffix=suffix)),
             "columns": ", ".join(self.quote_name(column) for column in columns),
             "extra": "",
         }
@@ -778,7 +778,7 @@ class BaseDatabaseSchemaEditor(object):
 
         return self.sql_create_fk % {
             "table": self.quote_name(from_table),
-            "name": self._create_index_name(model, [from_column], suffix=suffix),
+            "name": self.quote_name(self._create_index_name(model, [from_column], suffix=suffix)),
             "column": self.quote_name(from_column),
             "to_table": self.quote_name(to_table),
             "to_column": self.quote_name(to_column),
@@ -787,14 +787,14 @@ class BaseDatabaseSchemaEditor(object):
     def _create_unique_sql(self, model, columns):
         return self.sql_create_unique % {
             "table": self.quote_name(model._meta.db_table),
-            "name": self._create_index_name(model, columns, suffix="_uniq"),
+            "name": self.quote_name(self._create_index_name(model, columns, suffix="_uniq")),
             "columns": ", ".join(self.quote_name(column) for column in columns),
         }
 
     def _delete_constraint_sql(self, template, model, name):
         return template % {
             "table": self.quote_name(model._meta.db_table),
-            "name": name,
+            "name": self.quote_name(name),
         }
 
     def _constraint_names(self, model, column_names=None, unique=None,
