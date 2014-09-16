@@ -54,3 +54,6 @@ Bugfixes
 
 * Formats for Welsh (``cy``) and several Chinese locales (``zh_CN``,
   ``zh_Hans``, ``zh_Hant`` and ``zh_TW``) have been added.
+
+* Fixed bug that crash schema alteration if removal of constraint with capital
+  letters in the name is required. (:ticket:`23065`).
