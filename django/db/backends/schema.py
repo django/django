@@ -309,11 +309,7 @@ class BaseDatabaseSchemaEditor(object):
         # Created uniques
         for fields in news.difference(olds):
             columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
-            self.execute(self.sql_create_unique % {
-                "table": self.quote_name(model._meta.db_table),
-                "name": self._create_index_name(model, columns, suffix="_uniq"),
-                "columns": ", ".join(self.quote_name(column) for column in columns),
-            })
+            self.execute(self._create_unique_sql(model, columns))
 
     def alter_index_together(self, model, old_index_together, new_index_together):
         """
@@ -651,13 +647,7 @@ class BaseDatabaseSchemaEditor(object):
                 self.execute(sql, params)
         # Added a unique?
         if not old_field.unique and new_field.unique:
-            self.execute(
-                self.sql_create_unique % {
-                    "table": self.quote_name(model._meta.db_table),
-                    "name": self._create_index_name(model, [new_field.column], suffix="_uniq"),
-                    "columns": self.quote_name(new_field.column),
-                }
-            )
+            self.execute(self._create_unique_sql(model, [new_field.column]))
         # Added an index?
         if (not old_field.db_index and new_field.db_index and
                 not new_field.unique and not
@@ -837,6 +827,13 @@ class BaseDatabaseSchemaEditor(object):
             "column": self.quote_name(from_column),
             "to_table": self.quote_name(to_table),
             "to_column": self.quote_name(to_column),
+        }
+
+    def _create_unique_sql(self, model, columns):
+        return self.sql_create_unique % {
+            "table": self.quote_name(model._meta.db_table),
+            "name": self._create_index_name(model, columns, suffix="_uniq"),
+            "columns": ", ".join(self.quote_name(column) for column in columns),
         }
 
     def _constraint_names(self, model, column_names=None, unique=None,
