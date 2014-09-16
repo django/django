@@ -49,3 +49,5 @@ Bugfixes
 
 * Fixed bug in migrations that could cause unexpected data loss when executing
   a backwards or no-op migration (:ticket:`23474`).
+
+* Restored the ability to deepcopy ``F`` objects (:ticket:`23492`).
