@@ -265,6 +265,12 @@ Management Commands
 
 * :djadmin:`makemigrations` can now serialize timezone-aware values.
 
+Migrations
+^^^^^^^^^^
+
+* The :class:`~django.db.migrations.operations.RunSQL` operation can now handle
+  parameters passed to the SQL statements.
+
 Models
 ^^^^^^
 
