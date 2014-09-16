@@ -231,17 +231,7 @@ class BaseDatabaseSchemaEditor(object):
                 to_table = field.rel.to._meta.db_table
                 to_column = field.rel.to._meta.get_field(field.rel.field_name).column
                 if self.connection.features.supports_foreign_keys:
-                    self.deferred_sql.append(
-                        self.sql_create_fk % {
-                            "name": self._create_index_name(
-                                model, [field.column], suffix="_fk_%s_%s" % (to_table, to_column)
-                            ),
-                            "table": self.quote_name(model._meta.db_table),
-                            "column": self.quote_name(field.column),
-                            "to_table": self.quote_name(to_table),
-                            "to_column": self.quote_name(to_column),
-                        }
-                    )
+                    self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
                 elif self.sql_create_inline_fk:
                     definition += " " + self.sql_create_inline_fk % {
                         "to_table": self.quote_name(to_table),
@@ -415,17 +405,7 @@ class BaseDatabaseSchemaEditor(object):
             self.deferred_sql.append(self._create_index_sql(model, [field]))
         # Add any FK constraints later
         if field.rel and self.connection.features.supports_foreign_keys and field.db_constraint:
-            to_table = field.rel.to._meta.db_table
-            to_column = field.rel.to._meta.get_field(field.rel.field_name).column
-            self.deferred_sql.append(
-                self.sql_create_fk % {
-                    "name": self._create_index_name(model, [field.column], suffix="_fk_%s_%s" % (to_table, to_column)),
-                    "table": self.quote_name(model._meta.db_table),
-                    "column": self.quote_name(field.column),
-                    "to_table": self.quote_name(to_table),
-                    "to_column": self.quote_name(to_column),
-                }
-            )
+            self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
@@ -733,31 +713,11 @@ class BaseDatabaseSchemaEditor(object):
         if new_field.rel and \
            (fks_dropped or (old_field.rel and not old_field.db_constraint)) and \
            new_field.db_constraint:
-            to_table = new_field.rel.to._meta.db_table
-            to_column = new_field.rel.get_related_field().column
-            self.execute(
-                self.sql_create_fk % {
-                    "table": self.quote_name(model._meta.db_table),
-                    "name": self._create_index_name(
-                        model, [new_field.column], suffix="_fk_%s_%s" % (to_table, to_column)
-                    ),
-                    "column": self.quote_name(new_field.column),
-                    "to_table": self.quote_name(to_table),
-                    "to_column": self.quote_name(to_column),
-                }
-            )
+            self.execute(self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_column)s"))
         # Rebuild FKs that pointed to us if we previously had to drop them
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
             for rel in new_field.model._meta.get_all_related_objects():
-                self.execute(
-                    self.sql_create_fk % {
-                        "table": self.quote_name(rel.model._meta.db_table),
-                        "name": self._create_index_name(rel.model, [rel.field.column], suffix="_fk"),
-                        "column": self.quote_name(rel.field.column),
-                        "to_table": self.quote_name(model._meta.db_table),
-                        "to_column": self.quote_name(new_field.column),
-                    }
-                )
+                self.execute(self._create_fk_sql(rel.model, rel.field, "_fk"))
         # Does it have check constraints we need to add?
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:
             self.execute(
@@ -859,6 +819,24 @@ class BaseDatabaseSchemaEditor(object):
             "name": self._create_index_name(model, columns, suffix=suffix),
             "columns": ", ".join(self.quote_name(column) for column in columns),
             "extra": "",
+        }
+
+    def _create_fk_sql(self, model, field, suffix):
+        from_table = model._meta.db_table
+        from_column = field.column
+        to_table = field.related_field.model._meta.db_table
+        to_column = field.related_field.column
+        suffix = suffix % {
+            "to_table": to_table,
+            "to_column": to_column,
+        }
+
+        return self.sql_create_fk % {
+            "table": self.quote_name(from_table),
+            "name": self._create_index_name(model, [from_column], suffix=suffix),
+            "column": self.quote_name(from_column),
+            "to_table": self.quote_name(to_table),
+            "to_column": self.quote_name(to_column),
         }
 
     def _constraint_names(self, model, column_names=None, unique=None,
