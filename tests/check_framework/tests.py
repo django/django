@@ -6,6 +6,7 @@ import sys
 
 from django.apps import apps
 from django.conf import settings
+from django.contrib import admin
 from django.core import checks
 from django.core.checks import Error, Warning
 from django.core.checks.registry import CheckRegistry
@@ -327,3 +328,51 @@ class SilencingCheckTests(TestCase):
 
         self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
         self.assertEqual(err.getvalue(), '')
+
+
+class BookAdmin(admin.ModelAdmin):
+    list_display = ('this_field_cant_possibly_exist', )
+
+
+class CustomAdminSite(admin.AdminSite):
+    pass
+
+
+class AutoRunningAdminChecksTest(TestCase):
+    def tearDown(self):
+        admin.sites.system_check_errors = []
+
+    @override_settings(DEBUG=True)
+    def test_main_admin_site(self):
+        admin.site.register(Book, BookAdmin)
+        try:
+            call_command('check')
+            self.fail('check should have raised a CommandException')
+        except CommandError as e:
+            self.assertEqual(
+                e.message,
+                "System check identified some issues:\n\n"
+                "ERRORS:\n\x1b[31;1m"
+                "<class 'check_framework.tests.BookAdmin'>: (admin.E108) "
+                "The value of 'list_display[0]' refers to 'this_field_cant_possibly_exist', "
+                "which is not a callable, an attribute of 'BookAdmin', "
+                "or an attribute or method on 'check_framework.Book'.\x1b[0m\n\n"
+                "System check identified 1 issue (0 silenced).")
+
+    @override_settings(DEBUG=True)
+    def test_custom_admin_site(self):
+        custom_site = CustomAdminSite()
+        custom_site.register(Book, BookAdmin)
+        try:
+            call_command('check')
+            self.fail('check should have raised a CommandException')
+        except CommandError as e:
+            self.assertEqual(
+                e.message,
+                "System check identified some issues:\n\n"
+                "ERRORS:\n\x1b[31;1m"
+                "<class 'check_framework.tests.BookAdmin'>: (admin.E108) "
+                "The value of 'list_display[0]' refers to 'this_field_cant_possibly_exist', "
+                "which is not a callable, an attribute of 'BookAdmin', "
+                "or an attribute or method on 'check_framework.Book'.\x1b[0m\n\n"
+                "System check identified 1 issue (0 silenced).")
