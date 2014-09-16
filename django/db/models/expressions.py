@@ -145,6 +145,11 @@ class F(ExpressionNode):
         super(F, self).__init__(None, None, False)
         self.name = name
 
+    def __deepcopy__(self, memodict):
+        obj = super(F, self).__deepcopy__(memodict)
+        obj.name = self.name
+        return obj
+
     def prepare(self, evaluator, query, allow_joins):
         return evaluator.prepare_leaf(self, query, allow_joins)
 
