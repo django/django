@@ -1040,3 +1040,53 @@ class SchemaTests(TransactionTestCase):
             DatabaseError,
             lambda: list(Thing.objects.all()),
         )
+
+    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    def test_remove_constraints_capital_letters(self):
+        """
+        #23065 - Constraint names must be quoted if they contain capital letters.
+        """
+        def get_field(*args, **kwargs):
+            kwargs['db_column'] = "CamelCase"
+            field = kwargs.pop('field_class', IntegerField)(*args, **kwargs)
+            field.set_attributes_from_name("CamelCase")
+            return field
+
+        model = Author
+        field = get_field()
+        table = model._meta.db_table
+        column = field.column
+
+        with connection.schema_editor() as editor:
+            editor.create_model(model)
+            editor.add_field(model, field)
+
+            editor.execute(
+                editor.sql_create_index % {
+                    "table": editor.quote_name(table),
+                    "name": editor.quote_name("CamelCaseIndex"),
+                    "columns": editor.quote_name(column),
+                    "extra": "",
+                }
+            )
+            editor.alter_field(model, get_field(db_index=True), field)
+
+            editor.execute(
+                editor.sql_create_unique % {
+                    "table": editor.quote_name(table),
+                    "name": editor.quote_name("CamelCaseUniqConstraint"),
+                    "columns": editor.quote_name(field.column),
+                }
+            )
+            editor.alter_field(model, get_field(unique=True), field)
+
+            editor.execute(
+                editor.sql_create_fk % {
+                    "table": editor.quote_name(table),
+                    "name": editor.quote_name("CamelCaseFKConstraint"),
+                    "column": editor.quote_name(column),
+                    "to_table": editor.quote_name(table),
+                    "to_column": editor.quote_name(model._meta.auto_field.column),
+                }
+            )
+            editor.alter_field(model, get_field(Author, field_class=ForeignKey), field)
