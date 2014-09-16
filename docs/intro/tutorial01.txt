@@ -453,6 +453,7 @@ You should see something similar to the following:
       0001_initial.py:
         - Create model Question
         - Create model Choice
+        - Add field question to choice
 
 By running ``makemigrations``, you're telling Django that you've made
 some changes to your models (in this case, you've made new ones) and that
