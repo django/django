@@ -64,19 +64,31 @@ class RunSQL(Operation):
             state_operation.state_forwards(app_label, state)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        statements = schema_editor.connection.ops.prepare_sql_script(self.sql)
-        for statement in statements:
-            schema_editor.execute(statement, params=None)
+        self._run_sql(schema_editor, self.sql)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_sql is None:
             raise NotImplementedError("You cannot reverse this operation")
-        statements = schema_editor.connection.ops.prepare_sql_script(self.reverse_sql)
-        for statement in statements:
-            schema_editor.execute(statement, params=None)
+        self._run_sql(schema_editor, self.reverse_sql)
 
     def describe(self):
         return "Raw SQL operation"
+
+    def _run_sql(self, schema_editor, sql):
+        if isinstance(sql, (list, tuple)):
+            for sql in sql:
+                params = None
+                if isinstance(sql, (list, tuple)):
+                    elements = len(sql)
+                    if elements == 2:
+                        sql, params = sql
+                    else:
+                        raise ValueError("Expected a 2-tuple but got %d" % elements)
+                schema_editor.execute(sql, params=params)
+        else:
+            statements = schema_editor.connection.ops.prepare_sql_script(sql)
+            for statement in statements:
+                schema_editor.execute(statement, params=None)
 
 
 class RunPython(Operation):

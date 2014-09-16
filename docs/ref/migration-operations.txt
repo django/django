@@ -188,6 +188,17 @@ the database. On most database backends (all but PostgreSQL), Django will
 split the SQL into individual statements prior to executing them. This
 requires installing the sqlparse_ Python library.
 
+You can also pass a list of strings or 2-tuples. The latter is used for passing
+queries and parameters in the same way as :ref:`cursor.execute()
+<executing-custom-sql>`. These three operations are equivalent::
+
+    migrations.RunSQL("INSERT INTO musician (name) VALUES ('Reinhardt');")
+    migrations.RunSQL(["INSERT INTO musician (name) VALUES ('Reinhardt');", None])
+    migrations.RunSQL(["INSERT INTO musician (name) VALUES (%s);", ['Reinhardt']])
+
+If you want to include literal percent signs in the query, you have to double
+them if you are passing parameters.
+
 The ``state_operations`` argument is so you can supply operations that are
 equivalent to the SQL in terms of project state; for example, if you are
 manually creating a column, you should pass in a list containing an ``AddField``
@@ -197,8 +208,13 @@ operation that adds that field and so will try to run it again).
 
 .. versionchanged:: 1.7.1
 
-    If you want to include literal percent signs in the query you don't need to
-    double them anymore.
+    If you want to include literal percent signs in a query without parameters
+    you don't need to double them anymore.
+
+.. versionchanged:: 1.8
+
+    The ability to pass parameters to the ``sql`` and ``reverse_sql`` queries
+    was added.
 
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
