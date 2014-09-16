@@ -300,12 +300,7 @@ class BaseDatabaseSchemaEditor(object):
                     model._meta.db_table,
                     ", ".join(columns),
                 ))
-            self.execute(
-                self.sql_delete_unique % {
-                    "table": self.quote_name(model._meta.db_table),
-                    "name": constraint_names[0],
-                },
-            )
+            self.execute(self._delete_constraint_sql(self.sql_delete_unique, model, constraint_names[0]))
         # Created uniques
         for fields in news.difference(olds):
             columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
@@ -329,12 +324,7 @@ class BaseDatabaseSchemaEditor(object):
                     model._meta.db_table,
                     ", ".join(columns),
                 ))
-            self.execute(
-                self.sql_delete_index % {
-                    "table": self.quote_name(model._meta.db_table),
-                    "name": constraint_names[0],
-                },
-            )
+            self.execute(self._delete_constraint_sql(self.sql_delete_index, model, constraint_names[0]))
         # Created indexes
         for field_names in news.difference(olds):
             fields = [model._meta.get_field_by_name(field)[0] for field in field_names]
@@ -421,12 +411,7 @@ class BaseDatabaseSchemaEditor(object):
         if field.rel:
             fk_names = self._constraint_names(model, [field.column], foreign_key=True)
             for fk_name in fk_names:
-                self.execute(
-                    self.sql_delete_fk % {
-                        "table": self.quote_name(model._meta.db_table),
-                        "name": fk_name,
-                    }
-                )
+                self.execute(self._delete_constraint_sql(self.sql_delete_fk, model, fk_name))
         # Delete the column
         sql = self.sql_delete_column % {
             "table": self.quote_name(model._meta.db_table),
@@ -492,12 +477,7 @@ class BaseDatabaseSchemaEditor(object):
                     old_field.column,
                 ))
             for constraint_name in constraint_names:
-                self.execute(
-                    self.sql_delete_unique % {
-                        "table": self.quote_name(model._meta.db_table),
-                        "name": constraint_name,
-                    },
-                )
+                self.execute(self._delete_constraint_sql(self.sql_delete_unique, model, constraint_name))
         # Drop any FK constraints, we'll remake them later
         fks_dropped = set()
         if old_field.rel and old_field.db_constraint:
@@ -510,24 +490,14 @@ class BaseDatabaseSchemaEditor(object):
                 ))
             for fk_name in fk_names:
                 fks_dropped.add((old_field.column,))
-                self.execute(
-                    self.sql_delete_fk % {
-                        "table": self.quote_name(model._meta.db_table),
-                        "name": fk_name,
-                    }
-                )
+                self.execute(self._delete_constraint_sql(self.sql_delete_fk, model, fk_name))
         # Drop incoming FK constraints if we're a primary key and things are going
         # to change.
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
             for rel in new_field.model._meta.get_all_related_objects():
                 rel_fk_names = self._constraint_names(rel.model, [rel.field.column], foreign_key=True)
                 for fk_name in rel_fk_names:
-                    self.execute(
-                        self.sql_delete_fk % {
-                            "table": self.quote_name(rel.model._meta.db_table),
-                            "name": fk_name,
-                        }
-                    )
+                    self.execute(self._delete_constraint_sql(self.sql_delete_fk, rel.model, fk_name))
         # Removed an index?
         if (old_field.db_index and not new_field.db_index and
                 not old_field.unique and not
@@ -541,12 +511,7 @@ class BaseDatabaseSchemaEditor(object):
                     old_field.column,
                 ))
             for index_name in index_names:
-                self.execute(
-                    self.sql_delete_index % {
-                        "table": self.quote_name(model._meta.db_table),
-                        "name": index_name,
-                    }
-                )
+                self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
             constraint_names = self._constraint_names(model, [old_field.column], check=True)
@@ -557,12 +522,7 @@ class BaseDatabaseSchemaEditor(object):
                     old_field.column,
                 ))
             for constraint_name in constraint_names:
-                self.execute(
-                    self.sql_delete_check % {
-                        "table": self.quote_name(model._meta.db_table),
-                        "name": constraint_name,
-                    }
-                )
+                self.execute(self._delete_constraint_sql(self.sql_delete_check, model, constraint_name))
         # Have they renamed the column?
         if old_field.column != new_field.column:
             self.execute(self.sql_rename_column % {
@@ -670,12 +630,7 @@ class BaseDatabaseSchemaEditor(object):
                     model._meta.db_table,
                 ))
             for constraint_name in constraint_names:
-                self.execute(
-                    self.sql_delete_pk % {
-                        "table": self.quote_name(model._meta.db_table),
-                        "name": constraint_name,
-                    },
-                )
+                self.execute(self._delete_constraint_sql(self.sql_delete_pk, model, constraint_name))
             # Make the new one
             self.execute(
                 self.sql_create_pk % {
@@ -834,6 +789,12 @@ class BaseDatabaseSchemaEditor(object):
             "table": self.quote_name(model._meta.db_table),
             "name": self._create_index_name(model, columns, suffix="_uniq"),
             "columns": ", ".join(self.quote_name(column) for column in columns),
+        }
+
+    def _delete_constraint_sql(self, template, model, name):
+        return template % {
+            "table": self.quote_name(model._meta.db_table),
+            "name": name,
         }
 
     def _constraint_names(self, model, column_names=None, unique=None,
