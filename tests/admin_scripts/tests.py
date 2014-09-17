@@ -25,7 +25,7 @@ from django.core.management import BaseCommand, CommandError, call_command
 from django.db import connection
 from django.utils.encoding import force_text
 from django.utils._os import npath, upath
-from django.utils.six import StringIO
+from django.utils.six import PY3, StringIO
 from django.test import LiveServerTestCase, TestCase, override_settings
 from django.test.runner import DiscoverRunner
 
@@ -659,7 +659,7 @@ class ManageNoSettings(AdminScriptTestCase):
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named settings")
+        self.assertOutput(err, "No module named %ssettings" % "test_project." if PY3 else "")
 
     def test_builtin_with_bad_settings(self):
         "no settings: manage.py builtin commands fail if settings file (from argument) doesn't exist"
@@ -892,7 +892,7 @@ class ManageAlternateSettings(AdminScriptTestCase):
         args = ['sqlall', 'admin_scripts']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named settings")
+        self.assertOutput(err, "No module named %ssettings" % "test_project." if PY3 else "")
 
     def test_builtin_with_settings(self):
         "alternate: manage.py builtin commands work with settings provided as argument"
@@ -931,7 +931,7 @@ class ManageAlternateSettings(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "No module named settings")
+        self.assertOutput(err, "No module named %ssettings" % "test_project." if PY3 else "")
 
     def test_custom_command_with_settings(self):
         "alternate: manage.py can execute user commands if settings are provided as argument"
