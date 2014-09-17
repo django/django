@@ -39,9 +39,8 @@ def add_srs_entry(srs, auth_name='EPSG', auth_srid=None, ref_sys_name=None,
     if not hasattr(connection.ops, 'spatial_version'):
         raise Exception('The `add_srs_entry` utility only works '
                         'with spatial backends.')
-    if connection.ops.oracle or connection.ops.mysql:
-        raise Exception('This utility does not support the '
-                        'Oracle or MySQL spatial backends.')
+    if not connection.features.supports_add_srs_entry:
+        raise Exception('This utility does not support your database backend.')
     SpatialRefSys = connection.ops.spatial_ref_sys()
 
     # If argument is not a `SpatialReference` instance, use it as parameter
