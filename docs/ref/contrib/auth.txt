@@ -269,6 +269,10 @@ Anonymous users
     these differences:
 
     * :ref:`id <automatic-primary-key-fields>` is always ``None``.
+    * :attr:`~django.contrib.auth.models.User.username` is always the empty
+      string.
+    * :meth:`~django.contrib.auth.models.User.get_username()` always returns
+      the empty string.
     * :attr:`~django.contrib.auth.models.User.is_staff` and
       :attr:`~django.contrib.auth.models.User.is_superuser` are always
       ``False``.
@@ -284,6 +288,11 @@ Anonymous users
       :meth:`~django.contrib.auth.models.User.check_password()`,
       :meth:`~django.db.models.Model.save` and
       :meth:`~django.db.models.Model.delete()` raise :exc:`NotImplementedError`.
+
+    .. versionadded:: 1.8
+
+      ``AnonymousUser.get_username()`` has been added to
+      better mirror :class:`django.contrib.auth.models.User`.
 
 In practice, you probably won't need to use
 :class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
