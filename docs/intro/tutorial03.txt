@@ -265,7 +265,7 @@ you want, using whatever Python libraries you want.
 All Django wants is that :class:`~django.http.HttpResponse`. Or an exception.
 
 Because it's convenient, let's use Django's own database API, which we covered
-in :doc:`Tutorial 1 </intro/tutorial01>`. Here's one stab at the ``index()``
+in :doc:`Tutorial 1 </intro/tutorial01>`. Here's one stab at a new ``index()``
 view, which displays the latest 5 poll questions in the system, separated by
 commas, according to publication date::
 
@@ -277,6 +277,8 @@ commas, according to publication date::
         latest_poll_list = Poll.objects.order_by('-pub_date')[:5]
         output = ', '.join([p.question for p in latest_poll_list])
         return HttpResponse(output)
+
+    # Leave the rest of the views (detail, results, vote) unchanged
 
 There's a problem here, though: the page's design is hard-coded in the view. If
 you want to change the way the page looks, you'll have to edit this Python code.
