@@ -16,6 +16,9 @@ class BaseSpatialFeatures(object):
     # Does the database contain a SpatialRefSys model to store SRID information?
     has_spatialrefsys_table = True
 
+    # Does the backend support the django.contrib.gis.utils.add_srs_entry() utility?
+    supports_add_srs_entry = True
+
     # Reference implementation of 3D functions is:
     # http://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
     supports_3d_functions = False

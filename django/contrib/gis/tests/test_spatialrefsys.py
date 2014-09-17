@@ -105,6 +105,7 @@ class SpatialRefSysTest(unittest.TestCase):
             for i in range(3):
                 self.assertAlmostEqual(ellps1[i], ellps2[i], prec[i])
 
+    @skipUnlessDBFeature('supports_add_srs_entry')
     def test_add_entry(self):
         """
         Test adding a new entry in the SpatialRefSys model using the
