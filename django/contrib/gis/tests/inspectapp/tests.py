@@ -5,7 +5,7 @@ import re
 from unittest import skipUnless
 
 from django.core.management import call_command
-from django.db import connections
+from django.db import connection, connections
 from django.test import TestCase, skipUnlessDBFeature
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.test_data import TEST_DATA
@@ -30,8 +30,12 @@ class InspectDbTests(TestCase):
                  table_name_filter=lambda tn: tn.startswith('inspectapp_'),
                  stdout=out)
         output = out.getvalue()
-        self.assertIn('geom = models.PolygonField()', output)
-        self.assertIn('point = models.PointField()', output)
+        if connection.features.supports_geometry_field_introspection:
+            self.assertIn('geom = models.PolygonField()', output)
+            self.assertIn('point = models.PointField()', output)
+        else:
+            self.assertIn('geom = models.GeometryField(', output)
+            self.assertIn('point = models.GeometryField(', output)
         self.assertIn('objects = models.GeoManager()', output)
 
 
