@@ -724,6 +724,12 @@ class BaseDatabaseSchemaEditor(object):
             old_field.rel.through._meta.get_field_by_name(old_field.m2m_reverse_field_name())[0],
             new_field.rel.through._meta.get_field_by_name(new_field.m2m_reverse_field_name())[0],
         )
+        self.alter_field(
+            new_field.rel.through,
+            # for self-referential models we need to alter field from the other end too
+            old_field.rel.through._meta.get_field_by_name(old_field.m2m_field_name())[0],
+            new_field.rel.through._meta.get_field_by_name(new_field.m2m_field_name())[0],
+        )
 
     def _create_index_name(self, model, column_names, suffix=""):
         """
