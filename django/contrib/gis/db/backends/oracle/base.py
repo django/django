@@ -9,7 +9,7 @@ from django.contrib.gis.db.backends.oracle.operations import OracleOperations
 
 
 class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
-    pass
+    supports_add_srs_entry = False
 
 
 class DatabaseWrapper(OracleDatabaseWrapper):
