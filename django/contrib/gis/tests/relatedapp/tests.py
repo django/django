@@ -263,6 +263,10 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(vqs))
         self.assertEqual(3, vqs[0]['num_books'])
 
+    # TODO: fix on Oracle -- get the following error because the SQL is ordered
+    # by a geometry object, which Oracle apparently doesn't like:
+    #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
+    @no_oracle
     def test13c_count(self):
         "Testing `Count` aggregate with `.values()`.  See #15305."
         qs = Location.objects.filter(id=5).annotate(num_cities=Count('city')).values('id', 'point', 'num_cities')
