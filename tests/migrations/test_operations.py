@@ -472,6 +472,22 @@ class OperationTests(OperationTestBase):
             self.assertFKExists("test_rmwsrf_rider", ["friend_id"], ("test_rmwsrf_rider", "id"))
             self.assertFKNotExists("test_rmwsrf_rider", ["friend_id"], ("test_rmwsrf_horserider", "id"))
 
+    def test_rename_model_with_self_referential_m2m(self):
+        app_label = "test_rename_model_with_self_referential_m2m"
+
+        project_state = self.apply_operations(app_label, ProjectState(), operations=[
+            migrations.CreateModel("ReflexivePony", fields=[
+                ("ponies", models.ManyToManyField("self")),
+            ]),
+        ])
+        project_state = self.apply_operations(app_label, project_state, operations=[
+            migrations.RenameModel("ReflexivePony", "ReflexivePony2"),
+        ])
+        apps = project_state.render()
+        Pony = apps.get_model(app_label, "ReflexivePony2")
+        pony = Pony.objects.create()
+        pony.ponies.add(pony)
+
     def test_add_field(self):
         """
         Tests the AddField operation.
