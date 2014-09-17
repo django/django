@@ -18,6 +18,8 @@ class BaseSpatialFeatures(object):
 
     # Does the backend support the django.contrib.gis.utils.add_srs_entry() utility?
     supports_add_srs_entry = True
+    # Does the backend introspect GeometryField to its subtypes?
+    supports_geometry_field_introspection = True
 
     # Reference implementation of 3D functions is:
     # http://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
