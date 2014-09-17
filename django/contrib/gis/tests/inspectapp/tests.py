@@ -139,7 +139,11 @@ def get_ogr_db_string():
         'django.contrib.gis.db.backends.spatialite': ('SQLite', '%(db_name)s', '')
     }
 
-    drv_name, db_str, param_sep = drivers.get(db['ENGINE'])
+    db_engine = db['ENGINE']
+    if db_engine not in drivers:
+        return None
+
+    drv_name, db_str, param_sep = drivers[db_engine]
 
     # Ensure that GDAL library has driver support for the database.
     try:
