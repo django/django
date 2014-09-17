@@ -41,6 +41,9 @@ class BasicTestCase(TestCase):
         u.set_password(None)
         self.assertFalse(u.has_usable_password())
 
+        # Check username getter
+        self.assertEqual(u.get_username(), 'testuser')
+
         # Check authentication/permissions
         self.assertTrue(u.is_authenticated())
         self.assertFalse(u.is_staff)
@@ -66,6 +69,8 @@ class BasicTestCase(TestCase):
         "Check the properties of the anonymous user"
         a = AnonymousUser()
         self.assertEqual(a.pk, None)
+        self.assertEqual(a.username, '')
+        self.assertEqual(a.get_username(), '')
         self.assertFalse(a.is_authenticated())
         self.assertFalse(a.is_staff)
         self.assertFalse(a.is_active)
