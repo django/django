@@ -67,6 +67,7 @@ class OperationTests(TransactionTestCase):
         operation.state_forwards("gis", new_state)
         with connection.schema_editor() as editor:
             operation.database_forwards("gis", editor, project_state, new_state)
+        self.current_state = new_state
         self.assertColumnExists("gis_neighborhood", "path")
 
         # Test GeometryColumns when available
@@ -75,7 +76,6 @@ class OperationTests(TransactionTestCase):
                 GeometryColumns.objects.filter(**{GeometryColumns.table_name_col(): "gis_neighborhood"}).count(),
                 2
             )
-        self.current_state = new_state
 
     def test_remove_gis_field(self):
         """
@@ -87,6 +87,7 @@ class OperationTests(TransactionTestCase):
         operation.state_forwards("gis", new_state)
         with connection.schema_editor() as editor:
             operation.database_forwards("gis", editor, project_state, new_state)
+        self.current_state = new_state
         self.assertColumnNotExists("gis_neighborhood", "geom")
 
         # Test GeometryColumns when available
@@ -95,4 +96,3 @@ class OperationTests(TransactionTestCase):
                 GeometryColumns.objects.filter(**{GeometryColumns.table_name_col(): "gis_neighborhood"}).count(),
                 0
             )
-        self.current_state = new_state
