@@ -15,7 +15,7 @@ from django.utils._os import upath
 
 if HAS_GDAL:
     from django.contrib.gis.utils.layermapping import (LayerMapping,
-        LayerMapError, InvalidDecimal, MissingForeignKey)
+        LayerMapError, InvalidDecimal, InvalidString, MissingForeignKey)
     from django.contrib.gis.gdal import DataSource
 
     from .models import (
@@ -286,6 +286,13 @@ class LayerMapTest(TestCase):
         lm = LayerMapping(Invalid, invalid_shp, invalid_mapping,
                           source_srs=4326)
         lm.save(silent=True)
+
+    def test_charfield_too_short(self):
+        mapping = copy(city_mapping)
+        mapping['name_short'] = 'Name'
+        lm = LayerMapping(City, city_shp, mapping)
+        with self.assertRaises(InvalidString):
+            lm.save(silent=True, strict=True)
 
     def test_textfield(self):
         "Tests that String content fits also in a TextField"
