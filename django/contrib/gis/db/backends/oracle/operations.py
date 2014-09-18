@@ -142,6 +142,9 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
 
     truncate_params = {'relate': None}
 
+    def geo_quote_name(self, name):
+        return super(OracleOperations, self).geo_quote_name(name).upper()
+
     def get_db_converters(self, internal_type):
         converters = super(OracleOperations, self).get_db_converters(internal_type)
         geometry_fields = (

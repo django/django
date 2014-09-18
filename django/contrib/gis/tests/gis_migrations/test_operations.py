@@ -51,6 +51,17 @@ class OperationTests(TransactionTestCase):
         )]
         return self.apply_operations('gis', ProjectState(), operations)
 
+    def assertGeometryColumnsCount(self, expected_count):
+        table_name = "gis_neighborhood"
+        if connection.features.uppercases_column_names:
+            table_name = table_name.upper()
+        self.assertEqual(
+            GeometryColumns.objects.filter(**{
+                GeometryColumns.table_name_col(): table_name,
+            }).count(),
+            expected_count
+        )
+
     def test_add_gis_field(self):
         """
         Tests the AddField operation with a GIS-enabled column.
@@ -70,10 +81,7 @@ class OperationTests(TransactionTestCase):
 
         # Test GeometryColumns when available
         if HAS_GEOMETRY_COLUMNS:
-            self.assertEqual(
-                GeometryColumns.objects.filter(**{GeometryColumns.table_name_col(): "gis_neighborhood"}).count(),
-                2
-            )
+            self.assertGeometryColumnsCount(2)
 
         if self.has_spatial_indexes:
             with connection.cursor() as cursor:
@@ -95,10 +103,7 @@ class OperationTests(TransactionTestCase):
 
         # Test GeometryColumns when available
         if HAS_GEOMETRY_COLUMNS:
-            self.assertEqual(
-                GeometryColumns.objects.filter(**{GeometryColumns.table_name_col(): "gis_neighborhood"}).count(),
-                0
-            )
+            self.assertGeometryColumnsCount(0)
 
     def test_create_model_spatial_index(self):
         self.current_state = self.set_up_test_model()
