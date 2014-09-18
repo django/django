@@ -607,6 +607,10 @@ Miscellaneous
 * The default max size of the Oracle test tablespace has increased from 200M
   to 500M.
 
+* :func:`~django.core.urlresolvers.reverse` and
+  :func:`~django.core.urlresolvers.reverse_lazy` now return Unicode strings
+  instead of byte strings.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
