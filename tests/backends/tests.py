@@ -571,6 +571,14 @@ class BackendTestCase(TestCase):
         self.assertTrue(hasattr(connection.ops, 'connection'))
         self.assertEqual(connection, connection.ops.connection)
 
+    def test_database_operations_init(self):
+        """
+        Test that DatabaseOperations initialization doesn't query the database.
+        See #17656.
+        """
+        with self.assertNumQueries(0):
+            connection.ops.__class__(connection)
+
     def test_cached_db_features(self):
         self.assertIn(connection.features.supports_transactions, (True, False))
         self.assertIn(connection.features.supports_stddev, (True, False))
