@@ -222,6 +222,13 @@ class URLPatternReverse(TestCase):
             # exception
             self.fail("Expected a NoReverseMatch, but none occurred.")
 
+    def test_reverse_returns_unicode(self):
+        name, expected, args, kwargs = test_data[0]
+        self.assertIsInstance(
+            reverse(name, args=args, kwargs=kwargs),
+            six.text_type
+        )
+
 
 class ResolverTests(unittest.TestCase):
     def test_resolver_repr(self):
