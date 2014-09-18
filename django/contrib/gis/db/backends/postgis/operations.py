@@ -176,10 +176,6 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
             'bboverlaps': PostGISOperator('&&'),
         }
 
-        # Native geometry type support added in PostGIS 2.0.
-        if self.spatial_version >= (2, 0, 0):
-            self.geometry = True
-
         # Creating a dictionary lookup of all GIS terms for PostGIS.
         self.gis_terms = set(['isnull'])
         self.gis_terms.update(self.geometry_operators)
@@ -220,14 +216,33 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         self.union = prefix + 'Union'
         self.unionagg = prefix + 'Union'
 
+    # Following "attributes" are properties due to the spatial_version check and
+    # to delay database access
+    @property
+    def extent3d(self):
         if self.spatial_version >= (2, 0, 0):
-            self.extent3d = prefix + '3DExtent'
-            self.length3d = prefix + '3DLength'
-            self.perimeter3d = prefix + '3DPerimeter'
+            return self.geom_func_prefix + '3DExtent'
         else:
-            self.extent3d = prefix + 'Extent3D'
-            self.length3d = prefix + 'Length3D'
-            self.perimeter3d = prefix + 'Perimeter3D'
+            return self.geom_func_prefix + 'Extent3D'
+
+    @property
+    def length3d(self):
+        if self.spatial_version >= (2, 0, 0):
+            return self.geom_func_prefix + '3DLength'
+        else:
+            return self.geom_func_prefix + 'Length3D'
+
+    @property
+    def perimeter3d(self):
+        if self.spatial_version >= (2, 0, 0):
+            return self.geom_func_prefix + '3DPerimeter'
+        else:
+            return self.geom_func_prefix + 'Perimeter3D'
+
+    @property
+    def geometry(self):
+        # Native geometry type support added in PostGIS 2.0.
+        return self.spatial_version >= (2, 0, 0)
 
     @cached_property
     def spatial_version(self):
