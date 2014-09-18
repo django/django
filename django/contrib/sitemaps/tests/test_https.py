@@ -15,7 +15,15 @@ class HTTPSSitemapTests(SitemapTestsBase):
 
     def test_secure_sitemap_index(self):
         "A secure sitemap index can be rendered"
-        response = self.client.get('/secure/index.xml')
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+            # The URL for views.sitemap in tests/urls/https.py has been updated
+            # with a name but since reversing by Python path is tried first
+            # before reversing by name and works since we're giving
+            # name='django.contrib.sitemaps.views.sitemap', we need to silence
+            # the erroneous warning until reversing by dotted path is removed.
+            # The test will work without modification when it's removed.
+            response = self.client.get('/secure/index.xml')
         expected_content = """<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <sitemap><loc>%s/secure/sitemap-simple.xml</loc></sitemap>
@@ -42,7 +50,7 @@ class HTTPSDetectionSitemapTests(SitemapTestsBase):
         "A sitemap index requested in HTTPS is rendered with HTTPS links"
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
-            # The URL for views.sitemap in tests/urls/http.py has been updated
+            # The URL for views.sitemap in tests/urls/https.py has been updated
             # with a name but since reversing by Python path is tried first
             # before reversing by name and works since we're giving
             # name='django.contrib.sitemaps.views.sitemap', we need to silence
