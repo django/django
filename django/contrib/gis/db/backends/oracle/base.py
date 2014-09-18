@@ -6,6 +6,7 @@ from django.contrib.gis.db.backends.base import BaseSpatialFeatures
 from django.contrib.gis.db.backends.oracle.creation import OracleCreation
 from django.contrib.gis.db.backends.oracle.introspection import OracleIntrospection
 from django.contrib.gis.db.backends.oracle.operations import OracleOperations
+from django.contrib.gis.db.backends.oracle.schema import OracleGISSchemaEditor
 
 
 class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
@@ -20,3 +21,6 @@ class DatabaseWrapper(OracleDatabaseWrapper):
         self.ops = OracleOperations(self)
         self.creation = OracleCreation(self)
         self.introspection = OracleIntrospection(self)
+
+    def schema_editor(self, *args, **kwargs):
+        return OracleGISSchemaEditor(self, *args, **kwargs)
