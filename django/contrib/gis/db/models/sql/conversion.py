@@ -45,6 +45,9 @@ class GeomField(BaseField):
     using GeometryField (which requires an SQL query upon instantiation).
     """
     def from_db_value(self, value, connection):
+        if connection.vendor == 'oracle':
+            value = connection.ops.convert_textfield_value(value, self)
+
         if value is not None:
             value = Geometry(value)
         return value
