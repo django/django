@@ -142,6 +142,9 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
 
     truncate_params = {'relate': None}
 
+    def geo_quote_name(self, name):
+        return super(OracleOperations, self).geo_quote_name(name).upper()
+
     def convert_extent(self, clob):
         if clob:
             # Generally, Oracle returns a polygon for the extent -- however,

@@ -77,6 +77,9 @@ Bugfixes
 * Added ``SchemaEditor`` for MySQL GIS backend so that spatial indexes will be
   created for apps with migrations (:ticket:`23538`).
 
+* Added ``SchemaEditor`` for Oracle GIS backend so that spatial metadata and
+  indexes will be created for apps with migrations (:ticket:`23537`).
+
 * Coerced the ``related_name`` model field option to unicode during migration
   generation to generate migrations that work with both Python 2 and 3
   (:ticket:`23455`).
