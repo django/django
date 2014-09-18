@@ -198,7 +198,7 @@ class GeometryField(Field):
             return geom
 
     def from_db_value(self, value, connection):
-        if value is not None:
+        if value:
             value = Geometry(value)
         return value
 
