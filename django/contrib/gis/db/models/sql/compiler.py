@@ -152,7 +152,8 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         for i, alias in enumerate(self.query.extra_select):
             field = self.query.extra_select_fields.get(alias)
             if field:
-                converters[i] = ([], [field.from_db_value], field)
+                backend_converters = self.connection.ops.get_db_converters(field.get_internal_type())
+                converters[i] = (backend_converters, [field.from_db_value], field)
         return converters
 
     #### Routines unique to GeoQuery ####
