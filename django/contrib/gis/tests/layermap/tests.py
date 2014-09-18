@@ -291,7 +291,7 @@ class LayerMapTest(TestCase):
         lm = LayerMapping(City, city_shp, mapping)
         lm.save(silent=True, strict=True)
         self.assertEqual(City.objects.count(), 3)
-        self.assertEqual(City.objects.all().order_by('name_txt')[0].name_txt, "Houston")
+        self.assertEqual(City.objects.get(name='Houston').name_txt, "Houston")
 
     def test_encoded_name(self):
         """ Test a layer containing utf-8-encoded name """
