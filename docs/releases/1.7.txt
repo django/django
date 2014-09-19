@@ -1021,7 +1021,7 @@ script with::
 Otherwise, you will hit an ``AppRegistryNotReady`` exception.
 
 WSGI scripts
-~~~~~~~~~~~~
+^^^^^^^^^^^^
 
 Until Django 1.3, the recommended way to create a WSGI application was::
 
