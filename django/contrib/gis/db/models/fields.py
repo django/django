@@ -198,7 +198,10 @@ class GeometryField(Field):
             return geom
 
     def from_db_value(self, value, connection):
-        if value is not None:
+        if connection.vendor == 'oracle':
+            value = connection.ops.convert_textfield_value(value, self)
+
+        if value:
             value = Geometry(value)
         return value
 
