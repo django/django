@@ -151,6 +151,8 @@ class GeoSQLCompiler(compiler.SQLCompiler):
         converters = super(GeoSQLCompiler, self).get_converters(fields)
         for i, alias in enumerate(self.query.extra_select):
             field = self.query.extra_select_fields.get(alias)
+            if alias == 'gml':
+                converters[i] = (self.connection.ops.get_db_converters('GeometryField'), [], None)
             if field:
                 backend_converters = self.connection.ops.get_db_converters(field.get_internal_type())
                 converters[i] = (backend_converters, [field.from_db_value], field)
