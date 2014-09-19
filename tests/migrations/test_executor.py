@@ -234,8 +234,8 @@ class ExecutorTests(MigrationTestBase):
 
     @override_settings(
         MIGRATION_MODULES={
-          "migrations": "migrations.test_migrations_backwards_deps_1",
-          "migrations2": "migrations2.test_migrations_backwards_deps_2",
+            "migrations": "migrations.test_migrations_backwards_deps_1",
+            "migrations2": "migrations2.test_migrations_backwards_deps_2",
         },
     )
     def test_backwards_deps(self):
