@@ -1,7 +1,7 @@
 import unittest
 
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.tests.utils import (no_mysql, oracle, postgis,
+from django.contrib.gis.tests.utils import (no_mysql, no_oracle, oracle, postgis,
     spatialite, HAS_SPATIALREFSYS, SpatialRefSys)
 from django.db import connection
 from django.utils import six
@@ -103,6 +103,7 @@ class SpatialRefSysTest(unittest.TestCase):
                 self.assertAlmostEqual(ellps1[i], ellps2[i], prec[i])
 
     @no_mysql
+    @no_oracle
     def test_add_entry(self):
         """
         Test adding a new entry in the SpatialRefSys model using the
