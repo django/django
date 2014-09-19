@@ -29,8 +29,12 @@ class InspectDbTests(TestCase):
                  table_name_filter=lambda tn: tn.startswith('inspectapp_'),
                  stdout=out)
         output = out.getvalue()
-        self.assertIn('geom = models.PolygonField()', output)
-        self.assertIn('point = models.PointField()', output)
+        if not connections['default'].ops.oracle:
+            self.assertIn('geom = models.PolygonField()', output)
+            self.assertIn('point = models.PointField()', output)
+        else:
+            self.assertIn('geom = models.GeometryField(', output)
+            self.assertIn('point = models.GeometryField(', output)
         self.assertIn('objects = models.GeoManager()', output)
 
 
