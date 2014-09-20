@@ -1274,17 +1274,20 @@ class BaseDatabaseIntrospection(object):
         """
         return self.table_name_converter(name)
 
-    def table_names(self, cursor=None):
+    def table_names(self, cursor=None, include_views=False):
         """
         Returns a list of names of all tables that exist in the database.
         The returned table list is sorted by Python's default sorting. We
         do NOT use database's ORDER BY here to avoid subtle differences
         in sorting order between databases.
         """
+        def get_names(cursor):
+            return sorted([ti.name for ti in self.get_table_list(cursor)
+                           if include_views or ti.type == 't'])
         if cursor is None:
             with self.connection.cursor() as cursor:
-                return sorted([ti.name for ti in self.get_table_list(cursor) if ti.type == 't'])
-        return sorted([ti.name for ti in self.get_table_list(cursor) if ti.type == 't'])
+                return get_names(cursor)
+        return get_names(cursor)
 
     def get_table_list(self, cursor):
         """
@@ -1293,7 +1296,7 @@ class BaseDatabaseIntrospection(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_table_list() method')
 
-    def django_table_names(self, only_existing=False):
+    def django_table_names(self, only_existing=False, include_views=True):
         """
         Returns a list of all table names that have associated Django models and
         are in INSTALLED_APPS.
@@ -1312,7 +1315,7 @@ class BaseDatabaseIntrospection(object):
                 tables.update(f.m2m_db_table() for f in model._meta.local_many_to_many)
         tables = list(tables)
         if only_existing:
-            existing_tables = self.table_names()
+            existing_tables = self.table_names(include_views=include_views)
             tables = [
                 t
                 for t in tables
