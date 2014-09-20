@@ -222,7 +222,7 @@ class ManagementUtility(object):
             curr = ''
 
         subcommands = list(get_commands()) + ['help']
-        options = [('--help', None)]
+        options = [('--help', False)]
 
         # subcommand
         if cword == 1:

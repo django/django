@@ -70,3 +70,5 @@ Bugfixes
 
 * Made the :setting:`SERIALIZE <TEST_SERIALIZE>` entry in the
   :setting:`TEST <DATABASE-TEST>` dictionary usable (:ticket:`23421`).
+
+* Fixed a crash in bash autocompletion on Python 3 (:ticket:`23551`).
