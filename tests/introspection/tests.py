@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import connection
+from django.db.utils import DatabaseError
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import Reporter, Article
@@ -33,6 +34,23 @@ class IntrospectionTests(TestCase):
 
         tl = connection.introspection.django_table_names(only_existing=False)
         self.assertIs(type(tl), list)
+
+    def test_table_names_with_views(self):
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute(
+                    'CREATE VIEW introspection_article_view AS SELECT headline '
+                    'from introspection_article;')
+            except DatabaseError as e:
+                if 'insufficient privileges' in str(e):
+                    self.skipTest("The test user has no CREATE VIEW privileges")
+                else:
+                    raise
+
+        self.assertIn('introspection_article_view',
+                      connection.introspection.table_names(include_views=True))
+        self.assertNotIn('introspection_article_view',
+                         connection.introspection.table_names())
 
     def test_installed_models(self):
         tables = [Article._meta.db_table, Reporter._meta.db_table]
