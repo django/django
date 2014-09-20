@@ -23,6 +23,13 @@ from django.utils.functional import cached_property
 from django.utils import six
 from django.utils import timezone
 
+# Structure returned by DatabaseIntrospection.get_table_list()
+TableInfo = namedtuple('TableInfo', ['name', 'type'])
+
+# Structure returned by the DB-API cursor.description interface (PEP 249)
+FieldInfo = namedtuple('FieldInfo',
+    'name type_code display_size internal_size precision scale null_ok')
+
 
 class BaseDatabaseWrapper(object):
     """
@@ -1235,11 +1242,6 @@ class BaseDatabaseOperations(object):
         return self.integer_field_ranges[internal_type]
 
 
-# Structure returned by the DB-API cursor.description interface (PEP 249)
-FieldInfo = namedtuple('FieldInfo',
-    'name type_code display_size internal_size precision scale null_ok')
-
-
 class BaseDatabaseIntrospection(object):
     """
     This class encapsulates all backend-specific introspection utilities
@@ -1281,13 +1283,13 @@ class BaseDatabaseIntrospection(object):
         """
         if cursor is None:
             with self.connection.cursor() as cursor:
-                return sorted(self.get_table_list(cursor))
-        return sorted(self.get_table_list(cursor))
+                return sorted([ti.name for ti in self.get_table_list(cursor) if ti.type == 't'])
+        return sorted([ti.name for ti in self.get_table_list(cursor) if ti.type == 't'])
 
     def get_table_list(self, cursor):
         """
-        Returns an unsorted list of names of all tables that exist in the
-        database.
+        Returns an unsorted list of TableInfo named tuples of all tables and
+        views that exist in the database.
         """
         raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_table_list() method')
 
