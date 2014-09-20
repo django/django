@@ -1,7 +1,7 @@
 import re
 from .base import FIELD_TYPE
 from django.utils.datastructures import OrderedSet
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.db.backends import BaseDatabaseIntrospection, FieldInfo, TableInfo
 from django.utils.encoding import force_text
 
 
@@ -33,9 +33,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     }
 
     def get_table_list(self, cursor):
-        "Returns a list of table names in the current database."
-        cursor.execute("SHOW TABLES")
-        return [row[0] for row in cursor.fetchall()]
+        """
+        Returns a list of table and view names in the current database.
+        """
+        cursor.execute("SHOW FULL TABLES")
+        return [TableInfo(row[0], {'BASE TABLE': 't', 'VIEW': 'v'}.get(row[1]))
+                for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
         """

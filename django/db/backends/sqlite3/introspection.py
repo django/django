@@ -1,6 +1,6 @@
 import re
 
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.db.backends import BaseDatabaseIntrospection, FieldInfo, TableInfo
 
 
 field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
@@ -54,14 +54,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     data_types_reverse = FlexibleFieldLookupDict()
 
     def get_table_list(self, cursor):
-        "Returns a list of table names in the current database."
+        """
+        Returns a list of table and view names in the current database.
+        """
         # Skip the sqlite_sequence system table used for autoincrement key
         # generation.
         cursor.execute("""
-            SELECT name FROM sqlite_master
+            SELECT name, type FROM sqlite_master
             WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
             ORDER BY name""")
-        return [row[0] for row in cursor.fetchall()]
+        return [TableInfo(row[0], row[1][0]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."

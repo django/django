@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.db.backends import BaseDatabaseIntrospection, FieldInfo, TableInfo
 from django.utils.encoding import force_text
 
 
@@ -29,15 +29,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     ignored_tables = []
 
     def get_table_list(self, cursor):
-        "Returns a list of table names in the current database."
+        """
+        Returns a list of table and view names in the current database.
+        """
         cursor.execute("""
-            SELECT c.relname
+            SELECT c.relname, c.relkind
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-            WHERE c.relkind IN ('r', 'v', '')
+            WHERE c.relkind IN ('r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)""")
-        return [row[0] for row in cursor.fetchall() if row[0] not in self.ignored_tables]
+        return [TableInfo(row[0], {'r':'t', 'v': 'v'}.get(row[1]))
+                for row in cursor.fetchall()
+                if row[0] not in self.ignored_tables]
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
