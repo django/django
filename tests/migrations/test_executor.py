@@ -213,18 +213,18 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableExists("migrations_author")
         self.assertTableExists("migrations_tribble")
         # Make sure the soft-application detection works (#23093)
-        # Change get_table_list to not return auth_user during this as
+        # Change table_names to not return auth_user during this as
         # it wouldn't be there in a normal run, and ensure migrations.Author
         # exists in the global app registry temporarily.
-        old_get_table_list = connection.introspection.get_table_list
-        connection.introspection.get_table_list = lambda c: [x for x in old_get_table_list(c) if x != "auth_user"]
+        old_table_names = connection.introspection.table_names
+        connection.introspection.table_names = lambda c: [x for x in old_table_names(c) if x != "auth_user"]
         migrations_apps = executor.loader.project_state(("migrations", "0001_initial")).render()
         global_apps.get_app_config("migrations").models["author"] = migrations_apps.get_model("migrations", "author")
         try:
             migration = executor.loader.get_migration("auth", "0001_initial")
             self.assertEqual(executor.detect_soft_applied(migration), True)
         finally:
-            connection.introspection.get_table_list = old_get_table_list
+            connection.introspection.table_names = old_table_names
             del global_apps.get_app_config("migrations").models["author"]
         # And migrate back to clean up the database
         executor.loader.build_graph()
