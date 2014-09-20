@@ -74,7 +74,7 @@ explained later in this document.
     JavaScript and CSV. You can use the template language for any text-based
     format.
 
-    Oh, and one more thing: Making humans edit XML is sadistic!
+    Oh, and one more thing: making humans edit XML is sadistic!
 
 Variables
 =========
@@ -142,18 +142,16 @@ bio|truncatewords:30 }}``. This will display the first 30 words of the ``bio``
 variable.
 
 Filter arguments that contain spaces must be quoted; for example, to join a
-list with commas and spaced you'd use ``{{ list|join:", " }}``.
+list with commas and spaces you'd use ``{{ list|join:", " }}``.
 
-Django provides about thirty built-in template filters. You can read all about
+Django provides about sixty built-in template filters. You can read all about
 them in the :ref:`built-in filter reference <ref-templates-builtins-filters>`.
 To give you a taste of what's available, here are some of the more commonly
 used template filters:
 
 :tfilter:`default`
     If a variable is false or empty, use given default. Otherwise, use the
-    value of the variable
-
-    For example::
+    value of the variable. For example::
 
         {{ value|default:"nothing" }}
 
@@ -161,8 +159,8 @@ used template filters:
     "``nothing``".
 
 :tfilter:`length`
-    Returns the length of the value. This works for both strings and lists;
-    for example::
+    Returns the length of the value. This works for both strings and lists.
+    For example::
 
         {{ value|length }}
 
@@ -436,7 +434,7 @@ When generating HTML from templates, there's always a risk that a variable will
 include characters that affect the resulting HTML. For example, consider this
 template fragment::
 
-    Hello, {{ name }}.
+    Hello, {{ name }}
 
 At first, this seems like a harmless way to display a user's name, but consider
 what would happen if the user entered their name as this::
