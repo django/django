@@ -149,7 +149,7 @@ class MigrationExecutor(object):
                     # We have to fetch the model to test with from the
                     # main app cache, as it's not a direct dependency.
                     model = global_apps.get_model(model._meta.swapped)
-                if model._meta.db_table not in self.connection.introspection.get_table_list(self.connection.cursor()):
+                if model._meta.db_table not in self.connection.introspection.table_names(self.connection.cursor()):
                     return False
                 found_create_migration = True
         # If we get this far and we found at least one CreateModel migration,
