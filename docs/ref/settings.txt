@@ -2004,6 +2004,29 @@ Django will refuse to start if :setting:`SECRET_KEY` is not set.
     security protections, and can lead to privilege escalation and remote code
     execution vulnerabilities.
 
+The secret key is used for:
+
+* All :doc:`sessions </topics/http/sessions>` if you are using
+  any other session backend than ``"django.contrib.sessions.backends.cache"``,
+  or if you use
+  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware`
+  and are using the default
+  :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`.
+* All :doc:`messages </ref/contrib/messages>` if you are using
+  :class:`~django.contrib.messages.storage.cookie.CookieStorage` or
+  :class:`~django.contrib.messages.storage.fallback.FallbackStorage`.
+* :doc:`Form wizard </ref/contrib/formtools/form-wizard>` progress when using
+  cookie storage with
+  :class:`django.contrib.formtools.wizard.views.CookieWizardView`.
+* All :func:`~django.contrib.auth.views.password_reset` tokens.
+* All in progress :doc:`form previews </ref/contrib/formtools/form-preview>`.
+* Any usage of :doc:`cryptographic signing </topics/signing>`, unless a
+  different key is provided.
+
+If you rotate your secret key, all of the above will be invalidated.
+Secret keys are not used for passwords of users and key rotation will not
+affect them.
+
 .. setting:: SECURE_BROWSER_XSS_FILTER
 
 SECURE_BROWSER_XSS_FILTER
