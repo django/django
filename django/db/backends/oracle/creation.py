@@ -3,6 +3,7 @@ import time
 
 from django.conf import settings
 from django.db.backends.creation import BaseDatabaseCreation
+from django.db.utils import DatabaseError
 from django.utils.six.moves import input
 
 
@@ -172,9 +173,25 @@ class DatabaseCreation(BaseDatabaseCreation):
                TEMPORARY TABLESPACE %(tblspace_temp)s
                QUOTA UNLIMITED ON %(tblspace)s
             """,
-            """GRANT CONNECT, RESOURCE TO %(user)s""",
+            """GRANT CREATE SESSION,
+                     CREATE TABLE,
+                     CREATE SEQUENCE,
+                     CREATE PROCEDURE,
+                     CREATE TRIGGER
+               TO %(user)s""",
         ]
         self._execute_statements(cursor, statements, parameters, verbosity)
+        # Most test-suites can be run without the create-view privilege. But some need it.
+        extra = "GRANT CREATE VIEW TO %(user)s"
+        try:
+            self._execute_statements(cursor, [extra], parameters, verbosity, allow_quiet_fail=True)
+        except DatabaseError as err:
+            description = str(err)
+            if 'ORA-01031' in description:
+                if verbosity >= 2:
+                    print("Failed to grant CREATE VIEW permission to test user. This may be ok.")
+            else:
+                raise
 
     def _execute_test_db_destruction(self, cursor, parameters, verbosity):
         if verbosity >= 2:
@@ -194,7 +211,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         ]
         self._execute_statements(cursor, statements, parameters, verbosity)
 
-    def _execute_statements(self, cursor, statements, parameters, verbosity):
+    def _execute_statements(self, cursor, statements, parameters, verbosity, allow_quiet_fail=False):
         for template in statements:
             stmt = template % parameters
             if verbosity >= 2:
@@ -202,7 +219,8 @@ class DatabaseCreation(BaseDatabaseCreation):
             try:
                 cursor.execute(stmt)
             except Exception as err:
-                sys.stderr.write("Failed (%s)\n" % (err))
+                if (not allow_quiet_fail) or verbosity >= 2:
+                    sys.stderr.write("Failed (%s)\n" % (err))
                 raise
 
     def _get_test_db_params(self):
