@@ -165,7 +165,7 @@ You can get a local copy of the HTML documentation following a few easy steps:
 
   .. code-block:: bash
 
-        $ sudo pip install Sphinx
+        $ pip install Sphinx
 
 * Then, just use the included ``Makefile`` to turn the documentation into
   HTML:
