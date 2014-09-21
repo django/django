@@ -672,14 +672,37 @@ database user must have privileges to run the following commands:
 * CREATE PROCEDURE
 * CREATE TRIGGER
 
-To run Django's test suite, the user needs these *additional* privileges:
+To run a project's test suite, the user usually needs these *additional*
+privileges:
 
 * CREATE USER
 * DROP USER
 * CREATE TABLESPACE
 * DROP TABLESPACE
-* CONNECT WITH ADMIN OPTION
-* RESOURCE WITH ADMIN OPTION
+* CREATE SESSION WITH ADMIN OPTION
+* CREATE TABLE WITH ADMIN OPTION
+* CREATE SEQUENCE WITH ADMIN OPTION
+* CREATE PROCEDURE WITH ADMIN OPTION
+* CREATE TRIGGER WITH ADMIN OPTION
+
+Note that, while the RESOURCE role has the required CREATE TABLE, CREATE
+SEQUENCE, CREATE PROCEDURE and CREATE TRIGGER privileges, and a user
+granted RESOURCE WITH ADMIN OPTION can grant RESOURCE, such a user cannot
+grant the individual privileges (e.g. CREATE TABLE), and thus RESOURCE
+WITH ADMIN OPTION is not usually sufficient for running tests.
+
+Some test suites also create views; to run these, the user also needs
+the CREATE VIEW WITH ADMIN OPTION privilege. In particular, this is needed
+for Django's own test suite.
+
+.. versionchanged:: 1.8
+
+    Prior to Django 1.8, the test user was granted the CONNECT and RESOURCE
+    roles, so the extra privileges required for running the test suite were
+    different.
+
+All of these privileges are included in the DBA role, which is appropriate
+for use on a private developer's database.
 
 The Oracle database backend uses the ``SYS.DBMS_LOB`` package, so your user
 will require execute permissions on it. It's normally accessible to all users

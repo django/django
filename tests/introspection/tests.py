@@ -43,7 +43,7 @@ class IntrospectionTests(TestCase):
                     'from introspection_article;')
             except DatabaseError as e:
                 if 'insufficient privileges' in str(e):
-                    self.skipTest("The test user has no CREATE VIEW privileges")
+                    self.fail("The test user has no CREATE VIEW privileges")
                 else:
                     raise
 
