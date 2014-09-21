@@ -148,6 +148,7 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
             'PointField', 'GeometryField', 'LineStringField',
             'PolygonField', 'MultiPointField', 'MultiLineStringField',
             'MultiPolygonField', 'GeometryCollectionField', 'GeomField',
+            'GMLField',
         )
         if internal_type in geometry_fields:
             converters.append(self.convert_textfield_value)
