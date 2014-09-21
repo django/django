@@ -159,7 +159,7 @@ or if you are on Mac OS X:
 After modifying ``setup.cfg`` appropriately, then run the ``setup.py`` script
 to build and install::
 
-    $ sudo python setup.py install
+    $ python setup.py install
 
 .. _spatialite_macosx:
 
