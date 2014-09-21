@@ -3,7 +3,7 @@ from django.db.models.query import QuerySet
 
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.db.models.fields import get_srid_info, PointField, LineStringField
-from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery
+from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery, GMLField
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 
@@ -175,6 +175,8 @@ class GeoQuerySet(QuerySet):
         if backend.postgis:
             s['procedure_fmt'] = '%(version)s,%(geo_col)s,%(precision)s'
             s['procedure_args'] = {'precision': precision, 'version': version}
+        if backend.oracle:
+            s['select_field'] = GMLField()
 
         return self._spatial_attribute('gml', s, **kwargs)
 

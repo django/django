@@ -51,3 +51,15 @@ class GeomField(BaseField):
 
     def get_internal_type(self):
         return 'GeometryField'
+
+
+class GMLField(BaseField):
+    """
+    Wrapper for GML to be used by Oracle to ensure Database.LOB conversion.
+    """
+
+    def get_internal_type(self):
+        return 'GMLField'
+
+    def from_db_value(self, value, connection):
+        return value
