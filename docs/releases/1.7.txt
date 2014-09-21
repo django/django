@@ -65,7 +65,9 @@ but a few of the key features are:
   it as soon as possible (nothing more than renaming is required).
 
 * ``initial_data`` fixtures are no longer loaded for apps with migrations; if
-  you want to load initial data for an app, we suggest you do it in a migration.
+  you want to load initial data for an app, we suggest you create a migration for
+  your application and define a :class:`~django.db.migrations.operations.RunPython`
+  or :class:`~django.db.migrations.operations.RunSQL` operation in the ``operations`` section of the migration.
 
 * Test rollback behavior is different for apps with migrations; in particular,
   Django will no longer emulate rollbacks on non-transactional databases or
