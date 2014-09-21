@@ -8,6 +8,7 @@ from django.conf import settings
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
+from django.db.models.indexes import Index
 from django.utils import six
 from django.utils.encoding import force_text, smart_text, python_2_unicode_compatible
 from django.utils.functional import cached_property
@@ -58,6 +59,7 @@ class Options(object):
         self.ordering = []
         self.unique_together = []
         self.index_together = []
+        self.indexes = []
         self.select_on_save = False
         self.default_permissions = ('add', 'change', 'delete')
         self.permissions = []
@@ -145,8 +147,17 @@ class Options(object):
             ut = meta_attrs.pop('unique_together', self.unique_together)
             self.unique_together = normalize_together(ut)
 
+            self.indexes = meta_attrs.pop('indexes', self.indexes)
+
             it = meta_attrs.pop('index_together', self.index_together)
             self.index_together = normalize_together(it)
+            try:
+                for field_names in self.index_together:
+                    self.indexes.append(Index(field_names=field_names, model=self.model))
+            except TypeError:
+                # The value of index_togehter is invalid, this will be caught
+                # by the check framework
+                pass
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.

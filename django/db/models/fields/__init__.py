@@ -13,6 +13,7 @@ from itertools import tee
 
 from django.apps import apps
 from django.db import connection
+from django.db.models.indexes import Index
 from django.db.models.lookups import default_lookups, RegisterLookupMixin
 from django.db.models.query_utils import QueryWrapper
 from django.conf import settings
@@ -148,9 +149,10 @@ class Field(RegisterLookupMixin):
         self.db_tablespace = db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
         self.auto_created = auto_created
 
-        # Set db_index to True if the field has a relationship and doesn't
-        # explicitly set db_index.
-        self.db_index = db_index
+        if db_index is True:
+            self.db_index = Index([self])
+        else:
+            self.db_index = db_index
 
         # Adjust the appropriate creation counter, and save our local copy.
         if auto_created:
@@ -258,10 +260,10 @@ class Field(RegisterLookupMixin):
             return []
 
     def _check_db_index(self):
-        if self.db_index not in (None, True, False):
+        if self.db_index is not False and not isinstance(self.db_index, Index):
             return [
                 checks.Error(
-                    "'db_index' must be None, True or False.",
+                    "'db_index' must be True or False, or an Index.",
                     hint=None,
                     obj=self,
                     id='fields.E006',

@@ -1,11 +1,15 @@
 import datetime
 import unittest
+import warnings
 
 from django.test import TransactionTestCase
 from django.db import connection, DatabaseError, IntegrityError, OperationalError
 from django.db.models.fields import IntegerField, TextField, CharField, SlugField, BooleanField, BinaryField
 from django.db.models.fields.related import ManyToManyField, ForeignKey
+from django.db.models.indexes import Index
 from django.db.transaction import atomic
+from django.utils.deprecation import RemovedInDjango20Warning
+
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
     BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
     UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough,
@@ -787,11 +791,13 @@ class SchemaTests(TransactionTestCase):
         )
         # Alter the model to add an index
         with connection.schema_editor() as editor:
-            editor.alter_index_together(
-                Tag,
-                [],
-                [("slug", "title")],
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+                editor.alter_index_together(
+                    Tag,
+                    [],
+                    [("slug", "title")],
+                )
         # Ensure there is now an index
         self.assertEqual(
             True,
@@ -805,11 +811,13 @@ class SchemaTests(TransactionTestCase):
         new_new_field = SlugField(unique=True)
         new_new_field.set_attributes_from_name("slug")
         with connection.schema_editor() as editor:
-            editor.alter_index_together(
-                Tag,
-                [("slug", "title")],
-                [],
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", category=RemovedInDjango20Warning)
+                editor.alter_index_together(
+                    Tag,
+                    [("slug", "title")],
+                    [],
+                )
         # Ensure there's no index
         self.assertEqual(
             False,
@@ -833,6 +841,54 @@ class SchemaTests(TransactionTestCase):
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tagindexed").values()
+                if c['columns'] == ["slug", "title"]
+            ),
+        )
+
+    def test_create_indexes(self):
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+        # Ensure there's no index on the year/slug columns first
+        self.assertEqual(
+            False,
+            any(
+                c["index"]
+                for c in self.get_constraints("schema_tag").values()
+                if c['columns'] == ["slug", "title"]
+            ),
+        )
+        # Alter the model to add an index
+        with connection.schema_editor() as editor:
+            editor.alter_indexes(
+                Tag,
+                [],
+                [Index(field_names=["slug", "title"], model=Tag)],
+            )
+        # Ensure there is now an index
+        self.assertEqual(
+            True,
+            any(
+                c["index"]
+                for c in self.get_constraints("schema_tag").values()
+                if c['columns'] == ["slug", "title"]
+            ),
+        )
+        # Alter it back
+        new_new_field = SlugField(unique=True)
+        new_new_field.set_attributes_from_name("slug")
+        with connection.schema_editor() as editor:
+            editor.alter_indexes(
+                Tag,
+                [Index(field_names=["slug", "title"], model=Tag)],
+                [],
+            )
+        # Ensure there's no index
+        self.assertEqual(
+            False,
+            any(
+                c["index"]
+                for c in self.get_constraints("schema_tag").values()
                 if c['columns'] == ["slug", "title"]
             ),
         )
@@ -870,7 +926,7 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
 
-    def test_indexes(self):
+    def test_db_index(self):
         """
         Tests creation/altering of indexes
         """

@@ -625,8 +625,8 @@ class AutodetectorTests(TestCase):
         self.assertEqual(len(migration.operations), 1)
         # Right actions?
         action = migration.operations[0]
-        self.assertEqual(action.__class__.__name__, "AlterIndexTogether")
-        self.assertEqual(action.index_together, set())
+        self.assertEqual(action.__class__.__name__, "AlterIndexes")
+        self.assertEqual(action.indexes, set())
 
     def test_remove_unique_together(self):
         author_unique_together = ModelState("testapp", "Author", [

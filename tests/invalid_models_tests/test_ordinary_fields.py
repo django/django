@@ -169,7 +169,7 @@ class CharFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                "'db_index' must be None, True or False.",
+                "'db_index' must be True or False, or an Index.",
                 hint=None,
                 obj=field,
                 id='fields.E006',

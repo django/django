@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.fields.related import do_pending_lookups
 from django.db.models.fields.proxy import OrderWrt
+from django.db.models.indexes import Index
 from django.conf import settings
 from django.utils import six
 from django.utils.encoding import force_text, smart_text
@@ -160,6 +161,11 @@ class ModelState(object):
                 raise ValueError(
                     'ModelState.fields cannot be bound to a model - "%s" is.' % name
                 )
+        # Merge index_together into indexes
+        if self.options.get('index_together'):
+            self.options.setdefault('indexes', [])
+            for names in self.options['index_together']:
+                self.options['indexes'].append(Index(field_names=names))
 
     @classmethod
     def from_model(cls, model, exclude_rels=False):
