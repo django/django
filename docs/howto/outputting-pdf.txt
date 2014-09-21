@@ -27,7 +27,7 @@ Alternatively, you can also install it with ``pip``:
 
 .. code-block:: bash
 
-    $ sudo pip install reportlab
+    $ pip install reportlab
 
 Test your installation by importing it in the Python interactive interpreter::
 

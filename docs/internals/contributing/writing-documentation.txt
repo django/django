@@ -46,7 +46,7 @@ __ http://sphinx-doc.org/
 __ http://docutils.sourceforge.net/
 
 To actually build the documentation locally, you'll currently need to install
-Sphinx -- ``sudo pip install Sphinx`` should do the trick.
+Sphinx -- ``pip install Sphinx`` should do the trick.
 
 .. note::
 

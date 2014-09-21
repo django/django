@@ -326,7 +326,7 @@ psycopg2
 After you've installed the KyngChaos binaries and modified your ``PATH``, as
 described above, ``psycopg2`` may be installed using the following command::
 
-    $ sudo pip install psycopg2
+    $ pip install psycopg2
 
 .. note::
 

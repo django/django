@@ -36,7 +36,7 @@ or times, please try installing it before filing a bug. It's as simple as:
 
 .. code-block:: bash
 
-    $ sudo pip install pytz
+    $ pip install pytz
 
 .. note::
 
