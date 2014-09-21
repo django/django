@@ -23,6 +23,16 @@ class IntrospectionTests(TestCase):
             self.assertNotIn('django_ixn_test_table', tl,
                              "django_table_names() returned a non-Django table")
 
+    def test_table_and_view_names(self):
+        with connection.cursor() as cursor:
+            cursor.execute("CREATE TABLE django_test_custom_table (id INTEGER);")
+            cursor.execute(
+                "CREATE VIEW django_test_custom_view AS "
+                "SELECT id FROM django_test_custom_table;")
+            tl = connection.introspection.table_names()
+            self.assertTrue('django_test_custom_table' in tl)
+            self.assertTrue('django_test_custom_view' in tl)
+
     def test_django_table_names_retval_type(self):
         # Ticket #15216
         with connection.cursor() as cursor:
