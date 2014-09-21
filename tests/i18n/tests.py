@@ -27,7 +27,7 @@ from django.utils.six import PY3
 from django.utils.translation import (activate, deactivate,
     get_language, get_language_from_request, get_language_info,
     to_locale, trans_real,
-    gettext_lazy,
+    gettext, gettext_lazy,
     ugettext, ugettext_lazy,
     ngettext_lazy,
     ungettext_lazy,
@@ -351,7 +351,7 @@ class TranslationTests(TestCase):
         """
         with translation.override('de'):
             self.assertEqual("", ugettext(""))
-            self.assertEqual(b"", gettext(b""))
+            self.assertEqual(str(""), gettext(str("")))
             s = mark_safe("")
             self.assertEqual(s, ugettext(s))
 
