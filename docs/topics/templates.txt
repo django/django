@@ -11,7 +11,7 @@ The Django template language
 Django's template language is designed to strike a balance between power and
 ease. It's designed to feel comfortable to those used to working with HTML. If
 you have any exposure to other text-based template languages, such as Smarty_
-or CheetahTemplate_, you should feel right at home with Django's templates.
+or Jinja2_, you should feel right at home with Django's templates.
 
 .. admonition:: Philosophy
 
@@ -31,7 +31,7 @@ or CheetahTemplate_, you should feel right at home with Django's templates.
 
 .. _`The Django template language: For Python programmers`: ../templates_python/
 .. _Smarty: http://www.smarty.net/
-.. _CheetahTemplate: http://www.cheetahtemplate.org/
+.. _Jinja2: http://jinja.pocoo.org/
 
 Templates
 =========
