@@ -5,7 +5,8 @@ import re
 from django.conf import settings
 from django.core.mail import mail_managers
 from django.core import urlresolvers
-from django import http
+from django.http import (HttpResponsePermanentRedirect, HttpResponseForbidden,
+                         HttpResponseNotModified)
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils import six
@@ -34,6 +35,7 @@ class CommonMiddleware(object):
           the entire page content and Not Modified responses will be returned
           appropriately.
     """
+    response_redirect_class = HttpResponsePermanentRedirect
 
     def process_request(self, request):
         """
@@ -51,7 +53,7 @@ class CommonMiddleware(object):
                             'request': request
                         }
                     )
-                    return http.HttpResponseForbidden('<h1>Forbidden</h1>')
+                    return HttpResponseForbidden('<h1>Forbidden</h1>')
 
         # Check for a redirect based on settings.APPEND_SLASH
         # and settings.PREPEND_WWW
@@ -100,7 +102,7 @@ class CommonMiddleware(object):
                     newurl += '?' + request.META['QUERY_STRING'].decode()
                 except UnicodeDecodeError:
                     pass
-        return http.HttpResponsePermanentRedirect(newurl)
+        return self.response_redirect_class(newurl)
 
     def process_response(self, request, response):
         """
@@ -117,7 +119,7 @@ class CommonMiddleware(object):
                 if (200 <= response.status_code < 300
                         and request.META.get('HTTP_IF_NONE_MATCH') == etag):
                     cookies = response.cookies
-                    response = http.HttpResponseNotModified()
+                    response = HttpResponseNotModified()
                     response.cookies = cookies
                 else:
                     response['ETag'] = etag
