@@ -499,6 +499,16 @@ The end of upstream support periods was reached in July 2010 for Oracle 9.2,
 January 2012 for Oracle 10.1, and July 2013 for Oracle 10.2. As a consequence,
 Django 1.8 sets 11.1 as the minimum Oracle version it officially supports.
 
+Specific privileges used instead of roles for tests on Oracle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Earlier versions of Django granted the CONNECT and RESOURCE roles to the test
+user on Oracle. These roles have been deprecated, so Django 1.8 uses the
+specific underlying privileges instead. This changes the privileges required
+of the main user for running tests (unless the project is configured to avoid
+creating a test user). The exact privileges required now are detailed in
+:ref:`Oracle notes <oracle-notes>`.
+
 ``AbstractUser.last_login`` allows null values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
