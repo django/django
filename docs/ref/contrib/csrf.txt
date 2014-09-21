@@ -164,13 +164,13 @@ When using a different template engine than Django's built-in engine, you can
 set the token in your forms manually after making sure it's available in the
 template context.
 
-For example, in the Cheetah template language, your form could contain the
+For example, in the Jinja2 template language, your form could contain the
 following:
 
 .. code-block:: html
 
     <div style="display:none">
-        <input type="hidden" name="csrfmiddlewaretoken" value="$csrf_token"/>
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     </div>
 
 You can use JavaScript similar to the :ref:`AJAX code <csrf-ajax>` above to get

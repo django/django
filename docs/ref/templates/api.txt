@@ -953,7 +953,7 @@ Using an alternative template language
 The Django ``Template`` and ``Loader`` classes implement a simple API for
 loading and rendering templates. By providing some simple wrapper classes that
 implement this API we can use third party template systems like `Jinja2
-<http://jinja.pocoo.org/docs/>`_ or `Cheetah <http://www.cheetahtemplate.org/>`_. This
+<http://jinja.pocoo.org/docs/>`_. This
 allows us to use third-party template libraries without giving up useful Django
 features like the Django ``Context`` object and handy shortcuts like
 :func:`~django.shortcuts.render_to_response()`.
