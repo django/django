@@ -54,3 +54,5 @@ Bugfixes
 
 * Formats for Welsh (``cy``) and several Chinese locales (``zh_CN``,
   ``zh_Hans``, ``zh_Hant`` and ``zh_TW``) have been added.
+
+* Fixed renaming of model with self-referential m2m field (:ticket:`23503`).
