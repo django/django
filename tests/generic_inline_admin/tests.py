@@ -221,6 +221,63 @@ class GenericInlineAdminParametersTest(TestCase):
         self.assertEqual(formset.total_form_count(), 5)
         self.assertEqual(formset.initial_form_count(), 1)
 
+    def test_get_extra(self):
+
+        class GetExtraInline(GenericTabularInline):
+            model = Media
+            extra = 4
+
+            def get_extra(self, request, obj):
+                return 2
+
+        modeladmin = admin.ModelAdmin(Episode, admin_site)
+        modeladmin.inlines = [GetExtraInline]
+        e = self._create_object(Episode)
+        request = self.factory.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
+        request.user = User(username='super', is_superuser=True)
+        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        formset = response.context_data['inline_admin_formsets'][0].formset
+
+        self.assertEqual(formset.extra, 2)
+
+    def test_get_min_num(self):
+
+        class GetMinNumInline(GenericTabularInline):
+            model = Media
+            min_num = 5
+
+            def get_min_num(self, request, obj):
+                return 2
+
+        modeladmin = admin.ModelAdmin(Episode, admin_site)
+        modeladmin.inlines = [GetMinNumInline]
+        e = self._create_object(Episode)
+        request = self.factory.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
+        request.user = User(username='super', is_superuser=True)
+        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        formset = response.context_data['inline_admin_formsets'][0].formset
+
+        self.assertEqual(formset.min_num, 2)
+
+    def test_get_max_num(self):
+
+        class GetMaxNumInline(GenericTabularInline):
+            model = Media
+            extra = 5
+
+            def get_max_num(self, request, obj):
+                return 2
+
+        modeladmin = admin.ModelAdmin(Episode, admin_site)
+        modeladmin.inlines = [GetMaxNumInline]
+        e = self._create_object(Episode)
+        request = self.factory.get('/generic_inline_admin/admin/generic_inline_admin/episode/%s/' % e.pk)
+        request.user = User(username='super', is_superuser=True)
+        response = modeladmin.changeform_view(request, object_id=str(e.pk))
+        formset = response.context_data['inline_admin_formsets'][0].formset
+
+        self.assertEqual(formset.max_num, 2)
+
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',))
 class GenericInlineAdminWithUniqueTogetherTest(TestCase):
