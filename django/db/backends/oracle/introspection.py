@@ -51,11 +51,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         Returns a list of table and view names in the current database.
         """
-        cursor.execute("SELECT TABLE_NAME FROM USER_TABLES")
-        table_list = [TableInfo(row[0].lower(), 't') for row in cursor.fetchall()]
-        cursor.execute("SELECT VIEW_NAME FROM USER_VIEWS")
-        table_list.extend([TableInfo(row[0].lower(), 'v') for row in cursor.fetchall()])
-        return table_list
+        cursor.execute("SELECT TABLE_NAME, 't' FROM USER_TABLES UNION ALL "
+                       "SELECT VIEW_NAME, 'v' FROM USER_VIEWS")
+        return [TableInfo(row[0].lower(), row[1]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
