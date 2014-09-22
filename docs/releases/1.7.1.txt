@@ -53,4 +53,5 @@ Bugfixes
 * Restored the ability to deepcopy ``F`` objects (:ticket:`23492`).
 
 * Formats for Welsh (``cy``) and several Chinese locales (``zh_CN``,
-  ``zh_Hans``, ``zh_Hant`` and ``zh_TW``) have been added.
+  ``zh_Hans``, ``zh_Hant`` and ``zh_TW``) have been added. Formats for
+  Macedonian have been fixed (trailing dot removed, :ticket:`23532`).
