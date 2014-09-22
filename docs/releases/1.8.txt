@@ -72,6 +72,10 @@ Minor features
   <django.contrib.admin.AdminSite.site_url>` in order to display a link to the
   front-end site.
 
+* You can now specify :attr:`ModelAdmin.show_full_result_count
+  <django.contrib.admin.ModelAdmin.show_full_result_count>` to control whether
+  or not the full count of objects should be displayed on a filtered admin page.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

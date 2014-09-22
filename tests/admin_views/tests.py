@@ -2474,9 +2474,26 @@ class AdminSearchTest(TestCase):
         """
         Test presence of reset link in search bar ("1 result (_x total_)").
         """
-        response = self.client.get('/test_admin/admin/admin_views/person/?q=Gui')
+        #   1 query for session + 1 for fetching user
+        # + 1 for filtered result + 1 for filtered count
+        # + 1 for total count
+        with self.assertNumQueries(5):
+            response = self.client.get('/test_admin/admin/admin_views/person/?q=Gui')
         self.assertContains(response,
             """<span class="small quiet">1 result (<a href="?">3 total</a>)</span>""",
+            html=True)
+
+    def test_no_total_count(self):
+        """
+        #8408 -- "Show all" should be displayed instead of the total count if
+        ModelAdmin.show_full_result_count is False.
+        """
+        #   1 query for session + 1 for fetching user
+        # + 1 for filtered result + 1 for filtered count
+        with self.assertNumQueries(4):
+            response = self.client.get('/test_admin/admin/admin_views/recommendation/?q=bar')
+        self.assertContains(response,
+            """<span class="small quiet">1 result (<a href="?">Show all</a>)</span>""",
             html=True)
 
 

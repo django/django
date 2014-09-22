@@ -110,6 +110,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     readonly_fields = ()
     ordering = None
     view_on_site = True
+    show_full_result_count = True
 
     # Validation of ModelAdmin definitions
     # Old, deprecated style:
