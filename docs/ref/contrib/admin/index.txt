@@ -1160,6 +1160,19 @@ subclass::
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
     search behavior.
 
+.. attribute:: ModelAdmin.show_full_result_count
+
+    .. versionadded:: 1.8
+
+    Set ``show_full_result_count`` to control whether the full count of objects
+    should be displayed on a filtered admin page (e.g. ``99 results (103 total)``).
+    If this option is set to ``False``, a text like ``99 results (Show all)``
+    is displayed instead.
+
+    The default of ``show_full_result_count=True`` generates a query to perform
+    a full count on the table which can be expensive if the table contains a
+    large number of rows.
+
 .. attribute:: ModelAdmin.view_on_site
 
     .. versionadded:: 1.7

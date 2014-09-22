@@ -327,6 +327,7 @@ class LanguageAdmin(admin.ModelAdmin):
 
 
 class RecommendationAdmin(admin.ModelAdmin):
+    show_full_result_count = False
     search_fields = ('=titletranslation__text', '=recommender__titletranslation__text',)
 
 
