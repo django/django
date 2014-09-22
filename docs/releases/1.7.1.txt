@@ -61,3 +61,9 @@ Bugfixes
 
 * Fixed renaming of models with a self-referential many-to-many field
   (``ManyToManyField('self')``) (:ticket:`23503`).
+
+* Added the :meth:`~django.contrib.admin.InlineModelAdmin.get_extra()`,
+  :meth:`~django.contrib.admin.InlineModelAdmin.get_max_num()`, and
+  :meth:`~django.contrib.admin.InlineModelAdmin.get_min_num()` hooks to
+  :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`
+  (:ticket:`23539`).
