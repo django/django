@@ -182,7 +182,7 @@ class MigrationAutodetector(object):
         self.generate_added_fields()
         self.generate_altered_fields()
         self.generate_altered_unique_together()
-        self.generate_altered_index_together()
+        self.generate_altered_indexes()
         self.generate_altered_order_with_respect_to()
 
         # Now, reordering to make things possible. The order we have already
@@ -900,7 +900,29 @@ class MigrationAutodetector(object):
         self._generate_altered_foo_together(operations.AlterUniqueTogether)
 
     def generate_altered_index_together(self):
+        warnings.warn(
+            'generate_altered_index_together is deprecated. '
+            'Use generate_alter_indexes instead.',
+            RemovedInDjango20Warning, stacklevel=2)
         self._generate_altered_foo_together(operations.AlterIndexTogether)
+
+    def generate_altered_indexes(self):
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+
+            old_value = set(old_model_state.options.get('indexes') or [])
+            new_value = set(new_model_state.options.get('indexes') or [])
+
+            if old_value != new_value:
+                self.add_operation(
+                    app_label,
+                    operations.AlterIndexes(
+                        name=model_name,
+                        indexes=new_value,
+                    )
+                )
 
     def generate_altered_options(self):
         """

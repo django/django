@@ -1,10 +1,13 @@
 import hashlib
 import operator
+import warnings
 
 from django.db.backends.creation import BaseDatabaseCreation
 from django.db.backends.utils import truncate_name
 from django.db.models.fields.related import ManyToManyField
+from django.db.models.indexes import Index
 from django.db.transaction import atomic
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
 from django.utils.log import getLogger
 from django.utils.six.moves import reduce
@@ -225,7 +228,8 @@ class BaseDatabaseSchemaEditor(object):
             params.extend(extra_params)
             # Indexes
             if field.db_index and not field.unique:
-                self.deferred_sql.append(self._create_index_sql(model, [field], suffix=""))
+                field.db_index.fields = [field]
+                self.deferred_sql.append(field.db_index.as_sql(self, suffix=''))
             # FK
             if field.rel and field.db_constraint:
                 to_table = field.rel.to._meta.db_table
@@ -269,10 +273,9 @@ class BaseDatabaseSchemaEditor(object):
             "definition": ", ".join(column_sqls)
         }
         self.execute(sql, params)
-        # Add any index_togethers
-        for field_names in model._meta.index_together:
-            fields = [model._meta.get_field_by_name(field)[0] for field in field_names]
-            self.execute(self._create_index_sql(model, fields, suffix="_idx"))
+        # Add any indexes
+        for index in model._meta.indexes:
+            self.execute(index.as_sql(self, suffix='_idx'))
         # Make M2M tables
         for field in model._meta.local_many_to_many:
             if field.rel.through._meta.auto_created:
@@ -331,28 +334,29 @@ class BaseDatabaseSchemaEditor(object):
         Note: The input index_togethers must be doubly-nested, not the single-
         nested ["foo", "bar"] format.
         """
+        warnings.warn('alter_index_together is deprecated. Use alter_indexes instead.',
+                RemovedInDjango20Warning, stacklevel=2)
         olds = set(tuple(fields) for fields in old_index_together)
         news = set(tuple(fields) for fields in new_index_together)
         # Deleted indexes
         for fields in olds.difference(news):
-            columns = [model._meta.get_field_by_name(field)[0].column for field in fields]
-            constraint_names = self._constraint_names(model, list(columns), index=True)
-            if len(constraint_names) != 1:
-                raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
-                    len(constraint_names),
-                    model._meta.db_table,
-                    ", ".join(columns),
-                ))
-            self.execute(
-                self.sql_delete_index % {
-                    "table": self.quote_name(model._meta.db_table),
-                    "name": constraint_names[0],
-                },
-            )
+            index = Index(field_names=fields, model=model)
+            self.execute(index.as_delete_sql(self, suffix='_idx'))
         # Created indexes
-        for field_names in news.difference(olds):
-            fields = [model._meta.get_field_by_name(field)[0] for field in field_names]
-            self.execute(self._create_index_sql(model, fields, suffix="_idx"))
+        for fields in news.difference(olds):
+            index = Index(field_names=fields, model=model)
+            self.execute(index.as_sql(self, suffix='_idx'))
+
+    def alter_indexes(self, model, old_indexes, new_indexes):
+        """
+        Deals with a model changing its indexes. This also handles index_together.
+        """
+        olds = set(old_indexes)
+        news = set(new_indexes)
+        for index in olds.difference(news):
+            self.execute(index.as_remove_sql(self, suffix='_idx'))
+        for index in news.difference(olds):
+            self.execute(index.as_sql(self, suffix='_idx'))
 
     def alter_db_table(self, model, old_db_table, new_db_table):
         """
@@ -412,7 +416,7 @@ class BaseDatabaseSchemaEditor(object):
             self.execute(sql)
         # Add an index, if required
         if field.db_index and not field.unique:
-            self.deferred_sql.append(self._create_index_sql(model, [field]))
+            self.deferred_sql.append(field.db_index.as_sql(self, suffix=''))
         # Add any FK constraints later
         if field.rel and self.connection.features.supports_foreign_keys and field.db_constraint:
             to_table = field.rel.to._meta.db_table
@@ -682,7 +686,7 @@ class BaseDatabaseSchemaEditor(object):
         if (not old_field.db_index and new_field.db_index and
                 not new_field.unique and not
                 (not old_field.unique and new_field.unique)):
-            self.execute(self._create_index_sql(model, [new_field], suffix="_uniq"))
+            self.execute(new_field.db_index.as_sql(self, suffix=''))
         # Type alteration on primary key? Then we need to alter the column
         # referring to us.
         rels_to_update = []

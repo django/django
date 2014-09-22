@@ -1652,6 +1652,8 @@ class ForeignKey(ForeignObject):
             # be correct until contribute_to_class is called. Refs #12190.
             to_field = to_field or (to._meta.pk and to._meta.pk.name)
 
+        # Set db_index to True if the field has a relationship and doesn't
+        # explicitly set db_index.
         if 'db_index' not in kwargs:
             kwargs['db_index'] = True
 

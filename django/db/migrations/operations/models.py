@@ -283,10 +283,10 @@ class AlterIndexTogether(Operation):
         old_model = old_apps.get_model(app_label, self.name)
         new_model = new_apps.get_model(app_label, self.name)
         if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
-            schema_editor.alter_index_together(
+            schema_editor.alter_indexes(
                 new_model,
-                getattr(old_model._meta, self.option_name, set()),
-                getattr(new_model._meta, self.option_name, set()),
+                getattr(old_model._meta, 'indexes', set()),
+                getattr(new_model._meta, 'indexes', set()),
             )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -297,6 +297,41 @@ class AlterIndexTogether(Operation):
 
     def describe(self):
         return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.index_together or ''))
+
+
+class AlterIndexes(Operation):
+    """
+    Changes the value of indexes to the target one.
+    """
+
+    def __init__(self, name, indexes):
+        self.name = name
+        self.indexes = indexes
+
+    def state_forwards(self, app_label, state):
+        model_state = state.models[app_label, self.name.lower()]
+        model_state.options.indexes = self.indexes
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        old_apps = from_state.render()
+        new_apps = to_state.render()
+        old_model = old_apps.get_model(app_label, self.name)
+        new_model = new_apps.get_model(app_label, self.name)
+        if self.allowed_to_migrate(schema_editor.connection.alias, new_model):
+            schema_editor.alter_indexes(
+                new_model,
+                getattr(old_model._meta, 'indexes', set()),
+                getattr(new_model._meta, 'indexes', set()),
+            )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        return self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def references_model(self, name, app_label=None):
+        return name.lower() == self.name.lower()
+
+    def describe(self):
+        return "Alter indexes for %s (%s constraint(s))" % (self.name, len(self.indexes))
 
 
 class AlterOrderWithRespectTo(Operation):
