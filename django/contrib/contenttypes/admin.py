@@ -115,12 +115,12 @@ class GenericInlineModelAdmin(InlineModelAdmin):
             "form": self.form,
             "formfield_callback": partial(self.formfield_for_dbfield, request=request),
             "formset": self.formset,
-            "extra": self.extra,
+            "extra": self.get_extra(request, obj),
             "can_delete": can_delete,
             "can_order": False,
             "fields": fields,
-            "min_num": self.min_num,
-            "max_num": self.max_num,
+            "min_num": self.get_min_num(request, obj),
+            "max_num": self.get_max_num(request, obj),
             "exclude": exclude
         }
         defaults.update(kwargs)
