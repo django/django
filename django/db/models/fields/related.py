@@ -1743,7 +1743,7 @@ class ForeignKey(ForeignObject):
             warnings.append(
                 checks.Warning(
                     'Setting unique=True on a ForeignKey has the same effect as using a OneToOneField.',
-                    hint='Change the field type from ForeignKey to OneToOneField, and remove unique=True.',
+                    hint='Change the field type from ForeignKey to OneToOneField and remove unique=True.',
                     obj=self,
                     id='fields.W342',
                 )

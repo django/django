@@ -8,6 +8,7 @@ import warnings
 from django import test
 from django import forms
 from django.core import validators
+from django.core import checks
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction, models, IntegrityError
 from django.db.models.fields import (
@@ -180,6 +181,21 @@ class ForeignKeyTests(test.TestCase):
         fk_model_empty = FkToChar.objects.create(out=char_model_empty)
         fk_model_empty = FkToChar.objects.select_related('out').get(id=fk_model_empty.pk)
         self.assertEqual(fk_model_empty.out, char_model_empty)
+
+    def test_warning_when_unique_true_on_fk(self):
+        class FKUniqueTrue(models.Model):
+            fk_field = models.ForeignKey(Foo, unique=True)
+
+        expected_warnings = [
+            checks.Warning(
+                'Setting unique=True on a ForeignKey has the same effect as using a OneToOneField.',
+                hint='Change the field type from ForeignKey to OneToOneField and remove unique=True.',
+                obj=FKUniqueTrue.fk_field.field,
+                id='fields.W342',
+            )
+        ]
+        warnings = FKUniqueTrue.check()
+        self.assertEqual(warnings, expected_warnings)
 
 
 class DateTimeFieldTests(unittest.TestCase):
