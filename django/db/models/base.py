@@ -468,9 +468,9 @@ class Model(six.with_metaclass(ModelBase)):
 
     @classmethod
     def from_db(cls, db, field_names, values):
-        if cls._deferred:
+        try:
             new = cls(**dict(zip(field_names, values)))
-        else:
+        except TypeError:
             new = cls(*values)
         new._state.adding = False
         new._state.db = db
