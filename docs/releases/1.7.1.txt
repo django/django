@@ -67,3 +67,6 @@ Bugfixes
   :meth:`~django.contrib.admin.InlineModelAdmin.get_min_num()` hooks to
   :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`
   (:ticket:`23539`).
+
+* Made ``migrations.RunSQL`` no longer require percent sign escaping. This is
+  now consistent with ``cursor.execute()`` (:ticket:`23426`).

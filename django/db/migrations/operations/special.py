@@ -66,14 +66,14 @@ class RunSQL(Operation):
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         statements = schema_editor.connection.ops.prepare_sql_script(self.sql)
         for statement in statements:
-            schema_editor.execute(statement)
+            schema_editor.execute(statement, params=None)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_sql is None:
             raise NotImplementedError("You cannot reverse this operation")
         statements = schema_editor.connection.ops.prepare_sql_script(self.reverse_sql)
         for statement in statements:
-            schema_editor.execute(statement)
+            schema_editor.execute(statement, params=None)
 
     def describe(self):
         return "Raw SQL operation"
