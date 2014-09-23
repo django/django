@@ -192,6 +192,11 @@ operation here so that the autodetector still has an up-to-date state of the
 model (otherwise, when you next run ``makemigrations``, it won't see any
 operation that adds that field and so will try to run it again).
 
+.. versionchanged:: 1.7.1
+
+    If you want to include literal percent signs in the query you don't need to
+    double them anymore.
+
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
 RunPython
