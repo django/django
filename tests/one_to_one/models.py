@@ -96,3 +96,24 @@ class Pointer2(models.Model):
 
 class HiddenPointer(models.Model):
     target = models.OneToOneField(Target, related_name='hidden+')
+
+
+# Test related objects visibility.
+class SchoolManager(models.Manager):
+    def get_queryset(self):
+        return super(SchoolManager, self).get_queryset().filter(is_public=True)
+
+
+class School(models.Model):
+    is_public = models.BooleanField(default=False)
+    objects = SchoolManager()
+
+
+class DirectorManager(models.Manager):
+    def get_queryset(self):
+        return super(DirectorManager, self).get_queryset().filter(is_temp=False)
+
+class Director(models.Model):
+    is_temp = models.BooleanField(default=False)
+    school = models.OneToOneField(School)
+    objects = DirectorManager()

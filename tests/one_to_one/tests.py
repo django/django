@@ -4,7 +4,7 @@ from django.db import transaction, IntegrityError, connection
 from django.test import TestCase
 
 from .models import (Bar, Favorites, HiddenPointer, ManualPrimaryKey, MultiModel,
-    Place, RelatedModel, Restaurant, Target, UndergroundBar, Waiter)
+    Place, RelatedModel, Restaurant, School, Director, Target, UndergroundBar, Waiter)
 
 
 class OneToOneTests(TestCase):
@@ -382,3 +382,59 @@ class OneToOneTests(TestCase):
         self.assertFalse(
             hasattr(Target, HiddenPointer._meta.get_field('target').related.get_accessor_name())
         )
+
+    def test_related_object(self):
+        public_school = School.objects.create(is_public=True)
+        public_director = Director.objects.create(school=public_school, is_temp=False)
+
+        private_school = School.objects.create(is_public=False)
+        private_director = Director.objects.create(school=private_school, is_temp=True)
+
+        # Only one school is available via all() due to the custom default manager.
+        self.assertQuerysetEqual(
+            School.objects.all(),
+            ["<School: School object>"]
+        )
+
+        # Only one director is available via all() due to the custom default manager.
+        self.assertQuerysetEqual(
+            Director.objects.all(),
+            ["<Director: Director object>"]
+        )
+
+        self.assertEqual(public_director.school, public_school)
+        self.assertEqual(public_school.director, public_director)
+
+        # Make sure the base manager is used so that the related objects
+        # is still accessible even if the default manager doesn't normally
+        # allow it.
+        self.assertEqual(private_director.school, private_school)
+
+        # Make sure the base manager is used so that an student can still access
+        # its related school even if the default manager doesn't normally
+        # allow it.
+        self.assertEqual(private_school.director, private_director)
+
+        # If the manager is marked "use_for_related_fields", it'll get used instead
+        # of the "bare" queryset. Usually you'd define this as a property on the class,
+        # but this approximates that in a way that's easier in tests.
+        School.objects.use_for_related_fields = True
+        try:
+            private_director = Director._base_manager.get(pk=private_director.pk)
+            self.assertRaises(School.DoesNotExist, lambda: private_director.school)
+        finally:
+            School.objects.use_for_related_fields = False
+
+        Director.objects.use_for_related_fields = True
+        try:
+            private_school = School._base_manager.get(pk=private_school.pk)
+            self.assertRaises(Director.DoesNotExist, lambda: private_school.director)
+        finally:
+            Director.objects.use_for_related_fields = False
+
+    def test_hasattr_related_object(self):
+        # The exception raised on attribute access when a related object
+        # doesn't exist should be an instance of a subclass of `AttributeError`
+        # refs #21563
+        self.assertFalse(hasattr(Director(), 'director'))
+        self.assertFalse(hasattr(School(), 'school'))
