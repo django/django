@@ -370,14 +370,16 @@ class SingleRelatedObjectDescriptor(object):
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
-        # Gotcha: we return a `Manager` instance (i.e. not a `QuerySet`)!
-        return self.related.model._base_manager.db_manager(hints=hints)
+        manager = self.related.model._default_manager
+        # If the related manager indicates that it should be used for
+        # related fields, respect that.
+        if not getattr(manager, 'use_for_related_fields', False):
+            manager = self.related.model._base_manager
+        return manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
         if queryset is None:
-            # Despite its name `get_queryset()` returns an instance of
-            # `Manager`, therefore we call `all()` to normalize to `QuerySet`.
-            queryset = self.get_queryset().all()
+            queryset = self.get_queryset()
         queryset._add_hints(instance=instances[0])
 
         rel_obj_attr = attrgetter(self.related.field.attname)
@@ -499,20 +501,16 @@ class ReverseSingleRelatedObjectDescriptor(object):
         return hasattr(instance, self.cache_name)
 
     def get_queryset(self, **hints):
-        rel_mgr = self.field.rel.to._default_manager.db_manager(hints=hints)
+        manager = self.field.rel.to._default_manager
         # If the related manager indicates that it should be used for
         # related fields, respect that.
-        if getattr(rel_mgr, 'use_for_related_fields', False):
-            # Gotcha: we return a `Manager` instance (i.e. not a `QuerySet`)!
-            return rel_mgr
-        else:
-            return QuerySet(self.field.rel.to, hints=hints)
+        if not getattr(manager, 'use_for_related_fields', False):
+            manager = self.field.rel.to._base_manager
+        return manager.db_manager(hints=hints).all()
 
     def get_prefetch_queryset(self, instances, queryset=None):
         if queryset is None:
-            # Despite its name `get_queryset()` may return an instance of
-            # `Manager`, therefore we call `all()` to normalize to `QuerySet`.
-            queryset = self.get_queryset().all()
+            queryset = self.get_queryset()
         queryset._add_hints(instance=instances[0])
 
         rel_obj_attr = self.field.get_foreign_related_value
