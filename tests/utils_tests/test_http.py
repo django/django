@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from datetime import datetime
 import sys
 import unittest
@@ -125,6 +127,28 @@ class TestUtilsHttp(unittest.TestCase):
         decoded = http.urlsafe_base64_decode(encoded)
         self.assertEqual(bytestring, decoded)
 
+    def test_urlquote(self):
+        self.assertEqual(http.urlquote('Paris & Orl\xe9ans'),
+            'Paris%20%26%20Orl%C3%A9ans')
+        self.assertEqual(http.urlquote('Paris & Orl\xe9ans', safe="&"),
+            'Paris%20&%20Orl%C3%A9ans')
+        self.assertEqual(
+            http.urlunquote('Paris%20%26%20Orl%C3%A9ans'),
+            'Paris & Orl\xe9ans')
+        self.assertEqual(
+            http.urlunquote('Paris%20&%20Orl%C3%A9ans'),
+            'Paris & Orl\xe9ans')
+        self.assertEqual(http.urlquote_plus('Paris & Orl\xe9ans'),
+            'Paris+%26+Orl%C3%A9ans')
+        self.assertEqual(http.urlquote_plus('Paris & Orl\xe9ans', safe="&"),
+            'Paris+&+Orl%C3%A9ans')
+        self.assertEqual(
+            http.urlunquote_plus('Paris+%26+Orl%C3%A9ans'),
+            'Paris & Orl\xe9ans')
+        self.assertEqual(
+            http.urlunquote_plus('Paris+&+Orl%C3%A9ans'),
+            'Paris & Orl\xe9ans')
+
 
 class ETagProcessingTests(unittest.TestCase):
     def test_parsing(self):
@@ -137,6 +161,14 @@ class ETagProcessingTests(unittest.TestCase):
 
 
 class HttpDateProcessingTests(unittest.TestCase):
+    def test_http_date(self):
+        t = 1167616461.0
+        self.assertEqual(http.http_date(t), 'Mon, 01 Jan 2007 01:54:21 GMT')
+
+    def test_cookie_date(self):
+        t = 1167616461.0
+        self.assertEqual(http.cookie_date(t), 'Mon, 01-Jan-2007 01:54:21 GMT')
+
     def test_parsing_rfc1123(self):
         parsed = http.parse_http_date('Sun, 06 Nov 1994 08:49:37 GMT')
         self.assertEqual(datetime.utcfromtimestamp(parsed),
