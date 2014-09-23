@@ -73,3 +73,6 @@ Bugfixes
 
 * Fixed bug in migrations that prevented foreign key constraints to unmanaged
   models with a custom primary key (:ticket:`23415`).
+
+* Added ``SchemaEditor`` for MySQL GIS backend so that spatial indexes will be
+  created for apps with migrations (:ticket:`23538`).
