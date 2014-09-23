@@ -124,6 +124,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 indexes[row[4]]['unique'] = True
         return indexes
 
+    def get_storage_engine(self, cursor, table_name):
+        """
+        Retrieves the storage engine for a given table.
+        """
+        cursor.execute(
+            "SELECT engine "
+            "FROM information_schema.tables "
+            "WHERE table_name = %s", [table_name])
+        return cursor.fetchone()[0]
+
     def get_constraints(self, cursor, table_name):
         """
         Retrieves any constraints or keys (unique, pk, fk, check, index) across one or more columns.

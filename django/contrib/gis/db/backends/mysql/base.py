@@ -2,6 +2,7 @@ from django.db.backends.mysql.base import DatabaseWrapper as MySQLDatabaseWrappe
 from django.contrib.gis.db.backends.mysql.creation import MySQLCreation
 from django.contrib.gis.db.backends.mysql.introspection import MySQLIntrospection
 from django.contrib.gis.db.backends.mysql.operations import MySQLOperations
+from django.contrib.gis.db.backends.mysql.schema import MySQLGISSchemaEditor
 
 
 class DatabaseWrapper(MySQLDatabaseWrapper):
@@ -10,3 +11,7 @@ class DatabaseWrapper(MySQLDatabaseWrapper):
         self.creation = MySQLCreation(self)
         self.ops = MySQLOperations(self)
         self.introspection = MySQLIntrospection(self)
+
+    def schema_editor(self, *args, **kwargs):
+        "Returns a new instance of this backend's SchemaEditor"
+        return MySQLGISSchemaEditor(self, *args, **kwargs)
