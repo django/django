@@ -53,3 +53,12 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
             cursor.close()
 
         return field_type, field_params
+
+    def get_indexes(self, cursor, table_name):
+        indexes = super(SpatiaLiteIntrospection, self).get_indexes(cursor, table_name)
+        cursor.execute('SELECT f_geometry_column '
+                       'FROM geometry_columns '
+                       'WHERE f_table_name=%s AND spatial_index_enabled=1', (table_name,))
+        for row in cursor.fetchall():
+            indexes[row[0]] = {'primary_key': False, 'unique': False}
+        return indexes

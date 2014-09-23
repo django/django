@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.contrib.gis.tests.utils import mysql
 from django.db import connection, migrations, models
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
@@ -45,7 +46,7 @@ class OperationTests(TransactionTestCase):
             [
                 ("id", models.AutoField(primary_key=True)),
                 ('name', models.CharField(max_length=100, unique=True)),
-                ('geom', fields.MultiPolygonField(srid=4326, null=True)),
+                ('geom', fields.MultiPolygonField(srid=4326)),
             ],
         )]
         return self.apply_operations('gis', ProjectState(), operations)
@@ -58,7 +59,7 @@ class OperationTests(TransactionTestCase):
         operation = migrations.AddField(
             "Neighborhood",
             "path",
-            fields.LineStringField(srid=4326, null=True, blank=True),
+            fields.LineStringField(srid=4326),
         )
         new_state = project_state.clone()
         operation.state_forwards("gis", new_state)
@@ -73,6 +74,11 @@ class OperationTests(TransactionTestCase):
                 GeometryColumns.objects.filter(**{GeometryColumns.table_name_col(): "gis_neighborhood"}).count(),
                 2
             )
+
+        if self.has_spatial_indexes:
+            with connection.cursor() as cursor:
+                indexes = connection.introspection.get_indexes(cursor, "gis_neighborhood")
+            self.assertIn('path', indexes)
 
     def test_remove_gis_field(self):
         """
@@ -93,3 +99,20 @@ class OperationTests(TransactionTestCase):
                 GeometryColumns.objects.filter(**{GeometryColumns.table_name_col(): "gis_neighborhood"}).count(),
                 0
             )
+
+    def test_create_model_spatial_index(self):
+        self.current_state = self.set_up_test_model()
+
+        if not self.has_spatial_indexes:
+            self.skipTest("No support for Spatial indexes")
+
+        with connection.cursor() as cursor:
+            indexes = connection.introspection.get_indexes(cursor, "gis_neighborhood")
+        self.assertIn('geom', indexes)
+
+    @property
+    def has_spatial_indexes(self):
+        if mysql:
+            with connection.cursor() as cursor:
+                return connection.introspection.supports_spatial_index(cursor, "gis_neighborhood")
+        return True
