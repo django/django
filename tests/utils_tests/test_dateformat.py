@@ -8,15 +8,6 @@ from django.utils.dateformat import format
 from django.utils import dateformat
 from django.utils.timezone import utc, get_fixed_timezone, get_default_timezone, make_aware
 from django.utils import translation
-from django.utils.formats import ISO_INPUT_FORMATS
-
-
-class DateTimeISO8601Format(TestCase):
-    def test_format_from_string(self):
-        expected_date = datetime.now()
-        test_date_8601 = expected_date.isoformat()
-        result_date = datetime.strptime(test_date_8601, ISO_INPUT_FORMATS['DATETIME_INPUT_FORMATS'][4])
-        self.assertEqual(expected_date, result_date)
 
 
 @override_settings(TIME_ZONE='Europe/Copenhagen')

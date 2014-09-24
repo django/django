@@ -29,7 +29,7 @@ ISO_INPUT_FORMATS = {
         '%Y-%m-%d',
         '%Y-%m-%dT%H:%M:%S.%f',
         '%Y-%m-%dT%H:%M:%S',
-        '%Y-%m-%dT%H:%M'
+        '%Y-%m-%dT%H:%M',
     ),
 }
 

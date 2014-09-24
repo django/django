@@ -568,6 +568,9 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(datetime.datetime(2006, 10, 25, 14, 30), f.clean('10/25/06 14:30:00'))
         self.assertEqual(datetime.datetime(2006, 10, 25, 14, 30), f.clean('10/25/06 14:30'))
         self.assertEqual(datetime.datetime(2006, 10, 25, 0, 0), f.clean('10/25/06'))
+        self.assertEqual(datetime.datetime(2014, 9, 23, 22, 34, 41, 614804), f.clean('2014-09-23T22:34:41.614804'))
+        self.assertEqual(datetime.datetime(2014, 9, 23, 22, 34, 41), f.clean('2014-09-23T22:34:41'))
+        self.assertEqual(datetime.datetime(2014, 9, 23, 22, 34), f.clean('2014-09-23T22:34'))
         self.assertRaisesMessage(ValidationError, "'Enter a valid date/time.'", f.clean, 'hello')
         self.assertRaisesMessage(ValidationError, "'Enter a valid date/time.'", f.clean, '2006-10-25 4:30 p.m.')
 
