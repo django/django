@@ -27,7 +27,7 @@ from django.utils.six import PY3
 from django.utils.translation import (activate, deactivate,
     get_language, get_language_from_request, get_language_info,
     to_locale, trans_real,
-    gettext_lazy,
+    gettext, gettext_lazy,
     ugettext, ugettext_lazy,
     ngettext_lazy,
     ungettext_lazy,
@@ -344,6 +344,16 @@ class TranslationTests(TestCase):
         six.text_type(string_concat(...)) should not raise a TypeError - #4796
         """
         self.assertEqual('django', six.text_type(string_concat("dja", "ngo")))
+
+    def test_empty_value(self):
+        """
+        Empty value must stay empty after being translated (#23196).
+        """
+        with translation.override('de'):
+            self.assertEqual("", ugettext(""))
+            self.assertEqual(str(""), gettext(str("")))
+            s = mark_safe("")
+            self.assertEqual(s, ugettext(s))
 
     def test_safe_status(self):
         """

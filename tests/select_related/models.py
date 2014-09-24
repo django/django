@@ -1,5 +1,5 @@
 """
-41. Tests for select_related()
+Tests for select_related()
 
 ``select_related()`` follows all relationships and pre-caches any foreign key
 values so that complex trees can be fetched in a single query. However, this

@@ -1,5 +1,5 @@
 """
-24. Mutually referential many-to-one relationships
+Mutually referential many-to-one relationships
 
 Strings can be used instead of model literals to set up "lazy" relations.
 """

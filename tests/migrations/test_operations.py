@@ -472,6 +472,22 @@ class OperationTests(OperationTestBase):
             self.assertFKExists("test_rmwsrf_rider", ["friend_id"], ("test_rmwsrf_rider", "id"))
             self.assertFKNotExists("test_rmwsrf_rider", ["friend_id"], ("test_rmwsrf_horserider", "id"))
 
+    def test_rename_model_with_self_referential_m2m(self):
+        app_label = "test_rename_model_with_self_referential_m2m"
+
+        project_state = self.apply_operations(app_label, ProjectState(), operations=[
+            migrations.CreateModel("ReflexivePony", fields=[
+                ("ponies", models.ManyToManyField("self")),
+            ]),
+        ])
+        project_state = self.apply_operations(app_label, project_state, operations=[
+            migrations.RenameModel("ReflexivePony", "ReflexivePony2"),
+        ])
+        apps = project_state.render()
+        Pony = apps.get_model(app_label, "ReflexivePony2")
+        pony = Pony.objects.create()
+        pony.ponies.add(pony)
+
     def test_add_field(self):
         """
         Tests the AddField operation.
@@ -1140,10 +1156,18 @@ class OperationTests(OperationTestBase):
         # Create the operation
         operation = migrations.RunSQL(
             # Use a multi-line string with a comment to test splitting on SQLite and MySQL respectively
-            "CREATE TABLE i_love_ponies (id int, special_thing int);\n"
-            "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 42); -- this is magic!\n"
-            "INSERT INTO i_love_ponies (id, special_thing) VALUES (2, 51);\n",
+            "CREATE TABLE i_love_ponies (id int, special_thing varchar(15));\n"
+            "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 'i love ponies'); -- this is magic!\n"
+            "INSERT INTO i_love_ponies (id, special_thing) VALUES (2, 'i love django');\n"
+            "UPDATE i_love_ponies SET special_thing = 'Ponies' WHERE special_thing LIKE '%%ponies';"
+            "UPDATE i_love_ponies SET special_thing = 'Django' WHERE special_thing LIKE '%django';",
+
+            # Run delete queries to test for parameter substitution failure
+            # reported in #23426
+            "DELETE FROM i_love_ponies WHERE special_thing LIKE '%Django%';"
+            "DELETE FROM i_love_ponies WHERE special_thing LIKE '%%Ponies%%';"
             "DROP TABLE i_love_ponies",
+
             state_operations=[migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])],
         )
         self.assertEqual(operation.describe(), "Raw SQL operation")
@@ -1161,6 +1185,10 @@ class OperationTests(OperationTestBase):
         with connection.cursor() as cursor:
             cursor.execute("SELECT COUNT(*) FROM i_love_ponies")
             self.assertEqual(cursor.fetchall()[0][0], 2)
+            cursor.execute("SELECT COUNT(*) FROM i_love_ponies WHERE special_thing = 'Django'")
+            self.assertEqual(cursor.fetchall()[0][0], 1)
+            cursor.execute("SELECT COUNT(*) FROM i_love_ponies WHERE special_thing = 'Ponies'")
+            self.assertEqual(cursor.fetchall()[0][0], 1)
         # And test reversal
         self.assertTrue(operation.reversible)
         with connection.schema_editor() as editor:

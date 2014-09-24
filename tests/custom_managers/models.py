@@ -1,5 +1,5 @@
 """
-23. Giving models a custom manager
+Giving models a custom manager
 
 You can use a custom ``Manager`` in a particular model by extending the base
 ``Manager`` class and instantiating your custom ``Manager`` in your model.
@@ -11,27 +11,19 @@ returns.
 
 from __future__ import unicode_literals
 
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
-)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
-
-# An example of a custom manager called "objects".
 
 
 class PersonManager(models.Manager):
     def get_fun_people(self):
         return self.filter(fun=True)
 
-# An example of a custom manager that sets get_queryset().
-
 
 class PublishedBookManager(models.Manager):
     def get_queryset(self):
         return super(PublishedBookManager, self).get_queryset().filter(is_published=True)
-
-# An example of a custom queryset that copies its methods onto the manager.
 
 
 class CustomQuerySet(models.QuerySet):
@@ -138,8 +130,6 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
-# An example of providing multiple custom managers.
-
 
 class FastCarManager(models.Manager):
     def get_queryset(self):
@@ -153,6 +143,45 @@ class Car(models.Model):
     top_speed = models.IntegerField(help_text="In miles per hour.")
     cars = models.Manager()
     fast_cars = FastCarManager()
+
+    def __str__(self):
+        return self.name
+
+
+class RestrictedManager(models.Manager):
+    def get_queryset(self):
+        return super(RestrictedManager, self).get_queryset().filter(is_public=True)
+
+
+@python_2_unicode_compatible
+class RelatedModel(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class RestrictedModel(models.Model):
+    name = models.CharField(max_length=50)
+    is_public = models.BooleanField(default=False)
+    related = models.ForeignKey(RelatedModel)
+
+    objects = RestrictedManager()
+    plain_manager = models.Manager()
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class OneToOneRestrictedModel(models.Model):
+    name = models.CharField(max_length=50)
+    is_public = models.BooleanField(default=False)
+    related = models.OneToOneField(RelatedModel)
+
+    objects = RestrictedManager()
+    plain_manager = models.Manager()
 
     def __str__(self):
         return self.name

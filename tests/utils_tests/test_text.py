@@ -7,11 +7,57 @@ import warnings
 from django.test import SimpleTestCase
 from django.utils import six, text
 from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.encoding import force_text
+from django.utils.functional import lazy
+from django.utils.translation import override
+
+lazystr = lazy(force_text, six.text_type)
 
 IS_WIDE_BUILD = (len('\U0001F4A9') == 1)
 
 
 class TestUtilsText(SimpleTestCase):
+
+    def test_get_text_list(self):
+        self.assertEqual(text.get_text_list(['a', 'b', 'c', 'd']), 'a, b, c or d')
+        self.assertEqual(text.get_text_list(['a', 'b', 'c'], 'and'), 'a, b and c')
+        self.assertEqual(text.get_text_list(['a', 'b'], 'and'), 'a and b')
+        self.assertEqual(text.get_text_list(['a']), 'a')
+        self.assertEqual(text.get_text_list([]), '')
+        with override('ar'):
+            self.assertEqual(text.get_text_list(['a', 'b', 'c']), "a، b أو c")
+
+    def test_smart_split(self):
+        testdata = [
+            ('This is "a person" test.',
+                ['This', 'is', '"a person"', 'test.']),
+            ('This is "a person\'s" test.',
+                ['This', 'is', '"a person\'s"', 'test.']),
+            ('This is "a person\\"s" test.',
+                ['This', 'is', '"a person\\"s"', 'test.']),
+            ('"a \'one',
+                ['"a', "'one"]),
+            ('all friends\' tests',
+                ['all', 'friends\'', 'tests']),
+            ('url search_page words="something else"',
+                ['url', 'search_page', 'words="something else"']),
+            ("url search_page words='something else'",
+                ['url', 'search_page', "words='something else'"]),
+            ('url search_page words "something else"',
+                ['url', 'search_page', 'words', '"something else"']),
+            ('url search_page words-"something else"',
+                ['url', 'search_page', 'words-"something else"']),
+            ('url search_page words=hello',
+                ['url', 'search_page', 'words=hello']),
+            ('url search_page words="something else',
+                ['url', 'search_page', 'words="something', 'else']),
+            ("cut:','|cut:' '",
+                ["cut:','|cut:' '"]),
+            (lazystr("a b c d"),  # Test for #20231
+                ['a', 'b', 'c', 'd']),
+        ]
+        for test, expected in testdata:
+            self.assertEqual(list(text.smart_split(test)), expected)
 
     def test_truncate_chars(self):
         truncator = text.Truncator(
