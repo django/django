@@ -601,9 +601,14 @@ of three things ``(path, args, kwargs)``:
 Django will write out the value as an instantiation of your class with the
 given arguments, similar to the way it writes out references to Django fields.
 
+To prevent a new migration from being created each time
+:djadmin:`makemigrations` is run, you should also add a ``__eq__()`` method to
+the decorated class. This function will be called by Django's migration
+framework to detect changes between states.
+
 As long as all of the arguments to your class' constructor are themselves
-serializable, you can just use the ``@deconstructible`` class decorator
-from ``django.utils.deconstruct`` to add the method::
+serializable, you can use the ``@deconstructible`` class decorator from
+``django.utils.deconstruct`` to add the ``deconstruct()`` method::
 
     from django.utils.deconstruct import deconstructible
 
@@ -611,7 +616,12 @@ from ``django.utils.deconstruct`` to add the method::
     class MyCustomClass(object):
 
         def __init__(self, foo=1):
+            self.foo = foo
             ...
+
+        def __eq__(self, other):
+            return self.foo == other.foo
+
 
 The decorator adds logic to capture and preserve the arguments on their
 way into your constructor, and then returns those arguments exactly when
