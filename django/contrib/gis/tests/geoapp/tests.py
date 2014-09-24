@@ -86,9 +86,9 @@ class GeoModelTest(TestCase):
 
         # Testing the `ogr` and `srs` lazy-geometry properties.
         if gdal.HAS_GDAL:
-            self.assertEqual(True, isinstance(ns.poly.ogr, gdal.OGRGeometry))
+            self.assertIsInstance(ns.poly.ogr, gdal.OGRGeometry)
             self.assertEqual(ns.poly.wkb, ns.poly.ogr.wkb)
-            self.assertEqual(True, isinstance(ns.poly.srs, gdal.SpatialReference))
+            self.assertIsInstance(ns.poly.srs, gdal.SpatialReference)
             self.assertEqual('WGS 84', ns.poly.srs.name)
 
         # Changing the interior ring on the poly attribute.
@@ -165,16 +165,16 @@ class GeoModelTest(TestCase):
                                         Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0))))).save()
 
         f_1 = Feature.objects.get(name='Point')
-        self.assertEqual(True, isinstance(f_1.geom, Point))
+        self.assertIsInstance(f_1.geom, Point)
         self.assertEqual((1.0, 1.0), f_1.geom.tuple)
         f_2 = Feature.objects.get(name='LineString')
-        self.assertEqual(True, isinstance(f_2.geom, LineString))
+        self.assertIsInstance(f_2.geom, LineString)
         self.assertEqual(((0.0, 0.0), (1.0, 1.0), (5.0, 5.0)), f_2.geom.tuple)
 
         f_3 = Feature.objects.get(name='Polygon')
-        self.assertEqual(True, isinstance(f_3.geom, Polygon))
+        self.assertIsInstance(f_3.geom, Polygon)
         f_4 = Feature.objects.get(name='GeometryCollection')
-        self.assertEqual(True, isinstance(f_4.geom, GeometryCollection))
+        self.assertIsInstance(f_4.geom, GeometryCollection)
         self.assertEqual(f_3.geom, f_4.geom[2])
 
     @skipUnlessDBFeature("supports_transform")
@@ -232,7 +232,7 @@ class GeoLookupTest(TestCase):
             self.assertEqual(3, qs.count())
             cities = ['Houston', 'Dallas', 'Oklahoma City']
             for c in qs:
-                self.assertEqual(True, c.name in cities)
+                self.assertIn(c.name, cities)
 
         # Pulling out some cities.
         houston = City.objects.get(name='Houston')
@@ -285,14 +285,14 @@ class GeoLookupTest(TestCase):
         qs = City.objects.filter(point__right=co_border)
         self.assertEqual(6, len(qs))
         for c in qs:
-            self.assertEqual(True, c.name in cities)
+            self.assertIn(c.name, cities)
 
         # These cities should be strictly to the right of the KS border.
         cities = ['Chicago', 'Wellington']
         qs = City.objects.filter(point__right=ks_border)
         self.assertEqual(2, len(qs))
         for c in qs:
-            self.assertEqual(True, c.name in cities)
+            self.assertIn(c.name, cities)
 
         # Note: Wellington has an 'X' value of 174, so it will not be considered
         #  to the left of CO.
@@ -303,7 +303,7 @@ class GeoLookupTest(TestCase):
         qs = City.objects.filter(point__left=ks_border)
         self.assertEqual(2, len(qs))
         for c in qs:
-            self.assertEqual(True, c.name in cities)
+            self.assertIn(c.name, cities)
 
     # The left/right lookup tests are known failures on PostGIS 2.0/2.0.1
     # http://trac.osgeo.org/postgis/ticket/2035
@@ -336,8 +336,8 @@ class GeoLookupTest(TestCase):
         # The valid states should be Colorado & Kansas
         self.assertEqual(2, len(validqs))
         state_names = [s.name for s in validqs]
-        self.assertEqual(True, 'Colorado' in state_names)
-        self.assertEqual(True, 'Kansas' in state_names)
+        self.assertIn('Colorado', state_names)
+        self.assertIn('Kansas', state_names)
 
         # Saving another commonwealth w/a NULL geometry.
         nmi = State.objects.create(name='Northern Mariana Islands', poly=None)
@@ -347,7 +347,7 @@ class GeoLookupTest(TestCase):
         nmi.poly = 'POLYGON((0 0,1 0,1 1,1 0,0 0))'
         nmi.save()
         State.objects.filter(name='Northern Mariana Islands').update(poly=None)
-        self.assertEqual(None, State.objects.get(name='Northern Mariana Islands').poly)
+        self.assertIsNone(State.objects.get(name='Northern Mariana Islands').poly)
 
     @skipUnlessDBFeature("supports_relate_lookup")
     def test_relate_lookup(self):
@@ -410,7 +410,7 @@ class GeoQuerySetTest(TestCase):
         else:
             tol = 0.000000001
         for s in qs:
-            self.assertEqual(True, s.poly.centroid.equals_exact(s.centroid, tol))
+            self.assertTrue(s.poly.centroid.equals_exact(s.centroid, tol))
 
     @skipUnlessDBFeature(
         "has_difference_method", "has_intersection_method",
@@ -660,7 +660,7 @@ class GeoQuerySetTest(TestCase):
                 tol = 0.00001
             else:
                 tol = 0.000000001
-            self.assertEqual(True, ref[c.name].equals_exact(c.point_on_surface, tol))
+            self.assertTrue(ref[c.name].equals_exact(c.point_on_surface, tol))
 
     @skipUnlessDBFeature("has_reverse_method")
     def test_reverse_geom(self):
@@ -803,10 +803,10 @@ class GeoQuerySetTest(TestCase):
         u1 = qs.unionagg(field_name='point')
         u2 = qs.order_by('name').unionagg()
         tol = 0.00001
-        self.assertEqual(True, union1.equals_exact(u1, tol) or union2.equals_exact(u1, tol))
-        self.assertEqual(True, union1.equals_exact(u2, tol) or union2.equals_exact(u2, tol))
+        self.assertTrue(union1.equals_exact(u1, tol) or union2.equals_exact(u1, tol))
+        self.assertTrue(union1.equals_exact(u2, tol) or union2.equals_exact(u2, tol))
         qs = City.objects.filter(name='NotACity')
-        self.assertEqual(None, qs.unionagg(field_name='point'))
+        self.assertIsNone(qs.unionagg(field_name='point'))
 
     def test_non_concrete_field(self):
         NonConcreteModel.objects.create(point=Point(0, 0), name='name')
