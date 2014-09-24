@@ -61,3 +61,6 @@ Bugfixes
 
 * Fixed renaming of models with a self-referential many-to-many field
   (``ManyToManyField('self')``) (:ticket:`23503`).
+
+* Fixed inconsistency in ``migrations.RunSQL`` percent sign escaping compared
+  to ``cursor.execute()`` (:ticket:`23426`).
