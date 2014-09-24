@@ -463,9 +463,10 @@ will be visible in the test case. You can then use a standard ``try ... except``
 block or :meth:`~unittest.TestCase.assertRaises` to test for exceptions.
 
 The only exceptions that are not visible to the test client are ``Http404``,
-``PermissionDenied`` and ``SystemExit``. Django catches these exceptions
-internally and converts them into the appropriate HTTP response codes. In these
-cases, you can check ``response.status_code`` in your test.
+``PermissionDenied``, ``SystemExit`` and ``SuspiciousOperation``. Django
+catches these exceptions internally and converts them into the appropriate
+HTTP response codes. In these cases, you can check ``response.status_code``
+in your test.
 
 Persistent state
 ~~~~~~~~~~~~~~~~
