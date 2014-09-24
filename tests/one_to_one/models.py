@@ -113,6 +113,7 @@ class DirectorManager(models.Manager):
     def get_queryset(self):
         return super(DirectorManager, self).get_queryset().filter(is_temp=False)
 
+
 class Director(models.Model):
     is_temp = models.BooleanField(default=False)
     school = models.OneToOneField(School)
