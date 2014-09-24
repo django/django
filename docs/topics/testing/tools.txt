@@ -443,10 +443,12 @@ If you point the test client at a view that raises an exception, that exception
 will be visible in the test case. You can then use a standard ``try ... except``
 block or :meth:`~unittest.TestCase.assertRaises` to test for exceptions.
 
-The only exceptions that are not visible to the test client are ``Http404``,
-``PermissionDenied`` and ``SystemExit``. Django catches these exceptions
-internally and converts them into the appropriate HTTP response codes. In these
-cases, you can check ``response.status_code`` in your test.
+The only exceptions that are not visible to the test client are
+:class:`~django.http.Http404`,
+:class:`~django.core.exceptions.PermissionDenied`, :exc:`SystemExit`, and
+:class:`~django.core.exceptions.SuspiciousOperation`. Django catches these
+exceptions internally and converts them into the appropriate HTTP response
+codes. In these cases, you can check ``response.status_code`` in your test.
 
 Persistent state
 ~~~~~~~~~~~~~~~~
