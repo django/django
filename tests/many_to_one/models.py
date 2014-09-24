@@ -1,5 +1,5 @@
 """
-4. Many-to-one relationships
+Many-to-one relationships
 
 To define a many-to-one relationship, use ``ForeignKey()``.
 """

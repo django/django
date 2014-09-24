@@ -1,5 +1,5 @@
 """
-23. Giving models a custom manager
+Giving models a custom manager
 
 You can use a custom ``Manager`` in a particular model by extending the base
 ``Manager`` class and instantiating your custom ``Manager`` in your model.

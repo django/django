@@ -1,5 +1,5 @@
 """
-17. Custom column/table names
+Custom column/table names
 
 If your database column name is different than your model attribute, use the
 ``db_column`` parameter. Note that you'll use the field's name, not its column
