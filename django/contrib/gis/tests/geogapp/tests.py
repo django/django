@@ -9,7 +9,7 @@ from unittest import skipUnless
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D
-from django.contrib.gis.tests.utils import postgis
+from django.contrib.gis.tests.utils import oracle, postgis
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils._os import upath
 
@@ -96,7 +96,7 @@ class GeographyTest(TestCase):
     def test06_geography_area(self):
         "Testing that Area calculations work on geography columns."
         # SELECT ST_Area(poly) FROM geogapp_zipcode WHERE code='77002';
-        ref_area = 5439084.70637573
+        ref_area = 5439100.95415646 if oracle else 5439084.70637573
         tol = 5
         z = Zipcode.objects.area().get(code='77002')
         self.assertAlmostEqual(z.area.sq_m, ref_area, tol)
