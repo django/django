@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-14. Using a custom primary key
+Using a custom primary key
 
 By default, Django adds an ``"id"`` field to each model. But you can override
 this behavior by explicitly adding ``primary_key=True`` to a field.

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-39. Testing using the Test Client
+Testing using the Test Client
 
 The test client is a class that can act like a simple
 browser for testing purposes.
