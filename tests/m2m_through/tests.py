@@ -17,263 +17,307 @@ class M2mThroughTests(TestCase):
         self.rock = Group.objects.create(name='Rock')
         self.roll = Group.objects.create(name='Roll')
 
-    def test_m2m_through(self):
-        # We start out by making sure that the Group 'rock' has no members.
+    def test_retrieve_intermediate_items(self):
+        Membership.objects.create(person=self.jim, group=self.rock)
+        Membership.objects.create(person=self.jane, group=self.rock)
+
+        expected = ['Jane', 'Jim']
         self.assertQuerysetEqual(
             self.rock.members.all(),
-            []
+            expected,
+            attrgetter("name")
         )
-        # To make Jim a member of Group Rock, simply create a Membership object.
-        Membership.objects.create(person=self.jim, group=self.rock)
-        # We can do the same for Jane and Rock.
+
+    def test_get_on_intermediate_model(self):
         Membership.objects.create(person=self.jane, group=self.rock)
-        # Let's check to make sure that it worked.  Jane and Jim should be members of Rock.
-        self.assertQuerysetEqual(
-            self.rock.members.all(), [
-                'Jane',
-                'Jim'
-            ],
-            attrgetter("name")
-        )
-        # Now we can add a bunch more Membership objects to test with.
-        Membership.objects.create(person=self.bob, group=self.roll)
-        Membership.objects.create(person=self.jim, group=self.roll)
-        Membership.objects.create(person=self.jane, group=self.roll)
-        # We can get Jim's Group membership as with any ForeignKey.
-        self.assertQuerysetEqual(
-            self.jim.group_set.all(), [
-                'Rock',
-                'Roll'
-            ],
-            attrgetter("name")
-        )
-        # Querying the intermediary model works like normal.
+
+        queryset = Membership.objects.get(person=self.jane, group=self.rock)
+
         self.assertEqual(
-            repr(Membership.objects.get(person=self.jane, group=self.rock)),
+            repr(queryset),
             '<Membership: Jane is a member of Rock>'
         )
-        # It's not only get that works. Filter works like normal as well.
+
+    def test_filter_on_intermediate_model(self):
+        Membership.objects.create(person=self.jim, group=self.rock)
+        Membership.objects.create(person=self.jane, group=self.rock)
+
+        queryset = Membership.objects.filter(group=self.rock)
+
+        expected = [
+            '<Membership: Jim is a member of Rock>',
+            '<Membership: Jane is a member of Rock>',
+        ]
+
         self.assertQuerysetEqual(
-            Membership.objects.filter(person=self.jim), [
-                '<Membership: Jim is a member of Rock>',
-                '<Membership: Jim is a member of Roll>'
-            ]
-        )
-        self.rock.members.clear()
-        # Now there will be no members of Rock.
-        self.assertQuerysetEqual(
-            self.rock.members.all(),
-            []
+            queryset,
+            expected
         )
 
-    def test_forward_descriptors(self):
-        # Due to complications with adding via an intermediary model,
-        # the add method raises an error.
-        self.assertRaisesMessage(
-            AttributeError,
-            'Cannot use add() on a ManyToManyField which specifies an intermediary model',
-            lambda: self.rock.members.add(self.bob)
-        )
-        # Create is also disabled as it suffers from the same problems as add.
-        self.assertRaisesMessage(
-            AttributeError,
-            'Cannot use create() on a ManyToManyField which specifies an intermediary model',
-            lambda: self.rock.members.create(name='Anne')
-        )
-        # Remove has similar complications, and it also raises an error.
-        self.assertRaisesMessage(
-            AttributeError,
-            'Cannot use remove() on a ManyToManyField which specifies an intermediary model',
-            lambda: self.rock.members.remove(self.jim)
-        )
+    def test_cannot_use_add_on_m2m_with_intermediary_model(self):
+        msg = 'Cannot use add() on a ManyToManyField which specifies an intermediary model'
 
-        m1 = Membership.objects.create(person=self.jim, group=self.rock)
-        m2 = Membership.objects.create(person=self.jane, group=self.rock)
+        with self.assertRaisesMessage(AttributeError, msg):
+            self.rock.members.add(self.bob)
 
-        # Here we back up the list of all members of Rock.
-        backup = list(self.rock.members.all())
-        # ...and we verify that it has worked.
-        self.assertEqual(
-            [p.name for p in backup],
-            ['Jane', 'Jim']
-        )
-        # The clear function should still work.
-        self.rock.members.clear()
-        # Now there will be no members of Rock.
         self.assertQuerysetEqual(
             self.rock.members.all(),
             []
         )
 
-        # Assignment should not work with models specifying a through model for
-        # many of the same reasons as adding.
-        self.assertRaisesMessage(
-            AttributeError,
-            'Cannot set values on a ManyToManyField which specifies an intermediary model',
-            setattr,
-            self.rock,
-            "members",
-            backup
+    def test_cannot_use_create_on_m2m_with_intermediary_model(self):
+        msg = 'Cannot use create() on a ManyToManyField which specifies an intermediary model'
+
+        with self.assertRaisesMessage(AttributeError, msg):
+            self.rock.members.create(name='Annie')
+
+        self.assertQuerysetEqual(
+            self.rock.members.all(),
+            []
         )
 
-        # Let's re-save those instances that we've cleared.
-        m1.save()
-        m2.save()
-        # Verifying that those instances were re-saved successfully.
+    def test_cannot_use_remove_on_m2m_with_intermediary_model(self):
+        Membership.objects.create(person=self.jim, group=self.rock)
+        msg = 'Cannot use remove() on a ManyToManyField which specifies an intermediary model'
+
+        with self.assertRaisesMessage(AttributeError, msg):
+            self.rock.members.remove(self.jim)
+
         self.assertQuerysetEqual(
-            self.rock.members.all(), [
-                'Jane',
-                'Jim'
-            ],
+            self.rock.members.all(),
+            ['Jim', ],
             attrgetter("name")
         )
 
-    def test_reverse_descriptors(self):
-        # Due to complications with adding via an intermediary model,
-        # the add method is not provided.
-        self.assertRaisesMessage(
-            AttributeError,
-            'Cannot use add() on a ManyToManyField which specifies an intermediary model',
-            lambda: self.bob.group_set.add(self.rock)
+    def test_cannot_use_setattr_on_m2m_with_intermediary_model(self):
+        msg = 'Cannot set values on a ManyToManyField which specifies an intermediary model'
+        members = list(Person.objects.filter(name__in=['Bob', 'Jim']))
+
+        with self.assertRaisesMessage(AttributeError, msg):
+            setattr(self.rock, 'members', members)
+
+        self.assertQuerysetEqual(
+            self.rock.members.all(),
+            []
         )
 
-        # Create is also disabled as it suffers from the same problems as add.
-        self.assertRaisesMessage(
-            AttributeError,
-            'Cannot use create() on a ManyToManyField which specifies an intermediary model',
-            lambda: self.bob.group_set.create(name="funk")
+    def test_clear_removes_all_the_m2m_relationships(self):
+        Membership.objects.create(person=self.jim, group=self.rock)
+        Membership.objects.create(person=self.jane, group=self.rock)
+
+        self.rock.members.clear()
+
+        self.assertQuerysetEqual(
+            self.rock.members.all(),
+            []
         )
 
-        # Remove has similar complications, and is not provided either.
-        self.assertRaisesMessage(
-            AttributeError,
-            'Cannot use remove() on a ManyToManyField which specifies an intermediary model',
-            lambda: self.jim.group_set.remove(self.rock)
+    def test_retrieve_reverse_intermediate_items(self):
+        Membership.objects.create(person=self.jim, group=self.rock)
+        Membership.objects.create(person=self.jim, group=self.roll)
+
+        expected = ['Rock', 'Roll']
+        self.assertQuerysetEqual(
+            self.jim.group_set.all(),
+            expected,
+            attrgetter("name")
         )
 
-        m1 = Membership.objects.create(person=self.jim, group=self.rock)
-        m2 = Membership.objects.create(person=self.jim, group=self.roll)
+    def test_cannot_use_add_on_reverse_m2m_with_intermediary_model(self):
+        msg = 'Cannot use add() on a ManyToManyField which specifies an intermediary model'
 
-        # Here we back up the list of all of Jim's groups.
-        backup = list(self.jim.group_set.all())
-        self.assertEqual(
-            [g.name for g in backup],
-            ['Rock', 'Roll']
+        with self.assertRaisesMessage(AttributeError, msg):
+            self.bob.group_set.add(self.bob)
+
+        self.assertQuerysetEqual(
+            self.bob.group_set.all(),
+            []
         )
-        # The clear function should still work.
+
+    def test_cannot_use_create_on_reverse_m2m_with_intermediary_model(self):
+        msg = 'Cannot use create() on a ManyToManyField which specifies an intermediary model'
+
+        with self.assertRaisesMessage(AttributeError, msg):
+            self.bob.group_set.create(name='Funk')
+
+        self.assertQuerysetEqual(
+            self.bob.group_set.all(),
+            []
+        )
+
+    def test_cannot_use_remove_on_reverse_m2m_with_intermediary_model(self):
+        Membership.objects.create(person=self.bob, group=self.rock)
+        msg = 'Cannot use remove() on a ManyToManyField which specifies an intermediary model'
+
+        with self.assertRaisesMessage(AttributeError, msg):
+            self.bob.group_set.remove(self.rock)
+
+        self.assertQuerysetEqual(
+            self.bob.group_set.all(),
+            ['Rock', ],
+            attrgetter('name')
+        )
+
+    def test_cannot_use_setattr_on_reverse_m2m_with_intermediary_model(self):
+        msg = 'Cannot set values on a ManyToManyField which specifies an intermediary model'
+        members = list(Group.objects.filter(name__in=['Rock', 'Roll']))
+
+        with self.assertRaisesMessage(AttributeError, msg):
+            setattr(self.bob, 'group_set', members)
+
+        self.assertQuerysetEqual(
+            self.bob.group_set.all(),
+            []
+        )
+
+    def test_clear_on_reverse_removes_all_the_m2m_relationships(self):
+        Membership.objects.create(person=self.jim, group=self.rock)
+        Membership.objects.create(person=self.jim, group=self.roll)
+
         self.jim.group_set.clear()
-        # Now Jim will be in no groups.
+
         self.assertQuerysetEqual(
             self.jim.group_set.all(),
             []
         )
-        # Assignment should not work with models specifying a through model for
-        # many of the same reasons as adding.
-        self.assertRaisesMessage(
-            AttributeError,
-            'Cannot set values on a ManyToManyField which specifies an intermediary model',
-            setattr,
-            self.jim,
-            "group_set",
-            backup
-        )
 
-        # Let's re-save those instances that we've cleared.
-        m1.save()
-        m2.save()
-        # Verifying that those instances were re-saved successfully.
+    def test_query_model_by_attribute_name_of_related_model(self):
+        Membership.objects.create(person=self.jim, group=self.rock)
+        Membership.objects.create(person=self.jane, group=self.rock)
+        Membership.objects.create(person=self.bob, group=self.roll)
+        Membership.objects.create(person=self.jim, group=self.roll)
+        Membership.objects.create(person=self.jane, group=self.roll)
+
         self.assertQuerysetEqual(
-            self.jim.group_set.all(), [
-                'Rock',
-                'Roll'
-            ],
+            Group.objects.filter(members__name='Bob'),
+            ['Roll', ],
             attrgetter("name")
         )
 
-    def test_custom_tests(self):
-        # Let's see if we can query through our second relationship.
+    def test_query_first_model_by_intermediate_model_attribute(self):
+        Membership.objects.create(
+            person=self.jane, group=self.roll,
+            invite_reason="She was just awesome."
+        )
+        Membership.objects.create(
+            person=self.jim, group=self.roll,
+            invite_reason="He is good."
+        )
+        Membership.objects.create(person=self.bob, group=self.roll)
+
+        qs = Group.objects.filter(
+            membership__invite_reason="She was just awesome."
+        )
+        self.assertQuerysetEqual(
+            qs,
+            ['Roll'],
+            attrgetter("name")
+        )
+
+    def test_query_second_model_by_intermediate_model_attribute(self):
+        Membership.objects.create(
+            person=self.jane, group=self.roll,
+            invite_reason="She was just awesome."
+        )
+        Membership.objects.create(
+            person=self.jim, group=self.roll,
+            invite_reason="He is good."
+        )
+        Membership.objects.create(person=self.bob, group=self.roll)
+
+        qs = Person.objects.filter(
+            membership__invite_reason="She was just awesome."
+        )
+        self.assertQuerysetEqual(
+            qs,
+            ['Jane'],
+            attrgetter("name")
+        )
+
+    def test_query_model_by_related_model_name(self):
+        Membership.objects.create(person=self.jim, group=self.rock)
+        Membership.objects.create(person=self.jane, group=self.rock)
+        Membership.objects.create(person=self.bob, group=self.roll)
+        Membership.objects.create(person=self.jim, group=self.roll)
+        Membership.objects.create(person=self.jane, group=self.roll)
+
+        self.assertQuerysetEqual(
+            Person.objects.filter(group__name="Rock"),
+            ['Jane', 'Jim'],
+            attrgetter("name")
+        )
+
+    def test_query_model_by_custom_related_name(self):
+        CustomMembership.objects.create(person=self.bob, group=self.rock)
+        CustomMembership.objects.create(person=self.jim, group=self.rock)
+
+        self.assertQuerysetEqual(
+            Person.objects.filter(custom__name="Rock"),
+            ['Bob', 'Jim'],
+            attrgetter("name")
+        )
+
+    def test_query_model_by_intermediate_can_return_non_unique_queryset(self):
+        Membership.objects.create(person=self.jim, group=self.rock)
+        Membership.objects.create(
+            person=self.jane, group=self.rock,
+            date_joined=datetime(2006, 1, 1)
+        )
+        Membership.objects.create(
+            person=self.bob, group=self.roll,
+            date_joined=datetime(2004, 1, 1))
+        Membership.objects.create(person=self.jim, group=self.roll)
+        Membership.objects.create(
+            person=self.jane, group=self.roll,
+            date_joined=datetime(2004, 1, 1))
+
+        qs = Person.objects.filter(
+            membership__date_joined__gt=datetime(2004, 1, 1)
+        )
+        self.assertQuerysetEqual(
+            qs,
+            ['Jane', 'Jim', 'Jim'],
+            attrgetter("name")
+        )
+
+    def test_custom_related_name_forward_empty_qs(self):
         self.assertQuerysetEqual(
             self.rock.custom_members.all(),
             []
         )
-        # We can query in the opposite direction as well.
+
+    def test_custom_related_name_reverse_empty_qs(self):
         self.assertQuerysetEqual(
             self.bob.custom.all(),
             []
         )
 
+    def test_custom_related_name_forward_non_empty_qs(self):
         CustomMembership.objects.create(person=self.bob, group=self.rock)
         CustomMembership.objects.create(person=self.jim, group=self.rock)
 
-        # If we get the number of people in Rock, it should be both Bob and Jim.
         self.assertQuerysetEqual(
-            self.rock.custom_members.all(), [
-                'Bob',
-                'Jim'
-            ],
-            attrgetter("name")
-        )
-        # Bob should only be in one custom group.
-        self.assertQuerysetEqual(
-            self.bob.custom.all(), [
-                'Rock'
-            ],
-            attrgetter("name")
-        )
-        # Let's make sure our new descriptors don't conflict with the FK related_name.
-        self.assertQuerysetEqual(
-            self.bob.custom_person_related_name.all(), [
-                '<CustomMembership: Bob is a member of Rock>'
-            ]
-        )
-
-    def test_self_referential_tests(self):
-        # Let's first create a person who has no friends.
-        tony = PersonSelfRefM2M.objects.create(name="Tony")
-        self.assertQuerysetEqual(
-            tony.friends.all(),
-            []
-        )
-
-        chris = PersonSelfRefM2M.objects.create(name="Chris")
-        Friendship.objects.create(first=tony, second=chris, date_friended=datetime.now())
-
-        # Tony should now show that Chris is his friend.
-        self.assertQuerysetEqual(
-            tony.friends.all(), [
-                'Chris'
-            ],
-            attrgetter("name")
-        )
-        # But we haven't established that Chris is Tony's Friend.
-        self.assertQuerysetEqual(
-            chris.friends.all(),
-            []
-        )
-        Friendship.objects.create(first=chris, second=tony, date_friended=datetime.now())
-
-        # Having added Chris as a friend, let's make sure that his friend set reflects
-        # that addition.
-        self.assertQuerysetEqual(
-            chris.friends.all(), [
-                'Tony'
-            ],
+            self.rock.custom_members.all(),
+            ['Bob', 'Jim'],
             attrgetter("name")
         )
 
-        # Chris gets mad and wants to get rid of all of his friends.
-        chris.friends.clear()
-        # Now he should not have any more friends.
+    def test_custom_related_name_reverse_non_empty_qs(self):
+        CustomMembership.objects.create(person=self.bob, group=self.rock)
+        CustomMembership.objects.create(person=self.jim, group=self.rock)
+
         self.assertQuerysetEqual(
-            chris.friends.all(),
-            []
-        )
-        # Since this isn't a symmetrical relation, Tony's friend link still exists.
-        self.assertQuerysetEqual(
-            tony.friends.all(), [
-                'Chris'
-            ],
+            self.bob.custom.all(),
+            ['Rock'],
             attrgetter("name")
+        )
+
+    def test_custom_related_name_doesnt_conflict_with_fky_related_name(self):
+        CustomMembership.objects.create(person=self.bob, group=self.rock)
+
+        self.assertQuerysetEqual(
+            self.bob.custom_person_related_name.all(),
+            ['<CustomMembership: Bob is a member of Rock>']
         )
 
     def test_through_fields(self):
@@ -284,128 +328,101 @@ class M2mThroughTests(TestCase):
         event = Event.objects.create(title='Rockwhale 2014')
         Invitation.objects.create(event=event, inviter=self.bob, invitee=self.jim)
         Invitation.objects.create(event=event, inviter=self.bob, invitee=self.jane)
-        self.assertQuerysetEqual(event.invitees.all(), [
-            'Jane',
-            'Jim',
-        ], attrgetter('name'))
+        self.assertQuerysetEqual(
+            event.invitees.all(),
+            ['Jane', 'Jim'],
+            attrgetter('name')
+        )
+
+
+class M2mThroughReferentialTests(TestCase):
+    def test_self_referential_empty_qs(self):
+        tony = PersonSelfRefM2M.objects.create(name="Tony")
+        self.assertQuerysetEqual(
+            tony.friends.all(),
+            []
+        )
+
+    def test_self_referential_non_symmentrical_first_side(self):
+        tony = PersonSelfRefM2M.objects.create(name="Tony")
+        chris = PersonSelfRefM2M.objects.create(name="Chris")
+        Friendship.objects.create(
+            first=tony, second=chris, date_friended=datetime.now()
+        )
+
+        self.assertQuerysetEqual(
+            tony.friends.all(),
+            ['Chris'],
+            attrgetter("name")
+        )
+
+    def test_self_referential_non_symmentrical_second_side(self):
+        tony = PersonSelfRefM2M.objects.create(name="Tony")
+        chris = PersonSelfRefM2M.objects.create(name="Chris")
+        Friendship.objects.create(
+            first=tony, second=chris, date_friended=datetime.now()
+        )
+
+        self.assertQuerysetEqual(
+            chris.friends.all(),
+            []
+        )
+
+    def test_self_referential_non_symmentrical_clear_first_side(self):
+        tony = PersonSelfRefM2M.objects.create(name="Tony")
+        chris = PersonSelfRefM2M.objects.create(name="Chris")
+        Friendship.objects.create(
+            first=tony, second=chris, date_friended=datetime.now()
+        )
+
+        chris.friends.clear()
+
+        self.assertQuerysetEqual(
+            chris.friends.all(),
+            []
+        )
+
+        # Since this isn't a symmetrical relation, Tony's friend link still exists.
+        self.assertQuerysetEqual(
+            tony.friends.all(),
+            ['Chris'],
+            attrgetter("name")
+        )
+
+    def test_self_referential_symmentrical(self):
+        tony = PersonSelfRefM2M.objects.create(name="Tony")
+        chris = PersonSelfRefM2M.objects.create(name="Chris")
+        Friendship.objects.create(
+            first=tony, second=chris, date_friended=datetime.now()
+        )
+        Friendship.objects.create(
+            first=chris, second=tony, date_friended=datetime.now()
+        )
+
+        self.assertQuerysetEqual(
+            tony.friends.all(),
+            ['Chris'],
+            attrgetter("name")
+        )
+
+        self.assertQuerysetEqual(
+            chris.friends.all(),
+            ['Tony'],
+            attrgetter("name")
+        )
 
     def test_through_fields_self_referential(self):
         john = Employee.objects.create(name='john')
         peter = Employee.objects.create(name='peter')
         mary = Employee.objects.create(name='mary')
         harry = Employee.objects.create(name='harry')
+
         Relationship.objects.create(source=john, target=peter, another=None)
         Relationship.objects.create(source=john, target=mary, another=None)
         Relationship.objects.create(source=john, target=harry, another=peter)
-        self.assertQuerysetEqual(john.subordinates.all(), [
-            'peter',
-            'mary',
-            'harry',
-        ], attrgetter('name'))
 
-    def test_query_tests(self):
-        Membership.objects.create(person=self.jim, group=self.rock)
-        m2 = Membership.objects.create(person=self.jane, group=self.rock)
-        m3 = Membership.objects.create(person=self.bob, group=self.roll)
-        Membership.objects.create(person=self.jim, group=self.roll)
-        m5 = Membership.objects.create(person=self.jane, group=self.roll)
-
-        m2.invite_reason = "She was just awesome."
-        m2.date_joined = datetime(2006, 1, 1)
-        m2.save()
-        m3.date_joined = datetime(2004, 1, 1)
-        m3.save()
-        m5.date_joined = datetime(2004, 1, 1)
-        m5.save()
-
-        # We can query for the related model by using its attribute name (members, in
-        # this case).
         self.assertQuerysetEqual(
-            Group.objects.filter(members__name='Bob'), [
-                'Roll'
-            ],
-            attrgetter("name")
-        )
-
-        # To query through the intermediary model, we specify its model name.
-        # In this case, membership.
-        self.assertQuerysetEqual(
-            Group.objects.filter(membership__invite_reason="She was just awesome."), [
-                'Rock'
-            ],
-            attrgetter("name")
-        )
-
-        # If we want to query in the reverse direction by the related model, use its
-        # model name (group, in this case).
-        self.assertQuerysetEqual(
-            Person.objects.filter(group__name="Rock"), [
-                'Jane',
-                'Jim'
-            ],
-            attrgetter("name")
-        )
-
-        CustomMembership.objects.create(person=self.bob, group=self.rock)
-        CustomMembership.objects.create(person=self.jim, group=self.rock)
-        # If the m2m field has specified a related_name, using that will work.
-        self.assertQuerysetEqual(
-            Person.objects.filter(custom__name="Rock"), [
-                'Bob',
-                'Jim'
-            ],
-            attrgetter("name")
-        )
-
-        # To query through the intermediary model in the reverse direction, we again
-        # specify its model name (membership, in this case).
-        self.assertQuerysetEqual(
-            Person.objects.filter(membership__invite_reason="She was just awesome."), [
-                'Jane'
-            ],
-            attrgetter("name")
-        )
-
-        # Let's see all of the groups that Jane joined after 1 Jan 2005:
-        self.assertQuerysetEqual(
-            Group.objects.filter(membership__date_joined__gt=datetime(2005, 1, 1), membership__person=self.jane), [
-                'Rock'
-            ],
-            attrgetter("name")
-        )
-
-        # Queries also work in the reverse direction: Now let's see all of the people
-        # that have joined Rock since 1 Jan 2005:
-        self.assertQuerysetEqual(
-            Person.objects.filter(membership__date_joined__gt=datetime(2005, 1, 1), membership__group=self.rock), [
-                'Jane',
-                'Jim'
-            ],
-            attrgetter("name")
-        )
-
-        # Conceivably, queries through membership could return correct, but non-unique
-        # querysets.  To demonstrate this, we query for all people who have joined a
-        # group after 2004:
-        self.assertQuerysetEqual(
-            Person.objects.filter(membership__date_joined__gt=datetime(2004, 1, 1)), [
-                'Jane',
-                'Jim',
-                'Jim'
-            ],
-            attrgetter("name")
-        )
-
-        # Jim showed up twice, because he joined two groups ('Rock', and 'Roll'):
-        self.assertEqual(
-            [(m.person.name, m.group.name) for m in Membership.objects.filter(date_joined__gt=datetime(2004, 1, 1))],
-            [('Jane', 'Rock'), ('Jim', 'Rock'), ('Jim', 'Roll')]
-        )
-        # QuerySet's distinct() method can correct this problem.
-        self.assertQuerysetEqual(
-            Person.objects.filter(membership__date_joined__gt=datetime(2004, 1, 1)).distinct(), [
-                'Jane',
-                'Jim'
-            ],
-            attrgetter("name")
+            john.subordinates.all(),
+            ['peter', 'mary', 'harry'],
+            attrgetter('name')
         )
