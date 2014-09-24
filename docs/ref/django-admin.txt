@@ -647,8 +647,6 @@ Providing one or more app names as arguments will limit the migrations created
 to the app(s) specified and any dependencies needed (the table at the other end
 of a ``ForeignKey``, for example).
 
-The :djadminopt:`--noinput` option may be provided to suppress all user prompts.
-
 .. django-admin-option:: --empty
 
 The ``--empty`` option will cause ``makemigrations`` to output an empty
@@ -666,7 +664,9 @@ written.
 
 .. django-admin-option:: --merge
 
-The ``--merge`` option enables fixing of migration conflicts.
+The ``--merge`` option enables fixing of migration conflicts. The
+:djadminopt:`--noinput` option may be provided to suppress user prompts during
+a merge.
 
 migrate [<app_label> [<migrationname>]]
 ---------------------------------------
