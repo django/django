@@ -1,5 +1,5 @@
 """
-20. Multiple many-to-many relationships between the same two tables
+Multiple many-to-many relationships between the same two tables
 
 In this example, an ``Article`` can have many "primary" ``Category`` objects
 and many "secondary" ``Category`` objects.

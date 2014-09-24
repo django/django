@@ -1,5 +1,5 @@
 """
-13. Adding hooks before/after saving and deleting
+Adding hooks before/after saving and deleting
 
 To execute arbitrary code around ``save()`` and ``delete()``, just subclass
 the methods.

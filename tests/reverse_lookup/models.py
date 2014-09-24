@@ -1,5 +1,5 @@
 """
-25. Reverse lookups
+Reverse lookups
 
 This demonstrates the reverse lookup features of the database API.
 """

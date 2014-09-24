@@ -1,5 +1,5 @@
 """
-18. Using SQL reserved names
+Using SQL reserved names
 
 Need to use a reserved SQL name as a column name or table name? Need to include
 a hyphen in a column or table name? No problem. Django quotes names

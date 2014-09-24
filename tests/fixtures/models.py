@@ -1,5 +1,5 @@
 """
-37. Fixtures.
+Fixtures.
 
 Fixtures are a way of loading data into the database in bulk. Fixure data
 can be stored in any serializable format (including JSON and XML). Fixtures

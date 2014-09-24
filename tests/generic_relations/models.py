@@ -1,5 +1,5 @@
 """
-34. Generic relations
+Generic relations
 
 Generic relations let an object have a foreign key to any object through a
 content-type/object-id field. A ``GenericForeignKey`` field can point to any

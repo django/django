@@ -1,5 +1,5 @@
 """
-10. One-to-one relationships
+One-to-one relationships
 
 To define a one-to-one relationship, use ``OneToOneField()``.
 

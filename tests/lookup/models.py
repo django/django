@@ -1,5 +1,5 @@
 """
-7. The lookup API
+The lookup API
 
 This demonstrates features of the database API.
 """

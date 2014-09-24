@@ -1,5 +1,5 @@
 """
-6. Specifying ordering
+Specifying ordering
 
 Specify default ordering for a model using the ``ordering`` attribute, which
 should be a list or tuple of field names. This tells Django how to order

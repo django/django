@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-2. Adding __str__() or __unicode__() to models
+Adding __str__() or __unicode__() to models
 
 Although it's not a strict requirement, each model should have a
 ``_str__()`` or ``__unicode__()`` method to return a "human-readable"

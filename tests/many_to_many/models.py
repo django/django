@@ -1,5 +1,5 @@
 """
-5. Many-to-many relationships
+Many-to-many relationships
 
 To define a many-to-many relationship, use ``ManyToManyField()``.
 
