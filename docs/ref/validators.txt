@@ -37,6 +37,12 @@ use the same validator with forms::
     class MyForm(forms.Form):
         even_field = forms.IntegerField(validators=[validate_even])
 
+You can also use a class with a ``__call__`` method for configurable or more
+complex validators, similar to the :class:`RegexValidator`. If the validator is
+passed to a model field you should make sure it is :ref:`serializable by the
+migration framework <migration-serializing>` and therefore has a
+:ref:`deconstruct() <custom-deconstruct-method>` and ``__eq__()`` method.
+
 How validators are run
 ======================
 
