@@ -607,7 +607,9 @@ class GeoQuerySetTest(TestCase):
             '-95.23506 38.971823,-87.650175 41.850385,-123.305196 48.462611)',
             srid=4326
         )
-        self.assertEqual(ref_line, City.objects.make_line())
+        # We check for equality with a tolerance of 10e-5 which is a lower bound
+        # of the precisions of ref_line coordinates
+        self.assertTrue(ref_line.equals_exact(City.objects.make_line(), tolerance=10e-5))
 
     @skipUnlessDBFeature("has_num_geom_method")
     def test_num_geom(self):
