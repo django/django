@@ -37,6 +37,14 @@ use the same validator with forms::
     class MyForm(forms.Form):
         even_field = forms.IntegerField(validators=[validate_even])
 
+You can also use a class with a ``__call__()`` method for more complex or
+configurable validators. :class:`RegexValidator`, for example, uses this
+technique. If a class-based validator is used in the
+:attr:`~django.db.models.Field.validators` model field option, you should make
+sure it is :ref:`serializable by the migration framework
+<migration-serializing>` by adding :ref:`deconstruct()
+<custom-deconstruct-method>` and ``__eq__()`` methods.
+
 How validators are run
 ======================
 
