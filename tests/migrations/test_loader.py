@@ -1,7 +1,10 @@
+from __future__ import unicode_literals
+
 from unittest import skipIf
 
 from django.test import TestCase, override_settings
 from django.db import connection, connections
+from django.db.migrations.graph import NodeNotFoundError
 from django.db.migrations.loader import MigrationLoader, AmbiguityError
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import modify_settings
@@ -186,4 +189,105 @@ class LoaderTests(TestCase):
             len([x for x in migration_loader.graph.nodes if x[0] == "migrations"]),
             2,
         )
+        recorder.flush()
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed_complex"})
+    def test_loading_squashed_complex(self):
+        "Tests loading a complex set of squashed migrations"
+
+        loader = MigrationLoader(connection)
+        recorder = MigrationRecorder(connection)
+
+        def num_nodes():
+            plan = set(loader.graph.forwards_plan(('migrations', '7_auto')))
+            return len(plan - loader.applied_migrations)
+
+        # Empty database: use squashed migration
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 5)
+
+        # Starting at 1 or 2 should use the squashed migration too
+        recorder.record_applied("migrations", "1_auto")
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 4)
+
+        recorder.record_applied("migrations", "2_auto")
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 3)
+
+        # However, starting at 3 to 5 cannot use the squashed migration
+        recorder.record_applied("migrations", "3_auto")
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 4)
+
+        recorder.record_applied("migrations", "4_auto")
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 3)
+
+        # Starting at 5 to 7 we are passed the squashed migrations
+        recorder.record_applied("migrations", "5_auto")
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 2)
+
+        recorder.record_applied("migrations", "6_auto")
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 1)
+
+        recorder.record_applied("migrations", "7_auto")
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 0)
+
+        recorder.flush()
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed_erroneous"})
+    def test_loading_squashed_erroneous(self):
+        "Tests loading a complex but erroneous set of squashed migrations"
+
+        loader = MigrationLoader(connection)
+        recorder = MigrationRecorder(connection)
+
+        def num_nodes():
+            plan = set(loader.graph.forwards_plan(('migrations', '7_auto')))
+            return len(plan - loader.applied_migrations)
+
+        # Empty database: use squashed migration
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 5)
+
+        # Starting at 1 or 2 should use the squashed migration too
+        recorder.record_applied("migrations", "1_auto")
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 4)
+
+        recorder.record_applied("migrations", "2_auto")
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 3)
+
+        # However, starting at 3 or 4 we'd need to use non-existing migrations
+        msg = ("Migration migrations.6_auto depends on nonexistent node ('migrations', '5_auto'). "
+               "Django tried to replace migration migrations.5_auto with any of "
+               "[migrations.3_squashed_5] but wasn't able to because some of the replaced "
+               "migrations are already applied.")
+
+        recorder.record_applied("migrations", "3_auto")
+        with self.assertRaisesMessage(NodeNotFoundError, msg):
+            loader.build_graph()
+
+        recorder.record_applied("migrations", "4_auto")
+        with self.assertRaisesMessage(NodeNotFoundError, msg):
+            loader.build_graph()
+
+        # Starting at 5 to 7 we are passed the squashed migrations
+        recorder.record_applied("migrations", "5_auto")
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 2)
+
+        recorder.record_applied("migrations", "6_auto")
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 1)
+
+        recorder.record_applied("migrations", "7_auto")
+        loader.build_graph()
+        self.assertEqual(num_nodes(), 0)
+
         recorder.flush()
