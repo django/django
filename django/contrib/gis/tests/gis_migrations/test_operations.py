@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from unittest import skipUnless
 
-from django.contrib.gis.tests.utils import mysql
+from django.contrib.gis.tests.utils import HAS_SPATIAL_DB, mysql
 from django.db import connection, migrations, models
 from django.db.migrations.migration import Migration
 from django.db.migrations.state import ProjectState
