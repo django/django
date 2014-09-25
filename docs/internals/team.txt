@@ -451,6 +451,17 @@ Daniele Procida
 
     .. _Loïc Bistuer: https://github.com/loic
 
+`Michael Manfre`_
+    Michael started running Django on Windows against a Microsoft SQL Server
+    (MSSQL) database in 2008. He quickly became the maintainer of the
+    django-mssql 3rd party database backend. Much of his involvement with
+    Django relates to the ORM, the private 3rd party database API, and using
+    Django on Windows.
+
+    Michael lives in Cary, NC, USA.
+
+    .. _Michael Manfre: http://manfre.net
+
 Past team members
 =================
 
@@ -504,7 +515,7 @@ Malcolm Tredinnick
     unicode and autoescaping in templates can both be almost entirely
     attributed to Malcolm.
 
-    He was an International Man of Mystery and lived Sydney, Australia.
+    He was an International Man of Mystery and lived in Sydney, Australia.
 
     *Malcolm passed away on March 17, 2013.*
 
