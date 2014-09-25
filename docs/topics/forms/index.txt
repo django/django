@@ -423,9 +423,9 @@ type="text">``.
 
 In most cases, the field will have a sensible default widget. For example, by
 default, a :class:`CharField` will have a :class:`TextInput` widget, that
-produces an ``<input type="text">`` in the HTML. If you needed
-``<input type="textarea">`` instead, you'd specify the appropriate widget when
-defining your form field, as we have done for the ``message`` field.
+produces an ``<input type="text">`` in the HTML. If you needed ``<textarea>``
+instead, you'd specify the appropriate widget when defining your form field,
+as we have done for the ``message`` field.
 
 Field data
 ^^^^^^^^^^
