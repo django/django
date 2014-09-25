@@ -28,7 +28,8 @@ from .models import (
     JobResponsibilities, BaseA, FK1, Identifier, Program, Channel, Page, Paragraph,
     Chapter, Book, MyObject, Order, OrderItem, SharedConnection, Task, Staff,
     StaffUser, CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
-    Company, Employment, CustomPk, CustomPkTag, Classroom, School, Student)
+    Company, Employment, CustomPk, CustomPkTag, Classroom, School, Student,
+    IndexErrorArticle)
 
 
 class BaseQuerysetTest(TestCase):
@@ -3591,3 +3592,48 @@ class Ticket22429Tests(TestCase):
 
         queryset = Student.objects.filter(~Q(classroom__school=F('school')))
         self.assertQuerysetEqual(queryset, [st2], lambda x: x)
+
+
+class Ticket23555Test(TestCase):
+    """
+    Test that unexpected IndexError exceptions are not suppressed.
+
+    Many people like to use try/catch for expressions of form `qs[0]`. This
+    works well for plain lists, because developer expects that IndexError
+    may be raised only there is no such item on QS. However Django QuerySet is
+    not a list. This is the lazy query to DB, and it's `__getitem__` method
+    involves all complex work of DB record retrieval. The internal code also
+    uses a lot of lists. This may lead to suppressing of unexpected IndexError
+    exception on any of those internal lists, which actually does not mean
+    "there is no such item in the query set".
+
+    This test ensures that QuerySet methods do not suppress unexpected
+    IndexError exceptions to let the developers a chance to handle them
+    correct way.
+    """
+
+    def test_index_error(self):
+        # We know that we've broken the __iter__ method
+        # (see IndexErrorArticle model), so queryset should not work anymore.
+        # Is this really so?
+        self.assertRaises(IndexError,
+                          lambda: IndexErrorArticle.objects.all()[0])
+        self.assertRaises(IndexError, IndexErrorArticle.objects.all().first)
+        self.assertRaises(IndexError, IndexErrorArticle.objects.all().last)
+
+    def test_one_record_index_error(self):
+        # And it does not matter if there are any records in the DB.
+        IndexErrorArticle.objects.create(name='Article',
+                                         created=datetime.date.today())
+        self.assertEqual(IndexErrorArticle.objects.count(), 1)
+        self.test_index_error()
+
+    def test_success(self):
+        self.assertRaises(IndexError, lambda: Article.objects.all()[0])
+        self.assertIsNone(Article.objects.first())
+        self.assertIsNone(Article.objects.last())
+
+        Article.objects.create(name='Article', created=datetime.date.today())
+        self.assertIsInstance(Article.objects.all()[0], Article)
+        self.assertIsInstance(Article.objects.first(), Article)
+        self.assertIsInstance(Article.objects.last(), Article)
