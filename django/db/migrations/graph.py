@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.utils.datastructures import OrderedSet
 from django.db.migrations.state import ProjectState
+from django.utils.datastructures import OrderedSet
 
 
 class MigrationGraph(object):
@@ -37,12 +37,14 @@ class MigrationGraph(object):
 
     def add_dependency(self, migration, child, parent):
         if child not in self.nodes:
-            raise KeyError(
-                "Migration %s dependencies reference nonexistent child node %r" % (migration, child)
+            raise NodeNotFoundError(
+                "Migration %s dependencies reference nonexistent child node %r" % (migration, child),
+                child
             )
         if parent not in self.nodes:
-            raise KeyError(
-                "Migration %s dependencies reference nonexistent parent node %r" % (migration, parent)
+            raise NodeNotFoundError(
+                "Migration %s dependencies reference nonexistent parent node %r" % (migration, parent),
+                parent
             )
         self.dependencies.setdefault(child, set()).add(parent)
         self.dependents.setdefault(parent, set()).add(child)
@@ -55,7 +57,7 @@ class MigrationGraph(object):
         a database.
         """
         if node not in self.nodes:
-            raise ValueError("Node %r not a valid node" % (node, ))
+            raise NodeNotFoundError("Node %r not a valid node" % (node, ), node)
         return self.dfs(node, lambda x: self.dependencies.get(x, set()))
 
     def backwards_plan(self, node):
@@ -66,7 +68,7 @@ class MigrationGraph(object):
         a database.
         """
         if node not in self.nodes:
-            raise ValueError("Node %r not a valid node" % (node, ))
+            raise NodeNotFoundError("Node %r not a valid node" % (node, ), node)
         return self.dfs(node, lambda x: self.dependents.get(x, set()))
 
     def root_nodes(self, app=None):
@@ -160,3 +162,21 @@ class CircularDependencyError(Exception):
     Raised when there's an impossible-to-resolve circular dependency.
     """
     pass
+
+
+class NodeNotFoundError(LookupError):
+    """
+    Raised when an attempt on a node is made that is not available in the graph.
+    """
+
+    def __init__(self, message, node):
+        self.message = message
+        self.node = node
+
+    def __str__(self):
+        return self.message
+
+    __unicode__ = __str__
+
+    def __repr__(self):
+        return "NodeNotFoundError(%r)" % self.node
