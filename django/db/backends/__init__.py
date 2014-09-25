@@ -37,6 +37,7 @@ class BaseDatabaseWrapper(object):
     """
     ops = None
     vendor = 'unknown'
+    SchemaEditorClass = None
 
     queries_limit = 9000
 
@@ -479,8 +480,13 @@ class BaseDatabaseWrapper(object):
         )
 
     def schema_editor(self, *args, **kwargs):
-        "Returns a new instance of this backend's SchemaEditor"
-        raise NotImplementedError('subclasses of BaseDatabaseWrapper may require a schema_editor() method')
+        """
+        Returns a new instance of this backend's SchemaEditor.
+        """
+        if self.SchemaEditorClass is None:
+            raise NotImplementedError(
+                'The SchemaEditorClass attribute of this database wrapper is still None')
+        return self.SchemaEditorClass(self, *args, **kwargs)
 
 
 class BaseDatabaseFeatures(object):
