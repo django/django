@@ -14,7 +14,7 @@ from django.db.models.lookups import IsNull
 from django.db.models.related import RelatedObject, PathInfo
 from django.db.models.query import QuerySet
 from django.db.models.sql.datastructures import Col
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_text, smart_text
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import curry, cached_property
@@ -1400,7 +1400,7 @@ class ForeignObject(RelatedField):
         kwargs['from_fields'] = self.from_fields
         kwargs['to_fields'] = self.to_fields
         if self.rel.related_name is not None:
-            kwargs['related_name'] = self.rel.related_name
+            kwargs['related_name'] = force_text(self.rel.related_name)
         if self.rel.related_query_name is not None:
             kwargs['related_query_name'] = self.rel.related_query_name
         if self.rel.on_delete != CASCADE:
@@ -2190,7 +2190,7 @@ class ManyToManyField(RelatedField):
         if self.rel.db_constraint is not True:
             kwargs['db_constraint'] = self.rel.db_constraint
         if self.rel.related_name is not None:
-            kwargs['related_name'] = self.rel.related_name
+            kwargs['related_name'] = force_text(self.rel.related_name)
         if self.rel.related_query_name is not None:
             kwargs['related_query_name'] = self.rel.related_query_name
         # Rel needs more work.
