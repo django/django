@@ -593,6 +593,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     })
 
     Database = Database
+    SchemaEditorClass = DatabaseSchemaEditor
 
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
@@ -692,10 +693,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                    and x.code == 2091 and 'ORA-02291' in x.message:
                     six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
                 raise
-
-    def schema_editor(self, *args, **kwargs):
-        "Returns a new instance of this backend's SchemaEditor"
-        return DatabaseSchemaEditor(self, *args, **kwargs)
 
     # Oracle doesn't support releasing savepoints. But we fake them when query
     # logging is enabled to keep query counts consistent with other backends.

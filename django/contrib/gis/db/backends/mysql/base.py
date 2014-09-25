@@ -20,13 +20,11 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
 
 
 class DatabaseWrapper(MySQLDatabaseWrapper):
+    SchemaEditorClass = MySQLGISSchemaEditor
+
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
         self.features = DatabaseFeatures(self)
         self.creation = MySQLCreation(self)
         self.ops = MySQLOperations(self)
         self.introspection = MySQLIntrospection(self)
-
-    def schema_editor(self, *args, **kwargs):
-        "Returns a new instance of this backend's SchemaEditor"
-        return MySQLGISSchemaEditor(self, *args, **kwargs)

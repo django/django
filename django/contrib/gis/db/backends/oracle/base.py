@@ -15,12 +15,11 @@ class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
 
 
 class DatabaseWrapper(OracleDatabaseWrapper):
+    SchemaEditorClass = OracleGISSchemaEditor
+
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
         self.features = DatabaseFeatures(self)
         self.ops = OracleOperations(self)
         self.creation = OracleCreation(self)
         self.introspection = OracleIntrospection(self)
-
-    def schema_editor(self, *args, **kwargs):
-        return OracleGISSchemaEditor(self, *args, **kwargs)
