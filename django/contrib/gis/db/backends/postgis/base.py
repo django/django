@@ -16,6 +16,8 @@ class DatabaseFeatures(BaseSpatialFeatures, Psycopg2DatabaseFeatures):
 
 
 class DatabaseWrapper(Psycopg2DatabaseWrapper):
+    SchemaEditorClass = PostGISSchemaEditor
+
     def __init__(self, *args, **kwargs):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
         if kwargs.get('alias', '') != NO_DB_ALIAS:
@@ -23,7 +25,3 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
             self.creation = PostGISCreation(self)
             self.ops = PostGISOperations(self)
             self.introspection = PostGISIntrospection(self)
-
-    def schema_editor(self, *args, **kwargs):
-        "Returns a new instance of this backend's SchemaEditor"
-        return PostGISSchemaEditor(self, *args, **kwargs)
