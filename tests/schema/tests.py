@@ -313,15 +313,8 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         # BooleanField are stored as TINYINT(1) on MySQL.
-        field_type, field_info = columns['awesome']
-        if connection.vendor == 'mysql':
-            self.assertEqual(field_type, 'IntegerField')
-            self.assertEqual(field_info.precision, 1)
-        elif connection.vendor == 'oracle' and connection.version_has_default_introspection_bug:
-            self.assertEqual(field_type, 'IntegerField')
-            self.assertEqual(field_info.precision, 0)
-        else:
-            self.assertEqual(field_type, 'BooleanField')
+        field_type = columns['awesome'][0]
+        self.assertEqual(field_type, connection.features.introspected_boolean_field_type)
 
     def test_add_field_default_transform(self):
         """
