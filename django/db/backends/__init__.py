@@ -614,8 +614,8 @@ class BaseDatabaseFeatures(object):
     # Can the backend introspect an BinaryField, instead of an TextField?
     can_introspect_binary_field = True
 
-    # Can the backend introspect an BooleanField, instead of an IntegerField?
-    can_introspect_boolean_field = True
+    # What is the type returned when the backend introspect a BooleanField?
+    introspected_boolean_field_type = 'BooleanField'
 
     # Can the backend introspect an DecimalField, instead of an FloatField?
     can_introspect_decimal_field = True

@@ -125,6 +125,20 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # select for update with limit can be achieved on Oracle, but not with the current backend.
     supports_select_for_update_with_limit = False
 
+    @cached_property
+    def introspected_boolean_field_type(self):
+        """
+        Some versions of Oracle -- we've seen this on 11.2.0.1 and suspect
+        it goes back -- have a weird bug where, when an integer column is
+        defined with a default, its precision is later reported on introspection
+        as 0, regardless of the real precision. For Django introspection, this
+        means that such columns are reported as IntegerField even if they are
+        really BigIntegerField or BooleanField.
+
+        The bug is solved in Oracle 11.2.0.2 and up.
+        """
+        return 'IntegerField' if self.connection.oracle_full_version < '11.2.0.2' else 'BooleanField'
+
 
 class DatabaseOperations(BaseDatabaseOperations):
     compiler_module = "django.db.backends.oracle.compiler"
@@ -734,20 +748,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return int(self.oracle_full_version.split('.')[0])
         except ValueError:
             return None
-
-    @cached_property
-    def version_has_default_introspection_bug(self):
-        """
-        Some versions of Oracle -- we've seen this on 11.2.0.1 and suspect
-        it goes back -- have a weird bug where, when an integer column is
-        defined with a default, its precision is later reported on introspection
-        as 0, regardless of the real precision. For Django introspection, this
-        means that such columns are reported as IntegerField even if they are
-        really BigIntegerField or BooleanField.
-
-        The bug is solved in Oracle 11.2.0.2 and up.
-        """
-        return self.oracle_full_version < '11.2.0.2'
 
 
 class OracleParam(object):

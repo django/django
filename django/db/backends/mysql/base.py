@@ -178,7 +178,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
     can_introspect_binary_field = False
-    can_introspect_boolean_field = False
+    introspected_boolean_field_type = 'IntegerField'
     can_introspect_small_integer_field = True
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
