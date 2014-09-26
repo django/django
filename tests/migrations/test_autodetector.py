@@ -73,9 +73,9 @@ class AutodetectorTests(TestCase):
     book_with_field_and_author_renamed = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("writer", models.ForeignKey("testapp.Writer")), ("title", models.CharField(max_length=200))])
     book_with_multiple_authors = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("authors", models.ManyToManyField("testapp.Author")), ("title", models.CharField(max_length=200))])
     book_with_multiple_authors_through_attribution = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("authors", models.ManyToManyField("testapp.Author", through="otherapp.Attribution")), ("title", models.CharField(max_length=200))])
-    book_unique = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": set([("author", "title")])})
-    book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": set([("title", "author")])})
-    book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": set([("title", "newfield")])})
+    book_unique = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": {("author", "title")}})
+    book_unique_2 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": {("title", "author")}})
+    book_unique_3 = ModelState("otherapp", "Book", [("id", models.AutoField(primary_key=True)), ("newfield", models.IntegerField()), ("author", models.ForeignKey("testapp.Author")), ("title", models.CharField(max_length=200))], {"unique_together": {("title", "newfield")}})
     attribution = ModelState("otherapp", "Attribution", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("book", models.ForeignKey("otherapp.Book"))])
     edition = ModelState("thirdapp", "Edition", [("id", models.AutoField(primary_key=True)), ("book", models.ForeignKey("otherapp.Book"))])
     custom_user = ModelState("thirdapp", "CustomUser", [("id", models.AutoField(primary_key=True)), ("username", models.CharField(max_length=255))], bases=(AbstractBaseUser, ))
@@ -85,7 +85,7 @@ class AutodetectorTests(TestCase):
     aardvark_based_on_author = ModelState("testapp", "Aardvark", [], bases=("testapp.Author", ))
     aardvark_pk_fk_author = ModelState("testapp", "Aardvark", [("id", models.OneToOneField("testapp.Author", primary_key=True))])
     knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
-    rabbit = ModelState("eggs", "Rabbit", [("id", models.AutoField(primary_key=True)), ("knight", models.ForeignKey("eggs.Knight")), ("parent", models.ForeignKey("eggs.Rabbit"))], {"unique_together": set([("parent", "knight")])})
+    rabbit = ModelState("eggs", "Rabbit", [("id", models.AutoField(primary_key=True)), ("knight", models.ForeignKey("eggs.Knight")), ("parent", models.ForeignKey("eggs.Rabbit"))], {"unique_together": {("parent", "knight")}})
 
     def repr_changes(self, changes):
         output = ""
@@ -187,7 +187,7 @@ class AutodetectorTests(TestCase):
         graph = MigrationGraph()
         changes = autodetector.arrange_for_graph(changes, graph)
         changes["testapp"][0].dependencies.append(("otherapp", "0001_initial"))
-        changes = autodetector._trim_to_apps(changes, set(["testapp"]))
+        changes = autodetector._trim_to_apps(changes, {"testapp"})
         # Make sure there's the right set of migrations
         self.assertEqual(changes["testapp"][0].name, "0001_initial")
         self.assertEqual(changes["otherapp"][0].name, "0001_initial")
@@ -466,7 +466,7 @@ class AutodetectorTests(TestCase):
         # Right dependencies?
         self.assertEqual(changes['testapp'][0].dependencies, [("otherapp", "auto_1")])
         self.assertEqual(changes['otherapp'][0].dependencies, [])
-        self.assertEqual(set(changes['otherapp'][1].dependencies), set([("otherapp", "auto_1"), ("testapp", "auto_1")]))
+        self.assertEqual(set(changes['otherapp'][1].dependencies), {("otherapp", "auto_1"), ("testapp", "auto_1")})
 
     def test_same_app_circular_fk_dependency(self):
         """
@@ -522,7 +522,7 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
         self.assertEqual(action.name, "book")
-        self.assertEqual(action.unique_together, set([("author", "title")]))
+        self.assertEqual(action.unique_together, {("author", "title")})
 
     def test_unique_together_no_changes(self):
         "Tests that unique_togther doesn't generate a migration if no changes have been made"
@@ -594,7 +594,7 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AlterUniqueTogether")
         self.assertEqual(action.name, "book")
-        self.assertEqual(action.unique_together, set([("title", "author")]))
+        self.assertEqual(action.unique_together, {("title", "author")})
 
     def test_add_field_and_unique_together(self):
         "Tests that added fields will be created before using them in unique together"
@@ -612,12 +612,12 @@ class AutodetectorTests(TestCase):
         action2 = migration.operations[1]
         self.assertEqual(action1.__class__.__name__, "AddField")
         self.assertEqual(action2.__class__.__name__, "AlterUniqueTogether")
-        self.assertEqual(action2.unique_together, set([("title", "newfield")]))
+        self.assertEqual(action2.unique_together, {("title", "newfield")})
 
     def test_remove_index_together(self):
         author_index_together = ModelState("testapp", "Author", [
             ("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))
-        ], {"index_together": set([("id", "name")])})
+        ], {"index_together": {("id", "name")}})
 
         before = self.make_project_state([author_index_together])
         after = self.make_project_state([self.author_name])
@@ -636,7 +636,7 @@ class AutodetectorTests(TestCase):
     def test_remove_unique_together(self):
         author_unique_together = ModelState("testapp", "Author", [
             ("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))
-        ], {"unique_together": set([("id", "name")])})
+        ], {"unique_together": {("id", "name")}})
 
         before = self.make_project_state([author_unique_together])
         after = self.make_project_state([self.author_name])
@@ -1267,7 +1267,7 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'a', 1, ["AddField"])
         self.assertOperationTypes(changes, 'b', 0, ["CreateModel"])
         self.assertEqual(changes['a'][0].dependencies, [])
-        self.assertEqual(set(changes['a'][1].dependencies), set([('a', 'auto_1'), ('b', 'auto_1')]))
+        self.assertEqual(set(changes['a'][1].dependencies), {('a', 'auto_1'), ('b', 'auto_1')})
         self.assertEqual(changes['b'][0].dependencies, [('__setting__', 'AUTH_USER_MODEL')])
 
     @override_settings(AUTH_USER_MODEL="b.Tenant")
@@ -1298,7 +1298,7 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'a', 1, ["AddField"])
         self.assertOperationTypes(changes, 'b', 0, ["CreateModel"])
         self.assertEqual(changes['a'][0].dependencies, [])
-        self.assertEqual(set(changes['a'][1].dependencies), set([('__setting__', 'AUTH_USER_MODEL'), ('a', 'auto_1')]))
+        self.assertEqual(set(changes['a'][1].dependencies), {('__setting__', 'AUTH_USER_MODEL'), ('a', 'auto_1')})
         self.assertEqual(changes['b'][0].dependencies, [('a', 'auto_1')])
 
     @override_settings(AUTH_USER_MODEL="a.Person")
