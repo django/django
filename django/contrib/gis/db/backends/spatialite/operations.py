@@ -134,7 +134,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
         super(DatabaseOperations, self).__init__(connection)
 
         # Creating the GIS terms dictionary.
-        self.gis_terms = set(['isnull'])
+        self.gis_terms = {'isnull'}
         self.gis_terms.update(self.geometry_functions)
 
     @cached_property

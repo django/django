@@ -281,9 +281,9 @@ class FileStorageTests(unittest.TestCase):
         os.mkdir(os.path.join(self.temp_dir, 'storage_dir_1'))
 
         dirs, files = self.storage.listdir('')
-        self.assertEqual(set(dirs), set(['storage_dir_1']))
+        self.assertEqual(set(dirs), {'storage_dir_1'})
         self.assertEqual(set(files),
-                         set(['storage_test_1', 'storage_test_2']))
+                         {'storage_test_1', 'storage_test_2'})
 
         self.storage.delete('storage_test_1')
         self.storage.delete('storage_test_2')

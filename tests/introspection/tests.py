@@ -55,7 +55,7 @@ class IntrospectionTests(TestCase):
     def test_installed_models(self):
         tables = [Article._meta.db_table, Reporter._meta.db_table]
         models = connection.introspection.installed_models(tables)
-        self.assertEqual(models, set([Article, Reporter]))
+        self.assertEqual(models, {Article, Reporter})
 
     def test_sequence_list(self):
         sequences = connection.introspection.sequence_list()
@@ -129,8 +129,8 @@ class IntrospectionTests(TestCase):
             key_columns = connection.introspection.get_key_columns(cursor, Article._meta.db_table)
         self.assertEqual(
             set(key_columns),
-            set([('reporter_id', Reporter._meta.db_table, 'id'),
-                 ('response_to_id', Article._meta.db_table, 'id')]))
+            {('reporter_id', Reporter._meta.db_table, 'id'),
+                 ('response_to_id', Article._meta.db_table, 'id')})
 
     def test_get_primary_key_column(self):
         with connection.cursor() as cursor:

@@ -71,8 +71,8 @@ class BaseModelBackendTest(object):
 
         # reloading user to purge the _perm_cache
         user = self.UserModel._default_manager.get(pk=self.user.pk)
-        self.assertEqual(user.get_all_permissions() == set(['auth.test']), True)
-        self.assertEqual(user.get_group_permissions(), set([]))
+        self.assertEqual(user.get_all_permissions() == {'auth.test'}, True)
+        self.assertEqual(user.get_group_permissions(), set())
         self.assertEqual(user.has_module_perms('Group'), False)
         self.assertEqual(user.has_module_perms('auth'), True)
 
@@ -81,7 +81,7 @@ class BaseModelBackendTest(object):
         perm = Permission.objects.create(name='test3', content_type=content_type, codename='test3')
         user.user_permissions.add(perm)
         user = self.UserModel._default_manager.get(pk=self.user.pk)
-        self.assertEqual(user.get_all_permissions(), set(['auth.test2', 'auth.test', 'auth.test3']))
+        self.assertEqual(user.get_all_permissions(), {'auth.test2', 'auth.test', 'auth.test3'})
         self.assertEqual(user.has_perm('test'), False)
         self.assertEqual(user.has_perm('auth.test'), True)
         self.assertEqual(user.has_perms(['auth.test2', 'auth.test3']), True)
@@ -91,9 +91,9 @@ class BaseModelBackendTest(object):
         group.permissions.add(perm)
         user.groups.add(group)
         user = self.UserModel._default_manager.get(pk=self.user.pk)
-        exp = set(['auth.test2', 'auth.test', 'auth.test3', 'auth.test_group'])
+        exp = {'auth.test2', 'auth.test', 'auth.test3', 'auth.test_group'}
         self.assertEqual(user.get_all_permissions(), exp)
-        self.assertEqual(user.get_group_permissions(), set(['auth.test_group']))
+        self.assertEqual(user.get_group_permissions(), {'auth.test_group'})
         self.assertEqual(user.has_perms(['auth.test3', 'auth.test_group']), True)
 
         user = AnonymousUser()
@@ -108,9 +108,9 @@ class BaseModelBackendTest(object):
         user.user_permissions.add(perm)
 
         self.assertEqual(user.has_perm('auth.test', 'object'), False)
-        self.assertEqual(user.get_all_permissions('object'), set([]))
+        self.assertEqual(user.get_all_permissions('object'), set())
         self.assertEqual(user.has_perm('auth.test'), True)
-        self.assertEqual(user.get_all_permissions(), set(['auth.test']))
+        self.assertEqual(user.get_all_permissions(), {'auth.test'})
 
     def test_anonymous_has_no_permissions(self):
         """
@@ -129,9 +129,9 @@ class BaseModelBackendTest(object):
         user.groups.add(group)
         group.permissions.add(group_perm)
 
-        self.assertEqual(backend.get_all_permissions(user), set(['auth.test_user', 'auth.test_group']))
-        self.assertEqual(backend.get_user_permissions(user), set(['auth.test_user', 'auth.test_group']))
-        self.assertEqual(backend.get_group_permissions(user), set(['auth.test_group']))
+        self.assertEqual(backend.get_all_permissions(user), {'auth.test_user', 'auth.test_group'})
+        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user', 'auth.test_group'})
+        self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
 
         user.is_anonymous = lambda: True
 
@@ -156,9 +156,9 @@ class BaseModelBackendTest(object):
         user.groups.add(group)
         group.permissions.add(group_perm)
 
-        self.assertEqual(backend.get_all_permissions(user), set(['auth.test_user', 'auth.test_group']))
-        self.assertEqual(backend.get_user_permissions(user), set(['auth.test_user', 'auth.test_group']))
-        self.assertEqual(backend.get_group_permissions(user), set(['auth.test_group']))
+        self.assertEqual(backend.get_all_permissions(user), {'auth.test_user', 'auth.test_group'})
+        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user', 'auth.test_group'})
+        self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
 
         user.is_active = False
         user.save()
@@ -367,14 +367,14 @@ class RowlevelBackendTest(TestCase):
         self.assertEqual(self.user3.has_perms(['simple', 'advanced'], TestObj()), False)
 
     def test_get_all_permissions(self):
-        self.assertEqual(self.user1.get_all_permissions(TestObj()), set(['simple']))
-        self.assertEqual(self.user2.get_all_permissions(TestObj()), set(['simple', 'advanced']))
-        self.assertEqual(self.user2.get_all_permissions(), set([]))
+        self.assertEqual(self.user1.get_all_permissions(TestObj()), {'simple'})
+        self.assertEqual(self.user2.get_all_permissions(TestObj()), {'simple', 'advanced'})
+        self.assertEqual(self.user2.get_all_permissions(), set())
 
     def test_get_group_permissions(self):
         group = Group.objects.create(name='test_group')
         self.user3.groups.add(group)
-        self.assertEqual(self.user3.get_group_permissions(TestObj()), set(['group_perm']))
+        self.assertEqual(self.user3.get_group_permissions(TestObj()), {'group_perm'})
 
 
 class AnonymousUserBackendTest(TestCase):
@@ -405,7 +405,7 @@ class AnonymousUserBackendTest(TestCase):
         self.assertEqual(self.user1.has_module_perms("app2"), False)
 
     def test_get_all_permissions(self):
-        self.assertEqual(self.user1.get_all_permissions(TestObj()), set(['anon']))
+        self.assertEqual(self.user1.get_all_permissions(TestObj()), {'anon'})
 
 
 @skipIfCustomUser
