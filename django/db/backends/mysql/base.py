@@ -178,7 +178,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
     can_introspect_binary_field = False
-    introspected_boolean_field_type = 'IntegerField'
     can_introspect_small_integer_field = True
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
@@ -224,6 +223,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         with self.connection.cursor() as cursor:
             cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
             return cursor.fetchone() is not None
+
+    def introspected_boolean_field_type(self, *args):
+        return 'IntegerField'
 
 
 class DatabaseOperations(BaseDatabaseOperations):

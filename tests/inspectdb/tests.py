@@ -9,6 +9,8 @@ from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils.six import PY3, StringIO
 
+from .models import ColumnTypes
+
 
 class InspectDBTestCase(TestCase):
 
@@ -87,19 +89,18 @@ class InspectDBTestCase(TestCase):
         else:
             assertFieldType('big_int_field', "models.IntegerField()")
 
-        if connection.features.introspected_boolean_field_type == 'BooleanField':
-            assertFieldType('bool_field', "models.BooleanField()")
-            if connection.features.can_introspect_null:
-                assertFieldType('null_bool_field', "models.NullBooleanField()")
-            else:
-                assertFieldType('null_bool_field', "models.BooleanField()")
+        bool_field = ColumnTypes._meta.get_field('bool_field')
+        bool_field_type = connection.features.introspected_boolean_field_type(bool_field)
+        assertFieldType('bool_field', "models.{}()".format(bool_field_type))
+        null_bool_field = ColumnTypes._meta.get_field('null_bool_field')
+        null_bool_field_type = connection.features.introspected_boolean_field_type(null_bool_field)
+        if 'BooleanField' in null_bool_field_type:
+            assertFieldType('null_bool_field', "models.{}()".format(null_bool_field_type))
         else:
-            field_type = connection.features.introspected_boolean_field_type
-            assertFieldType('bool_field', "models.{}()".format(field_type))
             if connection.features.can_introspect_null:
-                assertFieldType('null_bool_field', "models.{}(blank=True, null=True)".format(field_type))
+                assertFieldType('null_bool_field', "models.{}(blank=True, null=True)".format(null_bool_field_type))
             else:
-                assertFieldType('null_bool_field', "models.{}()".format(field_type))
+                assertFieldType('null_bool_field', "models.{}()".format(null_bool_field_type))
 
         if connection.features.can_introspect_decimal_field:
             assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
