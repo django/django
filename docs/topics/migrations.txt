@@ -23,7 +23,7 @@ Third-party tools, most notably `South <http://south.aeracode.org>`_,
 provided support for these additional types of change, but it was considered
 important enough that support was brought into core Django.
 
-Two Commands
+The Commands
 ------------
 
 There are several commands which you will use to interact with migrations
