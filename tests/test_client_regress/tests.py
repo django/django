@@ -993,8 +993,8 @@ class ContextTests(TestCase):
         l = ContextList([c1, c2])
         # None, True and False are builtins of BaseContext, and present
         # in every Context without needing to be added.
-        self.assertEqual(set(['None', 'True', 'False', 'hello', 'goodbye',
-                              'python', 'dolly']),
+        self.assertEqual({'None', 'True', 'False', 'hello', 'goodbye',
+                              'python', 'dolly'},
                          l.keys())
 
     def test_15368(self):

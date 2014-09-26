@@ -54,9 +54,9 @@ def DO_NOTHING(collector, field, sub_objs, using):
 class Collector(object):
     def __init__(self, using):
         self.using = using
-        # Initially, {model: set([instances])}, later values become lists.
+        # Initially, {model: {instances}}, later values become lists.
         self.data = {}
-        self.field_updates = {}  # {model: {(field, value): set([instances])}}
+        self.field_updates = {}  # {model: {(field, value): {instances}}}
         # fast_deletes is a list of queryset-likes that can be deleted without
         # fetching the objects into memory.
         self.fast_deletes = []
@@ -66,7 +66,7 @@ class Collector(object):
         # should be included, as the dependencies exist only between actual
         # database tables; proxy models are represented here by their concrete
         # parent.
-        self.dependencies = {}  # {model: set([models])}
+        self.dependencies = {}  # {model: {models}}
 
     def add(self, objs, source=None, nullable=False, reverse_dependency=False):
         """
