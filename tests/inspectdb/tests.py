@@ -87,18 +87,19 @@ class InspectDBTestCase(TestCase):
         else:
             assertFieldType('big_int_field', "models.IntegerField()")
 
-        if connection.features.can_introspect_boolean_field:
+        if connection.features.introspected_boolean_field_type == 'BooleanField':
             assertFieldType('bool_field', "models.BooleanField()")
             if connection.features.can_introspect_null:
                 assertFieldType('null_bool_field', "models.NullBooleanField()")
             else:
                 assertFieldType('null_bool_field', "models.BooleanField()")
         else:
-            assertFieldType('bool_field', "models.IntegerField()")
+            field_type = connection.features.introspected_boolean_field_type
+            assertFieldType('bool_field', "models.{}()".format(field_type))
             if connection.features.can_introspect_null:
-                assertFieldType('null_bool_field', "models.IntegerField(blank=True, null=True)")
+                assertFieldType('null_bool_field', "models.{}(blank=True, null=True)".format(field_type))
             else:
-                assertFieldType('null_bool_field', "models.IntegerField()")
+                assertFieldType('null_bool_field', "models.{}()".format(field_type))
 
         if connection.features.can_introspect_decimal_field:
             assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
