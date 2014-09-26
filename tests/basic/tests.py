@@ -429,7 +429,7 @@ class ModelTest(TestCase):
             pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
         )
 
-        s = set([a10, a11, a12])
+        s = {a10, a11, a12}
         self.assertTrue(Article.objects.get(headline='Article 11') in s)
 
     def test_field_ordering(self):

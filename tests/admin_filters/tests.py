@@ -91,11 +91,11 @@ class DepartmentListFilterLookupWithNonStringValue(SimpleListFilter):
     parameter_name = 'department'
 
     def lookups(self, request, model_admin):
-        return sorted(set([
+        return sorted({
             (employee.department.id,  # Intentionally not a string (Refs #19318)
              employee.department.code)
             for employee in model_admin.get_queryset(request).all()
-        ]))
+        })
 
     def queryset(self, request, queryset):
         if self.value():

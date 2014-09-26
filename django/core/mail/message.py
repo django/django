@@ -64,7 +64,7 @@ def make_msgid(idstring=None):
 
 
 # Header names that contain structured address data (RFC #5322)
-ADDRESS_HEADERS = set([
+ADDRESS_HEADERS = {
     'from',
     'sender',
     'reply-to',
@@ -76,7 +76,7 @@ ADDRESS_HEADERS = set([
     'resent-to',
     'resent-cc',
     'resent-bcc',
-])
+}
 
 
 def forbid_multi_line_headers(name, val, encoding):

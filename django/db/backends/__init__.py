@@ -1351,10 +1351,10 @@ class BaseDatabaseIntrospection(object):
         for app_config in apps.get_app_configs():
             all_models.extend(router.get_migratable_models(app_config, self.connection.alias))
         tables = list(map(self.table_name_converter, tables))
-        return set([
+        return {
             m for m in all_models
             if self.table_name_converter(m._meta.db_table) in tables
-        ])
+        }
 
     def sequence_list(self):
         "Returns a list of information about all DB sequences for all models in all apps."

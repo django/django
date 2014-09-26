@@ -91,10 +91,10 @@ class Queries1Tests(BaseQuerysetTest):
         qs1 = Tag.objects.filter(pk__lte=0)
         qs2 = Tag.objects.filter(parent__in=qs1)
         qs3 = Tag.objects.filter(parent__in=qs2)
-        self.assertEqual(qs3.query.subq_aliases, set(['T', 'U', 'V']))
+        self.assertEqual(qs3.query.subq_aliases, {'T', 'U', 'V'})
         self.assertIn('v0', str(qs3.query).lower())
         qs4 = qs3.filter(parent__in=qs1)
-        self.assertEqual(qs4.query.subq_aliases, set(['T', 'U', 'V']))
+        self.assertEqual(qs4.query.subq_aliases, {'T', 'U', 'V'})
         # It is possible to reuse U for the second subquery, no need to use W.
         self.assertNotIn('w0', str(qs4.query).lower())
         # So, 'U0."id"' is referenced twice.
@@ -1972,29 +1972,29 @@ class SubqueryTests(TestCase):
     def test_ordered_subselect(self):
         "Subselects honor any manual ordering"
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])
-        self.assertEqual(set(query.values_list('id', flat=True)), set([3, 4]))
+        self.assertEqual(set(query.values_list('id', flat=True)), {3, 4})
 
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[:2])
-        self.assertEqual(set(query.values_list('id', flat=True)), set([3, 4]))
+        self.assertEqual(set(query.values_list('id', flat=True)), {3, 4})
 
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:2])
-        self.assertEqual(set(query.values_list('id', flat=True)), set([3]))
+        self.assertEqual(set(query.values_list('id', flat=True)), {3})
 
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[2:])
-        self.assertEqual(set(query.values_list('id', flat=True)), set([1, 2]))
+        self.assertEqual(set(query.values_list('id', flat=True)), {1, 2})
 
     def test_slice_subquery_and_query(self):
         """
         Slice a query that has a sliced subquery
         """
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:2])[0:2]
-        self.assertEqual(set([x.id for x in query]), set([3, 4]))
+        self.assertEqual({x.id for x in query}, {3, 4})
 
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:3])[1:3]
-        self.assertEqual(set([x.id for x in query]), set([3]))
+        self.assertEqual({x.id for x in query}, {3})
 
         query = DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[2:])[1:]
-        self.assertEqual(set([x.id for x in query]), set([2]))
+        self.assertEqual({x.id for x in query}, {2})
 
     def test_related_sliced_subquery(self):
         """
@@ -2010,18 +2010,18 @@ class SubqueryTests(TestCase):
         query = ManagedModel.normal_manager.filter(
             tag__in=Tag.objects.order_by('-id')[:1]
         )
-        self.assertEqual(set([x.id for x in query]), set([mm2.id]))
+        self.assertEqual({x.id for x in query}, {mm2.id})
 
     def test_sliced_delete(self):
         "Delete queries can safely contain sliced subqueries"
         DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[0:1]).delete()
-        self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1, 2, 3]))
+        self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), {1, 2, 3})
 
         DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:2]).delete()
-        self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([1, 3]))
+        self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), {1, 3})
 
         DumbCategory.objects.filter(id__in=DumbCategory.objects.order_by('-id')[1:]).delete()
-        self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), set([3]))
+        self.assertEqual(set(DumbCategory.objects.values_list('id', flat=True)), {3})
 
 
 class CloneTests(TestCase):
@@ -2360,7 +2360,7 @@ class ToFieldTests(TestCase):
 
         self.assertEqual(
             set(Eaten.objects.filter(food__in=[apple, pear])),
-            set([lunch, dinner]),
+            {lunch, dinner},
         )
 
     def test_reverse_in(self):
@@ -2371,7 +2371,7 @@ class ToFieldTests(TestCase):
 
         self.assertEqual(
             set(Food.objects.filter(eaten__in=[lunch_apple, lunch_pear])),
-            set([apple, pear])
+            {apple, pear}
         )
 
     def test_single_object(self):
@@ -2381,7 +2381,7 @@ class ToFieldTests(TestCase):
 
         self.assertEqual(
             set(Eaten.objects.filter(food=apple)),
-            set([lunch, dinner])
+            {lunch, dinner}
         )
 
     def test_single_object_reverse(self):
@@ -2390,7 +2390,7 @@ class ToFieldTests(TestCase):
 
         self.assertEqual(
             set(Food.objects.filter(eaten=lunch)),
-            set([apple])
+            {apple}
         )
 
     def test_recursive_fk(self):

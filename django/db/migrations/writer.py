@@ -207,10 +207,10 @@ class MigrationWriter(object):
     def serialize_deconstructed(cls, path, args, kwargs):
         module, name = path.rsplit(".", 1)
         if module == "django.db.models":
-            imports = set(["from django.db import models"])
+            imports = {"from django.db import models"}
             name = "models.%s" % name
         else:
-            imports = set(["import %s" % module])
+            imports = {"import %s" % module}
             name = path
         strings = []
         for arg in args:
@@ -246,6 +246,7 @@ class MigrationWriter(object):
                 imports.update(item_imports)
                 strings.append(item_string)
             if isinstance(value, set):
+                # Don't use the literal "{%s}" as it doesn't support empty set
                 format = "set([%s])"
             elif isinstance(value, tuple):
                 # When len(value)==0, the empty tuple should be serialized as
@@ -272,20 +273,20 @@ class MigrationWriter(object):
             value_repr = repr(value)
             if isinstance(value, datetime_safe.datetime):
                 value_repr = "datetime.%s" % value_repr
-            return value_repr, set(["import datetime"])
+            return value_repr, {"import datetime"}
         # Dates
         elif isinstance(value, datetime.date):
             value_repr = repr(value)
             if isinstance(value, datetime_safe.date):
                 value_repr = "datetime.%s" % value_repr
-            return value_repr, set(["import datetime"])
+            return value_repr, {"import datetime"}
         # Times
         elif isinstance(value, datetime.time):
             value_repr = repr(value)
-            return value_repr, set(["import datetime"])
+            return value_repr, {"import datetime"}
         # Settings references
         elif isinstance(value, SettingsReference):
-            return "settings.%s" % value.setting_name, set(["from django.conf import settings"])
+            return "settings.%s" % value.setting_name, {"from django.conf import settings"}
         # Simple types
         elif isinstance(value, six.integer_types + (float, bool, type(None))):
             return repr(value), set()
@@ -303,7 +304,7 @@ class MigrationWriter(object):
             return value_repr, set()
         # Decimal
         elif isinstance(value, decimal.Decimal):
-            return repr(value), set(["from decimal import Decimal"])
+            return repr(value), {"from decimal import Decimal"}
         # Django fields
         elif isinstance(value, models.Field):
             attr_name, path, args, kwargs = value.deconstruct()
@@ -317,7 +318,7 @@ class MigrationWriter(object):
             if getattr(value, "__self__", None) and isinstance(value.__self__, type):
                 klass = value.__self__
                 module = klass.__module__
-                return "%s.%s.%s" % (module, klass.__name__, value.__name__), set(["import %s" % module])
+                return "%s.%s.%s" % (module, klass.__name__, value.__name__), {"import %s" % module}
             # Further error checking
             if value.__name__ == '<lambda>':
                 raise ValueError("Cannot serialize function: lambda")
@@ -326,7 +327,7 @@ class MigrationWriter(object):
             # Python 3 is a lot easier, and only uses this branch if it's not local.
             if getattr(value, "__qualname__", None) and getattr(value, "__module__", None):
                 if "<" not in value.__qualname__:  # Qualname can include <locals>
-                    return "%s.%s" % (value.__module__, value.__qualname__), set(["import %s" % value.__module__])
+                    return "%s.%s" % (value.__module__, value.__qualname__), {"import %s" % value.__module__}
             # Python 2/fallback version
             module_name = value.__module__
             # Make sure it's actually there and not an unbound method
@@ -341,7 +342,7 @@ class MigrationWriter(object):
                     "For more information, see "
                     "https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values"
                     % (value.__name__, module_name))
-            return "%s.%s" % (module_name, value.__name__), set(["import %s" % module_name])
+            return "%s.%s" % (module_name, value.__name__), {"import %s" % module_name}
         # Classes
         elif isinstance(value, type):
             special_cases = [
@@ -355,7 +356,7 @@ class MigrationWriter(object):
                 if module == six.moves.builtins.__name__:
                     return value.__name__, set()
                 else:
-                    return "%s.%s" % (module, value.__name__), set(["import %s" % module])
+                    return "%s.%s" % (module, value.__name__), {"import %s" % module}
         # Other iterables
         elif isinstance(value, collections.Iterable):
             imports = set()
@@ -370,7 +371,7 @@ class MigrationWriter(object):
             return format % (", ".join(strings)), imports
         # Compiled regex
         elif isinstance(value, COMPILED_REGEX_TYPE):
-            imports = set(["import re"])
+            imports = {"import re"}
             regex_pattern, pattern_imports = cls.serialize(value.pattern)
             regex_flags, flag_imports = cls.serialize(value.flags)
             imports.update(pattern_imports)

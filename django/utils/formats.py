@@ -225,8 +225,8 @@ def sanitize_separators(value):
                 # Special case where we suspect a dot meant decimal separator (see #22171)
                 pass
             else:
-                for replacement in set([
-                        thousand_sep, unicodedata.normalize('NFKD', thousand_sep)]):
+                for replacement in {
+                        thousand_sep, unicodedata.normalize('NFKD', thousand_sep)}:
                     value = value.replace(replacement, '')
         parts.append(value)
         value = '.'.join(reversed(parts))

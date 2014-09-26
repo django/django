@@ -25,7 +25,7 @@ class RecorderTests(TestCase):
         recorder.record_applied("myapp", "0432_ponies")
         self.assertEqual(
             set((x, y) for (x, y) in recorder.applied_migrations() if x == "myapp"),
-            set([("myapp", "0432_ponies")]),
+            {("myapp", "0432_ponies")},
         )
         # That should not affect records of another database
         recorder_other = MigrationRecorder(connections['other'])

@@ -204,7 +204,7 @@ class Geo3DTest(TestCase):
         union = City3D.objects.aggregate(Union('point'))['point__union']
         self.assertTrue(union.hasz)
         # Ordering of points in the resulting geometry may vary between implementations
-        self.assertSetEqual(set([p.ewkt for p in ref_union]), set([p.ewkt for p in union]))
+        self.assertSetEqual({p.ewkt for p in ref_union}, {p.ewkt for p in union})
 
     def test_extent(self):
         """
