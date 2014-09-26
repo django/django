@@ -31,11 +31,11 @@ protect the following:
 
 .. code-block:: html+django
 
-    <style class="{{ var }}">...</style>
+    <style class={{ var }}>...</style>
 
 If ``var`` is set to ``'class1 onmouseover=javascript:func()'``, this can result
 in unauthorized JavaScript execution, depending on how the browser renders
-imperfect HTML.
+imperfect HTML. (Quoting the attribute value would fix this case.)
 
 It is also important to be particularly careful when using ``is_safe`` with
 custom template tags, the :tfilter:`safe` template tag, :mod:`mark_safe
