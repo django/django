@@ -352,7 +352,10 @@ class MigrationWriter(object):
                     return string, set(imports)
             if hasattr(value, "__module__"):
                 module = value.__module__
-                return "%s.%s" % (module, value.__name__), set(["import %s" % module])
+                if module == six.moves.builtins.__name__:
+                    return value.__name__, set()
+                else:
+                    return "%s.%s" % (module, value.__name__), set(["import %s" % module])
         # Other iterables
         elif isinstance(value, collections.Iterable):
             imports = set()
