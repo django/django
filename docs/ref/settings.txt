@@ -18,7 +18,8 @@ Core settings
 
 Here's a list of settings available in Django core and their default values.
 Settings provided by contrib apps are listed below, followed by a topical index
-of the core settings.
+of the core settings. For introductory material, see the :doc:`settings topic
+guide </topics/settings>`.
 
 .. setting:: ABSOLUTE_URL_OVERRIDES
 
