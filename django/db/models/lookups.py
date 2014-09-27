@@ -225,16 +225,6 @@ class IExact(BuiltinLookup):
 default_lookups['iexact'] = IExact
 
 
-class Contains(BuiltinLookup):
-    lookup_name = 'contains'
-default_lookups['contains'] = Contains
-
-
-class IContains(BuiltinLookup):
-    lookup_name = 'icontains'
-default_lookups['icontains'] = IContains
-
-
 class GreaterThan(BuiltinLookup):
     lookup_name = 'gt'
 default_lookups['gt'] = GreaterThan
@@ -306,6 +296,7 @@ default_lookups['in'] = In
 
 
 class PatternLookup(BuiltinLookup):
+
     def get_rhs_op(self, connection, rhs):
         # Assume we are in startswith. We need to produce SQL like:
         #     col LIKE %s, ['thevalue%']
@@ -318,9 +309,20 @@ class PatternLookup(BuiltinLookup):
         # pattern added.
         if (hasattr(self.rhs, 'get_compiler') or hasattr(self.rhs, 'as_sql')
                 or hasattr(self.rhs, '_as_sql') or self.bilateral_transforms):
-            return connection.pattern_ops[self.lookup_name] % rhs
+            pattern = connection.pattern_ops[self.lookup_name].format(connection.pattern_esc)
+            return pattern.format(rhs)
         else:
             return super(PatternLookup, self).get_rhs_op(connection, rhs)
+
+
+class Contains(PatternLookup):
+    lookup_name = 'contains'
+default_lookups['contains'] = Contains
+
+
+class IContains(PatternLookup):
+    lookup_name = 'icontains'
+default_lookups['icontains'] = IContains
 
 
 class StartsWith(PatternLookup):
@@ -333,12 +335,12 @@ class IStartsWith(PatternLookup):
 default_lookups['istartswith'] = IStartsWith
 
 
-class EndsWith(BuiltinLookup):
+class EndsWith(PatternLookup):
     lookup_name = 'endswith'
 default_lookups['endswith'] = EndsWith
 
 
-class IEndsWith(BuiltinLookup):
+class IEndsWith(PatternLookup):
     lookup_name = 'iendswith'
 default_lookups['iendswith'] = IEndsWith
 
