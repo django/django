@@ -607,6 +607,30 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKEC UPPER(%s) ESCAPE '\\'",
     })
 
+    # The patterns below are used to generate SQL pattern lookup clauses when
+    # the right-hand side of the lookup isn't a raw string (it might be an expression
+    # or the result of a bilateral transformation).
+    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
+    # escaped on database side.
+    #
+    # Note: we use str.format() here for readability as '%' is used as a wildcard for
+    # the LIKE operator.
+    pattern_esc = r"REPLACE(REPLACE(REPLACE({}, '\', '\\'), '%%', '\%%'), '_', '\_')"
+    _pattern_ops = {
+        'contains': "'%%' || {} || '%%'",
+        'icontains': "'%%' || UPPER({}) || '%%'",
+        'startswith': "{} || '%%'",
+        'istartswith': "UPPER({}) || '%%'",
+        'endswith': "'%%' || {}",
+        'iendswith': "'%%' || UPPER({})",
+    }
+
+    _standard_pattern_ops = {k: "LIKE TRANSLATE( " + v + " USING NCHAR_CS)"
+                                " ESCAPE TRANSLATE('\\' USING NCHAR_CS)"
+                             for k, v in _pattern_ops.items()}
+    _likec_pattern_ops = {k: "LIKEC " + v + " ESCAPE '\\'"
+                          for k, v in _pattern_ops.items()}
+
     Database = Database
     SchemaEditorClass = DatabaseSchemaEditor
 
@@ -674,8 +698,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                                ['X'])
             except DatabaseError:
                 self.operators = self._likec_operators
+                self.pattern_ops = self._likec_pattern_ops
             else:
                 self.operators = self._standard_operators
+                self.pattern_ops = self._standard_pattern_ops
             cursor.close()
 
         try:

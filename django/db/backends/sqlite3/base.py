@@ -343,9 +343,22 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'iendswith': "LIKE %s ESCAPE '\\'",
     }
 
+    # The patterns below are used to generate SQL pattern lookup clauses when
+    # the right-hand side of the lookup isn't a raw string (it might be an expression
+    # or the result of a bilateral transformation).
+    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
+    # escaped on database side.
+    #
+    # Note: we use str.format() here for readability as '%' is used as a wildcard for
+    # the LIKE operator.
+    pattern_esc = r"REPLACE(REPLACE(REPLACE({}, '\', '\\'), '%%', '\%%'), '_', '\_')"
     pattern_ops = {
-        'startswith': "LIKE %s || '%%%%'",
-        'istartswith': "LIKE UPPER(%s) || '%%%%'",
+        'contains': r"LIKE '%%' || {} || '%%' ESCAPE '\'",
+        'icontains': r"LIKE '%%' || UPPER({}) || '%%' ESCAPE '\'",
+        'startswith': r"LIKE {} || '%%' ESCAPE '\'",
+        'istartswith': r"LIKE UPPER({}) || '%%' ESCAPE '\'",
+        'endswith': r"LIKE '%%' || {} ESCAPE '\'",
+        'iendswith': r"LIKE '%%' || UPPER({}) ESCAPE '\'",
     }
 
     Database = Database
