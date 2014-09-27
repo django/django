@@ -4,9 +4,8 @@ from copy import deepcopy
 import datetime
 
 from django.core.exceptions import FieldError
-from django.db import connection
+from django.db import connection, transaction
 from django.db.models import F
-from django.db import transaction
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
 from django.utils import six
@@ -310,6 +309,70 @@ class ExpressionsTests(TestCase):
         self.assertEqual(n_qs.get(), n)
         # The original query still works correctly
         self.assertEqual(c_qs.get(), c)
+
+    def test_patterns_escape(self):
+        """
+        Test that special characters (e.g. %, _ and \) stored in database are
+        properly escaped when using a pattern lookup with an expression
+        refs #16731
+        """
+        Employee.objects.bulk_create([
+            Employee(firstname="%Joh\\nny", lastname="%Joh\\n"),
+            Employee(firstname="Johnny", lastname="%John"),
+            Employee(firstname="Jean-Claude", lastname="Claud_"),
+            Employee(firstname="Jean-Claude", lastname="Claude"),
+            Employee(firstname="Jean-Claude", lastname="Claude%"),
+            Employee(firstname="Johnny", lastname="Joh\\n"),
+            Employee(firstname="Johnny", lastname="John"),
+            Employee(firstname="Johnny", lastname="_ohn"),
+        ])
+
+        self.assertQuerysetEqual(
+            Employee.objects.filter(firstname__contains=F('lastname')),
+            ["<Employee: %Joh\\nny %Joh\\n>", "<Employee: Jean-Claude Claude>", "<Employee: Johnny John>"],
+            ordered=False)
+
+        self.assertQuerysetEqual(
+            Employee.objects.filter(firstname__startswith=F('lastname')),
+            ["<Employee: %Joh\\nny %Joh\\n>", "<Employee: Johnny John>"],
+            ordered=False)
+
+        self.assertQuerysetEqual(
+            Employee.objects.filter(firstname__endswith=F('lastname')),
+            ["<Employee: Jean-Claude Claude>"],
+            ordered=False)
+
+    def test_insensitive_patterns_escape(self):
+        """
+        Test that special characters (e.g. %, _ and \) stored in database are
+        properly escaped when using a case insensitive pattern lookup with an
+        expression -- refs #16731
+        """
+        Employee.objects.bulk_create([
+            Employee(firstname="%Joh\\nny", lastname="%joh\\n"),
+            Employee(firstname="Johnny", lastname="%john"),
+            Employee(firstname="Jean-Claude", lastname="claud_"),
+            Employee(firstname="Jean-Claude", lastname="claude"),
+            Employee(firstname="Jean-Claude", lastname="claude%"),
+            Employee(firstname="Johnny", lastname="joh\\n"),
+            Employee(firstname="Johnny", lastname="john"),
+            Employee(firstname="Johnny", lastname="_ohn"),
+        ])
+
+        self.assertQuerysetEqual(
+            Employee.objects.filter(firstname__icontains=F('lastname')),
+            ["<Employee: %Joh\\nny %joh\\n>", "<Employee: Jean-Claude claude>", "<Employee: Johnny john>"],
+            ordered=False)
+
+        self.assertQuerysetEqual(
+            Employee.objects.filter(firstname__istartswith=F('lastname')),
+            ["<Employee: %Joh\\nny %joh\\n>", "<Employee: Johnny john>"],
+            ordered=False)
+
+        self.assertQuerysetEqual(
+            Employee.objects.filter(firstname__iendswith=F('lastname')),
+            ["<Employee: Jean-Claude claude>"],
+            ordered=False)
 
 
 class ExpressionsNumericTests(TestCase):

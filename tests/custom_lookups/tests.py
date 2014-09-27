@@ -286,6 +286,9 @@ class BilateralTransformTests(TestCase):
             self.assertQuerysetEqual(
                 Author.objects.filter(name__upper='doe'),
                 ["<Author: Doe>", "<Author: doe>"], ordered=False)
+            self.assertQuerysetEqual(
+                Author.objects.filter(name__upper__contains='f'),
+                ["<Author: Foo>"], ordered=False)
         finally:
             models.CharField._unregister_lookup(UpperBilateralTransform)
 

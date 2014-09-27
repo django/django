@@ -382,6 +382,12 @@ Models
   are applied to both ``lhs`` and ``rhs`` when used in a lookup expression,
   providing opportunities for more sophisticated lookups.
 
+* SQL special characters (\, %, _) are now escaped properly when a pattern
+  lookup (e.g. ``contains``, ``startswith``, etc.) is used with an ``F()``
+  expression as the right-hand side. In those cases, the escaping is performed
+  by the database, which can lead to somewhat complex queries involving nested
+  ``REPLACE`` function calls.
+
 Signals
 ^^^^^^^
 
