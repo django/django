@@ -166,7 +166,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):
     def __init__(self, text, subtype, charset):
         self.encoding = charset
         if charset == 'utf-8':
-            # Unfortunately, Python doesn't support setting a Charset instance
+            # Unfortunately, Python < 3.5 doesn't support setting a Charset instance
             # as MIMEText init parameter (http://bugs.python.org/issue16324).
             # We do it manually and trigger re-encoding of the payload.
             MIMEText.__init__(self, text, subtype, None)
