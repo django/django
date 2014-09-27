@@ -267,3 +267,9 @@ It boils down to this: Use exactly one of either ``configure()`` or
 ``DJANGO_SETTINGS_MODULE``. Not both, and not neither.
 
 .. _@login_required: ../authentication/#the-login-required-decorator
+
+.. seealso::
+
+    :doc:`The Settings Reference </ref/settings>`
+        Covers the full API reference, including core settings, auth, comments,
+        messages, sessions, sites, and static files.
