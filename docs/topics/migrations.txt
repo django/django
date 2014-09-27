@@ -667,3 +667,9 @@ your Django migrations in the ``migrations`` directory.
 
 More information is available in the
 `South 1.0 release notes <http://south.readthedocs.org/en/latest/releasenotes/1.0.html#library-migration-path>`_.
+
+.. seealso::
+
+    :doc:`The Migrations Operations Reference </ref/migration-operations>`
+        Covers the schema operations API, special operations, and writing your
+        own operations.

@@ -28,6 +28,9 @@ output incorrect code.
 All of the core Django operations are available from the
 ``django.db.migrations.operations`` module.
 
+For introductory material, see the :doc:`migrations topic guide
+</topics/migrations>`.
+
 Schema Operations
 =================
 

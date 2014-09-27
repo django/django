@@ -693,3 +693,9 @@ access to the humanize template tags and filters. The child template is
 responsible for its own ``{% load humanize %}``.
 
 This is a feature for the sake of maintainability and sanity.
+
+.. seealso::
+
+    :doc:`The Templates Reference </ref/templates/index>`
+        Covers built-in tags, built-in filters, using an alternative template,
+        language, and more.
