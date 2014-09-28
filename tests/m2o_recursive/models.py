@@ -1,5 +1,5 @@
 """
-11. Relating an object to itself, many-to-one
+Relating an object to itself, many-to-one
 
 To define a many-to-one relationship between a model and itself, use
 ``ForeignKey('self')``.

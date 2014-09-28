@@ -55,16 +55,23 @@ class Media(object):
         return mark_safe('\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES])))
 
     def render_js(self):
-        return [format_html('<script type="text/javascript" src="{0}"></script>', self.absolute_path(path)) for path in self._js]
+        return [
+            format_html(
+                '<script type="text/javascript" src="{0}"></script>',
+                self.absolute_path(path)
+            ) for path in self._js
+        ]
 
     def render_css(self):
         # To keep rendering order consistent, we can't just iterate over items().
         # We need to sort the keys, and iterate over the sorted list.
         media = sorted(self._css.keys())
-        return chain(*[
-            [format_html('<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />', self.absolute_path(path), medium)
-             for path in self._css[medium]]
-            for medium in media])
+        return chain(*[[
+            format_html(
+                '<link href="{0}" type="text/css" media="{1}" rel="stylesheet" />',
+                self.absolute_path(path), medium
+            ) for path in self._css[medium]
+        ] for medium in media])
 
     def absolute_path(self, path, prefix=None):
         if path.startswith(('http://', 'https://', '/')):
@@ -341,7 +348,10 @@ class ClearableFileInput(FileInput):
     input_text = ugettext_lazy('Change')
     clear_checkbox_label = ugettext_lazy('Clear')
 
-    template_with_initial = '%(initial_text)s: <a href="%(initial_url)s">%(initial)s</a> %(clear_template)s<br />%(input_text)s: %(input)s'
+    template_with_initial = (
+        '%(initial_text)s: <a href="%(initial_url)s">%(initial)s</a> '
+        '%(clear_template)s<br />%(input_text)s: %(input)s'
+    )
 
     template_with_clear = '%(clear)s <label for="%(clear_checkbox_id)s">%(clear_checkbox_label)s</label>'
 

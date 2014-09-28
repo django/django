@@ -522,7 +522,6 @@ class BaseCacheTests(object):
     def _perform_cull_test(self, cull_cache, initial_count, final_count):
         # Create initial cache key entries. This will overflow the cache,
         # causing a cull.
-        cull_cache.clear()
         for i in range(1, initial_count):
             cull_cache.set('cull%d' % i, 'value', 1000)
         count = 0
@@ -919,10 +918,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
             stdout=stdout
         )
         self.assertEqual(stdout.getvalue(),
-            "Cache table 'test cache table' already exists.\n" * len([
-                k for k, v in settings.CACHES.items()
-                if v['BACKEND'] == 'django.core.cache.backends.db.DatabaseCache'])
-        )
+            "Cache table 'test cache table' already exists.\n" * len(settings.CACHES))
 
     def test_createcachetable_with_table_argument(self):
         """
@@ -1426,16 +1422,16 @@ class CacheUtils(TestCase):
     def test_patch_cache_control(self):
         tests = (
             # Initial Cache-Control, kwargs to patch_cache_control, expected Cache-Control parts
-            (None, {'private': True}, set(['private'])),
+            (None, {'private': True}, {'private'}),
 
             # Test whether private/public attributes are mutually exclusive
-            ('private', {'private': True}, set(['private'])),
-            ('private', {'public': True}, set(['public'])),
-            ('public', {'public': True}, set(['public'])),
-            ('public', {'private': True}, set(['private'])),
-            ('must-revalidate,max-age=60,private', {'public': True}, set(['must-revalidate', 'max-age=60', 'public'])),
-            ('must-revalidate,max-age=60,public', {'private': True}, set(['must-revalidate', 'max-age=60', 'private'])),
-            ('must-revalidate,max-age=60', {'public': True}, set(['must-revalidate', 'max-age=60', 'public'])),
+            ('private', {'private': True}, {'private'}),
+            ('private', {'public': True}, {'public'}),
+            ('public', {'public': True}, {'public'}),
+            ('public', {'private': True}, {'private'}),
+            ('must-revalidate,max-age=60,private', {'public': True}, {'must-revalidate', 'max-age=60', 'public'}),
+            ('must-revalidate,max-age=60,public', {'private': True}, {'must-revalidate', 'max-age=60', 'private'}),
+            ('must-revalidate,max-age=60', {'public': True}, {'must-revalidate', 'max-age=60', 'public'}),
         )
 
         cc_delim_re = re.compile(r'\s*,\s*')

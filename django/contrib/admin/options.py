@@ -110,6 +110,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     readonly_fields = ()
     ordering = None
     view_on_site = True
+    show_full_result_count = True
 
     # Validation of ModelAdmin definitions
     # Old, deprecated style:
@@ -272,7 +273,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                                     self.admin_site, using=db)
             kwargs['help_text'] = ''
         elif db_field.name in (list(self.filter_vertical) + list(self.filter_horizontal)):
-            kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
+            kwargs['widget'] = widgets.FilteredSelectMultiple(
+                db_field.verbose_name,
+                db_field.name in self.filter_vertical
+            )
 
         if 'queryset' not in kwargs:
             queryset = self.get_field_queryset(db, db_field, request)
@@ -436,6 +440,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         return clean_lookup in valid_lookups
 
     def to_field_allowed(self, request, to_field):
+        """
+        Returns True if the model associated with this admin should be
+        allowed to be referenced by the specified field.
+        """
         opts = self.model._meta
 
         try:
@@ -445,8 +453,13 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
 
         # Make sure at least one of the models registered for this site
         # references this field through a FK or a M2M relationship.
-        registered_models = self.admin_site._registry
-        for related_object in opts.related_objects:
+        registered_models = set()
+        for model, admin in self.admin_site._registry.items():
+            registered_models.add(model)
+            for inline in admin.inlines:
+                registered_models.add(inline.model)
+
+        for related_object in opts.get_fields(forward=False, reverse=True, include_hidden=True):
             related_model = related_object.model
             if (any(issubclass(model, related_model) for model in registered_models) and
                     related_object.field.rel.get_related_field() == field):
@@ -1130,7 +1143,10 @@ class ModelAdmin(BaseModelAdmin):
                                             (opts.app_label, opts.model_name),
                                             args=(quote(pk_value),),
                                             current_app=self.admin_site.name)
-            post_url_continue = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, post_url_continue)
+            post_url_continue = add_preserved_filters(
+                {'preserved_filters': preserved_filters, 'opts': opts},
+                post_url_continue
+            )
             return HttpResponseRedirect(post_url_continue)
 
         elif "_addanother" in request.POST:
@@ -1832,7 +1848,8 @@ class InlineModelAdmin(BaseModelAdmin):
                         objs = []
                         for p in collector.protected:
                             objs.append(
-                                # Translators: Model verbose name and instance representation, suitable to be an item in a list
+                                # Translators: Model verbose name and instance representation,
+                                # suitable to be an item in a list.
                                 _('%(class_name)s %(instance)s') % {
                                     'class_name': p._meta.verbose_name,
                                     'instance': p}

@@ -64,7 +64,7 @@ def make_msgid(idstring=None):
 
 
 # Header names that contain structured address data (RFC #5322)
-ADDRESS_HEADERS = set([
+ADDRESS_HEADERS = {
     'from',
     'sender',
     'reply-to',
@@ -76,7 +76,7 @@ ADDRESS_HEADERS = set([
     'resent-to',
     'resent-cc',
     'resent-bcc',
-])
+}
 
 
 def forbid_multi_line_headers(name, val, encoding):
@@ -166,7 +166,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):
     def __init__(self, text, subtype, charset):
         self.encoding = charset
         if charset == 'utf-8':
-            # Unfortunately, Python doesn't support setting a Charset instance
+            # Unfortunately, Python < 3.5 doesn't support setting a Charset instance
             # as MIMEText init parameter (http://bugs.python.org/issue16324).
             # We do it manually and trigger re-encoding of the payload.
             MIMEText.__init__(self, text, subtype, None)
@@ -393,7 +393,9 @@ class EmailMultiAlternatives(EmailMessage):
         bytestrings). The SafeMIMEText class will handle any necessary encoding
         conversions.
         """
-        super(EmailMultiAlternatives, self).__init__(subject, body, from_email, to, bcc, connection, attachments, headers, cc)
+        super(EmailMultiAlternatives, self).__init__(
+            subject, body, from_email, to, bcc, connection, attachments, headers, cc
+        )
         self.alternatives = alternatives or []
 
     def attach_alternative(self, content, mimetype):

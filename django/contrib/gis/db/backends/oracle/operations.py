@@ -137,10 +137,25 @@ class OracleOperations(DatabaseOperations, BaseSpatialOperations):
     }
     geometry_functions.update(distance_functions)
 
-    gis_terms = set(['isnull'])
+    gis_terms = {'isnull'}
     gis_terms.update(geometry_functions)
 
     truncate_params = {'relate': None}
+
+    def geo_quote_name(self, name):
+        return super(OracleOperations, self).geo_quote_name(name).upper()
+
+    def get_db_converters(self, internal_type):
+        converters = super(OracleOperations, self).get_db_converters(internal_type)
+        geometry_fields = (
+            'PointField', 'GeometryField', 'LineStringField',
+            'PolygonField', 'MultiPointField', 'MultiLineStringField',
+            'MultiPolygonField', 'GeometryCollectionField', 'GeomField',
+            'GMLField',
+        )
+        if internal_type in geometry_fields:
+            converters.append(self.convert_textfield_value)
+        return converters
 
     def convert_extent(self, clob):
         if clob:

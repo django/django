@@ -620,9 +620,14 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get("/test_admin/admin/admin_views/m2mreference/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
-        # Specifying a field that is not refered by any other model directly registered
+        # #23329 - Specifying a field that is not refered by any other model directly registered
         # to this admin site but registered through inheritance should be allowed.
         response = self.client.get("/test_admin/admin/admin_views/referencedbyparent/", {TO_FIELD_VAR: 'id'})
+        self.assertEqual(response.status_code, 200)
+
+        # #23431 - Specifying a field that is only refered to by a inline of a registered
+        # model should be allowed.
+        response = self.client.get("/test_admin/admin/admin_views/referencedbyinline/", {TO_FIELD_VAR: 'id'})
         self.assertEqual(response.status_code, 200)
 
         # We also want to prevent the add and change view from leaking a
@@ -2469,9 +2474,26 @@ class AdminSearchTest(TestCase):
         """
         Test presence of reset link in search bar ("1 result (_x total_)").
         """
-        response = self.client.get('/test_admin/admin/admin_views/person/?q=Gui')
+        #   1 query for session + 1 for fetching user
+        # + 1 for filtered result + 1 for filtered count
+        # + 1 for total count
+        with self.assertNumQueries(5):
+            response = self.client.get('/test_admin/admin/admin_views/person/?q=Gui')
         self.assertContains(response,
             """<span class="small quiet">1 result (<a href="?">3 total</a>)</span>""",
+            html=True)
+
+    def test_no_total_count(self):
+        """
+        #8408 -- "Show all" should be displayed instead of the total count if
+        ModelAdmin.show_full_result_count is False.
+        """
+        #   1 query for session + 1 for fetching user
+        # + 1 for filtered result + 1 for filtered count
+        with self.assertNumQueries(4):
+            response = self.client.get('/test_admin/admin/admin_views/recommendation/?q=bar')
+        self.assertContains(response,
+            """<span class="small quiet">1 result (<a href="?">Show all</a>)</span>""",
             html=True)
 
 

@@ -574,7 +574,7 @@ class Query(object):
             return
         orig_opts = self.get_meta()
         seen = {}
-        must_include = {orig_opts.concrete_model: set([orig_opts.pk])}
+        must_include = {orig_opts.concrete_model: {orig_opts.pk}}
         for field_name in field_names:
             parts = field_name.split(LOOKUP_SEP)
             cur_model = self.model._meta.concrete_model
@@ -1374,9 +1374,13 @@ class Query(object):
                 field = opts.get_field(name)
                 model = field.parent_model._meta.concrete_model
             except FieldDoesNotExist:
-                # We didn't found the current field, so move position back
+                # We didn't find the current field, so move position back
                 # one step.
                 pos -= 1
+                if pos == -1 or fail_on_missing:
+                    available = list(opts.field_names) + list(self.aggregate_select)
+                    raise FieldError("Cannot resolve keyword %r into field. "
+                                     "Choices are: %s" % (name, ", ".join(available)))
                 break
             # Check if we need any joins for concrete inheritance cases (the
             # field lives in parent, but we are currently in one of its
@@ -1394,7 +1398,9 @@ class Query(object):
                         targets = (final_field.rel.get_related_field(),)
                         opts = int_model._meta
                         path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
-                        cur_names_with_path[1].append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
+                        cur_names_with_path[1].append(
+                            PathInfo(final_field.model._meta, opts, targets, final_field, False, True)
+                        )
             if hasattr(field, 'get_path_info'):
                 pathinfos = field.get_path_info()
                 if not allow_many:
@@ -1414,15 +1420,12 @@ class Query(object):
                 # Local non-relational field.
                 final_field = field
                 targets = (field,)
+                if fail_on_missing and pos + 1 != len(names):
+                    raise FieldError(
+                        "Cannot resolve keyword %r into field. Join on '%s'"
+                        " not permitted." % (names[pos + 1], name))
                 break
-        if pos == -1 or (fail_on_missing and pos + 1 != len(names)):
-            self.raise_field_error(opts, name)
         return path, final_field, targets, names[pos + 1:]
-
-    def raise_field_error(self, opts, name):
-        available = list(opts.field_names) + list(self.aggregate_select)
-        raise FieldError("Cannot resolve keyword %r into field. "
-                         "Choices are: %s" % (name, ", ".join(sorted(available))))
 
     def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True):
         """
@@ -1776,7 +1779,8 @@ class Query(object):
                 entry_params = []
                 pos = entry.find("%s")
                 while pos != -1:
-                    entry_params.append(next(param_iter))
+                    if pos == 0 or entry[pos - 1] != '%':
+                        entry_params.append(next(param_iter))
                     pos = entry.find("%s", pos + 2)
                 select_pairs[name] = (entry, entry_params)
             # This is order preserving, since self.extra_select is an OrderedDict.
@@ -2024,7 +2028,7 @@ def add_to_dict(data, key, value):
     if key in data:
         data[key].add(value)
     else:
-        data[key] = set([value])
+        data[key] = {value}
 
 
 def is_reverse_o2o(field):

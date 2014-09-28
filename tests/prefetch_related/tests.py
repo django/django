@@ -683,7 +683,7 @@ class GenericRelationTests(TestCase):
     def test_prefetch_GFK(self):
         TaggedItem.objects.create(tag="awesome", content_object=self.book1)
         TaggedItem.objects.create(tag="great", content_object=self.reader1)
-        TaggedItem.objects.create(tag="stupid", content_object=self.book2)
+        TaggedItem.objects.create(tag="outstanding", content_object=self.book2)
         TaggedItem.objects.create(tag="amazing", content_object=self.reader3)
 
         # 1 for TaggedItem table, 1 for Book table, 1 for Reader table
@@ -719,9 +719,9 @@ class GenericRelationTests(TestCase):
             # If we limit to books, we know that they will have 'read_by'
             # attributes, so the following makes sense:
             qs = TaggedItem.objects.filter(content_type=ct, tag='awesome').prefetch_related('content_object__read_by')
-            readers_of_awesome_books = set([r.name for tag in qs
-                                            for r in tag.content_object.read_by.all()])
-            self.assertEqual(readers_of_awesome_books, set(["me", "you", "someone"]))
+            readers_of_awesome_books = {r.name for tag in qs
+                                            for r in tag.content_object.read_by.all()}
+            self.assertEqual(readers_of_awesome_books, {"me", "you", "someone"})
 
     def test_nullable_GFK(self):
         TaggedItem.objects.create(tag="awesome", content_object=self.book1,

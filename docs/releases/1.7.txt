@@ -65,7 +65,9 @@ but a few of the key features are:
   it as soon as possible (nothing more than renaming is required).
 
 * ``initial_data`` fixtures are no longer loaded for apps with migrations; if
-  you want to load initial data for an app, we suggest you do it in a migration.
+  you want to load initial data for an app, we suggest you create a migration for
+  your application and define a :class:`~django.db.migrations.operations.RunPython`
+  or :class:`~django.db.migrations.operations.RunSQL` operation in the ``operations`` section of the migration.
 
 * Test rollback behavior is different for apps with migrations; in particular,
   Django will no longer emulate rollbacks on non-transactional databases or
@@ -519,7 +521,7 @@ Minor features
   that doesn't use the cache system at all but instead a JSON file called
   ``staticfiles.json`` for storing the mapping between the original file name
   (e.g. ``css/styles.css``) and the hashed file name (e.g.
-  ``css/styles.55e7cbb9ba48.css``. The ``staticfiles.json`` file is created
+  ``css/styles.55e7cbb9ba48.css``). The ``staticfiles.json`` file is created
   when running the :djadmin:`collectstatic` management command and should
   be a less expensive alternative for remote storages such as Amazon S3.
 
@@ -567,7 +569,7 @@ Email
 * :func:`~django.core.mail.send_mail` now accepts an ``html_message``
   parameter for sending a multipart ``text/plain`` and ``text/html`` email.
 * The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now accepts a
-  :attr:`~django.core.mail.backends.smtp.EmailBackend.timeout` parameter.
+  ``timeout`` parameter.
 
 File Storage
 ^^^^^^^^^^^^
@@ -1020,6 +1022,22 @@ script with::
 
 Otherwise, you will hit an ``AppRegistryNotReady`` exception.
 
+WSGI scripts
+^^^^^^^^^^^^
+
+Until Django 1.3, the recommended way to create a WSGI application was::
+
+    import django.core.handlers.wsgi
+    application = django.core.handlers.wsgi.WSGIHandler()
+
+In Django 1.4, support for WSGI was improved and the API changed to::
+
+    from django.core.wsgi import get_wsgi_application
+    application = get_wsgi_application()
+
+If you're still using the former style in your WSGI script, you need to
+upgrade to the latter, or you will hit an ``AppRegistryNotReady`` exception.
+
 App registry consistency
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1441,6 +1459,11 @@ Miscellaneous
 
 * Decoding the query string from URLs now falls back to the ISO-8859-1 encoding
   when the input is not valid UTF-8.
+
+* With the addition of the
+  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` to
+  the default project template, a database must be created before accessing
+  a page using :djadmin:`runserver`.
 
 .. _deprecated-features-1.7:
 

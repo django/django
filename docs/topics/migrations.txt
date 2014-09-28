@@ -23,7 +23,7 @@ Third-party tools, most notably `South <http://south.aeracode.org>`_,
 provided support for these additional types of change, but it was considered
 important enough that support was brought into core Django.
 
-Two Commands
+The Commands
 ------------
 
 There are several commands which you will use to interact with migrations
@@ -340,7 +340,9 @@ They will, however, have the same fields, relationships and ``Meta`` options
 
 References to functions in field options such as ``upload_to`` and
 ``limit_choices_to`` are serialized in migrations, so the functions will need
-to be kept around for as long as there is a migration referencing them.
+to be kept around for as long as there is a migration referencing them. Any
+:doc:`custom model fields </howto/custom-model-fields>` will also need to be
+kept, since these are imported directly by migrations.
 
 In addition, the base classes of the model are just stored as pointers,
 so you must always keep base classes around for as long as there is a migration
@@ -543,8 +545,8 @@ Django can serialize the following:
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
 - ``decimal.Decimal`` instances
 - Any Django field
-- Any function or method reference (e.g. ``datetime.datetime.today``)
-- Any class reference
+- Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
+- Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
 Django can serialize the following on Python 3 only:
@@ -553,6 +555,7 @@ Django can serialize the following on Python 3 only:
 
 Django cannot serialize:
 
+- Nested classes
 - Arbitrary class instances (e.g. ``MyClass(4.3, 5.7)``)
 - Lambdas
 
@@ -598,9 +601,14 @@ of three things ``(path, args, kwargs)``:
 Django will write out the value as an instantiation of your class with the
 given arguments, similar to the way it writes out references to Django fields.
 
+To prevent a new migration from being created each time
+:djadmin:`makemigrations` is run, you should also add a ``__eq__()`` method to
+the decorated class. This function will be called by Django's migration
+framework to detect changes between states.
+
 As long as all of the arguments to your class' constructor are themselves
-serializable, you can just use the ``@deconstructible`` class decorator
-from ``django.utils.deconstruct`` to add the method::
+serializable, you can use the ``@deconstructible`` class decorator from
+``django.utils.deconstruct`` to add the ``deconstruct()`` method::
 
     from django.utils.deconstruct import deconstructible
 
@@ -608,7 +616,12 @@ from ``django.utils.deconstruct`` to add the method::
     class MyCustomClass(object):
 
         def __init__(self, foo=1):
+            self.foo = foo
             ...
+
+        def __eq__(self, other):
+            return self.foo == other.foo
+
 
 The decorator adds logic to capture and preserve the arguments on their
 way into your constructor, and then returns those arguments exactly when

@@ -17,7 +17,7 @@ setting_changed = Signal(providing_args=["setting", "value", "enter"])
 # except for cases where the receiver is related to a contrib app.
 
 # Settings that may not work well when using 'override_settings' (#19031)
-COMPLEX_OVERRIDE_SETTINGS = set(['DATABASES'])
+COMPLEX_OVERRIDE_SETTINGS = {'DATABASES'}
 
 
 @receiver(setting_changed)

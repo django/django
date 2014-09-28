@@ -36,7 +36,8 @@ from .models import (Article, Chapter, Child, Parent, Picture, Widget,
     FilteredManager, EmptyModelHidden, EmptyModelVisible, EmptyModelMixin,
     State, City, Restaurant, Worker, ParentWithDependentChildren,
     DependentChild, StumpJoke, FieldOverridePost, FunkyTag,
-    ReferencedByParent, ChildOfReferer, M2MReference)
+    ReferencedByParent, ChildOfReferer, M2MReference, ReferencedByInline,
+    InlineReference, InlineReferer)
 
 
 def callable_year(dt_value):
@@ -326,6 +327,7 @@ class LanguageAdmin(admin.ModelAdmin):
 
 
 class RecommendationAdmin(admin.ModelAdmin):
+    show_full_result_count = False
     search_fields = ('=titletranslation__text', '=recommender__titletranslation__text',)
 
 
@@ -832,6 +834,14 @@ class FunkyTagAdmin(admin.ModelAdmin):
     list_display = ('name', 'content_object')
 
 
+class InlineReferenceInline(admin.TabularInline):
+    model = InlineReference
+
+
+class InlineRefererAdmin(admin.ModelAdmin):
+    inlines = [InlineReferenceInline]
+
+
 site = admin.AdminSite(name="admin")
 site.site_url = '/my-site-url/'
 site.register(Article, ArticleAdmin)
@@ -892,6 +902,8 @@ site.register(FunkyTag, FunkyTagAdmin)
 site.register(ReferencedByParent)
 site.register(ChildOfReferer)
 site.register(M2MReference)
+site.register(ReferencedByInline)
+site.register(InlineReferer, InlineRefererAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:

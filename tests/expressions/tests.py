@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from copy import deepcopy
 import datetime
 
 from django.core.exceptions import FieldError
@@ -286,6 +287,14 @@ class ExpressionsTests(TestCase):
             company_ceo_set__num_employees=F('company_ceo_set__num_employees')
         )
         self.assertEqual(str(qs.query).count('JOIN'), 2)
+
+    def test_F_object_deepcopy(self):
+        """
+        Make sure F objects can be deepcopied (#23492)
+        """
+        f = F("foo")
+        g = deepcopy(f)
+        self.assertEqual(f.name, g.name)
 
 
 class ExpressionsNumericTests(TestCase):

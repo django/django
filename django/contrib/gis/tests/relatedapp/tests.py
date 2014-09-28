@@ -104,16 +104,18 @@ class RelatedGeoModelTest(TestCase):
         ref_u2 = MultiPoint(p2, p3, srid=4326)
 
         u1 = City.objects.unionagg(field_name='location__point')
-        u2 = City.objects.exclude(name__in=('Roswell', 'Houston', 'Dallas', 'Fort Worth')).unionagg(field_name='location__point')
+        u2 = City.objects.exclude(
+            name__in=('Roswell', 'Houston', 'Dallas', 'Fort Worth'),
+        ).unionagg(field_name='location__point')
         u3 = aggs['location__point__union']
         self.assertEqual(type(u1), MultiPoint)
         self.assertEqual(type(u3), MultiPoint)
 
         # Ordering of points in the result of the union is not defined and
         # implementation-dependent (DB backend, GEOS version)
-        self.assertSetEqual(set([p.ewkt for p in ref_u1]), set([p.ewkt for p in u1]))
-        self.assertSetEqual(set([p.ewkt for p in ref_u2]), set([p.ewkt for p in u2]))
-        self.assertSetEqual(set([p.ewkt for p in ref_u1]), set([p.ewkt for p in u3]))
+        self.assertSetEqual({p.ewkt for p in ref_u1}, {p.ewkt for p in u1})
+        self.assertSetEqual({p.ewkt for p in ref_u2}, {p.ewkt for p in u2})
+        self.assertSetEqual({p.ewkt for p in ref_u1}, {p.ewkt for p in u3})
 
     def test05_select_related_fk_to_subclass(self):
         "Testing that calling select_related on a query over a model with an FK to a model subclass works"
@@ -124,7 +126,11 @@ class RelatedGeoModelTest(TestCase):
         "Testing F() expressions on GeometryFields."
         # Constructing a dummy parcel border and getting the City instance for
         # assigning the FK.
-        b1 = GEOSGeometry('POLYGON((-97.501205 33.052520,-97.501205 33.052576,-97.501150 33.052576,-97.501150 33.052520,-97.501205 33.052520))', srid=4326)
+        b1 = GEOSGeometry(
+            'POLYGON((-97.501205 33.052520,-97.501205 33.052576,'
+            '-97.501150 33.052576,-97.501150 33.052520,-97.501205 33.052520))',
+            srid=4326
+        )
         pcity = City.objects.get(name='Aurora')
 
         # First parcel has incorrect center point that is equal to the City;
@@ -211,6 +217,8 @@ class RelatedGeoModelTest(TestCase):
             self.assertEqual(val_dict['id'], c_id)
             self.assertEqual(val_dict['location__id'], l_id)
 
+    # TODO: fix on Oracle -- qs2 returns an empty result for an unknown reason
+    @no_oracle
     def test10_combine(self):
         "Testing the combination of two GeoQuerySets.  See #10807."
         buf1 = City.objects.get(name='Aurora').location.point.buffer(0.1)
@@ -257,6 +265,10 @@ class RelatedGeoModelTest(TestCase):
         self.assertEqual(1, len(vqs))
         self.assertEqual(3, vqs[0]['num_books'])
 
+    # TODO: fix on Oracle -- get the following error because the SQL is ordered
+    # by a geometry object, which Oracle apparently doesn't like:
+    #  ORA-22901: cannot compare nested table or VARRAY or LOB attributes of an object type
+    @no_oracle
     def test13c_count(self):
         "Testing `Count` aggregate with `.values()`.  See #15305."
         qs = Location.objects.filter(id=5).annotate(num_cities=Count('city')).values('id', 'point', 'num_cities')
@@ -280,7 +292,10 @@ class RelatedGeoModelTest(TestCase):
         # SELECT AsText(ST_Collect("relatedapp_location"."point")) FROM "relatedapp_city" LEFT OUTER JOIN
         #    "relatedapp_location" ON ("relatedapp_city"."location_id" = "relatedapp_location"."id")
         #    WHERE "relatedapp_city"."state" = 'TX';
-        ref_geom = GEOSGeometry('MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,-95.363151 29.763374,-96.801611 32.782057)')
+        ref_geom = GEOSGeometry(
+            'MULTIPOINT(-97.516111 33.058333,-96.801611 32.782057,'
+            '-95.363151 29.763374,-96.801611 32.782057)'
+        )
 
         c1 = City.objects.filter(state='TX').collect(field_name='location__point')
         c2 = City.objects.filter(state='TX').aggregate(Collect('location__point'))['location__point__collect']

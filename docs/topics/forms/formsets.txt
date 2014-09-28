@@ -91,8 +91,7 @@ Limiting the maximum number of forms
 ------------------------------------
 
 The ``max_num`` parameter to :func:`~django.forms.formsets.formset_factory`
-gives you the ability to limit the maximum number of empty forms the formset
-will display::
+gives you the ability to limit the number of forms the formset will display::
 
     >>> from django.forms.formsets import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -103,15 +102,21 @@ will display::
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
 
-If the value of ``max_num`` is greater than the number of existing
-objects, up to ``extra`` additional blank forms will be added to the formset,
-so long as the total number of forms does not exceed ``max_num``.
+If the value of ``max_num`` is greater than the number of existing items in the
+initial data, up to ``extra`` additional blank forms will be added to the
+formset, so long as the total number of forms does not exceed ``max_num``. For
+example, if ``extra=2`` and ``max_num=2`` and the formset is initialized with
+one ``initial`` item, a form for the initial item and one blank form will be
+displayed.
+
+If the number of items in the initial data exceeds ``max_num``, all initial
+data forms will be displayed regardless of the value of ``max_num`` and no
+extra forms will be displayed. For example, if ``extra=3`` and ``max_num=1``
+and the formset is initialized with two initial items, two forms with the
+initial data will be displayed.
 
 A ``max_num`` value of ``None`` (the default) puts a high limit on the number
 of forms displayed (1000). In practice this is equivalent to no limit.
-
-If the number of forms in the initial data exceeds ``max_num``, all initial
-data forms will be displayed regardless.  (No extra forms will be displayed.)
 
 By default, ``max_num`` only affects how many forms are displayed and does not
 affect validation.  If ``validate_max=True`` is passed to the

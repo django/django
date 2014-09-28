@@ -14,5 +14,6 @@ secure_sitemaps = {
 urlpatterns = [
     url(r'^secure/index\.xml$', views.index, {'sitemaps': secure_sitemaps}),
     url(r'^secure/sitemap-(?P<section>.+)\.xml$', views.sitemap,
-        {'sitemaps': secure_sitemaps}),
+        {'sitemaps': secure_sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'),
 ]

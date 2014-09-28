@@ -73,7 +73,7 @@ class BaseStaticFilesTestCase(object):
         self._nonascii_filepath = os.path.join(self.testfiles_path, '\u2297.txt')
         with codecs.open(self._nonascii_filepath, 'w', 'utf-8') as f:
             f.write("\u2297 in the app dir")
-        # And also create the stupid hidden file to dwarf the setup.py's
+        # And also create the magic hidden file to trick the setup.py's
         # package data handling.
         self._hidden_filepath = os.path.join(self.testfiles_path, '.hidden')
         with codecs.open(self._hidden_filepath, 'w', 'utf-8') as f:

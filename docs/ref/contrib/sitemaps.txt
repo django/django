@@ -314,10 +314,7 @@ the sitemap. For example::
 
     # sitemaps.py
     from django.contrib import sitemaps
-    from django.contrib.sitemaps.views import sitemap
     from django.core.urlresolvers import reverse
-
-    from . import views
 
     class StaticViewSitemap(sitemaps.Sitemap):
         priority = 0.5
@@ -331,7 +328,10 @@ the sitemap. For example::
 
     # urls.py
     from django.conf.urls import url
+    from django.contrib.sitemaps.views import sitemap
+
     from .sitemaps import StaticViewSitemap
+    from . import views
 
     sitemaps = {
         'static': StaticViewSitemap,

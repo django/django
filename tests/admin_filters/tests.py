@@ -91,11 +91,11 @@ class DepartmentListFilterLookupWithNonStringValue(SimpleListFilter):
     parameter_name = 'department'
 
     def lookups(self, request, model_admin):
-        return sorted(set([
+        return sorted({
             (employee.department.id,  # Intentionally not a string (Refs #19318)
              employee.department.code)
             for employee in model_admin.get_queryset(request).all()
-        ]))
+        })
 
     def queryset(self, request, queryset):
         if self.value():
@@ -402,7 +402,7 @@ class ListFiltersTests(TestCase):
         # Make sure that all users are present in the author's list filter
         filterspec = changelist.get_filters(request)[0][1]
         expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
-        self.assertEqual(filterspec.lookup_choices, expected)
+        self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
 
         request = self.request_factory.get('/', {'author__isnull': 'True'})
         changelist = self.get_changelist(request, Book, modeladmin)
@@ -438,7 +438,7 @@ class ListFiltersTests(TestCase):
         # Make sure that all users are present in the contrib's list filter
         filterspec = changelist.get_filters(request)[0][2]
         expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
-        self.assertEqual(filterspec.lookup_choices, expected)
+        self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
 
         request = self.request_factory.get('/', {'contributors__isnull': 'True'})
         changelist = self.get_changelist(request, Book, modeladmin)
@@ -526,7 +526,7 @@ class ListFiltersTests(TestCase):
         # Make sure that only actual authors are present in author's list filter
         filterspec = changelist.get_filters(request)[0][4]
         expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob')]
-        self.assertEqual(filterspec.lookup_choices, expected)
+        self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
 
     def test_relatedonlyfieldlistfilter_manytomany(self):
         modeladmin = BookAdminRelatedOnlyFilter(Book, site)
@@ -537,7 +537,7 @@ class ListFiltersTests(TestCase):
         # Make sure that only actual contributors are present in contrib's list filter
         filterspec = changelist.get_filters(request)[0][5]
         expected = [(self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
-        self.assertEqual(filterspec.lookup_choices, expected)
+        self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
 
     def test_booleanfieldlistfilter(self):
         modeladmin = BookAdmin(Book, site)

@@ -2,7 +2,7 @@ import re
 
 import cx_Oracle
 
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from django.db.backends import BaseDatabaseIntrospection, FieldInfo, TableInfo
 from django.utils.encoding import force_text
 
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
@@ -48,9 +48,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return super(DatabaseIntrospection, self).get_field_type(data_type, description)
 
     def get_table_list(self, cursor):
-        "Returns a list of table names in the current database."
-        cursor.execute("SELECT TABLE_NAME FROM USER_TABLES")
-        return [row[0].lower() for row in cursor.fetchall()]
+        """
+        Returns a list of table and view names in the current database.
+        """
+        cursor.execute("SELECT TABLE_NAME, 't' FROM USER_TABLES UNION ALL "
+                       "SELECT VIEW_NAME, 'v' FROM USER_VIEWS")
+        return [TableInfo(row[0].lower(), row[1]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."

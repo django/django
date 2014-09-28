@@ -3,7 +3,7 @@ from django.db.models.query import QuerySet
 
 from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.db.models.fields import get_srid_info, PointField, LineStringField
-from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery
+from django.contrib.gis.db.models.sql import AreaField, DistanceField, GeomField, GeoQuery, GMLField
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 
@@ -175,6 +175,8 @@ class GeoQuerySet(QuerySet):
         if backend.postgis:
             s['procedure_fmt'] = '%(version)s,%(geo_col)s,%(precision)s'
             s['procedure_args'] = {'precision': precision, 'version': version}
+        if backend.oracle:
+            s['select_field'] = GMLField()
 
         return self._spatial_attribute('gml', s, **kwargs)
 
@@ -619,7 +621,10 @@ class GeoQuerySet(QuerySet):
                 geodetic = unit_name.lower() in geo_field.geodetic_units
 
             if geodetic and not connection.features.supports_distance_geodetic:
-                raise ValueError('This database does not support linear distance calculations on geodetic coordinate systems.')
+                raise ValueError(
+                    'This database does not support linear distance '
+                    'calculations on geodetic coordinate systems.'
+                )
 
             if distance:
                 if self.query.transformed_srid:
@@ -661,7 +666,10 @@ class GeoQuerySet(QuerySet):
                         if not isinstance(geo_field, PointField):
                             raise ValueError('Spherical distance calculation only supported on PointFields.')
                         if not str(Geometry(six.memoryview(params[0].ewkb)).geom_type) == 'Point':
-                            raise ValueError('Spherical distance calculation only supported with Point Geometry parameters')
+                            raise ValueError(
+                                'Spherical distance calculation only supported with '
+                                'Point Geometry parameters'
+                            )
                     # The `function` procedure argument needs to be set differently for
                     # geodetic distance calculations.
                     if spheroid:

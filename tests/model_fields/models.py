@@ -1,5 +1,6 @@
 import os
 import tempfile
+import uuid
 import warnings
 
 try:
@@ -342,3 +343,15 @@ class AllFieldsModel(models.Model):
 
 
 ###############################################################################
+
+
+class UUIDModel(models.Model):
+    field = models.UUIDField()
+
+
+class NullableUUIDModel(models.Model):
+    field = models.UUIDField(blank=True, null=True)
+
+
+class PrimaryKeyUUIDModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)

@@ -16,6 +16,11 @@ class BaseSpatialFeatures(object):
     # Does the database contain a SpatialRefSys model to store SRID information?
     has_spatialrefsys_table = True
 
+    # Does the backend support the django.contrib.gis.utils.add_srs_entry() utility?
+    supports_add_srs_entry = True
+    # Does the backend introspect GeometryField to its subtypes?
+    supports_geometry_field_introspection = True
+
     # Reference implementation of 3D functions is:
     # http://postgis.net/docs/PostGIS_Special_Functions_Index.html#PostGIS_3D_Functions
     supports_3d_functions = False
@@ -237,7 +242,12 @@ class SpatialRefSysMixin(object):
     # TODO: Figure out how to pull out angular units of projected coordinate system and
     # fix for LOCAL_CS types.  GDAL should be highly recommended for performing
     # distance queries.
-    units_regex = re.compile(r'.+UNIT ?\["(?P<unit_name>[\w \'\(\)]+)", ?(?P<unit>[\d\.]+)(,AUTHORITY\["(?P<unit_auth_name>[\w \'\(\)]+)","(?P<unit_auth_val>\d+)"\])?\]([\w ]+)?(,AUTHORITY\["(?P<auth_name>[\w \'\(\)]+)","(?P<auth_val>\d+)"\])?\]$')
+    units_regex = re.compile(
+        r'.+UNIT ?\["(?P<unit_name>[\w \'\(\)]+)", ?(?P<unit>[\d\.]+)'
+        r'(,AUTHORITY\["(?P<unit_auth_name>[\w \'\(\)]+)",'
+        r'"(?P<unit_auth_val>\d+)"\])?\]([\w ]+)?(,'
+        r'AUTHORITY\["(?P<auth_name>[\w \'\(\)]+)","(?P<auth_val>\d+)"\])?\]$'
+    )
 
     @property
     def srs(self):

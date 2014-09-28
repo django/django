@@ -124,6 +124,10 @@ class AppConfigStub(AppConfig):
     path = ''
 
     def __init__(self, label):
+        self.label = label
+        # App-label and app-name are not the same thing, so technically passing
+        # in the label here is wrong. In practice, migrations don't care about
+        # the app name, but we need something unique, and the label works fine.
         super(AppConfigStub, self).__init__(label, None)
 
     def import_models(self, all_models):

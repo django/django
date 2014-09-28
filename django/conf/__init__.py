@@ -12,7 +12,6 @@ import time     # Needed for Windows
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.datastructures import dict_merge
 from django.utils.functional import LazyObject, empty
 from django.utils import six
 
@@ -78,10 +77,6 @@ class BaseSettings(object):
         elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, six.string_types):
             raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
                 "to a tuple, not a string.")
-        elif (hasattr(self, name) and name.isupper() and
-                isinstance(getattr(self, name), dict) and isinstance(value, dict)):
-            # This allows defining only a partial dict to update a global setting
-            value = dict_merge(getattr(self, name), value)
         object.__setattr__(self, name, value)
 
 
@@ -95,13 +90,7 @@ class Settings(BaseSettings):
         # store the settings module in case someone later cares
         self.SETTINGS_MODULE = settings_module
 
-        try:
-            mod = importlib.import_module(self.SETTINGS_MODULE)
-        except ImportError as e:
-            raise ImportError(
-                "Could not import settings '%s' (Is it on sys.path? Is there an import error in the settings file?): %s"
-                % (self.SETTINGS_MODULE, e)
-            )
+        mod = importlib.import_module(self.SETTINGS_MODULE)
 
         tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS", "LOCALE_PATHS")
         self._explicit_settings = set()
@@ -149,7 +138,7 @@ class UserSettingsHolder(BaseSettings):
         from the module specified in default_settings (if possible).
         """
         self.__dict__['_deleted'] = set()
-        self.__dict__['default_settings'] = default_settings
+        self.default_settings = default_settings
 
     def __getattr__(self, name):
         if name in self._deleted:

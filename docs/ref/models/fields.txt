@@ -1012,6 +1012,31 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length` argument. If you don't specify
 :attr:`~CharField.max_length`, a default of 200 is used.
 
+UUIDField
+---------
+
+.. versionadded:: 1.8
+
+.. class:: UUIDField([**options])
+
+A field for storing universally unique identifiers. Uses Python's
+:class:`~python:uuid.UUID` class. When used on PostgreSQL, this stores in a
+``uuid`` datatype, otherwise in a ``char(32)``.
+
+Universally unique identifiers are a good alternative to :class:`AutoField` for
+:attr:`~Field.primary_key`. The database will not generate the UUID for you, so
+it is recommended to use :attr:`~Field.default`::
+
+    import uuid
+    from django.db import models
+
+    class MyUUIDModel(models.Model):
+        id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+        # other fields
+
+Note that a callable (with the parentheses omitted) is passed to ``default``,
+not an instance of ``UUID``.
+
 Relationship fields
 ===================
 
@@ -1259,6 +1284,12 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     You only want to override this to be ``False`` if you are sure your
     model should always point towards the swapped-in model - for example,
     if it is a profile model designed specifically for your custom user model.
+
+    Setting it to ``False`` does not mean you can reference a swappable model
+    even if it is swapped out - ``False`` just means that the migrations made
+    with this ForeignKey will always reference the exact model you specify
+    (so it will fail hard if the user tries to run with a User model you don't
+    support, for example).
 
     If in doubt, leave it to its default of ``True``.
 
@@ -1516,7 +1547,7 @@ accepted by :class:`ForeignKey`, plus one extra argument:
 .. attribute:: OneToOneField.parent_link
 
     When ``True`` and used in a model which inherits from another
-    (concrete) model, indicates that this field should be used as the
+    :term:`concrete model`, indicates that this field should be used as the
     link back to the parent class, rather than the extra
     ``OneToOneField`` which would normally be implicitly created by
     subclassing.
@@ -1625,7 +1656,7 @@ Field API reference
         See :ref:`converting-values-to-python-objects` for usage.
 
         .. note::
-        
+
             For performance reasons, ``from_db_value`` is not implemented as a
             no-op on fields which do not require it (all Django fields).
             Consequently you may not call ``super`` in your definition.
@@ -1684,7 +1715,7 @@ Field API reference
 
     Fields often receive their values as a different type, either from
     serialization or from forms.
-    
+
     .. method:: to_python(value)
 
         Converts the value into the correct Python object. It acts as the

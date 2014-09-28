@@ -78,9 +78,14 @@ class WriterTests(TestCase):
         self.assertEqual(string, "'foobar'")
         self.assertSerializedEqual({1: 2})
         self.assertSerializedEqual(["a", 2, True, None])
-        self.assertSerializedEqual(set([2, 3, "eighty"]))
+        self.assertSerializedEqual({2, 3, "eighty"})
         self.assertSerializedEqual({"lalalala": ["yeah", "no", "maybe"]})
         self.assertSerializedEqual(_('Hello'))
+        # Builtins
+        self.assertSerializedEqual([list, tuple, dict, set])
+        string, imports = MigrationWriter.serialize([list, tuple, dict, set])
+        self.assertEqual(string, "[list, tuple, dict, set]")
+        self.assertEqual(imports, set())
         # Functions
         with six.assertRaisesRegex(self, ValueError, 'Cannot serialize function: lambda'):
             self.assertSerializedEqual(lambda x: 42)
@@ -115,7 +120,7 @@ class WriterTests(TestCase):
             SettingsReference("someapp.model", "AUTH_USER_MODEL"),
             (
                 "settings.AUTH_USER_MODEL",
-                set(["from django.conf import settings"]),
+                {"from django.conf import settings"},
             )
         )
         self.assertSerializedResultEqual(
@@ -167,9 +172,17 @@ class WriterTests(TestCase):
         self.assertEqual(string, "django.core.validators.EmailValidator(message='hello')")
         self.serialize_round_trip(validator)
 
-        validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
+        validator = deconstructible(path="migrations.test_writer.EmailValidator")(EmailValidator)(message="hello")
         string = MigrationWriter.serialize(validator)[0]
-        self.assertEqual(string, "custom.EmailValidator(message='hello')")
+        self.assertEqual(string, "migrations.test_writer.EmailValidator(message='hello')")
+
+        validator = deconstructible(path="custom.EmailValidator")(EmailValidator)(message="hello")
+        with six.assertRaisesRegex(self, ImportError, "No module named '?custom'?"):
+            MigrationWriter.serialize(validator)
+
+        validator = deconstructible(path="django.core.validators.EmailValidator2")(EmailValidator)(message="hello")
+        with self.assertRaisesMessage(ValueError, "Could not find object EmailValidator2 in django.core.validators."):
+            MigrationWriter.serialize(validator)
 
     def test_serialize_empty_nonempty_tuple(self):
         """

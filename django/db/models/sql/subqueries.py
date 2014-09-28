@@ -130,7 +130,10 @@ class UpdateQuery(Query):
             direct = not field.is_reverse_object or hasattr(field, 'for_concrete_model')
             model = field.parent_model._meta.concrete_model
             if not direct or hasattr(field, 'is_m2m'):
-                raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
+                raise FieldError(
+                    'Cannot update model field %r (only non-relations and '
+                    'foreign keys permitted).' % field
+                )
             if model is not self.get_meta().model:
                 self.add_related_update(model, field, val)
                 continue

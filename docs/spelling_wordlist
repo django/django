@@ -203,6 +203,7 @@ filesizeformat
 filesystem
 filesystems
 findstatic
+Firesheep
 firstof
 fk
 flatpage
@@ -329,6 +330,7 @@ Kyngesburye
 latin
 lawrence
 Lawrence
+Leidel
 lexer
 lhs
 lifecycle
@@ -426,6 +428,7 @@ Palau
 params
 parens
 pdf
+PEM
 perl
 permalink
 pessimization
@@ -465,6 +468,7 @@ prepopulate
 prepopulated
 prepopulates
 preprocess
+Procida
 programmatically
 projectname
 proxied
@@ -571,7 +575,10 @@ sqlmigrate
 sqlsequencereset
 squashmigrations
 ssi
+SSL
 stacktrace
+startapp
+startproject
 startswith
 stateful
 staticfile
@@ -741,6 +748,7 @@ www
 xe
 xgettext
 xref
+XSS
 xxxxx
 yesno
 Zope

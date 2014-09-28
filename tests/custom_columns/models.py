@@ -1,5 +1,5 @@
 """
-17. Custom column/table names
+Custom column/table names
 
 If your database column name is different than your model attribute, use the
 ``db_column`` parameter. Note that you'll use the field's name, not its column
@@ -23,6 +23,7 @@ from django.utils.encoding import python_2_unicode_compatible
 
 @python_2_unicode_compatible
 class Author(models.Model):
+    Author_ID = models.AutoField(primary_key=True, db_column='Author ID')
     first_name = models.CharField(max_length=30, db_column='firstname')
     last_name = models.CharField(max_length=30, db_column='last')
 
@@ -36,8 +37,10 @@ class Author(models.Model):
 
 @python_2_unicode_compatible
 class Article(models.Model):
+    Article_ID = models.AutoField(primary_key=True, db_column='Article ID')
     headline = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author, db_table='my_m2m_table')
+    primary_author = models.ForeignKey(Author, db_column='Author ID', related_name='primary_set', null=True)
 
     def __str__(self):
         return self.headline
