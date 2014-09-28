@@ -8,12 +8,12 @@ import re
 # Valid query types (a set is used for speedy lookups). These are (currently)
 # considered SQL-specific; other storage systems may choose to use different
 # lookup types.
-QUERY_TERMS = set([
+QUERY_TERMS = {
     'exact', 'iexact', 'contains', 'icontains', 'gt', 'gte', 'lt', 'lte', 'in',
     'startswith', 'istartswith', 'endswith', 'iendswith', 'range', 'year',
     'month', 'day', 'week_day', 'hour', 'minute', 'second', 'isnull', 'search',
     'regex', 'iregex',
-])
+}
 
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.

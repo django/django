@@ -310,7 +310,7 @@ Argument        Value
 ``model``       ``Topping`` (the class of the objects added to the
                 ``Pizza``)
 
-``pk_set``      ``set([t.id])`` (since only ``Topping t`` was added to the relation)
+``pk_set``      ``{t.id}`` (since only ``Topping t`` was added to the relation)
 
 ``using``       ``"default"`` (since the default router sends writes here)
 ==============  ============================================================
@@ -337,7 +337,7 @@ Argument        Value
 ``model``       ``Pizza`` (the class of the objects removed from the
                 ``Topping``)
 
-``pk_set``      ``set([p.id])`` (since only ``Pizza p`` was removed from the
+``pk_set``      ``{p.id}`` (since only ``Pizza p`` was removed from the
                 relation)
 
 ``using``       ``"default"`` (since the default router sends writes here)

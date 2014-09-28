@@ -78,7 +78,7 @@ class WriterTests(TestCase):
         self.assertEqual(string, "'foobar'")
         self.assertSerializedEqual({1: 2})
         self.assertSerializedEqual(["a", 2, True, None])
-        self.assertSerializedEqual(set([2, 3, "eighty"]))
+        self.assertSerializedEqual({2, 3, "eighty"})
         self.assertSerializedEqual({"lalalala": ["yeah", "no", "maybe"]})
         self.assertSerializedEqual(_('Hello'))
         # Builtins
@@ -120,7 +120,7 @@ class WriterTests(TestCase):
             SettingsReference("someapp.model", "AUTH_USER_MODEL"),
             (
                 "settings.AUTH_USER_MODEL",
-                set(["from django.conf import settings"]),
+                {"from django.conf import settings"},
             )
         )
         self.assertSerializedResultEqual(

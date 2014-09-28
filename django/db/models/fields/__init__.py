@@ -349,7 +349,7 @@ class Field(RegisterLookupMixin):
             "validators": "_validators",
             "verbose_name": "_verbose_name",
         }
-        equals_comparison = set(["choices", "validators", "db_tablespace"])
+        equals_comparison = {"choices", "validators", "db_tablespace"}
         for name, default in possibles.items():
             value = getattr(self, attr_overrides.get(name, name))
             # Unroll anything iterable for choices into a concrete list

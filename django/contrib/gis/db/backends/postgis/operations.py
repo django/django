@@ -177,7 +177,7 @@ class PostGISOperations(DatabaseOperations, BaseSpatialOperations):
         }
 
         # Creating a dictionary lookup of all GIS terms for PostGIS.
-        self.gis_terms = set(['isnull'])
+        self.gis_terms = {'isnull'}
         self.gis_terms.update(self.geometry_operators)
         self.gis_terms.update(self.geometry_functions)
 
