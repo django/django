@@ -130,7 +130,7 @@ class IntrospectionTests(TestCase):
         self.assertEqual(
             set(key_columns),
             {('reporter_id', Reporter._meta.db_table, 'id'),
-                 ('response_to_id', Article._meta.db_table, 'id')})
+             ('response_to_id', Article._meta.db_table, 'id')})
 
     def test_get_primary_key_column(self):
         with connection.cursor() as cursor:
