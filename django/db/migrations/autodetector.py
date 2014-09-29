@@ -620,8 +620,8 @@ class MigrationAutodetector(object):
         """
         deleted_models = set(self.old_model_keys) - set(self.new_model_keys)
         deleted_unmanaged_models = set(self.old_unmanaged_keys) - set(self.new_unmanaged_keys)
-        models = chain(sorted(deleted_models), sorted(deleted_unmanaged_models))
-        for app_label, model_name in models:
+        all_deleted_models = chain(sorted(deleted_models), sorted(deleted_unmanaged_models))
+        for app_label, model_name in all_deleted_models:
             model_state = self.from_state.models[app_label, model_name]
             model = self.old_apps.get_model(app_label, model_name)
             if not model._meta.managed:
