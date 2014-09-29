@@ -69,7 +69,7 @@ class SQLEvaluator(object):
             except FieldDoesNotExist:
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (self.name,
-                                                      [f.name for f in self.opts.fields]))
+                                                      sorted(f.name for f in self.opts.fields)))
 
     ##################################################
     # Visitor methods for final expression evaluation #
