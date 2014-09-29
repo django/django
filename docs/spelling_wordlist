@@ -356,6 +356,7 @@ lte
 Magee
 makemessages
 makemigrations
+Mako
 Mapnik
 MBR
 memcache
@@ -381,6 +382,7 @@ modelformset
 modwsgi
 monkeypatched
 Montréal
+mssql
 multijoins
 multiline
 multipart

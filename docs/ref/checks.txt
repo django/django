@@ -8,7 +8,7 @@ The system check framework is a set of static checks for validating Django
 projects. It detects common problems and provides hints for how to fix them.
 The framework is extensible so you can easily add your own checks.
 
-For details on how to add your own checks and integrate them with Django`s
+For details on how to add your own checks and integrate them with Django's
 system checks, see the :doc:`System check topic guide </topics/checks>`.
 
 Builtin tags
