@@ -14,7 +14,7 @@ from django.test.html import HTMLParseError, parse_html
 from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
 
-from .models import Person
+from .models import Car, Person, PossessedCar
 from .views import empty_response
 
 
@@ -176,6 +176,33 @@ class AssertQuerysetEqualTests(TestCase):
         self.assertQuerysetEqual(
             Person.objects.filter(name='p1'),
             [repr(self.p1)]
+        )
+
+    def test_repeated_values(self):
+        """
+        Test that assertQuerysetEqual checks the number of appearance of each item
+        when used with option ordered=False.
+        """
+        batmobile = Car.objects.create(name='Batmobile')
+        k2000 = Car.objects.create(name='K 2000')
+        PossessedCar.objects.bulk_create([
+            PossessedCar(car=batmobile, belongs_to=self.p1),
+            PossessedCar(car=batmobile, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+        ])
+        with self.assertRaises(AssertionError):
+            self.assertQuerysetEqual(
+                self.p1.cars.all(),
+                [repr(batmobile), repr(k2000)],
+                ordered=False
+            )
+        self.assertQuerysetEqual(
+            self.p1.cars.all(),
+            [repr(batmobile)] * 2 + [repr(k2000)] * 4,
+            ordered=False
         )
 
 

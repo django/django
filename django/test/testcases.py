@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from collections import Counter
 from copy import copy
 import difflib
 import errno
@@ -871,7 +872,7 @@ class TransactionTestCase(SimpleTestCase):
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
         items = six.moves.map(transform, qs)
         if not ordered:
-            return self.assertEqual(set(items), set(values), msg=msg)
+            return self.assertEqual(Counter(items), Counter(values), msg=msg)
         values = list(values)
         # For example qs.iterator() could be passed as qs, but it does not
         # have 'ordered' attribute.
