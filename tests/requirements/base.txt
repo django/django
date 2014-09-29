@@ -1,6 +1,6 @@
 bcrypt
 docutils
-numpy
+numpy < 1.9
 Pillow
 PyYAML
 pytz > dev
