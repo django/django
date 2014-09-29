@@ -290,7 +290,7 @@ from_queryset
 
 .. classmethod:: from_queryset(queryset_class)
 
-For advance usage you might want both a custom ``Manager`` and a custom
+For advanced usage you might want both a custom ``Manager`` and a custom
 ``QuerySet``. You can do that by calling ``Manager.from_queryset()`` which
 returns a *subclass* of your base ``Manager`` with a copy of the custom
 ``QuerySet`` methods::
