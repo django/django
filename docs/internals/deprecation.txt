@@ -41,7 +41,8 @@ about each item can often be found in the release notes of two versions prior.
 * ``django.template.resolve_variable`` will be removed.
 
 * The following methods will be removed from
-  :class:`django.db.models.options.Options` (``Model._meta``):
+  :class:`django.db.models.options.Options` (``Model._meta``) and will be replaced
+  with alternatives that can be found :ref:`here <model-meta-field-apis>`:
 
   * ``get_field_by_name()``
   * ``get_all_field_names()``

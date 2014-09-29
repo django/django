@@ -1762,3 +1762,43 @@ Field API reference
 
         This method must be added to fields prior to 1.7 to migrate its data
         using :doc:`/topics/migrations`.
+
+.. _field-flags:
+
+Field Flags reference
+=====================
+
+.. class:: Field
+
+    Every ``Field`` instance contains a list of required flags that allow a user to
+    discover it's behavour avoiding specific class checking that is tightly coupling
+    and not maintainable.
+    Django's flags can be used together with the
+    :ref:`Model._meta APIs <model-meta-field-apis>` to allow developers to narrow
+    down their field search.
+    Developers that use third-party fields can assume that these flags are implemented. 
+
+    .. attribute:: concrete
+        
+        A concrete field has a database column associated to it's field instance.
+        Concrete fields require migrations and always contain state.
+
+    .. attribute:: editable
+        
+        An editable field is a field that's data can be manipulated (an Autofield
+        for example should not be manipulated and responds False to an "editable" query).
+
+    .. attribute:: has_many_values
+        
+        A field that can contain 1 or more values. This does not need to necessary be a
+        ManyToMany field, but can also be a CommaSeparatedIntegerField.
+
+    .. attribute:: has_relation
+        
+        A field has a relation when it depends on 1 or more models, and might generate
+        :ref:`reverse relations <model-meta-field-types>` on the pointed model.
+
+    .. attribute:: is_related_object
+
+        A very simple way to query if an object returned from ``get_field()`` or ``get_fields()``
+        is a reverse object or a forward object.

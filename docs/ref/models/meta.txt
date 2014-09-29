@@ -99,13 +99,15 @@ with a "+", it tells Django to exclude the relation as public, and therefore it 
 ``City`` has a reverse hidden field from ``Person`` (as you can't access
 ``person_set``).
 
+.. _model-meta-field-apis:
+
 ``Field-access APIs``
 =====================
 
 Retrieving a field instance by name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: Options.get_field(field_name, ...FIXME...)
+.. method:: Options.get_field(field_name)
 
     .. versionchanged:: 1.8
 
@@ -113,7 +115,7 @@ Retrieving a field instance by name
         flag any more. This method will automatically search through both
         forward and reverse fields, with no way to exclude M2M fields.
         If you wish to filter out M2M fields, you can do further filtering
-        using the field flags <--- ADD LINK!
+        using the :ref:`field flags <field-flags>`.
 
     Returns the field instance given a name of a field.
 
