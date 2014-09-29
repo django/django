@@ -77,7 +77,7 @@ def configure_logging(logging_config, logging_settings):
         # First find the logging configuration function ...
         logging_config_func = import_string(logging_config)
 
-        logging_config_func(DEFAULT_LOGGING)
+        dictConfig(DEFAULT_LOGGING)
 
         # ... then invoke it with the logging settings
         if logging_settings:

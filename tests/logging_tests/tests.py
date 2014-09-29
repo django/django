@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import logging
+import tempfile
 import warnings
 
 from django.core import mail
@@ -356,7 +357,8 @@ class SetupConfigureLogging(TestCase):
     """
     Test that calling django.setup() initializes the logging configuration.
     """
-    @override_settings(LOGGING_CONFIG='logging_tests.tests.dictConfig')
+    @override_settings(LOGGING_CONFIG='logging_tests.tests.dictConfig',
+                       LOGGING=OLD_LOGGING)
     def test_configure_initializes_logging(self):
         from django import setup
         setup()
@@ -386,3 +388,42 @@ class SecurityLoggerTest(TestCase):
         self.client.get('/suspicious/')
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn('path:/suspicious/,', mail.outbox[0].body)
+
+
+class SettingsCustomLoggingTest(AdminScriptTestCase):
+    """
+    Test that using a logging defaults are still applied when using a custom
+    callable in LOGGING_CONFIG (i.e., logging.config.fileConfig).
+    """
+    def setUp(self):
+        logging_conf = """
+[loggers]
+keys=root
+[handlers]
+keys=stream
+[formatters]
+keys=simple
+[logger_root]
+handlers=stream
+[handler_stream]
+class=StreamHandler
+formatter=simple
+args=(sys.stdout,)
+[formatter_simple]
+format=%(message)s
+"""
+        self.temp_file = tempfile.NamedTemporaryFile()
+        self.temp_file.write(logging_conf.encode('utf-8'))
+        self.temp_file.flush()
+        sdict = {'LOGGING_CONFIG': '"logging.config.fileConfig"',
+                 'LOGGING': '"%s"' % self.temp_file.name}
+        self.write_settings('settings.py', sdict=sdict)
+
+    def tearDown(self):
+        self.temp_file.close()
+        self.remove_settings('settings.py')
+
+    def test_custom_logging(self):
+        out, err = self.run_manage(['validate'])
+        self.assertNoOutput(err)
+        self.assertOutput(out, "System check identified no issues (0 silenced).")
