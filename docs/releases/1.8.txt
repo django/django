@@ -260,6 +260,12 @@ Management Commands
 * The :djadminopt:`--name` option for :djadmin:`makemigrations` allows you to
   to give the migration(s) a custom name instead of a generated one.
 
+Migrations
+^^^^^^^^^^
+
+* The :class:`django.db.migrations.operations.RunSQL` operation can now handle
+  parameters to be passed to the query strings.
+
 Models
 ^^^^^^
 
