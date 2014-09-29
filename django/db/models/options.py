@@ -343,8 +343,8 @@ class Options(object):
     @cached_property
     def fields(self):
         """
-        Returns a list of all data fields on the model and its parents.
-        All hidden and proxy fields are omitted.
+        Returns a list of all forward fields on the model and its parents excluding
+        ManyToManyFields.
         """
         return self._make_immutable_fields_list((f for f in self.get_fields()
                                                 if not (f.has_many_values and f.has_relation)))
@@ -352,16 +352,14 @@ class Options(object):
     @cached_property
     def concrete_fields(self):
         """
-        Returns a list of all concrete data fields on the model and its parents.
-        All hidden and proxy fields are omitted.
+        Returns a list of all concrete fields on the model and its parents.
         """
         return self._make_immutable_fields_list(f for f in self.fields if f.concrete)
 
     @cached_property
     def local_concrete_fields(self):
         """
-        Returns a list of all concrete data fields on the model.
-        All hidden and proxy fields are omitted.
+        Returns a list of all concrete fields on the model.
         """
         return self._make_immutable_fields_list(f for f in self.local_fields if f.concrete)
 
@@ -378,16 +376,17 @@ class Options(object):
         """
         Returns a list of all many to many fields on the model and
         its parents.
-        All hidden and proxy fields are omitted.
         """
         return self._make_immutable_fields_list((f for f in self.get_fields()
                                                 if f.has_many_values and f.has_relation))
 
     @cached_property
     def related_objects(self):
-        # This property contains all related objects pointing to the current model.
-        # The related objects can come from a one-to-one, one-to-many, many-to-many
-        # field relation type.
+        """
+        Returns all related objects pointing to the current model.
+        The related objects can come from a one-to-one, one-to-many, many-to-many
+        field relation type.
+        """
         all_related_fields = self.get_fields(forward=False, reverse=True,
                                              include_hidden=True, cache_results=True)
         return self._make_immutable_fields_list(
@@ -437,9 +436,8 @@ class Options(object):
             )
 
         fields_map = self.fields_map
-        # NOTE: previous get_field API had a many_to_many key. This key
-        # has now become m2m. In order to avoid breaking other's implementation
-        # we will catch the use of 'many_to_many'.
+        # NOTE: previous get_field API had a many_to_many key. In order to avoid breaking
+        # other's implementation we will catch the use of 'many_to_many'.
         if 'many_to_many' in kwargs:
 
             # If no many_to_many fields are wanted, create a new dictionary with
@@ -564,7 +562,7 @@ class Options(object):
     def _populate_directed_relation_graph(self):
         """
         This method is used by each model to find
-        related m2m and objects. As this method is very
+        it's reverse objects. As this method is very
         expensive and is accessed frequently
         (it looks up every field in a model,
         in every app), it is computed on first access
@@ -597,8 +595,8 @@ class Options(object):
             # if related_objects is not in __dict__.
             related_objects = related_objects_graph[model._meta]
 
-            # If both related_objects and related_m2m are empty, it makes sense
-            # to set EMPTY_RELATION_TREE. This will avoid allocating multiple
+            # If related_objects are empty, it makes sense # to set
+            # EMPTY_RELATION_TREE. This will avoid allocating multiple
             # empty relation trees.
             relation_tree = EMPTY_RELATION_TREE
             if related_objects:
@@ -632,16 +630,12 @@ class Options(object):
     def get_fields(self, forward=True, reverse=False,
                    include_parents=True, include_hidden=False, **kwargs):
         """
-        Returns a list of fields associated to the model. By default will only search in data.
-        This can be changed by enabling or disabling field types using
-        the flags available.
+        Returns a list of fields associated to the model. By default will only return forward fields.
+        This can be changed by enabling or disabling field types using the flags available.
 
         Fields can be any of the following:
-        - data:             any field that has an entry on the database
-        - m2m:              a ManyToManyField defined on the current model
-        - related_objects:  a one-to-many relation from another model that points to the current model
-        - related_m2m:      a M2M relation from another model that points to the current model
-        - virtual:          fields that do not necessarily have an entry on the database (like GenericForeignKey)
+        - forward:          fields that are contained on the current model
+        - reverse:          fields that point to the current model
 
         Options can be any of the following:
         - include_parents:        include fields derived from inheritance
@@ -683,7 +677,7 @@ class Options(object):
                                                          **options)):
 
                         if isinstance(obj.field.rel, ManyToManyRel):
-                            # In order for a related M2M object to be valid, its creation
+                            # In order for a reverse ManyToManyRel object to be valid, its creation
                             # counter must be > 0 and must be in the parent list
                             if not (obj.field.creation_counter < 0 and obj.model not in parent_list):
                                 fields[obj] = query_name
@@ -706,7 +700,7 @@ class Options(object):
         if forward:
             if include_parents:
                 for parent in self.parents:
-                    # Extend the fields dict with all the m2m fields of each parent.
+                    # Extend the fields dict with all the forward fields of each parent.
                     fields.update(parent._meta.get_fields(**options))
             fields.update(
                 (field, {field.name, field.attname})
@@ -729,9 +723,8 @@ class Options(object):
     @cached_property
     def field_names(self):
         """
-        Returns a list of all field names in the model. The list contains
-        data, m2m, related objects, related m2m and virtual fields.
-        All hidden and proxy fields are omitted.
+        Returns a list of all field names in the model, all hidden and proxy fields
+        are omitted.
         """
         res = set()
         fields = self.get_fields(reverse=True, export_name_map=True)
