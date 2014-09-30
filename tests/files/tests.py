@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from io import BytesIO
+from io import BytesIO, StringIO
 import os
 import gzip
 import tempfile
@@ -71,6 +71,54 @@ class FileTests(unittest.TestCase):
         """
         file = File(BytesIO(b'one\ntwo\nthree'))
         self.assertEqual(list(file), [b'one\n', b'two\n', b'three'])
+
+    def test_file_iteration_windows_newlines(self):
+        """
+        #8149 - File objects with \r\n line endings should yield lines
+        when iterated over.
+        """
+        f = File(BytesIO(b'one\r\ntwo\r\nthree'))
+        self.assertEqual(list(f), [b'one\r\n', b'two\r\n', b'three'])
+
+    def test_file_iteration_mac_newlines(self):
+        """
+        #8149 - File objects with \r line endings should yield lines
+        when iterated over.
+        """
+        f = File(BytesIO(b'one\rtwo\rthree'))
+        self.assertEqual(list(f), [b'one\r', b'two\r', b'three'])
+
+    def test_file_iteration_mixed_newlines(self):
+        f = File(BytesIO(b'one\rtwo\nthree\r\nfour'))
+        self.assertEqual(list(f), [b'one\r', b'two\n', b'three\r\n', b'four'])
+
+    def test_file_iteration_with_unix_newline_at_chunk_boundary(self):
+        f = File(BytesIO(b'one\ntwo\nthree'))
+        # Set chunk size to create a boundary after \n:
+        # b'one\n...
+        #        ^
+        f.DEFAULT_CHUNK_SIZE = 4
+        self.assertEqual(list(f), [b'one\n', b'two\n', b'three'])
+
+    def test_file_iteration_with_windows_newline_at_chunk_boundary(self):
+        f = File(BytesIO(b'one\r\ntwo\r\nthree'))
+        # Set chunk size to create a boundary between \r and \n:
+        # b'one\r\n...
+        #        ^
+        f.DEFAULT_CHUNK_SIZE = 4
+        self.assertEqual(list(f), [b'one\r\n', b'two\r\n', b'three'])
+
+    def test_file_iteration_with_mac_newline_at_chunk_boundary(self):
+        f = File(BytesIO(b'one\rtwo\rthree'))
+        # Set chunk size to create a boundary after \r:
+        # b'one\r...
+        #        ^
+        f.DEFAULT_CHUNK_SIZE = 4
+        self.assertEqual(list(f), [b'one\r', b'two\r', b'three'])
+
+    def test_file_iteration_with_text(self):
+        f = File(StringIO('one\ntwo\nthree'))
+        self.assertEqual(list(f), ['one\n', 'two\n', 'three'])
 
 
 class NoNameFileTestCase(unittest.TestCase):
