@@ -72,7 +72,7 @@ def shortcut(request, content_type_id, object_id):
         # Fall back to the current site (if possible).
         if object_domain is None:
             try:
-                object_domain = Site.objects.get_current().domain
+                object_domain = Site.objects.get_current(request).domain
             except Site.DoesNotExist:
                 pass
 

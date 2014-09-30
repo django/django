@@ -139,7 +139,10 @@ Minor features
 :mod:`django.contrib.sites`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* :func:`~django.contrib.sites.shortcuts.get_current_site` will now lookup
+  the current site based on :meth:`request.get_host()
+  <django.http.HttpRequest.get_host>` if the :setting:`SITE_ID` setting is not
+  defined.
 
 :mod:`django.contrib.staticfiles`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

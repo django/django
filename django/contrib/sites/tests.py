@@ -5,8 +5,9 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpRequest
 from django.test import TestCase, modify_settings, override_settings
 
+from . import models
 from .middleware import CurrentSiteMiddleware
-from .models import Site
+from .models import clear_site_cache, Site
 from .requests import RequestSite
 from .shortcuts import get_current_site
 
@@ -15,7 +16,12 @@ from .shortcuts import get_current_site
 class SitesFrameworkTests(TestCase):
 
     def setUp(self):
-        Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
+        self.site = Site(
+            id=settings.SITE_ID,
+            domain="example.com",
+            name="example.com",
+        )
+        self.site.save()
 
     def test_save_another(self):
         # Regression for #17415
@@ -71,6 +77,17 @@ class SitesFrameworkTests(TestCase):
             self.assertIsInstance(site, RequestSite)
             self.assertEqual(site.name, "example.com")
 
+    @override_settings(SITE_ID='', ALLOWED_HOSTS=['example.com'])
+    def test_get_current_site_no_site_id(self):
+        request = HttpRequest()
+        request.META = {
+            "SERVER_NAME": "example.com",
+            "SERVER_PORT": "80",
+        }
+        del settings.SITE_ID
+        site = get_current_site(request)
+        self.assertEqual(site.name, "example.com")
+
     def test_domain_name_with_whitespaces(self):
         # Regression for #17320
         # Domain names are not allowed contain whitespace characters
@@ -80,6 +97,26 @@ class SitesFrameworkTests(TestCase):
         self.assertRaises(ValidationError, site.full_clean)
         site.domain = "test\ntest"
         self.assertRaises(ValidationError, site.full_clean)
+
+    def test_clear_site_cache(self):
+        request = HttpRequest()
+        request.META = {
+            "SERVER_NAME": "example.com",
+            "SERVER_PORT": "80",
+        }
+        self.assertEqual(models.SITE_CACHE, {})
+        get_current_site(request)
+        expected_cache = {self.site.id: self.site}
+        self.assertEqual(models.SITE_CACHE, expected_cache)
+
+        with self.settings(SITE_ID=''):
+            get_current_site(request)
+
+        expected_cache.update({self.site.domain: self.site})
+        self.assertEqual(models.SITE_CACHE, expected_cache)
+
+        clear_site_cache(Site, instance=self.site)
+        self.assertEqual(models.SITE_CACHE, {})
 
 
 class MiddlewareTest(TestCase):
