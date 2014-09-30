@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# cihad <cihadgundogdu@gmail.com>, 2014
+# Burak Yavuz, 2014
+# Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-30 08:48+0000\n"
-"Last-Translator: cihad <cihadgundogdu@gmail.com>\n"
+"PO-Revision-Date: 2014-09-06 13:13+0000\n"
+"Last-Translator: Burak Yavuz\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -20,8 +21,8 @@ msgstr ""
 
 #: contrib/messages/apps.py:8
 msgid "Messages"
-msgstr "Mesajlar"
+msgstr "İletiler"
 
 #: contrib/messages/tests/base.py:105
 msgid "lazy message"
-msgstr "tembel mesaj"
+msgstr "zayıf ileti"

@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-06-21 08:46+0000\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-08-24 08:52+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
@@ -27,6 +27,10 @@ msgstr "ആഫ്രിക്കാന്‍സ്"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "അറബിക്"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr ""
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -169,6 +173,10 @@ msgid "Indonesian"
 msgstr "ഇന്തൊനേഷ്യന്‍"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "ഐസ്ലാന്‍ഡിക്"
 
@@ -223,6 +231,10 @@ msgstr "മലയാളം"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "മംഗോളിയന്‍"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr ""
 
 #: conf/global_settings.py:102
 msgid "Burmese"

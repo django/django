@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-08-17 10:00+0000\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-08-24 09:14+0000\n"
 "Last-Translator: Panos Laganakos <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
 "el/)\n"
@@ -30,6 +30,10 @@ msgstr "Αφρικάνς"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "Αραβικά"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr "Αστούριας"
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -172,6 +176,10 @@ msgid "Indonesian"
 msgstr "Ινδονησιακά"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "Ισλανδικά"
 
@@ -226,6 +234,10 @@ msgstr "Μαλαγιαλάμ"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "Μογγολικά"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr "Μαράθι"
 
 #: conf/global_settings.py:102
 msgid "Burmese"
@@ -447,12 +459,12 @@ msgstr "και"
 #: db/models/base.py:977
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s με αυτή την %(field_labels)s υπάρχει ήδη."
 
 #: db/models/fields/__init__.py:104
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Η τιμή %(value)r δεν είναι έγκυρη επιλογή."
 
 #: db/models/fields/__init__.py:105
 msgid "This field cannot be null."
@@ -487,12 +499,12 @@ msgstr "Ακέραιος"
 #: db/models/fields/__init__.py:851 db/models/fields/__init__.py:1571
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "Η τιμή '%(value)s' πρέπει να είναι ακέραιος."
 
 #: db/models/fields/__init__.py:926
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "Η τιμή '%(value)s' πρέπει να είναι είτε True ή False."
 
 #: db/models/fields/__init__.py:928
 msgid "Boolean (Either True or False)"
@@ -546,7 +558,7 @@ msgstr "Ημερομηνία (με την ώρα)"
 #: db/models/fields/__init__.py:1297
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "Η '%(value)s' τιμή πρέπει να είναι ακέραιος."
 
 #: db/models/fields/__init__.py:1299
 msgid "Decimal number"
@@ -563,7 +575,7 @@ msgstr "Τοποθεσία αρχείου"
 #: db/models/fields/__init__.py:1537
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "Η '%(value)s' τιμή πρέπει να είναι δεκαδικός."
 
 #: db/models/fields/__init__.py:1539
 msgid "Floating point number"
@@ -584,7 +596,7 @@ msgstr "διεύθυνση IP"
 #: db/models/fields/__init__.py:1747
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "Η '%(value)s' τιμή πρέπει είναι είτε None, True ή False."
 
 #: db/models/fields/__init__.py:1749
 msgid "Boolean (Either True, False or None)"
@@ -681,14 +693,16 @@ msgstr "Εισάγετε έναν αριθμό."
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] ""
+"Σιγουρευτείτε οτι τα σύνολο των ψηφίων δεν είναι παραπάνω από %(max)s"
 msgstr[1] ""
+"Σιγουρευτείτε οτι τα σύνολο των ψηφίων δεν είναι παραπάνω από %(max)s"
 
 #: forms/fields.py:322
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Σιγουρευτείτε ότι το δεκαδικό ψηφίο δεν είναι παραπάνω από %(max)s."
+msgstr[1] "Σιγουρευτείτε ότι τα δεκαδικά ψηφία δεν είναι παραπάνω από %(max)s."
 
 #: forms/fields.py:326
 #, python-format
@@ -760,7 +774,7 @@ msgstr "Εισάγετε μια λίστα τιμών."
 
 #: forms/fields.py:988
 msgid "Enter a complete value."
-msgstr ""
+msgstr "Εισάγετε μια πλήρης τιμή"
 
 #. Translators: This is the default suffix added to form field labels
 #: forms/forms.py:122
@@ -781,21 +795,21 @@ msgstr ":?.!"
 
 #: forms/formsets.py:95
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "Τα δεδομένα του ManagementForm λείπουν ή έχουν αλλοιωθεί"
 
 #: forms/formsets.py:332
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Παρακαλώ υποβάλλετε %d ή λιγότερες φόρμες."
+msgstr[1] "Παρακαλώ υποβάλλετε %d ή λιγότερες φόρμες."
 
 #: forms/formsets.py:339
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Παρακαλώ υποβάλλετε %d ή περισσότερες φόρμες."
+msgstr[1] "Παρακαλώ υποβάλλετε %d ή περισσότερες φόρμες."
 
 #: forms/formsets.py:367 forms/formsets.py:369
 msgid "Order"
@@ -845,7 +859,7 @@ msgstr ""
 #: forms/models.py:1194
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr ""
+msgstr "Το \"%(pk)s\" δεν είναι έγκυρη τιμή για πρωτεύων κλειδί"
 
 #: forms/models.py:1205
 msgid ""
@@ -1288,7 +1302,7 @@ msgstr "Απαγορευμένο"
 
 #: views/csrf.py:106
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "Η πιστοποίηση CSRF απέτυχε. Το αίτημα απέτυχε"
 
 #: views/csrf.py:110
 msgid ""
@@ -1382,14 +1396,14 @@ msgstr "Άδεια λίστα ενώ '%(class_name)s.allow_empty' δεν έχε�
 
 #: views/static.py:54
 msgid "Directory indexes are not allowed here."
-msgstr ""
+msgstr "Τα ευρετήρια καταλόγων δεν επιτρέπονται εδώ."
 
 #: views/static.py:56
 #, python-format
 msgid "\"%(path)s\" does not exist"
-msgstr ""
+msgstr "Το \"%(path)s\" δεν υπάρχει"
 
 #: views/static.py:97
 #, python-format
 msgid "Index of %(directory)s"
-msgstr ""
+msgstr "Ευρετήριο του %(directory)s"

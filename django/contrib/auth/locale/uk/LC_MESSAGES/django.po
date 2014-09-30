@@ -2,6 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # captain_m4l <qotsaman@gmail.com>, 2012
 # Oleksandr Bolotov <oleksandr.bolotov@gmail.com>, 2013
 msgid ""
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 09:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-23 22:28+0000\n"
+"Last-Translator: Max V. Stotsky <transifex@ms.pereslavl.ru>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +44,7 @@ msgstr "Змінити пароль: %s"
 
 #: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Аутентифікація та авторизація"
 
 #: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
 #: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
@@ -229,7 +230,7 @@ msgstr "дозволи користувача"
 
 #: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Специфічні права доступу для цього користувача."
 
 #: contrib/auth/models.py:367
 msgid "username"
@@ -298,28 +299,28 @@ msgstr "Вихід"
 
 #: contrib/auth/views.py:169
 msgid "Password reset"
-msgstr ""
+msgstr "Перевстановлення паролю"
 
 #: contrib/auth/views.py:181
 msgid "Password reset successful"
-msgstr ""
+msgstr "Пароль перевстановлено успішно"
 
 #: contrib/auth/views.py:216
 msgid "Enter new password"
-msgstr ""
+msgstr "Введіть новий пароль"
 
 #: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Пароль не перевстановлено"
 
 #: contrib/auth/views.py:244
 msgid "Password reset complete"
-msgstr ""
+msgstr "Пароль перевстановлено"
 
 #: contrib/auth/views.py:278
 msgid "Password change"
-msgstr ""
+msgstr "Зміна паролю"
 
 #: contrib/auth/views.py:291
 msgid "Password change successful"
-msgstr ""
+msgstr "Зміна паролю успішна"

@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Alexander Chernihov <aleksandr.chernigov@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Sergey Lysach <sergikoff88@gmail.com>, 2012
 msgid ""
@@ -8,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-29 13:50+0000\n"
+"Last-Translator: Alexander Chernihov <aleksandr.chernigov@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,7 @@ msgstr ""
 
 #: contrib/admindocs/apps.py:8
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Адміністративна документація"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:6
 #: contrib/admindocs/templates/admin_doc/index.html:6
@@ -130,7 +131,7 @@ msgstr "Теги"
 
 #: contrib/admindocs/templates/admin_doc/index.html:18
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "Список усіх тегів шаблонів та їх функцій."
 
 #: contrib/admindocs/templates/admin_doc/index.html:20
 #: contrib/admindocs/templates/admin_doc/template_filter_index.html:9
@@ -177,7 +178,7 @@ msgstr ""
 
 #: contrib/admindocs/templates/admin_doc/missing_docutils.html:10
 msgid "Please install docutils"
-msgstr ""
+msgstr "Будь ласка, встановіть docutils"
 
 #: contrib/admindocs/templates/admin_doc/missing_docutils.html:17
 #, python-format
@@ -195,31 +196,31 @@ msgstr ""
 #: contrib/admindocs/templates/admin_doc/model_detail.html:21
 #, python-format
 msgid "Model: %(name)s"
-msgstr ""
+msgstr "Модель: %(name)s"
 
 #: contrib/admindocs/templates/admin_doc/model_detail.html:35
 msgid "Field"
-msgstr ""
+msgstr "Поле"
 
 #: contrib/admindocs/templates/admin_doc/model_detail.html:36
 msgid "Type"
-msgstr ""
+msgstr "Тип"
 
 #: contrib/admindocs/templates/admin_doc/model_detail.html:37
 msgid "Description"
-msgstr ""
+msgstr "Опис"
 
 #: contrib/admindocs/templates/admin_doc/model_detail.html:52
 msgid "Back to Model Documentation"
-msgstr ""
+msgstr "Назад до документації моделі"
 
 #: contrib/admindocs/templates/admin_doc/model_index.html:18
 msgid "Model documentation"
-msgstr ""
+msgstr "Документація моделі"
 
 #: contrib/admindocs/templates/admin_doc/model_index.html:43
 msgid "Model groups"
-msgstr ""
+msgstr "Групи моделей"
 
 #: contrib/admindocs/templates/admin_doc/template_detail.html:8
 msgid "Templates"
@@ -228,12 +229,12 @@ msgstr "Шаблони"
 #: contrib/admindocs/templates/admin_doc/template_detail.html:13
 #, python-format
 msgid "Template: %(name)s"
-msgstr ""
+msgstr "Шаблон: %(name)s"
 
 #: contrib/admindocs/templates/admin_doc/template_detail.html:16
 #, python-format
 msgid "Template: \"%(name)s\""
-msgstr ""
+msgstr "Шаблон: \"%(name)s\""
 
 #: contrib/admindocs/templates/admin_doc/template_detail.html:18
 #, python-format
@@ -242,24 +243,24 @@ msgstr ""
 
 #: contrib/admindocs/templates/admin_doc/template_detail.html:21
 msgid "(does not exist)"
-msgstr ""
+msgstr "(не існує)"
 
 #: contrib/admindocs/templates/admin_doc/template_detail.html:25
 msgid "Back to Documentation"
-msgstr ""
+msgstr "Назад до Документації"
 
 #: contrib/admindocs/templates/admin_doc/template_filter_index.html:12
 msgid "Template filters"
-msgstr ""
+msgstr "Фільтри у шаблонах"
 
 #: contrib/admindocs/templates/admin_doc/template_filter_index.html:16
 msgid "Template filter documentation"
-msgstr ""
+msgstr "Документація фільтрів у шаблонах"
 
 #: contrib/admindocs/templates/admin_doc/template_filter_index.html:22
 #: contrib/admindocs/templates/admin_doc/template_filter_index.html:43
 msgid "Built-in filters"
-msgstr ""
+msgstr "Вбудовані фільтри"
 
 #: contrib/admindocs/templates/admin_doc/template_filter_index.html:23
 #, python-format
@@ -299,7 +300,7 @@ msgstr ""
 
 #: contrib/admindocs/templates/admin_doc/view_detail.html:28
 msgid "Templates:"
-msgstr ""
+msgstr "Шаблони:"
 
 #: contrib/admindocs/templates/admin_doc/view_detail.html:32
 msgid "Back to Views Documentation"
@@ -307,15 +308,15 @@ msgstr ""
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:16
 msgid "View documentation"
-msgstr ""
+msgstr "Переглянути документацію"
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:22
 msgid "Jump to namespace"
-msgstr ""
+msgstr "Перейти до іменованої зони"
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:27
 msgid "Empty namespace"
-msgstr ""
+msgstr "Порожня іменована зона"
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:40
 #, python-format

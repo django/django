@@ -3,13 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2014
+# pjrobertson <transifex@patjack.co.uk>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:18+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-23 17:32+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -40,7 +41,7 @@ msgstr "Dileu y %(verbose_name_plural)s â ddewiswyd"
 
 #: contrib/admin/apps.py:11
 msgid "Administration"
-msgstr ""
+msgstr "Gweinyddu"
 
 #: contrib/admin/filters.py:104 contrib/admin/filters.py:199
 #: contrib/admin/filters.py:239 contrib/admin/filters.py:276
@@ -316,7 +317,7 @@ msgstr "Mewngofnodi"
 #: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "Gweinyddu %(app)s"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -666,7 +667,7 @@ msgstr "Cadw"
 
 #: contrib/admin/templates/admin/search_form.html:7
 msgid "Search"
-msgstr "Chwilota"
+msgstr "Chwilio"
 
 #: contrib/admin/templates/admin/search_form.html:9
 #, python-format

@@ -7,13 +7,14 @@
 # Tran <hongdiepkien@gmail.com>, 2011
 # Tran Van <vantxm@yahoo.co.uk>, 2011,2013
 # Vuong Nguyen <autalpha@gmail.com>, 2011
+# xgenvn <xgenvn@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-06-21 08:46+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-09-07 19:11+0000\n"
+"Last-Translator: xgenvn <xgenvn@gmail.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
 "language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -29,6 +30,10 @@ msgstr "Afrikaans"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "Tiếng Ả Rập"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr "Asturian"
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -84,7 +89,7 @@ msgstr "Tiếng Anh"
 
 #: conf/global_settings.py:66
 msgid "Australian English"
-msgstr ""
+msgstr "Tiếng Anh ở Úc"
 
 #: conf/global_settings.py:67
 msgid "British English"
@@ -171,6 +176,10 @@ msgid "Indonesian"
 msgstr "Tiếng In-đô-nê-xi-a"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr "Ido"
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "Tiếng Aixơlen"
 
@@ -225,6 +234,10 @@ msgstr "Tiếng Malayalam"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "Tiếng Mông Cổ"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr "Marathi"
 
 #: conf/global_settings.py:102
 msgid "Burmese"
@@ -348,19 +361,19 @@ msgstr "Tiếng Tàu truyền thống"
 
 #: contrib/sitemaps/apps.py:8
 msgid "Site Maps"
-msgstr ""
+msgstr "Bản đồ trang web"
 
 #: contrib/staticfiles/apps.py:8
 msgid "Static Files"
-msgstr ""
+msgstr "Tập tin tĩnh"
 
 #: contrib/syndication/apps.py:8
 msgid "Syndication"
-msgstr ""
+msgstr "Syndication"
 
 #: contrib/webdesign/apps.py:8
 msgid "Web Design"
-msgstr ""
+msgstr "Thiết kế Web"
 
 #: core/validators.py:21
 msgid "Enter a valid value."
@@ -372,7 +385,7 @@ msgstr "Nhập một URL hợp lệ."
 
 #: core/validators.py:115
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Nhập một số nguyên hợp lệ."
 
 #: core/validators.py:120
 msgid "Enter a valid email address."
@@ -443,12 +456,12 @@ msgstr "và"
 #: db/models/base.py:977
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s với thông tin %(field_labels)s đã tồn tại"
 
 #: db/models/fields/__init__.py:104
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Giá trị %(value)r không phải là lựa chọn hợp lệ."
 
 #: db/models/fields/__init__.py:105
 msgid "This field cannot be null."
@@ -469,7 +482,7 @@ msgstr "%(model_name)s có %(field_label)s đã tồn tại."
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
-msgstr ""
+msgstr "%(field_label)s phải là duy nhất %(date_field_label)s %(lookup_type)s."
 
 #: db/models/fields/__init__.py:116
 #, python-format
@@ -483,12 +496,12 @@ msgstr "Số nguyên"
 #: db/models/fields/__init__.py:851 db/models/fields/__init__.py:1571
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "'%(value)s' phải là một số nguyên"
 
 #: db/models/fields/__init__.py:926
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "'%(value)s' phải là True hoặc False (Đúng hoặc Sai)"
 
 #: db/models/fields/__init__.py:928
 msgid "Boolean (Either True or False)"
@@ -508,7 +521,7 @@ msgstr "Các số nguyên được phân cách bằng dấu phẩy"
 msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
-msgstr ""
+msgstr "'%(value)s' phải là dạng ngày (ví dụ yyyy-mm-dd)."
 
 #: db/models/fields/__init__.py:1082 db/models/fields/__init__.py:1189
 #, python-format
@@ -516,6 +529,7 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"'%(value)s' có dạng là ngày (YYYY-MM-DD) tuy nhiên không phải là ngày hợp lệ."
 
 #: db/models/fields/__init__.py:1085
 msgid "Date (without time)"
@@ -527,6 +541,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%(value)s' không hợp lệ, giá trị phải có dạng: YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
 
 #: db/models/fields/__init__.py:1191
 #, python-format

@@ -3,6 +3,7 @@
 # Translators:
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Mazdak Badakhshan <geraneum@gmail.com>, 2014
 # Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2013
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 # Saeed <sd.javadi@gmail.com>, 2011
@@ -11,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-07-16 13:55+0000\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-08-24 09:06+0000\n"
 "Last-Translator: Reza Mohammadi <reza@teeleh.ir>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
@@ -29,6 +30,10 @@ msgstr "آفریکانس"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "عربی"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr "آستوری"
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -171,6 +176,10 @@ msgid "Indonesian"
 msgstr "اندونزیایی"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr "ایدو"
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "ایسلندی"
 
@@ -225,6 +234,10 @@ msgstr "مالایایی"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "مغولی"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr "مِراتی"
 
 #: conf/global_settings.py:102
 msgid "Burmese"
@@ -348,7 +361,7 @@ msgstr "چینی سنتی"
 
 #: contrib/sitemaps/apps.py:8
 msgid "Site Maps"
-msgstr ""
+msgstr "نقشه‌های وب‌گاه"
 
 #: contrib/staticfiles/apps.py:8
 msgid "Static Files"

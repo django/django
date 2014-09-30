@@ -5,14 +5,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
 # Todor Lubenov <tlubenov@gmail.com>, 2013
+# vestimir <vestimir@gmail.com>, 2014
 # Alexander Atanasov <aatanasov@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-06-21 08:46+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-08-28 20:15+0000\n"
+"Last-Translator: vestimir <vestimir@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/projects/p/django/"
 "language/bg/)\n"
 "MIME-Version: 1.0\n"
@@ -28,6 +29,10 @@ msgstr "Африкански"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "арабски език"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr ""
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -170,6 +175,10 @@ msgid "Indonesian"
 msgstr "индонезийски език"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "исландски език"
 
@@ -224,6 +233,10 @@ msgstr "малаялам"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "монголски език"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr ""
 
 #: conf/global_settings.py:102
 msgid "Burmese"
@@ -371,7 +384,7 @@ msgstr "Въведете валиден URL адрес."
 
 #: core/validators.py:115
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Въведете валидно число."
 
 #: core/validators.py:120
 msgid "Enter a valid email address."
@@ -1220,7 +1233,7 @@ msgstr "Декември"
 
 #: utils/ipv6.py:10
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "Въведете валиден IPv6 адрес."
 
 #: utils/text.py:76
 #, python-format

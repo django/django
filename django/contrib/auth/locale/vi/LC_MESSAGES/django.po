@@ -5,13 +5,14 @@
 # Anh Phan <vietnamesel10n@gmail.com>, 2013
 # Tran <hongdiepkien@gmail.com>, 2011
 # Tran Van <vantxm@yahoo.co.uk>, 2012
+# xgenvn <xgenvn@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 09:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-07 19:05+0000\n"
+"Last-Translator: xgenvn <xgenvn@gmail.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
 "language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +44,7 @@ msgstr "Thay đổi mật khẩu: %s"
 
 #: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Xác thực và ủy quyền"
 
 #: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
 #: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
@@ -152,7 +153,7 @@ msgstr "lặp lại"
 #: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
 #: contrib/auth/hashers.py:512
 msgid "salt"
-msgstr ""
+msgstr "Mã salt"
 
 #: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
 #: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
@@ -162,7 +163,7 @@ msgstr "băm"
 
 #: contrib/auth/hashers.py:336
 msgid "work factor"
-msgstr ""
+msgstr "yếu tố công việc"
 
 #: contrib/auth/hashers.py:338
 msgid "checksum"
@@ -202,13 +203,15 @@ msgstr "Lần cuối đăng nhập"
 
 #: contrib/auth/models.py:290
 msgid "superuser status"
-msgstr ""
+msgstr "trạng thái superuser"
 
 #: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
+"Định rằng người dùng này có tất cả các quyền mà không gán cho họ một cách cụ "
+"thể."
 
 #: contrib/auth/models.py:294
 msgid ""
@@ -224,7 +227,7 @@ msgstr "quyền của người sử dụng"
 
 #: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Quyền hạn cụ thể cho người dùng này."
 
 #: contrib/auth/models.py:367
 msgid "username"
@@ -232,7 +235,7 @@ msgstr "Tên đăng nhập"
 
 #: contrib/auth/models.py:371
 msgid "Enter a valid username."
-msgstr ""
+msgstr "Nhập tên người dùng hợp lệ."
 
 #: contrib/auth/models.py:373
 msgid "first name"
@@ -244,7 +247,7 @@ msgstr "Họ"
 
 #: contrib/auth/models.py:375
 msgid "email address"
-msgstr ""
+msgstr "địa chỉ email"
 
 #: contrib/auth/models.py:376
 msgid "staff status"
@@ -263,6 +266,8 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
+"Chỉ định xem người dùng này phải được coi là đang hoạt động. Bạn nên bỏ chọn "
+"này thay vì xóa tài khoản."
 
 #: contrib/auth/models.py:382
 msgid "date joined"
@@ -279,11 +284,11 @@ msgstr "người sử dụng"
 #: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr ""
+msgstr "Đặt lại mật khẩu trên %(site_name)s"
 
 #: contrib/auth/tests/test_forms.py:387
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "Nhập địa chỉ email hợp lệ."
 
 #: contrib/auth/views.py:92
 msgid "Logged out"
@@ -291,28 +296,28 @@ msgstr "Đã thoát"
 
 #: contrib/auth/views.py:169
 msgid "Password reset"
-msgstr ""
+msgstr "Đặt lại mật khẩu"
 
 #: contrib/auth/views.py:181
 msgid "Password reset successful"
-msgstr ""
+msgstr "Đặt lại mật khẩu thành công"
 
 #: contrib/auth/views.py:216
 msgid "Enter new password"
-msgstr ""
+msgstr "Nhập mật khẩu mới"
 
 #: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Đặt lại mật khẩu thành công"
 
 #: contrib/auth/views.py:244
 msgid "Password reset complete"
-msgstr ""
+msgstr "Đặt lại mật khẩu hoàn chỉnh"
 
 #: contrib/auth/views.py:278
 msgid "Password change"
-msgstr ""
+msgstr "Thay đổi mật khẩu"
 
 #: contrib/auth/views.py:291
 msgid "Password change successful"
-msgstr ""
+msgstr "Thay đổi mật khẩu thành công"

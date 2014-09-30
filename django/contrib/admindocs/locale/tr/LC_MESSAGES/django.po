@@ -2,6 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
+# Burak Yavuz, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Murat Çorlu <muratcorlu@gmail.com>, 2012
 msgid ""
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-09 05:19+0000\n"
+"Last-Translator: Burak Yavuz\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,7 @@ msgstr ""
 
 #: contrib/admindocs/apps.py:8
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Yönetimsel Belgeler"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:6
 #: contrib/admindocs/templates/admin_doc/index.html:6
@@ -34,7 +35,7 @@ msgstr ""
 #: contrib/admindocs/templates/admin_doc/view_detail.html:6
 #: contrib/admindocs/templates/admin_doc/view_index.html:7
 msgid "Home"
-msgstr "Anasayfa"
+msgstr "Giriş"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:7
 #: contrib/admindocs/templates/admin_doc/index.html:7
@@ -50,16 +51,16 @@ msgstr "Anasayfa"
 #: contrib/admindocs/templates/admin_doc/view_detail.html:7
 #: contrib/admindocs/templates/admin_doc/view_index.html:8
 msgid "Documentation"
-msgstr "Dokümantasyon"
+msgstr "Belgeler"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
 #: contrib/admindocs/templates/admin_doc/index.html:29
 msgid "Bookmarklets"
-msgstr "Kısayollar"
+msgstr "Bookmarklet'ler"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
-msgstr "Dokümantasyon kısayolları"
+msgstr "Belge bookmarklet'leri"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:15
 msgid ""
@@ -72,50 +73,57 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Kısayolları kullanabilmek için, bağlantıyı tarayıcınızdaki "
-"araç\n"
-"çubuğuna sürükleyin, ya da sağ tıklayıp sık kullanılan adresler listenize "
+"<p class=\"help\">Bookmarklet'leri yüklemek için, bağlantıyı yer imleri "
+"araç \n"
+"çubuğuna sürükleyin ya da bağlantıya sağ tıklayın ve yer imlerinize "
 "ekleyin. \n"
-"Bazı kısayollar, uygulamayı çalıştıran sunucu ile aynı adreste bulunan "
-"istemciler \n"
-"tarafından kullanılabilir.</p>\n"
+"Artık sitedeki herhangi bir sayfadan bookmarklet seçebilirsiniz. Bu "
+"bookmarklet'lerin \n"
+"bazılarının, \"dahili\" (bilgisayarınızın \"dahili\" olduğundan emin "
+"değilseniz sistem \n"
+"yöneticinizle konuşun) olarak ayarlanmış bir bilgisayardan siteyi "
+"görüntülüyor \n"
+"olmasını gerektirdiğini unutmayın.</p>\n"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
-msgstr "Bu sayfa için dokümantasyon"
+msgstr "Bu sayfa için belgeler"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
-msgstr "Sizi, bu sayfayı üreten betiğin dokümantasyonuna yönlendirir."
+msgstr ""
+"Sizi, bu sayfayı oluşturan görünüm için herhangi bir sayfadan  belgelere "
+"atlatır."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
-msgstr "Nesne numarasını göster"
+msgstr "Nesne kimliğini göster"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
-"Tek bir nesneyi temsil eden sayfaların içerik türünü ve numarasını gösterir."
+"Tek bir nesneyi temsil eden sayfalar için içerik türünü ve benzersiz kimliği "
+"gösterir."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
-msgstr "Nesneyi düzenle (aynı pencerede)"
+msgstr "Bu nesneyi düzenle (şu anki pencerede)"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Tek bir nesneyi temsil eden sayfaların yönetim sayfasını gösterir."
+msgstr "Tek bir nesneyi temsil eden sayfalar için yönetici sayfasına atlatır."
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
-msgstr "Nesneyi düzenle (yeni pencerede)"
+msgstr "Bu nesneyi düzenle (yeni pencerede)"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
-msgstr "Yukarıdaki gibi, ancak yönetim sayfasını yeni bir pencerede açar."
+msgstr "Yukarıdaki gibi, ancak yönetici sayfasını yeni bir pencerede açar."
 
 #: contrib/admindocs/templates/admin_doc/index.html:17
 #: contrib/admindocs/templates/admin_doc/template_tag_index.html:9
@@ -124,20 +132,20 @@ msgstr "Etiketler"
 
 #: contrib/admindocs/templates/admin_doc/index.html:18
 msgid "List of all the template tags and their functions."
-msgstr "Tüm şablon etiketlerinin ve fonksiyonlarının listesi"
+msgstr "Tüm şablon etiketlerinin ve işlevlerinin listesi."
 
 #: contrib/admindocs/templates/admin_doc/index.html:20
 #: contrib/admindocs/templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
-msgstr "Filtreler"
+msgstr "Süzgeçler"
 
 #: contrib/admindocs/templates/admin_doc/index.html:21
 msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
-"Filreler, sonucu değiştirmek için bir şablondaki değişkenlere uygulanabilen "
-"eylemlerdir."
+"Süzgeçler, çıktıyı değiştirmek için bir şablondaki değişkenlere "
+"uygulanabilen eylemlerdir."
 
 #: contrib/admindocs/templates/admin_doc/index.html:23
 #: contrib/admindocs/templates/admin_doc/model_detail.html:16
@@ -152,9 +160,9 @@ msgid ""
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
-"Modeller, sistemdeki nesnelerin ve alakalı alanlarının tanımlarıdır. Her "
-"modelin şablon değişkeni olarak erişilebilen alanları liste halinde "
-"mevcuttur."
+"Modeller, sistemdeki nesnelerin ve ilişkilendirilmiş alanlarının tümünün "
+"tanımlarıdır. Her model, şablon değişkenleri olarak erişilebilen alanların "
+"bir listesine sahiptir."
 
 #: contrib/admindocs/templates/admin_doc/index.html:26
 #: contrib/admindocs/templates/admin_doc/view_detail.html:8
@@ -169,18 +177,18 @@ msgid ""
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
-"Umumi sitedeki her sayfa, bir view tarafından üretilir. View, sayfayı "
-"üretmek için hangi şablonun kullanılacağını ve bu şablona hangi nesnelerin "
-"verileceğini belirler"
+"Ortak sitedeki her sayfa, bir görünüm tarafından oluşturulur. Görünüm, "
+"sayfayı oluşturmak için hangi şablonun kullanılacağını ve bu şablon için "
+"hangi nesnelerin kullanılabilir olacağını tanımlar."
 
 #: contrib/admindocs/templates/admin_doc/index.html:30
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
-"Tarayıcınızın yönetici işlevselliğine hızlıca ulaşabilmesi için araçlar"
+"Tarayıcınızın yönetici işlevselliğine hızlıca erişebilmesi için araçlar"
 
 #: contrib/admindocs/templates/admin_doc/missing_docutils.html:10
 msgid "Please install docutils"
-msgstr "Lütfen docutils kurun"
+msgstr "Lütfen docutils'i yükleyin"
 
 #: contrib/admindocs/templates/admin_doc/missing_docutils.html:17
 #, python-format
@@ -188,15 +196,16 @@ msgid ""
 "The admin documentation system requires Python's <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
-"Yönetici dökümantasyon sistemi, Python'un <a href=\"%(link)s\">docutils</a> "
-"kütüphanesine ihtiyaç duyar."
+"Yönetici belge sistemi, Python'un <a href=\"%(link)s\">docutils</a> "
+"kütüphanesini gerektirir."
 
 #: contrib/admindocs/templates/admin_doc/missing_docutils.html:19
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
-"Lütfen yöneticinizden <a href=\"%(link)s\">docutils</a> kurmasını isteyin."
+"Lütfen yöneticilerinizden <a href=\"%(link)s\">docutils</a> yüklemesini "
+"isteyin."
 
 #: contrib/admindocs/templates/admin_doc/model_detail.html:21
 #, python-format
@@ -209,7 +218,7 @@ msgstr "Alan"
 
 #: contrib/admindocs/templates/admin_doc/model_detail.html:36
 msgid "Type"
-msgstr "Tip"
+msgstr "Tür"
 
 #: contrib/admindocs/templates/admin_doc/model_detail.html:37
 msgid "Description"
@@ -217,11 +226,11 @@ msgstr "Açıklama"
 
 #: contrib/admindocs/templates/admin_doc/model_detail.html:52
 msgid "Back to Model Documentation"
-msgstr ""
+msgstr "Model Belgelerine Geri Dön"
 
 #: contrib/admindocs/templates/admin_doc/model_index.html:18
 msgid "Model documentation"
-msgstr "Model dökümantasyonu"
+msgstr "Model belgeleri"
 
 #: contrib/admindocs/templates/admin_doc/model_index.html:43
 msgid "Model groups"
@@ -244,7 +253,7 @@ msgstr "Şablon: \"%(name)s\""
 #: contrib/admindocs/templates/admin_doc/template_detail.html:18
 #, python-format
 msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgstr "\"%(name)s\" şablonu için arama yolu:"
 
 #: contrib/admindocs/templates/admin_doc/template_detail.html:21
 msgid "(does not exist)"
@@ -252,20 +261,20 @@ msgstr "(mevcut değil)"
 
 #: contrib/admindocs/templates/admin_doc/template_detail.html:25
 msgid "Back to Documentation"
-msgstr "Dökümantasyona Geri Dön"
+msgstr "Belgelere Geri Dön"
 
 #: contrib/admindocs/templates/admin_doc/template_filter_index.html:12
 msgid "Template filters"
-msgstr "Şablon filtreler"
+msgstr "Şablon süzgeçleri"
 
 #: contrib/admindocs/templates/admin_doc/template_filter_index.html:16
 msgid "Template filter documentation"
-msgstr "Şablon filtre dökümantasyonu"
+msgstr "Şablon süzgeci belgeleri"
 
 #: contrib/admindocs/templates/admin_doc/template_filter_index.html:22
 #: contrib/admindocs/templates/admin_doc/template_filter_index.html:43
 msgid "Built-in filters"
-msgstr "Dahili filtreler"
+msgstr "Yerleşik süzgeçler"
 
 #: contrib/admindocs/templates/admin_doc/template_filter_index.html:23
 #, python-format
@@ -273,7 +282,7 @@ msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
 "using the filter."
 msgstr ""
-"Bu filtreleri kullanmak için, şablonunuzun içine filtreyi kullanmadan önce "
+"Bu süzgeçleri kullanmak için, süzgeci kullanmadan önce şablonunuzun içine "
 "<code>%(code)s</code> yerleştirin."
 
 #: contrib/admindocs/templates/admin_doc/template_tag_index.html:12
@@ -282,12 +291,12 @@ msgstr "Şablon etiketleri"
 
 #: contrib/admindocs/templates/admin_doc/template_tag_index.html:16
 msgid "Template tag documentation"
-msgstr "Şablon etiketi dökümantasyonu"
+msgstr "Şablon etiketi belgeleri"
 
 #: contrib/admindocs/templates/admin_doc/template_tag_index.html:22
 #: contrib/admindocs/templates/admin_doc/template_tag_index.html:43
 msgid "Built-in tags"
-msgstr "Dahili etiketler"
+msgstr "Yerleşik etiketler"
 
 #: contrib/admindocs/templates/admin_doc/template_tag_index.html:23
 #, python-format
@@ -295,13 +304,13 @@ msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
 "the tag."
 msgstr ""
-"Bu etiketleri kullanmak için, şablonunuzun içine etiketi kullanmadan önce "
+"Bu etiketleri kullanmak için, etiketi kullanmadan önce şablonunuzun içine "
 "<code>%(code)s</code> yerleştirin."
 
 #: contrib/admindocs/templates/admin_doc/view_detail.html:12
 #, python-format
 msgid "View: %(name)s"
-msgstr "View: %(name)s"
+msgstr "Görünüm: %(name)s"
 
 #: contrib/admindocs/templates/admin_doc/view_detail.html:23
 msgid "Context:"
@@ -313,28 +322,28 @@ msgstr "Şablonlar:"
 
 #: contrib/admindocs/templates/admin_doc/view_detail.html:32
 msgid "Back to Views Documentation"
-msgstr "View Dökümantasyonuna Geri Dön"
+msgstr "Görünümler Belgelerine Geri Dön"
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:16
 msgid "View documentation"
-msgstr "Dökümantasyon görüntüle"
+msgstr "Belgeleri görüntüle"
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:22
 msgid "Jump to namespace"
-msgstr ""
+msgstr "İsim alanına atla"
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:27
 msgid "Empty namespace"
-msgstr ""
+msgstr "Boş isim alanı"
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:40
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "%(name)s isim alanına göre görünümler"
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:42
 msgid "Views by empty namespace"
-msgstr ""
+msgstr "Boş isim alanına göre görünümler"
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:49
 #, python-format
@@ -343,10 +352,13 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
+"\n"
+"    Görünüm işlevi: <code>%(full_name)s</code>. Adı: <code>%(url_name)s</"
+"code>.\n"
 
 #: contrib/admindocs/tests/test_fields.py:32
 msgid "Boolean (Either True or False)"
-msgstr "Mantıksal (True ya da False)"
+msgstr "Boolean (Ya True ya da False)"
 
 #: contrib/admindocs/tests/test_fields.py:42
 #, python-format
@@ -361,7 +373,7 @@ msgstr "etiket:"
 #: contrib/admindocs/views.py:109 contrib/admindocs/views.py:111
 #: contrib/admindocs/views.py:113
 msgid "filter:"
-msgstr "filtre:"
+msgstr "süzgeç:"
 
 #: contrib/admindocs/views.py:160 contrib/admindocs/views.py:162
 #: contrib/admindocs/views.py:164
@@ -371,7 +383,7 @@ msgstr "görünüm:"
 #: contrib/admindocs/views.py:191
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "%(app_label)r uygulaması bulunamadı"
 
 #: contrib/admindocs/views.py:195
 #, python-format
@@ -408,9 +420,9 @@ msgstr "%s sayısı"
 #: contrib/admindocs/views.py:275
 #, python-format
 msgid "Attributes on %s objects"
-msgstr "%s nesnesi için özellikler"
+msgstr "%s nesnelerindeki öznitelikler"
 
 #: contrib/admindocs/views.py:369
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
-msgstr "%s geçerli bir adres kalıbı değil"
+msgstr "%s, bir urlpattern nesnesi olarak görünmüyor"

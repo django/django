@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Sergey Lysach <sergikoff88@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:43+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-24 18:34+0000\n"
+"Last-Translator: Max V. Stotsky <transifex@ms.pereslavl.ru>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,7 @@ msgstr ""
 
 #: contrib/formtools/apps.py:8
 msgid "Form Tools"
-msgstr ""
+msgstr "Інструменти форми."
 
 #: contrib/formtools/templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
@@ -37,4 +38,4 @@ msgstr "відправити"
 
 #: contrib/formtools/wizard/views.py:276
 msgid "ManagementForm data is missing or has been tampered."
-msgstr ""
+msgstr "Дані ManagementForm відсутні або були спотворені."

@@ -2,8 +2,9 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
+# Burak Yavuz, 2014
 # Caner Başaran <basaran.caner@gmail.com>, 2013
-# cihad <cihadgundogdu@gmail.com>, 2014
+# Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
 # Gökmen Görgen <gokmen@alageek.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Metin Amiroff <amiroff@gmail.com>, 2012
@@ -14,8 +15,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-06-30 08:55+0000\n"
-"Last-Translator: cihad <cihadgundogdu@gmail.com>\n"
+"PO-Revision-Date: 2014-09-07 17:59+0000\n"
+"Last-Translator: Burak Yavuz\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -38,35 +39,35 @@ msgstr "Önemli tarihler"
 
 #: contrib/auth/admin.py:134
 msgid "Password changed successfully."
-msgstr "Şifre başarı ile değiştirildi."
+msgstr "Parola başarılı olarak değiştirildi."
 
 #: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
-msgstr "Şifre değiştir: %s"
+msgstr "Parolayı değiştir: %s"
 
 #: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Kimlik Doğrulama ve Yetkilendirme"
 
 #: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
 #: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
-msgstr "Şifre tanımlanmadı."
+msgstr "Ayarlı parola yok."
 
 #: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
 #: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr "Yanlış şifre formatı veya bilinmeyen şifreleme algoritması."
+msgstr "Geçersiz parola biçimi veya bilinmeyen adresleme algoritması."
 
 #: contrib/auth/forms.py:76
 msgid "A user with that username already exists."
-msgstr "Bu isimde bir kullanıcı zaten mevcuttur."
+msgstr "Bu kullanıcı adında bir kullanıcı zaten mevcut."
 
 #: contrib/auth/forms.py:77 contrib/auth/forms.py:285
 #: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
-msgstr "İki şifre alanı uyuşmuyor."
+msgstr "İki parola alanı uyuşmadı."
 
 #: contrib/auth/forms.py:79 contrib/auth/forms.py:129
 msgid "Username"
@@ -76,25 +77,26 @@ msgstr "Kullanıcı adı"
 #: contrib/auth/models.py:368
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Zorunlu alan. 30 karakter ya da az olmalı. Harf, rakam ve @/./+/-/_ "
-"karakterleri kullanılabilir."
+"Zorunlu. 30 karakter ya da daha az olmalı. Sadece harfler, rakamlar ve @/./"
+"+/-/_ karakterleri kullanılabilir."
 
 #: contrib/auth/forms.py:84 contrib/auth/forms.py:133
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Bu değer sadece harf, rakam ve @/./+/-/_ karakterlerini içerebilir."
+msgstr ""
+"Bu değer sadece harfleri, rakamları ve @/./+/-/_ karakterlerini içerebilir."
 
 #: contrib/auth/forms.py:86 contrib/auth/forms.py:135
 #: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
-msgstr "Şifre"
+msgstr "Parola"
 
 #: contrib/auth/forms.py:88
 msgid "Password confirmation"
-msgstr "Şifre onayı"
+msgstr "Parola onayı"
 
 #: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
-msgstr "Onaylamak için, yukarıdaki şifrenin aynısını girin."
+msgstr "Doğrulama için yukarıdaki parolanın aynısını girin."
 
 #: contrib/auth/forms.py:136
 msgid ""
@@ -102,8 +104,8 @@ msgid ""
 "password, but you can change the password using <a href=\"password/\">this "
 "form</a>."
 msgstr ""
-"Ham şifreler saklanmadığından kullanıcıların şifrelerini görmenin yolu "
-"yoktur, fakat <a href=\"password/\">buradaki form</a> aracılığıyla şifreyi "
+"Ham parolalar saklanmaz, bu yüzden bu kullanıcının parolasını görmenin yolu "
+"yoktur, fakat <a href=\"password/\">bu formu</a> kullanarak parolayı "
 "değiştirebilirsiniz."
 
 #: contrib/auth/forms.py:166
@@ -112,36 +114,36 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Lütfen %(username)s için geçerli parolayı giriniz. Tüm alanlar büyük/küçük "
-"harfe duyarlıdır."
+"Lütfen doğru %(username)s ve parola girin. Her iki alanında büyük küçük "
+"harfe duyarlı olabileceğini unutmayın."
 
 #: contrib/auth/forms.py:168
 msgid "This account is inactive."
-msgstr "Bu hesap aktif değil."
+msgstr "Bu hesap devre dışı."
 
 #: contrib/auth/forms.py:231
 msgid "Email"
-msgstr "Eposta"
+msgstr "E-posta"
 
 #: contrib/auth/forms.py:287
 msgid "New password"
-msgstr "Yeni şifre"
+msgstr "Yeni parola"
 
 #: contrib/auth/forms.py:289
 msgid "New password confirmation"
-msgstr "Yeni şifre tekrarı"
+msgstr "Yeni parola onayı"
 
 #: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "Eski şifreniz hatalı. Lütfen tekrar girin."
+msgstr "Eski parolanız yanlış girildi. Lütfen tekrar girin."
 
 #: contrib/auth/forms.py:323
 msgid "Old password"
-msgstr "Eski şifre"
+msgstr "Eski parola"
 
 #: contrib/auth/forms.py:353
 msgid "Password (again)"
-msgstr "Şifre (tekrar)"
+msgstr "Parola (tekrar)"
 
 #: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
 #: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
@@ -152,7 +154,7 @@ msgstr "algoritma"
 
 #: contrib/auth/hashers.py:253
 msgid "iterations"
-msgstr "iterasyonlar"
+msgstr "yinelemeler"
 
 #: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
 #: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
@@ -164,7 +166,7 @@ msgstr "tuz"
 #: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
 #: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
-msgstr "hash"
+msgstr "adresleme"
 
 #: contrib/auth/hashers.py:336
 msgid "work factor"
@@ -176,11 +178,11 @@ msgstr "sağlama"
 
 #: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
-msgstr "isim"
+msgstr "adı"
 
 #: contrib/auth/models.py:65
 msgid "codename"
-msgstr "takma ad"
+msgstr "kod adı"
 
 #: contrib/auth/models.py:69
 msgid "permission"
@@ -200,31 +202,31 @@ msgstr "gruplar"
 
 #: contrib/auth/models.py:192
 msgid "password"
-msgstr "şifre"
+msgstr "parola"
 
 #: contrib/auth/models.py:193
 msgid "last login"
-msgstr "son ziyaret"
+msgstr "son oturum açma"
 
 #: contrib/auth/models.py:290
 msgid "superuser status"
-msgstr "süper kullanıcı"
+msgstr "süper kullanıcı durumu"
 
 #: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"Kullanıcıya ayrı ayrı izin atamasına gerek kalmadan tüm hakların verilip "
-"verilmeyeceğini belirler."
+"Bu kullanıcıya ayrı ayrı izin atamadan tüm izinlerin verilip verilmeyeceğini "
+"belirler."
 
 #: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of his/her group."
 msgstr ""
-"Bu kullanıcının bağlı olduğu gruplar. Bir kullanıcı bağlı bulunduğu gruba "
-"atanan tüm yetkilere sahip olur."
+"Bu kullanıcının bağlı olduğu gruplar. Bir kullanıcı, her bir grubuna verilen "
+"tüm izinleri alacak."
 
 #: contrib/auth/models.py:299
 msgid "user permissions"
@@ -232,7 +234,7 @@ msgstr "kullanıcı izinleri"
 
 #: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
-msgstr "Bu kullanıcı için özel izinler"
+msgstr "Bu kullanıcı için belirli izinler."
 
 #: contrib/auth/models.py:367
 msgid "username"
@@ -240,43 +242,43 @@ msgstr "kullanıcı adı"
 
 #: contrib/auth/models.py:371
 msgid "Enter a valid username."
-msgstr "Geçerli bir kullanıcı adı giriniz."
+msgstr "Geçerli bir kullanıcı adı girin."
 
 #: contrib/auth/models.py:373
 msgid "first name"
-msgstr "isim"
+msgstr "adı"
 
 #: contrib/auth/models.py:374
 msgid "last name"
-msgstr "soyisim"
+msgstr "soyadı"
 
 #: contrib/auth/models.py:375
 msgid "email address"
-msgstr "eposta adresi"
+msgstr "e-posta adresi"
 
 #: contrib/auth/models.py:376
 msgid "staff status"
-msgstr "yönetici"
+msgstr "görev durumu"
 
 #: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
-msgstr "Kullanıcının yönetim (admin) paneline girip giremeyeceğini belirler."
+msgstr "Kullanıcının bu yönetici sitesine oturum açıp açamayacağını belirler."
 
 #: contrib/auth/models.py:379
 msgid "active"
-msgstr "aktif"
+msgstr "etkin"
 
 #: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Kullanıcının aktif olup olmadığını belirler. Kullanıcı hesabını silmek "
-"yerine bu işareti kaldırın."
+"Bu kullanıcının etkin olarak işlem görüp görmediğini belirler. Hesapları "
+"silmek yerine bunun işaretini kaldırın."
 
 #: contrib/auth/models.py:382
 msgid "date joined"
-msgstr "kayıt tarihi"
+msgstr "katılma tarihi"
 
 #: contrib/auth/models.py:390
 msgid "user"
@@ -289,40 +291,40 @@ msgstr "kullanıcılar"
 #: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr "Parola resetlemesi %(site_name)s"
+msgstr "%(site_name)s sitesinde parola sıfırlama"
 
 #: contrib/auth/tests/test_forms.py:387
 msgid "Enter a valid email address."
-msgstr "Geçerli bir kullanıcı adı giriniz."
+msgstr "Geçerli bir e-posta adresi girin."
 
 #: contrib/auth/views.py:92
 msgid "Logged out"
-msgstr "Çıkış yapıldı"
+msgstr "Oturum kapatıldı"
 
 #: contrib/auth/views.py:169
 msgid "Password reset"
-msgstr "Şifreyi sıfırla"
+msgstr "Parolayı sıfırla"
 
 #: contrib/auth/views.py:181
 msgid "Password reset successful"
-msgstr "Şifre sıfırlama başarılı"
+msgstr "Parola sıfırlama başarılı"
 
 #: contrib/auth/views.py:216
 msgid "Enter new password"
-msgstr "Yeni şifrenizi girin"
+msgstr "Yeni parolayı girin"
 
 #: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
-msgstr "Şifre sıfırlaması başarısız oldu"
+msgstr "Parola sıfırlama başarısız"
 
 #: contrib/auth/views.py:244
 msgid "Password reset complete"
-msgstr "Şifre sıfırlama tamamlandı"
+msgstr "Parola sıfırlama tamamlandı"
 
 #: contrib/auth/views.py:278
 msgid "Password change"
-msgstr "Şifre değişimi"
+msgstr "Parola değiştirme"
 
 #: contrib/auth/views.py:291
 msgid "Password change successful"
-msgstr "Şifre değişimi başarılı"
+msgstr "Parola değiştirme başarılı"

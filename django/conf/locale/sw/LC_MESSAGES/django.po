@@ -1,12 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# machaku <bmachaku@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-06-21 08:46+0000\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-08-24 08:52+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
@@ -18,11 +19,15 @@ msgstr ""
 
 #: conf/global_settings.py:51
 msgid "Afrikaans"
-msgstr ""
+msgstr "Kiafrikaani"
 
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "Kiarabu"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr ""
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -34,7 +39,7 @@ msgstr "Kibulgaria"
 
 #: conf/global_settings.py:55
 msgid "Belarusian"
-msgstr ""
+msgstr "Kibelarusi"
 
 #: conf/global_settings.py:56
 msgid "Bengali"
@@ -42,7 +47,7 @@ msgstr "Kibengali"
 
 #: conf/global_settings.py:57
 msgid "Breton"
-msgstr ""
+msgstr "Kibretoni"
 
 #: conf/global_settings.py:58
 msgid "Bosnian"
@@ -78,7 +83,7 @@ msgstr "Kiingereza"
 
 #: conf/global_settings.py:66
 msgid "Australian English"
-msgstr ""
+msgstr "Kiingereza cha Kiaustalia"
 
 #: conf/global_settings.py:67
 msgid "British English"
@@ -106,7 +111,7 @@ msgstr "Kihispania cha Nikaragua"
 
 #: conf/global_settings.py:73
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "Kihispania cha Kivenezuela"
 
 #: conf/global_settings.py:74
 msgid "Estonian"
@@ -165,6 +170,10 @@ msgid "Indonesian"
 msgstr "Kiindonesia"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "Kiaiselandi"
 
@@ -219,6 +228,10 @@ msgstr "Kimalayalam"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "Kimongolia"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr ""
 
 #: conf/global_settings.py:102
 msgid "Burmese"
@@ -354,7 +367,7 @@ msgstr ""
 
 #: contrib/webdesign/apps.py:8
 msgid "Web Design"
-msgstr ""
+msgstr "Muonekano wa tovuti"
 
 #: core/validators.py:21
 msgid "Enter a valid value."
@@ -366,11 +379,11 @@ msgstr "Ingiza URL halali."
 
 #: core/validators.py:115
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Ingiza namba halali"
 
 #: core/validators.py:120
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "Ingiza anuani halali ya barua pepe"
 
 #: core/validators.py:185
 msgid ""
@@ -482,7 +495,7 @@ msgstr ""
 #: db/models/fields/__init__.py:926
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "Thamani ya '%(value)s' ni lazma iwe Kweli au Si kweli"
 
 #: db/models/fields/__init__.py:928
 msgid "Boolean (Either True or False)"
@@ -747,7 +760,7 @@ msgstr ""
 #. Translators: This is the default suffix added to form field labels
 #: forms/forms.py:122
 msgid ":"
-msgstr ""
+msgstr ":"
 
 #: forms/forms.py:192
 #, python-format
@@ -759,7 +772,7 @@ msgstr ""
 #. label
 #: forms/forms.py:620
 msgid ":?.!"
-msgstr ""
+msgstr ":?.!"
 
 #: forms/formsets.py:95
 msgid "ManagementForm data is missing or has been tampered with"
@@ -1220,51 +1233,51 @@ msgstr ", "
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "mwaka %d"
+msgstr[1] "miaka %d"
 
 #: utils/timesince.py:26
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "mwezi %d"
+msgstr[1] "miezi %d"
 
 #: utils/timesince.py:27
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "wiki %d"
+msgstr[1] "wiki %d"
 
 #: utils/timesince.py:28
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "siku %d"
+msgstr[1] "siku %d"
 
 #: utils/timesince.py:29
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "saa %d"
+msgstr[1] "saa %d"
 
 #: utils/timesince.py:30
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "dakika %d"
+msgstr[1] "dakika %d"
 
 #: utils/timesince.py:46
 msgid "0 minutes"
-msgstr ""
+msgstr "dakika 0"
 
 #: views/csrf.py:105
 msgid "Forbidden"
-msgstr ""
+msgstr "Marufuku"
 
 #: views/csrf.py:106
 msgid "CSRF verification failed. Request aborted."
@@ -1300,7 +1313,7 @@ msgstr ""
 
 #: views/csrf.py:129
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "Maelezo zaidi yanapatikana ikiwa DEBUG=True"
 
 #: views/generic/dates.py:43
 msgid "No year specified"
@@ -1349,7 +1362,7 @@ msgstr "Ukurasa huu si 'mwisho', na wala hauwezi kubadilishwa kuwa int."
 #: views/generic/list.py:67
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Ukurasa batili (%(page_number)s): %(message)s"
 
 #: views/generic/list.py:158
 #, python-format

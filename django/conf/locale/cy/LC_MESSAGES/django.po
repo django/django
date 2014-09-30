@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-06-21 08:46+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-08-26 14:29+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,10 @@ msgstr "Affricaneg"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "Arabeg"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr "Astwrieg"
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -81,7 +85,7 @@ msgstr "Saesneg"
 
 #: conf/global_settings.py:66
 msgid "Australian English"
-msgstr ""
+msgstr "Saesneg Awstralia"
 
 #: conf/global_settings.py:67
 msgid "British English"
@@ -168,6 +172,10 @@ msgid "Indonesian"
 msgstr "Indoneseg"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr "Ido"
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "Islandeg"
 
@@ -222,6 +230,10 @@ msgstr "Malaialam"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "Mongoleg"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr "Marathi"
 
 #: conf/global_settings.py:102
 msgid "Burmese"
@@ -345,19 +357,19 @@ msgstr "Tseinëeg Traddodiadol"
 
 #: contrib/sitemaps/apps.py:8
 msgid "Site Maps"
-msgstr ""
+msgstr "Mapiau Safle"
 
 #: contrib/staticfiles/apps.py:8
 msgid "Static Files"
-msgstr ""
+msgstr "Ffeiliau Statig"
 
 #: contrib/syndication/apps.py:8
 msgid "Syndication"
-msgstr ""
+msgstr "Syndicetiad"
 
 #: contrib/webdesign/apps.py:8
 msgid "Web Design"
-msgstr ""
+msgstr "Dylunio Gwe"
 
 #: core/validators.py:21
 msgid "Enter a valid value."
@@ -369,7 +381,7 @@ msgstr "Rhowch URL dilys."
 
 #: core/validators.py:115
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Rhowch gyfanrif dilys."
 
 #: core/validators.py:120
 msgid "Enter a valid email address."
@@ -463,12 +475,12 @@ msgstr "a"
 #: db/models/base.py:977
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "Mae %(model_name)s gyda'r %(field_labels)s hyn yn bodoli'n barod."
 
 #: db/models/fields/__init__.py:104
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Nid yw gwerth %(value)r yn ddewis dilys."
 
 #: db/models/fields/__init__.py:105
 msgid "This field cannot be null."
@@ -503,12 +515,12 @@ msgstr "cyfanrif"
 #: db/models/fields/__init__.py:851 db/models/fields/__init__.py:1571
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "Rhaid i'r gwerth '%(value)s' fod yn gyfanrif."
 
 #: db/models/fields/__init__.py:926
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "Rhaid i werth '%(value)s' for unai'n True neu False."
 
 #: db/models/fields/__init__.py:928
 msgid "Boolean (Either True or False)"
@@ -529,6 +541,8 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"Mae gan werth '%(value)s' fformat dyddiad annilys. Rhaid iddo fod yn y "
+"fformat BBBB-MM-DD."
 
 #: db/models/fields/__init__.py:1082 db/models/fields/__init__.py:1189
 #, python-format
@@ -536,6 +550,8 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"Mae'r gwerth '%(value)s' yn y fformat cywir (BBBB-MM-DD) ond mae'r dyddiad "
+"yn annilys"
 
 #: db/models/fields/__init__.py:1085
 msgid "Date (without time)"
@@ -547,6 +563,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"Mae '%(value)s' mewn fformat annilys. Rhaid iddo fod yn y fformat BBBB-MM-DD "
+"AA:MM[:ee[.uuuuuu]][CA]"
 
 #: db/models/fields/__init__.py:1191
 #, python-format
@@ -554,6 +572,8 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"Mae '%(value)s' yn y fformat cywir (BBBB-MM-DD AA:MM[:ee[.uuuuuu]][CA]) on "
+"mae'n ddyddiad/amser annilys."
 
 #: db/models/fields/__init__.py:1195
 msgid "Date (with time)"
@@ -562,7 +582,7 @@ msgstr "Dyddiad (gydag amser)"
 #: db/models/fields/__init__.py:1297
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "Rhaid i '%(value)s' fod yn ddegolyn."
 
 #: db/models/fields/__init__.py:1299
 msgid "Decimal number"
@@ -579,7 +599,7 @@ msgstr "Llwybr ffeil"
 #: db/models/fields/__init__.py:1537
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "Rhaid i '%(value)s' fod yn rif pwynt arnawf."
 
 #: db/models/fields/__init__.py:1539
 msgid "Floating point number"
@@ -600,7 +620,7 @@ msgstr "cyfeiriad IP"
 #: db/models/fields/__init__.py:1747
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "Rhaid i '%(value)s' gael y gwerth None, True neu False."
 
 #: db/models/fields/__init__.py:1749
 msgid "Boolean (Either True, False or None)"
@@ -633,6 +653,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"Mae gan y gwerth '%(value)s' fformat annilys. Rhaid iddo fod yn y fformat AA:"
+"MM[:ee[.uuuuuu]]."
 
 #: db/models/fields/__init__.py:1895
 #, python-format
@@ -640,6 +662,8 @@ msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"Mae'r gwerth '%(value)s' yn y fformat cywir AA:MM[:ee[.uuuuuu]] ond mae'r "
+"amser yn annilys."
 
 #: db/models/fields/__init__.py:1898
 msgid "Time"
@@ -664,7 +688,7 @@ msgstr "Delwedd"
 #: db/models/fields/related.py:1580
 #, python-format
 msgid "%(model)s instance with pk %(pk)r does not exist."
-msgstr ""
+msgstr "Nid yw %(model)s gyda pk %(pk)r yn bodoli."
 
 #: db/models/fields/related.py:1582
 msgid "Foreign Key (type determined by related field)"
@@ -782,7 +806,7 @@ msgstr "Rhowch restr o werthoedd."
 
 #: forms/fields.py:988
 msgid "Enter a complete value."
-msgstr ""
+msgstr "Rhowch werth cyflawn."
 
 #. Translators: This is the default suffix added to form field labels
 #: forms/forms.py:122
@@ -803,7 +827,7 @@ msgstr ":?.!"
 
 #: forms/formsets.py:95
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "Mae data ManagementForm ar goll neu mae rhywun wedi ymyrryd ynddo"
 
 #: forms/formsets.py:332
 #, python-format
@@ -818,10 +842,10 @@ msgstr[3] "Cyflwynwch %d neu lai o ffurflenni."
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Cyflwynwch %d neu fwy o ffurflenni."
+msgstr[1] "Cyflwynwch %d neu fwy o ffurflenni."
+msgstr[2] "Cyflwynwch %d neu fwy o ffurflenni."
+msgstr[3] "Cyflwynwch %d neu fwy o ffurflenni."
 
 #: forms/formsets.py:367 forms/formsets.py:369
 msgid "Order"
@@ -1246,7 +1270,7 @@ msgstr "Rhagfyr"
 
 #: utils/ipv6.py:10
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "Nid yw hwn yn gyfeiriad IPv6 dilys."
 
 #: utils/text.py:76
 #, python-format
@@ -1323,11 +1347,11 @@ msgstr "0 munud"
 
 #: views/csrf.py:105
 msgid "Forbidden"
-msgstr ""
+msgstr "Gwaharddedig"
 
 #: views/csrf.py:106
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "Gwirio CSRF wedi methu.  Ataliwyd y cais."
 
 #: views/csrf.py:110
 msgid ""
@@ -1336,6 +1360,9 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Rydych yn gweld y neges hwn can fod y safle HTTPS hwn angen 'Referer header' "
+"i gael ei anfon gan ei porwr, ond ni anfonwyd un.  Mae angen y pennyn hwn ar "
+"mwyn diogelwch, i sicrhau na herwgipiwyd eich porwr gan trydydd parti."
 
 #: views/csrf.py:115
 msgid ""
@@ -1343,6 +1370,9 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"Os ydych wedi analluogi pennynau 'Referer' yn eich porwr yn galluogwch nhw, "
+"oleiaf ar gyfer y safle hwn neu ar gyfer cysylltiadau HTTPS neu ar gyfer "
+"ceisiadau 'same-origin'."
 
 #: views/csrf.py:120
 msgid ""
@@ -1350,16 +1380,21 @@ msgid ""
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"Dangosir y neges hwn oherwydd bod angen cwci CSRF ar y safle hwn pan yn "
+"anfon ffurflenni.  Mae angen y cwci ar gyfer diogelwch er mwyn sicrhau nad "
+"oes trydydd parti yn herwgipio eich porwr."
 
 #: views/csrf.py:125
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"Os ydych wedi analluogi cwcis, galluogwch nhw, oleiaf i'r safle hwn neu "
+"ceisiadau 'same-origin'."
 
 #: views/csrf.py:129
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "Mae mwy o wybodaeth ar gael gyda DEBUG=True"
 
 #: views/generic/dates.py:43
 msgid "No year specified"

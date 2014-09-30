@@ -2,6 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Roman Kozlovskyi <krzroman@gmail.com>, 2012
 # Sergey Lysach <sergikoff88@gmail.com>, 2011
 # Андрей Костенко <andrey@kostenko.name>, 2011
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-25 14:11+0000\n"
+"Last-Translator: Max V. Stotsky <transifex@ms.pereslavl.ru>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +24,7 @@ msgstr ""
 
 #: contrib/gis/apps.py:8
 msgid "GIS"
-msgstr ""
+msgstr "ГІС"
 
 #: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -35,7 +36,7 @@ msgstr "Точка"
 
 #: contrib/gis/db/models/fields.py:304
 msgid "Line string"
-msgstr ""
+msgstr "Ламана"
 
 #: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
@@ -43,23 +44,23 @@ msgstr "Багатокутник"
 
 #: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
-msgstr ""
+msgstr "Набір точок"
 
 #: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
-msgstr ""
+msgstr "Набір ламаних"
 
 #: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
-msgstr ""
+msgstr "Набір багатокутників"
 
 #: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
-msgstr ""
+msgstr "Набір геометричних об'єктів"
 
 #: contrib/gis/forms/fields.py:22
 msgid "No geometry value provided."
-msgstr "Не задано геометрічне значення."
+msgstr "Не задано геометричне значення."
 
 #: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
@@ -92,7 +93,7 @@ msgstr "Немає сторінки '%s'"
 
 #: contrib/gis/views.py:10
 msgid "No feeds are registered."
-msgstr ""
+msgstr "Немає зареєстрованих підписок."
 
 #: contrib/gis/views.py:16
 #, python-format

@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-07-22 18:42+0000\n"
+"PO-Revision-Date: 2014-08-23 07:26+0000\n"
 "Last-Translator: Reza Mohammadi <reza@teeleh.ir>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
@@ -145,7 +145,7 @@ msgstr ""
 #: contrib/admindocs/templates/admin_doc/model_index.html:10
 #: contrib/admindocs/templates/admin_doc/model_index.html:14
 msgid "Models"
-msgstr "مدل ها"
+msgstr "مدل‌ها"
 
 #: contrib/admindocs/templates/admin_doc/index.html:24
 msgid ""
