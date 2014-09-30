@@ -178,7 +178,10 @@ class QuerySet(object):
             "Negative indexing is not supported."
 
         if self._result_cache is not None:
-            return self._result_cache[k]
+            try:
+                return self._result_cache[k]
+            except IndexError, e:
+                raise QuerySetIndexError(*e.args)
 
         if isinstance(k, slice):
             qs = self._clone()
@@ -191,11 +194,22 @@ class QuerySet(object):
             else:
                 stop = None
             qs.query.set_limits(start, stop)
-            return list(qs)[::k.step] if k.step else qs
+            if k.step:
+                l = list(qs)
+                try:
+                    return l[::k.step]
+                except IndexError, e:
+                    raise QuerySetIndexError(*e.args)
+            else:
+                return qs
 
         qs = self._clone()
         qs.query.set_limits(k, k + 1)
-        return list(qs)[0]
+        l = list(qs)
+        try:
+            return l[0]
+        except IndexError, e:
+            raise QuerySetIndexError(*e.args)
 
     def __and__(self, other):
         self._merge_sanity_check(other)
@@ -519,7 +533,7 @@ class QuerySet(object):
         qs = self if self.ordered else self.order_by('pk')
         try:
             return qs[0]
-        except IndexError:
+        except QuerySetIndexError:
             return None
 
     def last(self):
@@ -529,7 +543,7 @@ class QuerySet(object):
         qs = self.reverse() if self.ordered else self.order_by('-pk')
         try:
             return qs[0]
-        except IndexError:
+        except QuerySetIndexError:
             return None
 
     def in_bulk(self, id_list):
@@ -1048,6 +1062,10 @@ class QuerySet(object):
         for example qs[1:]._has_filters() -> False.
         """
         return self.query.has_filters()
+
+
+class QuerySetIndexError(IndexError):
+    pass
 
 
 class InstanceCheckMeta(type):

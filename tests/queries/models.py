@@ -694,3 +694,26 @@ class Student(models.Model):
 class Classroom(models.Model):
     school = models.ForeignKey(School)
     students = models.ManyToManyField(Student, related_name='classroom')
+
+
+# Ticket #23555
+
+class IndexErrorQuerySet(models.QuerySet):
+    """
+    Raises IndexError on __iter__() call.
+
+    It's ok that __getitem__ may raise IndexError by itself when retrieving
+    an item from the list. But __getitem__ calls __iter__ to retrieve
+    the actual list of items, which makes a query to DB. If the last one
+    raises IndexError, this usually can not be expected and should not be
+    suppressed in any QuerySet method.
+    Let's break the QuerySet.__iter__ method to make it always raise
+    IndexError and ensure it is not catched by another method of
+    QuerySet.
+    """
+    def __iter__(self):
+        raise IndexError
+
+
+class IndexErrorArticle(Article):
+    objects = IndexErrorQuerySet.as_manager()
