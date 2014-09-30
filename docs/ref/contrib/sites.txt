@@ -18,10 +18,6 @@ The sites framework is mainly based on a simple model:
 .. class:: models.Site
 
     A model for storing the ``domain`` and ``name`` attributes of a Web site.
-    The :setting:`SITE_ID` setting specifies the database ID of the
-    :class:`~django.contrib.sites.models.Site` object (accessible using
-    the automatically added ``id`` attribute) associated with that
-    particular settings file.
 
     .. attribute:: domain
 
@@ -30,6 +26,14 @@ The sites framework is mainly based on a simple model:
     .. attribute:: name
 
         A human-readable "verbose" name for the Web site.
+
+The :setting:`SITE_ID` setting specifies the database ID of the
+:class:`~django.contrib.sites.models.Site` object associated with that
+particular settings file. It the setting is omitted, the
+:func:`~django.contrib.sites.shortcuts.get_current_site` function will
+try to get the current site by comparing the
+:attr:`~django.contrib.sites.models.Site.domain` with the host name from
+the :meth:`request.get_host() <django.http.HttpRequest.get_host>` method.
 
 How you use this is up to you, but Django uses it in a couple of ways
 automatically via simple conventions.
@@ -308,6 +312,11 @@ model(s). It's a model :doc:`manager </topics/db/managers>` that
 automatically filters its queries to include only objects associated
 with the current :class:`~django.contrib.sites.models.Site`.
 
+.. admonition:: Mandatory :setting:`SITE_ID`
+
+    The ``CurrentSiteManager`` is only usable when the :setting:`SITE_ID`
+    setting is defined in your settings.
+
 Use :class:`~django.contrib.sites.managers.CurrentSiteManager` by adding it to
 your model explicitly. For example::
 
@@ -492,3 +501,9 @@ Finally, to avoid repetitive fallback code, the framework provides a
     .. versionchanged:: 1.7
 
       This function used to be defined in ``django.contrib.sites.models``.
+
+    .. versionchanged:: 1.8
+
+      This function will now lookup the current site based on
+      :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
+      :setting:`SITE_ID` setting is not defined.
