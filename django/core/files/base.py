@@ -102,16 +102,22 @@ class File(FileProxyMixin):
         # Iterate over this file-like object by newlines
         buffer_ = None
         for chunk in self.chunks():
-            chunk_buffer = BytesIO(chunk)
-
-            for line in chunk_buffer:
+            for line in chunk.splitlines(True):
                 if buffer_:
-                    line = buffer_ + line
+                    if endswith_cr(buffer_) and not equals_lf(line):
+                        # Line split after a \r newline; yield buffer_.
+                        yield buffer_
+                        # Continue with line.
+                    else:
+                        # Line either split without a newline (line
+                        # continues after buffer_) or with \r\n
+                        # newline (line == b'\n').
+                        line = buffer_ + line
+                    # buffer_ handled, clear it.
                     buffer_ = None
 
-                # If this is the end of a line, yield
-                # otherwise, wait for the next round
-                if line[-1:] in (b'\n', b'\r'):
+                # If this is the end of a \n or \r\n line, yield.
+                if endswith_lf(line):
                     yield line
                 else:
                     buffer_ = line
@@ -165,3 +171,24 @@ class ContentFile(File):
 
     def close(self):
         pass
+
+
+def endswith_cr(line):
+    """
+    Return True if line (a text or byte string) ends with '\r'.
+    """
+    return line.endswith('\r' if isinstance(line, six.text_type) else b'\r')
+
+
+def endswith_lf(line):
+    """
+    Return True if line (a text or byte string) ends with '\n'.
+    """
+    return line.endswith('\n' if isinstance(line, six.text_type) else b'\n')
+
+
+def equals_lf(line):
+    """
+    Return True if line (a text or byte string) equals '\n'.
+    """
+    return line == ('\n' if isinstance(line, six.text_type) else b'\n')
