@@ -378,7 +378,7 @@ class BaseDatabaseSchemaEditor(object):
         self.execute(sql, params)
         # Drop the default if we need to
         # (Django usually does not use in-database defaults)
-        if not self.skip_default(field) and field.default is not None:
+        if self.skip_default(field) and field.default is not None:
             sql = self.sql_alter_column % {
                 "table": self.quote_name(model._meta.db_table),
                 "changes": self.sql_alter_column_no_default % {
@@ -675,7 +675,7 @@ class BaseDatabaseSchemaEditor(object):
             )
         # Drop the default if we need to
         # (Django usually does not use in-database defaults)
-        if not self.skip_default(new_field) and new_field.default is not None:
+        if self.skip_default(new_field) and new_field.default is not None:
             sql = self.sql_alter_column % {
                 "table": self.quote_name(model._meta.db_table),
                 "changes": self.sql_alter_column_no_default % {
