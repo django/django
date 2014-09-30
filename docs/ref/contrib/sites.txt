@@ -23,6 +23,12 @@ The sites framework is mainly based on a simple model:
     the automatically added ``id`` attribute) associated with that
     particular settings file.
 
+    In certain circumstances, such as running multiple sites from a single
+    Django server instance, you may not be able to set a single
+    :setting:`SITE_ID` setting. When no :setting:`SITE_ID` is configured, the
+    domain name from the ``request`` will be used to try and look up the
+    :class:`~django.contrib.sites.models.Site` object.
+
     .. attribute:: domain
 
         The domain name associated with the Web site.

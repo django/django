@@ -60,6 +60,12 @@ class SitesFrameworkTests(TestCase):
         self.assertIsInstance(site, Site)
         self.assertEqual(site.id, settings.SITE_ID)
 
+        # If no SITE_ID is set, current Site should be retrieved using the request
+        with override_settings(SITE_ID=None):
+            site = get_current_site(request)
+            self.assertTrue(isinstance(site, Site))
+            self.assertEqual(site.domain, "example.com")
+
         # Test that an exception is raised if the sites framework is installed
         # but there is no matching Site
         site.delete()
