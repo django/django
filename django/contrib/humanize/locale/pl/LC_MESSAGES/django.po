@@ -4,13 +4,14 @@
 # angularcircle, 2011
 # angularcircle, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Piotr Meuś <piotr.meus@gmail.com>, 2014
 # Roman Barczyński <rombar@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-07-07 09:27+0000\n"
+"PO-Revision-Date: 2014-09-18 19:26+0000\n"
 "Last-Translator: angularcircle\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/django/language/"
 "pl/)\n"
@@ -282,9 +283,9 @@ msgstr "teraz"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "sekundę temu"
+msgstr[1] "%(count)s sekundy temu"
+msgstr[2] "%(count)s sekund temu"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -292,9 +293,9 @@ msgstr[2] ""
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "minutę temu"
+msgstr[1] "%(count)s minuty temu"
+msgstr[2] "%(count)s minut temu"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -318,9 +319,9 @@ msgstr "za %(delta)s "
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "za sekundę"
+msgstr[1] "za %(count)s sekundy"
+msgstr[2] "za %(count)s sekund"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -328,9 +329,9 @@ msgstr[2] ""
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "za minutę"
+msgstr[1] "za %(count)s minuty"
+msgstr[2] "za %(count)s minut"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.

@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bayarkhuu Bataa <bbayarkhuu@gmail.com>, 2014
+# Bayarkhuu Bataa, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2013
+# Zorig <zorig_ezd@yahoo.com>, 2013-2014
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-31 03:30+0000\n"
+"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -319,12 +319,12 @@ msgstr ""
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:27
 msgid "Empty namespace"
-msgstr ""
+msgstr "Хоосон нэрний зай"
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:40
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "%(name)s нэрсээр харах"
 
 #: contrib/admindocs/templates/admin_doc/view_index.html:42
 msgid "Views by empty namespace"
@@ -365,7 +365,7 @@ msgstr "харах:"
 #: contrib/admindocs/views.py:191
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "%(app_label)r аппликэйшн олдсонгүй"
 
 #: contrib/admindocs/views.py:195
 #, python-format

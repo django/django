@@ -5,13 +5,14 @@
 # Tran <hongdiepkien@gmail.com>, 2011
 # Tran Van <vantxm@yahoo.co.uk>, 2013
 # Vuong Nguyen <autalpha@gmail.com>, 2011
+# xgenvn <xgenvn@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-07 19:06+0000\n"
+"Last-Translator: xgenvn <xgenvn@gmail.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
 "language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -124,12 +125,15 @@ msgstr ""
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] ""
+"Lưu ý: Hiện tại bạn đang thấy thời gian trước %s giờ so với thời gian máy "
+"chủ."
 
 #: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:87
 #, c-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] ""
+"Lưu ý: Hiện tại bạn đang thấy thời gian sau %s giờ so với thời gian máy chủ."
 
 #: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:114
 #: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149

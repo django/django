@@ -5,6 +5,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011
+# ouyanghongyu <ouyanghongyu@gmail.com>, 2014
 # pylemon <leeway1985@gmail.com>, 2013
 # slene <vslene@gmail.com>, 2011
 # Sun Liwen <sunliwen@gmail.com>, 2014
@@ -16,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-06-21 08:46+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-09-04 10:36+0000\n"
+"Last-Translator: ouyanghongyu <ouyanghongyu@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -34,6 +35,10 @@ msgstr "南非语"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "阿拉伯语"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr ""
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -176,6 +181,10 @@ msgid "Indonesian"
 msgstr "印尼语"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "冰岛语"
 
@@ -230,6 +239,10 @@ msgstr "马来亚拉姆语"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "蒙古语"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr ""
 
 #: conf/global_settings.py:102
 msgid "Burmese"
@@ -1260,7 +1273,7 @@ msgstr ""
 
 #: views/csrf.py:106
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "CSRF验证失败. 相应中断."
 
 #: views/csrf.py:110
 msgid ""

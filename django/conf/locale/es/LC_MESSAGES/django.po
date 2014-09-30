@@ -2,6 +2,7 @@
 #
 # Translators:
 # Abraham Estrada <abraham.estrada@gmail.com>, 2013
+# albertoalcolea <albertoalcolea@gmail.com>, 2014
 # Antoni Aloy <aaloy@apsl.net>, 2011-2014
 # Diego Andres Sanabria Martin <diegueus9@gmail.com>, 2012
 # Diego Schulz <dschulz@gmail.com>, 2012
@@ -19,9 +20,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-08-18 19:40+0000\n"
-"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-09-02 11:36+0000\n"
+"Last-Translator: albertoalcolea <albertoalcolea@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -37,6 +38,10 @@ msgstr "Afrikaans"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "Árabe"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr "Asturiano"
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -179,6 +184,10 @@ msgid "Indonesian"
 msgstr "Indonesio"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr "Ido"
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "Islandés"
 
@@ -233,6 +242,10 @@ msgstr "Malayalam"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "Mongol"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr "Maratí"
 
 #: conf/global_settings.py:102
 msgid "Burmese"

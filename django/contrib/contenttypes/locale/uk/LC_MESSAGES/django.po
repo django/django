@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Alexander Chernihov <aleksandr.chernigov@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Sergey Lysach <sergikoff88@gmail.com>, 2012
 msgid ""
@@ -8,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-24 12:21+0000\n"
+"Last-Translator: Alexander Chernihov <aleksandr.chernigov@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,7 @@ msgstr ""
 
 #: contrib/contenttypes/apps.py:9
 msgid "Content Types"
-msgstr ""
+msgstr "Content Types"
 
 #: contrib/contenttypes/models.py:134
 msgid "python model class name"
