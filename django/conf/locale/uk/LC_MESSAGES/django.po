@@ -1,8 +1,10 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Alexander Chernihov <aleksandr.chernigov@gmail.com>, 2014
 # Boryslav Larin <brabadu@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Oleksandr Bolotov <oleksandr.bolotov@gmail.com>, 2013-2014
 # Roman Kozlovskyi <krzroman@gmail.com>, 2012
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
@@ -10,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-07-03 21:58+0000\n"
-"Last-Translator: Oleksandr Bolotov <oleksandr.bolotov@gmail.com>\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-09-24 09:21+0000\n"
+"Last-Translator: Alexander Chernihov <aleksandr.chernigov@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -29,6 +31,10 @@ msgstr "Африканська"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "Арабська"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr ""
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -84,7 +90,7 @@ msgstr "Англійська"
 
 #: conf/global_settings.py:66
 msgid "Australian English"
-msgstr ""
+msgstr "Австралійський англійська"
 
 #: conf/global_settings.py:67
 msgid "British English"
@@ -171,6 +177,10 @@ msgid "Indonesian"
 msgstr "Індонезійська"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "Ісландська"
 
@@ -225,6 +235,10 @@ msgstr "Малаялам"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "Монгольська"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr ""
 
 #: conf/global_settings.py:102
 msgid "Burmese"
@@ -352,7 +366,7 @@ msgstr "Мапи сайту"
 
 #: contrib/staticfiles/apps.py:8
 msgid "Static Files"
-msgstr ""
+msgstr "Статичні Файли"
 
 #: contrib/syndication/apps.py:8
 msgid "Syndication"
@@ -372,7 +386,7 @@ msgstr "Уведіть коректний URL."
 
 #: core/validators.py:115
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Введіть коректне ціле число."
 
 #: core/validators.py:120
 msgid "Enter a valid email address."
@@ -461,12 +475,12 @@ msgstr "та"
 #: db/models/base.py:977
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s з таким %(field_labels)s вже існує."
 
 #: db/models/fields/__init__.py:104
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Значення %(value)r не є дозволеним вибором."
 
 #: db/models/fields/__init__.py:105
 msgid "This field cannot be null."
@@ -488,6 +502,8 @@ msgstr "%(model_name)s з таким %(field_label)s вже існує."
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s повинне бути унікальним для %(date_field_label)s "
+"%(lookup_type)s."
 
 #: db/models/fields/__init__.py:116
 #, python-format
@@ -501,12 +517,12 @@ msgstr "Ціле число"
 #: db/models/fields/__init__.py:851 db/models/fields/__init__.py:1571
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "Значення '%(value)s' повинне бути цілим числом."
 
 #: db/models/fields/__init__.py:926
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "Значення '%(value)s' повинне бути True або False."
 
 #: db/models/fields/__init__.py:928
 msgid "Boolean (Either True or False)"
@@ -527,6 +543,8 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"Значення '%(value)s' має невірний формат дати. Вона повинна бути у форматі "
+"YYYY-MM-DD."
 
 #: db/models/fields/__init__.py:1082 db/models/fields/__init__.py:1189
 #, python-format
@@ -534,6 +552,7 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"Значення '%(value)s' має коректний формат (YYYY-MM-DD), але це недійсна дата."
 
 #: db/models/fields/__init__.py:1085
 msgid "Date (without time)"
@@ -545,6 +564,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"Значення '%(value)s' має невірний формат. Воно повинне бути у форматі YYYY-"
+"MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #: db/models/fields/__init__.py:1191
 #, python-format
@@ -552,6 +573,8 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"Значення '%(value)s' має вірний формат (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]), "
+"але це недійсна дата/час."
 
 #: db/models/fields/__init__.py:1195
 msgid "Date (with time)"
@@ -560,7 +583,7 @@ msgstr "Дата (з часом)"
 #: db/models/fields/__init__.py:1297
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "Значення '%(value)s' повинне бути десятковим числом."
 
 #: db/models/fields/__init__.py:1299
 msgid "Decimal number"
@@ -577,7 +600,7 @@ msgstr "Шлях до файла"
 #: db/models/fields/__init__.py:1537
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "Значення '%(value)s' повинне бути числом з плаваючою крапкою."
 
 #: db/models/fields/__init__.py:1539
 msgid "Floating point number"
@@ -598,7 +621,7 @@ msgstr "IP адреса"
 #: db/models/fields/__init__.py:1747
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "Значення '%(value)s'  повинне бути None, True або False."
 
 #: db/models/fields/__init__.py:1749
 msgid "Boolean (Either True, False or None)"
@@ -631,6 +654,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"Значення '%(value)s' має невірний формат. Воно повинне бути у форматі HH:MM[:"
+"ss[.uuuuuu]]."
 
 #: db/models/fields/__init__.py:1895
 #, python-format
@@ -638,6 +663,8 @@ msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"Значення '%(value)s' має вірний формат (HH:MM[:ss[.uuuuuu]]), але це "
+"недійсний час."
 
 #: db/models/fields/__init__.py:1898
 msgid "Time"
@@ -662,7 +689,7 @@ msgstr "Зображення"
 #: db/models/fields/related.py:1580
 #, python-format
 msgid "%(model)s instance with pk %(pk)r does not exist."
-msgstr ""
+msgstr "Об'єкт моделі %(model)s з первинним ключем %(pk)r не існує."
 
 #: db/models/fields/related.py:1582
 msgid "Foreign Key (type determined by related field)"
@@ -784,7 +811,7 @@ msgstr "Введіть список значень."
 
 #: forms/fields.py:988
 msgid "Enter a complete value."
-msgstr ""
+msgstr "Введіть значення повністю."
 
 #. Translators: This is the default suffix added to form field labels
 #: forms/forms.py:122
@@ -805,7 +832,7 @@ msgstr ":?.!"
 
 #: forms/formsets.py:95
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "Дані ManagementForm відсутні або були пошкоджені"
 
 #: forms/formsets.py:332
 #, python-format
@@ -819,9 +846,9 @@ msgstr[2] "Будь ласка, відправте %d або менше форм
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Будь ласка, відправте як мінімум %d форму."
+msgstr[1] "Будь ласка, відправте як мінімум %d форми."
+msgstr[2] "Будь ласка, відправте як мінімум %d форм."
 
 #: forms/formsets.py:367 forms/formsets.py:369
 msgid "Order"
@@ -1246,7 +1273,7 @@ msgstr "грудня"
 
 #: utils/ipv6.py:10
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "Це не є правильною адресою IPv6."
 
 #: utils/text.py:76
 #, python-format
@@ -1317,7 +1344,7 @@ msgstr "0 хвилин"
 
 #: views/csrf.py:105
 msgid "Forbidden"
-msgstr ""
+msgstr "Заборонено"
 
 #: views/csrf.py:106
 msgid "CSRF verification failed. Request aborted."
@@ -1353,7 +1380,7 @@ msgstr ""
 
 #: views/csrf.py:129
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "Більше інформації можна отримати при DEBUG=True."
 
 #: views/generic/dates.py:43
 msgid "No year specified"

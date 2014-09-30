@@ -2,9 +2,10 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
+# Burak Yavuz, 2014
 # Caner Başaran <basaran.caner@gmail.com>, 2013
-# cihad <cihadgundogdu@gmail.com>, 2012
-# cihad <cihadgundogdu@gmail.com>, 2013-2014
+# Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
+# Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2013-2014
 # Gökmen Görgen <gokmen@alageek.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mesut Can Gürle <mesutcang@gmail.com>, 2013
@@ -14,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-06-30 09:01+0000\n"
-"Last-Translator: cihad <cihadgundogdu@gmail.com>\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-09-15 18:39+0000\n"
+"Last-Translator: Burak Yavuz\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -27,11 +28,15 @@ msgstr ""
 
 #: conf/global_settings.py:51
 msgid "Afrikaans"
-msgstr "Güney Afrika Hollanda Lehçesi"
+msgstr "Afrikanca"
 
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "Arapça"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr "Asturyaca"
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -47,7 +52,7 @@ msgstr "Beyaz Rusça"
 
 #: conf/global_settings.py:56
 msgid "Bengali"
-msgstr "Bengali Dili"
+msgstr "Bengalce"
 
 #: conf/global_settings.py:57
 msgid "Breton"
@@ -87,15 +92,15 @@ msgstr "İngilizce"
 
 #: conf/global_settings.py:66
 msgid "Australian English"
-msgstr ""
+msgstr "Avusturya İngilizcesi"
 
 #: conf/global_settings.py:67
 msgid "British English"
-msgstr "İngiltere İngilizce"
+msgstr "İngiliz İngilizce"
 
 #: conf/global_settings.py:68
 msgid "Esperanto"
-msgstr "Esperanto"
+msgstr "Esperanto dili"
 
 #: conf/global_settings.py:69
 msgid "Spanish"
@@ -139,7 +144,7 @@ msgstr "Fransızca"
 
 #: conf/global_settings.py:79
 msgid "Frisian"
-msgstr "Frisce"
+msgstr "Frizce"
 
 #: conf/global_settings.py:80
 msgid "Irish"
@@ -147,7 +152,7 @@ msgstr "İrlandaca"
 
 #: conf/global_settings.py:81
 msgid "Galician"
-msgstr "Galler Dili"
+msgstr "Galiçyaca"
 
 #: conf/global_settings.py:82
 msgid "Hebrew"
@@ -155,7 +160,7 @@ msgstr "İbranice"
 
 #: conf/global_settings.py:83
 msgid "Hindi"
-msgstr "Hinduca"
+msgstr "Hintçe"
 
 #: conf/global_settings.py:84
 msgid "Croatian"
@@ -174,8 +179,12 @@ msgid "Indonesian"
 msgstr "Endonezce"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr "Ido dili"
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
-msgstr "İzlanda dili"
+msgstr "İzlandaca"
 
 #: conf/global_settings.py:89
 msgid "Italian"
@@ -195,11 +204,11 @@ msgstr "Kazakça"
 
 #: conf/global_settings.py:93
 msgid "Khmer"
-msgstr "Kamboçyaca"
+msgstr "Kmerce"
 
 #: conf/global_settings.py:94
 msgid "Kannada"
-msgstr "Kannada Dili"
+msgstr "Kannada dili"
 
 #: conf/global_settings.py:95
 msgid "Korean"
@@ -215,7 +224,7 @@ msgstr "Litovca"
 
 #: conf/global_settings.py:98
 msgid "Latvian"
-msgstr "Leton Dili"
+msgstr "Letonca"
 
 #: conf/global_settings.py:99
 msgid "Macedonian"
@@ -230,12 +239,16 @@ msgid "Mongolian"
 msgstr "Moğolca"
 
 #: conf/global_settings.py:102
+msgid "Marathi"
+msgstr "Marathi dili"
+
+#: conf/global_settings.py:102
 msgid "Burmese"
-msgstr "Birmanya dili"
+msgstr "Birmanca"
 
 #: conf/global_settings.py:103
 msgid "Norwegian Bokmal"
-msgstr "Norveçce (Bokmal)"
+msgstr "Norveççe Bokmal"
 
 #: conf/global_settings.py:104
 msgid "Nepali"
@@ -243,11 +256,11 @@ msgstr "Nepalce"
 
 #: conf/global_settings.py:105
 msgid "Dutch"
-msgstr "Flamanca"
+msgstr "Flemenkçe"
 
 #: conf/global_settings.py:106
 msgid "Norwegian Nynorsk"
-msgstr "Norveçce (Nynorsk)"
+msgstr "Norveççe Nynorsk"
 
 #: conf/global_settings.py:107
 msgid "Ossetic"
@@ -255,7 +268,7 @@ msgstr "Osetçe"
 
 #: conf/global_settings.py:108
 msgid "Punjabi"
-msgstr "Punjabice"
+msgstr "Pencapça"
 
 #: conf/global_settings.py:109
 msgid "Polish"
@@ -295,7 +308,7 @@ msgstr "Sırpça"
 
 #: conf/global_settings.py:118
 msgid "Serbian Latin"
-msgstr "Sırp Latini"
+msgstr "Sırpça Latin"
 
 #: conf/global_settings.py:119
 msgid "Swedish"
@@ -303,7 +316,7 @@ msgstr "İsveççe"
 
 #: conf/global_settings.py:120
 msgid "Swahili"
-msgstr "Svahili Dili"
+msgstr "Savahilice"
 
 #: conf/global_settings.py:121
 msgid "Tamil"
@@ -311,7 +324,7 @@ msgstr "Tamilce"
 
 #: conf/global_settings.py:122
 msgid "Telugu"
-msgstr "Telugu Dili"
+msgstr "Telugu dili"
 
 #: conf/global_settings.py:123
 msgid "Thai"
@@ -343,7 +356,7 @@ msgstr "Vietnamca"
 
 #: conf/global_settings.py:130 conf/global_settings.py:131
 msgid "Simplified Chinese"
-msgstr "Basiteştirilmiş Çince"
+msgstr "Basitleştirilmiş Çince"
 
 #: conf/global_settings.py:132 conf/global_settings.py:133
 msgid "Traditional Chinese"
@@ -351,19 +364,19 @@ msgstr "Geleneksel Çince"
 
 #: contrib/sitemaps/apps.py:8
 msgid "Site Maps"
-msgstr "Site Haritası"
+msgstr "Site Haritaları"
 
 #: contrib/staticfiles/apps.py:8
 msgid "Static Files"
-msgstr "Statik Dosyalar"
+msgstr "Sabit Dosyalar"
 
 #: contrib/syndication/apps.py:8
 msgid "Syndication"
-msgstr ""
+msgstr "Dağıtım"
 
 #: contrib/webdesign/apps.py:8
 msgid "Web Design"
-msgstr ""
+msgstr "Web Tasarımı"
 
 #: core/validators.py:21
 msgid "Enter a valid value."
@@ -384,7 +397,9 @@ msgstr "Geçerli bir e-posta adresi girin."
 #: core/validators.py:185
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "Lütfen sadece harf, rakam, altçizgi veya çizgiden oluşan değer girin."
+msgstr ""
+"Harflerden, sayılardan, altçizgilerden veya tirelerden oluşan geçerli bir "
+"'kısaltma' girin."
 
 #: core/validators.py:188 core/validators.py:207
 msgid "Enter a valid IPv4 address."
@@ -396,30 +411,27 @@ msgstr "Geçerli bir IPv6 adresi girin."
 
 #: core/validators.py:203 core/validators.py:206
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Geçerli bir IPv4 veya IPv6 adresi girin"
+msgstr "Geçerli bir IPv4 veya IPv6 adresi girin."
 
 #: core/validators.py:229 db/models/fields/__init__.py:1070
 msgid "Enter only digits separated by commas."
-msgstr "Sadece virgülle ayrılmış sayılar girin."
+msgstr "Sadece virgülle ayrılmış rakamlar girin."
 
 #: core/validators.py:236
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr ""
-"Bu değerin en az %(limit_value)s karakterden oluştuğundan emin olun (şu anki "
-"karakter sayısı: %(show_value)s)."
+msgstr "Bu değerin %(limit_value)s olduğuna emin olun (şu an %(show_value)s)."
 
 #: core/validators.py:255
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
-msgstr ""
-"Bu değerin %(limit_value)s karakterden az veya eşit olduğundan emin olun."
+msgstr "Bu değerin %(limit_value)s değerinden az veya eşit olduğuna emin olun."
 
 #: core/validators.py:262
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr ""
-"Bu değerin %(limit_value)s karakterden çok veya eşit olduğundan emin olun."
+"Bu değerin %(limit_value)s değerinden büyük veya eşit olduğuna emin olun."
 
 #: core/validators.py:271
 #, python-format
@@ -430,11 +442,11 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
-"Bu değerin en az %(limit_value)d karakterden oluştuğundan emin olun (şu anki "
-"karakter sayısı: %(show_value)d)."
+"Bu değerin en az %(limit_value)d karaktere sahip olduğuna emin olun (şu an "
+"%(show_value)d)."
 msgstr[1] ""
-"Bu değerin en az %(limit_value)d karakterden oluştuğundan emin olun (şu anki "
-"karakter sayısı: %(show_value)d)."
+"Bu değerin en az %(limit_value)d karaktere sahip olduğuna emin olun (şu an "
+"%(show_value)d)."
 
 #: core/validators.py:282
 #, python-format
@@ -445,11 +457,11 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
-"Bu değerin en fazla %(limit_value)d karakterden oluştuğundan emin olun (şu "
-"anki karakter sayısı: %(show_value)d)."
+"Bu değerin en fazla %(limit_value)d karaktere sahip olduğuna emin olun (şu "
+"an %(show_value)d)."
 msgstr[1] ""
-"Bu değerin en fazla %(limit_value)d karakterden oluştuğundan emin olun (şu "
-"anki karakter sayısı: %(show_value)d)."
+"Bu değerin en fazla %(limit_value)d karaktere sahip olduğuna emin olun (şu "
+"an %(show_value)d)."
 
 #: db/models/base.py:975 forms/models.py:718
 msgid "and"
@@ -458,25 +470,25 @@ msgstr "ve"
 #: db/models/base.py:977
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr "%(model_name)s modelinde %(field_labels)s mevcut."
+msgstr "Bu %(field_labels)s alanına sahip %(model_name)s zaten mevcut."
 
 #: db/models/fields/__init__.py:104
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr "%(value)r değeri geçerli bir seçim deği"
+msgstr "%(value)r değeri geçerli bir seçim değil."
 
 #: db/models/fields/__init__.py:105
 msgid "This field cannot be null."
-msgstr "Bu alan boş bırakılamaz."
+msgstr "Bu alan boş olamaz."
 
 #: db/models/fields/__init__.py:106
 msgid "This field cannot be blank."
-msgstr "Bu alan boş bırakılamaz. "
+msgstr "Bu alan boş olamaz."
 
 #: db/models/fields/__init__.py:107
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr "%(field_label)s alanına sahip %(model_name)s zaten mevcuttur."
+msgstr "Bu %(field_label)s alanına sahip %(model_name)s zaten mevcut."
 
 #. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
 #. Eg: "Title must be unique for pub_date year"
@@ -485,6 +497,8 @@ msgstr "%(field_label)s alanına sahip %(model_name)s zaten mevcuttur."
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s,  %(date_field_label)s %(lookup_type)s için benzersiz olmak "
+"zorundadır."
 
 #: db/models/fields/__init__.py:116
 #, python-format
@@ -498,21 +512,21 @@ msgstr "Tamsayı"
 #: db/models/fields/__init__.py:851 db/models/fields/__init__.py:1571
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr "'%(value)s' değeri bir tamsayı olmalıdır."
+msgstr "'%(value)s' değeri bir tamsayı olmak zorundadır."
 
 #: db/models/fields/__init__.py:926
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr "'%(value)s' değeri Doğru-True veya Yanlış-False olmalıdır."
+msgstr "'%(value)s' değeri ya True ya da False olmak zorundadır."
 
 #: db/models/fields/__init__.py:928
 msgid "Boolean (Either True or False)"
-msgstr "Mantıksal (True ya da False)"
+msgstr "Boolean (Ya True ya da False)"
 
 #: db/models/fields/__init__.py:1004
 #, python-format
 msgid "String (up to %(max_length)s)"
-msgstr "Karakter disizi (en fazla %(max_length)s)"
+msgstr "Dizge (%(max_length)s karaktere kadar)"
 
 #: db/models/fields/__init__.py:1065
 msgid "Comma-separated integers"
@@ -524,7 +538,8 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"'%(value)s' değeri geçersiz tarih formatı. Bu YYYY-AA-GG biçiminde olmalıdır."
+"'%(value)s' değeri geçersiz bir tarih biçimine sahip. Bu YYYY-MM-DD "
+"biçiminde olmak zorundadır."
 
 #: db/models/fields/__init__.py:1082 db/models/fields/__init__.py:1189
 #, python-format
@@ -532,12 +547,12 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"'%(value)s' değeri doğru bir biçime sahip (YYYY-MM-DD) ancak bu geçersiz bir "
+"'%(value)s' değeri doğru bir biçime (YYYY-MM-DD) sahip ancak bu geçersiz bir "
 "tarih."
 
 #: db/models/fields/__init__.py:1085
 msgid "Date (without time)"
-msgstr "Tarih (saat yok)"
+msgstr "Tarih (saat olmadan)"
 
 #: db/models/fields/__init__.py:1187
 #, python-format
@@ -545,6 +560,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"'%(value)s' değeri geçersiz bir biçime sahip. YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ] biçiminde olmak zorundadır."
 
 #: db/models/fields/__init__.py:1191
 #, python-format
@@ -552,17 +569,17 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"'%(value)s' biçimsel olarak doğru (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) ancak "
-"bu geçersiz bir tarih/zaman."
+"'%(value)s' değeri doğru bir biçime (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+"sahip ancak bu geçersiz bir tarih/saat."
 
 #: db/models/fields/__init__.py:1195
 msgid "Date (with time)"
-msgstr "Tarih (saat var)"
+msgstr "Tarih (saat olan)"
 
 #: db/models/fields/__init__.py:1297
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr "'%(value)s' değeri bir ondalık sayı olmalıdır."
+msgstr "'%(value)s' değeri bir ondalık sayı olmak zorundadır."
 
 #: db/models/fields/__init__.py:1299
 msgid "Decimal number"
@@ -579,15 +596,15 @@ msgstr "Dosya yolu"
 #: db/models/fields/__init__.py:1537
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr "'%(value)s' değeri float olmalı"
+msgstr "'%(value)s' değeri kesirli olmak zorundadır."
 
 #: db/models/fields/__init__.py:1539
 msgid "Floating point number"
-msgstr "Floating point rakamı"
+msgstr "Kayan noktalı sayı"
 
 #: db/models/fields/__init__.py:1623
 msgid "Big (8 byte) integer"
-msgstr "Büyük (8 bayt) integer"
+msgstr "Büyük (8 bayt) tamsayı"
 
 #: db/models/fields/__init__.py:1638
 msgid "IPv4 address"
@@ -600,28 +617,28 @@ msgstr "IP adresi"
 #: db/models/fields/__init__.py:1747
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr "'%(value)s' değeri None, True veya False olmak zorundadır."
+msgstr "'%(value)s' değeri ya None, True ya da False olmak zorundadır."
 
 #: db/models/fields/__init__.py:1749
 msgid "Boolean (Either True, False or None)"
-msgstr "Mantıksal (True, False, ya da None)"
+msgstr "Booleanl (Ya True, False, ya da None)"
 
 #: db/models/fields/__init__.py:1809
 msgid "Positive integer"
-msgstr "Positif sayı"
+msgstr "Pozitif tamsayı"
 
 #: db/models/fields/__init__.py:1821
 msgid "Positive small integer"
-msgstr "Pozitif küçük sayı"
+msgstr "Pozitif küçük tamsayı"
 
 #: db/models/fields/__init__.py:1834
 #, python-format
 msgid "Slug (up to %(max_length)s)"
-msgstr "Slug (%(max_length)s karaktere kadar)"
+msgstr "Kısaltma (%(max_length)s karaktere kadar)"
 
 #: db/models/fields/__init__.py:1863
 msgid "Small integer"
-msgstr "Küçük sayı"
+msgstr "Küçük tamsayı"
 
 #: db/models/fields/__init__.py:1870
 msgid "Text"
@@ -633,6 +650,8 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"'%(value)s' değeri geçersiz bir biçime sahip. HH:MM[:ss[.uuuuuu]] biçiminde "
+"olmak zorundadır."
 
 #: db/models/fields/__init__.py:1895
 #, python-format
@@ -640,6 +659,8 @@ msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"'%(value)s' değeri doğru biçime (HH:MM[:ss[.uuuuuu]]) sahip ancak bu "
+"geçersiz bir saat."
 
 #: db/models/fields/__init__.py:1898
 msgid "Time"
@@ -664,11 +685,11 @@ msgstr "Resim"
 #: db/models/fields/related.py:1580
 #, python-format
 msgid "%(model)s instance with pk %(pk)r does not exist."
-msgstr ""
+msgstr "%(pk)r birincil anahtarı olan %(model)s örneği mevcut değil."
 
 #: db/models/fields/related.py:1582
 msgid "Foreign Key (type determined by related field)"
-msgstr "Yabancı Anahtar (türü ilişkili alana göre belirlenir)"
+msgstr "Dış Anahtar (türü ilgili alana göre belirlenir)"
 
 #: db/models/fields/related.py:1773
 msgid "One-to-one relationship"
@@ -676,7 +697,7 @@ msgstr "Bire-bir ilişki"
 
 #: db/models/fields/related.py:1843
 msgid "Many-to-many relationship"
-msgstr "Çoğa-çok ilişki"
+msgstr "Çoka-çok ilişki"
 
 #: forms/fields.py:55
 msgid "This field is required."
@@ -684,7 +705,7 @@ msgstr "Bu alan zorunludur."
 
 #: forms/fields.py:236
 msgid "Enter a whole number."
-msgstr "Tam sayı girin."
+msgstr "Tam bir sayı girin."
 
 #: forms/fields.py:279 forms/fields.py:316
 msgid "Enter a number."
@@ -694,15 +715,15 @@ msgstr "Bir sayı girin."
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Toplamda en fazla %(max)s rakam olduğundan emin olun."
-msgstr[1] "Toplamda en fazla %(max)s rakam olduğundan emin olun."
+msgstr[0] "Toplamda %(max)s rakamdan daha fazla olmadığından emin olun."
+msgstr[1] "Toplamda %(max)s rakamdan daha fazla olmadığından emin olun."
 
 #: forms/fields.py:322
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "En fazla %(max)s onluk yerin olduğundan emin olun."
-msgstr[1] "En fazla %(max)s onluk yerin olduğundan emin olun."
+msgstr[0] "%(max)s ondalık basamaktan daha fazla olmadığından emin olun."
+msgstr[1] "%(max)s ondalık basamaktan daha fazla olmadığından emin olun."
 
 #: forms/fields.py:326
 #, python-format
@@ -710,8 +731,10 @@ msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "Onluk kısımdan önce en fazla %(max)s rakam olduğundan emin olun."
-msgstr[1] "Onluk kısımdan önce en fazla %(max)s rakam olduğundan emin olun."
+msgstr[0] ""
+"Ondalık noktasından önce %(max)s rakamdan daha fazla olmadığından emin olun."
+msgstr[1] ""
+"Ondalık noktasından önce %(max)s rakamdan daha fazla olmadığından emin olun."
 
 #: forms/fields.py:437 forms/fields.py:1139
 msgid "Enter a valid date."
@@ -719,19 +742,19 @@ msgstr "Geçerli bir tarih girin."
 
 #: forms/fields.py:461 forms/fields.py:1140
 msgid "Enter a valid time."
-msgstr "Geçerli bir zaman girin."
+msgstr "Geçerli bir saat girin."
 
 #: forms/fields.py:483
 msgid "Enter a valid date/time."
-msgstr "Geçerli bir tarih/zaman girin."
+msgstr "Geçerli bir tarih/saat girin."
 
 #: forms/fields.py:564
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Dosya gönderilmedi. Formdaki kodlama türünü kontrol edin."
+msgstr "Hiç dosya gönderilmedi. Formdaki kodlama türünü kontrol edin."
 
 #: forms/fields.py:565
 msgid "No file was submitted."
-msgstr "Hiçbir dosya gönderilmedi."
+msgstr "Hiç dosya gönderilmedi."
 
 #: forms/fields.py:566
 msgid "The submitted file is empty."
@@ -743,34 +766,34 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
-"Bu dosya adının en fazla %(max)d karakterden oluştuğundan emin olun (şu anki "
-"karakter sayısı: %(length)d)."
+"Bu dosya adının en fazla %(max)d karaktere sahip olduğundan emin olun (şu an "
+"%(length)d)."
 msgstr[1] ""
-"Bu dosya adının en fazla %(max)d karakterden oluştuğundan emin olun (şu anki "
-"karakter sayısı: %(length)d)."
+"Bu dosya adının en fazla %(max)d karaktere sahip olduğundan emin olun (şu an "
+"%(length)d)."
 
 #: forms/fields.py:571
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
-"Lütfen ya dosya seçin, ya da sıfırla kutucuğunu işaretleyin. İkisini aynı "
-"anda yapmayın."
+"Lütfen ya bir dosya gönderin ya da temizle işaretleme kutusunu işaretleyin, "
+"ikisini aynı anda işaretlemeyin."
 
 #: forms/fields.py:632
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Geçerli bir resim girin. Gönderdiğiniz dosya resim değil, ya da bozuk bir "
-"dosya."
+"Geçerli bir resim gönderin. Gönderdiğiniz dosya ya bir resim değildi ya da "
+"bozulmuş bir resimdi."
 
 #: forms/fields.py:782 forms/fields.py:871 forms/models.py:1192
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "Geçerli bir seçimde bulunun; %(value)s mevcut değerlerden biri değil."
+msgstr "Geçerli bir seçenek seçin. %(value)s mevcut seçeneklerden biri değil."
 
 #: forms/fields.py:872 forms/fields.py:987 forms/models.py:1191
 msgid "Enter a list of values."
-msgstr "Değer listesi giriniz."
+msgstr "Değerlerin bir listesini girin."
 
 #: forms/fields.py:988
 msgid "Enter a complete value."
@@ -795,7 +818,7 @@ msgstr ":?.!"
 
 #: forms/formsets.py:95
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr "ManagementForm verisi eksik veya bozulmuş."
+msgstr "ManagementForm verisi eksik ya da kurcalanmış."
 
 #: forms/formsets.py:332
 #, python-format
@@ -808,8 +831,8 @@ msgstr[1] "Lütfen %d ya da daha az form gönderin."
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Lütfen %d ya da daha fazla form gönderin."
+msgstr[1] "Lütfen %d ya da daha fazla form gönderin."
 
 #: forms/formsets.py:367 forms/formsets.py:369
 msgid "Order"
@@ -822,14 +845,13 @@ msgstr "Sil"
 #: forms/models.py:712
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr "Lütfen %(field)s alanları için mükerrer kayıt problemini düzeltin."
+msgstr "Lütfen %(field)s için kopya veriyi düzeltin."
 
 #: forms/models.py:716
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
-"Lütfen %(field)s alanı için mükerrer verileri düzeltin, bunlar eşsiz "
-"olmalıdır."
+"Lütfen %(field)s için benzersiz olmak zorunda olan, kopya veriyi düzeltin."
 
 #: forms/models.py:722
 #, python-format
@@ -837,23 +859,21 @@ msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
-"Lütfen %(field_name)s alanı için mükerrer verileri düzeltin, bunlar "
-"%(date_field)s alanı %(lookup)s sorgulamaları için eşsiz olmalıdır."
+"Lütfen %(date_field)s içindeki %(lookup)s için benzersiz olmak zorunda olan "
+"%(field_name)s için kopya veriyi düzeltin."
 
 #: forms/models.py:730
 msgid "Please correct the duplicate values below."
-msgstr "Lütfen aşağıdaki mükerrer kayıtları düzeltin."
+msgstr "Lütfen aşağıdaki kopya değerleri düzeltin."
 
 #: forms/models.py:1028
 msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"İçeride belirtilmiş yabancı anahtar ebeveyin nesnenin birincil anahtarı ile "
-"uyuşmadı."
+msgstr "Satıriçi dış anahtar ana örnek birincil anahtarı ile eşleşmedi."
 
 #: forms/models.py:1094
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
-"Geçerli bir seçimde bulunun; seçiminiz mevcut değerlerden birisi değil."
+"Geçerli bir seçenek seçin. Bu seçenek, mevcut seçeneklerden biri değil."
 
 #: forms/models.py:1194
 #, python-format
@@ -864,8 +884,8 @@ msgstr "\"%(pk)s\" birincil anahtar için geçerli bir değer değil."
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-"\"Ctrl\" (Mac'de \"Command\") tuşunu basılı tutularak birden fazla seçim "
-"yapılabilir."
+"Birden fazla seçmek için \"Ctrl\" veya Mac'teki \"Command\" tuşuna basılı "
+"tutun."
 
 #: forms/utils.py:148
 #, python-format
@@ -873,20 +893,20 @@ msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-" %(datetime)s %(current_timezone)s saat dilimine yorumlanamadı; bu belirsiz "
-"olabilir ya da olmayabilir."
+" %(datetime)s, %(current_timezone)s saat dilimi olarak yorumlanamadı; bu "
+"belirsiz olabilir ya da mevcut olmayabilir."
 
 #: forms/widgets.py:350
 msgid "Currently"
-msgstr "Geçerli"
+msgstr "Şu anki"
 
 #: forms/widgets.py:351
 msgid "Change"
-msgstr "Düzenle"
+msgstr "Değiştir"
 
 #: forms/widgets.py:352
 msgid "Clear"
-msgstr "Sıfırla"
+msgstr "Temizle"
 
 #: forms/widgets.py:546
 msgid "Unknown"
@@ -1140,12 +1160,12 @@ msgstr "Mayıs"
 #: utils/dates.py:36
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "Haziran"
+msgstr "Haz."
 
 #: utils/dates.py:37
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "Temmuz"
+msgstr "Tem."
 
 #: utils/dates.py:38
 msgctxt "abbrev. month"
@@ -1303,7 +1323,7 @@ msgstr "Yasak"
 
 #: views/csrf.py:106
 msgid "CSRF verification failed. Request aborted."
-msgstr "CSRF doğrulama başarısız oldu. İstek iptal edildi."
+msgstr "CSRF doğrulaması başarısız oldu. İstek iptal edildi."
 
 #: views/csrf.py:110
 msgid ""
@@ -1312,6 +1332,10 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Bu iletiyi görüyorsunuz çünkü bu HTTPS sitesi Web tarayıcınız tarafından "
+"gönderilen 'Göndereni başlığı'nı gerektirir, ancak hiçbir şey gönderilmedi. "
+"Bu başlık güvenlik nedenleri için gerekir, tarayıcınızın üçüncü parti "
+"uygulamalar tarafından ele geçirilmediğinden emin olun."
 
 #: views/csrf.py:115
 msgid ""
@@ -1319,6 +1343,9 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"Eğer tarayıcınızı 'Göndereni' başlıklarını etkisizleştirmek için "
+"yapılandırdıysanız, lütfen bunları, en azından bu site ya da HTTPS "
+"bağlantıları veya 'aynı-kaynakta' olan istekler için yeniden etkinleştirin."
 
 #: views/csrf.py:120
 msgid ""
@@ -1326,16 +1353,23 @@ msgid ""
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"Bu iletiyi görüyorsunuz çünkü bu site, formları gönderdiğinizde bir CSRF "
+"tanımlama bilgisini gerektirir. Bu tanımlama bilgisi güvenlik nedenleri için "
+"gerekir, tarayıcınızın üçüncü parti uygulamalar tarafından ele "
+"geçirilmediğinden emin olun."
 
 #: views/csrf.py:125
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"Eğer tarayıcınızı tanımlama bilgilerini etkisizleştirmek için "
+"yapılandırdıysanız, lütfen bunları, en azından bu site ya da 'aynı-kaynakta' "
+"olan istekler için yeniden etkinleştirin."
 
 #: views/csrf.py:129
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "Daha fazla bilgi DEBUG=True ayarı ile mevcut olur."
 
 #: views/generic/dates.py:43
 msgid "No year specified"
@@ -1356,7 +1390,7 @@ msgstr "Hafta bilgisi belirtilmedi"
 #: views/generic/dates.py:369 views/generic/dates.py:397
 #, python-format
 msgid "No %(verbose_name_plural)s available"
-msgstr "Mevcut %(verbose_name_plural)s kaydı bulunamadı"
+msgstr "Mevcut %(verbose_name_plural)s yok"
 
 #: views/generic/dates.py:650
 #, python-format
@@ -1365,21 +1399,21 @@ msgid ""
 "allow_future is False."
 msgstr ""
 "Gelecek %(verbose_name_plural)s mevcut değil, çünkü %(class_name)s."
-"allow_future değeri False olarak tanımlıdır."
+"allow_future değeri False olarak tanımlı."
 
 #: views/generic/dates.py:682
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "Geçersiz tarih dizisi: '%(datestr)s', format: '%(format)s' "
+msgstr "Geçersiz tarih dizgesi '%(datestr)s' verilen biçim '%(format)s'"
 
 #: views/generic/detail.py:54
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
-msgstr "Sorguya uygun herhangi bir %(verbose_name)s bulunamadı"
+msgstr "Sorguyla eşleşen hiç %(verbose_name)s bulunamadı"
 
 #: views/generic/list.py:62
 msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "Sayfa 'sonuncu' değil, veya int'e çevirilemez."
+msgstr "Sayfa 'sonuncu' değil, ya da bir int'e dönüştürülemez."
 
 #: views/generic/list.py:67
 #, python-format
@@ -1393,12 +1427,12 @@ msgstr "Liste boş ve '%(class_name)s.allow_empty' değeri False olarak tanıml�
 
 #: views/static.py:54
 msgid "Directory indexes are not allowed here."
-msgstr "Klasör indeksi görünümü kapalı."
+msgstr "Dizin indekslerine burada izin verilmiyor."
 
 #: views/static.py:56
 #, python-format
 msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" yok"
+msgstr "\"%(path)s\" mevcut değil"
 
 #: views/static.py:97
 #, python-format

@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-26 13:51+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #: contrib/admindocs/apps.py:8
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Dogfennaeth Gweinyddol"
 
 #: contrib/admindocs/templates/admin_doc/bookmarklets.html:6
 #: contrib/admindocs/templates/admin_doc/index.html:6
@@ -221,7 +221,7 @@ msgstr "Disgrifiad"
 
 #: contrib/admindocs/templates/admin_doc/model_detail.html:52
 msgid "Back to Model Documentation"
-msgstr ""
+msgstr "Nôl i Ddogfennaeth Model"
 
 #: contrib/admindocs/templates/admin_doc/model_index.html:18
 msgid "Model documentation"
@@ -248,7 +248,7 @@ msgstr "Templad: \"%(name)s\""
 #: contrib/admindocs/templates/admin_doc/template_detail.html:18
 #, python-format
 msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgstr "Chwilio'r llwybr am dempled \"%(name)s\":"
 
 #: contrib/admindocs/templates/admin_doc/template_detail.html:21
 msgid "(does not exist)"
@@ -347,6 +347,9 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
+"\n"
+"Gweld ffwythiant: <code>%(full_name)s</code>. Enw: <code>%(url_name)s</"
+"code>.\n"
 
 #: contrib/admindocs/tests/test_fields.py:32
 msgid "Boolean (Either True or False)"
@@ -375,7 +378,7 @@ msgstr "golwg:"
 #: contrib/admindocs/views.py:191
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "Ni ddarganfuwyd ap %(app_label)r"
 
 #: contrib/admindocs/views.py:195
 #, python-format

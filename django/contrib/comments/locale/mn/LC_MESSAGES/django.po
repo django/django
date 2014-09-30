@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ankhbayar <ankhaa1002@gmail.com>, 2013
-# Bayarkhuu Bataa <bbayarkhuu@gmail.com>, 2013
+# Bayarkhuu Bataa, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Zorig <zorig_ezd@yahoo.com>, 2014
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011

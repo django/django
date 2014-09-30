@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-07-31 21:20+0000\n"
-"Last-Translator: Rasmus Précenth <prillan91@gmail.com>\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-08-24 08:52+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -30,6 +30,10 @@ msgstr "Afrikaans"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "Arabiska"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr ""
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -172,6 +176,10 @@ msgid "Indonesian"
 msgstr "Indonesiska"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "Isländska"
 
@@ -226,6 +234,10 @@ msgstr "Malayalam"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "Mongoliska"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr ""
 
 #: conf/global_settings.py:102
 msgid "Burmese"

@@ -2,15 +2,16 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# cihad <cihadgundogdu@gmail.com>, 2013
+# Burak Yavuz, 2014
+# Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2013
 # Murat Sahin <martinamca@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-07 18:30+0000\n"
+"Last-Translator: Burak Yavuz\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -25,44 +26,44 @@ msgstr "İçerik"
 
 #: contrib/comments/admin.py:28
 msgid "Metadata"
-msgstr "Başlık verisi"
+msgstr "Üstveri"
 
 #: contrib/comments/admin.py:55
 #, python-format
 msgid "%d comment was successfully flagged"
 msgid_plural "%d comments were successfully flagged"
-msgstr[0] "%d yorum başarıyla işaretlendi"
-msgstr[1] "%d yorum başarıyla işaretlendi"
+msgstr[0] "%d yorum başarılı olarak işaretlendi"
+msgstr[1] "%d yorum başarılı olarak işaretlendi"
 
 #: contrib/comments/admin.py:57
 msgid "Flag selected comments"
-msgstr "Seçili yorumları işaretle"
+msgstr "Seçilen yorumları işaretle"
 
 #: contrib/comments/admin.py:61
 #, python-format
 msgid "%d comment was successfully approved"
 msgid_plural "%d comments were successfully approved"
-msgstr[0] "%d yorum başarıyla onaylandı"
-msgstr[1] "%d yorum başarıyla onaylandı"
+msgstr[0] "%d yorum başarılı olarak onaylandı"
+msgstr[1] "%d yorum başarılı olarak onaylandı"
 
 #: contrib/comments/admin.py:63
 msgid "Approve selected comments"
-msgstr "Seçili yorumları onayla"
+msgstr "Seçilen yorumları onayla"
 
 #: contrib/comments/admin.py:67
 #, python-format
 msgid "%d comment was successfully removed"
 msgid_plural "%d comments were successfully removed"
-msgstr[0] "%d yorum başarıyla kaldırıldı"
-msgstr[1] "%d yorum başarıyla kaldırıldı"
+msgstr[0] "%d yorum başarılı olarak kaldırıldı"
+msgstr[1] "%d yorum başarılı olarak kaldırıldı"
 
 #: contrib/comments/admin.py:69
 msgid "Remove selected comments"
-msgstr "Seçili yorumları kaldır"
+msgstr "Seçilen yorumları kaldır"
 
 #: contrib/comments/apps.py:8
 msgid "Comments"
-msgstr ""
+msgstr "Yorumlar"
 
 #: contrib/comments/feeds.py:14
 #, python-format
@@ -72,15 +73,15 @@ msgstr "%(site_name)s yorumları"
 #: contrib/comments/feeds.py:20
 #, python-format
 msgid "Latest comments on %(site_name)s"
-msgstr "%(site_name)s üzerindeki son yorumlar"
+msgstr "%(site_name)s sitesindeki son yorumlar"
 
 #: contrib/comments/forms.py:96
 msgid "Name"
-msgstr "İsim"
+msgstr "Adı"
 
 #: contrib/comments/forms.py:97
 msgid "Email address"
-msgstr "Eposta adresi"
+msgstr "E-posta adresi"
 
 #: contrib/comments/forms.py:98
 msgid "URL"
@@ -94,8 +95,8 @@ msgstr "Yorum"
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Ağzınıza hakim olun! %s kelimeleri burada kullanılamaz."
-msgstr[1] "Ağzınıza hakim olun! %s kelimeleri burada kullanılamaz."
+msgstr[0] "Ağzınıza hakim olun! %s kelimesine burada izin verilmez."
+msgstr[1] "Ağzınıza hakim olun! %s kelimelerine burada izin verilmez."
 
 #: contrib/comments/forms.py:181
 #: contrib/comments/templates/comments/preview.html:16
@@ -105,15 +106,17 @@ msgstr "ve"
 #: contrib/comments/forms.py:186
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
-msgstr "Bu alana herhangibir şey yazarsanız yorumunuz önemsiz olarak algılanır"
+msgstr ""
+"Bu alana herhangi birşey girerseniz, yorumunuz istenmeyen mesaj olarak işlem "
+"görecektir"
 
 #: contrib/comments/models.py:23
 msgid "content type"
-msgstr "içerik tipi"
+msgstr "içerik türü"
 
 #: contrib/comments/models.py:25
 msgid "object ID"
-msgstr "nesne ID"
+msgstr "nesne kimliği"
 
 #: contrib/comments/models.py:53 contrib/comments/models.py:177
 msgid "user"
@@ -125,11 +128,11 @@ msgstr "kullanıcının adı"
 
 #: contrib/comments/models.py:56
 msgid "user's email address"
-msgstr "kullanıcının eposta adresi"
+msgstr "kullanıcının e-posta adresi"
 
 #: contrib/comments/models.py:57
 msgid "user's URL"
-msgstr "kullanıcının URL'i"
+msgstr "kullanıcının URL'si"
 
 #: contrib/comments/models.py:59 contrib/comments/models.py:79
 #: contrib/comments/models.py:178
@@ -146,12 +149,14 @@ msgstr "IP adresi"
 
 #: contrib/comments/models.py:64
 msgid "is public"
-msgstr "herkese açık"
+msgstr "herkese açıktır"
 
 #: contrib/comments/models.py:65
 msgid ""
 "Uncheck this box to make the comment effectively disappear from the site."
-msgstr "Yorumu siteden kolayca gizlemek için bu kutunun işaretini kaldırın"
+msgstr ""
+"Yorumun siteden etkili bir şekilde kaybolmasını sağlamak için bu kutunun "
+"işaretini kaldırın."
 
 #: contrib/comments/models.py:67
 msgid "is removed"
@@ -163,7 +168,7 @@ msgid ""
 "removed\" message will be displayed instead."
 msgstr ""
 "Bu yorum uygunsuz ise bu kutuyu işaretleyin. Yorum yerine \"Bu yorum "
-"kaldırıldı\" mesajı gösterilecektir."
+"kaldırıldı\" iletisi görüntülenecektir."
 
 #: contrib/comments/models.py:80
 msgid "comments"
@@ -174,16 +179,16 @@ msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
-"Bu yorum, kayıtlı bir kullanıcı tarafından yapıldığı için ismi salt-"
-"okunurdur."
+"Bu yorum kimliği doğrulanmış bir kullanıcı tarafından yazıldı ve bu yüzden "
+"adı salt-okunur şeklindedir."
 
 #: contrib/comments/models.py:134
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"Bu yorum, kayıtlı bir kullanıcı tarafından yapıldığı için eposta adresi salt-"
-"okunurdur."
+"Bu yorum kimliği doğrulanmış bir kullanıcı tarafından yazıldı ve bu yüzden e-"
+"posta adresi salt-okunur şeklindedir."
 
 #: contrib/comments/models.py:160
 #, python-format
@@ -194,7 +199,7 @@ msgid ""
 "\n"
 "http://%(domain)s%(url)s"
 msgstr ""
-"%(user)s tarafından %(date)s tarihinde gönderildi\n"
+"%(user)s tarafından %(date)s tarihinde yazıldı\n"
 "\n"
 "%(comment)s\n"
 "\n"
@@ -218,11 +223,11 @@ msgstr "yorum işaretleri"
 
 #: contrib/comments/templates/comments/approve.html:4
 msgid "Approve a comment"
-msgstr "Bir yorumu onayla"
+msgstr "Yorumu onayla"
 
 #: contrib/comments/templates/comments/approve.html:7
 msgid "Really make this comment public?"
-msgstr "Bu yorumu herkese açık yapalım mı?"
+msgstr "Bu yorum gerçekten herkese açık yapalsın mı?"
 
 #: contrib/comments/templates/comments/approve.html:12
 msgid "Approve"
@@ -238,16 +243,15 @@ msgstr "Onayladığınız için teşekkürler"
 msgid ""
 "Thanks for taking the time to improve the quality of discussion on our site"
 msgstr ""
-"Sitemizin tartışma kalitesine katkıda bulunmaya vakit ayırdığınız için "
-"teşekkürler"
+"Sitemizin tartışma kalitesini artırmaya vakit ayırdığınız için teşekkürler"
 
 #: contrib/comments/templates/comments/delete.html:4
 msgid "Remove a comment"
-msgstr "Bir yorum kaldır"
+msgstr "Yorumu kaldır"
 
 #: contrib/comments/templates/comments/delete.html:7
 msgid "Really remove this comment?"
-msgstr "Gerçekten bu yorumu kaldıralım mı?"
+msgstr "Bu yorum gerçekten kaldırılsın mı?"
 
 #: contrib/comments/templates/comments/delete.html:12
 msgid "Remove"
@@ -263,11 +267,11 @@ msgstr "Bu yorumu işaretle"
 
 #: contrib/comments/templates/comments/flag.html:7
 msgid "Really flag this comment?"
-msgstr "Gerçekten bu yorumu işaretleyelim mi?"
+msgstr "Bu yorum gerçekten işaretlensin mi?"
 
 #: contrib/comments/templates/comments/flag.html:12
 msgid "Flag"
-msgstr "Bayrak"
+msgstr "İşaretle"
 
 #: contrib/comments/templates/comments/flagged.html:4
 msgid "Thanks for flagging"
@@ -276,7 +280,7 @@ msgstr "İşaretlediğiniz için teşekkürler"
 #: contrib/comments/templates/comments/form.html:17
 #: contrib/comments/templates/comments/preview.html:32
 msgid "Post"
-msgstr "Gönderi"
+msgstr "Yazı"
 
 #: contrib/comments/templates/comments/form.html:18
 #: contrib/comments/templates/comments/preview.html:33
@@ -289,12 +293,12 @@ msgstr "Yorum yaptığınız için teşekkürler"
 
 #: contrib/comments/templates/comments/posted.html:7
 msgid "Thank you for your comment"
-msgstr "Yorumunuz için teşekkürler"
+msgstr "Yorumunuz için teşekkür ederiz"
 
 #: contrib/comments/templates/comments/preview.html:4
 #: contrib/comments/templates/comments/preview.html:13
 msgid "Preview your comment"
-msgstr "Yorumunuzun önizlemesini görün"
+msgstr "Yorumunuzu önizleyin"
 
 #: contrib/comments/templates/comments/preview.html:11
 msgid "Please correct the error below"
@@ -306,8 +310,8 @@ msgstr "Lütfen aşağıdaki hataları düzeltin"
 
 #: contrib/comments/templates/comments/preview.html:16
 msgid "Post your comment"
-msgstr "Yorumunuzu gönderin"
+msgstr "Yorumunuzu yazın"
 
 #: contrib/comments/templates/comments/preview.html:16
 msgid "or make changes"
-msgstr "ya da değişiklik yapı"
+msgstr "ya da değişiklik yapın"

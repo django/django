@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:43+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-26 14:33+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: contrib/formtools/apps.py:8
 msgid "Form Tools"
-msgstr ""
+msgstr "Offer Ffurflenni"
 
 #: contrib/formtools/templates/formtools/wizard/wizard_form.html:15
 msgid "first step"
@@ -36,4 +36,4 @@ msgstr "cyflwyno"
 
 #: contrib/formtools/wizard/views.py:276
 msgid "ManagementForm data is missing or has been tampered."
-msgstr ""
+msgstr "Mae data ManagementForm ar goll neu mae rhywun wedi ymyrryd ynddo."

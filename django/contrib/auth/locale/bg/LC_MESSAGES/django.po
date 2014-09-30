@@ -5,13 +5,14 @@
 # Georgi Kostadinov <grgkostadinov@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
+# vestimir <vestimir@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 09:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-28 20:19+0000\n"
+"Last-Translator: vestimir <vestimir@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/projects/p/django/"
 "language/bg/)\n"
 "MIME-Version: 1.0\n"
@@ -226,7 +227,7 @@ msgstr "права на потребител"
 
 #: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Специфични права за този потребител"
 
 #: contrib/auth/models.py:367
 msgid "username"
@@ -295,28 +296,28 @@ msgstr "Извън системата"
 
 #: contrib/auth/views.py:169
 msgid "Password reset"
-msgstr ""
+msgstr "Забравена парола"
 
 #: contrib/auth/views.py:181
 msgid "Password reset successful"
-msgstr ""
+msgstr "Паролата е успешно променена."
 
 #: contrib/auth/views.py:216
 msgid "Enter new password"
-msgstr ""
+msgstr "Въведете нова парола"
 
 #: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Неуспешна промяна на паролата "
 
 #: contrib/auth/views.py:244
 msgid "Password reset complete"
-msgstr ""
+msgstr "Промяната на парола завърши"
 
 #: contrib/auth/views.py:278
 msgid "Password change"
-msgstr ""
+msgstr "Промяна на парола"
 
 #: contrib/auth/views.py:291
 msgid "Password change successful"
-msgstr ""
+msgstr "Паролата е сменена успешно"

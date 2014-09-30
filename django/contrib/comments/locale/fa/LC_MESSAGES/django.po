@@ -4,14 +4,14 @@
 # Ali Nikneshan <ali@nikneshan.com>, 2012
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Reza Mohammadi <reza@teeleh.ir>, 2013
+# Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-23 07:34+0000\n"
+"Last-Translator: Reza Mohammadi <reza@teeleh.ir>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -60,7 +60,7 @@ msgstr "حذف نظر های انتخاب شده"
 
 #: contrib/comments/apps.py:8
 msgid "Comments"
-msgstr ""
+msgstr "نظرات"
 
 #: contrib/comments/feeds.py:14
 #, python-format

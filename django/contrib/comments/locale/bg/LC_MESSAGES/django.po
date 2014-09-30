@@ -5,13 +5,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
 # Todor Lubenov <tlubenov@gmail.com>, 2011
+# vestimir <vestimir@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-28 20:12+0000\n"
+"Last-Translator: vestimir <vestimir@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/projects/p/django/"
 "language/bg/)\n"
 "MIME-Version: 1.0\n"
@@ -63,7 +64,7 @@ msgstr "Премахване на избраните коментари"
 
 #: contrib/comments/apps.py:8
 msgid "Comments"
-msgstr ""
+msgstr "Коментари"
 
 #: contrib/comments/feeds.py:14
 #, python-format

@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:46+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-26 14:37+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgstr ""
 
 #: contrib/humanize/apps.py:8
 msgid "Humanize"
-msgstr ""
+msgstr "Dynoli"
 
 #: contrib/humanize/templatetags/humanize.py:30
 msgid "th"
@@ -301,10 +301,10 @@ msgstr "nawr"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "un eiliad yn ôl"
+msgstr[1] "%(count)s eiliad yn ôl"
+msgstr[2] "%(count)s eiliad yn ôl"
+msgstr[3] "%(count)s eiliad yn ôl"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -312,10 +312,10 @@ msgstr[3] ""
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "un munud yn ôl"
+msgstr[1] "%(count)s munud yn ôl"
+msgstr[2] "%(count)s munud yn ôl"
+msgstr[3] "%(count)s munud yn ôl"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -323,10 +323,10 @@ msgstr[3] ""
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "un awr yn ôl"
+msgstr[1] "%(count)s awr yn ôl"
+msgstr[2] "%(count)s awr yn ôl"
+msgstr[3] "%(count)s awr yn ôl"
 
 #: contrib/humanize/templatetags/humanize.py:229
 #, python-format
@@ -340,10 +340,10 @@ msgstr "%(delta)s o nawr"
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "un eiliad o nawr"
+msgstr[1] "%(count)s eiliad o nawr"
+msgstr[2] "%(count)s eiliad o nawr"
+msgstr[3] "%(count)s eiliad o nawr"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -351,10 +351,10 @@ msgstr[3] ""
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "un munud o nawr"
+msgstr[1] "%(count)s funud o nawr"
+msgstr[2] "%(count)s munud o nawr"
+msgstr[3] "%(count)s munud o nawr"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -362,7 +362,7 @@ msgstr[3] ""
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "un awr o nawr"
+msgstr[1] "%(count)s awr o nawr"
+msgstr[2] "%(count)s awr o nawr"
+msgstr[3] "%(count)s awr o nawr"

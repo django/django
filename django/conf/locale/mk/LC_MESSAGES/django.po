@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-08-15 10:32+0000\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-09-30 08:49+0000\n"
 "Last-Translator: vvangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
 "language/mk/)\n"
@@ -26,6 +26,10 @@ msgstr "Африканс"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "Арапски"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr "Астуриски"
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -168,6 +172,10 @@ msgid "Indonesian"
 msgstr "Индонезиски"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr "Идо"
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "Исландски"
 
@@ -222,6 +230,10 @@ msgstr "Малајалам"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "Монголски"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr "Марати"
 
 #: conf/global_settings.py:102
 msgid "Burmese"
