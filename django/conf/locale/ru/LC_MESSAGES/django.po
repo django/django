@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-07-09 15:09+0000\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-09-05 11:12+0000\n"
 "Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/django/language/"
 "ru/)\n"
@@ -32,6 +32,10 @@ msgstr "Бурский"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "Арабский"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr "Астурийский"
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -174,6 +178,10 @@ msgid "Indonesian"
 msgstr "Индонезийский"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr "Идо"
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "Исландский"
 
@@ -228,6 +236,10 @@ msgstr "Малаялам"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "Монгольский"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr "Маратхи"
 
 #: conf/global_settings.py:102
 msgid "Burmese"

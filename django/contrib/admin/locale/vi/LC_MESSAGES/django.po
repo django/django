@@ -7,13 +7,14 @@
 # Tran <hongdiepkien@gmail.com>, 2011
 # Tran Van <vantxm@yahoo.co.uk>, 2011-2013
 # Vuong Nguyen <autalpha@gmail.com>, 2011
+# xgenvn <xgenvn@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-14 17:13+0000\n"
-"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
+"PO-Revision-Date: 2014-09-07 15:42+0000\n"
+"Last-Translator: xgenvn <xgenvn@gmail.com>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
 "language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +44,7 @@ msgstr "Xóa các %(verbose_name_plural)s đã chọn"
 
 #: contrib/admin/apps.py:11
 msgid "Administration"
-msgstr ""
+msgstr "Quản trị website"
 
 #: contrib/admin/filters.py:104 contrib/admin/filters.py:199
 #: contrib/admin/filters.py:239 contrib/admin/filters.py:276
@@ -291,6 +292,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"Xóa %(class_name)s %(instance)s sẽ tự động xóa các đối tượng liên quan sau: "
+"%(related_objects)s"
 
 #: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
@@ -313,7 +316,7 @@ msgstr "Đăng nhập"
 #: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "Quản lý %(app)s"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -419,7 +422,7 @@ msgstr "Hãy sửa lỗi sai dưới đây"
 #: contrib/admin/templates/admin/login.html:17
 #: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Hãy chỉnh sửa lại các lỗi sau."
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format

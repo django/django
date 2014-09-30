@@ -1,16 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Alexander Chernihov <aleksandr.chernigov@gmail.com>, 2014
 # Boryslav Larin <brabadu@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:18+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-24 09:11+0000\n"
+"Last-Translator: Alexander Chernihov <aleksandr.chernigov@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -41,7 +43,7 @@ msgstr "Видалити обрані %(verbose_name_plural)s"
 
 #: contrib/admin/apps.py:11
 msgid "Administration"
-msgstr ""
+msgstr "Адміністрування"
 
 #: contrib/admin/filters.py:104 contrib/admin/filters.py:199
 #: contrib/admin/filters.py:239 contrib/admin/filters.py:276
@@ -285,7 +287,7 @@ msgstr "Історія змін: %s"
 #: contrib/admin/options.py:1802
 #, python-format
 msgid "%(class_name)s %(instance)s"
-msgstr ""
+msgstr "%(class_name)s %(instance)s"
 
 #: contrib/admin/options.py:1809
 #, python-format
@@ -293,6 +295,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"Видалення %(class_name)s %(instance)s вимагатиме видалення наступних "
+"захищених пов'язаних об'єктів: %(related_objects)s"
 
 #: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
@@ -315,7 +319,7 @@ msgstr "Увійти"
 #: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "Адміністрування %(app)s"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -422,7 +426,7 @@ msgstr "Будь ласка, виправте помилки нижче."
 #: contrib/admin/templates/admin/login.html:17
 #: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Будь ласка, виправте помилки нижче."
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
@@ -780,6 +784,8 @@ msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Якщо Ви не отримали електронного листа, будь ласка, переконайтеся, що ввели "
+"адресу яку вказували при реєстрації та перевірте папку зі спамом"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format

@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# vestimir <vestimir@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-28 20:17+0000\n"
+"Last-Translator: vestimir <vestimir@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/projects/p/django/"
 "language/bg/)\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +20,7 @@ msgstr ""
 
 #: contrib/sessions/apps.py:8
 msgid "Sessions"
-msgstr ""
+msgstr "Сесии"
 
 #: contrib/sessions/models.py:38
 msgid "session key"

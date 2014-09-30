@@ -2,6 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# ouyanghongyu <ouyanghongyu@gmail.com>, 2014
 # Xiang Yu <bupt.aswmtjdsj@gmail.com>, 2014
 # Ziang Song <songziang@gmail.com>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:46+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-04 10:34+0000\n"
+"Last-Translator: ouyanghongyu <ouyanghongyu@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +23,7 @@ msgstr ""
 
 #: contrib/humanize/apps.py:8
 msgid "Humanize"
-msgstr ""
+msgstr "人性化"
 
 #: contrib/humanize/templatetags/humanize.py:30
 msgid "th"

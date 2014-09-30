@@ -2,6 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
+# Burak Yavuz, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Metin Amiroff <amiroff@gmail.com>, 2012
 # Murat Sahin <martinamca@gmail.com>, 2011
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:46+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-06 12:42+0000\n"
+"Last-Translator: Burak Yavuz\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +23,7 @@ msgstr ""
 
 #: contrib/humanize/apps.py:8
 msgid "Humanize"
-msgstr ""
+msgstr "İnsansı"
 
 #: contrib/humanize/templatetags/humanize.py:30
 msgid "th"
@@ -259,8 +260,8 @@ msgstr "şimdi"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "bir saniye önce"
+msgstr[1] "%(count)s saniye önce"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -268,8 +269,8 @@ msgstr[1] ""
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "bir dakika önce"
+msgstr[1] "%(count)s dakika önce"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -277,14 +278,14 @@ msgstr[1] ""
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "bir saat önce"
+msgstr[1] "%(count)s saat önce"
 
 #: contrib/humanize/templatetags/humanize.py:229
 #, python-format
 msgctxt "naturaltime"
 msgid "%(delta)s from now"
-msgstr "şu andan %(delta)s sonra"
+msgstr "şu andan itibaren %(delta)s"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -292,8 +293,8 @@ msgstr "şu andan %(delta)s sonra"
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "şu andan itibaren bir saniye"
+msgstr[1] "şu andan itibaren %(count)s saniye"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -301,8 +302,8 @@ msgstr[1] ""
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "şu andan itibaren bir dakika"
+msgstr[1] "şu andan itibaren %(count)s dakika"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -310,5 +311,5 @@ msgstr[1] ""
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "şu andan itibaren bir saat"
+msgstr[1] "şu andan itibaren %(count)s saat"

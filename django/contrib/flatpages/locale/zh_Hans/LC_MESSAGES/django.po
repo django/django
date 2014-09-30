@@ -3,14 +3,15 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lele Long <schemacs@gmail.com>, 2011
+# ouyanghongyu <ouyanghongyu@gmail.com>, 2014
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-09-04 10:34+0000\n"
+"Last-Translator: ouyanghongyu <ouyanghongyu@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -25,7 +26,7 @@ msgstr "高级选项"
 
 #: contrib/flatpages/apps.py:8
 msgid "Flat Pages"
-msgstr ""
+msgstr "简单页面"
 
 #: contrib/flatpages/forms.py:8 contrib/flatpages/models.py:12
 msgid "URL"

@@ -4,15 +4,15 @@
 # Ankhbayar <ankhaa1002@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2014
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-14 17:07+0000\n"
-"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
+"PO-Revision-Date: 2014-09-12 07:59+0000\n"
+"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -42,7 +42,7 @@ msgstr "Сонгосон %(verbose_name_plural)s-ийг устга"
 
 #: contrib/admin/apps.py:11
 msgid "Administration"
-msgstr ""
+msgstr "Удирдлага"
 
 #: contrib/admin/filters.py:104 contrib/admin/filters.py:199
 #: contrib/admin/filters.py:239 contrib/admin/filters.py:276
@@ -314,7 +314,7 @@ msgstr "Нэвтрэх"
 #: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "%(app)s удирдлага"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8

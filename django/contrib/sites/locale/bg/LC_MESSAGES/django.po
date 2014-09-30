@@ -3,13 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
+# vestimir <vestimir@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:43+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2014-08-28 20:17+0000\n"
+"Last-Translator: vestimir <vestimir@gmail.com>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/projects/p/django/"
 "language/bg/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,7 @@ msgstr ""
 
 #: contrib/sites/apps.py:8
 msgid "Sites"
-msgstr ""
+msgstr "Сайтове"
 
 #: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."

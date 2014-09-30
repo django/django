@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-26 13:48+0200\n"
-"PO-Revision-Date: 2014-06-21 08:46+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2014-08-23 14:10+0200\n"
+"PO-Revision-Date: 2014-09-08 12:38+0000\n"
+"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/projects/p/django/"
 "language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,10 @@ msgstr "Afrikaans"
 #: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "Arab"
+
+#: conf/global_settings.py:53
+msgid "Asturian"
+msgstr "Asturia"
 
 #: conf/global_settings.py:53
 msgid "Azerbaijani"
@@ -168,6 +172,10 @@ msgid "Indonesian"
 msgstr "Indonesia"
 
 #: conf/global_settings.py:88
+msgid "Ido"
+msgstr ""
+
+#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "Islandia"
 
@@ -222,6 +230,10 @@ msgstr "Malayalam"
 #: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "Mongolia"
+
+#: conf/global_settings.py:102
+msgid "Marathi"
+msgstr ""
 
 #: conf/global_settings.py:102
 msgid "Burmese"
@@ -337,11 +349,11 @@ msgstr "Vietnam"
 
 #: conf/global_settings.py:130 conf/global_settings.py:131
 msgid "Simplified Chinese"
-msgstr "Cina Sederhana"
+msgstr "Tiongkok Sederhana"
 
 #: conf/global_settings.py:132 conf/global_settings.py:133
 msgid "Traditional Chinese"
-msgstr "Cina Tradisionil"
+msgstr "Tiongkok Tradisionil"
 
 #: contrib/sitemaps/apps.py:8
 msgid "Site Maps"

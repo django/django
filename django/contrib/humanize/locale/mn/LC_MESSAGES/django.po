@@ -1,8 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bayarkhuu Bataa <bbayarkhuu@gmail.com>, 2014
-# Bayarkhuu Bataa <bbayarkhuu@gmail.com>, 2013
+# Bayarkhuu Bataa, 2014
+# Bayarkhuu Bataa, 2013
 # Zorig <zorig_ezd@yahoo.com>, 2013
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013
 msgid ""
@@ -11,7 +11,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-05-19 15:12+0200\n"
 "PO-Revision-Date: 2014-05-21 02:46+0000\n"
-"Last-Translator: Bayarkhuu Bataa <bbayarkhuu@gmail.com>\n"
+"Last-Translator: Bayarkhuu Bataa\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
