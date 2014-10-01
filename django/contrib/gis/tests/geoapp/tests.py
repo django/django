@@ -1,12 +1,14 @@
 from __future__ import unicode_literals
 
 import re
+from tempfile import NamedTemporaryFile
 import unittest
 
 from django.db import connection
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.tests.utils import no_oracle, oracle, postgis, spatialite
+from django.core.management import call_command
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
@@ -202,6 +204,24 @@ class GeoModelTest(TestCase):
         )
         self.assertEqual(len(cities1), len(list(cities2)))
         self.assertIsInstance(cities2[0].point, Point)
+
+    def test_dumpdata_loaddata_cycle(self):
+        """
+        Test a dumpdata/loaddata cycle with geographic data.
+        """
+        out = six.StringIO()
+        original_data = list(City.objects.all().order_by('name'))
+        call_command('dumpdata', 'geoapp.City', stdout=out)
+        result = out.getvalue()
+        houston = City.objects.get(name='Houston')
+        self.assertIn('"point": "%s"' % houston.point.wkt, result)
+
+        # Reload now dumped data
+        with NamedTemporaryFile(mode='w', suffix='.json') as tempfile:
+            tempfile.write(result)
+            tempfile.seek(0)
+            call_command('loaddata', tempfile.name, verbosity=0)
+        self.assertListEqual(original_data, list(City.objects.all().order_by('name')))
 
 
 @skipUnlessDBFeature("gis_enabled")
