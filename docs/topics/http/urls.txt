@@ -834,25 +834,25 @@ displaying polls.
 .. snippet::
     :filename: urls.py
 
-    from django.conf.urls import include, url
+    from django.conf.urls import include, patterns, url
 
-    urlpatterns = [
+    urlpatterns = patterns('',
         url(r'^author-polls/', include('polls.urls', namespace='author-polls', app_name='polls')),
         url(r'^publisher-polls/', include('polls.urls', namespace='publisher-polls', app_name='polls')),
-    ]
+    )
 
 .. snippet::
     :filename: polls/urls.py
 
-    from django.conf.urls import url
+    from django.conf.urls import patterns, url
 
     from . import views
 
-    urlpatterns = [
+    urlpatterns = patterns('',
         url(r'^$', views.IndexView.as_view(), name='index'),
         url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
         ...
-    ]
+    )
 
 Using this setup, the following lookups are possible:
 
@@ -921,14 +921,14 @@ However, you can also ``include()`` a 3-tuple containing::
 
 For example::
 
-    from django.conf.urls import include, url
+    from django.conf.urls import include, patterns, url
 
     from . import views
 
-    polls_patterns = [
+    polls_patterns = patterns('',
         url(r'^$', views.IndexView.as_view(), name='index'),
         url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
-    ]
+    )
 
     url(r'^polls/', include((polls_patterns, 'polls', 'author-polls'))),
 
