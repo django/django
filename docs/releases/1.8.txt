@@ -39,7 +39,7 @@ The new API is composed of 3 main endpoints:
   * ``get_field_by_name()``
 
 * :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
-  retrieves   a list of fields given a specific filter criteria. This endpoint
+  retrieves a list of fields given a specific filter criteria. This endpoint
   replaces:
 
   * ``get_fields_with_model()``
@@ -50,7 +50,10 @@ The new API is composed of 3 main endpoints:
   * ``get_all_related_many_to_many_objects()``
   * ``get_all_related_m2m_objects_with_model()``
 
-* FIXME: add details about the properties?
+* :attr:`Options.related_objects <django.db.models.options.Options.related_objects>`
+  returns a list of related objects that point to the current model. This endpoint
+  is a cached property of :meth:`Options.get_fields() <django.db.models.options.Options.get_fields()>`
+  with only the ``reverse`` flag enabled.
 
 * :attr:`Options.field_names <django.db.models.options.Options.field_names>`
   retrieves all the field names of a model. This endpoint replaces:
