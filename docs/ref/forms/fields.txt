@@ -799,7 +799,18 @@ For each field, we describe the default widget used if you don't specify
     * Default widget: :class:`NullBooleanSelect`
     * Empty value: ``None``
     * Normalizes to: A Python ``True``, ``False`` or ``None`` value.
-    * Validates nothing (i.e., it never raises a ``ValidationError``).
+    * Validates that the value is ``True`` or ``False`` if the field has
+      ``required=True``.
+
+    .. note::
+
+        Unlike other fields, ``NullBooleanField`` has ``required=False`` by
+        default to keep existing behavior with older versions of Django.
+
+    .. versionchanged:: 1.8
+
+        Validates that the value is ``True`` or ``False`` if the field has
+        ``required=True``.
 
 ``RegexField``
 ~~~~~~~~~~~~~~

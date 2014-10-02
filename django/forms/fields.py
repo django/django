@@ -770,6 +770,13 @@ class NullBooleanField(BooleanField):
     """
     widget = NullBooleanSelect
 
+    def __init__(self, *args, **kwargs):
+        # To keep existing behavior with Django < 1.8, set required to
+        # False by default unless explicitly set.
+        if not args and 'required' not in kwargs:
+            kwargs['required'] = False
+        super(NullBooleanField, self).__init__(*args, **kwargs)
+
     def to_python(self, value):
         """
         Explicitly checks for the string 'True' and 'False', which is what a
@@ -787,7 +794,8 @@ class NullBooleanField(BooleanField):
             return None
 
     def validate(self, value):
-        pass
+        if value is None and self.required:
+            raise ValidationError(self.error_messages['required'], code='required')
 
     def has_changed(self, initial, data):
         # None (unknown) and False (No) are not the same

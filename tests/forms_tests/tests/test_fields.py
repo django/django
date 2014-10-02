@@ -1078,6 +1078,20 @@ class FieldsTests(SimpleTestCase):
         self.assertTrue(f.has_changed(True, None))
         self.assertTrue(f.has_changed(True, False))
 
+    def test_nullbooleanfield_required_false_default(self):
+        f = NullBooleanField()
+        self.assertFalse(f.required)
+        f = NullBooleanField(True)
+        self.assertTrue(f.required)
+        f = NullBooleanField(required=True)
+        self.assertTrue(f.required)
+
+    def test_nullbooleanfield_required(self):
+        f = NullBooleanField(required=True)
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, None)
+        self.assertEqual(False, f.clean(False))
+        self.assertEqual(True, f.clean(True))
+
     # MultipleChoiceField #########################################################
 
     def test_multiplechoicefield_1(self):

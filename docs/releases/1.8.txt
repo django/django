@@ -216,6 +216,11 @@ Forms
   will also update ``UploadedFile.content_type`` with the image's content type
   as determined by Pillow.
 
+* :class:`~django.forms.NullBooleanField` now handles the ``required``
+  argument. When ``required`` is ``True``, values ``True`` and ``False``
+  validate while ``None`` is invalid. To keep existing behavior with older
+  version of Django, ``NullBooleanField`` has ``required=False`` by default.
+
 Generic Views
 ^^^^^^^^^^^^^
 
