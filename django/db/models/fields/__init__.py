@@ -34,17 +34,13 @@ from django.utils.itercompat import is_iterable
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
 # makes these strings unicode
 __all__ = [str(x) for x in (
-    'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
-    'BooleanField', 'CharField', 'FieldFlagsMixin',
-    'CommaSeparatedIntegerField', 'DateField', 'DateTimeField',
-    'DecimalField', 'EmailField', 'Empty', 'Field', 'FieldDoesNotExist',
-    'FilePathField', 'FloatField', 'GenericIPAddressField', 'IPAddressField',
-    'IntegerField', 'NOT_PROVIDED',
-    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
-    'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
-    'UUIDField',
+    'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField', 'BooleanField',
+    'CharField', 'CommaSeparatedIntegerField', 'DateField', 'DateTimeField', 'DecimalField',
+    'EmailField', 'Empty', 'Field', 'FieldDoesNotExist', 'FieldFlagsMixin', 'FilePathField',
+    'FloatField', 'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
+    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField', 'SlugField',
+    'SmallIntegerField', 'TextField', 'TimeField', 'URLField', 'UUIDField'
 )]
-
 
 class FieldFlagsMixin(object):
     """
