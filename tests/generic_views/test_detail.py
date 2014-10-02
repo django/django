@@ -53,6 +53,34 @@ class DetailViewTest(TestCase):
         self.assertEqual(res.context['author'], Author.objects.get(slug='scott-rosenberg'))
         self.assertTemplateUsed(res, 'generic_views/author_detail.html')
 
+    def test_detail_by_pk_ignore_slug(self):
+        author = Author.objects.get(pk=1)
+        res = self.client.get('/detail/author/bypkignoreslug/1-roberto-bolano/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], author)
+        self.assertEqual(res.context['author'], author)
+        self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+
+    def test_detail_by_pk_ignore_slug_mismatch(self):
+        author = Author.objects.get(pk=1)
+        res = self.client.get('/detail/author/bypkignoreslug/1-scott-rosenberg/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], author)
+        self.assertEqual(res.context['author'], author)
+        self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+
+    def test_detail_by_pk_and_slug(self):
+        author = Author.objects.get(pk=1)
+        res = self.client.get('/detail/author/bypkandslug/1-roberto-bolano/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], author)
+        self.assertEqual(res.context['author'], author)
+        self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+
+    def test_detail_by_pk_and_slug_mismatch_404(self):
+        res = self.client.get('/detail/author/bypkandslug/1-scott-rosenberg/')
+        self.assertEqual(res.status_code, 404)
+
     def test_verbose_name(self):
         res = self.client.get('/detail/artist/1/')
         self.assertEqual(res.status_code, 200)
