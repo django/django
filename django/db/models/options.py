@@ -425,9 +425,8 @@ class Options(object):
 
     def get_field(self, field_name, **kwargs):
         """
-        Returns a field instance given a field name. By default will only search in forward
-        fields. By setting the include_related flag, the search is also extended to reverse
-        relations.
+        Returns a field instance given a field name. The field can be either a forward
+        or reverse field
         """
         if not apps.ready:
             raise AppRegistryNotReady(
