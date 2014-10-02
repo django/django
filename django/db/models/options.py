@@ -449,8 +449,8 @@ class Options(object):
             # We always want to throw a warning if many_to_many is used regardless
             # of if it alters the return type or not.
             warnings.warn(
-                "The 'many_to_many' argument on get_field() will be soon "
-                "deprecated. Please change your implementation accordingly.",
+                "The 'many_to_many' argument on get_field() is deprecated and will "
+                "be removed. Please change your implementation accordingly.",
                 RemovedInDjango20Warning
             )
 
@@ -561,12 +561,10 @@ class Options(object):
 
     def _populate_directed_relation_graph(self):
         """
-        This method is used by each model to find
-        it's reverse objects. As this method is very
-        expensive and is accessed frequently
-        (it looks up every field in a model,
-        in every app), it is computed on first access
-        and then is set as a property on every model.
+        This method is used by each model to find it's reverse objects. As this
+        method is very expensive and is accessed frequently (it looks up every
+        field in a model, in every app), it is computed on first access and then
+        is set as a property on every model.
         """
         related_objects_graph = defaultdict(list)
 
