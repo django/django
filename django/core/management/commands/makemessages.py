@@ -217,9 +217,10 @@ class Command(NoArgsCommand):
         if options.get('use_default_ignore_patterns'):
             ignore_patterns += ['CVS', '.*', '*~', '*.pyc']
         base_path = os.path.abspath('.')
-        for path in (settings.MEDIA_ROOT, settings.STATIC_ROOT):
-            if path and path.startswith(base_path):
-                ignore_patterns.append('%s*' % path[len(base_path) + 1:])
+        if self.domain != 'djangojs':
+            for path in (settings.MEDIA_ROOT, settings.STATIC_ROOT):
+                if path and path.startswith(base_path):
+                    ignore_patterns.append('%s*' % path[len(base_path) + 1:])
         self.ignore_patterns = list(set(ignore_patterns))
 
         # Avoid messing with mutable class variables
