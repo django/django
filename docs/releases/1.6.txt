@@ -1099,6 +1099,26 @@ a regular deprecation path.
 Methods that return a ``QuerySet`` such as ``Manager.get_query_set`` or
 ``ModelAdmin.queryset`` have been renamed to ``get_queryset``.
 
+If you are writing a library that implements, for example, a
+``Manager.get_query_set`` method, and you need to support old Django versions,
+you should rename the method and conditionally add an alias with the old name::
+
+    class CustomManager(models.Manager):
+        def get_queryset(self):
+            pass # ...
+
+        if django.VERSION < (1, 6):
+            get_query_set = get_queryset
+
+        # For Django >= 1.6, models.Manager provides a get_query_set fallback
+        # that emits a warning when used.
+
+If you are writing a library that needs to call the ``get_queryset`` method and
+must support old Django versions, you should write::
+
+    method = getattr(some_manager, 'get_queryset', some_manager.get_query_set)
+    method(params)
+
 ``shortcut`` view and URLconf
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
