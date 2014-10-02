@@ -449,6 +449,8 @@ def get_forward_field(opts, field_name):
     to be ready, this utility function is used to perform a
     get_field() lookup only on forward fields.
     """
+    if opts.apps.ready:
+        return opts.get_field(field_name)
     try:
         return next(
             f for f in opts.get_fields()

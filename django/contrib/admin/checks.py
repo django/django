@@ -172,7 +172,7 @@ class BaseModelAdminChecks(object):
             return []
         else:
             try:
-                field = self._get_field(model._meta, field_name)
+                field = get_forward_field(model._meta, field_name)
             except models.FieldDoesNotExist:
                 # If we can't find a field on the model that matches, it could
                 # be an extra field on the form.
@@ -247,18 +247,12 @@ class BaseModelAdminChecks(object):
                 for index, field_name in enumerate(cls.filter_horizontal)
             ]))
 
-    def _get_field(self, opts, field_name):
-        if opts.apps.ready:
-            return opts.get_field(field_name)
-        else:
-            return get_forward_field(opts, field_name)
-
     def _check_filter_item(self, cls, model, field_name, label):
         """ Check one item of `filter_vertical` or `filter_horizontal`, i.e.
         check that given field exists and is a ManyToManyField. """
 
         try:
-            field = self._get_field(model._meta, field_name)
+            field = get_forward_field(model._meta, field_name)
         except models.FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E019')
@@ -449,7 +443,7 @@ class BaseModelAdminChecks(object):
                 field_name = field_name[1:]
 
             try:
-                self._get_field(model._meta, field_name)
+                get_forward_field(model._meta, field_name)
             except models.FieldDoesNotExist:
                 return refer_to_missing_field(field=field_name, option=label,
                                               model=model, obj=cls, id='admin.E033')
@@ -591,7 +585,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         elif hasattr(model, item):
             # getattr(model, item) could be an X_RelatedObjectsDescriptor
             try:
-                field = self._get_field(model._meta, item)
+                field = get_forward_field(model._meta, item)
             except models.FieldDoesNotExist:
                 try:
                     field = getattr(model, item)
@@ -623,7 +617,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 return []
         else:
             try:
-                self._get_field(model._meta, item)
+                get_forward_field(model._meta, item)
             except models.FieldDoesNotExist:
                 return [
                     # This is a deliberate repeat of E108; there's more than one path
