@@ -29,7 +29,7 @@ The sites framework is mainly based on a simple model:
 
 The :setting:`SITE_ID` setting specifies the database ID of the
 :class:`~django.contrib.sites.models.Site` object associated with that
-particular settings file. It the setting is omitted, the
+particular settings file. If the setting is omitted, the
 :func:`~django.contrib.sites.shortcuts.get_current_site` function will
 try to get the current site by comparing the
 :attr:`~django.contrib.sites.models.Site.domain` with the host name from
