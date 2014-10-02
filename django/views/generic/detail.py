@@ -21,31 +21,11 @@ class SingleObjectMixin(ContextMixin):
     def get_object(self, queryset=None):
         """
         Returns the object the view is displaying.
-
-        By default this requires `self.queryset` and a `pk` or `slug` argument
-        in the URLconf, but subclasses can override this to return any object.
         """
         # Use a custom queryset if provided; this is required for subclasses
         # like DateDetailView
         if queryset is None:
             queryset = self.get_queryset()
-
-        # Next, try looking up by primary key.
-        pk = self.kwargs.get(self.pk_url_kwarg, None)
-        slug = self.kwargs.get(self.slug_url_kwarg, None)
-        if pk is not None:
-            queryset = queryset.filter(pk=pk)
-
-        # Next, try looking up by slug.
-        elif slug is not None:
-            slug_field = self.get_slug_field()
-            queryset = queryset.filter(**{slug_field: slug})
-
-        # If none of those are defined, it's an error.
-        else:
-            raise AttributeError("Generic detail view %s must be called with "
-                                 "either an object pk or a slug."
-                                 % self.__class__.__name__)
 
         try:
             # Get the single item from the filtered queryset
@@ -59,12 +39,15 @@ class SingleObjectMixin(ContextMixin):
         """
         Return the `QuerySet` that will be used to look up the object.
 
+        By default this requires `self.queryset` or `self.model` and a `pk` or `slug` argument
+        in the URLconf, but subclasses can override this to return any object.
+
         Note that this method is called by the default implementation of
         `get_object` and may not be called if `get_object` is overridden.
         """
         if self.queryset is None:
             if self.model:
-                return self.model._default_manager.all()
+                queryset = self.model._default_manager.all()
             else:
                 raise ImproperlyConfigured(
                     "%(cls)s is missing a QuerySet. Define "
@@ -73,7 +56,25 @@ class SingleObjectMixin(ContextMixin):
                         'cls': self.__class__.__name__
                     }
                 )
-        return self.queryset.all()
+        else:
+            queryset = self.queryset.all()
+        pk = self.kwargs.get(self.pk_url_kwarg, None)
+        slug = self.kwargs.get(self.slug_url_kwarg, None)
+        # First of all, try looking up by primary key.
+        if pk is not None:
+            queryset = queryset.filter(pk=pk)
+
+        # Next, try looking up by slug.
+        elif slug is not None:
+            slug_field = self.get_slug_field()
+            queryset = queryset.filter(**{slug_field: slug})
+
+        # If none of those are defined, it's an error.
+        else:
+            raise AttributeError("Generic detail view %s must be called with "
+                                 "either an object pk or a slug."
+                                 % self.__class__.__name__)
+        return queryset
 
     def get_slug_field(self):
         """

@@ -106,3 +106,10 @@ class DetailViewTest(TestCase):
         res = self.client.get('/detail/nonmodel/1/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object'].id, "non_model_1")
+
+    def test_overridden_get_queryset(self):
+        res = self.client.get('/detail/author/withoutslug/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], Author.objects.get(pk=1))
+        self.assertEqual(res.context['author'], Author.objects.get(pk=1))
+        self.assertTemplateUsed(res, 'generic_views/author_detail.html')
