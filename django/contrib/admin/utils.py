@@ -442,6 +442,21 @@ def reverse_field_path(model, path):
     return (parent, LOOKUP_SEP.join(reversed_path))
 
 
+def get_forward_field(opts, field_name):
+    """
+    A series of admin checks are performed before the Django app
+    registry is not ready. As get_field() requires the registry
+    to be ready, this utility function is used to perform a
+    get_field() lookup only on forward fields.
+    """
+    try:
+        return next(
+            f for f in opts.get_fields()
+            if f.name == field_name or f.attname == field_name
+        )
+    except StopIteration:
+        raise models.FieldDoesNotExist
+
 def get_fields_from_path(model, path):
     """ Return list of Fields given path relative to model.
 
@@ -458,9 +473,8 @@ def get_fields_from_path(model, path):
             parent = get_model_from_relation(fields[-1])
         else:
             parent = model
-        fields.append(parent._meta.get_field(piece))
+        fields.append(get_forward_field(parent._meta, piece))
     return fields
-
 
 def remove_trailing_data_field(fields):
     """ Discard trailing non-relation field if extant. """
