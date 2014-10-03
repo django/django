@@ -12,13 +12,6 @@ from .base import IsolatedModelsTestCase
 
 class RelativeFieldTests(IsolatedModelsTestCase):
 
-    def _get_forward_field(self, model, name):
-        fields = model._meta.get_fields()
-        try:
-            return next(f for f in fields if f.name == name)
-        except StopIteration:
-            raise FieldDoesNotExist('%s has no field named %r' % (model.object_name, name))
-
     def test_valid_foreign_key_without_accessor(self):
         class Target(models.Model):
             # There would be a clash if Model.field installed an accessor.
@@ -27,7 +20,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         class Model(models.Model):
             field = models.ForeignKey(Target, related_name='+')
 
-        field = self._get_forward_field(Model, 'field')
+        field = Model._meta.get_field('field')
         errors = field.check()
         self.assertEqual(errors, [])
 
@@ -38,7 +31,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         class Model(models.Model):
             foreign_key = models.ForeignKey('Rel1')
 
-        field = self._get_forward_field(Model, 'foreign_key')
+        field = Model._meta.get_field('foreign_key')
         errors = field.check()
         expected = [
             Error(
@@ -57,7 +50,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         # Calling include_related=False because, as this is an invalid model
         # a relation to Rel2 will not be found.
-        field = self._get_forward_field(Model, 'm2m')
+        field = Model._meta.get_field( 'm2m')
         errors = field.check(from_model=Model)
         expected = [
             Error(
@@ -314,7 +307,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         # Calling include_related=False because, as this is an invalid model
         # a relation to AbstractModel will not be found.
-        field = self._get_forward_field(Model, 'foreign_key')
+        field = Model._meta.get_field('foreign_key')
         errors = field.check()
         expected = [
             Error(
@@ -337,7 +330,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         # Calling include_related=False because, as this is an invalid model
         # a relation to AbstractModel will not be found.
-        field = self._get_forward_field(Model, 'm2m')
+        field = Model._meta.get_field('m2m')
         errors = field.check(from_model=Model)
         expected = [
             Error(

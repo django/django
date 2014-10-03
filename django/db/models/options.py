@@ -569,7 +569,7 @@ class Options(object):
         for model in all_models:
             for f in chain(model._meta.fields, model._meta.virtual_fields):
                 # Check if the field has a relation to another model
-                if f.has_relation and f.generate_reverse_relation:
+                if f.has_relation and f.generate_reverse_relation and not isinstance(f.rel.to, six.string_types):
                     # Set options_instance -> field
                     related_objects_graph[f.rel.to._meta].append(f)
 
