@@ -344,7 +344,7 @@ class Options(object):
         ManyToManyFields.
         """
         return make_immutable_fields_list("fields", (f for f in self.get_fields()
-                                                if not (f.has_many_values and f.has_relation)))
+                                          if not (f.has_many_values and f.has_relation)))
 
     @cached_property
     def concrete_fields(self):
@@ -375,7 +375,7 @@ class Options(object):
         its parents.
         """
         return make_immutable_fields_list("many_to_many", (f for f in self.get_fields()
-                                                if f.has_many_values and f.has_relation))
+                                          if f.has_many_values and f.has_relation))
 
     @cached_property
     def related_objects(self):
