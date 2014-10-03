@@ -43,7 +43,7 @@ class GetFieldsTests(OptionsBaseTests):
             fields = Person._meta.get_fields()
             with self.assertRaises(AttributeError) as err:
                 fields += ["errors"]
-            self.assertEqual(str(err.exception), IMMUTABLE_WARNING)
+            self.assertEqual(str(err.exception), IMMUTABLE_WARNING % "get_fields()")
 
     def test_get_fields_accepts_only_valid_kwargs(self):
         with self.assertRaises(TypeError) as err:

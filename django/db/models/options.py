@@ -24,8 +24,8 @@ from django.utils.translation import activate, deactivate_all, get_language, str
 EMPTY_RELATION_TREE = tuple()
 
 IMMUTABLE_WARNING = (
-    "The return type of most Model._meta API calls should never be mutated. If you want "
-    "to manipulate this list for your own use, make a copy first."
+    "The return type of '%s' should never be mutated. If you want to manipulate this list "
+    "for your own use, make a copy first."
 )
 
 DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
@@ -98,6 +98,8 @@ def normalize_together(option_together):
         # verbatim; this will be picked up by the check framework later.
         return option_together
 
+def make_immutable_fields_list(name, data):
+    return ImmutableList(data, warning=IMMUTABLE_WARNING % name)
 
 @python_2_unicode_compatible
 class Options(object):
@@ -159,11 +161,6 @@ class Options(object):
         self.default_related_name = None
         self._map_model = partial(_map_model, self)
         self._map_model_details = partial(_map_model_details, self)
-
-        self._make_immutable_fields_list = partial(
-            ImmutableList,
-            warning=IMMUTABLE_WARNING
-        )
 
     @property
     def app_config(self):
@@ -346,7 +343,7 @@ class Options(object):
         Returns a list of all forward fields on the model and its parents excluding
         ManyToManyFields.
         """
-        return self._make_immutable_fields_list((f for f in self.get_fields()
+        return make_immutable_fields_list("fields", (f for f in self.get_fields()
                                                 if not (f.has_many_values and f.has_relation)))
 
     @cached_property
@@ -354,14 +351,14 @@ class Options(object):
         """
         Returns a list of all concrete fields on the model and its parents.
         """
-        return self._make_immutable_fields_list(f for f in self.fields if f.concrete)
+        return make_immutable_fields_list("concrete_fields", (f for f in self.fields if f.concrete))
 
     @cached_property
     def local_concrete_fields(self):
         """
         Returns a list of all concrete fields on the model.
         """
-        return self._make_immutable_fields_list(f for f in self.local_fields if f.concrete)
+        return make_immutable_fields_list("local_concrete_fields", (f for f in self.local_fields if f.concrete))
 
     @raise_deprecation(suggested_alternative="get_fields()")
     def get_fields_with_model(self):
@@ -377,7 +374,7 @@ class Options(object):
         Returns a list of all many to many fields on the model and
         its parents.
         """
-        return self._make_immutable_fields_list((f for f in self.get_fields()
+        return make_immutable_fields_list("many_to_many", (f for f in self.get_fields()
                                                 if f.has_many_values and f.has_relation))
 
     @cached_property
@@ -389,9 +386,10 @@ class Options(object):
         """
         all_related_fields = self.get_fields(forward=False, reverse=True,
                                              include_hidden=True, cache_results=True)
-        return self._make_immutable_fields_list(
-            obj for obj in all_related_fields
-            if not obj.field.rel.is_hidden() or obj.field.has_many_values
+        return make_immutable_fields_list(
+            "related_objects",
+            (obj for obj in all_related_fields
+            if not obj.field.rel.is_hidden() or obj.field.has_many_values)
         )
 
     @raise_deprecation(suggested_alternative="get_fields()")
@@ -708,7 +706,7 @@ class Options(object):
             # By default, fields contains field instances as keys and all possible names
             # if the field instance as values. when get_fields is called, we only want to
             # return field instances, so we just preserve the keys.
-            fields = self._make_immutable_fields_list(fields.keys())
+            fields = make_immutable_fields_list("get_fields()", fields.keys())
 
         # Store result into cache for later access
         if cache_results:
