@@ -38,8 +38,6 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         class Model(models.Model):
             foreign_key = models.ForeignKey('Rel1')
 
-        # Calling include_related=False because, as this is an invalid model
-        # a relation to Rel1 will not be found.
         field = self._get_forward_field(Model, 'foreign_key')
         errors = field.check()
         expected = [
