@@ -412,6 +412,8 @@ class BaseCommand(object):
             translation.activate('en-us')
 
         try:
+            if self.requires_system_checks:
+                django.setup()
             if (self.requires_system_checks and
                     not options.get('skip_validation') and  # Remove at the end of deprecation for `skip_validation`.
                     not options.get('skip_checks')):
