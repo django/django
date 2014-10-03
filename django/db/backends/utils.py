@@ -29,7 +29,9 @@ class CursorWrapper(object):
             return cursor_attr
 
     def __iter__(self):
-        return iter(self.cursor)
+        with self.db.wrap_database_errors:
+            for item in self.cursor:
+                yield item
 
     def __enter__(self):
         return self
