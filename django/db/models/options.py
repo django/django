@@ -427,10 +427,18 @@ class Options(object):
         or reverse field
         """
         if not apps.ready:
-            raise AppRegistryNotReady(
-                "The Apps registry is still not ready, this means get_field() is not able "
-                "to find related objects that point to this model."
-            )
+
+            try:
+                #The Apps registry is still not ready, this means get_field() is not able
+                #to find related objects that point to this model.
+                return next(
+                    f for f in self.get_fields()
+                    if f.name == field_name or f.attname == field_name
+                )
+            except StopIteration:
+                raise FieldDoesNotExist('%s has no field named %r. The app cache isn\'t '
+                                        'ready yet, so if this is a forward field, it won\'t '
+                                        'be available yet.' % (self.object_name, field_name))
 
         fields_map = self.fields_map
         # NOTE: previous get_field API had a many_to_many key. In order to avoid breaking

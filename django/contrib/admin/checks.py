@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from itertools import chain
 
 from django.contrib.admin.utils import (
-    get_fields_from_path, get_forward_field, flatten, NotRelationField,
+    get_fields_from_path, flatten, NotRelationField,
 )
 from django.core import checks
 from django.db import models
@@ -172,7 +172,7 @@ class BaseModelAdminChecks(object):
             return []
         else:
             try:
-                field = get_forward_field(model._meta, field_name)
+                field = model._meta.get_field(field_name)
             except models.FieldDoesNotExist:
                 # If we can't find a field on the model that matches, it could
                 # be an extra field on the form.
@@ -252,7 +252,7 @@ class BaseModelAdminChecks(object):
         check that given field exists and is a ManyToManyField. """
 
         try:
-            field = get_forward_field(model._meta, field_name)
+            field = model._meta.get_field(field_name)
         except models.FieldDoesNotExist:
             return refer_to_missing_field(field=field_name, option=label,
                                           model=model, obj=cls, id='admin.E019')
@@ -443,7 +443,7 @@ class BaseModelAdminChecks(object):
                 field_name = field_name[1:]
 
             try:
-                get_forward_field(model._meta, field_name)
+                model._meta.get_field(field_name)
             except models.FieldDoesNotExist:
                 return refer_to_missing_field(field=field_name, option=label,
                                               model=model, obj=cls, id='admin.E033')
@@ -585,7 +585,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         elif hasattr(model, item):
             # getattr(model, item) could be an X_RelatedObjectsDescriptor
             try:
-                field = get_forward_field(model._meta, item)
+                field = model._meta.get_field(item)
             except models.FieldDoesNotExist:
                 try:
                     field = getattr(model, item)
@@ -617,7 +617,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                 return []
         else:
             try:
-                get_forward_field(model._meta, item)
+                model._meta.get_field(item)
             except models.FieldDoesNotExist:
                 return [
                     # This is a deliberate repeat of E108; there's more than one path

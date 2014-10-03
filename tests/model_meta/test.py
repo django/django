@@ -177,13 +177,25 @@ class GetFieldByNameTests(OptionsBaseTests):
         self.assertEqual(field_info[1:], (None, True, False))
         self.assertIsInstance(field_info[0], GenericRelation)
 
-    def test_get_field_raises_warning_if_apps_not_ready(self):
+    def test_get_fields_only_searaches_forward_on_apps_not_ready(self):
+        opts = Person._meta
+
         # If apps registry is not ready, get_field() searches
         # over only forward fields.
-        opts = Person._meta
         opts.apps.ready = False
-        with self.assertRaises(AppRegistryNotReady):
-            opts.get_field('data_abstract')
+
+        # 'data_abstract' is a forward field, and therefore will be found
+        self.assertTrue(opts.get_field('data_abstract'))
+
+        message = "Person has no field named 'relating_baseperson'. The app cache " \
+                  "isn't ready yet, so if this is a forward field, it won't be " \
+                  "available yet."
+
+        # 'data_abstract' is a reverse field, and will raise an exception
+        with self.assertRaises(FieldDoesNotExist) as err:
+            opts.get_field('relating_baseperson')
+        self.assertEqual(str(err.exception), message)
+
         opts.apps.ready = True
 
 
