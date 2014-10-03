@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 import copy
 import inspect
-import sys
 from itertools import chain
+import sys
 import warnings
 
 from django.apps import apps
@@ -182,7 +182,7 @@ class ModelBase(type):
             new_class._meta.local_many_to_many,
             new_class._meta.virtual_fields
         )
-        field_names = set(f.name for f in new_fields)
+        field_names = {f.name for f in new_fields}
 
         # Basic setup for proxy models.
         if is_proxy:
@@ -1454,15 +1454,13 @@ class Model(six.with_metaclass(ModelBase)):
         # but is an alias and therefore won't be found by opts.get_field.
         fields = set(f for f in fields if f != 'pk')
 
-        # Check for invalid or non existing field ordering.
+        # Check for invalid or non-existent fields in ordering.
         invalid_fields = []
 
         # Any field name that is not present in field_names does not exist.
-        invalid_fields.extend(fields - cls._meta.field_names)
-
-        # Any field that is a m2m field should not be allowed ordering
-        m2m_field_names = set(f.name for f in cls._meta.many_to_many)
-        invalid_fields.extend(fields & m2m_field_names)
+        # Also, ordering by m2m fields is not allowed.
+        valid_fields = cls._meta.field_names - {f.name for f in cls._meta.many_to_many}
+        invalid_fields.extend(fields - valid_fields)
 
         for invalid_field in invalid_fields:
             errors.append(

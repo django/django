@@ -1763,42 +1763,44 @@ Field API reference
         This method must be added to fields prior to 1.7 to migrate its data
         using :doc:`/topics/migrations`.
 
-.. _field-flags:
+.. _field-attributes:
 
-Field Flags reference
-=====================
+Field attribute reference
+=========================
 
 .. class:: Field
 
-    Every ``Field`` instance contains a list of required flags that allow a user to
-    discover it's behavour avoiding specific class checking that is tightly coupling
-    and not maintainable.
-    Django's flags can be used together with the
-    :ref:`Model._meta APIs <model-meta-field-apis>` to allow developers to narrow
-    down their field search.
-    Developers that use third-party fields can assume that these flags are implemented. 
+    Every ``Field`` instance contains several attributes that allow
+    introspecting its behavior. Use these attributes instead of ``isinstance``
+    checks when you need to write code that depends on a field's functionality.
+    These attributes can be used together with the :ref:`Model._meta APIs
+    <model-meta-field-apis>` to narrow down a search for specific model fields.
+    Custom model fields should implement these flags.
 
     .. attribute:: concrete
-        
-        A concrete field has a database column associated to it's field instance.
-        Concrete fields require migrations and always contain state.
+
+        A concrete field has a database column associated with it. Concrete
+        fields require a database migration and always contain state.
 
     .. attribute:: editable
-        
-        An editable field is a field that's data can be manipulated (an Autofield
-        for example should not be manipulated and responds False to an "editable" query).
+
+        An editable field is a field thats data can be manipulated in a model
+        or form. An ``Autofield``, for example, should generally not be
+        manipulated and therefore this attribute is ``False``.
 
     .. attribute:: has_many_values
-        
-        A field that can contain 1 or more values. This does not need to necessary be a
-        ManyToMany field, but can also be a CommaSeparatedIntegerField.
+
+        A field that can contain 1 or more values. This does not necessarily
+        need to  be a ``ManyToMany`` field, but can also be a
+        ``CommaSeparatedIntegerField`` for example.
 
     .. attribute:: has_relation
-        
-        A field has a relation when it depends on 1 or more models, and might generate
-        :ref:`reverse relations <model-meta-field-types>` on the pointed model.
+
+        A field has a relation when it depends on one or more models. It may
+        also generate :ref:`reverse relations <model-meta-field-types>` on the
+        pointed model.
 
     .. attribute:: is_related_object
 
-        A very simple way to query if an object returned from ``get_field()`` or ``get_fields()``
-        is a reverse object or a forward object.
+        A very simple way to query if an object returned from ``get_field()``
+        or ``get_fields()`` is a reverse object or a forward object.

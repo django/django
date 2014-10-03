@@ -151,7 +151,7 @@ class RenameModel(Operation):
                 new_model._meta.db_table,
             )
             # Alter the fields pointing to us
-            for related_object in (old_model._meta.related_objects):
+            for related_object in old_model._meta.related_objects:
                 if related_object.model == old_model:
                     model = new_model
                     related_key = (app_label, self.new_name.lower())

@@ -34,17 +34,19 @@ from django.utils.itercompat import is_iterable
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
 # makes these strings unicode
 __all__ = [str(x) for x in (
-    'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField', 'BooleanField',
-    'CharField', 'CommaSeparatedIntegerField', 'DateField', 'DateTimeField', 'DecimalField',
-    'EmailField', 'Empty', 'Field', 'FieldDoesNotExist', 'FieldFlagsMixin', 'FilePathField',
-    'FloatField', 'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
-    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField', 'SlugField',
-    'SmallIntegerField', 'TextField', 'TimeField', 'URLField', 'UUIDField'
+    'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
+    'BooleanField', 'CharField', 'CommaSeparatedIntegerField', 'DateField',
+    'DateTimeField', 'DecimalField', 'EmailField', 'Empty', 'Field',
+    'FieldDoesNotExist', 'FieldFlagsMixin', 'FilePathField', 'FloatField',
+    'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
+    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
+    'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
+    'UUIDField',
 )]
 
 class FieldFlagsMixin(object):
     """
-    Base mixin class for all field types. This allows required field flags to
+    Base mixin class for model fields types. This allows required field flags to
     be computed based on the internal attributes defined on the field instance.
     """
 
@@ -138,10 +140,10 @@ class Field(RegisterLookupMixin, FieldFlagsMixin):
     def __init__(self, verbose_name=None, name=None, primary_key=False,
             max_length=None, unique=False, blank=False, null=False,
             db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
-            has_many_values=False, serialize=True, unique_for_date=None,
-            unique_for_month=None, unique_for_year=None, choices=None,
-            help_text='', db_column=None, db_tablespace=None,
-            auto_created=False, validators=[], error_messages=None):
+            serialize=True, unique_for_date=None, unique_for_month=None,
+            unique_for_year=None, choices=None, help_text='', db_column=None,
+            db_tablespace=None, auto_created=False, validators=[],
+            error_messages=None, has_many_values=False):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction

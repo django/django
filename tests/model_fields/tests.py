@@ -8,7 +8,7 @@ import warnings
 from django import test
 from django import forms
 from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
+    GenericForeignKey, GenericRelation,
 )
 from django.core import validators
 from django.core.exceptions import ValidationError
@@ -23,7 +23,7 @@ from django.db.models.fields import (
 
 from django.db.models.fields.related import (
     ForeignObject, ForeignKey, OneToOneField, ManyToManyField,
-    RelatedObject
+    RelatedObject,
 )
 from django.db.models.fields.files import FileField, ImageField
 from django.utils import six

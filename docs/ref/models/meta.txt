@@ -24,24 +24,24 @@ Methods that it provides can be used for:
 Field Types
 ===========
 
-Fields can be divided into 2 main categories
+Fields are in 2 main categories:
 
 Forward fields
 ~~~~~~~~~~~~~~
 
-A forward field in any field that is defined on the current model. A forward field
-can also have relationships with 1 or many models.
-There are plenty of forward field examples as they are by far the most used field type,
-such as ``CharField``, ``BooleanField``, or ``ForeignKey``.
+A forward field in any field that is defined on the current model. A forward
+field can also have relationships with 1 or many models. There are plenty of
+forward field examples as they are by far the most used field type, such as
+``CharField``, ``BooleanField``, or ``ForeignKey``.
 
 Reverse fields
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
-A reverse field is a field defined on another model that points to the current model.
-Although these objects are treaded just like other fields, they are usually links to
-fields, such as a ``RelatedObject``.
-Reverse Fields are usually constructed transparently to the user, but can sometimes be
-explicitly defined on a model, such as a ``GenericForeignKey``.
+A reverse field is a field defined on another model that points to the current
+model. Although these objects are treaded just like other fields, they are
+usually links to fields, such as a ``RelatedObject``. Reverse fields are
+usually constructed transparently to the user, but can sometimes be explicitly
+defined on a model, such as a ``GenericForeignKey``.
 
 .. code-block:: python
 
@@ -82,11 +82,12 @@ field (``overdraft``).
 Hidden
 ~~~~~~
 
-Hidden fields are a subset of reverse fields, and will not have
-any effect on forward field queries.
-When a field that contains 1 or more relations (such as :class:`django.db.models.ManyToManyField`,
-or :class:`django.db.models.ForeignKey`) specifies a ``related_name`` that starts
-with a "+", it tells Django to exclude the relation as public, and therefore it becomes a hidden field.
+Hidden fields are a subset of reverse fields, and will not have any effect on
+forward field queries. When a field that contains 1 or more relations (such as
+:class:`django.db.models.ManyToManyField`, or
+:class:`django.db.models.ForeignKey`) specifies a ``related_name`` that starts
+with a "+", it tells Django to exclude the relation as public, and therefore it
+becomes a hidden field.
 
 .. code-block:: python
 
@@ -108,14 +109,6 @@ Retrieving a field instance by name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. method:: Options.get_field(field_name)
-
-    .. versionchanged:: 1.8
-
-        :meth:`Options.get_field()` does not accept a ``many_to_many``
-        flag any more. This method will automatically search through both
-        forward and reverse fields, with no way to exclude M2M fields.
-        If you wish to filter out M2M fields, you can do further filtering
-        using the :ref:`field flags <field-flags>`.
 
     Returns the field instance given a name of a field.
 
@@ -146,12 +139,20 @@ Retrieving a field instance by name
             ...
         FieldDoesNotExist: User has no field named 'does_not_exist'
 
-    .. note::
+    .. versionchanged:: 1.8
+
+        :meth:`Options.get_field()` does not accept a ``many_to_many``
+        flag any more. This method will automatically search through both
+        forward and reverse fields, with no way to exclude M2M fields.
+        If you wish to filter out M2M fields, you can do further filtering
+        using the :ref:`field attributes <field-attributes>`.
 
 Retrieving all field names
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. attribute:: Options.field_names
+
+    .. versionadded:: 1.8
 
     Returns a list of all forward and reverse field names on the
     current model.
@@ -199,12 +200,15 @@ need, you can use the ``get_fields()`` method along with its filtering flags.
 
 .. method:: Options.get_fields(forward=True, reverse=False, include_parents=True, include_hidden=False)
 
+    .. versionadded:: 1.8
+
     Returns a list of fields given a list of field types and filters.
 
-    get_fields() takes a set of flags as parameters and returns a tuple of field instances.
-    The flags are a combination of field types and field filters. All possible combinations
-    of filters and fields are possible, although some will have no effect (such as
-    ``include_hidden`` combined with ``forward``).
+    ``get_fields()`` takes a set of flags as parameters and returns a tuple of
+    field instances. The flags are a combination of field types and field
+    filters. All possible combinations of filters and fields are possible,
+    although some will have no effect (such as ``include_hidden`` combined with
+    ``forward``).
 
     .. code-block:: python
 

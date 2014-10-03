@@ -53,9 +53,12 @@ def DO_NOTHING(collector, field, sub_objs, using):
 
 
 def get_related_objects_on_proxies(opts):
-    return (f for f in chain.from_iterable(
+    return (
+        f for f in chain.from_iterable(
             c.related_objects for c in opts.concrete_model._meta.proxied_children
-            if c is not opts))
+            if c is not opts
+        )
+    )
 
 
 class Collector(object):
@@ -212,9 +215,11 @@ class Collector(object):
         if collect_related:
 
             from django.db.models.fields.related import ManyToManyRel
-            hidden_fk_fields = (related for
-                                related in model._meta.get_fields(forward=False, reverse=True, include_hidden=True)
-                                if not isinstance(related.field.rel, ManyToManyRel))
+            hidden_fk_fields = (
+                related for related in model._meta.get_fields(
+                    forward=False, reverse=True, include_hidden=True,
+                ) if not isinstance(related.field.rel, ManyToManyRel)
+            )
             related_opts = chain(
                 get_related_objects_on_proxies(model._meta),
                 hidden_fk_fields

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from itertools import chain
 
 from django.contrib.admin.utils import (
-    get_fields_from_path, get_forward_field, flatten, NotRelationField
+    get_fields_from_path, get_forward_field, flatten, NotRelationField,
 )
 from django.core import checks
 from django.db import models
