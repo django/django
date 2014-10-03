@@ -497,7 +497,7 @@ class CustomManagersRegressTestCase(TestCase):
         # deleted, since they *all* pointed to the RelatedModel. If
         # the default manager is used, only the public one will be
         # deleted.
-        self.assertEqual(len(RestrictedModel.plain_manager.all()), 0)
+        self.assertEqual(RestrictedModel.plain_manager.all().count(), 0)
 
     def test_delete_one_to_one_manager(self):
         # The same test case as the last one, but for one-to-one
@@ -507,4 +507,4 @@ class CustomManagersRegressTestCase(TestCase):
         OneToOneRestrictedModel.objects.create(name="foo", is_public=False, related=obj)
         obj = RelatedModel.objects.get(name="xyzzy")
         obj.delete()
-        self.assertEqual(len(OneToOneRestrictedModel.plain_manager.all()), 0)
+        self.assertEqual(OneToOneRestrictedModel.plain_manager.all().count(), 0)
