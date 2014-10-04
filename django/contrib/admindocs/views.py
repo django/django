@@ -150,10 +150,11 @@ class ViewDetailView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         view = self.kwargs['view']
-        mod, func = urlresolvers.get_mod_func(view)
-        try:
+        urlconf = urlresolvers.get_urlconf()
+        if urlresolvers.get_resolver(urlconf)._is_callback(view):
+            mod, func = urlresolvers.get_mod_func(view)
             view_func = getattr(import_module(mod), func)
-        except (ImportError, AttributeError):
+        else:
             raise Http404
         title, body, metadata = utils.parse_docstring(view_func.__doc__)
         if title:

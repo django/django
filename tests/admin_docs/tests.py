@@ -1,3 +1,4 @@
+import sys
 import unittest
 
 from django.conf import settings
@@ -78,6 +79,16 @@ class AdminDocViewTests(TestCase):
                     args=['django.contrib.admindocs.views.BaseAdminDocsView']))
         # View docstring
         self.assertContains(response, 'Base view for admindocs views.')
+
+    def test_view_detail_illegal_import(self):
+        """
+        #23601 - Ensure the view exists in the URLconf.
+        """
+        response = self.client.get(
+            reverse('django-admindocs-views-detail',
+                    args=['urlpatterns_reverse.nonimported_module.view']))
+        self.assertEqual(response.status_code, 404)
+        self.assertNotIn("urlpatterns_reverse.nonimported_module", sys.modules)
 
     def test_model_index(self):
         response = self.client.get(reverse('django-admindocs-models-index'))

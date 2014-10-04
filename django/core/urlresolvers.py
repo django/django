@@ -329,6 +329,11 @@ class RegexURLResolver(LocaleRegexProvider):
             self._populate()
         return self._app_dict[language_code]
 
+    def _is_callback(self, name):
+        if not self._populated:
+            self._populate()
+        return name in self._callback_strs
+
     def resolve(self, path):
         path = force_text(path)  # path may be a reverse_lazy object
         tried = []
@@ -410,7 +415,7 @@ class RegexURLResolver(LocaleRegexProvider):
             self._populate()
 
         try:
-            if lookup_view in self._callback_strs:
+            if self._is_callback(lookup_view):
                 lookup_view = get_callable(lookup_view, True)
         except (ImportError, AttributeError) as e:
             raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
