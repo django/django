@@ -76,6 +76,14 @@ Minor features
   <django.contrib.admin.ModelAdmin.show_full_result_count>` to control whether
   or not the full count of objects should be displayed on a filtered admin page.
 
+:mod:`django.contrib.admindocs`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* The view to browse view details now checks if the view specified in the URL
+  exists in the URLconf. Previously it was possible to import arbitrary
+  packages from the Python path. This was not considered a security issue
+  because ``admindocs`` is only accessible to staff users.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
