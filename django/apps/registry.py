@@ -128,7 +128,7 @@ class Apps(object):
         Raises an exception if all models haven't been imported yet.
         """
         if not self.models_ready:
-            raise AppRegistryNotReady("Models aren't loaded yet. Ensure django.setup() has been called.")
+            raise AppRegistryNotReady("Models aren't loaded yet.")
 
     def get_app_configs(self):
         """
