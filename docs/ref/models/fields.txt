@@ -1012,8 +1012,8 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length` argument. If you don't specify
 :attr:`~CharField.max_length`, a default of 200 is used.
 
-UUIDField
----------
+``UUIDField``
+-------------
 
 .. versionadded:: 1.8
 
