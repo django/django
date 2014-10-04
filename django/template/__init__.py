@@ -19,7 +19,7 @@ define their own custom node types.
 
 Each Node has a render() method, which takes a Context and returns a string of
 the rendered node. For example, the render() method of a Variable Node returns
-the variable's value as a string. The render() method of an IfNode returns the
+the variable's value as a string. The render() method of a ForNode returns the
 rendered output of whatever was inside the loop, recursively.
 
 The Template class is a convenient wrapper that takes care of template
