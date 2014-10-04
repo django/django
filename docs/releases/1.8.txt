@@ -35,6 +35,10 @@ site.
 
 .. _django-secure: https://pypi.python.org/pypi/django-secure
 
+Under special circumstances it was possible to import arbitrary packages from
+the Python path through the mod:`~django.contrib.admindocs`. This problem has
+been fixed by security hardening measures.
+
 New data types
 ~~~~~~~~~~~~~~
 
