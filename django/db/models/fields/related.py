@@ -97,10 +97,31 @@ signals.class_prepared.connect(do_pending_lookups)
 class RelatedField(Field):
     def check(self, **kwargs):
         errors = super(RelatedField, self).check(**kwargs)
+        errors.extend(self._check_related_name_is_valid())
         errors.extend(self._check_relation_model_exists())
         errors.extend(self._check_referencing_to_swapped_model())
         errors.extend(self._check_clashes())
         return errors
+
+    def _check_related_name_is_valid(self):
+        import re
+        import keyword
+        related_name = self.rel.related_name
+
+        is_valid_id = (related_name and re.match('^[a-zA-Z_][a-zA-Z0-9_]*$', related_name)
+                       and not keyword.iskeyword(related_name))
+        if related_name and not (is_valid_id or related_name.endswith('+')):
+            return [
+                checks.Error(
+                    "The name '%s' is invalid related_name for field %s.%s" %
+                    (self.rel.related_name, self.model._meta.object_name,
+                     self.name),
+                    hint="Related name must be a valid Python identifier or end with a '+'",
+                    obj=self,
+                    id='fields.E306',
+                )
+            ]
+        return []
 
     def _check_relation_model_exists(self):
         rel_is_missing = self.rel.to not in apps.get_models()
