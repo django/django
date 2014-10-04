@@ -2007,7 +2007,7 @@ Django will refuse to start if :setting:`SECRET_KEY` is not set.
 The secret key is used for:
 
 * All :doc:`sessions </topics/http/sessions>` if you are using
-  any other session backend than ``"django.contrib.sessions.backends.cache"``,
+  any other session backend than ``django.contrib.sessions.backends.cache``,
   or if you use
   :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware`
   and are using the default
