@@ -112,7 +112,15 @@ def language_changed(**kwargs):
 
 @receiver(setting_changed)
 def file_storage_changed(**kwargs):
-    if kwargs['setting'] in ('MEDIA_ROOT', 'DEFAULT_FILE_STORAGE'):
+    file_storage_settings = {
+        'DEFAULT_FILE_STORAGE',
+        'FILE_UPLOAD_DIRECTORY_PERMISSIONS',
+        'FILE_UPLOAD_PERMISSIONS',
+        'MEDIA_ROOT',
+        'MEDIA_URL',
+    }
+
+    if kwargs['setting'] in file_storage_settings:
         from django.core.files.storage import default_storage
         default_storage._wrapped = empty
 
