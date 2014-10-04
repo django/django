@@ -5,6 +5,7 @@ import unittest
 
 from django.conf.urls import url
 from django.core.urlresolvers import NoReverseMatch, reverse
+from django.core.files.storage import default_storage
 from django.db import connection
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
@@ -791,3 +792,45 @@ class OverrideSettingsTests(TestCase):
 
         self.assertRaises(NoReverseMatch, lambda: reverse('first'))
         self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+    def test_override_media_root(self):
+        """Check that overriding MEDIA_ROOT affects default_storage.
+
+        Overriding the MEDIA_ROOT setting should be reflected in the
+        base_location attribute of django.core.files.storage.default_storage.
+        """
+        self.assertEqual(default_storage.base_location, '')
+        with self.settings(MEDIA_ROOT='test_value'):
+            self.assertEqual(default_storage.base_location, 'test_value')
+
+    def test_override_media_url(self):
+        """Check that overriding MEDIA_URL affects default_storage.
+
+        Overriding the MEDIA_URL setting should be reflected in the
+        base_url attribute of django.core.files.storage.default_storage.
+        """
+        self.assertEqual(default_storage.base_location, '')
+        with self.settings(MEDIA_URL='/test_value/'):
+            self.assertEqual(default_storage.base_url, '/test_value/')
+
+    def test_override_file_upload_permissions_url(self):
+        """Check overriding FILE_UPLOAD_PERMISSIONS.
+
+        Overriding the FILE_UPLOAD_PERMISSIONS setting should be reflected in
+        the file_permissions_mode attribute of
+        django.core.files.storage.default_storage.
+        """
+        self.assertIsNone(default_storage.file_permissions_mode)
+        with self.settings(FILE_UPLOAD_PERMISSIONS=0o777):
+            self.assertEqual(default_storage.file_permissions_mode, 0o777)
+
+    def test_override_file_upload_directory_permissions_url(self):
+        """Check overriding FILE_UPLOAD_DIRECTORY_PERMISSIONS.
+
+        Overriding the FILE_UPLOAD_DIRECTORY_PERMISSIONS setting should be
+        reflected in the directory_permissions_mode attribute of
+        django.core.files.storage.default_storage.
+        """
+        self.assertIsNone(default_storage.directory_permissions_mode)
+        with self.settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o777):
+            self.assertEqual(default_storage.directory_permissions_mode, 0o777)
