@@ -1497,7 +1497,7 @@ your test suite.
 
     By default, the comparison is also ordering dependent. If ``qs`` doesn't
     provide an implicit ordering, you can set the ``ordered`` parameter to
-    ``False``, which turns the comparison into a Python set comparison.
+    ``False``, which turns the comparison into a ``collections.Counter`` comparison.
     If the order is undefined (if the given ``qs`` isn't ordered and the
     comparison is against more than one ordered values), a ``ValueError`` is
     raised.
