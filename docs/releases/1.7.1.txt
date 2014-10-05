@@ -9,6 +9,9 @@ Django 1.7.1 fixes several bugs in 1.7.
 Bugfixes
 ========
 
+* Allowed related many-to-many fields to be referenced in the admin
+  (:ticket:`23604`).
+
 * Added a more helpful error message if you try to migrate an app without first
   creating the ``contenttypes`` table (:ticket:`22411`).
 

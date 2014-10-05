@@ -37,7 +37,7 @@ from .models import (Article, Chapter, Child, Parent, Picture, Widget,
     State, City, Restaurant, Worker, ParentWithDependentChildren,
     DependentChild, StumpJoke, FieldOverridePost, FunkyTag,
     ReferencedByParent, ChildOfReferer, M2MReference, ReferencedByInline,
-    InlineReference, InlineReferer)
+    InlineReference, InlineReferer, Ingredient)
 
 
 def callable_year(dt_value):
@@ -940,6 +940,7 @@ site.register(EmptyModelHidden, EmptyModelHiddenAdmin)
 site.register(EmptyModelVisible, EmptyModelVisibleAdmin)
 site.register(EmptyModelMixin, EmptyModelMixinAdmin)
 site.register(StumpJoke)
+site.register(Ingredient)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group
