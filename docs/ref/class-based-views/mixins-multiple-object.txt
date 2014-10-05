@@ -56,7 +56,8 @@ MultipleObjectMixin
 
         The model that this view will display data for. Specifying ``model
         = Foo`` is effectively the same as specifying ``queryset =
-        Foo.objects.all()``.
+        Foo.objects.all()``, where ``objects`` stands for ``Foo``’s
+        :ref:`default manager <default-managers>`.
 
     .. attribute:: queryset
 
