@@ -852,3 +852,13 @@ class InlineReference(models.Model):
 
 class InlineReferer(models.Model):
     refs = models.ManyToManyField(InlineReference)
+
+
+# Models for #23604
+class Recipe(models.Model):
+    name = models.CharField(max_length=20)
+
+
+class Ingredient(models.Model):
+    name = models.CharField(max_length=20)
+    recipes = models.ManyToManyField('Recipe', related_name='ingredients')
