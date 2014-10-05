@@ -169,6 +169,11 @@ For example::
 This example allows you to request ``Person.men.all()``, ``Person.women.all()``,
 and ``Person.people.all()``, yielding predictable results.
 
+.. _default-managers:
+
+Default managers
+~~~~~~~~~~~~~~~~
+
 If you use custom ``Manager`` objects, take note that the first ``Manager``
 Django encounters (in the order in which they're defined in the model) has a
 special status. Django interprets the first ``Manager`` defined in a class as
