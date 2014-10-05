@@ -28,7 +28,7 @@ from .models import (Article, Chapter, Account, Media, Child, Parent, Picture,
     AdminOrderedField, AdminOrderedModelMethod, AdminOrderedAdminMethod,
     AdminOrderedCallable, Report, Color2, UnorderedObject, MainPrepopulated,
     RelatedPrepopulated, ReferencedByParent, ChildOfReferer, M2MReference,
-    ReferencedByInline, InlineReference, InlineReferer)
+    ReferencedByInline, InlineReference, InlineReferer, Ingredient)
 
 
 def callable_year(dt_value):
@@ -656,6 +656,7 @@ site.register(AdminOrderedModelMethod, AdminOrderedModelMethodAdmin)
 site.register(AdminOrderedAdminMethod, AdminOrderedAdminMethodAdmin)
 site.register(AdminOrderedCallable, AdminOrderedCallableAdmin)
 site.register(Color2, CustomTemplateFilterColorAdmin)
+site.register(Ingredient)
 
 # Register core models we need in our tests
 from django.contrib.auth.models import User, Group

@@ -281,6 +281,11 @@ class BaseModelAdmin(object):
         except FieldDoesNotExist:
             return False
 
+        # Check whether this model is the origin of a M2M relationship
+        # in which case to_field has to be the pk on this model.
+        if opts.many_to_many and field.primary_key:
+            return True
+
         # Make sure at least one of the models registered for this site
         # references this field through a FK or a M2M relationship.
         registered_models = set()
