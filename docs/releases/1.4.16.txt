@@ -10,6 +10,9 @@ preventing the use of some GEOS versions with GeoDjango.
 Bugfixes
 ========
 
+* Allowed related m2m fields to be referenced in the admin
+  (`#23604 <http://code.djangoproject.com/ticket/23604>`_).
+
 * Allowed inline and hidden references to admin fields
   (`#23431 <http://code.djangoproject.com/ticket/23431>`_).
 
