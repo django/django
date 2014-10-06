@@ -97,3 +97,6 @@ Bugfixes
   possible to import arbitrary packages from the Python path. This was not
   considered a security issue because ``admindocs`` is only accessible to staff
   users (:ticket:`23601`).
+
+* Fixed ``UnicodeDecodeError`` crash in ``AdminEmailHandler`` with non-ASCII
+  characters in the request (:ticket:`23593`).
