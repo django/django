@@ -89,3 +89,5 @@ Bugfixes
 
 * Fixed ``MigrationWriter`` to handle builtin types without imports
   (:ticket:`23560`).
+
+* Fixed ``deepcopy`` on ``ErrorList`` (:ticket:`23594`).
