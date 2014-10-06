@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
 import logging
@@ -318,6 +319,26 @@ class AdminEmailHandlerTest(TestCase):
             # Revert Monkeypatches
             mail.mail_admins = orig_mail_admins
             admin_email_handler.email_backend = orig_email_backend
+
+    @override_settings(
+        ADMINS=(('whatever admin', 'admin@example.com'),),
+    )
+    def test_emit_non_ascii(self):
+        """
+        #23593 - AdminEmailHandler should allow Unicode characters in the
+        request.
+        """
+        handler = self.get_admin_email_handler(self.logger)
+        record = self.logger.makeRecord('name', logging.ERROR, 'function', 'lno', 'message', None, None)
+        rf = RequestFactory()
+        url_path = '/º'
+        record.request = rf.get(url_path)
+        handler.emit(record)
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        self.assertEqual(msg.to, ['admin@example.com'])
+        self.assertEqual(msg.subject, "[Django] ERROR (EXTERNAL IP): message")
+        self.assertIn("path:%s" % url_path, msg.body)
 
 
 class SettingsConfigTest(AdminScriptTestCase):
