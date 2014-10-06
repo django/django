@@ -592,6 +592,19 @@ framework </ref/contrib/syndication>`, use ``get_absolute_url()`` when it is
 defined. If it makes sense for your model's instances to each have a unique
 URL, you should define ``get_absolute_url()``.
 
+.. warning::
+
+    You should avoid building the URL from un-validated user input, in order to
+    reduce possibilities of link or redirect poisoning::
+
+        def get_absolute_url(self):
+            return '/%s/' % self.name
+
+    If ``self.name`` is ``'/example.com'`` this returns ``'//example.com/'``
+    which, in turn, is a valid schema relative URL but not the expected
+    ``'/%2Fexample.com/'``.
+
+
 It's good practice to use ``get_absolute_url()`` in templates, instead of
 hard-coding your objects' URLs. For example, this template code is bad:
 
