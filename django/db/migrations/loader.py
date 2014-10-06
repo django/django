@@ -110,10 +110,12 @@ class MigrationLoader(object):
                 if not hasattr(migration_module, "Migration"):
                     raise BadMigrationError("Migration %s in app %s has no Migration class" % (migration_name, app_config.label))
                 # Ignore South-style migrations
-                if hasattr(migration_module.Migration, "forwards"):
+                migration = migration_module.Migration
+                if hasattr(migration, "forwards"):
                     south_style_migrations = True
                     break
-                self.disk_migrations[app_config.label, migration_name] = migration_module.Migration(migration_name, app_config.label)
+                app_label = getattr(migration, 'app_label', app_config.label)
+                self.disk_migrations[app_label, migration_name] = migration(migration_name, app_label)
             if south_style_migrations:
                 self.unmigrated_apps.add(app_config.label)
 

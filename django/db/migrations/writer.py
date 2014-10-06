@@ -120,6 +120,7 @@ class MigrationWriter(object):
         """
         items = {
             "replaces_str": "",
+            "app_label": self.migration.app_label,
         }
 
         imports = set()
@@ -408,6 +409,8 @@ from django.db import models, migrations
 
 class Migration(migrations.Migration):
 %(replaces_str)s
+    app_label = "%(app_label)s"
+
     dependencies = [
 %(dependencies)s\
     ]
