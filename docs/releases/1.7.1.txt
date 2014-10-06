@@ -106,3 +106,7 @@ Bugfixes
 
 * Made :func:`~django.utils.http.urlsafe_base64_decode` return the proper
   type (byte string) on Python 3 (:ticket:`23333`).
+
+* Added a prompt to the migrations questioner when removing the null constraint
+  from a field to prevent an IntegrityError on existing NULL rows
+  (:ticket:`23609`).

@@ -6,8 +6,8 @@ import datetime
 from itertools import chain
 
 from django.utils import six
-from django.db import models
 from django.conf import settings
+from django.db import models
 from django.db.migrations import operations
 from django.db.migrations.migration import Migration
 from django.db.migrations.questioner import MigrationQuestioner
@@ -838,7 +838,6 @@ class MigrationAutodetector(object):
         for app_label, model_name, field_name in sorted(self.old_field_keys.intersection(self.new_field_keys)):
             # Did the field change?
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
-            new_model_state = self.to_state.models[app_label, model_name]
             old_field_name = self.renamed_fields.get((app_label, model_name, field_name), field_name)
             old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field_by_name(old_field_name)[0]
             new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field_by_name(field_name)[0]
@@ -854,12 +853,23 @@ class MigrationAutodetector(object):
             old_field_dec = self.deep_deconstruct(old_field)
             new_field_dec = self.deep_deconstruct(new_field)
             if old_field_dec != new_field_dec:
+                preserve_default = True
+                if (old_field.null and not new_field.null and not new_field.has_default() and
+                        not isinstance(new_field, models.ManyToManyField)):
+                    field = new_field.clone()
+                    new_default = self.questioner.ask_not_null_alteration(field_name, model_name)
+                    if new_default is not models.NOT_PROVIDED:
+                        field.default = new_default
+                        preserve_default = False
+                else:
+                    field = new_field
                 self.add_operation(
                     app_label,
                     operations.AlterField(
                         model_name=model_name,
                         name=field_name,
-                        field=new_model_state.get_field_by_name(field_name),
+                        field=field,
+                        preserve_default=preserve_default,
                     )
                 )
 

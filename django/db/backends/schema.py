@@ -44,6 +44,7 @@ class BaseDatabaseSchemaEditor(object):
     sql_alter_column_no_default = "ALTER COLUMN %(column)s DROP DEFAULT"
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s CASCADE"
     sql_rename_column = "ALTER TABLE %(table)s RENAME COLUMN %(old_column)s TO %(new_column)s"
+    sql_update_with_default = "UPDATE %(table)s SET %(column)s = %(default)s WHERE %(column)s IS NULL"
 
     sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
     sql_delete_check = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
@@ -533,12 +534,19 @@ class BaseDatabaseSchemaEditor(object):
             })
         # Next, start accumulating actions to do
         actions = []
+        null_actions = []
         post_actions = []
         # Type change?
         if old_type != new_type:
             fragment, other_actions = self._alter_column_type_sql(model._meta.db_table, new_field.column, new_type)
             actions.append(fragment)
             post_actions.extend(other_actions)
+        # When changing a column NULL constraint to NOT NULL with a given
+        # default value, we need to perform 4 steps:
+        #  1. Add a default for new incoming writes
+        #  2. Update existing NULL rows with new default
+        #  3. Replace NULL constraint with NOT NULL
+        #  4. Drop the default again.
         # Default change?
         old_default = self.effective_default(old_field)
         new_default = self.effective_default(new_field)
@@ -573,7 +581,7 @@ class BaseDatabaseSchemaEditor(object):
         # Nullability change?
         if old_field.null != new_field.null:
             if new_field.null:
-                actions.append((
+                null_actions.append((
                     self.sql_alter_column_null % {
                         "column": self.quote_name(new_field.column),
                         "type": new_type,
@@ -581,14 +589,23 @@ class BaseDatabaseSchemaEditor(object):
                     [],
                 ))
             else:
-                actions.append((
+                null_actions.append((
                     self.sql_alter_column_not_null % {
                         "column": self.quote_name(new_field.column),
                         "type": new_type,
                     },
                     [],
                 ))
-        if actions:
+        # Only if we have a default and there is a change from NULL to NOT NULL
+        four_way_default_alteration = (
+            new_field.has_default() and
+            (old_field.null and not new_field.null)
+        )
+        if actions or null_actions:
+            if not four_way_default_alteration:
+                # If we don't have to do a 4-way default alteration we can
+                # directly run a (NOT) NULL alteration
+                actions = actions + null_actions
             # Combine actions together if we can (e.g. postgres)
             if self.connection.features.supports_combined_alters:
                 sql, params = tuple(zip(*actions))
@@ -602,6 +619,26 @@ class BaseDatabaseSchemaEditor(object):
                     },
                     params,
                 )
+            if four_way_default_alteration:
+                # Update existing rows with default value
+                self.execute(
+                    self.sql_update_with_default % {
+                        "table": self.quote_name(model._meta.db_table),
+                        "column": self.quote_name(new_field.column),
+                        "default": "%s",
+                    },
+                    [new_default],
+                )
+                # Since we didn't run a NOT NULL change before we need to do it
+                # now
+                for sql, params in null_actions:
+                    self.execute(
+                        self.sql_alter_column % {
+                            "table": self.quote_name(model._meta.db_table),
+                            "changes": sql,
+                        },
+                        params,
+                    )
         if post_actions:
             for sql, params in post_actions:
                 self.execute(sql, params)
