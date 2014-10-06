@@ -9,4 +9,6 @@ Django 1.6.8 fixes a regression in the 1.6.6 security release.
 Bugfixes
 ========
 
+* Allowed related m2m fields to be referenced in the admin (:ticket:`23604`).
+
 * Allowed inline and hidden references to admin fields (:ticket:`23431`).
