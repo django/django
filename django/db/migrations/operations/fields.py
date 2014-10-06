@@ -104,14 +104,20 @@ class AlterField(Operation):
     Alters a field's database column (e.g. null, max_length) to the provided new field
     """
 
-    def __init__(self, model_name, name, field):
+    def __init__(self, model_name, name, field, preserve_default=True):
         self.model_name = model_name
         self.name = name
         self.field = field
+        self.preserve_default = preserve_default
 
     def state_forwards(self, app_label, state):
+        if not self.preserve_default:
+            field = self.field.clone()
+            field.default = NOT_PROVIDED
+        else:
+            field = self.field
         state.models[app_label, self.model_name.lower()].fields = [
-            (n, self.field if n == self.name else f) for n, f in state.models[app_label, self.model_name.lower()].fields
+            (n, field if n == self.name else f) for n, f in state.models[app_label, self.model_name.lower()].fields
         ]
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -128,7 +134,11 @@ class AlterField(Operation):
                     from_field.rel.to = to_field.rel.to
                 elif to_field.rel and isinstance(to_field.rel.to, six.string_types):
                     to_field.rel.to = from_field.rel.to
+            if not self.preserve_default:
+                to_field.default = self.field.default
             schema_editor.alter_field(from_model, from_field, to_field)
+            if not self.preserve_default:
+                to_field.default = NOT_PROVIDED
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self.database_forwards(app_label, schema_editor, from_state, to_state)

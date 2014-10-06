@@ -3,7 +3,8 @@ import unittest
 
 from django.test import TransactionTestCase
 from django.db import connection, DatabaseError, IntegrityError, OperationalError
-from django.db.models.fields import IntegerField, TextField, CharField, SlugField, BooleanField, BinaryField
+from django.db.models.fields import (BinaryField, BooleanField, CharField, IntegerField,
+    PositiveIntegerField, SlugField, TextField)
 from django.db.models.fields.related import ManyToManyField, ForeignKey
 from django.db.transaction import atomic
 from .models import (Author, AuthorWithM2M, Book, BookWithLongName,
@@ -414,6 +415,38 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "TextField")
         self.assertEqual(bool(columns['name'][1][6]), False)
+
+    def test_alter_null_to_not_null(self):
+        """
+        #23609 - Tests handling of default values when altering from NULL to NOT NULL.
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Ensure the field is right to begin with
+        columns = self.column_classes(Author)
+        self.assertTrue(columns['height'][1][6])
+        # Create some test data
+        Author.objects.create(name='Not null author', height=12)
+        Author.objects.create(name='Null author')
+        # Verify null value
+        self.assertEqual(Author.objects.get(name='Not null author').height, 12)
+        self.assertIsNone(Author.objects.get(name='Null author').height)
+        # Alter the height field to NOT NULL with default
+        new_field = PositiveIntegerField(default=42)
+        new_field.set_attributes_from_name("height")
+        with connection.schema_editor() as editor:
+            editor.alter_field(
+                Author,
+                Author._meta.get_field_by_name("height")[0],
+                new_field
+            )
+        # Ensure the field is right afterwards
+        columns = self.column_classes(Author)
+        self.assertFalse(columns['height'][1][6])
+        # Verify default value
+        self.assertEqual(Author.objects.get(name='Not null author').height, 12)
+        self.assertEqual(Author.objects.get(name='Null author').height, 42)
 
     @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
     def test_alter_fk(self):
