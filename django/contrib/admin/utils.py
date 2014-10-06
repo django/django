@@ -441,6 +441,7 @@ def reverse_field_path(model, path):
         reversed_path.insert(0, related_name)
     return (parent, LOOKUP_SEP.join(reversed_path))
 
+
 def get_fields_from_path(model, path):
     """ Return list of Fields given path relative to model.
 
@@ -459,6 +460,7 @@ def get_fields_from_path(model, path):
             parent = model
         fields.append(parent._meta.get_field(piece))
     return fields
+
 
 def remove_trailing_data_field(fields):
     """ Discard trailing non-relation field if extant. """

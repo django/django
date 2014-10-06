@@ -248,11 +248,7 @@ class QuerySet(object):
         # build the list of fields that are to be loaded.
         if only_load:
             for field in self.model._meta.concrete_fields:
-                model = field.parent_model._meta.concrete_model
-
-                # A proxy model will have a different model and concrete_model
-                if model is self.model._meta.model:
-                    model = self.model
+                model = field.parent_model._meta.model
                 try:
                     if field.name in only_load[model]:
                         # Add a field that has been explicitly included

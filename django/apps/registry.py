@@ -330,7 +330,7 @@ class Apps(object):
         """
         if not self.ready:
             raise AppRegistryNotReady(
-                "App registry isn't ready yet. relation tree "
+                "App registry isn't ready yet. Relation tree "
                 "cannot be flushed."
             )
         for model in self.get_models(include_auto_created=True):
