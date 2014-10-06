@@ -137,7 +137,7 @@ or if it is temporary and just for this migration (``False``) - usually
 because the migration is adding a non-nullable field to a table and needs
 a default value to put into existing rows. It does not effect the behavior
 of setting defaults in the database directly - Django never sets database
-defaults, and always applies them in the Django ORM code.
+defaults and always applies them in the Django ORM code.
 
 RemoveField
 -----------
@@ -153,15 +153,27 @@ from any data loss, which of course is irreversible).
 AlterField
 ----------
 
-.. class:: AlterField(model_name, name, field)
+.. class:: AlterField(model_name, name, field, preserve_default=True)
 
 Alters a field's definition, including changes to its type,
 :attr:`~django.db.models.Field.null`, :attr:`~django.db.models.Field.unique`,
 :attr:`~django.db.models.Field.db_column` and other field attributes.
 
+The ``preserve_default`` argument indicates whether the field's default
+value is permanent and should be baked into the project state (``True``),
+or if it is temporary and just for this migration (``False``) - usually
+because the migration is altering a nullable field to a non-nullable one and
+needs a default value to put into existing rows. It does not effect the
+behavior of setting defaults in the database directly - Django never sets
+database defaults and always applies them in the Django ORM code.
+
 Note that not all changes are possible on all databases - for example, you
 cannot change a text-type field like ``models.TextField()`` into a number-type
 field like ``models.IntegerField()`` on most databases.
+
+.. versionchanged:: 1.7.1
+
+    The ``preserve_default`` argument was added.
 
 RenameField
 -----------

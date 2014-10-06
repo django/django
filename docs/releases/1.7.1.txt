@@ -108,3 +108,7 @@ Bugfixes
   type (byte string) on Python 3 (:ticket:`23333`).
 
 * :djadmin:`makemigrations` can now serialize timezone-aware values (:ticket:`23365`).
+
+* Added a prompt to the migrations questioner when removing the null constraint
+  from a field to prevent an IntegrityError on existing NULL rows
+  (:ticket:`23609`).
