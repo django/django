@@ -91,3 +91,9 @@ Bugfixes
   (:ticket:`23560`).
 
 * Fixed ``deepcopy`` on ``ErrorList`` (:ticket:`23594`).
+
+* Made the :mod:`~django.contrib.admindocs` view to browse view details check
+  if the view specified in the URL exists in the URLconf. Previously it was
+  possible to import arbitrary packages from the Python path. This was not
+  considered a security issue because ``admindocs`` is only accessible to staff
+  users (:ticket:`23601`).
