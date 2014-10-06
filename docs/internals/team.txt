@@ -462,6 +462,21 @@ Daniele Procida
 
     .. _Michael Manfre: http://manfre.net
 
+`Collin Anderson`_
+    Collin found Django in November 2006. He was in awe of the admin and ORM
+    and was amazed that the documentation was teaching him best web practices
+    like redirecting after a successful POST request. Why had he never learned
+    this before? No one knows to this day.
+
+    He enjoys improving the admin and making Django simple and easy for
+    newcomers.
+
+    Collin lives in South Bend, IN, USA where he uses Django to `increase
+    unity`_.
+
+    .. _Collin Anderson: https://github.com/collinanderson
+    .. _increase unity: http://onetencommunications.com/about/
+
 Past team members
 =================
 
