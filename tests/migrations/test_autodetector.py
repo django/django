@@ -26,6 +26,7 @@ class AutodetectorTests(TestCase):
 
     author_empty = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))])
     author_name = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200))])
+    author_name_null = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, null=True))])
     author_name_longer = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=400))])
     author_name_renamed = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("names", models.CharField(max_length=200))])
     author_name_default = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=200, default='Ada Lovelace'))])
@@ -302,6 +303,80 @@ class AutodetectorTests(TestCase):
         action = migration.operations[0]
         self.assertEqual(action.__class__.__name__, "AlterField")
         self.assertEqual(action.name, "name")
+        self.assertTrue(action.preserve_default)
+
+    def test_alter_field_to_not_null_with_default(self):
+        "#23609 - Tests autodetection of nullable to non-nullable alterations"
+        class CustomQuestioner(MigrationQuestioner):
+            def ask_not_null_alteration(self, field_name, model_name):
+                raise Exception("Should not have prompted for not null addition")
+
+        # Make state
+        before = self.make_project_state([self.author_name_null])
+        after = self.make_project_state([self.author_name_default])
+        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterField")
+        self.assertEqual(action.name, "name")
+        self.assertTrue(action.preserve_default)
+        self.assertEqual(action.field.default, 'Ada Lovelace')
+
+    def test_alter_field_to_not_null_without_default(self):
+        "#23609 - Tests autodetection of nullable to non-nullable alterations"
+        class CustomQuestioner(MigrationQuestioner):
+            def ask_not_null_alteration(self, field_name, model_name):
+                # Ignore for now, and let me handle existing rows with NULL
+                # myself (e.g. adding a RunPython or RunSQL operation in the new
+                # migration file before the AlterField operation)
+                return models.NOT_PROVIDED
+
+        # Make state
+        before = self.make_project_state([self.author_name_null])
+        after = self.make_project_state([self.author_name])
+        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterField")
+        self.assertEqual(action.name, "name")
+        self.assertTrue(action.preserve_default)
+        self.assertIs(action.field.default, models.NOT_PROVIDED)
+
+    def test_alter_field_to_not_null_oneoff_default(self):
+        "#23609 - Tests autodetection of nullable to non-nullable alterations"
+        class CustomQuestioner(MigrationQuestioner):
+            def ask_not_null_alteration(self, field_name, model_name):
+                # Provide a one-off default now (will be set on all existing rows)
+                return 'Some Name'
+
+        # Make state
+        before = self.make_project_state([self.author_name_null])
+        after = self.make_project_state([self.author_name])
+        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['testapp']), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        # Right action?
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterField")
+        self.assertEqual(action.name, "name")
+        self.assertFalse(action.preserve_default)
+        self.assertEqual(action.field.default, "Some Name")
 
     def test_rename_field(self):
         "Tests autodetection of renamed fields"
