@@ -71,3 +71,6 @@ Bugfixes
 
 * Avoided unnecessary rollbacks of migrations from other apps when migrating
   backwards (:ticket:`23410`).
+
+* Fixed a rare query error when using deeply nested subqueries
+  (:ticket:`23605`).
