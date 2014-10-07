@@ -477,6 +477,16 @@ Daniele Procida
     .. _Collin Anderson: https://github.com/collinanderson
     .. _increase unity: http://onetencommunications.com/about/
 
+`Tom Christie`_
+    Tom has background in speech recognition, networking, and web development.
+    He has a particular interest in Web API design and is the original author
+    of `Django REST framework`_.
+
+    Tom lives in the seaside city of Brighton, UK.
+
+    .. _Tom Christie: https://twitter.com/_tomchristie
+    .. _Django REST framework: http://django-rest-framework.org
+
 Past team members
 =================
 
