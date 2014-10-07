@@ -857,3 +857,15 @@ class TestTicket11101(TransactionTestCase):
             self.assertEqual(Thingy.objects.count(), 1)
             transaction.set_rollback(True)
         self.assertEqual(Thingy.objects.count(), 0)
+
+
+class TestLoadFixtureFromOtherAppDirectory(TestCase):
+    """
+    #23612 -- fixtures path should be normalized to allow referencing relative
+    paths on Windows.
+    """
+    fixtures = ['fixtures_regress/fixtures/absolute.json']
+
+    def test_fixtures_loaded(self):
+        count = Absolute.objects.count()
+        self.assertGreater(count, 0, "Fixtures not loaded properly.")
