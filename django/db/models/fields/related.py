@@ -733,12 +733,16 @@ def create_foreign_related_manager(superclass, rel_field, rel_model):
         create.alters_data = True
 
         def get_or_create(self, **kwargs):
-            # Update kwargs with the related object that this
-            # ForeignRelatedObjectsDescriptor knows about.
             kwargs[rel_field.name] = self.instance
             db = router.db_for_write(self.model, instance=self.instance)
             return super(RelatedManager, self.db_manager(db)).get_or_create(**kwargs)
         get_or_create.alters_data = True
+
+        def update_or_create(self, **kwargs):
+            kwargs[rel_field.name] = self.instance
+            db = router.db_for_write(self.model, instance=self.instance)
+            return super(RelatedManager, self.db_manager(db)).update_or_create(**kwargs)
+        update_or_create.alters_data = True
 
         # remove() and clear() are only provided if the ForeignKey can have a value of null.
         if rel_field.null:
@@ -999,14 +1003,23 @@ def create_many_related_manager(superclass, rel):
 
         def get_or_create(self, **kwargs):
             db = router.db_for_write(self.instance.__class__, instance=self.instance)
-            obj, created = \
-                super(ManyRelatedManager, self.db_manager(db)).get_or_create(**kwargs)
+            obj, created = super(ManyRelatedManager, self.db_manager(db)).get_or_create(**kwargs)
             # We only need to add() if created because if we got an object back
             # from get() then the relationship already exists.
             if created:
                 self.add(obj)
             return obj, created
         get_or_create.alters_data = True
+
+        def update_or_create(self, **kwargs):
+            db = router.db_for_write(self.instance.__class__, instance=self.instance)
+            obj, created = super(ManyRelatedManager, self.db_manager(db)).update_or_create(**kwargs)
+            # We only need to add() if created because if we got an object back
+            # from get() then the relationship already exists.
+            if created:
+                self.add(obj)
+            return obj, created
+        update_or_create.alters_data = True
 
         def _add_items(self, source_field_name, target_field_name, *objs):
             # source_field_name: the PK fieldname in join table for the source object

@@ -100,3 +100,6 @@ Bugfixes
 
 * Fixed ``UnicodeDecodeError`` crash in ``AdminEmailHandler`` with non-ASCII
   characters in the request (:ticket:`23593`).
+
+* Fixed missing ``get_or_create`` and ``update_or_create`` on related managers
+  causing ``IntegrityError`` (:ticket:`23611`).
