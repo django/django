@@ -8,7 +8,8 @@ from django.db import IntegrityError, DatabaseError
 from django.utils.encoding import DjangoUnicodeDecodeError
 from django.test import TestCase, TransactionTestCase
 
-from .models import DefaultPerson, Person, ManualPrimaryKeyTest, Profile, Tag, Thing
+from .models import (DefaultPerson, Person, ManualPrimaryKeyTest, Profile,
+    Tag, Thing, Publisher, Author, Book)
 
 
 class GetOrCreateTests(TestCase):
@@ -199,3 +200,54 @@ class UpdateOrCreateTests(TestCase):
         except IntegrityError:
             formatted_traceback = traceback.format_exc()
             self.assertIn('obj.save', formatted_traceback)
+
+    def test_create_with_related_manager(self):
+        """
+        Should be able to use update_or_create from the related manager to
+        create a book. Refs #23611.
+        """
+        p = Publisher.objects.create(name="Acme Publishing")
+        book, created = p.books.update_or_create(name="The Book of Ed & Fred")
+        self.assertTrue(created)
+        self.assertEqual(p.books.count(), 1)
+
+    def test_update_with_related_manager(self):
+        """
+        Should be able to use update_or_create from the related manager to
+        update a book. Refs #23611.
+        """
+        p = Publisher.objects.create(name="Acme Publishing")
+        book = Book.objects.create(name="The Book of Ed & Fred", publisher=p)
+        self.assertEqual(p.books.count(), 1)
+        name = "The Book of Django"
+        book, created = p.books.update_or_create(defaults={'name': name}, id=book.id)
+        self.assertFalse(created)
+        self.assertEqual(book.name, name)
+        self.assertEqual(p.books.count(), 1)
+
+    def test_create_with_many(self):
+        """
+        Should be able to use update_or_create from the m2m related manager to
+        create a book. Refs #23611.
+        """
+        p = Publisher.objects.create(name="Acme Publishing")
+        author = Author.objects.create(name="Ted")
+        book, created = author.books.update_or_create(name="The Book of Ed & Fred", publisher=p)
+        self.assertTrue(created)
+        self.assertEqual(author.books.count(), 1)
+
+    def test_update_with_many(self):
+        """
+        Should be able to use update_or_create from the m2m related manager to
+        update a book. Refs #23611.
+        """
+        p = Publisher.objects.create(name="Acme Publishing")
+        author = Author.objects.create(name="Ted")
+        book = Book.objects.create(name="The Book of Ed & Fred", publisher=p)
+        book.authors.add(author)
+        self.assertEqual(author.books.count(), 1)
+        name = "The Book of Django"
+        book, created = author.books.update_or_create(defaults={'name': name}, id=book.id)
+        self.assertFalse(created)
+        self.assertEqual(book.name, name)
+        self.assertEqual(author.books.count(), 1)

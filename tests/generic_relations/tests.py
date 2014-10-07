@@ -309,6 +309,64 @@ class GenericRelationsTests(TestCase):
             TaggedItem.objects.get(content_object='')
 
 
+class GetOrCreateAndUpdateOrCreateTests(TestCase):
+    """
+    GenericRelationsTests has changed significantly on master, this
+    standalone TestCase is part of the backport for #23611.
+    """
+    def setUp(self):
+        self.bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
+        self.bacon.tags.create(tag="fatty")
+        self.bacon.tags.create(tag="salty")
+
+    def test_generic_update_or_create_when_created(self):
+        """
+        Should be able to use update_or_create from the generic related manager
+        to create a tag. Refs #23611.
+        """
+        count = self.bacon.tags.count()
+        tag, created = self.bacon.tags.update_or_create(tag='stinky')
+        self.assertTrue(created)
+        self.assertEqual(count + 1, self.bacon.tags.count())
+
+    def test_generic_update_or_create_when_updated(self):
+        """
+        Should be able to use update_or_create from the generic related manager
+        to update a tag. Refs #23611.
+        """
+        count = self.bacon.tags.count()
+        tag = self.bacon.tags.create(tag='stinky')
+        self.assertEqual(count + 1, self.bacon.tags.count())
+        tag, created = self.bacon.tags.update_or_create(defaults={'tag': 'juicy'}, id=tag.id)
+        self.assertFalse(created)
+        self.assertEqual(count + 1, self.bacon.tags.count())
+        self.assertEqual(tag.tag, 'juicy')
+
+    def test_generic_get_or_create_when_created(self):
+        """
+        Should be able to use get_or_create from the generic related manager
+        to create a tag. Refs #23611.
+        """
+        count = self.bacon.tags.count()
+        tag, created = self.bacon.tags.get_or_create(tag='stinky')
+        self.assertTrue(created)
+        self.assertEqual(count + 1, self.bacon.tags.count())
+
+    def test_generic_get_or_create_when_exists(self):
+        """
+        Should be able to use get_or_create from the generic related manager
+        to get a tag. Refs #23611.
+        """
+        count = self.bacon.tags.count()
+        tag = self.bacon.tags.create(tag="stinky")
+        self.assertEqual(count + 1, self.bacon.tags.count())
+        tag, created = self.bacon.tags.get_or_create(id=tag.id, defaults={'tag': 'juicy'})
+        self.assertFalse(created)
+        self.assertEqual(count + 1, self.bacon.tags.count())
+        # shouldn't had changed the tag
+        self.assertEqual(tag.tag, 'stinky')
+
+
 class CustomWidget(forms.TextInput):
     pass
 
