@@ -28,7 +28,8 @@ from .models import (
     JobResponsibilities, BaseA, FK1, Identifier, Program, Channel, Page, Paragraph,
     Chapter, Book, MyObject, Order, OrderItem, SharedConnection, Task, Staff,
     StaffUser, CategoryRelationship, Ticket21203Parent, Ticket21203Child, Person,
-    Company, Employment, CustomPk, CustomPkTag, Classroom, School, Student)
+    Company, Employment, CustomPk, CustomPkTag, Classroom, School, Student,
+    Ticket23605A, Ticket23605B, Ticket23605C)
 
 
 class BaseQuerysetTest(TestCase):
@@ -3615,3 +3616,42 @@ class Ticket22429Tests(TestCase):
 
         queryset = Student.objects.filter(~Q(classroom__school=F('school')))
         self.assertQuerysetEqual(queryset, [st2], lambda x: x)
+
+
+class Ticket23605Tests(TestCase):
+    def test_ticket_23605(self):
+        a1 = Ticket23605A.objects.create()
+        a2 = Ticket23605A.objects.create()
+        c1 = Ticket23605C.objects.create(field_c0=10000.0)
+        Ticket23605B.objects.create(
+            field_b0=10000.0, field_b1=True,
+            modelc_fk=c1, modela_fk=a1)
+        qs = Ticket23605A.objects.filter(
+            Q(pk__in=Ticket23605A.objects.filter(
+                Q(ticket23605b__field_b0__gte=1000000 /
+                  F("ticket23605b__modelc_fk__field_c0")) &
+                Q(ticket23605b__field_b1__exact=True) &
+                ~Q(ticket23605b__pk__in=Ticket23605B.objects.filter(
+                    ~(
+                        Q(field_b1__exact=True) &
+                        Q(field_b0__gte=1000000 / F("modelc_fk__field_c0"))
+                    )
+                ))
+            ).filter(ticket23605b__field_b1__exact=True)
+            )
+        )
+        self.assertQuerysetEqual(qs, [a1], lambda x: x)
+        qs2 = Ticket23605A.objects.exclude(
+            Q(pk__in=Ticket23605A.objects.filter(
+                Q(ticket23605b__field_b0__gte=1000000 /
+                  F("ticket23605b__modelc_fk__field_c0")) &
+                Q(ticket23605b__field_b1__exact=True) &
+                ~Q(ticket23605b__pk__in=Ticket23605B.objects.filter(
+                    ~(
+                        Q(field_b1__exact=True) &
+                        Q(field_b0__gte=1000000 / F("modelc_fk__field_c0"))
+                    )
+                ))
+            ).filter(ticket23605b__field_b1__exact=True)
+            ))
+        self.assertQuerysetEqual(qs2, [a2], lambda x: x)
