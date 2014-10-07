@@ -114,6 +114,10 @@ class Query(object):
         # type they are. The key is the alias of the joined table (possibly
         # the table name) and the value is JoinInfo from constants.py.
         self.alias_map = {}
+        # Sometimes the query contains references to aliases in outer queries (as
+        # a result of split_exclude). Correct alias quoting needs to know these
+        # aliases too.
+        self.external_aliases = set()
         self.table_map = {}     # Maps table names to list of aliases.
         self.join_map = {}
         self.default_cols = True
@@ -241,6 +245,7 @@ class Query(object):
         obj.model = self.model
         obj.alias_refcount = self.alias_refcount.copy()
         obj.alias_map = self.alias_map.copy()
+        obj.external_aliases = self.external_aliases.copy()
         obj.table_map = self.table_map.copy()
         obj.join_map = self.join_map.copy()
         obj.default_cols = self.default_cols
@@ -334,6 +339,11 @@ class Query(object):
         else:
             # Return value depends on the type of the field being processed.
             return self.convert_values(value, aggregate.field, connection)
+
+    def relabeled_clone(self, change_map):
+        clone = self.clone()
+        clone.change_aliases(change_map)
+        return clone
 
     def get_aggregation(self, using, force_subq=False):
         """
@@ -788,7 +798,9 @@ class Query(object):
             ident = (change_map.get(ident[0], ident[0]),) + ident[1:]
             self.join_map[ident] = aliases
         for old_alias, new_alias in six.iteritems(change_map):
-            alias_data = self.alias_map[old_alias]
+            alias_data = self.alias_map.get(old_alias)
+            if alias_data is None:
+                continue
             alias_data = alias_data._replace(rhs_alias=new_alias)
             self.alias_refcount[new_alias] = self.alias_refcount[old_alias]
             del self.alias_refcount[old_alias]
@@ -814,6 +826,9 @@ class Query(object):
             if lhs in change_map:
                 data = data._replace(lhs_alias=change_map[lhs])
                 self.alias_map[alias] = data
+
+        self.external_aliases = {change_map.get(alias, alias)
+                                 for alias in self.external_aliases}
 
     def bump_prefix(self, outer_query):
         """
@@ -1048,6 +1063,9 @@ class Query(object):
         elif isinstance(value, ExpressionNode):
             # If value is a query expression, evaluate it
             value = SQLEvaluator(value, self, reuse=can_reuse)
+        # Subqueries need to use a different set of aliases than the
+        # outer query. Call bump_prefix to change aliases of the inner
+        # query (the value).
         if hasattr(value, 'query') and hasattr(value.query, 'bump_prefix'):
             value = value._clone()
             value.query.bump_prefix(self)
@@ -1509,6 +1527,7 @@ class Query(object):
             lookup = lookup_class(Col(query.select[0].col[0], pk, pk),
                                   Col(alias, pk, pk))
             query.where.add(lookup, AND)
+            query.external_aliases.add(alias)
 
         condition, needed_inner = self.build_filter(
             ('%s__in' % trimmed_prefix, query),

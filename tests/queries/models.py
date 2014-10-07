@@ -675,3 +675,18 @@ class Student(models.Model):
 class Classroom(models.Model):
     school = models.ForeignKey(School)
     students = models.ManyToManyField(Student, related_name='classroom')
+
+
+class Ticket23605A(models.Model):
+    pass
+
+
+class Ticket23605B(models.Model):
+    modela_fk = models.ForeignKey(Ticket23605A)
+    modelc_fk = models.ForeignKey("Ticket23605C")
+    field_b0 = models.IntegerField(null=True)
+    field_b1 = models.BooleanField(default=False)
+
+
+class Ticket23605C(models.Model):
+    field_c0 = models.FloatField()
