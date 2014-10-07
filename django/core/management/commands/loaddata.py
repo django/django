@@ -186,7 +186,7 @@ class Command(BaseCommand):
             fixture_name = os.path.basename(fixture_name)
         else:
             fixture_dirs = self.fixture_dirs
-            if os.path.sep in fixture_name:
+            if os.path.sep in os.path.normpath(fixture_name):
                 fixture_dirs = [os.path.join(dir_, os.path.dirname(fixture_name))
                                 for dir_ in fixture_dirs]
                 fixture_name = os.path.basename(fixture_name)
