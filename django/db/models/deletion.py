@@ -215,8 +215,6 @@ class Collector(object):
                              reverse_dependency=True)
 
         if collect_related:
-
-            from django.db.models.fields.related import ManyToManyRel
             related_opts = chain(
                 get_related_objects_on_proxies(model._meta),
                 (related for related in model._meta.get_fields(

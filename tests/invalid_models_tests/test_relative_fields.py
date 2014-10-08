@@ -49,7 +49,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         # Calling include_related=False because, as this is an invalid model
         # a relation to Rel2 will not be found.
-        field = Model._meta.get_field( 'm2m')
+        field = Model._meta.get_field('m2m')
         errors = field.check(from_model=Model)
         expected = [
             Error(

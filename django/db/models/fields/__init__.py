@@ -44,6 +44,7 @@ __all__ = [str(x) for x in (
     'UUIDField',
 )]
 
+
 class FieldFlagsMixin(object):
     """
     Base mixin class for model fields types. This allows required field flags to

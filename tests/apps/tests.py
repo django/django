@@ -15,10 +15,7 @@ from django.utils._os import upath
 from django.utils import six
 
 from .default_config_app.apps import CustomConfig
-from .models import (
-    TotallyNormal, SoAlternative, new_apps,
-    Relation, AbstractPerson, BasePerson, new_apps_2,
-)
+from .models import TotallyNormal, SoAlternative, new_apps
 
 
 # Small list with a variety of cases for tests that iterate on installed apps.

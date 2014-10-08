@@ -8,9 +8,8 @@ import warnings
 
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import AppRegistryNotReady
 from django.db.models.fields.related import ManyToManyRel, ManyToManyField
-from django.db.models.fields import AutoField, FieldDoesNotExist, Field
+from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.fields.proxy import OrderWrt
 from django.utils import six
 from django.utils.datastructures import ImmutableList
@@ -98,8 +97,10 @@ def normalize_together(option_together):
         # verbatim; this will be picked up by the check framework later.
         return option_together
 
+
 def make_immutable_fields_list(name, data):
     return ImmutableList(data, warning=IMMUTABLE_WARNING % name)
+
 
 @python_2_unicode_compatible
 class Options(object):

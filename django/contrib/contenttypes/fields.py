@@ -36,14 +36,7 @@ class GenericForeignKey(FieldFlagsMixin):
 
     def contribute_to_class(self, cls, name, **kwargs):
         self.name = name
-
-        # model contains a referece to the model class that
-        # owns 
         self.model = cls
-
-        # parent_model contains a referece to the model class that
-        # owns (contains) the field.
-        #self.parent_model = cls
 
         self.cache_attr = "_%s_cache" % name
         cls._meta.add_field(self, virtual=True)
