@@ -43,3 +43,6 @@ Bugfixes
 
 * Fixed a migrations crash when adding ``GeometryField``\s with ``blank=True``
   on PostGIS (:ticket:`23731`).
+
+* Allowed usage of ``DateTimeField()`` as ``Transform.output_field``
+  (:ticket:`23420`).

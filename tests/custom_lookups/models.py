@@ -11,3 +11,11 @@ class Author(models.Model):
 
     def __str__(self):
         return self.name
+
+
+@python_2_unicode_compatible
+class MySQLUnixTimestamp(models.Model):
+    timestamp = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.name
