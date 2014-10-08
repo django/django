@@ -173,10 +173,8 @@ Retrieving all field names
 Retrieving field instances
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django provides several ways to access a model's fields. The first is a set of
-properties that return specific sets of fields. Each property is cached on first
-access so they are guaranteed to be fast.
-
+In addition to the general API for accessing the fields on a model, Django also
+provides a set of properties that caches commonly needed subsets of fields.
 You should prefer to use the properties for better readability and performance,
 however, if there isn't an appropriate property that contains the fields you
 need, you can use the ``get_fields()`` method along with its filtering flags.
