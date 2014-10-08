@@ -591,6 +591,9 @@ class Client(RequestFactory):
         else:
             return False
 
+    def simple_login(self, user):
+        return self.login(user=user)
+
     def logout(self):
         """
         Removes the authenticated user's cookies and session object.

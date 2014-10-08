@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.apps import apps
 from django.conf import settings
 from django.core import checks
+from django.test.utils import TEST_ENVIRON_AUTHENTICATION_BACKENDS
 
 
 def check_user_model(**kwargs):
@@ -36,8 +37,7 @@ def check_user_model(**kwargs):
 
     # Check that the username field is unique
     if not cls._meta.get_field(cls.USERNAME_FIELD).unique:
-        if (settings.AUTHENTICATION_BACKENDS ==
-                ('django.contrib.auth.backends.ModelBackend',)):
+        if (settings.AUTHENTICATION_BACKENDS == TEST_ENVIRON_AUTHENTICATION_BACKENDS):
             errors.append(
                 checks.Error(
                     "'%s.%s' must be unique because it is named as the 'USERNAME_FIELD'." % (

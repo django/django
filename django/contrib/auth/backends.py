@@ -157,3 +157,8 @@ class RemoteUserBackend(ModelBackend):
         By default, returns the user unmodified.
         """
         return user
+
+
+class SimpleLoginBackend(ModelBackend):
+    def authenticate(self, user):
+        return user

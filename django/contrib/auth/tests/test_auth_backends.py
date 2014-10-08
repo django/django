@@ -608,3 +608,15 @@ class ImproperlyConfiguredUserModelTest(TestCase):
         request.session = self.client.session
 
         self.assertRaises(ImproperlyConfigured, get_user, request)
+
+
+@skipIfCustomUser
+class SimpleLoginBackendTest(TestCase):
+     def test_authenticate(self):
+        test_user = CustomUser._default_manager.create_user(
+            email='test@example.com',
+            password='test',
+            date_of_birth=date(2006, 4, 25)
+        )
+        authenticated_user = authenticate(user=test_user)
+        self.assertEqual(test_user, authenticated_user)
