@@ -82,7 +82,6 @@ class GenericRelationsTests(TestCase):
         # shouldn't had changed the tag
         self.assertEqual(tag.tag, 'stinky')
 
-
     def test_generic_relations_m2m_mimic(self):
         """
         Objects with declared GenericRelations can be tagged directly -- the
