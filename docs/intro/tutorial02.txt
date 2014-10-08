@@ -512,11 +512,18 @@ template directory in the source code of Django itself
         print(django.__path__)"
 
 Then, just edit the file and replace
-``{{ site_header|default:_('Django administration') }}`` with your own site's
-name as you see fit, e.g. ``{{ _('Polls administration') }}``. We use this
-approach to teach you how to override templates. In an actual project, you
-would probably use the :attr:`django.contrib.admin.AdminSite.site_header`
-attribute to more easily make this particular customization.
+``{{ site_header|default:_('Django administration') }}`` (including the curly
+braces) with your own site's name as you see fit. You should end up with
+a line like:
+
+.. code-block:: html+django
+
+    <h1 id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a></h1>
+
+We use this approach to teach you how to override templates. In an actual
+project, you would probably use
+the :attr:`django.contrib.admin.AdminSite.site_header` attribute to more easily
+make this particular customization.
 
 This template file contains lots of text like ``{% block branding %}``
 and ``{{ title }}``. The ``{%`` and ``{{`` tags are part of Django's
