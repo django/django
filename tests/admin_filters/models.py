@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -35,3 +37,23 @@ class Employee(models.Model):
 
     def __str__(self):
         return self.name
+
+
+@python_2_unicode_compatible
+class TaggedItem(models.Model):
+    tag = models.SlugField()
+    content_type = models.ForeignKey(ContentType, related_name='tagged_items')
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    def __str__(self):
+        return self.tag
+
+
+@python_2_unicode_compatible
+class Bookmark(models.Model):
+    url = models.URLField()
+    tags = GenericRelation(TaggedItem)
+
+    def __str__(self):
+        return self.url

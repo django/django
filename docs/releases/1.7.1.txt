@@ -113,3 +113,5 @@ Bugfixes
 * Added a prompt to the migrations questioner when removing the null constraint
   from a field to prevent an IntegrityError on existing NULL rows
   (:ticket:`23609`).
+
+* Fixed generic relations in ``ModelAdmin.list_filter`` (:ticket:`23616`).
