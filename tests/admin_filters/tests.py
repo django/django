@@ -12,7 +12,7 @@ from django.test import TestCase, RequestFactory, override_settings
 from django.utils.encoding import force_text
 from django.utils import six
 
-from .models import Book, Department, Employee
+from .models import Book, Department, Employee, Bookmark, TaggedItem
 
 
 def select_by(dictlist, key, value):
@@ -203,6 +203,10 @@ class DepartmentFilterUnderscoredEmployeeAdmin(EmployeeAdmin):
 
 class DepartmentFilterDynamicValueBookAdmin(EmployeeAdmin):
     list_filter = [DepartmentListFilterLookupWithDynamicValue, ]
+
+
+class BookmarkAdminGenericRelation(ModelAdmin):
+    list_filter = ['tags__tag']
 
 
 class ListFiltersTests(TestCase):
@@ -538,6 +542,24 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0][5]
         expected = [(self.bob.pk, 'bob'), (self.lisa.pk, 'lisa')]
         self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
+
+    def test_listfilter_genericrelation(self):
+        django_bookmark = Bookmark.objects.create(url='https://www.djangoproject.com/')
+        python_bookmark = Bookmark.objects.create(url='https://www.python.org/')
+        kernel_bookmark = Bookmark.objects.create(url='https://www.kernel.org/')
+
+        TaggedItem.objects.create(content_object=django_bookmark, tag='python')
+        TaggedItem.objects.create(content_object=python_bookmark, tag='python')
+        TaggedItem.objects.create(content_object=kernel_bookmark, tag='linux')
+
+        modeladmin = BookmarkAdminGenericRelation(Bookmark, site)
+
+        request = self.request_factory.get('/', {'tags__tag': 'python'})
+        changelist = self.get_changelist(request, Bookmark, modeladmin)
+        queryset = changelist.get_queryset(request)
+
+        expected = [python_bookmark, django_bookmark]
+        self.assertEqual(list(queryset), expected)
 
     def test_booleanfieldlistfilter(self):
         modeladmin = BookAdmin(Book, site)

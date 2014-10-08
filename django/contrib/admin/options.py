@@ -417,7 +417,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                     # since it's ignored in ChangeList.get_filters().
                     return True
                 model = field.rel.to
-                rel_name = field.rel.get_related_field().name
+                if hasattr(field.rel, 'get_related_field'):
+                    rel_name = field.rel.get_related_field().name
+                else:
+                    rel_name = None
             elif isinstance(field, RelatedObject):
                 model = field.model
                 rel_name = model._meta.pk.name
