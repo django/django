@@ -35,12 +35,12 @@ class NestedForeignKeysTests(TestCase):
         Event.objects.create()
         Screening.objects.create(movie=self.movie)
 
-        self.assertEqual(len(Event.objects.all()), 2)
-        self.assertEqual(len(Event.objects.select_related('screening')), 2)
+        self.assertEqual(Event.objects.all().count(), 2)
+        self.assertEqual(Event.objects.select_related('screening').count(), 2)
         # This failed.
-        self.assertEqual(len(Event.objects.select_related('screening__movie')), 2)
+        self.assertEqual(Event.objects.select_related('screening__movie').count(), 2)
 
-        self.assertEqual(len(Event.objects.values()), 2)
+        self.assertEqual(Event.objects.values().count(), 2)
         self.assertEqual(len(Event.objects.values('screening__pk')), 2)
         self.assertEqual(len(Event.objects.values('screening__movie__pk')), 2)
         self.assertEqual(len(Event.objects.values('screening__movie__title')), 2)
@@ -57,9 +57,9 @@ class NestedForeignKeysTests(TestCase):
         ScreeningNullFK.objects.create(movie=None)
         ScreeningNullFK.objects.create(movie=self.movie)
 
-        self.assertEqual(len(Event.objects.all()), 3)
-        self.assertEqual(len(Event.objects.select_related('screeningnullfk')), 3)
-        self.assertEqual(len(Event.objects.select_related('screeningnullfk__movie')), 3)
+        self.assertEqual(Event.objects.all().count(), 3)
+        self.assertEqual(Event.objects.select_related('screeningnullfk').count(), 3)
+        self.assertEqual(Event.objects.select_related('screeningnullfk__movie').count(), 3)
 
         self.assertEqual(len(Event.objects.values()), 3)
         self.assertEqual(len(Event.objects.values('screeningnullfk__pk')), 3)
@@ -84,9 +84,9 @@ class NestedForeignKeysTests(TestCase):
         screening = Screening.objects.create(movie=self.movie)
         Package.objects.create(screening=screening)
 
-        self.assertEqual(len(Package.objects.all()), 2)
-        self.assertEqual(len(Package.objects.select_related('screening')), 2)
-        self.assertEqual(len(Package.objects.select_related('screening__movie')), 2)
+        self.assertEqual(Package.objects.all().count(), 2)
+        self.assertEqual(Package.objects.select_related('screening').count(), 2)
+        self.assertEqual(Package.objects.select_related('screening__movie').count(), 2)
 
         self.assertEqual(len(Package.objects.values()), 2)
         self.assertEqual(len(Package.objects.values('screening__pk')), 2)
@@ -106,9 +106,9 @@ class NestedForeignKeysTests(TestCase):
         PackageNullFK.objects.create(screening=screening)
         PackageNullFK.objects.create(screening=screening_with_movie)
 
-        self.assertEqual(len(PackageNullFK.objects.all()), 3)
-        self.assertEqual(len(PackageNullFK.objects.select_related('screening')), 3)
-        self.assertEqual(len(PackageNullFK.objects.select_related('screening__movie')), 3)
+        self.assertEqual(PackageNullFK.objects.all().count(), 3)
+        self.assertEqual(PackageNullFK.objects.select_related('screening').count(), 3)
+        self.assertEqual(PackageNullFK.objects.select_related('screening__movie').count(), 3)
 
         self.assertEqual(len(PackageNullFK.objects.values()), 3)
         self.assertEqual(len(PackageNullFK.objects.values('screening__pk')), 3)
@@ -132,8 +132,8 @@ class DeeplyNestedForeignKeysTests(TestCase):
         Event.objects.create()
         Screening.objects.create(movie=self.movie)
 
-        self.assertEqual(len(Event.objects.all()), 2)
-        self.assertEqual(len(Event.objects.select_related('screening__movie__director')), 2)
+        self.assertEqual(Event.objects.all().count(), 2)
+        self.assertEqual(Event.objects.select_related('screening__movie__director').count(), 2)
 
         self.assertEqual(len(Event.objects.values()), 2)
         self.assertEqual(len(Event.objects.values('screening__movie__director__pk')), 2)
@@ -152,8 +152,8 @@ class DeeplyNestedForeignKeysTests(TestCase):
         screening = Screening.objects.create(movie=self.movie)
         Package.objects.create(screening=screening)
 
-        self.assertEqual(len(Package.objects.all()), 2)
-        self.assertEqual(len(Package.objects.select_related('screening__movie__director')), 2)
+        self.assertEqual(Package.objects.all().count(), 2)
+        self.assertEqual(Package.objects.select_related('screening__movie__director').count(), 2)
 
         self.assertEqual(len(Package.objects.values()), 2)
         self.assertEqual(len(Package.objects.values('screening__movie__director__pk')), 2)

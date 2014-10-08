@@ -182,12 +182,12 @@ class ProxyDeleteTest(TestCase):
         Image.objects.all().delete()
 
         # An Image deletion == File deletion
-        self.assertEqual(len(Image.objects.all()), 0)
-        self.assertEqual(len(File.objects.all()), 0)
+        self.assertEqual(Image.objects.count(), 0)
+        self.assertEqual(File.objects.count(), 0)
 
         # The Image deletion cascaded and *all* references to it are deleted.
-        self.assertEqual(len(FooImage.objects.all()), 0)
-        self.assertEqual(len(FooFile.objects.all()), 0)
+        self.assertEqual(FooImage.objects.count(), 0)
+        self.assertEqual(FooFile.objects.count(), 0)
 
     def test_delete_proxy_of_proxy(self):
         """
@@ -205,15 +205,15 @@ class ProxyDeleteTest(TestCase):
         Photo.objects.all().delete()
 
         # A Photo deletion == Image deletion == File deletion
-        self.assertEqual(len(Photo.objects.all()), 0)
-        self.assertEqual(len(Image.objects.all()), 0)
-        self.assertEqual(len(File.objects.all()), 0)
+        self.assertEqual(Photo.objects.count(), 0)
+        self.assertEqual(Image.objects.count(), 0)
+        self.assertEqual(File.objects.count(), 0)
 
         # The Photo deletion should have cascaded and deleted *all*
         # references to it.
-        self.assertEqual(len(FooPhoto.objects.all()), 0)
-        self.assertEqual(len(FooFile.objects.all()), 0)
-        self.assertEqual(len(FooImage.objects.all()), 0)
+        self.assertEqual(FooPhoto.objects.count(), 0)
+        self.assertEqual(FooFile.objects.count(), 0)
+        self.assertEqual(FooImage.objects.count(), 0)
 
     def test_delete_concrete_parent(self):
         """
@@ -226,13 +226,13 @@ class ProxyDeleteTest(TestCase):
         File.objects.all().delete()
 
         # A File deletion == Image deletion
-        self.assertEqual(len(File.objects.all()), 0)
-        self.assertEqual(len(Image.objects.all()), 0)
+        self.assertEqual(File.objects.count(), 0)
+        self.assertEqual(Image.objects.count(), 0)
 
         # The File deletion should have cascaded and deleted *all* references
         # to it.
-        self.assertEqual(len(FooFile.objects.all()), 0)
-        self.assertEqual(len(FooImage.objects.all()), 0)
+        self.assertEqual(FooFile.objects.count(), 0)
+        self.assertEqual(FooImage.objects.count(), 0)
 
     def test_delete_proxy_pair(self):
         """
@@ -252,7 +252,7 @@ class ProxyDeleteTest(TestCase):
 
         Image.objects.all().delete()
 
-        self.assertEqual(len(FooFileProxy.objects.all()), 0)
+        self.assertEqual(FooFileProxy.objects.count(), 0)
 
     def test_19187_values(self):
         with self.assertRaises(TypeError):
