@@ -4,7 +4,7 @@ from datetime import datetime
 
 from django.test import TestCase
 
-from .models import Article, Person
+from .models import Article, Person, IndexErrorArticle
 
 
 class EarliestOrLatestTests(TestCase):
@@ -122,6 +122,9 @@ class EarliestOrLatestTests(TestCase):
         self.assertRaises(AssertionError, Person.objects.latest)
         self.assertEqual(Person.objects.latest("birthday"), p2)
 
+
+class TestFirstLast(TestCase):
+
     def test_first(self):
         p1 = Person.objects.create(name="Bob", birthday=datetime(1950, 1, 1))
         p2 = Person.objects.create(name="Alice", birthday=datetime(1961, 2, 3))
@@ -152,3 +155,24 @@ class EarliestOrLatestTests(TestCase):
         self.assertIs(
             Person.objects.filter(birthday__lte=datetime(1940, 1, 1)).last(),
             None)
+
+    def test_index_error_not_suppressed(self):
+        """
+        #23555 -- Unexpected IndexError exceptions in QuerySet iteration
+        shouldn't be suppressed.
+        """
+        def check():
+            # We know that we've broken the __iter__ method, so the queryset
+            # should always raise an exception.
+            self.assertRaises(IndexError, lambda: IndexErrorArticle.objects.all()[0])
+            self.assertRaises(IndexError, IndexErrorArticle.objects.all().first)
+            self.assertRaises(IndexError, IndexErrorArticle.objects.all().last)
+
+        check()
+
+        # And it does not matter if there are any records in the DB.
+        IndexErrorArticle.objects.create(
+            headline="Article 1", pub_date=datetime(2005, 7, 26),
+            expire_date=datetime(2005, 9, 1)
+        )
+        check()
