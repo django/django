@@ -206,8 +206,7 @@ class TestFixtures(TestCase):
 
     def test_unknown_format(self):
         """
-        Test for ticket #4371 -- Loading data of an unknown form
-        at should fail
+        Test for ticket #4371 -- Loading data of an unknown format should fail
         Validate that error conditions are caught correctly
         """
         with six.assertRaisesRegex(self, management.CommandError,
