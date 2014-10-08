@@ -4,7 +4,7 @@ from datetime import datetime
 
 from django.test import TestCase
 
-from .models import Article, Person
+from .models import Article, Person, IndexErrorArticle
 
 
 class EarliestOrLatestTests(TestCase):
@@ -152,3 +152,24 @@ class EarliestOrLatestTests(TestCase):
         self.assertIs(
             Person.objects.filter(birthday__lte=datetime(1940, 1, 1)).last(),
             None)
+
+
+class Ticket23555Test(TestCase):
+    """
+    Test that unexpected IndexError exceptions are not suppressed.
+    """
+
+    def test_index_error(self):
+        # We know that we've broken the __iter__ method (see IndexErrorArticle model),
+        # so queryset should always raise exception.
+        self.assertRaises(IndexError, lambda: IndexErrorArticle.objects.all()[0])
+        self.assertRaises(IndexError, IndexErrorArticle.objects.all().first)
+        self.assertRaises(IndexError, IndexErrorArticle.objects.all().last)
+
+    def test_one_record_index_error(self):
+        # And it does not matter if there are any records in the DB.
+        IndexErrorArticle.objects.create(
+            headline='Article', pub_date=datetime.now(), expire_date=datetime.now())
+        self.assertEqual(IndexErrorArticle.objects.count(), 1)
+        # Repeat tests.
+        self.test_index_error()
