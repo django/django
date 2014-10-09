@@ -46,6 +46,18 @@ it with ``Field`` directly::
   from django.db.models.fields import Field
   Field.register_lookup(NotEqual)
 
+Lookup registration can also be done using a decorator pattern::
+
+    from django.db.models.fields import Field
+
+    @Field.registerLookup
+    class NotEqualLookup(Lookup):
+        # ...
+
+.. versionchanged:: 1.8
+
+    The ability to use the decorator pattern was added.
+
 We can now use ``foo__ne`` for any field ``foo``. You will need to ensure that
 this registration happens before you try to create any querysets using it. You
 could place the implementation in a ``models.py`` file, or register the lookup
