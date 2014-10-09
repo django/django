@@ -1,3 +1,4 @@
+from django.db import connection
 from django.db.backends.mysql.base import DatabaseOperations
 
 from django.contrib.gis.db.backends.adapter import WKTAdapter
@@ -15,21 +16,38 @@ class MySQLOperations(DatabaseOperations, BaseSpatialOperations):
 
     Adapter = WKTAdapter
     Adaptor = Adapter  # Backwards-compatibility alias.
-
-    geometry_functions = {
-        'bbcontains': 'MBRContains',  # For consistency w/PostGIS API
-        'bboverlaps': 'MBROverlaps',  # .. ..
-        'contained': 'MBRWithin',    # .. ..
-        'contains': 'MBRContains',
-        'disjoint': 'MBRDisjoint',
-        'equals': 'MBREqual',
-        'exact': 'MBREqual',
-        'intersects': 'MBRIntersects',
-        'overlaps': 'MBROverlaps',
-        'same_as': 'MBREqual',
-        'touches': 'MBRTouches',
-        'within': 'MBRWithin',
-    }
+    if connection.mysql_version >= (5, 6, 1):
+        # mysql 5.6.1 implemented spatial queries using shape objects properly
+        # instead of bounding box checks
+        geometry_functions = {
+            'bbcontains': 'MBRContains',  # For consistency w/PostGIS API
+            'bboverlaps': 'MBROverlaps',  # .. ..
+            'contained': 'ST_Within',    # .. ..
+            'contains': 'ST_Contains',
+            'disjoint': 'ST_Disjoint',
+            'equals': 'ST_Equal',
+            'exact': 'ST_Equal',
+            'intersects': 'ST_Intersects',
+            'overlaps': 'ST_Overlaps',
+            'same_as': 'ST_Equal',
+            'touches': 'ST_Touches',
+            'within': 'ST_Within',
+        }
+    else:
+        geometry_functions = {
+            'bbcontains': 'MBRContains',  # For consistency w/PostGIS API
+            'bboverlaps': 'MBROverlaps',  # .. ..
+            'contained': 'MBRWithin',    # .. ..
+            'contains': 'MBRContains',
+            'disjoint': 'MBRDisjoint',
+            'equals': 'MBREqual',
+            'exact': 'MBREqual',
+            'intersects': 'MBRIntersects',
+            'overlaps': 'MBROverlaps',
+            'same_as': 'MBREqual',
+            'touches': 'MBRTouches',
+            'within': 'MBRWithin',
+        }
 
     gis_terms = set(geometry_functions) | {'isnull'}
 

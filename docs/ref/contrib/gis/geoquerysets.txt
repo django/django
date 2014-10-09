@@ -82,11 +82,16 @@ Example::
 
     Zipcode.objects.filter(poly__contained=geom)
 
+.. note::
+
+    Requires MySQL 5.6.1 and above for ST_Within. For older version
+    it is treated as MBRContains
+
 ==========  ==========================
 Backend     SQL Equivalent
 ==========  ==========================
 PostGIS     ``poly @ geom``
-MySQL       ``MBRWithin(poly, geom)``
+MySQL       ``ST_Within(poly, geom)``
 SpatiaLite  ``MbrWithin(poly, geom)``
 ==========  ==========================
 
@@ -99,6 +104,11 @@ contains
 
 Tests if the geometry field spatially contains the lookup geometry.
 
+.. note::
+
+    Requires MySQL 5.6.1 and above for ST_Contains. For older version
+    it is treated as MBRContains
+
 Example::
 
     Zipcode.objects.filter(poly__contains=geom)
@@ -108,7 +118,7 @@ Backend     SQL Equivalent
 ==========  ============================
 PostGIS     ``ST_Contains(poly, geom)``
 Oracle      ``SDO_CONTAINS(poly, geom)``
-MySQL       ``MBRContains(poly, geom)``
+MySQL       ``ST_Contains(poly, geom)``
 SpatiaLite  ``Contains(poly, geom)``
 ==========  ============================
 
@@ -207,12 +217,17 @@ Example::
 
     Zipcode.objects.filter(poly__disjoint=geom)
 
+.. note::
+
+    Requires MySQL 5.6.1 and above for ST_Contains. For older version
+    it is treated as MBRContains
+
 ==========  =================================================
 Backend     SQL Equivalent
 ==========  =================================================
 PostGIS     ``ST_Disjoint(poly, geom)``
 Oracle      ``SDO_GEOM.RELATE(poly, 'DISJOINT', geom, 0.05)``
-MySQL       ``MBRDisjoint(poly, geom)``
+MySQL       ``ST_Disjoint(poly, geom)``
 SpatiaLite  ``Disjoint(poly, geom)``
 ==========  =================================================
 
@@ -242,12 +257,17 @@ Example::
 
     Zipcode.objects.filter(poly__intersects=geom)
 
+.. note::
+
+    Requires MySQL 5.6.1 and above for ST_Contains. For older version
+    it is treated as MBRContains
+
 ==========  =================================================
 Backend     SQL Equivalent
 ==========  =================================================
 PostGIS     ``ST_Intersects(poly, geom)``
 Oracle      ``SDO_OVERLAPBDYINTERSECT(poly, geom)``
-MySQL       ``MBRIntersects(poly, geom)``
+MySQL       ``ST_Intersects(poly, geom)``
 SpatiaLite  ``Intersects(poly, geom)``
 ==========  =================================================
 
@@ -323,11 +343,16 @@ Example::
 
     Zipcode.objects.filter(poly__touches=geom)
 
+.. note::
+
+    Requires MySQL 5.6.1 and above for ST_Contains. For older version
+    it is treated as MBRContains
+
 ==========  ==========================
 Backend     SQL Equivalent
 ==========  ==========================
 PostGIS     ``ST_Touches(poly, geom)``
-MySQL       ``MBRTouches(poly, geom)``
+MySQL       ``ST_Touches(poly, geom)``
 Oracle      ``SDO_TOUCH(poly, geom)``
 SpatiaLite  ``Touches(poly, geom)``
 ==========  ==========================
@@ -345,11 +370,16 @@ Example::
 
     Zipcode.objects.filter(poly__within=geom)
 
+.. note::
+
+    Requires MySQL 5.6.1 and above for ST_Contains. For older version
+    it is treated as MBRContains
+
 ==========  ==========================
 Backend     SQL Equivalent
 ==========  ==========================
 PostGIS     ``ST_Within(poly, geom)``
-MySQL       ``MBRWithin(poly, geom)``
+MySQL       ``ST_Within(poly, geom)``
 Oracle      ``SDO_INSIDE(poly, geom)``
 SpatiaLite  ``Within(poly, geom)``
 ==========  ==========================
