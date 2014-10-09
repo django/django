@@ -550,7 +550,7 @@ Django can serialize the following:
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
-.. versionchanged:: 1.8
+.. versionchanged:: 1.7.1
 
     Support for serializing timezone-aware datetimes was added.
 
