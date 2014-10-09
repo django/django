@@ -1195,7 +1195,6 @@ class OperationTests(OperationTestBase):
             operation.database_backwards("test_runsql", editor, new_state, project_state)
         self.assertTableNotExists("i_love_ponies")
 
-    @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql_params(self):
         """
         #23426 - RunSQL should accept parameters.
@@ -1203,8 +1202,8 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_runsql")
         # Create the operation
         operation = migrations.RunSQL(
-            "CREATE TABLE i_love_ponies (id int, special_thing varchar(15));",
-            "DROP TABLE i_love_ponies",
+            ["CREATE TABLE i_love_ponies (id int, special_thing varchar(15));"],
+            ["DROP TABLE i_love_ponies"],
         )
         param_operation = migrations.RunSQL(
             # forwards
