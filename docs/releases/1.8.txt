@@ -269,8 +269,6 @@ Management Commands
 * The :djadminopt:`--name` option for :djadmin:`makemigrations` allows you to
   to give the migration(s) a custom name instead of a generated one.
 
-* :djadmin:`makemigrations` can now serialize timezone-aware values.
-
 Migrations
 ^^^^^^^^^^
 
