@@ -4,6 +4,7 @@ import threading
 import warnings
 
 from django.conf import settings
+from django.core.signals import setting_changed
 from django.db import connections, router
 from django.db.utils import ConnectionRouter
 from django.dispatch import receiver, Signal
@@ -11,8 +12,6 @@ from django.utils import timezone
 from django.utils.functional import empty
 
 template_rendered = Signal(providing_args=["template", "context"])
-
-setting_changed = Signal(providing_args=["setting", "value", "enter"])
 
 # Most setting_changed receivers are supposed to be added below,
 # except for cases where the receiver is related to a contrib app.
