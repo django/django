@@ -115,3 +115,5 @@ Bugfixes
   (:ticket:`23609`).
 
 * Fixed generic relations in ``ModelAdmin.list_filter`` (:ticket:`23616`).
+
+* Restored RFC compliance for the SMTP backend on Python 3 (:ticket:`23063`).
