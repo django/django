@@ -1195,6 +1195,7 @@ class OperationTests(OperationTestBase):
             operation.database_backwards("test_runsql", editor, new_state, project_state)
         self.assertTableNotExists("i_love_ponies")
 
+    @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql_params(self):
         """
         #23426 - RunSQL should accept parameters.
