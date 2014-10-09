@@ -112,7 +112,7 @@ class EmailBackend(BaseEmailBackend):
                       for addr in email_message.recipients()]
         message = email_message.message()
         try:
-            self.connection.sendmail(from_email, recipients, message.as_bytes())
+            self.connection.sendmail(from_email, recipients, message.as_bytes(linesep='\r\n'))
         except smtplib.SMTPException:
             if not self.fail_silently:
                 raise
