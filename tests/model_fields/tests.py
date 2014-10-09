@@ -64,7 +64,6 @@ HAS_MANY_VALUES = (
 
 IS_REVERSE_OBJECT = (
     RelatedObject,
-    GenericRelation,
 )
 
 

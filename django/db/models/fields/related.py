@@ -95,6 +95,8 @@ signals.class_prepared.connect(do_pending_lookups)
 
 
 class RelatedField(Field):
+    generate_reverse_relation = True
+
     def check(self, **kwargs):
         errors = super(RelatedField, self).check(**kwargs)
         errors.extend(self._check_relation_model_exists())
@@ -1320,7 +1322,6 @@ class ManyToManyRel(object):
 
 class ForeignObject(RelatedField):
     requires_unique_target = True
-    generate_reverse_relation = True
     related_accessor_class = ForeignRelatedObjectsDescriptor
 
     def __init__(self, to, from_fields, to_fields, swappable=True, **kwargs):

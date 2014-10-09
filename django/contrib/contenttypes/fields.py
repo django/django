@@ -249,7 +249,7 @@ class GenericForeignKey(FieldFlagsMixin):
 
 class GenericRelation(ForeignObject):
     """Provides an accessor to generic related objects (e.g. comments)"""
-    is_reverse_object = True
+    is_reverse_object = False
 
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
