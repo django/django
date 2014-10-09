@@ -160,6 +160,7 @@ class ArrayField(Field):
         return super(ArrayField, self).formfield(**defaults)
 
 
+@ArrayField.register_lookup
 class ArrayContainsLookup(Lookup):
     lookup_name = 'contains'
 
@@ -171,9 +172,7 @@ class ArrayContainsLookup(Lookup):
         return '%s @> %s::%s' % (lhs, rhs, type_cast), params
 
 
-ArrayField.register_lookup(ArrayContainsLookup)
-
-
+@ArrayField.register_lookup
 class ArrayContainedByLookup(Lookup):
     lookup_name = 'contained_by'
 
@@ -184,9 +183,7 @@ class ArrayContainedByLookup(Lookup):
         return '%s <@ %s' % (lhs, rhs), params
 
 
-ArrayField.register_lookup(ArrayContainedByLookup)
-
-
+@ArrayField.register_lookup
 class ArrayOverlapLookup(Lookup):
     lookup_name = 'overlap'
 
@@ -197,9 +194,7 @@ class ArrayOverlapLookup(Lookup):
         return '%s && %s' % (lhs, rhs), params
 
 
-ArrayField.register_lookup(ArrayOverlapLookup)
-
-
+@ArrayField.register_lookup
 class ArrayLenTransform(Transform):
     lookup_name = 'len'
 
@@ -210,9 +205,6 @@ class ArrayLenTransform(Transform):
     def as_sql(self, qn, connection):
         lhs, params = qn.compile(self.lhs)
         return 'array_length(%s, 1)' % lhs, params
-
-
-ArrayField.register_lookup(ArrayLenTransform)
 
 
 class IndexTransform(Transform):

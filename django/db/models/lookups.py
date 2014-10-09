@@ -45,6 +45,7 @@ class RegisterLookupMixin(object):
         if 'class_lookups' not in cls.__dict__:
             cls.class_lookups = {}
         cls.class_lookups[lookup.lookup_name] = lookup
+        return lookup
 
     @classmethod
     def _unregister_lookup(cls, lookup):

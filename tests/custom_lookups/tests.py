@@ -50,6 +50,7 @@ class YearTransform(models.Transform):
         return models.IntegerField()
 
 
+@YearTransform.register_lookup
 class YearExact(models.lookups.Lookup):
     lookup_name = 'exact'
 
@@ -66,9 +67,9 @@ class YearExact(models.lookups.Lookup):
         return ("%(lhs)s >= (%(rhs)s || '-01-01')::date "
                 "AND %(lhs)s <= (%(rhs)s || '-12-31')::date" %
                 {'lhs': lhs_sql, 'rhs': rhs_sql}, params)
-YearTransform.register_lookup(YearExact)
 
 
+@YearTransform.register_lookup
 class YearLte(models.lookups.LessThanOrEqual):
     """
     The purpose of this lookup is to efficiently compare the year of the field.
@@ -86,7 +87,6 @@ class YearLte(models.lookups.LessThanOrEqual):
         #     WHERE somecol <= '2013-12-31')
         # but also make it work if the rhs_sql is field reference.
         return "%s <= (%s || '-12-31')::date" % (lhs_sql, rhs_sql), params
-YearTransform.register_lookup(YearLte)
 
 
 class SQLFunc(models.Lookup):
