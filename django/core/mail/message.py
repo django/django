@@ -123,7 +123,7 @@ def sanitize_address(addr, encoding):
 
 
 class MIMEMixin():
-    def as_string(self, unixfrom=False):
+    def as_string(self, unixfrom=False, linesep='\n'):
         """Return the entire formatted message as a string.
         Optional `unixfrom' when True, means include the Unix From_ envelope
         header.
@@ -133,13 +133,16 @@ class MIMEMixin():
         """
         fp = six.StringIO()
         g = generator.Generator(fp, mangle_from_=False)
-        g.flatten(self, unixfrom=unixfrom)
+        if six.PY2:
+            g.flatten(self, unixfrom=unixfrom)
+        else:
+            g.flatten(self, unixfrom=unixfrom, linesep=linesep)
         return fp.getvalue()
 
     if six.PY2:
         as_bytes = as_string
     else:
-        def as_bytes(self, unixfrom=False):
+        def as_bytes(self, unixfrom=False, linesep='\n'):
             """Return the entire formatted message as bytes.
             Optional `unixfrom' when True, means include the Unix From_ envelope
             header.
@@ -149,7 +152,7 @@ class MIMEMixin():
             """
             fp = six.BytesIO()
             g = generator.BytesGenerator(fp, mangle_from_=False)
-            g.flatten(self, unixfrom=unixfrom)
+            g.flatten(self, unixfrom=unixfrom, linesep=linesep)
             return fp.getvalue()
 
 
