@@ -301,6 +301,9 @@ Models
 * ``extra(select={...})`` now allows you to escape a literal ``%s`` sequence
   using ``%%s``.
 
+* :doc:`Custom Lookups</docs/howto/custom-lookups>` can now be registered using
+  a decorator pattern.
+
 Signals
 ^^^^^^^
 
