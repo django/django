@@ -460,6 +460,10 @@ Signals
   the request, was added to the :data:`~django.core.signals.request_started`
   signal.
 
+* You can now import the :func:`~django.test.signals.setting_changed` signal
+  from ``django.core.signals`` to avoid loading ``django.test`` in non-test
+  situations. Django no longer does so itself.
+
 System Check Framework
 ^^^^^^^^^^^^^^^^^^^^^^
 
