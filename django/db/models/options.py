@@ -576,19 +576,26 @@ class Options(object):
 
         all_models = self.apps.get_models(include_auto_created=True)
         for model in all_models:
-            for f in chain(model._meta.fields, model._meta.virtual_fields):
-                # Check if the field has a relation to another model
-                if f.has_relation and f.generate_reverse_relation and not isinstance(f.rel.to, six.string_types):
-                    # Set options_instance -> field
-                    related_objects_graph[f.rel.to._meta].append(f)
 
+            # Add all fields and virtual fields that are able to generate a reverse
+            # relation towards a model.
+            fields_with_relations = (
+                f for f in chain(model._meta.fields, model._meta.virtual_fields)
+                if f.has_relation and f.generate_reverse_relation
+            )
             if not model._meta.auto_created:
-                # Many to many relations are never auto-created
-                for f in model._meta.many_to_many:
-                    # Check if the field has a relation to another model
-                    if f.has_relation and not isinstance(f.rel.to, six.string_types):
-                        # Set options_instance -> field
-                        related_objects_graph[f.rel.to._meta].append(f)
+                # Add all many_to_many fields when the model was created by the user
+                # and filter out fields that are not able to generate a reverse relation
+                # towards a model.
+                fields_with_relations = chain(
+                    fields_with_relations,
+                    (f for f in model._meta.many_to_many
+                     if f.has_relation or f.generate_reverse_relation)
+                )
+
+            for f in fields_with_relations:
+                # Set options_instance -> field
+                related_objects_graph[f.rel.to._meta].append(f)
 
         for model in all_models:
             # Set the relation_tree using the internal __dict__.
@@ -680,7 +687,7 @@ class Options(object):
                     for obj, query_name in six.iteritems(parent._meta.get_fields(forward=False, reverse=True,
                                                          **options)):
 
-                        if isinstance(obj.field.rel, ManyToManyRel):
+                        if obj.field.has_many_values:
                             # In order for a reverse ManyToManyRel object to be valid, its creation
                             # counter must be > 0 and must be in the parent list
                             if not (obj.field.creation_counter < 0 and obj.model not in parent_list):
