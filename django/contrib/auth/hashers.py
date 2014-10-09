@@ -8,7 +8,7 @@ import importlib
 
 from django.dispatch import receiver
 from django.conf import settings
-from django.test.signals import setting_changed
+from django.core.signals import setting_changed
 from django.utils.encoding import force_bytes, force_str, force_text
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.crypto import (
