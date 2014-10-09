@@ -46,11 +46,11 @@ class TestLoadFixtureFromOtherAppDirectory(TestCase):
     os.path.sep matches.
     """
 
-    fixtures = ['fixtures/fixtures/fixture1.json']
+    fixtures = ['fixtures_regress/fixtures/absolute.json']
 
     def test_fixtures_loaded(self):
-        article_count = Article.objects.count()
-        self.assertGreater(article_count, 1, "Articles not loaded from "
+        absolute_count = Absolute.objects.count()
+        self.assertGreater(absolute_count, 0, "Absolute models not loaded from "
             "fixtures.")
 
 
