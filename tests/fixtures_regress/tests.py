@@ -34,6 +34,26 @@ from .models import (Animal, Stuff, Absolute, Parent, Child, Article, Widget,
 _cur_dir = os.path.dirname(os.path.abspath(upath(__file__)))
 
 
+class TestLoadFixtureFromOtherAppDirectory(TestCase):
+    """
+    This test should only fail on Windows when specifying a fixture in a
+    directory outside of the current app module. The fixture loader checks
+    the `fixture_name` for os.path.sep, which on Windows is `\`.
+
+    When specifying a path with forward slashes, the fixture will not be loaded,
+    as the path separator doesn't exist. The other unit tests for fixture
+    loading pass because they use os.path.join, not a hard-coded path, so
+    os.path.sep matches.
+    """
+
+    fixtures = ['fixtures_regress/fixtures/absolute.json']
+
+    def test_fixtures_loaded(self):
+        absolute_count = Absolute.objects.count()
+        self.assertGreater(absolute_count, 0, "Absolute models not loaded from "
+            "fixtures.")
+
+
 class TestFixtures(TestCase):
 
     def animal_pre_save_check(self, signal, sender, instance, **kwargs):
