@@ -29,7 +29,7 @@ What's new in Django 1.8
 Django now has an official API for ``Model._meta`` in the
 :class:`~django.db.models.options.Options` class, as well as formalized
 documentation for :ref:`field types <model-meta-field-types>` and
-:ref:`field filters <model-meta-field-filters>`.
+:ref:`field attributes <field-attributes>`.
 
 The new API is composed of 3 main endpoints:
 

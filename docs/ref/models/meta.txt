@@ -53,53 +53,6 @@ defined on a model, such as a ``GenericForeignKey``.
 
 In this case, ``City`` has a reverse field from ``Person``.
 
-.. _model-meta-field-filters:
-
-Field Filters
-=============
-
-There are several properties that each field can have. We can use these
-properties as filters for :meth:`Options.get_fields()`.
-
-Local
-~~~~~
-
-A local field is one that's declared directly on a model and not derived from
-inheritance. Fields from models that directly inherit from abstract models or
-proxy classes are still local.
-
-.. code-block:: python
-
-    class Person(models.Model):
-        name = models.CharField(max_length=50)
-
-    class Londoner(Person):
-        overdraft = models.DecimalField()
-
-``Londoner`` has two fields (``name`` and ``overdraft``) but only one local
-field (``overdraft``).
-
-Hidden
-~~~~~~
-
-Hidden fields are a subset of reverse fields, and will not have any effect on
-forward field queries. When a field that contains 1 or more relations (such as
-:class:`django.db.models.ManyToManyField`, or
-:class:`django.db.models.ForeignKey`) specifies a ``related_name`` that starts
-with a "+", it tells Django to exclude the relation as public, and therefore it
-becomes a hidden field.
-
-.. code-block:: python
-
-    class City(models.Model):
-        name = models.CharField(max_length=100)
-
-    class Person(models.Model):
-        city = models.ForeignKey(City, related_name='+')
-
-``City`` has a reverse hidden field from ``Person`` (as you can't access
-``person_set``).
-
 .. _model-meta-field-apis:
 
 ``Field-access APIs``
@@ -207,6 +160,28 @@ need, you can use the ``get_fields()`` method along with its filtering flags.
     filters. All possible combinations of filters and fields are possible,
     although some will have no effect (such as ``include_hidden`` combined with
     ``forward``).
+
+    Available parameters are:
+
+    ``forward``
+        Searches through forward fields.
+
+    ``reverse``
+        Searches through forward fields.
+
+    ``include_parents``
+        Searches recursively through all parents, if disabled it will only search for 
+        fields declared directly on the current model.
+        Fields from models that directly inherit from abstract models or
+        proxy classes are still local.
+
+    ``include_hidden``
+        Hidden fields are a subset of reverse fields, and will not have any effect on
+        forward field queries. When a field that contains 1 or more relations (such as
+        :class:`django.db.models.ManyToManyField`, or
+        :class:`django.db.models.ForeignKey`) specifies a ``related_name`` that starts
+        with a "+", it tells Django to exclude the relation as public, and therefore it
+        becomes a hidden field.
 
     .. code-block:: python
 
