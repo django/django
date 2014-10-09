@@ -594,8 +594,9 @@ class Options(object):
                 )
 
             for f in fields_with_relations:
-                # Set options_instance -> field
-                related_objects_graph[f.rel.to._meta].append(f)
+                if not isinstance(f.rel.to, six.string_types):
+                    # Set options_instance -> field
+                    related_objects_graph[f.rel.to._meta].append(f)
 
         for model in all_models:
             # Set the relation_tree using the internal __dict__.
