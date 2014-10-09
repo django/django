@@ -468,8 +468,8 @@ Daniele Procida
     like redirecting after a successful POST request. Why had he never learned
     this before? No one knows to this day.
 
-    He enjoys improving the admin and making Django simple and easy for
-    newcomers.
+    He enjoys helping people on the |django-users| mailing list and making
+    Django simple and easy for newcomers.
 
     Collin lives in South Bend, IN, USA where he uses Django to `increase
     unity`_.
