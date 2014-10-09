@@ -1777,6 +1777,9 @@ Field attribute reference
     <model-meta-field-apis>` to narrow down a search for specific model fields.
     Custom model fields should implement these flags.
 
+    Attributes for forward fields
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     .. attribute:: concrete
 
         A concrete field has a database column associated with it. Concrete
@@ -1799,6 +1802,26 @@ Field attribute reference
         A field has a relation when it depends on one or more models. It may
         also generate :ref:`reverse relations <model-meta-field-types>` on the
         pointed model.
+
+    .. attribute:: generate_reverse_relation
+
+        Not all fields with relations should generate forward objects for other
+        models. This attribute tells Django to not generate such relations
+        automatically and to let the class iself handle the relations manually.
+
+    .. attribute:: model
+
+        Returns the model that is pointed by the object. In the case of a forward
+        field, this is the model where the field was defined (in order of inheritance).
+        In case of a reverse field, this is the model that the forward relation points
+        to.
+
+    .. attribute:: parent_model
+
+        Returns the model where the relation is stored. In the case of a forward
+        field, this is the model where the field was defined (in order of inheritance).
+        In case of a reverse field, this is the model where the associated forward field
+        was defined.
 
     .. attribute:: is_related_object
 
