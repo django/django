@@ -829,3 +829,13 @@ in ``.values()`` calls or in aggregates. It has been replaced with
 :meth:`~django.db.models.Field.from_db_value`. Note that the new approach does
 not call the :meth:`~django.db.models.Field.to_python` method on assignment
 as was the case with ``SubfieldBase``.
+
+``django.utils.checksums``
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``django.utils.checksums`` module has been deprecated and will be removed
+in Django 2.0. The functionality it provided (validating checksum using the
+Luhn algorithm) was undocumented and not used in Django. The module has been
+moved to the `django-localflavor`_ package (version 1.1+).
+
+.. _django-localflavor: https://pypi.python.org/pypi/django-localflavor
