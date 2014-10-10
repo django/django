@@ -1,6 +1,12 @@
 import unittest
+import warnings
+from django.utils.deprecation import RemovedInDjango20Warning
 
-from django.utils import checksums
+with warnings.catch_warnings():
+    warnings.filterwarnings(
+        'ignore', 'django.utils.checksums will be removed in Django 2.0.',
+        RemovedInDjango20Warning)
+    from django.utils import checksums
 
 
 class TestUtilsChecksums(unittest.TestCase):
