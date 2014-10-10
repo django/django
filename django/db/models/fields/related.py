@@ -1269,7 +1269,7 @@ class ManyToOneRel(ForeignObjectRel):
         tied.
         """
         field = self.to._meta.get_field(self.field_name)
-        if not isinstance(field, Field) or hasattr(field, 'for_concrete_model'):
+        if not field.concrete:
             raise FieldDoesNotExist("No related field named '%s'" %
                     self.field_name)
         return field
