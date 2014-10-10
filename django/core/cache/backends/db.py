@@ -200,8 +200,3 @@ class DatabaseCache(BaseDatabaseCache):
         table = connections[db].ops.quote_name(self._table)
         with connections[db].cursor() as cursor:
             cursor.execute('DELETE FROM %s' % table)
-
-
-# For backwards compatibility
-class CacheClass(DatabaseCache):
-    pass
