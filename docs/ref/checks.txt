@@ -474,3 +474,10 @@ If you're using MySQL, the following checks will be performed:
 
 * **mysql.E001**: MySQL does not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
+
+Settings
+~~~~~~~~
+
+* **settings.W001**: setting:`FIXTURE_DIRS` has duplications.
+* **settings.W002**: :setting:`FIXTURE_DIRS` contains default
+  fixture path for applications ``(app/fixture)``
