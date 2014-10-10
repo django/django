@@ -150,8 +150,3 @@ class FileBasedCache(BaseCache):
         filelist = [os.path.join(self._dir, fname) for fname
                     in glob.glob1(self._dir, '*%s' % self.cache_suffix)]
         return filelist
-
-
-# For backwards compatibility
-class CacheClass(FileBasedCache):
-    pass
