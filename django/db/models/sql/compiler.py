@@ -664,7 +664,7 @@ class SQLCompiler(object):
             related_fields = [
                 (o.field, o.model)
                 for o in opts.related_objects
-                if o.field.unique
+                if o.field.unique and not o.field.has_many_values
             ]
             for f, model in related_fields:
                 if not select_related_descend(f, restricted, requested,
