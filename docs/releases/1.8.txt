@@ -615,6 +615,12 @@ Miscellaneous
 * GIS-specific lookups have been refactored to use the
   :class:`django.db.models.Lookup` API.
 
+* The ``CacheClass`` shim has been removed from all cache backends.
+  These aliases were provided for backwards compatibility with Django 1.3.
+  If you are still using them, please update your project to use the real
+  class name found in the :setting:`BACKEND <CACHES-BACKEND>` key of the
+  :setting:`CACHES` setting.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
