@@ -127,8 +127,3 @@ class LocMemCache(BaseCache):
     def clear(self):
         self._cache.clear()
         self._expire_info.clear()
-
-
-# For backwards compatibility
-class CacheClass(LocMemCache):
-    pass
