@@ -276,6 +276,9 @@ Migrations
 * The :class:`~django.db.migrations.operations.RunSQL` operation can now handle
   parameters passed to the SQL statements.
 
+* It is now possible to have migrations (most probably :ref:`data migrations
+  <data-migrations>`) for applications without models.
+
 Models
 ^^^^^^
 
