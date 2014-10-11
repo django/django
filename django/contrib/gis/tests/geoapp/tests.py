@@ -214,7 +214,7 @@ class GeoModelTest(TestCase):
         call_command('dumpdata', 'geoapp.City', stdout=out)
         result = out.getvalue()
         houston = City.objects.get(name='Houston')
-        self.assertIn('"point": "%s"' % houston.point.wkt, result)
+        self.assertIn('"point": "%s"' % houston.point.ewkt, result)
 
         # Reload now dumped data
         with NamedTemporaryFile(mode='w', suffix='.json') as tempfile:
