@@ -145,7 +145,7 @@ class GeoModelTest(TestCase):
 
         # If the GeometryField SRID is -1, then we shouldn't perform any
         # transformation if the SRID of the input geometry is different.
-        if spatialite and connection.ops.spatial_version < 3:
+        if spatialite and connection.ops.spatial_version < (3, 0, 0):
             # SpatiaLite < 3 does not support missing SRID values.
             return
         m1 = MinusOneSRID(geom=Point(17, 23, srid=4326))
@@ -269,7 +269,7 @@ class GeoLookupTest(TestCase):
         self.assertEqual('New Zealand', nz.name)
 
         # Spatialite 2.3 thinks that Lawrence is in Puerto Rico (a NULL geometry).
-        if not (spatialite and connection.ops.spatial_version < 3):
+        if not (spatialite and connection.ops.spatial_version < (3, 0, 0)):
             ks = State.objects.get(poly__contains=lawrence.point)
             self.assertEqual('Kansas', ks.name)
 
