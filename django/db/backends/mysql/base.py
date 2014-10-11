@@ -211,7 +211,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_microsecond_precision(self):
-        return self.connection.mysql_version >= (5, 6, 4)
+        # See https://github.com/farcepest/MySQLdb1/issues/24 for the reason
+        # about requiring MySQLdb 1.2.5
+        return self.connection.mysql_version >= (5, 6, 4) and Database.version_info >= (1, 2, 5)
 
     @cached_property
     def has_zoneinfo_database(self):
