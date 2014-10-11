@@ -688,6 +688,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if not self.get_autocommit():
             self.commit()
 
+    def make_cursor(self, cursor):
+        return CursorWrapper(cursor, self)
+
     def create_cursor(self):
         return FormatStylePlaceholderCursor(self.connection)
 
@@ -749,6 +752,22 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return int(self.oracle_full_version.split('.')[0])
         except ValueError:
             return None
+
+
+# Ticket #23546: though keyword parameters for callproc are not supported in
+# PEP 249, since we are just forwarding arguments to cx_Oracle which supports
+# keyword parameters, such deviation seems acceptable. This subclass is meant
+# to implement this.
+class CursorWrapper(backend_utils.CursorWrapper):
+    def callproc(self, procname, params=None, kparams=None):
+        self.db.validate_no_broken_transaction()
+        with self.db.wrap_database_errors:
+            if params is None and kparams is None:
+                return self.cursor.callproc(procname)
+            elif kparams is None:
+                return self.cursor.callproc(procname, params)
+            else:
+                return self.cursor.callproc(procname, params, kparams)
 
 
 class OracleParam(object):
