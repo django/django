@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             name='Household',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('neighborhood', models.ForeignKey(to='gis.Neighborhood', to_field='id', null=True)),
+                ('neighborhood', models.ForeignKey(to='gis_migrations.Neighborhood', to_field='id', null=True)),
                 ('address', models.CharField(max_length=100)),
                 ('zip_code', models.IntegerField(null=True, blank=True)),
                 ('geom', django.contrib.gis.db.models.fields.PointField(srid=4326, geography=True)),
@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='household',
             name='family',
-            field=models.ForeignKey(blank=True, to='gis.Family', null=True),
+            field=models.ForeignKey(blank=True, to='gis_migrations.Family', null=True),
             preserve_default=True,
         ),
     ]
