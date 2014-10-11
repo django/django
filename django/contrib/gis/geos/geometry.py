@@ -134,8 +134,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
         return self.clone()
 
     def __str__(self):
-        "WKT is used for the string representation."
-        return self.wkt
+        "EWKT is used for the string representation."
+        return self.ewkt
 
     def __repr__(self):
         "Short-hand representation because WKT may be very large."
