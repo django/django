@@ -386,6 +386,20 @@ class AssertTemplateUsedContextManagerTests(TestCase):
                 render_to_string('template_used/alternative.html')
 
 
+class AssertTemplateUsedOnHttpResponse(TestCase):
+    def test_assert_used_on_http_response_with_no_templates(self):
+        response = HttpResponse()
+        error_msg = "Response object has no attribute 'templates'"
+        with self.assertRaisesMessage(ValueError, error_msg):
+            self.assertTemplateUsed(response, "template.html")
+
+    def test_assert_not_used_on_http_response_with_no_templates(self):
+        response = HttpResponse()
+        error_msg = "Response object has no attribute 'templates'"
+        with self.assertRaisesMessage(ValueError, error_msg):
+            self.assertTemplateNotUsed(response, "template.html")
+
+
 class HTMLEqualTests(TestCase):
     def test_html_parser(self):
         element = parse_html('<div><p>Hello</p></div>')
