@@ -12,7 +12,7 @@ class MigrateTests(TransactionTestCase):
     """
     Tests running the migrate command in Geodjango.
     """
-    available_apps = ["django.contrib.gis"]
+    available_apps = ["django.contrib.gis.tests.gis_migrations"]
 
     def get_table_description(self, table):
         with connection.cursor() as cursor:
@@ -26,7 +26,6 @@ class MigrateTests(TransactionTestCase):
         with connection.cursor() as cursor:
             self.assertNotIn(table, connection.introspection.table_names(cursor))
 
-    @override_settings(MIGRATION_MODULES={"gis": "django.contrib.gis.tests.gis_migrations.migrations"})
     def test_migrate_gis(self):
         """
         Tests basic usage of the migrate command when a model uses Geodjango
@@ -38,22 +37,16 @@ class MigrateTests(TransactionTestCase):
         failure on geometry_columns. Regression for ticket #23030:
         https://code.djangoproject.com/ticket/23030
         """
-        # Make sure no tables are created
-        self.assertTableNotExists("migrations_neighborhood")
-        self.assertTableNotExists("migrations_household")
-        self.assertTableNotExists("migrations_family")
-        # Run the migrations to 0001 only
-        call_command("migrate", "gis", "0001", verbosity=0)
         # Make sure the right tables exist
-        self.assertTableExists("gis_neighborhood")
-        self.assertTableExists("gis_household")
-        self.assertTableExists("gis_family")
+        self.assertTableExists("gis_migrations_neighborhood")
+        self.assertTableExists("gis_migrations_household")
+        self.assertTableExists("gis_migrations_family")
         # Unmigrate everything
-        call_command("migrate", "gis", "zero", verbosity=0)
+        call_command("migrate", "gis_migrations", "zero", verbosity=0)
         # Make sure it's all gone
-        self.assertTableNotExists("gis_neighborhood")
-        self.assertTableNotExists("gis_household")
-        self.assertTableNotExists("gis_family")
+        self.assertTableNotExists("gis_migrations_neighborhood")
+        self.assertTableNotExists("gis_migrations_household")
+        self.assertTableNotExists("gis_migrations_family")
         # Even geometry columns metadata
         try:
             GeoColumn = connection.ops.geometry_columns()
@@ -66,3 +59,5 @@ class MigrateTests(TransactionTestCase):
                     **{'%s__in' % GeoColumn.table_name_col(): ["gis_neighborhood", "gis_household"]}
                     ).count(),
                 0)
+        # Revert the "unmigration"
+        call_command("migrate", "gis_migrations", verbosity=0)
