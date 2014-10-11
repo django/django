@@ -21,7 +21,7 @@ class SpatiaLiteOperations(DatabaseOperations, BaseSpatialOperations):
 
     @property
     def valid_aggregates(self):
-        if self.spatial_version >= 3:
+        if self.spatial_version >= (3, 0, 0):
             return {'Collect', 'Extent', 'Union'}
         else:
             return {'Union'}
