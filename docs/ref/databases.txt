@@ -503,7 +503,11 @@ Fractional seconds support for Time and DateTime fields
 
 MySQL 5.6.4 and later can store fractional seconds, provided that the
 column definition includes a fractional indication (e.g. ``DATETIME(6)``).
-Earlier versions do not support them at all.
+Earlier versions do not support them at all. In addition, versions of MySQLdb
+older than 1.2.5 have `a bug`_ that also prevents the use of fractional seconds
+with MySQL.
+
+.. _a bug: https://github.com/farcepest/MySQLdb1/issues/24
 
 Django will not upgrade existing columns to include fractional seconds if the
 database server supports it. If you want to enable them on an existing database,
@@ -521,7 +525,8 @@ or using a :class:`~django.db.migrations.operations.RunSQL` operation in a
     ``time`` values when using the MySQL backend. Now it lets the database
     decide whether it should drop that part of the value or not. By default, new
     ``DateTimeField`` or ``TimeField`` columns are now created with fractional
-    seconds support on MySQL 5.6.4 or later.
+    seconds support on MySQL 5.6.4 or later with either mysqlclient or
+    MySQLdb 1.2.5 or later.
 
 ``TIMESTAMP`` columns
 ~~~~~~~~~~~~~~~~~~~~~
