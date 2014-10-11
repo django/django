@@ -558,6 +558,22 @@ run this query::
             last_login=models.F('date_joined')
         ).update(last_login=None)
 
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Support for GEOS 3.1 and GDAL 1.6 has been dropped.
+
+* Support for SpatiaLite < 2.4 has been dropped.
+
+* GIS-specific lookups have been refactored to use the
+  :class:`django.db.models.Lookup` API.
+
+* The default ``str`` representation of
+  :class:`~django.contrib.gis.geos.GEOSGeometry` objects has been changed from
+  WKT to EWKT format (including the SRID). As this representation is used in
+  the serialization framework, that means that ``dumpdata`` output will now
+  contain the SRID value of geometry objects.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -573,12 +589,8 @@ Miscellaneous
 
 * ``URLField.to_python`` no longer adds a trailing slash to pathless URLs.
 
-* ``django.contrib.gis`` dropped support for GEOS 3.1 and GDAL 1.6.
-
 * The :tfilter:`length` template filter now returns ``0`` for an undefined
   variable, rather than an empty string.
-
-* Support for SpatiaLite < 2.4 has been dropped.
 
 * ``ForeignKey.default_error_message['invalid']`` has been changed from
   ``'%(model)s instance with pk %(pk)r does not exist.'`` to
@@ -615,9 +627,6 @@ Miscellaneous
 * :func:`~django.core.urlresolvers.reverse` and
   :func:`~django.core.urlresolvers.reverse_lazy` now return Unicode strings
   instead of byte strings.
-
-* GIS-specific lookups have been refactored to use the
-  :class:`django.db.models.Lookup` API.
 
 * The ``CacheClass`` shim has been removed from all cache backends.
   These aliases were provided for backwards compatibility with Django 1.3.
