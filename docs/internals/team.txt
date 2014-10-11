@@ -487,6 +487,17 @@ Daniele Procida
     .. _Tom Christie: https://twitter.com/_tomchristie
     .. _Django REST framework: http://django-rest-framework.org
 
+`Curtis Maloney`_
+    Curtis is a self-taught programmer from Melbourne, Australia, who eschews
+    specialisation.  Upon finding Django when it was first open sourced, he
+    realised it was possible to enjoy web development.
+
+    He spends a lot of time helping people on the #django IRC channel, and has
+    authored and released a number of `smaller django apps`_.
+
+    .. _Curtis Maloney: http://musings.tinbrain.net/blog/
+    .. _smaller django apps: https://github.com/funkybob/
+
 Past team members
 =================
 
