@@ -385,6 +385,18 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 
+    def test_assert_used_on_http_response(self):
+        response = HttpResponse()
+        error_msg = (
+            'assertTemplateUsed() and assertTemplateNotUsed() are only '
+            'usable on responses fetched using the Django test Client.'
+        )
+        with self.assertRaisesMessage(ValueError, error_msg):
+            self.assertTemplateUsed(response, 'template.html')
+
+        with self.assertRaisesMessage(ValueError, error_msg):
+            self.assertTemplateNotUsed(response, 'template.html')
+
 
 class HTMLEqualTests(TestCase):
     def test_html_parser(self):
