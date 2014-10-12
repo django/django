@@ -157,7 +157,8 @@ Minor features
 Cache
 ^^^^^
 
-* ...
+* The ``incr()`` method of the
+  ``django.core.cache.backends.locmem.LocMemCache`` backend is now thread-safe.
 
 Email
 ^^^^^
