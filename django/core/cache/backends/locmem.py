@@ -1,5 +1,6 @@
 "Thread-safe in-memory cache backend."
 
+from contextlib import contextmanager
 import time
 try:
     from django.utils.six.moves import cPickle as pickle
@@ -15,6 +16,12 @@ from django.utils.synch import RWLock
 _caches = {}
 _expire_info = {}
 _locks = {}
+
+
+@contextmanager
+def dummy():
+    """A context manager that does nothing special."""
+    yield
 
 
 class LocMemCache(BaseCache):
@@ -34,11 +41,11 @@ class LocMemCache(BaseCache):
                 return True
             return False
 
-    def get(self, key, default=None, version=None):
+    def get(self, key, default=None, version=None, acquire_lock=True):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         pickled = None
-        with self._lock.reader():
+        with (self._lock.reader() if acquire_lock else dummy()):
             if not self._has_expired(key):
                 pickled = self._cache[key]
         if pickled is not None:
@@ -47,7 +54,7 @@ class LocMemCache(BaseCache):
             except pickle.PickleError:
                 return default
 
-        with self._lock.writer():
+        with (self._lock.writer() if acquire_lock else dummy()):
             try:
                 del self._cache[key]
                 del self._expire_info[key]
@@ -69,13 +76,13 @@ class LocMemCache(BaseCache):
             self._set(key, pickled, timeout)
 
     def incr(self, key, delta=1, version=None):
-        value = self.get(key, version=version)
-        if value is None:
-            raise ValueError("Key '%s' not found" % key)
-        new_value = value + delta
-        key = self.make_key(key, version=version)
-        pickled = pickle.dumps(new_value, pickle.HIGHEST_PROTOCOL)
         with self._lock.writer():
+            value = self.get(key, version=version, acquire_lock=False)
+            if value is None:
+                raise ValueError("Key '%s' not found" % key)
+            new_value = value + delta
+            key = self.make_key(key, version=version)
+            pickled = pickle.dumps(new_value, pickle.HIGHEST_PROTOCOL)
             self._cache[key] = pickled
         return new_value
 
