@@ -157,7 +157,7 @@ Minor features
 Cache
 ^^^^^
 
-* ...
+* :meth:`LocMemCache.incr` is now thread-safe.
 
 Email
 ^^^^^
