@@ -117,3 +117,6 @@ Bugfixes
 * Fixed generic relations in ``ModelAdmin.list_filter`` (:ticket:`23616`).
 
 * Restored RFC compliance for the SMTP backend on Python 3 (:ticket:`23063`).
+
+* Fixed a crash while parsing cookies containing invalid content
+  (:ticket:`23638`).
