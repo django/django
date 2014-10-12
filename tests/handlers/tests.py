@@ -80,6 +80,16 @@ class HandlerTests(TestCase):
         # much more work than fixing #20557. Feel free to remove force_str()!
         self.assertEqual(request.COOKIES['want'], force_str("café"))
 
+    def test_invalid_unicode_cookie(self):
+        """
+        Invalid cookie content should result in an absent cookie, but not in a
+        crash while trying to decode it (#23638).
+        """
+        environ = RequestFactory().get('/').environ
+        environ['HTTP_COOKIE'] = 'x=W\x03c(h]\x8e'
+        request = WSGIRequest(environ)
+        self.assertEqual(request.COOKIES, {})
+
 
 @override_settings(ROOT_URLCONF='handlers.urls')
 class TransactionsPerRequestTests(TransactionTestCase):
