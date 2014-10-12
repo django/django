@@ -259,4 +259,4 @@ def get_str_from_wsgi(environ, key, default):
     """
     value = environ.get(str(key), str(default))
     # Same comment as above
-    return value if six.PY2 else value.encode(ISO_8859_1).decode(UTF_8)
+    return value if six.PY2 else value.encode(ISO_8859_1).decode(UTF_8, errors='replace')
