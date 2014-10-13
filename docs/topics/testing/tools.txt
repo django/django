@@ -316,6 +316,20 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure`` and ``extra`` arguments act the same as for
         :meth:`Client.get`.
 
+    .. method:: Client.trace(path, follow=False, secure=False, **extra)
+
+        .. versionadded:: 1.8
+
+        Makes a TRACE request on the provided ``path`` and returns a
+        ``Response`` object. Useful for simulating diagnostic probes.
+
+        Unlike the other request methods, ``data`` is not provided as a keyword
+        parameter in order to comply with :rfc:`2616`, which mandates that
+        TRACE requests should not have an entity-body.
+
+        The ``follow``, ``secure``, and ``extra`` arguments act the same as for
+        :meth:`Client.get`.
+
     .. method:: Client.login(**credentials)
 
         If your site uses Django's :doc:`authentication system</topics/auth/index>`

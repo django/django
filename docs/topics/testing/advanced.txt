@@ -21,8 +21,8 @@ restricted subset of the test client API:
 
 * It only has access to the HTTP methods :meth:`~Client.get()`,
   :meth:`~Client.post()`, :meth:`~Client.put()`,
-  :meth:`~Client.delete()`, :meth:`~Client.head()` and
-  :meth:`~Client.options()`.
+  :meth:`~Client.delete()`, :meth:`~Client.head()`,
+  :meth:`~Client.options()`, and :meth:`~Client.trace()`.
 
 * These methods accept all the same arguments *except* for
   ``follows``. Since this is just a factory for producing
