@@ -62,21 +62,21 @@ settings file. Here's an explanation of all available values for
 Memcached
 ---------
 
-By far the fastest, most efficient type of cache available to Django,
-Memcached__ is an entirely memory-based cache framework originally developed to
-handle high loads at LiveJournal.com and subsequently open-sourced by Danga
-Interactive.  It is used by sites such as Facebook and Wikipedia to reduce
-database access and dramatically increase site performance.
+The fastest, most efficient type of cache supported natively by Django,
+Memcached__ is an entirely memory-based cache server, originally developed
+to handle high loads at LiveJournal.com and subsequently open-sourced by
+Danga Interactive. It is used by sites such as Facebook and Wikipedia to
+reduce database access and dramatically increase site performance.
 
 __ http://memcached.org/
 
-Memcached runs as a daemon and is allotted a specified amount of RAM. All it does is
-provide a fast interface for adding, retrieving and deleting arbitrary data in
-the cache.  All data is stored directly in memory, so there's no overhead of
+Memcached runs as a daemon and is allotted a specified amount of RAM. All it
+does is provide a fast interface for adding, retrieving and deleting data in
+the cache. All data is stored directly in memory, so there's no overhead of
 database or filesystem usage.
 
-After installing Memcached itself, you'll need to install a memcached
-binding. There are several python memcached bindings available; the
+After installing Memcached itself, you'll need to install a Memcached
+binding. There are several Python Memcached bindings available; the
 two most common are `python-memcached`_ and `pylibmc`_.
 
 .. _`python-memcached`: ftp://ftp.tummy.com/pub/python-memcached/
@@ -114,12 +114,13 @@ In this example, Memcached is available through a local Unix socket file
         }
     }
 
-One excellent feature of Memcached is its ability to share cache over multiple
-servers. This means you can run Memcached daemons on multiple machines, and the
-program will treat the group of machines as a *single* cache, without the need
-to duplicate cache values on each machine. To take advantage of this feature,
-include all server addresses in :setting:`LOCATION <CACHES-LOCATION>`, either
-separated by semicolons or as a list.
+One excellent feature of Memcached is its ability to share a cache over
+multiple servers. This means you can run Memcached daemons on multiple
+machines, and the program will treat the group of machines as a *single*
+cache, without the need to duplicate cache values on each machine. To take
+advantage of this feature, include all server addresses in
+:setting:`LOCATION <CACHES-LOCATION>`, either separated by semicolons or as
+a list.
 
 In this example, the cache is shared over Memcached instances running on IP
 address 172.19.26.240 and 172.19.26.242, both on port 11211::
@@ -149,8 +150,8 @@ on the IP addresses 172.19.26.240 (port 11211), 172.19.26.242 (port 11212), and
         }
     }
 
-A final point about Memcached is that memory-based caching has one
-disadvantage: Because the cached data is stored in memory, the data will be
+A final point about Memcached is that memory-based caching has a
+disadvantage: because the cached data is stored in memory, the data will be
 lost if your server crashes. Clearly, memory isn't intended for permanent data
 storage, so don't rely on memory-based caching as your only data storage.
 Without a doubt, *none* of the Django caching backends should be used for
