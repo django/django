@@ -438,7 +438,7 @@ unescape_string_literal = allow_lazy(unescape_string_literal)
 
 def slugify(value):
     """
-    Converts to lowercase, removes non-word characters (alphanumerics and
+    Converts to lowercase, removes non-word characters (ASCII alphanumerics and
     underscores) and converts spaces to hyphens. Also strips leading and
     trailing whitespace.
     """

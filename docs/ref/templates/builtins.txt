@@ -2002,7 +2002,7 @@ If ``some_list`` is ``['a', 'b', 'c']``, the output will be ``['a', 'b']``.
 slugify
 ^^^^^^^
 
-Converts to lowercase, removes non-word characters (alphanumerics and
+Converts to lowercase, removes non-word characters (ASCII alphanumerics and
 underscores) and converts spaces to hyphens. Also strips leading and trailing
 whitespace.
 
