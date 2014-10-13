@@ -8,6 +8,7 @@ from . import views
 urlpatterns = [
     url(r'^get_view/$', views.get_view, name='get_view'),
     url(r'^post_view/$', views.post_view),
+    url(r'^trace_view/$', views.trace_view),
     url(r'^header_view/$', views.view_with_header),
     url(r'^raw_post_view/$', views.raw_post_view),
     url(r'^redirect_view/$', views.redirect_view),
