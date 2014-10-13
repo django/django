@@ -338,6 +338,10 @@ class Apps(object):
                 del model._meta._relation_tree
             except AttributeError:
                 pass
+            try:
+                del model._meta.fields_map
+            except AttributeError:
+                pass
 
     def clear_cache(self):
         """
