@@ -340,6 +340,7 @@ class AllFieldsModel(models.Model):
     content_type = models.ForeignKey(ContentType)
     gfk = GenericForeignKey()
     gr = GenericRelation(DataModel)
+    uuid = models.UUIDField()
 
 
 ###############################################################################

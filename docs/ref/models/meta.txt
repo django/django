@@ -198,11 +198,11 @@ Using cached properties for common field queries
 
 .. attribute:: Options.concrete_fields
 
-    Returns a list of all concrete data fields.
+    Returns a list of all :attr:`concrete <django.db.models.Field.concrete>` data fields.
 
 .. attribute:: Options.local_concrete_fields
 
-    Returns a list of all concrete data fields that have not been inherited
+    Returns a list of all :attr:`concrete <django.db.models.Field.concrete>` data fields that have not been inherited
     from another model.
 
 .. attribute:: Options.many_to_many

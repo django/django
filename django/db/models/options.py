@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 from bisect import bisect
 from collections import OrderedDict, defaultdict
-from functools import partial
 from itertools import chain
 import warnings
 
@@ -33,27 +32,6 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save', 'default_related_name')
-
-
-@lru_cache(maxsize=None)
-def _map_model(opts, link):
-    direct = not (link.is_reverse_object and link.field.generate_reverse_relation)
-    model = link.model if direct else link.parent_model._meta.concrete_model
-    if model == opts.model:
-        model = None
-    return link, model
-
-
-@lru_cache(maxsize=None)
-def _map_model_details(opts, link):
-    direct = not (link.is_reverse_object and link.field.generate_reverse_relation)
-    model = link.model if direct else link.parent_model._meta.concrete_model
-    if model == opts.model:
-        model = None
-
-    field = link if direct else link.field
-    m2m = isinstance(field, ManyToManyField)
-    return link, model, direct, m2m
 
 
 class raise_deprecation(object):
@@ -160,8 +138,25 @@ class Options(object):
         self.apps = apps
 
         self.default_related_name = None
-        self._map_model = partial(_map_model, self)
-        self._map_model_details = partial(_map_model_details, self)
+
+    @lru_cache(maxsize=None)
+    def _map_model(self, link):
+        direct = not (link.is_reverse_object and link.field.generate_reverse_relation)
+        model = link.model if direct else link.parent_model._meta.concrete_model
+        if model == self.model:
+            model = None
+        return link, model
+
+    @lru_cache(maxsize=None)
+    def _map_model_details(self, link):
+        direct = not (link.is_reverse_object and link.field.generate_reverse_relation)
+        model = link.model if direct else link.parent_model._meta.concrete_model
+        if model == self.model:
+            model = None
+
+        field = link if direct else link.field
+        m2m = isinstance(field, ManyToManyField)
+        return link, model, direct, m2m
 
     @property
     def app_config(self):
