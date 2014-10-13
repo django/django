@@ -263,6 +263,20 @@ class RelatedField(Field):
                     )
                 )
 
+        # Check clashes between reverse query name of `field` and manager name.
+        managers = (manager[1] for manager in opts.abstract_managers + opts.concrete_managers)
+        for manager_name in managers:
+            if rel_query_name == manager_name:
+                errors.append(
+                    checks.Error(
+                        "Reverse query name for '%s' clashes with manager: '%s' name."
+                        % (field_name, manager_name),
+                        hint="Rename manager or related_name",
+                        obj=self,
+                        id='fields.E307',
+                    )
+                )
+
         return errors
 
     def db_type(self, connection):

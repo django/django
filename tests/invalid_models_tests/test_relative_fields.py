@@ -907,6 +907,47 @@ class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
+class RelatedQueryNameClashWithManagerTests(IsolatedModelsTestCase):
+    def test_related_name_clashes_with_manager(self):
+        class Parent(models.Model):
+            parents = models.Manager()
+            mentor = models.ForeignKey('self', related_name='parents')
+
+        errors = Parent.check()
+        expected = [
+            Error(
+                "Reverse query name for 'Parent.mentor' clashes with manager: "
+                "'parents' name.",
+                hint="Rename manager or related_name",
+                obj=Parent._meta.get_field('mentor'),
+                id='fields.E307',)
+        ]
+
+        self.assertEqual(errors, expected)
+
+    def test_related_name_clashes_with_abstract_manager(self):
+        class AbstractParent(models.Model):
+            children = models.Manager()
+
+            class Meta:
+                abstract = True
+
+        class Child(AbstractParent):
+            sibling = models.ForeignKey('self', related_name='children')
+
+        errors = Child.check()
+        expected = [
+            Error(
+                "Reverse query name for 'Child.sibling' clashes with manager: "
+                "'children' name.",
+                hint="Rename manager or related_name",
+                obj=Child._meta.get_field('sibling'),
+                id='fields.E307',)
+        ]
+
+        self.assertEqual(errors, expected)
+
+
 class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
 
     def test_clash_between_accessors(self):
