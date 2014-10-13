@@ -306,6 +306,10 @@ class RequestFactory(object):
         r.update(extra)
         return self.generic('HEAD', path, secure=secure, **r)
 
+    def trace(self, path, secure=False, **extra):
+        "Construct a TRACE request."
+        return self.generic('TRACE', path, secure=secure, **extra)
+
     def options(self, path, data='', content_type='application/octet-stream',
                 secure=False, **extra):
         "Construct an OPTIONS request."
@@ -548,6 +552,15 @@ class Client(RequestFactory):
         response = super(Client, self).delete(path, data=data,
                                               content_type=content_type,
                                               secure=secure, **extra)
+        if follow:
+            response = self._handle_redirects(response, **extra)
+        return response
+
+    def trace(self, path, data='', follow=False, secure=False, **extra):
+        """
+        Send a TRACE request to the server.
+        """
+        response = super(Client, self).trace(path, data=data, secure=secure, **extra)
         if follow:
             response = self._handle_redirects(response, **extra)
         return response

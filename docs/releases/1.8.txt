@@ -372,6 +372,10 @@ Requests and Responses
 Tests
 ^^^^^
 
+* The :class:`RequestFactory.trace() <django.test.RequestFactory>`
+  and :class:`Client.trace() <django.test.Client.trace>` methods were
+  implemented, allowing you to create ``TRACE`` requests in your tests.
+
 * The ``count`` argument was added to
   :meth:`~django.test.SimpleTestCase.assertTemplateUsed`. This allows you to
   assert that a template was rendered a specific number of times.
