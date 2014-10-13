@@ -829,7 +829,7 @@ appropriate entities.
 
 .. function:: slugify
 
-    Converts to lowercase, removes non-word characters (alphanumerics and
+    Converts to lowercase, removes non-word characters (ASCII alphanumerics and
     underscores) and converts spaces to hyphens. Also strips leading and
     trailing whitespace.
 
@@ -839,6 +839,10 @@ appropriate entities.
 
     If ``value`` is ``"Joel is a slug"``, the output will be
     ``"joel-is-a-slug"``.
+
+    To generate Unicode slugs, consider using `unicode-slugify`_.
+
+.. _unicode-slugify: https://github.com/mozilla/unicode-slugify/
 
 .. _time-zone-selection-functions:
 
