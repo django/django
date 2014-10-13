@@ -10,6 +10,7 @@ This example uses ``datetime.datetime.now`` as the default for the ``pub_date``
 field.
 """
 
+import uuid
 from datetime import datetime
 
 from django.db import models
@@ -23,3 +24,8 @@ class Article(models.Model):
 
     def __str__(self):
         return self.headline
+
+
+class Comment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    text = models.TextField()
