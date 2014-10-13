@@ -232,9 +232,9 @@ def make_list(value):
 @stringfilter
 def slugify(value):
     """
-    Converts to lowercase, removes non-word characters (alphanumerics and
-    underscores) and converts spaces to hyphens. Also strips leading and
-    trailing whitespace.
+    Converts to ASCII. Converts spaces to hyphens. Removes characters that
+    aren't alphanumerics, underscores, or hyphens. Converts to lowercase.
+    Also strips leading and trailing whitespace.
     """
     return _slugify(value)
 
