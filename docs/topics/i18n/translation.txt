@@ -628,6 +628,9 @@ You can use multiple expressions inside a single ``blocktrans`` tag::
 .. note:: The previous more verbose format is still supported:
    ``{% blocktrans with book|title as book_t and author|title as author_t %}``
 
+Other block tags (for example ``{% for %}`` or ``{% if %}``) are not allowed
+inside a ``blocktrans`` tag.
+
 If resolving one of the block arguments fails, blocktrans will fall back to
 the default language by deactivating the currently active language
 temporarily with the :func:`~django.utils.translation.deactivate_all`
