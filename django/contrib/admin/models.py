@@ -9,6 +9,7 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 from django.utils.text import get_text_list
 from django.utils.encoding import smart_text
 from django.utils.encoding import python_2_unicode_compatible
+import re
 
 ADDITION = 1
 CHANGE = 2
@@ -56,7 +57,6 @@ class LogEntry(models.Model):
         return ugettext('LogEntry Object')
 
     def get_change_message(self):
-        import re
 
         obj = self.get_edited_object()
 
