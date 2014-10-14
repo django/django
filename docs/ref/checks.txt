@@ -77,8 +77,6 @@ Fields
   human readable name)`` tuples.
 * **fields.E006**: ``db_index`` must be ``None``, ``True`` or ``False``.
 * **fields.E007**: Primary keys must not have ``null=True``.
-* **fields.E008**: ``check`` is a reserved word on :class:`django.db.models.Model`,
-  that is used by the System check framework, and cannot be overridden.
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
 * **fields.E110**: ``BooleanField``\s do not accept null values.
 * **fields.E120**: ``CharField``\s must define a ``max_length`` attribute.
@@ -95,6 +93,8 @@ Fields
 * **fields.E160**: The options ``auto_now``, ``auto_now_add``, and ``default``
   are mutually exclusive. Only one of these options may be present.
 * **fields.W161**: Fixed default value provided.
+* **fields.W162**: ``check`` is a reserved word on :class:`django.db.models.Model`,
+  that is used by the System check framework, and cannot be overridden.
 
 
 File Fields

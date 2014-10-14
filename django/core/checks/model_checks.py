@@ -7,7 +7,7 @@ import types
 
 from django.apps import apps
 
-from . import Error, Tags, register
+from . import Warning, Error, Tags, register
 
 
 @register(Tags.models)
@@ -20,14 +20,14 @@ def check_all_models(app_configs=None, **kwargs):
             else:
                 errors.append(
                     [
-                        Error(
+                        Warning(
                             "'check' is a reserved word on Model and cannot "
                             "be overridden by '{0}'.".format(
                                 type(model.check).__name__
                             ),
                             hint=None,
                             obj=model,
-                            id='fields.E008'
+                            id='fields.W162'
                         )
                     ]
                 )

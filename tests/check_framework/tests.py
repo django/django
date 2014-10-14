@@ -346,13 +346,13 @@ class CheckFrameworkReservedNamesTests(TestCase):
         apps.all_models[__package__].pop("collection")
 
     @override_settings(SILENCED_SYSTEM_CHECKS=['fields.E008'])
-    def test_check_as_a_field_name_does_not_raise_an_exception(self):
-        """A ForeignKey field named `check` on a model will return an error
-        during the checks.
+    def test_check_as_a_field_name_generates_a_warning(self):
+        """A ForeignKey field named `check` on a model will generate a warning
+        during the checks, instead of raising an Exception.
 
         This tests the check for E008. See ticket #23615.
         """
         from django.core.checks.model_checks import check_all_models
-        errors = check_all_models()
-        self.assertTrue(errors)
-        self.assertEquals("fields.E008", errors[0].id)
+        warnings = check_all_models()
+        self.assertTrue(warnings)
+        self.assertEquals("fields.W162", warnings[0].id)
