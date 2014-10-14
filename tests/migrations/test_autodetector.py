@@ -56,6 +56,15 @@ class AutodetectorTests(TestCase):
     ])
     author_with_m2m_through = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True)), ("publishers", models.ManyToManyField("testapp.Publisher", through="testapp.Contract"))])
     author_with_options = ModelState("testapp", "Author", [("id", models.AutoField(primary_key=True))], {"verbose_name": "Authi", "permissions": [('can_hire', 'Can hire')]})
+    author_with_db_table_options = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True))
+    ], {"db_table": "author_one"})
+    author_with_new_db_table_options = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True))
+    ], {"db_table": "author_two"})
+    author_renamed_with_db_table_options = ModelState("testapp", "NewAuthor", [
+        ("id", models.AutoField(primary_key=True))
+    ], {"db_table": "author_one"})
     contract = ModelState("testapp", "Contract", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("publisher", models.ForeignKey("testapp.Publisher"))])
     publisher = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("name", models.CharField(max_length=100))])
     publisher_with_author = ModelState("testapp", "Publisher", [("id", models.AutoField(primary_key=True)), ("author", models.ForeignKey("testapp.Author")), ("name", models.CharField(max_length=100))])
@@ -370,7 +379,6 @@ class AutodetectorTests(TestCase):
         after = self.make_project_state([self.author_renamed_with_book, self.book_with_author_renamed])
         autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename_model": True}))
         changes = autodetector._detect_changes()
-
         # Right number of migrations for model rename?
         self.assertNumberMigrations(changes, 'testapp', 1)
         # Right number of actions?
@@ -581,6 +589,87 @@ class AutodetectorTests(TestCase):
         changes = autodetector._detect_changes()
         # Right number of migrations?
         self.assertEqual(len(changes), 0)
+
+    def test_alter_db_table_add(self):
+        """Tests detection for adding db_table in model's options"""
+        # Make state
+        before = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.author_with_db_table_options])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterModelTable")
+        self.assertEqual(action.name, "author")
+        self.assertEqual(action.table, "author_one")
+
+    def test_alter_db_table_change(self):
+        "Tests detection for changing db_table in model's options'"
+        # Make state
+        before = self.make_project_state([self.author_with_db_table_options])
+        after = self.make_project_state([self.author_with_new_db_table_options])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterModelTable")
+        self.assertEqual(action.name, "author")
+        self.assertEqual(action.table, "author_two")
+
+    def test_alter_db_table_remove(self):
+        """Tests detection for removing db_table in model's options"""
+        # Make state
+        before = self.make_project_state([self.author_with_db_table_options])
+        after = self.make_project_state([self.author_empty])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes), 1)
+        # Right number of actions?
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
+        action = migration.operations[0]
+        self.assertEqual(action.__class__.__name__, "AlterModelTable")
+        self.assertEqual(action.name, "author")
+        self.assertEqual(action.table, None)
+
+    def test_alter_db_table_no_changes(self):
+        """
+        Tests that alter_db_table doesn't generate a migration if no changes
+        have been made.
+        """
+        # Make state
+        before = self.make_project_state([self.author_with_db_table_options])
+        after = self.make_project_state([self.author_with_db_table_options])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes), 0)
+
+    def test_alter_db_table_with_model_change(self):
+        """
+        Tests when model changes, autodetector does not create more than one
+        operation.
+        """
+        # Make state
+        before = self.make_project_state([self.author_with_db_table_options])
+        after = self.make_project_state([self.author_renamed_with_db_table_options])
+        autodetector = MigrationAutodetector(
+            before, after, MigrationQuestioner({"ask_rename_model": True})
+        )
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes), 1)
+        migration = changes['testapp'][0]
+        self.assertEqual(len(migration.operations), 1)
 
     def test_empty_foo_together(self):
         "#23452 - Empty unique/index_togther shouldn't generate a migration."
