@@ -738,6 +738,11 @@ available to the included template::
     This means that there is no shared state between included templates --
     each include is a completely independent rendering process.
 
+    Blocks are evaluated *before* they are included. This means that a template
+    that includes blocks from another will contain blocks that have *already
+    been evaluated and rendered* - not blocks that can be overridden by, for
+    example, an extending template.
+
 See also: :ttag:`{% ssi %}<ssi>`.
 
 .. templatetag:: load
