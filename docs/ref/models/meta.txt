@@ -150,7 +150,7 @@ need, you can use the ``get_fields()`` method along with its filtering flags.
         Searches through forward fields.
 
     ``reverse``
-        Searches through forward fields.
+        Searches through reverse fields.
 
     ``include_parents``
         Searches recursively through all parents, if disabled it will only search for 
@@ -194,15 +194,15 @@ Using cached properties for common field queries
 
 .. attribute:: Options.fields
 
-    Returns a list of all data fields.
+    Returns a list of all forward fields.
 
 .. attribute:: Options.concrete_fields
 
-    Returns a list of all :attr:`concrete <django.db.models.Field.concrete>` data fields.
+    Returns a list of all :attr:`concrete <django.db.models.Field.concrete>` forward fields.
 
 .. attribute:: Options.local_concrete_fields
 
-    Returns a list of all :attr:`concrete <django.db.models.Field.concrete>` data fields that have not been inherited
+    Returns a list of all :attr:`concrete <django.db.models.Field.concrete>` forward fields that have not been inherited
     from another model.
 
 .. attribute:: Options.many_to_many
