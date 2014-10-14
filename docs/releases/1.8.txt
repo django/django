@@ -276,6 +276,9 @@ Migrations
 * The :class:`~django.db.migrations.operations.RunSQL` operation can now handle
   parameters passed to the SQL statements.
 
+* The :djadmin:`makemigrations` command can now detect
+  :attr:`~django.db.models.Options.db_table` changes in model ``Meta`` class.
+
 Models
 ^^^^^^
 
