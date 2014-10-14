@@ -355,4 +355,4 @@ class CheckFrameworkReservedNamesTests(TestCase):
         from django.core.checks.model_checks import check_all_models
         warnings = check_all_models()
         self.assertTrue(warnings)
-        self.assertEquals("fields.W162", warnings[0].id)
+        self.assertEqual("fields.W162", warnings[0].id)
