@@ -120,3 +120,6 @@ Bugfixes
 
 * Fixed a crash while parsing cookies containing invalid content
   (:ticket:`23638`).
+
+* The system check framework now raises error **models.E020** when the
+  class method ``Model.check()`` is unreachable (:ticket:`23615`).
