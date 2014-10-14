@@ -13,7 +13,7 @@ from django.core.checks.compatibility.django_1_6_0 import check_1_6_compatibilit
 from django.core.checks.compatibility.django_1_7_0 import check_1_7_compatibility
 from django.core.management.base import CommandError
 from django.core.management import call_command
-from django.db.models import Model,ForeignKey
+from django.db.models import Model, ForeignKey
 from django.db.models.fields import NOT_PROVIDED
 from django.test import TestCase
 from django.test.utils import override_settings, override_system_checks
@@ -336,8 +336,12 @@ class CheckFrameworkReservedNamesTests(TestCase):
     def setUp(self):
         """Register a new model that will use the reserved keyword.
         """
+        class AnotherArticle(Model):
+            pass
+
         class Collection(Model):
             check = ForeignKey("NewsArticle")
+            article = ForeignKey(AnotherArticle, related_name="check")
 
     def tearDown(self):
         """Unregister the invalid model.
@@ -355,4 +359,6 @@ class CheckFrameworkReservedNamesTests(TestCase):
         from django.core.checks.model_checks import check_all_models
         warnings = check_all_models()
         self.assertTrue(warnings)
-        self.assertEqual("fields.W162", warnings[0].id)
+        self.assertEquals(2, len(warnings))
+        for warn in warnings:
+            self.assertEqual("fields.W162", warn.id)
