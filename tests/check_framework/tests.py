@@ -348,6 +348,7 @@ class CheckFrameworkReservedNamesTests(TestCase):
         """
         from django.apps import apps
         apps.all_models[__package__].pop("collection")
+        apps.all_models[__package__].pop("anotherarticle")
 
     @override_settings(SILENCED_SYSTEM_CHECKS=['fields.W162'])
     def test_check_as_a_field_name_generates_a_warning(self):
@@ -358,7 +359,6 @@ class CheckFrameworkReservedNamesTests(TestCase):
         """
         from django.core.checks.model_checks import check_all_models
         warnings = check_all_models()
-        self.assertTrue(warnings)
         self.assertEquals(2, len(warnings))
         for warn in warnings:
             self.assertEqual("fields.W162", warn.id)
