@@ -65,6 +65,8 @@ class OracleTests(unittest.TestCase):
             # cx_Oracle.Cursor.callproc. See ticket #23546.
             cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'), [],
                     {convert_unicode('client_id'): convert_unicode('_django_testing!')})
+            cursor.callproc(convert_unicode('DBMS_SESSION.SET_IDENTIFIER'),
+                    kparams={convert_unicode('client_id'): convert_unicode('_django_testing!')})
 
     def test_cursor_var(self):
         # If the backend is Oracle, test that we can pass cursor variables

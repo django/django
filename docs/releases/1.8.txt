@@ -302,6 +302,10 @@ Models
 * :doc:`Custom Lookups</howto/custom-lookups>` can now be registered using
   a decorator pattern.
 
+* :meth:`cursor.callproc() <django.db.models.Cursor.callproc>` now
+  supports keyword parameters, however, only when the underlying backend
+  supports keyword parameters (e.g cx_Oracle) can it work properly.
+
 Signals
 ^^^^^^^
 
