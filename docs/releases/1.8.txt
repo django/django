@@ -160,6 +160,14 @@ Cache
 * The ``incr()`` method of the
   ``django.core.cache.backends.locmem.LocMemCache`` backend is now thread-safe.
 
+Check framework
+^^^^^^^^^^^^^^^
+
+* An attribute named ``check`` defined on :class:`django.db.models.Model` will
+  be reported as an error with id **fields.E008**, as it is a reserved word.
+  This fixes `#23615 <https://code.djangoproject.com/ticket/23615>`_,
+  as a an Exception was being raised instead.
+
 Email
 ^^^^^
 

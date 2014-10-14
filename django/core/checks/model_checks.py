@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import inspect
 
 from itertools import chain
 import types
@@ -11,9 +12,25 @@ from . import Error, Tags, register
 
 @register(Tags.models)
 def check_all_models(app_configs=None, **kwargs):
-    errors = [model.check(**kwargs)
-        for model in apps.get_models()
-        if app_configs is None or model._meta.app_config in app_configs]
+    errors = []
+    for model in apps.get_models():
+        if app_configs is None or model._meta.app_config in app_configs:
+            if inspect.ismethod(model.check):
+                errors.append(model.check(**kwargs))
+            else:
+                errors.append(
+                    [
+                        Error(
+                            "'check' is a reserved word on Model and cannot "
+                            "be overridden by '{0}'.".format(
+                                type(model.check).__name__
+                            ),
+                            hint=None,
+                            obj=model,
+                            id='fields.E008'
+                        )
+                    ]
+                )
     return list(chain(*errors))
 
 

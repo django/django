@@ -13,6 +13,7 @@ from django.core.checks.compatibility.django_1_6_0 import check_1_6_compatibilit
 from django.core.checks.compatibility.django_1_7_0 import check_1_7_compatibility
 from django.core.management.base import CommandError
 from django.core.management import call_command
+from django.db.models import Model,ForeignKey
 from django.db.models.fields import NOT_PROVIDED
 from django.test import TestCase
 from django.test.utils import override_settings, override_system_checks
@@ -327,3 +328,31 @@ class SilencingCheckTests(TestCase):
 
         self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
         self.assertEqual(err.getvalue(), '')
+
+
+class CheckFrameworkReservedNamesTests(TestCase):
+    """Tests for the Check framework checks that validate field names.
+    """
+    def setUp(self):
+        """Register a new model that will use the reserved keyword.
+        """
+        class Collection(Model):
+            check = ForeignKey("NewsArticle")
+
+    def tearDown(self):
+        """Unregister the invalid model.
+        """
+        from django.apps import apps
+        apps.all_models[__package__].pop("collection")
+
+    @override_settings(SILENCED_SYSTEM_CHECKS=['fields.E008'])
+    def test_check_as_a_field_name_does_not_raise_an_exception(self):
+        """A ForeignKey field named `check` on a model will return an error
+        during the checks.
+
+        This tests the check for E008. See ticket #23615.
+        """
+        from django.core.checks.model_checks import check_all_models
+        errors = check_all_models()
+        self.assertTrue(errors)
+        self.assertEquals("fields.E008", errors[0].id)
