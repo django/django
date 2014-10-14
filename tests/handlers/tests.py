@@ -88,7 +88,10 @@ class HandlerTests(TestCase):
         environ = RequestFactory().get('/').environ
         environ['HTTP_COOKIE'] = 'x=W\x03c(h]\x8e'
         request = WSGIRequest(environ)
-        self.assertEqual(request.COOKIES, {})
+        # We don't test COOKIES content, as the result might differ between
+        # Python version because parsing invalid content became stricter in
+        # latest versions.
+        self.assertIsInstance(request.COOKIES, dict)
 
 
 @override_settings(ROOT_URLCONF='handlers.urls')
