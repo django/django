@@ -422,7 +422,7 @@ class Options(object):
         Returns a field instance given a field name. The field can be either a forward
         or reverse field
         """
-        if not apps.ready:
+        if not self.apps.ready:
 
             try:
                 #The Apps registry is still not ready, this means get_field() is not able
