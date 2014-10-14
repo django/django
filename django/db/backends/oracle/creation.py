@@ -3,6 +3,7 @@ import time
 
 from django.conf import settings
 from django.db.backends.creation import BaseDatabaseCreation
+from django.db.utils import DatabaseError
 from django.utils.six.moves import input
 
 
@@ -80,10 +81,22 @@ class DatabaseCreation(BaseDatabaseCreation):
                 if not autoclobber:
                     confirm = input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_NAME)
                 if autoclobber or confirm == 'yes':
+                    if verbosity >= 1:
+                        print("Destroying old test database '%s'..." % self.connection.alias)
                     try:
-                        if verbosity >= 1:
-                            print("Destroying old test database '%s'..." % self.connection.alias)
                         self._execute_test_db_destruction(cursor, parameters, verbosity)
+                    except DatabaseError as e:
+                        if 'ORA-29857' in str(e):
+                            self._handle_objects_preventing_db_destruction(cursor, parameters,
+                                                                           verbosity, autoclobber)
+                        else:
+                            # Ran into a database error that isn't about leftover objects in the tablespace
+                            sys.stderr.write("Got an error destroying the old test database: %s\n" % e)
+                            sys.exit(2)
+                    except Exception as e:
+                        sys.stderr.write("Got an error destroying the old test database: %s\n" % e)
+                        sys.exit(2)
+                    try:
                         self._execute_test_db_creation(cursor, parameters, verbosity)
                     except Exception as e:
                         sys.stderr.write("Got an error recreating the test database: %s\n" % e)
@@ -127,6 +140,41 @@ class DatabaseCreation(BaseDatabaseCreation):
         real_settings['PASSWORD'] = self.connection.settings_dict['PASSWORD'] = TEST_PASSWD
 
         return self.connection.settings_dict['NAME']
+
+    def _handle_objects_preventing_db_destruction(self, cursor, parameters, verbosity, autoclobber):
+        # There are objects in the test tablespace which prevent dropping it
+        # The easy fix is to drop the test user -- but are we allowed to do so?
+        print("There are objects in the old test database which prevent its destruction.")
+        print("If they belong to the test user, deleting the user will allow the test "
+              "database to be recreated.")
+        print("Otherwise, you will need to find and remove each of these objects, "
+              "or use a different tablespace.\n")
+        if self._test_user_create():
+            if not autoclobber:
+                confirm = input("Type 'yes' to delete user %s: " % parameters['user'])
+            if autoclobber or confirm == 'yes':
+                try:
+                    if verbosity >= 1:
+                        print("Destroying old test user...")
+                    self._destroy_test_user(cursor, parameters, verbosity)
+                except Exception as e:
+                    sys.stderr.write("Got an error destroying the test user: %s\n" % e)
+                    sys.exit(2)
+                try:
+                    if verbosity >= 1:
+                        print("Destroying old test database '%s'..." % self.connection.alias)
+                    self._execute_test_db_destruction(cursor, parameters, verbosity)
+                except Exception as e:
+                    sys.stderr.write("Got an error destroying the test database: %s\n" % e)
+                    sys.exit(2)
+            else:
+                print("Tests cancelled -- test database cannot be recreated.")
+                sys.exit(1)
+        else:
+            print("Django is configured to use pre-existing test user '%s',"
+                  " and will not attempt to delete it.\n" % parameters['user'])
+            print("Tests cancelled -- test database cannot be recreated.")
+            sys.exit(1)
 
     def _destroy_test_db(self, test_database_name, verbosity=1):
         """
