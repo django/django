@@ -56,6 +56,7 @@ Models
 * **models.E015**: ``ordering`` refers to the non-existent field
   ``<field name>``.
 * **models.E017**: Proxy model ``<model>`` contains model fields.
+* **models.E020**: The ``<model>.check()`` class method is currently overridden.
 
 Fields
 ~~~~~~
