@@ -700,6 +700,10 @@ available to the included template::
     This means that there is no shared state between included templates --
     each include is a completely independent rendering process.
 
+    It’s not possible, for example, to define blocks in the
+    current page using the included template, as blocks are evaluated
+    before any includes.
+
 See also: :ttag:`{% ssi %}<ssi>`.
 
 .. templatetag:: load
