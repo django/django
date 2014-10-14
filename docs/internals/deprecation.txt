@@ -65,6 +65,9 @@ about each item can often be found in the release notes of two versions prior.
 * The ``original_content_type_id`` attribute on
   ``django.contrib.admin.helpers.InlineAdminForm`` will be removed.
 
+* The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
+  defined with no default value for its ``form_class`` argument will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

@@ -1,13 +1,39 @@
+import inspect
+import warnings
+
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import models as model_forms
 from django.http import HttpResponseRedirect
+from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
 from django.views.generic.detail import (SingleObjectMixin,
                         SingleObjectTemplateResponseMixin, BaseDetailView)
 
 
-class FormMixin(ContextMixin):
+class FormMixinBase(type):
+    def __new__(cls, name, bases, attrs):
+        get_form = attrs.get('get_form')
+        if get_form and inspect.isfunction(get_form):
+            try:
+                inspect.getcallargs(get_form, None)
+            except TypeError:
+                warnings.warn(
+                    "`%s.%s.get_form` method must define a default value for "
+                    "its `form_class` argument." % (attrs['__module__'], name),
+                    RemovedInDjango20Warning, stacklevel=2
+                )
+
+                def get_form_with_form_class(self, form_class=None):
+                    if form_class is None:
+                        form_class = self.get_form_class()
+                    return get_form(self, form_class=form_class)
+                attrs['get_form'] = get_form_with_form_class
+        return super(FormMixinBase, cls).__new__(cls, name, bases, attrs)
+
+
+class FormMixin(six.with_metaclass(FormMixinBase, ContextMixin)):
     """
     A mixin that provides a way to show and handle a form in a request.
     """
@@ -35,10 +61,12 @@ class FormMixin(ContextMixin):
         """
         return self.form_class
 
-    def get_form(self, form_class):
+    def get_form(self, form_class=None):
         """
         Returns an instance of the form to be used in this view.
         """
+        if form_class is None:
+            form_class = self.get_form_class()
         return form_class(**self.get_form_kwargs())
 
     def get_form_kwargs(self):
@@ -156,8 +184,7 @@ class ProcessFormView(View):
         """
         Handles GET requests and instantiates a blank version of the form.
         """
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
+        form = self.get_form()
         return self.render_to_response(self.get_context_data(form=form))
 
     def post(self, request, *args, **kwargs):
@@ -165,8 +192,7 @@ class ProcessFormView(View):
         Handles POST requests, instantiating a form instance with the passed
         POST variables and then checked for validity.
         """
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
+        form = self.get_form()
         if form.is_valid():
             return self.form_valid(form)
         else:

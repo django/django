@@ -242,6 +242,10 @@ Generic Views
   :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
   so that it'll perform its lookup using both the primary key and the slug.
 
+* The :meth:`~django.views.generic.edit.FormMixin.get_form()` method doesn't
+  require a ``form_class`` to be provided anymore. If not provided ``form_class``
+  defaults to :meth:`~django.views.generic.edit.FormMixin.get_form_class()`.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -892,3 +896,10 @@ The ``original_content_type_id`` attribute on ``InlineAdminForm`` has been
 deprecated and will be removed in Django 2.0. Historically, it was used
 to construct the "view on site" URL. This URL is now accessible using the
 ``absolute_url`` attribute of the form.
+
+``django.views.generic.edit.FormMixin.get_form()``’s ``form_class`` argument
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``FormMixin`` subclasses that override the ``get_form()`` method should make
+sure to provide a default value for the ``form_class`` argument since it's
+now optional.
