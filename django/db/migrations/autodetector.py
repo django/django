@@ -183,6 +183,7 @@ class MigrationAutodetector(object):
         self.generate_altered_fields()
         self.generate_altered_unique_together()
         self.generate_altered_index_together()
+        self.generate_altered_db_table()
         self.generate_altered_order_with_respect_to()
 
         # Now, reordering to make things possible. The order we have already
@@ -909,6 +910,23 @@ class MigrationAutodetector(object):
 
     def generate_altered_index_together(self):
         self._generate_altered_foo_together(operations.AlterIndexTogether)
+
+    def generate_altered_db_table(self):
+        models_to_check = self.kept_model_keys.union(self.kept_proxy_keys).union(self.kept_unmanaged_keys)
+        for app_label, model_name in sorted(models_to_check):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+            old_db_table_name = old_model_state.options.get('db_table')
+            new_db_table_name = new_model_state.options.get('db_table')
+            if old_db_table_name != new_db_table_name:
+                self.add_operation(
+                    app_label,
+                    operations.AlterModelTable(
+                        name=model_name,
+                        table=new_db_table_name,
+                    )
+                )
 
     def generate_altered_options(self):
         """

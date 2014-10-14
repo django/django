@@ -126,3 +126,6 @@ Bugfixes
 
 * Made the Oracle test database creation drop the test user in the event of an
   unclean exit of a previous test run (:ticket:`23649`).
+
+* Fixed :djadmin:`makemigrations` to detect changes to
+  :attr:`Meta.db_table <django.db.models.Options.db_table>` (:ticket:`23629`).
