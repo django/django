@@ -242,7 +242,9 @@ Rollback emulation
 Any initial data loaded in migrations will only be available in ``TestCase``
 tests and not in ``TransactionTestCase`` tests, and additionally only on
 backends where transactions are supported (the most important exception being
-MyISAM).
+MyISAM). This is also true for tests which rely on ``TransactionTestCase``
+such as :class:`LiveServerTestCase` and
+:class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`.
 
 Django can reload that data for you on a per-testcase basis by
 setting the ``serialized_rollback`` option to ``True`` in the body of the
