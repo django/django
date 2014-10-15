@@ -198,8 +198,8 @@ GETTEXT_CASES = (
             for (var x = a in foo && "</x>" || mot ? z/x:3;x<5;y<"REGEX") {xyz(x++);}
         """
     ), (
-        r"""
-            \u1234xyz = gettext('Hello there');
+        """
+            \\u1234xyz = gettext('Hello there');
         """, r"""
             Uu1234xyz = gettext("Hello there");
         """
