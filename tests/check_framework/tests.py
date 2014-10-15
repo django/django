@@ -125,28 +125,28 @@ class Django_1_6_0_CompatibilityChecks(TestCase):
             settings._wrapped._explicit_settings.remove('MANAGERS')
             settings._wrapped._explicit_settings.remove('ADMINS')
 
+    @override_settings(TEST_RUNNER='myapp.test.CustomRunner')
     def test_boolean_field_default_value(self):
-        with self.settings(TEST_RUNNER='myapp.test.CustomRunnner'):
-            # We patch the field's default value to trigger the warning
-            boolean_field = Book._meta.get_field('is_published')
-            old_default = boolean_field.default
-            try:
-                boolean_field.default = NOT_PROVIDED
-                errors = check_1_6_compatibility()
-                expected = [
-                    checks.Warning(
-                        'BooleanField does not have a default value.',
-                        hint=('Django 1.6 changed the default value of BooleanField from False to None. '
-                              'See https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield '
-                              'for more information.'),
-                        obj=boolean_field,
-                        id='1_6.W002',
-                    )
-                ]
-                self.assertEqual(errors, expected)
-            finally:
-                # Restore the ``default``
-                boolean_field.default = old_default
+        # We patch the field's default value to trigger the warning
+        boolean_field = Book._meta.get_field('is_published')
+        old_default = boolean_field.default
+        try:
+            boolean_field.default = NOT_PROVIDED
+            errors = check_1_6_compatibility()
+            expected = [
+                checks.Warning(
+                    'BooleanField does not have a default value.',
+                    hint=('Django 1.6 changed the default value of BooleanField from False to None. '
+                          'See https://docs.djangoproject.com/en/1.6/ref/models/fields/#booleanfield '
+                          'for more information.'),
+                    obj=boolean_field,
+                    id='1_6.W002',
+                )
+            ]
+            self.assertEqual(errors, expected)
+        finally:
+            # Restore the ``default``
+            boolean_field.default = old_default
 
 
 class Django_1_7_0_CompatibilityChecks(TestCase):
