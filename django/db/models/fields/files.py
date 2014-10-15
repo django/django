@@ -1,5 +1,7 @@
 import datetime
+from inspect import getargspec
 import os
+import warnings
 
 from django import forms
 from django.db.models.fields import Field
@@ -11,6 +13,7 @@ from django.db.models import signals
 from django.utils.encoding import force_str, force_text
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 class FieldFile(File):
@@ -85,7 +88,19 @@ class FieldFile(File):
 
     def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
-        self.name = self.storage.save(name, content)
+
+        args, varargs, varkw, defaults = getargspec(self.storage.save)
+        if 'max_length' in args:
+            self.name = self.storage.save(name, content, max_length=self.field.max_length)
+        else:
+            warnings.warn(
+                'Backwards compatibility for storage backends without '
+                'support for the `max_length` argument in '
+                'Storage.save() will be removed in Django 2.0.',
+                RemovedInDjango20Warning, stacklevel=2
+            )
+            self.name = self.storage.save(name, content)
+
         setattr(self.instance, self.field.name, self.name)
 
         # Update the filesize cache
