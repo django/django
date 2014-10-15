@@ -286,7 +286,7 @@ Second, here's an example of a fairly complex logging setup, configured using
                 'level': 'DEBUG',
                 'class': 'logging.NullHandler',
             },
-            'console':{
+            'console': {
                 'level': 'DEBUG',
                 'class': 'logging.StreamHandler',
                 'formatter': 'simple'
