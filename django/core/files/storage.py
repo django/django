@@ -34,7 +34,7 @@ class Storage(object):
         """
         return self._open(name, mode)
 
-    def save(self, name, content, max_length=100):
+    def save(self, name, content):
         """
         Saves new content to the file specified by name. The content should be
         a proper File object or any python file-like object, ready to be read
@@ -47,7 +47,7 @@ class Storage(object):
         if not hasattr(content, 'chunks'):
             content = File(content)
 
-        name = self.get_available_name(name, max_length=max_length)
+        name = self.get_available_name(name)
         name = self._save(name, content)
 
         # Store filenames with forward slashes, even on Windows
@@ -62,7 +62,7 @@ class Storage(object):
         """
         return get_valid_filename(name)
 
-    def get_available_name(self, name, max_length=100):
+    def get_available_name(self, name):
         """
         Returns a filename that's free on the target storage system, and
         available for new content to be written to.
@@ -72,24 +72,10 @@ class Storage(object):
         # If the filename already exists, add an underscore and a random 7
         # character alphanumeric string (before the file extension, if one
         # exists) to the filename until the generated filename doesn't exist.
-        # Then check the new filename does not exceed max_length.
         while self.exists(name):
-            # File_ext includes the dot.
+            # file_ext includes the dot.
             name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
-            # Truncating file_root if max_length exceeded.
-            truncation = len(name) - max_length
-            if truncation:
-                file_root = file_root[:-truncation]
-                # Entire file_root was truncated down in attempt to find a unique
-                # filename. This typically indicates that max_length is too small
-                # and/or that big chunk of it is taken by dir_name and file_ext.
-                if not file_root:
-                    raise SuspiciousFileOperation(
-                        'Storage can not generate a unique filename for "%s". Make sure '
-                        'that the corresponding file field allows sufficient max_length.' % name
-                    )
-                # Testing truncated name.
-                name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
+
         return name
 
     def path(self, name):

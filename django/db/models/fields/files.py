@@ -83,10 +83,9 @@ class FieldFile(File):
     # to further manipulate the underlying file, as well as update the
     # associated model instance.
 
-    def save(self, name, content, save=True, max_length=100):
+    def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
-        max_length = self.field.max_length or max_length
-        self.name = self.storage.save(name, content, max_length=max_length)
+        self.name = self.storage.save(name, content)
         setattr(self.instance, self.field.name, self.name)
 
         # Update the filesize cache
@@ -298,7 +297,7 @@ class FileField(Field):
         file = super(FileField, self).pre_save(model_instance, add)
         if file and not file._committed:
             # Commit the file to storage prior to saving the model
-            file.save(file.name, file, save=False, max_length=self.max_length)
+            file.save(file.name, file, save=False)
         return file
 
     def contribute_to_class(self, cls, name, **kwargs):

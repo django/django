@@ -407,7 +407,7 @@ class FileStorageTests(unittest.TestCase):
 
 
 class CustomStorage(FileSystemStorage):
-    def get_available_name(self, name, max_length=100):
+    def get_available_name(self, name):
         """
         Append numbers to duplicate files rather than underscores, like Trac.
         """
@@ -499,21 +499,6 @@ class FileFieldStorageTests(unittest.TestCase):
             names = [o.normal.name for o in objs]
             self.assertEqual(names[0], "tests/multiple_files.txt")
             six.assertRegex(self, names[1], "tests/multiple_files_%s.txt" % FILE_SUFFIX_REGEX)
-        finally:
-            for o in objs:
-                o.delete()
-
-    def test_file_truncation(self):
-        # Given the max_length is limited, when multiple files get uploaded under the same name,
-        # then the names get truncated and _(7 random chars) appended to them.
-        objs = [Storage() for i in range(5)]
-        for o in objs:
-            o.limited_length.save("multiple_files.txt", ContentFile("Same Content"))
-        try:
-            names = [o.limited_length.name for o in objs]
-            self.assertEqual(names[0], "tests/multiple_files.txt")
-            for name in names[1:]:
-                six.assertRegex(self, name, "tests/multip_%s.txt" % FILE_SUFFIX_REGEX)
         finally:
             for o in objs:
                 o.delete()

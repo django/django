@@ -31,4 +31,3 @@ class Storage(models.Model):
     random = models.FileField(storage=temp_storage, upload_to=random_upload_to)
     default = models.FileField(storage=temp_storage, upload_to='tests', default='tests/default.txt')
     empty = models.FileField(storage=temp_storage)
-    limited_length = models.FileField(storage=temp_storage, upload_to='tests', max_length=24)
