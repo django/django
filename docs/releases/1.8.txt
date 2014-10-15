@@ -317,7 +317,15 @@ Email
 File Storage
 ^^^^^^^^^^^^
 
-* ...
+* :meth:`Storage.get_available_name()
+  <django.core.files.storage.Storage.get_available_name>` and
+  :meth:`Storage.save() <django.core.files.storage.Storage.save>`
+  now take a ``max_length`` argument to implement storage-level maximum
+  filename length constraints. Filenames exceeding this argument will get
+  truncated. This prevents a database error when appending a unique suffix to a
+  long filename that already exists on the storage. See the :ref:`deprecation
+  note <storage-max-length-update>` about adding this argument to your custom
+  storage classes.
 
 File Uploads
 ^^^^^^^^^^^^
@@ -1431,6 +1439,17 @@ loader that inherits ``BaseLoader``, you must inherit ``Loader`` instead.
 
 Private API ``django.test.utils.TestTemplateLoader`` is deprecated in favor of
 ``django.template.loaders.locmem.Loader``.
+
+.. _storage-max-length-update:
+
+Support for the ``max_length`` argument on custom ``Storage`` classes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``Storage`` subclasses should add ``max_length=None`` as a parameter to
+:meth:`~django.core.files.storage.Storage.get_available_name` and/or
+:meth:`~django.core.files.storage.Storage.save` if they override either method.
+Support for storages that do not accept this argument will be removed in
+Django 2.0.
 
 ``qn`` replaced by ``compiler``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
