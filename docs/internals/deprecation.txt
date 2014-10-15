@@ -140,6 +140,9 @@ details on these changes.
 
 * The ``ssi`` template tag will be removed.
 
+* The backwards compatibility shim to allow ``Storage.get_available_name()`` to be
+  defined with no default value for its ``max_length`` argument will be removed.
+
 .. _deprecation-removed-in-1.9:
 
 1.9

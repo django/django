@@ -1,5 +1,8 @@
 import datetime
 import os
+import warnings
+
+from inspect import getargspec
 
 from django import forms
 from django.db.models.fields import Field
@@ -11,6 +14,7 @@ from django.db.models import signals
 from django.utils.encoding import force_str, force_text
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 class FieldFile(File):
@@ -83,9 +87,21 @@ class FieldFile(File):
     # to further manipulate the underlying file, as well as update the
     # associated model instance.
 
-    def save(self, name, content, save=True):
+    def save(self, name, content, save=True, **kwargs):
         name = self.field.generate_filename(self.instance, name)
-        self.name = self.storage.save(name, content)
+
+        args, varargs, varkw, defaults = getargspec(self.storage.save)
+        if 'max_length' in args:
+            max_length = kwargs.get('max_length', self.field.max_length)
+            self.name = self.storage.save(name, content, max_length=max_length)
+        else:
+            warnings.warn(
+                'Backwards compatibility for storage backends without '
+                'support for `max_length` will be removed in Django 2.0.',
+                RemovedInDjango20Warning, stacklevel=2
+            )
+            self.name = self.storage.save(name, content)
+
         setattr(self.instance, self.field.name, self.name)
 
         # Update the filesize cache
@@ -297,7 +313,7 @@ class FileField(Field):
         file = super(FileField, self).pre_save(model_instance, add)
         if file and not file._committed:
             # Commit the file to storage prior to saving the model
-            file.save(file.name, file, save=False)
+            file.save(file.name, file, save=False, max_length=self.max_length)
         return file
 
     def contribute_to_class(self, cls, name, **kwargs):

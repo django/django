@@ -114,15 +114,30 @@ The Storage Class
         in the storage system, or ``False`` if the name is available for a new
         file.
 
-    .. method:: get_available_name(name)
+    .. method:: get_available_name(name, max_length=100)
 
         Returns a filename based on the ``name`` parameter that's free and
         available for new content to be written to on the target storage
-        system.
+        system. The new filename length will not exceed ``max_length``, that is
+        100 by default, which matches similar argument of
+        :class:`~django.db.models.FileField`.
 
         If a file with ``name`` already exists, an underscore plus a random
         7 character alphanumeric string is appended to the filename before
         the extension.
+
+        .. versionchanged:: 1.8
+
+            Added ``max_length`` argument to implement maximum filename length
+            constraint. Filenames exceeding this argument will get truncated.
+
+            Previously, when a file was uploaded to a field, if its length was
+            close to the field's ``max_length``, and such filename already
+            presented on the storage, appending an underscore and a char-sequence
+            to the filename could cause a database-level error.
+
+            If no free unique filename is available, :exc:`SuspiciousFileOperation
+            <SuspiciousOperation>` exception will be raised.
 
         .. versionchanged:: 1.7
 

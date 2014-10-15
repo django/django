@@ -728,7 +728,7 @@ associated with this instance in the mode specified by ``mode``.
 Behaves like the standard Python ``file.close()`` method and closes the file
 associated with this instance.
 
-.. method:: FieldFile.save(name, content, save=True)
+.. method:: FieldFile.save(name, content, save=True, **kwargs)
 
 This method takes a filename and file contents and passes them to the storage
 class for the field, then associates the stored file with the model field.
@@ -737,10 +737,9 @@ If you want to manually associate file data with
 method is used to persist that file data.
 
 Takes two required arguments: ``name`` which is the name of the file, and
-``content`` which is an object containing the file's contents.  The
-optional ``save`` argument controls whether or not the model instance is
-saved after the file associated with this field has been altered. Defaults to
-``True``.
+``content`` which is an object containing the file's contents.  The optional
+``save`` argument controls whether or not the model instance is saved after
+the file associated with this field has been altered. Defaults to ``True``.
 
 Note that the ``content`` argument should be an instance of
 :class:`django.core.files.File`, not Python's built-in file object.
@@ -758,6 +757,11 @@ Or you can construct one from a Python string like this::
     myfile = ContentFile("hello world")
 
 For more information, see :doc:`/topics/files`.
+
+.. versionchanged:: 1.8
+
+    Added ``**kwargs`` to pass extra arguments to the storage. This allows
+    to implement maximum filename length constraint on the storage.
 
 .. method:: FieldFile.delete(save=True)
 
