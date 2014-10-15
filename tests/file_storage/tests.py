@@ -504,23 +504,19 @@ class FileFieldStorageTests(unittest.TestCase):
                 o.delete()
 
     def test_file_truncation(self):
-        # Multiple files with the same name and limited max_length get truncated
-        # before _N appended to them.
+        # Given the max_length is limited, when multiple files get uploaded under the same name,
+        # then the names get truncated and _(7 random chars) appended to them.
         objs = [Storage() for i in range(5)]
         for o in objs:
             o.limited_length.save("multiple_files.txt", ContentFile("Same Content"))
-        self.assertEqual(
-            [o.limited_length.name for o in objs],
-            [
-                "tests/multiple_files.txt",
-                "tests/multiple_file.txt",
-                "tests/multiple_fil.txt",
-                "tests/multiple_fil_1.txt",
-                "tests/multiple_fil_2.txt"
-            ]
-        )
-        for o in objs:
-            o.delete()
+        try:
+            names = [o.limited_length.name for o in objs]
+            self.assertEqual(names[0], "tests/multiple_files.txt")
+            for name in names[1:]:
+                six.assertRegex(self, name, "tests/multip_%s.txt" % FILE_SUFFIX_REGEX)
+        finally:
+            for o in objs:
+                o.delete()
 
     def test_filefield_default(self):
         # Default values allow an object to access a single file.

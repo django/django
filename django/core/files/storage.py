@@ -72,9 +72,24 @@ class Storage(object):
         # If the filename already exists, add an underscore and a random 7
         # character alphanumeric string (before the file extension, if one
         # exists) to the filename until the generated filename doesn't exist.
+        # Then check the new filename does not exceed max_length.
         while self.exists(name):
-            # file_ext includes the dot.
+            # File_ext includes the dot.
             name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
+            # Truncating file_root if max_length exceeded.
+            truncation = len(name) - max_length
+            if truncation:
+                file_root = file_root[:-truncation]
+                # Entire file_root was truncated down in attempt to find a unique
+                # filename. This typically indicates that max_length is too small
+                # and/or that big chunk of it is taken by dir_name and file_ext.
+                if not file_root:
+                    raise SuspiciousFileOperation(
+                        'Storage can not generate a unique filename for "%s". Make sure '
+                        'that the corresponding file field allows sufficient max_length.' % name
+                    )
+                # Testing truncated name.
+                name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
         return name
 
     def path(self, name):
